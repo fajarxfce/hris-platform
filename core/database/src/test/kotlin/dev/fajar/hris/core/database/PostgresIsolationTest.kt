@@ -221,4 +221,57 @@ class PostgresIsolationTest {
             }
         assertEquals(Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied")), result)
     }
+
+    @Test
+    fun queryTimeoutRollsBackAndTransactionSettingsDoNotLeak() {
+        val bounded =
+            PostgresTransactionRunner(
+                JdbcTransactionManager(pool),
+                jdbc,
+                java.time.Duration.ofMillis(150),
+                java.time.Duration.ofMillis(100),
+            )
+        val result =
+            bounded.run(actor(companyA)) {
+                safeDatabaseCall {
+                    jdbc.update("update companies set name='Timed out' where id=?", companyA)
+                    jdbc.queryForObject("select pg_sleep(1)", String::class.java)
+                }
+            }
+        assertEquals(Result.Failed(Failure(FailureKind.UNAVAILABLE, "database_busy")), result)
+        assertEquals(
+            "Company A",
+            admin.queryForObject(
+                "select name from companies where id=?",
+                String::class.java,
+                companyA,
+            ),
+        )
+        assertEquals("0", jdbc.queryForObject("show statement_timeout", String::class.java))
+        assertEquals("0", jdbc.queryForObject("show lock_timeout", String::class.java))
+        assertEquals(0, jdbc.queryForObject("select count(*) from companies", Int::class.java))
+    }
+
+    @Test
+    fun lateInterruptionRollsBackEvenWhenTheOperationReturnsSuccess() {
+        try {
+            assertThrows(InterruptedException::class.java) {
+                transactions.run(actor(companyB)) {
+                    jdbc.update("update companies set name='Late success' where id=?", companyB)
+                    Thread.currentThread().interrupt()
+                    Result.Success(Unit)
+                }
+            }
+        } finally {
+            Thread.interrupted()
+        }
+        assertEquals(
+            "Company B",
+            admin.queryForObject(
+                "select name from companies where id=?",
+                String::class.java,
+                companyB,
+            ),
+        )
+    }
 }

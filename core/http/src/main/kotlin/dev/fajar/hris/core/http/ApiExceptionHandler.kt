@@ -35,10 +35,27 @@ class ApiExceptionHandler {
     @ExceptionHandler(
         HttpMessageNotReadableException::class,
         MethodArgumentNotValidException::class,
+        org.springframework.beans.TypeMismatchException::class,
     )
-    fun invalid(): ProblemDetail =
-        ProblemDetail.forStatus(HttpStatus.BAD_REQUEST).apply {
-            setProperty("code", "invalid_request")
+    fun invalid(error: Exception): ProblemDetail {
+        val tooLarge =
+            generateSequence<Throwable>(error) { it.cause }
+                .take(16)
+                .any { it is RequestBodyTooLargeException }
+        return ProblemDetail.forStatus(
+                if (tooLarge) HttpStatus.CONTENT_TOO_LARGE else HttpStatus.BAD_REQUEST
+            )
+            .apply {
+                setProperty("code", if (tooLarge) "request_body_too_large" else "invalid_request")
+                setProperty("correlationId", org.slf4j.MDC.get("correlationId"))
+            }
+    }
+
+    @ExceptionHandler(RequestBodyTooLargeException::class)
+    fun tooLarge(): ProblemDetail =
+        ProblemDetail.forStatus(HttpStatus.CONTENT_TOO_LARGE).apply {
+            setProperty("code", "request_body_too_large")
+            setProperty("correlationId", org.slf4j.MDC.get("correlationId"))
         }
 
     @ExceptionHandler(Exception::class)

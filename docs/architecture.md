@@ -18,7 +18,7 @@ JDK 21, Spring Boot 4.1, Kotlin 2.3, Spring MVC, PostgreSQL 18, Flyway, and jOOQ
 
 Domain Result carries typed failures. Stateless safeDatabaseCall and storage/SDK-specific boundaries map technical exceptions once, preserve interruption/cancellation, and do not retry. False/null outcomes have operation-specific semantics.
 
-TransactionRunner is a domain port implemented using Spring transactions. A failed Result marks rollback. Request-scoped company context is installed using SET LOCAL and does not leak through pooled connections. Runtime credentials cannot bypass RLS; migration credentials are separate.
+TransactionRunner is a domain port implemented using Spring transactions. A failed Result marks rollback. Request-scoped company context is installed using SET LOCAL and does not leak through pooled connections. Runtime credentials cannot bypass RLS; migration credentials are separate. Business transactions set local query (15 seconds), lock (5 seconds), and idle-transaction (30 seconds) timeouts with a 30-second transaction budget. A late interruption before commit rolls back and propagates cancellation. Mapping failures become sanitized data failures; internal diagnostics retain SQLState and application call frames, never SQL text or bound values.
 
 Business changes, audit, outbox, and idempotency receipts share their transaction. Receipt keys bind company, actor, operation, and payload hash. Repeated identical commands return the committed outcome; key/payload mismatches fail. Optimistic versions reject obsolete updates. A lost response never implies that the transaction rolled back.
 

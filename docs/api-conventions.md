@@ -8,7 +8,7 @@ Creation and versioned changes use a UUID `Idempotency-Key` header. A key is sco
 
 Updates send the last observed `version`. HTTP 409 `stale_version` requires reading the resource again before applying a new command. Blindly replacing the version and retrying can overwrite somebody else's intent. Receipt handling and optimistic locking run inside the same database transaction as the business mutation, audit, and outbox insertion.
 
-Problems contain a stable `code`, optional field codes, and a correlation ID. HTTP 400 means malformed input, 422 a domain validation failure, 401 authentication required, 403 denied scope, 404 missing resource, 409 conflict, 503 a temporarily unavailable dependency, and 500 an unexpected failure. Driver errors and credentials are not response content.
+Problems contain a stable `code`, optional field codes, and a correlation ID. HTTP 400 means malformed input, 422 a domain validation failure, 401 authentication required, 403 denied scope, 404 missing resource, 409 conflict, 503 a temporarily unavailable dependency, and 500 an unexpected failure. Driver errors and credentials are not response content. Malformed path/query/header values return 400 with a correlation ID. JSON bodies are limited to 1 MiB based on actual bytes, including chunked requests; larger bodies return 413. Upload streams use their separate document limits.
 
 Company setup:
 

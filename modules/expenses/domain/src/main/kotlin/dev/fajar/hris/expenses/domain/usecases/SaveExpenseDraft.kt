@@ -122,7 +122,7 @@ class SaveExpenseDraft(
                 val capacity = claims.capacity(company, actor.accountId)
                 if (capacity is Result.Failed) return@run capacity
                 val usage = (capacity as Result.Success).value
-                if (usage.companyDrafts >= 1000 || usage.actorDrafts >= 50)
+                if (usage.companyOpenClaims >= 1000 || usage.actorOpenClaims >= 50)
                     return@run Result.Failed(
                         Failure(FailureKind.RATE_LIMITED, "expense_draft_capacity")
                     )

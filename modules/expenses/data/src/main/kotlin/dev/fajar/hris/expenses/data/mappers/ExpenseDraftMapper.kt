@@ -15,6 +15,8 @@ fun ExpenseClaimsRecord.toClaim(): ExpenseClaim =
         requireNotNull(version),
         requireNotNull(draftRevision),
         ExpenseClaimStatus.valueOf(requireNotNull(status)),
+        requireNotNull(submissionCount),
+        latestSubmissionId,
     )
 
 fun ExpenseDraftsRecord.toDraft(
@@ -58,6 +60,7 @@ fun ExpenseClaimChangesRecord.toChange(): ExpenseClaimChange =
         requireNotNull(actorId),
         requireNotNull(reason),
         requireNotNull(recordedAt).toInstant(),
+        submissionId,
     )
 
 fun ExpenseClaimSummaryRow.toSummary() =
@@ -83,6 +86,8 @@ fun ExpenseClaim.toRecord(company: UUID): ExpenseClaimsRecord =
         it.version = version
         it.draftRevision = draftRevision
         it.status = status.name
+        it.submissionCount = submissionCount
+        it.latestSubmissionId = latestSubmissionId
     }
 
 fun ExpenseDraft.toRecord(company: UUID): ExpenseDraftsRecord =
@@ -142,4 +147,5 @@ fun ExpenseClaimChange.toRecord(company: UUID): ExpenseClaimChangesRecord =
         it.actorId = actorId
         it.reason = reason
         it.recordedAt = recordedAt.atOffset(ZoneOffset.UTC)
+        it.submissionId = submissionId
     }

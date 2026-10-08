@@ -11,4 +11,6 @@ data class ExpenseClaim(
     val version: Long,
     val draftRevision: Int,
     val status: ExpenseClaimStatus,
+    val submissionCount: Int = 0,
+    val latestSubmissionId: UUID? = null,
 )

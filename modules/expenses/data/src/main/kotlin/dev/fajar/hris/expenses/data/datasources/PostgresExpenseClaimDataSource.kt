@@ -22,7 +22,7 @@ class PostgresExpenseClaimDataSource(private val sql: DSLContext) : ExpenseClaim
         sql.select(DSL.count(), DSL.count().filterWhere(C.CREATED_BY.eq(account)))
             .from(C)
             .where(C.COMPANY_ID.eq(company))
-            .and(C.STATUS.eq("DRAFT"))
+            .and(C.STATUS.`in`("DRAFT", "PENDING"))
             .fetchSingle { ExpenseCapacityRow(it.value1(), it.value2()) }
 
     override fun find(company: UUID, id: UUID): ExpenseClaimsRecord? =
@@ -173,6 +173,36 @@ class PostgresExpenseClaimDataSource(private val sql: DSLContext) : ExpenseClaim
         sql.update(C)
             .set(C.VERSION, version + 1)
             .set(C.STATUS, "CANCELLED")
+            .where(C.COMPANY_ID.eq(company))
+            .and(C.ID.eq(id))
+            .and(C.VERSION.eq(version))
+            .returning(C.VERSION)
+            .fetchOne()
+            ?.version
+
+    override fun submit(
+        company: UUID,
+        id: UUID,
+        version: Long,
+        submission: UUID,
+        number: Int,
+    ): Long? =
+        sql.update(C)
+            .set(C.VERSION, version + 1)
+            .set(C.STATUS, "PENDING")
+            .set(C.LATEST_SUBMISSION_ID, submission)
+            .set(C.SUBMISSION_COUNT, number)
+            .where(C.COMPANY_ID.eq(company))
+            .and(C.ID.eq(id))
+            .and(C.VERSION.eq(version))
+            .returning(C.VERSION)
+            .fetchOne()
+            ?.version
+
+    override fun withdraw(company: UUID, id: UUID, version: Long): Long? =
+        sql.update(C)
+            .set(C.VERSION, version + 1)
+            .set(C.STATUS, "DRAFT")
             .where(C.COMPANY_ID.eq(company))
             .and(C.ID.eq(id))
             .and(C.VERSION.eq(version))

@@ -10,6 +10,36 @@ interface ExpenseClaimRepository {
 
     fun capacity(companyId: UUID, accountId: UUID): Result<ExpenseClaimCapacity>
 
+    fun contributors(companyId: UUID, claimId: UUID): Result<Set<UUID>>
+
+    fun submission(companyId: UUID, id: UUID): Result<ExpenseSubmission?>
+
+    fun submissions(
+        companyId: UUID,
+        claimId: UUID,
+        after: Int?,
+        limit: Int,
+    ): Result<Page<ExpenseSubmissionSummary>>
+
+    fun duplicateReceiptDigests(
+        companyId: UUID,
+        exceptClaimId: UUID,
+        digests: Set<String>,
+    ): Result<Set<String>>
+
+    fun submit(
+        actor: Actor,
+        claim: ExpenseClaim,
+        submission: ExpenseSubmission,
+    ): Result<MutationReceipt>
+
+    fun withdraw(
+        actor: Actor,
+        claim: ExpenseClaim,
+        reason: String,
+        at: Instant,
+    ): Result<MutationReceipt>
+
     fun find(companyId: UUID, id: UUID): Result<ExpenseClaim?>
 
     fun draft(companyId: UUID, id: UUID, revision: Int): Result<ExpenseDraft?>

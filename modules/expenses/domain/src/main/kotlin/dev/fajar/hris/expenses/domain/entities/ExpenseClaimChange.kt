@@ -12,4 +12,5 @@ data class ExpenseClaimChange(
     val actorId: UUID,
     val reason: String,
     val recordedAt: Instant,
+    val submissionId: UUID? = null,
 )

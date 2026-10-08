@@ -12,4 +12,6 @@ data class ExpenseClaimResponse(
     val draftRevision: Int,
     val status: String,
     val draft: ExpenseDraftResponse,
+    val submissionCount: Int,
+    val latestSubmissionId: UUID?,
 )

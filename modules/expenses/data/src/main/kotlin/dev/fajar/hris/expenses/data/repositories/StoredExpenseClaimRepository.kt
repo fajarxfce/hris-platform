@@ -3,6 +3,7 @@ package dev.fajar.hris.expenses.data.repositories
 import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.expenses.data.datasources.ExpenseClaimDataSource
+import dev.fajar.hris.expenses.data.datasources.ExpenseSubmissionDataSource
 import dev.fajar.hris.expenses.data.mappers.*
 import dev.fajar.hris.expenses.domain.entities.*
 import dev.fajar.hris.expenses.domain.repositories.ExpenseClaimRepository
@@ -10,14 +11,130 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.util.UUID
 
-class StoredExpenseClaimRepository(private val source: ExpenseClaimDataSource) :
-    ExpenseClaimRepository {
+class StoredExpenseClaimRepository(
+    private val source: ExpenseClaimDataSource,
+    private val submissions: ExpenseSubmissionDataSource,
+) : ExpenseClaimRepository {
+    override fun contributors(companyId: UUID, claimId: UUID): Result<Set<UUID>> =
+        safeDatabaseCall {
+            submissions.contributors(companyId, claimId)
+        }
+
+    override fun submission(companyId: UUID, id: UUID): Result<ExpenseSubmission?> =
+        safeDatabaseCall {
+            submissions.find(companyId, id)?.let { row ->
+                val draft =
+                    requireNotNull(
+                        source.draft(
+                            companyId,
+                            requireNotNull(row.claimId),
+                            requireNotNull(row.draftRevision),
+                        )
+                    )
+                row.toSubmission(
+                    draft,
+                    submissions.lines(companyId, id),
+                    submissions.receipts(companyId, id),
+                )
+            }
+        }
+
+    override fun submissions(
+        companyId: UUID,
+        claimId: UUID,
+        after: Int?,
+        limit: Int,
+    ): Result<Page<ExpenseSubmissionSummary>> = safeDatabaseCall {
+        val rows = submissions.list(companyId, claimId, after, limit + 1)
+        Page(
+            rows.take(limit).map { it.toSubmissionSummary() },
+            if (rows.size > limit) rows[limit - 1].number.toString() else null,
+        )
+    }
+
+    override fun duplicateReceiptDigests(
+        companyId: UUID,
+        exceptClaimId: UUID,
+        digests: Set<String>,
+    ): Result<Set<String>> = safeDatabaseCall {
+        submissions.duplicateDigests(companyId, exceptClaimId, digests)
+    }
+
+    override fun submit(
+        actor: Actor,
+        claim: ExpenseClaim,
+        submission: ExpenseSubmission,
+    ): Result<MutationReceipt> =
+        safeDatabaseCall {
+                source.submit(
+                    requireNotNull(actor.companyId),
+                    claim.id,
+                    claim.version,
+                    submission.id,
+                    submission.number,
+                )
+            }
+            .requireCurrentVersion()
+            .flatMap { version ->
+                safeDatabaseCall {
+                    val company = requireNotNull(actor.companyId)
+                    submissions.insert(submission.toRecord(company))
+                    submissions.insertLines(submission.submittedLineRecords(company))
+                    submissions.insertReceipts(submission.submittedReceiptRecords(company))
+                    source.appendChange(
+                        ExpenseClaimChange(
+                                claim.id,
+                                version,
+                                claim.draftRevision,
+                                ExpenseClaimStatus.PENDING,
+                                ExpenseClaimChangeKind.SUBMITTED,
+                                actor.accountId,
+                                submission.reason,
+                                submission.submittedAt,
+                                submission.id,
+                            )
+                            .toRecord(company)
+                    )
+                    MutationReceipt(claim.id, version)
+                }
+            }
+
+    override fun withdraw(
+        actor: Actor,
+        claim: ExpenseClaim,
+        reason: String,
+        at: Instant,
+    ): Result<MutationReceipt> =
+        safeDatabaseCall {
+                source.withdraw(requireNotNull(actor.companyId), claim.id, claim.version)
+            }
+            .requireCurrentVersion()
+            .flatMap { version ->
+                safeDatabaseCall {
+                    source.appendChange(
+                        ExpenseClaimChange(
+                                claim.id,
+                                version,
+                                claim.draftRevision,
+                                ExpenseClaimStatus.DRAFT,
+                                ExpenseClaimChangeKind.WITHDRAWN,
+                                actor.accountId,
+                                reason,
+                                at,
+                                claim.latestSubmissionId,
+                            )
+                            .toRecord(requireNotNull(actor.companyId))
+                    )
+                    MutationReceipt(claim.id, version)
+                }
+            }
+
     override fun lock(companyId: UUID): Result<Unit> = safeDatabaseCall { source.lock(companyId) }
 
     override fun capacity(companyId: UUID, accountId: UUID): Result<ExpenseClaimCapacity> =
         safeDatabaseCall {
             source.capacity(companyId, accountId).let {
-                ExpenseClaimCapacity(it.companyDrafts, it.actorDrafts)
+                ExpenseClaimCapacity(it.companyOpenClaims, it.actorOpenClaims)
             }
         }
 
@@ -120,6 +237,7 @@ class StoredExpenseClaimRepository(private val source: ExpenseClaimDataSource) :
                                 actor.accountId,
                                 draft.reason,
                                 draft.recordedAt,
+                                claim.latestSubmissionId,
                             )
                             .toRecord(company)
                     )
@@ -147,6 +265,7 @@ class StoredExpenseClaimRepository(private val source: ExpenseClaimDataSource) :
                                 actor.accountId,
                                 reason,
                                 at,
+                                claim.latestSubmissionId,
                             )
                             .toRecord(requireNotNull(actor.companyId))
                     )

@@ -1,5 +1,6 @@
 package dev.fajar.hris.expenses.data.di
 
+import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.documents.domain.repositories.DocumentRepository
 import dev.fajar.hris.expenses.data.datasources.*
@@ -64,8 +65,14 @@ class ExpenseConfiguration {
         PostgresExpenseClaimDataSource(sql)
 
     @Bean
-    fun expenseClaims(source: ExpenseClaimDataSource): ExpenseClaimRepository =
-        StoredExpenseClaimRepository(source)
+    fun expenseSubmissionSource(sql: DSLContext): ExpenseSubmissionDataSource =
+        PostgresExpenseSubmissionDataSource(sql)
+
+    @Bean
+    fun expenseClaims(
+        source: ExpenseClaimDataSource,
+        submissions: ExpenseSubmissionDataSource,
+    ): ExpenseClaimRepository = StoredExpenseClaimRepository(source, submissions)
 
     @Bean
     fun saveExpenseDraft(
@@ -160,4 +167,94 @@ class ExpenseConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
     ) = ListExpenseClaims(claims, people, companies, identities, transactions, clock)
+
+    @Bean
+    fun submitExpenseClaim(
+        claims: ExpenseClaimRepository,
+        policies: ExpensePolicyRepository,
+        documents: DocumentRepository,
+        people: PeopleRepository,
+        units: OrganizationRepository,
+        approvals: ApprovalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        SubmitExpenseClaim(
+            claims,
+            policies,
+            documents,
+            people,
+            units,
+            approvals,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun withdrawExpenseSubmission(
+        claims: ExpenseClaimRepository,
+        approvals: ApprovalRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        WithdrawExpenseSubmission(
+            claims,
+            approvals,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun getExpenseSubmission(
+        claims: ExpenseClaimRepository,
+        approvals: ApprovalRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        GetExpenseSubmission(
+            claims,
+            approvals,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun listExpenseSubmissions(
+        claims: ExpenseClaimRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = ListExpenseSubmissions(claims, people, companies, identities, transactions, clock)
 }

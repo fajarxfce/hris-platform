@@ -8,7 +8,7 @@ import java.util.UUID
 import org.junit.jupiter.api.Assertions.*
 import tools.jackson.databind.JsonNode
 
-abstract class ExpenseApiFixture : PeopleApiFixture() {
+abstract class ExpenseApiFixture : DocumentValidationApiFixture() {
     protected data class ExpenseFixture(
         val company: UUID,
         val category: UUID,

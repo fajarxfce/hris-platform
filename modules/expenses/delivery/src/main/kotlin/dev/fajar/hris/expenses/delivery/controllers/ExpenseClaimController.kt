@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/companies/{companyId}/expenses/claims")
 class ExpenseClaimController(
     private val save: SaveExpenseDraft,
+    private val submit: SubmitExpenseClaim,
+    private val submissions: ListExpenseSubmissions,
     private val cancel: CancelExpenseDraft,
     private val get: GetExpenseClaim,
     private val list: ListExpenseClaims,
@@ -29,6 +31,29 @@ class ExpenseClaimController(
         @RequestBody body: SaveExpenseDraftRequest,
     ): MutationResponse =
         save.execute(actor, operationId, body.toCommand(id)).response().toResponse()
+
+    @PostMapping("/{id}/submit")
+    fun submit(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestHeader("Idempotency-Key") operationId: UUID,
+        @RequestBody body: SubmitExpenseClaimRequest,
+    ): MutationResponse =
+        submit
+            .execute(actor, operationId, id, body.submissionId, body.expectedVersion, body.reason)
+            .response()
+            .toResponse()
+
+    @GetMapping("/{id}/submissions")
+    fun submissions(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestParam(required = false) after: Int?,
+        @RequestParam(defaultValue = "20") limit: Int,
+    ): Page<ExpenseSubmissionSummaryResponse> =
+        submissions.execute(actor, id, after, limit).response().let {
+            Page(it.items.map { submission -> submission.toResponse() }, it.nextCursor)
+        }
 
     @PostMapping("/{id}/cancel")
     fun cancel(

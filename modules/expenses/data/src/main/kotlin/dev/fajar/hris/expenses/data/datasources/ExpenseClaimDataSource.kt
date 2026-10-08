@@ -38,6 +38,10 @@ interface ExpenseClaimDataSource {
 
     fun cancel(company: UUID, id: UUID, version: Long): Long?
 
+    fun submit(company: UUID, id: UUID, version: Long, submission: UUID, number: Int): Long?
+
+    fun withdraw(company: UUID, id: UUID, version: Long): Long?
+
     fun append(row: ExpenseDraftsRecord)
 
     fun insertLines(rows: List<ExpenseDraftLinesRecord>)

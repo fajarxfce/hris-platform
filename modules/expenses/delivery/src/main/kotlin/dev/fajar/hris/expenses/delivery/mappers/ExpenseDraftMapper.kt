@@ -64,6 +64,8 @@ fun ExpenseClaimDetails.toResponse() =
         claim.draftRevision,
         claim.status.name,
         draft.toResponse(),
+        claim.submissionCount,
+        claim.latestSubmissionId,
     )
 
 fun ExpenseClaimSummary.toResponse() =
@@ -89,4 +91,5 @@ fun ExpenseClaimChange.toResponse() =
         actorId,
         reason,
         recordedAt,
+        submissionId,
     )

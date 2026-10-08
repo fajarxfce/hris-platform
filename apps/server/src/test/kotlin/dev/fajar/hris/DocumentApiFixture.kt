@@ -150,6 +150,8 @@ abstract class DocumentApiFixture : PeopleApiFixture() {
     @AfterEach
     fun resetDocumentProbe() {
         storageProbe.beforeWrite = null
+        storageProbe.beforeRead = null
+        storageProbe.reads.set(0)
         storageProbe.fail = false
         storageProbe.objects.clear()
         storageProbe.calls.set(0)

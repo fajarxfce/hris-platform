@@ -16,6 +16,8 @@ class DocumentStorageProbe : ObjectStorageDataSource {
     val calls = AtomicInteger()
     @Volatile var beforeWrite: ((String) -> Unit)? = null
     @Volatile var fail = false
+    @Volatile var beforeRead: (() -> Unit)? = null
+    val reads = AtomicInteger()
 
     override fun put(key: String, bytes: ByteArray, sha256: String): ObjectMetadataData {
         check(!TransactionSynchronizationManager.isActualTransactionActive())
@@ -33,6 +35,8 @@ class DocumentStorageProbe : ObjectStorageDataSource {
 
     override fun read(key: String, offset: Long, length: Int, etag: String): ByteArray {
         check(!TransactionSynchronizationManager.isActualTransactionActive())
+        beforeRead?.invoke()
+        reads.incrementAndGet()
         return objects.getValue(key).bytes.copyOfRange(offset.toInt(), offset.toInt() + length)
     }
 
@@ -44,6 +48,7 @@ class DocumentStorageProbe : ObjectStorageDataSource {
     override fun close() {
         objects.clear()
         beforeWrite = null
+        beforeRead = null
     }
 }
 

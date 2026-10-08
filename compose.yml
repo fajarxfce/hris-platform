@@ -79,6 +79,7 @@ services:
         condition: service_completed_successfully
     init: true
     restart: unless-stopped
+    stop_grace_period: 90s
     mem_limit: 2g
   worker:
     build:

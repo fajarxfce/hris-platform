@@ -1,6 +1,5 @@
 package dev.fajar.hris.core.http
 
-import dev.fajar.hris.core.domain.FailureKind
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
@@ -15,17 +14,7 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(DomainFailureException::class)
     fun domain(error: DomainFailureException): ProblemDetail {
-        val status =
-            when (error.failure.kind) {
-                FailureKind.VALIDATION -> HttpStatus.UNPROCESSABLE_CONTENT
-                FailureKind.NOT_FOUND -> HttpStatus.NOT_FOUND
-                FailureKind.CONFLICT -> HttpStatus.CONFLICT
-                FailureKind.FORBIDDEN -> HttpStatus.FORBIDDEN
-                FailureKind.UNAUTHENTICATED -> HttpStatus.UNAUTHORIZED
-                FailureKind.RATE_LIMITED -> HttpStatus.TOO_MANY_REQUESTS
-                FailureKind.UNAVAILABLE -> HttpStatus.SERVICE_UNAVAILABLE
-                FailureKind.UNEXPECTED -> HttpStatus.INTERNAL_SERVER_ERROR
-            }
+        val status = failureHttpStatus(error.failure.kind)
         return ProblemDetail.forStatus(status).apply {
             setProperty("correlationId", org.slf4j.MDC.get("correlationId"))
             setProperty("code", error.failure.code)

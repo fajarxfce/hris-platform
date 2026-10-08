@@ -234,4 +234,21 @@ class DocumentsConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
     ) = GetDocumentValidationAttempts(documents, profiles, identities, transactions)
+
+    @Bean
+    fun getDocumentDownload(
+        documents: DocumentRepository,
+        profiles: PersonProfileRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetDocumentDownload(documents, profiles, identities, transactions)
+
+    @Bean
+    fun readDocumentContent(
+        documents: DocumentRepository,
+        profiles: PersonProfileRepository,
+        identities: IdentityRepository,
+        storage: ObjectStorageRepository,
+        transactions: TransactionRunner,
+    ) = ReadDocumentContent(documents, profiles, identities, storage, transactions)
 }

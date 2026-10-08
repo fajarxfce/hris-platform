@@ -12,7 +12,7 @@ Acceptance: offset/lost-response recovery, wrong version/range, permission revoc
 
 ## Resumable upload API
 
-The upload/status/cancellation and durable validation APIs are implemented. Uploading all bytes does not publish a revision; only a completed, accepted inspection sets `READY`. Downloads are the next slice.
+The upload/status/cancellation and durable validation APIs are implemented. Uploading all bytes does not publish a revision; only a completed, accepted inspection sets `READY`. Authorized downloads are available for ready revisions.
 
 Company routes use `/api/v1/companies/{companyId}/documents`. `POST /uploads` accepts stable document/revision UUIDs, employment ID, title, classification, expected document version, file name, media type, size, SHA-256, and reason. Use `Idempotency-Key` for every command. Metadata/history use `GET /{documentId}`, `GET /{documentId}/revisions`, and `GET /revisions/{revisionId}`. Lists require an `employmentId` and support bounded cursors.
 
@@ -45,3 +45,13 @@ The worker checks current credentials, company membership, document permission, 
 Accepted object retention, inspection evidence, publication, job checkpoint/completion, and audit commit together. Losing any accepted cleanup registration fails the entire publication. Ready revisions remain immutable and count against company storage quota even after their temporary cleanup rows are removed. Cancelled, expired, and rejected revisions cannot become ready.
 
 Transient infrastructure failures use the existing job retry policy with at most eight lease attempts. An operator can explicitly call `/validate` again after the prior job failed or was cancelled; a revision allows at most eight validation jobs. Crashed/exhausted jobs are projected as failed processing without rewriting their history. An expired upload requires a new revision. Cancelling the upload also requests cancellation of its active validation job. Late results and stale leases cannot publish; a worker can finalize cleanup even after the initiating account loses access.
+
+## Authorized downloads
+
+`GET /revisions/{revisionId}/content` streams a ready revision as an attachment. `HEAD` returns its headers without reading storage. Both requests verify current document scope; knowing a revision UUID or ETag does not grant access. Responses use a strong revision/content ETag, `private, no-store`, `nosniff`, and `Accept-Ranges: bytes`.
+
+One `Range: bytes=start-end`, open-ended range, or suffix is supported. An invalid, unsatisfiable, or multipart range returns an empty 416 with `Content-Range: bytes */size`. `If-Range` uses an exact strong ETag; a different validator returns the full representation. `If-None-Match` can return 304 after authorization. HEAD ignores Range and does not acquire a download slot. Resume a partial download using the same revision and its ETag.
+
+Four concurrent transfers share four owned readers and a bounded queue per API instance. Each response reads one part of at most 1 MiB at a time, verifies its stored digest, and writes in nonblocking 16-KiB slices. Socket backpressure stops additional part reads. No database transaction is held during storage or client I/O, and credentials/company/document scope are checked again after every storage read. A revoked permission prevents that pending part from being emitted. Previously authorized bytes already sent to a client cannot be withdrawn.
+
+Transfers have a 60-second deadline. Saturation returns 429 with `Retry-After: 1`; shutdown returns 503. Errors after metadata authorization may have an empty body. If failure occurs after output starts, the incomplete Content-Length tells the client that the transfer was interrupted; retry only the missing range with a matching validator. Disconnect, timeout, and application shutdown cancel owned reads, release buffers/slots, and discard late results. Reader shutdown waits at most 25 seconds; the API container allows 90 seconds for servlet and resource shutdown. These are configured bounds, not throughput or heap measurements.

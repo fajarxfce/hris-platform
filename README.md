@@ -1,0 +1,20 @@
+# HRIS Platform
+
+A self-hosted HRIS for multi-company organizations, built with Kotlin, Spring Boot, PostgreSQL, and a React dashboard using Fluent UI.
+
+The dashboard follows Azure Portal interaction patterns. Employees use a separate Compose application; the web dashboard serves HR, managers, finance, administrators, and auditors.
+
+## Project status
+
+Implementation is in progress. [Delivery status](docs/delivery.md) distinguishes implemented capabilities from the roadmap. Payroll rules and integrations must pass their documented acceptance checks before operational use.
+
+## Documentation
+
+- [Product and module specification](docs/product.md)
+- [Architecture and ownership](docs/architecture.md)
+- [Dashboard design](docs/dashboard.md)
+- [Delivery and validation](docs/delivery.md)
+
+## License
+
+Apache-2.0.

@@ -1,0 +1,17 @@
+.gradle/
+**/build/
+node_modules/
+dist/
+.work/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*service-account*.json
+.idea/
+.vscode/*.local.json
+playwright-report/
+test-results/

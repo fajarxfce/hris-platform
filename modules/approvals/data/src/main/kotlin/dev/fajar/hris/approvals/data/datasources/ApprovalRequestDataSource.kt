@@ -5,6 +5,8 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 interface ApprovalRequestDataSource {
+    fun lock(companyId: UUID)
+
     fun insert(row: ApprovalRequestsRecord)
 
     fun find(companyId: UUID, id: UUID): ApprovalRequestsRecord?
@@ -13,6 +15,7 @@ interface ApprovalRequestDataSource {
         companyId: UUID,
         accountId: UUID,
         includeBlocked: Boolean,
+        permissionsByKind: Map<String, Set<String>>,
         at: OffsetDateTime,
         after: UUID?,
         limit: Int,

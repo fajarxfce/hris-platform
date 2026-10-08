@@ -7,6 +7,39 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface ApprovalRepository {
+    fun lock(companyId: UUID): Result<Unit>
+
+    fun countTemplates(
+        companyId: UUID,
+        kind: ApprovalKind,
+        activeOnly: Boolean,
+        exceptId: UUID,
+    ): Result<Int>
+
+    fun templatePage(
+        companyId: UUID,
+        kind: ApprovalKind,
+        asOf: LocalDate,
+        after: UUID?,
+        limit: Int,
+    ): Result<Page<ApprovalTemplate>>
+
+    fun countDelegations(
+        companyId: UUID,
+        accountId: UUID,
+        at: Instant,
+        activeOnly: Boolean,
+        exceptId: UUID,
+    ): Result<Int>
+
+    fun delegationPage(
+        companyId: UUID,
+        accountId: UUID,
+        at: Instant,
+        after: UUID?,
+        limit: Int,
+    ): Result<Page<Delegation>>
+
     fun findDelegation(companyId: UUID, id: UUID): Result<Delegation?>
 
     fun findTemplate(companyId: UUID, id: UUID): Result<ApprovalTemplate?>
@@ -27,6 +60,7 @@ interface ApprovalRepository {
         companyId: UUID,
         accountId: UUID,
         includeBlocked: Boolean,
+        kinds: Set<ApprovalKind>,
         at: Instant,
         after: UUID?,
         limit: Int,

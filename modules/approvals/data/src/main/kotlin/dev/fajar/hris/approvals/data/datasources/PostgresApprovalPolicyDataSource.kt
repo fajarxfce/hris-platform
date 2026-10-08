@@ -6,9 +6,26 @@ import dev.fajar.hris.schema.tables.records.*
 import java.time.LocalDate
 import java.util.UUID
 import org.jooq.DSLContext
+import org.jooq.impl.DSL
 
 class PostgresApprovalPolicyDataSource(private val sql: DSLContext) : ApprovalPolicyDataSource {
-    override fun list(companyId: UUID, kind: String, asOf: LocalDate): List<TemplateRow> {
+    override fun count(companyId: UUID, kind: String, activeOnly: Boolean, exceptId: UUID): Int =
+        sql.fetchCount(
+            T,
+            T.COMPANY_ID.eq(companyId)
+                .and(T.KIND.eq(kind))
+                .and(T.ID.ne(exceptId))
+                .and(if (activeOnly) T.ACTIVE.isTrue else DSL.noCondition()),
+        )
+
+    override fun list(
+        companyId: UUID,
+        kind: String,
+        asOf: LocalDate,
+        activeOnly: Boolean,
+        after: UUID?,
+        limit: Int,
+    ): List<TemplateRow> {
         val latest = R.`as`("latest")
         return sql.select(T.asterisk(), R.asterisk())
             .from(T)
@@ -17,6 +34,8 @@ class PostgresApprovalPolicyDataSource(private val sql: DSLContext) : ApprovalPo
             .and(R.TEMPLATE_ID.eq(T.ID))
             .where(T.COMPANY_ID.eq(companyId))
             .and(T.KIND.eq(kind))
+            .and(if (activeOnly) T.ACTIVE.isTrue else DSL.noCondition())
+            .and(after?.let { T.ID.gt(it) } ?: DSL.noCondition())
             .and(
                 R.REVISION.eq(
                     sql.select(latest.REVISION)
@@ -29,6 +48,7 @@ class PostgresApprovalPolicyDataSource(private val sql: DSLContext) : ApprovalPo
                 )
             )
             .orderBy(T.ID)
+            .limit(limit)
             .fetch { TemplateRow(it.into(T), it.into(R)) }
     }
 

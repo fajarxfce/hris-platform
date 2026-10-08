@@ -2,6 +2,7 @@ package dev.fajar.hris.leave.data.di
 
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.leave.data.datasources.*
 import dev.fajar.hris.leave.data.repositories.*
@@ -90,6 +91,7 @@ class LeaveConfiguration {
         companies: CompanyRepository,
         schedules: ScheduleRepository,
         approvals: ApprovalRepository,
+        identities: IdentityRepository,
         members: MembershipRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
@@ -104,6 +106,7 @@ class LeaveConfiguration {
             companies,
             schedules,
             approvals,
+            identities,
             members,
             operations,
             journal,
@@ -116,6 +119,9 @@ class LeaveConfiguration {
         requests: LeaveRequestRepository,
         ledger: LeaveLedgerRepository,
         approvals: ApprovalRepository,
+        identities: IdentityRepository,
+        companies: CompanyRepository,
+        people: PeopleRepository,
         members: MembershipRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
@@ -126,6 +132,9 @@ class LeaveConfiguration {
             requests,
             ledger,
             approvals,
+            identities,
+            companies,
+            people,
             members,
             operations,
             journal,
@@ -138,17 +147,33 @@ class LeaveConfiguration {
         requests: LeaveRequestRepository,
         ledger: LeaveLedgerRepository,
         approvals: ApprovalRepository,
+        identities: IdentityRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = WithdrawLeaveRequest(requests, ledger, approvals, operations, journal, transactions, clock)
+    ) =
+        WithdrawLeaveRequest(
+            requests,
+            ledger,
+            approvals,
+            identities,
+            companies,
+            members,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
 
     @Bean
     fun requestLeaveCancellation(
         requests: LeaveRequestRepository,
         ledger: LeaveLedgerRepository,
         approvals: ApprovalRepository,
+        identities: IdentityRepository,
         people: PeopleRepository,
         companies: CompanyRepository,
         members: MembershipRepository,
@@ -161,6 +186,7 @@ class LeaveConfiguration {
             requests,
             ledger,
             approvals,
+            identities,
             people,
             companies,
             members,
@@ -177,9 +203,20 @@ class LeaveConfiguration {
         people: PeopleRepository,
         approvals: ApprovalRepository,
         members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetLeaveRequest(requests, ledger, people, approvals, members, transactions, clock)
+    ) =
+        GetLeaveRequest(
+            requests,
+            ledger,
+            people,
+            approvals,
+            members,
+            identities,
+            transactions,
+            clock,
+        )
 
     @Bean
     fun listLeaveRequests(

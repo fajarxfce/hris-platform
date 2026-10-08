@@ -16,6 +16,15 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresPeopleDataSource(private val sql: DSLContext) : PeopleDataSource {
+    override fun accountForEmployee(companyId: UUID, employeeId: UUID): UUID? =
+        sql.select(P.ACCOUNT_ID)
+            .from(E)
+            .join(P)
+            .on(P.ID.eq(E.PERSON_ID))
+            .where(E.COMPANY_ID.eq(companyId))
+            .and(E.ID.eq(employeeId))
+            .fetchOne(P.ACCOUNT_ID)
+
     override fun employeeNumberExists(companyId: UUID, number: String) =
         sql.fetchExists(
             sql.selectOne()

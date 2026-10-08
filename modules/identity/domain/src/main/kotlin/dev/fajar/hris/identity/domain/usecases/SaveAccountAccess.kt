@@ -2,6 +2,7 @@ package dev.fajar.hris.identity.domain.usecases
 
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.entities.ManagedAccount
 import dev.fajar.hris.identity.domain.policies.*
 import dev.fajar.hris.identity.domain.repositories.AccountAdministrationRepository
 import java.time.Clock
@@ -55,14 +56,15 @@ class SaveAccountAccess(
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
-            }
             val lock = accounts.lockAdministration()
             if (lock is Result.Failed) return@run lock
-            val author = accounts.lockAccount(actor.accountId)
-            if (author is Result.Failed) return@run author
-            val currentAuthor = (author as Result.Success).value
+            val lockedAccounts = mutableMapOf<UUID, ManagedAccount?>()
+            for (accountId in setOf(actor.accountId, id).sorted()) {
+                val locked = accounts.lockAccount(accountId)
+                if (locked is Result.Failed) return@run locked
+                lockedAccounts[accountId] = (locked as Result.Success).value
+            }
+            val currentAuthor = lockedAccounts[actor.accountId]
             if (
                 currentAuthor == null ||
                     !currentAuthor.account.active ||
@@ -71,12 +73,11 @@ class SaveAccountAccess(
                         currentAuthor.account.securityVersion != actor.credentialVersion)
             )
                 return@run Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "session_revoked"))
-            val found =
-                if (id == actor.accountId) Result.Success(currentAuthor)
-                else accounts.lockAccount(id)
-            if (found is Result.Failed) return@run found
+            (replay as Result.Success).value?.let {
+                return@run Result.Success(it)
+            }
             val target =
-                (found as Result.Success).value
+                lockedAccounts[id]
                     ?: return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "account_not_found"))
             if (target.account.version != expectedVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))

@@ -4,7 +4,10 @@ import dev.fajar.hris.approvals.domain.entities.*
 import dev.fajar.hris.approvals.domain.policies.approvalPermissions
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import java.time.Clock
 import java.time.Duration
 import java.util.UUID
@@ -12,6 +15,8 @@ import java.util.UUID
 class SaveApprovalDelegation(
     private val approvals: ApprovalRepository,
     private val members: MembershipRepository,
+    private val companies: CompanyRepository,
+    private val identities: IdentityRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
@@ -33,13 +38,14 @@ class SaveApprovalDelegation(
                 !delegation.validUntil.isAfter(delegation.validFrom) ||
                 Duration.between(delegation.validFrom, delegation.validUntil) >
                     Duration.ofDays(90) ||
-                (delegation.active && !delegation.validUntil.isAfter(clock.instant())) ||
                 (expectedVersion ?: 0) < 0 ||
                 reason.isBlank() ||
                 reason.length > 1000
         )
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_delegation"))
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         val key =
             OperationKey(
                 "approvals.delegation_save",
@@ -59,6 +65,27 @@ class SaveApprovalDelegation(
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
+            val approvalLock = approvals.lock(company)
+            if (approvalLock is Result.Failed) return@run approvalLock
+            val companyLock = companies.lock(company)
+            if (companyLock is Result.Failed) return@run companyLock
+            val memberLock = members.lock(company)
+            if (memberLock is Result.Failed) return@run memberLock
+            for (account in
+                setOf(actor.accountId, delegation.fromAccount, delegation.toAccount).sorted()) {
+                val accountLock = identities.lockAccount(account)
+                if (accountLock is Result.Failed) return@run accountLock
+            }
+            val currentActor =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (currentActor is Result.Failed) return@run currentActor
+            val live = (currentActor as Result.Success).value
+            val liveAccess = live.requirePermission("approvals.read")
+            if (liveAccess is Result.Failed) return@run liveAccess
+            if (delegation.fromAccount != live.accountId && "approvals.manage" !in live.permissions)
+                return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
@@ -67,6 +94,37 @@ class SaveApprovalDelegation(
             val previous = (existing as Result.Success).value
             if (previous != null && previous.fromAccount != delegation.fromAccount)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "delegator_immutable"))
+            if (previous?.version != expectedVersion)
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
+            val now = clock.instant()
+            if (delegation.active && !delegation.validUntil.isAfter(now))
+                return@run Result.Failed(Failure(FailureKind.VALIDATION, "invalid_delegation"))
+            if (delegation.validUntil.isAfter(now)) {
+                for (account in setOf(delegation.fromAccount, delegation.toAccount)) {
+                    val counted =
+                        previous != null &&
+                            previous.validUntil.isAfter(now) &&
+                            account in setOf(previous.fromAccount, previous.toAccount)
+                    if (!counted) {
+                        val total =
+                            approvals.countDelegations(company, account, now, false, delegation.id)
+                        if (total is Result.Failed) return@run total
+                        if ((total as Result.Success).value >= 1000)
+                            return@run Result.Failed(
+                                Failure(FailureKind.CONFLICT, "approval_delegation_limit")
+                            )
+                    }
+                    if (delegation.active && !(counted && previous.active)) {
+                        val active =
+                            approvals.countDelegations(company, account, now, true, delegation.id)
+                        if (active is Result.Failed) return@run active
+                        if ((active as Result.Success).value >= 200)
+                            return@run Result.Failed(
+                                Failure(FailureKind.CONFLICT, "approval_delegation_capacity")
+                            )
+                    }
+                }
+            }
             val candidates =
                 members.candidates(
                     company,

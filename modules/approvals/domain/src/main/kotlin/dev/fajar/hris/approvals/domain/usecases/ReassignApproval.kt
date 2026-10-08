@@ -4,12 +4,17 @@ import dev.fajar.hris.approvals.domain.entities.*
 import dev.fajar.hris.approvals.domain.policies.approvalPermissions
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import java.util.UUID
 
 class ReassignApproval(
     private val approvals: ApprovalRepository,
     private val members: MembershipRepository,
+    private val companies: CompanyRepository,
+    private val identities: IdentityRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
@@ -33,10 +38,30 @@ class ReassignApproval(
                 listOf(id.toString(), version.toString(), reason) +
                     assignees.map(UUID::toString).sorted(),
             )
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
+            val approvalLock = approvals.lock(company)
+            if (approvalLock is Result.Failed) return@run approvalLock
+            val companyLock = companies.lock(company)
+            if (companyLock is Result.Failed) return@run companyLock
+            val memberLock = members.lock(company)
+            if (memberLock is Result.Failed) return@run memberLock
+            for (account in (assignees + actor.accountId).sorted()) {
+                val accountLock = identities.lockAccount(account)
+                if (accountLock is Result.Failed) return@run accountLock
+            }
+            val currentActor =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (currentActor is Result.Failed) return@run currentActor
+            val live = (currentActor as Result.Success).value
+            val liveAccess = live.requirePermission("approvals.manage")
+            if (liveAccess is Result.Failed) return@run liveAccess
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }

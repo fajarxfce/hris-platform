@@ -52,16 +52,17 @@ class InviteAccount(
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
-            }
             if (!policy.enabled)
                 return@run Result.Failed(Failure(FailureKind.UNAVAILABLE, "mail_not_configured"))
             val administration = accounts.lockAdministration()
             if (administration is Result.Failed) return@run administration
-            val author = accounts.lockAccount(actor.accountId)
-            if (author is Result.Failed) return@run author
-            val currentAuthor = (author as Result.Success).value
+            val lockedAccounts = mutableMapOf<UUID, ManagedAccount?>()
+            for (accountId in setOf(actor.accountId, id).sorted()) {
+                val locked = accounts.lockAccount(accountId)
+                if (locked is Result.Failed) return@run locked
+                lockedAccounts[accountId] = (locked as Result.Success).value
+            }
+            val currentAuthor = lockedAccounts[actor.accountId]
             if (
                 currentAuthor == null ||
                     !currentAuthor.account.active ||
@@ -70,6 +71,9 @@ class InviteAccount(
                         actor.credentialVersion != currentAuthor.account.securityVersion)
             )
                 return@run Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "session_revoked"))
+            (replay as Result.Success).value?.let {
+                return@run Result.Success(it)
+            }
             val found = credentials.lockAccount(id)
             if (found is Result.Failed) return@run found
             val current = (found as Result.Success).value

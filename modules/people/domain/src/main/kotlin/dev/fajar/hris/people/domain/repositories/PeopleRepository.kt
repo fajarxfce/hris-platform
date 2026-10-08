@@ -45,6 +45,9 @@ interface PeopleRepository {
 
     fun lockReportingLines(companyId: UUID): Result<Unit>
 
+    /** Current person/account linkage, including employment that has not started yet. */
+    fun accountForEmployee(companyId: UUID, employeeId: UUID): Result<UUID?>
+
     fun find(companyId: UUID, id: UUID, asOf: LocalDate): Result<Employee?>
 
     fun findAtInstant(companyId: UUID, id: UUID, at: Instant): Result<Employee?>

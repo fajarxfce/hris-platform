@@ -4,6 +4,8 @@ import dev.fajar.hris.approvals.domain.entities.ApprovalRequest
 import dev.fajar.hris.approvals.domain.policies.isAssignedApprover
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import java.time.Clock
 import java.util.UUID
@@ -11,12 +13,19 @@ import java.util.UUID
 class GetApprovalRequest(
     private val approvals: ApprovalRepository,
     private val members: MembershipRepository,
+    private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
 ) {
     fun execute(actor: Actor, id: UUID): Result<ApprovalRequest> =
         transactions.run(actor) {
             val company = requireNotNull(actor.companyId)
+            val checked =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
             val found = approvals.find(company, id)
             if (found is Result.Failed) return@run found
             val request =
@@ -25,7 +34,7 @@ class GetApprovalRequest(
                         Failure(FailureKind.NOT_FOUND, "approval_not_found")
                     )
             if (
-                "approvals.manage" in actor.permissions ||
+                "approvals.manage" in live.permissions ||
                     actor.accountId == request.authorId ||
                     actor.accountId == request.requesterId
             )
@@ -38,7 +47,7 @@ class GetApprovalRequest(
             if (grants is Result.Failed) return@run grants
             if (
                 isAssignedApprover(
-                    actor,
+                    live,
                     request,
                     (delegated as Result.Success).value,
                     (grants as Result.Success).value,

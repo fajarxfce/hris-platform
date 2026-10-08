@@ -14,6 +14,7 @@ fun leaveAvailableActions(
     delegations: List<Delegation>,
     members: List<MemberAccount>,
     at: Instant,
+    beneficiaryAccountId: java.util.UUID? = request.ownerAccountId,
 ): Set<LeaveAction> = buildSet {
     if (canManageLeave(actor, request)) {
         when (request.status) {
@@ -23,18 +24,13 @@ fun leaveAvailableActions(
             else -> Unit
         }
     }
-    if (
-        request.status in setOf(LeaveStatus.PENDING, LeaveStatus.CANCELLATION_PENDING) &&
-            decideApproval(
-                approval,
-                actor,
-                ApprovalDecision.APPROVE,
-                "",
-                delegations,
-                members,
-                at,
-            ) is
-                Result.Success
-    )
-        add(LeaveAction.DECIDE)
+    if (request.status in setOf(LeaveStatus.PENDING, LeaveStatus.CANCELLATION_PENDING)) {
+        val decision =
+            decideApproval(approval, actor, ApprovalDecision.APPROVE, "", delegations, members, at)
+        if (
+            decision is Result.Success &&
+                beneficiaryAccountId !in setOf(actor.accountId, decision.value.decidingFor)
+        )
+            add(LeaveAction.DECIDE)
+    }
 }

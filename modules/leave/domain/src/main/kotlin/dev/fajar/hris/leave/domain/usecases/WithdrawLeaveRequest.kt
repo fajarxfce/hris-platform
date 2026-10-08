@@ -4,9 +4,13 @@ import dev.fajar.hris.approvals.domain.entities.*
 import dev.fajar.hris.approvals.domain.policies.*
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.leave.domain.policies.*
 import dev.fajar.hris.leave.domain.repositories.*
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import java.time.*
 import java.util.UUID
 
@@ -14,6 +18,9 @@ class WithdrawLeaveRequest(
     private val requests: LeaveRequestRepository,
     private val ledger: LeaveLedgerRepository,
     private val approvals: ApprovalRepository,
+    private val identities: IdentityRepository,
+    private val companies: CompanyRepository,
+    private val members: MembershipRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
@@ -40,9 +47,6 @@ class WithdrawLeaveRequest(
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
-            }
             val original = requests.find(company, id)
             if (original is Result.Failed) return@run original
             val employeeId =
@@ -52,6 +56,25 @@ class WithdrawLeaveRequest(
                     )
             val lock = ledger.lock(company, employeeId)
             if (lock is Result.Failed) return@run lock
+            val approvalLock = approvals.lock(company)
+            if (approvalLock is Result.Failed) return@run approvalLock
+            val companyLock = companies.lock(company)
+            if (companyLock is Result.Failed) return@run companyLock
+            val memberLock = members.lock(company)
+            if (memberLock is Result.Failed) return@run memberLock
+            val accountLock = identities.lockAccount(actor.accountId)
+            if (accountLock is Result.Failed) return@run accountLock
+            val checkedActor =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (checkedActor is Result.Failed) return@run checkedActor
+            val live = (checkedActor as Result.Success).value
+            if ("leave.manage" !in live.permissions && "leave.self.manage" !in live.permissions)
+                return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
+            (replay as Result.Success).value?.let {
+                return@run Result.Success(it)
+            }
             val found = requests.find(company, id)
             if (found is Result.Failed) return@run found
             val request =
@@ -59,7 +82,7 @@ class WithdrawLeaveRequest(
                     ?: return@run Result.Failed(
                         Failure(FailureKind.NOT_FOUND, "leave_request_not_found")
                     )
-            if (!canManageLeave(actor, request))
+            if (!canManageLeave(live, request))
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "leave_request_not_found"))
             if (request.version != version)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))

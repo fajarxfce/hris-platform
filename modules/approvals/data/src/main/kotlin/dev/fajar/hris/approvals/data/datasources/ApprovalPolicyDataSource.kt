@@ -5,7 +5,16 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface ApprovalPolicyDataSource {
-    fun list(companyId: UUID, kind: String, asOf: LocalDate): List<TemplateRow>
+    fun count(companyId: UUID, kind: String, activeOnly: Boolean, exceptId: UUID): Int
+
+    fun list(
+        companyId: UUID,
+        kind: String,
+        asOf: LocalDate,
+        activeOnly: Boolean,
+        after: UUID?,
+        limit: Int,
+    ): List<TemplateRow>
 
     fun find(companyId: UUID, id: UUID): TemplateRow?
 

@@ -137,7 +137,7 @@ class ApprovalHttpTest : ApiIntegrationTest() {
         val list =
             get(client, "/api/v1/companies/$company/approvals/templates?kind=LEAVE&asOf=2026-10-08")
         assertEquals(200, list.statusCode(), list.body())
-        assertEquals(1, json.readTree(list.body())[0].get("appliedRevision").asLong())
+        assertEquals(1, json.readTree(list.body()).get("items")[0].get("appliedRevision").asLong())
         val persisted = get(client, "/api/v1/companies/$company/approvals/${request.id}")
         assertEquals(0, json.readTree(persisted.body()).get("templateRevision").asLong())
         assertEquals(

@@ -14,4 +14,19 @@ Acceptance: competing decisions transition once, expiry/revocation are checked, 
 
 Effective template revisions, bounded stage rules (up to eight stages), named/manager/permission assignment, immutable request snapshots, optimistic decisions, blocked-stage reassignment, delegation ownership/expiry/revocation policy, and the current inbox are implemented. Assignment overrides are separate immutable records; the original snapshot remains intact. Decisions cannot come from the author or beneficiary. Delegated decisions require the delegator's current account, company membership, and action permission.
 
-Feature use cases must coordinate their own business effect with ApprovalRepository in the same transaction. There is intentionally no generic HTTP decision endpoint: leave, expense, overtime, and payroll delivery belong to those modules. Their end-to-end business effects remain planned. Administrative reassignment and delegation changes require reasons and idempotency keys. Delegation periods are bounded to 90 days and cannot be reassigned to a different delegator.
+Feature use cases must coordinate their own business effect with ApprovalRepository in the same transaction. There is intentionally no generic HTTP decision endpoint: leave, expense, overtime, and payroll delivery belong to those modules. Leave submission, decisions, withdrawal, and cancellation already apply their business consequences atomically; the other feature integrations remain planned. Administrative reassignment and delegation changes require reasons and idempotency keys. Delegation periods are bounded to 90 days and cannot be reassigned to a different delegator.
+
+
+## Access and concurrent changes
+
+Approval mutations serialize per company. Business use cases acquire their business locks first, then the approval, company, membership, and account guards. Account IDs are locked in a consistent order; global account administration and invitation use the same account ordering. Delegation revocation, template changes, reassignment, and a leave decision cannot interleave inside the approval transaction. A revocation committed before a waiting decision acquires its guard is applied to that decision. A decision already protected by its guard completes before the competing revocation.
+
+Commands revalidate account state, credential version, membership, and the original request's permissions before mutation or receipt replay. New grants require a freshly resolved request. Delegated decisions check both parties' live access and the delegation period at decision time. Leave decisions also exclude the employment's current beneficiary account, including an account linked after submission or before employment starts; delegation cannot bypass this exclusion. The inbox excludes assignments when the corresponding action permission or the delegator's access has been removed.
+
+## Bounded administration and selection
+
+`GET /approvals/templates?kind=...&asOf=YYYY-MM-DD` and `GET /approvals/delegations` return `{items, nextCursor}` pages. Both accept `after` and `limit` (default fifty, maximum 200). Template pages include inactive definitions effective by the selected date. Delegation pages include active and inactive, unexpired incoming/outgoing delegations owned by the current account.
+
+A company can have 200 active templates and 1,000 total definitions per approval kind. An account can have 200 active, unexpired delegations and 1,000 total unexpired delegations in its company. Future delegation periods reserve capacity. Deactivation releases active capacity; expiry releases unexpired capacity. Existing definitions can still be edited/deactivated if legacy data exceeds a limit, while adding or reactivating beyond capacity is rejected.
+
+Policy selection reads at most 201 active effective templates, and delegated decisions read at most 201 current active delegations. The additional row detects overflow: selection/decision fails explicitly instead of choosing from a truncated set. Paged administration remains available to repair oversized data. Reasons, optimistic versions, audit, and original operation receipts remain transactional.

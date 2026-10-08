@@ -19,7 +19,7 @@ class PostgresCredentialStoreDataSource(private val sql: DSLContext) : Credentia
         selectCredentialAccounts(sql).where(A.ID.eq(id)).fetchOne { it.toCredentialAccountRow() }
 
     override fun lockAccount(id: UUID) =
-        selectCredentialAccounts(sql).where(A.ID.eq(id)).forUpdate().of(A).fetchOne {
+        selectCredentialAccounts(sql).where(A.ID.eq(id)).forNoKeyUpdate().of(A).fetchOne {
             it.toCredentialAccountRow()
         }
 

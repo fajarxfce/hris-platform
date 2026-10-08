@@ -195,8 +195,8 @@ abstract class LeaveApiFixture : ApiIntegrationTest() {
             "/api/v1/companies/${f.company}/leave/employees/${f.employee}/balances/${f.type}/2026$suffix",
         )
 
-    protected fun balance(f: Fixture): JsonNode {
-        val result = ledger(f)
+    protected fun balance(f: Fixture, client: HttpClient = f.worker): JsonNode {
+        val result = ledger(f, client)
         assertEquals(200, result.statusCode(), result.body())
         return json.readTree(result.body()).get("balance")
     }

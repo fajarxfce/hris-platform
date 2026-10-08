@@ -3,6 +3,8 @@ package dev.fajar.hris.leave.domain.usecases
 import dev.fajar.hris.approvals.domain.policies.isAssignedApprover
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.leave.domain.policies.*
@@ -17,6 +19,7 @@ class GetLeaveRequest(
     private val people: PeopleRepository,
     private val approvals: ApprovalRepository,
     private val members: MembershipRepository,
+    private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
 ) {
@@ -39,6 +42,12 @@ class GetLeaveRequest(
                     )
             val lock = ledger.lock(company, employeeId)
             if (lock is Result.Failed) return@run lock
+            val checked =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
             val found = requests.find(company, id)
             if (found is Result.Failed) return@run found
             val request =
@@ -69,10 +78,10 @@ class GetLeaveRequest(
             if (currentResult is Result.Failed) return@run currentResult
             val current = (currentResult as Result.Success).value
             val scoped =
-                "leave.read" in actor.permissions ||
-                    ("leave.self.manage" in actor.permissions &&
+                "leave.read" in live.permissions ||
+                    ("leave.self.manage" in live.permissions &&
                         request.ownerAccountId == actor.accountId) ||
-                    (current != null && canReadLeave(actor, current, current))
+                    (current != null && canReadLeave(live, current, current))
             val active =
                 if (request.status == LeaveStatus.CANCELLATION_PENDING) requireNotNull(cancellation)
                 else initial
@@ -83,9 +92,13 @@ class GetLeaveRequest(
             if (memberResult is Result.Failed) return@run memberResult
             val delegations = (delegationResult as Result.Success).value
             val grants = (memberResult as Result.Success).value
-            if (!scoped && !isAssignedApprover(actor, active, delegations, grants, now))
+            if (!scoped && !isAssignedApprover(live, active, delegations, grants, now))
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "leave_request_not_found"))
-            val actions = leaveAvailableActions(actor, request, active, delegations, grants, now)
+            val accountResult = people.accountForEmployee(company, employeeId)
+            if (accountResult is Result.Failed) return@run accountResult
+            val beneficiary = (accountResult as Result.Success).value
+            val actions =
+                leaveAvailableActions(live, request, active, delegations, grants, now, beneficiary)
             requests.history(company, id, historyAfter, historyLimit).map {
                 LeaveRequestDetails(request, initial, cancellation, it, actions)
             }

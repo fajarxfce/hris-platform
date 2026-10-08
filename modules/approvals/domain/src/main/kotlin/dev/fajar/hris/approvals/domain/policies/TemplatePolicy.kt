@@ -7,6 +7,7 @@ fun validateApprovalTemplate(change: TemplateChange): Result<Unit> {
     if (
         change.name.isBlank() ||
             change.name.length > 200 ||
+            change.effectiveFrom.year !in 1900..2200 ||
             change.reason.isBlank() ||
             change.reason.length > 1000 ||
             (change.expectedVersion ?: 0) < 0 ||

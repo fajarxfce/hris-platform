@@ -27,8 +27,12 @@ class ApprovalController(
         actor: Actor,
         @RequestParam kind: ApprovalKind,
         @RequestParam asOf: LocalDate,
-    ): List<TemplateResponse> =
-        templates.execute(actor, kind, asOf).response().map { it.toResponse() }
+        @RequestParam(required = false) after: UUID?,
+        @RequestParam(defaultValue = "50") limit: Int,
+    ): Page<TemplateResponse> =
+        templates.execute(actor, kind, asOf, after, limit).response().let {
+            Page(it.items.map { item -> item.toResponse() }, it.nextCursor)
+        }
 
     @PutMapping("/templates/{id}")
     fun saveTemplate(
@@ -84,8 +88,14 @@ class ApprovalController(
             .toResponse()
 
     @GetMapping("/delegations")
-    fun delegations(actor: Actor): List<DelegationResponse> =
-        delegations.execute(actor).response().map { it.toResponse() }
+    fun delegations(
+        actor: Actor,
+        @RequestParam(required = false) after: UUID?,
+        @RequestParam(defaultValue = "50") limit: Int,
+    ): Page<DelegationResponse> =
+        delegations.execute(actor, after, limit).response().let {
+            Page(it.items.map { item -> item.toResponse() }, it.nextCursor)
+        }
 
     @PutMapping("/delegations/{id}")
     fun saveDelegation(

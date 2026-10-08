@@ -10,6 +10,8 @@ fun selectApprovalTemplate(
     templates: List<ApprovalTemplate>,
     context: ApprovalContext,
 ): Result<ApprovalTemplate> {
+    if (templates.size > 200)
+        return Result.Failed(Failure(FailureKind.CONFLICT, "approval_policy_capacity"))
     val matches =
         templates
             .filter {
@@ -98,6 +100,8 @@ fun decideApproval(
     members: List<MemberAccount>,
     at: Instant,
 ): Result<ApprovalTransition> {
+    if (delegations.size > 200)
+        return Result.Failed(Failure(FailureKind.CONFLICT, "approval_delegation_capacity"))
     if (request.status != ApprovalStatus.PENDING)
         return Result.Failed(Failure(FailureKind.CONFLICT, "approval_not_pending"))
     if (actor.accountId == request.authorId || actor.accountId == request.requesterId)

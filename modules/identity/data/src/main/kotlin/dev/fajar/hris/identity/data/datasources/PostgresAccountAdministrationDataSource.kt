@@ -14,9 +14,11 @@ class PostgresAccountAdministrationDataSource(private val sql: DSLContext) :
     }
 
     override fun lockAccount(id: UUID): AccountAdministrationRow? =
-        selectManagedAccounts(sql).where(ACCOUNTS.ID.eq(id)).forUpdate().of(ACCOUNTS).fetchOne {
-            it.toAccountAdministrationRow()
-        }
+        selectManagedAccounts(sql)
+            .where(ACCOUNTS.ID.eq(id))
+            .forNoKeyUpdate()
+            .of(ACCOUNTS)
+            .fetchOne { it.toAccountAdministrationRow() }
 
     override fun list(query: String, after: UUID?, limit: Int): List<AccountAdministrationRow> =
         selectManagedAccounts(sql)

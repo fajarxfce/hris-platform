@@ -4,6 +4,7 @@ import dev.fajar.hris.approvals.data.datasources.*
 import dev.fajar.hris.approvals.data.mappers.*
 import dev.fajar.hris.approvals.data.models.StageRuleData
 import dev.fajar.hris.approvals.domain.entities.*
+import dev.fajar.hris.approvals.domain.policies.approvalPermissions
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.*
@@ -19,6 +20,67 @@ class StoredApprovalRepository(
     private val delegationSource: DelegationDataSource,
     private val json: ObjectMapper,
 ) : ApprovalRepository {
+    override fun lock(companyId: UUID): Result<Unit> = safeDatabaseCall { requests.lock(companyId) }
+
+    override fun countTemplates(
+        companyId: UUID,
+        kind: ApprovalKind,
+        activeOnly: Boolean,
+        exceptId: UUID,
+    ): Result<Int> = safeDatabaseCall { policies.count(companyId, kind.name, activeOnly, exceptId) }
+
+    override fun templatePage(
+        companyId: UUID,
+        kind: ApprovalKind,
+        asOf: LocalDate,
+        after: UUID?,
+        limit: Int,
+    ): Result<Page<ApprovalTemplate>> = safeDatabaseCall {
+        val rows = policies.list(companyId, kind.name, asOf, false, after, limit + 1)
+        Page(
+            rows.take(limit).map { it.toTemplate(json) },
+            if (rows.size > limit) rows[limit - 1].template.id.toString() else null,
+        )
+    }
+
+    override fun countDelegations(
+        companyId: UUID,
+        accountId: UUID,
+        at: Instant,
+        activeOnly: Boolean,
+        exceptId: UUID,
+    ): Result<Int> = safeDatabaseCall {
+        delegationSource.countUnexpired(
+            companyId,
+            accountId,
+            at.atOffset(ZoneOffset.UTC),
+            activeOnly,
+            exceptId,
+        )
+    }
+
+    override fun delegationPage(
+        companyId: UUID,
+        accountId: UUID,
+        at: Instant,
+        after: UUID?,
+        limit: Int,
+    ): Result<Page<Delegation>> = safeDatabaseCall {
+        val rows =
+            delegationSource.forAccount(
+                companyId,
+                accountId,
+                at.atOffset(ZoneOffset.UTC),
+                false,
+                after,
+                limit + 1,
+            )
+        Page(
+            rows.take(limit).map { it.toDelegation() },
+            if (rows.size > limit) rows[limit - 1].id.toString() else null,
+        )
+    }
+
     override fun findDelegation(companyId: UUID, id: UUID): Result<Delegation?> = safeDatabaseCall {
         delegationSource.find(companyId, id)?.toDelegation()
     }
@@ -28,7 +90,7 @@ class StoredApprovalRepository(
         kind: ApprovalKind,
         asOf: LocalDate,
     ): Result<List<ApprovalTemplate>> = safeDatabaseCall {
-        policies.list(companyId, kind.name, asOf).map { it.toTemplate(json) }
+        policies.list(companyId, kind.name, asOf, true, null, 201).map { it.toTemplate(json) }
     }
 
     override fun findTemplate(companyId: UUID, id: UUID): Result<ApprovalTemplate?> =
@@ -101,6 +163,7 @@ class StoredApprovalRepository(
         companyId: UUID,
         accountId: UUID,
         includeBlocked: Boolean,
+        kinds: Set<ApprovalKind>,
         at: Instant,
         after: UUID?,
         limit: Int,
@@ -110,6 +173,7 @@ class StoredApprovalRepository(
                 companyId,
                 accountId,
                 includeBlocked,
+                kinds.associate { it.name to approvalPermissions(it) },
                 at.atOffset(ZoneOffset.UTC),
                 after,
                 limit + 1,
@@ -129,9 +193,9 @@ class StoredApprovalRepository(
         accountId: UUID,
         at: Instant,
     ): Result<List<Delegation>> = safeDatabaseCall {
-        delegationSource.forAccount(companyId, accountId, at.atOffset(ZoneOffset.UTC)).map {
-            it.toDelegation()
-        }
+        delegationSource
+            .forAccount(companyId, accountId, at.atOffset(ZoneOffset.UTC), true, null, 201)
+            .map { it.toDelegation() }
     }
 
     override fun decide(

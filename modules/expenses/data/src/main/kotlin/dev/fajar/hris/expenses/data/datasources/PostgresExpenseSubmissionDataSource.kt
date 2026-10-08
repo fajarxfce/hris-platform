@@ -17,6 +17,26 @@ import org.jooq.impl.DSL
 
 class PostgresExpenseSubmissionDataSource(private val sql: DSLContext) :
     ExpenseSubmissionDataSource {
+    override fun receipt(company: UUID, submission: UUID, revision: UUID): ExpenseReceiptRow? =
+        sql.select(R.asterisk(), C.EMPLOYMENT_ID, S.APPROVAL_ID)
+            .from(R)
+            .join(S)
+            .on(S.COMPANY_ID.eq(R.COMPANY_ID).and(S.ID.eq(R.SUBMISSION_ID)))
+            .join(C)
+            .on(C.COMPANY_ID.eq(S.COMPANY_ID).and(C.ID.eq(S.CLAIM_ID)))
+            .where(R.COMPANY_ID.eq(company))
+            .and(R.SUBMISSION_ID.eq(submission))
+            .and(R.DOCUMENT_REVISION_ID.eq(revision))
+            .orderBy(R.LINE_ID)
+            .limit(1)
+            .fetchOne {
+                ExpenseReceiptRow(
+                    it.into(R),
+                    requireNotNull(it[C.EMPLOYMENT_ID]),
+                    requireNotNull(it[S.APPROVAL_ID]),
+                )
+            }
+
     override fun reviews(company: UUID, submission: UUID): List<ExpenseReviewsRecord> =
         sql.selectFrom(V)
             .where(V.COMPANY_ID.eq(company))

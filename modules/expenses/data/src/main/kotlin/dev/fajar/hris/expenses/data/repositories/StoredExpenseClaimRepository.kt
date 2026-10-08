@@ -15,6 +15,14 @@ class StoredExpenseClaimRepository(
     private val source: ExpenseClaimDataSource,
     private val submissions: ExpenseSubmissionDataSource,
 ) : ExpenseClaimRepository {
+    override fun receipt(
+        companyId: UUID,
+        submissionId: UUID,
+        revisionId: UUID,
+    ): Result<ExpenseReceipt?> = safeDatabaseCall {
+        submissions.receipt(companyId, submissionId, revisionId)?.toReceipt()
+    }
+
     override fun reviews(companyId: UUID, submissionId: UUID): Result<List<ExpenseReview>> =
         safeDatabaseCall {
             submissions.reviews(companyId, submissionId).map { it.toReview() }

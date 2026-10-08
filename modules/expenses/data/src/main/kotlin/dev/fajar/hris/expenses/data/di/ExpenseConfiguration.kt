@@ -11,6 +11,7 @@ import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.organization.domain.repositories.OrganizationRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
+import dev.fajar.hris.storage.domain.repositories.ObjectStorageRepository
 import java.time.Clock
 import org.jooq.DSLContext
 import org.springframework.context.annotation.Bean
@@ -282,5 +283,55 @@ class ExpenseConfiguration {
             journal,
             transactions,
             clock,
+        )
+
+    @Bean
+    fun getExpenseReceiptDownload(
+        claims: ExpenseClaimRepository,
+        documents: DocumentRepository,
+        approvals: ApprovalRepository,
+        companies: CompanyRepository,
+        people: PeopleRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        GetExpenseReceiptDownload(
+            claims,
+            documents,
+            approvals,
+            companies,
+            people,
+            identities,
+            members,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun readExpenseReceiptContent(
+        claims: ExpenseClaimRepository,
+        approvals: ApprovalRepository,
+        companies: CompanyRepository,
+        people: PeopleRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        documents: DocumentRepository,
+        storage: ObjectStorageRepository,
+    ) =
+        ReadExpenseReceiptContent(
+            claims,
+            documents,
+            approvals,
+            companies,
+            people,
+            identities,
+            members,
+            transactions,
+            clock,
+            storage,
         )
 }

@@ -6,6 +6,8 @@ import java.time.Instant
 import java.util.UUID
 
 interface ExpenseClaimRepository {
+    fun receipt(companyId: UUID, submissionId: UUID, revisionId: UUID): Result<ExpenseReceipt?>
+
     fun reviews(companyId: UUID, submissionId: UUID): Result<List<ExpenseReview>>
 
     fun review(actor: Actor, claim: ExpenseClaim, review: ExpenseReview): Result<MutationReceipt>

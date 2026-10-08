@@ -36,8 +36,16 @@ abstract class ExpenseSubmissionApiFixture : ExpenseApiFixture() {
         val started =
             start(docs, uploadInput(docs, bytes, revision = id, classification = "RECEIPT"))
         assertEquals(200, started.statusCode(), started.body())
-        val uploaded = upload(docs, id, bytes)
-        assertEquals(200, uploaded.statusCode(), uploaded.body())
+        for (offset in bytes.indices step 1048576) {
+            val uploaded =
+                upload(
+                    docs,
+                    id,
+                    bytes.copyOfRange(offset, minOf(bytes.size, offset + 1048576)),
+                    offset.toLong(),
+                )
+            assertEquals(200, uploaded.statusCode(), uploaded.body())
+        }
         assertEquals(Result.Success(JobStep(1, true)), run(docs, beginValidation(docs, id)))
         assertEquals("READY", revision(docs, id).get("status").asString())
         return id

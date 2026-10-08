@@ -12,6 +12,7 @@ fun BackgroundJob.toResponse(actor: Actor): JobResponse =
         status.name,
         completedItems,
         request.totalItems,
+        request.progressMode.name,
         attempts,
         cancellationRequested,
         failureCode,

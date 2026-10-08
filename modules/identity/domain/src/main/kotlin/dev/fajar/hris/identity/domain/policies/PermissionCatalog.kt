@@ -34,6 +34,7 @@ object PermissionCatalog {
             "expenses.approve",
             "documents.read",
             "documents.manage",
+            "documents.inventory",
             "announcements.read",
             "announcements.manage",
             "reports.read",

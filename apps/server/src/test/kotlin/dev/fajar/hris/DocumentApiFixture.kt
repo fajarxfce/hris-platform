@@ -151,6 +151,10 @@ abstract class DocumentApiFixture : PeopleApiFixture() {
     fun resetDocumentProbe() {
         storageProbe.beforeWrite = null
         storageProbe.beforeRead = null
+        storageProbe.beforeList = null
+        storageProbe.failList = false
+        storageProbe.listings.set(0)
+        storageProbe.cursors.clear()
         storageProbe.reads.set(0)
         storageProbe.fail = false
         storageProbe.objects.clear()

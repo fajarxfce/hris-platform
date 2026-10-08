@@ -148,4 +148,11 @@ class WorkerConfiguration {
         advance: AdvanceDocumentValidation,
         abort: AbortDocumentValidation,
     ): JobTask = DocumentValidationTask(resolve, advance, abort)
+
+    @Bean
+    fun documentInventoryTask(
+        resolve: ResolveActor,
+        advance: AdvanceDocumentInventory,
+        abort: AbortDocumentInventory,
+    ): JobTask = DocumentInventoryTask(resolve, advance, abort)
 }

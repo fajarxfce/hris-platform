@@ -105,7 +105,7 @@ abstract class DocumentValidationApiFixture : DocumentApiFixture() {
                 id,
             )
 
-    protected fun claimDocuments(): List<JobLease> {
+    protected fun claimDocuments(kind: JobKind = JobKind.DOCUMENT_VALIDATE): List<JobLease> {
         database()
             .execute(
                 """DO ${'$'}${'$'} BEGIN IF NOT EXISTS(SELECT 1 FROM pg_roles WHERE rolname='hris_document_worker') THEN
@@ -136,7 +136,7 @@ abstract class DocumentValidationApiFixture : DocumentApiFixture() {
                     clock,
                     JobRetryPolicy(),
                 )
-                .execute(UUID.randomUUID(), 2, 120, setOf(JobKind.DOCUMENT_VALIDATE))
+                .execute(UUID.randomUUID(), 2, 120, setOf(kind))
         assertTrue(result is Result.Success, result.toString())
         return (result as Result.Success).value
     }

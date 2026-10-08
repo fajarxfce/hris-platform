@@ -10,6 +10,7 @@ import dev.fajar.hris.jobs.domain.usecases.LeaseJobs
 import dev.fajar.hris.storage.data.datasources.ObjectStorageDataSource
 import dev.fajar.hris.storage.data.models.ObjectMetadataData
 import dev.fajar.hris.worker.runtime.BatchJobExecutor
+import dev.fajar.hris.worker.tasks.DocumentInventoryTask
 import dev.fajar.hris.worker.tasks.DocumentValidationTask
 import java.time.Instant
 import java.util.UUID
@@ -68,6 +69,9 @@ class DocumentValidationWorkerTest {
     @Autowired private lateinit var task: DocumentValidationTask
     @Autowired private lateinit var batch: BatchJobExecutor
     @Autowired private lateinit var probe: DocumentWorkerScanProbe
+    @Autowired private lateinit var inventoryStart: StartDocumentInventory
+    @Autowired private lateinit var inventoryTask: DocumentInventoryTask
+    @Autowired private lateinit var inventoryProbe: DocumentInventoryWorkerProbe
 
     private fun database() =
         JdbcTemplate(
@@ -102,6 +106,8 @@ class DocumentValidationWorkerTest {
                 "company.read",
                 "documents.read",
                 "documents.manage",
+                "documents.inventory",
+                "jobs.retry",
                 "people.profile.read",
                 "people.profile.manage",
             )
@@ -166,8 +172,8 @@ class DocumentValidationWorkerTest {
         return actor to id
     }
 
-    private fun claim(): JobLease {
-        val claimed = lease.execute(UUID.randomUUID(), 1, 120, setOf(JobKind.DOCUMENT_VALIDATE))
+    private fun claim(kind: JobKind = JobKind.DOCUMENT_VALIDATE): JobLease {
+        val claimed = lease.execute(UUID.randomUUID(), 1, 120, setOf(kind))
         assertTrue(claimed is Result.Success, claimed.toString())
         return (claimed as Result.Success).value.single()
     }
@@ -175,9 +181,10 @@ class DocumentValidationWorkerTest {
     @AfterEach
     fun settleJobs() {
         probe.beforeFinish = null
+        inventoryProbe.beforeList = null
         database()
             .update(
-                "update background_jobs set status='CANCELLED',finished_at=now(),lease_owner=null,lease_token=null,lease_until=null where kind='DOCUMENT_VALIDATE' and status in ('QUEUED','RUNNING')"
+                "update background_jobs set status='CANCELLED',finished_at=now(),lease_owner=null,lease_token=null,lease_until=null where kind in ('DOCUMENT_VALIDATE','DOCUMENT_INVENTORY') and status in ('QUEUED','RUNNING')"
             )
     }
 
@@ -268,6 +275,120 @@ class DocumentValidationWorkerTest {
                 ),
         )
     }
+
+    @Test
+    fun realBatchInventoryFinishesAnUnknownTotalWithoutWeakeningFixedJobs() {
+        val (actor, _) = fixture()
+        val id = UUID.randomUUID()
+        assertTrue(
+            inventoryStart.execute(
+                actor.copy(mfaVerifiedAt = Instant.now()),
+                UUID.randomUUID(),
+                id,
+                null,
+                "Worker reconciliation",
+            ) is Result.Success
+        )
+        val owned = claim(JobKind.DOCUMENT_INVENTORY)
+        assertEquals(Result.Success(Unit), batch.execute(owned, inventoryTask))
+        assertEquals(
+            "COMPLETED",
+            database()
+                .queryForObject(
+                    "select status from document_inventory_runs where id=?",
+                    String::class.java,
+                    id,
+                ),
+        )
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select completed_items from background_jobs where id=?",
+                    Int::class.java,
+                    owned.job.request.id,
+                ),
+        )
+        assertEquals(10000, owned.job.request.totalItems)
+        assertEquals(
+            "SUCCEEDED",
+            database()
+                .queryForObject(
+                    "select status from background_jobs where id=?",
+                    String::class.java,
+                    owned.job.request.id,
+                ),
+        )
+        assertThrows(org.springframework.dao.DataAccessException::class.java) {
+            database()
+                .update(
+                    "update background_jobs set status='SUCCEEDED',finished_at=now() where company_id=? and kind='DOCUMENT_VALIDATE'",
+                    actor.companyId,
+                )
+        }
+    }
+
+    @Test
+    fun interruptedInventoryBatchDiscardsThePageAndAnotherLeaseResumes() {
+        val (actor, _) = fixture()
+        val id = UUID.randomUUID()
+        assertTrue(
+            inventoryStart.execute(
+                actor.copy(mfaVerifiedAt = Instant.now()),
+                UUID.randomUUID(),
+                id,
+                null,
+                "Worker reconciliation",
+            ) is Result.Success
+        )
+        val old = claim(JobKind.DOCUMENT_INVENTORY)
+        val entered = CountDownLatch(1)
+        val exited = CountDownLatch(1)
+        inventoryProbe.beforeList = {
+            entered.countDown()
+            try {
+                check(CountDownLatch(1).await(10, TimeUnit.SECONDS))
+            } finally {
+                exited.countDown()
+            }
+        }
+        Executors.newSingleThreadExecutor().use { pool ->
+            val pending = pool.submit<Result<Unit>> { batch.execute(old, inventoryTask) }
+            try {
+                assertTrue(entered.await(5, TimeUnit.SECONDS))
+            } finally {
+                pending.cancel(true)
+            }
+            assertTrue(exited.await(5, TimeUnit.SECONDS))
+        }
+        inventoryProbe.beforeList = null
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select pages from document_inventory_runs where id=?",
+                    Int::class.java,
+                    id,
+                ),
+        )
+        database()
+            .update(
+                "update background_jobs set lease_until=clock_timestamp()-interval '1 second' where id=?",
+                old.job.request.id,
+            )
+        val resumed = claim(JobKind.DOCUMENT_INVENTORY)
+        assertNotEquals(old.token, resumed.token)
+        assertEquals(Result.Success(Unit), batch.execute(resumed, inventoryTask))
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from document_inventory_pages where run_id=?",
+                    Int::class.java,
+                    id,
+                ),
+        )
+    }
 }
 
 class DocumentWorkerScanProbe : DocumentScanDataSource {
@@ -294,13 +415,19 @@ class DocumentWorkerScanProbe : DocumentScanDataSource {
     }
 }
 
+class DocumentInventoryWorkerProbe {
+    @Volatile var beforeList: (() -> Unit)? = null
+}
+
 @TestConfiguration(proxyBeanMethods = false)
 class DocumentWorkerProbeConfiguration {
+    @Bean fun workerInventoryProbe() = DocumentInventoryWorkerProbe()
+
     @Bean @Primary fun workerDocumentScanner() = DocumentWorkerScanProbe()
 
     @Bean
     @Primary
-    fun workerDocumentStorage(): ObjectStorageDataSource =
+    fun workerDocumentStorage(probe: DocumentInventoryWorkerProbe): ObjectStorageDataSource =
         object : ObjectStorageDataSource {
             val stored = ConcurrentHashMap<String, Pair<ByteArray, String>>()
 
@@ -308,8 +435,30 @@ class DocumentWorkerProbeConfiguration {
                 prefix: String,
                 afterKey: String?,
                 limit: Int,
-            ): dev.fajar.hris.storage.data.models.ObjectInventoryPageData =
-                throw UnsupportedOperationException("Listing is not part of this fixture")
+            ): dev.fajar.hris.storage.data.models.ObjectInventoryPageData {
+                check(!TransactionSynchronizationManager.isActualTransactionActive())
+                val values =
+                    stored.entries
+                        .filter {
+                            it.key.startsWith(prefix) && (afterKey == null || it.key > afterKey)
+                        }
+                        .sortedBy { it.key }
+                        .take(limit + 1)
+                val page =
+                    dev.fajar.hris.storage.data.models.ObjectInventoryPageData(
+                        values.take(limit).map {
+                            dev.fajar.hris.storage.data.models.ObjectInventoryEntryData(
+                                it.key,
+                                it.value.first.size.toLong(),
+                                it.value.second,
+                                Instant.now(),
+                            )
+                        },
+                        values.size > limit,
+                    )
+                probe.beforeList?.invoke()
+                return page
+            }
 
             override fun put(key: String, bytes: ByteArray, sha256: String): ObjectMetadataData {
                 check(!TransactionSynchronizationManager.isActualTransactionActive())

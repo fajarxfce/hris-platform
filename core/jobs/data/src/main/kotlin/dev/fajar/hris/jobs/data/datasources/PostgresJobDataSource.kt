@@ -205,7 +205,9 @@ class PostgresJobDataSource(private val sql: DSLContext) : JobDataSource {
                 .and(J.STATUS.eq("RUNNING"))
                 .and(J.LEASE_UNTIL.gt(DSL.field("clock_timestamp()", OffsetDateTime::class.java)))
         if (status == "SUCCEEDED")
-            query.and(J.CANCELLATION_REQUESTED.isFalse).and(J.COMPLETED_ITEMS.eq(J.TOTAL_ITEMS))
+            query
+                .and(J.CANCELLATION_REQUESTED.isFalse)
+                .and(J.PROGRESS_MODE.eq("UPPER_BOUND").or(J.COMPLETED_ITEMS.eq(J.TOTAL_ITEMS)))
         return query.execute() == 1
     }
 

@@ -30,6 +30,7 @@ fun BackgroundJobsRecord.toJob(json: ObjectMapper): BackgroundJob =
             correlationId,
             createdAt.toInstant(),
             totalItems,
+            JobProgressMode.valueOf(progressMode),
         ),
         JobStatus.valueOf(status),
         attempts,
@@ -54,4 +55,5 @@ fun JobRequest.toRecord(json: ObjectMapper): BackgroundJobsRecord =
         it.correlationId = correlationId
         it.createdAt = OffsetDateTime.ofInstant(createdAt, ZoneOffset.UTC)
         it.totalItems = totalItems
+        it.progressMode = progressMode.name
     }

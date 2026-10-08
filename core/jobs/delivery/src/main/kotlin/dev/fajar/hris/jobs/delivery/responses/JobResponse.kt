@@ -8,6 +8,7 @@ data class JobResponse(
     val status: String,
     val completedItems: Int,
     val totalItems: Int,
+    val progressMode: String,
     val attempts: Int,
     val cancellationRequested: Boolean,
     val failureCode: String?,

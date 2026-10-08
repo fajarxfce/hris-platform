@@ -10,7 +10,11 @@ import org.springframework.context.annotation.Primary
 import org.springframework.transaction.support.TransactionSynchronizationManager
 
 class DocumentStorageProbe : ObjectStorageDataSource {
-    data class Value(val bytes: ByteArray, val sha256: String)
+    data class Value(
+        val bytes: ByteArray,
+        val sha256: String,
+        val modifiedAt: java.time.Instant = java.time.Instant.now(),
+    )
 
     val objects = ConcurrentHashMap<String, Value>()
     val calls = AtomicInteger()
@@ -18,13 +22,50 @@ class DocumentStorageProbe : ObjectStorageDataSource {
     @Volatile var fail = false
     @Volatile var beforeRead: (() -> Unit)? = null
     val reads = AtomicInteger()
+    val listings = AtomicInteger()
+    val cursors = java.util.concurrent.CopyOnWriteArrayList<String>()
+    @Volatile var beforeList: (() -> Unit)? = null
+    @Volatile var failList = false
 
     override fun list(
         prefix: String,
         afterKey: String?,
         limit: Int,
-    ): dev.fajar.hris.storage.data.models.ObjectInventoryPageData =
-        throw UnsupportedOperationException("Listing is not part of this fixture")
+    ): dev.fajar.hris.storage.data.models.ObjectInventoryPageData {
+        check(!TransactionSynchronizationManager.isActualTransactionActive())
+        listings.incrementAndGet()
+        cursors += afterKey ?: ""
+        val order =
+            Comparator<String> { a, b ->
+                java.util.Arrays.compareUnsigned(
+                    a.toByteArray(Charsets.UTF_8),
+                    b.toByteArray(Charsets.UTF_8),
+                )
+            }
+        val rows =
+            objects.entries
+                .filter {
+                    it.key.startsWith(prefix) &&
+                        (afterKey == null || order.compare(it.key, afterKey) > 0)
+                }
+                .sortedWith { a, b -> order.compare(a.key, b.key) }
+                .take(limit + 1)
+        val page =
+            dev.fajar.hris.storage.data.models.ObjectInventoryPageData(
+                rows.take(limit).map {
+                    dev.fajar.hris.storage.data.models.ObjectInventoryEntryData(
+                        it.key,
+                        it.value.bytes.size.toLong(),
+                        it.value.sha256,
+                        it.value.modifiedAt,
+                    )
+                },
+                rows.size > limit,
+            )
+        beforeList?.invoke()
+        if (failList) throw java.io.IOException("Inventory fixture unavailable")
+        return page
+    }
 
     override fun put(key: String, bytes: ByteArray, sha256: String): ObjectMetadataData {
         check(!TransactionSynchronizationManager.isActualTransactionActive())
@@ -56,6 +97,7 @@ class DocumentStorageProbe : ObjectStorageDataSource {
         objects.clear()
         beforeWrite = null
         beforeRead = null
+        beforeList = null
     }
 }
 

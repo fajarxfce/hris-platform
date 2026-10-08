@@ -2,6 +2,7 @@ package dev.fajar.hris.worker.runtime
 
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.jobs.domain.entities.JobLease
+import dev.fajar.hris.jobs.domain.policies.validJobProgress
 import org.springframework.batch.core.BatchStatus
 import org.springframework.batch.core.job.builder.JobBuilder
 import org.springframework.batch.core.job.parameters.JobParametersBuilder
@@ -42,11 +43,7 @@ class BatchJobExecutor(
                 throw BatchStepException(result.failure)
             }
             val next = (result as Result.Success).value
-            if (
-                next.completedItems !in completed..lease.job.request.totalItems ||
-                    (!next.finished && next.completedItems <= completed) ||
-                    (next.finished && next.completedItems != lease.job.request.totalItems)
-            )
+            if (!validJobProgress(lease.job.request, completed, next))
                 throw BatchStepException(Failure(FailureKind.UNEXPECTED, "job_did_not_progress"))
             contribution.incrementWriteCount((next.completedItems - completed).toLong())
             completed = next.completedItems

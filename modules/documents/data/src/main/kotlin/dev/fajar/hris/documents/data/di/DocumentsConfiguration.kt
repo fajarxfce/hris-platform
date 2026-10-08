@@ -251,4 +251,104 @@ class DocumentsConfiguration {
         storage: ObjectStorageRepository,
         transactions: TransactionRunner,
     ) = ReadDocumentContent(documents, profiles, identities, storage, transactions)
+
+    @Bean
+    fun documentInventorySource(sql: DSLContext): DocumentInventoryDataSource =
+        PostgresDocumentInventoryDataSource(sql)
+
+    @Bean
+    fun documentInventory(source: DocumentInventoryDataSource): DocumentInventoryRepository =
+        StoredDocumentInventoryRepository(source)
+
+    @Bean
+    fun startDocumentInventory(
+        inventory: DocumentInventoryRepository,
+        documents: DocumentRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        StartDocumentInventory(
+            inventory,
+            documents,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun advanceDocumentInventory(
+        inventory: DocumentInventoryRepository,
+        documents: DocumentRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        storage: ObjectStorageRepository,
+        cleanup: ObjectCleanupRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        AdvanceDocumentInventory(
+            inventory,
+            documents,
+            companies,
+            members,
+            identities,
+            jobs,
+            storage,
+            cleanup,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun abortDocumentInventory(
+        documents: DocumentRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+    ) = AbortDocumentInventory(documents, jobs, journal, transactions)
+
+    @Bean
+    fun getDocumentInventory(
+        inventory: DocumentInventoryRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetDocumentInventory(inventory, identities, transactions)
+
+    @Bean
+    fun listDocumentInventories(
+        inventory: DocumentInventoryRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = ListDocumentInventories(inventory, identities, transactions)
+
+    @Bean
+    fun getDocumentInventoryAttempts(
+        inventory: DocumentInventoryRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetDocumentInventoryAttempts(inventory, identities, transactions)
+
+    @Bean
+    fun getDocumentInventoryPages(
+        inventory: DocumentInventoryRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetDocumentInventoryPages(inventory, identities, transactions)
 }

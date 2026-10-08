@@ -15,4 +15,5 @@ data class JobRequest(
     val correlationId: UUID,
     val createdAt: Instant,
     val totalItems: Int,
+    val progressMode: JobProgressMode = JobProgressMode.FIXED_TOTAL,
 )

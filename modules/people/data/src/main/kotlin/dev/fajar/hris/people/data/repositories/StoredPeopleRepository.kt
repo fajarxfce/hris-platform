@@ -3,6 +3,7 @@ package dev.fajar.hris.people.data.repositories
 import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.people.data.datasources.PeopleDataSource
+import dev.fajar.hris.people.data.datasources.PersonProfileDataSource
 import dev.fajar.hris.people.data.mappers.*
 import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -12,7 +13,10 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import java.util.UUID
 
-class StoredPeopleRepository(private val source: PeopleDataSource) : PeopleRepository {
+class StoredPeopleRepository(
+    private val source: PeopleDataSource,
+    private val profiles: PersonProfileDataSource,
+) : PeopleRepository {
     override fun employeeIds(companyId: UUID, limit: Int): Result<List<UUID>> = safeDatabaseCall {
         source.employeeIds(companyId, limit)
     }
@@ -100,6 +104,7 @@ class StoredPeopleRepository(private val source: PeopleDataSource) : PeopleRepos
     ): Result<MutationReceipt> = safeDatabaseCall {
         val company = requireNotNull(actor.companyId)
         source.insertPerson(person.toRow(company))
+        profiles.insertRevision(person.toProfileRevision(company, 0, actor.accountId, reason))
         source.insertEmployment(
             EmploymentsRecord().also {
                 it.companyId = company

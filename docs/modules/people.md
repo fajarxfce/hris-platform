@@ -18,6 +18,14 @@ Organization unit creation/update/archive and cycle checks are implemented. Empl
 
 Employee directories and detail reads support company-wide HR, direct-report manager, and self scope. Their public projection excludes birth date and nationality. Lists and history use bounded cursor pagination. Current endpoints require an explicit `asOf` date for employee reads.
 
-Personal profile editing, lifecycle checklists, CSV import, cross-company transfers, and automatic offboarding access changes remain planned. See [API conventions](../api-conventions.md).
+Versioned personal profile editing and immutable history are implemented. Lifecycle checklists, CSV import, cross-company transfers, and automatic offboarding access changes remain planned. See [API conventions](../api-conventions.md).
 
 Team visibility follows current reporting assignments using company-local dates from the server clock. Historical filters cannot restore former-manager access. Combined team/self grants include both scopes.
+
+## Personal profiles
+
+Sensitive profiles have separate `people.profile.read` and `people.profile.manage` grants. Company administrators and HR templates include these for new assignments; existing memberships require an explicit permission update. Directory access alone does not reveal birth dates or nationality. An employee can read their own profile with `people.self.read`, while profile history requires the explicit sensitive-read grant.
+
+`GET/PUT /companies/{companyId}/employees/{employeeId}/profile` reads or changes the shared person profile. Changes require the owning company, an expected profile version, an idempotency key, and a reason. Account linkage and the owning company are immutable through this operation. The profile version is independent of employment revisions. Profile changes, complete immutable history, audit/outbox, and receipts share one transaction. Employment revision numbers and terms remain unchanged. Directories show the current profile; submitted leave snapshots remain immutable. Payroll must snapshot personal data at finalization.
+
+`GET .../profile/history` uses ascending revision cursors with a maximum page size of 200. Migrated initial profiles have no recorded actor; subsequent revisions retain the actual actor and reason. Company access to a shared person permits reads only when the company has that person's employment and the actor has the required grant. The owner company remains responsible for edits.

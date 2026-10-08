@@ -9,6 +9,14 @@ import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import java.util.UUID
 
 class StoredMembershipRepository(private val source: MembershipDataSource) : MembershipRepository {
+    override fun hasOtherActiveMember(
+        companyId: UUID,
+        exceptAccountId: UUID,
+        permission: String,
+    ): Result<Boolean> = safeDatabaseCall {
+        source.hasOtherActiveMember(companyId, exceptAccountId, permission)
+    }
+
     override fun lock(companyId: UUID): Result<Unit> = safeDatabaseCall { source.lock(companyId) }
 
     override fun find(companyId: UUID, accountId: UUID): Result<MemberAccount?> = safeDatabaseCall {

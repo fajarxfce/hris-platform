@@ -2,6 +2,7 @@ package dev.fajar.hris.people.data.datasources
 
 import dev.fajar.hris.people.data.queries.activeEmploymentRevision
 import dev.fajar.hris.people.data.queries.employeesAtInstant
+import dev.fajar.hris.people.data.queries.latestEmploymentRevision
 import dev.fajar.hris.schema.Tables.EMPLOYMENT_REVISION_CANCELLATIONS as C
 import dev.fajar.hris.schema.tables.EmployeesAt.EMPLOYEES_AT
 import dev.fajar.hris.schema.tables.EmploymentRevisions.EMPLOYMENT_REVISIONS as R
@@ -15,6 +16,67 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresPeopleDataSource(private val sql: DSLContext) : PeopleDataSource {
+    override fun hasOpenEmploymentAtOrAfter(
+        companyId: UUID,
+        personId: UUID,
+        exceptId: UUID?,
+        from: LocalDate,
+    ): Boolean {
+        val current = EMPLOYEES_AT.call(companyId, from)
+        val present =
+            DSL.exists(
+                sql.selectOne()
+                    .from(current)
+                    .where(current.PERSON_ID.eq(personId))
+                    .and(exceptId?.let { current.ID.ne(it) } ?: DSL.noCondition())
+                    .and(current.STATUS.ne("ENDED"))
+                    .and(current.END_DATE.isNull.or(current.END_DATE.ge(from)))
+            )
+        val future =
+            DSL.exists(
+                sql.selectOne()
+                    .from(R)
+                    .join(E)
+                    .on(E.COMPANY_ID.eq(R.COMPANY_ID).and(E.ID.eq(R.EMPLOYMENT_ID)))
+                    .where(R.COMPANY_ID.eq(companyId))
+                    .and(E.PERSON_ID.eq(personId))
+                    .and(exceptId?.let { E.ID.ne(it) } ?: DSL.noCondition())
+                    .and(R.EFFECTIVE_FROM.gt(from))
+                    .and(R.STATUS.ne("ENDED"))
+                    .and(R.END_DATE.isNull.or(R.END_DATE.ge(R.EFFECTIVE_FROM)))
+                    .and(latestEmploymentRevision(R))
+            )
+        return sql.fetchExists(sql.selectOne().where(present.or(future)))
+    }
+
+    override fun hasReportingDependentsAtOrAfter(
+        companyId: UUID,
+        id: UUID,
+        from: LocalDate,
+    ): Boolean {
+        val current = EMPLOYEES_AT.call(companyId, from)
+        val present =
+            DSL.exists(
+                sql.selectOne()
+                    .from(current)
+                    .where(current.MANAGER_ID.eq(id))
+                    .and(current.STATUS.ne("ENDED"))
+                    .and(current.END_DATE.isNull.or(current.END_DATE.ge(from)))
+            )
+        val future =
+            DSL.exists(
+                sql.selectOne()
+                    .from(R)
+                    .where(R.COMPANY_ID.eq(companyId))
+                    .and(R.MANAGER_ID.eq(id))
+                    .and(R.EFFECTIVE_FROM.gt(from))
+                    .and(R.STATUS.ne("ENDED"))
+                    .and(R.END_DATE.isNull.or(R.END_DATE.ge(R.EFFECTIVE_FROM)))
+                    .and(latestEmploymentRevision(R))
+            )
+        return sql.fetchExists(sql.selectOne().where(present.or(future)))
+    }
+
     override fun currentVersion(companyId: UUID, id: UUID): Long? =
         sql.select(E.VERSION)
             .from(E)

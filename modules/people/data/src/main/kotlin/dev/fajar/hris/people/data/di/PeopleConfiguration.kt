@@ -1,12 +1,12 @@
 package dev.fajar.hris.people.data.di
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.repositories.IdentityRepository
-import dev.fajar.hris.organization.domain.repositories.OrganizationRepository
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.organization.domain.repositories.*
 import dev.fajar.hris.people.data.datasources.*
 import dev.fajar.hris.people.data.repositories.*
-import dev.fajar.hris.people.domain.repositories.PeopleRepository
-import dev.fajar.hris.people.domain.repositories.PersonProfileRepository
+import dev.fajar.hris.people.domain.repositories.*
 import dev.fajar.hris.people.domain.usecases.*
 import java.time.Clock
 import org.jooq.DSLContext
@@ -66,7 +66,8 @@ class PeopleConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
-    ) = ReviseEmployment(people, units, operations, journal, transactions)
+        transfers: EmploymentTransferRepository,
+    ) = ReviseEmployment(people, units, operations, journal, transactions, transfers)
 
     @Bean
     fun getEmployee(people: PeopleRepository, transactions: TransactionRunner, clock: Clock) =
@@ -83,10 +84,54 @@ class PeopleConfiguration {
     @Bean
     fun cancelEmploymentRevision(
         people: PeopleRepository,
-        companies: dev.fajar.hris.organization.domain.repositories.CompanyRepository,
+        companies: CompanyRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
     ) = CancelEmploymentRevision(people, companies, operations, journal, transactions, clock)
+
+    @Bean
+    fun transferSource(sql: DSLContext): EmploymentTransferDataSource =
+        PostgresEmploymentTransferDataSource(sql)
+
+    @Bean
+    fun employmentTransfers(source: EmploymentTransferDataSource): EmploymentTransferRepository =
+        StoredEmploymentTransferRepository(source)
+
+    @Bean
+    fun getEmploymentTransfers(
+        transfers: EmploymentTransferRepository,
+        transactions: TransactionRunner,
+    ) = GetEmploymentTransfers(transfers, transactions)
+
+    @Bean
+    fun transferEmployee(
+        people: PeopleRepository,
+        transfers: EmploymentTransferRepository,
+        companies: CompanyRepository,
+        units: OrganizationRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        roles: RoleTemplateRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: CrossCompanyTransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        TransferEmployee(
+            people,
+            transfers,
+            companies,
+            units,
+            identities,
+            members,
+            roles,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
 }

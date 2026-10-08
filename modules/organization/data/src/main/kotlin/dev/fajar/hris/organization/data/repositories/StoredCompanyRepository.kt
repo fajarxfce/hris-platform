@@ -15,6 +15,8 @@ class StoredCompanyRepository(
     private val receipts: OperationReceiptDataSource,
     private val json: ObjectMapper,
 ) : CompanyRepository {
+    override fun lock(id: UUID): Result<Unit> = safeDatabaseCall { source.lock(id) }
+
     override fun find(id: UUID): Result<Company?> = safeDatabaseCall {
         source.find(id)?.toCompany()
     }

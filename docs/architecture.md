@@ -20,6 +20,8 @@ Domain Result carries typed failures. Stateless safeDatabaseCall and storage/SDK
 
 TransactionRunner is a domain port implemented using Spring transactions. A failed Result marks rollback. Request-scoped company context is installed using SET LOCAL and does not leak through pooled connections. Runtime credentials cannot bypass RLS; migration credentials are separate. Business transactions set local query (15 seconds), lock (5 seconds), and idle-transaction (30 seconds) timeouts with a 30-second transaction budget. A late interruption before commit rolls back and propagates cancellation. Mapping failures become sanitized data failures; internal diagnostics retain SQLState and application call frames, never SQL text or bound values.
 
+An explicitly injected CrossCompanyTransactionRunner supports atomic employment transfers. It installs one secondary company for a bounded transaction, with RLS policies limited to transfer inputs, employment writes, and audit/outbox inserts. Ordinary transactions explicitly clear that secondary scope. Transfer use cases lock companies/memberships in stable order and recheck live access to both companies before mutation or replay. This is not a global RLS bypass.
+
 Business changes, audit, outbox, and idempotency receipts share their transaction. Receipt keys bind company or account scope, actor, operation, and payload hash. Account receipts cannot be read through a company scope or by another actor. Repeated identical commands return the committed outcome; key/payload mismatches fail. Optimistic versions reject obsolete updates. A lost response never implies that the transaction rolled back.
 
 ## Security

@@ -134,13 +134,9 @@ class SaveCompanyMembership(
                     (!active || "identity.manage" !in effectivePermissions)
             ) {
                 val administrators =
-                    members.candidates(company, emptySet(), setOf("identity.manage"), 200)
+                    members.hasOtherActiveMember(company, accountId, "identity.manage")
                 if (administrators is Result.Failed) return@run administrators
-                if (
-                    (administrators as Result.Success).value.count {
-                        it.accountActive && it.membershipActive
-                    } <= 1
-                )
+                if (!(administrators as Result.Success).value)
                     return@run Result.Failed(
                         Failure(FailureKind.CONFLICT, "last_company_administrator")
                     )

@@ -6,6 +6,11 @@ import java.util.UUID
 import org.jooq.DSLContext
 
 class PostgresCompanyDataSource(private val sql: DSLContext) : CompanyDataSource {
+    override fun lock(id: UUID) {
+        sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "company-state:$id")
+            .execute()
+    }
+
     override fun find(id: UUID): CompaniesRecord? =
         sql.selectFrom(COMPANIES).where(COMPANIES.ID.eq(id)).fetchOne()
 

@@ -6,6 +6,15 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 interface PeopleDataSource {
+    fun hasOpenEmploymentAtOrAfter(
+        companyId: UUID,
+        personId: UUID,
+        exceptId: UUID?,
+        from: LocalDate,
+    ): Boolean
+
+    fun hasReportingDependentsAtOrAfter(companyId: UUID, id: UUID, from: LocalDate): Boolean
+
     fun currentVersion(companyId: UUID, id: UUID): Long?
 
     fun findRevision(companyId: UUID, id: UUID, revision: Long): EmploymentRevisionsRecord?

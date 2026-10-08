@@ -42,3 +42,7 @@ fun canReadEmployee(actor: Actor, employee: Employee, current: Employee?): Boole
         ("people.team.read" in actor.permissions &&
             current?.managerAccountId == actor.accountId &&
             current.terms.status != EmploymentStatus.ENDED)
+
+fun validateEmployeeNumber(number: String): Result<Unit> =
+    if (number.matches(Regex("[A-Z0-9][A-Z0-9_-]{1,31}"))) Result.Success(Unit)
+    else Result.Failed(Failure(FailureKind.VALIDATION, "invalid_employee_number"))

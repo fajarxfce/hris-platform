@@ -5,6 +5,8 @@ import dev.fajar.hris.organization.domain.entities.Company
 import java.util.UUID
 
 interface CompanyRepository {
+    fun lock(id: UUID): Result<Unit>
+
     fun find(id: UUID): Result<Company?>
 
     fun create(actor: Actor, operationId: UUID, company: Company): Result<MutationReceipt>

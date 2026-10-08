@@ -9,6 +9,25 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresMembershipDataSource(private val sql: DSLContext) : MembershipDataSource {
+    override fun hasOtherActiveMember(
+        companyId: UUID,
+        exceptAccountId: UUID,
+        permission: String,
+    ): Boolean =
+        sql.fetchExists(
+            sql.selectOne()
+                .from(M)
+                .join(A)
+                .on(A.ID.eq(M.ACCOUNT_ID))
+                .join(P)
+                .on(P.COMPANY_ID.eq(M.COMPANY_ID).and(P.ACCOUNT_ID.eq(M.ACCOUNT_ID)))
+                .where(M.COMPANY_ID.eq(companyId))
+                .and(M.ACCOUNT_ID.ne(exceptAccountId))
+                .and(M.ACTIVE.isTrue)
+                .and(A.ACTIVE.isTrue)
+                .and(P.PERMISSION.eq(permission))
+        )
+
     override fun lock(companyId: UUID) {
         sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "memberships:$companyId")
             .execute()

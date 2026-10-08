@@ -1,6 +1,5 @@
 package dev.fajar.hris.core.database
 
-import dev.fajar.hris.core.domain.TransactionRunner
 import javax.sql.DataSource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -47,5 +46,5 @@ class DatabaseConfiguration {
     fun transactionRunner(
         manager: PlatformTransactionManager,
         jdbc: JdbcTemplate,
-    ): TransactionRunner = PostgresTransactionRunner(manager, jdbc)
+    ): PostgresTransactionRunner = PostgresTransactionRunner(manager, jdbc)
 }

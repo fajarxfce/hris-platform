@@ -10,6 +10,10 @@ import java.util.UUID
 import org.jooq.DSLContext
 
 class PostgresIdentityDataSource(private val sql: DSLContext) : IdentityDataSource {
+    override fun lockAccount(id: UUID) {
+        sql.select(ACCOUNTS.ID).from(ACCOUNTS).where(ACCOUNTS.ID.eq(id)).forUpdate().fetchOne()
+    }
+
     override fun lockBootstrap() {
         sql.execute("select pg_advisory_xact_lock(70419321)")
     }

@@ -5,6 +5,12 @@ import dev.fajar.hris.identity.domain.entities.MemberAccount
 import java.util.UUID
 
 interface MembershipRepository {
+    fun hasOtherActiveMember(
+        companyId: UUID,
+        exceptAccountId: UUID,
+        permission: String,
+    ): Result<Boolean>
+
     fun lock(companyId: UUID): Result<Unit>
 
     fun find(companyId: UUID, accountId: UUID): Result<MemberAccount?>

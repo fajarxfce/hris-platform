@@ -32,8 +32,8 @@ class CreateEmployee(
         val access = actor.requirePermission("people.manage")
         if (access is Result.Failed) return access
         val employeeNumber = number.trim().uppercase()
-        if (!employeeNumber.matches(Regex("[A-Z0-9][A-Z0-9_-]{1,31}")))
-            return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_employee_number"))
+        val numberValidation = validateEmployeeNumber(employeeNumber)
+        if (numberValidation is Result.Failed) return numberValidation
         val person =
             profile.copy(
                 legalName = profile.legalName.trim(),

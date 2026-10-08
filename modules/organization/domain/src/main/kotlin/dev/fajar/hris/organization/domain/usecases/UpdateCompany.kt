@@ -34,6 +34,8 @@ class UpdateCompany(
         if (validation is Result.Failed) return validation
         if (version < 0) return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_version"))
         return transactions.run(actor) {
+            val lock = companies.lock(company.id)
+            if (lock is Result.Failed) return@run lock
             companies.update(actor, operationId, company).flatMap { receipt ->
                 if (receipt.replayed) Result.Success(receipt)
                 else

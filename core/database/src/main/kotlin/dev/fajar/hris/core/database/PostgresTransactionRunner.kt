@@ -13,7 +13,7 @@ class PostgresTransactionRunner(
     private val jdbc: JdbcTemplate,
     private val statementTimeout: java.time.Duration = java.time.Duration.ofSeconds(15),
     private val lockTimeout: java.time.Duration = java.time.Duration.ofSeconds(5),
-) : TransactionRunner {
+) : TransactionRunner, dev.fajar.hris.core.domain.CrossCompanyTransactionRunner {
     init {
         require(statementTimeout.toMillis() in 1..300_000)
         require(lockTimeout.toMillis() in 1..statementTimeout.toMillis())
@@ -22,6 +22,22 @@ class PostgresTransactionRunner(
     private val transaction = TransactionTemplate(manager).apply { timeout = 30 }
 
     override fun <T> run(actor: Actor, operation: () -> Result<T>): Result<T> =
+        runScoped(actor, null, operation)
+
+    override fun <T> run(
+        actor: Actor,
+        secondaryCompanyId: java.util.UUID,
+        operation: () -> Result<T>,
+    ): Result<T> {
+        require(actor.companyId != null && actor.companyId != secondaryCompanyId)
+        return runScoped(actor, secondaryCompanyId, operation)
+    }
+
+    private fun <T> runScoped(
+        actor: Actor,
+        secondaryCompanyId: java.util.UUID?,
+        operation: () -> Result<T>,
+    ): Result<T> =
         try {
             if (Thread.currentThread().isInterrupted) throw InterruptedException()
             check(
@@ -55,6 +71,11 @@ class PostgresTransactionRunner(
                         "select set_config('hris.actor_id', ?, true)",
                         String::class.java,
                         actor.accountId.toString(),
+                    )
+                    jdbc.queryForObject(
+                        "select set_config('hris.secondary_company_id', ?, true)",
+                        String::class.java,
+                        secondaryCompanyId?.toString() ?: "",
                     )
                     val result = operation()
                     if (Thread.currentThread().isInterrupted) throw InterruptedException()

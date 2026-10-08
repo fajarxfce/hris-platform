@@ -18,6 +18,45 @@ class StoredPeopleRepository(
     private val source: PeopleDataSource,
     private val profiles: PersonProfileDataSource,
 ) : PeopleRepository {
+    override fun createForPerson(
+        actor: Actor,
+        id: UUID,
+        number: String,
+        personId: UUID,
+        terms: EmploymentTerms,
+        reason: String,
+    ): Result<MutationReceipt> = safeDatabaseCall {
+        val company = requireNotNull(actor.companyId)
+        source.insertEmployment(
+            EmploymentsRecord().also {
+                it.companyId = company
+                it.id = id
+                it.personId = personId
+                it.employeeNumber = number
+                it.version = 0
+            }
+        )
+        source.insertRevision(terms.toRow(company, id, 0, actor.accountId, reason))
+        MutationReceipt(id, 0)
+    }
+
+    override fun hasOpenEmploymentAtOrAfter(
+        companyId: UUID,
+        personId: UUID,
+        exceptId: UUID?,
+        from: LocalDate,
+    ): Result<Boolean> = safeDatabaseCall {
+        source.hasOpenEmploymentAtOrAfter(companyId, personId, exceptId, from)
+    }
+
+    override fun hasReportingDependentsAtOrAfter(
+        companyId: UUID,
+        id: UUID,
+        from: LocalDate,
+    ): Result<Boolean> = safeDatabaseCall {
+        source.hasReportingDependentsAtOrAfter(companyId, id, from)
+    }
+
     override fun currentVersion(companyId: UUID, id: UUID): Result<Long?> = safeDatabaseCall {
         source.currentVersion(companyId, id)
     }

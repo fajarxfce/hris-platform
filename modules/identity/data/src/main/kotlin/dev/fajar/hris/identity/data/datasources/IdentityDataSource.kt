@@ -4,6 +4,8 @@ import dev.fajar.hris.schema.tables.records.AccountsRecord
 import java.util.UUID
 
 interface IdentityDataSource {
+    fun lockAccount(id: UUID)
+
     fun lockBootstrap()
 
     fun countAccounts(): Int

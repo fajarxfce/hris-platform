@@ -7,6 +7,24 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface PeopleRepository {
+    fun createForPerson(
+        actor: Actor,
+        id: UUID,
+        number: String,
+        personId: UUID,
+        terms: EmploymentTerms,
+        reason: String,
+    ): Result<MutationReceipt>
+
+    fun hasOpenEmploymentAtOrAfter(
+        companyId: UUID,
+        personId: UUID,
+        exceptId: UUID?,
+        from: LocalDate,
+    ): Result<Boolean>
+
+    fun hasReportingDependentsAtOrAfter(companyId: UUID, id: UUID, from: LocalDate): Result<Boolean>
+
     fun currentVersion(companyId: UUID, id: UUID): Result<Long?>
 
     fun findRevision(companyId: UUID, id: UUID, revision: Long): Result<EmploymentRevision?>

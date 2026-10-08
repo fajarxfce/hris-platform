@@ -1,7 +1,6 @@
 package dev.fajar.hris.worker.di
 
 import dev.fajar.hris.core.database.PostgresTransactionRunner
-import dev.fajar.hris.core.domain.TransactionRunner
 import dev.fajar.hris.identity.domain.usecases.ResolveActor
 import dev.fajar.hris.jobs.domain.usecases.*
 import dev.fajar.hris.worker.runtime.*
@@ -32,7 +31,7 @@ class WorkerConfiguration {
     fun workerTransactions(
         manager: PlatformTransactionManager,
         jdbc: JdbcTemplate,
-    ): TransactionRunner =
+    ): PostgresTransactionRunner =
         PostgresTransactionRunner(
             manager,
             jdbc,

@@ -274,4 +274,88 @@ class PostgresIsolationTest {
             ),
         )
     }
+
+    @Test
+    fun explicitSecondaryScopeIsLimitedToRequiredTablesAndClearsOnRollbackAndReuse() {
+        val third = UUID.randomUUID()
+        val firstEvent = UUID.randomUUID()
+        val secondEvent = UUID.randomUUID()
+        admin.update(
+            "insert into companies(id,code,name,timezone) values(?,?,'Third company','UTC')",
+            third,
+            "C${third.toString().take(8)}",
+        )
+        val expected = Result.Failed(Failure(FailureKind.CONFLICT, "fixture_rollback"))
+        val outcome =
+            transactions.run(actor(companyA), companyB) {
+                assertEquals(
+                    listOf("A", "B"),
+                    jdbc.queryForList(
+                        "select code from companies order by code",
+                        String::class.java,
+                    ),
+                )
+                // Secondary company metadata is readable; this scope grants no metadata update.
+                assertEquals(
+                    0,
+                    jdbc.update("update companies set name='Not permitted' where id=?", companyB),
+                )
+                for ((company, id) in listOf(companyA to firstEvent, companyB to secondEvent)) {
+                    jdbc.update(
+                        "insert into audit_entries(id,company_id,actor_id,resource_type,resource_id,action,correlation_id) values(?,?,?,'fixture',?,'transfer_scope',?)",
+                        id,
+                        company,
+                        actorId,
+                        UUID.randomUUID(),
+                        UUID.randomUUID(),
+                    )
+                }
+                expected
+            }
+        assertEquals(expected, outcome)
+        assertEquals(
+            0,
+            admin.queryForObject(
+                "select count(*) from audit_entries where id in (?,?)",
+                Int::class.java,
+                firstEvent,
+                secondEvent,
+            ),
+        )
+        assertEquals(
+            Result.Success(listOf("A")),
+            transactions.run(actor(companyA)) {
+                Result.Success(jdbc.queryForList("select code from companies", String::class.java))
+            },
+        )
+        assertTrue(
+            jdbc
+                .queryForObject(
+                    "select current_setting('hris.secondary_company_id',true)",
+                    String::class.java,
+                )
+                .isNullOrEmpty()
+        )
+        val denied =
+            transactions.run(actor(companyA), companyB) {
+                safeDatabaseCall {
+                    jdbc.update(
+                        "insert into audit_entries(id,company_id,actor_id,resource_type,resource_id,action,correlation_id) values(?,?,?,'fixture',?,'forbidden',?)",
+                        UUID.randomUUID(),
+                        third,
+                        actorId,
+                        UUID.randomUUID(),
+                        UUID.randomUUID(),
+                    )
+                }
+            }
+        assertInstanceOf(Result.Failed::class.java, denied)
+        assertEquals(0, jdbc.queryForObject("select count(*) from companies", Int::class.java))
+        assertThrows(IllegalArgumentException::class.java) {
+            transactions.run(actor(null), companyB) { Result.Success(Unit) }
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            transactions.run(actor(companyA), companyA) { Result.Success(Unit) }
+        }
+    }
 }

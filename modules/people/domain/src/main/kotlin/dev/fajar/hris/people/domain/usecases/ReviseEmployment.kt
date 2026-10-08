@@ -14,6 +14,7 @@ class ReviseEmployment(
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
+    private val transfers: dev.fajar.hris.people.domain.repositories.EmploymentTransferRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -71,6 +72,21 @@ class ReviseEmployment(
             if (terms.startDate != employee.terms.startDate)
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "employment_start_immutable")
+                )
+            val transferred = transfers.forEmployee(company, id)
+            if (transferred is Result.Failed) return@run transferred
+            val outgoing =
+                (transferred as Result.Success).value.firstOrNull {
+                    it.sourceCompanyId == company && it.sourceEmploymentId == id
+                }
+            if (
+                outgoing != null &&
+                    !terms.effectiveFrom.isBefore(outgoing.effectiveDate) &&
+                    (terms.status != EmploymentStatus.ENDED ||
+                        terms.endDate != outgoing.effectiveDate.minusDays(1))
+            )
+                return@run Result.Failed(
+                    Failure(FailureKind.CONFLICT, "transferred_employment_closed")
                 )
             for ((unitId, kind) in
                 listOf(

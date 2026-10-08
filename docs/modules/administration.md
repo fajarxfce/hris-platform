@@ -9,3 +9,14 @@ Runtime audit is append-only with actor/reason/resource/correlation. Failed jobs
 Screens: settings, flags, integration status, audit explorer, job monitor.
 
 Acceptance: policy effective dates, restricted settings/audit access, safe retry, stale client policy, secret redaction, and recovery from backup.
+
+
+## Durable job foundation
+
+Company-scoped job queries and versioned cancellation requests are implemented. Lists expose progress and safe failure codes, with own-job visibility or explicit company-wide access. Job request inputs and terminal updates are immutable. A cancellation request blocks subsequent progress and successful completion; the feature worker must acknowledge cancellation and release its own reservations.
+
+PostgreSQL leasing is restricted to the `hris_worker_capability` role. Its broader RLS policy applies to the queue only; business tables retain their existing company scope. Application credentials cannot execute the lease function or access the separate Spring Batch metadata schema. A new lease changes the ownership token. Heartbeats, checkpoints, completion, and deferral require the current token and a lease that is still valid according to the database clock. Feature workers must update their business result and checkpoint in one transaction.
+
+Claims allow at most two active jobs per company and four across the deployment, with bounded scans and eight attempts. The leasing use case turns exhausted leases into failed jobs with an atomic audit record; the datasource does not choose retry or cleanup policy. A failed or cancelled business workflow may need a feature-specific recovery action; the queue cannot silently release business reservations. Job inputs and checkpoint JSON are limited to 8 KiB each. Feature submission endpoints, Spring Batch execution, worker lifecycle, and business recovery are subsequent slices; no generic arbitrary-job submission endpoint is exposed.
+
+The metadata schema is based on Spring Batch 6.0.5 and is distributed under Apache-2.0. [Spring Batch source](https://github.com/spring-projects/spring-batch/tree/v6.0.5/spring-batch-core/src/main/resources/org/springframework/batch/core).

@@ -32,3 +32,5 @@ include(":modules:approvals:domain", ":modules:approvals:data", ":modules:approv
 include(":modules:workforce:domain", ":modules:workforce:data", ":modules:workforce:delivery")
 
 include(":modules:leave:domain", ":modules:leave:data", ":modules:leave:delivery")
+
+include(":core:jobs:domain", ":core:jobs:data", ":core:jobs:delivery")

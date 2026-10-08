@@ -28,6 +28,7 @@ object PermissionCatalog {
             "settings.manage",
             "audit.read",
             "jobs.read",
+            "jobs.manage",
             "jobs.retry",
         )
     val humanResources =

@@ -11,7 +11,7 @@
 - Leave: effective policies, independent balance adjustments, immutable scoped ledger, snapshotted requests, staged approval, withdrawal, and cancellation implemented. Accrual, carryover/expiry, attachments, and closing integration remain planned.
 - Documents and expenses: planned.
 - Payroll: planned.
-- Communications, reporting, and administration: planned.
+- Communications and reporting: planned. Administration has company-scoped job queries/cancellation, bounded PostgreSQL leasing, and isolated Spring Batch metadata. Worker execution, feature scheduling/recovery, and other operational controls remain planned.
 - Azure-style dashboard: planned.
 - Compose employee application integration: subsequent phase.
 
@@ -70,3 +70,5 @@ Password resource controls: full Gradle check and bootJar passed (90 tests total
 Authenticator MFA: full Gradle check and bootJar passed (101 tests total). Additional tests cover RFC 6238 vectors, account-bound encryption and key rotation, mandatory and voluntary MFA, enrollment replay and expiry, session/CSRF rotation, concurrent one-use authenticator and recovery codes, recent-authentication limits, committed failed-attempt budgets, missing-key refusal, and complete rollback after a deliberately failed audit insert. API interception also protects handlers without an Actor parameter. Compose configuration validation passed; no live deployment is claimed.
 
 Native session slice: full Gradle check and bootJar passed (109 tests total). Eight HTTP/PostgreSQL tests cover exchange replay, cookie/bearer separation, malformed or duplicate authorization headers, concurrent refresh with equal/different operation IDs, committed reuse revocation, complete refresh rollback after a failed audit insert, credential expiry and revocation, account ownership, native MFA renewal, and bounded session issuance/rotation. No device integration or performance benchmark is claimed.
+
+Durable job foundation: full Gradle check and bootJar passed (113 tests total). Four additional HTTP/PostgreSQL tests cover worker-only leasing, queue and business RLS separation, restricted Spring Batch metadata, competing leases with company/global limits, stale ownership and transactional rollback, immutable completed updates, versioned cancellation, and audited exhaustion after repeated crashes. Retry/exhaustion policy is owned by a domain use case. The Spring Batch executor, process lifecycle, feature scheduling, and feature-specific recovery are not claimed by these checks.

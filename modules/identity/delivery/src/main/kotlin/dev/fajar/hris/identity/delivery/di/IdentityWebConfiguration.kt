@@ -21,6 +21,16 @@ import tools.jackson.databind.ObjectMapper
 
 @Configuration(proxyBeanMethods = false)
 class IdentityWebConfiguration {
+    @Bean fun sessionContexts() = HttpSessionSecurityContextRepository()
+
+    @Bean fun csrfTokens() = HttpSessionCsrfTokenRepository()
+
+    @Bean
+    fun mfaSessionElevation(
+        contexts: HttpSessionSecurityContextRepository,
+        csrf: HttpSessionCsrfTokenRepository,
+    ) = MfaSessionElevation(contexts, csrf)
+
     @Bean
     fun passwordAuthenticationProvider(
         signIn: SignInWithPassword,
@@ -31,10 +41,19 @@ class IdentityWebConfiguration {
     @Bean
     fun actorArguments(resolve: ResolveActor): WebMvcConfigurer =
         object : WebMvcConfigurer {
+            override fun addInterceptors(
+                registry: org.springframework.web.servlet.config.annotation.InterceptorRegistry
+            ) {
+                registry
+                    .addInterceptor(ActorRequestInterceptor(resolve))
+                    .addPathPatterns("/api/v1/**")
+                    .excludePathPatterns("/api/v1/auth/csrf")
+            }
+
             override fun addArgumentResolvers(
                 resolvers: MutableList<HandlerMethodArgumentResolver>
             ) {
-                resolvers.add(CompanyActorArgumentResolver(resolve))
+                resolvers.add(CompanyActorArgumentResolver())
             }
         }
 
@@ -43,9 +62,9 @@ class IdentityWebConfiguration {
         http: HttpSecurity,
         provider: org.springframework.security.authentication.AuthenticationProvider,
         json: ObjectMapper,
+        contexts: HttpSessionSecurityContextRepository,
+        csrf: HttpSessionCsrfTokenRepository,
     ): SecurityFilterChain {
-        val contexts = HttpSessionSecurityContextRepository()
-        val csrf = HttpSessionCsrfTokenRepository()
         val authentication =
             JsonLoginFilter(ProviderManager(provider), JsonLoginConverter(json)).apply {
                 setSecurityContextRepository(contexts)

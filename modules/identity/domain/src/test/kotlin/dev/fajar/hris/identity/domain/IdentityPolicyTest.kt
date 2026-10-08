@@ -124,7 +124,12 @@ class IdentityPolicyTest {
                     AccountAccess(account, setOf("payroll.read"), flags.first, flags.second),
                 )
             val result =
-                ResolveActor(repository, transactions)
+                ResolveActor(
+                        repository,
+                        transactions,
+                        Clock.fixed(now, ZoneOffset.UTC),
+                        IdentitySecurityPolicy(enforceMfa = false),
+                    )
                     .execute(account.id, UUID.randomUUID(), now, UUID.randomUUID())
             assertEquals(
                 Result.Failed(Failure(FailureKind.FORBIDDEN, "company_access_denied")),
@@ -139,7 +144,12 @@ class IdentityPolicyTest {
         val repository =
             IdentityFake(account, AccountAccess(account, setOf("people.read"), true, true))
         val result =
-            ResolveActor(repository, transactions)
+            ResolveActor(
+                    repository,
+                    transactions,
+                    Clock.fixed(now, ZoneOffset.UTC),
+                    IdentitySecurityPolicy(enforceMfa = false),
+                )
                 .execute(account.id, company, now, UUID.randomUUID())
         assertInstanceOf(Result.Success::class.java, result)
         val actor = (result as Result.Success).value

@@ -11,6 +11,8 @@ class SaveCompanyMembership(
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
+    private val clock: java.time.Clock,
+    private val security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -23,6 +25,15 @@ class SaveCompanyMembership(
     ): Result<MutationReceipt> {
         val access = actor.requirePermission("identity.manage")
         if (access is Result.Failed) return access
+        if (security.enforceMfa) {
+            val recent =
+                dev.fajar.hris.identity.domain.policies.requireRecentMfa(
+                    actor,
+                    clock.instant(),
+                    security.recentAuthenticationAge,
+                )
+            if (recent is Result.Failed) return recent
+        }
         if (
             !PermissionCatalog.assignable.containsAll(permissions) ||
                 reason.isBlank() ||

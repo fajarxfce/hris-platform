@@ -36,6 +36,22 @@ class PostgresIdentityDataSource(private val sql: DSLContext) : IdentityDataSour
             .returning()
             .fetchSingle()
 
+    override fun activeMembershipPermissions(accountId: UUID): Set<String> =
+        sql.selectDistinct(MEMBERSHIP_PERMISSIONS.PERMISSION)
+            .from(MEMBERSHIP_PERMISSIONS)
+            .join(COMPANY_MEMBERSHIPS)
+            .on(
+                COMPANY_MEMBERSHIPS.COMPANY_ID.eq(MEMBERSHIP_PERMISSIONS.COMPANY_ID)
+                    .and(COMPANY_MEMBERSHIPS.ACCOUNT_ID.eq(MEMBERSHIP_PERMISSIONS.ACCOUNT_ID))
+            )
+            .join(COMPANIES)
+            .on(COMPANIES.ID.eq(COMPANY_MEMBERSHIPS.COMPANY_ID))
+            .where(MEMBERSHIP_PERMISSIONS.ACCOUNT_ID.eq(accountId))
+            .and(COMPANY_MEMBERSHIPS.ACTIVE.isTrue)
+            .and(COMPANIES.ACTIVE.isTrue)
+            .fetch(MEMBERSHIP_PERMISSIONS.PERMISSION)
+            .toSet()
+
     override fun platformPermissions(accountId: UUID): Set<String> =
         sql.select(PLATFORM_PERMISSIONS.PERMISSION)
             .from(PLATFORM_PERMISSIONS)

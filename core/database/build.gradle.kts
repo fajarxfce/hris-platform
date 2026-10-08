@@ -5,7 +5,7 @@ val jooqGenerator by configurations.creating
 dependencies {
     api(projects.core.domain)
     api(libs.jooq)
-    implementation(libs.spring.jdbc)
+    api(libs.spring.jdbc)
     implementation(libs.spring.jooq)
     implementation(libs.jackson.kotlin)
     implementation(libs.spring.flyway)

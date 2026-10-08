@@ -15,4 +15,11 @@ fun CurrentAccount.toResponse(): SessionResponse =
         companies.map {
             MembershipResponse(it.companyId.toString(), it.companyName, it.companyCode, it.timezone)
         },
+        SessionAssuranceResponse(
+            assurance.required,
+            assurance.verified,
+            assurance.setupAvailable,
+            assurance.validUntil?.toString(),
+            assurance.recentUntil?.toString(),
+        ),
     )

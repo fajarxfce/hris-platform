@@ -4,4 +4,5 @@ data class CurrentAccount(
     val account: Account,
     val permissions: Set<String>,
     val companies: List<CompanyMembership>,
+    val assurance: SessionAssurance,
 )

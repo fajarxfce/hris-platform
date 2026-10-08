@@ -14,6 +14,8 @@ interface IdentityDataSource {
 
     fun insertAccount(id: UUID, email: String, name: String, passwordHash: String): AccountsRecord
 
+    fun activeMembershipPermissions(accountId: UUID): Set<String>
+
     fun platformPermissions(accountId: UUID): Set<String>
 
     fun companyPermissions(accountId: UUID, companyId: UUID): CompanyPermissionRow?

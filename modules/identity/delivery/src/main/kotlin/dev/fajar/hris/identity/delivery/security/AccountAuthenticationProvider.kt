@@ -32,7 +32,12 @@ class AccountAuthenticationProvider(
             is Result.Failed -> throw IdentityAuthenticationException(result.failure)
             is Result.Success ->
                 UsernamePasswordAuthenticationToken.authenticated(
-                    SessionIdentity(result.value.id, clock.instant(), result.value.mfaConfigured),
+                    SessionIdentity(
+                        result.value.id,
+                        clock.instant(),
+                        result.value.mfaConfigured,
+                        result.value.securityVersion,
+                    ),
                     null,
                     listOf(SimpleGrantedAuthority("SESSION")),
                 )

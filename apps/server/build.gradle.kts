@@ -28,6 +28,7 @@ dependencies {
     implementation(kotlin("reflect"))
     runtimeOnly(libs.flyway.postgresql)
     runtimeOnly(libs.postgresql)
+    testImplementation(libs.bouncycastle)
     testImplementation(libs.spring.test)
     testImplementation(libs.spring.webmvc.test)
     testImplementation(libs.testcontainers.postgresql)

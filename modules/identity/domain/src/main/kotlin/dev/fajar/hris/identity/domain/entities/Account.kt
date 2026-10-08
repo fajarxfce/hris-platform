@@ -9,4 +9,5 @@ data class Account(
     val active: Boolean,
     val mfaConfigured: Boolean,
     val version: Long,
+    val securityVersion: Long = 0,
 )

@@ -97,3 +97,15 @@ Leave requests:
 All request mutations use idempotency keys. Version is the leave request version, not the nested approval version. A submission includes at most 366 explicit dates within a 366-day span. Off/holiday dates are omitted from charged duration; missing schedules and ineligible employment dates fail the entire command. Reservations are made per balance year. Cancellation does not restore balance until approved. Submitted policy and schedule snapshots remain unchanged by later edits.
 
 Password authentication counts successful and failed attempts in fixed 15-minute windows. Limits are ten per normalized account and one hundred per server-observed origin. HTTP 429 `sign_in_rate_limited` carries `Retry-After: 900`; clients must wait instead of automatically looping. Capacity exhaustion returns 503 `password_verification_busy`. Neither response confirms account existence.
+
+Multi-factor authentication:
+
+- `GET /me` includes `assurance` with required/verified/setupAvailable, validUntil, and recentUntil. A pending MFA session receives no company list or permission grants.
+- `POST /auth/mfa/enrollment` with an `Idempotency-Key` creates a ten-minute enrollment for the signed-in account. A repeated key returns the same still-pending enrollment. Response: operationId, secret, otpauthUri, expiresAt.
+- `POST /auth/mfa/enrollment/confirm`: operationId, code. Activates the authenticator and returns ten recovery codes once.
+- `POST /auth/mfa/verify`: code and optional recovery boolean. Uses a current authenticator code or one unused recovery code.
+- `POST /auth/mfa/recovery-codes`: replaces recovery codes using recent MFA. Other sessions and all old recovery codes are revoked.
+
+All routes retain the `/api/v1` prefix and use the current session plus CSRF. Proof-bearing calls rotate session/CSRF tokens; refetch `/auth/csrf` afterward. Confirmation/verification codes are single-use, so do not retry them automatically after a lost response. Sign in again and use the next authenticator code; recent verification permits replacing recovery codes if their initial response was lost. MFA mutations are scoped to the authenticated account, never an account ID supplied in the body. Enrollment/proof responses use `Cache-Control: no-store`.
+
+`mfa_setup_required`, `mfa_required`, and `recent_authentication_required` are HTTP 403 states requiring an explicit authentication interaction. `invalid_mfa_code` is 401; five attempts in a five-minute account window produce 429 `mfa_rate_limited`. A disabled account or changed credential version returns 401 `session_revoked` even on authentication metadata routes.

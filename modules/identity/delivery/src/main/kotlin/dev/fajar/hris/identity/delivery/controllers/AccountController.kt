@@ -15,6 +15,7 @@ class AccountController(private val current: GetCurrentAccount) {
     fun csrf(token: CsrfToken): Map<String, String> =
         mapOf("token" to token.token, "headerName" to token.headerName)
 
+    @dev.fajar.hris.identity.delivery.security.PendingMfaAllowed
     @GetMapping("/api/v1/me")
     fun me(actor: Actor): SessionResponse = current.execute(actor).response().toResponse()
 

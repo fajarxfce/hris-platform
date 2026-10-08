@@ -37,7 +37,18 @@ class IdentityConfiguration {
         operations: dev.fajar.hris.core.domain.OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
-    ) = SaveCompanyMembership(members, identities, operations, journal, transactions)
+        clock: Clock,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+    ) =
+        SaveCompanyMembership(
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean fun clock(): Clock = Clock.systemUTC()
 
@@ -86,14 +97,84 @@ class IdentityConfiguration {
     ) = SignInWithPassword(identities, journal, transactions, clock, limits, enforceLimits)
 
     @Bean
-    fun resolveActor(identities: IdentityRepository, transactions: TransactionRunner) =
-        ResolveActor(identities, transactions)
+    fun resolveActor(
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+    ) = ResolveActor(identities, transactions, clock, security)
 
     @Bean
     fun listMyCompanies(identities: IdentityRepository, transactions: TransactionRunner) =
         ListMyCompanies(identities, transactions)
 
     @Bean
-    fun currentAccount(identities: IdentityRepository, transactions: TransactionRunner) =
-        GetCurrentAccount(identities, transactions)
+    fun currentAccount(
+        identities: IdentityRepository,
+        mfa: dev.fajar.hris.identity.domain.repositories.MfaRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+    ) = GetCurrentAccount(identities, mfa, transactions, clock, security)
+
+    @Bean
+    fun identitySecurity(
+        @org.springframework.beans.factory.annotation.Value("\${hris.security.enforce-mfa:true}")
+        enforceMfa: Boolean
+    ) = dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy(enforceMfa = enforceMfa)
+
+    @Bean
+    fun mfaCrypto(
+        @org.springframework.beans.factory.annotation.Value("\${HRIS_IDENTITY_ACTIVE_KEY:v1}")
+        activeId: String,
+        @org.springframework.beans.factory.annotation.Value("\${HRIS_IDENTITY_KEYS:}")
+        encoded: String,
+    ): MfaCryptoDataSource =
+        JceMfaCryptoDataSource(
+            dev.fajar.hris.identity.data.crypto.parseIdentityKeyring(activeId, encoded)
+        )
+
+    @Bean fun mfaStore(sql: DSLContext): MfaStoreDataSource = PostgresMfaStoreDataSource(sql)
+
+    @Bean
+    fun mfaRepository(
+        store: MfaStoreDataSource,
+        crypto: MfaCryptoDataSource,
+    ): dev.fajar.hris.identity.domain.repositories.MfaRepository =
+        dev.fajar.hris.identity.data.repositories.StoredMfaRepository(store, crypto)
+
+    @Bean
+    fun beginMfa(
+        mfa: dev.fajar.hris.identity.domain.repositories.MfaRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+    ) = BeginMfaEnrollment(mfa, transactions, clock, security)
+
+    @Bean
+    fun confirmMfa(
+        mfa: dev.fajar.hris.identity.domain.repositories.MfaRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+    ) = ConfirmMfaEnrollment(mfa, journal, transactions, clock, security)
+
+    @Bean
+    fun verifyMfa(
+        mfa: dev.fajar.hris.identity.domain.repositories.MfaRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+    ) = VerifyMfa(mfa, journal, transactions, clock, security)
+
+    @Bean
+    fun regenerateMfa(
+        mfa: dev.fajar.hris.identity.domain.repositories.MfaRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+    ) = RegenerateMfaRecoveryCodes(mfa, journal, transactions, clock, security)
 }

@@ -9,6 +9,8 @@ data class Actor(
     val permissions: Set<String>,
     val authenticatedAt: Instant,
     val correlationId: UUID,
+    val mfaVerifiedAt: Instant? = null,
+    val credentialVersion: Long? = null,
 ) {
     fun requirePermission(permission: String): Result<Unit> =
         if (permission in permissions) Result.Success(Unit)

@@ -55,14 +55,15 @@ class StoredIdentityRepository(
             if (account == null) null
             else {
                 val companyPermissions = companyId?.let { source.companyPermissions(accountId, it) }
+                val global = source.platformPermissions(accountId)
                 val permissions =
-                    if (companyId == null) source.platformPermissions(accountId)
-                    else companyPermissions?.permissions.orEmpty()
+                    if (companyId == null) global else companyPermissions?.permissions.orEmpty()
                 AccountAccess(
                     account.toAccount(),
                     permissions,
                     companyId == null || companyPermissions?.memberActive == true,
                     companyId == null || companyPermissions?.companyActive == true,
+                    global + source.activeMembershipPermissions(accountId),
                 )
             }
         }

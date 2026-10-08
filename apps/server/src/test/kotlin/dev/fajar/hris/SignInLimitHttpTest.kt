@@ -14,7 +14,12 @@ import org.springframework.context.annotation.Import
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = ["server.address=127.0.0.1", "hris.security.sign-in-limits=true"],
+    properties =
+        [
+            "server.address=127.0.0.1",
+            "hris.security.sign-in-limits=true",
+            "hris.security.enforce-mfa=false",
+        ],
 )
 @Import(TestClockConfiguration::class)
 class SignInLimitHttpTest : ApiIntegrationTest() {

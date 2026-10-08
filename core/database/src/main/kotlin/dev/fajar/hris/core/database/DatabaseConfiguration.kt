@@ -11,6 +11,9 @@ import org.springframework.transaction.PlatformTransactionManager
 @Configuration(proxyBeanMethods = false)
 class DatabaseConfiguration {
     @Bean
+    fun jooqSettings(): org.jooq.conf.Settings = org.jooq.conf.Settings().withExecuteLogging(false)
+
+    @Bean
     fun operations(
         source: dev.fajar.hris.core.database.datasources.OperationReceiptDataSource,
         json: tools.jackson.databind.ObjectMapper,

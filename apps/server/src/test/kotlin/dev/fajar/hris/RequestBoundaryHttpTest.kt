@@ -24,6 +24,7 @@ class RequestBoundaryHttpTest : ApiIntegrationTest() {
             )
         assertEquals(200, created.statusCode(), created.body())
         val company = json.readTree(created.body()).get("id").asString()
+        assertEquals(400, get(client, "/api/v1/companies/not-a-uuid").statusCode())
         for (path in
             listOf(
                 "employees?asOf=not-a-date",

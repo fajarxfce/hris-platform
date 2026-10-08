@@ -1,0 +1,35 @@
+[versions]
+kotlin = "2.3.21"
+spring-boot = "4.1.1"
+ktfmt = "0.59"
+archunit = "1.4.1"
+
+[libraries]
+kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-spring = { module = "org.jetbrains.kotlin:kotlin-allopen", version.ref = "kotlin" }
+spring-boot-gradle = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot" }
+spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
+spring-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+spring-jooq = { module = "org.springframework.boot:spring-boot-starter-jooq" }
+spring-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc" }
+spring-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-flyway = { module = "org.springframework.boot:spring-boot-starter-flyway" }
+spring-session = { module = "org.springframework.session:spring-session-jdbc" }
+spring-batch = { module = "org.springframework.boot:spring-boot-starter-batch" }
+spring-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+spring-security-test = { module = "org.springframework.security:spring-security-test" }
+spring-core = { module = "org.springframework:spring-context" }
+jackson-kotlin = { module = "tools.jackson.module:jackson-module-kotlin" }
+postgresql = { module = "org.postgresql:postgresql" }
+flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql" }
+jooq = { module = "org.jooq:jooq" }
+jooq-codegen = { module = "org.jooq:jooq-codegen" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql" }
+testcontainers-junit = { module = "org.testcontainers:testcontainers-junit-jupiter" }
+archunit = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
+ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }

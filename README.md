@@ -8,6 +8,16 @@ The dashboard follows Azure Portal interaction patterns. Employees use a separat
 
 Implementation is in progress. [Delivery status](docs/delivery.md) distinguishes implemented capabilities from the roadmap. Payroll rules and integrations must pass their documented acceptance checks before operational use.
 
+## Build
+
+Requires JDK 21, Docker, and Python 3.
+
+```sh
+./gradlew check :apps:server:bootJar
+```
+
+See [development](docs/development.md) for Docker access, migrations, and local runtime configuration.
+
 ## Documentation
 
 - [Product and module specification](docs/product.md)

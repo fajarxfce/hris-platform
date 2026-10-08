@@ -3,7 +3,7 @@
 ## Status
 
 - Repository and product/architecture specification: initialized.
-- Backend foundation: planned.
+- Backend foundation: implemented Gradle conventions, PostgreSQL migrations/jOOQ generation, transaction/error boundaries, company RLS, immutable audit/outbox storage, correlation IDs, CI, and local container configuration. Identity and job processing are separate pending slices.
 - Identity, organization, and people: planned.
 - Workforce, approvals, and leave: planned.
 - Documents and expenses: planned.
@@ -35,3 +35,7 @@ Payroll acceptance includes sourced statutory golden cases, rule-version selecti
 Performance targets on a 4-vCPU/16-GiB reference deployment: interactive API p95 below one second during the attendance scenario; a 5,000-employee payroll below ten minutes; bounded file/worker memory. Record actual workload, measurements, and limitations. These are targets, not current results.
 
 Commits are atomic and include relevant tests/docs. No co-author trailers. Push increments; releases and production deployment require explicit instructions. Documentation and demo data must not contain secrets or real employee data.
+
+## Observed validation
+
+Backend foundation: Gradle check and bootJar passed; six PostgreSQL integration tests passed, covering pooled company isolation, denied writes, typed/raw SQL failure mapping, failed-result rollback, cancellation rollback, and immutable audit records. Compose configuration and actionlint passed. No business module, deployment, or performance benchmark is claimed by these checks.

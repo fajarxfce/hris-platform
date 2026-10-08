@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: hris-platform
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${HRIS_DATABASE_URL:jdbc:postgresql://localhost:5432/hris}
+    username: ${HRIS_DATABASE_USER:hris_app}
+    password: ${HRIS_DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 16
+      connection-timeout: 5000
+  flyway:
+    enabled: ${HRIS_MIGRATIONS_ENABLED:false}
+    url: ${HRIS_DATABASE_URL:jdbc:postgresql://localhost:5432/hris}
+    user: ${HRIS_MIGRATION_USER:hris_migrator}
+    password: ${HRIS_MIGRATION_PASSWORD:}
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+server:
+  shutdown: graceful
+  error:
+    include-message: never
+    include-stacktrace: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true

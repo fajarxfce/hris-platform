@@ -11,3 +11,11 @@ The data module supplies Spring configuration for consumers that compose it. Ena
 Use private bucket credentials restricted to the intended bucket. Encryption of storage volumes, backups, and production key management belongs to deployment configuration. No real document or cloud account is used by the tests.
 
 References: [Garage quick start](https://garagehq.deuxfleurs.fr/documentation/quick-start/), [Garage S3 compatibility](https://garagehq.deuxfleurs.fr/documentation/reference-manual/s3-compatibility/).
+
+## Temporary-object cleanup
+
+The API and worker now compose the storage module. `object_cleanup_queue` records each temporary key, expected byte count, owning company/resource, and earliest deletion time. Features must register keys before external writes, retain the accepted keys in the publication transaction, and leave rejected/abandoned attempts scheduled for deletion. Accepted keys are removed from the queue only while unleased; publication must reject an already claimed or expired candidate. This infrastructure does not infer document retention policy.
+
+A worker-only database function claims bounded leases without exposing company business tables. Claims allow four active deletions across the deployment and two per company, with a bounded scan. One lifecycle-owned poller processes at most two objects per pass. Physical S3 deletion runs outside SQL transactions; acknowledgement and audit commit together. A lost acknowledgement may repeat deletion, which is idempotent. Expired tokens cannot acknowledge another worker's lease. Cleanup remains possible after the uploader loses access.
+
+Unavailable storage backs off for five to 300 seconds and stops after eight attempts. Other failure categories stop for review. Repeated process crashes also produce an audited failed entry. `GET /companies/{companyId}/storage-cleanup` requires `jobs.read` and uses bounded pagination; it excludes storage keys. `POST .../{id}/retry` requires `jobs.retry`, an expected version, reason, and idempotency key. Retry is explicit and audited. Shutdown cancels pending work and releases the owned polling timer; outstanding keys remain recoverable after their leases expire. The container grace period covers the independently bounded Batch, mail, and cleanup shutdown budgets.

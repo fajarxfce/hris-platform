@@ -77,6 +77,13 @@ class ObjectStorageBoundaryTest {
                 "secret",
             )
         assertFalse(base.toString().contains("secret"))
+        val malformed =
+            assertThrows(IllegalArgumentException::class.java) {
+                parseObjectStorageEndpoint("https://user:private-secret @storage.example.test")
+            }
+        assertFalse(malformed.toString().contains("private-secret"))
+        org.junit.jupiter.api.Assertions.assertNull(malformed.cause)
+
         for (uri in
             listOf(
                 "http://storage.example.test",

@@ -117,4 +117,27 @@ class WorkerConfiguration {
         advance: AdvanceEmployeeImportApply,
         abort: AbortEmployeeImport,
     ): JobTask = EmployeeImportApplyTask(resolve, advance, abort)
+
+    @Bean
+    fun objectCleanupTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 1
+            setThreadNamePrefix("hris-object-cleanup-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(30)
+        }
+
+    @Bean
+    @ConditionalOnProperty(name = ["HRIS_STORAGE_ENABLED"], havingValue = "true")
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnExpression(
+        "'\${hris.worker.enabled:true}' == 'true'"
+    )
+    fun objectCleanupWorker(
+        collect: dev.fajar.hris.storage.domain.usecases.CollectObjectGarbage,
+        @org.springframework.beans.factory.annotation.Qualifier("objectCleanupTimers")
+        timer: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+    ) = dev.fajar.hris.worker.storage.ObjectCleanupWorker(collect, timer)
 }

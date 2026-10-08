@@ -39,4 +39,4 @@ include(":apps:worker")
 
 include(":core:mail:domain", ":core:mail:data")
 
-include(":core:storage:domain", ":core:storage:data")
+include(":core:storage:domain", ":core:storage:data", ":core:storage:delivery")

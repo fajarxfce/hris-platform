@@ -6,6 +6,8 @@ ktfmt = "0.59"
 archunit = "1.4.1"
 
 [libraries]
+spring-mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
+angus-mail = { module = "org.eclipse.angus:angus-mail" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-spring = { module = "org.jetbrains.kotlin:kotlin-allopen", version.ref = "kotlin" }
 spring-boot-gradle = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot" }

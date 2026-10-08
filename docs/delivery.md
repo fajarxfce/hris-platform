@@ -11,7 +11,7 @@
 - Leave: effective policies, independent balance adjustments, immutable scoped ledger, snapshotted requests, staged approval, withdrawal, and cancellation implemented. Accrual, carryover/expiry, attachments, and closing integration remain planned.
 - Documents and expenses: planned.
 - Payroll: planned.
-- Communications and reporting: planned. Administration has company-scoped job queries/cancellation, bounded PostgreSQL leasing, and isolated Spring Batch metadata. Spring Batch worker execution and workforce closing/recovery are implemented. Other operational controls remain planned.
+- Communications and reporting: planned; the shared outbound SMTP boundary is implemented, with consumer workflows still pending. Administration has company-scoped job queries/cancellation, bounded PostgreSQL leasing, and isolated Spring Batch metadata. Spring Batch worker execution and workforce closing/recovery are implemented. Other operational controls remain planned.
 - Azure-style dashboard: planned.
 - Compose employee application integration: subsequent phase.
 
@@ -80,3 +80,5 @@ OIDC account sign-in: full Gradle check and both application bootJar builds pass
 Personal profile management: full Gradle check and both application bootJar builds passed (141 tests total). Four HTTP/PostgreSQL tests cover sensitive-profile versus directory access, owning-company edits, shared-person RLS, employee self reads, independent profile/employment versions, historical pagination/immutability, concurrent saves, receipt replay/mismatch, validation, and complete rollback after failed audit insertion. Documentation links passed. No employee dashboard or cross-company transfer workflow is claimed by these checks.
 
 Company role templates: full Gradle check and both application bootJar builds passed (146 tests total). Five additional HTTP/PostgreSQL tests cover frozen permission sources, explicit reapplication, archive-safe receipt replay, stale selections, company scope, sensitive/self-grant denial, sensitive reactivation, competing role codes, immutable revisions/applications, assignment rollback after failed audit, and bounded definition counts/pagination. The backend exposes its assignable permission catalog. No role-management dashboard is claimed by these checks.
+
+Outbound mail boundary: full Gradle check and both application bootJar builds passed (152 tests total). Six SMTP/unit tests cover stable message IDs, single recipients, connection cleanup, bounded stalled-provider reads, required TLS, envelope/UTF-8 size limits, header/group rejection, transient versus permanent SMTP failures, secret-free representations, and direct/nested cancellation and late interruption. Existing backend tests remained up to date where inputs were unchanged. Documentation links passed. Tests used an owned loopback SMTP fixture; no real email was sent, and no invitation/recovery consumer or production delivery is claimed yet.

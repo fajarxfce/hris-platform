@@ -36,3 +36,5 @@ include(":modules:leave:domain", ":modules:leave:data", ":modules:leave:delivery
 include(":core:jobs:domain", ":core:jobs:data", ":core:jobs:delivery")
 
 include(":apps:worker")
+
+include(":core:mail:domain", ":core:mail:data")

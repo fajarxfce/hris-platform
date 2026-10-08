@@ -6,6 +6,7 @@ import dev.fajar.hris.workforce.data.datasources.*
 import dev.fajar.hris.workforce.data.repositories.StoredScheduleRepository
 import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
 import dev.fajar.hris.workforce.domain.usecases.*
+import java.time.Clock
 import org.jooq.DSLContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -62,7 +63,8 @@ class WorkforceConfiguration {
         schedules: ScheduleRepository,
         people: PeopleRepository,
         transactions: TransactionRunner,
-    ) = GetEmployeeCalendar(schedules, people, transactions)
+        clock: Clock,
+    ) = GetEmployeeCalendar(schedules, people, transactions, clock)
 
     @Bean
     fun saveHoliday(

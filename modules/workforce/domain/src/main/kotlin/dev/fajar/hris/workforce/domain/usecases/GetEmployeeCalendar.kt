@@ -5,6 +5,7 @@ import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.domain.entities.EmployeeCalendar
 import dev.fajar.hris.workforce.domain.policies.*
 import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
+import java.time.Clock
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.UUID
@@ -13,6 +14,7 @@ class GetEmployeeCalendar(
     private val schedules: ScheduleRepository,
     private val people: PeopleRepository,
     private val transactions: TransactionRunner,
+    private val clock: Clock,
 ) {
     fun execute(
         actor: Actor,
@@ -25,9 +27,17 @@ class GetEmployeeCalendar(
         val company = requireNotNull(actor.companyId)
         return transactions.run(actor) {
             people.find(company, employeeId, until).flatMap { employee ->
-                if (employee == null || !canReadWorkforce(actor, employee))
+                if (employee == null)
                     Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
-                else schedules.calendar(company, employeeId, from, until).flatMap(::resolveCalendar)
+                else
+                    people.findAtInstant(company, employeeId, clock.instant()).flatMap { current ->
+                        if (!canReadWorkforce(actor, employee, current))
+                            Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
+                        else
+                            schedules
+                                .calendar(company, employeeId, from, until)
+                                .flatMap(::resolveCalendar)
+                    }
             }
         }
     }

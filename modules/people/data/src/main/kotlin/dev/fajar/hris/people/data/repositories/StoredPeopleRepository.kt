@@ -7,7 +7,9 @@ import dev.fajar.hris.people.data.mappers.*
 import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.schema.tables.records.EmploymentsRecord
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneOffset
 import java.util.UUID
 
 class StoredPeopleRepository(private val source: PeopleDataSource) : PeopleRepository {
@@ -20,16 +22,32 @@ class StoredPeopleRepository(private val source: PeopleDataSource) : PeopleRepos
             source.find(companyId, id, asOf)?.toEmployee()
         }
 
+    override fun findAtInstant(companyId: UUID, id: UUID, at: Instant): Result<Employee?> =
+        safeDatabaseCall {
+            source.findAtInstant(companyId, id, at.atOffset(ZoneOffset.UTC))?.toEmployee()
+        }
+
     override fun list(
         companyId: UUID,
         accountId: UUID,
         visibility: EmployeeVisibility,
         asOf: LocalDate,
+        accessAt: Instant,
         query: String,
         after: String?,
         limit: Int,
     ): Result<Page<Employee>> = safeDatabaseCall {
-        val rows = source.list(companyId, accountId, visibility.name, asOf, query, after, limit + 1)
+        val rows =
+            source.list(
+                companyId,
+                accountId,
+                visibility.name,
+                asOf,
+                accessAt.atOffset(ZoneOffset.UTC),
+                query,
+                after,
+                limit + 1,
+            )
         Page(
             rows.take(limit).map { it.toEmployee() },
             if (rows.size > limit) rows[limit - 1].employeeNumber else null,

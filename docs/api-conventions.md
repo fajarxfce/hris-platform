@@ -57,3 +57,5 @@ Work calendars:
 - `PUT /companies/{companyId}/workforce/holidays/{id}`: workDate, name, active, expectedVersion, reason.
 
 All calendar writes require `workforce.manage` and an idempotency key. Schedule reads enforce company, team, or self access. Shift changes preserve already published assignments and rosters; publishing a new version requires a deliberate new assignment.
+
+Team directory, employee details, and calendar authorization use current reporting assignments at the server instant in the company timezone. Historical/future date filters only select the returned projection; they cannot restore a former manager’s access. Team and self grants are combined.

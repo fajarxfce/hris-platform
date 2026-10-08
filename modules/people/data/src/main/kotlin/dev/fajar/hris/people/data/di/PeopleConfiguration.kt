@@ -39,12 +39,12 @@ class PeopleConfiguration {
     ) = ReviseEmployment(people, units, operations, journal, transactions)
 
     @Bean
-    fun getEmployee(people: PeopleRepository, transactions: TransactionRunner) =
-        GetEmployee(people, transactions)
+    fun getEmployee(people: PeopleRepository, transactions: TransactionRunner, clock: Clock) =
+        GetEmployee(people, transactions, clock)
 
     @Bean
-    fun listEmployees(people: PeopleRepository, transactions: TransactionRunner) =
-        ListEmployees(people, transactions)
+    fun listEmployees(people: PeopleRepository, transactions: TransactionRunner, clock: Clock) =
+        ListEmployees(people, transactions, clock)
 
     @Bean
     fun employmentHistory(people: PeopleRepository, transactions: TransactionRunner) =

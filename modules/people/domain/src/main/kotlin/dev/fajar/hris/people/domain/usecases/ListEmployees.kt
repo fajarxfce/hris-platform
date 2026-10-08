@@ -3,11 +3,13 @@ package dev.fajar.hris.people.domain.usecases
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
+import java.time.Clock
 import java.time.LocalDate
 
 class ListEmployees(
     private val people: PeopleRepository,
     private val transactions: TransactionRunner,
+    private val clock: Clock,
 ) {
     fun execute(
         actor: Actor,
@@ -19,6 +21,8 @@ class ListEmployees(
         val visibility =
             when {
                 "people.read" in actor.permissions -> EmployeeVisibility.ALL
+                "people.team.read" in actor.permissions &&
+                    "people.self.read" in actor.permissions -> EmployeeVisibility.TEAM_AND_SELF
                 "people.team.read" in actor.permissions -> EmployeeVisibility.TEAM
                 "people.self.read" in actor.permissions -> EmployeeVisibility.SELF
                 else -> return Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
@@ -31,6 +35,7 @@ class ListEmployees(
                 actor.accountId,
                 visibility,
                 asOf,
+                clock.instant(),
                 query.trim(),
                 after,
                 limit,

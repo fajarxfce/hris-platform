@@ -36,7 +36,9 @@ fun validateEmployment(terms: EmploymentTerms, reason: String): Result<Unit> {
     return Result.Success(Unit)
 }
 
-fun canReadEmployee(actor: Actor, employee: Employee): Boolean =
+fun canReadEmployee(actor: Actor, employee: Employee, current: Employee?): Boolean =
     "people.read" in actor.permissions ||
         ("people.self.read" in actor.permissions && employee.person.accountId == actor.accountId) ||
-        ("people.team.read" in actor.permissions && employee.managerAccountId == actor.accountId)
+        ("people.team.read" in actor.permissions &&
+            current?.managerAccountId == actor.accountId &&
+            current.terms.status != EmploymentStatus.ENDED)

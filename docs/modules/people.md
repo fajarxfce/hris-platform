@@ -19,3 +19,5 @@ Organization unit creation/update/archive and cycle checks are implemented. Empl
 Employee directories and detail reads support company-wide HR, direct-report manager, and self scope. Their public projection excludes birth date and nationality. Lists and history use bounded cursor pagination. Current endpoints require an explicit `asOf` date for employee reads.
 
 Personal profile editing, lifecycle checklists, CSV import, cross-company transfers, and automatic offboarding access changes remain planned. See [API conventions](../api-conventions.md).
+
+Team visibility follows current reporting assignments using company-local dates from the server clock. Historical filters cannot restore former-manager access. Combined team/self grants include both scopes.

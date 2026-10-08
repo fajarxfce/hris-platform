@@ -1,11 +1,13 @@
 package dev.fajar.hris.people.data.datasources
 
+import dev.fajar.hris.people.data.queries.employeesAtInstant
 import dev.fajar.hris.schema.tables.EmployeesAt.EMPLOYEES_AT
 import dev.fajar.hris.schema.tables.EmploymentRevisions.EMPLOYMENT_REVISIONS as R
 import dev.fajar.hris.schema.tables.Employments.EMPLOYMENTS as E
 import dev.fajar.hris.schema.tables.Persons.PERSONS as P
 import dev.fajar.hris.schema.tables.records.*
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import java.util.UUID
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
@@ -21,20 +23,35 @@ class PostgresPeopleDataSource(private val sql: DSLContext) : PeopleDataSource {
         return sql.selectFrom(employees).where(employees.ID.eq(id)).fetchOne()
     }
 
+    override fun findAtInstant(companyId: UUID, id: UUID, at: OffsetDateTime): EmployeesAtRecord? {
+        val employees = employeesAtInstant(companyId, at)
+        return sql.selectFrom(employees).where(employees.ID.eq(id)).fetchOne()
+    }
+
     override fun list(
         companyId: UUID,
         accountId: UUID,
         visibility: String,
         asOf: LocalDate,
+        accessAt: OffsetDateTime,
         query: String,
         after: String?,
         limit: Int,
     ): List<EmployeesAtRecord> {
         val employees = EMPLOYEES_AT.call(companyId, asOf)
+        val current = employeesAtInstant(companyId, accessAt)
+        val team =
+            employees.ID.`in`(
+                DSL.select(current.ID)
+                    .from(current)
+                    .where(current.MANAGER_ACCOUNT_ID.eq(accountId))
+                    .and(current.STATUS.ne("ENDED"))
+            )
         val scope =
             when (visibility) {
                 "ALL" -> DSL.noCondition()
-                "TEAM" -> employees.MANAGER_ACCOUNT_ID.eq(accountId)
+                "TEAM" -> team
+                "TEAM_AND_SELF" -> team.or(employees.ACCOUNT_ID.eq(accountId))
                 "SELF" -> employees.ACCOUNT_ID.eq(accountId)
                 else -> DSL.falseCondition()
             }

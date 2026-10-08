@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/v1/companies/{companyId}/expenses/claims")
 class ExpenseClaimController(
+    private val payments: GetExpenseClaimPayments,
     private val save: SaveExpenseDraft,
     private val submit: SubmitExpenseClaim,
     private val submissions: ListExpenseSubmissions,
@@ -23,6 +24,19 @@ class ExpenseClaimController(
     private val drafts: GetExpenseDrafts,
     private val history: GetExpenseClaimHistory,
 ) {
+    @GetMapping("/{id}/payments")
+    fun payments(actor: Actor, @PathVariable id: UUID): List<ExpensePaymentProgressResponse> =
+        payments.execute(actor, id).response().map {
+            ExpensePaymentProgressResponse(
+                it.batchId,
+                it.itemId,
+                it.status.name,
+                it.createdAt,
+                it.releasedAt,
+                it.settledAt,
+            )
+        }
+
     @PutMapping("/{id}/draft")
     fun save(
         actor: Actor,

@@ -7,6 +7,7 @@ import dev.fajar.hris.expenses.data.datasources.*
 import dev.fajar.hris.expenses.data.repositories.*
 import dev.fajar.hris.expenses.domain.repositories.*
 import dev.fajar.hris.expenses.domain.usecases.*
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.organization.domain.repositories.OrganizationRepository
@@ -333,5 +334,193 @@ class ExpenseConfiguration {
             transactions,
             clock,
             storage,
+        )
+
+    @Bean
+    fun expensePaymentDataSource(sql: DSLContext): ExpensePaymentDataSource =
+        PostgresExpensePaymentDataSource(sql)
+
+    @Bean
+    fun expensePaymentRepository(source: ExpensePaymentDataSource): ExpensePaymentRepository =
+        StoredExpensePaymentRepository(source)
+
+    @Bean
+    fun prepareExpensePaymentBatch(
+        payments: ExpensePaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        PrepareExpensePaymentBatch(
+            payments,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun releaseExpensePaymentBatch(
+        payments: ExpensePaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ReleaseExpensePaymentBatch(
+            payments,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun cancelExpensePaymentBatch(
+        payments: ExpensePaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        CancelExpensePaymentBatch(
+            payments,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun reconcileExpensePaymentBatch(
+        payments: ExpensePaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ReconcileExpensePaymentBatch(
+            payments,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun listExpensePayables(
+        payments: ExpensePaymentRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListExpensePayables(payments, companies, identities, transactions, security, clock)
+
+    @Bean
+    fun listExpensePaymentBatches(
+        payments: ExpensePaymentRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListExpensePaymentBatches(payments, companies, identities, transactions, security, clock)
+
+    @Bean
+    fun getExpensePaymentBatch(
+        payments: ExpensePaymentRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetExpensePaymentBatch(payments, identities, transactions, security, clock)
+
+    @Bean
+    fun getExpensePaymentHistory(
+        payments: ExpensePaymentRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetExpensePaymentHistory(payments, identities, transactions, security, clock)
+
+    @Bean
+    fun getExpensePaymentResults(
+        payments: ExpensePaymentRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetExpensePaymentResults(payments, identities, transactions, security, clock)
+
+    @Bean
+    fun getExpensePaymentExport(
+        payments: ExpensePaymentRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetExpensePaymentExport(payments, identities, transactions, security, clock)
+
+    @Bean
+    fun getExpenseClaimPayments(
+        claims: ExpenseClaimRepository,
+        payments: ExpensePaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        GetExpenseClaimPayments(
+            claims,
+            payments,
+            people,
+            companies,
+            identities,
+            transactions,
+            clock,
         )
 }

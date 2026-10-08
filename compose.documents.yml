@@ -1,0 +1,103 @@
+services:
+  garage:
+    image: dxflrs/garage:v2.4.1
+    command: ["/garage", "server", "--single-node", "--default-bucket"]
+    environment:
+      GARAGE_RPC_SECRET: ${HRIS_GARAGE_RPC_SECRET:?Set HRIS_GARAGE_RPC_SECRET}
+      GARAGE_DEFAULT_ACCESS_KEY: ${HRIS_STORAGE_ACCESS_KEY:?Set HRIS_STORAGE_ACCESS_KEY}
+      GARAGE_DEFAULT_SECRET_KEY: ${HRIS_STORAGE_SECRET_KEY:?Set HRIS_STORAGE_SECRET_KEY}
+      GARAGE_DEFAULT_BUCKET: ${HRIS_STORAGE_BUCKET:-hris-documents}
+    volumes:
+      - ./deploy/garage/garage.toml:/etc/garage.toml:ro
+      - garage-metadata:/var/lib/garage/meta
+      - garage-content:/var/lib/garage/data
+    read_only: true
+    tmpfs: ["/tmp:size=64m,mode=1777"]
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    healthcheck:
+      test: ["CMD", "/garage", "status"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 20s
+    restart: unless-stopped
+    stop_grace_period: 30s
+    mem_limit: 1g
+  antivirus-update:
+    image: clamav/clamav:1.5.4_base
+    entrypoint: ["/usr/bin/freshclam"]
+    command: ["--daemon", "--foreground", "--stdout", "--config-file=/etc/clamav/freshclam.conf"]
+    user: "100:101"
+    volumes:
+      - ./deploy/clamav/freshclam.conf:/etc/clamav/freshclam.conf:ro
+      - antivirus-signatures:/var/lib/clamav
+    read_only: true
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    healthcheck:
+      test: ["CMD-SHELL", "{ test -s /var/lib/clamav/main.cvd || test -s /var/lib/clamav/main.cld; } && { test -s /var/lib/clamav/daily.cvd || test -s /var/lib/clamav/daily.cld; }"]
+      interval: 10s
+      timeout: 3s
+      retries: 30
+      start_period: 60s
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 30s
+    mem_limit: 2g
+  antivirus:
+    image: clamav/clamav:1.5.4_base
+    entrypoint: ["/usr/sbin/clamd"]
+    command: ["--foreground", "--config-file=/etc/clamav/clamd.conf"]
+    user: "100:101"
+    volumes:
+      - ./deploy/clamav/clamd.conf:/etc/clamav/clamd.conf:ro
+      - antivirus-signatures:/var/lib/clamav:ro
+    read_only: true
+    tmpfs: ["/tmp:size=768m,mode=1777"]
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    healthcheck:
+      test: ["CMD-SHELL", "printf 'zPING\\0' | nc -w 2 127.0.0.1 3310 | grep -q PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 60s
+    depends_on:
+      antivirus-update:
+        condition: service_healthy
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 30s
+    mem_limit: 3g
+  api:
+    environment:
+      HRIS_STORAGE_ENABLED: "true"
+      HRIS_STORAGE_ENDPOINT: http://garage:3900
+      HRIS_STORAGE_REGION: garage
+      HRIS_STORAGE_BUCKET: ${HRIS_STORAGE_BUCKET:-hris-documents}
+      HRIS_STORAGE_ALLOW_PLAINTEXT: "true"
+      HRIS_DOCUMENT_SCANNER_ENABLED: "true"
+      HRIS_DOCUMENT_SCANNER_HOST: antivirus
+      HRIS_DOCUMENT_SCANNER_PORT: 3310
+    depends_on:
+      garage:
+        condition: service_started
+  worker:
+    environment:
+      HRIS_STORAGE_ENABLED: "true"
+      HRIS_STORAGE_ENDPOINT: http://garage:3900
+      HRIS_STORAGE_REGION: garage
+      HRIS_STORAGE_BUCKET: ${HRIS_STORAGE_BUCKET:-hris-documents}
+      HRIS_STORAGE_ALLOW_PLAINTEXT: "true"
+      HRIS_DOCUMENT_SCANNER_ENABLED: "true"
+      HRIS_DOCUMENT_SCANNER_HOST: antivirus
+      HRIS_DOCUMENT_SCANNER_PORT: 3310
+    depends_on:
+      garage:
+        condition: service_started
+volumes:
+  garage-metadata:
+  garage-content:
+  antivirus-signatures:

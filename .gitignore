@@ -17,3 +17,4 @@ playwright-report/
 test-results/
 
 .kotlin/
+__pycache__/

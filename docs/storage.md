@@ -12,6 +12,26 @@ Use private bucket credentials restricted to the intended bucket. Encryption of 
 
 References: [Garage quick start](https://garagehq.deuxfleurs.fr/documentation/quick-start/), [Garage S3 compatibility](https://garagehq.deuxfleurs.fr/documentation/reference-manual/s3-compatibility/).
 
+## Private document services
+
+`compose.documents.yml` adds Garage 2.4.1 and ClamAV 1.5.4 to the base deployment. Garage runs as a single node with a private default bucket. The scanner and signature updater run as separate foreground processes, so a process exit is visible to the container restart policy. Their ports are available only on the Compose network. The API and worker use that trusted internal network; public access still goes through authorized document endpoints.
+
+Before enabling the add-on, set `HRIS_GARAGE_RPC_SECRET` and `HRIS_STORAGE_SECRET_KEY` to separately generated 32-byte hexadecimal values (`openssl rand -hex 32`). Set `HRIS_STORAGE_ACCESS_KEY` to `GK` followed by a separately generated 16-byte hexadecimal value, and choose `HRIS_STORAGE_BUCKET`. Keep these values in the ignored `.env` or a deployment secret manager. After building both application jars, the deployment command is:
+
+```sh
+docker compose -f compose.yml -f compose.documents.yml up --build -d
+```
+
+Use both files for subsequent Compose operations. The add-on explicitly enables storage and scanning for the API and worker. It initializes the configured bucket/key only when absent; changing environment values is not a credential-rotation procedure for existing storage. Rotate an existing key through Garage administration and update consumers deliberately. The single-node configuration provides no storage replication or high availability.
+
+The initial signature download requires external DNS/HTTPS access and can take several minutes. The scanner waits for the main and daily databases, then checks for updated databases every minute. Freshclam checks for updates twelve times per day. Its health check proves that database files exist, not that they are recent; monitor update logs and signature age. A failed or unavailable scanner leaves document validation pending/retryable or failed according to its bounded job policy. It cannot publish an unchecked file.
+
+Both ClamAV containers use a non-root UID, a read-only root filesystem, and no Linux capabilities. The scanner permits two scans and a four-command queue, with a 60-second scan budget, bounded archive expansion/recursion, and alerts for encrypted content or exceeded limits. Its temporary filesystem is capped at 768 MiB and its container at 3 GiB; the updater is capped at 2 GiB to accommodate signature validation. Garage is capped at 1 GiB. These are configured ceilings, not measured maximum-file or full-signature memory requirements. Load-test the intended workload before adjusting them.
+
+Persist and back up PostgreSQL, Garage metadata, and Garage content as one consistent recovery set, with the necessary credentials stored separately and protected. Signature files use a separate persistent volume and can be downloaded again. Do not remove volumes during an upgrade. Document retention rules and storage inventory reconciliation are tracked separately from temporary-object cleanup.
+
+`python3 tool/check_document_services.py` validates the merged configuration and starts only uniquely labelled temporary test containers. It checks Garage bucket initialization, the exact configured health commands, and clean/EICAR scan results using an owned minimal signature database. It then removes its own containers. It does not start the deployment, contact a real bucket, or download production signature databases.
+
 ## Temporary-object cleanup
 
 The API and worker now compose the storage module. `object_cleanup_queue` records each temporary key, expected byte count, owning company/resource, and earliest deletion time. Features must register keys before external writes, retain the accepted keys in the publication transaction, and leave rejected/abandoned attempts scheduled for deletion. Accepted keys are removed from the queue only while unleased; publication must reject an already claimed or expired candidate. This infrastructure does not infer document retention policy.

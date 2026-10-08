@@ -38,7 +38,7 @@ class JsonRequestLimitFilter(private val json: ObjectMapper) : OncePerRequestFil
             )
             return
         }
-        chain.doFilter(BoundedJsonRequest(request, MAXIMUM_BYTES), response)
+        chain.doFilter(BoundedBodyRequest(request, MAXIMUM_BYTES), response)
     }
 
     companion object {

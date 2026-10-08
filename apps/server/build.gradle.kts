@@ -1,6 +1,9 @@
 plugins { id("hris.application") }
 
 dependencies {
+    implementation(projects.modules.documents.domain)
+    implementation(projects.modules.documents.data)
+    implementation(projects.modules.documents.delivery)
     implementation(projects.core.storage.domain)
     implementation(projects.core.storage.data)
     implementation(projects.core.storage.delivery)

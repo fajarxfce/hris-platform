@@ -39,18 +39,37 @@ class ApiExceptionHandler {
         org.springframework.beans.TypeMismatchException::class,
     )
     fun invalid(error: Exception): ProblemDetail {
-        val tooLarge =
-            generateSequence<Throwable>(error) { it.cause }
-                .take(16)
-                .any { it is RequestBodyTooLargeException }
-        return ProblemDetail.forStatus(
-                if (tooLarge) HttpStatus.CONTENT_TOO_LARGE else HttpStatus.BAD_REQUEST
-            )
-            .apply {
-                setProperty("code", if (tooLarge) "request_body_too_large" else "invalid_request")
-                setProperty("correlationId", org.slf4j.MDC.get("correlationId"))
+        val causes = generateSequence<Throwable>(error) { it.cause }.take(16).toList()
+        val tooLarge = causes.any { it is RequestBodyTooLargeException }
+        val timedOut =
+            causes.any {
+                it is RequestBodyTimeoutException || it is java.net.SocketTimeoutException
             }
+        val status =
+            when {
+                tooLarge -> HttpStatus.CONTENT_TOO_LARGE
+                timedOut -> HttpStatus.REQUEST_TIMEOUT
+                else -> HttpStatus.BAD_REQUEST
+            }
+        return ProblemDetail.forStatus(status).apply {
+            setProperty(
+                "code",
+                when {
+                    tooLarge -> "request_body_too_large"
+                    timedOut -> "request_body_timeout"
+                    else -> "invalid_request"
+                },
+            )
+            setProperty("correlationId", org.slf4j.MDC.get("correlationId"))
+        }
     }
+
+    @ExceptionHandler(RequestBodyTimeoutException::class)
+    fun timedOut(): ProblemDetail =
+        ProblemDetail.forStatus(HttpStatus.REQUEST_TIMEOUT).apply {
+            setProperty("code", "request_body_timeout")
+            setProperty("correlationId", org.slf4j.MDC.get("correlationId"))
+        }
 
     @ExceptionHandler(RequestBodyTooLargeException::class)
     fun tooLarge(): ProblemDetail =

@@ -105,6 +105,7 @@ object PermissionCatalog {
             "leave.self.manage",
             "expenses.self.manage",
             "documents.self.read",
+            "documents.self.upload",
             "payroll.self.read",
         )
     val assignable = companyAdministrator + humanResources + finance + manager + employee

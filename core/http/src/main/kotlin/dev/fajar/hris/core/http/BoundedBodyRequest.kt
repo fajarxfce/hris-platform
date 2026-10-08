@@ -6,9 +6,12 @@ import jakarta.servlet.http.HttpServletRequestWrapper
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
-class BoundedJsonRequest(request: HttpServletRequest, maximum: Long) :
-    HttpServletRequestWrapper(request) {
-    private val stream = BoundedRequestStream(request.inputStream, maximum)
+class BoundedBodyRequest(
+    request: HttpServletRequest,
+    maximum: Long,
+    budget: java.time.Duration = java.time.Duration.ofSeconds(30),
+) : HttpServletRequestWrapper(request) {
+    private val stream = BoundedRequestStream(request.inputStream, maximum, budget)
 
     override fun getInputStream(): ServletInputStream = stream
 

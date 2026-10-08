@@ -26,3 +26,5 @@ include(
 )
 
 include(":modules:people:domain", ":modules:people:data", ":modules:people:delivery")
+
+include(":modules:approvals:domain", ":modules:approvals:data", ":modules:approvals:delivery")

@@ -15,6 +15,30 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder
 
 @Configuration(proxyBeanMethods = false)
 class IdentityConfiguration {
+    @Bean
+    fun membershipSource(sql: DSLContext): MembershipDataSource = PostgresMembershipDataSource(sql)
+
+    @Bean
+    fun members(
+        source: MembershipDataSource
+    ): dev.fajar.hris.identity.domain.repositories.MembershipRepository =
+        dev.fajar.hris.identity.data.repositories.StoredMembershipRepository(source)
+
+    @Bean
+    fun companyMembers(
+        members: dev.fajar.hris.identity.domain.repositories.MembershipRepository,
+        transactions: TransactionRunner,
+    ) = ListCompanyMembers(members, transactions)
+
+    @Bean
+    fun saveMembership(
+        members: dev.fajar.hris.identity.domain.repositories.MembershipRepository,
+        identities: IdentityRepository,
+        operations: dev.fajar.hris.core.domain.OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+    ) = SaveCompanyMembership(members, identities, operations, journal, transactions)
+
     @Bean fun clock(): Clock = Clock.systemUTC()
 
     @Bean

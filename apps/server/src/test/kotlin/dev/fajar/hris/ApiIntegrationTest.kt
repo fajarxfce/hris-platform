@@ -95,13 +95,15 @@ abstract class ApiIntegrationTest {
         )
     }
 
-    protected fun login(client: HttpClient): String {
+    protected fun login(client: HttpClient, email: String = "admin@example.test"): String {
         val csrf = json.readTree(get(client, "/api/v1/auth/csrf").body()).get("token").asString()
         val response =
             post(
                 client,
                 "/api/v1/auth/login",
-                """{"email":"admin@example.test","password":"Testing-password-123!"}""",
+                json.writeValueAsString(
+                    mapOf("email" to email, "password" to "Testing-password-123!")
+                ),
                 csrf,
             )
         assertEquals(200, response.statusCode(), response.body())

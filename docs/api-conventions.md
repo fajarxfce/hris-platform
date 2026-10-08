@@ -31,3 +31,17 @@ Organization and people:
 - `GET /companies/{companyId}/employees/{id}/history`: after revision and limit; requires company-wide `people.read`.
 
 Employee creation uses effectiveFrom equal to startDate. PERMANENT and FIXED_TERM contracts are supported; fixed-term employment requires an end date and does not permit probation. Changes never overwrite an earlier revision. Replays are resolved before mutable organization references are revalidated, while current authorization is still required.
+
+Access and approvals:
+
+- `GET /companies/{companyId}/members`: bounded account directory for `identity.manage`.
+- `PUT /companies/{companyId}/members/{accountId}`: expectedVersion, active, permissions, reason. Null version adds an existing account; grants and revocations require an idempotency key.
+- `GET /companies/{companyId}/approvals/templates?kind=LEAVE&asOf=YYYY-MM-DD`: effective policies for `approvals.manage`.
+- `PUT /companies/{companyId}/approvals/templates/{id}`: name, kind, effectiveFrom, optional category, decimal-string minimumAmount, active, expectedVersion, stages, reason. Stage assignment is MANAGER, NAMED (accountIds), or PERMISSION (permission). Writes retain immutable policy revisions.
+- `GET /companies/{companyId}/approvals`: bounded current assignment/delegation inbox; administrators additionally see blocked requests.
+- `GET /companies/{companyId}/approvals/{id}`: request snapshot with effective assignments for participants and approval administrators.
+- `POST /companies/{companyId}/approvals/{id}/reassign`: version, assignees, reason; changes only the current pending/blocked stage and retains the original snapshot.
+- `GET /companies/{companyId}/approvals/delegations`: current/future delegations involving the account.
+- `PUT /companies/{companyId}/approvals/delegations/{id}`: kind, fromAccount, toAccount, validFrom, validUntil, active, expectedVersion, reason. The delegator is immutable; ordinary approvers manage only their own delegations.
+
+Approval changes use idempotency keys and optimistic versions. Business decision routes belong to their respective features so a successful approval and its business consequence cannot commit separately.

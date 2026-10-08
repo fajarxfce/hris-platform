@@ -65,4 +65,42 @@ class WorkerConfiguration {
         run: JobRunExecutor,
         settings: WorkerSettings,
     ) = JobScheduler(tasks, lease, keepAlive, defer, run, settings)
+
+    @Bean
+    fun identityMailTasks() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor().apply {
+            corePoolSize = 2
+            maxPoolSize = 2
+            setQueueCapacity(0)
+            setThreadNamePrefix("hris-mail-")
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(10)
+            setStrictEarlyShutdown(true)
+        }
+
+    @Bean
+    fun identityMailTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 2
+            setThreadNamePrefix("hris-mail-control-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(5)
+        }
+
+    @Bean
+    @ConditionalOnProperty(name = ["HRIS_MAIL_ENABLED"], havingValue = "true")
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnExpression(
+        "'\${hris.worker.enabled:true}' == 'true'"
+    )
+    fun identityMailWorker(
+        lease: dev.fajar.hris.identity.domain.usecases.LeaseIdentityMail,
+        deliver: dev.fajar.hris.identity.domain.usecases.DeliverIdentityMail,
+        @org.springframework.beans.factory.annotation.Qualifier("identityMailTasks")
+        tasks: org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor,
+        @org.springframework.beans.factory.annotation.Qualifier("identityMailTimers")
+        timers: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+    ) = dev.fajar.hris.worker.mail.IdentityMailWorker(lease, deliver, tasks, timers)
 }

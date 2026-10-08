@@ -6,10 +6,10 @@ import java.security.SecureRandom
 import java.util.Base64
 import java.util.HexFormat
 
-class JceNativeTokenDataSource(
+class JceIdentityTokenDataSource(
     private val keyring: IdentityKeyring,
     private val random: SecureRandom = SecureRandom(),
-) : NativeTokenDataSource {
+) : IdentityTokenDataSource {
     override fun generate(): String =
         Base64.getUrlEncoder()
             .withoutPadding()

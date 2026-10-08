@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Import
 @SpringBootApplication
 @Import(
     DatabaseConfiguration::class,
+    dev.fajar.hris.mail.data.di.MailConfiguration::class,
     IdentityConfiguration::class,
     JobsConfiguration::class,
     OrganizationConfiguration::class,

@@ -2,7 +2,7 @@ package dev.fajar.hris.identity.data.datasources
 
 import java.time.Instant
 
-interface SignInAttemptDataSource {
+interface AuthenticationAttemptDataSource {
     fun purgeExpired(before: Instant, limit: Int): Int
 
     fun increment(

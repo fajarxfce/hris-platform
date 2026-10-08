@@ -1,7 +1,7 @@
 package dev.fajar.hris.identity.domain.entities
 
 /** Application limits are independent of storage/window implementation. */
-data class SignInAttemptPolicy(
+data class AuthenticationAttemptPolicy(
     val windowSeconds: Long = 900,
     val perOrigin: Int = 100,
     val perAccount: Int = 10,

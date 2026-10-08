@@ -1,8 +1,8 @@
 package dev.fajar.hris
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.entities.SignInAttemptPolicy
-import dev.fajar.hris.identity.domain.repositories.SignInLimitRepository
+import dev.fajar.hris.identity.domain.entities.AuthenticationAttemptPolicy
+import dev.fajar.hris.identity.domain.repositories.AuthenticationRateLimitRepository
 import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.*
@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Import
 @Import(TestClockConfiguration::class)
 class SignInLimitHttpTest : ApiIntegrationTest() {
     @Autowired lateinit var clock: MutableTestClock
-    @Autowired lateinit var limits: SignInLimitRepository
+    @Autowired lateinit var limits: AuthenticationRateLimitRepository
     @Autowired lateinit var transactions: TransactionRunner
 
     @Test
@@ -102,7 +102,7 @@ class SignInLimitHttpTest : ApiIntegrationTest() {
                                     email,
                                     origin,
                                     now,
-                                    SignInAttemptPolicy(perAccount = 3),
+                                    AuthenticationAttemptPolicy(perAccount = 3),
                                 )
                             }
                         }
@@ -134,7 +134,7 @@ class SignInLimitHttpTest : ApiIntegrationTest() {
                     email,
                     origin,
                     now.minusSeconds(1000),
-                    SignInAttemptPolicy(perAccount = 3),
+                    AuthenticationAttemptPolicy(perAccount = 3),
                 )
             },
         )

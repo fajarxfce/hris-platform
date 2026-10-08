@@ -1,6 +1,8 @@
 plugins { id("hris.application") }
 
 dependencies {
+    implementation(projects.core.mail.domain)
+    implementation(projects.core.mail.data)
     implementation(projects.core.domain)
     implementation(projects.core.database)
     implementation(projects.core.jobs.domain)
@@ -20,6 +22,7 @@ dependencies {
     implementation(kotlin("reflect"))
     runtimeOnly(libs.flyway.postgresql)
     runtimeOnly(libs.postgresql)
+    testImplementation(libs.spring.mail)
     testImplementation(libs.spring.test)
     testImplementation(libs.testcontainers.postgresql)
     testImplementation(libs.testcontainers.junit)

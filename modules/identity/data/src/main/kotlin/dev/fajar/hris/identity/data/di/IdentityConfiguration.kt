@@ -87,14 +87,14 @@ class IdentityConfiguration {
     ) = BootstrapAdministrator(identities, transactions, journal, clock)
 
     @Bean
-    fun signInAttemptSource(sql: DSLContext): SignInAttemptDataSource =
-        PostgresSignInAttemptDataSource(sql)
+    fun authenticationAttemptSource(sql: DSLContext): AuthenticationAttemptDataSource =
+        PostgresAuthenticationAttemptDataSource(sql)
 
     @Bean
-    fun signInLimits(
-        source: SignInAttemptDataSource
-    ): dev.fajar.hris.identity.domain.repositories.SignInLimitRepository =
-        dev.fajar.hris.identity.data.repositories.PostgresSignInLimitRepository(source)
+    fun authenticationLimits(
+        source: AuthenticationAttemptDataSource
+    ): dev.fajar.hris.identity.domain.repositories.AuthenticationRateLimitRepository =
+        dev.fajar.hris.identity.data.repositories.PostgresAuthenticationRateLimitRepository(source)
 
     @Bean
     fun signInWithPassword(
@@ -102,7 +102,7 @@ class IdentityConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-        limits: dev.fajar.hris.identity.domain.repositories.SignInLimitRepository,
+        limits: dev.fajar.hris.identity.domain.repositories.AuthenticationRateLimitRepository,
         @org.springframework.beans.factory.annotation.Value("\${hris.security.sign-in-limits:true}")
         enforceLimits: Boolean,
     ) = SignInWithPassword(identities, journal, transactions, clock, limits, enforceLimits)
@@ -197,14 +197,14 @@ class IdentityConfiguration {
     fun nativeStore(sql: DSLContext): NativeSessionDataSource = PostgresNativeSessionDataSource(sql)
 
     @Bean
-    fun nativeCrypto(
+    fun identityTokens(
         keyring: dev.fajar.hris.identity.data.crypto.IdentityKeyring
-    ): NativeTokenDataSource = JceNativeTokenDataSource(keyring)
+    ): IdentityTokenDataSource = JceIdentityTokenDataSource(keyring)
 
     @Bean
     fun nativeSessions(
         store: NativeSessionDataSource,
-        crypto: NativeTokenDataSource,
+        crypto: IdentityTokenDataSource,
     ): dev.fajar.hris.identity.domain.repositories.NativeSessionRepository =
         dev.fajar.hris.identity.data.repositories.StoredNativeSessionRepository(store, crypto)
 
@@ -352,4 +352,115 @@ class IdentityConfiguration {
         security: IdentitySecurityPolicy,
         clock: Clock,
     ) = SaveAccountAccess(accounts, operations, journal, transactions, security, clock)
+
+    @Bean
+    fun credentialPolicy(
+        environment: org.springframework.core.env.Environment
+    ): CredentialChallengePolicy {
+        val enabled = environment.getProperty("HRIS_MAIL_ENABLED", Boolean::class.java, false)
+        val origin =
+            if (enabled)
+                credentialPublicOrigin(
+                    environment.getRequiredProperty("HRIS_PUBLIC_URL"),
+                    environment.getProperty(
+                        "HRIS_AUTH_LINKS_ALLOW_LOOPBACK_HTTP",
+                        Boolean::class.java,
+                        false,
+                    ),
+                )
+            else ""
+        return CredentialChallengePolicy(enabled, origin)
+    }
+
+    @Bean
+    fun credentialSource(sql: DSLContext): CredentialStoreDataSource =
+        PostgresCredentialStoreDataSource(sql)
+
+    @Bean
+    fun credentialChallenges(
+        source: CredentialStoreDataSource,
+        passwords: PasswordDataSource,
+        tokens: IdentityTokenDataSource,
+    ): dev.fajar.hris.identity.domain.repositories.CredentialChallengeRepository =
+        dev.fajar.hris.identity.data.repositories.StoredCredentialChallengeRepository(
+            source,
+            passwords,
+            tokens,
+        )
+
+    @Bean
+    fun identityMailSource(sql: DSLContext): IdentityMailDataSource =
+        PostgresIdentityMailDataSource(sql)
+
+    @Bean
+    fun identityMail(
+        source: IdentityMailDataSource,
+        tokens: IdentityTokenDataSource,
+    ): dev.fajar.hris.identity.domain.repositories.IdentityMailRepository =
+        dev.fajar.hris.identity.data.repositories.StoredIdentityMailRepository(source, tokens)
+
+    @Bean
+    fun inviteAccount(
+        accounts: AccountAdministrationRepository,
+        credentials: dev.fajar.hris.identity.domain.repositories.CredentialChallengeRepository,
+        mail: dev.fajar.hris.identity.domain.repositories.IdentityMailRepository,
+        operations: dev.fajar.hris.core.domain.OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        policy: CredentialChallengePolicy,
+        clock: Clock,
+    ) =
+        InviteAccount(
+            accounts,
+            credentials,
+            mail,
+            operations,
+            journal,
+            transactions,
+            security,
+            policy,
+            clock,
+        )
+
+    @Bean
+    fun requestPasswordRecovery(
+        credentials: dev.fajar.hris.identity.domain.repositories.CredentialChallengeRepository,
+        mail: dev.fajar.hris.identity.domain.repositories.IdentityMailRepository,
+        limits: dev.fajar.hris.identity.domain.repositories.AuthenticationRateLimitRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        policy: CredentialChallengePolicy,
+        clock: Clock,
+    ) = RequestPasswordRecovery(credentials, mail, limits, journal, transactions, policy, clock)
+
+    @Bean
+    fun confirmAccountCredential(
+        credentials: dev.fajar.hris.identity.domain.repositories.CredentialChallengeRepository,
+        mail: dev.fajar.hris.identity.domain.repositories.IdentityMailRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = ConfirmAccountCredential(credentials, mail, journal, transactions, clock)
+
+    @Bean
+    fun leaseIdentityMail(
+        mail: dev.fajar.hris.identity.domain.repositories.IdentityMailRepository,
+        credentials: dev.fajar.hris.identity.domain.repositories.CredentialChallengeRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        policy: CredentialChallengePolicy,
+        clock: Clock,
+    ) = LeaseIdentityMail(mail, credentials, journal, transactions, policy, clock)
+
+    @Bean
+    fun deliverIdentityMail(
+        deliveries: dev.fajar.hris.identity.domain.repositories.IdentityMailRepository,
+        credentials: dev.fajar.hris.identity.domain.repositories.CredentialChallengeRepository,
+        mail: dev.fajar.hris.mail.domain.repositories.MailRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        policy: CredentialChallengePolicy,
+        clock: Clock,
+    ) = DeliverIdentityMail(deliveries, credentials, mail, journal, transactions, policy, clock)
 }

@@ -53,6 +53,9 @@ class IdentityWebConfiguration {
                         "/api/v1/auth/csrf",
                         "/api/v1/auth/native/refresh",
                         "/api/v1/auth/providers",
+                        "/api/v1/auth/password-recovery",
+                        "/api/v1/auth/password-recovery/confirm",
+                        "/api/v1/auth/invitations/accept",
                     )
             }
 
@@ -141,6 +144,9 @@ class IdentityWebConfiguration {
                     "/api/v1/auth/login",
                     "/api/v1/auth/csrf",
                     "/api/v1/auth/providers",
+                    "/api/v1/auth/password-recovery",
+                    "/api/v1/auth/password-recovery/confirm",
+                    "/api/v1/auth/invitations/accept",
                     "/oauth2/authorization/**",
                     "/login/oauth2/code/**",
                     "/actuator/health/**",

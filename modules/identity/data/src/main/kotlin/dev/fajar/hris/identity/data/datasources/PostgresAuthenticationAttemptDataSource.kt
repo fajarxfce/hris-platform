@@ -7,7 +7,8 @@ import java.time.ZoneOffset
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
-class PostgresSignInAttemptDataSource(private val sql: DSLContext) : SignInAttemptDataSource {
+class PostgresAuthenticationAttemptDataSource(private val sql: DSLContext) :
+    AuthenticationAttemptDataSource {
     override fun purgeExpired(before: Instant, limit: Int): Int =
         sql.deleteFrom(A)
             .where(

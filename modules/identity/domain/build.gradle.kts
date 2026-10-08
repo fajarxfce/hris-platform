@@ -1,3 +1,6 @@
 plugins { id("hris.kotlin") }
 
-dependencies { api(projects.core.domain) }
+dependencies {
+    api(projects.core.domain)
+    api(projects.core.mail.domain)
+}

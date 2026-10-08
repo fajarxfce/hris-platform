@@ -22,12 +22,13 @@ class IdentityPolicyTest {
         }
 
     private val limits =
-        object : dev.fajar.hris.identity.domain.repositories.SignInLimitRepository {
+        object : dev.fajar.hris.identity.domain.repositories.AuthenticationRateLimitRepository {
             override fun takeAttempt(
                 email: String,
                 origin: String,
                 at: Instant,
-                policy: SignInAttemptPolicy,
+                policy: AuthenticationAttemptPolicy,
+                kind: AuthenticationAttemptKind,
             ) = Result.Success(true)
 
             override fun purgeExpired(before: Instant, limit: Int) = Result.Success(0)
@@ -37,12 +38,13 @@ class IdentityPolicyTest {
     fun deniedBudgetPreventsPasswordWorkButIsCommittedAsAnAccountingOutcome() {
         val repo = IdentityFake(account, AccountAccess(account, emptySet(), true, true))
         val denied =
-            object : dev.fajar.hris.identity.domain.repositories.SignInLimitRepository {
+            object : dev.fajar.hris.identity.domain.repositories.AuthenticationRateLimitRepository {
                 override fun takeAttempt(
                     email: String,
                     origin: String,
                     at: Instant,
-                    policy: SignInAttemptPolicy,
+                    policy: AuthenticationAttemptPolicy,
+                    kind: AuthenticationAttemptKind,
                 ) = Result.Success(false)
 
                 override fun purgeExpired(before: Instant, limit: Int) = Result.Success(0)

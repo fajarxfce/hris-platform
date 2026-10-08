@@ -1,6 +1,8 @@
 plugins { id("hris.application") }
 
 dependencies {
+    implementation(projects.core.mail.domain)
+    implementation(projects.core.mail.data)
     implementation(projects.core.jobs.domain)
     implementation(projects.core.jobs.data)
     implementation(projects.core.jobs.delivery)

@@ -14,7 +14,7 @@ import java.util.UUID
 
 class StoredNativeSessionRepository(
     private val store: NativeSessionDataSource,
-    private val crypto: NativeTokenDataSource,
+    private val crypto: IdentityTokenDataSource,
 ) : NativeSessionRepository {
     override fun lockAccount(accountId: UUID): Result<Account?> = safeIdentityCall {
         store.lockAccount(accountId)?.toAccount()

@@ -1,6 +1,6 @@
 package dev.fajar.hris.identity.data.datasources
 
-interface NativeTokenDataSource {
+interface IdentityTokenDataSource {
     fun generate(): String
 
     fun hash(token: String): String

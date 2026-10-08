@@ -11,10 +11,11 @@ class SignInWithPassword(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
-    private val limits: dev.fajar.hris.identity.domain.repositories.SignInLimitRepository,
+    private val limits:
+        dev.fajar.hris.identity.domain.repositories.AuthenticationRateLimitRepository,
     private val enforceLimits: Boolean = true,
-    private val policy: dev.fajar.hris.identity.domain.entities.SignInAttemptPolicy =
-        dev.fajar.hris.identity.domain.entities.SignInAttemptPolicy(),
+    private val policy: dev.fajar.hris.identity.domain.entities.AuthenticationAttemptPolicy =
+        dev.fajar.hris.identity.domain.entities.AuthenticationAttemptPolicy(),
 ) {
     fun execute(
         email: String,

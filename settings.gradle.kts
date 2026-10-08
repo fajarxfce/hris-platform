@@ -38,3 +38,5 @@ include(":core:jobs:domain", ":core:jobs:data", ":core:jobs:delivery")
 include(":apps:worker")
 
 include(":core:mail:domain", ":core:mail:data")
+
+include(":core:storage:domain", ":core:storage:data")

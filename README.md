@@ -24,6 +24,7 @@ See [development](docs/development.md) for Docker access, migrations, and local 
 - [Architecture and ownership](docs/architecture.md)
 - [SSO configuration](docs/sso.md)
 - [Outbound email](docs/mail.md)
+- [Private object storage](docs/storage.md)
 - [API conventions](docs/api-conventions.md)
 - [Dashboard design](docs/dashboard.md)
 - [Delivery and validation](docs/delivery.md)

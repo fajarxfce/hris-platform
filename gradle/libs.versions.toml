@@ -1,4 +1,5 @@
 [versions]
+aws-sdk = "2.55.12"
 commons-csv = "1.14.1"
 commons-io = "2.22.0"
 bouncycastle = "1.86"
@@ -8,6 +9,10 @@ ktfmt = "0.59"
 archunit = "1.4.1"
 
 [libraries]
+aws-s3 = { module = "software.amazon.awssdk:s3", version.ref = "aws-sdk" }
+aws-url-connection = { module = "software.amazon.awssdk:url-connection-client", version.ref = "aws-sdk" }
+slf4j-api = { module = "org.slf4j:slf4j-api" }
+testcontainers-core = { module = "org.testcontainers:testcontainers" }
 commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commons-csv" }
 commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
 spring-mail = { module = "org.springframework.boot:spring-boot-starter-mail" }

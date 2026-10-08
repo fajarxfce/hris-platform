@@ -4,6 +4,7 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.expenses.domain.entities.ExpenseCategory
 import dev.fajar.hris.expenses.domain.policies.*
 import dev.fajar.hris.expenses.domain.repositories.ExpensePolicyRepository
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import java.time.LocalDate
 
@@ -26,7 +27,7 @@ class ListExpenseCategories(
         return transactions.run(actor) {
             val current =
                 identities.access(actor.accountId, company).flatMap {
-                    validateExpenseActor(actor, it)
+                    validateCompanyCommandActor(actor, it)
                 }
             if (current is Result.Failed) return@run current
             if (!canReadExpensePolicies((current as Result.Success).value))

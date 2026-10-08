@@ -28,7 +28,7 @@ Business changes, audit, outbox, and idempotency receipts share their transactio
 
 Account, person, employment, company membership, and role assignment are separate concepts. An account can have multiple company memberships. Initial binding to an existing person requires an independent authorized operator and an active company membership. Account row locks protecting credential/access changes use `FOR NO KEY UPDATE` where identity keys remain immutable, so unrelated foreign-key history writes can proceed without a reversed lock dependency. Server-side permission includes company and resource scope; permission to administer users does not automatically grant payroll access.
 
-Web uses HttpOnly Secure session cookies and CSRF protection. Mobile uses short-lived access tokens with rotated refresh tokens. OIDC uses verified issuer/subject; provider claims are never trusted from client decoding. Privileged accounts require MFA and sensitive operations require recent authentication.
+Web uses HttpOnly Secure session cookies and CSRF protection. Mobile uses short-lived access tokens with rotated refresh tokens. OIDC uses verified issuer/subject; provider claims are never trusted from client decoding. Privileged accounts require MFA and sensitive operations require recent authentication. Revalidating an already resolved request may remove permissions but must not add newly granted capabilities without a new request and its assurance checks. The shared company-command access policy applies this intersection; background jobs resolve execution authority separately.
 
 ## Storage and jobs
 

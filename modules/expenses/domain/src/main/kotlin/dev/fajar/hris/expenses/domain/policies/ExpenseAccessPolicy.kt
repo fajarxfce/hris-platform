@@ -1,20 +1,6 @@
 package dev.fajar.hris.expenses.domain.policies
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.entities.AccountAccess
-
-fun validateExpenseActor(actor: Actor, access: AccountAccess?): Result<Actor> {
-    if (
-        access == null ||
-            !access.account.active ||
-            (actor.credentialVersion != null &&
-                actor.credentialVersion != access.account.securityVersion)
-    )
-        return Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "session_revoked"))
-    if (!access.companyActive || !access.membershipActive)
-        return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_access_denied"))
-    return Result.Success(actor.copy(permissions = access.permissions))
-}
 
 fun canReadExpensePolicies(actor: Actor): Boolean =
     actor.permissions.any {
@@ -30,3 +16,22 @@ fun canReadExpensePolicies(actor: Actor): Boolean =
                 "expenses.manage",
             )
     }
+
+fun canManageExpenseClaim(
+    actor: Actor,
+    employee: dev.fajar.hris.people.domain.entities.Employee,
+): Boolean =
+    "expenses.manage" in actor.permissions ||
+        ("expenses.self.manage" in actor.permissions &&
+            employee.person.accountId == actor.accountId)
+
+fun canReadExpenseClaim(
+    actor: Actor,
+    employee: dev.fajar.hris.people.domain.entities.Employee,
+    today: java.time.LocalDate,
+): Boolean =
+    "expenses.read" in actor.permissions ||
+        canManageExpenseClaim(actor, employee) ||
+        ("expenses.team.read" in actor.permissions &&
+            employee.managerAccountId == actor.accountId &&
+            employee.terms.isWorkingOn(today))

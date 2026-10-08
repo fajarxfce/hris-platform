@@ -1,12 +1,16 @@
 package dev.fajar.hris.expenses.data.di
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.documents.domain.repositories.DocumentRepository
 import dev.fajar.hris.expenses.data.datasources.*
-import dev.fajar.hris.expenses.data.repositories.StoredExpensePolicyRepository
-import dev.fajar.hris.expenses.domain.repositories.ExpensePolicyRepository
+import dev.fajar.hris.expenses.data.repositories.*
+import dev.fajar.hris.expenses.domain.repositories.*
 import dev.fajar.hris.expenses.domain.usecases.*
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.organization.domain.repositories.OrganizationRepository
+import dev.fajar.hris.people.domain.repositories.PeopleRepository
+import java.time.Clock
 import org.jooq.DSLContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -54,4 +58,106 @@ class ExpenseConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
     ) = GetExpenseCategoryHistory(policies, identities, transactions)
+
+    @Bean
+    fun expenseClaimSource(sql: DSLContext): ExpenseClaimDataSource =
+        PostgresExpenseClaimDataSource(sql)
+
+    @Bean
+    fun expenseClaims(source: ExpenseClaimDataSource): ExpenseClaimRepository =
+        StoredExpenseClaimRepository(source)
+
+    @Bean
+    fun saveExpenseDraft(
+        claims: ExpenseClaimRepository,
+        policies: ExpensePolicyRepository,
+        documents: DocumentRepository,
+        people: PeopleRepository,
+        units: OrganizationRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        SaveExpenseDraft(
+            claims,
+            policies,
+            documents,
+            people,
+            units,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun cancelExpenseDraft(
+        claims: ExpenseClaimRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        CancelExpenseDraft(
+            claims,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun getExpenseClaim(
+        claims: ExpenseClaimRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = GetExpenseClaim(claims, people, companies, identities, transactions, clock)
+
+    @Bean
+    fun getExpenseDrafts(
+        claims: ExpenseClaimRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = GetExpenseDrafts(claims, people, companies, identities, transactions, clock)
+
+    @Bean
+    fun getExpenseClaimHistory(
+        claims: ExpenseClaimRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = GetExpenseClaimHistory(claims, people, companies, identities, transactions, clock)
+
+    @Bean
+    fun listExpenseClaims(
+        claims: ExpenseClaimRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = ListExpenseClaims(claims, people, companies, identities, transactions, clock)
 }

@@ -4,6 +4,7 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.expenses.domain.entities.ExpenseCategory
 import dev.fajar.hris.expenses.domain.policies.*
 import dev.fajar.hris.expenses.domain.repositories.ExpensePolicyRepository
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import java.util.UUID
@@ -65,7 +66,7 @@ class SaveExpenseCategory(
             if (accountLock is Result.Failed) return@run accountLock
             val current =
                 identities.access(actor.accountId, company).flatMap {
-                    validateExpenseActor(actor, it)
+                    validateCompanyCommandActor(actor, it)
                 }
             if (current is Result.Failed) return@run current
             val permission =

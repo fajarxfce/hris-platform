@@ -7,6 +7,7 @@ import dev.fajar.hris.people.data.datasources.PersonProfileDataSource
 import dev.fajar.hris.people.data.mappers.*
 import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
+import dev.fajar.hris.schema.tables.records.EmploymentRevisionCancellationsRecord
 import dev.fajar.hris.schema.tables.records.EmploymentsRecord
 import java.time.Instant
 import java.time.LocalDate
@@ -17,6 +18,51 @@ class StoredPeopleRepository(
     private val source: PeopleDataSource,
     private val profiles: PersonProfileDataSource,
 ) : PeopleRepository {
+    override fun currentVersion(companyId: UUID, id: UUID): Result<Long?> = safeDatabaseCall {
+        source.currentVersion(companyId, id)
+    }
+
+    override fun findRevision(
+        companyId: UUID,
+        id: UUID,
+        revision: Long,
+    ): Result<EmploymentRevision?> = safeDatabaseCall {
+        source
+            .findRevision(companyId, id, revision)
+            ?.toRevision(source.cancellations(companyId, id, setOf(revision)).singleOrNull())
+    }
+
+    override fun hasRevisionsAfter(companyId: UUID, id: UUID, date: LocalDate): Result<Boolean> =
+        safeDatabaseCall {
+            source.hasRevisionsAfter(companyId, id, date)
+        }
+
+    override fun cancelRevision(
+        actor: Actor,
+        id: UUID,
+        expectedVersion: Long,
+        revision: Long,
+        reason: String,
+    ): Result<MutationReceipt> =
+        safeDatabaseCall {
+                source.advanceVersion(requireNotNull(actor.companyId), id, expectedVersion)
+            }
+            .requireCurrentVersion()
+            .flatMap { version ->
+                safeDatabaseCall {
+                    source.insertCancellation(
+                        EmploymentRevisionCancellationsRecord().also {
+                            it.companyId = actor.companyId
+                            it.employmentId = id
+                            it.revision = revision
+                            it.actorId = actor.accountId
+                            it.reason = reason
+                        }
+                    )
+                    MutationReceipt(id, version)
+                }
+            }
+
     override fun employeeIds(companyId: UUID, limit: Int): Result<List<UUID>> = safeDatabaseCall {
         source.employeeIds(companyId, limit)
     }
@@ -78,8 +124,12 @@ class StoredPeopleRepository(
         limit: Int,
     ): Result<Page<EmploymentRevision>> = safeDatabaseCall {
         val rows = source.history(companyId, id, after, limit + 1)
+        val cancellations =
+            source
+                .cancellations(companyId, id, rows.take(limit).map { it.revision }.toSet())
+                .associateBy { it.revision }
         Page(
-            rows.take(limit).map { it.toRevision() },
+            rows.take(limit).map { it.toRevision(cancellations[it.revision]) },
             if (rows.size > limit) rows[limit - 1].revision.toString() else null,
         )
     }

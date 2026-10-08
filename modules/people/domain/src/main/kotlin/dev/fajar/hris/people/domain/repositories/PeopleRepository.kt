@@ -7,6 +7,20 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface PeopleRepository {
+    fun currentVersion(companyId: UUID, id: UUID): Result<Long?>
+
+    fun findRevision(companyId: UUID, id: UUID, revision: Long): Result<EmploymentRevision?>
+
+    fun hasRevisionsAfter(companyId: UUID, id: UUID, date: LocalDate): Result<Boolean>
+
+    fun cancelRevision(
+        actor: Actor,
+        id: UUID,
+        expectedVersion: Long,
+        revision: Long,
+        reason: String,
+    ): Result<MutationReceipt>
+
     fun employeeIds(companyId: UUID, limit: Int): Result<List<UUID>>
 
     fun lockReportingLines(companyId: UUID): Result<Unit>

@@ -7,15 +7,19 @@ import dev.fajar.hris.people.domain.entities.ReportingAssignment
 fun validateReportingLine(
     change: ReportingAssignment,
     history: List<ReportingAssignment>,
+): Result<Unit> =
+    validateReportingHistory(change.employeeId, change.effectiveFrom, history + change)
+
+fun validateReportingHistory(
+    employeeId: java.util.UUID,
+    from: java.time.LocalDate,
+    history: List<ReportingAssignment>,
 ): Result<Unit> {
-    val assignments = history + change
-    val byEmployee = assignments.groupBy { it.employeeId }
+    val byEmployee = history.groupBy { it.employeeId }
     val boundaries =
-        (assignments.map { it.effectiveFrom } + change.effectiveFrom)
-            .filter { !it.isBefore(change.effectiveFrom) }
-            .distinct()
+        (history.map { it.effectiveFrom } + from).filter { !it.isBefore(from) }.distinct()
     for (date in boundaries) {
-        var current = change.employeeId
+        var current = employeeId
         val visited = mutableSetOf<java.util.UUID>()
         while (true) {
             if (!visited.add(current) || visited.size > 32)

@@ -1,6 +1,8 @@
 package dev.fajar.hris.people.data.datasources
 
+import dev.fajar.hris.people.data.queries.activeEmploymentRevision
 import dev.fajar.hris.people.data.queries.employeesAtInstant
+import dev.fajar.hris.schema.Tables.EMPLOYMENT_REVISION_CANCELLATIONS as C
 import dev.fajar.hris.schema.tables.EmployeesAt.EMPLOYEES_AT
 import dev.fajar.hris.schema.tables.EmploymentRevisions.EMPLOYMENT_REVISIONS as R
 import dev.fajar.hris.schema.tables.Employments.EMPLOYMENTS as E
@@ -13,6 +15,45 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresPeopleDataSource(private val sql: DSLContext) : PeopleDataSource {
+    override fun currentVersion(companyId: UUID, id: UUID): Long? =
+        sql.select(E.VERSION)
+            .from(E)
+            .where(E.COMPANY_ID.eq(companyId))
+            .and(E.ID.eq(id))
+            .fetchOne(E.VERSION)
+
+    override fun findRevision(companyId: UUID, id: UUID, revision: Long) =
+        sql.selectFrom(R)
+            .where(R.COMPANY_ID.eq(companyId))
+            .and(R.EMPLOYMENT_ID.eq(id))
+            .and(R.REVISION.eq(revision))
+            .fetchOne()
+
+    override fun hasRevisionsAfter(companyId: UUID, id: UUID, date: LocalDate) =
+        sql.fetchExists(
+            sql.selectOne()
+                .from(R)
+                .where(R.COMPANY_ID.eq(companyId))
+                .and(R.EMPLOYMENT_ID.eq(id))
+                .and(R.EFFECTIVE_FROM.gt(date))
+                .and(activeEmploymentRevision(R))
+        )
+
+    override fun cancellations(
+        companyId: UUID,
+        id: UUID,
+        revisions: Set<Long>,
+    ): List<EmploymentRevisionCancellationsRecord> =
+        sql.selectFrom(C)
+            .where(C.COMPANY_ID.eq(companyId))
+            .and(C.EMPLOYMENT_ID.eq(id))
+            .and(C.REVISION.`in`(revisions))
+            .fetch()
+
+    override fun insertCancellation(record: EmploymentRevisionCancellationsRecord) {
+        sql.executeInsert(record)
+    }
+
     override fun employeeIds(companyId: UUID, limit: Int): List<UUID> =
         sql.select(E.ID)
             .from(E)
@@ -89,12 +130,14 @@ class PostgresPeopleDataSource(private val sql: DSLContext) : PeopleDataSource {
                 .where(baseline.COMPANY_ID.eq(companyId))
                 .and(baseline.EMPLOYMENT_ID.eq(id))
                 .and(baseline.EFFECTIVE_FROM.le(from))
+                .and(activeEmploymentRevision(baseline))
         return sql.select(R.asterisk())
             .distinctOn(R.EFFECTIVE_FROM)
             .from(R)
             .where(R.COMPANY_ID.eq(companyId))
             .and(R.EMPLOYMENT_ID.eq(id))
             .and(R.EFFECTIVE_FROM.le(until))
+            .and(activeEmploymentRevision(R))
             .and(R.EFFECTIVE_FROM.ge(from).or(R.EFFECTIVE_FROM.eq(baselineDate)))
             .orderBy(R.EFFECTIVE_FROM, R.REVISION.desc())
             .fetchInto(R)
@@ -124,8 +167,10 @@ class PostgresPeopleDataSource(private val sql: DSLContext) : PeopleDataSource {
         with recursive reachable(id) as (
             values (?::uuid),(?::uuid)
             union select h.manager_id from employment_revisions h join reachable r on r.id=h.employment_id
-                where h.company_id=? and h.manager_id is not null
-        ) select h.* from employment_revisions h join reachable r on r.id=h.employment_id where h.company_id=?
+                where h.company_id=? and h.manager_id is not null and not exists(
+                    select 1 from employment_revision_cancellations c where c.company_id=h.company_id and c.employment_id=h.employment_id and c.revision=h.revision)
+        ) select h.* from employment_revisions h join reachable r on r.id=h.employment_id where h.company_id=? and not exists(
+            select 1 from employment_revision_cancellations c where c.company_id=h.company_id and c.employment_id=h.employment_id and c.revision=h.revision)
     """,
                 employeeId,
                 managerId,

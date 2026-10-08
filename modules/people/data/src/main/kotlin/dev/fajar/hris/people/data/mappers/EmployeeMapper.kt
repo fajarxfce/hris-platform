@@ -27,7 +27,9 @@ fun EmployeesAtRecord.toEmployee(): Employee =
         appliedRevision,
     )
 
-fun EmploymentRevisionsRecord.toRevision(): EmploymentRevision =
+fun EmploymentRevisionsRecord.toRevision(
+    cancellation: EmploymentRevisionCancellationsRecord? = null
+): EmploymentRevision =
     EmploymentRevision(
         revision,
         EmploymentTerms(
@@ -45,6 +47,9 @@ fun EmploymentRevisionsRecord.toRevision(): EmploymentRevision =
         actorId,
         reason,
         recordedAt.toInstant(),
+        cancellation?.let {
+            EmploymentRevisionCancellation(it.actorId, it.reason, it.recordedAt.toInstant())
+        },
     )
 
 fun PersonProfile.toRow(companyId: UUID): PersonsRecord =

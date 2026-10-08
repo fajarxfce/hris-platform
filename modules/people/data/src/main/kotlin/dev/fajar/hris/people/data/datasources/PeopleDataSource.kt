@@ -6,6 +6,20 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 interface PeopleDataSource {
+    fun currentVersion(companyId: UUID, id: UUID): Long?
+
+    fun findRevision(companyId: UUID, id: UUID, revision: Long): EmploymentRevisionsRecord?
+
+    fun hasRevisionsAfter(companyId: UUID, id: UUID, date: LocalDate): Boolean
+
+    fun cancellations(
+        companyId: UUID,
+        id: UUID,
+        revisions: Set<Long>,
+    ): List<EmploymentRevisionCancellationsRecord>
+
+    fun insertCancellation(record: EmploymentRevisionCancellationsRecord)
+
     fun employeeIds(companyId: UUID, limit: Int): List<UUID>
 
     fun lock(companyId: UUID)

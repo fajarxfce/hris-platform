@@ -29,4 +29,11 @@ fun Employee.toResponse(): EmployeeResponse =
     )
 
 fun EmploymentRevision.toResponse(): RevisionResponse =
-    RevisionResponse(revision, terms.toResponse(), actorId, reason, recordedAt)
+    RevisionResponse(
+        revision,
+        terms.toResponse(),
+        actorId,
+        reason,
+        recordedAt,
+        cancellation?.let { RevisionCancellationResponse(it.actorId, it.reason, it.recordedAt) },
+    )

@@ -79,4 +79,14 @@ class PeopleConfiguration {
     @Bean
     fun employmentHistory(people: PeopleRepository, transactions: TransactionRunner) =
         GetEmploymentHistory(people, transactions)
+
+    @Bean
+    fun cancelEmploymentRevision(
+        people: PeopleRepository,
+        companies: dev.fajar.hris.organization.domain.repositories.CompanyRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = CancelEmploymentRevision(people, companies, operations, journal, transactions, clock)
 }

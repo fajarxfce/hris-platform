@@ -17,6 +17,7 @@ import java.util.UUID
 
 class TransferEmployee(
     private val people: PeopleRepository,
+    private val lifecycle: LifecycleRepository,
     private val transfers: EmploymentTransferRepository,
     private val companies: CompanyRepository,
     private val units: OrganizationRepository,
@@ -138,6 +139,12 @@ class TransferEmployee(
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
             val valid = validateImmediateTransfer(employee, command, today, targetToday)
             if (valid is Result.Failed) return@run valid
+            val openCases = lifecycle.hasOpenCases(sourceCompany, id)
+            if (openCases is Result.Failed) return@run openCases
+            if ((openCases as Result.Success).value)
+                return@run Result.Failed(
+                    Failure(FailureKind.CONFLICT, "open_lifecycle_cases_pending")
+                )
             val future = people.hasRevisionsAfter(sourceCompany, id, today)
             if (future is Result.Failed) return@run future
             if ((future as Result.Success).value)

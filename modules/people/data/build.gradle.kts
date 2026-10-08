@@ -6,4 +6,5 @@ dependencies {
     implementation(projects.modules.identity.domain)
     implementation(projects.core.database)
     implementation(libs.spring.core)
+    implementation(libs.jackson.kotlin)
 }

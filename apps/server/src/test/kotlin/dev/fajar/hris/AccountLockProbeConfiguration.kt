@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 
-class TransferAccessProbe {
+class AccountLockProbe {
     data class Barrier(
         val account: UUID,
         val entered: CountDownLatch = CountDownLatch(1),
@@ -22,14 +22,14 @@ class TransferAccessProbe {
 }
 
 @TestConfiguration(proxyBeanMethods = false)
-class TransferAccessProbeConfiguration {
-    @Bean fun transferAccessProbe() = TransferAccessProbe()
+class AccountLockProbeConfiguration {
+    @Bean fun accountLockProbe() = AccountLockProbe()
 
     @Bean
     @Primary
     fun probedIdentities(
         @Qualifier("identities") delegate: IdentityRepository,
-        probe: TransferAccessProbe,
+        probe: AccountLockProbe,
     ): IdentityRepository =
         object : IdentityRepository by delegate {
             override fun lockAccount(accountId: UUID): Result<Unit> {

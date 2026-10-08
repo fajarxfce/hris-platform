@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import org.springframework.dao.DataAccessException
 
-@Import(TransferAccessProbeConfiguration::class)
+@Import(AccountLockProbeConfiguration::class)
 class EmploymentTransferHttpTest : PeopleApiFixture() {
-    @Autowired private lateinit var accessProbe: TransferAccessProbe
+    @Autowired private lateinit var accessProbe: AccountLockProbe
 
     private fun account(): UUID {
         val id = UUID.randomUUID()
@@ -250,7 +250,7 @@ class EmploymentTransferHttpTest : PeopleApiFixture() {
                 operator,
                 permission,
             )
-        val barrier = TransferAccessProbe.Barrier(operator)
+        val barrier = AccountLockProbe.Barrier(operator)
         accessProbe.current.set(barrier)
         Executors.newSingleThreadExecutor().use { executor ->
             val request =

@@ -5,7 +5,7 @@ import dev.fajar.hris.organization.domain.entities.UnitKind
 import dev.fajar.hris.organization.domain.repositories.OrganizationRepository
 import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.policies.*
-import dev.fajar.hris.people.domain.repositories.PeopleRepository
+import dev.fajar.hris.people.domain.repositories.*
 import java.util.UUID
 
 class ReviseEmployment(
@@ -14,7 +14,8 @@ class ReviseEmployment(
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
-    private val transfers: dev.fajar.hris.people.domain.repositories.EmploymentTransferRepository,
+    private val transfers: EmploymentTransferRepository,
+    private val lifecycle: LifecycleRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -73,6 +74,15 @@ class ReviseEmployment(
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "employment_start_immutable")
                 )
+            val closed = lifecycle.completedOffboardingDate(company, id)
+            if (closed is Result.Failed) return@run closed
+            val lastWorkingDate = (closed as Result.Success).value
+            if (
+                lastWorkingDate != null &&
+                    terms.effectiveFrom.isAfter(lastWorkingDate) &&
+                    (terms.status != EmploymentStatus.ENDED || terms.endDate != lastWorkingDate)
+            )
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "employment_offboarded"))
             val transferred = transfers.forEmployee(company, id)
             if (transferred is Result.Failed) return@run transferred
             val outgoing =

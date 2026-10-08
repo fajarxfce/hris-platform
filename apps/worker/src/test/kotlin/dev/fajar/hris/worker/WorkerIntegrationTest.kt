@@ -267,12 +267,18 @@ class WorkerIntegrationTest {
         }
         assertTrue(interrupted.await(2, TimeUnit.SECONDS))
         assertFalse(scheduler.isRunning)
-        assertTrue(
-            Thread.getAllStackTraces().keys.none {
-                it.isAlive &&
-                    (it.name.startsWith("hris-job-") || it.name.startsWith("hris-worker-control-"))
+        // Executor termination is signalled before its final worker's Thread.run returns.
+        // Join those threads within a shared bound before asserting actual thread exit.
+        val remainingThreads =
+            Thread.getAllStackTraces().keys.filter {
+                it.name.startsWith("hris-job-") || it.name.startsWith("hris-worker-control-")
             }
-        )
+        val deadline = System.nanoTime() + Duration.ofSeconds(2).toNanos()
+        for (thread in remainingThreads) {
+            val remaining = deadline - System.nanoTime()
+            if (remaining > 0) thread.join(Duration.ofNanos(remaining))
+        }
+        assertTrue(remainingThreads.none { it.isAlive })
         assertEquals(
             "QUEUED",
             database()

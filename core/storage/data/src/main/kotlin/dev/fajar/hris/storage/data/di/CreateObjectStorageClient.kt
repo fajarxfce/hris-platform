@@ -1,5 +1,6 @@
 package dev.fajar.hris.storage.data.di
 
+import dev.fajar.hris.storage.data.datasources.S3InventoryResponseInterceptor
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.core.checksums.RequestChecksumCalculation
@@ -38,6 +39,7 @@ fun createObjectStorageClient(settings: ObjectStorageSettings): S3Client =
         )
         .overrideConfiguration(
             ClientOverrideConfiguration.builder()
+                .addExecutionInterceptor(S3InventoryResponseInterceptor())
                 .apiCallTimeout(settings.callTimeout)
                 .apiCallAttemptTimeout(settings.callTimeout)
                 .retryStrategy(StandardRetryStrategy.builder().maxAttempts(1).build())

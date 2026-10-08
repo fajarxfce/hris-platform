@@ -160,4 +160,37 @@ class GarageStorageTest {
             assertEquals(Result.Success(Unit), repo.delete(key))
         }
     }
+
+    @Test
+    fun companyInventoryUsesFiniteOrderedPagesOnGarage() {
+        S3ObjectStorageDataSource(createObjectStorageClient(settings()), "hris-tests").use { source
+            ->
+            val repo = PrivateObjectStorageRepository(source)
+            val company = UUID.randomUUID()
+            val other = UUID.randomUUID()
+            val keys = (1..3).map { "$company/000$it" }
+            for (key in keys + "$other/foreign") assertTrue(
+                repo.put(key, "fixture".toByteArray()) is Result.Success
+            )
+            val first = repo.list(company, null, 2)
+            assertTrue(first is Result.Success, first.toString())
+            val page = (first as Result.Success).value
+            assertEquals(keys.take(2), page.entries.map { it.key })
+            assertTrue(page.hasMore)
+            assertTrue(page.entries.all { it.size == 7L && it.etag.isNotBlank() })
+            val next = (repo.list(company, page.entries.last().key, 2) as Result.Success).value
+            assertEquals(keys.drop(2), next.entries.map { it.key })
+            assertFalse(next.hasMore)
+            assertTrue(
+                (repo.list(company, keys.last(), 2) as Result.Success).value.entries.isEmpty()
+            )
+            assertTrue(
+                (repo.list(UUID.randomUUID(), null, 2) as Result.Success).value.entries.isEmpty()
+            )
+            for (key in keys + "$other/foreign") assertEquals(
+                Result.Success(Unit),
+                repo.delete(key),
+            )
+        }
+    }
 }

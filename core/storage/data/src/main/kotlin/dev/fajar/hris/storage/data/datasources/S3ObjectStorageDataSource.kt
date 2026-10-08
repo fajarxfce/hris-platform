@@ -2,7 +2,7 @@ package dev.fajar.hris.storage.data.datasources
 
 import dev.fajar.hris.storage.data.errors.InvalidObjectStorageResponse
 import dev.fajar.hris.storage.data.errors.StoredObjectVersionChanged
-import dev.fajar.hris.storage.data.models.ObjectMetadataData
+import dev.fajar.hris.storage.data.models.*
 import java.net.SocketTimeoutException
 import java.time.Duration
 import java.util.concurrent.Semaphore
@@ -21,6 +21,30 @@ class S3ObjectStorageDataSource(
     }
 
     private val capacity = Semaphore(8)
+
+    override fun list(prefix: String, afterKey: String?, limit: Int): ObjectInventoryPageData =
+        withObjectStorageCapacity(capacity) {
+            val response =
+                client.listObjectsV2(
+                    ListObjectsV2Request.builder()
+                        .bucket(bucket)
+                        .prefix(prefix)
+                        .startAfter(afterKey)
+                        .maxKeys(limit)
+                        .build()
+                )
+            ObjectInventoryPageData(
+                response.contents().map { item ->
+                    ObjectInventoryEntryData(
+                        item.key() ?: throw InvalidObjectStorageResponse(),
+                        item.size() ?: throw InvalidObjectStorageResponse(),
+                        item.eTag() ?: throw InvalidObjectStorageResponse(),
+                        item.lastModified() ?: throw InvalidObjectStorageResponse(),
+                    )
+                },
+                response.isTruncated ?: throw InvalidObjectStorageResponse(),
+            )
+        }
 
     override fun put(key: String, bytes: ByteArray, sha256: String): ObjectMetadataData =
         withObjectStorageCapacity(capacity) {

@@ -53,6 +53,13 @@ abstract class ObjectCleanupApiFixture : ApiIntegrationTest() {
             deleted += key
         }
 
+        override fun list(
+            prefix: String,
+            afterKey: String?,
+            limit: Int,
+        ): dev.fajar.hris.storage.data.models.ObjectInventoryPageData =
+            throw UnsupportedOperationException("Listing is not part of this fixture")
+
         override fun put(key: String, bytes: ByteArray, sha256: String): ObjectMetadataData =
             throw UnsupportedOperationException()
 

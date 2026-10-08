@@ -1,9 +1,13 @@
 package dev.fajar.hris.storage.domain.repositories
 
 import dev.fajar.hris.core.domain.Result
-import dev.fajar.hris.storage.domain.entities.StoredObject
+import dev.fajar.hris.storage.domain.entities.*
+import java.util.UUID
 
 interface ObjectStorageRepository {
+    /** One bounded, ordered company-prefix page. Consumers own scan policy and authorization. */
+    fun list(companyId: UUID, afterKey: String?, limit: Int): Result<ObjectInventoryPage>
+
     /**
      * Writes a private object. Callers allocate a unique key per attempt to preserve immutability.
      */

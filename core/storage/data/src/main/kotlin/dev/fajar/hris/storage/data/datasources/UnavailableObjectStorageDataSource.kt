@@ -4,6 +4,12 @@ import dev.fajar.hris.storage.data.errors.ObjectStorageUnavailable
 import dev.fajar.hris.storage.data.models.ObjectMetadataData
 
 class UnavailableObjectStorageDataSource : ObjectStorageDataSource {
+    override fun list(
+        prefix: String,
+        afterKey: String?,
+        limit: Int,
+    ): dev.fajar.hris.storage.data.models.ObjectInventoryPageData = throw ObjectStorageUnavailable()
+
     override fun put(key: String, bytes: ByteArray, sha256: String): ObjectMetadataData =
         throw ObjectStorageUnavailable()
 

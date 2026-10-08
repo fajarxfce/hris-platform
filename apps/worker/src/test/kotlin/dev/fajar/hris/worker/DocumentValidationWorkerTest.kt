@@ -304,6 +304,13 @@ class DocumentWorkerProbeConfiguration {
         object : ObjectStorageDataSource {
             val stored = ConcurrentHashMap<String, Pair<ByteArray, String>>()
 
+            override fun list(
+                prefix: String,
+                afterKey: String?,
+                limit: Int,
+            ): dev.fajar.hris.storage.data.models.ObjectInventoryPageData =
+                throw UnsupportedOperationException("Listing is not part of this fixture")
+
             override fun put(key: String, bytes: ByteArray, sha256: String): ObjectMetadataData {
                 check(!TransactionSynchronizationManager.isActualTransactionActive())
                 stored[key] = bytes.copyOf() to sha256

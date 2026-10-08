@@ -12,7 +12,7 @@ Acceptance: cross-company/resource denial, refresh replay/revocation, invitation
 
 ## Implementation status
 
-Password sign-in, administrator bootstrap, server sessions in PostgreSQL, CSRF/session ID rotation, current-account reads, and live company authorization are implemented. Company member directories and versioned permission/activation updates are also implemented. Sensitive payroll/payment grants require platform administration and cannot be self-granted; company membership changes preserve the last administrator and are audited. Authenticator MFA, recovery codes, credential-version revocation, and recent-authentication checks are implemented. Configured OIDC sign-in and versioned global identity bindings are implemented. Configurable company role templates and versioned assignment snapshots are implemented. Invitations/password recovery remain planned.
+Password sign-in, administrator bootstrap, server sessions in PostgreSQL, CSRF/session ID rotation, current-account reads, and live company authorization are implemented. Company member directories and versioned permission/activation updates are also implemented. Sensitive payroll/payment grants require platform administration and cannot be self-granted; company membership changes preserve the last administrator and are audited. Authenticator MFA, recovery codes, credential-version revocation, and recent-authentication checks are implemented. Configured OIDC sign-in and versioned global identity bindings are implemented. Configurable company role templates, versioned assignment snapshots, and global account access administration are implemented. Invitations/password recovery remain planned.
 
 Endpoints: GET /api/v1/auth/csrf, POST /api/v1/auth/login, POST /api/v1/auth/logout, GET /api/v1/me, GET /api/v1/companies/{companyId}/me/access. Login uses JSON email/password and a current X-CSRF-TOKEN header. Fetch a new CSRF token after successful login. Cookies are Secure by default; set HRIS_SECURE_COOKIES=false only for local HTTP development.
 
@@ -50,3 +50,13 @@ Membership writes accept direct `permissions` and up to eight distinct `roleTemp
 `GET /companies/{companyId}/members/{accountId}` returns effective membership access and the direct/template sources used for that version. Older grants without a recorded template application are represented as direct permissions. Template application history is immutable; access, source snapshots, receipts, and audit/outbox commit together.
 
 Sensitive-grant checks run on the combined permissions. A company administrator cannot use a role template to bypass the platform-administrator requirement for payroll/payment access or grant those permissions to themselves. Reactivating a membership counts as granting its permissions again. Membership and template changes retain recent-MFA checks when enforcement is enabled. A template name never substitutes for a server permission check.
+
+## Global account administration
+
+`GET /identity/accounts` provides a bounded global account directory for platform administrators. Queries acquire only administrative fields; password hashes and authenticator secrets are not selected or returned. Company membership administrators do not gain access to this directory.
+
+`PUT /identity/accounts/{accountId}/access` changes account activation and platform permissions with an expected account version, idempotency key, and reason. Every successful access change advances the credential version, invalidating existing cookie and native sessions. Reactivation requires a new sign-in. Company memberships remain recorded and still need their own grants.
+
+Access changes serialize global administration and lock/revalidate the initiating account before changing the target. Two competing administrators cannot both disable one another. Administrators cannot remove their own administration. Pending invitations cannot be activated through this endpoint; explicitly disabling one cancels its pending status and advances the credential version. Invitation acceptance is a separate workflow, still pending implementation.
+
+Account IDs and login email addresses remain immutable. Credential/version counters cannot move backwards. Account updates, permission changes, receipts, and audit/outbox share a transaction. The endpoint retains recent authentication and MFA requirements; it never accepts passwords or changes authenticator enrollment.

@@ -3,10 +3,12 @@ package dev.fajar.hris.identity.data.di
 import dev.fajar.hris.core.domain.ChangeJournalRepository
 import dev.fajar.hris.core.domain.TransactionRunner
 import dev.fajar.hris.identity.data.datasources.*
+import dev.fajar.hris.identity.data.repositories.StoredAccountAdministrationRepository
 import dev.fajar.hris.identity.data.repositories.StoredIdentityRepository
 import dev.fajar.hris.identity.data.repositories.StoredOidcIdentityRepository
 import dev.fajar.hris.identity.data.repositories.StoredRoleTemplateRepository
 import dev.fajar.hris.identity.domain.entities.*
+import dev.fajar.hris.identity.domain.repositories.AccountAdministrationRepository
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.OidcIdentityRepository
 import dev.fajar.hris.identity.domain.repositories.RoleTemplateRepository
@@ -325,4 +327,29 @@ class IdentityConfiguration {
         roles: RoleTemplateRepository,
         transactions: TransactionRunner,
     ) = GetCompanyMemberGrant(members, roles, transactions)
+
+    @Bean
+    fun accountAdministrationSource(sql: DSLContext): AccountAdministrationDataSource =
+        PostgresAccountAdministrationDataSource(sql)
+
+    @Bean
+    fun accountAdministration(
+        source: AccountAdministrationDataSource
+    ): AccountAdministrationRepository = StoredAccountAdministrationRepository(source)
+
+    @Bean
+    fun listManagedAccounts(
+        accounts: AccountAdministrationRepository,
+        transactions: TransactionRunner,
+    ) = ListManagedAccounts(accounts, transactions)
+
+    @Bean
+    fun saveAccountAccess(
+        accounts: AccountAdministrationRepository,
+        operations: dev.fajar.hris.core.domain.OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = SaveAccountAccess(accounts, operations, journal, transactions, security, clock)
 }

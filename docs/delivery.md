@@ -7,7 +7,7 @@
 - Identity: password sign-in, persistent cookie sessions, CSRF/session rotation, bootstrap, current-company permissions, revocation checks, and credential-race handling implemented. Company member administration is implemented, including versioned grants/revocation and sensitive-grant restrictions. MFA, OIDC, native tokens, invitations, and configurable role templates remain planned.
 - Organization and people: company setup, organization units, employee onboarding, scoped directories, and effective employment revisions implemented. Profile editing, lifecycle checklists, import, and cross-company transfer remain planned.
 - Approvals: effective templates, immutable snapshots, assignment/delegation, inbox, optimistic decision storage, and pure transitions implemented. Feature-specific business decisions remain planned.
-- Workforce: versioned shifts, weekly schedules, roster overrides, holidays, and scoped calendar reads implemented. Attendance, overtime, closing, and bulk/reset workflows remain planned.
+- Workforce: versioned shifts, weekly schedules, roster overrides, holidays, and scoped calendar reads implemented. Attendance capture and independent verification are implemented. Corrections, overtime, closing, and bulk/reset workflows remain planned.
 - Leave: planned.
 - Documents and expenses: planned.
 - Payroll: planned.
@@ -54,3 +54,5 @@ Approval/access slice: full Gradle check and bootJar passed (36 tests total). Si
 Calendar slice: full Gradle check and bootJar passed (46 tests total). Six pure tests cover overnight anchoring, DST gap/overlap, calendar precedence, future revisions, and location/duration validation. Four HTTP/PostgreSQL tests cover frozen shift snapshots, effective assignments, immutable history, holiday/roster precedence and replay, stale/cross-company shift references, range bounds, and employee scope. No attendance or payroll behavior is claimed by these checks.
 
 Current-team access fix: full Gradle check and bootJar passed (47 tests total). The additional HTTP/PostgreSQL test advances a controlled clock across midnight in Asia/Jakarta and verifies that former managers lose historical employee/calendar access while current managers retain it. Combined team/self directory grants are covered.
+
+Attendance capture slice: full Gradle check and bootJar passed (56 tests total). Six policy tests and three HTTP/PostgreSQL tests cover offline/expired proof, GPS validation, overnight totals, frozen schedules, lost-response replay, proof ownership/reuse, self-review denial, competing reviewers, rollback without consuming proof, immutable events, and live access revocation. Closing and payroll integration are not claimed by these tests.

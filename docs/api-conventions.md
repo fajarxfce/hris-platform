@@ -59,3 +59,12 @@ Work calendars:
 All calendar writes require `workforce.manage` and an idempotency key. Schedule reads enforce company, team, or self access. Shift changes preserve already published assignments and rosters; publishing a new version requires a deliberate new assignment.
 
 Team directory, employee details, and calendar authorization use current reporting assignments at the server instant in the company timezone. Historical/future date filters only select the returned projection; they cannot restore a former manager’s access. Team and self grants are combined.
+
+Attendance:
+
+- `POST /companies/{companyId}/workforce/employees/{id}/attendance/windows`: deviceId and idempotency key. Returns a one-use capture-window ID and expiry. Requires the current employee's `attendance.self.record` permission.
+- `POST /companies/{companyId}/workforce/employees/{id}/attendance`: id, workDate, kind (CLOCK_IN/CLOCK_OUT), capturedAt, deviceId, optional windowId, explicit offline flag, and optional location `{latitude, longitude, accuracyMeters, mocked}`. Use a stable operation key when retrying the same event.
+- `GET /companies/{companyId}/workforce/employees/{id}/attendance?from=YYYY-MM-DD&until=YYYY-MM-DD`: up to 31 dates, scoped to HR/current team/self. Returns immutable evidence, reviews, pending counts, incomplete pairs, and accepted minutes.
+- `POST /companies/{companyId}/workforce/attendance/{id}/review`: version, decision (ACCEPT/REJECT), reason. Requires `attendance.verify` or the current manager's `attendance.team.verify`; self-review is denied.
+
+Missing/expired windows and all explicit offline events require review. Reusing another account/device's window is rejected; a consumed window cannot back another event. Validation failures roll back both evidence and consumption. Unverified events never contribute to accepted minutes. A pending duplicate or unmatched checkout must be rejected or reviewed after its valid clock-in, rather than silently overwriting a punch.

@@ -4,7 +4,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.core.checksums.RequestChecksumCalculation
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration
-import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient
+import software.amazon.awssdk.http.apache5.Apache5HttpClient
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.retries.StandardRetryStrategy
 import software.amazon.awssdk.services.s3.S3Client
@@ -27,7 +27,12 @@ fun createObjectStorageClient(settings: ObjectStorageSettings): S3Client =
                 .build()
         )
         .httpClientBuilder(
-            UrlConnectionHttpClient.builder()
+            Apache5HttpClient.builder()
+                .maxConnections(8)
+                .connectionAcquisitionTimeout(java.time.Duration.ofMillis(100))
+                .connectionMaxIdleTime(java.time.Duration.ofSeconds(30))
+                .connectionTimeToLive(java.time.Duration.ofMinutes(5))
+                .useIdleConnectionReaper(false)
                 .connectionTimeout(settings.connectTimeout)
                 .socketTimeout(settings.readTimeout)
         )

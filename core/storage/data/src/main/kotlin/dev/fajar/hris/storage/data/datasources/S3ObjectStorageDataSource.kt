@@ -61,26 +61,40 @@ class S3ObjectStorageDataSource(
                     .ifMatch(etag)
                     .build(),
                 ResponseTransformer<GetObjectResponse, ByteArray> { response, stream ->
-                    if (response.eTag() != etag) throw StoredObjectVersionChanged()
-                    if (
-                        response.contentRange()?.startsWith("bytes $offset-${offset+length-1}/") !=
-                            true || response.contentLength() != length.toLong()
-                    )
-                        throw InvalidObjectStorageResponse()
-                    val bytes = ByteArray(length)
-                    var read = 0
-                    while (read < length) {
-                        if (Thread.currentThread().isInterrupted) throw InterruptedException()
+                    try {
+                        if (response.eTag() != etag) throw StoredObjectVersionChanged()
+                        if (
+                            response
+                                .contentRange()
+                                ?.startsWith("bytes $offset-${offset+length-1}/") != true ||
+                                response.contentLength() != length.toLong()
+                        )
+                            throw InvalidObjectStorageResponse()
+                        val bytes = ByteArray(length)
+                        var read = 0
+                        while (read < length) {
+                            if (Thread.currentThread().isInterrupted) throw InterruptedException()
+                            if (System.nanoTime() >= deadline)
+                                throw SocketTimeoutException("Object read deadline exceeded")
+                            val amount = stream.read(bytes, read, minOf(length - read, 65536))
+                            if (amount <= 0) throw InvalidObjectStorageResponse()
+                            read += amount
+                        }
                         if (System.nanoTime() >= deadline)
                             throw SocketTimeoutException("Object read deadline exceeded")
-                        val amount = stream.read(bytes, read, minOf(length - read, 65536))
-                        if (amount <= 0) throw InvalidObjectStorageResponse()
-                        read += amount
+                        if (stream.read() != -1) throw InvalidObjectStorageResponse()
+                        bytes
+                    } catch (failure: Throwable) {
+                        // Closing an unread response may drain it. Abort its connection before the
+                        // SDK closes the stream, preserving both cancellation and the original
+                        // error.
+                        try {
+                            stream.abort()
+                        } catch (closingFailure: Throwable) {
+                            failure.addSuppressed(closingFailure)
+                        }
+                        throw failure
                     }
-                    if (System.nanoTime() >= deadline)
-                        throw SocketTimeoutException("Object read deadline exceeded")
-                    if (stream.read() != -1) throw InvalidObjectStorageResponse()
-                    bytes
                 },
             )
         }

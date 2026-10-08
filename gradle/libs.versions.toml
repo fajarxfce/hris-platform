@@ -10,7 +10,7 @@ archunit = "1.4.1"
 
 [libraries]
 aws-s3 = { module = "software.amazon.awssdk:s3", version.ref = "aws-sdk" }
-aws-url-connection = { module = "software.amazon.awssdk:url-connection-client", version.ref = "aws-sdk" }
+aws-apache5 = { module = "software.amazon.awssdk:apache5-client", version.ref = "aws-sdk" }
 slf4j-api = { module = "org.slf4j:slf4j-api" }
 testcontainers-core = { module = "org.testcontainers:testcontainers" }
 commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commons-csv" }

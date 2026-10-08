@@ -5,4 +5,5 @@ dependencies {
     implementation(projects.core.database)
     implementation(libs.spring.security)
     implementation(libs.bouncycastle)
+    implementation(libs.jackson.kotlin)
 }

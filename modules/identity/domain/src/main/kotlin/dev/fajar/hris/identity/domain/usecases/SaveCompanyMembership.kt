@@ -1,6 +1,7 @@
 package dev.fajar.hris.identity.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.*
 import dev.fajar.hris.identity.domain.policies.PermissionCatalog
 import dev.fajar.hris.identity.domain.repositories.*
 import java.util.UUID
@@ -13,6 +14,7 @@ class SaveCompanyMembership(
     private val transactions: TransactionRunner,
     private val clock: java.time.Clock,
     private val security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+    private val roles: RoleTemplateRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -22,6 +24,7 @@ class SaveCompanyMembership(
         active: Boolean,
         permissions: Set<String>,
         reason: String,
+        roleTemplates: List<RoleTemplateSelection> = emptyList(),
     ): Result<MutationReceipt> {
         val access = actor.requirePermission("identity.manage")
         if (access is Result.Failed) return access
@@ -36,13 +39,14 @@ class SaveCompanyMembership(
         }
         if (
             !PermissionCatalog.assignable.containsAll(permissions) ||
+                roleTemplates.size > 8 ||
+                roleTemplates.map { it.id }.distinct().size != roleTemplates.size ||
+                roleTemplates.any { it.version < 0 } ||
                 reason.isBlank() ||
                 reason.length > 1000 ||
                 (expectedVersion ?: 0) < 0
         )
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_membership"))
-        if (accountId == actor.accountId && (!active || "identity.manage" !in permissions))
-            return Result.Failed(Failure(FailureKind.CONFLICT, "cannot_remove_own_administration"))
         val company = requireNotNull(actor.companyId)
         val key =
             OperationKey(
@@ -53,7 +57,11 @@ class SaveCompanyMembership(
                     expectedVersion?.toString(),
                     active.toString(),
                     reason,
-                ) + permissions.sorted(),
+                ) +
+                    permissions.sorted() +
+                    roleTemplates
+                        .sortedBy { it.id }
+                        .flatMap { listOf("template", it.id.toString(), it.version.toString()) },
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
@@ -61,12 +69,48 @@ class SaveCompanyMembership(
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
+            if (roleTemplates.isNotEmpty()) {
+                val roleLock = roles.lock(company)
+                if (roleLock is Result.Failed) return@run roleLock
+            }
+            val applied = mutableListOf<AppliedRoleTemplate>()
+            for (selection in roleTemplates.sortedBy { it.id }) {
+                val found = roles.find(company, selection.id)
+                if (found is Result.Failed) return@run found
+                val role = (found as Result.Success).value
+                if (role == null || !role.active)
+                    return@run Result.Failed(
+                        Failure(FailureKind.VALIDATION, "role_template_unavailable")
+                    )
+                if (role.version != selection.version)
+                    return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_role_template"))
+                applied +=
+                    AppliedRoleTemplate(
+                        role.id,
+                        role.code,
+                        role.name,
+                        role.version,
+                        role.permissions,
+                    )
+            }
+            val effectivePermissions = permissions + applied.flatMap { it.permissions }
+            if (!PermissionCatalog.assignable.containsAll(effectivePermissions))
+                return@run Result.Failed(Failure(FailureKind.VALIDATION, "invalid_membership"))
+            if (
+                accountId == actor.accountId &&
+                    (!active || "identity.manage" !in effectivePermissions)
+            )
+                return@run Result.Failed(
+                    Failure(FailureKind.CONFLICT, "cannot_remove_own_administration")
+                )
             val lock = members.lock(company)
             if (lock is Result.Failed) return@run lock
             val existing = members.find(company, accountId)
             if (existing is Result.Failed) return@run existing
             val member = (existing as Result.Success).value
-            val added = permissions - member?.permissions.orEmpty()
+            val previousGrants =
+                if (member?.membershipActive == true) member.permissions else emptySet()
+            val added = effectivePermissions - previousGrants
             if (
                 added.any {
                     (it.startsWith("payroll.") && it != "payroll.self.read") || it == "expenses.pay"
@@ -87,7 +131,7 @@ class SaveCompanyMembership(
                 member != null &&
                     member.membershipActive &&
                     "identity.manage" in member.permissions &&
-                    (!active || "identity.manage" !in permissions)
+                    (!active || "identity.manage" !in effectivePermissions)
             ) {
                 val administrators =
                     members.candidates(company, emptySet(), setOf("identity.manage"), 200)
@@ -105,27 +149,35 @@ class SaveCompanyMembership(
             if (target is Result.Failed) return@run target
             if ((target as Result.Success).value?.account?.active != true)
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "account_unavailable"))
-            members.save(company, accountId, expectedVersion, active, permissions).flatMap { receipt
-                ->
-                operations
-                    .record(actor, key, receipt)
-                    .flatMap {
-                        journal.record(
+            members
+                .save(company, accountId, expectedVersion, active, effectivePermissions)
+                .flatMap { receipt ->
+                    roles
+                        .recordApplication(
                             actor,
-                            ChangeRecord(
-                                "company_membership",
-                                accountId,
-                                "identity.membership_saved",
-                                mapOf(
-                                    "permissions" to permissions.sorted().joinToString(","),
-                                    "active" to active.toString(),
-                                ),
-                                reason,
-                            ),
+                            accountId,
+                            receipt.version,
+                            MembershipGrant(permissions.toSet(), applied.toList()),
                         )
-                    }
-                    .map { receipt }
-            }
+                        .flatMap { operations.record(actor, key, receipt) }
+                        .flatMap {
+                            journal.record(
+                                actor,
+                                ChangeRecord(
+                                    "company_membership",
+                                    accountId,
+                                    "identity.membership_saved",
+                                    mapOf(
+                                        "permissions" to
+                                            effectivePermissions.sorted().joinToString(","),
+                                        "active" to active.toString(),
+                                    ),
+                                    reason,
+                                ),
+                            )
+                        }
+                        .map { receipt }
+                }
         }
     }
 }

@@ -12,7 +12,7 @@ Acceptance: cross-company/resource denial, refresh replay/revocation, invitation
 
 ## Implementation status
 
-Password sign-in, administrator bootstrap, server sessions in PostgreSQL, CSRF/session ID rotation, current-account reads, and live company authorization are implemented. Company member directories and versioned permission/activation updates are also implemented. Sensitive payroll/payment grants require platform administration and cannot be self-granted; company membership changes preserve the last administrator and are audited. Authenticator MFA, recovery codes, credential-version revocation, and recent-authentication checks are implemented. Configured OIDC sign-in and versioned global identity bindings are implemented. Invitations/password recovery and configurable role templates remain planned.
+Password sign-in, administrator bootstrap, server sessions in PostgreSQL, CSRF/session ID rotation, current-account reads, and live company authorization are implemented. Company member directories and versioned permission/activation updates are also implemented. Sensitive payroll/payment grants require platform administration and cannot be self-granted; company membership changes preserve the last administrator and are audited. Authenticator MFA, recovery codes, credential-version revocation, and recent-authentication checks are implemented. Configured OIDC sign-in and versioned global identity bindings are implemented. Configurable company role templates and versioned assignment snapshots are implemented. Invitations/password recovery remain planned.
 
 Endpoints: GET /api/v1/auth/csrf, POST /api/v1/auth/login, POST /api/v1/auth/logout, GET /api/v1/me, GET /api/v1/companies/{companyId}/me/access. Login uses JSON email/password and a current X-CSRF-TOKEN header. Fetch a new CSRF token after successful login. Cookies are Secure by default; set HRIS_SECURE_COOKIES=false only for local HTTP development.
 
@@ -40,3 +40,13 @@ Native MFA verification and recovery-code regeneration return new native credent
 ## OIDC
 
 Spring Security handles authorization code, PKCE, ID-token validation, state, and nonce. Account resolution uses only an explicitly linked issuer/subject. Global credential administration is distinct from company membership administration. Provider role/email/MFA claims do not bypass local authorization. See [SSO configuration](../sso.md) for registration, revocation, request/resource limits, and the client flow.
+
+## Company role templates
+
+`GET/PUT /companies/{companyId}/role-templates` lists or saves named, versioned permission templates. Codes are stable, definitions can be archived, and changes retain immutable revisions. There are at most 128 definitions per company, including archived entries. `GET .../role-templates/permissions` returns the server permission catalog; defining a template does not assign its permissions to anyone.
+
+Membership writes accept direct `permissions` and up to eight distinct `roleTemplates` selections, each with `id` and `version`. The use case validates current active templates in the same company and records their full permission snapshots with the resulting membership version. Existing members retain their granted permissions when a template changes or is archived. Reapplying a changed template requires an explicit membership update and expected membership version. Refresh the template before retrying a stale selection.
+
+`GET /companies/{companyId}/members/{accountId}` returns effective membership access and the direct/template sources used for that version. Older grants without a recorded template application are represented as direct permissions. Template application history is immutable; access, source snapshots, receipts, and audit/outbox commit together.
+
+Sensitive-grant checks run on the combined permissions. A company administrator cannot use a role template to bypass the platform-administrator requirement for payroll/payment access or grant those permissions to themselves. Reactivating a membership counts as granting its permissions again. Membership and template changes retain recent-MFA checks when enforcement is enabled. A template name never substitutes for a server permission check.

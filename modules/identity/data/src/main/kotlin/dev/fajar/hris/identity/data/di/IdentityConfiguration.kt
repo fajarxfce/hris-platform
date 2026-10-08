@@ -5,9 +5,11 @@ import dev.fajar.hris.core.domain.TransactionRunner
 import dev.fajar.hris.identity.data.datasources.*
 import dev.fajar.hris.identity.data.repositories.StoredIdentityRepository
 import dev.fajar.hris.identity.data.repositories.StoredOidcIdentityRepository
-import dev.fajar.hris.identity.domain.entities.OidcPolicy
+import dev.fajar.hris.identity.data.repositories.StoredRoleTemplateRepository
+import dev.fajar.hris.identity.domain.entities.*
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.OidcIdentityRepository
+import dev.fajar.hris.identity.domain.repositories.RoleTemplateRepository
 import dev.fajar.hris.identity.domain.usecases.*
 import java.time.Clock
 import java.util.UUID
@@ -18,6 +20,8 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder
 
 @Configuration(proxyBeanMethods = false)
 class IdentityConfiguration {
+    @Bean fun assignablePermissions() = ListAssignablePermissions()
+
     @Bean
     fun membershipSource(sql: DSLContext): MembershipDataSource = PostgresMembershipDataSource(sql)
 
@@ -42,6 +46,7 @@ class IdentityConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+        roles: RoleTemplateRepository,
     ) =
         SaveCompanyMembership(
             members,
@@ -51,6 +56,7 @@ class IdentityConfiguration {
             transactions,
             clock,
             security,
+            roles,
         )
 
     @Bean fun clock(): Clock = Clock.systemUTC()
@@ -288,4 +294,35 @@ class IdentityConfiguration {
         oidc: OidcPolicy,
         clock: Clock,
     ) = SignInWithOidc(links, journal, transactions, oidc, clock)
+
+    @Bean
+    fun roleTemplateSource(sql: DSLContext): RoleTemplateDataSource =
+        PostgresRoleTemplateDataSource(sql)
+
+    @Bean
+    fun roleTemplates(
+        source: RoleTemplateDataSource,
+        json: tools.jackson.databind.ObjectMapper,
+    ): RoleTemplateRepository = StoredRoleTemplateRepository(source, json)
+
+    @Bean
+    fun listRoleTemplates(roles: RoleTemplateRepository, transactions: TransactionRunner) =
+        ListRoleTemplates(roles, transactions)
+
+    @Bean
+    fun saveRoleTemplate(
+        roles: RoleTemplateRepository,
+        operations: dev.fajar.hris.core.domain.OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = SaveRoleTemplate(roles, operations, journal, transactions, security, clock)
+
+    @Bean
+    fun getCompanyMemberGrant(
+        members: dev.fajar.hris.identity.domain.repositories.MembershipRepository,
+        roles: RoleTemplateRepository,
+        transactions: TransactionRunner,
+    ) = GetCompanyMemberGrant(members, roles, transactions)
 }

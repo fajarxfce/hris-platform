@@ -3,7 +3,8 @@ package dev.fajar.hris.identity.delivery.controllers
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.core.http.*
 import dev.fajar.hris.identity.delivery.requests.MembershipRequest
-import dev.fajar.hris.identity.delivery.responses.MemberResponse
+import dev.fajar.hris.identity.delivery.responses.*
+import dev.fajar.hris.identity.domain.entities.RoleTemplateSelection
 import dev.fajar.hris.identity.domain.usecases.*
 import java.util.UUID
 import org.springframework.web.bind.annotation.*
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*
 class MembershipController(
     private val list: ListCompanyMembers,
     private val save: SaveCompanyMembership,
+    private val getGrant: GetCompanyMemberGrant,
 ) {
     @GetMapping
     fun list(
@@ -37,6 +39,27 @@ class MembershipController(
             )
         }
 
+    @GetMapping("/{accountId}")
+    fun get(actor: Actor, @PathVariable accountId: UUID): MemberGrantResponse {
+        val result = getGrant.execute(actor, accountId).response()
+        val member = result.member
+        return MemberGrantResponse(
+            MemberResponse(
+                member.id,
+                member.email,
+                member.displayName,
+                member.accountActive,
+                member.membershipActive,
+                member.permissions,
+                member.version,
+            ),
+            result.grant.directPermissions,
+            result.grant.roleTemplates.map {
+                AppliedRoleTemplateResponse(it.id, it.code, it.name, it.permissions, it.version)
+            },
+        )
+    }
+
     @PutMapping("/{accountId}")
     fun save(
         actor: Actor,
@@ -53,6 +76,7 @@ class MembershipController(
                 body.active,
                 body.permissions,
                 body.reason,
+                body.roleTemplates.map { RoleTemplateSelection(it.id, it.version) },
             )
             .response()
             .toResponse()

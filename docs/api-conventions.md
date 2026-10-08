@@ -45,3 +45,15 @@ Access and approvals:
 - `PUT /companies/{companyId}/approvals/delegations/{id}`: kind, fromAccount, toAccount, validFrom, validUntil, active, expectedVersion, reason. The delegator is immutable; ordinary approvers manage only their own delegations.
 
 Approval changes use idempotency keys and optimistic versions. Business decision routes belong to their respective features so a successful approval and its business consequence cannot commit separately.
+
+Work calendars:
+
+- `GET /companies/{companyId}/workforce/shifts`: query, after code, limit.
+- `PUT /companies/{companyId}/workforce/shifts/{id}`: code, name, startsAt/endsAt (minute precision), breakMinutes, IANA timezone, mode (ONSITE/REMOTE/FIELD), locationRequired, maxAccuracyMeters, optional fence, active, expectedVersion, reason.
+- `PUT /companies/{companyId}/workforce/employees/{id}/schedule`: effectiveFrom, days keyed by MONDAY through SUNDAY with `{id, version}` shift references, expectedVersion, reason. Missing days are off; an empty pattern supports explicit rotating rosters. Version belongs to the employee's schedule, independently of employment version.
+- `PUT /companies/{companyId}/workforce/employees/{id}/roster/{day}`: optional `{id, version}` shift, expectedVersion, reason. A null shift explicitly marks that date off. Version belongs to that roster date.
+- `GET /companies/{companyId}/workforce/employees/{id}/calendar?from=YYYY-MM-DD&until=YYYY-MM-DD`: up to 62 days, with schedule version, WORK/OFF/UNASSIGNED status, UTC shift interval, and snapshot provenance.
+- `GET /companies/{companyId}/workforce/holidays?from=YYYY-MM-DD&until=YYYY-MM-DD`: up to 366 days.
+- `PUT /companies/{companyId}/workforce/holidays/{id}`: workDate, name, active, expectedVersion, reason.
+
+All calendar writes require `workforce.manage` and an idempotency key. Schedule reads enforce company, team, or self access. Shift changes preserve already published assignments and rosters; publishing a new version requires a deliberate new assignment.

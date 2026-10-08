@@ -1,0 +1,99 @@
+package dev.fajar.hris.workforce.domain.usecases
+
+import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.people.domain.repositories.PeopleRepository
+import dev.fajar.hris.workforce.domain.entities.*
+import dev.fajar.hris.workforce.domain.policies.scheduledWorkDay
+import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
+import java.time.LocalDate
+import java.util.UUID
+
+class SetRosterDay(
+    private val schedules: ScheduleRepository,
+    private val people: PeopleRepository,
+    private val operations: OperationRepository,
+    private val journal: ChangeJournalRepository,
+    private val transactions: TransactionRunner,
+) {
+    fun execute(
+        actor: Actor,
+        operationId: UUID,
+        employeeId: UUID,
+        date: LocalDate,
+        reference: ShiftReference?,
+        version: Long?,
+        reason: String,
+    ): Result<MutationReceipt> {
+        val access = actor.requirePermission("workforce.manage")
+        if (access is Result.Failed) return access
+        if (
+            (version ?: 0) < 0 ||
+                (reference?.version ?: 0) < 0 ||
+                reason.isBlank() ||
+                reason.length > 1000
+        )
+            return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_roster_change"))
+        val key =
+            OperationKey(
+                "workforce.roster_save",
+                operationId,
+                listOf(
+                    employeeId.toString(),
+                    date.toString(),
+                    reference?.id?.toString(),
+                    reference?.version?.toString(),
+                    version?.toString(),
+                    reason,
+                ),
+            )
+        val company = requireNotNull(actor.companyId)
+        return transactions.run(actor) {
+            val replay = operations.lockAndReplay(actor, key)
+            if (replay is Result.Failed) return@run replay
+            (replay as Result.Success).value?.let {
+                return@run Result.Success(it)
+            }
+            val lock = schedules.lock(company)
+            if (lock is Result.Failed) return@run lock
+            val employee = people.find(company, employeeId, date)
+            if (employee is Result.Failed) return@run employee
+            if ((employee as Result.Success).value?.terms?.isWorkingOn(date) != true)
+                return@run Result.Failed(Failure(FailureKind.VALIDATION, "employee_unavailable"))
+            var snapshot: ShiftSnapshot? = null
+            if (reference != null) {
+                val found = schedules.findShift(company, reference.id)
+                if (found is Result.Failed) return@run found
+                val shift =
+                    (found as Result.Success).value
+                        ?: return@run Result.Failed(
+                            Failure(FailureKind.VALIDATION, "shift_unavailable")
+                        )
+                if (!shift.active)
+                    return@run Result.Failed(Failure(FailureKind.VALIDATION, "shift_unavailable"))
+                if (shift.version != reference.version)
+                    return@run Result.Failed(Failure(FailureKind.CONFLICT, "shift_changed"))
+                snapshot = ShiftSnapshot(shift.id, shift.version, shift.details)
+                val interval = scheduledWorkDay(date, snapshot, CalendarOrigin.ROSTER, version ?: 0)
+                if (interval is Result.Failed) return@run interval
+            }
+            schedules.roster(actor, employeeId, date, snapshot, version, reason).flatMap { receipt
+                ->
+                operations
+                    .record(actor, key, receipt)
+                    .flatMap {
+                        journal.record(
+                            actor,
+                            ChangeRecord(
+                                "roster_day",
+                                employeeId,
+                                "workforce.roster_saved",
+                                mapOf("workDate" to date.toString()),
+                                reason,
+                            ),
+                        )
+                    }
+                    .map { receipt }
+            }
+        }
+    }
+}

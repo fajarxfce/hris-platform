@@ -7,7 +7,8 @@
 - Identity: password sign-in, persistent cookie sessions, CSRF/session rotation, bootstrap, current-company permissions, revocation checks, and credential-race handling implemented. Company member administration is implemented, including versioned grants/revocation and sensitive-grant restrictions. MFA, OIDC, native tokens, invitations, and configurable role templates remain planned.
 - Organization and people: company setup, organization units, employee onboarding, scoped directories, and effective employment revisions implemented. Profile editing, lifecycle checklists, import, and cross-company transfer remain planned.
 - Approvals: effective templates, immutable snapshots, assignment/delegation, inbox, optimistic decision storage, and pure transitions implemented. Feature-specific business decisions remain planned.
-- Workforce and leave: planned.
+- Workforce: versioned shifts, weekly schedules, roster overrides, holidays, and scoped calendar reads implemented. Attendance, overtime, closing, and bulk/reset workflows remain planned.
+- Leave: planned.
 - Documents and expenses: planned.
 - Payroll: planned.
 - Communications, reporting, and administration: planned.
@@ -49,3 +50,5 @@ Company setup slice: full Gradle check and bootJar passed (17 tests total). Thre
 Organization/people slice: full Gradle check and bootJar passed (25 tests total). Five additional HTTP/PostgreSQL tests cover history immutability/as-of reads, stale edits, replay after reference archival, cross-company reference rejection, concurrent employee numbers without orphan people, organization cycles, and team/self resource scope. Three pure policy tests cover reporting cycles across future effective boundaries. Shared HTTP fixtures own bounded clients and close application contexts between database lifetimes.
 
 Approval/access slice: full Gradle check and bootJar passed (36 tests total). Six policy tests cover blocked stages, author/beneficiary exclusion, delegation expiry and source-access revocation, ambiguous policy selection, and bounded monetary input. Five HTTP/PostgreSQL tests cover submitted snapshots, cross-company reads, competing decisions with one audit, idempotent reassignment, delegation ownership/revocation, and denied sensitive self grants. The inbox uses typed jOOQ timestamp parameters. Business ledger/payroll consequences are not claimed by these tests.
+
+Calendar slice: full Gradle check and bootJar passed (46 tests total). Six pure tests cover overnight anchoring, DST gap/overlap, calendar precedence, future revisions, and location/duration validation. Four HTTP/PostgreSQL tests cover frozen shift snapshots, effective assignments, immutable history, holiday/roster precedence and replay, stale/cross-company shift references, range bounds, and employee scope. No attendance or payroll behavior is claimed by these checks.

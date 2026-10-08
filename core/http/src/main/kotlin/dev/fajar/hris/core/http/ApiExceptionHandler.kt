@@ -48,6 +48,15 @@ class ApiExceptionHandler {
             Thread.currentThread().interrupt()
             throw error
         }
+        if (error is org.springframework.web.ErrorResponse && error.statusCode.is4xxClientError) {
+            return ProblemDetail.forStatus(error.statusCode).apply {
+                setProperty(
+                    "code",
+                    if (error.statusCode.value() == 404) "not_found" else "invalid_request",
+                )
+                setProperty("correlationId", org.slf4j.MDC.get("correlationId"))
+            }
+        }
         val reference = org.slf4j.MDC.get("correlationId") ?: java.util.UUID.randomUUID().toString()
         logger.error(
             "Unhandled request failure reference={} category={}",

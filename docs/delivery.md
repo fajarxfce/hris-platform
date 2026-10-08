@@ -4,7 +4,8 @@
 
 - Repository and product/architecture specification: initialized.
 - Backend foundation: implemented Gradle conventions, PostgreSQL migrations/jOOQ generation, transaction/error boundaries, company RLS, immutable audit/outbox storage, correlation IDs, CI, and local container configuration. Identity and job processing are separate pending slices.
-- Identity, organization, and people: planned.
+- Identity: password sign-in, persistent cookie sessions, CSRF/session rotation, bootstrap, current-company permissions, revocation checks, and credential-race handling implemented. MFA, OIDC, native tokens, invitations, and access administration remain planned.
+- Organization and people: planned.
 - Workforce, approvals, and leave: planned.
 - Documents and expenses: planned.
 - Payroll: planned.
@@ -39,3 +40,5 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 ## Observed validation
 
 Backend foundation: Gradle check and bootJar passed; six PostgreSQL integration tests passed, covering pooled company isolation, denied writes, typed/raw SQL failure mapping, failed-result rollback, cancellation rollback, and immutable audit records. Compose configuration and actionlint passed. No business module, deployment, or performance benchmark is claimed by these checks.
+
+Identity password/session slice: full Gradle check and bootJar passed. Four domain tests and four HTTP/PostgreSQL tests passed alongside the six database tests (14 total). HTTP tests verify persisted sessions, session/CSRF rotation, logout, company isolation, and membership revocation. No MFA, OIDC, or native-token validation is claimed yet.

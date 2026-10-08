@@ -3,5 +3,5 @@
 !apps/server/
 !apps/server/build/
 !apps/server/build/libs/
-!apps/server/build/libs/server.jar
+!apps/server/build/libs/apps-server.jar
 !Dockerfile

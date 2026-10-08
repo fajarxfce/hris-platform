@@ -1,0 +1,100 @@
+package dev.fajar.hris.identity.delivery.di
+
+import dev.fajar.hris.identity.delivery.security.*
+import dev.fajar.hris.identity.domain.usecases.ResolveActor
+import dev.fajar.hris.identity.domain.usecases.SignInWithPassword
+import java.time.Clock
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.security.authentication.ProviderManager
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.authentication.session.ChangeSessionIdAuthenticationStrategy
+import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository
+import org.springframework.security.web.csrf.CsrfAuthenticationStrategy
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository
+import org.springframework.web.method.support.HandlerMethodArgumentResolver
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import tools.jackson.databind.ObjectMapper
+
+@Configuration(proxyBeanMethods = false)
+class IdentityWebConfiguration {
+    @Bean
+    fun passwordAuthenticationProvider(
+        signIn: SignInWithPassword,
+        clock: Clock,
+    ): org.springframework.security.authentication.AuthenticationProvider =
+        AccountAuthenticationProvider(signIn, clock)
+
+    @Bean
+    fun actorArguments(resolve: ResolveActor): WebMvcConfigurer =
+        object : WebMvcConfigurer {
+            override fun addArgumentResolvers(
+                resolvers: MutableList<HandlerMethodArgumentResolver>
+            ) {
+                resolvers.add(CompanyActorArgumentResolver(resolve))
+            }
+        }
+
+    @Bean
+    fun webSecurity(
+        http: HttpSecurity,
+        provider: org.springframework.security.authentication.AuthenticationProvider,
+        json: ObjectMapper,
+    ): SecurityFilterChain {
+        val contexts = HttpSessionSecurityContextRepository()
+        val csrf = HttpSessionCsrfTokenRepository()
+        val authentication =
+            JsonLoginFilter(ProviderManager(provider), JsonLoginConverter(json)).apply {
+                setSecurityContextRepository(contexts)
+                setSessionAuthenticationStrategy(
+                    CompositeSessionAuthenticationStrategy(
+                        listOf(
+                            ChangeSessionIdAuthenticationStrategy(),
+                            CsrfAuthenticationStrategy(csrf),
+                        )
+                    )
+                )
+                setAuthenticationSuccessHandler(ApiAuthenticationSuccessHandler(json))
+                setAuthenticationFailureHandler(ApiAuthenticationFailureHandler(json))
+            }
+        http.csrf { it.csrfTokenRepository(csrf) }
+        http.securityContext { it.securityContextRepository(contexts).requireExplicitSave(true) }
+        http.authorizeHttpRequests {
+            it.requestMatchers("/api/v1/auth/login", "/api/v1/auth/csrf", "/actuator/health/**")
+                .permitAll()
+                .anyRequest()
+                .authenticated()
+        }
+        http.exceptionHandling {
+            it.authenticationEntryPoint { request, response, error ->
+                ApiAuthenticationFailureHandler(json)
+                    .onAuthenticationFailure(request, response, error)
+            }
+            it.accessDeniedHandler { request, response, _ ->
+                response.status = 403
+                response.contentType = "application/problem+json"
+                json.writeValue(
+                    response.outputStream,
+                    mapOf(
+                        "status" to 403,
+                        "code" to "access_denied",
+                        "correlationId" to request.getAttribute("hris.correlationId")?.toString(),
+                    ),
+                )
+            }
+        }
+        http.requestCache { it.disable() }
+        http.formLogin { it.disable() }
+        http.httpBasic { it.disable() }
+        http.logout {
+            it.logoutUrl("/api/v1/auth/logout").logoutSuccessHandler { _, response, _ ->
+                response.status = 204
+            }
+        }
+        http.addFilterAt(authentication, UsernamePasswordAuthenticationFilter::class.java)
+        return http.build()
+    }
+}

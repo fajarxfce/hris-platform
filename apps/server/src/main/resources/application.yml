@@ -16,10 +16,20 @@ spring:
     url: ${HRIS_DATABASE_URL:jdbc:postgresql://localhost:5432/hris}
     user: ${HRIS_MIGRATION_USER:hris_migrator}
     password: ${HRIS_MIGRATION_PASSWORD:}
+  session:
+    timeout: 30m
+    jdbc:
+      initialize-schema: never
   jackson:
     deserialization:
       fail-on-unknown-properties: true
 server:
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        secure: ${HRIS_SECURE_COOKIES:true}
+        same-site: lax
   shutdown: graceful
   error:
     include-message: never

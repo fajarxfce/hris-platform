@@ -1,0 +1,62 @@
+package dev.fajar.hris.identity.data.di
+
+import dev.fajar.hris.core.domain.ChangeJournalRepository
+import dev.fajar.hris.core.domain.TransactionRunner
+import dev.fajar.hris.identity.data.datasources.*
+import dev.fajar.hris.identity.data.repositories.StoredIdentityRepository
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.usecases.*
+import java.time.Clock
+import java.util.UUID
+import org.jooq.DSLContext
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder
+
+@Configuration(proxyBeanMethods = false)
+class IdentityConfiguration {
+    @Bean fun clock(): Clock = Clock.systemUTC()
+
+    @Bean
+    fun identityDataSource(sql: DSLContext): IdentityDataSource = PostgresIdentityDataSource(sql)
+
+    @Bean
+    fun passwordDataSource(): PasswordDataSource =
+        ArgonPasswordDataSource(Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8())
+
+    @Bean
+    fun identities(source: IdentityDataSource, passwords: PasswordDataSource): IdentityRepository =
+        StoredIdentityRepository(
+            source,
+            passwords,
+            checkNotNull(passwords.hash(UUID.randomUUID().toString())),
+        )
+
+    @Bean
+    fun bootstrapAdministrator(
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        journal: ChangeJournalRepository,
+        clock: Clock,
+    ) = BootstrapAdministrator(identities, transactions, journal, clock)
+
+    @Bean
+    fun signInWithPassword(
+        identities: IdentityRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = SignInWithPassword(identities, journal, transactions, clock)
+
+    @Bean
+    fun resolveActor(identities: IdentityRepository, transactions: TransactionRunner) =
+        ResolveActor(identities, transactions)
+
+    @Bean
+    fun listMyCompanies(identities: IdentityRepository, transactions: TransactionRunner) =
+        ListMyCompanies(identities, transactions)
+
+    @Bean
+    fun currentAccount(identities: IdentityRepository, transactions: TransactionRunner) =
+        GetCurrentAccount(identities, transactions)
+}

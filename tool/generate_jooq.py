@@ -37,6 +37,7 @@ try:
         config = Path(temporary) / "jooq.xml"
         config.write_text(f"""<?xml version="1.0" encoding="UTF-8"?>
 <configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.21.0.xsd">
+<logging>WARN</logging>
 <jdbc><driver>org.postgresql.Driver</driver><url>jdbc:postgresql://127.0.0.1:{port}/hris</url><user>postgres</user><password>codegen-only</password></jdbc>
 <generator><database><name>org.jooq.meta.postgres.PostgresDatabase</name><inputSchema>public</inputSchema><excludes>flyway_schema_history</excludes></database>
 <generate><deprecated>false</deprecated><records>true</records><pojos>false</pojos></generate>

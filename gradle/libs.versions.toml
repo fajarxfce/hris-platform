@@ -1,4 +1,5 @@
 [versions]
+bouncycastle = "1.86"
 kotlin = "2.3.21"
 spring-boot = "4.1.1"
 ktfmt = "0.59"
@@ -16,7 +17,7 @@ spring-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc" }
 spring-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 spring-flyway = { module = "org.springframework.boot:spring-boot-starter-flyway" }
-spring-session = { module = "org.springframework.session:spring-session-jdbc" }
+spring-session = { module = "org.springframework.boot:spring-boot-starter-session-jdbc" }
 spring-batch = { module = "org.springframework.boot:spring-boot-starter-batch" }
 spring-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 spring-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
@@ -33,3 +34,5 @@ testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgr
 testcontainers-junit = { module = "org.testcontainers:testcontainers-junit-jupiter" }
 archunit = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "archunit" }
 ktfmt = { module = "com.facebook:ktfmt", version.ref = "ktfmt" }
+
+bouncycastle = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }

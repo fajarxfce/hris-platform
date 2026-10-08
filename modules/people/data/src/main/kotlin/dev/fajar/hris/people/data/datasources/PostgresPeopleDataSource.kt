@@ -16,6 +16,14 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresPeopleDataSource(private val sql: DSLContext) : PeopleDataSource {
+    override fun employeeNumberExists(companyId: UUID, number: String) =
+        sql.fetchExists(
+            sql.selectOne()
+                .from(E)
+                .where(E.COMPANY_ID.eq(companyId))
+                .and(E.EMPLOYEE_NUMBER.eq(number))
+        )
+
     override fun hasOpenEmploymentAtOrAfter(
         companyId: UUID,
         personId: UUID,

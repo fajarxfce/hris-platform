@@ -3,8 +3,9 @@ package dev.fajar.hris.worker.di
 import dev.fajar.hris.core.database.PostgresTransactionRunner
 import dev.fajar.hris.identity.domain.usecases.ResolveActor
 import dev.fajar.hris.jobs.domain.usecases.*
+import dev.fajar.hris.people.domain.usecases.*
 import dev.fajar.hris.worker.runtime.*
-import dev.fajar.hris.worker.tasks.WorkPeriodCloseTask
+import dev.fajar.hris.worker.tasks.*
 import dev.fajar.hris.workforce.domain.usecases.*
 import org.springframework.batch.core.launch.JobOperator
 import org.springframework.batch.core.repository.JobRepository
@@ -102,4 +103,18 @@ class WorkerConfiguration {
         @org.springframework.beans.factory.annotation.Qualifier("identityMailTimers")
         timers: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
     ) = dev.fajar.hris.worker.mail.IdentityMailWorker(lease, deliver, tasks, timers)
+
+    @Bean
+    fun employeeImportPreviewTask(
+        resolve: ResolveActor,
+        advance: AdvanceEmployeeImportPreview,
+        abort: AbortEmployeeImport,
+    ): JobTask = EmployeeImportPreviewTask(resolve, advance, abort)
+
+    @Bean
+    fun employeeImportApplyTask(
+        resolve: ResolveActor,
+        advance: AdvanceEmployeeImportApply,
+        abort: AbortEmployeeImport,
+    ): JobTask = EmployeeImportApplyTask(resolve, advance, abort)
 }

@@ -18,6 +18,10 @@ class StoredPeopleRepository(
     private val source: PeopleDataSource,
     private val profiles: PersonProfileDataSource,
 ) : PeopleRepository {
+    override fun employeeNumberExists(companyId: UUID, number: String) = safeDatabaseCall {
+        source.employeeNumberExists(companyId, number)
+    }
+
     override fun createForPerson(
         actor: Actor,
         id: UUID,

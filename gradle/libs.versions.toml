@@ -1,4 +1,6 @@
 [versions]
+commons-csv = "1.14.1"
+commons-io = "2.22.0"
 bouncycastle = "1.86"
 kotlin = "2.3.21"
 spring-boot = "4.1.1"
@@ -6,6 +8,8 @@ ktfmt = "0.59"
 archunit = "1.4.1"
 
 [libraries]
+commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commons-csv" }
+commons-io = { module = "commons-io:commons-io", version.ref = "commons-io" }
 spring-mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
 angus-mail = { module = "org.eclipse.angus:angus-mail" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

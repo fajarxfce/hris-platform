@@ -7,6 +7,8 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface PeopleRepository {
+    fun employeeNumberExists(companyId: UUID, number: String): Result<Boolean>
+
     fun createForPerson(
         actor: Actor,
         id: UUID,

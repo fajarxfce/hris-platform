@@ -3,6 +3,7 @@ package dev.fajar.hris.people.data.di
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.*
 import dev.fajar.hris.people.data.datasources.*
 import dev.fajar.hris.people.data.repositories.*
@@ -254,4 +255,153 @@ class PeopleConfiguration {
             security,
             clock,
         )
+
+    @Bean fun employeeCsvSource(): EmployeeCsvDataSource = CommonsEmployeeCsvDataSource()
+
+    @Bean
+    fun employeeImportInput(source: EmployeeCsvDataSource): EmployeeImportInputRepository =
+        CsvEmployeeImportInputRepository(source)
+
+    @Bean
+    fun employeeImportSource(sql: DSLContext): EmployeeImportDataSource =
+        PostgresEmployeeImportDataSource(sql)
+
+    @Bean
+    fun employeeImports(
+        source: EmployeeImportDataSource,
+        json: tools.jackson.databind.ObjectMapper,
+    ): EmployeeImportRepository = StoredEmployeeImportRepository(source, json)
+
+    @Bean
+    fun startEmployeeImport(
+        input: EmployeeImportInputRepository,
+        imports: EmployeeImportRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        StartEmployeeImport(
+            input,
+            imports,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun applyEmployeeImport(
+        imports: EmployeeImportRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = ApplyEmployeeImport(imports, jobs, operations, journal, transactions, clock, security)
+
+    @Bean
+    fun resumeEmployeeImport(
+        imports: EmployeeImportRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = ResumeEmployeeImport(imports, jobs, operations, journal, transactions, clock, security)
+
+    @Bean
+    fun cancelEmployeeImport(
+        imports: EmployeeImportRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = CancelEmployeeImport(imports, jobs, operations, journal, transactions, clock, security)
+
+    @Bean
+    fun getEmployeeImport(imports: EmployeeImportRepository, transactions: TransactionRunner) =
+        GetEmployeeImport(imports, transactions)
+
+    @Bean
+    fun listEmployeeImports(imports: EmployeeImportRepository, transactions: TransactionRunner) =
+        ListEmployeeImports(imports, transactions)
+
+    @Bean
+    fun getEmployeeImportRows(imports: EmployeeImportRepository, transactions: TransactionRunner) =
+        GetEmployeeImportRows(imports, transactions)
+
+    @Bean
+    fun getEmployeeImportAttempts(
+        imports: EmployeeImportRepository,
+        transactions: TransactionRunner,
+    ) = GetEmployeeImportAttempts(imports, transactions)
+
+    @Bean
+    fun getEmployeeImportTemplate(input: EmployeeImportInputRepository) =
+        GetEmployeeImportTemplate(input)
+
+    @Bean
+    fun advanceEmployeeImportPreview(
+        imports: EmployeeImportRepository,
+        jobs: JobRepository,
+        people: PeopleRepository,
+        units: OrganizationRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        AdvanceEmployeeImportPreview(
+            imports,
+            jobs,
+            people,
+            units,
+            identities,
+            members,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun advanceEmployeeImportApply(
+        imports: EmployeeImportRepository,
+        jobs: JobRepository,
+        people: PeopleRepository,
+        units: OrganizationRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        AdvanceEmployeeImportApply(
+            imports,
+            jobs,
+            people,
+            units,
+            identities,
+            members,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun abortEmployeeImport(
+        imports: EmployeeImportRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+    ) = AbortEmployeeImport(imports, jobs, journal, transactions)
 }

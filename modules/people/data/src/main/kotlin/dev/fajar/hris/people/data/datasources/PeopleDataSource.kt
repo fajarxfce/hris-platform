@@ -6,6 +6,8 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 interface PeopleDataSource {
+    fun employeeNumberExists(companyId: UUID, number: String): Boolean
+
     fun hasOpenEmploymentAtOrAfter(
         companyId: UUID,
         personId: UUID,

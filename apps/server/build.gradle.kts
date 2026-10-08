@@ -31,6 +31,7 @@ dependencies {
     implementation(kotlin("reflect"))
     runtimeOnly(libs.flyway.postgresql)
     runtimeOnly(libs.postgresql)
+    testImplementation(libs.spring.oauth2.client)
     testImplementation(libs.bouncycastle)
     testImplementation(libs.spring.test)
     testImplementation(libs.spring.webmvc.test)

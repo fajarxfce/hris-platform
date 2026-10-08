@@ -4,7 +4,10 @@ import dev.fajar.hris.core.domain.ChangeJournalRepository
 import dev.fajar.hris.core.domain.TransactionRunner
 import dev.fajar.hris.identity.data.datasources.*
 import dev.fajar.hris.identity.data.repositories.StoredIdentityRepository
+import dev.fajar.hris.identity.data.repositories.StoredOidcIdentityRepository
+import dev.fajar.hris.identity.domain.entities.OidcPolicy
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.OidcIdentityRepository
 import dev.fajar.hris.identity.domain.usecases.*
 import java.time.Clock
 import java.util.UUID
@@ -247,4 +250,42 @@ class IdentityConfiguration {
         clock: Clock,
         policy: dev.fajar.hris.identity.domain.entities.NativeSessionPolicy,
     ) = ElevateNativeSession(sessions, transactions, journal, clock, policy)
+
+    @Bean
+    fun oidcPolicy(
+        @org.springframework.beans.factory.annotation.Value("\${HRIS_OIDC_ENABLED:false}")
+        enabled: Boolean,
+        @org.springframework.beans.factory.annotation.Value("\${HRIS_OIDC_ISSUER:}") issuer: String,
+    ) = OidcPolicy(enabled, issuer)
+
+    @Bean
+    fun oidcSource(sql: DSLContext): OidcIdentityDataSource = PostgresOidcIdentityDataSource(sql)
+
+    @Bean
+    fun oidcIdentities(source: OidcIdentityDataSource): OidcIdentityRepository =
+        StoredOidcIdentityRepository(source)
+
+    @Bean
+    fun saveOidcIdentity(
+        links: OidcIdentityRepository,
+        operations: dev.fajar.hris.core.domain.OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+        oidc: OidcPolicy,
+        clock: Clock,
+    ) = SaveOidcIdentity(links, operations, journal, transactions, security, oidc, clock)
+
+    @Bean
+    fun listOidcIdentities(links: OidcIdentityRepository, transactions: TransactionRunner) =
+        ListOidcIdentities(links, transactions)
+
+    @Bean
+    fun signInWithOidc(
+        links: OidcIdentityRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        oidc: OidcPolicy,
+        clock: Clock,
+    ) = SignInWithOidc(links, journal, transactions, oidc, clock)
 }

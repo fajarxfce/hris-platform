@@ -1,9 +1,11 @@
 package dev.fajar.hris.identity.delivery.di
 
+import dev.fajar.hris.identity.delivery.oidc.*
 import dev.fajar.hris.identity.delivery.security.*
 import dev.fajar.hris.identity.domain.usecases.ResolveActor
 import dev.fajar.hris.identity.domain.usecases.SignInWithPassword
 import java.time.Clock
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.ProviderManager
@@ -47,7 +49,11 @@ class IdentityWebConfiguration {
                 registry
                     .addInterceptor(ActorRequestInterceptor(resolve))
                     .addPathPatterns("/api/v1/**")
-                    .excludePathPatterns("/api/v1/auth/csrf", "/api/v1/auth/native/refresh")
+                    .excludePathPatterns(
+                        "/api/v1/auth/csrf",
+                        "/api/v1/auth/native/refresh",
+                        "/api/v1/auth/providers",
+                    )
             }
 
             override fun addArgumentResolvers(
@@ -112,6 +118,7 @@ class IdentityWebConfiguration {
         json: ObjectMapper,
         contexts: HttpSessionSecurityContextRepository,
         csrf: HttpSessionCsrfTokenRepository,
+        oidc: org.springframework.beans.factory.ObjectProvider<OidcWebSupport>,
     ): SecurityFilterChain {
         val authentication =
             JsonLoginFilter(ProviderManager(provider), JsonLoginConverter(json)).apply {
@@ -130,7 +137,14 @@ class IdentityWebConfiguration {
         http.csrf { it.csrfTokenRepository(csrf) }
         http.securityContext { it.securityContextRepository(contexts).requireExplicitSave(true) }
         http.authorizeHttpRequests {
-            it.requestMatchers("/api/v1/auth/login", "/api/v1/auth/csrf", "/actuator/health/**")
+            it.requestMatchers(
+                    "/api/v1/auth/login",
+                    "/api/v1/auth/csrf",
+                    "/api/v1/auth/providers",
+                    "/oauth2/authorization/**",
+                    "/login/oauth2/code/**",
+                    "/actuator/health/**",
+                )
                 .permitAll()
                 .anyRequest()
                 .authenticated()
@@ -161,7 +175,44 @@ class IdentityWebConfiguration {
                 response.status = 204
             }
         }
+        oidc.ifAvailable { it.configure(http) }
         http.addFilterAt(authentication, UsernamePasswordAuthenticationFilter::class.java)
         return http.build()
     }
+
+    @Bean(destroyMethod = "close")
+    @ConditionalOnProperty(name = ["HRIS_OIDC_ENABLED"], havingValue = "true")
+    fun oidcHttpTransport() = OidcHttpTransport()
+
+    @Bean
+    @ConditionalOnProperty(name = ["HRIS_OIDC_ENABLED"], havingValue = "true")
+    fun oidcWebSupport(
+        environment: org.springframework.core.env.Environment,
+        signIn: dev.fajar.hris.identity.domain.usecases.SignInWithOidc,
+        clock: Clock,
+        contexts: HttpSessionSecurityContextRepository,
+        transport: OidcHttpTransport,
+    ): OidcWebSupport {
+        val settings =
+            OidcClientSettings(
+                environment.getRequiredProperty("HRIS_OIDC_ISSUER"),
+                environment.getRequiredProperty("HRIS_OIDC_CLIENT_ID"),
+                environment.getRequiredProperty("HRIS_OIDC_CLIENT_SECRET"),
+                environment.getRequiredProperty("HRIS_PUBLIC_URL"),
+                environment.getRequiredProperty("HRIS_OIDC_AUTHORIZATION_URI"),
+                environment.getRequiredProperty("HRIS_OIDC_TOKEN_URI"),
+                environment.getRequiredProperty("HRIS_OIDC_JWK_SET_URI"),
+                environment.getProperty("HRIS_OIDC_CLIENT_AUTH", "client_secret_basic"),
+                environment.getProperty("HRIS_OIDC_ALLOW_LOOPBACK_HTTP", Boolean::class.java, false),
+            )
+        return OidcWebSupport(settings, signIn, clock, contexts, transport)
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = ["HRIS_OIDC_ENABLED"], havingValue = "true")
+    fun oidcTokenDecoders(
+        support: OidcWebSupport
+    ): org.springframework.security.oauth2.jwt.JwtDecoderFactory<
+        org.springframework.security.oauth2.client.registration.ClientRegistration
+    > = support.decoderFactory
 }

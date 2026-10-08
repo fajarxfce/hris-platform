@@ -7,7 +7,7 @@ import org.jooq.DSLContext
 import org.jooq.JSONB
 
 class PostgresOperationReceiptDataSource(private val sql: DSLContext) : OperationReceiptDataSource {
-    override fun lock(companyId: UUID, actorId: UUID, operation: String, operationId: UUID) {
+    override fun lock(companyId: UUID?, actorId: UUID, operation: String, operationId: UUID) {
         sql.query(
                 "select pg_advisory_xact_lock(hashtextextended(?, 0))",
                 "$companyId:$actorId:$operation:$operationId",
@@ -16,20 +16,20 @@ class PostgresOperationReceiptDataSource(private val sql: DSLContext) : Operatio
     }
 
     override fun find(
-        companyId: UUID,
+        companyId: UUID?,
         actorId: UUID,
         operation: String,
         operationId: UUID,
     ): OperationReceiptsRecord? =
         sql.selectFrom(OPERATION_RECEIPTS)
-            .where(OPERATION_RECEIPTS.COMPANY_ID.eq(companyId))
+            .where(OPERATION_RECEIPTS.COMPANY_ID.isNotDistinctFrom(companyId))
             .and(OPERATION_RECEIPTS.ACTOR_ID.eq(actorId))
             .and(OPERATION_RECEIPTS.OPERATION.eq(operation))
             .and(OPERATION_RECEIPTS.OPERATION_ID.eq(operationId))
             .fetchOne()
 
     override fun insert(
-        companyId: UUID,
+        companyId: UUID?,
         actorId: UUID,
         operation: String,
         operationId: UUID,

@@ -11,7 +11,7 @@ class PostgresOperationRepository(
 ) : OperationRepository {
     override fun lockAndReplay(actor: Actor, key: OperationKey): Result<MutationReceipt?> =
         safeDatabaseCall {
-                val company = requireNotNull(actor.companyId)
+                val company = actor.companyId
                 source.lock(company, actor.accountId, key.name, key.id)
                 source.find(company, actor.accountId, key.name, key.id)
             }
@@ -32,7 +32,7 @@ class PostgresOperationRepository(
     override fun record(actor: Actor, key: OperationKey, receipt: MutationReceipt): Result<Unit> =
         safeDatabaseCall {
             source.insert(
-                requireNotNull(actor.companyId),
+                actor.companyId,
                 actor.accountId,
                 key.name,
                 key.id,

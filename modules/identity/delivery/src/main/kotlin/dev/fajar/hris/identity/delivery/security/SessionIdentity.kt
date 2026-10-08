@@ -10,10 +10,15 @@ data class SessionIdentity(
     val mfaConfigured: Boolean,
     override val credentialVersion: Long = 0,
     override val mfaVerifiedAt: Instant? = null,
-) : AuthenticatedIdentity, Serializable {
+) : AuthenticatedIdentity, Serializable, org.springframework.security.oauth2.core.user.OAuth2User {
     private companion object {
         private const val serialVersionUID = 1L
     }
 
     override fun getName(): String = accountId.toString()
+
+    override fun getAttributes(): Map<String, Any> = mapOf("sub" to accountId.toString())
+
+    override fun getAuthorities(): Collection<org.springframework.security.core.GrantedAuthority> =
+        listOf(org.springframework.security.core.authority.SimpleGrantedAuthority("SESSION"))
 }

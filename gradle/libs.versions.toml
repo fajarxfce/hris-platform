@@ -11,6 +11,7 @@ kotlin-spring = { module = "org.jetbrains.kotlin:kotlin-allopen", version.ref = 
 spring-boot-gradle = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot" }
 spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 spring-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-oauth2-client = { module = "org.springframework.boot:spring-boot-starter-security-oauth2-client" }
 spring-security = { module = "org.springframework.boot:spring-boot-starter-security" }
 spring-jackson = { module = "org.springframework.boot:spring-boot-starter-jackson" }
 spring-jooq = { module = "org.springframework.boot:spring-boot-starter-jooq" }

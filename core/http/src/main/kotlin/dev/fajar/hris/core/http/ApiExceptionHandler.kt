@@ -22,6 +22,7 @@ class ApiExceptionHandler {
                 FailureKind.CONFLICT -> HttpStatus.CONFLICT
                 FailureKind.FORBIDDEN -> HttpStatus.FORBIDDEN
                 FailureKind.UNAUTHENTICATED -> HttpStatus.UNAUTHORIZED
+                FailureKind.RATE_LIMITED -> HttpStatus.TOO_MANY_REQUESTS
                 FailureKind.UNAVAILABLE -> HttpStatus.SERVICE_UNAVAILABLE
                 FailureKind.UNEXPECTED -> HttpStatus.INTERNAL_SERVER_ERROR
             }

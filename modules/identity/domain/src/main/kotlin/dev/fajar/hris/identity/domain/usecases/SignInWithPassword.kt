@@ -11,10 +11,36 @@ class SignInWithPassword(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val limits: dev.fajar.hris.identity.domain.repositories.SignInLimitRepository,
+    private val enforceLimits: Boolean = true,
+    private val policy: dev.fajar.hris.identity.domain.entities.SignInAttemptPolicy =
+        dev.fajar.hris.identity.domain.entities.SignInAttemptPolicy(),
 ) {
-    fun execute(email: String, password: String, correlationId: UUID): Result<Account> {
+    fun execute(
+        email: String,
+        password: String,
+        correlationId: UUID,
+        origin: String = "unspecified",
+    ): Result<Account> {
         if (email.length > 254 || password.length !in 1..128) {
             return Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "invalid_credentials"))
+        }
+        if (origin.isBlank() || origin.length > 128)
+            return Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "invalid_credentials"))
+        if (enforceLimits) {
+            val attempt =
+                transactions.run(
+                    Actor(UUID(0, 0), null, emptySet(), clock.instant(), correlationId)
+                ) {
+                    // Denied attempts are successful accounting outcomes and must commit.
+                    val now = clock.instant()
+                    limits.purgeExpired(now.minusSeconds(86400), 100).flatMap {
+                        limits.takeAttempt(email.trim().lowercase(), origin, now, policy)
+                    }
+                }
+            if (attempt is Result.Failed) return attempt
+            if (!(attempt as Result.Success).value)
+                return Result.Failed(Failure(FailureKind.RATE_LIMITED, "sign_in_rate_limited"))
         }
         return identities.verifyPassword(email.trim().lowercase(), password).flatMap { account ->
             if (account == null || !account.active) {

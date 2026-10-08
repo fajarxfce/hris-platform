@@ -5,6 +5,7 @@ import dev.fajar.hris.core.domain.Failure
 import dev.fajar.hris.core.domain.FailureKind
 import dev.fajar.hris.core.domain.Result
 import dev.fajar.hris.core.domain.flatMap
+import dev.fajar.hris.identity.data.crypto.safePasswordCall
 import dev.fajar.hris.identity.data.datasources.IdentityDataSource
 import dev.fajar.hris.identity.data.datasources.PasswordDataSource
 import dev.fajar.hris.identity.data.mappers.toAccount
@@ -29,23 +30,24 @@ class StoredIdentityRepository(
         displayName: String,
         password: String,
     ): Result<Account> =
-        safeDatabaseCall {
-                passwords.hash(password)?.let { hash ->
-                    source.insertAccount(id, email, displayName, hash).toAccount()
-                }
-            }
-            .flatMap { account ->
-                if (account == null)
+        safePasswordCall { passwords.hash(password) }
+            .flatMap { hash ->
+                if (hash == null)
                     Result.Failed(Failure(FailureKind.UNEXPECTED, "password_encoding_failed"))
-                else Result.Success(account)
+                else
+                    safeDatabaseCall {
+                        source.insertAccount(id, email, displayName, hash).toAccount()
+                    }
             }
 
     override fun verifyPassword(email: String, password: String): Result<Account?> =
-        safeDatabaseCall {
-            val account = source.findByEmail(email)
-            val matches = passwords.matches(password, account?.passwordHash ?: dummyHash)
-            if (matches && account?.passwordHash != null) account.toAccount() else null
-        }
+        safeDatabaseCall { source.findByEmail(email) }
+            .flatMap { account ->
+                safePasswordCall {
+                    val matches = passwords.matches(password, account?.passwordHash ?: dummyHash)
+                    if (matches && account?.passwordHash != null) account.toAccount() else null
+                }
+            }
 
     override fun access(accountId: UUID, companyId: UUID?): Result<AccountAccess?> =
         safeDatabaseCall {

@@ -23,7 +23,7 @@ import tools.jackson.databind.ObjectMapper
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = ["server.address=127.0.0.1"],
+    properties = ["server.address=127.0.0.1", "hris.security.sign-in-limits=false"],
 )
 @Testcontainers
 @org.springframework.test.annotation.DirtiesContext(

@@ -21,6 +21,55 @@ class IdentityPolicyTest {
             override fun <T> run(actor: Actor, operation: () -> Result<T>): Result<T> = operation()
         }
 
+    private val limits =
+        object : dev.fajar.hris.identity.domain.repositories.SignInLimitRepository {
+            override fun takeAttempt(
+                email: String,
+                origin: String,
+                at: Instant,
+                policy: SignInAttemptPolicy,
+            ) = Result.Success(true)
+
+            override fun purgeExpired(before: Instant, limit: Int) = Result.Success(0)
+        }
+
+    @Test
+    fun deniedBudgetPreventsPasswordWorkButIsCommittedAsAnAccountingOutcome() {
+        val repo = IdentityFake(account, AccountAccess(account, emptySet(), true, true))
+        val denied =
+            object : dev.fajar.hris.identity.domain.repositories.SignInLimitRepository {
+                override fun takeAttempt(
+                    email: String,
+                    origin: String,
+                    at: Instant,
+                    policy: SignInAttemptPolicy,
+                ) = Result.Success(false)
+
+                override fun purgeExpired(before: Instant, limit: Int) = Result.Success(0)
+            }
+        var transactionSucceeded = false
+        val tx =
+            object : TransactionRunner {
+                override fun <T> run(actor: Actor, operation: () -> Result<T>): Result<T> =
+                    operation().also { transactionSucceeded = it is Result.Success }
+            }
+        val result =
+            SignInWithPassword(
+                    repo,
+                    RecordingJournal(),
+                    tx,
+                    Clock.fixed(now, ZoneOffset.UTC),
+                    denied,
+                )
+                .execute(account.email, "password", UUID.randomUUID(), "127.0.0.1")
+        assertEquals(
+            Result.Failed(Failure(FailureKind.RATE_LIMITED, "sign_in_rate_limited")),
+            result,
+        )
+        assertTrue(transactionSucceeded)
+        assertEquals(0, repo.verifications)
+    }
+
     @Test
     fun disabledAccountCannotPublishAnAuthenticatedIdentity() {
         val repository =
@@ -30,7 +79,13 @@ class IdentityPolicyTest {
             )
         val journal = RecordingJournal()
         val result =
-            SignInWithPassword(repository, journal, transactions, Clock.fixed(now, ZoneOffset.UTC))
+            SignInWithPassword(
+                    repository,
+                    journal,
+                    transactions,
+                    Clock.fixed(now, ZoneOffset.UTC),
+                    limits,
+                )
                 .execute(account.email, "Example-password", UUID.randomUUID())
         assertEquals(
             Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "invalid_credentials")),
@@ -45,7 +100,13 @@ class IdentityPolicyTest {
             IdentityFake(account, AccountAccess(account.copy(version = 1), emptySet(), true, true))
         val journal = RecordingJournal()
         val result =
-            SignInWithPassword(repository, journal, transactions, Clock.fixed(now, ZoneOffset.UTC))
+            SignInWithPassword(
+                    repository,
+                    journal,
+                    transactions,
+                    Clock.fixed(now, ZoneOffset.UTC),
+                    limits,
+                )
                 .execute(account.email, "Example-password", UUID.randomUUID())
         assertEquals(
             Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "invalid_credentials")),
@@ -99,8 +160,12 @@ private class RecordingJournal : ChangeJournalRepository {
 
 private class IdentityFake(private val credential: Account?, private val current: AccountAccess?) :
     IdentityRepository {
-    override fun verifyPassword(email: String, password: String): Result<Account?> =
-        Result.Success(credential)
+    var verifications = 0
+
+    override fun verifyPassword(email: String, password: String): Result<Account?> {
+        verifications++
+        return Result.Success(credential)
+    }
 
     override fun access(accountId: UUID, companyId: UUID?): Result<AccountAccess?> =
         Result.Success(current)

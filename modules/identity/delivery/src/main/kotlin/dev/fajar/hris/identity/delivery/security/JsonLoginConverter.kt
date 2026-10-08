@@ -26,5 +26,6 @@ class JsonLoginConverter(private val json: ObjectMapper) : AuthenticationConvert
                 )
             }
         return UsernamePasswordAuthenticationToken.unauthenticated(input.email, input.password)
+            .apply { details = LoginOrigin(request.remoteAddr) }
     }
 }

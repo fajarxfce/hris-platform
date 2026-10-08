@@ -8,7 +8,7 @@ Creation and versioned changes use a UUID `Idempotency-Key` header. A key is sco
 
 Updates send the last observed `version`. HTTP 409 `stale_version` requires reading the resource again before applying a new command. Blindly replacing the version and retrying can overwrite somebody else's intent. Receipt handling and optimistic locking run inside the same database transaction as the business mutation, audit, and outbox insertion.
 
-Problems contain a stable `code`, optional field codes, and a correlation ID. HTTP 400 means malformed input, 422 a domain validation failure, 401 authentication required, 403 denied scope, 404 missing resource, 409 conflict, 503 a temporarily unavailable dependency, and 500 an unexpected failure. Driver errors and credentials are not response content. Malformed path/query/header values return 400 with a correlation ID. JSON bodies are limited to 1 MiB based on actual bytes, including chunked requests; larger bodies return 413. Upload streams use their separate document limits.
+Problems contain a stable `code`, optional field codes, and a correlation ID. HTTP 400 means malformed input, 422 a domain validation failure, 401 authentication required, 403 denied scope, 404 missing resource, 409 conflict, 429 a rate limit, 503 a temporarily unavailable dependency, and 500 an unexpected failure. Driver errors and credentials are not response content. Malformed path/query/header values return 400 with a correlation ID. JSON bodies are limited to 1 MiB based on actual bytes, including chunked requests; larger bodies return 413. Upload streams use their separate document limits.
 
 Company setup:
 
@@ -95,3 +95,5 @@ Leave requests:
 - `POST /companies/{companyId}/leave/requests/{id}/cancellation`: version, reason. Starts independent approval of cancellation for approved leave.
 
 All request mutations use idempotency keys. Version is the leave request version, not the nested approval version. A submission includes at most 366 explicit dates within a 366-day span. Off/holiday dates are omitted from charged duration; missing schedules and ineligible employment dates fail the entire command. Reservations are made per balance year. Cancellation does not restore balance until approved. Submitted policy and schedule snapshots remain unchanged by later edits.
+
+Password authentication counts successful and failed attempts in fixed 15-minute windows. Limits are ten per normalized account and one hundred per server-observed origin. HTTP 429 `sign_in_rate_limited` carries `Retry-After: 900`; clients must wait instead of automatically looping. Capacity exhaustion returns 503 `password_verification_busy`. Neither response confirms account existence.

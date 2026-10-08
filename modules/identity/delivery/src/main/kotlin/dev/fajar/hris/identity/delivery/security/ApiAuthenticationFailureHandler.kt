@@ -16,11 +16,13 @@ class ApiAuthenticationFailureHandler(private val json: ObjectMapper) :
         val failure = (error as? IdentityAuthenticationException)?.failure
         val status =
             when (failure?.kind) {
+                dev.fajar.hris.core.domain.FailureKind.RATE_LIMITED -> 429
                 dev.fajar.hris.core.domain.FailureKind.UNAVAILABLE -> 503
                 dev.fajar.hris.core.domain.FailureKind.UNEXPECTED -> 500
                 dev.fajar.hris.core.domain.FailureKind.VALIDATION -> 400
                 else -> 401
             }
+        if (status == 429) response.setHeader("Retry-After", "900")
         response.status = status
         response.contentType = "application/problem+json"
         json.writeValue(

@@ -65,12 +65,25 @@ class IdentityConfiguration {
     ) = BootstrapAdministrator(identities, transactions, journal, clock)
 
     @Bean
+    fun signInAttemptSource(sql: DSLContext): SignInAttemptDataSource =
+        PostgresSignInAttemptDataSource(sql)
+
+    @Bean
+    fun signInLimits(
+        source: SignInAttemptDataSource
+    ): dev.fajar.hris.identity.domain.repositories.SignInLimitRepository =
+        dev.fajar.hris.identity.data.repositories.PostgresSignInLimitRepository(source)
+
+    @Bean
     fun signInWithPassword(
         identities: IdentityRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = SignInWithPassword(identities, journal, transactions, clock)
+        limits: dev.fajar.hris.identity.domain.repositories.SignInLimitRepository,
+        @org.springframework.beans.factory.annotation.Value("\${hris.security.sign-in-limits:true}")
+        enforceLimits: Boolean,
+    ) = SignInWithPassword(identities, journal, transactions, clock, limits, enforceLimits)
 
     @Bean
     fun resolveActor(identities: IdentityRepository, transactions: TransactionRunner) =

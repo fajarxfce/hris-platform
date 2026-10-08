@@ -6,6 +6,7 @@ enum class FailureKind {
     CONFLICT,
     FORBIDDEN,
     UNAUTHENTICATED,
+    RATE_LIMITED,
     UNAVAILABLE,
     UNEXPECTED,
 }

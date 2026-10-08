@@ -8,4 +8,5 @@ data class AttendanceDayResponse(
     val acceptedMinutes: Long,
     val pendingCount: Int,
     val incomplete: Boolean,
+    val correction: AttendanceCorrectionResponse?,
 )

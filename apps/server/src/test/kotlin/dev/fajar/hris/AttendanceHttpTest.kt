@@ -415,4 +415,158 @@ class AttendanceHttpTest : ApiIntegrationTest() {
                 .statusCode(),
         )
     }
+
+    private fun correction(
+        f: Fixture,
+        version: Long? = null,
+        key: UUID = UUID.randomUUID(),
+        absent: Boolean = false,
+    ): HttpResponse<String> =
+        command(
+            f.admin,
+            "/api/v1/companies/${f.company}/workforce/employees/${f.employee}/attendance/corrections",
+            json.writeValueAsString(
+                mapOf(
+                    "workDate" to "2026-10-01",
+                    "clockIn" to if (absent) null else "2026-10-01T15:00:00Z",
+                    "clockOut" to if (absent) null else "2026-10-01T23:00:00Z",
+                    "breakMinutes" to if (absent) 0 else 30,
+                    "expectedVersion" to version,
+                    "reason" to "Verified attendance correction",
+                )
+            ),
+            f.adminCsrf,
+            key,
+        )
+
+    @Test
+    fun CorrectionsAreVersionedIndependentAndNeverOverwriteEvidence() {
+        val f = fixture()
+        clock.set(Instant.parse("2026-10-01T23:00:00Z"))
+        val key = UUID.randomUUID()
+        val initial = correction(f, key = key)
+        assertEquals(200, initial.statusCode(), initial.body())
+        assertEquals(450, day(f).get("acceptedMinutes").asLong())
+        assertEquals(0, day(f).get("entries").size())
+        assertEquals(0, day(f).get("correction").get("version").asLong())
+        assertEquals(200, correction(f, 0, absent = true).statusCode())
+        assertEquals(0, day(f).get("acceptedMinutes").asLong())
+        assertEquals(409, correction(f, 0).statusCode())
+        assertEquals(initial.body(), correction(f, key = key).body())
+        val ready = CountDownLatch(2)
+        val start = CountDownLatch(1)
+        Executors.newFixedThreadPool(2).use { pool ->
+            val results =
+                (1..2).map {
+                    pool.submit<Int> {
+                        ready.countDown()
+                        assertTrue(start.await(5, TimeUnit.SECONDS))
+                        correction(f, 1).statusCode()
+                    }
+                }
+            assertTrue(ready.await(5, TimeUnit.SECONDS))
+            start.countDown()
+            assertEquals(listOf(200, 409), results.map { it.get(15, TimeUnit.SECONDS) }.sorted())
+        }
+        val history =
+            get(
+                f.worker,
+                "/api/v1/companies/${f.company}/workforce/employees/${f.employee}/attendance/corrections?workDate=2026-10-01&limit=1",
+            )
+        assertEquals(200, history.statusCode(), history.body())
+        assertEquals("2", json.readTree(history.body()).get("nextCursor").asString())
+        assertEquals(1, json.readTree(history.body()).get("items").size())
+        assertEquals(
+            3,
+            database()
+                .queryForObject(
+                    "select count(*) from attendance_corrections where company_id=?",
+                    Int::class.java,
+                    f.company,
+                ),
+        )
+        assertThrows(DataAccessException::class.java) {
+            database().update("delete from attendance_corrections where company_id=?", f.company)
+        }
+        database()
+            .update(
+                "insert into membership_permissions(company_id,account_id,permission) values(?,?,'attendance.correct')",
+                f.company,
+                f.account,
+            )
+        val own =
+            command(
+                f.worker,
+                "/api/v1/companies/${f.company}/workforce/employees/${f.employee}/attendance/corrections",
+                """{"workDate":"2026-10-01","expectedVersion":2,"reason":"Own correction"}""",
+                f.workerCsrf,
+                UUID.randomUUID(),
+            )
+        assertEquals(403, own.statusCode(), own.body())
+        assertEquals("self_correction_denied", json.readTree(own.body()).get("code").asString())
+    }
+
+    @Test
+    fun CorrectionsRequireResolvedEvidenceAndLaterPunchesCannotReplaceThem() {
+        val f = fixture()
+        val raw = UUID.randomUUID()
+        val recorded =
+            record(
+                f,
+                capture(f, raw, "CLOCK_IN", "2026-10-01T15:00:00Z", null, true),
+                UUID.randomUUID(),
+            )
+        assertEquals(200, recorded.statusCode(), recorded.body())
+        clock.set(Instant.parse("2026-10-01T23:00:00Z"))
+        val blocked = correction(f)
+        assertEquals(409, blocked.statusCode(), blocked.body())
+        assertEquals(
+            "attendance_verification_required",
+            json.readTree(blocked.body()).get("code").asString(),
+        )
+        val rejected =
+            command(
+                f.admin,
+                "/api/v1/companies/${f.company}/workforce/attendance/$raw/review",
+                """{"version":0,"decision":"REJECT","reason":"Incorrect captured time"}""",
+                f.adminCsrf,
+                UUID.randomUUID(),
+            )
+        assertEquals(200, rejected.statusCode(), rejected.body())
+        assertEquals(200, correction(f).statusCode())
+        val late = UUID.randomUUID()
+        val lateResponse =
+            record(
+                f,
+                capture(f, late, "CLOCK_IN", "2026-10-01T23:00:00Z", window(f), false),
+                UUID.randomUUID(),
+            )
+        assertEquals(200, lateResponse.statusCode(), lateResponse.body())
+        assertEquals(1, day(f).get("pendingCount").asInt())
+        assertEquals(450, day(f).get("acceptedMinutes").asLong())
+        val prevented = review(f, late)
+        assertEquals(409, prevented.statusCode(), prevented.body())
+        assertEquals(
+            "attendance_day_corrected",
+            json.readTree(prevented.body()).get("code").asString(),
+        )
+        assertEquals(
+            2,
+            database()
+                .queryForObject(
+                    "select count(*) from attendance_events where company_id=?",
+                    Int::class.java,
+                    f.company,
+                ),
+        )
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from attendance_corrections where company_id=?",
+                    Int::class.java,
+                    f.company,
+                ),
+        )
+    }
 }

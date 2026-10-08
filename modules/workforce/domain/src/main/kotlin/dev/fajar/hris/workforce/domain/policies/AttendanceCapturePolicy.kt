@@ -44,8 +44,10 @@ fun assessAttendance(
     schedule: ScheduledDay,
     prior: List<AttendanceEntry>,
     receivedAt: Instant,
+    corrected: Boolean = false,
 ): Result<AttendanceAssessment> {
     val issues = mutableSetOf<AttendanceIssue>()
+    if (corrected) issues += AttendanceIssue.CORRECTED_DAY
     if (capture.offline) issues += AttendanceIssue.OFFLINE
     if (window == null) {
         if (capture.windowId != null)

@@ -13,6 +13,7 @@ fun AttendanceDay.toResponse(): AttendanceDayResponse =
         acceptedMinutes,
         pendingCount,
         incomplete,
+        correction?.toResponse(),
     )
 
 fun AttendanceEntry.toResponse(): AttendanceEntryResponse =
@@ -32,5 +33,17 @@ fun AttendanceEntry.toResponse(): AttendanceEntryResponse =
         review?.let {
             AttendanceReviewResponse(it.actorId, it.decision.name, it.reviewedAt, it.reason)
         },
+        version,
+    )
+
+fun AttendanceCorrection.toResponse(): AttendanceCorrectionResponse =
+    AttendanceCorrectionResponse(
+        id,
+        clockIn,
+        clockOut,
+        breakMinutes,
+        actorId,
+        recordedAt,
+        reason,
         version,
     )

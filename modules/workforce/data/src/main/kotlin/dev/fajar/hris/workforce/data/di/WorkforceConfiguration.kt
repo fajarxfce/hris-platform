@@ -4,8 +4,10 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.data.datasources.*
+import dev.fajar.hris.workforce.data.repositories.StoredAttendanceCorrectionRepository
 import dev.fajar.hris.workforce.data.repositories.StoredAttendanceRepository
 import dev.fajar.hris.workforce.data.repositories.StoredScheduleRepository
+import dev.fajar.hris.workforce.domain.repositories.AttendanceCorrectionRepository
 import dev.fajar.hris.workforce.domain.repositories.AttendanceRepository
 import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
 import dev.fajar.hris.workforce.domain.usecases.*
@@ -101,6 +103,7 @@ class WorkforceConfiguration {
     @Bean
     fun recordAttendance(
         attendance: AttendanceRepository,
+        corrections: AttendanceCorrectionRepository,
         schedules: ScheduleRepository,
         people: PeopleRepository,
         companies: CompanyRepository,
@@ -111,6 +114,7 @@ class WorkforceConfiguration {
     ) =
         RecordAttendance(
             attendance,
+            corrections,
             schedules,
             people,
             companies,
@@ -123,18 +127,62 @@ class WorkforceConfiguration {
     @Bean
     fun reviewAttendance(
         attendance: AttendanceRepository,
+        corrections: AttendanceCorrectionRepository,
         people: PeopleRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = ReviewAttendance(attendance, people, operations, journal, transactions, clock)
+    ) = ReviewAttendance(attendance, corrections, people, operations, journal, transactions, clock)
 
     @Bean
     fun employeeAttendance(
         attendance: AttendanceRepository,
+        corrections: AttendanceCorrectionRepository,
         people: PeopleRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetEmployeeAttendance(attendance, people, transactions, clock)
+    ) = GetEmployeeAttendance(attendance, corrections, people, transactions, clock)
+
+    @Bean
+    fun attendanceCorrectionSource(sql: DSLContext): AttendanceCorrectionDataSource =
+        PostgresAttendanceCorrectionDataSource(sql)
+
+    @Bean
+    fun attendanceCorrections(
+        source: AttendanceCorrectionDataSource,
+        json: ObjectMapper,
+    ): AttendanceCorrectionRepository = StoredAttendanceCorrectionRepository(source, json)
+
+    @Bean
+    fun correctAttendance(
+        attendance: AttendanceRepository,
+        corrections: AttendanceCorrectionRepository,
+        schedules: ScheduleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        CorrectAttendance(
+            attendance,
+            corrections,
+            schedules,
+            people,
+            companies,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun correctionHistory(
+        corrections: AttendanceCorrectionRepository,
+        people: PeopleRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = GetAttendanceCorrectionHistory(corrections, people, transactions, clock)
 }

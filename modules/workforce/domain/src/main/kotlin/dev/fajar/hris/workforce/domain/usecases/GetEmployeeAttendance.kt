@@ -10,6 +10,7 @@ import java.util.UUID
 
 class GetEmployeeAttendance(
     private val attendance: AttendanceRepository,
+    private val corrections: AttendanceCorrectionRepository,
     private val people: PeopleRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
@@ -36,12 +37,19 @@ class GetEmployeeAttendance(
                     )
                         Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
                     else
-                        attendance.entries(company, employeeId, from, until).map { entries ->
-                            val byDate = entries.groupBy { it.capture.workDate }
-                            (0..java.time.temporal.ChronoUnit.DAYS.between(from, until)).map { day
-                                ->
-                                val date = from.plusDays(day)
-                                summarizeAttendance(date, byDate[date].orEmpty())
+                        attendance.entries(company, employeeId, from, until).flatMap { entries ->
+                            corrections.latest(company, employeeId, from, until).map { changes ->
+                                val byDate = entries.groupBy { it.capture.workDate }
+                                val correctedDates = changes.associateBy { it.workDate }
+                                (0..java.time.temporal.ChronoUnit.DAYS.between(from, until)).map {
+                                    day ->
+                                    val date = from.plusDays(day)
+                                    summarizeAttendance(
+                                        date,
+                                        byDate[date].orEmpty(),
+                                        correctedDates[date],
+                                    )
+                                }
                             }
                         }
                 }

@@ -10,6 +10,7 @@ import java.util.UUID
 
 class RecordAttendance(
     private val attendance: AttendanceRepository,
+    private val corrections: AttendanceCorrectionRepository,
     private val schedules: ScheduleRepository,
     private val people: PeopleRepository,
     private val companies: dev.fajar.hris.organization.domain.repositories.CompanyRepository,
@@ -96,8 +97,20 @@ class RecordAttendance(
                     if (result is Result.Failed) return@run result
                     (result as Result.Success).value
                 }
+            val correctionResult =
+                corrections.latest(company, capture.employeeId, capture.workDate, capture.workDate)
+            if (correctionResult is Result.Failed) return@run correctionResult
+            val corrected = (correctionResult as Result.Success).value.isNotEmpty()
             val assessed =
-                assessAttendance(capture, actor.accountId, window, schedule, entries, now)
+                assessAttendance(
+                    capture,
+                    actor.accountId,
+                    window,
+                    schedule,
+                    entries,
+                    now,
+                    corrected,
+                )
             if (assessed is Result.Failed) return@run assessed
             val assessment = (assessed as Result.Success).value
             val entry =

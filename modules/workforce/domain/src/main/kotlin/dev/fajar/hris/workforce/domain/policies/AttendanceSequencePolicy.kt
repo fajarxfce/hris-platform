@@ -28,12 +28,16 @@ fun validateAttendanceSequence(
     return Result.Success(Unit)
 }
 
-fun summarizeAttendance(date: LocalDate, entries: List<AttendanceEntry>): AttendanceDay {
+fun summarizeAttendance(
+    date: LocalDate,
+    entries: List<AttendanceEntry>,
+    correction: AttendanceCorrection? = null,
+): AttendanceDay {
     val accepted = entries.filter { it.status == AttendanceStatus.ACCEPTED }
     val start = accepted.singleOrNull { it.capture.kind == AttendanceKind.CLOCK_IN }
     val end = accepted.singleOrNull { it.capture.kind == AttendanceKind.CLOCK_OUT }
     val breakMinutes = (start?.schedule as? ScheduledDay.Work)?.shift?.details?.breakMinutes ?: 0
-    val minutes =
+    val rawMinutes =
         if (start == null || end == null) 0
         else
             (Duration.between(start.capture.capturedAt, end.capture.capturedAt).toMinutes() -
@@ -42,8 +46,17 @@ fun summarizeAttendance(date: LocalDate, entries: List<AttendanceEntry>): Attend
     return AttendanceDay(
         date,
         entries.toList(),
-        minutes,
+        if (correction == null) rawMinutes
+        else {
+            val correctedIn = correction.clockIn
+            val correctedOut = correction.clockOut
+            if (correctedIn == null || correctedOut == null) 0
+            else
+                (Duration.between(correctedIn, correctedOut).toMinutes() - correction.breakMinutes)
+                    .coerceAtLeast(0)
+        },
         entries.count { it.status == AttendanceStatus.PENDING },
-        (start == null) != (end == null),
+        correction == null && ((start == null) != (end == null)),
+        correction,
     )
 }

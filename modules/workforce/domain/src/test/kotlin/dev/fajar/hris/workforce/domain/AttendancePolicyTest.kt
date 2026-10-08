@@ -213,4 +213,67 @@ class AttendancePolicyTest {
         assertTrue(validateAttendanceSequence(checkIn, verified) is Result.Failed)
         assertTrue(validateAttendanceSequence(checkOut, emptyList()) is Result.Failed)
     }
+
+    @Test
+    fun CorrectionIntervalsRejectPartialFutureAndNonMinuteTimes() {
+        val end = now.plusSeconds(8 * 3600)
+        assertTrue(
+            validateAttendanceCorrection(date, now, end, 30, "Verified", end) is Result.Success
+        )
+        assertTrue(
+            validateAttendanceCorrection(date, now, null, 0, "Verified", end) is Result.Failed
+        )
+        assertTrue(
+            validateAttendanceCorrection(date, now, end, 480, "Verified", end) is Result.Failed
+        )
+        assertTrue(
+            validateAttendanceCorrection(date, now, end, 30, "Verified", now) is Result.Failed
+        )
+        assertTrue(
+            validateAttendanceCorrection(date, now.plusSeconds(1), end, 30, "Verified", end)
+                is Result.Failed
+        )
+        assertTrue(
+            validateAttendanceCorrection(date, null, null, 0, "Verified absence", end)
+                is Result.Success
+        )
+    }
+
+    @Test
+    fun CorrectedDaysKeepExplicitAbsenceAndRequireReviewOfNewEvidence() {
+        val correction =
+            AttendanceCorrection(
+                UUID.randomUUID(),
+                employee,
+                date,
+                null,
+                null,
+                0,
+                schedule,
+                UUID.randomUUID(),
+                now,
+                "Verified absence",
+                0,
+            )
+        val entry =
+            AttendanceEntry(
+                capture(),
+                account,
+                now,
+                schedule,
+                AttendanceAssessment(AttendanceStatus.ACCEPTED, emptySet()),
+                AttendanceStatus.ACCEPTED,
+                null,
+                0,
+            )
+        val day = summarizeAttendance(date, listOf(entry), correction)
+        assertEquals(0, day.acceptedMinutes)
+        assertFalse(day.incomplete)
+        assertSame(correction, day.correction)
+        val assessed =
+            assessAttendance(capture(), account, window, schedule, emptyList(), now, true)
+                as Result.Success
+        assertEquals(AttendanceStatus.PENDING, assessed.value.status)
+        assertTrue(AttendanceIssue.CORRECTED_DAY in assessed.value.issues)
+    }
 }

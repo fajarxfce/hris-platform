@@ -68,3 +68,10 @@ Attendance:
 - `POST /companies/{companyId}/workforce/attendance/{id}/review`: version, decision (ACCEPT/REJECT), reason. Requires `attendance.verify` or the current manager's `attendance.team.verify`; self-review is denied.
 
 Missing/expired windows and all explicit offline events require review. Reusing another account/device's window is rejected; a consumed window cannot back another event. Validation failures roll back both evidence and consumption. Unverified events never contribute to accepted minutes. A pending duplicate or unmatched checkout must be rejected or reviewed after its valid clock-in, rather than silently overwriting a punch.
+
+Attendance corrections:
+
+- `POST /companies/{companyId}/workforce/employees/{id}/attendance/corrections`: workDate, clockIn/clockOut (UTC minute precision), breakMinutes, expectedVersion, reason; requires `attendance.correct` and an idempotency key. Null expectedVersion creates the first correction; later edits use the current correction version. Null clock-in/out means an explicit absence.
+- `GET /companies/{companyId}/workforce/employees/{id}/attendance/corrections?workDate=YYYY-MM-DD`: after revision, limit; follows workforce read scope and returns immutable correction history.
+
+Corrected totals appear beside the original entries in daily attendance responses. Self-correction, future intervals, unresolved pending evidence, and stale versions are rejected. Closing rules will be added with period processing; this endpoint does not yet represent a finalized payroll amendment workflow.

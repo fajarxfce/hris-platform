@@ -10,6 +10,7 @@ import java.util.UUID
 
 class ReviewAttendance(
     private val attendance: AttendanceRepository,
+    private val corrections: AttendanceCorrectionRepository,
     private val people: PeopleRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
@@ -66,6 +67,18 @@ class ReviewAttendance(
             if (entry.version != version || entry.status != AttendanceStatus.PENDING)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
             if (decision == AttendanceReviewDecision.ACCEPT) {
+                val correctionResult =
+                    corrections.latest(
+                        company,
+                        capture.employeeId,
+                        capture.workDate,
+                        capture.workDate,
+                    )
+                if (correctionResult is Result.Failed) return@run correctionResult
+                if ((correctionResult as Result.Success).value.isNotEmpty())
+                    return@run Result.Failed(
+                        Failure(FailureKind.CONFLICT, "attendance_day_corrected")
+                    )
                 val sequence = validateAttendanceSequence(capture, entries)
                 if (sequence is Result.Failed) return@run sequence
             }

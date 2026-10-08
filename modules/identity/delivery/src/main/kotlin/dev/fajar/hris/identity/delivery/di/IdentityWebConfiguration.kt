@@ -47,7 +47,7 @@ class IdentityWebConfiguration {
                 registry
                     .addInterceptor(ActorRequestInterceptor(resolve))
                     .addPathPatterns("/api/v1/**")
-                    .excludePathPatterns("/api/v1/auth/csrf")
+                    .excludePathPatterns("/api/v1/auth/csrf", "/api/v1/auth/native/refresh")
             }
 
             override fun addArgumentResolvers(
@@ -58,6 +58,54 @@ class IdentityWebConfiguration {
         }
 
     @Bean
+    @org.springframework.core.annotation.Order(1)
+    fun nativeSecurity(
+        http: HttpSecurity,
+        resolve: dev.fajar.hris.identity.domain.usecases.ResolveNativeAccess,
+        json: ObjectMapper,
+    ): SecurityFilterChain {
+        http.securityMatcher(
+            org.springframework.security.web.util.matcher.RequestMatcher { request ->
+                request.getHeader("Authorization") != null ||
+                    request.servletPath == "/api/v1/auth/native/refresh"
+            }
+        )
+        http.sessionManagement {
+            it.sessionCreationPolicy(
+                org.springframework.security.config.http.SessionCreationPolicy.STATELESS
+            )
+        }
+        http.securityContext {
+            it.securityContextRepository(
+                org.springframework.security.web.context.NullSecurityContextRepository()
+            )
+        }
+        http.csrf { it.disable() }
+        http.requestCache { it.disable() }
+        http.logout { it.disable() }
+        http.formLogin { it.disable() }
+        http.httpBasic { it.disable() }
+        http.authorizeHttpRequests {
+            it.requestMatchers("/api/v1/auth/native/refresh")
+                .permitAll()
+                .anyRequest()
+                .authenticated()
+        }
+        http.exceptionHandling {
+            it.authenticationEntryPoint { request, response, error ->
+                ApiAuthenticationFailureHandler(json)
+                    .onAuthenticationFailure(request, response, error)
+            }
+        }
+        http.addFilterBefore(
+            NativeAccessFilter(resolve, json),
+            org.springframework.security.web.access.intercept.AuthorizationFilter::class.java,
+        )
+        return http.build()
+    }
+
+    @Bean
+    @org.springframework.core.annotation.Order(2)
     fun webSecurity(
         http: HttpSecurity,
         provider: org.springframework.security.authentication.AuthenticationProvider,

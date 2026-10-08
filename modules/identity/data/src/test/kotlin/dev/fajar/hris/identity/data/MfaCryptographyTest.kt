@@ -48,21 +48,21 @@ class MfaCryptographyTest {
         assertEquals(secret, rotated.decrypt(account, encrypted))
         assertInstanceOf(
             Result.Failed::class.java,
-            safeMfaCall { rotated.decrypt(UUID.randomUUID(), encrypted) },
+            safeIdentityCall { rotated.decrypt(UUID.randomUUID(), encrypted) },
         )
         val newCiphertext = rotated.encrypt(account, secret)
         assertTrue(newCiphertext.startsWith("v2."))
         assertEquals(
             Result.Failed(Failure(FailureKind.UNAVAILABLE, "identity_key_unavailable")),
-            safeMfaCall { old.decrypt(account, newCiphertext) },
+            safeIdentityCall { old.decrypt(account, newCiphertext) },
         )
         val parts = encrypted.split('.').toMutableList()
         val bytes = Base64.getDecoder().decode(parts[2])
         bytes[0] = (bytes[0].toInt() xor 1).toByte()
         parts[2] = Base64.getEncoder().encodeToString(bytes)
         assertEquals(
-            Result.Failed(Failure(FailureKind.UNEXPECTED, "mfa_operation_failed")),
-            safeMfaCall { rotated.decrypt(account, parts.joinToString(".")) },
+            Result.Failed(Failure(FailureKind.UNEXPECTED, "identity_credential_failed")),
+            safeIdentityCall { rotated.decrypt(account, parts.joinToString(".")) },
         )
         assertFalse(parseIdentityKeyring("v1", "v1:$first").toString().contains(first))
     }
@@ -73,7 +73,7 @@ class MfaCryptographyTest {
         assertFalse(crypto.available())
         assertEquals(
             Result.Failed(Failure(FailureKind.UNAVAILABLE, "identity_key_unavailable")),
-            safeMfaCall { crypto.encrypt(UUID.randomUUID(), crypto.newSecret()) },
+            safeIdentityCall { crypto.encrypt(UUID.randomUUID(), crypto.newSecret()) },
         )
         for (invalid in listOf("v1:invalid-value", "v1:AA==", "v1:$first,v1:$first", "v2:$first")) {
             assertThrows(IllegalArgumentException::class.java) {

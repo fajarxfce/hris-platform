@@ -13,6 +13,7 @@ import java.util.UUID
 import org.springframework.web.bind.annotation.*
 
 @RestController
+@SessionTransport(SessionKind.COOKIE)
 @RequestMapping("/api/v1/auth/mfa")
 class MfaController(
     private val begin: BeginMfaEnrollment,

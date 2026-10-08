@@ -5,7 +5,7 @@ import dev.fajar.hris.core.domain.*
 import java.util.concurrent.CancellationException
 import org.slf4j.LoggerFactory
 
-fun <T> safeMfaCall(operation: () -> T): Result<T> =
+fun <T> safeIdentityCall(operation: () -> T): Result<T> =
     try {
         if (Thread.currentThread().isInterrupted) throw InterruptedException()
         val value = operation()
@@ -24,7 +24,7 @@ fun <T> safeMfaCall(operation: () -> T): Result<T> =
                 else -> {
                     LoggerFactory.getLogger("dev.fajar.hris.identity")
                         .warn(
-                            "MFA operation failed category={} frames={}",
+                            "Identity credential operation failed category={} frames={}",
                             error.javaClass.name,
                             error.stackTrace
                                 .asSequence()
@@ -32,7 +32,7 @@ fun <T> safeMfaCall(operation: () -> T): Result<T> =
                                 .take(8)
                                 .joinToString(" | "),
                         )
-                    Failure(FailureKind.UNEXPECTED, "mfa_operation_failed")
+                    Failure(FailureKind.UNEXPECTED, "identity_credential_failed")
                 }
             }
         Result.Failed(failure)

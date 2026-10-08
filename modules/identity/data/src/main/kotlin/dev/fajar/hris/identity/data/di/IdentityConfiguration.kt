@@ -124,15 +124,17 @@ class IdentityConfiguration {
     ) = dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy(enforceMfa = enforceMfa)
 
     @Bean
-    fun mfaCrypto(
+    fun identityKeyring(
         @org.springframework.beans.factory.annotation.Value("\${HRIS_IDENTITY_ACTIVE_KEY:v1}")
         activeId: String,
         @org.springframework.beans.factory.annotation.Value("\${HRIS_IDENTITY_KEYS:}")
         encoded: String,
-    ): MfaCryptoDataSource =
-        JceMfaCryptoDataSource(
-            dev.fajar.hris.identity.data.crypto.parseIdentityKeyring(activeId, encoded)
-        )
+    ) = dev.fajar.hris.identity.data.crypto.parseIdentityKeyring(activeId, encoded)
+
+    @Bean
+    fun mfaCrypto(
+        keyring: dev.fajar.hris.identity.data.crypto.IdentityKeyring
+    ): MfaCryptoDataSource = JceMfaCryptoDataSource(keyring)
 
     @Bean fun mfaStore(sql: DSLContext): MfaStoreDataSource = PostgresMfaStoreDataSource(sql)
 
@@ -177,4 +179,72 @@ class IdentityConfiguration {
         clock: Clock,
         security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
     ) = RegenerateMfaRecoveryCodes(mfa, journal, transactions, clock, security)
+
+    @Bean fun nativeSessionPolicy() = dev.fajar.hris.identity.domain.entities.NativeSessionPolicy()
+
+    @Bean
+    fun nativeStore(sql: DSLContext): NativeSessionDataSource = PostgresNativeSessionDataSource(sql)
+
+    @Bean
+    fun nativeCrypto(
+        keyring: dev.fajar.hris.identity.data.crypto.IdentityKeyring
+    ): NativeTokenDataSource = JceNativeTokenDataSource(keyring)
+
+    @Bean
+    fun nativeSessions(
+        store: NativeSessionDataSource,
+        crypto: NativeTokenDataSource,
+    ): dev.fajar.hris.identity.domain.repositories.NativeSessionRepository =
+        dev.fajar.hris.identity.data.repositories.StoredNativeSessionRepository(store, crypto)
+
+    @Bean
+    fun exchangeNative(
+        sessions: dev.fajar.hris.identity.domain.repositories.NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        journal: ChangeJournalRepository,
+        clock: Clock,
+        policy: dev.fajar.hris.identity.domain.entities.NativeSessionPolicy,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+    ) = ExchangeNativeSession(sessions, identities, transactions, journal, clock, policy, security)
+
+    @Bean
+    fun resolveNative(
+        sessions: dev.fajar.hris.identity.domain.repositories.NativeSessionRepository,
+        clock: Clock,
+    ) = ResolveNativeAccess(sessions, clock)
+
+    @Bean
+    fun refreshNative(
+        sessions: dev.fajar.hris.identity.domain.repositories.NativeSessionRepository,
+        transactions: TransactionRunner,
+        journal: ChangeJournalRepository,
+        clock: Clock,
+        policy: dev.fajar.hris.identity.domain.entities.NativeSessionPolicy,
+    ) = RefreshNativeSession(sessions, transactions, journal, clock, policy)
+
+    @Bean
+    fun listNative(
+        sessions: dev.fajar.hris.identity.domain.repositories.NativeSessionRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        policy: dev.fajar.hris.identity.domain.entities.NativeSessionPolicy,
+    ) = ListNativeSessions(sessions, transactions, clock, policy)
+
+    @Bean
+    fun revokeNative(
+        sessions: dev.fajar.hris.identity.domain.repositories.NativeSessionRepository,
+        transactions: TransactionRunner,
+        journal: ChangeJournalRepository,
+        clock: Clock,
+    ) = RevokeNativeSession(sessions, transactions, journal, clock)
+
+    @Bean
+    fun elevateNative(
+        sessions: dev.fajar.hris.identity.domain.repositories.NativeSessionRepository,
+        transactions: TransactionRunner,
+        journal: ChangeJournalRepository,
+        clock: Clock,
+        policy: dev.fajar.hris.identity.domain.entities.NativeSessionPolicy,
+    ) = ElevateNativeSession(sessions, transactions, journal, clock, policy)
 }

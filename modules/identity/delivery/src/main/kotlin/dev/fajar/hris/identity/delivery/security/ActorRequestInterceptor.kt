@@ -19,10 +19,21 @@ class ActorRequestInterceptor(private val resolve: ResolveActor) : HandlerInterc
         handler: Any,
     ): Boolean {
         val identity =
-            SecurityContextHolder.getContext().authentication?.principal as? SessionIdentity
+            SecurityContextHolder.getContext().authentication?.principal as? AuthenticatedIdentity
                 ?: throw DomainFailureException(
                     Failure(FailureKind.UNAUTHENTICATED, "authentication_required")
                 )
+        val method = handler as? HandlerMethod
+        val transport =
+            method?.getMethodAnnotation(SessionTransport::class.java)
+                ?: method?.beanType?.getAnnotation(SessionTransport::class.java)
+        if (
+            (transport?.value == SessionKind.COOKIE && identity !is SessionIdentity) ||
+                (transport?.value == SessionKind.NATIVE && identity !is NativeIdentity)
+        )
+            throw DomainFailureException(
+                Failure(FailureKind.FORBIDDEN, "invalid_session_transport")
+            )
         val variables =
             request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE) as? Map<*, *>
         val companyId =

@@ -75,3 +75,12 @@ Attendance corrections:
 - `GET /companies/{companyId}/workforce/employees/{id}/attendance/corrections?workDate=YYYY-MM-DD`: after revision, limit; follows workforce read scope and returns immutable correction history.
 
 Corrected totals appear beside the original entries in daily attendance responses. Self-correction, future intervals, unresolved pending evidence, and stale versions are rejected. Closing rules will be added with period processing; this endpoint does not yet represent a finalized payroll amendment workflow.
+
+Leave policies and balances:
+
+- `PUT /companies/{companyId}/leave/types/{id}`: code, name, effectiveFrom, paid, allowPartialDays, minServiceMonths, allowedContracts, maxRequestDays, active, expectedVersion, reason. Requires `leave.manage` and an idempotency key; type code cannot change after creation.
+- `GET /companies/{companyId}/leave/types?asOf=YYYY-MM-DD`: after code, limit; includes current `version` and the selected `appliedRevision`.
+- `POST /companies/{companyId}/leave/employees/{id}/balances/{typeId}/{year}/adjustments`: decimal-string days (signed, nonzero, increments of 0.5, at most 366 in magnitude) and reason. Requires `leave.manage` and an idempotency key. Own balance adjustments are denied.
+- `GET /companies/{companyId}/leave/employees/{id}/balances/{typeId}/{year}`: after opaque entry cursor and limit. Returns available/reserved/consumed day strings and a chronological, immutable ledger. Current company/team/self authorization applies independently of the balance year.
+
+Balances are read consistently with their history. Manual reductions use only available balance; reserved/consumed units cannot be spent as available entitlement. Archived types retain ledger correction access without allowing new leave requests.

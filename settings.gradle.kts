@@ -30,3 +30,5 @@ include(":modules:people:domain", ":modules:people:data", ":modules:people:deliv
 include(":modules:approvals:domain", ":modules:approvals:data", ":modules:approvals:delivery")
 
 include(":modules:workforce:domain", ":modules:workforce:data", ":modules:workforce:delivery")
+
+include(":modules:leave:domain", ":modules:leave:data", ":modules:leave:delivery")

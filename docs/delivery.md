@@ -8,7 +8,7 @@
 - Organization and people: company setup, organization units, employee onboarding, scoped directories, and effective employment revisions implemented. Profile editing, lifecycle checklists, import, and cross-company transfer remain planned.
 - Approvals: effective templates, immutable snapshots, assignment/delegation, inbox, optimistic decision storage, and pure transitions implemented. Feature-specific business decisions remain planned.
 - Workforce: versioned shifts, weekly schedules, roster overrides, holidays, and scoped calendar reads implemented. Attendance capture and independent verification are implemented. Versioned HR corrections are implemented. Overtime, closing, and bulk/reset workflows remain planned.
-- Leave: planned.
+- Leave: effective policies, independent balance adjustments, and immutable scoped ledger implemented. Request/approval/cancellation, accrual, carryover/expiry, attachments, and closing integration remain planned.
 - Documents and expenses: planned.
 - Payroll: planned.
 - Communications, reporting, and administration: planned.
@@ -58,3 +58,5 @@ Current-team access fix: full Gradle check and bootJar passed (47 tests total). 
 Attendance capture slice: full Gradle check and bootJar passed (56 tests total). Six policy tests and three HTTP/PostgreSQL tests cover offline/expired proof, GPS validation, overnight totals, frozen schedules, lost-response replay, proof ownership/reuse, self-review denial, competing reviewers, rollback without consuming proof, immutable events, and live access revocation. Closing and payroll integration are not claimed by these tests.
 
 Attendance correction slice: full Gradle check and bootJar passed (60 tests total). Two policy and two HTTP/PostgreSQL tests cover independent corrections, absence, pending-evidence gates, immutable history, optimistic concurrent corrections, original receipt replay, self-correction denial, and later punches that cannot replace corrected facts.
+
+Leave balance foundation: full Gradle check and bootJar passed (65 tests total). Two policy and three HTTP/PostgreSQL tests cover effective policy revisions, stable type codes, immutable history, half-day input bounds, competing reductions without overspending, adjustment replay, chronological pagination, current team access, self-adjustment denial, and archived-type corrections. Request reservations are a subsequent slice.

@@ -24,3 +24,5 @@ include(
     ":modules:organization:data",
     ":modules:organization:delivery",
 )
+
+include(":modules:people:domain", ":modules:people:data", ":modules:people:delivery")

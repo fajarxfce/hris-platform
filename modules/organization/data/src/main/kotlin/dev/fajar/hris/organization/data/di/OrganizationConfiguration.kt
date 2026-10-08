@@ -14,6 +14,30 @@ import tools.jackson.databind.ObjectMapper
 
 @Configuration(proxyBeanMethods = false)
 class OrganizationConfiguration {
+    @Bean
+    fun organizationSource(sql: DSLContext): OrganizationDataSource =
+        PostgresOrganizationDataSource(sql)
+
+    @Bean
+    fun organization(
+        source: OrganizationDataSource
+    ): dev.fajar.hris.organization.domain.repositories.OrganizationRepository =
+        dev.fajar.hris.organization.data.repositories.StoredOrganizationRepository(source)
+
+    @Bean
+    fun saveUnit(
+        units: dev.fajar.hris.organization.domain.repositories.OrganizationRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+    ) = SaveOrganizationUnit(units, operations, journal, transactions)
+
+    @Bean
+    fun listUnits(
+        units: dev.fajar.hris.organization.domain.repositories.OrganizationRepository,
+        transactions: TransactionRunner,
+    ) = ListOrganizationUnits(units, transactions)
+
     @Bean fun companySource(sql: DSLContext): CompanyDataSource = PostgresCompanyDataSource(sql)
 
     @Bean

@@ -14,4 +14,8 @@ Acceptance: concurrent employee number uniqueness, effective-dated history, comp
 
 Company creation, reads, and versioned updates are implemented. Creation grants only the documented company administrator permissions. Idempotency receipts, membership, audit, and outbox records commit together; replay returns the original mutation outcome. Company codes are normalized to uppercase and timezones must be recognized IANA identifiers.
 
-Organization units, people, effective employment history, imports, and transfer workflows remain planned. See [API conventions](../api-conventions.md).
+Organization unit creation/update/archive and cycle checks are implemented. Employee onboarding separates person and employment records. Employment revisions are append-only, optimistic, audited, and effective-dated; reads select the latest applicable revision for the requested date. Reporting line validation includes scheduled future boundaries. The database enforces company references, employee number uniqueness, and immutable revisions.
+
+Employee directories and detail reads support company-wide HR, direct-report manager, and self scope. Their public projection excludes birth date and nationality. Lists and history use bounded cursor pagination. Current endpoints require an explicit `asOf` date for employee reads.
+
+Personal profile editing, lifecycle checklists, CSV import, cross-company transfers, and automatic offboarding access changes remain planned. See [API conventions](../api-conventions.md).

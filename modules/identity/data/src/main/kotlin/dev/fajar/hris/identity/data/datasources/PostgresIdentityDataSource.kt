@@ -11,7 +11,8 @@ import org.jooq.DSLContext
 
 class PostgresIdentityDataSource(private val sql: DSLContext) : IdentityDataSource {
     override fun lockAccount(id: UUID) {
-        sql.select(ACCOUNTS.ID).from(ACCOUNTS).where(ACCOUNTS.ID.eq(id)).forUpdate().fetchOne()
+        // Protect credential/access changes while allowing FK references to the immutable ID.
+        sql.select(ACCOUNTS.ID).from(ACCOUNTS).where(ACCOUNTS.ID.eq(id)).forNoKeyUpdate().fetchOne()
     }
 
     override fun lockBootstrap() {

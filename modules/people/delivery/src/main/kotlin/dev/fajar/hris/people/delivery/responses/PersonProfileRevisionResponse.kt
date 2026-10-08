@@ -13,4 +13,5 @@ data class PersonProfileRevisionResponse(
     val actorId: UUID?,
     val reason: String,
     val recordedAt: Instant,
+    val accountId: UUID?,
 )

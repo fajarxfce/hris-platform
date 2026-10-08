@@ -71,6 +71,7 @@ class PersonProfileController(
                     it.actorId,
                     it.reason,
                     it.recordedAt,
+                    it.profile.accountId,
                 )
             },
             page.nextCursor,

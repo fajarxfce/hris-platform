@@ -17,6 +17,7 @@ object PermissionCatalog {
             "people.lifecycle.perform",
             "people.profile.read",
             "people.profile.manage",
+            "people.account.link",
             "workforce.read",
             "workforce.manage",
             "workforce.close",

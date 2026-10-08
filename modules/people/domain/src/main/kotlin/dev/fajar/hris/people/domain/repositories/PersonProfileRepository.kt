@@ -5,6 +5,14 @@ import dev.fajar.hris.people.domain.entities.*
 import java.util.UUID
 
 interface PersonProfileRepository {
+    fun bindAccount(
+        actor: Actor,
+        personId: UUID,
+        accountId: UUID,
+        expectedVersion: Long,
+        reason: String,
+    ): Result<MutationReceipt>
+
     fun findForEmployee(companyId: UUID, employeeId: UUID): Result<ManagedPersonProfile?>
 
     fun history(personId: UUID, after: Long?, limit: Int): Result<Page<PersonProfileRevision>>

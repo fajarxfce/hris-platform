@@ -8,6 +8,28 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresPersonProfileDataSource(private val sql: DSLContext) : PersonProfileDataSource {
+    override fun insertAccountLink(
+        row: dev.fajar.hris.schema.tables.records.PersonAccountLinksRecord
+    ) {
+        sql.insertInto(PERSON_ACCOUNT_LINKS).set(row).execute()
+    }
+
+    override fun bindAccount(
+        companyId: UUID,
+        personId: UUID,
+        accountId: UUID,
+        expectedVersion: Long,
+    ): PersonsRecord? =
+        sql.update(PERSONS)
+            .set(PERSONS.ACCOUNT_ID, accountId)
+            .set(PERSONS.VERSION, expectedVersion + 1)
+            .where(PERSONS.ID.eq(personId))
+            .and(PERSONS.OWNER_COMPANY_ID.eq(companyId))
+            .and(PERSONS.ACCOUNT_ID.isNull)
+            .and(PERSONS.VERSION.eq(expectedVersion))
+            .returning()
+            .fetchOne()
+
     override fun findForEmployee(companyId: UUID, employeeId: UUID): PersonsRecord? =
         sql.select(PERSONS.fields().toList())
             .from(PERSONS)

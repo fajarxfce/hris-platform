@@ -15,6 +15,7 @@ fun PersonsRecord.toManagedProfile() =
 fun PersonProfile.toProfileRevision(companyId: UUID, version: Long, actorId: UUID, reason: String) =
     PersonProfileRevisionsRecord().also {
         it.personId = id
+        it.accountId = accountId
         it.revision = version
         it.ownerCompanyId = companyId
         it.legalName = legalName
@@ -28,7 +29,7 @@ fun PersonProfile.toProfileRevision(companyId: UUID, version: Long, actorId: UUI
 fun PersonProfileRevisionsRecord.toProfileRevision() =
     PersonProfileRevision(
         revision,
-        PersonProfile(personId, null, legalName, birthDate, nationality, email),
+        PersonProfile(personId, accountId, legalName, birthDate, nationality, email),
         actorId,
         reason,
         recordedAt.toInstant(),

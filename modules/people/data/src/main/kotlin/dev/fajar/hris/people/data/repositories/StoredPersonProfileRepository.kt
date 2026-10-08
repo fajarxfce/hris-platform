@@ -10,6 +10,49 @@ import java.util.UUID
 
 class StoredPersonProfileRepository(private val source: PersonProfileDataSource) :
     PersonProfileRepository {
+    override fun bindAccount(
+        actor: Actor,
+        personId: UUID,
+        accountId: UUID,
+        expectedVersion: Long,
+        reason: String,
+    ): Result<MutationReceipt> =
+        safeDatabaseCall {
+                source.insertAccountLink(
+                    dev.fajar.hris.schema.tables.records.PersonAccountLinksRecord().also {
+                        it.personId = personId
+                        it.companyId = requireNotNull(actor.companyId)
+                        it.accountId = accountId
+                        it.profileVersion = expectedVersion + 1
+                        it.actorId = actor.accountId
+                        it.reason = reason
+                    }
+                )
+                source
+                    .bindAccount(
+                        requireNotNull(actor.companyId),
+                        personId,
+                        accountId,
+                        expectedVersion,
+                    )
+                    ?.toManagedProfile()
+            }
+            .flatMap { updated ->
+                if (updated == null) Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
+                else
+                    safeDatabaseCall {
+                        source.insertRevision(
+                            updated.profile.toProfileRevision(
+                                updated.ownerCompanyId,
+                                updated.version,
+                                actor.accountId,
+                                reason,
+                            )
+                        )
+                        MutationReceipt(personId, updated.version)
+                    }
+            }
+
     override fun findForEmployee(companyId: UUID, employeeId: UUID): Result<ManagedPersonProfile?> =
         safeDatabaseCall {
             source.findForEmployee(companyId, employeeId)?.toManagedProfile()

@@ -16,6 +16,34 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration(proxyBeanMethods = false)
 class PeopleConfiguration {
+    @Bean
+    fun bindPersonAccount(
+        profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        accounts: AccountAdministrationRepository,
+        members: MembershipRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        BindPersonAccount(
+            profiles,
+            people,
+            companies,
+            identities,
+            accounts,
+            members,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
     @Bean fun peopleSource(sql: DSLContext): PeopleDataSource = PostgresPeopleDataSource(sql)
 
     @Bean

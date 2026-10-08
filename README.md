@@ -13,7 +13,7 @@ Implementation is in progress. [Delivery status](docs/delivery.md) distinguishes
 Requires JDK 21, Docker, and Python 3.
 
 ```sh
-./gradlew check :apps:server:bootJar
+./gradlew check :apps:server:bootJar :apps:worker:bootJar
 ```
 
 See [development](docs/development.md) for Docker access, migrations, and local runtime configuration.

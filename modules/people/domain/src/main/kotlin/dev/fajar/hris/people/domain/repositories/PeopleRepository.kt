@@ -7,6 +7,8 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface PeopleRepository {
+    fun employeeIds(companyId: UUID, limit: Int): Result<List<UUID>>
+
     fun lockReportingLines(companyId: UUID): Result<Unit>
 
     fun find(companyId: UUID, id: UUID, asOf: LocalDate): Result<Employee?>

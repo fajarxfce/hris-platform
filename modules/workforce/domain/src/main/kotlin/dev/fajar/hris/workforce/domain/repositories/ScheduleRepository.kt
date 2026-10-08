@@ -45,6 +45,8 @@ interface ScheduleRepository {
         reason: String,
     ): Result<MutationReceipt>
 
+    fun findHoliday(companyId: UUID, id: UUID): Result<WorkHoliday?>
+
     fun holidays(companyId: UUID, from: LocalDate, until: LocalDate): Result<List<WorkHoliday>>
 
     fun saveHoliday(

@@ -7,11 +7,13 @@ services:
       POSTGRES_USER: hris_migrator
       POSTGRES_PASSWORD: ${HRIS_MIGRATION_PASSWORD:?Set HRIS_MIGRATION_PASSWORD}
       HRIS_DATABASE_PASSWORD: ${HRIS_DATABASE_PASSWORD:?Set HRIS_DATABASE_PASSWORD}
+      HRIS_WORKER_DATABASE_PASSWORD: ${HRIS_WORKER_DATABASE_PASSWORD:?Set HRIS_WORKER_DATABASE_PASSWORD}
     ports:
       - "127.0.0.1:55432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql
       - ./deploy/postgres/init-runtime.sh:/docker-entrypoint-initdb.d/10-runtime.sh:ro
+      - ./deploy/postgres/configure-worker.sh:/docker-entrypoint-initdb.d/20-worker.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U hris_migrator -d hris"]
       interval: 3s
@@ -49,5 +51,23 @@ services:
     init: true
     restart: unless-stopped
     mem_limit: 2g
+  worker:
+    build:
+      context: .
+      args:
+        APP_JAR: apps/worker/build/libs/apps-worker.jar
+    environment:
+      HRIS_DATABASE_URL: jdbc:postgresql://database:5432/hris
+      HRIS_WORKER_DATABASE_USER: hris_worker
+      HRIS_WORKER_DATABASE_PASSWORD: ${HRIS_WORKER_DATABASE_PASSWORD}
+      HRIS_IDENTITY_ACTIVE_KEY: ${HRIS_IDENTITY_ACTIVE_KEY:-v1}
+      HRIS_IDENTITY_KEYS: ${HRIS_IDENTITY_KEYS:?Set the identity encryption keyring}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 50s
+    mem_limit: 1g
 volumes:
   postgres-data:

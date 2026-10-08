@@ -1,0 +1,28 @@
+plugins { id("hris.application") }
+
+dependencies {
+    implementation(projects.core.domain)
+    implementation(projects.core.database)
+    implementation(projects.core.jobs.domain)
+    implementation(projects.core.jobs.data)
+    implementation(projects.modules.identity.domain)
+    implementation(projects.modules.identity.data)
+    implementation(projects.modules.organization.domain)
+    implementation(projects.modules.organization.data)
+    implementation(projects.modules.people.domain)
+    implementation(projects.modules.people.data)
+    implementation(projects.modules.workforce.domain)
+    implementation(projects.modules.workforce.data)
+    implementation(libs.spring.jackson)
+    implementation(libs.spring.batch)
+    implementation(libs.spring.actuator)
+    implementation(libs.jackson.kotlin)
+    implementation(kotlin("reflect"))
+    runtimeOnly(libs.flyway.postgresql)
+    runtimeOnly(libs.postgresql)
+    testImplementation(libs.spring.test)
+    testImplementation(libs.testcontainers.postgresql)
+    testImplementation(libs.testcontainers.junit)
+}
+
+springBoot { mainClass.set("dev.fajar.hris.worker.WorkerApplicationKt") }

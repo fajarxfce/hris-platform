@@ -6,6 +6,8 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 interface PeopleDataSource {
+    fun employeeIds(companyId: UUID, limit: Int): List<UUID>
+
     fun lock(companyId: UUID)
 
     fun find(companyId: UUID, id: UUID, asOf: LocalDate): EmployeesAtRecord?

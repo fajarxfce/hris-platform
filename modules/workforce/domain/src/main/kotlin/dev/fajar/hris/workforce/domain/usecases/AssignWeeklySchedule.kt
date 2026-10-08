@@ -3,12 +3,14 @@ package dev.fajar.hris.workforce.domain.usecases
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.domain.entities.*
-import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
+import dev.fajar.hris.workforce.domain.policies.*
+import dev.fajar.hris.workforce.domain.repositories.*
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.util.UUID
 
 class AssignWeeklySchedule(
+    private val periods: WorkPeriodRepository,
     private val schedules: ScheduleRepository,
     private val people: PeopleRepository,
     private val operations: OperationRepository,
@@ -59,6 +61,13 @@ class AssignWeeklySchedule(
             }
             val lock = schedules.lock(company)
             if (lock is Result.Failed) return@run lock
+            val lockedPeriods = periods.lockRange(company, java.time.YearMonth.from(effectiveFrom))
+            if (lockedPeriods is Result.Failed) return@run lockedPeriods
+            if (
+                (lockedPeriods as Result.Success).value.size > 1212 ||
+                    lockedPeriods.value.any(::workPeriodLocked)
+            )
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "work_period_locked"))
             val employee = people.find(company, employeeId, effectiveFrom)
             if (employee is Result.Failed) return@run employee
             if ((employee as Result.Success).value?.terms?.isWorkingOn(effectiveFrom) != true)

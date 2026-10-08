@@ -13,6 +13,15 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresPeopleDataSource(private val sql: DSLContext) : PeopleDataSource {
+    override fun employeeIds(companyId: UUID, limit: Int): List<UUID> =
+        sql.select(E.ID)
+            .from(E)
+            .where(E.COMPANY_ID.eq(companyId))
+            .orderBy(E.ID)
+            .limit(limit)
+            .fetch(E.ID)
+            .map { requireNotNull(it) }
+
     override fun lock(companyId: UUID) {
         sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "people:$companyId")
             .execute()

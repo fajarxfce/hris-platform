@@ -43,4 +43,12 @@ class JobsConfiguration {
         clock: java.time.Clock,
         retry: JobRetryPolicy,
     ) = LeaseJobs(jobs, transactions, journal, clock, retry)
+
+    @Bean
+    fun keepJobAlive(jobs: JobRepository, transactions: TransactionRunner) =
+        KeepJobAlive(jobs, transactions)
+
+    @Bean
+    fun deferJob(jobs: JobRepository, transactions: TransactionRunner, policy: JobRetryPolicy) =
+        DeferJob(jobs, transactions, policy)
 }

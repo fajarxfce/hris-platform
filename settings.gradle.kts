@@ -34,3 +34,5 @@ include(":modules:workforce:domain", ":modules:workforce:data", ":modules:workfo
 include(":modules:leave:domain", ":modules:leave:data", ":modules:leave:delivery")
 
 include(":core:jobs:domain", ":core:jobs:data", ":core:jobs:delivery")
+
+include(":apps:worker")

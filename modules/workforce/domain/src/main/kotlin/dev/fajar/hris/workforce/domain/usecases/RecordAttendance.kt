@@ -9,6 +9,7 @@ import java.time.*
 import java.util.UUID
 
 class RecordAttendance(
+    private val periods: WorkPeriodRepository,
     private val attendance: AttendanceRepository,
     private val corrections: AttendanceCorrectionRepository,
     private val schedules: ScheduleRepository,
@@ -72,6 +73,9 @@ class RecordAttendance(
             if (historical is Result.Failed) return@run historical
             if ((historical as Result.Success).value?.terms?.isWorkingOn(capture.workDate) != true)
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "employee_unavailable"))
+            val periodResult = periods.lockMonth(company, YearMonth.from(capture.workDate), false)
+            if (periodResult is Result.Failed) return@run periodResult
+            val period = (periodResult as Result.Success).value
             val lock = attendance.lockDay(company, capture.employeeId, capture.workDate)
             if (lock is Result.Failed) return@run lock
             val previous =
@@ -112,7 +116,15 @@ class RecordAttendance(
                     corrected,
                 )
             if (assessed is Result.Failed) return@run assessed
-            val assessment = (assessed as Result.Success).value
+            val rawAssessment = (assessed as Result.Success).value
+            val assessment =
+                if (workPeriodLocked(period))
+                    rawAssessment.copy(
+                        status = AttendanceStatus.PENDING,
+                        issues = rawAssessment.issues + AttendanceIssue.PERIOD_LOCKED,
+                        closingJobId = period.jobId,
+                    )
+                else rawAssessment
             val entry =
                 AttendanceEntry(
                     capture,

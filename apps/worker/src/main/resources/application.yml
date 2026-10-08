@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: hris-worker
+  main:
+    web-application-type: none
+  lifecycle:
+    timeout-per-shutdown-phase: 45s
+  datasource:
+    url: ${HRIS_DATABASE_URL:jdbc:postgresql://localhost:5432/hris}
+    username: ${HRIS_WORKER_DATABASE_USER:hris_worker}
+    password: ${HRIS_WORKER_DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 8
+      connection-timeout: 3000
+  flyway:
+    enabled: false
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: never
+logging:
+  level:
+    org.springframework.batch: WARN

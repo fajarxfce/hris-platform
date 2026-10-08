@@ -9,6 +9,7 @@ import java.time.*
 import java.util.UUID
 
 class ReviewAttendance(
+    private val periods: WorkPeriodRepository,
     private val attendance: AttendanceRepository,
     private val corrections: AttendanceCorrectionRepository,
     private val people: PeopleRepository,
@@ -57,6 +58,16 @@ class ReviewAttendance(
             if (current is Result.Failed) return@run current
             if (!canReviewAttendance(actor, (current as Result.Success).value, original.accountId))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "attendance_review_denied"))
+            val periodResult = periods.lockMonth(company, YearMonth.from(capture.workDate), false)
+            if (periodResult is Result.Failed) return@run periodResult
+            val period = (periodResult as Result.Success).value
+            if (
+                period.status == WorkPeriodStatus.PROCESSING ||
+                    (period.status == WorkPeriodStatus.CLOSED &&
+                        (decision != AttendanceReviewDecision.REJECT ||
+                            original.initial.closingJobId != period.jobId))
+            )
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "work_period_locked"))
             val lock = attendance.lockDay(company, capture.employeeId, capture.workDate)
             if (lock is Result.Failed) return@run lock
             val previous =

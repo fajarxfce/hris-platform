@@ -10,6 +10,7 @@ import java.time.*
 import java.util.UUID
 
 class CorrectAttendance(
+    private val periods: WorkPeriodRepository,
     private val attendance: AttendanceRepository,
     private val corrections: AttendanceCorrectionRepository,
     private val schedules: ScheduleRepository,
@@ -80,6 +81,11 @@ class CorrectAttendance(
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "self_correction_denied"))
             if (!employee.terms.isWorkingOn(date))
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "employee_unavailable"))
+            val mutable =
+                periods
+                    .lockMonth(company, YearMonth.from(date), false)
+                    .flatMap(::requireMutablePeriod)
+            if (mutable is Result.Failed) return@run mutable
             val lock = attendance.lockDay(company, employeeId, date)
             if (lock is Result.Failed) return@run lock
             val entriesResult = attendance.entries(company, employeeId, date, date)

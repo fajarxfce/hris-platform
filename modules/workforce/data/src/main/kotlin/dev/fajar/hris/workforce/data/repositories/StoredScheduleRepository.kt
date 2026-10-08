@@ -174,6 +174,10 @@ class StoredScheduleRepository(
             }
     }
 
+    override fun findHoliday(companyId: UUID, id: UUID): Result<WorkHoliday?> = safeDatabaseCall {
+        holidaySource.find(companyId, id)?.toHoliday()
+    }
+
     override fun holidays(
         companyId: UUID,
         from: LocalDate,

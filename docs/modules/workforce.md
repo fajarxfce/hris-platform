@@ -24,4 +24,16 @@ Capture accepts up to 31 days of offline history, tolerates at most 30 seconds o
 
 HR corrections are implemented as immutable revisions with optimistic versions and required reasons. They retain original evidence and snapshots, expose a paginated history, and prohibit self-correction. Pending evidence must be resolved first. Later punches on a corrected day remain pending and cannot overwrite the correction; reviewers can reject that evidence or HR can publish another explicit correction. An explicit absence has null clock-in/out and zero break minutes.
 
-Overtime, period closing/late adjustments, roster reset/bulk editing, and lifecycle cleanup remain planned. Accepted attendance totals are factual inputs; they are not a finalized payroll result.
+Overtime, late payroll adjustments, roster reset/bulk editing, and lifecycle cleanup remain planned. Accepted attendance totals are factual inputs; they are not a finalized payroll result.
+
+## Monthly attendance closing
+
+`POST /workforce/periods/{yyyy-MM}/close` requires `workforce.close`, an idempotency key, the observed period version (zero for a new period), and a reason. Only an ended month in the company timezone can close. It snapshots up to 5,000 employee IDs and creates one durable job. The company queue is limited to 100 pending jobs. This is factual attendance closing; it does not calculate leave entitlement, payable absence, overtime, or payroll eligibility.
+
+Each employee produces an immutable monthly snapshot, committed with its fenced checkpoint. Pending evidence recorded before this attempt and incomplete accepted pairs block closing. Facts distinguish worked time, explicitly corrected absence, unrecorded scheduled days, off days, and missing schedules. A missing record never automatically becomes a paid absence. The final transaction publishes the closed period, successful job, and audit/outbox together.
+
+Attendance commands hold a shared month lock before their employee/day lock. Starting closing takes the exclusive month lock. Roster and holiday changes also honor the month gate; weekly assignments cannot rewrite a locked month. Moving a holiday checks both dates. Raw late attendance remains pending and is stamped with the current closing job ID. Current-attempt late evidence does not change the snapshot. Evidence from an earlier failed attempt must be resolved before another close can succeed. Closed-period late evidence may be rejected, but accepting it or modifying factual totals requires a future explicit adjustment workflow.
+
+Cancellation and permanent failure leave the month in `REVIEW_REQUIRED`. Transient failures retain checkpoints for bounded retry. If a worker repeatedly crashes until its job exhausts all attempts, the period remains frozen until an authorized `POST /workforce/periods/{yyyy-MM}/recover` verifies that the job has stopped. A new close creates another attempt; old snapshots are retained. Worker steps re-resolve the initiating account's current credentials and company permission; fenced cleanup remains possible after revocation.
+
+`GET /workforce/periods?from=yyyy-MM&until=yyyy-MM` covers up to 24 months. `GET /workforce/periods/{yyyy-MM}/employees/{id}` returns a closed employee snapshot under current HR/team/self scope. Employment or leave changes do not rewrite these facts; downstream payroll must validate their applicability separately.

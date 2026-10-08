@@ -12,7 +12,7 @@ Acceptance: cross-company/resource denial, refresh replay/revocation, invitation
 
 ## Implementation status
 
-Password sign-in, administrator bootstrap, server sessions in PostgreSQL, CSRF/session ID rotation, current-account reads, and live company authorization are implemented. Company member directories and versioned permission/activation updates are also implemented. Sensitive payroll/payment grants require platform administration and cannot be self-granted; company membership changes preserve the last administrator and are audited. Authenticator MFA, recovery codes, credential-version revocation, and recent-authentication checks are implemented. OIDC, invitations/password recovery, native tokens, and configurable role templates remain planned.
+Password sign-in, administrator bootstrap, server sessions in PostgreSQL, CSRF/session ID rotation, current-account reads, and live company authorization are implemented. Company member directories and versioned permission/activation updates are also implemented. Sensitive payroll/payment grants require platform administration and cannot be self-granted; company membership changes preserve the last administrator and are audited. Authenticator MFA, recovery codes, credential-version revocation, and recent-authentication checks are implemented. OIDC, invitations/password recovery, and configurable role templates remain planned.
 
 Endpoints: GET /api/v1/auth/csrf, POST /api/v1/auth/login, POST /api/v1/auth/logout, GET /api/v1/me, GET /api/v1/companies/{companyId}/me/access. Login uses JSON email/password and a current X-CSRF-TOKEN header. Fetch a new CSRF token after successful login. Cookies are Secure by default; set HRIS_SECURE_COOKIES=false only for local HTTP development.
 

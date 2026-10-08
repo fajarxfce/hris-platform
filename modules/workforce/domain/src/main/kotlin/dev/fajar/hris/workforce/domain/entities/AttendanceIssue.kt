@@ -1,6 +1,7 @@
 package dev.fajar.hris.workforce.domain.entities
 enum class AttendanceIssue {
     OFFLINE,
+    PERIOD_LOCKED,
     CORRECTED_DAY,
     UNVERIFIED_CAPTURE,
     WINDOW_EXPIRED,

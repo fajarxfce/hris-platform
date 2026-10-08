@@ -8,6 +8,9 @@ import java.util.UUID
 import org.jooq.DSLContext
 
 class PostgresHolidayDataSource(private val sql: DSLContext) : HolidayDataSource {
+    override fun find(companyId: UUID, id: UUID): WorkHolidaysRecord? =
+        sql.selectFrom(D).where(D.COMPANY_ID.eq(companyId), D.ID.eq(id)).fetchOne()
+
     override fun list(
         companyId: UUID,
         from: LocalDate,

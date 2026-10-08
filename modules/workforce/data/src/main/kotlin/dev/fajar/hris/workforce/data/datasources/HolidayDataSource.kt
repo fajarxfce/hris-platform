@@ -5,6 +5,8 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface HolidayDataSource {
+    fun find(companyId: UUID, id: UUID): WorkHolidaysRecord?
+
     fun list(companyId: UUID, from: LocalDate, until: LocalDate): List<WorkHolidaysRecord>
 
     fun insert(row: WorkHolidaysRecord)

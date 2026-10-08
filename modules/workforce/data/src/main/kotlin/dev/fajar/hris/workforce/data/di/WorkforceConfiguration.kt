@@ -1,15 +1,18 @@
 package dev.fajar.hris.workforce.data.di
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.data.datasources.*
 import dev.fajar.hris.workforce.data.repositories.StoredAttendanceCorrectionRepository
 import dev.fajar.hris.workforce.data.repositories.StoredAttendanceRepository
 import dev.fajar.hris.workforce.data.repositories.StoredScheduleRepository
+import dev.fajar.hris.workforce.data.repositories.StoredWorkPeriodRepository
 import dev.fajar.hris.workforce.domain.repositories.AttendanceCorrectionRepository
 import dev.fajar.hris.workforce.domain.repositories.AttendanceRepository
 import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
+import dev.fajar.hris.workforce.domain.repositories.WorkPeriodRepository
 import dev.fajar.hris.workforce.domain.usecases.*
 import java.time.Clock
 import org.jooq.DSLContext
@@ -47,21 +50,23 @@ class WorkforceConfiguration {
 
     @Bean
     fun assignSchedule(
+        periods: WorkPeriodRepository,
         schedules: ScheduleRepository,
         people: PeopleRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
-    ) = AssignWeeklySchedule(schedules, people, operations, journal, transactions)
+    ) = AssignWeeklySchedule(periods, schedules, people, operations, journal, transactions)
 
     @Bean
     fun setRosterDay(
+        periods: WorkPeriodRepository,
         schedules: ScheduleRepository,
         people: PeopleRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
-    ) = SetRosterDay(schedules, people, operations, journal, transactions)
+    ) = SetRosterDay(periods, schedules, people, operations, journal, transactions)
 
     @Bean
     fun employeeCalendar(
@@ -73,11 +78,12 @@ class WorkforceConfiguration {
 
     @Bean
     fun saveHoliday(
+        periods: WorkPeriodRepository,
         schedules: ScheduleRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
-    ) = SaveWorkHoliday(schedules, operations, journal, transactions)
+    ) = SaveWorkHoliday(periods, schedules, operations, journal, transactions)
 
     @Bean
     fun listHolidays(schedules: ScheduleRepository, transactions: TransactionRunner) =
@@ -102,6 +108,7 @@ class WorkforceConfiguration {
 
     @Bean
     fun recordAttendance(
+        periods: WorkPeriodRepository,
         attendance: AttendanceRepository,
         corrections: AttendanceCorrectionRepository,
         schedules: ScheduleRepository,
@@ -113,6 +120,7 @@ class WorkforceConfiguration {
         clock: Clock,
     ) =
         RecordAttendance(
+            periods,
             attendance,
             corrections,
             schedules,
@@ -126,6 +134,7 @@ class WorkforceConfiguration {
 
     @Bean
     fun reviewAttendance(
+        periods: WorkPeriodRepository,
         attendance: AttendanceRepository,
         corrections: AttendanceCorrectionRepository,
         people: PeopleRepository,
@@ -133,7 +142,17 @@ class WorkforceConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = ReviewAttendance(attendance, corrections, people, operations, journal, transactions, clock)
+    ) =
+        ReviewAttendance(
+            periods,
+            attendance,
+            corrections,
+            people,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
 
     @Bean
     fun employeeAttendance(
@@ -156,6 +175,7 @@ class WorkforceConfiguration {
 
     @Bean
     fun correctAttendance(
+        periods: WorkPeriodRepository,
         attendance: AttendanceRepository,
         corrections: AttendanceCorrectionRepository,
         schedules: ScheduleRepository,
@@ -167,6 +187,7 @@ class WorkforceConfiguration {
         clock: Clock,
     ) =
         CorrectAttendance(
+            periods,
             attendance,
             corrections,
             schedules,
@@ -185,4 +206,86 @@ class WorkforceConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
     ) = GetAttendanceCorrectionHistory(corrections, people, transactions, clock)
+
+    @Bean
+    fun workPeriodSource(sql: DSLContext): WorkPeriodDataSource = PostgresWorkPeriodDataSource(sql)
+
+    @Bean
+    fun workPeriods(source: WorkPeriodDataSource, json: ObjectMapper): WorkPeriodRepository =
+        StoredWorkPeriodRepository(source, json)
+
+    @Bean
+    fun startWorkPeriodClose(
+        periods: WorkPeriodRepository,
+        jobs: JobRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        schedules: ScheduleRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        StartWorkPeriodClose(
+            periods,
+            jobs,
+            people,
+            companies,
+            schedules,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun advanceWorkPeriodClose(
+        periods: WorkPeriodRepository,
+        jobs: JobRepository,
+        schedules: ScheduleRepository,
+        attendance: AttendanceRepository,
+        corrections: AttendanceCorrectionRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        AdvanceWorkPeriodClose(
+            periods,
+            jobs,
+            schedules,
+            attendance,
+            corrections,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun abortWorkPeriodClose(
+        periods: WorkPeriodRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+    ) = AbortWorkPeriodClose(periods, jobs, journal, transactions)
+
+    @Bean
+    fun recoverWorkPeriod(
+        periods: WorkPeriodRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+    ) = RecoverWorkPeriod(periods, jobs, operations, journal, transactions)
+
+    @Bean
+    fun listWorkPeriods(periods: WorkPeriodRepository, transactions: TransactionRunner) =
+        ListWorkPeriods(periods, transactions)
+
+    @Bean
+    fun getWorkPeriodSnapshot(
+        periods: WorkPeriodRepository,
+        people: PeopleRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = GetWorkPeriodSnapshot(periods, people, transactions, clock)
 }

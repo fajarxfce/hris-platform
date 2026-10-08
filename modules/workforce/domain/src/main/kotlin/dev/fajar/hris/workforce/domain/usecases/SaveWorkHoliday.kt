@@ -2,10 +2,12 @@ package dev.fajar.hris.workforce.domain.usecases
 
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.workforce.domain.entities.WorkHoliday
-import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
+import dev.fajar.hris.workforce.domain.policies.*
+import dev.fajar.hris.workforce.domain.repositories.*
 import java.util.UUID
 
 class SaveWorkHoliday(
+    private val periods: WorkPeriodRepository,
     private val schedules: ScheduleRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
@@ -49,6 +51,19 @@ class SaveWorkHoliday(
             }
             val lock = schedules.lock(requireNotNull(actor.companyId))
             if (lock is Result.Failed) return@run lock
+            val company = requireNotNull(actor.companyId)
+            val previous = schedules.findHoliday(company, holiday.id)
+            if (previous is Result.Failed) return@run previous
+            val months =
+                listOfNotNull((previous as Result.Success).value?.workDate, holiday.workDate)
+                    .map { java.time.YearMonth.from(it) }
+                    .distinct()
+                    .sorted()
+            for (month in months) {
+                val mutable =
+                    periods.lockMonth(company, month, false).flatMap(::requireMutablePeriod)
+                if (mutable is Result.Failed) return@run mutable
+            }
             schedules
                 .saveHoliday(actor, holiday.copy(name = holiday.name.trim()), version, reason)
                 .flatMap { receipt ->

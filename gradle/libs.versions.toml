@@ -12,6 +12,7 @@ spring-boot-gradle = { module = "org.springframework.boot:spring-boot-gradle-plu
 spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 spring-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
 spring-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+spring-jackson = { module = "org.springframework.boot:spring-boot-starter-jackson" }
 spring-jooq = { module = "org.springframework.boot:spring-boot-starter-jooq" }
 spring-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc" }
 spring-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }

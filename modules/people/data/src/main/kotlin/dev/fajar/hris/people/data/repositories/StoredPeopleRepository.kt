@@ -13,6 +13,10 @@ import java.time.ZoneOffset
 import java.util.UUID
 
 class StoredPeopleRepository(private val source: PeopleDataSource) : PeopleRepository {
+    override fun employeeIds(companyId: UUID, limit: Int): Result<List<UUID>> = safeDatabaseCall {
+        source.employeeIds(companyId, limit)
+    }
+
     override fun lockReportingLines(companyId: UUID): Result<Unit> = safeDatabaseCall {
         source.lock(companyId)
     }

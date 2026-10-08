@@ -3,12 +3,14 @@ package dev.fajar.hris.workforce.domain.usecases
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.domain.entities.*
+import dev.fajar.hris.workforce.domain.policies.*
 import dev.fajar.hris.workforce.domain.policies.scheduledWorkDay
-import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
+import dev.fajar.hris.workforce.domain.repositories.*
 import java.time.LocalDate
 import java.util.UUID
 
 class SetRosterDay(
+    private val periods: WorkPeriodRepository,
     private val schedules: ScheduleRepository,
     private val people: PeopleRepository,
     private val operations: OperationRepository,
@@ -55,6 +57,11 @@ class SetRosterDay(
             }
             val lock = schedules.lock(company)
             if (lock is Result.Failed) return@run lock
+            val mutable =
+                periods
+                    .lockMonth(company, java.time.YearMonth.from(date), false)
+                    .flatMap(::requireMutablePeriod)
+            if (mutable is Result.Failed) return@run mutable
             val employee = people.find(company, employeeId, date)
             if (employee is Result.Failed) return@run employee
             if ((employee as Result.Success).value?.terms?.isWorkingOn(date) != true)

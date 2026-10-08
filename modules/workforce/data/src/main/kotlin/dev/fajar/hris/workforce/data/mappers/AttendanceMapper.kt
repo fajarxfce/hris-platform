@@ -66,6 +66,7 @@ fun AttendanceRow.toEntry(json: ObjectMapper): AttendanceEntry {
         AttendanceAssessment(
             AttendanceStatus.valueOf(event.initialStatus),
             event.issues.map { AttendanceIssue.valueOf(it) }.toSet(),
+            event.closingJobId,
         )
     val status =
         when (decision?.decision) {
@@ -103,6 +104,7 @@ fun AttendanceEntry.toRow(company: UUID, json: ObjectMapper): AttendanceEventsRe
         it.accuracyMeters = capture.location?.accuracyMeters
         it.mocked = capture.location?.mocked ?: false
         it.schedule = JSONB.valueOf(json.writeValueAsString(schedule.toData()))
+        it.closingJobId = initial.closingJobId
         it.initialStatus = initial.status.name
         it.issues = initial.issues.map { issue -> issue.name }.sorted().toTypedArray()
     }

@@ -1,6 +1,11 @@
 plugins { id("hris.spring") }
 
 dependencies {
+    implementation(projects.core.storage.data)
+    implementation(libs.tika.core)
+    implementation(libs.slf4j.api)
+    testImplementation(libs.testcontainers.core)
+    testImplementation(libs.testcontainers.junit)
     implementation(projects.modules.documents.domain)
     implementation(projects.core.database)
     implementation(projects.core.storage.domain)

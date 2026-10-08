@@ -1,4 +1,5 @@
 [versions]
+tika = "4.1.0"
 aws-sdk = "2.55.12"
 commons-csv = "1.14.1"
 commons-io = "2.22.0"
@@ -9,6 +10,7 @@ ktfmt = "0.59"
 archunit = "1.4.1"
 
 [libraries]
+tika-core = { module = "org.apache.tika:tika-core", version.ref = "tika" }
 aws-s3 = { module = "software.amazon.awssdk:s3", version.ref = "aws-sdk" }
 aws-apache5 = { module = "software.amazon.awssdk:apache5-client", version.ref = "aws-sdk" }
 slf4j-api = { module = "org.slf4j:slf4j-api" }

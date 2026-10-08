@@ -2,8 +2,8 @@ package dev.fajar.hris.documents.data.di
 
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.documents.data.datasources.*
-import dev.fajar.hris.documents.data.repositories.StoredDocumentRepository
-import dev.fajar.hris.documents.domain.repositories.DocumentRepository
+import dev.fajar.hris.documents.data.repositories.*
+import dev.fajar.hris.documents.domain.repositories.*
 import dev.fajar.hris.documents.domain.usecases.*
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
@@ -16,6 +16,29 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration(proxyBeanMethods = false)
 class DocumentsConfiguration {
+    @Bean
+    fun documentScanSource(
+        environment: org.springframework.core.env.Environment
+    ): DocumentScanDataSource {
+        if (!environment.getProperty("HRIS_DOCUMENT_SCANNER_ENABLED", Boolean::class.java, false))
+            return UnavailableDocumentScanDataSource()
+        val host = environment.getRequiredProperty("HRIS_DOCUMENT_SCANNER_HOST")
+        require(host.length in 1..253 && host.matches(Regex("[A-Za-z0-9_.:-]+"))) {
+            "Invalid document scanner host"
+        }
+        val port = environment.getProperty("HRIS_DOCUMENT_SCANNER_PORT", Int::class.java, 3310)
+        return ClamAvDocumentScanDataSource(ClamAvSettings(java.net.InetSocketAddress(host, port)))
+    }
+
+    @Bean fun documentMediaTypes(): DocumentMediaTypeDataSource = TikaDocumentMediaTypeDataSource()
+
+    @Bean
+    fun documentInspection(
+        storage: dev.fajar.hris.storage.data.datasources.ObjectStorageDataSource,
+        scanner: DocumentScanDataSource,
+        types: DocumentMediaTypeDataSource,
+    ): DocumentInspectionRepository = InspectedDocumentRepository(storage, scanner, types)
+
     @Bean fun documentSource(sql: DSLContext): DocumentDataSource = PostgresDocumentDataSource(sql)
 
     @Bean

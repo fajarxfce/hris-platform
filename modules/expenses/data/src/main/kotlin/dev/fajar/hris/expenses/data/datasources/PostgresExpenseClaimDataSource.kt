@@ -22,7 +22,7 @@ class PostgresExpenseClaimDataSource(private val sql: DSLContext) : ExpenseClaim
         sql.select(DSL.count(), DSL.count().filterWhere(C.CREATED_BY.eq(account)))
             .from(C)
             .where(C.COMPANY_ID.eq(company))
-            .and(C.STATUS.`in`("DRAFT", "PENDING"))
+            .and(C.STATUS.`in`("DRAFT", "PENDING", "RETURNED"))
             .fetchSingle { ExpenseCapacityRow(it.value1(), it.value2()) }
 
     override fun find(company: UUID, id: UUID): ExpenseClaimsRecord? =
@@ -162,6 +162,7 @@ class PostgresExpenseClaimDataSource(private val sql: DSLContext) : ExpenseClaim
         sql.update(C)
             .set(C.VERSION, version + 1)
             .set(C.DRAFT_REVISION, revision)
+            .set(C.STATUS, "DRAFT")
             .where(C.COMPANY_ID.eq(company))
             .and(C.ID.eq(id))
             .and(C.VERSION.eq(version))
@@ -192,6 +193,17 @@ class PostgresExpenseClaimDataSource(private val sql: DSLContext) : ExpenseClaim
             .set(C.STATUS, "PENDING")
             .set(C.LATEST_SUBMISSION_ID, submission)
             .set(C.SUBMISSION_COUNT, number)
+            .where(C.COMPANY_ID.eq(company))
+            .and(C.ID.eq(id))
+            .and(C.VERSION.eq(version))
+            .returning(C.VERSION)
+            .fetchOne()
+            ?.version
+
+    override fun review(company: UUID, id: UUID, version: Long, status: String): Long? =
+        sql.update(C)
+            .set(C.VERSION, version + 1)
+            .set(C.STATUS, status)
             .where(C.COMPANY_ID.eq(company))
             .and(C.ID.eq(id))
             .and(C.VERSION.eq(version))

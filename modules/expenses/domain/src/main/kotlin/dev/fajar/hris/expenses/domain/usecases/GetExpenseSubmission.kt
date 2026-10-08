@@ -65,26 +65,44 @@ class GetExpenseSubmission(
             val foundEmployee = people.findAtInstant(company, claim.employmentId, now)
             if (foundEmployee is Result.Failed) return@run foundEmployee
             val employee = (foundEmployee as Result.Success).value
-            if (employee != null && canReadExpenseClaim(live, employee, today))
-                return@run Result.Success(ExpenseSubmissionDetails(submission, claim, approval))
-            val delegated = approvals.delegations(company, actor.accountId, now)
-            if (delegated is Result.Failed) return@run delegated
-            val assigned = approval.stages.flatMap { it.assignees }.toSet()
-            val grants = members.candidates(company, assigned, emptySet(), assigned.size)
-            if (grants is Result.Failed) return@run grants
-            if (
-                !isAssignedApprover(
-                    live,
+            if (employee == null || !canReadExpenseClaim(live, employee, today)) {
+                val delegated = approvals.delegations(company, actor.accountId, now)
+                if (delegated is Result.Failed) return@run delegated
+                val assigned = approval.stages.flatMap { it.assignees }.toSet()
+                val grants = members.candidates(company, assigned, emptySet(), assigned.size)
+                if (grants is Result.Failed) return@run grants
+                if (
+                    !isAssignedApprover(
+                        live,
+                        approval,
+                        (delegated as Result.Success).value,
+                        (grants as Result.Success).value,
+                        now,
+                    )
+                )
+                    return@run Result.Failed(
+                        Failure(FailureKind.NOT_FOUND, "expense_submission_not_found")
+                    )
+            }
+            val foundReviews = claims.reviews(company, id)
+            if (foundReviews is Result.Failed) return@run foundReviews
+            val hashes = submission.lines.flatMap { it.receipts }.map { it.sha256 }.toSet()
+            val foundDuplicates = claims.duplicateReceiptDigests(company, claim.id, hashes)
+            if (foundDuplicates is Result.Failed) return@run foundDuplicates
+            val duplicates =
+                duplicateExpenseReceiptDigests(
+                    submission.lines,
+                    (foundDuplicates as Result.Success).value,
+                )
+            Result.Success(
+                ExpenseSubmissionDetails(
+                    submission,
+                    claim,
                     approval,
-                    (delegated as Result.Success).value,
-                    (grants as Result.Success).value,
-                    now,
+                    (foundReviews as Result.Success).value,
+                    duplicates,
                 )
             )
-                return@run Result.Failed(
-                    Failure(FailureKind.NOT_FOUND, "expense_submission_not_found")
-                )
-            Result.Success(ExpenseSubmissionDetails(submission, claim, approval))
         }
     }
 }

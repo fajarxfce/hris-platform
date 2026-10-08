@@ -4,5 +4,6 @@ enum class ExpenseClaimChangeKind {
     DRAFT_SAVED,
     SUBMITTED,
     WITHDRAWN,
+    REVIEWED,
     CANCELLED,
 }

@@ -3,7 +3,7 @@ package dev.fajar.hris.expenses.delivery.controllers
 import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.core.http.*
 import dev.fajar.hris.expenses.delivery.mappers.*
-import dev.fajar.hris.expenses.delivery.requests.ExpenseActionRequest
+import dev.fajar.hris.expenses.delivery.requests.*
 import dev.fajar.hris.expenses.delivery.responses.ExpenseSubmissionResponse
 import dev.fajar.hris.expenses.domain.usecases.*
 import java.util.UUID
@@ -14,10 +14,32 @@ import org.springframework.web.bind.annotation.*
 class ExpenseSubmissionController(
     private val get: GetExpenseSubmission,
     private val withdraw: WithdrawExpenseSubmission,
+    private val review: ReviewExpenseSubmission,
 ) {
     @GetMapping("/{id}")
     fun get(actor: Actor, @PathVariable id: UUID): ExpenseSubmissionResponse =
         get.execute(actor, id).response().toResponse()
+
+    @PostMapping("/{id}/decisions")
+    fun review(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestHeader("Idempotency-Key") operationId: UUID,
+        @RequestBody body: ReviewExpenseSubmissionRequest,
+    ): MutationResponse =
+        review
+            .execute(
+                actor,
+                operationId,
+                id,
+                body.expectedVersion,
+                body.expectedApprovalVersion,
+                body.decision,
+                body.reason,
+                body.acknowledgeDuplicates,
+            )
+            .response()
+            .toResponse()
 
     @PostMapping("/{id}/withdraw")
     fun withdraw(

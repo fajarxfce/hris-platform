@@ -112,7 +112,10 @@ class SaveExpenseDraft(
             }
             if (existing?.version != input.expectedVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
-            if (existing != null && existing.status != ExpenseClaimStatus.DRAFT)
+            if (
+                existing != null &&
+                    existing.status !in setOf(ExpenseClaimStatus.DRAFT, ExpenseClaimStatus.RETURNED)
+            )
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "expense_not_editable"))
             if (existing?.draftRevision == 99)
                 return@run Result.Failed(
@@ -171,6 +174,7 @@ class SaveExpenseDraft(
                 existing?.copy(
                     version = existing.version + 1,
                     draftRevision = existing.draftRevision + 1,
+                    status = ExpenseClaimStatus.DRAFT,
                 )
                     ?: ExpenseClaim(
                         input.id,

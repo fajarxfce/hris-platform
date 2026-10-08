@@ -5,6 +5,10 @@ import dev.fajar.hris.schema.tables.records.*
 import java.util.UUID
 
 interface ExpenseSubmissionDataSource {
+    fun reviews(company: UUID, submission: UUID): List<ExpenseReviewsRecord>
+
+    fun appendReview(row: ExpenseReviewsRecord)
+
     fun contributors(company: UUID, claim: UUID): Set<UUID>
 
     fun find(company: UUID, id: UUID): ExpenseSubmissionsRecord?

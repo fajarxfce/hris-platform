@@ -87,7 +87,7 @@ class CancelExpenseDraft(
             }
             if (claim.version != version)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
-            if (claim.status != ExpenseClaimStatus.DRAFT)
+            if (claim.status !in setOf(ExpenseClaimStatus.DRAFT, ExpenseClaimStatus.RETURNED))
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "expense_not_editable"))
             claims.cancel(actor, claim, reason, now).flatMap { receipt ->
                 operations

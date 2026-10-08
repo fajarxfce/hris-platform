@@ -35,6 +35,8 @@ fun ExpenseSubmissionDetails.toResponse(): ExpenseSubmissionResponse {
         claim.version,
         claim.status.name,
         claim.latestSubmissionId == s.id,
+        reviews.map { it.toResponse() },
+        duplicateReceiptDigests,
     )
 }
 
@@ -70,4 +72,19 @@ fun ExpenseSubmissionSummary.toResponse() =
         "IDR",
         submittedBy,
         submittedAt,
+    )
+
+fun ExpenseReview.toResponse() =
+    ExpenseReviewResponse(
+        claimVersion,
+        approvalVersion,
+        step,
+        actorId,
+        decidingFor,
+        decision.name,
+        status.name,
+        duplicateDigests,
+        duplicatesAcknowledged,
+        reason,
+        decidedAt,
     )

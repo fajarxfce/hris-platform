@@ -6,6 +6,8 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 interface ExpenseClaimDataSource {
+    fun review(company: UUID, id: UUID, version: Long, status: String): Long?
+
     fun lock(company: UUID)
 
     fun capacity(company: UUID, account: UUID): ExpenseCapacityRow

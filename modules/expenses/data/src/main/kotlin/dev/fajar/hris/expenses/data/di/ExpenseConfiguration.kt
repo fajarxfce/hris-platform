@@ -257,4 +257,30 @@ class ExpenseConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
     ) = ListExpenseSubmissions(claims, people, companies, identities, transactions, clock)
+
+    @Bean
+    fun reviewExpenseSubmission(
+        claims: ExpenseClaimRepository,
+        approvals: ApprovalRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        ReviewExpenseSubmission(
+            claims,
+            approvals,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
 }

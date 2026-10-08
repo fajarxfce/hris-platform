@@ -6,6 +6,7 @@ import dev.fajar.hris.schema.tables.ExpenseCategoryRevisions.EXPENSE_CATEGORY_RE
 import dev.fajar.hris.schema.tables.ExpenseClaims.EXPENSE_CLAIMS as C
 import dev.fajar.hris.schema.tables.ExpenseDraftLines.EXPENSE_DRAFT_LINES as DL
 import dev.fajar.hris.schema.tables.ExpenseDrafts.EXPENSE_DRAFTS as D
+import dev.fajar.hris.schema.tables.ExpenseReviews.EXPENSE_REVIEWS as V
 import dev.fajar.hris.schema.tables.ExpenseSubmissions.EXPENSE_SUBMISSIONS as S
 import dev.fajar.hris.schema.tables.ExpenseSubmittedLines.EXPENSE_SUBMITTED_LINES as L
 import dev.fajar.hris.schema.tables.ExpenseSubmittedReceipts.EXPENSE_SUBMITTED_RECEIPTS as R
@@ -16,6 +17,18 @@ import org.jooq.impl.DSL
 
 class PostgresExpenseSubmissionDataSource(private val sql: DSLContext) :
     ExpenseSubmissionDataSource {
+    override fun reviews(company: UUID, submission: UUID): List<ExpenseReviewsRecord> =
+        sql.selectFrom(V)
+            .where(V.COMPANY_ID.eq(company))
+            .and(V.SUBMISSION_ID.eq(submission))
+            .orderBy(V.STEP)
+            .limit(8)
+            .fetch()
+
+    override fun appendReview(row: ExpenseReviewsRecord) {
+        sql.insertInto(V).set(row).execute()
+    }
+
     override fun contributors(company: UUID, claim: UUID): Set<UUID> =
         sql.selectDistinct(D.ACTOR_ID)
             .from(D)
@@ -124,7 +137,7 @@ class PostgresExpenseSubmissionDataSource(private val sql: DSLContext) :
             )
             .where(C.COMPANY_ID.eq(company))
             .and(C.ID.ne(exceptClaim))
-            .and(C.STATUS.eq("PENDING"))
+            .and(C.STATUS.`in`("PENDING", "APPROVED"))
             .and(R.SHA256.`in`(digests))
             .orderBy(R.SHA256)
             .limit(60)

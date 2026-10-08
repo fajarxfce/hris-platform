@@ -15,6 +15,47 @@ class StoredExpenseClaimRepository(
     private val source: ExpenseClaimDataSource,
     private val submissions: ExpenseSubmissionDataSource,
 ) : ExpenseClaimRepository {
+    override fun reviews(companyId: UUID, submissionId: UUID): Result<List<ExpenseReview>> =
+        safeDatabaseCall {
+            submissions.reviews(companyId, submissionId).map { it.toReview() }
+        }
+
+    override fun review(
+        actor: Actor,
+        claim: ExpenseClaim,
+        review: ExpenseReview,
+    ): Result<MutationReceipt> =
+        safeDatabaseCall {
+                source.review(
+                    requireNotNull(actor.companyId),
+                    claim.id,
+                    claim.version,
+                    review.status.name,
+                )
+            }
+            .requireCurrentVersion()
+            .flatMap { version ->
+                safeDatabaseCall {
+                    val company = requireNotNull(actor.companyId)
+                    submissions.appendReview(review.toRecord(company))
+                    source.appendChange(
+                        ExpenseClaimChange(
+                                claim.id,
+                                version,
+                                claim.draftRevision,
+                                review.status,
+                                ExpenseClaimChangeKind.REVIEWED,
+                                actor.accountId,
+                                review.reason,
+                                review.decidedAt,
+                                review.submissionId,
+                            )
+                            .toRecord(company)
+                    )
+                    MutationReceipt(claim.id, version)
+                }
+            }
+
     override fun contributors(companyId: UUID, claimId: UUID): Result<Set<UUID>> =
         safeDatabaseCall {
             submissions.contributors(companyId, claimId)

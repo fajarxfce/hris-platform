@@ -28,6 +28,7 @@ object PermissionCatalog {
             "leave.approve",
             "approvals.read",
             "approvals.manage",
+            "expenses.policy.manage",
             "expenses.read",
             "expenses.approve",
             "documents.read",
@@ -73,6 +74,7 @@ object PermissionCatalog {
         setOf(
             "company.read",
             "people.read",
+            "expenses.policy.manage",
             "expenses.read",
             "expenses.approve",
             "expenses.pay",

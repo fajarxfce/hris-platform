@@ -54,6 +54,15 @@ class StoredPeopleRepository(private val source: PeopleDataSource) : PeopleRepos
         )
     }
 
+    override fun effectiveRevisions(
+        companyId: UUID,
+        id: UUID,
+        from: LocalDate,
+        until: LocalDate,
+    ): Result<List<EmploymentRevision>> = safeDatabaseCall {
+        source.effectiveRevisions(companyId, id, from, until).map { it.toRevision() }
+    }
+
     override fun history(
         companyId: UUID,
         id: UUID,

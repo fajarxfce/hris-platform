@@ -40,7 +40,7 @@ try:
 <logging>WARN</logging>
 <jdbc><driver>org.postgresql.Driver</driver><url>jdbc:postgresql://127.0.0.1:{port}/hris</url><user>postgres</user><password>codegen-only</password></jdbc>
 <generator><database><name>org.jooq.meta.postgres.PostgresDatabase</name><inputSchema>public</inputSchema><excludes>flyway_schema_history</excludes></database>
-<generate><deprecated>false</deprecated><records>true</records><pojos>false</pojos></generate>
+<generate><deprecated>false</deprecated><implicitJoinPathsToMany>false</implicitJoinPathsToMany><implicitJoinPathsManyToMany>false</implicitJoinPathsManyToMany><records>true</records><pojos>false</pojos></generate>
 <target><packageName>dev.fajar.hris.schema</packageName><directory>{escape(destination)}</directory><clean>true</clean></target></generator>
 </configuration>""")
         subprocess.run(["java", "-Dorg.jooq.no-logo=true", "-Dorg.jooq.no-tips=true", "-cp", classpath,

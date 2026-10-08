@@ -200,4 +200,148 @@ abstract class LeaveApiFixture : ApiIntegrationTest() {
         assertEquals(200, result.statusCode(), result.body())
         return json.readTree(result.body()).get("balance")
     }
+
+    protected fun configureWorkAndApprovals(f: Fixture, staged: Boolean = false) {
+        val shift = UUID.randomUUID()
+        val created =
+            command(
+                f.admin,
+                "/api/v1/companies/${f.company}/workforce/shifts/$shift",
+                json.writeValueAsString(
+                    mapOf(
+                        "code" to "NIGHT",
+                        "name" to "Night",
+                        "startsAt" to "22:00",
+                        "endsAt" to "06:00",
+                        "breakMinutes" to 30,
+                        "timezone" to "Asia/Jakarta",
+                        "mode" to "REMOTE",
+                        "reason" to "Work schedule",
+                    )
+                ),
+                f.adminCsrf,
+                UUID.randomUUID(),
+                "PUT",
+            )
+        assertEquals(200, created.statusCode(), created.body())
+        val schedule =
+            command(
+                f.admin,
+                "/api/v1/companies/${f.company}/workforce/employees/${f.employee}/schedule",
+                json.writeValueAsString(
+                    mapOf(
+                        "effectiveFrom" to "2025-01-01",
+                        "days" to
+                            java.time.DayOfWeek.entries
+                                .filter { it.value <= 5 }
+                                .associate { it.name to mapOf("id" to shift, "version" to 0) },
+                        "reason" to "Work schedule",
+                    )
+                ),
+                f.adminCsrf,
+                UUID.randomUUID(),
+                "PUT",
+            )
+        assertEquals(200, schedule.statusCode(), schedule.body())
+        val adminId =
+            database()
+                .queryForObject(
+                    "select id from accounts where email='admin@example.test'",
+                    UUID::class.java,
+                )
+        for (kind in listOf("LEAVE", "LEAVE_CANCELLATION")) {
+            val stages = mutableListOf<Map<String, Any>>(mapOf("assignment" to "MANAGER"))
+            if (staged && kind == "LEAVE")
+                stages += mapOf("assignment" to "NAMED", "accountIds" to listOf(adminId))
+            val template =
+                command(
+                    f.admin,
+                    "/api/v1/companies/${f.company}/approvals/templates/${UUID.randomUUID()}",
+                    json.writeValueAsString(
+                        mapOf(
+                            "name" to "Leave approval",
+                            "kind" to kind,
+                            "effectiveFrom" to "2025-01-01",
+                            "minimumAmount" to "0",
+                            "stages" to stages,
+                            "reason" to "Approval setup",
+                        )
+                    ),
+                    f.adminCsrf,
+                    UUID.randomUUID(),
+                    "PUT",
+                )
+            assertEquals(200, template.statusCode(), template.body())
+        }
+    }
+
+    protected fun submit(
+        f: Fixture,
+        id: UUID,
+        days: List<Pair<String, String>>,
+        key: UUID = UUID.randomUUID(),
+    ): HttpResponse<String> =
+        command(
+            f.worker,
+            "/api/v1/companies/${f.company}/leave/requests",
+            json.writeValueAsString(
+                mapOf(
+                    "id" to id,
+                    "employeeId" to f.employee,
+                    "typeId" to f.type,
+                    "days" to days.map { mapOf("workDate" to it.first, "portion" to it.second) },
+                    "reason" to "Personal leave",
+                )
+            ),
+            f.workerCsrf,
+            key,
+        )
+
+    protected fun details(
+        f: Fixture,
+        id: UUID,
+        client: HttpClient = f.worker,
+        suffix: String = "",
+    ): JsonNode {
+        val response = get(client, "/api/v1/companies/${f.company}/leave/requests/$id$suffix")
+        assertEquals(200, response.statusCode(), response.body())
+        return json.readTree(response.body())
+    }
+
+    protected fun decide(
+        f: Fixture,
+        id: UUID,
+        version: Long,
+        decision: String = "APPROVE",
+        key: UUID = UUID.randomUUID(),
+        asAdmin: Boolean = false,
+    ): HttpResponse<String> =
+        command(
+            if (asAdmin) f.admin else f.supervisor,
+            "/api/v1/companies/${f.company}/leave/requests/$id/decisions",
+            json.writeValueAsString(
+                mapOf(
+                    "version" to version,
+                    "decision" to decision,
+                    "reason" to if (decision == "REJECT") "Request declined" else "",
+                )
+            ),
+            if (asAdmin) f.adminCsrf else f.supervisorCsrf,
+            key,
+        )
+
+    protected fun action(
+        f: Fixture,
+        id: UUID,
+        action: String,
+        version: Long,
+        key: UUID = UUID.randomUUID(),
+    ): HttpResponse<String> =
+        command(
+            f.worker,
+            "/api/v1/companies/${f.company}/leave/requests/$id/$action",
+            json.writeValueAsString(mapOf("version" to version, "reason" to "Leave plan changed")),
+            f.workerCsrf,
+            key,
+        )
 }

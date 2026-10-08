@@ -1,11 +1,15 @@
 package dev.fajar.hris.leave.data.di
 
+import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.leave.data.datasources.*
 import dev.fajar.hris.leave.data.repositories.*
 import dev.fajar.hris.leave.domain.repositories.*
 import dev.fajar.hris.leave.domain.usecases.*
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
+import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
 import java.time.Clock
 import org.jooq.DSLContext
 import org.springframework.context.annotation.Bean
@@ -61,4 +65,127 @@ class LeaveConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
     ) = GetLeaveLedger(ledger, policies, people, transactions, clock)
+
+    @Bean
+    fun leaveRequestSource(sql: DSLContext): LeaveRequestDataSource =
+        PostgresLeaveRequestDataSource(sql)
+
+    @Bean
+    fun leaveAllocationSource(sql: DSLContext): LeaveAllocationDataSource =
+        PostgresLeaveAllocationDataSource(sql)
+
+    @Bean
+    fun leaveRequests(
+        source: LeaveRequestDataSource,
+        allocations: LeaveAllocationDataSource,
+        json: ObjectMapper,
+    ): LeaveRequestRepository = StoredLeaveRequestRepository(source, allocations, json)
+
+    @Bean
+    fun submitLeaveRequest(
+        requests: LeaveRequestRepository,
+        ledger: LeaveLedgerRepository,
+        policies: LeavePolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        schedules: ScheduleRepository,
+        approvals: ApprovalRepository,
+        members: MembershipRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        SubmitLeaveRequest(
+            requests,
+            ledger,
+            policies,
+            people,
+            companies,
+            schedules,
+            approvals,
+            members,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun decideLeaveRequest(
+        requests: LeaveRequestRepository,
+        ledger: LeaveLedgerRepository,
+        approvals: ApprovalRepository,
+        members: MembershipRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        DecideLeaveRequest(
+            requests,
+            ledger,
+            approvals,
+            members,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun withdrawLeaveRequest(
+        requests: LeaveRequestRepository,
+        ledger: LeaveLedgerRepository,
+        approvals: ApprovalRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = WithdrawLeaveRequest(requests, ledger, approvals, operations, journal, transactions, clock)
+
+    @Bean
+    fun requestLeaveCancellation(
+        requests: LeaveRequestRepository,
+        ledger: LeaveLedgerRepository,
+        approvals: ApprovalRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        RequestLeaveCancellation(
+            requests,
+            ledger,
+            approvals,
+            people,
+            companies,
+            members,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun getLeaveRequest(
+        requests: LeaveRequestRepository,
+        ledger: LeaveLedgerRepository,
+        people: PeopleRepository,
+        approvals: ApprovalRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = GetLeaveRequest(requests, ledger, people, approvals, members, transactions, clock)
+
+    @Bean
+    fun listLeaveRequests(
+        requests: LeaveRequestRepository,
+        people: PeopleRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = ListLeaveRequests(requests, people, transactions, clock)
 }

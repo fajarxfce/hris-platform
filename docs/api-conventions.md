@@ -84,3 +84,14 @@ Leave policies and balances:
 - `GET /companies/{companyId}/leave/employees/{id}/balances/{typeId}/{year}`: after opaque entry cursor and limit. Returns available/reserved/consumed day strings and a chronological, immutable ledger. Current company/team/self authorization applies independently of the balance year.
 
 Balances are read consistently with their history. Manual reductions use only available balance; reserved/consumed units cannot be spent as available entitlement. Archived types retain ledger correction access without allowing new leave requests.
+
+Leave requests:
+
+- `POST /companies/{companyId}/leave/requests`: id, employeeId, typeId, days (`{workDate, portion}`), reason. Portions are FULL, FIRST_HALF, or SECOND_HALF. Requires own `leave.self.manage` or on-behalf `leave.manage`, with an idempotency key.
+- `GET /companies/{companyId}/leave/requests`: optional employeeId, status, after, limit. Company-wide lists require `leave.read`; self/current-team reads require an explicit employeeId.
+- `GET /companies/{companyId}/leave/requests/{id}`: optional historyAfter and historyLimit. Returns submitted policy/day snapshots, workflow state, version, availableActions, and bounded change history.
+- `POST /companies/{companyId}/leave/requests/{id}/decisions`: version, decision (APPROVE/REJECT), reason. A rejection requires a reason. Applies to the current initial/cancellation workflow; requires its current independently assigned approver.
+- `POST /companies/{companyId}/leave/requests/{id}/withdraw`: version, reason. Withdraws a pending request or its pending cancellation.
+- `POST /companies/{companyId}/leave/requests/{id}/cancellation`: version, reason. Starts independent approval of cancellation for approved leave.
+
+All request mutations use idempotency keys. Version is the leave request version, not the nested approval version. A submission includes at most 366 explicit dates within a 366-day span. Off/holiday dates are omitted from charged duration; missing schedules and ineligible employment dates fail the entire command. Reservations are made per balance year. Cancellation does not restore balance until approved. Submitted policy and schedule snapshots remain unchanged by later edits.

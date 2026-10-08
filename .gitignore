@@ -15,3 +15,5 @@ dist/
 .vscode/*.local.json
 playwright-report/
 test-results/
+
+.kotlin/

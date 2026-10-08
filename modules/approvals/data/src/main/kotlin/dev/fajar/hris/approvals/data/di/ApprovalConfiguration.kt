@@ -59,7 +59,8 @@ class ApprovalConfiguration {
         approvals: ApprovalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetApprovalRequest(approvals, transactions, clock)
+        members: MembershipRepository,
+    ) = GetApprovalRequest(approvals, members, transactions, clock)
 
     @Bean
     fun reassignApproval(

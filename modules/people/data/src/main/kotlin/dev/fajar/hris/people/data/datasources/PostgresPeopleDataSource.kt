@@ -67,6 +67,30 @@ class PostgresPeopleDataSource(private val sql: DSLContext) : PeopleDataSource {
             .fetch()
     }
 
+    override fun effectiveRevisions(
+        companyId: UUID,
+        id: UUID,
+        from: LocalDate,
+        until: LocalDate,
+    ): List<EmploymentRevisionsRecord> {
+        val baseline = R.`as`("baseline")
+        val baselineDate =
+            DSL.select(DSL.max(baseline.EFFECTIVE_FROM))
+                .from(baseline)
+                .where(baseline.COMPANY_ID.eq(companyId))
+                .and(baseline.EMPLOYMENT_ID.eq(id))
+                .and(baseline.EFFECTIVE_FROM.le(from))
+        return sql.select(R.asterisk())
+            .distinctOn(R.EFFECTIVE_FROM)
+            .from(R)
+            .where(R.COMPANY_ID.eq(companyId))
+            .and(R.EMPLOYMENT_ID.eq(id))
+            .and(R.EFFECTIVE_FROM.le(until))
+            .and(R.EFFECTIVE_FROM.ge(from).or(R.EFFECTIVE_FROM.eq(baselineDate)))
+            .orderBy(R.EFFECTIVE_FROM, R.REVISION.desc())
+            .fetchInto(R)
+    }
+
     override fun history(
         companyId: UUID,
         id: UUID,

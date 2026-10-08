@@ -23,6 +23,13 @@ interface PeopleDataSource {
         limit: Int,
     ): List<EmployeesAtRecord>
 
+    fun effectiveRevisions(
+        companyId: UUID,
+        id: UUID,
+        from: LocalDate,
+        until: LocalDate,
+    ): List<EmploymentRevisionsRecord>
+
     fun history(
         companyId: UUID,
         id: UUID,

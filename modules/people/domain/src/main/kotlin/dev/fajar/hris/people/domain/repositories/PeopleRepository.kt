@@ -24,6 +24,13 @@ interface PeopleRepository {
         limit: Int,
     ): Result<Page<Employee>>
 
+    fun effectiveRevisions(
+        companyId: UUID,
+        id: UUID,
+        from: LocalDate,
+        until: LocalDate,
+    ): Result<List<EmploymentRevision>>
+
     fun history(
         companyId: UUID,
         id: UUID,

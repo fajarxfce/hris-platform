@@ -11,6 +11,12 @@ import org.springframework.transaction.PlatformTransactionManager
 @Configuration(proxyBeanMethods = false)
 class DatabaseConfiguration {
     @Bean
+    fun operationReceipts(
+        sql: org.jooq.DSLContext
+    ): dev.fajar.hris.core.database.datasources.OperationReceiptDataSource =
+        dev.fajar.hris.core.database.datasources.PostgresOperationReceiptDataSource(sql)
+
+    @Bean
     fun changeJournal(
         source: dev.fajar.hris.core.database.datasources.ChangeJournalDataSource
     ): dev.fajar.hris.core.domain.ChangeJournalRepository =

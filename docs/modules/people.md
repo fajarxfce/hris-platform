@@ -9,3 +9,9 @@ Foreign identity/document expiry and tax residency are separate attributes. Impo
 Screens: company/employee directories, organization structure, employee tabs, import, scheduled changes.
 
 Acceptance: concurrent employee number uniqueness, effective-dated history, company-reference constraints, safe import replay, and historical payroll unchanged.
+
+## Implementation status
+
+Company creation, reads, and versioned updates are implemented. Creation grants only the documented company administrator permissions. Idempotency receipts, membership, audit, and outbox records commit together; replay returns the original mutation outcome. Company codes are normalized to uppercase and timezones must be recognized IANA identifiers.
+
+Organization units, people, effective employment history, imports, and transfer workflows remain planned. See [API conventions](../api-conventions.md).

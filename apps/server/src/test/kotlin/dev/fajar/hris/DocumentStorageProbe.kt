@@ -31,8 +31,10 @@ class DocumentStorageProbe : ObjectStorageDataSource {
         return ObjectMetadataData(value.bytes.size.toLong(), "\"${value.sha256}\"", value.sha256)
     }
 
-    override fun read(key: String, offset: Long, length: Int, etag: String) =
-        objects.getValue(key).bytes.copyOfRange(offset.toInt(), offset.toInt() + length)
+    override fun read(key: String, offset: Long, length: Int, etag: String): ByteArray {
+        check(!TransactionSynchronizationManager.isActualTransactionActive())
+        return objects.getValue(key).bytes.copyOfRange(offset.toInt(), offset.toInt() + length)
+    }
 
     override fun delete(key: String) {
         check(!TransactionSynchronizationManager.isActualTransactionActive())

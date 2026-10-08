@@ -77,4 +77,48 @@ interface DocumentDataSource {
         etag: String,
         version: Long,
     ): DocumentUploadChunksRecord?
+
+    fun validationRevision(companyId: UUID, jobId: UUID): DocumentRevisionsRecord?
+
+    fun chunks(companyId: UUID, revisionId: UUID): List<DocumentUploadChunksRecord>
+
+    fun validationAttempts(
+        companyId: UUID,
+        revisionId: UUID,
+    ): List<DocumentValidationAttemptsRecord>
+
+    fun insertValidationAttempt(row: DocumentValidationAttemptsRecord)
+
+    fun scheduleValidation(
+        companyId: UUID,
+        id: UUID,
+        version: Long,
+        jobId: UUID,
+        attempt: Int,
+    ): DocumentRevisionsRecord?
+
+    fun finishValidation(
+        companyId: UUID,
+        id: UUID,
+        version: Long,
+        jobId: UUID,
+        status: String,
+        size: Long,
+        sha256: String,
+        mediaType: String,
+        clean: Boolean,
+        engineVersion: String,
+        code: String?,
+        at: java.time.OffsetDateTime,
+    ): DocumentRevisionsRecord?
+
+    fun failValidation(
+        companyId: UUID,
+        id: UUID,
+        version: Long,
+        jobId: UUID,
+        code: String,
+    ): DocumentRevisionsRecord?
+
+    fun publish(companyId: UUID, id: UUID, version: Long, revisionId: UUID): DocumentsRecord?
 }

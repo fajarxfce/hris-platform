@@ -199,7 +199,8 @@ class UploadDocumentChunk(
                 if (allocated is Result.Failed) return@run allocated
                 if (
                     (allocated as Result.Success).value +
-                        (capacity as Result.Success).value.unfilledBytes > DOCUMENT_COMPANY_BYTES
+                        (capacity as Result.Success).value.unfilledBytes +
+                        capacity.value.readyBytes > DOCUMENT_COMPANY_BYTES
                 )
                     return@run Result.Failed(
                         Failure(FailureKind.CONFLICT, "document_storage_quota")

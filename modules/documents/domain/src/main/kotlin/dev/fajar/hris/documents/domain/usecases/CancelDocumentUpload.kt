@@ -5,6 +5,8 @@ import dev.fajar.hris.documents.domain.entities.*
 import dev.fajar.hris.documents.domain.policies.*
 import dev.fajar.hris.documents.domain.repositories.DocumentRepository
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.entities.JobStatus
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PersonProfileRepository
 import dev.fajar.hris.storage.domain.repositories.*
@@ -13,6 +15,7 @@ import java.util.UUID
 
 class CancelDocumentUpload(
     private val documents: DocumentRepository,
+    private val jobs: JobRepository,
     private val profiles: PersonProfileRepository,
     private val companies: CompanyRepository,
     private val members: MembershipRepository,
@@ -86,8 +89,25 @@ class CancelDocumentUpload(
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
-            if (revision.version != version || revision.status != DocumentRevisionStatus.UPLOADING)
+            if (revision.version != version || revision.status !in ACTIVE_DOCUMENT_STATUSES)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
+            val validationId = revision.validationJobId
+            if (validationId != null) {
+                val previousJob = jobs.find(company, validationId, true)
+                if (previousJob is Result.Failed) return@run previousJob
+                val pendingJob = (previousJob as Result.Success).value
+                if (
+                    pendingJob != null &&
+                        pendingJob.status in setOf(JobStatus.QUEUED, JobStatus.RUNNING) &&
+                        !pendingJob.cancellationRequested
+                ) {
+                    val stoppedJob =
+                        jobs.requestCancellation(company, validationId, pendingJob.version)
+                    if (stoppedJob is Result.Failed) return@run stoppedJob
+                    if ((stoppedJob as Result.Success).value == null)
+                        return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
+                }
+            }
             val changed =
                 documents.transition(company, revisionId, version, DocumentRevisionStatus.CANCELLED)
             if (changed is Result.Failed) return@run changed

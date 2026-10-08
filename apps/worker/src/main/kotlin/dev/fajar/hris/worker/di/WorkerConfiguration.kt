@@ -1,6 +1,7 @@
 package dev.fajar.hris.worker.di
 
 import dev.fajar.hris.core.database.PostgresTransactionRunner
+import dev.fajar.hris.documents.domain.usecases.*
 import dev.fajar.hris.identity.domain.usecases.ResolveActor
 import dev.fajar.hris.jobs.domain.usecases.*
 import dev.fajar.hris.people.domain.usecases.*
@@ -140,4 +141,11 @@ class WorkerConfiguration {
         @org.springframework.beans.factory.annotation.Qualifier("objectCleanupTimers")
         timer: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
     ) = dev.fajar.hris.worker.storage.ObjectCleanupWorker(collect, timer)
+
+    @Bean
+    fun documentValidationTask(
+        resolve: ResolveActor,
+        advance: AdvanceDocumentValidation,
+        abort: AbortDocumentValidation,
+    ): JobTask = DocumentValidationTask(resolve, advance, abort)
 }

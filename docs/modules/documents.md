@@ -12,7 +12,7 @@ Acceptance: offset/lost-response recovery, wrong version/range, permission revoc
 
 ## Resumable upload API
 
-The upload/status/cancellation API is implemented. Validation, publication, and downloads are the next slice; uploading all bytes does not make a document readable.
+The upload/status/cancellation and durable validation APIs are implemented. Uploading all bytes does not publish a revision; only a completed, accepted inspection sets `READY`. Downloads are the next slice.
 
 Company routes use `/api/v1/companies/{companyId}/documents`. `POST /uploads` accepts stable document/revision UUIDs, employment ID, title, classification, expected document version, file name, media type, size, SHA-256, and reason. Use `Idempotency-Key` for every command. Metadata/history use `GET /{documentId}`, `GET /{documentId}/revisions`, and `GET /revisions/{revisionId}`. Lists require an `employmentId` and support bounded cursors.
 
@@ -32,6 +32,16 @@ Set `HRIS_DOCUMENT_SCANNER_ENABLED=true`, `HRIS_DOCUMENT_SCANNER_HOST`, and `HRI
 
 The adapter permits two sessions per process without a waiting queue, checks at most 100 one-MiB parts, and sends them incrementally. Detection uses at most 64 KiB. Connections allow three seconds to connect, ten seconds per write, seventy seconds for a final scanner response, and 120 seconds for the complete inspection. Response frames are limited to four KiB. Nonblocking socket/selector loops check deadlines and interruption; every session, permit, stream, and selector has an owner. Existing storage failures retain their classification even if scanner cleanup also fails.
 
-Configure the daemon for at least the document limit (`StreamMaxLength 105M`, `MaxFileSize 105M`), finite scan/archive limits, and `AlertExceedsMax yes`. Enable encrypted-document alerts if those files cannot be inspected under the organization's policy. Keep signature databases current and persistent. Integration tests use ClamAV 1.5.4 with a deliberately minimal, owned EICAR signature database; they do not establish production signature coverage or update operations. Durable validation/publication is tracked in the next slice.
+Configure the daemon for at least the document limit (`StreamMaxLength 105M`, `MaxFileSize 105M`), finite scan/archive limits, and `AlertExceedsMax yes`. Enable encrypted-document alerts if those files cannot be inspected under the organization's policy. Keep signature databases current and persistent. Integration tests use ClamAV 1.5.4 with a deliberately minimal, owned EICAR signature database; they do not establish production signature coverage or update operations. The worker runs this adapter through the validation workflow described below.
 
 References: [ClamAV releases](https://github.com/Cisco-Talos/clamav/releases), [ClamAV Docker configuration](https://github.com/Cisco-Talos/clamav-docker/blob/main/clamav/README-alpine.md), [clamd protocol](https://docs.clamav.net/manual/Usage/Scanning.html#clamd), [Apache Tika](https://tika.apache.org/).
+
+## Validation and publication
+
+After every chunk is committed, call `POST /revisions/{revisionId}/validate` with `expectedVersion`, a reason, and an idempotency key. The response is the revision mutation receipt; its status response exposes `validationJobId`. Observe that job through the existing company job API. `GET /revisions/{revisionId}/validation-attempts` returns the bounded, immutable attempt history to authorized document readers.
+
+The worker checks current credentials, company membership, document permission, upload expiry, and its lease before and after storage/scanner I/O. It performs no external I/O inside a database transaction. A complete manifest, matching whole-file size/SHA-256/type, and a clean verdict are required. An accepted revision becomes `READY` and advances the document's `currentRevisionId`. A rejected revision becomes `REJECTED` with a stable failure code; the previous ready revision remains current. The job succeeds when inspection reaches either verdict. Technical processing failures use `VALIDATION_FAILED` and remain unavailable for content access.
+
+Accepted object retention, inspection evidence, publication, job checkpoint/completion, and audit commit together. Losing any accepted cleanup registration fails the entire publication. Ready revisions remain immutable and count against company storage quota even after their temporary cleanup rows are removed. Cancelled, expired, and rejected revisions cannot become ready.
+
+Transient infrastructure failures use the existing job retry policy with at most eight lease attempts. An operator can explicitly call `/validate` again after the prior job failed or was cancelled; a revision allows at most eight validation jobs. Crashed/exhausted jobs are projected as failed processing without rewriting their history. An expired upload requires a new revision. Cancelling the upload also requests cancellation of its active validation job. Late results and stale leases cannot publish; a worker can finalize cleanup even after the initiating account loses access.

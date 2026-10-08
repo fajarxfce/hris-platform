@@ -4,4 +4,5 @@ data class DocumentCapacity(
     val activeUploads: Int,
     val activeActorUploads: Int,
     val unfilledBytes: Long,
+    val readyBytes: Long = 0,
 )

@@ -13,6 +13,7 @@ data class DocumentResponse(
     val version: Long,
     val createdBy: UUID,
     val createdAt: Instant,
+    val currentRevisionId: UUID?,
 )
 
 fun Document.toResponse() =
@@ -25,4 +26,5 @@ fun Document.toResponse() =
         version,
         createdBy,
         createdAt,
+        currentRevisionId,
     )

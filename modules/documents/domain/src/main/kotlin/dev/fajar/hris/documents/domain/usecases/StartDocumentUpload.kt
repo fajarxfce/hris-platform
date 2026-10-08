@@ -5,6 +5,8 @@ import dev.fajar.hris.documents.domain.entities.*
 import dev.fajar.hris.documents.domain.policies.*
 import dev.fajar.hris.documents.domain.repositories.DocumentRepository
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.entities.JobStatus
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PersonProfileRepository
 import dev.fajar.hris.storage.domain.repositories.*
@@ -13,6 +15,7 @@ import java.util.UUID
 
 class StartDocumentUpload(
     private val documents: DocumentRepository,
+    private val jobs: JobRepository,
     private val profiles: PersonProfileRepository,
     private val companies: CompanyRepository,
     private val members: MembershipRepository,
@@ -107,6 +110,23 @@ class StartDocumentUpload(
                     return@run Result.Failed(
                         Failure(FailureKind.CONFLICT, "document_upload_active")
                     )
+                val validationId = previous.validationJobId
+                if (validationId != null) {
+                    val previousJob = jobs.find(company, validationId, true)
+                    if (previousJob is Result.Failed) return@run previousJob
+                    val pendingJob = (previousJob as Result.Success).value
+                    if (
+                        pendingJob != null &&
+                            pendingJob.status in setOf(JobStatus.QUEUED, JobStatus.RUNNING) &&
+                            !pendingJob.cancellationRequested
+                    ) {
+                        val stoppedJob =
+                            jobs.requestCancellation(company, validationId, pendingJob.version)
+                        if (stoppedJob is Result.Failed) return@run stoppedJob
+                        if ((stoppedJob as Result.Success).value == null)
+                            return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
+                    }
+                }
                 val expired =
                     documents.transition(
                         company,
@@ -145,8 +165,10 @@ class StartDocumentUpload(
             val allocated = cleanup.allocatedBytes(company)
             if (allocated is Result.Failed) return@run allocated
             if (
-                (allocated as Result.Success).value + usage.unfilledBytes + input.size >
-                    DOCUMENT_COMPANY_BYTES
+                (allocated as Result.Success).value +
+                    usage.unfilledBytes +
+                    usage.readyBytes +
+                    input.size > DOCUMENT_COMPANY_BYTES
             )
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "document_storage_quota"))
             if (existing == null) {

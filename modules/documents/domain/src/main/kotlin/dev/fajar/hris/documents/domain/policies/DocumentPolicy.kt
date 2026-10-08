@@ -69,6 +69,35 @@ fun validateDocumentInput(input: StartDocumentUploadCommand): Result<Unit> {
 }
 
 fun documentStatus(revision: DocumentRevision, at: Instant): DocumentRevisionStatus =
-    if (revision.status == DocumentRevisionStatus.UPLOADING && !revision.expiresAt.isAfter(at))
+    if (revision.status in ACTIVE_DOCUMENT_STATUSES && !revision.expiresAt.isAfter(at))
         DocumentRevisionStatus.EXPIRED
     else revision.status
+
+val ACTIVE_DOCUMENT_STATUSES =
+    setOf(
+        DocumentRevisionStatus.UPLOADING,
+        DocumentRevisionStatus.VALIDATING,
+        DocumentRevisionStatus.VALIDATION_FAILED,
+    )
+
+fun projectDocumentRevision(
+    revision: DocumentRevision,
+    job: dev.fajar.hris.jobs.domain.entities.BackgroundJob?,
+    at: Instant,
+): DocumentRevision {
+    if (documentStatus(revision, at) == DocumentRevisionStatus.EXPIRED)
+        return revision.copy(status = DocumentRevisionStatus.EXPIRED)
+    return if (
+        revision.status == DocumentRevisionStatus.VALIDATING &&
+            job?.status in
+                setOf(
+                    dev.fajar.hris.jobs.domain.entities.JobStatus.FAILED,
+                    dev.fajar.hris.jobs.domain.entities.JobStatus.CANCELLED,
+                )
+    )
+        revision.copy(
+            status = DocumentRevisionStatus.VALIDATION_FAILED,
+            failureCode = job?.failureCode ?: "document_validation_stopped",
+        )
+    else revision
+}

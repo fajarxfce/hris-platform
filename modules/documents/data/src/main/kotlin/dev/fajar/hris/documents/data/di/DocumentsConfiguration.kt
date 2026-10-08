@@ -6,6 +6,7 @@ import dev.fajar.hris.documents.data.repositories.*
 import dev.fajar.hris.documents.domain.repositories.*
 import dev.fajar.hris.documents.domain.usecases.*
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PersonProfileRepository
 import dev.fajar.hris.storage.domain.repositories.*
@@ -47,6 +48,7 @@ class DocumentsConfiguration {
     @Bean
     fun startDocumentUpload(
         documents: DocumentRepository,
+        jobs: JobRepository,
         profiles: PersonProfileRepository,
         companies: CompanyRepository,
         members: MembershipRepository,
@@ -59,6 +61,7 @@ class DocumentsConfiguration {
     ) =
         StartDocumentUpload(
             documents,
+            jobs,
             profiles,
             companies,
             members,
@@ -101,6 +104,7 @@ class DocumentsConfiguration {
     @Bean
     fun cancelDocumentUpload(
         documents: DocumentRepository,
+        jobs: JobRepository,
         profiles: PersonProfileRepository,
         companies: CompanyRepository,
         members: MembershipRepository,
@@ -113,6 +117,7 @@ class DocumentsConfiguration {
     ) =
         CancelDocumentUpload(
             documents,
+            jobs,
             profiles,
             companies,
             members,
@@ -135,11 +140,12 @@ class DocumentsConfiguration {
     @Bean
     fun getDocumentRevision(
         documents: DocumentRepository,
+        jobs: JobRepository,
         profiles: PersonProfileRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetDocumentRevision(documents, profiles, identities, transactions, clock)
+    ) = GetDocumentRevision(documents, jobs, profiles, identities, transactions, clock)
 
     @Bean
     fun listDocuments(
@@ -152,9 +158,80 @@ class DocumentsConfiguration {
     @Bean
     fun getDocumentRevisions(
         documents: DocumentRepository,
+        jobs: JobRepository,
         profiles: PersonProfileRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetDocumentRevisions(documents, profiles, identities, transactions, clock)
+    ) = GetDocumentRevisions(documents, jobs, profiles, identities, transactions, clock)
+
+    @Bean
+    fun startDocumentValidation(
+        documents: DocumentRepository,
+        profiles: PersonProfileRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        StartDocumentValidation(
+            documents,
+            profiles,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun advanceDocumentValidation(
+        documents: DocumentRepository,
+        profiles: PersonProfileRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        inspection: DocumentInspectionRepository,
+        cleanup: ObjectCleanupRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        AdvanceDocumentValidation(
+            documents,
+            profiles,
+            companies,
+            members,
+            identities,
+            jobs,
+            inspection,
+            cleanup,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun abortDocumentValidation(
+        documents: DocumentRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+    ) = AbortDocumentValidation(documents, jobs, journal, transactions)
+
+    @Bean
+    fun getDocumentValidationAttempts(
+        documents: DocumentRepository,
+        profiles: PersonProfileRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetDocumentValidationAttempts(documents, profiles, identities, transactions)
 }

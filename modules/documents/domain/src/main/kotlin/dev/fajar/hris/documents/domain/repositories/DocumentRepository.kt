@@ -64,4 +64,36 @@ interface DocumentRepository {
         lease: DocumentUploadLease,
         etag: String,
     ): Result<MutationReceipt>
+
+    fun validationRevision(companyId: UUID, jobId: UUID): Result<DocumentRevision?>
+
+    fun chunks(companyId: UUID, revisionId: UUID): Result<List<DocumentUploadChunk>>
+
+    fun validationAttempts(
+        companyId: UUID,
+        revisionId: UUID,
+    ): Result<List<DocumentValidationAttempt>>
+
+    fun scheduleValidation(
+        actor: Actor,
+        revision: DocumentRevision,
+        attempt: DocumentValidationAttempt,
+    ): Result<MutationReceipt>
+
+    fun finishValidation(
+        companyId: UUID,
+        revision: DocumentRevision,
+        status: DocumentRevisionStatus,
+        inspection: DocumentInspection,
+        code: String?,
+        at: java.time.Instant,
+    ): Result<MutationReceipt>
+
+    fun failValidation(
+        companyId: UUID,
+        revision: DocumentRevision,
+        code: String,
+    ): Result<MutationReceipt>
+
+    fun publish(companyId: UUID, document: Document, revisionId: UUID): Result<Unit>
 }

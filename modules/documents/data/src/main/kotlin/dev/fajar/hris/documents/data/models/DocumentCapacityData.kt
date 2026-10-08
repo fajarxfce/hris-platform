@@ -5,4 +5,5 @@ data class DocumentCapacityData(
     val active: Long,
     val owned: Long,
     val unfilledBytes: Long,
+    val readyBytes: Long,
 )

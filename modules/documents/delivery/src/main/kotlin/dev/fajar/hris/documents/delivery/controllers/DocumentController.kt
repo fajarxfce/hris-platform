@@ -13,12 +13,14 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/companies/{companyId}/documents")
 class DocumentController(
     private val start: StartDocumentUpload,
+    private val validate: StartDocumentValidation,
     private val upload: UploadDocumentChunk,
     private val cancel: CancelDocumentUpload,
     private val get: GetDocument,
     private val getRevision: GetDocumentRevision,
     private val list: ListDocuments,
     private val history: GetDocumentRevisions,
+    private val validationHistory: GetDocumentValidationAttempts,
 ) {
     @PostMapping("/uploads")
     fun start(
@@ -73,6 +75,18 @@ class DocumentController(
             .response()
             .toResponse()
 
+    @PostMapping("/revisions/{revisionId}/validate")
+    fun validate(
+        actor: Actor,
+        @PathVariable revisionId: UUID,
+        @RequestHeader("Idempotency-Key") operationId: UUID,
+        @RequestBody input: ValidateDocumentRequest,
+    ): MutationResponse =
+        validate
+            .execute(actor, operationId, revisionId, input.expectedVersion, input.reason)
+            .response()
+            .toResponse()
+
     @GetMapping("/{documentId}")
     fun get(actor: Actor, @PathVariable documentId: UUID) =
         get.execute(actor, documentId).response().toResponse()
@@ -91,6 +105,10 @@ class DocumentController(
         val page = list.execute(actor, employmentId, after, limit).response()
         return Page(page.items.map { it.toResponse() }, page.nextCursor)
     }
+
+    @GetMapping("/revisions/{revisionId}/validation-attempts")
+    fun validationAttempts(actor: Actor, @PathVariable revisionId: UUID) =
+        validationHistory.execute(actor, revisionId).response().map { it.toResponse() }
 
     @GetMapping("/{documentId}/revisions")
     fun history(

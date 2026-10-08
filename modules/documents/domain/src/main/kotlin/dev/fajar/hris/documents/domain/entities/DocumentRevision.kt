@@ -18,4 +18,9 @@ data class DocumentRevision(
     val createdAt: Instant,
     val expiresAt: Instant,
     val reason: String,
+    val validationJobId: UUID? = null,
+    val validationAttempts: Int = 0,
+    val failureCode: String? = null,
+    val inspection: DocumentInspection? = null,
+    val validatedAt: Instant? = null,
 )

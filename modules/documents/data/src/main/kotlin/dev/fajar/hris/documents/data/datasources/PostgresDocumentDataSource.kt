@@ -17,12 +17,14 @@ class PostgresDocumentDataSource(private val sql: DSLContext) : DocumentDataSour
             sql.fetchOne(
                 """
                 select (select count(*) from documents where company_id=?) as documents,
+                    (select coalesce(sum(expected_bytes),0) from document_revisions where company_id=? and status='READY') as ready,
                     count(*) as active,count(*) filter(where created_by=?) as own,
                     coalesce(sum(expected_bytes-uploaded_bytes-coalesce((select sum(byte_count) from document_upload_chunks c
                         where c.company_id=r.company_id and c.revision_id=r.id and c.status='PENDING' and c.current_attempt_id is not null),0)),0) as unfilled
-                from document_revisions r where company_id=? and status='UPLOADING' and expires_at>clock_timestamp()
+                from document_revisions r where company_id=? and status IN ('UPLOADING','VALIDATING','VALIDATION_FAILED') and expires_at>clock_timestamp()
                 """
                     .trimIndent(),
+                companyId,
                 companyId,
                 actorId,
                 companyId,
@@ -32,6 +34,7 @@ class PostgresDocumentDataSource(private val sql: DSLContext) : DocumentDataSour
             row.get("active", Long::class.java),
             row.get("own", Long::class.java),
             row.get("unfilled", Long::class.java),
+            row.get("ready", Long::class.java),
         )
     }
 
@@ -50,7 +53,7 @@ class PostgresDocumentDataSource(private val sql: DSLContext) : DocumentDataSour
             .where(
                 DOCUMENT_REVISIONS.COMPANY_ID.eq(companyId),
                 DOCUMENT_REVISIONS.DOCUMENT_ID.eq(documentId),
-                DOCUMENT_REVISIONS.STATUS.eq("UPLOADING"),
+                DOCUMENT_REVISIONS.STATUS.`in`("UPLOADING", "VALIDATING", "VALIDATION_FAILED"),
             )
             .fetchOne()
 
@@ -111,7 +114,7 @@ class PostgresDocumentDataSource(private val sql: DSLContext) : DocumentDataSour
                 DOCUMENT_REVISIONS.COMPANY_ID.eq(companyId),
                 DOCUMENT_REVISIONS.ID.eq(id),
                 DOCUMENT_REVISIONS.VERSION.eq(version),
-                DOCUMENT_REVISIONS.STATUS.eq("UPLOADING"),
+                DOCUMENT_REVISIONS.STATUS.`in`("UPLOADING", "VALIDATING", "VALIDATION_FAILED"),
             )
             .returning()
             .fetchOne()
@@ -215,6 +218,129 @@ class PostgresDocumentDataSource(private val sql: DSLContext) : DocumentDataSour
                 DOCUMENT_UPLOAD_CHUNKS.CURRENT_ATTEMPT_ID.eq(attemptId),
                 DOCUMENT_UPLOAD_CHUNKS.STATUS.eq("PENDING"),
                 DSL.condition("lease_until>clock_timestamp()"),
+            )
+            .returning()
+            .fetchOne()
+
+    override fun validationRevision(companyId: UUID, jobId: UUID) =
+        sql.selectFrom(DOCUMENT_REVISIONS)
+            .where(
+                DOCUMENT_REVISIONS.COMPANY_ID.eq(companyId),
+                DOCUMENT_REVISIONS.VALIDATION_JOB_ID.eq(jobId),
+            )
+            .fetchOne()
+
+    override fun chunks(companyId: UUID, revisionId: UUID) =
+        sql.selectFrom(DOCUMENT_UPLOAD_CHUNKS)
+            .where(
+                DOCUMENT_UPLOAD_CHUNKS.COMPANY_ID.eq(companyId),
+                DOCUMENT_UPLOAD_CHUNKS.REVISION_ID.eq(revisionId),
+            )
+            .orderBy(DOCUMENT_UPLOAD_CHUNKS.ORDINAL)
+            .limit(100)
+            .fetch()
+
+    override fun validationAttempts(companyId: UUID, revisionId: UUID) =
+        sql.selectFrom(DOCUMENT_VALIDATION_ATTEMPTS)
+            .where(
+                DOCUMENT_VALIDATION_ATTEMPTS.COMPANY_ID.eq(companyId),
+                DOCUMENT_VALIDATION_ATTEMPTS.REVISION_ID.eq(revisionId),
+            )
+            .orderBy(DOCUMENT_VALIDATION_ATTEMPTS.ATTEMPT)
+            .limit(8)
+            .fetch()
+
+    override fun insertValidationAttempt(row: DocumentValidationAttemptsRecord) {
+        sql.insertInto(DOCUMENT_VALIDATION_ATTEMPTS).set(row).execute()
+    }
+
+    override fun scheduleValidation(
+        companyId: UUID,
+        id: UUID,
+        version: Long,
+        jobId: UUID,
+        attempt: Int,
+    ) =
+        sql.update(DOCUMENT_REVISIONS)
+            .set(DOCUMENT_REVISIONS.STATUS, "VALIDATING")
+            .set(DOCUMENT_REVISIONS.VERSION, version + 1)
+            .set(DOCUMENT_REVISIONS.VALIDATION_JOB_ID, jobId)
+            .set(DOCUMENT_REVISIONS.VALIDATION_ATTEMPTS, attempt)
+            .setNull(DOCUMENT_REVISIONS.FAILURE_CODE)
+            .where(
+                DOCUMENT_REVISIONS.COMPANY_ID.eq(companyId),
+                DOCUMENT_REVISIONS.ID.eq(id),
+                DOCUMENT_REVISIONS.VERSION.eq(version),
+                DOCUMENT_REVISIONS.STATUS.`in`("UPLOADING", "VALIDATING", "VALIDATION_FAILED"),
+                DSL.condition("expires_at>clock_timestamp()"),
+            )
+            .returning()
+            .fetchOne()
+
+    override fun finishValidation(
+        companyId: UUID,
+        id: UUID,
+        version: Long,
+        jobId: UUID,
+        status: String,
+        size: Long,
+        sha256: String,
+        mediaType: String,
+        clean: Boolean,
+        engineVersion: String,
+        code: String?,
+        at: java.time.OffsetDateTime,
+    ) =
+        sql.update(DOCUMENT_REVISIONS)
+            .set(DOCUMENT_REVISIONS.STATUS, status)
+            .set(DOCUMENT_REVISIONS.VERSION, version + 1)
+            .set(DOCUMENT_REVISIONS.CONTENT_BYTES, size)
+            .set(DOCUMENT_REVISIONS.CONTENT_SHA256, sha256)
+            .set(DOCUMENT_REVISIONS.DETECTED_MEDIA_TYPE, mediaType)
+            .set(DOCUMENT_REVISIONS.SCAN_CLEAN, clean)
+            .set(DOCUMENT_REVISIONS.SCANNER_VERSION, engineVersion)
+            .set(DOCUMENT_REVISIONS.FAILURE_CODE, code)
+            .set(DOCUMENT_REVISIONS.VALIDATED_AT, at)
+            .where(
+                DOCUMENT_REVISIONS.COMPANY_ID.eq(companyId),
+                DOCUMENT_REVISIONS.ID.eq(id),
+                DOCUMENT_REVISIONS.VERSION.eq(version),
+                DOCUMENT_REVISIONS.VALIDATION_JOB_ID.eq(jobId),
+                DOCUMENT_REVISIONS.STATUS.eq("VALIDATING"),
+                DSL.condition("expires_at>clock_timestamp()"),
+            )
+            .returning()
+            .fetchOne()
+
+    override fun failValidation(
+        companyId: UUID,
+        id: UUID,
+        version: Long,
+        jobId: UUID,
+        code: String,
+    ) =
+        sql.update(DOCUMENT_REVISIONS)
+            .set(DOCUMENT_REVISIONS.STATUS, "VALIDATION_FAILED")
+            .set(DOCUMENT_REVISIONS.VERSION, version + 1)
+            .set(DOCUMENT_REVISIONS.FAILURE_CODE, code)
+            .where(
+                DOCUMENT_REVISIONS.COMPANY_ID.eq(companyId),
+                DOCUMENT_REVISIONS.ID.eq(id),
+                DOCUMENT_REVISIONS.VERSION.eq(version),
+                DOCUMENT_REVISIONS.VALIDATION_JOB_ID.eq(jobId),
+                DOCUMENT_REVISIONS.STATUS.eq("VALIDATING"),
+            )
+            .returning()
+            .fetchOne()
+
+    override fun publish(companyId: UUID, id: UUID, version: Long, revisionId: UUID) =
+        sql.update(DOCUMENTS)
+            .set(DOCUMENTS.CURRENT_REVISION_ID, revisionId)
+            .set(DOCUMENTS.VERSION, version + 1)
+            .where(
+                DOCUMENTS.COMPANY_ID.eq(companyId),
+                DOCUMENTS.ID.eq(id),
+                DOCUMENTS.VERSION.eq(version),
             )
             .returning()
             .fetchOne()

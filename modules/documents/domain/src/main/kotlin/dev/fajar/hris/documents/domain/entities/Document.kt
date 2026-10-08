@@ -12,4 +12,5 @@ data class Document(
     val version: Long,
     val createdBy: UUID,
     val createdAt: Instant,
+    val currentRevisionId: UUID? = null,
 )

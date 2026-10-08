@@ -5,20 +5,16 @@ import dev.fajar.hris.documents.domain.entities.*
 import dev.fajar.hris.documents.domain.policies.*
 import dev.fajar.hris.documents.domain.repositories.DocumentRepository
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
-import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.people.domain.repositories.PersonProfileRepository
-import java.time.Clock
 import java.util.UUID
 
-class GetDocumentRevision(
+class GetDocumentValidationAttempts(
     private val documents: DocumentRepository,
-    private val jobs: JobRepository,
     private val profiles: PersonProfileRepository,
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
-    private val clock: Clock,
 ) {
-    fun execute(actor: Actor, id: UUID): Result<DocumentRevision> {
+    fun execute(actor: Actor, id: UUID): Result<List<DocumentValidationAttempt>> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
@@ -54,12 +50,7 @@ class GetDocumentRevision(
                 )
             )
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "document_access_denied"))
-            val jobId = revision.validationJobId
-            if (revision.status == DocumentRevisionStatus.VALIDATING && jobId != null)
-                jobs.find(company, jobId).map {
-                    projectDocumentRevision(revision, it, clock.instant())
-                }
-            else Result.Success(projectDocumentRevision(revision, null, clock.instant()))
+            documents.validationAttempts(company, id)
         }
     }
 }

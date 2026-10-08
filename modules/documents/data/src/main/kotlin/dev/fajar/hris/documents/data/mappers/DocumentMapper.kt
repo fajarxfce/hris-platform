@@ -15,6 +15,7 @@ fun DocumentsRecord.toDocument() =
         version,
         createdBy,
         createdAt.toInstant(),
+        currentRevisionId,
     )
 
 fun DocumentRevisionsRecord.toDocumentRevision() =
@@ -33,6 +34,19 @@ fun DocumentRevisionsRecord.toDocumentRevision() =
         createdAt.toInstant(),
         expiresAt.toInstant(),
         reason,
+        validationJobId,
+        validationAttempts,
+        failureCode,
+        if (validatedAt == null) null
+        else
+            DocumentInspection(
+                requireNotNull(contentBytes),
+                requireNotNull(contentSha256),
+                requireNotNull(detectedMediaType),
+                requireNotNull(scanClean),
+                requireNotNull(scannerVersion),
+            ),
+        validatedAt?.toInstant(),
     )
 
 fun DocumentUploadChunksRecord.toDocumentChunk() =
@@ -103,3 +117,6 @@ fun DocumentUploadChunk.toChunkRow(company: UUID) =
         r.etag = etag
         r.committedVersion = committedVersion
     }
+
+fun DocumentValidationAttemptsRecord.toValidationAttempt() =
+    DocumentValidationAttempt(jobId, attempt, actorId, createdAt.toInstant(), reason)

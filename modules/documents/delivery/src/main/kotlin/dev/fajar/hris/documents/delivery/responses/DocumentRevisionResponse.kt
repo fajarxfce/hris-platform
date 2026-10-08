@@ -21,6 +21,10 @@ data class DocumentRevisionResponse(
     val createdAt: Instant,
     val expiresAt: Instant,
     val reason: String,
+    val validationJobId: UUID?,
+    val validationAttempts: Int,
+    val failureCode: String?,
+    val validatedAt: Instant?,
 )
 
 fun DocumentRevision.toResponse() =
@@ -40,4 +44,8 @@ fun DocumentRevision.toResponse() =
         createdAt,
         expiresAt,
         reason,
+        validationJobId,
+        validationAttempts,
+        failureCode,
+        validatedAt,
     )

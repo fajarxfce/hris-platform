@@ -105,46 +105,103 @@ class PeopleConfiguration {
     @Bean
     fun createEmployee(
         people: PeopleRepository,
-        units: OrganizationRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
+        units: OrganizationRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = CreateEmployee(people, units, identities, operations, journal, transactions, clock)
+    ) =
+        CreateEmployee(
+            people,
+            companies,
+            members,
+            identities,
+            units,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
 
     @Bean
     fun reviseEmployment(
         people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         units: OrganizationRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         transfers: EmploymentTransferRepository,
         lifecycle: LifecycleRepository,
-    ) = ReviseEmployment(people, units, operations, journal, transactions, transfers, lifecycle)
+    ) =
+        ReviseEmployment(
+            people,
+            companies,
+            members,
+            identities,
+            units,
+            operations,
+            journal,
+            transactions,
+            transfers,
+            lifecycle,
+        )
 
     @Bean
-    fun getEmployee(people: PeopleRepository, transactions: TransactionRunner, clock: Clock) =
-        GetEmployee(people, transactions, clock)
+    fun getEmployee(
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = GetEmployee(people, companies, members, identities, transactions, clock)
 
     @Bean
-    fun listEmployees(people: PeopleRepository, transactions: TransactionRunner, clock: Clock) =
-        ListEmployees(people, transactions, clock)
+    fun listEmployees(
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = ListEmployees(people, companies, members, identities, transactions, clock)
 
     @Bean
-    fun employmentHistory(people: PeopleRepository, transactions: TransactionRunner) =
-        GetEmploymentHistory(people, transactions)
+    fun employmentHistory(
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetEmploymentHistory(people, companies, members, identities, transactions)
 
     @Bean
     fun cancelEmploymentRevision(
         people: PeopleRepository,
         companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = CancelEmploymentRevision(people, companies, operations, journal, transactions, clock)
+    ) =
+        CancelEmploymentRevision(
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
 
     @Bean
     fun transferSource(sql: DSLContext): EmploymentTransferDataSource =
@@ -157,8 +214,12 @@ class PeopleConfiguration {
     @Bean
     fun getEmploymentTransfers(
         transfers: EmploymentTransferRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetEmploymentTransfers(transfers, transactions)
+    ) = GetEmploymentTransfers(transfers, people, companies, members, identities, transactions)
 
     @Bean
     fun transferEmployee(

@@ -1,7 +1,10 @@
 package dev.fajar.hris.people.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.entities.UnitKind
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.organization.domain.repositories.OrganizationRepository
 import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.policies.*
@@ -10,6 +13,9 @@ import java.util.UUID
 
 class ReviseEmployment(
     private val people: PeopleRepository,
+    private val companies: CompanyRepository,
+    private val members: MembershipRepository,
+    private val identities: IdentityRepository,
     private val units: OrganizationRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
@@ -30,7 +36,9 @@ class ReviseEmployment(
         val valid = validateEmployment(terms, reason)
         if (valid is Result.Failed) return valid
         if (version < 0) return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_version"))
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         val key =
             OperationKey(
                 "people.revise",
@@ -54,13 +62,25 @@ class ReviseEmployment(
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
-            }
             val lock = people.lockReportingLines(company)
             if (lock is Result.Failed) return@run lock
             val unitLock = units.lockStructure(company)
             if (unitLock is Result.Failed) return@run unitLock
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
+            val checked =
+                identities
+                    .access(actor.accountId, company)
+                    .flatMap { validateCompanyCommandActor(actor, it) }
+                    .flatMap { it.requirePermission("people.manage") }
+            if (checked is Result.Failed) return@run checked
+            (replay as Result.Success).value?.let {
+                return@run Result.Success(it)
+            }
             val existing = people.find(company, id, terms.effectiveFrom)
             if (existing is Result.Failed) return@run existing
             val employee =

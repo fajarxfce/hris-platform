@@ -32,6 +32,8 @@ Sensitive profiles have separate `people.profile.read` and `people.profile.manag
 
 Profile reads/edits hold people, company, membership, and account guards and recheck the original/live permission intersection before acquisition or receipt replay. Organization-unit reads/edits similarly protect the structure before validating live company access. Company creation revalidates platform credentials and `companies.create`; company settings revalidate current company authority. A previously committed receipt does not bypass current authorization.
 
+Employment creation, revisions, cancellation, directory/detail reads, and history/transfer reads use the same live-access boundary. Directory visibility is recomputed from the remaining permissions after waiting; losing company-wide read access can narrow a response to the caller's own employment. Creation locks linked accounts in stable ID order and rechecks their active company membership. Reads require an explicit `asOf` date where the effective employment view is requested.
+
 ## Scheduled employment changes
 
 Future employment revisions can be cancelled through `POST /companies/{companyId}/employees/{id}/revisions/{revision}/cancel`, with an expected employment version, idempotency key, and reason. Cancellation is an immutable record; the original revision remains in history with its cancellation metadata. Effective reads, leave eligibility, and current reporting access exclude cancelled revisions. Version counters continue increasing even though cancelled revisions are not applied.

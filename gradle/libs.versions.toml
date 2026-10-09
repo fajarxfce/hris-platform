@@ -10,6 +10,7 @@ ktfmt = "0.59"
 archunit = "1.4.1"
 springdoc = "3.1.1"
 swagger-parser = "2.1.48"
+pdfbox = "3.0.8"
 
 [libraries]
 tika-core = { module = "org.apache.tika:tika-core", version.ref = "tika" }
@@ -28,6 +29,7 @@ spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies"
 spring-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
 springdoc-webmvc = { module = "org.springdoc:springdoc-openapi-starter-webmvc-api", version.ref = "springdoc" }
 swagger-parser = { module = "io.swagger.parser.v3:swagger-parser", version.ref = "swagger-parser" }
+pdfbox = { module = "org.apache.pdfbox:pdfbox", version.ref = "pdfbox" }
 spring-oauth2-client = { module = "org.springframework.boot:spring-boot-starter-security-oauth2-client" }
 spring-security = { module = "org.springframework.boot:spring-boot-starter-security" }
 spring-jackson = { module = "org.springframework.boot:spring-boot-starter-jackson" }

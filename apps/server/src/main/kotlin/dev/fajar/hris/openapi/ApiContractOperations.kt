@@ -254,6 +254,7 @@ fun describeBinaryTransport(path: String, method: PathItem.HttpMethod, operation
                 )
     }
     if (method != PathItem.HttpMethod.GET) return
+    val payslipPdf = path.endsWith("/payroll/payslips/{id}/pdf")
     if (path.endsWith("/payments/{id}/export")) {
         operation.responses["200"] =
             ApiResponse()
@@ -262,7 +263,7 @@ fun describeBinaryTransport(path: String, method: PathItem.HttpMethod, operation
                 .addHeaderObject("Content-Disposition", Header().schema(StringSchema()))
         return
     }
-    if (!path.endsWith("/{revisionId}/content")) return
+    if (!payslipPdf && !path.endsWith("/{revisionId}/content")) return
     for ((name, description) in
         mapOf(
             "Range" to "Single byte range; multiple/unsatisfiable ranges return 416.",
@@ -286,7 +287,7 @@ fun describeBinaryTransport(path: String, method: PathItem.HttpMethod, operation
                 .content(
                     Content()
                         .addMediaType(
-                            "application/octet-stream",
+                            if (payslipPdf) "application/pdf" else "application/octet-stream",
                             MediaType().schema(BinarySchema()),
                         )
                 )
@@ -304,5 +305,8 @@ fun describeBinaryTransport(path: String, method: PathItem.HttpMethod, operation
             .description("Unsupported or unsatisfiable byte range; no response body.")
             .addHeaderObject("Content-Range", Header().schema(StringSchema()))
     operation.description =
-        "The actual Content-Type follows the validated document. HEAD returns authorized metadata without bytes. Admission failure can return an empty 429/503 response. A failure after streaming starts cannot become a JSON problem; discard incomplete bytes and resume using Range/ETag."
+        if (payslipPdf)
+            "Authorized finalized payslip with ID/EN labels, generated eagerly within a 1 MiB/16-page bound and four concurrent renders. Current authorization also gates conditional requests and content reads. HEAD returns metadata only. The bounded shared download transport supports Range/ETag; admission or late access failure may return an empty error body."
+        else
+            "The actual Content-Type follows the validated document. HEAD returns authorized metadata without bytes. Admission failure can return an empty 429/503 response. A failure after streaming starts cannot become a JSON problem; discard incomplete bytes and resume using Range/ETag."
 }

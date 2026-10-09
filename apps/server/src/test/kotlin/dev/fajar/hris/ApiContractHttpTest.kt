@@ -215,6 +215,17 @@ class ApiContractHttpTest : PeopleApiFixture() {
     fun negotiatedDownloadsAndRawUploadsAreNotDocumentedAsJsonDtos() {
         val document = contract()
         val paths = document["paths"]
+        val payslip = paths["/api/v1/companies/{companyId}/payroll/payslips/{id}/pdf"]["get"]
+        assertEquals(
+            "binary",
+            payslip["responses"]["200"]["content"]["application/pdf"]["schema"]["format"].asString(),
+        )
+        assertNotNull(payslip["responses"]["403"]["content"]["application/problem+json"])
+        assertEquals(
+            "binary",
+            payslip["responses"]["206"]["content"]["application/pdf"]["schema"]["format"].asString(),
+        )
+        assertNull(payslip["responses"]["304"]["content"])
         val download =
             paths["/api/v1/companies/{companyId}/documents/revisions/{revisionId}/content"]["get"]
         for (status in listOf("200", "206")) {

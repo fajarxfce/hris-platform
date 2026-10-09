@@ -56,6 +56,8 @@ The mobile change feed is scoped by actor/company/permission and initially cover
 
 Feature data adapters map transport DTOs. Pure use cases own application policy. Feature controllers/hooks coordinate state, events, effects, and cancellation. Pages render state. TanStack Query keys include account and company; navigation cancels obsolete work. React Hook Form owns form mechanics; validation affecting business remains in the domain/backend.
 
+Server delivery also owns output representations such as CSV and PDF. The payslip PDF adapter consumes the domain snapshot returned by the existing authorized use case; it does not call repositories, perform payroll policy, or move PDFBox types into domain. Its delivery configuration owns a bounded renderer, and each request closes its document/content resources. Storage publication would be a separate data/application capability, not a hidden renderer side effect.
+
 ## Verification
 
 Compile-time project boundaries and architecture checks complement behavior tests. PostgreSQL integration tests cover actual RLS, transactions, constraints, migrations, concurrent writes, and rollback. Payroll uses official golden fixtures and immutable rule versions. UI tests exercise company switching, permissions, lifecycle, keyboard focus, and screenshots. Performance is measured against the documented budget.

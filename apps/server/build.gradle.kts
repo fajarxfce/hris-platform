@@ -51,6 +51,7 @@ dependencies {
     runtimeOnly(libs.postgresql)
     testImplementation(libs.spring.oauth2.client)
     testImplementation(libs.swagger.parser)
+    testImplementation(libs.pdfbox)
     testImplementation(libs.bouncycastle)
     testImplementation(libs.spring.test)
     testImplementation(libs.spring.flyway)

@@ -59,6 +59,8 @@ class CompleteOffboarding(
             if (replay is Result.Failed) return@run replay
             val structure = people.lockReportingLines(company)
             if (structure is Result.Failed) return@run structure
+            val locked = lifecycle.lockCase(company, id)
+            if (locked is Result.Failed) return@run locked
             val companyLock = companies.lock(company)
             if (companyLock is Result.Failed) return@run companyLock
             val membershipLock = members.lock(company)
@@ -96,8 +98,6 @@ class CompleteOffboarding(
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
-            val locked = lifecycle.lockCase(company, id)
-            if (locked is Result.Failed) return@run locked
             val found = lifecycle.case(company, id)
             if (found is Result.Failed) return@run found
             val case =

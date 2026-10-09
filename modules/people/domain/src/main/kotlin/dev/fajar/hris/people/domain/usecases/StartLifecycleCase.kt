@@ -1,7 +1,9 @@
 package dev.fajar.hris.people.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.repositories.MembershipRepository
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.policies.*
 import dev.fajar.hris.people.domain.repositories.*
@@ -10,6 +12,8 @@ import java.util.UUID
 
 class StartLifecycleCase(
     private val lifecycle: LifecycleRepository,
+    private val companies: CompanyRepository,
+    private val identities: IdentityRepository,
     private val people: PeopleRepository,
     private val members: MembershipRepository,
     private val operations: OperationRepository,
@@ -29,7 +33,9 @@ class StartLifecycleCase(
         if (valid is Result.Failed) return valid
         if (command.templateVersion < 0 || command.assignees.size > 64)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_lifecycle_case"))
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         val key =
             OperationKey(
                 "people.lifecycle_start",
@@ -46,17 +52,33 @@ class StartLifecycleCase(
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
+            val structure = people.lockReportingLines(company)
+            if (structure is Result.Failed) return@run structure
+            val templateLock = lifecycle.lockTemplates(company)
+            if (templateLock is Result.Failed) return@run templateLock
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            for (account in (command.assignees.values + actor.accountId).toSet().sorted()) {
+                val accountGuard = identities.lockAccount(account, shared = true)
+                if (accountGuard is Result.Failed) return@run accountGuard
+            }
+            val checked =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
+            val permission = live.requirePermission("people.lifecycle.manage")
+            if (permission is Result.Failed) return@run permission
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
-            val structure = people.lockReportingLines(company)
-            if (structure is Result.Failed) return@run structure
             val previousClosure = lifecycle.completedOffboardingDate(company, command.employmentId)
             if (previousClosure is Result.Failed) return@run previousClosure
             if ((previousClosure as Result.Success).value != null)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "employment_offboarded"))
-            val templateLock = lifecycle.lockTemplates(company)
-            if (templateLock is Result.Failed) return@run templateLock
             val found = lifecycle.template(company, command.templateId)
             if (found is Result.Failed) return@run found
             val template = (found as Result.Success).value
@@ -82,8 +104,6 @@ class StartLifecycleCase(
                     employee.terms.status == EmploymentStatus.ENDED
             )
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "employment_unavailable"))
-            val membershipLock = members.lock(company)
-            if (membershipLock is Result.Failed) return@run membershipLock
             for (id in command.assignees.values.toSet()) {
                 val result = members.find(company, id)
                 if (result is Result.Failed) return@run result

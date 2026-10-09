@@ -265,82 +265,191 @@ class PeopleConfiguration {
     @Bean
     fun saveLifecycleTemplate(
         lifecycle: LifecycleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
-    ) = SaveLifecycleTemplate(lifecycle, operations, journal, transactions)
+    ) =
+        SaveLifecycleTemplate(
+            lifecycle,
+            companies,
+            identities,
+            members,
+            operations,
+            journal,
+            transactions,
+        )
 
     @Bean
     fun startLifecycleCase(
         lifecycle: LifecycleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
         people: PeopleRepository,
         members: MembershipRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = StartLifecycleCase(lifecycle, people, members, operations, journal, transactions, clock)
+    ) =
+        StartLifecycleCase(
+            lifecycle,
+            companies,
+            identities,
+            people,
+            members,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
 
     @Bean
-    fun listLifecycleTemplates(lifecycle: LifecycleRepository, transactions: TransactionRunner) =
-        ListLifecycleTemplates(lifecycle, transactions)
+    fun listLifecycleTemplates(
+        lifecycle: LifecycleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+    ) = ListLifecycleTemplates(lifecycle, companies, identities, members, transactions)
 
     @Bean
-    fun getLifecycleCase(lifecycle: LifecycleRepository, transactions: TransactionRunner) =
-        GetLifecycleCase(lifecycle, transactions)
+    fun getLifecycleCase(
+        lifecycle: LifecycleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        people: PeopleRepository,
+        transactions: TransactionRunner,
+    ) = GetLifecycleCase(lifecycle, companies, identities, members, people, transactions)
 
     @Bean
-    fun listLifecycleCases(lifecycle: LifecycleRepository, transactions: TransactionRunner) =
-        ListLifecycleCases(lifecycle, transactions)
+    fun listLifecycleCases(
+        lifecycle: LifecycleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        people: PeopleRepository,
+        transactions: TransactionRunner,
+    ) = ListLifecycleCases(lifecycle, companies, identities, members, people, transactions)
 
     @Bean
-    fun getLifecycleHistory(lifecycle: LifecycleRepository, transactions: TransactionRunner) =
-        GetLifecycleHistory(lifecycle, transactions)
+    fun getLifecycleHistory(
+        lifecycle: LifecycleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        people: PeopleRepository,
+        transactions: TransactionRunner,
+    ) = GetLifecycleHistory(lifecycle, companies, identities, members, people, transactions)
 
     @Bean
     fun listAssignedLifecycleTasks(
         lifecycle: LifecycleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        people: PeopleRepository,
         transactions: TransactionRunner,
-    ) = ListAssignedLifecycleTasks(lifecycle, transactions)
+    ) = ListAssignedLifecycleTasks(lifecycle, companies, identities, members, people, transactions)
 
     @Bean
     fun changeLifecycleTask(
         lifecycle: LifecycleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        people: PeopleRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = ChangeLifecycleTask(lifecycle, operations, journal, transactions, clock)
+    ) =
+        ChangeLifecycleTask(
+            lifecycle,
+            companies,
+            identities,
+            members,
+            people,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
 
     @Bean
     fun assignLifecycleTask(
         lifecycle: LifecycleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        people: PeopleRepository,
         members: MembershipRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = AssignLifecycleTask(lifecycle, members, operations, journal, transactions, clock)
+    ) =
+        AssignLifecycleTask(
+            lifecycle,
+            companies,
+            identities,
+            people,
+            members,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
 
     @Bean
     fun cancelLifecycleCase(
         lifecycle: LifecycleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
         people: PeopleRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = CancelLifecycleCase(lifecycle, people, operations, journal, transactions, clock)
+    ) =
+        CancelLifecycleCase(
+            lifecycle,
+            companies,
+            identities,
+            members,
+            people,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
 
     @Bean
     fun completeOnboarding(
         lifecycle: LifecycleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
         people: PeopleRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = CompleteOnboarding(lifecycle, people, operations, journal, transactions, clock)
+    ) =
+        CompleteOnboarding(
+            lifecycle,
+            companies,
+            identities,
+            members,
+            people,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
 
     @Bean
     fun completeOffboarding(

@@ -5,7 +5,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface LifecycleDataSource {
-    fun lockTemplates(companyId: UUID)
+    fun lockTemplates(companyId: UUID, shared: Boolean)
 
     fun templateCount(companyId: UUID): Int
 
@@ -19,7 +19,7 @@ interface LifecycleDataSource {
 
     fun insertTemplateRevision(record: LifecycleTemplateRevisionsRecord)
 
-    fun lockCase(companyId: UUID, id: UUID)
+    fun lockCase(companyId: UUID, id: UUID, shared: Boolean)
 
     fun case(companyId: UUID, id: UUID): LifecycleCasesRecord?
 
@@ -29,7 +29,7 @@ interface LifecycleDataSource {
         status: String?,
         after: UUID?,
         limit: Int,
-    ): List<LifecycleCasesRecord>
+    ): List<LifecycleCaseRow>
 
     fun completedOffboardingDate(companyId: UUID, employeeId: UUID): LocalDate?
 

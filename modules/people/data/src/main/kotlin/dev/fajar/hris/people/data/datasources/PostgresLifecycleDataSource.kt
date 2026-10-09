@@ -11,9 +11,10 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresLifecycleDataSource(private val sql: DSLContext) : LifecycleDataSource {
-    override fun lockTemplates(companyId: UUID) {
+    override fun lockTemplates(companyId: UUID, shared: Boolean) {
         sql.query(
-                "select pg_advisory_xact_lock(hashtextextended(?,0))",
+                if (shared) "select pg_advisory_xact_lock_shared(hashtextextended(?,0))"
+                else "select pg_advisory_xact_lock(hashtextextended(?,0))",
                 "lifecycle-templates:$companyId",
             )
             .execute()
@@ -54,13 +55,9 @@ class PostgresLifecycleDataSource(private val sql: DSLContext) : LifecycleDataSo
         sql.insertInto(R).set(record).execute()
     }
 
-    override fun lockCase(companyId: UUID, id: UUID) {
-        sql.select(C.ID)
-            .from(C)
-            .where(C.COMPANY_ID.eq(companyId))
-            .and(C.ID.eq(id))
-            .forUpdate()
-            .fetch()
+    override fun lockCase(companyId: UUID, id: UUID, shared: Boolean) {
+        val query = sql.select(C.ID).from(C).where(C.COMPANY_ID.eq(companyId)).and(C.ID.eq(id))
+        if (shared) query.forShare().fetch() else query.forUpdate().fetch()
     }
 
     override fun case(companyId: UUID, id: UUID) =
@@ -73,14 +70,24 @@ class PostgresLifecycleDataSource(private val sql: DSLContext) : LifecycleDataSo
         after: UUID?,
         limit: Int,
     ) =
-        sql.selectFrom(C)
+        sql.select(
+                C,
+                DSL.multiset(
+                    DSL.selectFrom(K)
+                        .where(K.COMPANY_ID.eq(companyId))
+                        .and(K.CASE_ID.eq(C.ID))
+                        .orderBy(K.KEY)
+                        .limit(64)
+                ),
+            )
+            .from(C)
             .where(C.COMPANY_ID.eq(companyId))
             .and(employeeId?.let { C.EMPLOYMENT_ID.eq(it) } ?: DSL.noCondition())
             .and(status?.let { C.STATUS.eq(it) } ?: DSL.noCondition())
             .and(after?.let { C.ID.gt(it) } ?: DSL.noCondition())
             .orderBy(C.ID)
             .limit(limit)
-            .fetch()
+            .fetch { LifecycleCaseRow(it.value1(), it.value2().toList()) }
 
     override fun completedOffboardingDate(companyId: UUID, employeeId: UUID) =
         sql.select(C.TARGET_DATE)

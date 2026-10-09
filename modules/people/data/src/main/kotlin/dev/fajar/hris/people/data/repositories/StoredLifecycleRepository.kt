@@ -14,8 +14,8 @@ class StoredLifecycleRepository(
     private val source: LifecycleDataSource,
     private val json: ObjectMapper,
 ) : LifecycleRepository {
-    override fun lockTemplates(companyId: UUID) = safeDatabaseCall {
-        source.lockTemplates(companyId)
+    override fun lockTemplates(companyId: UUID, shared: Boolean) = safeDatabaseCall {
+        source.lockTemplates(companyId, shared)
     }
 
     override fun templateCount(companyId: UUID) = safeDatabaseCall {
@@ -69,8 +69,8 @@ class StoredLifecycleRepository(
             }
     }
 
-    override fun lockCase(companyId: UUID, id: UUID) = safeDatabaseCall {
-        source.lockCase(companyId, id)
+    override fun lockCase(companyId: UUID, id: UUID, shared: Boolean) = safeDatabaseCall {
+        source.lockCase(companyId, id, shared)
     }
 
     override fun case(companyId: UUID, id: UUID) = safeDatabaseCall {
@@ -85,11 +85,9 @@ class StoredLifecycleRepository(
         limit: Int,
     ) = safeDatabaseCall {
         val rows = source.cases(companyId, employeeId, status?.name, after, limit + 1)
-        val tasks =
-            source.tasks(companyId, rows.take(limit).map { it.id }.toSet()).groupBy { it.caseId }
         Page(
-            rows.take(limit).map { it.toLifecycleCase(tasks[it.id].orEmpty()) },
-            if (rows.size > limit) rows[limit - 1].id.toString() else null,
+            rows.take(limit).map { it.case.toLifecycleCase(it.tasks) },
+            if (rows.size > limit) rows[limit - 1].case.id.toString() else null,
         )
     }
 

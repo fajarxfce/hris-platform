@@ -1,6 +1,9 @@
 package dev.fajar.hris.people.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.policies.*
 import dev.fajar.hris.people.domain.repositories.*
@@ -9,6 +12,10 @@ import java.util.UUID
 
 class ChangeLifecycleTask(
     private val lifecycle: LifecycleRepository,
+    private val companies: CompanyRepository,
+    private val identities: IdentityRepository,
+    private val members: MembershipRepository,
+    private val people: PeopleRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
@@ -21,10 +28,10 @@ class ChangeLifecycleTask(
         taskKey: String,
         command: LifecycleTaskChange,
     ): Result<MutationReceipt> {
-        val manager = "people.lifecycle.manage" in actor.permissions
+        val initiallyManager = "people.lifecycle.manage" in actor.permissions
         if (
             actor.companyId == null ||
-                (!manager && "people.lifecycle.perform" !in actor.permissions)
+                (!initiallyManager && "people.lifecycle.perform" !in actor.permissions)
         )
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "lifecycle_access_required"))
         if (
@@ -34,7 +41,9 @@ class ChangeLifecycleTask(
                 !taskKey.matches(Regex("[a-z][a-z0-9_-]{0,47}"))
         )
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_lifecycle_change"))
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         val key =
             OperationKey(
                 "people.lifecycle_task_change",
@@ -50,8 +59,27 @@ class ChangeLifecycleTask(
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
+            val peopleGuard = people.lockReportingLines(company, shared = true)
+            if (peopleGuard is Result.Failed) return@run peopleGuard
             val lock = lifecycle.lockCase(company, id)
             if (lock is Result.Failed) return@run lock
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
+            val checked =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
+            val manager = "people.lifecycle.manage" in live.permissions
+            if (!manager && "people.lifecycle.perform" !in live.permissions)
+                return@run Result.Failed(
+                    Failure(FailureKind.FORBIDDEN, "lifecycle_access_required")
+                )
             val result = lifecycle.case(company, id)
             if (result is Result.Failed) return@run result
             val case =

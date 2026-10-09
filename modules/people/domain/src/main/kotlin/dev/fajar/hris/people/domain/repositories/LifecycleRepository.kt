@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface LifecycleRepository {
-    fun lockTemplates(companyId: UUID): Result<Unit>
+    fun lockTemplates(companyId: UUID, shared: Boolean = false): Result<Unit>
 
     fun templateCount(companyId: UUID): Result<Int>
 
@@ -21,7 +21,7 @@ interface LifecycleRepository {
         reason: String,
     ): Result<MutationReceipt>
 
-    fun lockCase(companyId: UUID, id: UUID): Result<Unit>
+    fun lockCase(companyId: UUID, id: UUID, shared: Boolean = false): Result<Unit>
 
     fun case(companyId: UUID, id: UUID): Result<LifecycleCase?>
 

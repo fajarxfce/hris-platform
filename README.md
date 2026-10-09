@@ -26,6 +26,7 @@ The dashboard requires Node.js 24 or newer. From `apps/dashboard`, run `npm ci`,
 - [Architecture and ownership](docs/architecture.md)
 - [SSO configuration](docs/sso.md)
 - [Outbound email](docs/mail.md)
+- [Mobile push delivery](docs/push.md)
 - [Private object storage](docs/storage.md)
 - [API conventions](docs/api-conventions.md)
 - [Generated OpenAPI contract](docs/openapi.md)

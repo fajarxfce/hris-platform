@@ -1,4 +1,5 @@
 [versions]
+google-auth = "1.54.0"
 tika = "4.1.0"
 aws-sdk = "2.55.12"
 commons-csv = "1.14.1"
@@ -13,6 +14,7 @@ swagger-parser = "2.1.48"
 pdfbox = "3.0.8"
 
 [libraries]
+google-auth = { module = "com.google.auth:google-auth-library-oauth2-http", version.ref = "google-auth" }
 tika-core = { module = "org.apache.tika:tika-core", version.ref = "tika" }
 aws-s3 = { module = "software.amazon.awssdk:s3", version.ref = "aws-sdk" }
 aws-apache5 = { module = "software.amazon.awssdk:apache5-client", version.ref = "aws-sdk" }

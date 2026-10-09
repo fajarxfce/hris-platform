@@ -54,3 +54,5 @@ include(
     ":modules:communications:data",
     ":modules:communications:delivery",
 )
+
+include(":core:push:domain", ":core:push:data")

@@ -43,7 +43,10 @@ fun LeaveDayData.toDay(): LeaveDay =
         scheduleRevision,
     )
 
-fun LeaveRequestsRecord.toRequest(json: ObjectMapper): LeaveRequest =
+fun LeaveRequestsRecord.toRequest(
+    json: ObjectMapper,
+    attachments: List<LeaveAttachment>,
+): LeaveRequest =
     LeaveRequest(
         id,
         employmentId,
@@ -59,6 +62,7 @@ fun LeaveRequestsRecord.toRequest(json: ObjectMapper): LeaveRequest =
         approvalId,
         cancellationApprovalId,
         version,
+        attachments,
     )
 
 fun LeaveRequest.toRow(company: UUID, json: ObjectMapper): LeaveRequestsRecord =
@@ -83,6 +87,7 @@ fun LeaveRequest.toRow(company: UUID, json: ObjectMapper): LeaveRequestsRecord =
         it.approvalId = approvalId
         it.cancellationApprovalId = cancellationApprovalId
         it.version = version
+        it.attachmentCount = attachments.size.toShort()
     }
 
 fun LeaveRequest.toAllocations(company: UUID): List<LeaveAllocationsRecord> =

@@ -15,4 +15,5 @@ data class LeaveTypeRequest(
     val active: Boolean = true,
     val expectedVersion: Long? = null,
     val reason: String,
+    val attachmentRequired: Boolean = false,
 )

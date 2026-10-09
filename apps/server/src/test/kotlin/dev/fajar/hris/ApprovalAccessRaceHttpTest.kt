@@ -20,7 +20,7 @@ class ApprovalAccessRaceHttpTest : ApprovalApiFixture() {
 
     @Test
     fun revocationCommittedBeforeTheDecisionFencePreventsDelegatedApproval() {
-        val f = fixture()
+        val f = leaveFixture()
         val request = pending(f)
         val to = reviewer(f.company)
         val delegation = UUID.randomUUID()
@@ -63,7 +63,7 @@ class ApprovalAccessRaceHttpTest : ApprovalApiFixture() {
 
     @Test
     fun aDecisionInsideItsFenceCompletesBeforeACompetingRevocation() {
-        val f = fixture()
+        val f = leaveFixture()
         val request = pending(f)
         val to = reviewer(f.company)
         val delegation = UUID.randomUUID()
@@ -119,7 +119,7 @@ class ApprovalAccessRaceHttpTest : ApprovalApiFixture() {
 
     @Test
     fun reassignmentWhileWaitingCannotBeBypassedByTheFormerAssignee() {
-        val f = fixture()
+        val f = leaveFixture()
         val request = pending(f)
         val next = reviewer(f.company)
         val barrier = ApprovalFenceProbe.Barrier(f.company)
@@ -152,7 +152,7 @@ class ApprovalAccessRaceHttpTest : ApprovalApiFixture() {
 
     @Test
     fun aWaitingSubmissionUsesThePolicyThatSurvivedArchival() {
-        val f = fixture()
+        val f = leaveFixture()
         configureWorkAndApprovals(f)
         assertEquals(200, adjust(f, "5").statusCode())
         val template =
@@ -200,7 +200,7 @@ class ApprovalAccessRaceHttpTest : ApprovalApiFixture() {
     @Test
     fun approvalAdministrationReplaysRecheckCredentialsAfterWaiting() {
         for (kind in listOf("template", "delegation", "reassignment")) {
-            val f = fixture()
+            val f = leaveFixture()
             val id =
                 if (kind == "reassignment") approvalId(f.company, pending(f)) else UUID.randomUUID()
             val to = reviewer(f.company)
@@ -260,7 +260,7 @@ class ApprovalAccessRaceHttpTest : ApprovalApiFixture() {
     @Test
     fun pendingLeaveCommandsCannotUseRemovedPermissions() {
         for (kind in listOf("submit", "withdraw", "cancellation", "decide")) {
-            val f = fixture()
+            val f = leaveFixture()
             val request =
                 if (kind == "submit") {
                     configureWorkAndApprovals(f)
@@ -321,7 +321,7 @@ class ApprovalAccessRaceHttpTest : ApprovalApiFixture() {
 
     @Test
     fun aBeneficiaryLinkedAfterSubmissionCannotApproveDirectlyOrThroughDelegation() {
-        val original = fixture()
+        val original = leaveFixture()
         val to = reviewer(original.company)
         val employee = UUID.randomUUID()
         val created =
@@ -440,7 +440,7 @@ class ApprovalAccessRaceHttpTest : ApprovalApiFixture() {
     @Test
     fun failedAdministrationAuditRollsBackEveryChangeAndLeavesTheOriginalKeyRetryable() {
         for (kind in listOf("template", "delegation", "reassignment")) {
-            val f = fixture()
+            val f = leaveFixture()
             val id =
                 if (kind == "reassignment") approvalId(f.company, pending(f)) else UUID.randomUUID()
             val to = reviewer(f.company)
@@ -537,7 +537,7 @@ class ApprovalAccessRaceHttpTest : ApprovalApiFixture() {
 
     @Test
     fun delegationExpiryWhileARequestWaitsIsEvaluatedAtDecisionTime() {
-        val f = fixture()
+        val f = leaveFixture()
         val request = pending(f)
         val to = reviewer(f.company)
         val id = UUID.randomUUID()
@@ -567,7 +567,7 @@ class ApprovalAccessRaceHttpTest : ApprovalApiFixture() {
 
     @Test
     fun beneficiaryIdentityIsAvailableBeforeEmploymentStarts() {
-        val f = fixture()
+        val f = leaveFixture()
         val to = reviewer(f.company)
         val id = UUID.randomUUID()
         val created =

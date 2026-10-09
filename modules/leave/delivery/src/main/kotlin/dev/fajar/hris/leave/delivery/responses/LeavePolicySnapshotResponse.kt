@@ -12,4 +12,5 @@ data class LeavePolicySnapshotResponse(
     val minServiceMonths: Int,
     val allowedContracts: Set<String>,
     val maxRequestDays: Int,
+    val attachmentRequired: Boolean,
 )

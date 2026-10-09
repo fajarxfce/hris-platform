@@ -5,15 +5,13 @@ import java.net.http.HttpResponse
 import java.time.Instant
 import java.util.UUID
 import org.junit.jupiter.api.Assertions.*
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import tools.jackson.databind.JsonNode
 
 @Import(TestClockConfiguration::class)
-abstract class LeaveApiFixture : ApiIntegrationTest() {
-    @Autowired protected lateinit var clock: MutableTestClock
+abstract class LeaveApiFixture : DocumentValidationApiFixture() {
 
-    protected data class Fixture(
+    protected data class LeaveFixture(
         val company: UUID,
         val employee: UUID,
         val account: UUID,
@@ -28,8 +26,8 @@ abstract class LeaveApiFixture : ApiIntegrationTest() {
         val supervisorCsrf: String,
     )
 
-    protected fun fixture(): Fixture {
-        clock.set(Instant.parse("2026-10-01T15:00:00Z"))
+    protected fun leaveFixture(at: Instant = Instant.parse("2026-10-01T15:00:00Z")): LeaveFixture {
+        clock.set(at)
         val admin = client()
         val csrf = login(admin)
         val response =
@@ -121,7 +119,7 @@ abstract class LeaveApiFixture : ApiIntegrationTest() {
         val supervisor = client()
         val supervisorCsrf = login(supervisor, "$managerAccount@example.test")
         val f =
-            Fixture(
+            LeaveFixture(
                 company,
                 employee,
                 account,
@@ -141,12 +139,14 @@ abstract class LeaveApiFixture : ApiIntegrationTest() {
     }
 
     protected fun policy(
-        f: Fixture,
+        f: LeaveFixture,
         version: Long? = null,
         from: String = "2026-01-01",
         paid: Boolean = true,
         code: String = "ANNUAL",
         active: Boolean = true,
+        attachmentRequired: Boolean = false,
+        key: UUID = UUID.randomUUID(),
     ): HttpResponse<String> =
         command(
             f.admin,
@@ -160,18 +160,19 @@ abstract class LeaveApiFixture : ApiIntegrationTest() {
                     "allowPartialDays" to true,
                     "minServiceMonths" to 12,
                     "maxRequestDays" to 30,
+                    "attachmentRequired" to attachmentRequired,
                     "active" to active,
                     "expectedVersion" to version,
                     "reason" to "Leave policy configuration",
                 )
             ),
             f.adminCsrf,
-            UUID.randomUUID(),
+            key,
             "PUT",
         )
 
     protected fun adjust(
-        f: Fixture,
+        f: LeaveFixture,
         days: String,
         key: UUID = UUID.randomUUID(),
     ): HttpResponse<String> =
@@ -186,7 +187,7 @@ abstract class LeaveApiFixture : ApiIntegrationTest() {
         )
 
     protected fun ledger(
-        f: Fixture,
+        f: LeaveFixture,
         client: HttpClient = f.worker,
         suffix: String = "",
     ): HttpResponse<String> =
@@ -195,13 +196,13 @@ abstract class LeaveApiFixture : ApiIntegrationTest() {
             "/api/v1/companies/${f.company}/leave/employees/${f.employee}/balances/${f.type}/2026$suffix",
         )
 
-    protected fun balance(f: Fixture, client: HttpClient = f.worker): JsonNode {
+    protected fun balance(f: LeaveFixture, client: HttpClient = f.worker): JsonNode {
         val result = ledger(f, client)
         assertEquals(200, result.statusCode(), result.body())
         return json.readTree(result.body()).get("balance")
     }
 
-    protected fun configureWorkAndApprovals(f: Fixture, staged: Boolean = false) {
+    protected fun configureWorkAndApprovals(f: LeaveFixture, staged: Boolean = false) {
         val shift = UUID.randomUUID()
         val created =
             command(
@@ -276,10 +277,11 @@ abstract class LeaveApiFixture : ApiIntegrationTest() {
     }
 
     protected fun submit(
-        f: Fixture,
+        f: LeaveFixture,
         id: UUID,
         days: List<Pair<String, String>>,
         key: UUID = UUID.randomUUID(),
+        attachments: List<UUID> = emptyList(),
     ): HttpResponse<String> =
         command(
             f.worker,
@@ -291,6 +293,7 @@ abstract class LeaveApiFixture : ApiIntegrationTest() {
                     "typeId" to f.type,
                     "days" to days.map { mapOf("workDate" to it.first, "portion" to it.second) },
                     "reason" to "Personal leave",
+                    "attachmentRevisionIds" to attachments,
                 )
             ),
             f.workerCsrf,
@@ -298,7 +301,7 @@ abstract class LeaveApiFixture : ApiIntegrationTest() {
         )
 
     protected fun details(
-        f: Fixture,
+        f: LeaveFixture,
         id: UUID,
         client: HttpClient = f.worker,
         suffix: String = "",
@@ -309,7 +312,7 @@ abstract class LeaveApiFixture : ApiIntegrationTest() {
     }
 
     protected fun decide(
-        f: Fixture,
+        f: LeaveFixture,
         id: UUID,
         version: Long,
         decision: String = "APPROVE",
@@ -331,7 +334,7 @@ abstract class LeaveApiFixture : ApiIntegrationTest() {
         )
 
     protected fun action(
-        f: Fixture,
+        f: LeaveFixture,
         id: UUID,
         action: String,
         version: Long,

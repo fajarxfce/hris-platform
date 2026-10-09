@@ -14,10 +14,13 @@ import tools.jackson.databind.ObjectMapper
 class StoredLeaveRequestRepository(
     private val source: LeaveRequestDataSource,
     private val allocations: LeaveAllocationDataSource,
+    private val attachments: LeaveAttachmentDataSource,
     private val json: ObjectMapper,
 ) : LeaveRequestRepository {
     override fun find(companyId: UUID, id: UUID): Result<LeaveRequest?> = safeDatabaseCall {
-        source.find(companyId, id)?.toRequest(json)
+        source.find(companyId, id)?.let { row ->
+            row.toRequest(json, attachments.list(companyId, id).map { it.toAttachment() })
+        }
     }
 
     override fun list(
@@ -61,6 +64,11 @@ class StoredLeaveRequestRepository(
     override fun create(companyId: UUID, request: LeaveRequest): Result<MutationReceipt> =
         safeDatabaseCall {
             source.insert(request.toRow(companyId, json))
+            attachments.insert(
+                request.attachments.mapIndexed { index, item ->
+                    item.toRow(companyId, request.id, index + 1)
+                }
+            )
             allocations.insert(request.toAllocations(companyId))
             source.append(
                 LeaveRequestChangesRecord().also {

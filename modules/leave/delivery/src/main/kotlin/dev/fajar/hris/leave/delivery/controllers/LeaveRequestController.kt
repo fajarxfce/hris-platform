@@ -35,6 +35,7 @@ class LeaveRequestController(
                 body.typeId,
                 body.days.map { RequestedLeaveDay(it.workDate, it.portion) },
                 body.reason,
+                body.attachmentRevisionIds,
             )
             .response()
             .toResponse()

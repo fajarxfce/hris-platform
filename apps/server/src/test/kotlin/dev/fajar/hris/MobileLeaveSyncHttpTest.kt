@@ -16,10 +16,10 @@ class MobileLeaveSyncHttpTest : LeaveApiFixture() {
         return json.readTree(response.body())
     }
 
-    private fun bootstrap(f: Fixture) =
+    private fun bootstrap(f: LeaveFixture) =
         body(get(f.worker, "/api/v1/companies/${f.company}/sync/bootstrap"))
 
-    private fun changes(f: Fixture, cursor: String) =
+    private fun changes(f: LeaveFixture, cursor: String) =
         body(
             get(
                 f.worker,
@@ -35,7 +35,7 @@ class MobileLeaveSyncHttpTest : LeaveApiFixture() {
 
     @Test
     fun leaveSubmissionApprovalAndCancellationPublishVersionsWithoutPrivateReasons() {
-        val f = fixture()
+        val f = leaveFixture()
         configureWorkAndApprovals(f)
         body(adjust(f, "2"))
         val initial = bootstrap(f).get("changesCursor").asString()
@@ -72,7 +72,7 @@ class MobileLeaveSyncHttpTest : LeaveApiFixture() {
 
     @Test
     fun withdrawnRequestsKeepTheirCancelledCanonicalStateAndOwnerScope() {
-        val f = fixture()
+        val f = leaveFixture()
         configureWorkAndApprovals(f)
         body(adjust(f, "2"))
         val id = UUID.randomUUID()

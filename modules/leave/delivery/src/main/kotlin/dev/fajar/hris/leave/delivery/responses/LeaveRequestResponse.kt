@@ -22,4 +22,5 @@ data class LeaveRequestResponse(
     val cancellation: LeaveWorkflowResponse?,
     val history: Page<LeaveRequestChangeResponse>,
     val availableActions: Set<String>,
+    val attachments: List<LeaveAttachmentResponse>,
 )

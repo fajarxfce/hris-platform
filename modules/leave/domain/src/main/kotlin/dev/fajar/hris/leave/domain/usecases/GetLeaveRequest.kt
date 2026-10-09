@@ -77,11 +77,7 @@ class GetLeaveRequest(
             val currentResult = people.findAtInstant(company, employeeId, now)
             if (currentResult is Result.Failed) return@run currentResult
             val current = (currentResult as Result.Success).value
-            val scoped =
-                "leave.read" in live.permissions ||
-                    ("leave.self.manage" in live.permissions &&
-                        request.ownerAccountId == actor.accountId) ||
-                    (current != null && canReadLeave(live, current, current))
+            val scoped = canReadLeaveRequest(live, request, current)
             val active =
                 if (request.status == LeaveStatus.CANCELLATION_PENDING) requireNotNull(cancellation)
                 else initial

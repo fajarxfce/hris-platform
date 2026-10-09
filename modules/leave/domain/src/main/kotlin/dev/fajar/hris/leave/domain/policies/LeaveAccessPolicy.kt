@@ -1,6 +1,7 @@
 package dev.fajar.hris.leave.domain.policies
 
 import dev.fajar.hris.core.domain.Actor
+import dev.fajar.hris.leave.domain.entities.LeaveRequest
 import dev.fajar.hris.people.domain.entities.Employee
 import dev.fajar.hris.people.domain.entities.EmploymentStatus
 
@@ -24,3 +25,9 @@ fun canReadLeaveTypes(actor: Actor): Boolean =
                 "leave.team.approve",
             )
     }
+
+/** Request ownership remains snapshotted when a person's current binding changes. */
+fun canReadLeaveRequest(actor: Actor, request: LeaveRequest, current: Employee?): Boolean =
+    "leave.read" in actor.permissions ||
+        ("leave.self.manage" in actor.permissions && request.ownerAccountId == actor.accountId) ||
+        (current != null && canReadLeave(actor, current, current))

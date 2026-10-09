@@ -17,6 +17,7 @@ fun LeaveTypeRequest.toType(id: UUID): LeaveType =
             minServiceMonths,
             allowedContracts.toSet(),
             maxRequestDays,
+            attachmentRequired,
         ),
         active,
         expectedVersion ?: 0,

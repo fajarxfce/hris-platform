@@ -13,6 +13,7 @@ fun LeavePolicy.toData(): LeavePolicyData =
         minServiceMonths,
         allowedContracts.map { it.name }.toSet(),
         maxRequestDays,
+        attachmentRequired,
     )
 
 fun LeavePolicyData.toPolicy(): LeavePolicy =
@@ -23,6 +24,7 @@ fun LeavePolicyData.toPolicy(): LeavePolicy =
         minServiceMonths,
         allowedContracts.map { ContractKind.valueOf(it) }.toSet(),
         maxRequestDays,
+        attachmentRequired,
     )
 
 fun LeaveTypeRow.toType(json: ObjectMapper): LeaveType =

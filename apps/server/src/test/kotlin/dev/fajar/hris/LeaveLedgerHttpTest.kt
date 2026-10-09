@@ -12,7 +12,7 @@ import org.springframework.dao.DataAccessException
 class LeaveLedgerHttpTest : LeaveApiFixture() {
     @Test
     fun policiesKeepEffectiveHistoryAndStableCodes() {
-        val f = fixture()
+        val f = leaveFixture()
         val changed = policy(f, 0, "2026-11-01", false)
         assertEquals(200, changed.statusCode(), changed.body())
         val past = get(f.worker, "/api/v1/companies/${f.company}/leave/types?asOf=2026-10-01")
@@ -36,7 +36,7 @@ class LeaveLedgerHttpTest : LeaveApiFixture() {
 
     @Test
     fun concurrentReductionsCannotOverspendAndLedgerReplaysDoNotDoubleGrant() {
-        val f = fixture()
+        val f = leaveFixture()
         val key = UUID.randomUUID()
         val granted = adjust(f, "2.5", key)
         assertEquals(200, granted.statusCode(), granted.body())
@@ -93,7 +93,7 @@ class LeaveLedgerHttpTest : LeaveApiFixture() {
 
     @Test
     fun currentTeamScopeAndIndependentAdjustmentsApplyToLeaveBalances() {
-        val f = fixture()
+        val f = leaveFixture()
         assertEquals(200, adjust(f, "5").statusCode())
         assertEquals(200, ledger(f, f.supervisor).statusCode())
         val moved =

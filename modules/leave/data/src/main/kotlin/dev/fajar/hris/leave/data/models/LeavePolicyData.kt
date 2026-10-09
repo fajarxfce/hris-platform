@@ -7,4 +7,5 @@ data class LeavePolicyData(
     val minServiceMonths: Int,
     val allowedContracts: Set<String>,
     val maxRequestDays: Int,
+    val attachmentRequired: Boolean = false,
 )

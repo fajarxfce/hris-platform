@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 class ApprovalCapacityHttpTest : ApprovalApiFixture() {
     @Test
     fun concurrentTemplatesShareTheActiveLimitAndAdministrationRemainsPaged() {
-        val f = fixture()
+        val f = leaveFixture()
         seedTemplates(f, 199)
         val ids = List(2) { UUID.randomUUID() }
         val go = CountDownLatch(1)
@@ -59,7 +59,7 @@ class ApprovalCapacityHttpTest : ApprovalApiFixture() {
 
     @Test
     fun overCapacityPolicySelectionFailsClosedAndArchivalAllowsRecovery() {
-        val f = fixture()
+        val f = leaveFixture()
         configureWorkAndApprovals(f)
         assertEquals(200, adjust(f, "5").statusCode())
         seedTemplates(f, 200, "LEAVE")
@@ -83,7 +83,7 @@ class ApprovalCapacityHttpTest : ApprovalApiFixture() {
 
     @Test
     fun totalTemplateLimitStillAllowsAnExistingDefinitionToBeRepaired() {
-        val f = fixture()
+        val f = leaveFixture()
         seedTemplates(f, 1000, active = false)
         assertCode(
             saveTemplate(f, UUID.randomUUID(), templateBody(active = false)),
@@ -122,7 +122,7 @@ class ApprovalCapacityHttpTest : ApprovalApiFixture() {
 
     @Test
     fun delegationCapacityIsSerializedAndRevocationOrExpiryReleasesTheRightCapacity() {
-        val f = fixture()
+        val f = leaveFixture()
         val to = reviewer(f.company)
         seedDelegations(f, to.account, 199)
         val ids = List(2) { UUID.randomUUID() }
@@ -184,7 +184,7 @@ class ApprovalCapacityHttpTest : ApprovalApiFixture() {
 
     @Test
     fun oversizedDelegationSetsDoNotPermitTruncatedDecisionsAndCanBeRepaired() {
-        val f = fixture()
+        val f = leaveFixture()
         val request = pending(f)
         val to = reviewer(f.company)
         seedDelegations(f, to.account, 201)
@@ -210,7 +210,7 @@ class ApprovalCapacityHttpTest : ApprovalApiFixture() {
 
     @Test
     fun inboxRequiresCurrentActionPermissionForBothDelegateAndDelegator() {
-        val f = fixture()
+        val f = leaveFixture()
         val request = pending(f)
         val to = reviewer(f.company)
         val id = UUID.randomUUID()

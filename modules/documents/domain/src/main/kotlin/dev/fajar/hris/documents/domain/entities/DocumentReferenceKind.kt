@@ -1,5 +1,6 @@
 package dev.fajar.hris.documents.domain.entities
 
 enum class DocumentReferenceKind {
-    EXPENSE_DRAFT
+    EXPENSE_DRAFT,
+    LEAVE_REQUEST,
 }

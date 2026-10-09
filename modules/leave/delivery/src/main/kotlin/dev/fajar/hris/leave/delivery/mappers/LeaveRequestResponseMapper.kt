@@ -16,6 +16,7 @@ fun LeavePolicySnapshot.toResponse(): LeavePolicySnapshotResponse =
         policy.minServiceMonths,
         policy.allowedContracts.map { it.name }.toSet(),
         policy.maxRequestDays,
+        policy.attachmentRequired,
     )
 
 fun LeaveDay.toResponse(): LeaveDayResponse =
@@ -92,4 +93,14 @@ fun LeaveRequestDetails.toResponse(): LeaveRequestResponse =
             history.nextCursor,
         ),
         availableActions.map { it.name }.toSet(),
+        request.attachments.map {
+            LeaveAttachmentResponse(
+                it.documentId,
+                it.revisionId,
+                it.fileName,
+                it.mediaType,
+                it.size,
+                it.sha256,
+            )
+        },
     )

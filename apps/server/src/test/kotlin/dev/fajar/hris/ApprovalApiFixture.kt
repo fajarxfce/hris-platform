@@ -45,7 +45,7 @@ abstract class ApprovalApiFixture : LeaveApiFixture() {
                 UUID::class.java,
             )!!
 
-    protected fun pending(f: Fixture): UUID {
+    protected fun pending(f: LeaveFixture): UUID {
         configureWorkAndApprovals(f)
         assertEquals(200, adjust(f, "5").statusCode())
         val id = UUID.randomUUID()
@@ -64,7 +64,7 @@ abstract class ApprovalApiFixture : LeaveApiFixture() {
             )!!
 
     protected fun delegationBody(
-        f: Fixture,
+        f: LeaveFixture,
         to: UUID,
         version: Long? = null,
         active: Boolean = true,
@@ -84,7 +84,7 @@ abstract class ApprovalApiFixture : LeaveApiFixture() {
         )
 
     protected fun saveDelegation(
-        f: Fixture,
+        f: LeaveFixture,
         id: UUID,
         body: String,
         key: UUID = UUID.randomUUID(),
@@ -99,7 +99,7 @@ abstract class ApprovalApiFixture : LeaveApiFixture() {
         )
 
     protected fun decideAs(
-        f: Fixture,
+        f: LeaveFixture,
         id: UUID,
         reviewer: Reviewer,
         key: UUID = UUID.randomUUID(),
@@ -131,7 +131,7 @@ abstract class ApprovalApiFixture : LeaveApiFixture() {
         )
 
     protected fun saveTemplate(
-        f: Fixture,
+        f: LeaveFixture,
         id: UUID,
         body: String = templateBody(),
         key: UUID = UUID.randomUUID(),
@@ -146,7 +146,7 @@ abstract class ApprovalApiFixture : LeaveApiFixture() {
         )
 
     protected fun reassign(
-        f: Fixture,
+        f: LeaveFixture,
         approval: UUID,
         assignees: Set<UUID>,
         version: Long = 0,
@@ -167,7 +167,7 @@ abstract class ApprovalApiFixture : LeaveApiFixture() {
         )
 
     protected fun seedTemplates(
-        f: Fixture,
+        f: LeaveFixture,
         count: Int,
         kind: String = "EXPENSE",
         active: Boolean = true,
@@ -186,7 +186,7 @@ abstract class ApprovalApiFixture : LeaveApiFixture() {
             )
     }
 
-    protected fun seedDelegations(f: Fixture, to: UUID, count: Int, active: Boolean = true) {
+    protected fun seedDelegations(f: LeaveFixture, to: UUID, count: Int, active: Boolean = true) {
         database()
             .update(
                 """insert into approval_delegations(company_id,id,kind,from_account,to_account,valid_from,valid_until,active)

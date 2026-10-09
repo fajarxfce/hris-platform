@@ -78,7 +78,7 @@ Corrected totals appear beside the original entries in daily attendance response
 
 Leave policies and balances:
 
-- `PUT /companies/{companyId}/leave/types/{id}`: code, name, effectiveFrom, paid, allowPartialDays, minServiceMonths, allowedContracts, maxRequestDays, active, expectedVersion, reason. Requires `leave.manage` and an idempotency key; type code cannot change after creation.
+- `PUT /companies/{companyId}/leave/types/{id}`: code, name, effectiveFrom, paid, allowPartialDays, minServiceMonths, allowedContracts, maxRequestDays, attachmentRequired (optional, defaults to false), active, expectedVersion, reason. Requires `leave.manage` and an idempotency key; type code cannot change after creation.
 - `GET /companies/{companyId}/leave/types?asOf=YYYY-MM-DD`: after code, limit; includes current `version` and the selected `appliedRevision`.
 - `POST /companies/{companyId}/leave/employees/{id}/balances/{typeId}/{year}/adjustments`: decimal-string days (signed, nonzero, increments of 0.5, at most 366 in magnitude) and reason. Requires `leave.manage` and an idempotency key. Own balance adjustments are denied.
 - `GET /companies/{companyId}/leave/employees/{id}/balances/{typeId}/{year}`: after opaque entry cursor and limit. Returns available/reserved/consumed day strings and a chronological, immutable ledger. Current company/team/self authorization applies independently of the balance year.
@@ -87,14 +87,17 @@ Balances are read consistently with their history. Manual reductions use only av
 
 Leave requests:
 
-- `POST /companies/{companyId}/leave/requests`: id, employeeId, typeId, days (`{workDate, portion}`), reason. Portions are FULL, FIRST_HALF, or SECOND_HALF. Requires own `leave.self.manage` or on-behalf `leave.manage`, with an idempotency key.
+- `POST /companies/{companyId}/leave/requests`: id, employeeId, typeId, days (`{workDate, portion}`), optional attachmentRevisionIds (up to three distinct UUIDs), reason. Portions are FULL, FIRST_HALF, or SECOND_HALF. Requires own `leave.self.manage` or on-behalf `leave.manage`, with an idempotency key.
 - `GET /companies/{companyId}/leave/requests`: optional employeeId, status, after, limit. Company-wide lists require `leave.read`; self/current-team reads require an explicit employeeId.
-- `GET /companies/{companyId}/leave/requests/{id}`: optional historyAfter and historyLimit. Returns submitted policy/day snapshots, workflow state, version, availableActions, and bounded change history.
+- `GET /companies/{companyId}/leave/requests/{id}`: optional historyAfter and historyLimit. Returns submitted policy/day snapshots, frozen attachment metadata, workflow state, version, availableActions, and bounded change history.
+- `GET` / `HEAD /companies/{companyId}/leave/requests/{id}/attachments/{revisionId}/content`: current request/approver scope, single Range and ETag negotiation. Only evidence attached to that exact request is available; storage keys are never exposed.
 - `POST /companies/{companyId}/leave/requests/{id}/decisions`: version, decision (APPROVE/REJECT), reason. A rejection requires a reason. Applies to the current initial/cancellation workflow; requires its current independently assigned approver.
 - `POST /companies/{companyId}/leave/requests/{id}/withdraw`: version, reason. Withdraws a pending request or its pending cancellation.
 - `POST /companies/{companyId}/leave/requests/{id}/cancellation`: version, reason. Starts independent approval of cancellation for approved leave.
 
 All request mutations use idempotency keys. Version is the leave request version, not the nested approval version. A submission includes at most 366 explicit dates within a 366-day span. Off/holiday dates are omitted from charged duration; missing schedules and ineligible employment dates fail the entire command. Reservations are made per balance year. Cancellation does not restore balance until approved. Submitted policy and schedule snapshots remain unchanged by later edits.
+
+Attachments must be accepted `PERSONAL` document revisions for the same employment. `leave_attachment_required`, `invalid_leave_attachments`, and `leave_attachment_unavailable` expose stable validation outcomes. The policy flag and empty attachment list preserve existing command fingerprints. Attachment ID order is insignificant for replay. References remain retained after withdrawal/cancellation. A client may finish resumable document validation first and then retry the same submission operation; failed validation does not consume its operation ID.
 
 Password authentication counts successful and failed attempts in fixed 15-minute windows. Limits are ten per normalized account and one hundred per server-observed origin. HTTP 429 `sign_in_rate_limited` carries `Retry-After: 900`; clients must wait instead of automatically looping. Capacity exhaustion returns 503 `password_verification_busy`. Neither response confirms account existence.
 

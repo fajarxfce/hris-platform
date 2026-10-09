@@ -4,6 +4,9 @@ import dev.fajar.hris.approvals.domain.entities.*
 import dev.fajar.hris.approvals.domain.policies.*
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.documents.domain.entities.*
+import dev.fajar.hris.documents.domain.repositories.DocumentReferenceRepository
+import dev.fajar.hris.documents.domain.repositories.DocumentRepository
 import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
@@ -32,6 +35,8 @@ class SubmitLeaveRequest(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val documents: DocumentRepository,
+    private val references: DocumentReferenceRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -41,11 +46,14 @@ class SubmitLeaveRequest(
         typeId: UUID,
         days: List<RequestedLeaveDay>,
         reason: String,
+        attachmentRevisionIds: List<UUID> = emptyList(),
     ): Result<MutationReceipt> {
         if ("leave.manage" !in actor.permissions && "leave.self.manage" !in actor.permissions)
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
         val valid = validateRequestedLeaveDays(days, reason)
         if (valid is Result.Failed) return valid
+        val attachmentInput = validateLeaveAttachmentIds(attachmentRevisionIds)
+        if (attachmentInput is Result.Failed) return attachmentInput
         val key =
             OperationKey(
                 "leave.request_submit",
@@ -53,7 +61,10 @@ class SubmitLeaveRequest(
                 listOf(id.toString(), employeeId.toString(), typeId.toString(), reason) +
                     days
                         .sortedBy { it.workDate }
-                        .flatMap { listOf(it.workDate.toString(), it.portion.name) },
+                        .flatMap { listOf(it.workDate.toString(), it.portion.name) } +
+                    if (attachmentRevisionIds.isEmpty()) emptyList()
+                    else
+                        listOf("attachments") + attachmentRevisionIds.map { it.toString() }.sorted(),
             )
         val company = requireNotNull(actor.companyId)
         val from = days.minOf { it.workDate }
@@ -65,6 +76,10 @@ class SubmitLeaveRequest(
             if (lock is Result.Failed) return@run lock
             val peopleLock = people.lockReportingLines(company)
             if (peopleLock is Result.Failed) return@run peopleLock
+            if (attachmentRevisionIds.isNotEmpty()) {
+                val documentLock = documents.lock(company)
+                if (documentLock is Result.Failed) return@run documentLock
+            }
             val approvalLock = approvals.lock(company)
             if (approvalLock is Result.Failed) return@run approvalLock
             val companyLock = companies.lock(company)
@@ -129,6 +144,34 @@ class SubmitLeaveRequest(
             val type = (typeResult as Result.Success).value
             if (type == null || !type.active)
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "leave_type_unavailable"))
+            if (type.policy.attachmentRequired && attachmentRevisionIds.isEmpty())
+                return@run Result.Failed(
+                    Failure(
+                        FailureKind.VALIDATION,
+                        "leave_attachment_required",
+                        fields = mapOf("attachmentRevisionIds" to "required"),
+                    )
+                )
+            val attachments = mutableListOf<LeaveAttachment>()
+            for (revisionId in attachmentRevisionIds.sortedBy { it.toString() }) {
+                val revisionResult = documents.revision(company, revisionId)
+                if (revisionResult is Result.Failed) return@run revisionResult
+                val revision =
+                    (revisionResult as Result.Success).value
+                        ?: return@run Result.Failed(
+                            Failure(FailureKind.VALIDATION, "leave_attachment_unavailable")
+                        )
+                val documentResult = documents.find(company, revision.documentId)
+                if (documentResult is Result.Failed) return@run documentResult
+                val evidence =
+                    snapshotLeaveAttachment(
+                        (documentResult as Result.Success).value,
+                        revision,
+                        employeeId,
+                    )
+                if (evidence is Result.Failed) return@run evidence
+                attachments += (evidence as Result.Success).value
+            }
             val history = people.effectiveRevisions(company, employeeId, from, until)
             if (history is Result.Failed) return@run history
             val planned =
@@ -194,6 +237,7 @@ class SubmitLeaveRequest(
                     snapshot.id,
                     null,
                     0,
+                    attachments.toList(),
                 )
             val entries =
                 movements.map {
@@ -213,6 +257,17 @@ class SubmitLeaveRequest(
                         reason,
                     )
                 }
+            if (attachmentRevisionIds.isNotEmpty()) {
+                val retained =
+                    references.retain(
+                        company,
+                        DocumentReferenceOrigin(DocumentReferenceKind.LEAVE_REQUEST, id, 0),
+                        attachmentRevisionIds.toSet(),
+                        actor.accountId,
+                        now,
+                    )
+                if (retained is Result.Failed) return@run retained
+            }
             approvals
                 .create(company, snapshot)
                 .flatMap { requests.create(company, request) }

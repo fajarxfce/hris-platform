@@ -8,4 +8,5 @@ data class LeaveSubmissionRequest(
     val typeId: UUID,
     val days: List<LeaveDayRequest>,
     val reason: String,
+    val attachmentRevisionIds: List<UUID> = emptyList(),
 )

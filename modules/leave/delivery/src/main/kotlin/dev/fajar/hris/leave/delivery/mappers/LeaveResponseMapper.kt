@@ -18,6 +18,7 @@ fun LeaveType.toResponse(): LeaveTypeResponse =
         active,
         version,
         appliedRevision,
+        policy.attachmentRequired,
     )
 
 fun LeaveLedger.toResponse(): LeaveLedgerResponse =

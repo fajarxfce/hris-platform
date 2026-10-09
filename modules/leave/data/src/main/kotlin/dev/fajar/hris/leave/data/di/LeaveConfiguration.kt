@@ -2,6 +2,8 @@ package dev.fajar.hris.leave.data.di
 
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.documents.domain.repositories.DocumentReferenceRepository
+import dev.fajar.hris.documents.domain.repositories.DocumentRepository
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.leave.data.datasources.*
@@ -10,6 +12,7 @@ import dev.fajar.hris.leave.domain.repositories.*
 import dev.fajar.hris.leave.domain.usecases.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
+import dev.fajar.hris.storage.domain.repositories.ObjectStorageRepository
 import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
 import java.time.Clock
 import org.jooq.DSLContext
@@ -41,7 +44,10 @@ class LeaveConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
-    ) = SaveLeaveType(policies, operations, journal, transactions)
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+    ) = SaveLeaveType(policies, operations, journal, transactions, companies, members, identities)
 
     @Bean
     fun listLeaveTypes(policies: LeavePolicyRepository, transactions: TransactionRunner) =
@@ -76,11 +82,16 @@ class LeaveConfiguration {
         PostgresLeaveAllocationDataSource(sql)
 
     @Bean
+    fun leaveAttachmentSource(sql: DSLContext): LeaveAttachmentDataSource =
+        PostgresLeaveAttachmentDataSource(sql)
+
+    @Bean
     fun leaveRequests(
         source: LeaveRequestDataSource,
         allocations: LeaveAllocationDataSource,
+        attachments: LeaveAttachmentDataSource,
         json: ObjectMapper,
-    ): LeaveRequestRepository = StoredLeaveRequestRepository(source, allocations, json)
+    ): LeaveRequestRepository = StoredLeaveRequestRepository(source, allocations, attachments, json)
 
     @Bean
     fun submitLeaveRequest(
@@ -97,6 +108,8 @@ class LeaveConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        documents: DocumentRepository,
+        references: DocumentReferenceRepository,
     ) =
         SubmitLeaveRequest(
             requests,
@@ -112,6 +125,8 @@ class LeaveConfiguration {
             journal,
             transactions,
             clock,
+            documents,
+            references,
         )
 
     @Bean
@@ -225,4 +240,54 @@ class LeaveConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
     ) = ListLeaveRequests(requests, people, transactions, clock)
+
+    @Bean
+    fun getLeaveAttachmentDownload(
+        requests: LeaveRequestRepository,
+        documents: DocumentRepository,
+        people: PeopleRepository,
+        approvals: ApprovalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        GetLeaveAttachmentDownload(
+            requests,
+            documents,
+            people,
+            approvals,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun readLeaveAttachmentContent(
+        requests: LeaveRequestRepository,
+        documents: DocumentRepository,
+        people: PeopleRepository,
+        approvals: ApprovalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        storage: ObjectStorageRepository,
+    ) =
+        ReadLeaveAttachmentContent(
+            requests,
+            documents,
+            people,
+            approvals,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            storage,
+        )
 }

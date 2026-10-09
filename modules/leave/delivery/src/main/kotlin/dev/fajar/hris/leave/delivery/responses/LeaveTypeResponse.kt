@@ -16,4 +16,5 @@ data class LeaveTypeResponse(
     val active: Boolean,
     val version: Long,
     val appliedRevision: Long,
+    val attachmentRequired: Boolean,
 )

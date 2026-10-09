@@ -11,7 +11,7 @@ import org.springframework.dao.DataAccessException
 class LeaveRequestHttpTest : LeaveApiFixture() {
     @Test
     fun snapshotsSurvivePolicyAndRosterChangesAndCancellationRefundsOnlyAfterApproval() {
-        val f = fixture()
+        val f = leaveFixture()
         configureWorkAndApprovals(f)
         assertEquals(200, adjust(f, "5").statusCode())
         val id = UUID.randomUUID()
@@ -107,7 +107,7 @@ class LeaveRequestHttpTest : LeaveApiFixture() {
 
     @Test
     fun simultaneousRequestsCannotReserveTheSameAvailableBalance() {
-        val f = fixture()
+        val f = leaveFixture()
         configureWorkAndApprovals(f)
         assertEquals(200, adjust(f, "2").statusCode())
         val ids = List(2) { UUID.randomUUID() }
@@ -172,7 +172,7 @@ class LeaveRequestHttpTest : LeaveApiFixture() {
 
     @Test
     fun halfDayOccupancyIsSharedAcrossTypesAndWithdrawalReleasesOnce() {
-        val f = fixture()
+        val f = leaveFixture()
         configureWorkAndApprovals(f)
         assertEquals(200, adjust(f, "2").statusCode())
         val first = UUID.randomUUID()
@@ -206,7 +206,7 @@ class LeaveRequestHttpTest : LeaveApiFixture() {
 
     @Test
     fun decisionsAreAtomicWithLedgerAndAllocationCleanup() {
-        val f = fixture()
+        val f = leaveFixture()
         configureWorkAndApprovals(f)
         assertEquals(200, adjust(f, "4").statusCode())
         val first = UUID.randomUUID()
@@ -266,7 +266,7 @@ class LeaveRequestHttpTest : LeaveApiFixture() {
 
     @Test
     fun stagedApprovalsAndWithdrawnOrRejectedCancellationsKeepConsumption() {
-        val f = fixture()
+        val f = leaveFixture()
         configureWorkAndApprovals(f, staged = true)
         assertEquals(200, adjust(f, "1").statusCode())
         val id = UUID.randomUUID()
@@ -319,7 +319,7 @@ class LeaveRequestHttpTest : LeaveApiFixture() {
 
     @Test
     fun yearSpanningRequestsAllocateBothBucketsAndRejectNewIneligibleDates() {
-        val f = fixture()
+        val f = leaveFixture()
         configureWorkAndApprovals(f)
         assertEquals(200, adjust(f, "1").statusCode())
         val nextYear =

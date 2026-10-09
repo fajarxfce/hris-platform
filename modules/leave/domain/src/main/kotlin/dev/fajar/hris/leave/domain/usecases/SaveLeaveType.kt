@@ -1,15 +1,22 @@
 package dev.fajar.hris.leave.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.leave.domain.entities.LeaveType
 import dev.fajar.hris.leave.domain.policies.validateLeaveType
 import dev.fajar.hris.leave.domain.repositories.LeavePolicyRepository
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 
 class SaveLeaveType(
     private val policies: LeavePolicyRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
+    private val companies: CompanyRepository,
+    private val members: MembershipRepository,
+    private val identities: IdentityRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -41,17 +48,32 @@ class SaveLeaveType(
                     type.active.toString(),
                     expectedVersion?.toString(),
                     reason,
-                ),
+                ) +
+                    if (type.policy.attachmentRequired) listOf("attachmentRequired", "true")
+                    else emptyList(),
             )
         val company = requireNotNull(actor.companyId)
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
+            val lock = policies.lock(company)
+            if (lock is Result.Failed) return@run lock
+            val companyLock = companies.lock(company)
+            if (companyLock is Result.Failed) return@run companyLock
+            val memberLock = members.lock(company)
+            if (memberLock is Result.Failed) return@run memberLock
+            val accountLock = identities.lockAccount(actor.accountId)
+            if (accountLock is Result.Failed) return@run accountLock
+            val checked =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (checked is Result.Failed) return@run checked
+            val allowed = (checked as Result.Success).value.requirePermission("leave.manage")
+            if (allowed is Result.Failed) return@run allowed
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
-            val lock = policies.lock(company)
-            if (lock is Result.Failed) return@run lock
             val existing = policies.find(company, type.id)
             if (existing is Result.Failed) return@run existing
             val current = (existing as Result.Success).value

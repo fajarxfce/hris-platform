@@ -12,7 +12,7 @@ Acceptance: simultaneous requests cannot overspend balance; replay and cancellat
 
 ## Implementation status
 
-Effective leave types and the immutable balance ledger are implemented. Policies define paid status, partial-day support, minimum service in calendar months, allowed contract kinds, and maximum days per request. Type codes are stable; revisions preserve historical policy.
+Effective leave types and the immutable balance ledger are implemented. Policies define paid status, partial-day support, minimum service in calendar months, allowed contract kinds, maximum days per request, and whether evidence is required. Type codes are stable; revisions preserve historical policy.
 
 The ledger represents half-day units internally and decimal day strings at the API. HR adjustments require an independent actor and reason, reject reductions below available balance, and share an employee lock with balance/history reads. Replay never grants twice. Adjustment of an archived type is allowed for accounting corrections; this does not reactivate it for new requests. Ledger reads follow current team/self/company scope and paginate chronologically.
 
@@ -22,4 +22,12 @@ Approval consumes a reservation only after its final stage. Rejection or withdra
 
 Request detail exposes server-calculated actions. Current HR/team/self scope or a permitted snapshotted approver/delegate controls access. A delegated approver loses access when the source membership or approval permission is revoked. Summary and history reads are paginated.
 
-Scheduled accrual, carryover/expiry, attachments, and payroll cutoff integration remain planned.
+## Attachments
+
+Submission accepts up to three distinct `attachmentRevisionIds`. Each revision must already be `READY`, belong to a `PERSONAL` document for the same employment, and remain available in the selected company. The selected policy's `attachmentRequired` flag defaults to false. Missing required evidence and unavailable evidence have stable validation codes; a foreign revision is not identified in the response.
+
+The request freezes document/revision IDs, file name, media type, byte count, and SHA-256. It registers immutable business references in the same transaction as reservations, approval, audit, operation receipt, and the sync invalidation. Deferred database constraints reject missing attachment rows or references. Replaying the same request does not resnapshot a replaced document or a changed policy. Withdrawal and cancellation preserve the original evidence, which continues to prevent retirement of the referenced content.
+
+`GET` and `HEAD /api/v1/companies/{companyId}/leave/requests/{requestId}/attachments/{revisionId}/content` support bounded Range downloads and ETag validation. Access follows current request scope or an independently assigned approver/delegate; it does not require a broad personal-document grant. Each storage read is outside the SQL transaction, verifies content integrity, and rechecks current access before returning bytes. Responses are private and must not be cached outside the account/company partition.
+
+Scheduled accrual, carryover/expiry, and payroll cutoff integration remain planned.

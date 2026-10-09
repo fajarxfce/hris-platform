@@ -45,7 +45,7 @@ A stopped job can be resumed by its original author with current assurance, obse
 
 To correct input, first stop a running job, then abandon its run with observed run and period versions. A completed calculation can also be abandoned after any pending or approved review has been explicitly withdrawn. Abandonment preserves evidence, reopens the period as `DRAFT`, and releases its source cutoffs. Start a new run to reassess corrected input; resume does not rewind an existing result. A period retains at most twenty runs. Changes to its immutable roster/payment metadata still require cancelling and replacing the draft.
 
-The current tax-history source is an independently verified opening through the preceding month. Chaining later finalized payroll into that history, duplicate payout prevention, approval/finalization, and amendments remain subsequent work. Do not simulate that chain by overwriting a frozen opening.
+The current tax-history source is an independently verified opening through the preceding month. Finalized history chaining, employee payslip delivery, payments, and amendments remain subsequent work. Do not simulate that chain by overwriting a frozen opening.
 
 ## Source cutoffs
 
@@ -77,3 +77,16 @@ A missing assignee blocks the shared approval until administrative reassignment.
 Review, approval transition, immutable change evidence, audit/outbox, and receipt share a transaction. The database rejects changed totals, missing history, unmatched decisions, or abandonment with an active review. Submission aggregates summary amount columns; it does not load every employee's complete JSON snapshot. Review reads return at most ten change records, and submission history uses bounded pages.
 
 Mobile clients retain both observed versions with a pending command. A lost response can replay the original operation after current access checks. `stale_version` or `approval_changed` requires fetching the latest review before constructing a new action. A finalized/paid state is never inferred from a completed calculation or approved review.
+
+
+## Finalization
+
+`payroll.finalize` starts an explicit publication job for an unchanged, approved run. The command carries an idempotency key, a client-generated finalization ID, review ID, observed run/review/approval versions, and reason. Current company membership, credentials, recent authentication, and configured MFA are checked before both a new command and its original receipt replay. The existing aggregate maker/checker review remains mandatory; a finalizer may be a payroll beneficiary whose personal sources were independently reviewed.
+
+Each request retains its actor, approved references, reason, job ID, and company code/name at submission. Later company renaming does not rewrite the published issuer labels. A run permits eight explicit finalization attempts. A queued/running attempt must be cancelled through the job API and reach a terminal outcome before retry or review withdrawal. A failed attempt does not undo review or silently recalculate sources. Start also respects the bounded company job queue.
+
+The worker locks its lease before the company payroll, people, approval, and access guards. It rechecks current authority, credential version, authentication age, exact approved versions, and employment heads. A changed employment revision requires explicit withdrawal and recalculation, including a later effective revision. One person cannot receive two original assessments for the same company/tax month through different employment IDs. A positive THR result retains its holiday kind/year, with a company/person/year/kind uniqueness constraint.
+
+One database transaction inserts thin immutable assessment references to all successful retained results, marks the finalization published, changes run and period to `FINALIZED`, retains period history, completes the job, and records audit/outbox. No employee is published early. The operation uses set-based source validation and checks completeness at the publication header, without loading 5,000 complete calculation payloads in the application. Deferred references prevent unpublished rows from committing. Cancellation, a lost lease, missing effects, or an audit failure rolls back publication.
+
+The calculation job, counters, facts, and results remain unchanged. The run exposes `finalizationId`; the separate finalization detail exposes its own finite job progress and nullable `publishedAt`. A lost HTTP response can be recovered using the same command ID/key and payload. There is no hidden retry that changes an observed version. Finalization establishes assessment evidence, not a bank payment. Finalized payroll cannot be withdrawn, abandoned, edited, or cancelled; corrections require a subsequent referenced amendment.

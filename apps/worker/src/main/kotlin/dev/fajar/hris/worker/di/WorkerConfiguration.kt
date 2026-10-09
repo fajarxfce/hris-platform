@@ -202,4 +202,11 @@ class WorkerConfiguration {
         advance: AdvancePayrollCalculation,
         abort: AbortPayrollCalculation,
     ): JobTask = PayrollCalculationTask(resolve, advance, abort)
+
+    @Bean
+    fun payrollFinalizationTask(
+        resolve: ResolveActor,
+        advance: AdvancePayrollFinalization,
+        abort: AbortPayrollFinalization,
+    ): JobTask = PayrollFinalizationTask(resolve, advance, abort)
 }

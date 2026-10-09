@@ -26,4 +26,5 @@ data class PayrollRun(
     val processed: Int = 0,
     val succeeded: Int = 0,
     val failed: Int = 0,
+    val finalizationId: UUID? = null,
 )

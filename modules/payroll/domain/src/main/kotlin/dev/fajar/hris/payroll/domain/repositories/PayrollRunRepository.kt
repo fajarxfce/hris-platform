@@ -36,6 +36,8 @@ interface PayrollRunRepository {
         job: UUID = run.jobId,
     ): Result<MutationReceipt>
 
+    fun finalize(company: UUID, run: PayrollRun, finalizationId: UUID): Result<MutationReceipt>
+
     fun attempts(company: UUID, run: UUID): Result<List<PayrollRunAttempt>>
 
     fun appendAttempt(company: UUID, run: UUID, attempt: PayrollRunAttempt): Result<Unit>

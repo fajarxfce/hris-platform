@@ -153,6 +153,21 @@ class PostgresPayrollRunDataSource(private val sql: DSLContext) : PayrollRunData
             .fetchOne()
             ?.version
 
+    override fun finalize(company: UUID, run: UUID, version: Long, finalization: UUID): Long? =
+        sql.update(R)
+            .set(R.STATUS, "FINALIZED")
+            .set(R.VERSION, version + 1)
+            .set(R.FINALIZATION_ID, finalization)
+            .where(
+                R.COMPANY_ID.eq(company),
+                R.ID.eq(run),
+                R.VERSION.eq(version),
+                R.STATUS.eq("CALCULATED"),
+            )
+            .returning(R.VERSION)
+            .fetchOne()
+            ?.version
+
     override fun attempts(company: UUID, run: UUID): List<PayrollRunAttemptsRecord> =
         sql.selectFrom(A)
             .where(A.COMPANY_ID.eq(company), A.RUN_ID.eq(run))

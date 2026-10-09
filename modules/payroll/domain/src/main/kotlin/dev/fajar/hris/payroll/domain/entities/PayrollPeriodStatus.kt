@@ -4,5 +4,6 @@ enum class PayrollPeriodStatus {
     DRAFT,
     PROCESSING,
     CALCULATED,
+    FINALIZED,
     CANCELLED,
 }

@@ -7,6 +7,8 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.entities.JobStatus
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.payroll.domain.entities.*
 import dev.fajar.hris.payroll.domain.policies.*
@@ -27,6 +29,8 @@ class WithdrawPayrollReview(
     private val transactions: TransactionRunner,
     private val security: IdentitySecurityPolicy,
     private val clock: Clock,
+    private val finalizations: PayrollFinalizationRepository,
+    private val jobs: JobRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -102,6 +106,20 @@ class WithdrawPayrollReview(
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "payroll_review_not_current")
                 )
+            val latestFinalization = finalizations.latest(company, run.id)
+            if (latestFinalization is Result.Failed) return@run latestFinalization
+            val finalization = (latestFinalization as Result.Success).value
+            if (finalization != null) {
+                val job = jobs.find(company, finalization.jobId)
+                if (job is Result.Failed) return@run job
+                if (
+                    (job as Result.Success).value?.status in
+                        setOf(JobStatus.QUEUED, JobStatus.RUNNING)
+                )
+                    return@run Result.Failed(
+                        Failure(FailureKind.CONFLICT, "payroll_finalization_active")
+                    )
+            }
             val foundApproval = approvals.find(company, review.approvalId)
             if (foundApproval is Result.Failed) return@run foundApproval
             val approval =

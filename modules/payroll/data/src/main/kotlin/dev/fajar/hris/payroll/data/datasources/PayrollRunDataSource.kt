@@ -30,6 +30,8 @@ interface PayrollRunDataSource {
 
     fun transition(company: UUID, run: UUID, version: Long, status: String, job: UUID): Long?
 
+    fun finalize(company: UUID, run: UUID, version: Long, finalization: UUID): Long?
+
     fun attempts(company: UUID, run: UUID): List<PayrollRunAttemptsRecord>
 
     fun insertAttempt(row: PayrollRunAttemptsRecord)

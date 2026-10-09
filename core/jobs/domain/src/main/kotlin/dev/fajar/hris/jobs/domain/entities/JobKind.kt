@@ -3,6 +3,7 @@ package dev.fajar.hris.jobs.domain.entities
 enum class JobKind {
     WORKFORCE_CLOSE,
     PAYROLL_CALCULATE,
+    PAYROLL_FINALIZE,
     LEAVE_ACCRUAL,
     LEAVE_YEAR_CLOSE,
     DOCUMENT_VALIDATE,

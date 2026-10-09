@@ -26,4 +26,5 @@ data class PayrollRunResponse(
     val processed: Int,
     val succeeded: Int,
     val failed: Int,
+    val finalizationId: UUID?,
 )

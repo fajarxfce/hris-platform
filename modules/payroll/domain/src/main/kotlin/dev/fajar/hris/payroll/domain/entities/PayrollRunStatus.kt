@@ -7,5 +7,6 @@ enum class PayrollRunStatus {
     PROCESSING,
     STOPPED,
     CALCULATED,
+    FINALIZED,
     ABANDONED,
 }

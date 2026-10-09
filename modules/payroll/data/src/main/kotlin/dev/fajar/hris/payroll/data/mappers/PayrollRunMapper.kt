@@ -33,6 +33,7 @@ fun PayrollRunsRecord.toRun() =
         processed,
         succeeded,
         failed,
+        finalizationId,
     )
 
 fun PayrollRunTargetsRecord.toTarget() =

@@ -102,6 +102,15 @@ class StoredPayrollRunRepository(
             .requireCurrentVersion()
             .map { MutationReceipt(run.id, it) }
 
+    override fun finalize(
+        company: UUID,
+        run: PayrollRun,
+        finalizationId: UUID,
+    ): Result<MutationReceipt> =
+        safeDatabaseCall { source.finalize(company, run.id, run.version, finalizationId) }
+            .requireCurrentVersion()
+            .map { MutationReceipt(run.id, it) }
+
     override fun attempts(company: UUID, run: UUID): Result<List<PayrollRunAttempt>> =
         safeDatabaseCall {
             source.attempts(company, run).map { it.toAttempt() }

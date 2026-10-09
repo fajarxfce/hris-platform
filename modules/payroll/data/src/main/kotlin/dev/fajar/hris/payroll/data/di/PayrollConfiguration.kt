@@ -768,6 +768,8 @@ class PayrollConfiguration {
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
+        finalizations: PayrollFinalizationRepository,
+        jobs: JobRepository,
     ) =
         WithdrawPayrollReview(
             reviews,
@@ -782,6 +784,8 @@ class PayrollConfiguration {
             transactions,
             security,
             clock,
+            finalizations,
+            jobs,
         )
 
     @Bean
@@ -805,4 +809,133 @@ class PayrollConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
     ) = ListPayrollReviews(reviews, runs, policies, companies, members, identities, transactions)
+
+    @Bean
+    fun payrollFinalizationSource(sql: DSLContext): PayrollFinalizationDataSource =
+        PostgresPayrollFinalizationDataSource(sql)
+
+    @Bean
+    fun payrollFinalizations(source: PayrollFinalizationDataSource): PayrollFinalizationRepository =
+        StoredPayrollFinalizationRepository(source)
+
+    @Bean
+    fun startPayrollFinalization(
+        finalizations: PayrollFinalizationRepository,
+        runs: PayrollRunRepository,
+        reviews: PayrollReviewRepository,
+        policies: PayrollPolicyRepository,
+        approvals: ApprovalRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+        operations: OperationRepository,
+    ) =
+        StartPayrollFinalization(
+            finalizations,
+            runs,
+            reviews,
+            policies,
+            approvals,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            journal,
+            transactions,
+            security,
+            clock,
+            operations,
+        )
+
+    @Bean
+    fun advancePayrollFinalization(
+        finalizations: PayrollFinalizationRepository,
+        runs: PayrollRunRepository,
+        reviews: PayrollReviewRepository,
+        policies: PayrollPolicyRepository,
+        approvals: ApprovalRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+        periods: PayrollPeriodRepository,
+    ) =
+        AdvancePayrollFinalization(
+            finalizations,
+            runs,
+            reviews,
+            policies,
+            approvals,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            journal,
+            transactions,
+            security,
+            clock,
+            periods,
+        )
+
+    @Bean
+    fun abortPayrollFinalization(
+        finalizations: PayrollFinalizationRepository,
+        policies: PayrollPolicyRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+    ) = AbortPayrollFinalization(finalizations, policies, jobs, journal, transactions)
+
+    @Bean
+    fun getPayrollFinalization(
+        finalizations: PayrollFinalizationRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        jobs: JobRepository,
+    ) =
+        GetPayrollFinalization(
+            finalizations,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            jobs,
+        )
+
+    @Bean
+    fun listPayrollFinalizations(
+        finalizations: PayrollFinalizationRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        runs: PayrollRunRepository,
+    ) =
+        ListPayrollFinalizations(
+            finalizations,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            runs,
+        )
 }

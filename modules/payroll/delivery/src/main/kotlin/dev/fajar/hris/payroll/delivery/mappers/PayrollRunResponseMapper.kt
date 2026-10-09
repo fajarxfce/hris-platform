@@ -29,6 +29,7 @@ fun PayrollRun.toResponse() =
         processed,
         succeeded,
         failed,
+        finalizationId,
     )
 
 fun PayrollRunTarget.toResponse() =

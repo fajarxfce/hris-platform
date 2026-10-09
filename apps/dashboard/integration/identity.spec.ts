@@ -94,6 +94,18 @@ test("real API sessions, MFA, company reports, locale errors and logout", async 
   await expect(page.getByRole("region", { name: "Status kerja", exact: true })).toContainText(
     "Aktif",
   );
+  await page
+    .getByRole("group", { name: "Filter laporan" })
+    .getByRole("combobox", { name: "Perusahaan", exact: true })
+    .click();
+  await page.getByRole("menuitemcheckbox", { name: /Browser North/u }).click();
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Terapkan", exact: true }).click();
+  const breakdown = page.getByRole("table", { name: "Per perusahaan" });
+  await expect(breakdown.getByRole("row")).toHaveCount(3);
+  await expect(breakdown.getByRole("row").filter({ hasText: "Browser North" })).toContainText("0");
+  await expect(breakdown.getByRole("row").filter({ hasText: "Browser South" })).toContainText("1");
+  await expect(page.getByRole("region", { name: "Jumlah orang", exact: true })).toContainText("1");
   const signedOut = page.waitForResponse(
     (response) =>
       new URL(response.url()).pathname === "/api/v1/auth/logout" &&

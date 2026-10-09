@@ -1,15 +1,10 @@
-import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { CompanyHeadcount } from "./company-headcount";
+import type { HeadcountCounts } from "./headcount-counts";
 
 export type HeadcountReport = Readonly<{
-  companyId: CompanyId;
   asOf: string;
   evaluatedAt: string;
   definitionVersion: "headcount.v1";
-  employments: number;
-  persons: number;
-  active: number;
-  probation: number;
-  suspended: number;
-  permanent: number;
-  fixedTerm: number;
+  totals: HeadcountCounts;
+  companies: readonly CompanyHeadcount[];
 }>;

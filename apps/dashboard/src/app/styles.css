@@ -151,6 +151,21 @@ a {
   display: grid;
   gap: 24px;
 }
+.app-multi-select {
+  width: min(320px, 100%);
+  min-width: 0;
+}
+.app-multi-select-control {
+  min-width: 0;
+  width: 100%;
+}
+.app-table-scroll {
+  overflow-x: auto;
+}
+.app-table-number {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
 .app-metric-grid,
 .app-report-grid {
   display: grid;

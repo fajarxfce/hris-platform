@@ -59,6 +59,7 @@ export function Application({
           {state.stage === "ready" ? (
             <PortalRoutes
               accountId={state.session.account.id}
+              companies={state.session.companies}
               access={state.access}
               reporting={reporting}
               company={

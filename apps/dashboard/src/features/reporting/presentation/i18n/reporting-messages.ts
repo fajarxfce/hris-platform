@@ -2,6 +2,12 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 
 const english = {
   headcount: "Headcount",
+  companies: "Companies",
+  company: "Company",
+  companyGroup: "Company group",
+  selectedCompanies: "companies selected",
+  selectCompanies: "Select companies",
+  companyBreakdown: "By company",
   asOf: "As of date",
   filters: "Report filters",
   apply: "Apply",
@@ -21,6 +27,12 @@ const english = {
 type ReportingMessages = { readonly [K in keyof typeof english]: string };
 const indonesian: ReportingMessages = {
   headcount: "Headcount",
+  companies: "Perusahaan",
+  company: "Perusahaan",
+  companyGroup: "Grup perusahaan",
+  selectedCompanies: "perusahaan dipilih",
+  selectCompanies: "Pilih perusahaan",
+  companyBreakdown: "Per perusahaan",
   asOf: "Tanggal laporan",
   filters: "Filter laporan",
   apply: "Terapkan",

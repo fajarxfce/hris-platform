@@ -1,8 +1,9 @@
+import type { CompanyId } from "../../../../core/domain/identifiers";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { ReportingUseCases } from "../contracts/reporting-use-cases";
 import { type HeadcountState, initialHeadcountState } from "../models/headcount-state";
 
-/** Owns one mounted account/company/date report; no process-wide report cache or polling. */
+/** Owns one mounted account/company-selection/date report; no shared report cache or polling. */
 export class HeadcountController {
   #state: HeadcountState = initialHeadcountState;
   #listeners = new Set<() => void>();
@@ -13,7 +14,10 @@ export class HeadcountController {
     private readonly load: ReportingUseCases["loadHeadcount"],
     private readonly access: CompanyAccess,
     private readonly asOf: string,
-  ) {}
+    private readonly companies: readonly CompanyId[] = [access.companyId],
+  ) {
+    this.companies = Object.freeze([...companies]);
+  }
 
   getSnapshot = (): HeadcountState => this.#state;
 
@@ -42,7 +46,12 @@ export class HeadcountController {
     this.#pending = pending;
     this.publish({ stage: "loading", report: null, failure: null });
     try {
-      const result = await this.load.execute(this.access, this.asOf, pending.signal);
+      const result = await this.load.execute(
+        this.access,
+        this.asOf,
+        pending.signal,
+        this.companies,
+      );
       if (pending.signal.aborted || this.#pending !== pending) return;
       this.publish(
         result.ok

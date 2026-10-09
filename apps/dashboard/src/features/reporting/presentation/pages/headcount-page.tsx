@@ -5,8 +5,10 @@ import { AppCommandBar } from "../../../../core/presentation/components/app-comm
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
 import { AppLoading } from "../../../../core/presentation/components/app-loading";
 import { AppMetricCard } from "../../../../core/presentation/components/app-metric-card";
+import { AppMultiSelect } from "../../../../core/presentation/components/app-multi-select";
 import { AppPageHeader } from "../../../../core/presentation/components/app-page-header";
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
+import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { AppTextField } from "../../../../core/presentation/components/app-text-field";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useHeadcountFilters } from "../controllers/use-headcount-filters";
@@ -48,6 +50,11 @@ export function HeadcountPage({
       />
       <form onSubmit={filters.apply} noValidate>
         <AppCommandBar label={text.filters}>
+          <AppMultiSelect
+            label={text.companies}
+            placeholder={text.selectCompanies}
+            {...filters.companies}
+          />
           <AppTextField
             label={text.asOf}
             type="date"
@@ -73,6 +80,17 @@ export function HeadcountPage({
             <AppPropertyList title={text.statuses} items={view.statuses} />
             <AppPropertyList title={text.contracts} items={view.contracts} />
           </div>
+          {view.companies.length > 1 && (
+            <AppResourceTable
+              title={text.companyBreakdown}
+              columns={[
+                { id: "company", label: text.company },
+                { id: "employments", label: text.employments, numeric: true },
+                { id: "persons", label: text.persons, numeric: true },
+              ]}
+              rows={view.companies}
+            />
+          )}
           <Text className="app-muted">{text.definition}</Text>
         </div>
       )}

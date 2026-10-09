@@ -5,12 +5,12 @@ import type { HeadcountReportDataSource } from "./headcount-report-data-source";
 export class HttpHeadcountReportDataSource implements HeadcountReportDataSource {
   constructor(private readonly http: HttpClient) {}
 
-  async load(company: string, asOf: string, signal: AbortSignal) {
-    const query = new URLSearchParams({ asOf });
+  async load(companies: readonly string[], asOf: string, signal: AbortSignal) {
+    const query = new URLSearchParams({ companies: companies.join(","), asOf });
     return headcountReportDto.parse(
       await this.http.request(
         {
-          path: `/api/v1/companies/${encodeURIComponent(company)}/reports/headcount?${query}`,
+          path: `/api/v1/reports/headcount?${query}`,
         },
         signal,
       ),

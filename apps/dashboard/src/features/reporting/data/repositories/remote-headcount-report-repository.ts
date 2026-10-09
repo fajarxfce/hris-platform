@@ -7,9 +7,9 @@ import { toHeadcountReport } from "../mappers/headcount-report-mapper";
 export class RemoteHeadcountReportRepository implements HeadcountReportRepository {
   constructor(private readonly source: HeadcountReportDataSource) {}
 
-  load(company: CompanyId, asOf: string, signal: AbortSignal) {
+  load(companies: readonly CompanyId[], asOf: string, signal: AbortSignal) {
     return safeHttpCall(signal, async () =>
-      toHeadcountReport(await this.source.load(company, asOf, signal), company, asOf),
+      toHeadcountReport(await this.source.load(companies, asOf, signal), companies, asOf),
     );
   }
 }

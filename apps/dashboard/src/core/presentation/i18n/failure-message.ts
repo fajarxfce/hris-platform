@@ -70,6 +70,10 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Choose a valid date between 1900 and 2100.",
     "Pilih tanggal yang valid antara tahun 1900 dan 2100.",
   ],
+  invalid_report_companies: [
+    "Select between 1 and 32 different companies.",
+    "Pilih 1 hingga 32 perusahaan yang berbeda.",
+  ],
   invalid_response: [
     "The service returned an invalid response. Please retry.",
     "Respons layanan tidak valid. Silakan coba lagi.",

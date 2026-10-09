@@ -3,5 +3,9 @@ import type { Result } from "../../../../core/domain/result";
 import type { HeadcountReport } from "../entities/headcount-report";
 
 export interface HeadcountReportRepository {
-  load(company: CompanyId, asOf: string, signal: AbortSignal): Promise<Result<HeadcountReport>>;
+  load(
+    companies: readonly CompanyId[],
+    asOf: string,
+    signal: AbortSignal,
+  ): Promise<Result<HeadcountReport>>;
 }

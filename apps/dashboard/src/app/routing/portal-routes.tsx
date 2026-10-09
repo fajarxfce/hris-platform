@@ -20,12 +20,14 @@ const HeadcountScreen = lazy(() =>
 export function PortalRoutes({
   accountId,
   company,
+  companies,
   access,
   reporting,
   locale,
 }: {
   accountId: AccountId;
   company: CompanyMembership | null;
+  companies: readonly CompanyMembership[];
   access: CompanyAccess | null;
   reporting: ReportingUseCases;
   locale: Locale;
@@ -42,7 +44,7 @@ export function PortalRoutes({
               accountId={accountId}
               access={access}
               loadHeadcount={reporting.loadHeadcount}
-              companyName={company.name}
+              companies={companies}
               timezone={company.timezone}
               locale={locale}
             />

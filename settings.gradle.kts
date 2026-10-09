@@ -48,3 +48,9 @@ include(":modules:expenses:domain", ":modules:expenses:data", ":modules:expenses
 include(":modules:sync:domain", ":modules:sync:data", ":modules:sync:delivery")
 
 include(":modules:payroll:domain", ":modules:payroll:data", ":modules:payroll:delivery")
+
+include(
+    ":modules:communications:domain",
+    ":modules:communications:data",
+    ":modules:communications:delivery",
+)

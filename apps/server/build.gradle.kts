@@ -1,6 +1,9 @@
 plugins { id("hris.application") }
 
 dependencies {
+    implementation(projects.modules.communications.domain)
+    implementation(projects.modules.communications.data)
+    implementation(projects.modules.communications.delivery)
     implementation(libs.springdoc.webmvc)
     implementation(projects.modules.payroll.domain)
     implementation(projects.modules.payroll.data)

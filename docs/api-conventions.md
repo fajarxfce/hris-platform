@@ -260,3 +260,19 @@ Employee payslips:
 Summaries contain `id`, `employeeId`, `employeeNumber`, `employeeName`, `taxMonth`, `plannedPaymentDate`, `currency`, decimal-string `taxableGross`/`withheld`/`takeHome`, `publishedAt`, and `version: 0`. A planned payment date does not indicate settlement. Both responses use `Cache-Control: no-store`; the mobile application owns its protected offline cache. Company-wide reads require `payroll.read`; `payroll.self.read` restricts reads to the current account's employments. Generic administration and calculation/review/finalization permissions do not grant payslip reads.
 
 Stable codes include `payroll_payslip_not_found` (404), `invalid_page`, `invalid_payroll_payslip_range` (`maximumMonths: "36"`), and `payroll_scope_limit` (`maximumEmployments: "200"`, all 422). Standard live-access and credential failures remain unchanged. Mobile `PAYSLIPS` sync references use the same ID/version and the detail endpoint as their canonical resource. See [payslip semantics](payroll-workflows.md#payslips).
+
+## Announcement authoring
+
+All paths below are under `/api/v1/companies/{companyId}` and require current `announcements.manage` access.
+
+- `PUT /announcements/{id}`: `title`, plain-text `body`, `audience:{kind,targetIds}`, `acknowledgementRequired`, nullable `expectedVersion`, and `reason`. A null version creates a draft; subsequent edits require its current version.
+- `GET /announcements`: summary pages with an optional UUID `after` and `limit` (default 50, maximum 200), ordered by ID. Body and target lists are excluded.
+- `GET /announcements/{id}`: the current complete revision. `GET /announcements/{id}/revisions/{version}` retrieves one retained revision with current authorization.
+- `GET /announcements/{id}/history`: summary pages in ascending revision order, with optional numeric `after` and bounded `limit`.
+- `PUT /communications/audience-groups/{id}`: `name`, `active`, explicit `employmentIds`, nullable `expectedVersion`, and `reason`. An empty group remains empty; it never selects the whole company.
+- `GET /communications/audience-groups`: ID-ordered summary pages with UUID `after` and bounded `limit`. Full membership lists are excluded.
+- `GET /communications/audience-groups/{id}` and `/{id}/revisions/{version}`: the complete current or retained group definition.
+
+Both PUT operations require `Idempotency-Key`. Group membership and announcement target order are normalized for receipt identity; editing with the same key but different content returns `operation_payload_mismatch`. An accepted draft can replay after its audience becomes inactive, but current management access remains mandatory. Groups contain at most 5,000 distinct employment IDs; non-company audiences contain 1–32 distinct IDs of exactly one kind. A foreign, inactive, or wrong-kind reference never expands the audience.
+
+Stable errors include `invalid_announcement`, `invalid_audience_group`, `announcement_audience_unavailable`, `audience_group_employee_unavailable`, `announcement_not_found`, `audience_group_not_found`, `stale_version`, `announcement_limit`, `audience_group_limit`, and the corresponding `*_revision_limit` codes. Domain failures carry unlocalized field codes, such as `audience.targetIds: invalid_selection`; the client owns display language. See [audience and publication policy](modules/communications.md).

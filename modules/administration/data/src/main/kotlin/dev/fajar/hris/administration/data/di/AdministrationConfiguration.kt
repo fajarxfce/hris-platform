@@ -1,7 +1,9 @@
 package dev.fajar.hris.administration.data.di
 
 import dev.fajar.hris.administration.data.datasources.*
+import dev.fajar.hris.administration.data.repositories.StoredAuditRepository
 import dev.fajar.hris.administration.data.repositories.StoredCompanyClientPolicyRepository
+import dev.fajar.hris.administration.domain.repositories.AuditRepository
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.administration.domain.usecases.*
 import dev.fajar.hris.core.domain.*
@@ -15,6 +17,21 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration(proxyBeanMethods = false)
 class AdministrationConfiguration {
+    @Bean fun auditSource(sql: DSLContext): AuditDataSource = PostgresAuditDataSource(sql)
+
+    @Bean fun audits(source: AuditDataSource): AuditRepository = StoredAuditRepository(source)
+
+    @Bean
+    fun searchAuditEvents(
+        audits: AuditRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = SearchAuditEvents(audits, companies, members, identities, transactions, security, clock)
+
     @Bean
     fun companyClientPolicySource(sql: DSLContext): CompanyClientPolicyDataSource =
         PostgresCompanyClientPolicyDataSource(sql)

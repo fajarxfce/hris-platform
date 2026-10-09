@@ -15,6 +15,10 @@ Acceptance: policy effective dates, restricted settings/audit access, safe retry
 Versioned company client policy is implemented, including future activation, immutable history, paired build headers, bounded maintenance, and server admission for feature endpoints and sync selections. Settings writes retain idempotent receipts and current permission/recent-authentication checks. [Client policy](../client-policy.md) defines recovery, scheduling, and mobile behavior. These availability controls do not grant permissions or interrupt already admitted transactions/jobs.
 
 
+## Audit search
+
+Company audit metadata search is implemented with current `audit.read`, original/live access and MFA checks, bounded time windows, exact filters, and timestamp/ID pagination. Reasons and change payloads are excluded from the SQL projection. [Audit search](../audit.md) defines continuation, disclosure, and live-history consistency. Detailed audit disclosure, global audit queries, and the browser explorer remain subsequent work.
+
 ## Durable job foundation
 
 Company-scoped job queries and versioned cancellation requests are implemented. Lists expose progress and safe failure codes, with own-job visibility or explicit company-wide access. Job request inputs and terminal updates are immutable. A cancellation request blocks subsequent progress and successful completion; the feature worker must acknowledge cancellation and release its own reservations.

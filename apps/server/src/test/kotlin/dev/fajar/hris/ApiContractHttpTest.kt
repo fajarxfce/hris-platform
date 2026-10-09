@@ -210,6 +210,25 @@ class ApiContractHttpTest : PeopleApiFixture() {
         assertTrue(selectedCompanies["schema"]["uniqueItems"].asBoolean())
         assertEquals("uuid", selectedCompanies["schema"]["items"]["format"].asString())
         assertFalse(selectedCompanies["explode"].asBoolean())
+        val audit = paths["/api/v1/companies/{companyId}/audit-events"]["get"]
+        assertFalse(audit["x-hris-company-admission"].asBoolean())
+        val auditParameters =
+            audit["parameters"].iterator().asSequence().associateBy { it["name"].asString() }
+        assertEquals("uuid", auditParameters.getValue("cursor")["schema"]["format"].asString())
+        assertEquals(200, auditParameters.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals(
+            setOf(
+                "id",
+                "companyId",
+                "actorId",
+                "resourceType",
+                "resourceId",
+                "action",
+                "correlationId",
+                "recordedAt",
+            ),
+            schemas["AuditEventResponse"]["properties"].properties().map { it.key }.toSet(),
+        )
         assertTrue(mutation["x-hris-idempotency-key"].asBoolean())
         val permissions =
             mutation["security"]

@@ -7,7 +7,10 @@ import java.time.Instant
 
 fun selfSyncCollections(permissions: Set<String>): Set<SyncCollection> = buildSet {
     if ("expenses.self.manage" in permissions) add(SyncCollection.EXPENSE_CLAIMS)
-    if ("leave.self.manage" in permissions) add(SyncCollection.LEAVE_REQUESTS)
+    if ("leave.self.manage" in permissions) {
+        add(SyncCollection.LEAVE_REQUESTS)
+        add(SyncCollection.LEAVE_BALANCES)
+    }
     if ("overtime.self.manage" in permissions) add(SyncCollection.OVERTIME_REQUESTS)
 }
 

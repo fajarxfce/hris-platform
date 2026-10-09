@@ -9,6 +9,25 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresLeaveRequestDataSource(private val sql: DSLContext) : LeaveRequestDataSource {
+    override fun unresolved(
+        company: UUID,
+        employee: UUID,
+        type: UUID,
+        from: java.time.LocalDate,
+        until: java.time.LocalDate,
+        statuses: Set<String>,
+    ): Boolean =
+        sql.fetchExists(
+            sql.selectOne()
+                .from(R)
+                .where(R.COMPANY_ID.eq(company))
+                .and(R.EMPLOYMENT_ID.eq(employee))
+                .and(R.TYPE_ID.eq(type))
+                .and(R.STARTS_ON.le(until))
+                .and(R.ENDS_ON.ge(from))
+                .and(R.STATUS.`in`(statuses))
+        )
+
     override fun find(company: UUID, id: UUID): LeaveRequestsRecord? =
         sql.selectFrom(R).where(R.COMPANY_ID.eq(company)).and(R.ID.eq(id)).fetchOne()
 

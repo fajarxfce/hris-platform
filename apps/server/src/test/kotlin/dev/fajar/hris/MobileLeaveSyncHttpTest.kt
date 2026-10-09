@@ -38,6 +38,7 @@ class MobileLeaveSyncHttpTest : LeaveApiFixture() {
         val f = leaveFixture()
         configureWorkAndApprovals(f)
         body(adjust(f, "2"))
+        publish()
         val initial = bootstrap(f).get("changesCursor").asString()
         val id = UUID.randomUUID()
         val key = UUID.randomUUID()
@@ -49,7 +50,13 @@ class MobileLeaveSyncHttpTest : LeaveApiFixture() {
         body(decide(f, id, 2))
         publish()
         val delta = changes(f, initial)
-        val items = delta.get("items").iterator().asSequence().toList()
+        val items =
+            delta
+                .get("items")
+                .iterator()
+                .asSequence()
+                .filter { it.get("collection").asString() == "LEAVE_REQUESTS" }
+                .toList()
         assertEquals(listOf(0L, 1L, 2L, 3L), items.map { it.get("version").asLong() })
         assertTrue(
             items.all {
@@ -61,8 +68,12 @@ class MobileLeaveSyncHttpTest : LeaveApiFixture() {
         assertFalse(delta.toString().contains("Personal leave"))
         assertFalse(delta.toString().contains(f.employee.toString()))
         val snapshot = bootstrap(f)
-        assertEquals(1, snapshot.get("items").size())
-        assertEquals(3, snapshot.get("items")[0].get("version").asLong())
+        assertEquals(2, snapshot.get("items").size())
+        val request =
+            snapshot.get("items").iterator().asSequence().single {
+                it.get("collection").asString() == "LEAVE_REQUESTS"
+            }
+        assertEquals(3, request.get("version").asLong())
         assertEquals("CANCELLED", details(f, id).get("status").asString())
         assertEquals(
             403,
@@ -80,7 +91,16 @@ class MobileLeaveSyncHttpTest : LeaveApiFixture() {
         body(action(f, id, "withdraw", 0))
         publish()
         val snapshot = bootstrap(f)
-        assertEquals(id.toString(), snapshot.get("items")[0].get("id").asString())
+        assertEquals(
+            id.toString(),
+            snapshot
+                .get("items")
+                .iterator()
+                .asSequence()
+                .single { it.get("collection").asString() == "LEAVE_REQUESTS" }
+                .get("id")
+                .asString(),
+        )
         assertEquals("CANCELLED", details(f, id).get("status").asString())
         database()
             .update(

@@ -1,37 +1,36 @@
 package dev.fajar.hris.leave.data.datasources
 
-import dev.fajar.hris.leave.data.models.LeaveBalanceRow
+import dev.fajar.hris.schema.tables.LeaveAccounts.LEAVE_ACCOUNTS as A
 import dev.fajar.hris.schema.tables.LeaveLedger.LEAVE_LEDGER as L
+import dev.fajar.hris.schema.tables.records.LeaveAccountsRecord
 import dev.fajar.hris.schema.tables.records.LeaveLedgerRecord
 import java.util.UUID
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresLeaveLedgerDataSource(private val sql: DSLContext) : LeaveLedgerDataSource {
-    override fun lock(company: UUID, employee: UUID) {
-        sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "leave:$company:$employee")
-            .execute()
+    override fun lock(company: UUID, employee: UUID, shared: Boolean) {
+        val statement =
+            if (shared) "select pg_advisory_xact_lock_shared(hashtextextended(?,0))"
+            else "select pg_advisory_xact_lock(hashtextextended(?,0))"
+        sql.query(statement, "leave:$company:$employee").execute()
     }
 
-    override fun balance(company: UUID, employee: UUID, type: UUID, year: Int): LeaveBalanceRow {
-        val row =
-            sql.select(
-                    DSL.sum(L.AVAILABLE_DELTA),
-                    DSL.sum(L.RESERVED_DELTA),
-                    DSL.sum(L.CONSUMED_DELTA),
-                )
-                .from(L)
-                .where(L.COMPANY_ID.eq(company))
-                .and(L.EMPLOYMENT_ID.eq(employee))
-                .and(L.TYPE_ID.eq(type))
-                .and(L.BALANCE_YEAR.eq(year))
-                .fetchSingle()
-        return LeaveBalanceRow(
-            row.value1()?.longValueExact() ?: 0,
-            row.value2()?.longValueExact() ?: 0,
-            row.value3()?.longValueExact() ?: 0,
-        )
-    }
+    override fun account(company: UUID, id: UUID): LeaveAccountsRecord? =
+        sql.selectFrom(A).where(A.COMPANY_ID.eq(company)).and(A.ID.eq(id)).fetchOne()
+
+    override fun balance(
+        company: UUID,
+        employee: UUID,
+        type: UUID,
+        year: Int,
+    ): LeaveAccountsRecord? =
+        sql.selectFrom(A)
+            .where(A.COMPANY_ID.eq(company))
+            .and(A.EMPLOYMENT_ID.eq(employee))
+            .and(A.TYPE_ID.eq(type))
+            .and(A.BALANCE_YEAR.eq(year))
+            .fetchOne()
 
     override fun entries(
         company: UUID,

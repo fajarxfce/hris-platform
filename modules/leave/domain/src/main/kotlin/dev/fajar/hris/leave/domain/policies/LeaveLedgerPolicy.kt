@@ -22,6 +22,13 @@ fun leaveLedgerMovements(
         }
 
 fun validateLeaveMovement(balance: LeaveBalance, movement: LeaveLedgerMovement): Result<Unit> {
+    if (balance.closed) return Result.Failed(Failure(FailureKind.CONFLICT, "leave_year_closed"))
+    if (
+        balance.availableHalfDays.toLong() + movement.availableDelta > Int.MAX_VALUE ||
+            balance.reservedHalfDays.toLong() + movement.reservedDelta > Int.MAX_VALUE ||
+            balance.consumedHalfDays.toLong() + movement.consumedDelta > Int.MAX_VALUE
+    )
+        return Result.Failed(Failure(FailureKind.CONFLICT, "leave_balance_limit"))
     if (balance.availableHalfDays.toLong() + movement.availableDelta < 0)
         return Result.Failed(Failure(FailureKind.CONFLICT, "insufficient_leave_balance"))
     if (

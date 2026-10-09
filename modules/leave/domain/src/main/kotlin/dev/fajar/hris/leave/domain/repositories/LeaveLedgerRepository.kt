@@ -5,7 +5,9 @@ import dev.fajar.hris.leave.domain.entities.*
 import java.util.UUID
 
 interface LeaveLedgerRepository {
-    fun lock(companyId: UUID, employeeId: UUID): Result<Unit>
+    fun lock(companyId: UUID, employeeId: UUID, shared: Boolean = false): Result<Unit>
+
+    fun account(companyId: UUID, id: UUID): Result<LeaveAccount?>
 
     fun balance(companyId: UUID, employeeId: UUID, typeId: UUID, year: Int): Result<LeaveBalance>
 

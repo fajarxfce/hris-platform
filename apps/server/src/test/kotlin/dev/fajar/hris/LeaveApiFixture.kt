@@ -175,12 +175,17 @@ abstract class LeaveApiFixture : DocumentValidationApiFixture() {
         f: LeaveFixture,
         days: String,
         key: UUID = UUID.randomUUID(),
+        expectedVersion: Long = balance(f, f.admin).get("version").asLong(),
     ): HttpResponse<String> =
         command(
             f.admin,
             "/api/v1/companies/${f.company}/leave/employees/${f.employee}/balances/${f.type}/2026/adjustments",
             json.writeValueAsString(
-                mapOf("days" to days, "reason" to "Annual entitlement adjustment")
+                mapOf(
+                    "days" to days,
+                    "reason" to "Annual entitlement adjustment",
+                    "expectedVersion" to expectedVersion,
+                )
             ),
             f.adminCsrf,
             key,

@@ -10,4 +10,5 @@ data class LeavePolicy(
     val allowedContracts: Set<ContractKind>,
     val maxRequestDays: Int,
     val attachmentRequired: Boolean = false,
+    val accrual: LeaveAccrualPolicy? = null,
 )

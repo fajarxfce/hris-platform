@@ -92,6 +92,12 @@ class RequestLeaveCancellation(
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
             if (request.status != LeaveStatus.APPROVED)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "leave_not_approved"))
+            for (year in request.days.map { it.workDate.year }.distinct()) {
+                val balance = ledger.balance(company, employeeId, request.policy.typeId, year)
+                if (balance is Result.Failed) return@run balance
+                if ((balance as Result.Success).value.closed)
+                    return@run Result.Failed(Failure(FailureKind.CONFLICT, "leave_year_closed"))
+            }
             val now = clock.instant()
             val companyResult = companies.find(company)
             if (companyResult is Result.Failed) return@run companyResult

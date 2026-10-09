@@ -23,6 +23,109 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class LeaveConfiguration {
     @Bean
+    fun leaveEntitlementSource(sql: DSLContext): LeaveEntitlementDataSource =
+        PostgresLeaveEntitlementDataSource(sql)
+
+    @Bean
+    fun leaveEntitlements(
+        source: LeaveEntitlementDataSource,
+        json: ObjectMapper,
+    ): LeaveEntitlementRepository = StoredLeaveEntitlementRepository(source, json)
+
+    @Bean
+    fun postEmployeeLeaveAccrual(
+        ledger: LeaveLedgerRepository,
+        policies: LeavePolicyRepository,
+        entitlements: LeaveEntitlementRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        PostEmployeeLeaveAccrual(
+            ledger,
+            policies,
+            entitlements,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun closeEmployeeLeaveYear(
+        ledger: LeaveLedgerRepository,
+        policies: LeavePolicyRepository,
+        entitlements: LeaveEntitlementRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        requests: LeaveRequestRepository,
+    ) =
+        CloseEmployeeLeaveYear(
+            ledger,
+            policies,
+            entitlements,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            requests,
+        )
+
+    @Bean
+    fun getLeaveAccount(
+        ledger: LeaveLedgerRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = GetLeaveAccount(ledger, people, companies, members, identities, transactions, clock)
+
+    @Bean
+    fun getLeaveEntitlements(
+        ledger: LeaveLedgerRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        entitlements: LeaveEntitlementRepository,
+        policies: LeavePolicyRepository,
+    ) =
+        GetLeaveEntitlements(
+            ledger,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            entitlements,
+            policies,
+        )
+
+    @Bean
     fun leavePolicySource(sql: DSLContext): LeavePolicyDataSource =
         PostgresLeavePolicyDataSource(sql)
 
@@ -62,7 +165,22 @@ class LeaveConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = AdjustLeaveBalance(ledger, policies, people, operations, journal, transactions, clock)
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+    ) =
+        AdjustLeaveBalance(
+            ledger,
+            policies,
+            people,
+            operations,
+            journal,
+            transactions,
+            clock,
+            companies,
+            members,
+            identities,
+        )
 
     @Bean
     fun getLeaveLedger(
@@ -71,7 +189,20 @@ class LeaveConfiguration {
         people: PeopleRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetLeaveLedger(ledger, policies, people, transactions, clock)
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+    ) =
+        GetLeaveLedger(
+            ledger,
+            policies,
+            people,
+            transactions,
+            clock,
+            companies,
+            members,
+            identities,
+        )
 
     @Bean
     fun leaveRequestSource(sql: DSLContext): LeaveRequestDataSource =

@@ -95,6 +95,15 @@ class GetLeaveRequest(
             val beneficiary = (accountResult as Result.Success).value
             val actions =
                 leaveAvailableActions(live, request, active, delegations, grants, now, beneficiary)
+                    .toMutableSet()
+            if (LeaveAction.REQUEST_CANCELLATION in actions) {
+                for (year in request.days.map { it.workDate.year }.distinct()) {
+                    val balance = ledger.balance(company, employeeId, request.policy.typeId, year)
+                    if (balance is Result.Failed) return@run balance
+                    if ((balance as Result.Success).value.closed)
+                        actions.remove(LeaveAction.REQUEST_CANCELLATION)
+                }
+            }
             requests.history(company, id, historyAfter, historyLimit).map {
                 LeaveRequestDetails(request, initial, cancellation, it, actions)
             }

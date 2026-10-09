@@ -17,6 +17,22 @@ class StoredLeaveRequestRepository(
     private val attachments: LeaveAttachmentDataSource,
     private val json: ObjectMapper,
 ) : LeaveRequestRepository {
+    override fun unresolvedYear(
+        companyId: UUID,
+        employeeId: UUID,
+        typeId: UUID,
+        year: Int,
+    ): Result<Boolean> = safeDatabaseCall {
+        source.unresolved(
+            companyId,
+            employeeId,
+            typeId,
+            java.time.LocalDate.of(year, 1, 1),
+            java.time.LocalDate.of(year, 12, 31),
+            setOf(LeaveStatus.PENDING.name, LeaveStatus.CANCELLATION_PENDING.name),
+        )
+    }
+
     override fun find(companyId: UUID, id: UUID): Result<LeaveRequest?> = safeDatabaseCall {
         source.find(companyId, id)?.let { row ->
             row.toRequest(json, attachments.list(companyId, id).map { it.toAttachment() })

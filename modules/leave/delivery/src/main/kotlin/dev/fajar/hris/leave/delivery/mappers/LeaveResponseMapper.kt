@@ -19,16 +19,12 @@ fun LeaveType.toResponse(): LeaveTypeResponse =
         version,
         appliedRevision,
         policy.attachmentRequired,
+        policy.accrual?.toResponse(),
     )
 
 fun LeaveLedger.toResponse(): LeaveLedgerResponse =
     LeaveLedgerResponse(
-        LeaveBalanceResponse(
-            balance.year,
-            balance.availableHalfDays.toLeaveDays(),
-            balance.reservedHalfDays.toLeaveDays(),
-            balance.consumedHalfDays.toLeaveDays(),
-        ),
+        balance.toResponse(),
         Page(
             entries.items.map {
                 LeaveLedgerEntryResponse(

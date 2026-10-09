@@ -10,8 +10,13 @@ import java.util.UUID
 
 class StoredLeaveLedgerRepository(private val source: LeaveLedgerDataSource) :
     LeaveLedgerRepository {
-    override fun lock(companyId: UUID, employeeId: UUID): Result<Unit> = safeDatabaseCall {
-        source.lock(companyId, employeeId)
+    override fun lock(companyId: UUID, employeeId: UUID, shared: Boolean): Result<Unit> =
+        safeDatabaseCall {
+            source.lock(companyId, employeeId, shared)
+        }
+
+    override fun account(companyId: UUID, id: UUID): Result<LeaveAccount?> = safeDatabaseCall {
+        source.account(companyId, id)?.toAccount()
     }
 
     override fun balance(
@@ -21,12 +26,7 @@ class StoredLeaveLedgerRepository(private val source: LeaveLedgerDataSource) :
         year: Int,
     ): Result<LeaveBalance> = safeDatabaseCall {
         val row = source.balance(companyId, employeeId, typeId, year)
-        LeaveBalance(
-            year,
-            Math.toIntExact(row.available),
-            Math.toIntExact(row.reserved),
-            Math.toIntExact(row.consumed),
-        )
+        row?.toBalance() ?: LeaveBalance(year, 0, 0, 0)
     }
 
     override fun entries(

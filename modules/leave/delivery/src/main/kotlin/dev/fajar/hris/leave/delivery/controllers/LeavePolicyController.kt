@@ -51,7 +51,16 @@ class LeavePolicyController(
         @RequestBody body: LeaveBalanceAdjustmentRequest,
     ): MutationResponse =
         adjust
-            .execute(actor, operationId, id, typeId, year, parseHalfDays(body.days), body.reason)
+            .execute(
+                actor,
+                operationId,
+                id,
+                typeId,
+                year,
+                parseHalfDays(body.days),
+                body.reason,
+                body.expectedVersion,
+            )
             .response()
             .toResponse()
 

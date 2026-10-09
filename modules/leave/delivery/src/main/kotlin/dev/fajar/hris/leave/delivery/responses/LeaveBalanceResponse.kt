@@ -5,4 +5,7 @@ data class LeaveBalanceResponse(
     val availableDays: String,
     val reservedDays: String,
     val consumedDays: String,
+    val version: Long,
+    val closed: Boolean,
+    val accountId: java.util.UUID?,
 )

@@ -5,4 +5,7 @@ data class LeaveBalance(
     val availableHalfDays: Int,
     val reservedHalfDays: Int,
     val consumedHalfDays: Int,
+    val version: Long = 0,
+    val closed: Boolean = false,
+    val accountId: java.util.UUID? = null,
 )

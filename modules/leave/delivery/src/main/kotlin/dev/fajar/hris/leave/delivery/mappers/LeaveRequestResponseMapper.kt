@@ -17,6 +17,7 @@ fun LeavePolicySnapshot.toResponse(): LeavePolicySnapshotResponse =
         policy.allowedContracts.map { it.name }.toSet(),
         policy.maxRequestDays,
         policy.attachmentRequired,
+        policy.accrual?.toResponse(),
     )
 
 fun LeaveDay.toResponse(): LeaveDayResponse =

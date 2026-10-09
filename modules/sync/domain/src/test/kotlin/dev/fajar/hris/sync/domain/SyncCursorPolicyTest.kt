@@ -45,7 +45,11 @@ class SyncCursorPolicyTest {
             selfSyncCollections(setOf("expenses.read", "leave.read", "people.read")).isEmpty()
         )
         assertEquals(
-            setOf(SyncCollection.EXPENSE_CLAIMS, SyncCollection.LEAVE_REQUESTS),
+            setOf(
+                SyncCollection.EXPENSE_CLAIMS,
+                SyncCollection.LEAVE_REQUESTS,
+                SyncCollection.LEAVE_BALANCES,
+            ),
             selfSyncCollections(setOf("expenses.self.manage", "leave.self.manage")),
         )
     }

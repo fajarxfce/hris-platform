@@ -1,13 +1,15 @@
 package dev.fajar.hris.leave.data.datasources
 
-import dev.fajar.hris.leave.data.models.LeaveBalanceRow
+import dev.fajar.hris.schema.tables.records.LeaveAccountsRecord
 import dev.fajar.hris.schema.tables.records.LeaveLedgerRecord
 import java.util.UUID
 
 interface LeaveLedgerDataSource {
-    fun lock(company: UUID, employee: UUID)
+    fun lock(company: UUID, employee: UUID, shared: Boolean)
 
-    fun balance(company: UUID, employee: UUID, type: UUID, year: Int): LeaveBalanceRow
+    fun account(company: UUID, id: UUID): LeaveAccountsRecord?
+
+    fun balance(company: UUID, employee: UUID, type: UUID, year: Int): LeaveAccountsRecord?
 
     fun entries(
         company: UUID,

@@ -167,6 +167,16 @@ class LeaveAttachmentHttpTest : LeaveAttachmentApiFixture() {
         val revision = evidence(f)
         val id = UUID.randomUUID()
         val key = UUID.randomUUID()
+        val tables = listOf("leave_requests", "leave_request_attachments", "mobile_sync_changes")
+        val before =
+            tables.associateWith { table ->
+                database()
+                    .queryForObject(
+                        "select count(*) from $table where company_id=?",
+                        Int::class.java,
+                        f.company,
+                    )
+            }
         attachmentProbe.beforeJournal = { row ->
             if (row.resourceId == id) throw IllegalStateException("private-attachment-audit")
         }
@@ -175,19 +185,16 @@ class LeaveAttachmentHttpTest : LeaveAttachmentApiFixture() {
         assertFalse(failed.body().contains("private-attachment-audit"))
         assertEquals(0, referenceCount(f, id))
         assertEquals("0", balance(f).get("reservedDays").asString())
-        for (table in
-            listOf(
-                "leave_requests",
-                "leave_request_attachments",
-                "mobile_sync_changes",
-            )) assertEquals(
-            0,
-            database()
-                .queryForObject(
-                    "select count(*) from $table where company_id=?",
-                    Int::class.java,
-                    f.company,
-                ),
+        assertEquals(
+            before,
+            tables.associateWith { table ->
+                database()
+                    .queryForObject(
+                        "select count(*) from $table where company_id=?",
+                        Int::class.java,
+                        f.company,
+                    )
+            },
         )
         attachmentProbe.clear()
         body(submitEvidence(f, id, listOf(revision), key))

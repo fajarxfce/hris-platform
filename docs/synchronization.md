@@ -8,9 +8,12 @@ The supported collections are:
 | --- | --- | --- | --- |
 | `EXPENSE_CLAIMS` | `expenses.self.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}` |
 | `LEAVE_REQUESTS` | `leave.self.manage` | Current account's employments or immutable request owner | `/api/v1/companies/{companyId}/leave/requests/{id}` |
+| `LEAVE_BALANCES` | `leave.self.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/leave/balances/{id}` |
 | `OVERTIME_REQUESTS` | `overtime.self.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/overtime/{id}` |
 
-All request statuses are included. A cancellation or withdrawal is an `UPSERT` with a new version, not a deletion. Team/company administration rights do not grant an employee-wide export. Documents, attendance, balances, schedules, approval inboxes, payroll, and communication are not registered sync collections yet. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
+Balance projections have stable IDs and versions. A year closing can publish several versions of its source balance and a destination update in one transaction; fetching a reference returns the latest committed account. Empty accounts are exposed only after a movement or explicit closing. Adding the balance collection invalidates older scope fingerprints and requires bootstrap.
+
+All request statuses are included. A cancellation or withdrawal is an `UPSERT` with a new version, not a deletion. Team/company administration rights do not grant an employee-wide export. Documents, attendance, schedules, approval inboxes, payroll, and communication are not registered sync collections yet. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
 
 ## Configuration
 

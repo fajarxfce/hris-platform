@@ -7,6 +7,8 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface LeaveRequestRepository {
+    fun unresolvedYear(companyId: UUID, employeeId: UUID, typeId: UUID, year: Int): Result<Boolean>
+
     fun find(companyId: UUID, id: UUID): Result<LeaveRequest?>
 
     fun list(

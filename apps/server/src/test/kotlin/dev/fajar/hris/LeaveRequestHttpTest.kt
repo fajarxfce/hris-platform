@@ -326,7 +326,7 @@ class LeaveRequestHttpTest : LeaveApiFixture() {
             command(
                 f.admin,
                 "/api/v1/companies/${f.company}/leave/employees/${f.employee}/balances/${f.type}/2027/adjustments",
-                """{"days":"1","reason":"Next year entitlement"}""",
+                """{"days":"1","reason":"Next year entitlement","expectedVersion":0}""",
                 f.adminCsrf,
                 UUID.randomUUID(),
             )

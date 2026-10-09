@@ -141,7 +141,11 @@ class MobileSyncAccessHttpTest : MobileSyncApiFixture() {
                 )
             )
         assertEquals(
-            setOf(SyncCollection.EXPENSE_CLAIMS, SyncCollection.LEAVE_REQUESTS),
+            setOf(
+                SyncCollection.EXPENSE_CLAIMS,
+                SyncCollection.LEAVE_REQUESTS,
+                SyncCollection.LEAVE_BALANCES,
+            ),
             expanded.collections,
         )
         database()

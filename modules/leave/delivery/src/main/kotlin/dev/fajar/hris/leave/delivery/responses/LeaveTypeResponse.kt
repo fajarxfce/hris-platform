@@ -17,4 +17,5 @@ data class LeaveTypeResponse(
     val version: Long,
     val appliedRevision: Long,
     val attachmentRequired: Boolean,
+    val accrual: LeaveAccrualPolicyResponse?,
 )

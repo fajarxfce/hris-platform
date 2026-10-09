@@ -18,10 +18,12 @@ fun validateLeaveType(type: LeaveType, reason: String): Result<Unit> {
             type.version < 0
     )
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_leave_policy"))
-    return Result.Success(Unit)
+    return p.accrual?.let { validateLeaveAccrualPolicy(it, p.allowPartialDays) }
+        ?: Result.Success(Unit)
 }
 
 fun validateLeaveBalanceAdjustment(balance: LeaveBalance, delta: Int): Result<Unit> {
+    if (balance.closed) return Result.Failed(Failure(FailureKind.CONFLICT, "leave_year_closed"))
     if (delta == 0 || delta !in -732..732)
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_leave_adjustment"))
     if (balance.availableHalfDays.toLong() + delta !in 0L..Int.MAX_VALUE.toLong())

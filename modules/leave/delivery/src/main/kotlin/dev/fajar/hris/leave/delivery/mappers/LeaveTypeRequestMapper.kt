@@ -18,6 +18,13 @@ fun LeaveTypeRequest.toType(id: UUID): LeaveType =
             allowedContracts.toSet(),
             maxRequestDays,
             attachmentRequired,
+            accrual?.let {
+                LeaveAccrualPolicy(
+                    it.frequency,
+                    parseHalfDays(it.daysPerPeriod),
+                    parseHalfDays(it.carryLimitDays),
+                )
+            },
         ),
         active,
         expectedVersion ?: 0,

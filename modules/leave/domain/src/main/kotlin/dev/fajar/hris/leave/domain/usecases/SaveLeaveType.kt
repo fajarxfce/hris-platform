@@ -49,8 +49,16 @@ class SaveLeaveType(
                     expectedVersion?.toString(),
                     reason,
                 ) +
-                    if (type.policy.attachmentRequired) listOf("attachmentRequired", "true")
-                    else emptyList(),
+                    (if (type.policy.attachmentRequired) listOf("attachmentRequired", "true")
+                    else emptyList()) +
+                    (type.policy.accrual?.let {
+                        listOf(
+                            "accrual",
+                            it.frequency.name,
+                            it.halfDaysPerPeriod.toString(),
+                            it.carryLimitHalfDays.toString(),
+                        )
+                    } ?: emptyList()),
             )
         val company = requireNotNull(actor.companyId)
         return transactions.run(actor) {

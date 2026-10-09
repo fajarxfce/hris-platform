@@ -5,6 +5,15 @@ import dev.fajar.hris.schema.tables.records.*
 import java.util.UUID
 
 interface LeaveRequestDataSource {
+    fun unresolved(
+        company: UUID,
+        employee: UUID,
+        type: UUID,
+        from: java.time.LocalDate,
+        until: java.time.LocalDate,
+        statuses: Set<String>,
+    ): Boolean
+
     fun find(company: UUID, id: UUID): LeaveRequestsRecord?
 
     fun list(

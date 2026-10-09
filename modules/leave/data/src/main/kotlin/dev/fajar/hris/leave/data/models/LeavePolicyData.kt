@@ -8,4 +8,5 @@ data class LeavePolicyData(
     val allowedContracts: Set<String>,
     val maxRequestDays: Int,
     val attachmentRequired: Boolean = false,
+    val accrual: LeaveAccrualPolicyData? = null,
 )

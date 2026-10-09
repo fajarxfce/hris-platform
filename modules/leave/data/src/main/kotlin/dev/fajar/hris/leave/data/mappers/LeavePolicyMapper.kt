@@ -14,6 +14,9 @@ fun LeavePolicy.toData(): LeavePolicyData =
         allowedContracts.map { it.name }.toSet(),
         maxRequestDays,
         attachmentRequired,
+        accrual?.let {
+            LeaveAccrualPolicyData(it.frequency.name, it.halfDaysPerPeriod, it.carryLimitHalfDays)
+        },
     )
 
 fun LeavePolicyData.toPolicy(): LeavePolicy =
@@ -25,6 +28,13 @@ fun LeavePolicyData.toPolicy(): LeavePolicy =
         allowedContracts.map { ContractKind.valueOf(it) }.toSet(),
         maxRequestDays,
         attachmentRequired,
+        accrual?.let {
+            LeaveAccrualPolicy(
+                LeaveAccrualFrequency.valueOf(it.frequency),
+                it.halfDaysPerPeriod,
+                it.carryLimitHalfDays,
+            )
+        },
     )
 
 fun LeaveTypeRow.toType(json: ObjectMapper): LeaveType =

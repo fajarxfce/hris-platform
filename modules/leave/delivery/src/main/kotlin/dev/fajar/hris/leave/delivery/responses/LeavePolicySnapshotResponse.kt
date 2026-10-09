@@ -13,4 +13,5 @@ data class LeavePolicySnapshotResponse(
     val allowedContracts: Set<String>,
     val maxRequestDays: Int,
     val attachmentRequired: Boolean,
+    val accrual: LeaveAccrualPolicyResponse?,
 )

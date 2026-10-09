@@ -38,7 +38,7 @@ class LeaveLedgerHttpTest : LeaveApiFixture() {
     fun concurrentReductionsCannotOverspendAndLedgerReplaysDoNotDoubleGrant() {
         val f = leaveFixture()
         val key = UUID.randomUUID()
-        val granted = adjust(f, "2.5", key)
+        val granted = adjust(f, "2.5", key, expectedVersion = 0)
         assertEquals(200, granted.statusCode(), granted.body())
         clock.set(Instant.parse("2026-10-01T16:00:00Z"))
         val ready = CountDownLatch(2)
@@ -57,7 +57,7 @@ class LeaveLedgerHttpTest : LeaveApiFixture() {
             assertEquals(listOf(200, 409), results.map { it.get(15, TimeUnit.SECONDS) }.sorted())
         }
         assertEquals("0.5", balance(f).get("availableDays").asString())
-        assertEquals(granted.body(), adjust(f, "2.5", key).body())
+        assertEquals(granted.body(), adjust(f, "2.5", key, expectedVersion = 0).body())
         assertEquals(409, adjust(f, "3", key).statusCode())
         val page = ledger(f, suffix = "?limit=1")
         assertEquals(200, page.statusCode(), page.body())
@@ -129,7 +129,7 @@ class LeaveLedgerHttpTest : LeaveApiFixture() {
             command(
                 f.worker,
                 "/api/v1/companies/${f.company}/leave/employees/${f.employee}/balances/${f.type}/2026/adjustments",
-                """{"days":"1","reason":"Own grant"}""",
+                """{"days":"1","reason":"Own grant","expectedVersion":1}""",
                 f.workerCsrf,
                 UUID.randomUUID(),
             )

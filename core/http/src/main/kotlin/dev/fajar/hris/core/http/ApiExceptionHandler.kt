@@ -54,10 +54,13 @@ class ApiExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun unexpected(error: Exception): ProblemDetail {
-        if (error is java.util.concurrent.CancellationException) throw error
-        if (error is InterruptedException) {
+        val causes = generateSequence<Throwable>(error) { it.cause }.take(16).toList()
+        causes.filterIsInstance<java.util.concurrent.CancellationException>().firstOrNull()?.let {
+            throw it
+        }
+        causes.filterIsInstance<InterruptedException>().firstOrNull()?.let {
             Thread.currentThread().interrupt()
-            throw error
+            throw it
         }
         if (error is org.springframework.web.ErrorResponse && error.statusCode.is4xxClientError) {
             return apiProblem(
@@ -67,10 +70,19 @@ class ApiExceptionHandler {
             )
         }
         val reference = MDC.get("correlationId") ?: java.util.UUID.randomUUID().toString()
+        val frames =
+            causes
+                .asSequence()
+                .flatMap { it.stackTrace.asSequence() }
+                .filter { it.className.startsWith("dev.fajar.hris.") }
+                .distinct()
+                .take(12)
+                .joinToString(" | ")
         logger.error(
-            "Unhandled request failure reference={} category={}",
+            "Unhandled request failure reference={} categories={} frames={}",
             reference,
-            error.javaClass.name,
+            causes.map { it.javaClass.name }.distinct().joinToString(" > "),
+            frames,
         )
         return apiProblem(HttpStatus.INTERNAL_SERVER_ERROR, "unexpected_error", reference)
     }

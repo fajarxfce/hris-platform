@@ -21,4 +21,5 @@ spring:
       initialize-schema: never
 logging:
   level:
+    org.springframework.boot.jooq.autoconfigure.ExceptionTranslatorExecuteListener: "OFF"
     org.springframework.batch: WARN

@@ -48,3 +48,7 @@ management:
     health:
       probes:
         enabled: true
+
+logging:
+  level:
+    org.springframework.boot.jooq.autoconfigure.ExceptionTranslatorExecuteListener: "OFF"

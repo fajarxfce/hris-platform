@@ -164,6 +164,17 @@ Optional `terms.payBasis` contains `overtimeRuleId` (`ID-PP35-2021-v1`), `holida
 Compensation reads require `payroll.read` or `payroll.compensation.manage`; policy management alone does not expose salary. Company access and current credential/permission intersection apply on every read and command. A previous successful operation replays its receipt while current authority remains valid; a failed operation can be retried with corrected data. Configuration history is immutable. The initial mobile sync collections do not yet include compensation or payroll output.
 
 
+Payroll opening history:
+
+- `PUT /companies/{companyId}/payroll/employees/{employeeId}/tax-openings/{year}`: `terms`, nullable `expectedVersion`, `expectedEmploymentVersion`, and `reason`. Requires `payroll.calculate`, recent authentication/MFA, and an idempotency key.
+- `POST /companies/{companyId}/payroll/employees/{employeeId}/tax-openings/{year}/verify`: `expectedVersion` and `reason`. Requires independent `payroll.review`, recent authentication/MFA, and an idempotency key.
+- `GET /companies/{companyId}/payroll/employees/{employeeId}/tax-openings/{year}`: latest draft or verified revision; an absent record returns `payroll_tax_opening_not_found`.
+- `GET /companies/{companyId}/payroll/employees/{employeeId}/tax-openings/{year}/history`: revision `after`, bounded `limit`.
+- `GET /companies/{companyId}/payroll/tax-openings`: required `year`, optional `status` (`DRAFT`/`VERIFIED`), employment UUID `after`, bounded `limit`.
+
+Terms contain `throughMonth` (0–11), `residency`, `ptkp`, `reference`, and `history`. All history fields are explicit: decimal-string `taxableGross`, `retirementContributions`, `qualifiedDonations`, `withheld`, `previousEmployerNet`, `previousEmployerWithheld`, and integer `employmentMonths`. A zero declaration must supply zero values. Responses include immutable revision, preparation/verification accounts, status, and history; no generic administrator or employee salary access is added. See [opening semantics](payroll-rules.md#opening-tax-history).
+
+
 ## Overtime commands
 
 All paths below are under `/api/v1/companies/{companyId}/workforce/overtime`. Mutations require `Idempotency-Key`.

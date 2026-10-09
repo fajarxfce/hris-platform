@@ -167,4 +167,108 @@ class PayrollConfiguration {
             security,
             clock,
         )
+
+    @Bean
+    fun payrollTaxOpeningSource(sql: DSLContext): PayrollTaxOpeningDataSource =
+        PostgresPayrollTaxOpeningDataSource(sql)
+
+    @Bean
+    fun payrollTaxOpenings(
+        source: PayrollTaxOpeningDataSource,
+        json: ObjectMapper,
+    ): PayrollTaxOpeningRepository = StoredPayrollTaxOpeningRepository(source, json)
+
+    @Bean
+    fun savePayrollTaxOpening(
+        openings: PayrollTaxOpeningRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        SavePayrollTaxOpening(
+            openings,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun verifyPayrollTaxOpening(
+        openings: PayrollTaxOpeningRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        VerifyPayrollTaxOpening(
+            openings,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun getPayrollTaxOpening(
+        openings: PayrollTaxOpeningRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetPayrollTaxOpening(openings, policies, companies, members, identities, transactions)
+
+    @Bean
+    fun getPayrollTaxOpeningHistory(
+        openings: PayrollTaxOpeningRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) =
+        GetPayrollTaxOpeningHistory(
+            openings,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+        )
+
+    @Bean
+    fun listPayrollTaxOpenings(
+        openings: PayrollTaxOpeningRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = ListPayrollTaxOpenings(openings, policies, companies, members, identities, transactions)
 }

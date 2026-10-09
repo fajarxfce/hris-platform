@@ -1,5 +1,6 @@
 package dev.fajar.hris.payroll.data.di
 
+import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
@@ -625,6 +626,7 @@ class PayrollConfiguration {
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
+        reviews: PayrollReviewRepository,
     ) =
         AbandonPayrollCalculation(
             runs,
@@ -640,6 +642,7 @@ class PayrollConfiguration {
             transactions,
             security,
             clock,
+            reviews,
         )
 
     @Bean
@@ -682,4 +685,124 @@ class PayrollConfiguration {
         transactions: TransactionRunner,
         periods: PayrollPeriodRepository,
     ) = ListPayrollRuns(runs, policies, companies, members, identities, transactions, periods)
+
+    @Bean
+    fun payrollReviewSource(sql: DSLContext): PayrollReviewDataSource =
+        PostgresPayrollReviewDataSource(sql)
+
+    @Bean
+    fun payrollReviews(source: PayrollReviewDataSource): PayrollReviewRepository =
+        StoredPayrollReviewRepository(source)
+
+    @Bean
+    fun submitPayrollReview(
+        reviews: PayrollReviewRepository,
+        runs: PayrollRunRepository,
+        policies: PayrollPolicyRepository,
+        approvals: ApprovalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        SubmitPayrollReview(
+            reviews,
+            runs,
+            policies,
+            approvals,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun decidePayrollReview(
+        reviews: PayrollReviewRepository,
+        runs: PayrollRunRepository,
+        policies: PayrollPolicyRepository,
+        approvals: ApprovalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        DecidePayrollReview(
+            reviews,
+            runs,
+            policies,
+            approvals,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun withdrawPayrollReview(
+        reviews: PayrollReviewRepository,
+        runs: PayrollRunRepository,
+        policies: PayrollPolicyRepository,
+        approvals: ApprovalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        WithdrawPayrollReview(
+            reviews,
+            runs,
+            policies,
+            approvals,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun getPayrollReview(
+        reviews: PayrollReviewRepository,
+        policies: PayrollPolicyRepository,
+        approvals: ApprovalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetPayrollReview(reviews, policies, approvals, companies, members, identities, transactions)
+
+    @Bean
+    fun listPayrollReviews(
+        reviews: PayrollReviewRepository,
+        runs: PayrollRunRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = ListPayrollReviews(reviews, runs, policies, companies, members, identities, transactions)
 }

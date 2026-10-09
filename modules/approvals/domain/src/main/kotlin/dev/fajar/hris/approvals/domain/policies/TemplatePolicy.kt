@@ -18,6 +18,11 @@ fun validateApprovalTemplate(change: TemplateChange): Result<Unit> {
             change.stages.size !in 1..8
     )
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_approval_template"))
+    if (
+        change.kind == ApprovalKind.PAYROLL &&
+            change.stages.any { it.assignment == AssignmentKind.MANAGER }
+    )
+        return Result.Failed(Failure(FailureKind.VALIDATION, "payroll_approval_assignment_invalid"))
     for (stage in change.stages) {
         val valid =
             when (stage.assignment) {

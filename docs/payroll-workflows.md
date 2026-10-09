@@ -1,6 +1,6 @@
-# Payroll preparation and calculation
+# Payroll preparation, calculation, and review
 
-Period preparation, independently verified inputs, durable monthly calculation, and source cutoffs are implemented. Run approval/finalization, payslips, and payment processing are subsequent steps. A calculated run is not an approved payroll or a payment instruction.
+Period preparation, independently verified inputs, durable monthly calculation, source cutoffs, and staged run review are implemented. Finalization, payslips, and payment processing are subsequent steps. Approval retains sign-off on calculated results; it does not establish payment.
 
 ## Periods
 
@@ -43,7 +43,7 @@ Each committed employee advances exactly one indexed checkpoint. The final metad
 
 A stopped job can be resumed by its original author with current assurance, observed run version, reason, and a new idempotency key. Resume creates another job attempt for the remaining employees and metadata step, preserving every prior outcome, including failures. Each run permits eight explicit attempts. If process retries exhaust before feature cleanup, the run may still say `PROCESSING` while the job is terminal; that terminal job is eligible for explicit recovery. A replaced or expired lease cannot commit late results.
 
-To correct input, first stop a running job, then abandon its run with observed run and period versions. A completed calculation can also be abandoned before approval/finalization exists. Abandonment preserves evidence, reopens the period as `DRAFT`, and releases its source cutoffs. Start a new run to reassess corrected input; resume does not rewind an existing result. A period retains at most twenty runs. Changes to its immutable roster/payment metadata still require cancelling and replacing the draft.
+To correct input, first stop a running job, then abandon its run with observed run and period versions. A completed calculation can also be abandoned after any pending or approved review has been explicitly withdrawn. Abandonment preserves evidence, reopens the period as `DRAFT`, and releases its source cutoffs. Start a new run to reassess corrected input; resume does not rewind an existing result. A period retains at most twenty runs. Changes to its immutable roster/payment metadata still require cancelling and replacing the draft.
 
 The current tax-history source is an independently verified opening through the preceding month. Chaining later finalized payroll into that history, duplicate payout prevention, approval/finalization, and amendments remain subsequent work. Do not simulate that chain by overwriting a frozen opening.
 
@@ -62,3 +62,18 @@ Input and history lists return metadata summaries, without the earning/deduction
 Scope local caches by account and company; add earnings month and revision to input keys. Keep unsent changes separate from a verified server revision. After `stale_version`, `stale_employment_version`, or `stale_workforce_version`, fetch the current resource before deciding whether to resubmit. An existing operation receipt is historical confirmation, not the latest resource state. Stop obsolete requests when navigating or switching accounts/companies. Clients translate stable error and field codes, including per-employee outcome parameters. Persist the run ID after the start receipt and restore progress after reconnecting; poll only while the screen owns the observation. A queued command with a lost response must reuse its original key. The current employee sync feed does not yet publish payroll results.
 
 API paths and request fields are listed in [API conventions](api-conventions.md). Tax, overtime, proration, THR, and opening-history policies are documented in [payroll rules](payroll-rules.md).
+
+
+## Run review
+
+Only a fully calculated run with no failed employees can be submitted. Review retains the exact run version, participant count, taxable gross, withholding, and take-home totals. Total take-home selects the effective `PAYROLL` approval template on the submission date in the run's recorded timezone. Named and permission-based assignments are supported. A company payroll aggregate has no individual manager to resolve; manager assignment is rejected.
+
+Submission and withdrawal require `payroll.calculate`; an assigned or currently delegated `payroll.review` account decides each stage. Every mutation requires current recent authentication/MFA, live company access, an idempotency key, and observed versions. Review versions and shared approval versions are separate: reassignment advances the approval version without editing the frozen payroll snapshot. Reads require `payroll.read`, `payroll.calculate`, or `payroll.review`.
+
+The calculation maker and submission author cannot approve directly or through delegation. These exclusions remain in the shared approval snapshot after reassignment. A finance officer who receives payroll may approve the aggregate if neither maker. Personal compensation, monthly input, and opening history still require independent preparation and verification; aggregate sign-off does not authorize changing them.
+
+A missing assignee blocks the shared approval until administrative reassignment. Rejection retains the decision and requires a new calculation; identical rejected results cannot be submitted to another reviewer. Pending or approved reviews may be explicitly withdrawn before finalization. Withdrawal cancels the approval and preserves its decisions. Only then can the run be abandoned to release source cutoffs. A withdrawn snapshot may be submitted again, with at most eight review rounds per run.
+
+Review, approval transition, immutable change evidence, audit/outbox, and receipt share a transaction. The database rejects changed totals, missing history, unmatched decisions, or abandonment with an active review. Submission aggregates summary amount columns; it does not load every employee's complete JSON snapshot. Review reads return at most ten change records, and submission history uses bounded pages.
+
+Mobile clients retain both observed versions with a pending command. A lost response can replay the original operation after current access checks. `stale_version` or `approval_changed` requires fetching the latest review before constructing a new action. A finalized/paid state is never inferred from a completed calculation or approved review.

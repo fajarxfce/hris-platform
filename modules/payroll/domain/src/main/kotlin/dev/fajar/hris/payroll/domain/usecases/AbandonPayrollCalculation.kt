@@ -28,6 +28,7 @@ class AbandonPayrollCalculation(
     private val transactions: TransactionRunner,
     private val security: IdentitySecurityPolicy,
     private val clock: Clock,
+    private val reviews: PayrollReviewRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -98,6 +99,15 @@ class AbandonPayrollCalculation(
             if (run.status == PayrollRunStatus.ABANDONED)
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "payroll_run_already_abandoned")
+                )
+            val reviewResult = reviews.latest(company, run.id)
+            if (reviewResult is Result.Failed) return@run reviewResult
+            if (
+                (reviewResult as Result.Success).value?.status in
+                    setOf(PayrollReviewStatus.PENDING, PayrollReviewStatus.APPROVED)
+            )
+                return@run Result.Failed(
+                    Failure(FailureKind.CONFLICT, "payroll_review_withdrawal_required")
                 )
             val previous = jobs.find(company, run.jobId)
             if (previous is Result.Failed) return@run previous

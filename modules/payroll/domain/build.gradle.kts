@@ -1,6 +1,7 @@
 plugins { id("hris.kotlin") }
 
 dependencies {
+    api(projects.modules.approvals.domain)
     api(projects.core.domain)
     implementation(projects.core.jobs.domain)
     implementation(projects.modules.people.domain)

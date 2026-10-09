@@ -454,58 +454,134 @@ class ExpenseConfiguration {
     @Bean
     fun listExpensePayables(
         payments: ExpensePaymentRepository,
+        people: PeopleRepository,
         companies: CompanyRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
-    ) = ListExpensePayables(payments, companies, identities, transactions, security, clock)
+    ) =
+        ListExpensePayables(
+            payments,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun listExpensePaymentBatches(
         payments: ExpensePaymentRepository,
+        people: PeopleRepository,
         companies: CompanyRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
-    ) = ListExpensePaymentBatches(payments, companies, identities, transactions, security, clock)
+    ) =
+        ListExpensePaymentBatches(
+            payments,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun getExpensePaymentBatch(
         payments: ExpensePaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
-    ) = GetExpensePaymentBatch(payments, identities, transactions, security, clock)
+    ) =
+        GetExpensePaymentBatch(
+            payments,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun getExpensePaymentHistory(
         payments: ExpensePaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
-    ) = GetExpensePaymentHistory(payments, identities, transactions, security, clock)
+    ) =
+        GetExpensePaymentHistory(
+            payments,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun getExpensePaymentResults(
         payments: ExpensePaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
-    ) = GetExpensePaymentResults(payments, identities, transactions, security, clock)
+    ) =
+        GetExpensePaymentResults(
+            payments,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun getExpensePaymentExport(
         payments: ExpensePaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
-    ) = GetExpensePaymentExport(payments, identities, transactions, security, clock)
+    ) =
+        GetExpensePaymentExport(
+            payments,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun getExpenseClaimPayments(
@@ -513,6 +589,7 @@ class ExpenseConfiguration {
         payments: ExpensePaymentRepository,
         people: PeopleRepository,
         companies: CompanyRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
@@ -522,6 +599,7 @@ class ExpenseConfiguration {
             payments,
             people,
             companies,
+            members,
             identities,
             transactions,
             clock,

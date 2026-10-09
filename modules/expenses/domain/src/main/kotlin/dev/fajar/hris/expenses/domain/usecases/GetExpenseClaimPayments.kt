@@ -6,6 +6,7 @@ import dev.fajar.hris.expenses.domain.policies.canReadExpenseClaim
 import dev.fajar.hris.expenses.domain.repositories.*
 import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import java.time.Clock
@@ -17,6 +18,7 @@ class GetExpenseClaimPayments(
     private val payments: ExpensePaymentRepository,
     private val people: PeopleRepository,
     private val companies: CompanyRepository,
+    private val members: MembershipRepository,
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
@@ -26,6 +28,16 @@ class GetExpenseClaimPayments(
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         return transactions.run(actor) {
+            val resource = payments.lock(company, shared = true)
+            if (resource is Result.Failed) return@run resource
+            val peopleGuard = people.lockReportingLines(company, shared = true)
+            if (peopleGuard is Result.Failed) return@run peopleGuard
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
             val checked =
                 identities.access(actor.accountId, company).flatMap {
                     validateCompanyCommandActor(actor, it)

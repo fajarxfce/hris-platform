@@ -8,7 +8,7 @@ import java.util.UUID
 interface ExpensePaymentRepository {
     fun progress(companyId: UUID, claimId: UUID): Result<List<ExpensePaymentProgress>>
 
-    fun lock(companyId: UUID): Result<Unit>
+    fun lock(companyId: UUID, shared: Boolean = false): Result<Unit>
 
     fun capacity(companyId: UUID): Result<ExpensePaymentCapacity>
 

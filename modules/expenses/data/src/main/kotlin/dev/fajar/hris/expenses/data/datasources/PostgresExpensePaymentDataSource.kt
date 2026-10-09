@@ -33,8 +33,12 @@ class PostgresExpensePaymentDataSource(private val sql: DSLContext) : ExpensePay
                 )
             }
 
-    override fun lock(company: UUID) {
-        sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "expenses:$company")
+    override fun lock(company: UUID, shared: Boolean) {
+        sql.query(
+                if (shared) "select pg_advisory_xact_lock_shared(hashtextextended(?,0))"
+                else "select pg_advisory_xact_lock(hashtextextended(?,0))",
+                "expenses:$company",
+            )
             .execute()
     }
 

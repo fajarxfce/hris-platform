@@ -8,12 +8,15 @@ import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import java.time.*
 import java.util.UUID
 
 class ListExpensePaymentBatches(
     private val payments: ExpensePaymentRepository,
+    private val people: PeopleRepository,
     private val companies: CompanyRepository,
+    private val members: MembershipRepository,
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val security: IdentitySecurityPolicy,
@@ -37,7 +40,19 @@ class ListExpensePaymentBatches(
                 java.time.temporal.ChronoUnit.DAYS.between(from, until) !in 0..365
         )
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_page"))
+        val access = validateExpensePaymentAccess(actor, clock.instant(), security)
+        if (access is Result.Failed) return access
         return transactions.run(actor) {
+            val resource = payments.lock(company, shared = true)
+            if (resource is Result.Failed) return@run resource
+            val peopleGuard = people.lockReportingLines(company, shared = true)
+            if (peopleGuard is Result.Failed) return@run peopleGuard
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
             val checked =
                 identities.access(actor.accountId, company).flatMap {
                     validateCompanyCommandActor(actor, it)

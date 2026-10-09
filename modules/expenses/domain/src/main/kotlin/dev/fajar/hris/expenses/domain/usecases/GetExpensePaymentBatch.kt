@@ -7,11 +7,16 @@ import dev.fajar.hris.expenses.domain.repositories.ExpensePaymentRepository
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import java.time.*
 import java.util.UUID
 
 class GetExpensePaymentBatch(
     private val payments: ExpensePaymentRepository,
+    private val people: PeopleRepository,
+    private val companies: CompanyRepository,
+    private val members: MembershipRepository,
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val security: IdentitySecurityPolicy,
@@ -21,7 +26,19 @@ class GetExpensePaymentBatch(
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
+        val access = validateExpensePaymentAccess(actor, clock.instant(), security)
+        if (access is Result.Failed) return access
         return transactions.run(actor) {
+            val resource = payments.lock(company, shared = true)
+            if (resource is Result.Failed) return@run resource
+            val peopleGuard = people.lockReportingLines(company, shared = true)
+            if (peopleGuard is Result.Failed) return@run peopleGuard
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
             val checked =
                 identities.access(actor.accountId, company).flatMap {
                     validateCompanyCommandActor(actor, it)

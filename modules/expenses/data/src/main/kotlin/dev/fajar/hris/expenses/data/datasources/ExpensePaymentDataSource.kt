@@ -8,7 +8,7 @@ import java.util.UUID
 interface ExpensePaymentDataSource {
     fun progress(company: UUID, claim: UUID): List<ExpensePaymentProgressRow>
 
-    fun lock(company: UUID)
+    fun lock(company: UUID, shared: Boolean = false)
 
     fun capacity(company: UUID): ExpensePaymentCapacityRow
 

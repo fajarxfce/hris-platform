@@ -26,7 +26,9 @@ class StoredExpensePaymentRepository(private val source: ExpensePaymentDataSourc
             }
         }
 
-    override fun lock(companyId: UUID): Result<Unit> = safeDatabaseCall { source.lock(companyId) }
+    override fun lock(companyId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
+        source.lock(companyId, shared)
+    }
 
     override fun capacity(companyId: UUID): Result<ExpensePaymentCapacity> = safeDatabaseCall {
         source.capacity(companyId).let { ExpensePaymentCapacity(it.totalBatches, it.openBatches) }

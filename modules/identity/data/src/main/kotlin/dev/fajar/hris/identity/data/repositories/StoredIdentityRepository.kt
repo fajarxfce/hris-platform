@@ -20,8 +20,8 @@ class StoredIdentityRepository(
     private val passwords: PasswordDataSource,
     private val dummyHash: String,
 ) : IdentityRepository {
-    override fun lockAccount(accountId: UUID): Result<Unit> = safeDatabaseCall {
-        source.lockAccount(accountId)
+    override fun lockAccount(accountId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
+        source.lockAccount(accountId, shared)
     }
 
     override fun lockBootstrap(): Result<Unit> = safeDatabaseCall { source.lockBootstrap() }

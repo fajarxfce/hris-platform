@@ -28,8 +28,12 @@ class PostgresMembershipDataSource(private val sql: DSLContext) : MembershipData
                 .and(P.PERMISSION.eq(permission))
         )
 
-    override fun lock(companyId: UUID) {
-        sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "memberships:$companyId")
+    override fun lock(companyId: UUID, shared: Boolean) {
+        sql.query(
+                if (shared) "select pg_advisory_xact_lock_shared(hashtextextended(?,0))"
+                else "select pg_advisory_xact_lock(hashtextextended(?,0))",
+                "memberships:$companyId",
+            )
             .execute()
     }
 

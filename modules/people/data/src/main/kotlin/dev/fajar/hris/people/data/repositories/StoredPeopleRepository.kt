@@ -115,9 +115,10 @@ class StoredPeopleRepository(
         source.employeeIds(companyId, limit)
     }
 
-    override fun lockReportingLines(companyId: UUID): Result<Unit> = safeDatabaseCall {
-        source.lock(companyId)
-    }
+    override fun lockReportingLines(companyId: UUID, shared: Boolean): Result<Unit> =
+        safeDatabaseCall {
+            source.lock(companyId, shared)
+        }
 
     override fun find(companyId: UUID, id: UUID, asOf: LocalDate): Result<Employee?> =
         safeDatabaseCall {
@@ -241,4 +242,12 @@ class StoredPeopleRepository(
                     MutationReceipt(id, version)
                 }
             }
+
+    override fun employeeIdsForAccount(
+        companyId: UUID,
+        accountId: UUID,
+        limit: Int,
+    ): Result<List<UUID>> = safeDatabaseCall {
+        source.employeeIdsForAccount(companyId, accountId, limit)
+    }
 }

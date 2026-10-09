@@ -10,9 +10,10 @@ import java.util.UUID
 import org.jooq.DSLContext
 
 class PostgresIdentityDataSource(private val sql: DSLContext) : IdentityDataSource {
-    override fun lockAccount(id: UUID) {
+    override fun lockAccount(id: UUID, shared: Boolean) {
         // Protect credential/access changes while allowing FK references to the immutable ID.
-        sql.select(ACCOUNTS.ID).from(ACCOUNTS).where(ACCOUNTS.ID.eq(id)).forNoKeyUpdate().fetchOne()
+        val query = sql.select(ACCOUNTS.ID).from(ACCOUNTS).where(ACCOUNTS.ID.eq(id))
+        if (shared) query.forShare().fetchOne() else query.forNoKeyUpdate().fetchOne()
     }
 
     override fun lockBootstrap() {

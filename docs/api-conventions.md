@@ -117,3 +117,11 @@ Native authentication uses `Authorization: Bearer <access-token>`. Send no Autho
 
 
 Job queries use `/api/v1/companies/{companyId}/jobs`, with `size` (maximum 200) and paired `beforeAt`/`beforeId` cursor fields. Detail is `/{jobId}`; `POST /{jobId}/cancel` takes `expectedVersion`. Cancellation is requested first and acknowledged by the feature worker later. Own-job access is allowed within an active company membership; `jobs.read` broadens reads and `jobs.manage` permits cancelling other accounts' jobs. Responses omit stored authentication snapshots, request payloads, and internal lease tokens. Feature workflows own job submission and recovery.
+
+
+Mobile synchronization:
+
+- `GET /companies/{companyId}/sync/bootstrap`: optional opaque `cursor`, `limit` (default 100, maximum 200). Returns authorized collection references and either the next bootstrap page or the initial changes cursor.
+- `GET /companies/{companyId}/sync/changes`: required opaque `cursor`, `limit` (default 100, maximum 200). Returns UPSERT/DELETE references, continuation state, pending-publication status, and polling guidance.
+
+The initial collections are owned expense claims and leave requests. Each page rechecks live account/company scope. See [synchronization](synchronization.md) for local atomic cursor storage, bootstrap limits, key rotation, retention, access invalidation, and post-commit publication.

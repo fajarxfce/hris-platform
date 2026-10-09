@@ -7,7 +7,7 @@ import dev.fajar.hris.identity.domain.entities.CompanyMembership
 import java.util.UUID
 
 interface IdentityRepository {
-    fun lockAccount(accountId: UUID): Result<Unit>
+    fun lockAccount(accountId: UUID, shared: Boolean = false): Result<Unit>
 
     fun lockBootstrap(): Result<Unit>
 

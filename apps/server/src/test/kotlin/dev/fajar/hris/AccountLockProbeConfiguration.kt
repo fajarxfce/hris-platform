@@ -32,7 +32,7 @@ class AccountLockProbeConfiguration {
         probe: AccountLockProbe,
     ): IdentityRepository =
         object : IdentityRepository by delegate {
-            override fun lockAccount(accountId: UUID): Result<Unit> {
+            override fun lockAccount(accountId: UUID, shared: Boolean): Result<Unit> {
                 probe.current
                     .get()
                     ?.takeIf { it.account == accountId }
@@ -40,7 +40,7 @@ class AccountLockProbeConfiguration {
                         it.entered.countDown()
                         check(it.release.await(5, TimeUnit.SECONDS))
                     }
-                return delegate.lockAccount(accountId)
+                return delegate.lockAccount(accountId, shared)
             }
         }
 }

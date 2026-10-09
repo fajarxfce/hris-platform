@@ -40,7 +40,7 @@ Spring Batch provides persistent checkpoints for payroll/import/export. An outbo
 
 /api/v1 is the public prefix; company resources use /companies/{companyId}. OpenAPI describes DTOs, error codes, pagination, optimistic versions, and idempotency. Money uses decimal strings; timestamps use UTC with explicit IANA schedule zones. Default/max list sizes are 50/200.
 
-The mobile change feed is scoped by actor/company/permission. Commands carry stable operation IDs; offline attendance remains pending verification. Cursor invalidation and access revocation require refreshing the corresponding client partition.
+The mobile change feed is scoped by actor/company/permission and initially covers owned expense claims and leave requests. Storage triggers capture raw invalidations atomically; a bounded worker publishes positions after commit. Sync use cases hold shared people/company/membership/account guards and a shared publication-head guard for one page, validate live scope, and issue encrypted finite cursors. Datasources do not resolve access policy. Commands carry stable operation IDs; offline attendance remains pending verification. Cursor invalidation and access revocation require replacing the corresponding client partition. See [synchronization](synchronization.md) for pagination, retention, key rotation, and client recovery.
 
 ## Frontend
 

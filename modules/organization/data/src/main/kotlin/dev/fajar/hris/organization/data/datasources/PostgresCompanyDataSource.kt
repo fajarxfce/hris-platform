@@ -6,8 +6,12 @@ import java.util.UUID
 import org.jooq.DSLContext
 
 class PostgresCompanyDataSource(private val sql: DSLContext) : CompanyDataSource {
-    override fun lock(id: UUID) {
-        sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "company-state:$id")
+    override fun lock(id: UUID, shared: Boolean) {
+        sql.query(
+                if (shared) "select pg_advisory_xact_lock_shared(hashtextextended(?,0))"
+                else "select pg_advisory_xact_lock(hashtextextended(?,0))",
+                "company-state:$id",
+            )
             .execute()
     }
 

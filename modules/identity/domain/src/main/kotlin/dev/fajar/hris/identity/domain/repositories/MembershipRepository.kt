@@ -11,7 +11,7 @@ interface MembershipRepository {
         permission: String,
     ): Result<Boolean>
 
-    fun lock(companyId: UUID): Result<Unit>
+    fun lock(companyId: UUID, shared: Boolean = false): Result<Unit>
 
     fun find(companyId: UUID, accountId: UUID): Result<MemberAccount?>
 

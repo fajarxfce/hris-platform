@@ -172,7 +172,7 @@ private class RecordingJournal : ChangeJournalRepository {
 
 private class IdentityFake(private val credential: Account?, private val current: AccountAccess?) :
     IdentityRepository {
-    override fun lockAccount(accountId: UUID): Result<Unit> = Result.Success(Unit)
+    override fun lockAccount(accountId: UUID, shared: Boolean): Result<Unit> = Result.Success(Unit)
 
     var verifications = 0
 

@@ -17,7 +17,9 @@ class StoredMembershipRepository(private val source: MembershipDataSource) : Mem
         source.hasOtherActiveMember(companyId, exceptAccountId, permission)
     }
 
-    override fun lock(companyId: UUID): Result<Unit> = safeDatabaseCall { source.lock(companyId) }
+    override fun lock(companyId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
+        source.lock(companyId, shared)
+    }
 
     override fun find(companyId: UUID, accountId: UUID): Result<MemberAccount?> = safeDatabaseCall {
         source.find(companyId, accountId)?.toMember()

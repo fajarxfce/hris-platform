@@ -43,7 +43,9 @@ interface PeopleRepository {
 
     fun employeeIds(companyId: UUID, limit: Int): Result<List<UUID>>
 
-    fun lockReportingLines(companyId: UUID): Result<Unit>
+    fun employeeIdsForAccount(companyId: UUID, accountId: UUID, limit: Int): Result<List<UUID>>
+
+    fun lockReportingLines(companyId: UUID, shared: Boolean = false): Result<Unit>
 
     /** Current person/account linkage, including employment that has not started yet. */
     fun accountForEmployee(companyId: UUID, employeeId: UUID): Result<UUID?>

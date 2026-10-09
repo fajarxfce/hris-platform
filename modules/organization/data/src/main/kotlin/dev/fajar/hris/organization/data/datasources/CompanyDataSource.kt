@@ -4,7 +4,7 @@ import dev.fajar.hris.schema.tables.records.CompaniesRecord
 import java.util.UUID
 
 interface CompanyDataSource {
-    fun lock(id: UUID)
+    fun lock(id: UUID, shared: Boolean = false)
 
     fun find(id: UUID): CompaniesRecord?
 

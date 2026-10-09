@@ -5,7 +5,7 @@ import dev.fajar.hris.organization.domain.entities.Company
 import java.util.UUID
 
 interface CompanyRepository {
-    fun lock(id: UUID): Result<Unit>
+    fun lock(id: UUID, shared: Boolean = false): Result<Unit>
 
     fun find(id: UUID): Result<Company?>
 

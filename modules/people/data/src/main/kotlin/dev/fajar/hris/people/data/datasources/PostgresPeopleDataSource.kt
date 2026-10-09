@@ -142,8 +142,12 @@ class PostgresPeopleDataSource(private val sql: DSLContext) : PeopleDataSource {
             .fetch(E.ID)
             .map { requireNotNull(it) }
 
-    override fun lock(companyId: UUID) {
-        sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "people:$companyId")
+    override fun lock(companyId: UUID, shared: Boolean) {
+        sql.query(
+                if (shared) "select pg_advisory_xact_lock_shared(hashtextextended(?,0))"
+                else "select pg_advisory_xact_lock(hashtextextended(?,0))",
+                "people:$companyId",
+            )
             .execute()
     }
 
@@ -279,4 +283,14 @@ class PostgresPeopleDataSource(private val sql: DSLContext) : PeopleDataSource {
             .returning(E.VERSION)
             .fetchOne()
             ?.version
+
+    override fun employeeIdsForAccount(companyId: UUID, accountId: UUID, limit: Int): List<UUID> =
+        sql.select(E.ID)
+            .from(E)
+            .join(P)
+            .on(P.ID.eq(E.PERSON_ID))
+            .where(E.COMPANY_ID.eq(companyId), P.ACCOUNT_ID.eq(accountId))
+            .orderBy(E.ID)
+            .limit(limit)
+            .fetch(E.ID)
 }

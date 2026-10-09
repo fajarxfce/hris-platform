@@ -155,4 +155,28 @@ class WorkerConfiguration {
         advance: AdvanceDocumentInventory,
         abort: AbortDocumentInventory,
     ): JobTask = DocumentInventoryTask(resolve, advance, abort)
+
+    @Bean
+    fun mobileSyncTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 1
+            setThreadNamePrefix("hris-mobile-sync-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(15)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = ["hris.worker.enabled"],
+        havingValue = "true",
+        matchIfMissing = true,
+    )
+    fun mobileSyncWorker(
+        maintain: dev.fajar.hris.sync.domain.usecases.MaintainMobileSync,
+        @org.springframework.beans.factory.annotation.Qualifier("mobileSyncTimers")
+        timer: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+    ) = dev.fajar.hris.worker.sync.MobileSyncWorker(maintain, timer)
 }

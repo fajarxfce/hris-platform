@@ -5,7 +5,7 @@ import java.util.UUID
 interface MembershipDataSource {
     fun hasOtherActiveMember(companyId: UUID, exceptAccountId: UUID, permission: String): Boolean
 
-    fun lock(companyId: UUID)
+    fun lock(companyId: UUID, shared: Boolean = false)
 
     fun find(companyId: UUID, accountId: UUID): MemberRow?
 

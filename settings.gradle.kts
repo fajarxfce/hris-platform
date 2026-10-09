@@ -44,3 +44,5 @@ include(":core:storage:domain", ":core:storage:data", ":core:storage:delivery")
 include(":modules:documents:domain", ":modules:documents:data", ":modules:documents:delivery")
 
 include(":modules:expenses:domain", ":modules:expenses:data", ":modules:expenses:delivery")
+
+include(":modules:sync:domain", ":modules:sync:data", ":modules:sync:delivery")

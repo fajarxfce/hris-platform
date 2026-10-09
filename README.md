@@ -27,6 +27,7 @@ See [development](docs/development.md) for Docker access, migrations, and local 
 - [Private object storage](docs/storage.md)
 - [API conventions](docs/api-conventions.md)
 - [Mobile and offline clients](docs/mobile-api.md)
+- [Incremental synchronization](docs/synchronization.md)
 - [Dashboard design](docs/dashboard.md)
 - [Delivery and validation](docs/delivery.md)
 

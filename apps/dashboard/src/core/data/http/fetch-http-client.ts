@@ -6,16 +6,28 @@ const maximumBytes = 1024 * 1024;
 
 /** Same-origin cookie transport. It owns each deadline and never retries a command. */
 export class FetchHttpClient implements HttpClient {
+  private readonly deadlineMilliseconds: number;
+  private readonly clientBuild: number;
+
   constructor(
     private readonly fetcher: typeof fetch = globalThis.fetch.bind(globalThis),
-    private readonly deadlineMilliseconds = 15_000,
+    options: Readonly<{ deadlineMilliseconds?: number; clientBuild?: number }> = {},
   ) {
+    this.deadlineMilliseconds = options.deadlineMilliseconds ?? 15_000;
+    this.clientBuild = options.clientBuild ?? 1;
     if (
-      !Number.isInteger(deadlineMilliseconds) ||
-      deadlineMilliseconds < 1 ||
-      deadlineMilliseconds > 60_000
+      !Number.isInteger(this.deadlineMilliseconds) ||
+      this.deadlineMilliseconds < 1 ||
+      this.deadlineMilliseconds > 60_000
     ) {
       throw new RangeError("Invalid request deadline");
+    }
+    if (
+      !Number.isInteger(this.clientBuild) ||
+      this.clientBuild < 0 ||
+      this.clientBuild > 999_999_999
+    ) {
+      throw new RangeError("Invalid client build");
     }
   }
 
@@ -37,7 +49,11 @@ export class FetchHttpClient implements HttpClient {
     );
     try {
       const method = request.method ?? "GET";
-      const headers = new Headers({ Accept: "application/json" });
+      const headers = new Headers({
+        Accept: "application/json",
+        "X-HRIS-Client-Platform": "WEB",
+        "X-HRIS-Client-Build": String(this.clientBuild),
+      });
       if (method !== "GET") {
         // Login, logout and MFA rotate CSRF state; acquire the current token for each mutation.
         const csrf = await this.send(

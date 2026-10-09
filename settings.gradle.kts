@@ -56,3 +56,9 @@ include(
 )
 
 include(":core:push:domain", ":core:push:data")
+
+include(
+    ":modules:administration:domain",
+    ":modules:administration:data",
+    ":modules:administration:delivery",
+)

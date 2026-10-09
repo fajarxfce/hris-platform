@@ -59,6 +59,12 @@ class ApiDocumentationConfiguration {
             handler.hasMethodAnnotation(PendingMfaAllowed::class.java),
         )
         operation.tags = listOf(handler.beanType.packageName.split('.').getOrElse(3) { "api" })
+        val feature =
+            handler.beanType.packageName.removePrefix("dev.fajar.hris.").substringBefore('.')
+        operation.addExtension(
+            "x-hris-company-admission",
+            feature !in dev.fajar.hris.availability.companyPolicyExemptPackages,
+        )
         operation
     }
 

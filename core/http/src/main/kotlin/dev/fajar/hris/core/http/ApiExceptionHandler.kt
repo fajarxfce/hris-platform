@@ -14,8 +14,16 @@ class ApiExceptionHandler {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @ExceptionHandler(DomainFailureException::class)
-    fun domain(error: DomainFailureException): ProblemDetail =
-        apiProblem(error.failure, MDC.get("correlationId"))
+    fun domain(
+        error: DomainFailureException,
+        response: jakarta.servlet.http.HttpServletResponse,
+    ): ProblemDetail {
+        response.setHeader("Cache-Control", "no-store")
+        failureRetryAfterSeconds(error.failure)?.let {
+            response.setHeader("Retry-After", it.toString())
+        }
+        return apiProblem(error.failure, MDC.get("correlationId"))
+    }
 
     @ExceptionHandler(
         HttpMessageNotReadableException::class,

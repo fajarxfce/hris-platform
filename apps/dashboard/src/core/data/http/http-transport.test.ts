@@ -19,7 +19,7 @@ describe("cookie API transport", () => {
       .mockResolvedValueOnce(json({ code: "stale_version" }, 409))
       .mockResolvedValueOnce(json({ token: "second", headerName: "X-CSRF-TOKEN" }))
       .mockResolvedValueOnce(json({ id: "accepted" }));
-    const source = new FetchHttpClient(fetcher);
+    const source = new FetchHttpClient(fetcher, { clientBuild: 42 });
     const command = {
       path: "/api/v1/example",
       method: "POST" as const,
@@ -37,6 +37,8 @@ describe("cookie API transport", () => {
       const headers = new Headers(options?.headers);
       expect(headers.get("X-CSRF-TOKEN")).toBe(token);
       expect(headers.get("Idempotency-Key")).toBe(command.operationId);
+      expect(headers.get("X-HRIS-Client-Platform")).toBe("WEB");
+      expect(headers.get("X-HRIS-Client-Build")).toBe("42");
       expect(options?.credentials).toBe("same-origin");
       expect(options?.redirect).toBe("error");
       expect(options?.body).toBe('{"expectedVersion":4}');
@@ -76,7 +78,7 @@ describe("cookie API transport", () => {
           });
         }),
     );
-    const source = new FetchHttpClient(fetcher, 200);
+    const source = new FetchHttpClient(fetcher, { deadlineMilliseconds: 200 });
     const requestSignal = signal();
     const pending = safeHttpCall(requestSignal, () =>
       source.request({ path: "/api/v1/me" }, requestSignal),

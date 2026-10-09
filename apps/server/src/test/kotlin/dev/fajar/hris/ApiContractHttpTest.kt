@@ -175,6 +175,20 @@ class ApiContractHttpTest : PeopleApiFixture() {
             }
         assertEquals("uuid", company["schema"]["format"].asString())
         val mutation = paths["/api/v1/companies/{companyId}/employees"]["post"]
+        assertTrue(mutation["x-hris-company-admission"].asBoolean())
+        assertEquals(
+            setOf("X-HRIS-Client-Platform", "X-HRIS-Client-Build"),
+            mutation["parameters"]
+                .iterator()
+                .asSequence()
+                .map { it["name"].asString() }
+                .filter { it.startsWith("X-HRIS-Client-") }
+                .toSet(),
+        )
+        assertFalse(
+            paths["/api/v1/companies/{companyId}/client-policy"]["get"]["x-hris-company-admission"]
+                .asBoolean()
+        )
         assertTrue(mutation["x-hris-idempotency-key"].asBoolean())
         val permissions =
             mutation["security"]

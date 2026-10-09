@@ -10,6 +10,10 @@ Screens: settings, flags, integration status, audit explorer, job monitor.
 
 Acceptance: policy effective dates, restricted settings/audit access, safe retry, stale client policy, secret redaction, and recovery from backup.
 
+## Client availability and module flags
+
+Versioned company client policy is implemented, including future activation, immutable history, paired build headers, bounded maintenance, and server admission for feature endpoints and sync selections. Settings writes retain idempotent receipts and current permission/recent-authentication checks. [Client policy](../client-policy.md) defines recovery, scheduling, and mobile behavior. These availability controls do not grant permissions or interrupt already admitted transactions/jobs.
+
 
 ## Durable job foundation
 

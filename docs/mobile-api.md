@@ -50,6 +50,8 @@ Revalidate membership and permissions on reconnect and foreground entry. Offline
 
 ## Transport conventions
 
+Use the [company client policy](client-policy.md) for module flags, minimum builds, and maintenance. Persist its account/company scope and freshness bound, and send paired `X-HRIS-Client-Platform`/`X-HRIS-Client-Build` headers on company business calls. Resolve availability before retrying queued commands; a module flag never grants permission. Sync follows the same policy without silently changing selected collections.
+
 Treat endpoint cursors and tokens as opaque. Follow bounded pages rather than requesting an entire organization in one response. Store decimal strings without converting them through binary floating point. Use server UTC timestamps for synchronization, explicit IANA zones for schedules, and local dates for work-day policy. A device clock is evidence, not an authority for conflict ordering.
 
 Resumable uploads use bounded chunks and stable operation keys. Finishing bytes is separate from successful validation. Authorized downloads support Range/ETag; do not cache storage URLs or assume a previously authorized document remains readable after access changes.

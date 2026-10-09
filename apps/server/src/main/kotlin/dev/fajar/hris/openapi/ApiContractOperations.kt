@@ -142,6 +142,34 @@ fun completeApiContract(api: OpenAPI) {
                     else -> listOf(SecurityRequirement().addList("nativeBearer"), cookie)
                 }
             operation.addExtension("x-hris-authentication-required", path !in publicPaths)
+            val companyAdmission =
+                "{companyId}" in path &&
+                    operation.extensions?.get("x-hris-company-admission") == true
+            operation.addExtension("x-hris-company-admission", companyAdmission)
+            if (companyAdmission) {
+                operation.addParametersItem(
+                    Parameter()
+                        .name("X-HRIS-Client-Platform")
+                        .`in`("header")
+                        .required(false)
+                        .schema(StringSchema().pattern("^(ANDROID|IOS|WEB)$"))
+                        .description(
+                            "Send with X-HRIS-Client-Build. Native sessions use ANDROID/IOS; browser sessions use WEB. Company client policy can require these headers."
+                        )
+                )
+                operation.addParametersItem(
+                    Parameter()
+                        .name("X-HRIS-Client-Build")
+                        .`in`("header")
+                        .required(false)
+                        .schema(
+                            IntegerSchema().minimum(BigDecimal.ZERO).maximum(BigDecimal(999999999))
+                        )
+                        .description(
+                            "Monotonic client build number, paired with X-HRIS-Client-Platform. Version gates never replace permission or payload validation."
+                        )
+                )
+            }
             if (path in browserOnly) operation.addExtension("x-hris-session-transport", "COOKIE")
             if (
                 "{companyId}" in path &&

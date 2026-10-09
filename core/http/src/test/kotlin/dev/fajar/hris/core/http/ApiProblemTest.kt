@@ -29,7 +29,9 @@ class ApiProblemTest {
                 mapOf("maximum" to "1234.50", "currency" to "IDR"),
             )
         MDC.putCloseable("correlationId", reference).use {
-            val problem = ApiExceptionHandler().domain(DomainFailureException(failure))
+            val problem =
+                ApiExceptionHandler()
+                    .domain(DomainFailureException(failure), MockHttpServletResponse())
             assertEquals(422, problem.status)
             assertEquals("urn:hris:problem:amount_limit", problem.type.toString())
             assertEquals(failure.fields, problem.properties?.get("fields"))
@@ -38,6 +40,31 @@ class ApiProblemTest {
             assertNull(problem.detail)
         }
         assertNull(MDC.get("correlationId"))
+    }
+
+    @Test
+    fun domainRetryMetadataRequiresAnExplicitBoundedTemporaryFailure() {
+        for ((kind, delay, expected) in
+            listOf(
+                Triple(FailureKind.UNAVAILABLE, "120", 120L),
+                Triple(FailureKind.RATE_LIMITED, "1", 1L),
+                Triple(FailureKind.FORBIDDEN, "120", null),
+                Triple(FailureKind.UNAVAILABLE, "-1", null),
+                Triple(FailureKind.UNAVAILABLE, "99999999999999999999", null),
+                Triple(FailureKind.UNAVAILABLE, "604801", null),
+            )) {
+            val response = MockHttpServletResponse()
+            val failure =
+                Failure(
+                    kind,
+                    "bounded_retry_fixture",
+                    parameters = mapOf("retryAfterSeconds" to delay),
+                )
+            val body = ApiExceptionHandler().domain(DomainFailureException(failure), response)
+            assertEquals(expected?.toString(), response.getHeader("Retry-After"))
+            assertEquals(expected, body.properties?.get("retryAfterSeconds"))
+            assertEquals("no-store", response.getHeader("Cache-Control"))
+        }
     }
 
     @Test

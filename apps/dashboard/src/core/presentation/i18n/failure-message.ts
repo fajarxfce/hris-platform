@@ -38,6 +38,26 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Company access is unavailable. Select another company or contact an administrator.",
     "Akses perusahaan tidak tersedia. Pilih perusahaan lain atau hubungi administrator.",
   ],
+  client_version_required: [
+    "Reload the application to continue.",
+    "Muat ulang aplikasi untuk melanjutkan.",
+  ],
+  client_update_required: [
+    "Update the application to continue.",
+    "Perbarui aplikasi untuk melanjutkan.",
+  ],
+  company_module_disabled: [
+    "This module is disabled for the selected company.",
+    "Modul ini dinonaktifkan untuk perusahaan yang dipilih.",
+  ],
+  company_maintenance: [
+    "Company services are under maintenance. Try again later.",
+    "Layanan perusahaan sedang dalam maintenance. Coba lagi nanti.",
+  ],
+  invalid_client_version: [
+    "Reload the application or contact support.",
+    "Muat ulang aplikasi atau hubungi support.",
+  ],
   connection_unavailable: [
     "Unable to connect. Check your connection and retry.",
     "Tidak dapat terhubung. Periksa koneksi dan coba lagi.",

@@ -24,6 +24,8 @@ Application messages translate stable failure codes; unknown codes receive a gen
 
 ## Commands
 
+The shared HTTP transport sends `X-HRIS-Client-Platform: WEB` with the compiled `HRIS_DASHBOARD_BUILD` (default `1`, bounded integer). Set this build-time value consistently for distributed dashboard artifacts. Company policy can require an update or pause business requests during maintenance; availability errors have English/Indonesian messages. Policy management and company preflight screens remain subsequent business workflows.
+
 From `apps/dashboard`:
 
 ```sh

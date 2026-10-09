@@ -17,7 +17,7 @@ const queries = new QueryClient({
   },
 });
 const identity = new IdentityController(
-  createIdentityFeature(new FetchHttpClient()),
+  createIdentityFeature(new FetchHttpClient(undefined, { clientBuild: __HRIS_DASHBOARD_BUILD__ })),
   () => crypto.randomUUID() as OperationId,
   () => queries.clear(),
 );

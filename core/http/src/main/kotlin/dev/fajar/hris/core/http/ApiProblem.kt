@@ -33,7 +33,17 @@ fun apiProblem(failure: Failure, correlationId: String?): ProblemDetail =
         correlationId,
         failure.fields,
         failure.parameters,
+        failureRetryAfterSeconds(failure),
     )
+
+/** Maps an explicit domain delay to bounded HTTP metadata without inferring retry policy. */
+fun failureRetryAfterSeconds(failure: Failure): Long? =
+    when (failure.kind) {
+        dev.fajar.hris.core.domain.FailureKind.RATE_LIMITED,
+        dev.fajar.hris.core.domain.FailureKind.UNAVAILABLE ->
+            failure.parameters["retryAfterSeconds"]?.toLongOrNull()?.takeIf { it in 1..604800 }
+        else -> null
+    }
 
 /** Filters run outside MVC's ProblemDetail converter; keep the same wire representation. */
 fun writeApiProblem(

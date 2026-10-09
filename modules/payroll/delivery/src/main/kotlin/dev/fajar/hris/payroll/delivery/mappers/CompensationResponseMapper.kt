@@ -30,6 +30,7 @@ fun CompensationTerms.toResponse() =
         additionalRetirementContribution.toPlainString(),
         qualifiedDonation.toPlainString(),
         otherNetDeduction.toPlainString(),
+        payBasis?.toResponse(),
     )
 
 fun EmployeeCompensation.toResponse() =

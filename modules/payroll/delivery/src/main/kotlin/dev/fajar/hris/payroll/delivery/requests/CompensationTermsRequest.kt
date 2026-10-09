@@ -15,4 +15,5 @@ data class CompensationTermsRequest(
     val additionalRetirementContribution: String = "0",
     val qualifiedDonation: String = "0",
     val otherNetDeduction: String = "0",
+    val payBasis: PayrollPayBasisRequest? = null,
 )

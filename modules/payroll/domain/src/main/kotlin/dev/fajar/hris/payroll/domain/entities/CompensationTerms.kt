@@ -15,4 +15,5 @@ data class CompensationTerms(
     val additionalRetirementContribution: BigDecimal,
     val qualifiedDonation: BigDecimal,
     val otherNetDeduction: BigDecimal,
+    val payBasis: PayrollPayBasis? = null,
 )

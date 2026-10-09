@@ -16,6 +16,6 @@ Sources: https://jdih.kemenkeu.go.id/dok/pp-58-tahun-2023 ; https://jdih.kemenke
 
 ## Implementation status
 
-Effective company payroll policy, independently managed compensation, immutable history, scoped reads, optimistic updates, and replay are implemented. The pure calculation library includes the reviewed TER tables, resident final-period reconciliation, domestic PPh 26, bounded gross-up/net treatment, and separately configured social insurance contributions. See [configuration and rules](../payroll-rules.md) for exact inputs, sources, rounding, access, and bounds.
+Effective company payroll policy, independently managed compensation, immutable history, scoped reads, optimistic updates, and replay are implemented. The pure calculation library includes the reviewed TER tables, resident final-period reconciliation, domestic PPh 26, bounded gross-up/net treatment, separately configured social insurance contributions, standard monthly-wage overtime, explicit-unit proration, and THR service/amount rules. Optional reviewed pay-basis settings are retained in compensation history. See [configuration and rules](../payroll-rules.md) for exact inputs, sources, rounding, access, and bounds.
 
 Period runs, durable calculation, approval/finalization, payslips, payment reconciliation, amendments, and the dashboard remain planned. Configuration or a passing calculator fixture does not represent a completed payroll run.

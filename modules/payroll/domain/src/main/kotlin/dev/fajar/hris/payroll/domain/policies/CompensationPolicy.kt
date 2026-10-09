@@ -83,10 +83,16 @@ fun validateCompensation(
         return Result.Failed(
             Failure(FailureKind.VALIDATION, "invalid_compensation", fields = fields)
         )
+    terms.payBasis?.let {
+        val basis = validatePayrollPayBasis(it)
+        if (basis is Result.Failed) return basis
+    }
     val cash =
         terms.basicSalary + earnings.fold(BigDecimal.ZERO) { total, line -> total + line.amount }
     if (
         cash > PAYROLL_MAXIMUM_MONTHLY_AMOUNT ||
+            cash + (terms.payBasis?.regularNonFixedWage ?: BigDecimal.ZERO) >
+                PAYROLL_MAXIMUM_MONTHLY_AMOUNT ||
             terms.additionalRetirementContribution +
                 terms.qualifiedDonation +
                 terms.otherNetDeduction > cash
@@ -124,4 +130,20 @@ fun compensationOperationParts(terms: CompensationTerms): List<String?> =
                     it.amount.stripTrailingZeros().toPlainString(),
                     it.taxable.toString(),
                 )
-            }
+            } +
+        (terms.payBasis?.let { basis ->
+            listOf(
+                "payBasis",
+                basis.overtimeRuleId,
+                basis.holidayAllowanceRuleId,
+                basis.proration.name,
+                basis.workWeek.name,
+                basis.shortestWorkDay?.name,
+                basis.overtimeEligibility.name,
+                basis.overtimeExemptionReference,
+                basis.regularNonFixedWage.stripTrailingZeros().toPlainString(),
+                basis.serviceMonthConvention.name,
+                basis.rounding.name,
+                basis.reviewReference,
+            )
+        } ?: emptyList())

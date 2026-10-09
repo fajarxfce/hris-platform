@@ -13,4 +13,5 @@ data class CompensationTermsData(
     val additionalRetirementContribution: String,
     val qualifiedDonation: String,
     val otherNetDeduction: String,
+    val payBasis: PayrollPayBasisData? = null,
 )

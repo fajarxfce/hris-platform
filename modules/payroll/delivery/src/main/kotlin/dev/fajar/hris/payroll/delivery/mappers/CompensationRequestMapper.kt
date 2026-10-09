@@ -33,4 +33,5 @@ fun CompensationTermsRequest.toTerms() =
         decimalAmount(additionalRetirementContribution),
         decimalAmount(qualifiedDonation),
         decimalAmount(otherNetDeduction),
+        payBasis?.toBasis(),
     )

@@ -44,6 +44,7 @@ fun CompensationTerms.toData() =
         additionalRetirementContribution.toPlainString(),
         qualifiedDonation.toPlainString(),
         otherNetDeduction.toPlainString(),
+        payBasis?.toData(),
     )
 
 fun CompensationTermsData.toTerms() =
@@ -62,6 +63,7 @@ fun CompensationTermsData.toTerms() =
         BigDecimal(additionalRetirementContribution),
         BigDecimal(qualifiedDonation),
         BigDecimal(otherNetDeduction),
+        payBasis?.toBasis(),
     )
 
 fun CompensationRow.toCompensation(json: ObjectMapper) =

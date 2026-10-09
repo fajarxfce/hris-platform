@@ -175,6 +175,22 @@ Payroll opening history:
 Terms contain `throughMonth` (0–11), `residency`, `ptkp`, `reference`, and `history`. All history fields are explicit: decimal-string `taxableGross`, `retirementContributions`, `qualifiedDonations`, `withheld`, `previousEmployerNet`, `previousEmployerWithheld`, and integer `employmentMonths`. A zero declaration must supply zero values. Responses include immutable revision, preparation/verification accounts, status, and history; no generic administrator or employee salary access is added. See [opening semantics](payroll-rules.md#opening-tax-history).
 
 
+Payroll period preparation:
+
+- `POST /companies/{companyId}/payroll/periods`: `id`, `earningsMonth` (`YYYY-MM`), `plannedPaymentDate`, `employeeIds` (1–5,000), and `reason`. Requires `payroll.calculate`, recent authentication/MFA, and an idempotency key.
+- `POST /companies/{companyId}/payroll/periods/{id}/cancel`: `expectedVersion`, `reason`, and an idempotency key. Only a draft can be cancelled.
+- `GET /companies/{companyId}/payroll/periods`: `from`, `until` (at most thirty-six months), optional `status`, UUID `after`, and bounded `limit`.
+- `GET /companies/{companyId}/payroll/periods/{id}`: `period`, paginated `members`, and paginated `history`. Use employment UUID `after`/`limit` for members and revision `historyAfter`/`historyLimit` for changes. Members expose nullable `inputVersion`/`inputStatus`.
+- `GET /companies/{companyId}/payroll/employees/{employeeId}/work-source?month=YYYY-MM`: current workforce reference, `closed`, and `includesEmployee`.
+- `PUT /companies/{companyId}/payroll/employees/{employeeId}/inputs/{month}`: `workJobId`, `expectedWorkPeriodVersion`, `expectedEmploymentVersion`, nullable `expectedVersion`, `terms`, and `reason`. Requires `payroll.calculate`, recent authentication/MFA, and an idempotency key.
+- `POST /companies/{companyId}/payroll/employees/{employeeId}/inputs/{month}/verify`: `expectedVersion`, `reason`, and an idempotency key. Requires independent `payroll.review` and recent authentication/MFA.
+- `GET /companies/{companyId}/payroll/employees/{employeeId}/inputs/{month}`: complete current input; optional `revision` fetches exact retained history.
+- `GET /companies/{companyId}/payroll/employees/{employeeId}/inputs/{month}/history`: metadata summaries with revision `after` and bounded `limit`.
+- `GET /companies/{companyId}/payroll/inputs`: required `month`, optional `status`, employment UUID `after`, and bounded `limit`; returns summaries without financial input arrays.
+
+Input terms require `earnings` (`code`, `name`, decimal-string `amount`, `taxable`), `deductions` (`code`, `name`, decimal-string `amount`), decimal-string `nonCashTaxable`, `dayResolutions` (`workDate`, `portion`, `disposition`, `reference`), and `reviewReference`. `scheduledMonthUnits` is an optional decimal string. Optional `holidayAllowance` contains `kind`, `holidayDate`, `continuousServiceFrom`, `priorPayment` (`NOT_PAID`/`PAID`), `reviewReference`, and optional decimal-string `promisedAmount`. The day portion is `FULL`, `FIRST_HALF`, or `SECOND_HALF`; disposition is `PAID` or `UNPAID`. See [workflow semantics and limits](payroll-workflows.md). Draft creation and verification do not calculate or pay payroll.
+
+
 ## Overtime commands
 
 All paths below are under `/api/v1/companies/{companyId}/workforce/overtime`. Mutations require `Idempotency-Key`.

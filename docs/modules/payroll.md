@@ -20,4 +20,6 @@ Effective company payroll policy, independently managed compensation, immutable 
 
 Versioned opening tax history, independent verification, immutable evidence, and bounded scoped reads are implemented.
 
-Period runs, durable calculation, approval/finalization, payslips, payment reconciliation, amendments, and the dashboard remain planned. Configuration or a passing calculator fixture does not represent a completed payroll run.
+Period drafts, frozen participant lists, cancellation, exact workforce references, and independently verified monthly input history are implemented. See [period preparation](../payroll-workflows.md).
+
+Durable calculation, cutoff enforcement, approval/finalization, payslips, payment reconciliation, amendments, and the dashboard remain planned. Configuration or a passing calculator fixture does not represent a completed payroll run.

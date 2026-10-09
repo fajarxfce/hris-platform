@@ -271,4 +271,202 @@ class PayrollConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
     ) = ListPayrollTaxOpenings(openings, policies, companies, members, identities, transactions)
+
+    @Bean
+    fun payrollPeriodSource(sql: DSLContext): PayrollPeriodDataSource =
+        PostgresPayrollPeriodDataSource(sql)
+
+    @Bean
+    fun payrollInputSource(sql: DSLContext): PayrollInputDataSource =
+        PostgresPayrollInputDataSource(sql)
+
+    @Bean
+    fun payrollWorkSource(sql: DSLContext): PayrollWorkSourceDataSource =
+        PostgresPayrollWorkSourceDataSource(sql)
+
+    @Bean
+    fun payrollPeriods(source: PayrollPeriodDataSource): PayrollPeriodRepository =
+        StoredPayrollPeriodRepository(source)
+
+    @Bean
+    fun payrollInputs(source: PayrollInputDataSource, json: ObjectMapper): PayrollInputRepository =
+        StoredPayrollInputRepository(source, json)
+
+    @Bean
+    fun payrollWorkSources(source: PayrollWorkSourceDataSource): PayrollWorkSourceRepository =
+        StoredPayrollWorkSourceRepository(source)
+
+    @Bean
+    fun createPayrollPeriod(
+        periods: PayrollPeriodRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        CreatePayrollPeriod(
+            periods,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun cancelPayrollPeriod(
+        periods: PayrollPeriodRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        CancelPayrollPeriod(
+            periods,
+            policies,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun savePayrollInput(
+        inputs: PayrollInputRepository,
+        sources: PayrollWorkSourceRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        SavePayrollInput(
+            inputs,
+            sources,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun verifyPayrollInput(
+        inputs: PayrollInputRepository,
+        sources: PayrollWorkSourceRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        VerifyPayrollInput(
+            inputs,
+            sources,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun getPayrollPeriod(
+        periods: PayrollPeriodRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetPayrollPeriod(periods, policies, companies, members, identities, transactions)
+
+    @Bean
+    fun listPayrollPeriods(
+        periods: PayrollPeriodRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = ListPayrollPeriods(periods, policies, companies, members, identities, transactions)
+
+    @Bean
+    fun getPayrollInput(
+        inputs: PayrollInputRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetPayrollInput(inputs, policies, companies, members, identities, transactions)
+
+    @Bean
+    fun getPayrollInputHistory(
+        inputs: PayrollInputRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetPayrollInputHistory(inputs, policies, companies, members, identities, transactions)
+
+    @Bean
+    fun listPayrollInputs(
+        inputs: PayrollInputRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = ListPayrollInputs(inputs, policies, companies, members, identities, transactions)
+
+    @Bean
+    fun getPayrollWorkSource(
+        sources: PayrollWorkSourceRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetPayrollWorkSource(sources, policies, companies, members, identities, transactions)
 }

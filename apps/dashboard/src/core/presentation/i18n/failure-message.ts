@@ -87,6 +87,18 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Halaman tidak tersedia untuk filter ini. Reset filter untuk memulai kembali.",
   ],
   invalid_revision: ["Enter a revision from 0 to 9999.", "Masukkan revisi dari 0 hingga 9999."],
+  invalid_pagination: [
+    "This page link is invalid. Return to the first page.",
+    "Link halaman tidak valid. Kembali ke halaman pertama.",
+  ],
+  job_not_found: [
+    "The job was not found or is no longer accessible.",
+    "Job tidak ditemukan atau tidak dapat diakses.",
+  ],
+  job_already_finished: [
+    "This job has already finished. Refresh its status.",
+    "Job ini sudah selesai. Muat ulang statusnya.",
+  ],
   client_policy_revision_not_found: [
     "The configuration revision was not found.",
     "Revisi konfigurasi tidak ditemukan.",
@@ -96,8 +108,8 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Respons layanan tidak valid. Silakan coba lagi.",
   ],
   stale_version: [
-    "This record has changed. Refresh before saving again.",
-    "Data sudah berubah. Muat ulang sebelum menyimpan kembali.",
+    "This record has changed. Refresh before trying again.",
+    "Data sudah berubah. Muat ulang sebelum mencoba lagi.",
   ],
   request_conflict: [
     "The action conflicts with the current record. Refresh and review it.",

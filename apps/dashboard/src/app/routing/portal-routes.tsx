@@ -9,8 +9,15 @@ import type {
   CompanyAccess,
   CompanyMembership,
 } from "../../features/identity/domain/entities/session";
+import type { JobsUseCases } from "../../features/jobs/presentation/contracts/jobs-use-cases";
 import { OverviewPage } from "../../features/overview/presentation/pages/overview-page";
 import type { ReportingUseCases } from "../../features/reporting/presentation/contracts/reporting-use-cases";
+
+const JobsScreen = lazy(() =>
+  import("../../features/jobs/presentation/bindings/jobs-screen").then((module) => ({
+    default: module.JobsScreen,
+  })),
+);
 
 const HeadcountScreen = lazy(() =>
   import("../../features/reporting/presentation/bindings/headcount-screen").then((module) => ({
@@ -37,6 +44,7 @@ export function PortalRoutes({
   access,
   reporting,
   administration,
+  jobs,
   locale,
 }: {
   accountId: AccountId;
@@ -45,12 +53,27 @@ export function PortalRoutes({
   access: CompanyAccess | null;
   reporting: ReportingUseCases;
   administration: AdministrationUseCases;
+  jobs: JobsUseCases;
   locale: Locale;
 }) {
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
       <Route path="/" element={<OverviewPage company={company} locale={locale} />} />
+      <Route
+        path="/administration/jobs"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <JobsScreen
+              accountId={accountId}
+              access={access}
+              jobs={jobs}
+              companyName={company.name}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/reports/headcount"
         element={

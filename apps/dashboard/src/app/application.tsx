@@ -10,6 +10,7 @@ import { type Locale, messages } from "../core/presentation/i18n/messages";
 import type { AdministrationUseCases } from "../features/administration/presentation/contracts/administration-use-cases";
 import { AuthScreen } from "../features/identity/presentation/bindings/auth-screen";
 import type { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
+import type { JobsUseCases } from "../features/jobs/presentation/contracts/jobs-use-cases";
 import type { ReportingUseCases } from "../features/reporting/presentation/contracts/reporting-use-cases";
 import { useIdentityLifecycle } from "./lifecycle/use-identity-lifecycle";
 import { portalNavigation } from "./routing/portal-navigation";
@@ -19,10 +20,12 @@ export function Application({
   identity,
   reporting,
   administration,
+  jobs,
 }: {
   identity: IdentityController;
   reporting: ReportingUseCases;
   administration: AdministrationUseCases;
+  jobs: JobsUseCases;
 }) {
   const state = useSyncExternalStore(
     identity.subscribe,
@@ -57,7 +60,7 @@ export function Application({
           onThemeChanged={toggleTheme}
           onNavigationToggled={toggleNavigation}
           onSignOut={identity.signOut}
-          navigation={portalNavigation(state.access?.permissions ?? [], locale)}
+          navigation={portalNavigation(state.access, locale)}
         >
           {state.stage === "ready" ? (
             <PortalRoutes
@@ -66,6 +69,7 @@ export function Application({
               access={state.access}
               reporting={reporting}
               administration={administration}
+              jobs={jobs}
               company={
                 state.session.companies.find((company) => company.id === state.companyId) ?? null
               }

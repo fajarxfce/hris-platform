@@ -14,7 +14,7 @@ function authenticatorCode(secret: string): string {
   return ((digest.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).toString().padStart(6, "0");
 }
 
-test("real API sessions, MFA, reports, audit, client policy, locale errors and logout", async ({
+test("real API sessions, MFA, reports, audit, policy, job cancellation and logout", async ({
   page,
   context,
 }) => {
@@ -159,6 +159,60 @@ test("real API sessions, MFA, reports, audit, client policy, locale errors and l
   await page.getByLabel("Revisi", { exact: true }).fill("0");
   await page.getByRole("button", { name: "Lihat revisi", exact: true }).click();
   await expect(policyConfiguration).toContainText("Browser policy revision 0");
+  const announcementPath = `/api/v1/companies/${companies[1]}/announcements/${randomUUID()}`;
+  const draft = await context.request.put(announcementPath, {
+    headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
+    data: {
+      title: "Browser job fixture",
+      body: "Browser announcement contents",
+      audience: { kind: "COMPANY", targetIds: [] },
+      acknowledgementRequired: false,
+      reason: "Create a scheduled job for browser validation",
+    },
+  });
+  expect(draft.status()).toBe(200);
+  const queued = await context.request.post(`${announcementPath}/publish`, {
+    headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
+    data: {
+      expectedVersion: 0,
+      scheduledFor: new Date(Date.now() + 600_000).toISOString(),
+      reason: "Scheduled browser fixture",
+    },
+  });
+  expect(queued.status()).toBe(200);
+  const announcement = await context.request.get(announcementPath);
+  expect(announcement.status()).toBe(200);
+  const { publicationJobId } = (await announcement.json()) as { publicationJobId: string };
+  expect(publicationJobId).toMatch(/^[0-9a-f-]{36}$/u);
+  await page.getByRole("link", { name: "Job", exact: true }).click();
+  const jobTable = page.getByRole("table");
+  await expect(jobTable).toContainText("Publikasi pengumuman");
+  await jobTable
+    .getByRole("button", { name: `Lihat detail: ${publicationJobId}`, exact: true })
+    .click();
+  const jobPanel = page.getByRole("dialog", { name: "Detail job", exact: true });
+  await expect(jobPanel).toContainText(publicationJobId);
+  await expect(jobPanel).not.toContainText("Browser announcement contents");
+  await jobPanel.getByRole("button", { name: "Minta pembatalan", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "Batalkan job ini?", exact: true })
+    .getByRole("button", { name: "Minta pembatalan", exact: true })
+    .click();
+  await expect(jobPanel.getByRole("status")).toHaveText("Pembatalan diminta");
+  await expect(jobPanel.getByRole("region", { name: "Detail job", exact: true })).toContainText(
+    "Dalam antrean",
+  );
+  const cancelled = await context.request.get(
+    `/api/v1/companies/${companies[1]}/jobs/${publicationJobId}`,
+  );
+  expect(cancelled.status()).toBe(200);
+  expect(await cancelled.json()).toMatchObject({
+    cancellationRequested: true,
+    status: "QUEUED",
+    version: 1,
+  });
+  await jobPanel.getByRole("button", { name: "Tutup", exact: true }).click();
+  await expect(jobTable).toContainText("Pembatalan diminta");
   const signedOut = page.waitForResponse(
     (response) =>
       new URL(response.url()).pathname === "/api/v1/auth/logout" &&

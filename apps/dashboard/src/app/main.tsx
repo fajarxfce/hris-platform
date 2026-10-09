@@ -8,6 +8,7 @@ import { AppErrorBoundary } from "../core/presentation/components/app-error-boun
 import { createAdministrationFeature } from "../features/administration/di/administration-feature";
 import { createIdentityFeature } from "../features/identity/di/identity-feature";
 import { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
+import { createJobsFeature } from "../features/jobs/di/jobs-feature";
 import { createReportingFeature } from "../features/reporting/di/reporting-feature";
 import { Application } from "./application";
 import "./styles.css";
@@ -21,6 +22,7 @@ const queries = new QueryClient({
 const http = new FetchHttpClient(undefined, { clientBuild: __HRIS_DASHBOARD_BUILD__ });
 const reporting = createReportingFeature(http);
 const administration = createAdministrationFeature(http);
+const jobs = createJobsFeature(http);
 const identity = new IdentityController(
   createIdentityFeature(http),
   () => crypto.randomUUID() as OperationId,
@@ -33,7 +35,12 @@ createRoot(root).render(
     <QueryClientProvider client={queries}>
       <BrowserRouter>
         <AppErrorBoundary locale="en" onReload={() => window.location.reload()}>
-          <Application identity={identity} reporting={reporting} administration={administration} />
+          <Application
+            identity={identity}
+            reporting={reporting}
+            administration={administration}
+            jobs={jobs}
+          />
         </AppErrorBoundary>
       </BrowserRouter>
     </QueryClientProvider>

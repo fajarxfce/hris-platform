@@ -7,6 +7,8 @@ import java.util.UUID
 interface AnnouncementDataSource {
     fun lock(companyId: UUID, shared: Boolean)
 
+    fun forJob(companyId: UUID, jobId: UUID): AnnouncementRevisionsRecord?
+
     fun count(companyId: UUID): Int
 
     fun find(companyId: UUID, id: UUID, revision: Long?): AnnouncementRevisionsRecord?

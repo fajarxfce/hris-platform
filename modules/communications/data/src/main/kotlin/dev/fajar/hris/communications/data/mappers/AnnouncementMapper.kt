@@ -23,6 +23,11 @@ fun AnnouncementRevisionsRecord.toAnnouncement(json: ObjectMapper) =
         recordedAt.toInstant(),
         actorId,
         reason,
+        publicationJobId,
+        scheduledFor?.toInstant(),
+        publishedAt?.toInstant(),
+        recipientCount,
+        publicationAttempts,
     )
 
 fun AnnouncementSummaryRow.toSummary() =
@@ -35,6 +40,11 @@ fun AnnouncementSummaryRow.toSummary() =
         acknowledgementRequired,
         AnnouncementStatus.valueOf(status),
         recordedAt.toInstant(),
+        publicationJobId,
+        scheduledFor?.toInstant(),
+        publishedAt?.toInstant(),
+        recipientCount,
+        publicationAttempts,
     )
 
 fun Announcement.toRecord(company: UUID, json: ObjectMapper) =
@@ -52,4 +62,9 @@ fun Announcement.toRecord(company: UUID, json: ObjectMapper) =
         it.recordedAt = recordedAt.atOffset(ZoneOffset.UTC)
         it.actorId = recordedBy
         it.reason = reason
+        it.publicationJobId = publicationJobId
+        it.scheduledFor = scheduledFor?.atOffset(ZoneOffset.UTC)
+        it.publishedAt = publishedAt?.atOffset(ZoneOffset.UTC)
+        it.recipientCount = recipientCount
+        it.publicationAttempts = publicationAttempts
     }

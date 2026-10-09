@@ -6,6 +6,7 @@ import dev.fajar.hris.communications.domain.repositories.*
 import dev.fajar.hris.communications.domain.usecases.*
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.*
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import java.time.Clock
@@ -128,4 +129,188 @@ class CommunicationsConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
     ) = ListAudienceGroups(groups, companies, members, identities, transactions)
+
+    @Bean
+    fun announcementAudienceSource(sql: DSLContext): AnnouncementAudienceDataSource =
+        PostgresAnnouncementAudienceDataSource(sql)
+
+    @Bean
+    fun announcementPublicationSource(sql: DSLContext): AnnouncementPublicationDataSource =
+        PostgresAnnouncementPublicationDataSource(sql)
+
+    @Bean fun inboxSource(sql: DSLContext): InboxDataSource = PostgresInboxDataSource(sql)
+
+    @Bean
+    fun announcementAudience(
+        source: AnnouncementAudienceDataSource
+    ): AnnouncementAudienceRepository = StoredAnnouncementAudienceRepository(source)
+
+    @Bean
+    fun announcementPublications(
+        source: AnnouncementPublicationDataSource,
+        json: ObjectMapper,
+    ): AnnouncementPublicationRepository = StoredAnnouncementPublicationRepository(source, json)
+
+    @Bean fun inbox(source: InboxDataSource): InboxRepository = StoredInboxRepository(source)
+
+    @Bean
+    fun queueAnnouncement(
+        announcements: AnnouncementRepository,
+        groups: AudienceGroupRepository,
+        organization: OrganizationRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        QueueAnnouncement(
+            announcements,
+            groups,
+            organization,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun advanceAnnouncementPublication(
+        announcements: AnnouncementRepository,
+        groups: AudienceGroupRepository,
+        audience: AnnouncementAudienceRepository,
+        publications: AnnouncementPublicationRepository,
+        people: PeopleRepository,
+        organization: OrganizationRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        AdvanceAnnouncementPublication(
+            announcements,
+            groups,
+            audience,
+            publications,
+            people,
+            organization,
+            companies,
+            members,
+            identities,
+            jobs,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun abortAnnouncementPublication(
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+    ) = AbortAnnouncementPublication(jobs, journal, transactions)
+
+    @Bean
+    fun returnAnnouncementToDraft(
+        announcements: AnnouncementRepository,
+        jobs: JobRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        ReturnAnnouncementToDraft(
+            announcements,
+            jobs,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun archiveAnnouncement(
+        announcements: AnnouncementRepository,
+        inbox: InboxRepository,
+        jobs: JobRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        ArchiveAnnouncement(
+            announcements,
+            inbox,
+            jobs,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun getInboxItem(
+        inbox: InboxRepository,
+        announcements: AnnouncementRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetInboxItem(inbox, announcements, companies, members, identities, transactions)
+
+    @Bean
+    fun listInbox(
+        inbox: InboxRepository,
+        announcements: AnnouncementRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = ListInbox(inbox, announcements, companies, members, identities, transactions)
+
+    @Bean
+    fun updateInboxItem(
+        inbox: InboxRepository,
+        announcements: AnnouncementRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        clock: Clock,
+    ) =
+        UpdateInboxItem(
+            inbox,
+            announcements,
+            companies,
+            members,
+            identities,
+            transactions,
+            operations,
+            journal,
+            clock,
+        )
 }

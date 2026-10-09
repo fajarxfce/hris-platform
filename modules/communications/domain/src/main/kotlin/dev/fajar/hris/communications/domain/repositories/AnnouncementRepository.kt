@@ -7,6 +7,8 @@ import java.util.UUID
 interface AnnouncementRepository {
     fun lock(companyId: UUID, shared: Boolean = false): Result<Unit>
 
+    fun forJob(companyId: UUID, jobId: UUID): Result<Announcement?>
+
     fun count(companyId: UUID): Result<Int>
 
     fun find(companyId: UUID, id: UUID, revision: Long? = null): Result<Announcement?>

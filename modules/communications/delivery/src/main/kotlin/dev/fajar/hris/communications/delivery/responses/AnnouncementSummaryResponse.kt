@@ -11,4 +11,9 @@ data class AnnouncementSummaryResponse(
     val acknowledgementRequired: Boolean,
     val status: String,
     val recordedAt: String,
+    val publicationJobId: UUID?,
+    val scheduledFor: String?,
+    val publishedAt: String?,
+    val recipientCount: Int,
+    val publicationAttempts: Int,
 )

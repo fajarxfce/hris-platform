@@ -12,4 +12,9 @@ data class AnnouncementSummary(
     val acknowledgementRequired: Boolean,
     val status: AnnouncementStatus,
     val recordedAt: Instant,
+    val publicationJobId: UUID? = null,
+    val scheduledFor: Instant? = null,
+    val publishedAt: Instant? = null,
+    val recipientCount: Int = 0,
+    val publicationAttempts: Int = 0,
 )

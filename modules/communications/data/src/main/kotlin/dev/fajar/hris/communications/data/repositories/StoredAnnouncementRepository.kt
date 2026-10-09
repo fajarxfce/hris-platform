@@ -17,6 +17,10 @@ class StoredAnnouncementRepository(
         source.lock(companyId, shared)
     }
 
+    override fun forJob(companyId: UUID, jobId: UUID): Result<Announcement?> = safeDatabaseCall {
+        source.forJob(companyId, jobId)?.toAnnouncement(json)
+    }
+
     override fun count(companyId: UUID): Result<Int> = safeDatabaseCall { source.count(companyId) }
 
     override fun find(companyId: UUID, id: UUID, revision: Long?): Result<Announcement?> =

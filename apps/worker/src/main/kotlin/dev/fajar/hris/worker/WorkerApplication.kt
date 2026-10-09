@@ -1,6 +1,7 @@
 package dev.fajar.hris.worker
 
 import dev.fajar.hris.approvals.data.di.ApprovalConfiguration
+import dev.fajar.hris.communications.data.di.CommunicationsConfiguration
 import dev.fajar.hris.core.database.DatabaseConfiguration
 import dev.fajar.hris.identity.data.di.IdentityConfiguration
 import dev.fajar.hris.jobs.data.di.JobsConfiguration
@@ -29,6 +30,7 @@ import org.springframework.context.annotation.Import
     WorkforceConfiguration::class,
     LeaveConfiguration::class,
     PayrollConfiguration::class,
+    CommunicationsConfiguration::class,
 )
 class WorkerApplication
 

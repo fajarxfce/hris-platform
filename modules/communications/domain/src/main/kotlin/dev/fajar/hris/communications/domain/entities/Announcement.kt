@@ -14,4 +14,9 @@ data class Announcement(
     val recordedAt: Instant,
     val recordedBy: UUID,
     val reason: String,
+    val publicationJobId: UUID? = null,
+    val scheduledFor: Instant? = null,
+    val publishedAt: Instant? = null,
+    val recipientCount: Int = 0,
+    val publicationAttempts: Int = 0,
 )

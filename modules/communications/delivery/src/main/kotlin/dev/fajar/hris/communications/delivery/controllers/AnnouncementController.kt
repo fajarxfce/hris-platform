@@ -1,7 +1,7 @@
 package dev.fajar.hris.communications.delivery.controllers
 
 import dev.fajar.hris.communications.delivery.mappers.toResponse
-import dev.fajar.hris.communications.delivery.requests.SaveAnnouncementRequest
+import dev.fajar.hris.communications.delivery.requests.*
 import dev.fajar.hris.communications.delivery.responses.*
 import dev.fajar.hris.communications.domain.entities.*
 import dev.fajar.hris.communications.domain.usecases.*
@@ -17,6 +17,9 @@ class AnnouncementController(
     private val get: GetAnnouncement,
     private val list: ListAnnouncements,
     private val history: ListAnnouncementHistory,
+    private val queue: QueueAnnouncement,
+    private val reset: ReturnAnnouncementToDraft,
+    private val archive: ArchiveAnnouncement,
 ) {
     @PutMapping("/{id}")
     fun save(
@@ -73,4 +76,40 @@ class AnnouncementController(
         history.execute(actor, id, after, limit).response().let {
             Page(it.items.map { row -> row.toResponse() }, it.nextCursor)
         }
+
+    @PostMapping("/{id}/publish")
+    fun publish(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestHeader("Idempotency-Key") operationId: UUID,
+        @RequestBody body: PublishAnnouncementRequest,
+    ): MutationResponse =
+        queue
+            .execute(actor, operationId, id, body.expectedVersion, body.scheduledFor, body.reason)
+            .response()
+            .toResponse()
+
+    @PostMapping("/{id}/return-to-draft")
+    fun reset(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestHeader("Idempotency-Key") operationId: UUID,
+        @RequestBody body: AnnouncementCommandRequest,
+    ): MutationResponse =
+        reset
+            .execute(actor, operationId, id, body.expectedVersion, body.reason)
+            .response()
+            .toResponse()
+
+    @PostMapping("/{id}/archive")
+    fun archive(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestHeader("Idempotency-Key") operationId: UUID,
+        @RequestBody body: AnnouncementCommandRequest,
+    ): MutationResponse =
+        archive
+            .execute(actor, operationId, id, body.expectedVersion, body.reason)
+            .response()
+            .toResponse()
 }

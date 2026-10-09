@@ -15,6 +15,11 @@ fun Announcement.toResponse() =
         recordedAt.toString(),
         recordedBy,
         reason,
+        publicationJobId,
+        scheduledFor?.toString(),
+        publishedAt?.toString(),
+        recipientCount,
+        publicationAttempts,
     )
 
 fun AnnouncementSummary.toResponse() =
@@ -27,4 +32,9 @@ fun AnnouncementSummary.toResponse() =
         acknowledgementRequired,
         status.name,
         recordedAt.toString(),
+        publicationJobId,
+        scheduledFor?.toString(),
+        publishedAt?.toString(),
+        recipientCount,
+        publicationAttempts,
     )

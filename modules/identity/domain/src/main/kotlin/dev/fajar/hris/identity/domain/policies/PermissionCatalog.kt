@@ -115,6 +115,7 @@ object PermissionCatalog {
         )
     val employee =
         setOf(
+            "announcements.read",
             "company.read",
             "people.self.read",
             "people.lifecycle.perform",

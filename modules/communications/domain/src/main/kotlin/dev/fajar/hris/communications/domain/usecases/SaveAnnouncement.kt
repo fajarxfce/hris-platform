@@ -87,7 +87,7 @@ class SaveAnnouncement(
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
             if (previous != null && previous.status != AnnouncementStatus.DRAFT)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "announcement_not_draft"))
-            if (previous != null && previous.version >= 999)
+            if (previous != null && previous.version >= 996)
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "announcement_revision_limit")
                 )
@@ -129,6 +129,7 @@ class SaveAnnouncement(
                     clock.instant(),
                     actor.accountId,
                     input.reason,
+                    publicationAttempts = previous?.publicationAttempts ?: 0,
                 )
             announcements.save(company, snapshot, input.expectedVersion).flatMap { receipt ->
                 operations

@@ -12,4 +12,9 @@ data class AnnouncementSummaryRow(
     val acknowledgementRequired: Boolean,
     val status: String,
     val recordedAt: OffsetDateTime,
+    val publicationJobId: UUID?,
+    val scheduledFor: OffsetDateTime?,
+    val publishedAt: OffsetDateTime?,
+    val recipientCount: Int,
+    val publicationAttempts: Int,
 )

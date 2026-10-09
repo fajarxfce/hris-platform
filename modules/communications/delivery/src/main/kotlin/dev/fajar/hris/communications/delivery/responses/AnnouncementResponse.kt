@@ -13,4 +13,9 @@ data class AnnouncementResponse(
     val recordedAt: String,
     val recordedBy: UUID,
     val reason: String,
+    val publicationJobId: UUID?,
+    val scheduledFor: String?,
+    val publishedAt: String?,
+    val recipientCount: Int,
+    val publicationAttempts: Int,
 )

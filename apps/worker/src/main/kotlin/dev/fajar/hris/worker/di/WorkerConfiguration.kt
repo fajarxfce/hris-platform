@@ -1,5 +1,6 @@
 package dev.fajar.hris.worker.di
 
+import dev.fajar.hris.communications.domain.usecases.*
 import dev.fajar.hris.core.database.PostgresTransactionRunner
 import dev.fajar.hris.documents.domain.usecases.*
 import dev.fajar.hris.identity.domain.usecases.ResolveActor
@@ -209,4 +210,11 @@ class WorkerConfiguration {
         advance: AdvancePayrollFinalization,
         abort: AbortPayrollFinalization,
     ): JobTask = PayrollFinalizationTask(resolve, advance, abort)
+
+    @Bean
+    fun announcementPublicationTask(
+        resolve: ResolveActor,
+        advance: AdvanceAnnouncementPublication,
+        abort: AbortAnnouncementPublication,
+    ): JobTask = AnnouncementPublicationTask(resolve, advance, abort)
 }

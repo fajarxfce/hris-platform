@@ -18,6 +18,14 @@ class PostgresAnnouncementDataSource(private val sql: DSLContext) : Announcement
             .execute()
     }
 
+    override fun forJob(companyId: UUID, jobId: UUID): AnnouncementRevisionsRecord? =
+        sql.select(R.fields().toList())
+            .from(R)
+            .join(H)
+            .on(H.COMPANY_ID.eq(R.COMPANY_ID), H.ID.eq(R.ID), H.VERSION.eq(R.VERSION))
+            .where(R.COMPANY_ID.eq(companyId), R.PUBLICATION_JOB_ID.eq(jobId))
+            .fetchOneInto(R)
+
     override fun count(companyId: UUID): Int =
         requireNotNull(
             sql.selectCount()
@@ -48,6 +56,11 @@ class PostgresAnnouncementDataSource(private val sql: DSLContext) : Announcement
                 R.ACKNOWLEDGEMENT_REQUIRED,
                 R.STATUS,
                 R.RECORDED_AT,
+                R.PUBLICATION_JOB_ID,
+                R.SCHEDULED_FOR,
+                R.PUBLISHED_AT,
+                R.RECIPIENT_COUNT,
+                R.PUBLICATION_ATTEMPTS,
             )
             .from(R)
             .join(H)
@@ -65,6 +78,11 @@ class PostgresAnnouncementDataSource(private val sql: DSLContext) : Announcement
                     it[R.ACKNOWLEDGEMENT_REQUIRED]!!,
                     it[R.STATUS]!!,
                     it[R.RECORDED_AT]!!,
+                    it[R.PUBLICATION_JOB_ID],
+                    it[R.SCHEDULED_FOR],
+                    it[R.PUBLISHED_AT],
+                    it[R.RECIPIENT_COUNT]!!,
+                    it[R.PUBLICATION_ATTEMPTS]!!,
                 )
             }
 
@@ -83,6 +101,11 @@ class PostgresAnnouncementDataSource(private val sql: DSLContext) : Announcement
                 R.ACKNOWLEDGEMENT_REQUIRED,
                 R.STATUS,
                 R.RECORDED_AT,
+                R.PUBLICATION_JOB_ID,
+                R.SCHEDULED_FOR,
+                R.PUBLISHED_AT,
+                R.RECIPIENT_COUNT,
+                R.PUBLICATION_ATTEMPTS,
             )
             .from(R)
             .where(
@@ -102,6 +125,11 @@ class PostgresAnnouncementDataSource(private val sql: DSLContext) : Announcement
                     it[R.ACKNOWLEDGEMENT_REQUIRED]!!,
                     it[R.STATUS]!!,
                     it[R.RECORDED_AT]!!,
+                    it[R.PUBLICATION_JOB_ID],
+                    it[R.SCHEDULED_FOR],
+                    it[R.PUBLISHED_AT],
+                    it[R.RECIPIENT_COUNT]!!,
+                    it[R.PUBLICATION_ATTEMPTS]!!,
                 )
             }
 

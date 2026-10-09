@@ -276,3 +276,24 @@ All paths below are under `/api/v1/companies/{companyId}` and require current `a
 Both PUT operations require `Idempotency-Key`. Group membership and announcement target order are normalized for receipt identity; editing with the same key but different content returns `operation_payload_mismatch`. An accepted draft can replay after its audience becomes inactive, but current management access remains mandatory. Groups contain at most 5,000 distinct employment IDs; non-company audiences contain 1–32 distinct IDs of exactly one kind. A foreign, inactive, or wrong-kind reference never expands the audience.
 
 Stable errors include `invalid_announcement`, `invalid_audience_group`, `announcement_audience_unavailable`, `audience_group_employee_unavailable`, `announcement_not_found`, `audience_group_not_found`, `stale_version`, `announcement_limit`, `audience_group_limit`, and the corresponding `*_revision_limit` codes. Domain failures carry unlocalized field codes, such as `audience.targetIds: invalid_selection`; the client owns display language. See [audience and publication policy](modules/communications.md).
+
+
+## Announcement publication and recipient inbox
+
+Management commands below require `announcements.manage`, `Idempotency-Key`, and a body containing `expectedVersion` and a nonblank `reason` of at most 1,000 characters. Paths are relative to `/api/v1/companies/{companyId}`.
+
+- `POST /announcements/{id}/publish` additionally accepts optional `scheduledFor`. It transitions a draft to `QUEUED` and returns its versioned mutation receipt. Read `publicationJobId` from the announcement and inspect the ordinary jobs endpoint. An omitted schedule means immediate eligibility; an explicit schedule is an immutable UTC instant with microsecond precision within 365 days.
+- `POST /announcements/{id}/return-to-draft` requires a queued announcement whose previous job is `FAILED` or `CANCELLED`. It clears the current job/schedule pointer while retaining history and the attempt count. Publishing again creates a distinct job; there are at most eight attempts.
+- `POST /announcements/{id}/archive` retains history and withdraws all delivered inbox items atomically. A queued announcement must first have a terminal failed/cancelled job; use the existing job cancellation endpoint and wait for cleanup.
+
+Published detail and summary responses include `publicationJobId`, `scheduledFor`, `publishedAt`, `recipientCount`, and `publicationAttempts`. Worker success produces a frozen `PUBLISHED` revision and one inbox item per distinct eligible account. Empty/invalid audiences and audiences exceeding 5,000 recipients publish nothing. Current group definitions and effective employment are evaluated when the job executes, not when it was scheduled. A published revision cannot be edited or republished.
+
+Recipient endpoints require current `announcements.read`. Only the original recipient account can access an item; company administration does not grant another person's inbox.
+
+- `GET /inbox`: summaries ordered by UUID with optional `after` and `limit` (default 50, maximum 200). Full body text is excluded.
+- `GET /inbox/{id}`: the frozen plain-text content and this recipient's `version`, `deliveredAt`, `readAt`, and `acknowledgedAt`. GET has no read-state side effect.
+- `POST /inbox/{id}/read` and `POST /inbox/{id}/acknowledge`: `Idempotency-Key` plus `{ "expectedVersion": 0 }`. Acknowledgement requires `acknowledgementRequired` and also marks an unread item read. Timestamps are assigned by the server and never move backwards. Already completed actions with the current version are no-ops. Another key with an obsolete version returns `stale_version`.
+
+Clients may replay an accepted publication request after its schedule passed, subject to current access. An archived inbox item is unavailable even to a replayed read/acknowledgement. Account-owned mailbox retention and future-audience changes are described in the [communications policy](modules/communications.md). Native bearer requests need no browser CSRF token; browser commands retain CSRF protection.
+
+Stable codes include `invalid_announcement_schedule` (422, `maximumDays: "365"`), `announcement_audience_empty` (422), `announcement_audience_limit` (409, `maximum: "5000"`), `announcement_attempt_limit`, `announcement_publication_active`, `announcement_publication_not_stopped`, `announcement_not_draft`, `announcement_archived`, `stale_version`, `inbox_acknowledgement_not_required` (409), and `inbox_item_not_found` (404). Codes and safe parameters are unlocalized; client applications own translation. A worker reports `job_lease_lost` or `announcement_publication_obsolete` when its request is no longer authoritative; it cannot commit stale recipients.

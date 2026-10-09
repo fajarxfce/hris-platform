@@ -51,6 +51,8 @@ Membership writes accept direct `permissions` and up to eight distinct `roleTemp
 
 Sensitive-grant checks run on the combined permissions. A company administrator cannot use a role template to bypass the platform-administrator requirement for payroll/payment access or grant those permissions to themselves. Reactivating a membership counts as granting its permissions again. Membership and template changes retain recent-MFA checks when enforcement is enabled. A template name never substitutes for a server permission check.
 
+Role/member commands and reads revalidate active company membership, credentials, and the original/live permission intersection under guards. Actor and target accounts are guarded in stable ID order. Company and platform grants remain separate in the request context: newly added global administration cannot authorize a sensitive grant that was already waiting, and removed global administration stops it. Successful receipt replay still requires current company administration and applicable recent MFA, while preserving the original outcome instead of reapplying mutable template or target-state checks. New membership grants require an active target account. Member/grant reads hold a shared membership guard so effective access and its recorded source version cannot diverge during an update.
+
 ## Global account administration
 
 `GET /identity/accounts` provides a bounded global account directory for platform administrators. Queries acquire only administrative fields; password hashes and authenticator secrets are not selected or returned. Company membership administrators do not gain access to this directory.

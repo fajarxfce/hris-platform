@@ -6,4 +6,5 @@ data class AccountAccess(
     val membershipActive: Boolean,
     val companyActive: Boolean,
     val securityPermissions: Set<String> = permissions,
+    val platformPermissions: Set<String> = emptySet(),
 )

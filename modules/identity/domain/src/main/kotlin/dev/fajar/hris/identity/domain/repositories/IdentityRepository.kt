@@ -7,6 +7,9 @@ import dev.fajar.hris.identity.domain.entities.CompanyMembership
 import java.util.UUID
 
 interface IdentityRepository {
+    /** Shares the company-state guard with settings changes without owning company settings. */
+    fun lockCompany(companyId: UUID, shared: Boolean = false): Result<Unit>
+
     fun lockAccount(accountId: UUID, shared: Boolean = false): Result<Unit>
 
     fun lockBootstrap(): Result<Unit>

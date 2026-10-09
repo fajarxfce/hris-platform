@@ -4,6 +4,8 @@ import dev.fajar.hris.schema.tables.records.AccountsRecord
 import java.util.UUID
 
 interface IdentityDataSource {
+    fun lockCompany(companyId: UUID, shared: Boolean)
+
     fun lockAccount(id: UUID, shared: Boolean = false)
 
     fun lockBootstrap()

@@ -15,5 +15,10 @@ fun validatePlatformCommandActor(actor: Actor, access: AccountAccess?): Result<A
                 actor.credentialVersion != access.account.securityVersion)
     )
         return Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "session_revoked"))
-    return Result.Success(actor.copy(permissions = actor.permissions intersect access.permissions))
+    return Result.Success(
+        actor.copy(
+            permissions = actor.permissions intersect access.permissions,
+            platformPermissions = actor.platformPermissions intersect access.platformPermissions,
+        )
+    )
 }

@@ -36,6 +36,8 @@ Account, person, employment, company membership, and role assignment are separat
 
 Web uses HttpOnly Secure session cookies and CSRF protection. Mobile uses short-lived access tokens with rotated refresh tokens. OIDC uses verified issuer/subject; provider claims are never trusted from client decoding. Privileged accounts require MFA and sensitive operations require recent authentication. Revalidating an already resolved request may remove permissions but must not add newly granted capabilities without a new request and its assurance checks. The shared company-command access policy applies this intersection; background jobs resolve execution authority separately.
 
+The request actor retains company and platform permissions separately. The union used to decide MFA requirements is not an authorization scope. Revalidation intersects each original scope with its corresponding live grants; company administration cannot stand in for platform administration. Identity exposes an access-specific company guard using the same company-state lock as organization settings, preserving the acyclic domain dependency graph. Role/member operations acquire any template guard before company, membership, and ordered account guards.
+
 ## Storage and jobs
 
 Private S3-compatible object storage holds documents; the self-hosted distribution uses Garage. Uploads are resumable and bounded, downloads support Range/ETag, and documents are not readable until validation completes. Metadata and authorization stay in PostgreSQL.

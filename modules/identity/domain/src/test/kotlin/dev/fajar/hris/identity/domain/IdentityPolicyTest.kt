@@ -172,6 +172,9 @@ private class RecordingJournal : ChangeJournalRepository {
 
 private class IdentityFake(private val credential: Account?, private val current: AccountAccess?) :
     IdentityRepository {
+    override fun lockCompany(companyId: UUID, shared: Boolean): Result<Unit> =
+        error("Unexpected call")
+
     override fun lockAccount(accountId: UUID, shared: Boolean): Result<Unit> = Result.Success(Unit)
 
     var verifications = 0

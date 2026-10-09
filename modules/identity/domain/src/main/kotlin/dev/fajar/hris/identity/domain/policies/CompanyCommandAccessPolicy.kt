@@ -21,5 +21,10 @@ fun validateCompanyCommandActor(actor: Actor, access: AccountAccess?): Result<Ac
         return Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "session_revoked"))
     if (!access.companyActive || !access.membershipActive)
         return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_access_denied"))
-    return Result.Success(actor.copy(permissions = actor.permissions intersect access.permissions))
+    return Result.Success(
+        actor.copy(
+            permissions = actor.permissions intersect access.permissions,
+            platformPermissions = actor.platformPermissions intersect access.platformPermissions,
+        )
+    )
 }

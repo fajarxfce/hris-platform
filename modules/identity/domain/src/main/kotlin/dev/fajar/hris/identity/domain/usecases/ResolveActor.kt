@@ -51,8 +51,19 @@ class ResolveActor(
                                 clock.instant(),
                                 policy,
                             )
-                            .map { scope.copy(permissions = access.permissions) }
-                    else -> Result.Success(scope.copy(permissions = access.permissions))
+                            .map {
+                                scope.copy(
+                                    permissions = access.permissions,
+                                    platformPermissions = access.platformPermissions,
+                                )
+                            }
+                    else ->
+                        Result.Success(
+                            scope.copy(
+                                permissions = access.permissions,
+                                platformPermissions = access.platformPermissions,
+                            )
+                        )
                 }
             }
         }

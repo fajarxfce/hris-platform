@@ -10,6 +10,7 @@ import dev.fajar.hris.identity.data.repositories.StoredRoleTemplateRepository
 import dev.fajar.hris.identity.domain.entities.*
 import dev.fajar.hris.identity.domain.repositories.AccountAdministrationRepository
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.identity.domain.repositories.OidcIdentityRepository
 import dev.fajar.hris.identity.domain.repositories.RoleTemplateRepository
 import dev.fajar.hris.identity.domain.usecases.*
@@ -36,8 +37,9 @@ class IdentityConfiguration {
     @Bean
     fun companyMembers(
         members: dev.fajar.hris.identity.domain.repositories.MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListCompanyMembers(members, transactions)
+    ) = ListCompanyMembers(members, identities, transactions)
 
     @Bean
     fun saveMembership(
@@ -308,25 +310,42 @@ class IdentityConfiguration {
     ): RoleTemplateRepository = StoredRoleTemplateRepository(source, json)
 
     @Bean
-    fun listRoleTemplates(roles: RoleTemplateRepository, transactions: TransactionRunner) =
-        ListRoleTemplates(roles, transactions)
+    fun listRoleTemplates(
+        roles: RoleTemplateRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+    ) = ListRoleTemplates(roles, identities, members, transactions)
 
     @Bean
     fun saveRoleTemplate(
         roles: RoleTemplateRepository,
         operations: dev.fajar.hris.core.domain.OperationRepository,
         journal: ChangeJournalRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
-    ) = SaveRoleTemplate(roles, operations, journal, transactions, security, clock)
+    ) =
+        SaveRoleTemplate(
+            roles,
+            operations,
+            journal,
+            identities,
+            members,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun getCompanyMemberGrant(
         members: dev.fajar.hris.identity.domain.repositories.MembershipRepository,
         roles: RoleTemplateRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetCompanyMemberGrant(members, roles, transactions)
+    ) = GetCompanyMemberGrant(members, roles, identities, transactions)
 
     @Bean
     fun accountAdministrationSource(sql: DSLContext): AccountAdministrationDataSource =

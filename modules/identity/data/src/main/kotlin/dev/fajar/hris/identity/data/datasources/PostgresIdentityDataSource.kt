@@ -10,6 +10,11 @@ import java.util.UUID
 import org.jooq.DSLContext
 
 class PostgresIdentityDataSource(private val sql: DSLContext) : IdentityDataSource {
+    override fun lockCompany(companyId: UUID, shared: Boolean) {
+        val function = if (shared) "pg_advisory_xact_lock_shared" else "pg_advisory_xact_lock"
+        sql.query("select $function(hashtextextended(?,0))", "company-state:$companyId").execute()
+    }
+
     override fun lockAccount(id: UUID, shared: Boolean) {
         // Protect credential/access changes while allowing FK references to the immutable ID.
         val query = sql.select(ACCOUNTS.ID).from(ACCOUNTS).where(ACCOUNTS.ID.eq(id))

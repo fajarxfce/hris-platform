@@ -20,6 +20,10 @@ class StoredIdentityRepository(
     private val passwords: PasswordDataSource,
     private val dummyHash: String,
 ) : IdentityRepository {
+    override fun lockCompany(companyId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
+        source.lockCompany(companyId, shared)
+    }
+
     override fun lockAccount(accountId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
         source.lockAccount(accountId, shared)
     }
@@ -68,6 +72,7 @@ class StoredIdentityRepository(
                     companyId == null || companyPermissions?.memberActive == true,
                     companyId == null || companyPermissions?.companyActive == true,
                     global + source.activeMembershipPermissions(accountId),
+                    platformPermissions = global,
                 )
             }
         }

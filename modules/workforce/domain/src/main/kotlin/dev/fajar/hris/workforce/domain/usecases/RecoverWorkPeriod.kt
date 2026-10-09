@@ -1,8 +1,12 @@
 package dev.fajar.hris.workforce.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.workforce.domain.entities.*
 import dev.fajar.hris.workforce.domain.policies.*
 import dev.fajar.hris.workforce.domain.repositories.*
@@ -14,6 +18,9 @@ class RecoverWorkPeriod(
     private val jobs: JobRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
+    private val companies: CompanyRepository,
+    private val members: MembershipRepository,
+    private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
 ) {
     fun execute(
@@ -27,7 +34,9 @@ class RecoverWorkPeriod(
         if (access is Result.Failed) return access
         if (month.year !in 2000..2100 || version < 0 || reason.isBlank() || reason.length > 1000)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_work_period_recovery"))
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         val key =
             OperationKey(
                 "workforce.period_recover",
@@ -37,22 +46,38 @@ class RecoverWorkPeriod(
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
-            }
             val found = periods.find(company, month)
             if (found is Result.Failed) return@run found
             val initial = (found as Result.Success).value
-            val jobId =
-                initial?.jobId
-                    ?: return@run Result.Failed(
-                        Failure(FailureKind.CONFLICT, "work_period_recovery_unavailable")
-                    )
-            val lockedJob = jobs.find(company, jobId, true)
+            val jobId = initial?.jobId
+            val lockedJob =
+                if (jobId == null) Result.Success(null) else jobs.find(company, jobId, true)
             if (lockedJob is Result.Failed) return@run lockedJob
-            val job = (lockedJob as Result.Success).value
-            val locked = periods.forJob(company, jobId, true)
+            val locked =
+                if (jobId == null) Result.Success(null) else periods.forJob(company, jobId, true)
             if (locked is Result.Failed) return@run locked
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
+            val checked =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
+            val permission = live.requirePermission("workforce.close")
+            if (permission is Result.Failed) return@run permission
+            (replay as Result.Success).value?.let {
+                return@run Result.Success(it)
+            }
+            if (jobId == null)
+                return@run Result.Failed(
+                    Failure(FailureKind.CONFLICT, "work_period_recovery_unavailable")
+                )
+            val job = (lockedJob as Result.Success).value
             val period = (locked as Result.Success).value
             if (period == null || period.version != version)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))

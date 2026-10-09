@@ -42,6 +42,8 @@ Attendance commands hold a shared month lock before their employee/day lock. Sta
 
 Cancellation and permanent failure leave the month in `REVIEW_REQUIRED`. Transient failures retain checkpoints for bounded retry. If a worker repeatedly crashes until its job exhausts all attempts, the period remains frozen until an authorized `POST /workforce/periods/{yyyy-MM}/recover` verifies that the job has stopped. A new close creates another attempt; old snapshots are retained. Worker steps re-resolve the initiating account's current credentials and company permission; fenced cleanup remains possible after revocation.
 
+Closing steps recheck the initiating credential version and live company/member/account authority after acquiring the job and period locks. A later sign-in cannot replace an old job's originating credentials. Recovery uses the same job-before-period order and validates current authority before mutation or receipt replay. Period lists and closed-snapshot reads recheck live permissions; snapshot visibility uses current team/self scope. Closed periods and their published snapshots are immutable, so these reads do not create or update period rows.
+
 `GET /workforce/periods?from=yyyy-MM&until=yyyy-MM` covers up to 24 months. `GET /workforce/periods/{yyyy-MM}/employees/{id}` returns a closed employee snapshot under current HR/team/self scope. Employment or leave changes do not rewrite these facts; downstream payroll must validate their applicability separately.
 
 

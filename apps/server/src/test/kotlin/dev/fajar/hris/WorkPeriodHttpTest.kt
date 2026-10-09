@@ -1,8 +1,11 @@
 package dev.fajar.hris
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.workforce.domain.entities.*
 import dev.fajar.hris.workforce.domain.repositories.*
 import dev.fajar.hris.workforce.domain.usecases.*
@@ -27,6 +30,9 @@ class WorkPeriodHttpTest : WorkPeriodApiFixture() {
     @Autowired private lateinit var corrections: AttendanceCorrectionRepository
     @Autowired private lateinit var journal: ChangeJournalRepository
     @Autowired private lateinit var transactions: TransactionRunner
+    @Autowired private lateinit var companies: CompanyRepository
+    @Autowired private lateinit var members: MembershipRepository
+    @Autowired private lateinit var identities: IdentityRepository
     @Autowired private lateinit var runtime: JdbcTemplate
 
     @Test
@@ -209,6 +215,9 @@ class WorkPeriodHttpTest : WorkPeriodApiFixture() {
                 attendance,
                 corrections,
                 journal,
+                companies,
+                members,
+                identities,
                 transactions,
                 clock,
                 overtime,

@@ -365,6 +365,9 @@ class WorkforceConfiguration {
         attendance: AttendanceRepository,
         corrections: AttendanceCorrectionRepository,
         journal: ChangeJournalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
         overtime: OvertimeRepository,
@@ -376,6 +379,9 @@ class WorkforceConfiguration {
             attendance,
             corrections,
             journal,
+            companies,
+            members,
+            identities,
             transactions,
             clock,
             overtime,
@@ -395,20 +401,41 @@ class WorkforceConfiguration {
         jobs: JobRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = RecoverWorkPeriod(periods, jobs, operations, journal, transactions)
+    ) =
+        RecoverWorkPeriod(
+            periods,
+            jobs,
+            operations,
+            journal,
+            companies,
+            members,
+            identities,
+            transactions,
+        )
 
     @Bean
-    fun listWorkPeriods(periods: WorkPeriodRepository, transactions: TransactionRunner) =
-        ListWorkPeriods(periods, transactions)
+    fun listWorkPeriods(
+        periods: WorkPeriodRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = ListWorkPeriods(periods, companies, members, identities, transactions)
 
     @Bean
     fun getWorkPeriodSnapshot(
         periods: WorkPeriodRepository,
         people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetWorkPeriodSnapshot(periods, people, transactions, clock)
+    ) = GetWorkPeriodSnapshot(periods, people, companies, members, identities, transactions, clock)
 
     @Bean fun overtimeSource(sql: DSLContext): OvertimeDataSource = PostgresOvertimeDataSource(sql)
 

@@ -14,7 +14,7 @@ function authenticatorCode(secret: string): string {
   return ((digest.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).toString().padStart(6, "0");
 }
 
-test("real API sessions, MFA, company reports, locale errors and logout", async ({
+test("real API sessions, MFA, company reports, audit, locale errors and logout", async ({
   page,
   context,
 }) => {
@@ -67,10 +67,11 @@ test("real API sessions, MFA, company reports, locale errors and logout", async 
     headerName: string;
     token: string;
   };
+  const employeeId = randomUUID();
   const created = await context.request.post(`/api/v1/companies/${companies[1]}/employees`, {
     headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
     data: {
-      id: randomUUID(),
+      id: employeeId,
       employeeNumber: "BROWSER-REPORT",
       person: { id: randomUUID(), legalName: "Report fixture employee", nationality: "ID" },
       terms: {
@@ -106,6 +107,19 @@ test("real API sessions, MFA, company reports, locale errors and logout", async 
   await expect(breakdown.getByRole("row").filter({ hasText: "Browser North" })).toContainText("0");
   await expect(breakdown.getByRole("row").filter({ hasText: "Browser South" })).toContainText("1");
   await expect(page.getByRole("region", { name: "Jumlah orang", exact: true })).toContainText("1");
+  await page.getByRole("link", { name: "Log audit", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Log audit", exact: true })).toBeVisible();
+  await page.getByLabel("ID resource", { exact: true }).fill(employeeId);
+  await page.getByRole("button", { name: "Terapkan", exact: true }).click();
+  const audit = page.getByRole("table", { name: "Event", exact: true });
+  await expect(audit.getByRole("row")).toHaveCount(2);
+  await audit.getByRole("button", { name: /^Lihat detail:/u }).click();
+  const details = page.getByRole("dialog", { name: "Event audit", exact: true });
+  await expect(details).toContainText(employeeId);
+  await expect(details).toContainText(companies[1] ?? "");
+  await expect(details).not.toContainText("Report fixture employee");
+  await expect(details).not.toContainText("Browser report fixture");
+  await page.getByRole("button", { name: "Tutup", exact: true }).click();
   const signedOut = page.waitForResponse(
     (response) =>
       new URL(response.url()).pathname === "/api/v1/auth/logout" &&

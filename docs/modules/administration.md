@@ -17,7 +17,7 @@ Versioned company client policy is implemented, including future activation, imm
 
 ## Audit search
 
-Company audit metadata search is implemented with current `audit.read`, original/live access and MFA checks, bounded time windows, exact filters, and timestamp/ID pagination. Reasons and change payloads are excluded from the SQL projection. [Audit search](../audit.md) defines continuation, disclosure, and live-history consistency. Detailed audit disclosure, global audit queries, and the browser explorer remain subsequent work.
+Company audit metadata search is implemented with current `audit.read`, original/live access and MFA checks, bounded time windows, exact filters, and timestamp/ID pagination. Reasons and change payloads are excluded from the SQL projection. The browser explorer includes UTC filters, bounded URL pagination, and metadata details with keyboard focus restoration. [Audit search](../audit.md) defines continuation, disclosure, and live-history consistency. Detailed audit disclosure and global audit queries remain subsequent work.
 
 ## Durable job foundation
 

@@ -150,6 +150,7 @@ a {
 .app-report-content {
   display: grid;
   gap: 24px;
+  min-width: 0;
 }
 .app-multi-select {
   width: min(320px, 100%);
@@ -165,6 +166,41 @@ a {
 .app-table-number {
   text-align: end;
   font-variant-numeric: tabular-nums;
+}
+.app-table-scroll td {
+  overflow-wrap: anywhere;
+}
+.app-table-action {
+  min-width: 120px;
+}
+.app-audit-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+.app-audit-filters > * {
+  min-width: 0;
+}
+.app-filter-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.app-filter-actions > span {
+  flex: 1 1 100%;
+}
+.app-pagination {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
 }
 .app-metric-grid,
 .app-report-grid {
@@ -186,6 +222,7 @@ a {
   display: contents;
 }
 .app-resource-panel {
+  min-width: 0;
   background: var(--colorNeutralBackground1);
   border: 1px solid var(--colorNeutralStroke2);
   padding: 24px;
@@ -206,6 +243,7 @@ a {
 }
 .app-property-list dd {
   margin: 0;
+  overflow-wrap: anywhere;
 }
 .app-portal-collapsed {
   grid-template-columns: 56px minmax(0, 1fr);
@@ -309,6 +347,9 @@ a {
     padding: 20px 16px;
   }
   .app-report-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .app-audit-filters {
     grid-template-columns: minmax(0, 1fr);
   }
   .app-property-list {

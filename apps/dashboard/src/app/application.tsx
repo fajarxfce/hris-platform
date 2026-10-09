@@ -7,6 +7,7 @@ import { AppLoading } from "../core/presentation/components/app-loading";
 import { AppPortalShell } from "../core/presentation/components/app-portal-shell";
 import { AppPreferences } from "../core/presentation/components/app-preferences";
 import { type Locale, messages } from "../core/presentation/i18n/messages";
+import type { AdministrationUseCases } from "../features/administration/presentation/contracts/administration-use-cases";
 import { AuthScreen } from "../features/identity/presentation/bindings/auth-screen";
 import type { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
 import type { ReportingUseCases } from "../features/reporting/presentation/contracts/reporting-use-cases";
@@ -17,9 +18,11 @@ import { PortalRoutes } from "./routing/portal-routes";
 export function Application({
   identity,
   reporting,
+  administration,
 }: {
   identity: IdentityController;
   reporting: ReportingUseCases;
+  administration: AdministrationUseCases;
 }) {
   const state = useSyncExternalStore(
     identity.subscribe,
@@ -62,6 +65,7 @@ export function Application({
               companies={state.session.companies}
               access={state.access}
               reporting={reporting}
+              administration={administration}
               company={
                 state.session.companies.find((company) => company.id === state.companyId) ?? null
               }

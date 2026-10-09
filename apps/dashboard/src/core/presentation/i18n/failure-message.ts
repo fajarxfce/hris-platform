@@ -74,6 +74,18 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Select between 1 and 32 different companies.",
     "Pilih 1 hingga 32 perusahaan yang berbeda.",
   ],
+  invalid_audit_range: [
+    "Choose a valid UTC time window of up to 90 days, ending no later than now.",
+    "Pilih rentang waktu UTC yang valid, maksimal 90 hari, dengan akhir tidak melewati waktu saat ini.",
+  ],
+  invalid_audit_filter: [
+    "Enter a valid action, resource type, or ID.",
+    "Masukkan kode aksi, jenis resource, atau ID yang valid.",
+  ],
+  invalid_audit_cursor: [
+    "This page is no longer available for these filters. Reset the filters to start again.",
+    "Halaman tidak tersedia untuk filter ini. Reset filter untuk memulai kembali.",
+  ],
   invalid_response: [
     "The service returned an invalid response. Please retry.",
     "Respons layanan tidak valid. Silakan coba lagi.",

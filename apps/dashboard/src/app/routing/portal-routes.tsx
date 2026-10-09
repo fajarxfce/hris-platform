@@ -24,6 +24,12 @@ const AuditScreen = lazy(() =>
   })),
 );
 
+const ClientPolicyScreen = lazy(() =>
+  import("../../features/administration/presentation/bindings/client-policy-screen").then(
+    (module) => ({ default: module.ClientPolicyScreen }),
+  ),
+);
+
 export function PortalRoutes({
   accountId,
   company,
@@ -68,6 +74,20 @@ export function PortalRoutes({
               accountId={accountId}
               access={access}
               searchAudit={administration.searchAudit}
+              companyName={company.name}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/settings/client-policy"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ClientPolicyScreen
+              accountId={accountId}
+              access={access}
+              loadClientPolicy={administration.loadClientPolicy}
               companyName={company.name}
               locale={locale}
             />

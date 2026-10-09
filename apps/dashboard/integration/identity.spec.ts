@@ -14,7 +14,7 @@ function authenticatorCode(secret: string): string {
   return ((digest.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).toString().padStart(6, "0");
 }
 
-test("real API sessions, MFA, company reports, audit, locale errors and logout", async ({
+test("real API sessions, MFA, reports, audit, client policy, locale errors and logout", async ({
   page,
   context,
 }) => {
@@ -120,6 +120,45 @@ test("real API sessions, MFA, company reports, audit, locale errors and logout",
   await expect(details).not.toContainText("Report fixture employee");
   await expect(details).not.toContainText("Browser report fixture");
   await page.getByRole("button", { name: "Tutup", exact: true }).click();
+  await page.getByRole("link", { name: "Policy client", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText(
+    "Belum ada konfigurasi perusahaan yang disimpan.",
+  );
+  const policyPath = `/api/v1/companies/${companies[1]}/settings/client-policy`;
+  for (const version of [0, 1]) {
+    const response = await context.request.put(policyPath, {
+      headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
+      data: {
+        expectedVersion: version === 0 ? null : 0,
+        activateAt: version === 0 ? null : new Date(Date.now() + 600_000).toISOString(),
+        disabledModules: version === 0 ? ["EXPENSES"] : ["PAYROLL"],
+        minimumBuilds: { android: version + 1, ios: 0, web: 0 },
+        maintenance: null,
+        reason: `Browser policy revision ${version}`,
+      },
+    });
+    expect(response.status()).toBe(200);
+  }
+  await page.getByRole("button", { name: "Muat ulang", exact: true }).click();
+  const effectivePolicy = page.getByRole("region", { name: "Policy efektif", exact: true });
+  await expect(
+    effectivePolicy
+      .locator(".app-property-row")
+      .filter({ has: page.getByText("Revisi", { exact: true }) }),
+  ).toContainText("0");
+  await expect(
+    effectivePolicy.locator(".app-property-row").filter({ hasText: "Revisi konfigurasi terbaru" }),
+  ).toContainText("1");
+  const policyConfiguration = page.getByRole("region", { name: "Revisi konfigurasi", exact: true });
+  await expect(policyConfiguration).toContainText("Browser policy revision 1");
+  const modules = page.getByRole("table", { name: "Modul", exact: true });
+  await expect(modules.getByRole("row").filter({ hasText: "Pengeluaran" })).toContainText(
+    "Nonaktif",
+  );
+  await expect(modules.getByRole("row").filter({ hasText: "Payroll" })).toContainText("Aktif");
+  await page.getByLabel("Revisi", { exact: true }).fill("0");
+  await page.getByRole("button", { name: "Lihat revisi", exact: true }).click();
+  await expect(policyConfiguration).toContainText("Browser policy revision 0");
   const signedOut = page.waitForResponse(
     (response) =>
       new URL(response.url()).pathname === "/api/v1/auth/logout" &&

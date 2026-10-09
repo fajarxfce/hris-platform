@@ -86,6 +86,11 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "This page is no longer available for these filters. Reset the filters to start again.",
     "Halaman tidak tersedia untuk filter ini. Reset filter untuk memulai kembali.",
   ],
+  invalid_revision: ["Enter a revision from 0 to 9999.", "Masukkan revisi dari 0 hingga 9999."],
+  client_policy_revision_not_found: [
+    "The configuration revision was not found.",
+    "Revisi konfigurasi tidak ditemukan.",
+  ],
   invalid_response: [
     "The service returned an invalid response. Please retry.",
     "Respons layanan tidak valid. Silakan coba lagi.",

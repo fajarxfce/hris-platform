@@ -14,7 +14,7 @@ Reference: https://learn.microsoft.com/en-us/azure/azure-portal/azure-portal-ove
 
 ## Implemented foundation
 
-`apps/dashboard` provides password sign-in, configured SSO entry links, session bootstrap, authenticator enrollment/verification, and explicit acknowledgement of one-use recovery codes. The portal includes current-company selection, an authorized company overview, company/group headcount reports, audit metadata search, responsive navigation, and English/Indonesian light/dark interfaces. Other business resource screens listed above remain subsequent work; the overview does not invent statistics.
+`apps/dashboard` provides password sign-in, configured SSO entry links, session bootstrap, authenticator enrollment/verification, and explicit acknowledgement of one-use recovery codes. The portal includes current-company selection, an authorized company overview, company/group headcount reports, audit metadata search, client policy review, responsive navigation, and English/Indonesian light/dark interfaces. Other business resource screens listed above remain subsequent work; the overview does not invent statistics.
 
 Feature datasources validate transport DTOs; repositories map them inside the HTTP failure boundary; use cases own policy; the identity controller owns requests and presentation state. Pages render that state. Shared `AppXxx` components wrap Fluent controls. The import checker rejects domain/framework dependencies, data access from presentation, repository peers, and use-case peers. These static checks complement review of orchestration and resource ownership.
 
@@ -40,9 +40,15 @@ The controller retains one page of at most 50 events. Older-page navigation writ
 
 There is no polling or cumulative page cache. Refresh, filter changes, company/account changes, and unmount cancel previous requests and remove the page and details. Stale successes and failures are ignored. A company change drops a cursor belonging to the previous company. Revoked access cannot leave old events visible. Navigation visibility is only a client convenience; the use case and API independently enforce audit permission.
 
+## Client policy review
+
+`/settings/client-policy` shows the [company settings snapshot](client-policy.md): effective modules, minimum builds, maintenance status, evaluation time, and the latest configured revision. A scheduled head remains distinct from the revision currently enforced by the server. The revision form accepts an explicit immutable revision from 0 to 9999; its company and selection live in the URL, and Back/Forward restores the controlled input. The latest revision needs one settings request; a named historical revision uses a second authorized read.
+
+The feature requires `settings.manage`. Its controller owns one pending review, cancels both stages on replacement/disposal, and clears configuration on refresh or access failure. Company changes discard the previous company's revision selection. Repository mapping validates bounded builds, distinct modules, maintenance intervals, version relationships, and coherent effective values before creating immutable entities. Locale/theme changes only reformat the loaded snapshot. Refresh is explicit; this screen has no polling or local policy cache. Configuration editing remains subsequent work.
+
 ## Commands
 
-The shared HTTP transport sends `X-HRIS-Client-Platform: WEB` with the compiled `HRIS_DASHBOARD_BUILD` (default `1`, bounded integer). Set this build-time value consistently for distributed dashboard artifacts. Company policy can require an update or pause business requests during maintenance; availability errors have English/Indonesian messages. Policy management and company preflight screens remain subsequent business workflows.
+The shared HTTP transport sends `X-HRIS-Client-Platform: WEB` with the compiled `HRIS_DASHBOARD_BUILD` (default `1`, bounded integer). Set this build-time value consistently for distributed dashboard artifacts. Company policy can require an update or pause business requests during maintenance; availability errors have English/Indonesian messages. Policy editing and company preflight screens remain subsequent business workflows.
 
 From `apps/dashboard`:
 
@@ -60,7 +66,7 @@ npm run test:integration
 
 `check` runs import boundaries, Biome, strict TypeScript, and transport/controller tests. `test:e2e` launches an isolated local Vite server and runs the real client composition against owned API fixtures, including delayed responses, company-switch cancellation, form cleanup, and mobile keyboard navigation.
 
-`test:integration` owns a temporary PostgreSQL container, runs the real API jar with separate migration/runtime credentials, and tests password errors, MFA enrollment, recovery codes, company switching, company/group headcount including an empty company, filtered audit metadata/details, language selection, and completed server logout. It requires free loopback ports 18080 and 4174, tears down its processes/container, and keeps local diagnostics under `.work/dashboard-integration`. The fixture disables external providers, mail, storage, and scanning; no real OIDC provider, delivery service, or production deployment is exercised. CI runs both browser suites.
+`test:integration` owns a temporary PostgreSQL container, runs the real API jar with separate migration/runtime credentials, and tests password errors, MFA enrollment, recovery codes, company switching, company/group headcount including an empty company, filtered audit metadata/details, configured/effective client policy and history, language selection, and completed server logout. It requires free loopback ports 18080 and 4174, tears down its processes/container, and keeps local diagnostics under `.work/dashboard-integration`. The fixture disables external providers, mail, storage, and scanning; no real OIDC provider, delivery service, or production deployment is exercised. CI runs both browser suites.
 
 Group headcount validation passed the architecture/Biome/TypeScript checks, 33 unit/controller tests, a production build, 12 browser tests, and one real-API/PostgreSQL browser test. Browser checks cover pending-selection cancellation, scope changes, Back/Forward filters, localized failures, and light/dark responsive layouts. The initial browser fixtures used the wrong ARIA role for Fluent's multiselect entries; they now select `menuitemcheckbox`. The report route remains lazy-loaded. These checks do not claim device validation or runtime performance benchmarks.
 

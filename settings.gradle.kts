@@ -62,3 +62,5 @@ include(
     ":modules:administration:data",
     ":modules:administration:delivery",
 )
+
+include(":modules:reporting:domain", ":modules:reporting:data", ":modules:reporting:delivery")

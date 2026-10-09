@@ -4,6 +4,7 @@ import dev.fajar.hris.core.database.PostgresTransactionRunner
 import dev.fajar.hris.documents.domain.usecases.*
 import dev.fajar.hris.identity.domain.usecases.ResolveActor
 import dev.fajar.hris.jobs.domain.usecases.*
+import dev.fajar.hris.leave.domain.usecases.*
 import dev.fajar.hris.people.domain.usecases.*
 import dev.fajar.hris.worker.runtime.*
 import dev.fajar.hris.worker.tasks.*
@@ -179,4 +180,18 @@ class WorkerConfiguration {
         @org.springframework.beans.factory.annotation.Qualifier("mobileSyncTimers")
         timer: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
     ) = dev.fajar.hris.worker.sync.MobileSyncWorker(maintain, timer)
+
+    @Bean
+    fun leaveAccrualTask(
+        resolve: ResolveActor,
+        advance: AdvanceLeaveAccrualBatch,
+        abort: AbortLeaveBatch,
+    ): JobTask = LeaveAccrualTask(resolve, advance, abort)
+
+    @Bean
+    fun leaveYearCloseTask(
+        resolve: ResolveActor,
+        advance: AdvanceLeaveYearCloseBatch,
+        abort: AbortLeaveBatch,
+    ): JobTask = LeaveYearCloseTask(resolve, advance, abort)
 }

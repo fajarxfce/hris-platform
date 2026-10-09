@@ -22,3 +22,5 @@ Claims allow at most two active jobs per company and four across the deployment,
 The metadata schema is based on Spring Batch 6.0.5 and is distributed under Apache-2.0. [Spring Batch source](https://github.com/spring-projects/spring-batch/tree/v6.0.5/spring-batch-core/src/main/resources/org/springframework/batch/core).
 
 Job responses include `progressMode`. `FIXED_TOTAL` jobs must complete every declared item; the database and worker both enforce this. `UPPER_BOUND` jobs can finish when a finite source is exhausted before its safety ceiling. Both modes reject backwards, excessive, or non-progressing intermediate steps. Company document inventory uses the latter mode; no public endpoint accepts arbitrary job definitions.
+
+Leave entitlement batches use `FIXED_TOTAL` jobs with one transaction per employee and one final metadata step. The leave module owns accrual/year-closing submission, immutable outcomes, and explicit recovery. Company job monitoring is shared; no new timer, in-memory task registry, or arbitrary-job API is introduced.

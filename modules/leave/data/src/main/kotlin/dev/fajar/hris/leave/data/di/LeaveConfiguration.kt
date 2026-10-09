@@ -6,6 +6,7 @@ import dev.fajar.hris.documents.domain.repositories.DocumentReferenceRepository
 import dev.fajar.hris.documents.domain.repositories.DocumentRepository
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.leave.data.datasources.*
 import dev.fajar.hris.leave.data.repositories.*
 import dev.fajar.hris.leave.domain.repositories.*
@@ -420,5 +421,183 @@ class LeaveConfiguration {
             transactions,
             clock,
             storage,
+        )
+
+    @Bean
+    fun leaveBatchSource(sql: DSLContext): LeaveBatchDataSource = PostgresLeaveBatchDataSource(sql)
+
+    @Bean
+    fun leaveBatches(source: LeaveBatchDataSource, json: ObjectMapper): LeaveBatchRepository =
+        StoredLeaveBatchRepository(source, json)
+
+    @Bean
+    fun abortLeaveBatch(
+        batches: LeaveBatchRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+    ) = AbortLeaveBatch(batches, jobs, journal, transactions)
+
+    @Bean
+    fun advanceLeaveAccrualBatch(
+        batches: LeaveBatchRepository,
+        policies: LeavePolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        ledger: LeaveLedgerRepository,
+        entitlements: LeaveEntitlementRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        AdvanceLeaveAccrualBatch(
+            batches,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            ledger,
+            entitlements,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun advanceLeaveYearCloseBatch(
+        batches: LeaveBatchRepository,
+        policies: LeavePolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        ledger: LeaveLedgerRepository,
+        entitlements: LeaveEntitlementRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        requests: LeaveRequestRepository,
+    ) =
+        AdvanceLeaveYearCloseBatch(
+            batches,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            ledger,
+            entitlements,
+            journal,
+            transactions,
+            clock,
+            requests,
+        )
+
+    @Bean
+    fun getLeaveBatch(
+        batches: LeaveBatchRepository,
+        jobs: JobRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetLeaveBatch(batches, jobs, companies, members, identities, transactions)
+
+    @Bean
+    fun listLeaveBatches(
+        batches: LeaveBatchRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = ListLeaveBatches(batches, companies, members, identities, transactions)
+
+    @Bean
+    fun resumeLeaveBatch(
+        batches: LeaveBatchRepository,
+        policies: LeavePolicyRepository,
+        jobs: JobRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        ResumeLeaveBatch(
+            batches,
+            policies,
+            jobs,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun startLeaveAccrualBatch(
+        batches: LeaveBatchRepository,
+        policies: LeavePolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        StartLeaveAccrualBatch(
+            batches,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun startLeaveYearCloseBatch(
+        batches: LeaveBatchRepository,
+        policies: LeavePolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        StartLeaveYearCloseBatch(
+            batches,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            clock,
         )
 }

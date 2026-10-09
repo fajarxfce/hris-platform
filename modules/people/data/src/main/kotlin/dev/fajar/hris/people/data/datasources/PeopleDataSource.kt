@@ -33,6 +33,8 @@ interface PeopleDataSource {
 
     fun employeeIds(companyId: UUID, limit: Int): List<UUID>
 
+    fun existingEmployeeIds(companyId: UUID, ids: Set<UUID>): List<UUID>
+
     fun employeeIdsForAccount(companyId: UUID, accountId: UUID, limit: Int): List<UUID>
 
     fun lock(companyId: UUID, shared: Boolean = false)

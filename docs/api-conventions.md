@@ -92,6 +92,16 @@ Grant and closing receipts identify their immutable evidence; read the employee/
 
 Balances are read consistently with their history. Manual reductions use only available balance; reserved/consumed units cannot be spent as available entitlement. Archived types retain ledger correction access without allowing new leave requests.
 
+Company leave batches:
+
+- `POST /companies/{companyId}/leave/accrual-batches`: id, typeId, month (`YYYY-MM`), expectedPolicyVersion, optional employeeIds, reason. Requires `leave.accrual.post`.
+- `POST /companies/{companyId}/leave/year-close-batches`: id, typeId, year, expectedPolicyVersion, optional employeeIds, reason. Requires `leave.year.close` and an ended company-local year.
+- `GET /companies/{companyId}/leave/batches`: after UUID, limit (default 50, maximum 200). Requires `leave.read`.
+- `GET /companies/{companyId}/leave/batches/{id}`: after employee ordinal, limit. Returns the frozen batch, aggregate counts, up to eight attempts, current job progress, and a page of employee outcomes. Raw job request/credential/lease data is excluded.
+- `POST /companies/{companyId}/leave/batches/{id}/resume`: expectedVersion and reason. Requires the original author's current permission and a stopped/exhausted job. All three batch commands require an idempotency key; cancellation uses the existing job endpoint and its observed job version.
+
+Employee selection is bounded to 1–5,000 distinct IDs. Omitting it freezes the current company directory. Outcomes have `ordinal`, `employeeId`, `jobId`, `status`, optional immutable `resourceId`, `failureCode`, safe `parameters`, and `completedAt`. Follow `results.nextCursor` as the next `after` ordinal. Counts are cumulative across attempts; current job progress covers remaining employees plus its final metadata step. `leave_batch_active`, `leave_batch_policy_changed`, `leave_batch_attempt_limit`, `leave_batch_not_stopped`, and stale versions require an explicit client action. Poll only while the current job is active, cancel obsolete requests, and stop polling when the screen/account/company changes. See [batch semantics](modules/leave.md#company-entitlement-batches).
+
 Leave requests:
 
 - `POST /companies/{companyId}/leave/requests`: id, employeeId, typeId, days (`{workDate, portion}`), optional attachmentRevisionIds (up to three distinct UUIDs), reason. Portions are FULL, FIRST_HALF, or SECOND_HALF. Requires own `leave.self.manage` or on-behalf `leave.manage`, with an idempotency key.
@@ -134,7 +144,7 @@ Mobile synchronization:
 - `GET /companies/{companyId}/sync/bootstrap`: optional opaque `cursor`, `limit` (default 100, maximum 200). Returns authorized collection references and either the next bootstrap page or the initial changes cursor.
 - `GET /companies/{companyId}/sync/changes`: required opaque `cursor`, `limit` (default 100, maximum 200). Returns UPSERT/DELETE references, continuation state, pending-publication status, and polling guidance.
 
-The registered collections are owned expense claims, leave requests, and overtime requests. Each page rechecks live account/company scope. See [synchronization](synchronization.md) for local atomic cursor storage, bootstrap limits, key rotation, retention, access invalidation, and post-commit publication.
+The registered collections are owned expense claims, leave requests/balances, and overtime requests. Each page rechecks live account/company scope. See [synchronization](synchronization.md) for local atomic cursor storage, bootstrap limits, key rotation, retention, access invalidation, and post-commit publication.
 
 Payroll configuration:
 

@@ -133,6 +133,14 @@ class PostgresPeopleDataSource(private val sql: DSLContext) : PeopleDataSource {
         sql.executeInsert(record)
     }
 
+    override fun existingEmployeeIds(companyId: UUID, ids: Set<UUID>): List<UUID> =
+        sql.select(E.ID)
+            .from(E)
+            .where(E.COMPANY_ID.eq(companyId), E.ID.`in`(ids))
+            .orderBy(E.ID)
+            .fetch(E.ID)
+            .map { requireNotNull(it) }
+
     override fun employeeIds(companyId: UUID, limit: Int): List<UUID> =
         sql.select(E.ID)
             .from(E)

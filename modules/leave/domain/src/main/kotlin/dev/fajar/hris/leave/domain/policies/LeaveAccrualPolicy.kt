@@ -20,15 +20,8 @@ fun calculateLeaveAccrual(
             ?: return Result.Failed(Failure(FailureKind.VALIDATION, "leave_accrual_not_configured"))
     val valid = validateLeaveAccrualPolicy(accrual, policy.allowPartialDays)
     if (valid is Result.Failed) return valid
-    if (accrual.frequency == LeaveAccrualFrequency.MANUAL)
-        return Result.Failed(Failure(FailureKind.VALIDATION, "leave_accrual_not_configured"))
-    if (
-        month.year !in 1900..2199 ||
-            month > YearMonth.from(today) ||
-            (accrual.frequency == LeaveAccrualFrequency.MONTHLY &&
-                !today.isAfter(month.atEndOfMonth()))
-    )
-        return Result.Failed(Failure(FailureKind.VALIDATION, "leave_accrual_not_due"))
+    val due = validateLeaveAccrualPeriod(month, today, accrual.frequency)
+    if (due is Result.Failed) return due
     if (history.size > 1000)
         return Result.Failed(Failure(FailureKind.CONFLICT, "employment_history_capacity"))
     val from = month.atDay(1)

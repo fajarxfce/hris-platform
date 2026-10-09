@@ -43,6 +43,9 @@ interface PeopleRepository {
 
     fun employeeIds(companyId: UUID, limit: Int): Result<List<UUID>>
 
+    /** Exact scoped lookup for a validated selection of at most 5,000 IDs. */
+    fun existingEmployeeIds(companyId: UUID, ids: Set<UUID>): Result<Set<UUID>>
+
     fun employeeIdsForAccount(companyId: UUID, accountId: UUID, limit: Int): Result<List<UUID>>
 
     fun lockReportingLines(companyId: UUID, shared: Boolean = false): Result<Unit>

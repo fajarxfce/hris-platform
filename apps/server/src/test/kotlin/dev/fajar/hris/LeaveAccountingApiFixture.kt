@@ -190,6 +190,11 @@ abstract class LeaveAccountingApiFixture : LeaveApiFixture() {
             PermissionCatalog.companyAdministrator,
             clock.instant(),
             UUID.randomUUID(),
-            credentialVersion = 0,
+            credentialVersion =
+                database()
+                    .queryForObject(
+                        "select security_version from accounts where email='admin@example.test'",
+                        Long::class.java,
+                    )!!,
         )
 }

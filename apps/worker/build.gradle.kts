@@ -1,6 +1,8 @@
 plugins { id("hris.application") }
 
 dependencies {
+    implementation(projects.modules.leave.domain)
+    implementation(projects.modules.leave.data)
     implementation(projects.modules.approvals.domain)
     implementation(projects.modules.approvals.data)
 

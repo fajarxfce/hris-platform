@@ -111,6 +111,11 @@ class StoredPeopleRepository(
             source.accountForEmployee(companyId, employeeId)
         }
 
+    override fun existingEmployeeIds(companyId: UUID, ids: Set<UUID>): Result<Set<UUID>> =
+        safeDatabaseCall {
+            source.existingEmployeeIds(companyId, ids).toSet()
+        }
+
     override fun employeeIds(companyId: UUID, limit: Int): Result<List<UUID>> = safeDatabaseCall {
         source.employeeIds(companyId, limit)
     }

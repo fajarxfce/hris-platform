@@ -38,6 +38,8 @@ Web uses HttpOnly Secure session cookies and CSRF protection. Mobile uses short-
 
 The request actor retains company and platform permissions separately. The union used to decide MFA requirements is not an authorization scope. Revalidation intersects each original scope with its corresponding live grants; company administration cannot stand in for platform administration. Identity exposes an access-specific company guard using the same company-state lock as organization settings, preserving the acyclic domain dependency graph. Role/member operations acquire any template guard before company, membership, and ordered account guards.
 
+Global credential administration takes its administration or provider-subject guard before ordered actor/target accounts. Recent authentication is rechecked after waiting. Account locking reads current access fields in a fresh SQL snapshot after acquiring the row guard; directory projections select versions and permissions together in one bounded query. This avoids both stale permissions after a lock wait and mixed-version list responses.
+
 ## Storage and jobs
 
 Private S3-compatible object storage holds documents; the self-hosted distribution uses Garage. Uploads are resumable and bounded, downloads support Range/ETag, and documents are not readable until validation completes. Metadata and authorization stay in PostgreSQL.

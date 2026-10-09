@@ -13,12 +13,19 @@ class PostgresAccountAdministrationDataSource(private val sql: DSLContext) :
             .execute()
     }
 
-    override fun lockAccount(id: UUID): AccountAdministrationRow? =
-        selectManagedAccounts(sql)
-            .where(ACCOUNTS.ID.eq(id))
-            .forNoKeyUpdate()
-            .of(ACCOUNTS)
-            .fetchOne { it.toAccountAdministrationRow() }
+    override fun lockAccount(id: UUID): AccountAdministrationRow? {
+        val locked =
+            sql.select(ACCOUNTS.ID)
+                .from(ACCOUNTS)
+                .where(ACCOUNTS.ID.eq(id))
+                .forNoKeyUpdate()
+                .fetchOne()
+        if (locked == null) return null
+        // Read permissions in a fresh snapshot after a possible wait for the row guard.
+        return selectManagedAccounts(sql).where(ACCOUNTS.ID.eq(id)).fetchOne {
+            it.toAccountAdministrationRow()
+        }
+    }
 
     override fun list(query: String, after: UUID?, limit: Int): List<AccountAdministrationRow> =
         selectManagedAccounts(sql)
@@ -29,13 +36,6 @@ class PostgresAccountAdministrationDataSource(private val sql: DSLContext) :
             .orderBy(ACCOUNTS.ID)
             .limit(limit)
             .fetch { it.toAccountAdministrationRow() }
-
-    override fun permissions(ids: Set<UUID>): Map<UUID, Set<String>> =
-        sql.select(PLATFORM_PERMISSIONS.ACCOUNT_ID, PLATFORM_PERMISSIONS.PERMISSION)
-            .from(PLATFORM_PERMISSIONS)
-            .where(PLATFORM_PERMISSIONS.ACCOUNT_ID.`in`(ids))
-            .fetchGroups(PLATFORM_PERMISSIONS.ACCOUNT_ID, PLATFORM_PERMISSIONS.PERMISSION)
-            .mapValues { it.value.toSet() }
 
     override fun update(id: UUID, expectedVersion: Long, active: Boolean): Long? =
         sql.update(ACCOUNTS)

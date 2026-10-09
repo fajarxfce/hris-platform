@@ -3,12 +3,14 @@ package dev.fajar.hris.identity.domain.usecases
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.*
 import dev.fajar.hris.identity.domain.policies.*
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.OidcIdentityRepository
 import java.time.Clock
 import java.util.UUID
 
 class SaveOidcIdentity(
     private val links: OidcIdentityRepository,
+    private val identities: IdentityRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
@@ -29,15 +31,7 @@ class SaveOidcIdentity(
     ): Result<MutationReceipt> {
         if (actor.companyId != null || "identity.manage" !in actor.permissions)
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "platform_administrator_required"))
-        val recent =
-            if (security.enforceMfa)
-                requireRecentMfa(actor, clock.instant(), security.recentAuthenticationAge)
-            else
-                requireRecentAuthentication(
-                    actor,
-                    clock.instant(),
-                    security.recentAuthenticationAge,
-                )
+        val recent = requireRecentIdentityAdministration(actor, clock.instant(), security)
         if (recent is Result.Failed) return recent
         if (
             issuer.length !in 1..500 ||
@@ -45,8 +39,7 @@ class SaveOidcIdentity(
                 subject.any(Char::isISOControl) ||
                 (expectedVersion ?: 0) < 0 ||
                 reason.isBlank() ||
-                reason.length > 1000 ||
-                (active && (!oidc.enabled || issuer != oidc.issuer))
+                reason.length > 1000
         )
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_oidc_identity"))
         val key =
@@ -66,15 +59,39 @@ class SaveOidcIdentity(
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
+            val locked = links.lockSubject(issuer, subject)
+            if (locked is Result.Failed) return@run locked
+            var target: Account? = null
+            for (idToLock in setOf(actor.accountId, accountId).sorted()) {
+                if (idToLock == accountId) {
+                    val found = links.lockAccount(idToLock)
+                    if (found is Result.Failed) return@run found
+                    target = (found as Result.Success).value
+                } else {
+                    val guard = identities.lockAccount(idToLock, shared = true)
+                    if (guard is Result.Failed) return@run guard
+                }
+            }
+            val checked =
+                identities.access(actor.accountId, null).flatMap {
+                    validatePlatformCommandActor(actor, it)
+                }
+            if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
+            if ("identity.manage" !in live.permissions)
+                return@run Result.Failed(
+                    Failure(FailureKind.FORBIDDEN, "platform_administrator_required")
+                )
+            val currentAssurance =
+                requireRecentIdentityAdministration(actor, clock.instant(), security)
+            if (currentAssurance is Result.Failed) return@run currentAssurance
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
-            val locked = links.lockSubject(issuer, subject)
-            if (locked is Result.Failed) return@run locked
-            val found = links.lockAccount(accountId)
-            if (found is Result.Failed) return@run found
+            if (active && (!oidc.enabled || issuer != oidc.issuer))
+                return@run Result.Failed(Failure(FailureKind.VALIDATION, "invalid_oidc_identity"))
             val account =
-                (found as Result.Success).value
+                target
                     ?: return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "account_not_found"))
             if (active && !account.active)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "account_disabled"))

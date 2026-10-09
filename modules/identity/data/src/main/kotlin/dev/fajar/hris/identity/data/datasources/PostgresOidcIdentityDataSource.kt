@@ -12,7 +12,7 @@ class PostgresOidcIdentityDataSource(private val sql: DSLContext) : OidcIdentity
     }
 
     override fun lockAccount(accountId: UUID): AccountsRecord? =
-        sql.selectFrom(ACCOUNTS).where(ACCOUNTS.ID.eq(accountId)).forUpdate().fetchOne()
+        sql.selectFrom(ACCOUNTS).where(ACCOUNTS.ID.eq(accountId)).forNoKeyUpdate().fetchOne()
 
     override fun find(id: UUID): OidcIdentitiesRecord? =
         sql.selectFrom(OIDC_IDENTITIES).where(OIDC_IDENTITIES.ID.eq(id)).fetchOne()

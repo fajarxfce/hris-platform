@@ -40,6 +40,15 @@ fun requireRecentMfa(actor: Actor, now: Instant, maximumAge: Duration): Result<U
     else Result.Success(Unit)
 }
 
+/** Global credential administration requires a recent applicable authentication proof. */
+fun requireRecentIdentityAdministration(
+    actor: Actor,
+    now: Instant,
+    policy: IdentitySecurityPolicy,
+): Result<Unit> =
+    if (policy.enforceMfa) requireRecentMfa(actor, now, policy.recentAuthenticationAge)
+    else requireRecentAuthentication(actor, now, policy.recentAuthenticationAge)
+
 fun validateMfaCredential(actor: Actor, credential: MfaCredential?): Result<Unit> =
     if (
         credential == null ||

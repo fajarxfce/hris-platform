@@ -11,4 +11,5 @@ data class AccountAdministrationRow(
     val version: Long,
     val securityVersion: Long,
     val invitationPending: Boolean,
+    val platformPermissions: Set<String>,
 )

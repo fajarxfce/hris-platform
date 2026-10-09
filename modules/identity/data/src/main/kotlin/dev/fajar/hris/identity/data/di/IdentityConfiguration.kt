@@ -118,10 +118,6 @@ class IdentityConfiguration {
     ) = ResolveActor(identities, transactions, clock, security)
 
     @Bean
-    fun listMyCompanies(identities: IdentityRepository, transactions: TransactionRunner) =
-        ListMyCompanies(identities, transactions)
-
-    @Bean
     fun currentAccount(
         identities: IdentityRepository,
         mfa: dev.fajar.hris.identity.domain.repositories.MfaRepository,
@@ -239,10 +235,11 @@ class IdentityConfiguration {
     @Bean
     fun listNative(
         sessions: dev.fajar.hris.identity.domain.repositories.NativeSessionRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
         policy: dev.fajar.hris.identity.domain.entities.NativeSessionPolicy,
-    ) = ListNativeSessions(sessions, transactions, clock, policy)
+    ) = ListNativeSessions(sessions, identities, transactions, clock, policy)
 
     @Bean
     fun revokeNative(
@@ -278,17 +275,31 @@ class IdentityConfiguration {
     @Bean
     fun saveOidcIdentity(
         links: OidcIdentityRepository,
+        identities: IdentityRepository,
         operations: dev.fajar.hris.core.domain.OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
         oidc: OidcPolicy,
         clock: Clock,
-    ) = SaveOidcIdentity(links, operations, journal, transactions, security, oidc, clock)
+    ) =
+        SaveOidcIdentity(
+            links,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            oidc,
+            clock,
+        )
 
     @Bean
-    fun listOidcIdentities(links: OidcIdentityRepository, transactions: TransactionRunner) =
-        ListOidcIdentities(links, transactions)
+    fun listOidcIdentities(
+        links: OidcIdentityRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = ListOidcIdentities(links, identities, transactions)
 
     @Bean
     fun signInWithOidc(
@@ -359,8 +370,9 @@ class IdentityConfiguration {
     @Bean
     fun listManagedAccounts(
         accounts: AccountAdministrationRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListManagedAccounts(accounts, transactions)
+    ) = ListManagedAccounts(accounts, identities, transactions)
 
     @Bean
     fun saveAccountAccess(

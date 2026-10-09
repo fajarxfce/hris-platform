@@ -29,15 +29,7 @@ class InviteAccount(
     ): Result<MutationReceipt> {
         if (actor.companyId != null || "identity.manage" !in actor.permissions)
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "platform_administrator_required"))
-        val recent =
-            if (security.enforceMfa)
-                requireRecentMfa(actor, clock.instant(), security.recentAuthenticationAge)
-            else
-                requireRecentAuthentication(
-                    actor,
-                    clock.instant(),
-                    security.recentAuthenticationAge,
-                )
+        val recent = requireRecentIdentityAdministration(actor, clock.instant(), security)
         if (recent is Result.Failed) return recent
         val normalized = email.trim().lowercase()
         val name = displayName.trim()
@@ -52,8 +44,6 @@ class InviteAccount(
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
-            if (!policy.enabled)
-                return@run Result.Failed(Failure(FailureKind.UNAVAILABLE, "mail_not_configured"))
             val administration = accounts.lockAdministration()
             if (administration is Result.Failed) return@run administration
             val lockedAccounts = mutableMapOf<UUID, ManagedAccount?>()
@@ -71,9 +61,14 @@ class InviteAccount(
                         actor.credentialVersion != currentAuthor.account.securityVersion)
             )
                 return@run Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "session_revoked"))
+            val currentAssurance =
+                requireRecentIdentityAdministration(actor, clock.instant(), security)
+            if (currentAssurance is Result.Failed) return@run currentAssurance
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
+            if (!policy.enabled)
+                return@run Result.Failed(Failure(FailureKind.UNAVAILABLE, "mail_not_configured"))
             val found = credentials.lockAccount(id)
             if (found is Result.Failed) return@run found
             val current = (found as Result.Success).value

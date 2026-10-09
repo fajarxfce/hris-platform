@@ -15,6 +15,8 @@ class GetCurrentAccount(
 ) {
     fun execute(actor: Actor): Result<CurrentAccount> =
         transactions.run(actor.copy(companyId = null)) {
+            val guard = identities.lockAccount(actor.accountId, shared = true)
+            if (guard is Result.Failed) return@run guard
             identities.access(actor.accountId, null).flatMap { access ->
                 if (
                     access == null ||

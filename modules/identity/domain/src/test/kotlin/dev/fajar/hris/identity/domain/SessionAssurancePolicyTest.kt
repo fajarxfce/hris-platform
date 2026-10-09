@@ -75,4 +75,36 @@ class SessionAssurancePolicyTest {
             validateMfaCredential(actor, MfaCredential(account.copy(active = false), null, null)),
         )
     }
+
+    @Test
+    fun administrationUsesTheConfiguredProofWithoutExtendingItsLifetime() {
+        val actor = Actor(account.id, null, emptySet(), now, UUID.randomUUID(), now, 0)
+        for (enforced in listOf(true, false)) {
+            val configured = policy.copy(enforceMfa = enforced)
+            assertEquals(
+                Result.Success(Unit),
+                requireRecentIdentityAdministration(actor, now.plusSeconds(599), configured),
+            )
+            assertInstanceOf(
+                Result.Failed::class.java,
+                requireRecentIdentityAdministration(actor, now.plusSeconds(600), configured),
+            )
+            assertInstanceOf(
+                Result.Failed::class.java,
+                requireRecentIdentityAdministration(actor, now.minusSeconds(1), configured),
+            )
+        }
+        assertInstanceOf(
+            Result.Failed::class.java,
+            requireRecentIdentityAdministration(actor.copy(mfaVerifiedAt = null), now, policy),
+        )
+        assertEquals(
+            Result.Success(Unit),
+            requireRecentIdentityAdministration(
+                actor.copy(mfaVerifiedAt = null),
+                now,
+                policy.copy(enforceMfa = false),
+            ),
+        )
+    }
 }

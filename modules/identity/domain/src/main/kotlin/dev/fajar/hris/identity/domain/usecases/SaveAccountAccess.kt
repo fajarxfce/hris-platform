@@ -27,15 +27,7 @@ class SaveAccountAccess(
     ): Result<MutationReceipt> {
         if (actor.companyId != null || "identity.manage" !in actor.permissions)
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "platform_administrator_required"))
-        val recent =
-            if (security.enforceMfa)
-                requireRecentMfa(actor, clock.instant(), security.recentAuthenticationAge)
-            else
-                requireRecentAuthentication(
-                    actor,
-                    clock.instant(),
-                    security.recentAuthenticationAge,
-                )
+        val recent = requireRecentIdentityAdministration(actor, clock.instant(), security)
         if (recent is Result.Failed) return recent
         if (
             expectedVersion < 0 ||
@@ -73,6 +65,9 @@ class SaveAccountAccess(
                         currentAuthor.account.securityVersion != actor.credentialVersion)
             )
                 return@run Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "session_revoked"))
+            val currentAssurance =
+                requireRecentIdentityAdministration(actor, clock.instant(), security)
+            if (currentAssurance is Result.Failed) return@run currentAssurance
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }

@@ -52,3 +52,17 @@ management:
 logging:
   level:
     org.springframework.boot.jooq.autoconfigure.ExceptionTranslatorExecuteListener: "OFF"
+
+springdoc:
+  api-docs:
+    enabled: ${HRIS_API_DOCS_ENABLED:false}
+    path: /api/v1/openapi
+    version: OPENAPI_3_1
+  paths-to-match: /api/v1/**
+  paths-to-exclude: /api/v1/openapi, /api/v1/openapi.yaml
+  default-produces-media-type: application/json
+  allowed-locales: en
+  cache:
+    max-entries: 1
+  override-with-generic-response: false
+  writer-with-order-by-keys: true

@@ -32,6 +32,7 @@ class IdentityHttpTest : ApiIntegrationTest() {
         )
 
         assertEquals(404, get(client, "/api/v1/does-not-exist").statusCode())
+        assertEquals(404, get(client, "/api/v1/openapi").statusCode())
         assertEquals(204, post(client, "/api/v1/auth/logout", "{}", csrf).statusCode())
         assertEquals(401, get(client, "/api/v1/me").statusCode())
     }

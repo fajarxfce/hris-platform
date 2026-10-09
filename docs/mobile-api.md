@@ -1,5 +1,7 @@
 # Mobile API contract
 
+The [OpenAPI description](openapi.md) provides the generated transport contract and its CI artifact. The policies below define client behavior beyond DTO serialization.
+
 The versioned API serves web and native clients. Native authentication, idempotent commands, optimistic versions, bounded pagination, resumable documents, and structured problems are implemented. [Incremental synchronization](synchronization.md) is implemented for owned expense claims, leave requests/balances, overtime requests, finalized payslips, and payroll payment progress. Send an explicit `collections` selection supported by the mobile version and persist it with its cursor; server expansion then does not introduce an unrecognized collection automatically. Other list endpoints do not implicitly provide a consistent snapshot or change cursor.
 
 ## Localizable errors

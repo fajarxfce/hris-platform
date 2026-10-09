@@ -1,6 +1,7 @@
 plugins { id("hris.application") }
 
 dependencies {
+    implementation(libs.springdoc.webmvc)
     implementation(projects.modules.payroll.domain)
     implementation(projects.modules.payroll.data)
     implementation(projects.modules.payroll.delivery)
@@ -49,6 +50,7 @@ dependencies {
     runtimeOnly(libs.flyway.postgresql)
     runtimeOnly(libs.postgresql)
     testImplementation(libs.spring.oauth2.client)
+    testImplementation(libs.swagger.parser)
     testImplementation(libs.bouncycastle)
     testImplementation(libs.spring.test)
     testImplementation(libs.spring.flyway)

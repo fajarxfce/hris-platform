@@ -8,6 +8,8 @@ kotlin = "2.3.21"
 spring-boot = "4.1.1"
 ktfmt = "0.59"
 archunit = "1.4.1"
+springdoc = "3.1.1"
+swagger-parser = "2.1.48"
 
 [libraries]
 tika-core = { module = "org.apache.tika:tika-core", version.ref = "tika" }
@@ -24,6 +26,8 @@ kotlin-spring = { module = "org.jetbrains.kotlin:kotlin-allopen", version.ref = 
 spring-boot-gradle = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot" }
 spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 spring-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+springdoc-webmvc = { module = "org.springdoc:springdoc-openapi-starter-webmvc-api", version.ref = "springdoc" }
+swagger-parser = { module = "io.swagger.parser.v3:swagger-parser", version.ref = "swagger-parser" }
 spring-oauth2-client = { module = "org.springframework.boot:spring-boot-starter-security-oauth2-client" }
 spring-security = { module = "org.springframework.boot:spring-boot-starter-security" }
 spring-jackson = { module = "org.springframework.boot:spring-boot-starter-jackson" }

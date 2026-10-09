@@ -28,6 +28,7 @@ The dashboard requires Node.js 24 or newer. From `apps/dashboard`, run `npm ci`,
 - [Outbound email](docs/mail.md)
 - [Private object storage](docs/storage.md)
 - [API conventions](docs/api-conventions.md)
+- [Generated OpenAPI contract](docs/openapi.md)
 - [Mobile and offline clients](docs/mobile-api.md)
 - [Payroll configuration and calculation rules](docs/payroll-rules.md)
 - [Incremental synchronization](docs/synchronization.md)

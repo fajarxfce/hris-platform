@@ -39,4 +39,23 @@ class SyncCollectionPolicyTest {
         assertEquals("invalid_sync_collections", failed.failure.code)
         assertEquals(mapOf("collections" to "required"), failed.failure.fields)
     }
+
+    @Test
+    fun inboxRequiresAnExplicitSelectionAndItsOwnReadPermission() {
+        val permissions = setOf("expenses.self.manage", "announcements.read")
+        assertEquals(
+            Result.Success(setOf(EXPENSE_CLAIMS)),
+            selectSyncCollections(permissions, null),
+        )
+        assertEquals(Result.Success(setOf(INBOX)), selectSyncCollections(permissions, setOf(INBOX)))
+        assertEquals(
+            Result.Success(setOf(EXPENSE_CLAIMS, INBOX)),
+            selectSyncCollections(permissions, setOf(EXPENSE_CLAIMS, INBOX)),
+        )
+        val unselected = selectSyncCollections(setOf("announcements.read"), null) as Result.Failed
+        assertEquals("sync_access_denied", unselected.failure.code)
+        val unprivileged =
+            selectSyncCollections(setOf("announcements.manage"), setOf(INBOX)) as Result.Failed
+        assertEquals("sync_access_denied", unprivileged.failure.code)
+    }
 }

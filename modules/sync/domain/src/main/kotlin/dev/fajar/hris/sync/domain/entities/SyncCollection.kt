@@ -7,4 +7,5 @@ enum class SyncCollection {
     OVERTIME_REQUESTS,
     PAYSLIPS,
     PAYROLL_PAYMENTS,
+    INBOX,
 }

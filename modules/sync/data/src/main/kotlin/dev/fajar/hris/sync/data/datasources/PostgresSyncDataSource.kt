@@ -1,6 +1,7 @@
 package dev.fajar.hris.sync.data.datasources
 
 import dev.fajar.hris.schema.tables.ExpenseClaims.EXPENSE_CLAIMS as E
+import dev.fajar.hris.schema.tables.InboxItems.INBOX_ITEMS as I
 import dev.fajar.hris.schema.tables.LeaveAccounts.LEAVE_ACCOUNTS as B
 import dev.fajar.hris.schema.tables.LeaveRequests.LEAVE_REQUESTS as L
 import dev.fajar.hris.schema.tables.MobileSyncChanges.MOBILE_SYNC_CHANGES as C
@@ -99,6 +100,19 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                     S.EMPLOYMENT_ID.`in`(selection.employmentIds),
                     DSL.inline("PAYROLL_PAYMENTS").`in`(selection.collections),
                 )
+        val inbox =
+            sql.select(
+                    DSL.inline("INBOX").`as`("collection"),
+                    I.ID.`as`("resource_id"),
+                    I.VERSION.`as`("resource_version"),
+                )
+                .from(I)
+                .where(
+                    I.COMPANY_ID.eq(selection.companyId),
+                    I.OWNER_ACCOUNT_ID.eq(selection.accountId),
+                    I.WITHDRAWN.isFalse,
+                    DSL.inline("INBOX").`in`(selection.collections),
+                )
         val records =
             expenses
                 .unionAll(leaves)
@@ -106,6 +120,7 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                 .unionAll(balances)
                 .unionAll(payslips)
                 .unionAll(payments)
+                .unionAll(inbox)
                 .asTable("sync_resources")
         val collection = requireNotNull(records.field("collection", String::class.java))
         val id = requireNotNull(records.field("resource_id", UUID::class.java))

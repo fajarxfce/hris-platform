@@ -9,6 +9,7 @@ fun syncAudience(selection: SyncSelection): Condition =
     C.COMPANY_ID.eq(selection.companyId)
         .and(C.COLLECTION.`in`(selection.collections))
         .and(
-            C.EMPLOYMENT_ID.`in`(selection.employmentIds)
+            C.COLLECTION.ne("INBOX")
+                .and(C.EMPLOYMENT_ID.`in`(selection.employmentIds))
                 .or(C.OWNER_ACCOUNT_ID.eq(selection.accountId))
         )

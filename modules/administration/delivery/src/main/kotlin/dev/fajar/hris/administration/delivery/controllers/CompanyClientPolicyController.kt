@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*
 class CompanyClientPolicyController(
     private val current: GetClientPolicy,
     private val revision: GetCompanyClientPolicyRevision,
+    private val settings: GetCompanyClientPolicySettings,
     private val save: SaveCompanyClientPolicy,
 ) {
     @GetMapping("/client-policy")
@@ -22,7 +23,7 @@ class CompanyClientPolicyController(
 
     @GetMapping("/settings/client-policy")
     fun settings(actor: Actor): CompanyClientPolicySettingsResponse =
-        CompanyClientPolicySettingsResponse(revision.execute(actor).response()?.toResponse())
+        settings.execute(actor).response().toResponse()
 
     @GetMapping("/settings/client-policy/revisions/{version}")
     fun revision(actor: Actor, @PathVariable version: Long): CompanyClientPolicyRevisionResponse =

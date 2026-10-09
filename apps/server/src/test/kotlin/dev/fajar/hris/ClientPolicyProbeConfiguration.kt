@@ -22,10 +22,12 @@ class ClientPolicyProbe {
 
     val beforeLock = AtomicReference<Barrier?>()
     val afterEffectiveRead = AtomicReference<Barrier?>()
+    val afterLatestRead = AtomicReference<Barrier?>()
 
     fun clear() {
         beforeLock.getAndSet(null)?.release?.countDown()
         afterEffectiveRead.getAndSet(null)?.release?.countDown()
+        afterLatestRead.getAndSet(null)?.release?.countDown()
     }
 }
 
@@ -40,6 +42,21 @@ class ClientPolicyProbeConfiguration {
         probe: ClientPolicyProbe,
     ): CompanyClientPolicyDataSource =
         object : CompanyClientPolicyDataSource by delegate {
+            override fun find(
+                companyId: UUID,
+                version: Long?,
+            ): CompanyClientPolicyRevisionsRecord? {
+                val row = delegate.find(companyId, version)
+                probe.afterLatestRead
+                    .get()
+                    ?.takeIf { it.company == companyId && version == null }
+                    ?.let {
+                        it.entered.countDown()
+                        check(it.release.await(5, TimeUnit.SECONDS))
+                    }
+                return row
+            }
+
             override fun lock(companyId: UUID, shared: Boolean) {
                 probe.beforeLock
                     .get()

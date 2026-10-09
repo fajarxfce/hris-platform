@@ -1,3 +1,6 @@
 package dev.fajar.hris.administration.delivery.responses
 
-data class CompanyClientPolicySettingsResponse(val latest: CompanyClientPolicyRevisionResponse?)
+data class CompanyClientPolicySettingsResponse(
+    val latest: CompanyClientPolicyRevisionResponse?,
+    val effective: ClientPolicyResponse,
+)

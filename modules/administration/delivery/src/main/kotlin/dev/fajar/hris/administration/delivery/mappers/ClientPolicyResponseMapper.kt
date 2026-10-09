@@ -7,6 +7,9 @@ fun MinimumClientBuilds.toResponse() = MinimumClientBuildsResponse(android, ios,
 
 fun MaintenanceWindow.toResponse() = MaintenanceWindowResponse(startsAt, endsAt)
 
+fun CompanyClientPolicySettings.toResponse() =
+    CompanyClientPolicySettingsResponse(latest?.toResponse(), effective.toResponse())
+
 fun CompanyClientPolicyRevision.toResponse() =
     CompanyClientPolicyRevisionResponse(
         version,

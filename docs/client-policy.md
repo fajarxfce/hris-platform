@@ -48,7 +48,7 @@ Sync checks the effective authorized collection selection, including the establi
 
 These routes require current `settings.manage`; writes additionally require recent authentication, or recent MFA when configured:
 
-- `GET /api/v1/companies/{companyId}/settings/client-policy` returns `{latest: ...}` or `{latest: null}`.
+- `GET /api/v1/companies/{companyId}/settings/client-policy` returns `{latest, effective}`. `latest` is the nullable configured head; `effective` has the public client-policy response shape evaluated at the same guarded read.
 - `GET /api/v1/companies/{companyId}/settings/client-policy/revisions/{version}` returns an immutable revision.
 - `PUT /api/v1/companies/{companyId}/settings/client-policy` requires `Idempotency-Key` and a complete replacement policy:
 
@@ -64,6 +64,8 @@ These routes require current `settings.manage`; writes additionally require rece
 ```
 
 Null activation means immediate activation after acquiring command guards. An explicit UTC activation must still be in the future when a new command is accepted and be within 365 days. Receipt replay remains valid after that date. Revisions use microsecond precision and optimistic versions. At most 10,000 immutable revisions are retained per company.
+
+The settings snapshot holds the shared policy guard through the latest-revision and effective-policy queries, including the next activation boundary. A concurrent write cannot mix a new effective policy with an old configured head. Access and applicable MFA assurance are rechecked after policy, company, membership, and account guards. A future latest revision can coexist with an older effective version, or with the default policy before the first activation. Clients should keep these concepts separate and use `effective.serverTime`/`validUntil` when displaying or refreshing the snapshot.
 
 The effective configuration is the highest revision whose activation time has arrived. To cancel or replace a previously scheduled revision, save a higher immediate revision with the desired current values. The old scheduled revision remains in history and cannot later supersede that newer revision. A maintenance interval includes its start, excludes its end, and lasts at most seven days; expired windows have no effect.
 

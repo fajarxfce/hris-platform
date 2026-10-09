@@ -211,6 +211,12 @@ class ApiContractHttpTest : PeopleApiFixture() {
         assertEquals("uuid", selectedCompanies["schema"]["items"]["format"].asString())
         assertFalse(selectedCompanies["explode"].asBoolean())
         val audit = paths["/api/v1/companies/{companyId}/audit-events"]["get"]
+        val settingsSchema =
+            document["components"]["schemas"]["CompanyClientPolicySettingsResponse"]
+        assertEquals(
+            setOf("latest", "effective"),
+            settingsSchema["properties"].properties().map { it.key }.toSet(),
+        )
         assertFalse(audit["x-hris-company-admission"].asBoolean())
         val auditParameters =
             audit["parameters"].iterator().asSequence().associateBy { it["name"].asString() }

@@ -14,6 +14,8 @@ Acceptance: policy effective dates, restricted settings/audit access, safe retry
 
 Versioned company client policy is implemented, including future activation, immutable history, paired build headers, bounded maintenance, and server admission for feature endpoints and sync selections. Settings writes retain idempotent receipts and current permission/recent-authentication checks. [Client policy](../client-policy.md) defines recovery, scheduling, and mobile behavior. These availability controls do not grant permissions or interrupt already admitted transactions/jobs.
 
+Settings reads return the configured head and effective policy in one guarded snapshot, with original/live access and MFA checks after waiting. Named revision reads retain the immutable history contract.
+
 
 ## Audit search
 

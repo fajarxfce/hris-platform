@@ -10,7 +10,15 @@ data class DocumentRetentionChangeResponse(
     val actorId: UUID,
     val recordedAt: Instant,
     val reason: String,
+    val retiredRevisionId: UUID?,
 )
 
 fun DocumentRetentionChange.toResponse() =
-    DocumentRetentionChangeResponse(state.toResponse(), action.name, actorId, recordedAt, reason)
+    DocumentRetentionChangeResponse(
+        state.toResponse(),
+        action.name,
+        actorId,
+        recordedAt,
+        reason,
+        retiredRevisionId,
+    )

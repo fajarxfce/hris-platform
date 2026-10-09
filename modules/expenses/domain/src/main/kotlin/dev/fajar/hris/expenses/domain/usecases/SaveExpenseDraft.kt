@@ -171,6 +171,9 @@ class SaveExpenseDraft(
                 val document = (foundDocument as Result.Success).value
                 if (
                     document == null ||
+                        revision.status ==
+                            dev.fajar.hris.documents.domain.entities.DocumentRevisionStatus
+                                .RETIRED ||
                         document.employmentId != employee.id ||
                         document.classification !=
                             dev.fajar.hris.documents.domain.entities.DocumentClassification.RECEIPT

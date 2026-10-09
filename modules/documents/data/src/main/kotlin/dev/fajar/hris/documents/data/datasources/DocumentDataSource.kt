@@ -121,4 +121,13 @@ interface DocumentDataSource {
     ): DocumentRevisionsRecord?
 
     fun publish(companyId: UUID, id: UUID, version: Long, revisionId: UUID): DocumentsRecord?
+
+    fun retire(companyId: UUID, revisionId: UUID, expectedVersion: Long): DocumentRevisionsRecord?
+
+    fun unpublish(
+        companyId: UUID,
+        documentId: UUID,
+        expectedVersion: Long,
+        revisionId: UUID,
+    ): DocumentsRecord?
 }

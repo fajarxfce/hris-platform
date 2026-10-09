@@ -49,6 +49,7 @@ fun classifyDocumentInventoryEntry(
                     DocumentRevisionStatus.CANCELLED,
                     DocumentRevisionStatus.REJECTED,
                     DocumentRevisionStatus.EXPIRED,
+                    DocumentRevisionStatus.RETIRED,
                 ) ||
             (reference.revisionStatus in ACTIVE_DOCUMENT_STATUSES &&
                 !reference.expiresAt.isAfter(now))

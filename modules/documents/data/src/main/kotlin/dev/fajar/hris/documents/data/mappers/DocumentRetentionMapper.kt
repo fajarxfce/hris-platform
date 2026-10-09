@@ -37,4 +37,5 @@ fun DocumentRetentionStateViewsRecord.toRetentionChange() =
         actorId,
         recordedAt.toInstant(),
         reason,
+        retiredRevisionId,
     )

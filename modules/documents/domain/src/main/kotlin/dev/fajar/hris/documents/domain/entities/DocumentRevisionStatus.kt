@@ -7,4 +7,5 @@ enum class DocumentRevisionStatus {
     REJECTED,
     CANCELLED,
     EXPIRED,
+    RETIRED,
 }

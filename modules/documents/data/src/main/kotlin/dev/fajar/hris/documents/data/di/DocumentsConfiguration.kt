@@ -451,4 +451,34 @@ class DocumentsConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
     ) = GetDocumentRetentionHistory(retention, documents, identities, transactions)
+
+    @Bean
+    fun retireDocumentRevision(
+        retention: DocumentRetentionRepository,
+        documents: DocumentRepository,
+        references: DocumentReferenceRepository,
+        cleanup: ObjectCleanupRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        RetireDocumentRevision(
+            retention,
+            documents,
+            references,
+            cleanup,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
 }

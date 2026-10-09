@@ -37,6 +37,8 @@ fun transitionDocumentRetention(
         return Result.Failed(Failure(FailureKind.CONFLICT, "document_retention_history_limit"))
     val next = state.copy(version = (state.version ?: -1) + 1)
     return when (action) {
+        DocumentRetentionAction.RETIRE ->
+            Result.Failed(Failure(FailureKind.VALIDATION, "document_retirement_command_required"))
         DocumentRetentionAction.ARCHIVE -> {
             if (state.archive != null)
                 Result.Failed(Failure(FailureKind.CONFLICT, "document_already_archived"))

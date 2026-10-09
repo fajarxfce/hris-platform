@@ -126,4 +126,8 @@ class PostgresDocumentRetentionDataSource(private val sql: DSLContext) :
             .limit(limit)
             .fetch()
     }
+
+    override fun insertRetirement(row: DocumentRetirementsRecord) {
+        sql.insertInto(DOCUMENT_RETIREMENTS).set(row).execute()
+    }
 }

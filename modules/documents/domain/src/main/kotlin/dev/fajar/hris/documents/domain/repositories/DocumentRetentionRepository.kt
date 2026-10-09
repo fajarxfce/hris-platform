@@ -27,6 +27,8 @@ interface DocumentRetentionRepository {
         expectedVersion: Long?,
     ): Result<MutationReceipt>
 
+    fun recordRetirement(companyId: UUID, retirement: DocumentRetirement): Result<Unit>
+
     fun state(companyId: UUID, documentId: UUID): Result<DocumentRetentionState?>
 
     fun saveState(

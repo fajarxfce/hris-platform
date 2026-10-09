@@ -96,4 +96,8 @@ interface DocumentRepository {
     ): Result<MutationReceipt>
 
     fun publish(companyId: UUID, document: Document, revisionId: UUID): Result<Unit>
+
+    fun retire(companyId: UUID, revisionId: UUID, expectedVersion: Long): Result<MutationReceipt>
+
+    fun unpublish(companyId: UUID, document: Document, revisionId: UUID): Result<Unit>
 }

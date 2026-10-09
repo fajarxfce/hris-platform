@@ -9,4 +9,5 @@ data class DocumentRetentionChange(
     val actorId: UUID,
     val recordedAt: Instant,
     val reason: String,
+    val retiredRevisionId: UUID? = null,
 )

@@ -286,4 +286,20 @@ class StoredDocumentRepository(private val source: DocumentDataSource) : Documen
                 if (it) Result.Success(Unit)
                 else Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
             }
+
+    override fun retire(
+        companyId: UUID,
+        revisionId: UUID,
+        expectedVersion: Long,
+    ): Result<MutationReceipt> =
+        safeDatabaseCall { source.retire(companyId, revisionId, expectedVersion)?.version }
+            .requireCurrentVersion()
+            .map { MutationReceipt(revisionId, it) }
+
+    override fun unpublish(companyId: UUID, document: Document, revisionId: UUID): Result<Unit> =
+        safeDatabaseCall {
+                source.unpublish(companyId, document.id, document.version, revisionId)?.version
+            }
+            .requireCurrentVersion()
+            .map { Unit }
 }

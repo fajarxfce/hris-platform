@@ -37,4 +37,6 @@ interface DocumentRetentionDataSource {
         after: Long?,
         limit: Int,
     ): List<DocumentRetentionStateViewsRecord>
+
+    fun insertRetirement(row: DocumentRetirementsRecord)
 }

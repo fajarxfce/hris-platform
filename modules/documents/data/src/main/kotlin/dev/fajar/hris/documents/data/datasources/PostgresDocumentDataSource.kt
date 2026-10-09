@@ -344,4 +344,43 @@ class PostgresDocumentDataSource(private val sql: DSLContext) : DocumentDataSour
             )
             .returning()
             .fetchOne()
+
+    override fun retire(
+        companyId: UUID,
+        revisionId: UUID,
+        expectedVersion: Long,
+    ): DocumentRevisionsRecord? {
+        val r = DOCUMENT_REVISIONS
+        return sql.update(r)
+            .set(r.STATUS, "RETIRED")
+            .set(r.VERSION, expectedVersion + 1)
+            .where(
+                r.COMPANY_ID.eq(companyId),
+                r.ID.eq(revisionId),
+                r.VERSION.eq(expectedVersion),
+                r.STATUS.eq("READY"),
+            )
+            .returning()
+            .fetchOne()
+    }
+
+    override fun unpublish(
+        companyId: UUID,
+        documentId: UUID,
+        expectedVersion: Long,
+        revisionId: UUID,
+    ): DocumentsRecord? {
+        val d = DOCUMENTS
+        return sql.update(d)
+            .setNull(d.CURRENT_REVISION_ID)
+            .set(d.VERSION, expectedVersion + 1)
+            .where(
+                d.COMPANY_ID.eq(companyId),
+                d.ID.eq(documentId),
+                d.VERSION.eq(expectedVersion),
+                d.CURRENT_REVISION_ID.eq(revisionId),
+            )
+            .returning()
+            .fetchOne()
+    }
 }

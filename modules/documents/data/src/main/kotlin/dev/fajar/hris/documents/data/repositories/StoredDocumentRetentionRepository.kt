@@ -100,6 +100,7 @@ class StoredDocumentRetentionRepository(private val source: DocumentRetentionDat
                             it.documentId = state.documentId
                             it.version = version
                             it.kind = change.action.name
+                            it.retiredRevisionId = change.retiredRevisionId
                             it.legalHold = state.legalHold
                             it.archivedAt = state.archive?.archivedAt?.atOffset(ZoneOffset.UTC)
                             it.policyId = state.archive?.policyId
@@ -124,6 +125,23 @@ class StoredDocumentRetentionRepository(private val source: DocumentRetentionDat
                 items,
                 if (rows.size > limit) requireNotNull(items.last().state.version).toString()
                 else null,
+            )
+        }
+
+    override fun recordRetirement(companyId: UUID, retirement: DocumentRetirement) =
+        safeDatabaseCall {
+            source.insertRetirement(
+                DocumentRetirementsRecord().also {
+                    it.companyId = companyId
+                    it.documentId = retirement.documentId
+                    it.revisionId = retirement.revisionId
+                    it.revisionVersion = retirement.revisionVersion
+                    it.retentionVersion = retirement.retentionVersion
+                    it.actorId = retirement.actorId
+                    it.retiredAt = retirement.retiredAt.atOffset(ZoneOffset.UTC)
+                    it.deleteAfter = retirement.deleteAfter.atOffset(ZoneOffset.UTC)
+                    it.reason = retirement.reason
+                }
             )
         }
 }

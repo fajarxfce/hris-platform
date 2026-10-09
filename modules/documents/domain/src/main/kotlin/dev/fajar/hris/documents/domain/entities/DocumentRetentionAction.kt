@@ -5,4 +5,5 @@ enum class DocumentRetentionAction {
     RESTORE,
     PLACE_HOLD,
     RELEASE_HOLD,
+    RETIRE,
 }

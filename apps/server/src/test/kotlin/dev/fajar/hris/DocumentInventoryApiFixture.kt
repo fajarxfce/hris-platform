@@ -1,27 +1,13 @@
 package dev.fajar.hris
 
-import dev.fajar.hris.core.database.PostgresTransactionRunner
-import dev.fajar.hris.core.database.datasources.PostgresChangeJournalDataSource
-import dev.fajar.hris.core.database.repositories.PostgresChangeJournalRepository
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.documents.domain.usecases.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.usecases.RequestJobCancellation
-import dev.fajar.hris.storage.data.datasources.PostgresObjectCleanupDataSource
-import dev.fajar.hris.storage.data.repositories.*
-import dev.fajar.hris.storage.domain.usecases.CollectObjectGarbage
-import java.time.*
 import java.util.UUID
-import org.jooq.SQLDialect
-import org.jooq.conf.Settings
-import org.jooq.impl.DSL
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.datasource.DriverManagerDataSource
-import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy
-import org.springframework.jdbc.support.JdbcTransactionManager
 
 abstract class DocumentInventoryApiFixture : DocumentValidationApiFixture() {
     @Autowired protected lateinit var inventoryAdvance: AdvanceDocumentInventory
@@ -116,39 +102,8 @@ abstract class DocumentInventoryApiFixture : DocumentValidationApiFixture() {
                 id,
             )
 
-    protected fun cleanupCollector(): CollectObjectGarbage {
-        database()
-            .execute(
-                """do ${'$'}${'$'} begin if not exists(select 1 from pg_roles where rolname='inventory_cleanup_test') then create role inventory_cleanup_test login password 'inventory-fixture-only' nosuperuser nobypassrls;end if;end ${'$'}${'$'}"""
-            )
-        database().execute("grant hris_worker_capability to inventory_cleanup_test")
-        database().execute("grant usage on schema public to inventory_cleanup_test")
-        database()
-            .execute(
-                "grant select,insert,update,delete on all tables in schema public to inventory_cleanup_test"
-            )
-        val source =
-            DriverManagerDataSource(
-                postgres.jdbcUrl,
-                "inventory_cleanup_test",
-                "inventory-fixture-only",
-            )
-        val sql =
-            DSL.using(
-                TransactionAwareDataSourceProxy(source),
-                SQLDialect.POSTGRES,
-                Settings().withExecuteLogging(false),
-            )
-        val queue = PostgresObjectCleanupRepository(PostgresObjectCleanupDataSource(sql))
-        val journal = PostgresChangeJournalRepository(PostgresChangeJournalDataSource(sql, json))
-        return CollectObjectGarbage(
-            queue,
-            PrivateObjectStorageRepository(storageProbe),
-            journal,
-            PostgresTransactionRunner(JdbcTransactionManager(source), JdbcTemplate(source)),
-            Clock.systemUTC(),
-        )
-    }
+    protected fun cleanupCollector() =
+        documentCleanupWorker(postgres.jdbcUrl, database(), storageProbe, json)
 
     protected fun due(revision: UUID) {
         database()

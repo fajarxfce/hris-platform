@@ -16,6 +16,7 @@ class DocumentRetentionController(
     private val policies: GetDocumentRetentionPolicies,
     private val policyHistory: GetDocumentRetentionPolicyHistory,
     private val change: ChangeDocumentRetention,
+    private val retire: RetireDocumentRevision,
     private val get: GetDocumentRetention,
     private val history: GetDocumentRetentionHistory,
 ) {
@@ -138,6 +139,25 @@ class DocumentRetentionController(
                 documentId,
                 DocumentRetentionAction.RELEASE_HOLD,
                 input.expectedVersion,
+                input.reason,
+            )
+            .response()
+            .toResponse()
+
+    @PostMapping("/revisions/{revisionId}/retire")
+    fun retire(
+        actor: Actor,
+        @PathVariable revisionId: UUID,
+        @RequestHeader("Idempotency-Key") operationId: UUID,
+        @RequestBody input: RetireDocumentRevisionRequest,
+    ) =
+        retire
+            .execute(
+                actor,
+                operationId,
+                revisionId,
+                input.expectedRevisionVersion,
+                input.expectedRetentionVersion,
                 input.reason,
             )
             .response()

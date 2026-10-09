@@ -10,4 +10,4 @@ Screens: role overview, report catalogue, filters, drill-down, export history.
 
 Acceptance: totals reconcile, row/resource isolation, historical definitions, export interruption, bounded memory, and expired export access.
 
-Company headcount is implemented with effective-date status/contract counts, a separate distinct-person total, current source/report permissions, and a single bounded aggregate response. [Reporting API](../reporting.md) documents the exact definition and historical limits. Group aggregation, other metrics, exports, and browser workflows remain planned.
+Company headcount is implemented with effective-date status/contract counts, a separate distinct-person total, current source/report permissions, a single bounded aggregate response, and a responsive dashboard report. [Reporting API](../reporting.md) documents the exact definition and historical limits. Group aggregation, other metrics, exports, and their browser workflows remain planned.

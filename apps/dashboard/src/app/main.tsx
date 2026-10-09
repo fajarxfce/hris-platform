@@ -7,6 +7,7 @@ import type { OperationId } from "../core/domain/identifiers";
 import { AppErrorBoundary } from "../core/presentation/components/app-error-boundary";
 import { createIdentityFeature } from "../features/identity/di/identity-feature";
 import { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
+import { createReportingFeature } from "../features/reporting/di/reporting-feature";
 import { Application } from "./application";
 import "./styles.css";
 
@@ -16,8 +17,10 @@ const queries = new QueryClient({
     mutations: { retry: false },
   },
 });
+const http = new FetchHttpClient(undefined, { clientBuild: __HRIS_DASHBOARD_BUILD__ });
+const reporting = createReportingFeature(http);
 const identity = new IdentityController(
-  createIdentityFeature(new FetchHttpClient(undefined, { clientBuild: __HRIS_DASHBOARD_BUILD__ })),
+  createIdentityFeature(http),
   () => crypto.randomUUID() as OperationId,
   () => queries.clear(),
 );
@@ -28,7 +31,7 @@ createRoot(root).render(
     <QueryClientProvider client={queries}>
       <BrowserRouter>
         <AppErrorBoundary locale="en" onReload={() => window.location.reload()}>
-          <Application identity={identity} />
+          <Application identity={identity} reporting={reporting} />
         </AppErrorBoundary>
       </BrowserRouter>
     </QueryClientProvider>

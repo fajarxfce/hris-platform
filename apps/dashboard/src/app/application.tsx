@@ -9,10 +9,18 @@ import { AppPreferences } from "../core/presentation/components/app-preferences"
 import { type Locale, messages } from "../core/presentation/i18n/messages";
 import { AuthScreen } from "../features/identity/presentation/bindings/auth-screen";
 import type { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
-import { OverviewPage } from "../features/overview/presentation/pages/overview-page";
+import type { ReportingUseCases } from "../features/reporting/presentation/contracts/reporting-use-cases";
 import { useIdentityLifecycle } from "./lifecycle/use-identity-lifecycle";
+import { portalNavigation } from "./routing/portal-navigation";
+import { PortalRoutes } from "./routing/portal-routes";
 
-export function Application({ identity }: { identity: IdentityController }) {
+export function Application({
+  identity,
+  reporting,
+}: {
+  identity: IdentityController;
+  reporting: ReportingUseCases;
+}) {
   const state = useSyncExternalStore(
     identity.subscribe,
     identity.getSnapshot,
@@ -26,7 +34,10 @@ export function Application({ identity }: { identity: IdentityController }) {
     document.documentElement.lang = locale;
   }, [locale]);
   return (
-    <FluentProvider theme={dark ? webDarkTheme : webLightTheme}>
+    <FluentProvider
+      theme={dark ? webDarkTheme : webLightTheme}
+      style={{ colorScheme: dark ? "dark" : "light" }}
+    >
       {state.session &&
       (state.stage === "ready" || state.stage === "loading" || state.stage === "unavailable") ? (
         <AppPortalShell
@@ -43,9 +54,13 @@ export function Application({ identity }: { identity: IdentityController }) {
           onThemeChanged={toggleTheme}
           onNavigationToggled={toggleNavigation}
           onSignOut={identity.signOut}
+          navigation={portalNavigation(state.access?.permissions ?? [], locale)}
         >
           {state.stage === "ready" ? (
-            <OverviewPage
+            <PortalRoutes
+              accountId={state.session.account.id}
+              access={state.access}
+              reporting={reporting}
               company={
                 state.session.companies.find((company) => company.id === state.companyId) ?? null
               }

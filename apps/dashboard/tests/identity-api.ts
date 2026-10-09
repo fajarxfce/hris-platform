@@ -8,7 +8,13 @@ export const companyIds = [
 /** Owned transport fixture: browser tests exercise production DI, mapping, controllers and views. */
 export async function installIdentityApi(
   page: Page,
-  options: { signedIn?: boolean; mfa?: boolean; failLogin?: string; noCompanies?: boolean } = {},
+  options: {
+    signedIn?: boolean;
+    mfa?: boolean;
+    failLogin?: string;
+    noCompanies?: boolean;
+    permissions?: readonly string[];
+  } = {},
 ) {
   let signedIn = options.signedIn ?? false;
   let verified = !options.mfa;
@@ -88,7 +94,10 @@ export async function installIdentityApi(
     }
     if (path.endsWith("/me/access")) {
       const companyId = path.split("/")[4];
-      return respond({ companyId, permissions: ["company.read", "people.read"] });
+      return respond({
+        companyId,
+        permissions: options.permissions ?? ["company.read", "people.read"],
+      });
     }
     if (path === "/api/v1/auth/mfa/enrollment") {
       return respond({

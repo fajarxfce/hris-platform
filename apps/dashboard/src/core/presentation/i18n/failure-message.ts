@@ -66,6 +66,10 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "The request timed out. Retry when the connection is available.",
     "Request melewati batas waktu. Coba lagi setelah koneksi tersedia.",
   ],
+  invalid_report_date: [
+    "Choose a valid date between 1900 and 2100.",
+    "Pilih tanggal yang valid antara tahun 1900 dan 2100.",
+  ],
   invalid_response: [
     "The service returned an invalid response. Please retry.",
     "Respons layanan tidak valid. Silakan coba lagi.",

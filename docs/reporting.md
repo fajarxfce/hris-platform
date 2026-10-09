@@ -23,4 +23,6 @@ The report returns aggregates only, without names, account identities, or employ
 
 The result is bounded to fixed scalar counts. The database query uses effective-date indexes, executes under normal company RLS and transaction timeouts, and does not materialize an employee directory in application memory. `invalid_report_date` is a stable localizable validation code. Technical exceptions use the existing sanitized database failure contract. Responses are `no-store`; any client cache must remain account/company scoped.
 
-Group aggregation, other source metrics, immutable export jobs, drill-down, and report screens are subsequent capabilities. A client must not sum `persons` across companies and label it a unique group headcount.
+The dashboard exposes this report at `/reports/headcount` with an applied date filter, localized counts, and request ownership scoped to account/company. See [dashboard](dashboard.md) for browser behavior and checks.
+
+Group aggregation, other source metrics, immutable export jobs, and drill-down are subsequent capabilities. A client must not sum `persons` across companies and label it a unique group headcount.

@@ -1,10 +1,12 @@
 import { Avatar, Select } from "@fluentui/react-components";
-import { Home20Regular, Navigation20Regular, SignOut20Regular } from "@fluentui/react-icons";
+import { Navigation20Regular, SignOut20Regular } from "@fluentui/react-icons";
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import { type Locale, messages } from "../i18n/messages";
 import { AppButton } from "./app-button";
 import { AppPreferences } from "./app-preferences";
+
+export type AppNavigationItem = Readonly<{ to: string; label: string; icon: ReactNode }>;
 
 type Props = {
   locale: Locale;
@@ -18,6 +20,7 @@ type Props = {
   onThemeChanged: () => void;
   onNavigationToggled: () => void;
   onSignOut: () => void;
+  navigation: readonly AppNavigationItem[];
   children: ReactNode;
 };
 
@@ -70,16 +73,21 @@ export function AppPortalShell(props: Props) {
       </header>
       <aside className="app-sidebar">
         <nav id="app-main-navigation" aria-label={text.navigation}>
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) => `app-nav-item${isActive ? " app-nav-item-selected" : ""}`}
-            title={text.overview}
-            aria-label={text.overview}
-          >
-            <Home20Regular />
-            <span>{text.overview}</span>
-          </NavLink>
+          {props.navigation.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end
+              className={({ isActive }) =>
+                `app-nav-item${isActive ? " app-nav-item-selected" : ""}`
+              }
+              title={item.label}
+              aria-label={item.label}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
         </nav>
       </aside>
       <main id="main-content" tabIndex={-1} className="app-workspace">

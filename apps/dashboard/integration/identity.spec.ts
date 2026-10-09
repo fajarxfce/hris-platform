@@ -14,7 +14,7 @@ function authenticatorCode(secret: string): string {
   return ((digest.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).toString().padStart(6, "0");
 }
 
-test("real API sessions, MFA, company access, locale errors and logout", async ({
+test("real API sessions, MFA, company reports, locale errors and logout", async ({
   page,
   context,
 }) => {
@@ -63,6 +63,37 @@ test("real API sessions, MFA, company access, locale errors and logout", async (
   await expect(page.getByRole("main")).not.toContainText("Browser North");
   await page.getByRole("combobox", { name: "Language" }).selectOption("id");
   await expect(page.getByRole("heading", { name: "Ringkasan" })).toBeVisible();
+  const csrf = (await (await context.request.get("/api/v1/auth/csrf")).json()) as {
+    headerName: string;
+    token: string;
+  };
+  const created = await context.request.post(`/api/v1/companies/${companies[1]}/employees`, {
+    headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
+    data: {
+      id: randomUUID(),
+      employeeNumber: "BROWSER-REPORT",
+      person: { id: randomUUID(), legalName: "Report fixture employee", nationality: "ID" },
+      terms: {
+        effectiveFrom: "2026-01-01",
+        startDate: "2026-01-01",
+        status: "ACTIVE",
+        contract: "PERMANENT",
+      },
+      reason: "Browser report fixture",
+    },
+  });
+  expect(created.status()).toBe(200);
+  await page.getByRole("link", { name: "Laporan", exact: true }).click();
+  await page.getByLabel("Tanggal laporan", { exact: true }).fill("2026-10-01");
+  await page.getByRole("button", { name: "Terapkan", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Headcount" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Hubungan kerja", exact: true })).toContainText(
+    "1",
+  );
+  await expect(page.getByRole("region", { name: "Jumlah orang", exact: true })).toContainText("1");
+  await expect(page.getByRole("region", { name: "Status kerja", exact: true })).toContainText(
+    "Aktif",
+  );
   const signedOut = page.waitForResponse(
     (response) =>
       new URL(response.url()).pathname === "/api/v1/auth/logout" &&

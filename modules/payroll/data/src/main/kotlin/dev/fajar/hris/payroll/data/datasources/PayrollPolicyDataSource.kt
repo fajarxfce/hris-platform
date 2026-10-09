@@ -6,6 +6,8 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface PayrollPolicyDataSource {
+    fun revision(company: UUID, revision: Long): PayrollPolicyRow?
+
     fun lock(company: UUID, shared: Boolean)
 
     fun current(company: UUID): PayrollPolicyRow?

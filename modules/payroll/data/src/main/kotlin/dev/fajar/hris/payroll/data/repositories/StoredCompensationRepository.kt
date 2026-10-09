@@ -16,6 +16,14 @@ class StoredCompensationRepository(
     private val source: CompensationDataSource,
     private val json: ObjectMapper,
 ) : CompensationRepository {
+    override fun revision(
+        companyId: UUID,
+        employeeId: UUID,
+        revision: Long,
+    ): Result<EmployeeCompensation?> = safeDatabaseCall {
+        source.revision(companyId, employeeId, revision)?.toCompensation(json)
+    }
+
     override fun current(companyId: UUID, employeeId: UUID): Result<EmployeeCompensation?> =
         safeDatabaseCall {
             source.current(companyId, employeeId)?.toCompensation(json)

@@ -5,6 +5,8 @@ import dev.fajar.hris.schema.tables.records.*
 import java.util.UUID
 
 interface PayrollTaxOpeningDataSource {
+    fun revision(company: UUID, employee: UUID, year: Int, revision: Long): PayrollTaxOpeningRow?
+
     fun find(company: UUID, employee: UUID, year: Int): PayrollTaxOpeningRow?
 
     fun history(

@@ -2,6 +2,7 @@ package dev.fajar.hris.jobs.domain.entities
 
 enum class JobKind {
     WORKFORCE_CLOSE,
+    PAYROLL_CALCULATE,
     LEAVE_ACCRUAL,
     LEAVE_YEAR_CLOSE,
     DOCUMENT_VALIDATE,

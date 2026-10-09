@@ -6,6 +6,16 @@ import java.time.*
 import java.util.UUID
 
 interface PayrollPeriodRepository {
+    fun transition(
+        company: UUID,
+        period: PayrollPeriod,
+        status: PayrollPeriodStatus,
+        runId: UUID?,
+        actor: UUID,
+        at: Instant,
+        reason: String,
+    ): Result<MutationReceipt>
+
     fun find(company: UUID, id: UUID): Result<PayrollPeriod?>
 
     fun active(company: UUID, month: YearMonth): Result<Boolean>

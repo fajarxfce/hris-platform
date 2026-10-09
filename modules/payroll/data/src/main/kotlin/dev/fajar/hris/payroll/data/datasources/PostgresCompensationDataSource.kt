@@ -10,6 +10,14 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresCompensationDataSource(private val sql: DSLContext) : CompensationDataSource {
+    override fun revision(company: UUID, employee: UUID, revision: Long): CompensationRow? =
+        sql.select(C.VERSION, *R.fields())
+            .from(C)
+            .join(R)
+            .on(R.COMPANY_ID.eq(C.COMPANY_ID).and(R.EMPLOYMENT_ID.eq(C.EMPLOYMENT_ID)))
+            .where(C.COMPANY_ID.eq(company), C.EMPLOYMENT_ID.eq(employee), R.REVISION.eq(revision))
+            .fetchOne { CompensationRow(it.get(C.VERSION)!!, it.into(R)) }
+
     override fun current(company: UUID, employee: UUID): CompensationRow? =
         sql.select(C.VERSION, *R.fields())
             .from(C)

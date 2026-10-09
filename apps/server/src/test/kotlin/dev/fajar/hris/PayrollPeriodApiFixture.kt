@@ -143,7 +143,7 @@ abstract class PayrollPeriodApiFixture : PayrollApiFixture() {
                 UUID.randomUUID(),
             )
         val id = UUID.fromString(payrollBody(result)["id"].asString())
-        val lease = claimWork().single { it.job.request.id == id }
+        val lease = claimPayrollJobs(JobKind.WORKFORCE_CLOSE).single { it.job.request.id == id }
         if (finish) {
             var done = false
             repeat(lease.job.request.totalItems) {
@@ -222,7 +222,7 @@ abstract class PayrollPeriodApiFixture : PayrollApiFixture() {
             key,
         )
 
-    private fun claimWork(): List<JobLease> {
+    protected fun claimPayrollJobs(kind: JobKind, limit: Int = 2): List<JobLease> {
         database()
             .execute(
                 """DO $$ BEGIN IF NOT EXISTS(SELECT 1 FROM pg_roles WHERE rolname='hris_payroll_fixture_worker') THEN CREATE ROLE hris_payroll_fixture_worker LOGIN PASSWORD 'fixture-worker-only' INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS; END IF; END $$"""
@@ -256,7 +256,7 @@ abstract class PayrollPeriodApiFixture : PayrollApiFixture() {
                     clock,
                     JobRetryPolicy(),
                 )
-                .execute(UUID.randomUUID(), 2, 60, setOf(JobKind.WORKFORCE_CLOSE))
+                .execute(UUID.randomUUID(), limit, 120, setOf(kind))
         assertTrue(result is Result.Success, result.toString())
         return (result as Result.Success).value
     }

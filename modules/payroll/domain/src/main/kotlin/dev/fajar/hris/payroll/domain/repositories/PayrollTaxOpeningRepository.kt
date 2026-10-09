@@ -5,6 +5,13 @@ import dev.fajar.hris.payroll.domain.entities.*
 import java.util.UUID
 
 interface PayrollTaxOpeningRepository {
+    fun revision(
+        company: UUID,
+        employee: UUID,
+        year: Int,
+        revision: Long,
+    ): Result<PayrollTaxOpening?>
+
     fun find(company: UUID, employee: UUID, year: Int): Result<PayrollTaxOpening?>
 
     fun history(

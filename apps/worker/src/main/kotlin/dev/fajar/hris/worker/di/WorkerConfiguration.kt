@@ -5,6 +5,7 @@ import dev.fajar.hris.documents.domain.usecases.*
 import dev.fajar.hris.identity.domain.usecases.ResolveActor
 import dev.fajar.hris.jobs.domain.usecases.*
 import dev.fajar.hris.leave.domain.usecases.*
+import dev.fajar.hris.payroll.domain.usecases.*
 import dev.fajar.hris.people.domain.usecases.*
 import dev.fajar.hris.worker.runtime.*
 import dev.fajar.hris.worker.tasks.*
@@ -194,4 +195,11 @@ class WorkerConfiguration {
         advance: AdvanceLeaveYearCloseBatch,
         abort: AbortLeaveBatch,
     ): JobTask = LeaveYearCloseTask(resolve, advance, abort)
+
+    @Bean
+    fun payrollCalculationTask(
+        resolve: ResolveActor,
+        advance: AdvancePayrollCalculation,
+        abort: AbortPayrollCalculation,
+    ): JobTask = PayrollCalculationTask(resolve, advance, abort)
 }

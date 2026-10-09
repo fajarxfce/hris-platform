@@ -60,4 +60,6 @@ A policy head change stops unprocessed work; a new batch explicitly selects the 
 
 Batch details include the current job state, counts, attempts, and paginated employee outcomes. If process retries are exhausted before feature cleanup, the job can be terminal while the batch header still says `RUNNING`; the job state controls recovery. General job cancellation is acknowledged by the feature worker. Reads require current `leave.read`; a self-service employee cannot browse company batch results. A metadata-only final step can complete already-recorded work after a policy edit; it makes no new balance changes.
 
-Automatic scheduling, carry-bucket expiry dates, and payroll cutoff integration remain subsequent work. Current expiry occurs at explicit year closing; no expiry date or statutory entitlement is invented by a default policy.
+Payroll cutoffs are integrated into request submission, decisions, withdrawal, and cancellation, including available cancellation actions. Pending decisions on selected actual dates block a payroll start; active/calculated payroll freezes those absence facts until explicit abandonment. See [cutoff and recovery semantics](../payroll-workflows.md#source-cutoffs).
+
+Automatic scheduling and carry-bucket expiry dates remain subsequent work. Current expiry occurs at explicit year closing; no expiry date or statutory entitlement is invented by a default policy.

@@ -16,6 +16,7 @@ fun PayrollPeriodsRecord.toPeriod() =
         createdAt.toInstant(),
         PayrollPeriodStatus.valueOf(status),
         version,
+        currentRunId,
     )
 
 fun PayrollPeriodChangesRecord.toChange() =
@@ -25,6 +26,7 @@ fun PayrollPeriodChangesRecord.toChange() =
         actorId,
         recordedAt.toInstant(),
         reason,
+        runId,
     )
 
 fun PayrollPeriodMemberRow.toMember() =

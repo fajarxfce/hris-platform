@@ -6,6 +6,8 @@ import java.time.YearMonth
 import java.util.UUID
 
 interface PayrollPolicyRepository {
+    fun revision(companyId: UUID, revision: Long): Result<PayrollPolicy?>
+
     fun lock(companyId: UUID, shared: Boolean = false): Result<Unit>
 
     fun current(companyId: UUID): Result<PayrollPolicy?>

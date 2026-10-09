@@ -6,6 +6,7 @@ import dev.fajar.hris.identity.data.di.IdentityConfiguration
 import dev.fajar.hris.jobs.data.di.JobsConfiguration
 import dev.fajar.hris.leave.data.di.LeaveConfiguration
 import dev.fajar.hris.organization.data.di.OrganizationConfiguration
+import dev.fajar.hris.payroll.data.di.PayrollConfiguration
 import dev.fajar.hris.people.data.di.PeopleConfiguration
 import dev.fajar.hris.workforce.data.di.WorkforceConfiguration
 import org.springframework.boot.WebApplicationType
@@ -27,6 +28,7 @@ import org.springframework.context.annotation.Import
     ApprovalConfiguration::class,
     WorkforceConfiguration::class,
     LeaveConfiguration::class,
+    PayrollConfiguration::class,
 )
 class WorkerApplication
 

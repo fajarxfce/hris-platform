@@ -1,0 +1,66 @@
+package dev.fajar.hris.payroll.domain.usecases
+
+import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.entities.*
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
+import dev.fajar.hris.payroll.domain.entities.*
+import dev.fajar.hris.payroll.domain.policies.*
+import dev.fajar.hris.payroll.domain.repositories.*
+import java.time.*
+
+class AbortPayrollCalculation(
+    private val runs: PayrollRunRepository,
+    private val policies: PayrollPolicyRepository,
+    private val jobs: JobRepository,
+    private val journal: ChangeJournalRepository,
+    private val transactions: TransactionRunner,
+) {
+    fun execute(lease: JobLease, failure: Failure): Result<Unit> {
+        val request = lease.job.request
+        if (request.kind != JobKind.PAYROLL_CALCULATE)
+            return Result.Failed(Failure(FailureKind.FORBIDDEN, "job_scope_mismatch"))
+        val actor =
+            Actor(
+                request.actorId,
+                request.companyId,
+                emptySet(),
+                request.authenticatedAt,
+                request.correlationId,
+            )
+        return transactions.run(actor) {
+            val leased = jobs.lockLease(lease)
+            if (leased is Result.Failed) return@run leased
+            val job = (leased as Result.Success).value ?: return@run Result.Success(Unit)
+            val guard = policies.lock(request.companyId)
+            if (guard is Result.Failed) return@run guard
+            val found = runs.forJob(request.companyId, request.id, lock = true)
+            if (found is Result.Failed) return@run found
+            val run = (found as Result.Success).value
+            if (run != null && run.status == PayrollRunStatus.PROCESSING) {
+                val stopped = runs.transition(request.companyId, run, PayrollRunStatus.STOPPED)
+                if (stopped is Result.Failed) return@run stopped
+            }
+            val code = if (job.cancellationRequested) "job_cancelled" else failure.code
+            jobs
+                .complete(
+                    lease,
+                    if (job.cancellationRequested) JobStatus.CANCELLED else JobStatus.FAILED,
+                    code,
+                )
+                .flatMap { changed ->
+                    if (!changed) Result.Failed(Failure(FailureKind.CONFLICT, "job_lease_lost"))
+                    else
+                        journal.record(
+                            actor,
+                            ChangeRecord(
+                                "payroll_run",
+                                run?.id ?: request.id,
+                                "payroll.calculation_stopped",
+                                mapOf("jobId" to request.id.toString(), "code" to code),
+                            ),
+                        )
+                }
+        }
+    }
+}

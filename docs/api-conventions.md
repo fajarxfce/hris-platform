@@ -203,3 +203,17 @@ All paths below are under `/api/v1/companies/{companyId}/workforce/overtime`. Mu
 - `GET /?employeeId=...&from=yyyy-MM-dd&until=yyyy-MM-dd&status=PENDING&after=uuid&limit=50`: at most 62 dates and 200 results. Non-administrative lists require an authorized employee scope. Assigned approvers use the approval inbox and exact request URL.
 
 Stable failures include `overtime_overlap`, `overtime_month_capacity`, `overtime_not_ended`, `overtime_outside_requested_window`, `overtime_resolution_required`, `work_period_locked`, and `stale_employment_version`. Error messages are translated by the client. A plan has zero approved minutes; only a completed approval contributes time to a closing snapshot. API interval limits are resource/validation bounds, not a statutory overtime rate rule.
+
+
+Durable payroll calculation:
+
+- `POST /companies/{companyId}/payroll/periods/{periodId}/runs`: `id`, `incomeDueDate`, `expectedPeriodVersion`, `expectedWorkPeriodVersion`, `expectedPolicyVersion`, `reviewReference`, and `reason`. Requires `payroll.calculate`, recent authentication/MFA, and an idempotency key. Returns a mutation receipt identifying the durable run.
+- `GET /companies/{companyId}/payroll/periods/{periodId}/runs`: numeric run-number `after` and bounded `limit`.
+- `GET /companies/{companyId}/payroll/runs/{id}`: `run`, `attempts`, `job`, and paginated `results`. Use numeric employee ordinal `after` and bounded `limit`. Result summaries omit facts and full financial arrays.
+- `GET /companies/{companyId}/payroll/runs/{id}/employees/{employeeId}`: retained `item`, nullable `facts`, and nullable `calculation`. Failed readiness checks may have no complete facts; failed calculations have no financial result.
+- `POST /companies/{companyId}/payroll/runs/{id}/resume`: `expectedVersion`, `reason`, and an idempotency key. The original author must renew current permission/assurance; only a terminal failed/cancelled job can resume.
+- `POST /companies/{companyId}/payroll/runs/{id}/abandon`: `expectedVersion`, `expectedPeriodVersion`, `reason`, and an idempotency key. Releases source cutoffs and reopens the period after its current job is terminal. Previous results remain retained.
+
+Run status is `PROCESSING`, `STOPPED`, `CALCULATED`, or `ABANDONED`. Periods additionally expose `currentRunId`; period changes expose `runId`. The job has one progress item per employee plus a final metadata step. Run counters distinguish processed, succeeded, and failed employees. Job metadata does not expose request credentials or lease ownership. Reads require `payroll.read`, `payroll.calculate`, or `payroll.review` in the current company. Employee self-service permission does not expose company payroll runs.
+
+An outcome failure is an unlocalized `{kind, code, fields, parameters}` object. Examples include `payroll_compensation_required`, `payroll_input_verification_required`, `payroll_tax_opening_verification_required`, and `payroll_day_review_required` with `workDate`/`half` parameters. Starting may return `payroll_leave_decision_pending`, `stale_policy_version`, or `payroll_tax_month_review_required`. Source changes after cutoff return `payroll_period_frozen`. The run's `taxMonth` equals `earningsMonth` under its reviewed same-month income liability; `plannedPaymentDate` remains separate. See [calculation and recovery semantics](payroll-workflows.md).

@@ -9,4 +9,5 @@ data class PayrollPeriodChangeResponse(
     val actorId: UUID,
     val recordedAt: Instant,
     val reason: String,
+    val runId: UUID?,
 )

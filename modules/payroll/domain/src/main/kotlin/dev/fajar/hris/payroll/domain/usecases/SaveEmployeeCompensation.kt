@@ -8,6 +8,7 @@ import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.payroll.domain.entities.*
 import dev.fajar.hris.payroll.domain.policies.*
 import dev.fajar.hris.payroll.domain.repositories.*
+import dev.fajar.hris.payroll.domain.repositories.PayrollCutoffRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import java.time.*
 import java.util.UUID
@@ -24,6 +25,7 @@ class SaveEmployeeCompensation(
     private val transactions: TransactionRunner,
     private val security: IdentitySecurityPolicy,
     private val clock: Clock,
+    private val cutoffs: PayrollCutoffRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -96,6 +98,11 @@ class SaveEmployeeCompensation(
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
+            val frozen = cutoffs.frozenFrom(company, employeeId, effectiveFrom)
+            if (frozen is Result.Failed) return@run frozen
+            if ((frozen as Result.Success).value)
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "payroll_period_frozen"))
+
             val companyResult = companies.find(company)
             if (companyResult is Result.Failed) return@run companyResult
             val settings =

@@ -16,6 +16,15 @@ class StoredPayrollTaxOpeningRepository(
     private val source: PayrollTaxOpeningDataSource,
     private val json: ObjectMapper,
 ) : PayrollTaxOpeningRepository {
+    override fun revision(
+        company: UUID,
+        employee: UUID,
+        year: Int,
+        revision: Long,
+    ): Result<PayrollTaxOpening?> = safeDatabaseCall {
+        source.revision(company, employee, year, revision)?.toOpening(json)
+    }
+
     override fun find(company: UUID, employee: UUID, year: Int): Result<PayrollTaxOpening?> =
         safeDatabaseCall {
             source.find(company, employee, year)?.toOpening(json)

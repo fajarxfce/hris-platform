@@ -12,6 +12,7 @@ import dev.fajar.hris.leave.data.repositories.*
 import dev.fajar.hris.leave.domain.repositories.*
 import dev.fajar.hris.leave.domain.usecases.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.payroll.domain.repositories.PayrollCutoffRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.storage.domain.repositories.ObjectStorageRepository
 import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
@@ -242,6 +243,7 @@ class LeaveConfiguration {
         clock: Clock,
         documents: DocumentRepository,
         references: DocumentReferenceRepository,
+        cutoffs: PayrollCutoffRepository,
     ) =
         SubmitLeaveRequest(
             requests,
@@ -259,6 +261,7 @@ class LeaveConfiguration {
             clock,
             documents,
             references,
+            cutoffs,
         )
 
     @Bean
@@ -274,6 +277,7 @@ class LeaveConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        cutoffs: PayrollCutoffRepository,
     ) =
         DecideLeaveRequest(
             requests,
@@ -287,6 +291,7 @@ class LeaveConfiguration {
             journal,
             transactions,
             clock,
+            cutoffs,
         )
 
     @Bean
@@ -301,6 +306,7 @@ class LeaveConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        cutoffs: PayrollCutoffRepository,
     ) =
         WithdrawLeaveRequest(
             requests,
@@ -313,6 +319,7 @@ class LeaveConfiguration {
             journal,
             transactions,
             clock,
+            cutoffs,
         )
 
     @Bean
@@ -328,6 +335,7 @@ class LeaveConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        cutoffs: PayrollCutoffRepository,
     ) =
         RequestLeaveCancellation(
             requests,
@@ -341,6 +349,7 @@ class LeaveConfiguration {
             journal,
             transactions,
             clock,
+            cutoffs,
         )
 
     @Bean
@@ -353,6 +362,7 @@ class LeaveConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        cutoffs: PayrollCutoffRepository,
     ) =
         GetLeaveRequest(
             requests,
@@ -363,6 +373,7 @@ class LeaveConfiguration {
             identities,
             transactions,
             clock,
+            cutoffs,
         )
 
     @Bean

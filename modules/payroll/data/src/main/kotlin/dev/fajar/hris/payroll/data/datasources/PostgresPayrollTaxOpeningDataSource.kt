@@ -10,6 +10,26 @@ import org.jooq.impl.DSL
 
 class PostgresPayrollTaxOpeningDataSource(private val sql: DSLContext) :
     PayrollTaxOpeningDataSource {
+    override fun revision(
+        company: UUID,
+        employee: UUID,
+        year: Int,
+        revision: Long,
+    ): PayrollTaxOpeningRow? =
+        sql.select(H.EMPLOYMENT_ID, H.TAX_YEAR, *R.fields())
+            .from(H)
+            .join(R)
+            .on(R.COMPANY_ID.eq(H.COMPANY_ID).and(R.OPENING_ID.eq(H.ID)))
+            .where(
+                H.COMPANY_ID.eq(company),
+                H.EMPLOYMENT_ID.eq(employee),
+                H.TAX_YEAR.eq(year),
+                R.REVISION.eq(revision),
+            )
+            .fetchOne {
+                PayrollTaxOpeningRow(it.get(H.EMPLOYMENT_ID)!!, it.get(H.TAX_YEAR)!!, it.into(R))
+            }
+
     override fun find(company: UUID, employee: UUID, year: Int): PayrollTaxOpeningRow? =
         sql.select(H.EMPLOYMENT_ID, H.TAX_YEAR, *R.fields())
             .from(H)

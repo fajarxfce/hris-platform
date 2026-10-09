@@ -16,10 +16,11 @@ fun PayrollPeriod.toResponse() =
         createdAt,
         status.name,
         version,
+        currentRunId,
     )
 
 fun PayrollPeriodChange.toResponse() =
-    PayrollPeriodChangeResponse(version, status.name, actorId, recordedAt, reason)
+    PayrollPeriodChangeResponse(version, status.name, actorId, recordedAt, reason, runId)
 
 fun PayrollPeriodMember.toResponse() =
     PayrollPeriodMemberResponse(employeeId, inputVersion, inputStatus?.name)

@@ -8,12 +8,14 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 
 class PayrollPeriodProbe {
+    @Volatile var omitTransition = false
     @Volatile var omitMembers = false
     @Volatile var omitPeriodChange = false
     @Volatile var omitInputRevision = false
     @Volatile var beforeInputAppend: ((PayrollInputRevisionsRecord) -> Unit)? = null
 
     fun clear() {
+        omitTransition = false
         omitMembers = false
         omitPeriodChange = false
         omitInputRevision = false
@@ -32,6 +34,16 @@ class PayrollPeriodProbeConfiguration {
         probe: PayrollPeriodProbe,
     ): PayrollPeriodDataSource =
         object : PayrollPeriodDataSource by source {
+            override fun transition(
+                company: java.util.UUID,
+                id: java.util.UUID,
+                version: Long,
+                status: String,
+                runId: java.util.UUID?,
+            ): Long? =
+                if (probe.omitTransition) version + 1
+                else source.transition(company, id, version, status, runId)
+
             override fun insertMembers(rows: List<PayrollPeriodMembersRecord>) {
                 if (!probe.omitMembers) source.insertMembers(rows)
             }

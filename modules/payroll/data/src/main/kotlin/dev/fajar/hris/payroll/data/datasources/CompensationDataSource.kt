@@ -6,6 +6,8 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface CompensationDataSource {
+    fun revision(company: UUID, employee: UUID, revision: Long): CompensationRow?
+
     fun current(company: UUID, employee: UUID): CompensationRow?
 
     fun effective(company: UUID, employee: UUID, month: LocalDate): CompensationRow?

@@ -12,6 +12,37 @@ import java.util.UUID
 
 class StoredPayrollPeriodRepository(private val source: PayrollPeriodDataSource) :
     PayrollPeriodRepository {
+    override fun transition(
+        company: UUID,
+        period: PayrollPeriod,
+        status: PayrollPeriodStatus,
+        runId: UUID?,
+        actor: UUID,
+        at: Instant,
+        reason: String,
+    ): Result<MutationReceipt> =
+        safeDatabaseCall {
+                source.transition(company, period.id, period.version, status.name, runId)
+            }
+            .requireCurrentVersion()
+            .flatMap { version ->
+                safeDatabaseCall {
+                    source.append(
+                        PayrollPeriodChangesRecord().also {
+                            it.companyId = company
+                            it.periodId = period.id
+                            it.revision = version
+                            it.status = status.name
+                            it.runId = runId
+                            it.actorId = actor
+                            it.recordedAt = at.atOffset(ZoneOffset.UTC)
+                            it.reason = reason
+                        }
+                    )
+                    MutationReceipt(period.id, version)
+                }
+            }
+
     override fun find(company: UUID, id: UUID): Result<PayrollPeriod?> = safeDatabaseCall {
         source.find(company, id)?.toPeriod()
     }

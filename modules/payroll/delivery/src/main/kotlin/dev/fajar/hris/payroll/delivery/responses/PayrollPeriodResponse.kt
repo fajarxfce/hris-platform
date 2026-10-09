@@ -14,4 +14,5 @@ data class PayrollPeriodResponse(
     val createdAt: Instant,
     val status: String,
     val version: Long,
+    val currentRunId: UUID?,
 )

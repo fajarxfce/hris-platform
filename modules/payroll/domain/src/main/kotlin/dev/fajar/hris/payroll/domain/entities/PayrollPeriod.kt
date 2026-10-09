@@ -13,6 +13,7 @@ data class PayrollPeriod(
     val createdAt: Instant,
     val status: PayrollPeriodStatus,
     val version: Long,
+    val currentRunId: UUID? = null,
 ) {
     val plannedPaymentMonth: YearMonth
         get() = YearMonth.from(plannedPaymentDate)

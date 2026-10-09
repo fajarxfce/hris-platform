@@ -6,6 +6,8 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface PayrollPeriodDataSource {
+    fun transition(company: UUID, id: UUID, version: Long, status: String, runId: UUID?): Long?
+
     fun find(company: UUID, id: UUID): PayrollPeriodsRecord?
 
     fun active(company: UUID, month: LocalDate): Boolean

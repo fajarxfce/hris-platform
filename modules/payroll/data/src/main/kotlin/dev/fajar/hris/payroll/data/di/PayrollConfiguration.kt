@@ -3,6 +3,7 @@ package dev.fajar.hris.payroll.data.di
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.payroll.data.datasources.*
 import dev.fajar.hris.payroll.data.repositories.*
@@ -129,6 +130,7 @@ class PayrollConfiguration {
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
+        cutoffs: PayrollCutoffRepository,
     ) =
         SaveEmployeeCompensation(
             policies,
@@ -142,6 +144,7 @@ class PayrollConfiguration {
             transactions,
             security,
             clock,
+            cutoffs,
         )
 
     @Bean
@@ -155,6 +158,7 @@ class PayrollConfiguration {
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
+        cutoffs: PayrollCutoffRepository,
     ) =
         SavePayrollPolicy(
             policies,
@@ -166,6 +170,7 @@ class PayrollConfiguration {
             transactions,
             security,
             clock,
+            cutoffs,
         )
 
     @Bean
@@ -191,6 +196,7 @@ class PayrollConfiguration {
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
+        cutoffs: PayrollCutoffRepository,
     ) =
         SavePayrollTaxOpening(
             openings,
@@ -204,6 +210,7 @@ class PayrollConfiguration {
             transactions,
             security,
             clock,
+            cutoffs,
         )
 
     @Bean
@@ -219,6 +226,7 @@ class PayrollConfiguration {
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
+        cutoffs: PayrollCutoffRepository,
     ) =
         VerifyPayrollTaxOpening(
             openings,
@@ -232,6 +240,7 @@ class PayrollConfiguration {
             transactions,
             security,
             clock,
+            cutoffs,
         )
 
     @Bean
@@ -364,6 +373,7 @@ class PayrollConfiguration {
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
+        cutoffs: PayrollCutoffRepository,
     ) =
         SavePayrollInput(
             inputs,
@@ -378,6 +388,7 @@ class PayrollConfiguration {
             transactions,
             security,
             clock,
+            cutoffs,
         )
 
     @Bean
@@ -394,6 +405,7 @@ class PayrollConfiguration {
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
+        cutoffs: PayrollCutoffRepository,
     ) =
         VerifyPayrollInput(
             inputs,
@@ -408,6 +420,7 @@ class PayrollConfiguration {
             transactions,
             security,
             clock,
+            cutoffs,
         )
 
     @Bean
@@ -469,4 +482,204 @@ class PayrollConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
     ) = GetPayrollWorkSource(sources, policies, companies, members, identities, transactions)
+
+    @Bean
+    fun payrollRunSource(sql: DSLContext): PayrollRunDataSource = PostgresPayrollRunDataSource(sql)
+
+    @Bean
+    fun payrollRuns(source: PayrollRunDataSource, json: ObjectMapper): PayrollRunRepository =
+        StoredPayrollRunRepository(source, json)
+
+    @Bean
+    fun payrollCalculationSource(sql: DSLContext): PayrollCalculationSourceDataSource =
+        PostgresPayrollCalculationSourceDataSource(sql)
+
+    @Bean
+    fun payrollCalculationSources(
+        source: PayrollCalculationSourceDataSource,
+        json: ObjectMapper,
+    ): PayrollCalculationSourceRepository = StoredPayrollCalculationSourceRepository(source, json)
+
+    @Bean
+    fun payrollCutoffSource(sql: DSLContext): PayrollCutoffDataSource =
+        PostgresPayrollCutoffDataSource(sql)
+
+    @Bean
+    fun payrollCutoffs(source: PayrollCutoffDataSource): PayrollCutoffRepository =
+        StoredPayrollCutoffRepository(source)
+
+    @Bean
+    fun startPayrollCalculation(
+        runs: PayrollRunRepository,
+        periods: PayrollPeriodRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        sources: PayrollCalculationSourceRepository,
+        operations: OperationRepository,
+        security: IdentitySecurityPolicy,
+    ) =
+        StartPayrollCalculation(
+            runs,
+            periods,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            journal,
+            transactions,
+            clock,
+            sources,
+            operations,
+            security,
+        )
+
+    @Bean
+    fun advancePayrollCalculation(
+        runs: PayrollRunRepository,
+        periods: PayrollPeriodRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        sources: PayrollCalculationSourceRepository,
+        compensation: CompensationRepository,
+        inputs: PayrollInputRepository,
+        openings: PayrollTaxOpeningRepository,
+    ) =
+        AdvancePayrollCalculation(
+            runs,
+            periods,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            journal,
+            transactions,
+            clock,
+            sources,
+            compensation,
+            inputs,
+            openings,
+        )
+
+    @Bean
+    fun resumePayrollCalculation(
+        runs: PayrollRunRepository,
+        periods: PayrollPeriodRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ResumePayrollCalculation(
+            runs,
+            periods,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun abandonPayrollCalculation(
+        runs: PayrollRunRepository,
+        periods: PayrollPeriodRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        AbandonPayrollCalculation(
+            runs,
+            periods,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun abortPayrollCalculation(
+        runs: PayrollRunRepository,
+        policies: PayrollPolicyRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+    ) = AbortPayrollCalculation(runs, policies, jobs, journal, transactions)
+
+    @Bean
+    fun getPayrollRun(
+        runs: PayrollRunRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        jobs: JobRepository,
+    ) = GetPayrollRun(runs, policies, companies, members, identities, transactions, jobs)
+
+    @Bean
+    fun getPayrollRunEmployee(
+        runs: PayrollRunRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetPayrollRunEmployee(runs, policies, companies, members, identities, transactions)
+
+    @Bean
+    fun listPayrollRuns(
+        runs: PayrollRunRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        periods: PayrollPeriodRepository,
+    ) = ListPayrollRuns(runs, policies, companies, members, identities, transactions, periods)
 }

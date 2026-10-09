@@ -22,4 +22,4 @@ Versioned opening tax history, independent verification, immutable evidence, and
 
 Period drafts, frozen participant lists, cancellation, exact workforce references, and independently verified monthly input history are implemented. See [period preparation](../payroll-workflows.md).
 
-Durable calculation, cutoff enforcement, approval/finalization, payslips, payment reconciliation, amendments, and the dashboard remain planned. Configuration or a passing calculator fixture does not represent a completed payroll run.
+Durable per-employee calculation, immutable facts/results, lease/checkpoint fencing, bounded explicit recovery, and payroll/leave source cutoffs are implemented. Run detail separates processing completion from failed employee outcomes. Approval/finalization, finalized tax-history chaining, payslips, payment reconciliation, amendments, and the dashboard remain planned. A calculated run does not authorize payment.

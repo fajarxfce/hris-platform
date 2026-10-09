@@ -14,6 +14,7 @@ import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.leave.domain.policies.*
 import dev.fajar.hris.leave.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.payroll.domain.repositories.PayrollCutoffRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.domain.entities.ScheduledDay
 import dev.fajar.hris.workforce.domain.policies.resolveCalendar
@@ -37,6 +38,7 @@ class SubmitLeaveRequest(
     private val clock: Clock,
     private val documents: DocumentRepository,
     private val references: DocumentReferenceRepository,
+    private val cutoffs: PayrollCutoffRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -74,6 +76,8 @@ class SubmitLeaveRequest(
             if (replay is Result.Failed) return@run replay
             val lock = ledger.lock(company, employeeId)
             if (lock is Result.Failed) return@run lock
+            val cutoffLock = cutoffs.lock(company)
+            if (cutoffLock is Result.Failed) return@run cutoffLock
             val peopleLock = people.lockReportingLines(company)
             if (peopleLock is Result.Failed) return@run peopleLock
             if (attachmentRevisionIds.isNotEmpty()) {
@@ -122,6 +126,17 @@ class SubmitLeaveRequest(
                         current?.terms?.isWorkingOn(today) != true)
             )
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
+
+            val frozen =
+                cutoffs.frozenMonths(
+                    company,
+                    employeeId,
+                    days.map { java.time.YearMonth.from(it.workDate) }.toSet(),
+                )
+            if (frozen is Result.Failed) return@run frozen
+            if ((frozen as Result.Success).value)
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "payroll_period_frozen"))
+
             val calendarResult =
                 schedules.calendar(company, employeeId, from, until).flatMap(::resolveCalendar)
             if (calendarResult is Result.Failed) return@run calendarResult

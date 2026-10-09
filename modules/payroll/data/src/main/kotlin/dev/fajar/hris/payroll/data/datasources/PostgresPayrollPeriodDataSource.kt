@@ -13,6 +13,22 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresPayrollPeriodDataSource(private val sql: DSLContext) : PayrollPeriodDataSource {
+    override fun transition(
+        company: UUID,
+        id: UUID,
+        version: Long,
+        status: String,
+        runId: UUID?,
+    ): Long? =
+        sql.update(P)
+            .set(P.VERSION, version + 1)
+            .set(P.STATUS, status)
+            .set(P.CURRENT_RUN_ID, runId)
+            .where(P.COMPANY_ID.eq(company), P.ID.eq(id), P.VERSION.eq(version))
+            .returning(P.VERSION)
+            .fetchOne()
+            ?.version
+
     override fun find(company: UUID, id: UUID): PayrollPeriodsRecord? =
         sql.selectFrom(P).where(P.COMPANY_ID.eq(company), P.ID.eq(id)).fetchOne()
 

@@ -11,6 +11,7 @@ import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.leave.domain.policies.*
 import dev.fajar.hris.leave.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.payroll.domain.repositories.PayrollCutoffRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import java.time.*
 import java.util.UUID
@@ -27,6 +28,7 @@ class RequestLeaveCancellation(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val cutoffs: PayrollCutoffRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -58,6 +60,8 @@ class RequestLeaveCancellation(
                     )
             val lock = ledger.lock(company, employeeId)
             if (lock is Result.Failed) return@run lock
+            val cutoffLock = cutoffs.lock(company)
+            if (cutoffLock is Result.Failed) return@run cutoffLock
             val peopleLock = people.lockReportingLines(company)
             if (peopleLock is Result.Failed) return@run peopleLock
             val approvalLock = approvals.lock(company)
@@ -88,6 +92,17 @@ class RequestLeaveCancellation(
                     )
             if (!canManageLeave(live, request))
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "leave_request_not_found"))
+
+            val frozen =
+                cutoffs.frozenMonths(
+                    company,
+                    employeeId,
+                    request.days.map { java.time.YearMonth.from(it.workDate) }.toSet(),
+                )
+            if (frozen is Result.Failed) return@run frozen
+            if ((frozen as Result.Success).value)
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "payroll_period_frozen"))
+
             if (request.version != version)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
             if (request.status != LeaveStatus.APPROVED)

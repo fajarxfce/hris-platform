@@ -16,6 +16,11 @@ class StoredPayrollPolicyRepository(
     private val source: PayrollPolicyDataSource,
     private val json: ObjectMapper,
 ) : PayrollPolicyRepository {
+    override fun revision(companyId: UUID, revision: Long): Result<PayrollPolicy?> =
+        safeDatabaseCall {
+            source.revision(companyId, revision)?.toPolicy(json)
+        }
+
     override fun lock(companyId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
         source.lock(companyId, shared)
     }

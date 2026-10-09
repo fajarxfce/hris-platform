@@ -8,6 +8,7 @@ import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.payroll.domain.entities.*
 import dev.fajar.hris.payroll.domain.policies.*
 import dev.fajar.hris.payroll.domain.repositories.*
+import dev.fajar.hris.payroll.domain.repositories.PayrollCutoffRepository
 import java.time.*
 import java.util.UUID
 
@@ -21,6 +22,7 @@ class SavePayrollPolicy(
     private val transactions: TransactionRunner,
     private val security: IdentitySecurityPolicy,
     private val clock: Clock,
+    private val cutoffs: PayrollCutoffRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -80,6 +82,11 @@ class SavePayrollPolicy(
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
+            val frozen = cutoffs.frozenFrom(company, null, policy.effectiveFrom)
+            if (frozen is Result.Failed) return@run frozen
+            if ((frozen as Result.Success).value)
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "payroll_period_frozen"))
+
             val found = policies.current(company)
             if (found is Result.Failed) return@run found
             val current = (found as Result.Success).value

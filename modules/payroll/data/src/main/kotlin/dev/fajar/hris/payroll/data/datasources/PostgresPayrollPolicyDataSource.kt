@@ -10,6 +10,14 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresPayrollPolicyDataSource(private val sql: DSLContext) : PayrollPolicyDataSource {
+    override fun revision(company: UUID, revision: Long): PayrollPolicyRow? =
+        sql.select(P.VERSION, *R.fields())
+            .from(P)
+            .join(R)
+            .on(R.COMPANY_ID.eq(P.COMPANY_ID))
+            .where(P.COMPANY_ID.eq(company), R.REVISION.eq(revision))
+            .fetchOne { PayrollPolicyRow(it.get(P.VERSION)!!, it.into(R)) }
+
     override fun lock(company: UUID, shared: Boolean) {
         val query =
             if (shared) "select pg_advisory_xact_lock_shared(hashtextextended(?,0))"

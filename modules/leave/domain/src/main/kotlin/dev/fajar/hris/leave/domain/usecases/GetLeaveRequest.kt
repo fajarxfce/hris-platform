@@ -9,6 +9,7 @@ import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.leave.domain.policies.*
 import dev.fajar.hris.leave.domain.repositories.*
+import dev.fajar.hris.payroll.domain.repositories.PayrollCutoffRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import java.time.Clock
 import java.util.UUID
@@ -22,6 +23,7 @@ class GetLeaveRequest(
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val cutoffs: PayrollCutoffRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -40,8 +42,10 @@ class GetLeaveRequest(
                     ?: return@run Result.Failed(
                         Failure(FailureKind.NOT_FOUND, "leave_request_not_found")
                     )
-            val lock = ledger.lock(company, employeeId)
+            val lock = ledger.lock(company, employeeId, shared = true)
             if (lock is Result.Failed) return@run lock
+            val cutoffLock = cutoffs.lock(company)
+            if (cutoffLock is Result.Failed) return@run cutoffLock
             val checked =
                 identities.access(actor.accountId, company).flatMap {
                     validateCompanyCommandActor(actor, it)
@@ -97,6 +101,15 @@ class GetLeaveRequest(
                 leaveAvailableActions(live, request, active, delegations, grants, now, beneficiary)
                     .toMutableSet()
             if (LeaveAction.REQUEST_CANCELLATION in actions) {
+                val frozen =
+                    cutoffs.frozenMonths(
+                        company,
+                        employeeId,
+                        request.days.map { java.time.YearMonth.from(it.workDate) }.toSet(),
+                    )
+                if (frozen is Result.Failed) return@run frozen
+                if ((frozen as Result.Success).value)
+                    actions.remove(LeaveAction.REQUEST_CANCELLATION)
                 for (year in request.days.map { it.workDate.year }.distinct()) {
                     val balance = ledger.balance(company, employeeId, request.policy.typeId, year)
                     if (balance is Result.Failed) return@run balance

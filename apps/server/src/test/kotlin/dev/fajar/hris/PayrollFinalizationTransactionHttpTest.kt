@@ -17,6 +17,7 @@ class PayrollFinalizationTransactionHttpTest : PayrollFinalizationApiFixture() {
             listOf(
                 "payroll_finalizations",
                 "payroll_assessments",
+                "mobile_sync_changes",
                 "background_jobs",
                 "payroll_period_changes",
                 "operation_receipts",
@@ -110,6 +111,7 @@ class PayrollFinalizationTransactionHttpTest : PayrollFinalizationApiFixture() {
         }
         finalizationProbe.clear()
         assertEquals(0, count(f.calculation.people.payroll.company, "payroll_assessments"))
+        assertEquals(0, count(f.calculation.people.payroll.company, "mobile_sync_changes"))
         assertTrue(finalizationView(f, finalizationId(lease))["finalization"]["publishedAt"].isNull)
         assertEquals(Result.Success(JobStep(1, true)), stepFinalization(f, lease))
     }
@@ -155,6 +157,7 @@ class PayrollFinalizationTransactionHttpTest : PayrollFinalizationApiFixture() {
         assertTrue(result is Result.Failed, result.toString())
         finalizationProbe.clear()
         assertEquals(0, count(f.calculation.people.payroll.company, "payroll_assessments"))
+        assertEquals(0, count(f.calculation.people.payroll.company, "mobile_sync_changes"))
         assertTrue(finalizationView(f, finalizationId(lease))["finalization"]["publishedAt"].isNull)
         assertEquals(Result.Success(JobStep(1, true)), stepFinalization(f, lease))
     }

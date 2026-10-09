@@ -106,6 +106,7 @@ class PayrollFinalizationPublicationHttpTest : PayrollFinalizationApiFixture() {
         assertEquals(Result.Success(JobStep(1, true)), result)
         assertTrue(elapsed < Duration.ofSeconds(30), elapsed.toString())
         assertEquals(5000, count(f.calculation.people.payroll.company, "payroll_assessments"))
+        assertEquals(5000, count(f.calculation.people.payroll.company, "mobile_sync_changes"))
         assertEquals("FINALIZED", runView(f.calculation, f.run)["run"]["status"].asString())
         println(
             "Published 5000 retained payroll references in ${elapsed.toMillis()} ms; references acquired at ${Duration.ofNanos(referencesAt-started).toMillis()} ms"

@@ -950,4 +950,34 @@ class PayrollConfiguration {
         source: PayrollAssessmentDataSource,
         json: ObjectMapper,
     ): PayrollAssessmentRepository = StoredPayrollAssessmentRepository(source, json)
+
+    @Bean
+    fun getPayrollPayslip(
+        assessments: PayrollAssessmentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetPayrollPayslip(assessments, people, companies, members, identities, transactions)
+
+    @Bean
+    fun listPayrollPayslips(
+        assessments: PayrollAssessmentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        ListPayrollPayslips(
+            assessments,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+        )
 }

@@ -5,4 +5,5 @@ enum class SyncCollection {
     LEAVE_REQUESTS,
     LEAVE_BALANCES,
     OVERTIME_REQUESTS,
+    PAYSLIPS,
 }

@@ -1,8 +1,13 @@
 package dev.fajar.hris
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
+import dev.fajar.hris.jobs.domain.usecases.*
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import java.net.http.HttpClient
 import java.net.http.HttpResponse
 import java.util.UUID
@@ -19,6 +24,10 @@ class JobAccessHttpTest : PeopleApiFixture() {
     @Autowired private lateinit var jobs: JobRepository
     @Autowired private lateinit var transactions: TransactionRunner
     @Autowired private lateinit var probe: AccountLockProbe
+    @Autowired private lateinit var identities: IdentityRepository
+    @Autowired private lateinit var members: MembershipRepository
+    @Autowired private lateinit var companies: CompanyRepository
+    @Autowired private lateinit var journal: ChangeJournalRepository
 
     private data class Member(val id: UUID, val client: HttpClient, val csrf: String)
 
@@ -104,15 +113,11 @@ class JobAccessHttpTest : PeopleApiFixture() {
     private fun cancel(f: Fixture, member: Member = f.operator) =
         post(member.client, "${f.path}/cancel", """{"expectedVersion":0}""", member.csrf)
 
-    private fun whileWaiting(
-        member: Member,
-        change: () -> Unit,
-        call: () -> HttpResponse<String>,
-    ): HttpResponse<String> {
+    private fun <T> whileWaiting(member: Member, change: () -> Unit, call: () -> T): T {
         val barrier = AccountLockProbe.Barrier(member.id)
         probe.current.set(barrier)
         return Executors.newSingleThreadExecutor().use { pool ->
-            val pending = pool.submit<HttpResponse<String>> { call() }
+            val pending = pool.submit<T> { call() }
             try {
                 assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
                 change()
@@ -272,6 +277,125 @@ class JobAccessHttpTest : PeopleApiFixture() {
                             f.job,
                         ),
                 )
+            }
+        }
+    }
+
+    @Test
+    fun jobActionHintsUseTheOriginalAndCurrentGrantIntersection() {
+        for (operation in listOf("get", "list")) {
+            for (originallyAllowed in listOf(true, false)) {
+                val f =
+                    fixture(
+                        if (originallyAllowed) setOf("jobs.read", "jobs.manage")
+                        else setOf("jobs.read")
+                    )
+                val response =
+                    whileWaiting(
+                        f.operator,
+                        {
+                            if (originallyAllowed)
+                                database()
+                                    .update(
+                                        "delete from membership_permissions where company_id=? and account_id=? and permission='jobs.manage'",
+                                        f.company,
+                                        f.operator.id,
+                                    )
+                            else
+                                database()
+                                    .update(
+                                        "insert into membership_permissions(company_id,account_id,permission) values(?,?,'jobs.manage')",
+                                        f.company,
+                                        f.operator.id,
+                                    )
+                        },
+                    ) {
+                        if (operation == "get") get(f.operator.client, f.path)
+                        else get(f.operator.client, "/api/v1/companies/${f.company}/jobs")
+                    }
+                assertEquals(200, response.statusCode(), response.body())
+                val body = json.readTree(response.body())
+                val item = if (operation == "get") body else body["items"].get(0)
+                assertEquals(0, item["availableActions"].size())
+                val refreshed = json.readTree(get(f.operator.client, f.path).body())
+                assertEquals(if (originallyAllowed) 0 else 1, refreshed["availableActions"].size())
+                if (originallyAllowed) assertError(cancel(f), 404, "job_not_found")
+            }
+        }
+    }
+
+    @Test
+    fun expiredAssuranceAfterWaitingCannotReadJobsOrRequestCancellation() {
+        val security = IdentitySecurityPolicy(enforceMfa = true)
+        val get = GetJob(jobs, transactions, companies, members, identities, security, clock)
+        val list = ListJobs(jobs, transactions, companies, members, identities, security, clock)
+        val cancel =
+            RequestJobCancellation(
+                jobs,
+                transactions,
+                journal,
+                companies,
+                members,
+                identities,
+                security,
+                clock,
+            )
+        for (operation in listOf("get", "list", "cancel")) {
+            val f = fixture()
+            val actor =
+                Actor(
+                    f.operator.id,
+                    f.company,
+                    setOf("jobs.read", "jobs.manage"),
+                    clock.instant(),
+                    UUID.randomUUID(),
+                    mfaVerifiedAt = clock.instant().minus(security.maximumMfaAge).plusSeconds(1),
+                    credentialVersion = 0,
+                )
+            database()
+                .update(
+                    "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
+                    f.operator.id,
+                )
+            try {
+                val result =
+                    whileWaiting(f.operator, { clock.set(clock.instant().plusSeconds(2)) }) {
+                        when (operation) {
+                            "get" -> get.execute(actor, f.job)
+                            "list" -> list.execute(actor, 50, null, null)
+                            else -> cancel.execute(actor, f.job, 0)
+                        }
+                    }
+                assertEquals("mfa_required", (result as Result.Failed).failure.code)
+                assertEquals(
+                    false,
+                    database()
+                        .queryForObject(
+                            "select cancellation_requested from background_jobs where id=?",
+                            Boolean::class.java,
+                            f.job,
+                        ),
+                )
+                assertEquals(
+                    0,
+                    database()
+                        .queryForObject(
+                            "select count(*) from audit_entries where resource_id=? and action='jobs.cancellation_requested'",
+                            Int::class.java,
+                            f.job,
+                        ),
+                )
+                val renewed = actor.copy(mfaVerifiedAt = clock.instant())
+                val accepted = cancel.execute(renewed, f.job, 0) as Result.Success
+                assertTrue(accepted.value.job.cancellationRequested)
+                assertTrue(accepted.value.availableActions.isEmpty())
+                assertEquals(accepted, cancel.execute(renewed, f.job, 0))
+            } finally {
+                database()
+                    .update(
+                        "update accounts set mfa_secret_encrypted=null where id=?",
+                        f.operator.id,
+                    )
             }
         }
     }

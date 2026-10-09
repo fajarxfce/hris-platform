@@ -23,7 +23,9 @@ Company audit metadata search is implemented with current `audit.read`, original
 
 ## Durable job foundation
 
-Company-scoped job queries and versioned cancellation requests are implemented. Lists expose progress and safe failure codes, with own-job visibility or explicit company-wide access. Job request inputs and terminal updates are immutable. A cancellation request blocks subsequent progress and successful completion; the feature worker must acknowledge cancellation and release its own reservations.
+Company-scoped job queries and versioned cancellation requests are implemented. Lists expose progress and safe failure codes, with own-job visibility or explicit company-wide access. Interactive use cases recheck live access and MFA after waiting for guards. Available actions come from the original/current permission intersection inside that transaction. Job request inputs and terminal updates are immutable. A cancellation request blocks subsequent progress and successful completion; the feature worker must acknowledge cancellation and release its own reservations.
+
+Cancellation is naturally idempotent: after current authorization, an already requested cancellation returns its current job without changing its cleanup availability. A first request requires the observed version. Clients must distinguish requesting cancellation from a terminal `CANCELLED` status; an interrupted HTTP response requires a status read or an explicit retry, not an assumed rollback.
 
 PostgreSQL leasing is restricted to the `hris_worker_capability` role. Its broader RLS policy applies to the queue only; business tables retain their existing company scope. Application credentials cannot execute the lease function or access the separate Spring Batch metadata schema. A new lease changes the ownership token. Heartbeats, checkpoints, completion, and deferral require the current token and a lease that is still valid according to the database clock. Feature workers must update their business result and checkpoint in one transaction.
 

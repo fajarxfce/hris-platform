@@ -1,6 +1,7 @@
 package dev.fajar.hris.jobs.data.di
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.jobs.data.datasources.*
@@ -9,6 +10,7 @@ import dev.fajar.hris.jobs.domain.entities.JobRetryPolicy
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.jobs.domain.usecases.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import java.time.Clock
 import org.jooq.DSLContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -31,7 +33,9 @@ class JobsConfiguration {
         companies: CompanyRepository,
         members: MembershipRepository,
         identities: IdentityRepository,
-    ) = GetJob(jobs, transactions, companies, members, identities)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetJob(jobs, transactions, companies, members, identities, security, clock)
 
     @Bean
     fun listJobs(
@@ -40,7 +44,9 @@ class JobsConfiguration {
         companies: CompanyRepository,
         members: MembershipRepository,
         identities: IdentityRepository,
-    ) = ListJobs(jobs, transactions, companies, members, identities)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListJobs(jobs, transactions, companies, members, identities, security, clock)
 
     @Bean
     fun requestJobCancellation(
@@ -50,15 +56,26 @@ class JobsConfiguration {
         companies: CompanyRepository,
         members: MembershipRepository,
         identities: IdentityRepository,
-        clock: java.time.Clock,
-    ) = RequestJobCancellation(jobs, transactions, journal, companies, members, identities, clock)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        RequestJobCancellation(
+            jobs,
+            transactions,
+            journal,
+            companies,
+            members,
+            identities,
+            security,
+            clock,
+        )
 
     @Bean
     fun leaseJobs(
         jobs: JobRepository,
         transactions: TransactionRunner,
         journal: ChangeJournalRepository,
-        clock: java.time.Clock,
+        clock: Clock,
         retry: JobRetryPolicy,
     ) = LeaseJobs(jobs, transactions, journal, clock, retry)
 

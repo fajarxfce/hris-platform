@@ -23,17 +23,16 @@ class JobController(
         @RequestParam(defaultValue = "50") size: Int,
         @RequestParam(required = false) beforeAt: Instant?,
         @RequestParam(required = false) beforeId: UUID?,
-    ): JobPageResponse = list.execute(actor, size, beforeAt, beforeId).response().toResponse(actor)
+    ): JobPageResponse = list.execute(actor, size, beforeAt, beforeId).response().toResponse()
 
     @GetMapping("/{jobId}")
     fun get(actor: Actor, @PathVariable jobId: UUID): JobResponse =
-        get.execute(actor, jobId).response().toResponse(actor)
+        get.execute(actor, jobId).response().toResponse()
 
     @PostMapping("/{jobId}/cancel")
     fun cancel(
         actor: Actor,
         @PathVariable jobId: UUID,
         @RequestBody input: CancelJobRequest,
-    ): JobResponse =
-        cancel.execute(actor, jobId, input.expectedVersion).response().toResponse(actor)
+    ): JobResponse = cancel.execute(actor, jobId, input.expectedVersion).response().toResponse()
 }

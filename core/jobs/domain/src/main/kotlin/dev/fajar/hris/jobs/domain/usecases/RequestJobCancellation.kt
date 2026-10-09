@@ -1,10 +1,12 @@
 package dev.fajar.hris.jobs.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.jobs.domain.entities.*
+import dev.fajar.hris.jobs.domain.policies.availableJobActions
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import java.time.Clock
@@ -17,9 +19,10 @@ class RequestJobCancellation(
     private val companies: CompanyRepository,
     private val members: MembershipRepository,
     private val identities: IdentityRepository,
+    private val security: IdentitySecurityPolicy,
     private val clock: Clock,
 ) {
-    fun execute(actor: Actor, id: UUID, expectedVersion: Long): Result<BackgroundJob> {
+    fun execute(actor: Actor, id: UUID, expectedVersion: Long): Result<JobDetails> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
@@ -35,7 +38,7 @@ class RequestJobCancellation(
             if (accountGuard is Result.Failed) return@run accountGuard
             val access =
                 identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (access is Result.Failed) return@run access
             val current = (access as Result.Success).value
@@ -45,7 +48,8 @@ class RequestJobCancellation(
                         "jobs.manage" !in current.permissions)
             )
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "job_not_found"))
-            if (job.cancellationRequested) return@run Result.Success(job)
+            if (job.cancellationRequested)
+                return@run Result.Success(JobDetails(job, availableJobActions(current, job)))
             if (job.status !in setOf(JobStatus.QUEUED, JobStatus.RUNNING))
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "job_already_finished"))
             if (job.version != expectedVersion)
@@ -56,7 +60,7 @@ class RequestJobCancellation(
                 else
                     journal
                         .record(actor, ChangeRecord("job", id, "jobs.cancellation_requested"))
-                        .map { changed }
+                        .map { JobDetails(changed, availableJobActions(current, changed)) }
             }
         }
     }

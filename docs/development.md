@@ -1,6 +1,6 @@
 # Development
 
-Requires JDK 21, Docker, and Python 3. Gradle Wrapper pins the build tool. Frontend tooling is configured when the dashboard lands.
+Requires JDK 21, Docker, and Python 3. Gradle Wrapper pins the build tool. The dashboard uses Node.js 24 or newer with the committed npm lockfile.
 
 ## Backend checks
 

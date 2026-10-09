@@ -1,0 +1,271 @@
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+body {
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+* {
+  box-sizing: border-box;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+a {
+  color: var(--colorBrandForegroundLink);
+}
+.app-portal {
+  min-height: 100dvh;
+  display: grid;
+  grid-template: 48px minmax(0, 1fr) / 224px minmax(0, 1fr);
+  background: var(--colorNeutralBackground2);
+}
+.app-topbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  background: #0078d4;
+  color: #fff;
+  z-index: 1;
+}
+.app-topbar button {
+  color: #fff;
+}
+.app-topbar button:hover {
+  background: #0067b5;
+}
+.app-topbar button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+.app-topbar-spacer {
+  flex: 1;
+}
+.app-preferences {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.app-auth-shell {
+  position: relative;
+}
+.app-auth-preferences {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+.app-fatal-error {
+  max-width: 480px;
+  margin: 15vh auto;
+  padding: 24px;
+}
+.app-wordmark {
+  font-weight: 600;
+  font-size: 18px;
+  margin-right: 18px;
+}
+.app-company-select {
+  width: min(280px, 30vw);
+}
+.app-account-name {
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.app-sidebar {
+  padding: 12px 0;
+  border-right: 1px solid var(--colorNeutralStroke2);
+  background: var(--colorNeutralBackground1);
+}
+.app-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  padding: 0 18px;
+  text-decoration: none;
+  color: var(--colorNeutralForeground1);
+  border-left: 3px solid transparent;
+}
+.app-nav-item:hover {
+  background: var(--colorNeutralBackground1Hover);
+}
+.app-nav-item-selected {
+  background: var(--colorBrandBackground2);
+  border-left-color: var(--colorBrandStroke1);
+}
+.app-workspace {
+  padding: 24px 32px;
+  min-width: 0;
+}
+.app-workspace:focus {
+  outline: none;
+}
+.app-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.app-page-header h1 {
+  display: block;
+  margin: 0;
+}
+.app-command-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.app-muted {
+  color: var(--colorNeutralForeground3);
+}
+.app-resource-panel {
+  background: var(--colorNeutralBackground1);
+  border: 1px solid var(--colorNeutralStroke2);
+  padding: 24px;
+}
+.app-resource-panel h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 20px;
+}
+.app-property-list {
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(100px, 180px) 1fr;
+  gap: 16px;
+}
+.app-property-list dt {
+  color: var(--colorNeutralForeground3);
+}
+.app-property-list dd {
+  margin: 0;
+}
+.app-portal-collapsed {
+  grid-template-columns: 56px minmax(0, 1fr);
+}
+.app-portal-collapsed .app-nav-item span {
+  display: none;
+}
+.app-skip-link {
+  position: fixed;
+  top: -60px;
+  left: 12px;
+  z-index: 10;
+  background: var(--colorNeutralBackground1);
+  padding: 8px 16px;
+}
+.app-skip-link:focus {
+  top: 4px;
+}
+.app-auth-layout {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 80px 24px 40px;
+  background: var(--colorNeutralBackground2);
+}
+.app-auth-panel {
+  width: min(100%, 420px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 36px;
+  border: 1px solid var(--colorNeutralStroke2);
+  background: var(--colorNeutralBackground1);
+  box-shadow: var(--shadow8);
+}
+.app-auth-panel h1 {
+  margin: 0;
+}
+.app-auth-brand {
+  color: var(--colorBrandForeground1);
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.app-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.app-form > button {
+  align-self: flex-start;
+  min-width: 100px;
+}
+.app-loading {
+  padding: 32px;
+  display: grid;
+  place-items: center;
+}
+.app-reference {
+  font-size: 11px;
+  padding-top: 4px;
+  overflow-wrap: anywhere;
+}
+.app-sso-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.app-enrollment-key {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.app-enrollment-key code {
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+.app-recovery-codes {
+  padding: 16px;
+  margin: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  background: var(--colorNeutralBackground2);
+}
+@media (max-width: 800px) {
+  .app-portal {
+    grid-template-columns: 56px minmax(0, 1fr);
+  }
+  .app-nav-item span,
+  .app-account-name {
+    display: none;
+  }
+  .app-topbar {
+    gap: 6px;
+  }
+  .app-wordmark {
+    margin-right: 0;
+  }
+  .app-workspace {
+    padding: 20px 16px;
+  }
+  .app-topbar .app-account-avatar {
+    display: none;
+  }
+}
+@media (max-width: 480px) {
+  .app-company-select {
+    width: 128px;
+  }
+  .app-topbar {
+    flex-wrap: wrap;
+    min-height: 92px;
+  }
+  .app-portal {
+    grid-template-rows: 92px minmax(0, 1fr);
+  }
+  .app-auth-panel {
+    padding: 24px;
+  }
+}

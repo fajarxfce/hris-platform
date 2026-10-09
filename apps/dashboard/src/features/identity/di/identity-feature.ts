@@ -1,0 +1,28 @@
+import type { HttpClient } from "../../../core/data/http/http-client";
+import { HttpIdentityDataSource } from "../data/datasources/http-identity-data-source";
+import { RemoteIdentityRepository } from "../data/repositories/remote-identity-repository";
+import { BeginMfaEnrollment } from "../domain/usecases/begin-mfa-enrollment";
+import { ConfirmMfaEnrollment } from "../domain/usecases/confirm-mfa-enrollment";
+import { LoadCompanyAccess } from "../domain/usecases/load-company-access";
+import { LoadIdentityProviders } from "../domain/usecases/load-identity-providers";
+import { LoadSession } from "../domain/usecases/load-session";
+import { SignIn } from "../domain/usecases/sign-in";
+import { SignOut } from "../domain/usecases/sign-out";
+import { VerifyMfa } from "../domain/usecases/verify-mfa";
+
+export function createIdentityFeature(http: HttpClient) {
+  const source = new HttpIdentityDataSource(http);
+  const repository = new RemoteIdentityRepository(source);
+  return {
+    loadSession: new LoadSession(repository),
+    loadCompanyAccess: new LoadCompanyAccess(repository),
+    loadProviders: new LoadIdentityProviders(repository),
+    signIn: new SignIn(repository),
+    signOut: new SignOut(repository),
+    beginEnrollment: new BeginMfaEnrollment(repository),
+    confirmEnrollment: new ConfirmMfaEnrollment(repository),
+    verifyMfa: new VerifyMfa(repository),
+  };
+}
+
+export type IdentityFeature = ReturnType<typeof createIdentityFeature>;

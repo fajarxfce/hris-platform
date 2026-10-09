@@ -1,9 +1,10 @@
 from pathlib import Path
 import re
 import sys
+from check_dashboard_architecture import check_dashboard
 
 root = Path(__file__).resolve().parents[1]
-errors = []
+errors = check_dashboard(root)
 for source in root.rglob("*.kt"):
     if any(part in {"build", ".gradle", ".work", "node_modules"} for part in source.parts):
         continue

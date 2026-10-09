@@ -499,6 +499,9 @@ class PeopleConfiguration {
     fun startEmployeeImport(
         input: EmployeeImportInputRepository,
         imports: EmployeeImportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         jobs: JobRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
@@ -509,6 +512,9 @@ class PeopleConfiguration {
         StartEmployeeImport(
             input,
             imports,
+            companies,
+            members,
+            identities,
             jobs,
             operations,
             journal,
@@ -520,53 +526,116 @@ class PeopleConfiguration {
     @Bean
     fun applyEmployeeImport(
         imports: EmployeeImportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         jobs: JobRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
         security: IdentitySecurityPolicy,
-    ) = ApplyEmployeeImport(imports, jobs, operations, journal, transactions, clock, security)
+    ) =
+        ApplyEmployeeImport(
+            imports,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun resumeEmployeeImport(
         imports: EmployeeImportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         jobs: JobRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
         security: IdentitySecurityPolicy,
-    ) = ResumeEmployeeImport(imports, jobs, operations, journal, transactions, clock, security)
+    ) =
+        ResumeEmployeeImport(
+            imports,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun cancelEmployeeImport(
         imports: EmployeeImportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         jobs: JobRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
         security: IdentitySecurityPolicy,
-    ) = CancelEmployeeImport(imports, jobs, operations, journal, transactions, clock, security)
+    ) =
+        CancelEmployeeImport(
+            imports,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
-    fun getEmployeeImport(imports: EmployeeImportRepository, transactions: TransactionRunner) =
-        GetEmployeeImport(imports, transactions)
+    fun getEmployeeImport(
+        imports: EmployeeImportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetEmployeeImport(imports, companies, members, identities, transactions)
 
     @Bean
-    fun listEmployeeImports(imports: EmployeeImportRepository, transactions: TransactionRunner) =
-        ListEmployeeImports(imports, transactions)
+    fun listEmployeeImports(
+        imports: EmployeeImportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = ListEmployeeImports(imports, companies, members, identities, transactions)
 
     @Bean
-    fun getEmployeeImportRows(imports: EmployeeImportRepository, transactions: TransactionRunner) =
-        GetEmployeeImportRows(imports, transactions)
+    fun getEmployeeImportRows(
+        imports: EmployeeImportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetEmployeeImportRows(imports, companies, members, identities, transactions)
 
     @Bean
     fun getEmployeeImportAttempts(
         imports: EmployeeImportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetEmployeeImportAttempts(imports, transactions)
+    ) = GetEmployeeImportAttempts(imports, companies, members, identities, transactions)
 
     @Bean
     fun getEmployeeImportTemplate(input: EmployeeImportInputRepository) =
@@ -575,6 +644,7 @@ class PeopleConfiguration {
     @Bean
     fun advanceEmployeeImportPreview(
         imports: EmployeeImportRepository,
+        companies: CompanyRepository,
         jobs: JobRepository,
         people: PeopleRepository,
         units: OrganizationRepository,
@@ -586,6 +656,7 @@ class PeopleConfiguration {
     ) =
         AdvanceEmployeeImportPreview(
             imports,
+            companies,
             jobs,
             people,
             units,
@@ -599,6 +670,7 @@ class PeopleConfiguration {
     @Bean
     fun advanceEmployeeImportApply(
         imports: EmployeeImportRepository,
+        companies: CompanyRepository,
         jobs: JobRepository,
         people: PeopleRepository,
         units: OrganizationRepository,
@@ -610,6 +682,7 @@ class PeopleConfiguration {
     ) =
         AdvanceEmployeeImportApply(
             imports,
+            companies,
             jobs,
             people,
             units,

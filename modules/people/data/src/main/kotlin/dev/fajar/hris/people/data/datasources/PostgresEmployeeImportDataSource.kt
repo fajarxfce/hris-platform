@@ -10,6 +10,11 @@ import org.jooq.JSONB
 import org.jooq.impl.DSL
 
 class PostgresEmployeeImportDataSource(private val sql: DSLContext) : EmployeeImportDataSource {
+    override fun lock(companyId: UUID, id: UUID, shared: Boolean) {
+        val query = sql.select(B.ID).from(B).where(B.COMPANY_ID.eq(companyId)).and(B.ID.eq(id))
+        if (shared) query.forShare().fetch() else query.forUpdate().fetch()
+    }
+
     override fun insertBatch(record: EmployeeImportsRecord) {
         sql.insertInto(B).set(record).execute()
     }

@@ -40,17 +40,14 @@ abstract class EmployeeImportApiFixture : PeopleApiFixture() {
             get() = "/api/v1/companies/$company/employee-imports"
     }
 
-    protected fun fixture(): ImportFixture {
+    protected fun fixture(email: String = "admin@example.test"): ImportFixture {
         val browser = client()
-        val csrf = login(browser)
+        val csrf = login(browser, email)
         val company = company(browser, csrf)
         companies += company
         val account =
             database()
-                .queryForObject(
-                    "select id from accounts where email='admin@example.test'",
-                    UUID::class.java,
-                )!!
+                .queryForObject("select id from accounts where email=?", UUID::class.java, email)!!
         val version =
             database()
                 .queryForObject(

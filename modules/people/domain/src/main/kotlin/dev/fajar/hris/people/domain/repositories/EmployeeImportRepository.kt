@@ -5,6 +5,8 @@ import dev.fajar.hris.people.domain.entities.*
 import java.util.UUID
 
 interface EmployeeImportRepository {
+    fun lock(companyId: UUID, id: UUID, shared: Boolean = false): Result<Unit>
+
     fun create(
         actor: Actor,
         batch: EmployeeImport,

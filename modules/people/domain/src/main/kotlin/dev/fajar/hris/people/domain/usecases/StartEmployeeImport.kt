@@ -2,8 +2,10 @@ package dev.fajar.hris.people.domain.usecases
 
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.policies.*
 import dev.fajar.hris.people.domain.repositories.*
@@ -15,6 +17,9 @@ import java.util.UUID
 class StartEmployeeImport(
     private val input: EmployeeImportInputRepository,
     private val imports: EmployeeImportRepository,
+    private val companies: CompanyRepository,
+    private val members: MembershipRepository,
+    private val identities: IdentityRepository,
     private val jobs: JobRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
@@ -48,7 +53,9 @@ class StartEmployeeImport(
         if (bytes.isEmpty() || bytes.size > 524288)
             return Result.Failed(Failure(FailureKind.VALIDATION, "employee_import_size_limit"))
         val hash = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes))
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         val key =
             OperationKey(
                 "people.employee_import_start",
@@ -58,6 +65,19 @@ class StartEmployeeImport(
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
+            val authorized =
+                identities.access(actor.accountId, company).flatMap {
+                    validateEmployeeImportActor(actor, it)
+                }
+            if (authorized is Result.Failed) return@run authorized
+            val currentAssurance = requireEmployeeImportAssurance(actor, security, clock.instant())
+            if (currentAssurance is Result.Failed) return@run currentAssurance
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
@@ -86,6 +106,8 @@ class StartEmployeeImport(
                 }
             val lock = jobs.lockQueue(company)
             if (lock is Result.Failed) return@run lock
+            val queuedAssurance = requireEmployeeImportAssurance(actor, security, clock.instant())
+            if (queuedAssurance is Result.Failed) return@run queuedAssurance
             val count = jobs.pendingCount(company)
             if (count is Result.Failed) return@run count
             if ((count as Result.Success).value >= 100)

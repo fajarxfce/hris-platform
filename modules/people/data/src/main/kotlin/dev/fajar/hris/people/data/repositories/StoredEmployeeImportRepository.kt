@@ -14,6 +14,10 @@ class StoredEmployeeImportRepository(
     private val source: EmployeeImportDataSource,
     private val json: ObjectMapper,
 ) : EmployeeImportRepository {
+    override fun lock(companyId: UUID, id: UUID, shared: Boolean) = safeDatabaseCall {
+        source.lock(companyId, id, shared)
+    }
+
     override fun create(actor: Actor, batch: EmployeeImport, rows: List<EmployeeImportRow>) =
         safeDatabaseCall {
             val company = requireNotNull(actor.companyId)

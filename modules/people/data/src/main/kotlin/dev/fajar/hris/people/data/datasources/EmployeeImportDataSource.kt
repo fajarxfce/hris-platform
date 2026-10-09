@@ -5,6 +5,8 @@ import java.util.UUID
 import org.jooq.JSONB
 
 interface EmployeeImportDataSource {
+    fun lock(companyId: UUID, id: UUID, shared: Boolean)
+
     fun insertBatch(record: EmployeeImportsRecord)
 
     fun insertRows(records: List<EmployeeImportRowsRecord>)

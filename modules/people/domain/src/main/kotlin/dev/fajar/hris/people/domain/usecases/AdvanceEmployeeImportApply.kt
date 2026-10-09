@@ -5,6 +5,7 @@ import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.entities.UnitKind
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.organization.domain.repositories.OrganizationRepository
 import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.policies.*
@@ -14,6 +15,7 @@ import java.time.LocalDate
 
 class AdvanceEmployeeImportApply(
     private val imports: EmployeeImportRepository,
+    private val companies: CompanyRepository,
     private val jobs: JobRepository,
     private val people: PeopleRepository,
     private val units: OrganizationRepository,
@@ -59,9 +61,11 @@ class AdvanceEmployeeImportApply(
             if (structure is Result.Failed) return@run structure
             val unitLock = units.lockStructure(company)
             if (unitLock is Result.Failed) return@run unitLock
-            val memberLock = members.lock(company)
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberLock = members.lock(company, shared = true)
             if (memberLock is Result.Failed) return@run memberLock
-            val actorLock = identities.lockAccount(actor.accountId)
+            val actorLock = identities.lockAccount(actor.accountId, shared = true)
             if (actorLock is Result.Failed) return@run actorLock
             val authorization = identities.access(actor.accountId, company)
             if (authorization is Result.Failed) return@run authorization

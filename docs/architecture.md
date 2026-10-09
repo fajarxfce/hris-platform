@@ -26,6 +26,8 @@ When a workflow needs both organization structure and company guards, acquire st
 
 Lifecycle case operations acquire people guards before case locks, followed by company, membership, and ordered account guards. Template operations acquire the template guard before access guards. Shared case reads cannot hold access guards while waiting for a writer that needs them. Multi-query aggregate reads need their resource guard; paginated case/task projections instead use one bounded SQL snapshot.
 
+Import recovery and cancellation acquire the previous job before the import header, matching worker order. Import reads protect the header and row outcomes with a shared resource guard before access guards. Privileged commands recheck recent authentication after a pending resource or queue acquisition; an earlier check cannot authorize work indefinitely.
+
 Business changes, audit, outbox, and idempotency receipts share their transaction. Receipt keys bind company or account scope, actor, operation, and payload hash. Account receipts cannot be read through a company scope or by another actor. Repeated identical commands return the committed outcome; key/payload mismatches fail. Optimistic versions reject obsolete updates. A lost response never implies that the transaction rolled back.
 
 ## Security

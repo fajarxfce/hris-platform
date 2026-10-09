@@ -53,3 +53,17 @@ Revalidate membership and permissions on reconnect and foreground entry. Offline
 Treat endpoint cursors and tokens as opaque. Follow bounded pages rather than requesting an entire organization in one response. Store decimal strings without converting them through binary floating point. Use server UTC timestamps for synchronization, explicit IANA zones for schedules, and local dates for work-day policy. A device clock is evidence, not an authority for conflict ordering.
 
 Resumable uploads use bounded chunks and stable operation keys. Finishing bytes is separate from successful validation. Authorized downloads support Range/ETag; do not cache storage URLs or assume a previously authorized document remains readable after access changes.
+
+## Native push registration
+
+A native session owns at most one FCM registration for Android or iOS. Use the authenticated bearer session; cookie transport is rejected. The server takes the session identity from authentication, never a request account/session ID.
+
+- `GET /api/v1/auth/native/push-registration` returns metadata or `push_registration_not_found`. Tokens and fingerprints are never returned.
+- `PUT` on the same route takes `expectedVersion` (`null` initially), `platform` (`ANDROID`/`IOS`), and `token`, with `Idempotency-Key`. The result is the usual mutation receipt. Renew registration after a token change and on foreground/reconnect before expiry, using a fresh observed version and operation key.
+- `POST /api/v1/auth/native/push-registration/disable` takes `expectedVersion` and `Idempotency-Key`. It clears the token and fingerprint. Disabling an already disabled current version is a receipt-only no-op.
+
+A registration lives no longer than its native session or 30 days from renewal. Refreshing access credentials keeps the same registration; ending that native session makes it ineligible. Current account credentials, session version, access expiry, and revocation are checked again after locking, including receipt replay. Native session issuance already limits device families. Each registration permits at most 10,000 revisions; revoke the session and authenticate again if that bound is reached.
+
+Tokens are opaque printable ASCII (16–2,048 characters), encrypted with the configured identity keyring using account/session/version-bound associated data. Retain old decryption keys while registrations use them. Operation storage retains only a payload fingerprint; audit and responses contain no token. Only one registration can hold a token. A conflicting registration returns `data_conflict`, without revealing its owner. On account switching, disable the old registration and revoke its session, then delete/rotate the client FCM token before registering under the new session. Never reclaim another session's token implicitly. If logout happens offline, discard that token locally and complete queued revocation only under its original account.
+
+Persist registration commands per native session. A lost response uses the same key/payload; a later metadata read determines current state because replay does not undo a subsequent disable. SDK token acquisition, OS notification permission, and local notification rendering belong to the mobile application. Push delivery is a separate worker capability; registration alone does not send a message.

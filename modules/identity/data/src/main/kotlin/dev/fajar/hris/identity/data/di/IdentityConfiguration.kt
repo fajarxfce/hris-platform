@@ -494,4 +494,62 @@ class IdentityConfiguration {
         policy: CredentialChallengePolicy,
         clock: Clock,
     ) = DeliverIdentityMail(deliveries, credentials, mail, journal, transactions, policy, clock)
+
+    @Bean
+    fun nativePushRegistrationSource(sql: DSLContext): NativePushRegistrationDataSource =
+        PostgresNativePushRegistrationDataSource(sql)
+
+    @Bean
+    fun nativePushRegistrations(
+        source: NativePushRegistrationDataSource,
+        tokens: IdentityTokenDataSource,
+    ): dev.fajar.hris.identity.domain.repositories.NativePushRegistrationRepository =
+        dev.fajar.hris.identity.data.repositories.StoredNativePushRegistrationRepository(
+            source,
+            tokens,
+        )
+
+    @Bean
+    fun getNativePushRegistration(
+        registrations: dev.fajar.hris.identity.domain.repositories.NativePushRegistrationRepository,
+        sessions: dev.fajar.hris.identity.domain.repositories.NativeSessionRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = GetNativePushRegistration(registrations, sessions, transactions, clock)
+
+    @Bean
+    fun saveNativePushRegistration(
+        registrations: dev.fajar.hris.identity.domain.repositories.NativePushRegistrationRepository,
+        sessions: dev.fajar.hris.identity.domain.repositories.NativeSessionRepository,
+        operations: dev.fajar.hris.core.domain.OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        SaveNativePushRegistration(
+            registrations,
+            sessions,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun disableNativePushRegistration(
+        registrations: dev.fajar.hris.identity.domain.repositories.NativePushRegistrationRepository,
+        sessions: dev.fajar.hris.identity.domain.repositories.NativeSessionRepository,
+        operations: dev.fajar.hris.core.domain.OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        DisableNativePushRegistration(
+            registrations,
+            sessions,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
 }

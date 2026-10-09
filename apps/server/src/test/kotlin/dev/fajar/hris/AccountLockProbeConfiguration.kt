@@ -5,6 +5,7 @@ import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import java.util.UUID
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.TestConfiguration
@@ -16,7 +17,10 @@ class AccountLockProbe {
         val account: UUID,
         val entered: CountDownLatch = CountDownLatch(1),
         val release: CountDownLatch = CountDownLatch(1),
-    )
+        val occurrence: Int = 1,
+    ) {
+        val calls = AtomicInteger()
+    }
 
     val current = AtomicReference<Barrier?>()
 }
@@ -35,7 +39,9 @@ class AccountLockProbeConfiguration {
             override fun lockAccount(accountId: UUID, shared: Boolean): Result<Unit> {
                 probe.current
                     .get()
-                    ?.takeIf { it.account == accountId }
+                    ?.takeIf {
+                        it.account == accountId && it.calls.incrementAndGet() >= it.occurrence
+                    }
                     ?.let {
                         it.entered.countDown()
                         check(it.release.await(5, TimeUnit.SECONDS))

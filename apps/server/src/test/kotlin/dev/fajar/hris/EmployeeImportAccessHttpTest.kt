@@ -84,9 +84,10 @@ class EmployeeImportAccessHttpTest : EmployeeImportApiFixture() {
     private fun waiting(
         account: UUID,
         change: () -> Unit,
+        occurrence: Int = 1,
         request: () -> HttpResponse<String>,
     ): HttpResponse<String> {
-        val barrier = AccountLockProbe.Barrier(account)
+        val barrier = AccountLockProbe.Barrier(account, occurrence = occurrence)
         accountProbe.current.set(barrier)
         return Executors.newSingleThreadExecutor().use { pool ->
             val pending = pool.submit<HttpResponse<String>> { request() }
@@ -295,6 +296,7 @@ class EmployeeImportAccessHttpTest : EmployeeImportApiFixture() {
                             )
                     }
                 },
+                occurrence = 2, // The first guard belongs to company client admission.
             ) {
                 get(f.browser, "${f.path}/$id")
             }

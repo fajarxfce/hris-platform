@@ -4,9 +4,11 @@ import java.util.UUID
 import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
 
 @TestPropertySource(properties = ["spring.flyway.target=53"])
+@Import(PreClientPolicyMigrationConfiguration::class)
 class ExpensePaymentReferenceMigrationHttpTest : ExpensePaymentApiFixture() {
     @Test
     fun existingSettlementsAreBackfilledPerCompanyWithoutChangingTheirEvidence() {

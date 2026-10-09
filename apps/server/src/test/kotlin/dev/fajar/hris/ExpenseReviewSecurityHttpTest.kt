@@ -9,10 +9,15 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 
-@Import(ApprovalFenceProbeConfiguration::class, AccountLockProbeConfiguration::class)
+@Import(
+    ApprovalFenceProbeConfiguration::class,
+    AccountLockProbeConfiguration::class,
+    CompanyLockObservationConfiguration::class,
+)
 class ExpenseReviewSecurityHttpTest : ExpenseReviewApiFixture() {
     @Autowired private lateinit var approvalProbe: ApprovalFenceProbe
     @Autowired private lateinit var accountProbe: AccountLockProbe
+    @Autowired private lateinit var companyLocks: CompanyLockObservation
 
     @Test
     fun reassigningAnEarlierMakerOrDelegatingForThemCannotBypassIndependentReview() {
@@ -256,8 +261,8 @@ class ExpenseReviewSecurityHttpTest : ExpenseReviewApiFixture() {
                 val deciding =
                     pool.submit<java.net.http.HttpResponse<String>> { reviewExpense(f, id, to) }
                 assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
-                val observation = ApprovalFenceProbe.Observation(f.company)
-                approvalProbe.observedLock.set(observation)
+                val observation = CompanyLockObservation.Attempt(f.company)
+                companyLocks.current.set(observation)
                 val revoking =
                     pool.submit<UUID> {
                         expenseDelegation(f, from, to.account, delegation, 0, false)
@@ -272,7 +277,7 @@ class ExpenseReviewSecurityHttpTest : ExpenseReviewApiFixture() {
         } finally {
             barrier.release.countDown()
             approvalProbe.beforeDecision.set(null)
-            approvalProbe.observedLock.set(null)
+            companyLocks.current.set(null)
         }
         val detail = submissionDetails(f, id)
         assertEquals("APPROVED", detail.get("claimStatus").asString())

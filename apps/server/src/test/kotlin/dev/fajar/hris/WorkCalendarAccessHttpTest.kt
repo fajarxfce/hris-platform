@@ -180,7 +180,8 @@ class WorkCalendarAccessHttpTest : WorkforceAccessApiFixture() {
     @Test
     fun calendarReadsShareTheirResourceGuardAndExcludeConcurrentScheduleWrites() {
         val f = isolatedFixture()
-        val barrier = AccountLockProbe.Barrier(f.actor.accountId)
+        // Pause the calendar transaction, after the separate client admission check.
+        val barrier = AccountLockProbe.Barrier(f.actor.accountId, occurrence = 2)
         accountProbe.current.set(barrier)
         Executors.newSingleThreadExecutor().use { pool ->
             val first = pool.submit<HttpResponse<String>> { get(f.admin, calendarPath(f)) }

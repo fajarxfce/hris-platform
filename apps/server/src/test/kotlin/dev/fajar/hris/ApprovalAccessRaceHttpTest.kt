@@ -11,10 +11,15 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 
-@Import(ApprovalFenceProbeConfiguration::class, AccountLockProbeConfiguration::class)
+@Import(
+    ApprovalFenceProbeConfiguration::class,
+    AccountLockProbeConfiguration::class,
+    CompanyLockObservationConfiguration::class,
+)
 class ApprovalAccessRaceHttpTest : ApprovalApiFixture() {
     @Autowired private lateinit var probe: ApprovalFenceProbe
     @Autowired private lateinit var accounts: AccountLockProbe
+    @Autowired private lateinit var companyLocks: CompanyLockObservation
     @Autowired private lateinit var people: PeopleRepository
     @Autowired private lateinit var transactions: TransactionRunner
 
@@ -74,8 +79,9 @@ class ApprovalAccessRaceHttpTest : ApprovalApiFixture() {
             Executors.newFixedThreadPool(2).use { pool ->
                 val deciding = pool.submit<HttpResponse<String>> { decideAs(f, request, to) }
                 assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
-                val waiting = ApprovalFenceProbe.Observation(f.company)
-                probe.observedLock.set(waiting)
+                // Admission now waits for the decision's company guard before its business fence.
+                val waiting = CompanyLockObservation.Attempt(f.company)
+                companyLocks.current.set(waiting)
                 val revoking =
                     pool.submit<HttpResponse<String>> {
                         saveDelegation(f, delegation, delegationBody(f, to.account, 0, false))
@@ -92,7 +98,7 @@ class ApprovalAccessRaceHttpTest : ApprovalApiFixture() {
         } finally {
             barrier.release.countDown()
             probe.beforeDecision.set(null)
-            probe.observedLock.set(null)
+            companyLocks.current.set(null)
         }
         assertEquals("APPROVED", details(f, request).get("status").asString())
         assertEquals("1", balance(f, f.admin).get("consumedDays").asString())

@@ -4,6 +4,7 @@ import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.core.http.response
 import dev.fajar.hris.sync.delivery.mappers.toResponse
 import dev.fajar.hris.sync.delivery.responses.*
+import dev.fajar.hris.sync.domain.entities.SyncCollection
 import dev.fajar.hris.sync.domain.usecases.GetMobileSyncBootstrap
 import dev.fajar.hris.sync.domain.usecases.GetMobileSyncChanges
 import org.springframework.web.bind.annotation.*
@@ -19,12 +20,16 @@ class MobileSyncController(
         actor: Actor,
         @RequestParam(required = false) cursor: String?,
         @RequestParam(defaultValue = "100") limit: Int,
-    ): SyncBootstrapResponse = bootstrap.execute(actor, cursor, limit).response().toResponse()
+        @RequestParam(required = false) collections: Set<SyncCollection>?,
+    ): SyncBootstrapResponse =
+        bootstrap.execute(actor, cursor, limit, collections).response().toResponse()
 
     @GetMapping("/changes")
     fun changes(
         actor: Actor,
         @RequestParam cursor: String,
         @RequestParam(defaultValue = "100") limit: Int,
-    ): SyncChangesResponse = changes.execute(actor, cursor, limit).response().toResponse()
+        @RequestParam(required = false) collections: Set<SyncCollection>?,
+    ): SyncChangesResponse =
+        changes.execute(actor, cursor, limit, collections).response().toResponse()
 }

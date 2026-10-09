@@ -13,13 +13,23 @@ The supported collections are:
 | `PAYSLIPS` | `payroll.self.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}` |
 | `PAYROLL_PAYMENTS` | `payroll.self.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}/payments` |
 
-Balance projections have stable IDs and versions. A year closing can publish several versions of its source balance and a destination update in one transaction; fetching a reference returns the latest committed account. Empty accounts are exposed only after a movement or explicit closing. Adding the balance collection invalidates older scope fingerprints and requires bootstrap.
+Balance projections have stable IDs and versions. A year closing can publish several versions of its source balance and a destination update in one transaction; fetching a reference returns the latest committed account. Empty accounts are exposed only after a movement or explicit closing. Adding a collection to the selected projection changes its scope fingerprint and requires bootstrap.
 
 All request statuses are included. A cancellation or withdrawal is an `UPSERT` with a new version, not a deletion. Team/company administration rights do not grant an employee-wide export. Documents, attendance, schedules, approval inboxes, unfinalized payroll, and communication are not registered sync collections yet. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
 
 Payslips reference immutable finalized assessments and have version `0`. Publication captures the entire run's references in one transaction; rollback or cancellation exposes none. The feed carries IDs, never salary amounts or calculation evidence. New collection authorization changes the scope fingerprint, so existing published assessments are discovered through a fresh bootstrap. Company-wide `payroll.read` does not grant employee sync; that projection requires `payroll.self.read`.
 
-Payroll payment references use the assessment ID, but belong to a separate collection and monotonically increasing progress version. Preparation, release, cancellation, and reconciliation capture changes atomically. A retry after a confirmed failure retains earlier attempts and advances the same progress resource. Bank destinations and transaction references are excluded from employee progress and sync. Before the first attempt, the canonical progress resource returns an empty version `0`; no payment reference is needed in bootstrap yet. Adding this collection requires replacing older scope fingerprints through bootstrap.
+Payroll payment references use the assessment ID, but belong to a separate collection and monotonically increasing progress version. Preparation, release, cancellation, and reconciliation capture changes atomically. A retry after a confirmed failure retains earlier attempts and advances the same progress resource. Bank destinations and transaction references are excluded from employee progress and sync. Before the first attempt, the canonical progress resource returns an empty version `0`; no payment reference is needed in bootstrap yet. Adding this collection to an existing selection requires a fresh bootstrap.
+
+## Client collection selection
+
+Mobile clients should send an explicit list of collections implemented by that client version, for example `?collections=EXPENSE_CLAIMS,LEAVE_REQUESTS&limit=100`. Both bootstrap and changes accept this optional comma-separated enum set. The effective projection is the intersection of that selection and current self-service permissions. A selection never grants company-wide access. Bootstrap returns the effective `collections` list; absent permissions can narrow it.
+
+Persist the requested selection with the account/company partition and cursor, and send it on every page. Cursors bind the effective selection. Switching to another effective selection, or omitting a selection when the default would include more collections, returns `409 sync_scope_changed`; replace the local partition through bootstrap. Changing order or adding an unauthorized collection does not alter the effective projection. Current permission and ownership changes still invalidate scope independently.
+
+An explicit selection prevents a newly registered server collection from appearing automatically in an older client. A client upgrade that adds support for another collection explicitly changes its selection and replaces the partition. Omitting `collections` retains the original behavior of selecting every authorized collection, so existing clients/cursors remain compatible; those clients must handle future scope resets and unknown collection types.
+
+An empty set returns `422 invalid_sync_collections`; an unknown enum value returns `400 invalid_request`. A known selection with no authorized collection returns `403 sync_access_denied`. Correct unsupported/empty selections instead of retrying them unchanged. Nonselected records are excluded from snapshot, delta, and pending-publication responses.
 
 ## Configuration
 

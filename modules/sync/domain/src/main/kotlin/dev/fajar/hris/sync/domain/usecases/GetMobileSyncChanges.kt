@@ -21,12 +21,18 @@ class GetMobileSyncChanges(
     private val transactions: TransactionRunner,
     private val clock: Clock,
 ) {
-    fun execute(actor: Actor, token: String, limit: Int = 100): Result<SyncChangePage> {
+    fun execute(
+        actor: Actor,
+        token: String,
+        limit: Int = 100,
+        requestedCollections: Set<SyncCollection>? = null,
+    ): Result<SyncChangePage> {
         val companyId =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
-        if (selfSyncCollections(actor.permissions).isEmpty())
-            return Result.Failed(Failure(FailureKind.FORBIDDEN, "sync_access_denied"))
+        val requested = requestedCollections?.toSet()
+        val initialSelection = selectSyncCollections(actor.permissions, requested)
+        if (initialSelection is Result.Failed) return initialSelection
         if (limit !in 1..200)
             return Result.Failed(
                 Failure(
@@ -53,9 +59,9 @@ class GetMobileSyncChanges(
             val checked = validateCompanyCommandActor(actor, identity)
             if (checked is Result.Failed) return@run checked
             val current = (checked as Result.Success).value
-            val collections = selfSyncCollections(current.permissions)
-            if (collections.isEmpty())
-                return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "sync_access_denied"))
+            val selection = selectSyncCollections(current.permissions, requested)
+            if (selection is Result.Failed) return@run selection
+            val collections = (selection as Result.Success).value
             val companyResult = companies.find(companyId)
             if (companyResult is Result.Failed) return@run companyResult
             val company =

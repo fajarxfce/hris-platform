@@ -44,8 +44,35 @@ class ExpenseReviewSecurityHttpTest : ExpenseReviewApiFixture() {
         assertEquals("BLOCKED", detail.get("approval").get("status").asString())
         val approval = UUID.fromString(detail.get("approval").get("id").asString())
         val reassigned = reassignExpense(f, approval, setOf(maker.account))
-        assertEquals(200, reassigned.statusCode(), reassigned.body())
-        val direct = reviewExpense(f, id, maker, 3, 1)
+        assertEquals(422, reassigned.statusCode(), reassigned.body())
+        assertEquals("approver_unavailable", json.readTree(reassigned.body())["code"].asString())
+        val stored =
+            json.readTree(get(f.admin, "/api/v1/companies/${f.company}/approvals/$approval").body())
+        assertTrue(
+            stored["excludedAccountIds"].iterator().asSequence().any {
+                it.asString() == maker.account.toString()
+            }
+        )
+        assertEquals(0, stored["version"].asLong())
+        assertThrows(org.springframework.dao.DataAccessException::class.java) {
+            database()
+                .update(
+                    "update approval_requests set excluded_account_ids='{}' where company_id=? and id=?",
+                    f.company,
+                    approval,
+                )
+        }
+        assertThrows(org.springframework.dao.DataAccessException::class.java) {
+            database()
+                .update(
+                    "insert into approval_assignment_overrides(company_id,request_id,step,revision,assignees,actor_id,reason) values(?,?,0,1,ARRAY[?]::uuid[],?,'Invalid maker assignment')",
+                    f.company,
+                    approval,
+                    maker.account,
+                    adminAccount(),
+                )
+        }
+        val direct = reviewExpense(f, id, maker, 3, 0)
         assertEquals(403, direct.statusCode(), direct.body())
         assertEquals("self_approval_denied", json.readTree(direct.body()).get("code").asString())
         val delegate =
@@ -57,11 +84,14 @@ class ExpenseReviewSecurityHttpTest : ExpenseReviewApiFixture() {
                 ),
             )
         expenseDelegation(f, maker, delegate.account)
-        val indirect = reviewExpense(f, id, delegate, 3, 1)
+        val inbox = get(delegate.browser, "/api/v1/companies/${f.company}/approvals")
+        assertEquals(200, inbox.statusCode(), inbox.body())
+        assertEquals(0, json.readTree(inbox.body())["items"].size())
+        val indirect = reviewExpense(f, id, delegate, 3, 0)
         assertEquals(403, indirect.statusCode(), indirect.body())
         assertEquals(0, submissionDetails(f, id).get("reviews").size())
-        assertEquals(200, reassignExpense(f, approval, setOf(delegate.account), 1).statusCode())
-        val independent = reviewExpense(f, id, delegate, 3, 2)
+        assertEquals(200, reassignExpense(f, approval, setOf(delegate.account), 0).statusCode())
+        val independent = reviewExpense(f, id, delegate, 3, 1)
         assertEquals(200, independent.statusCode(), independent.body())
         assertEquals(
             delegate.account.toString(),

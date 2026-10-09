@@ -13,6 +13,12 @@ fun isAssignedApprover(
     at: Instant,
 ): Boolean {
     if (actor.permissions.none { it in approvalPermissions(request.kind) }) return false
+    if (
+        actor.accountId == request.authorId ||
+            actor.accountId == request.requesterId ||
+            actor.accountId in request.excludedAccountIds
+    )
+        return false
     val assigned = request.stages.flatMap { it.assignees }.toSet()
     if (actor.accountId in assigned) return true
     if (delegations.size > 200) return false
@@ -21,6 +27,9 @@ fun isAssignedApprover(
             delegation.toAccount == actor.accountId &&
             delegation.kind == request.kind &&
             delegation.fromAccount in assigned &&
+            delegation.fromAccount !in request.excludedAccountIds &&
+            delegation.fromAccount != request.authorId &&
+            delegation.fromAccount != request.requesterId &&
             !at.isBefore(delegation.validFrom) &&
             at.isBefore(delegation.validUntil) &&
             members.any {

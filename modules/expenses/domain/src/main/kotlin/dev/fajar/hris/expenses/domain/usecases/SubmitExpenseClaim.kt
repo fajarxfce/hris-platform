@@ -219,6 +219,7 @@ class SubmitExpenseClaim(
                     lines.first().category.code,
                     draft.totalAmount,
                     now,
+                    excludedAccountIds = makers,
                 )
             val foundTemplates = approvals.templates(company, ApprovalKind.EXPENSE, today)
             if (foundTemplates is Result.Failed) return@run foundTemplates
@@ -247,8 +248,7 @@ class SubmitExpenseClaim(
                 return@run Result.Failed(
                     Failure(FailureKind.VALIDATION, "approval_group_too_large")
                 )
-            val snapshot =
-                snapshotApproval(template, context, candidates.filter { it.id !in makers })
+            val snapshot = snapshotApproval(template, context, candidates)
             if (snapshot is Result.Failed) return@run snapshot
             val approval = (snapshot as Result.Success).value
             val submission =

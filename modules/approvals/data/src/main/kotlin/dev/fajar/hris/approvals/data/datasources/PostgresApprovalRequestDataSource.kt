@@ -70,13 +70,36 @@ class PostgresApprovalRequestDataSource(private val sql: DSLContext) : ApprovalR
                     .and(D.VALID_FROM.le(at))
                     .and(D.VALID_UNTIL.gt(at))
                     .and(DSL.condition("{0} = any({1})", D.FROM_ACCOUNT, assignees))
+                    .and(
+                        DSL.condition(
+                            "not ({0} = any({1}))",
+                            D.FROM_ACCOUNT,
+                            R.EXCLUDED_ACCOUNT_IDS,
+                        )
+                    )
+                    .and(D.FROM_ACCOUNT.ne(R.AUTHOR_ID))
+                    .and(R.REQUESTER_ID.isNull.or(D.FROM_ACCOUNT.ne(R.REQUESTER_ID)))
             )
+        val eligible =
+            R.AUTHOR_ID.ne(accountId)
+                .and(R.REQUESTER_ID.isNull.or(R.REQUESTER_ID.ne(accountId)))
+                .and(
+                    DSL.condition(
+                        "not ({0} = any({1}))",
+                        DSL.`val`(accountId),
+                        R.EXCLUDED_ACCOUNT_IDS,
+                    )
+                )
         val blocked = if (includeBlocked) R.STATUS.eq("BLOCKED") else DSL.falseCondition()
         return sql.selectFrom(R)
             .where(R.COMPANY_ID.eq(companyId))
             .and(R.STATUS.`in`("PENDING", "BLOCKED"))
             .and(after?.let { R.ID.gt(it) } ?: DSL.noCondition())
-            .and(blocked.or(R.KIND.`in`(permissionsByKind.keys).and(assigned.or(delegated))))
+            .and(
+                blocked.or(
+                    eligible.and(R.KIND.`in`(permissionsByKind.keys)).and(assigned.or(delegated))
+                )
+            )
             .orderBy(R.ID)
             .limit(limit)
             .fetch()

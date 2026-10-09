@@ -87,6 +87,7 @@ class ReassignApproval(
                             it.membershipActive &&
                             it.id != request.authorId &&
                             it.id != request.requesterId &&
+                            it.id !in request.excludedAccountIds &&
                             it.permissions.any { p -> p in approvalPermissions(request.kind) }
                     }
                     .map { it.id }

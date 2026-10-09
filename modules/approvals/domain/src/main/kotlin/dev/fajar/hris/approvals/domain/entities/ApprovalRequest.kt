@@ -16,4 +16,5 @@ data class ApprovalRequest(
     val status: ApprovalStatus,
     val version: Long,
     val submittedAt: Instant,
+    val excludedAccountIds: Set<UUID> = emptySet(),
 )

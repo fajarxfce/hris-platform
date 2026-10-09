@@ -23,6 +23,12 @@ Approval mutations serialize per company. Business use cases acquire their busin
 
 Commands revalidate account state, credential version, membership, and the original request's permissions before mutation or receipt replay. New grants require a freshly resolved request. Delegated decisions check both parties' live access and the delegation period at decision time. Leave and expense decisions also exclude the employment's current beneficiary account, including an account linked after submission or before employment starts; delegation cannot bypass this exclusion. Expenses additionally exclude every frozen draft maker. The inbox excludes assignments when the corresponding action permission or the delegator's access has been removed.
 
+## Frozen maker exclusions
+
+Feature use cases can supply at most 200 additional maker account IDs when creating an approval snapshot. These IDs are retained in `excludedAccountIds`; they are not supplied or edited through an HTTP request. Initial assignment, reassignment, direct decisions, delegated decisions, and the actionable inbox all respect them. Exclusion never removes the existing author/requester checks or the consuming feature's current-beneficiary policy. A blocked request remains visible to approval administrators for repair.
+
+Expense submissions supply their complete retained maker set. Migration V48 derives the same set from existing expense submission evidence; it does not guess past account ownership. Stored exclusions are immutable. Database constraints also reject new assignments and decisions using an excluded maker.
+
 ## Bounded administration and selection
 
 `GET /approvals/templates?kind=...&asOf=YYYY-MM-DD` and `GET /approvals/delegations` return `{items, nextCursor}` pages. Both accept `after` and `limit` (default fifty, maximum 200). Template pages include inactive definitions effective by the selected date. Delegation pages include active and inactive, unexpired incoming/outgoing delegations owned by the current account.

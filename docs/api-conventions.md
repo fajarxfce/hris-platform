@@ -34,6 +34,8 @@ Employee creation uses effectiveFrom equal to startDate. PERMANENT and FIXED_TER
 
 Access and approvals:
 
+Approval responses include immutable `excludedAccountIds`, supplied by the owning business use case. They supplement author/requester exclusion and also apply to reassignment and delegated authority. Clients cannot edit this list. Assigning an excluded maker returns `approver_unavailable`.
+
 - `GET /companies/{companyId}/members`: bounded account directory for `identity.manage`.
 - `PUT /companies/{companyId}/members/{accountId}`: expectedVersion, active, permissions, reason. Null version adds an existing account; grants and revocations require an idempotency key.
 - `GET /companies/{companyId}/approvals/templates?kind=LEAVE&asOf=YYYY-MM-DD`: effective policies for `approvals.manage`.

@@ -16,4 +16,5 @@ data class ApprovalContext(
     val category: String?,
     val amount: BigDecimal,
     val submittedAt: Instant,
+    val excludedAccountIds: Set<UUID> = emptySet(),
 )

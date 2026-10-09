@@ -16,4 +16,5 @@ data class ApprovalResponse(
     val status: String,
     val version: Long,
     val submittedAt: Instant,
+    val excludedAccountIds: Set<UUID>,
 )

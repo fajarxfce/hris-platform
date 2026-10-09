@@ -50,6 +50,7 @@ fun ApprovalRequestsRecord.toRequest(
         ApprovalStatus.valueOf(status),
         version,
         submittedAt.toInstant(),
+        excludedAccountIds.toSet(),
     )
 }
 
@@ -71,6 +72,7 @@ fun ApprovalRequest.toRow(companyId: UUID, json: ObjectMapper): ApprovalRequests
         it.status = status.name
         it.version = version
         it.submittedAt = submittedAt.atOffset(ZoneOffset.UTC)
+        it.excludedAccountIds = excludedAccountIds.sorted().toTypedArray()
     }
 
 fun ApprovalDelegationsRecord.toDelegation(): Delegation =

@@ -45,6 +45,8 @@ fun snapshotApproval(
     context: ApprovalContext,
     members: List<MemberAccount>,
 ): Result<ApprovalRequest> {
+    if (context.excludedAccountIds.size > 200)
+        return Result.Failed(Failure(FailureKind.VALIDATION, "approval_exclusion_capacity"))
     if (members.size > 200)
         return Result.Failed(Failure(FailureKind.VALIDATION, "approval_group_too_large"))
     val eligible =
@@ -53,6 +55,7 @@ fun snapshotApproval(
                 it.membershipActive &&
                 it.id != context.authorId &&
                 it.id != context.requesterId &&
+                it.id !in context.excludedAccountIds &&
                 it.permissions.any { p -> p in approvalPermissions(context.kind) }
         }
     val stages =
@@ -87,6 +90,7 @@ fun snapshotApproval(
             else ApprovalStatus.PENDING,
             0,
             context.submittedAt,
+            context.excludedAccountIds.toSet(),
         )
     )
 }
@@ -104,7 +108,11 @@ fun decideApproval(
         return Result.Failed(Failure(FailureKind.CONFLICT, "approval_delegation_capacity"))
     if (request.status != ApprovalStatus.PENDING)
         return Result.Failed(Failure(FailureKind.CONFLICT, "approval_not_pending"))
-    if (actor.accountId == request.authorId || actor.accountId == request.requesterId)
+    if (
+        actor.accountId == request.authorId ||
+            actor.accountId == request.requesterId ||
+            actor.accountId in request.excludedAccountIds
+    )
         return Result.Failed(Failure(FailureKind.FORBIDDEN, "self_approval_denied"))
     if (actor.permissions.none { it in approvalPermissions(request.kind) })
         return Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
@@ -120,6 +128,9 @@ fun decideApproval(
                         it.kind == request.kind &&
                         it.toAccount == actor.accountId &&
                         it.fromAccount in assignees &&
+                        it.fromAccount !in request.excludedAccountIds &&
+                        it.fromAccount != request.authorId &&
+                        it.fromAccount != request.requesterId &&
                         !at.isBefore(it.validFrom) &&
                         at.isBefore(it.validUntil) &&
                         members.any { member ->

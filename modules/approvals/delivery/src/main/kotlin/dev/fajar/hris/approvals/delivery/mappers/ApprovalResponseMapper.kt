@@ -31,6 +31,7 @@ fun ApprovalRequest.toResponse(): ApprovalResponse =
         status.name,
         version,
         submittedAt,
+        excludedAccountIds,
     )
 
 fun Delegation.toResponse(): DelegationResponse =

@@ -1,6 +1,6 @@
 # Payroll preparation, calculation, and review
 
-Period preparation, independently verified inputs, durable monthly calculation, source cutoffs, and staged run review are implemented. Finalization, payslips, and payment processing are subsequent steps. Approval retains sign-off on calculated results; it does not establish payment.
+Period preparation, independently verified inputs, durable monthly calculation, source cutoffs, staged review, immutable finalization, and payslip reads are implemented. Payment processing is a subsequent step. Approval retains sign-off on calculated results; it does not establish payment.
 
 ## Periods
 
@@ -88,6 +88,8 @@ Each request retains its actor, approved references, reason, job ID, and company
 The worker locks its lease before the company payroll, people, approval, and access guards. It rechecks current authority, credential version, authentication age, exact approved versions, and employment heads. A changed employment revision requires explicit withdrawal and recalculation, including a later effective revision. One person cannot receive two original assessments for the same company/tax month through different employment IDs. A positive THR result retains its holiday kind/year, with a company/person/year/kind uniqueness constraint.
 
 One database transaction inserts thin immutable assessment references to all successful retained results, marks the finalization published, changes run and period to `FINALIZED`, retains period history, completes the job, and records audit/outbox. No employee is published early. The operation uses set-based source validation and checks completeness at the publication header, without loading 5,000 complete calculation payloads in the application. Deferred references prevent unpublished rows from committing. Cancellation, a lost lease, missing effects, or an audit failure rolls back publication.
+
+Publication reads bounded target, employee, outcome, and prior-assessment sets. Database functions keep join planning local to these bulk operations so recently imported rows do not cause repeated company-wide scans before statistics refresh. The setting is restored when each function exits, including failures. Runtime privileges, RLS, existing locks, and the worker's ten-second statement/two-second lock/thirty-second transaction budgets remain in force.
 
 The calculation job, counters, facts, and results remain unchanged. The run exposes `finalizationId`; the separate finalization detail exposes its own finite job progress and nullable `publishedAt`. A lost HTTP response can be recovered using the same command ID/key and payload. There is no hidden retry that changes an observed version. Finalization establishes assessment evidence, not a bank payment. Finalized payroll cannot be withdrawn, abandoned, edited, or cancelled; corrections require a subsequent referenced amendment.
 

@@ -44,59 +44,18 @@ class PostgresPayrollFinalizationDataSource(private val sql: DSLContext) :
     }
 
     override fun readiness(company: UUID, run: UUID): PayrollPublicationReadinessRow =
-        sql.fetchOne(
-                """
-                WITH run_scope AS MATERIALIZED (
-                  SELECT id,company_id,earnings_month FROM payroll_runs WHERE company_id=? AND id=? LIMIT 1
-                )
-                SELECT count(*) FILTER(WHERE e.version<>t.employment_version)::integer changed,
-                 (count(*)-count(DISTINCT e.person_id))::integer duplicates,
-                 count(*) FILTER(WHERE t.previous_assessment_id IS DISTINCT FROM a.id)::integer assessed,
-                 count(*) FILTER(WHERE (o.calculation->'holiday'->>'amount')::numeric>0 AND EXISTS(SELECT 1 FROM payroll_assessments a WHERE a.company_id=r.company_id AND a.person_id=e.person_id
-                   AND a.holiday_year=extract(year FROM (o.calculation->'holiday'->>'holidayDate')::date)::integer AND a.holiday_kind=o.facts->'input'->'holidayAllowance'->>'kind'))::integer holidays
-                FROM run_scope r
-                 CROSS JOIN LATERAL(SELECT t.ordinal,t.employment_id,t.employment_version,t.previous_assessment_id FROM payroll_run_targets t
-                   WHERE t.company_id=r.company_id AND t.run_id=r.id ORDER BY t.ordinal LIMIT 5000) t
-                 CROSS JOIN LATERAL(SELECT e.person_id,e.version FROM employments e WHERE e.company_id=r.company_id AND e.id=t.employment_id LIMIT 1) e
-                 CROSS JOIN LATERAL(SELECT o.facts,o.calculation FROM payroll_run_results o WHERE o.company_id=r.company_id AND o.run_id=r.id AND o.ordinal=t.ordinal LIMIT 1) o
-                 LEFT JOIN LATERAL(SELECT a.id FROM payroll_assessments a WHERE a.company_id=r.company_id AND a.person_id=e.person_id
-                   AND a.tax_month>=date_trunc('year',r.earnings_month)::date AND a.tax_month<(date_trunc('year',r.earnings_month)+interval '1 year')::date
-                   ORDER BY a.tax_month DESC LIMIT 1) a ON true
-                """
-                    .trimIndent(),
-                company,
-                run,
-            )!!
-            .let {
-                PayrollPublicationReadinessRow(
-                    it.get("changed", Int::class.javaObjectType)!!,
-                    it.get("duplicates", Int::class.javaObjectType)!!,
-                    it.get("assessed", Int::class.javaObjectType)!!,
-                    it.get("holidays", Int::class.javaObjectType)!!,
-                )
-            }
+        sql.fetchOne("select * from payroll_publication_readiness(?,?)", company, run)!!.let {
+            PayrollPublicationReadinessRow(
+                it.get("changed", Int::class.javaObjectType)!!,
+                it.get("duplicates", Int::class.javaObjectType)!!,
+                it.get("assessed", Int::class.javaObjectType)!!,
+                it.get("holidays", Int::class.javaObjectType)!!,
+            )
+        }
 
     override fun insertAssessments(company: UUID, finalization: UUID, at: OffsetDateTime) {
         sql.execute(
-            """
-            WITH publication AS MATERIALIZED (
-              SELECT f.company_id,f.id,f.run_id,r.earnings_month FROM payroll_finalizations f
-               JOIN payroll_runs r ON r.company_id=f.company_id AND r.id=f.run_id
-              WHERE f.company_id=? AND f.id=? LIMIT 1
-            )
-            INSERT INTO payroll_assessments(company_id,id,finalization_id,run_id,ordinal,employment_id,person_id,tax_month,published_at,holiday_kind,holiday_year)
-            SELECT f.company_id,gen_random_uuid(),f.id,f.run_id,t.ordinal,t.employment_id,e.person_id,f.earnings_month,?::timestamptz,
-              CASE WHEN (o.calculation->'holiday'->>'amount')::numeric>0 THEN o.facts->'input'->'holidayAllowance'->>'kind' END,
-              CASE WHEN (o.calculation->'holiday'->>'amount')::numeric>0 THEN extract(year FROM (o.calculation->'holiday'->>'holidayDate')::date)::integer END
-            FROM publication f
-              CROSS JOIN LATERAL(SELECT t.ordinal,t.employment_id FROM payroll_run_targets t
-                WHERE t.company_id=f.company_id AND t.run_id=f.run_id ORDER BY t.ordinal LIMIT 5000) t
-              CROSS JOIN LATERAL(SELECT e.person_id FROM employments e WHERE e.company_id=f.company_id AND e.id=t.employment_id LIMIT 1) e
-              CROSS JOIN LATERAL(SELECT o.facts,o.calculation FROM payroll_run_results o
-                WHERE o.company_id=f.company_id AND o.run_id=f.run_id AND o.ordinal=t.ordinal AND o.status='SUCCEEDED' LIMIT 1) o
-            ORDER BY t.ordinal
-            """
-                .trimIndent(),
+            "select insert_payroll_assessments(?,?,?::timestamptz)",
             company,
             finalization,
             at,

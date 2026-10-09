@@ -100,10 +100,19 @@ class PayrollFinalizationPublicationHttpTest : PayrollFinalizationApiFixture() {
 
         val started = System.nanoTime()
         var referencesAt = started
-        finalizationProbe.afterAssessments = { referencesAt = System.nanoTime() }
+        var joinSetting: String? = null
+        finalizationProbe.afterAssessments = {
+            referencesAt = System.nanoTime()
+            joinSetting = runtimeJdbc.queryForObject("show enable_nestloop", String::class.java)
+        }
         val result = stepFinalization(f, lease)
         val elapsed = Duration.ofNanos(System.nanoTime() - started)
         assertEquals(Result.Success(JobStep(1, true)), result)
+        assertEquals(
+            "on",
+            joinSetting,
+            "Publication settings must not leak into the caller transaction",
+        )
         assertTrue(elapsed < Duration.ofSeconds(30), elapsed.toString())
         assertEquals(5000, count(f.calculation.people.payroll.company, "payroll_assessments"))
         assertEquals(5000, count(f.calculation.people.payroll.company, "mobile_sync_changes"))

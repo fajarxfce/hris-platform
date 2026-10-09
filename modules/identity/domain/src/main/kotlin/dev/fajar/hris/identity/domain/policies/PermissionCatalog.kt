@@ -113,5 +113,11 @@ object PermissionCatalog {
             "documents.self.upload",
             "payroll.self.read",
         )
-    val assignable = companyAdministrator + humanResources + finance + manager + employee
+    val assignable =
+        companyAdministrator +
+            humanResources +
+            finance +
+            manager +
+            employee +
+            setOf("documents.retention")
 }

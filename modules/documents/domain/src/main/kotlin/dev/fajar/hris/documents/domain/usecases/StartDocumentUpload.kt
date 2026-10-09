@@ -4,6 +4,7 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.documents.domain.entities.*
 import dev.fajar.hris.documents.domain.policies.*
 import dev.fajar.hris.documents.domain.repositories.DocumentRepository
+import dev.fajar.hris.documents.domain.repositories.DocumentRetentionRepository
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.JobStatus
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
@@ -15,6 +16,7 @@ import java.util.UUID
 
 class StartDocumentUpload(
     private val documents: DocumentRepository,
+    private val retention: DocumentRetentionRepository,
     private val jobs: JobRepository,
     private val profiles: PersonProfileRepository,
     private val companies: CompanyRepository,
@@ -101,6 +103,10 @@ class StartDocumentUpload(
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
             if ((existing?.revisionCount ?: 0) >= 100)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "document_revision_limit"))
+            val retentionState = retention.state(company, input.documentId)
+            if (retentionState is Result.Failed) return@run retentionState
+            if ((retentionState as Result.Success).value?.archive != null)
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "document_archived"))
             val active = documents.activeRevision(company, input.documentId)
             if (active is Result.Failed) return@run active
             val previous = (active as Result.Success).value

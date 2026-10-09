@@ -48,6 +48,7 @@ class DocumentsConfiguration {
     @Bean
     fun startDocumentUpload(
         documents: DocumentRepository,
+        retention: DocumentRetentionRepository,
         jobs: JobRepository,
         profiles: PersonProfileRepository,
         companies: CompanyRepository,
@@ -61,6 +62,7 @@ class DocumentsConfiguration {
     ) =
         StartDocumentUpload(
             documents,
+            retention,
             jobs,
             profiles,
             companies,
@@ -359,4 +361,94 @@ class DocumentsConfiguration {
     @Bean
     fun documentReferences(source: DocumentReferenceDataSource): DocumentReferenceRepository =
         StoredDocumentReferenceRepository(source)
+
+    @Bean
+    fun documentRetentionSource(sql: DSLContext): DocumentRetentionDataSource =
+        PostgresDocumentRetentionDataSource(sql)
+
+    @Bean
+    fun documentRetention(source: DocumentRetentionDataSource): DocumentRetentionRepository =
+        StoredDocumentRetentionRepository(source)
+
+    @Bean
+    fun saveDocumentRetentionPolicy(
+        retention: DocumentRetentionRepository,
+        documents: DocumentRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        SaveDocumentRetentionPolicy(
+            retention,
+            documents,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun changeDocumentRetention(
+        retention: DocumentRetentionRepository,
+        documents: DocumentRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ChangeDocumentRetention(
+            retention,
+            documents,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun getDocumentRetentionPolicies(
+        retention: DocumentRetentionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetDocumentRetentionPolicies(retention, identities, transactions)
+
+    @Bean
+    fun getDocumentRetentionPolicyHistory(
+        retention: DocumentRetentionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetDocumentRetentionPolicyHistory(retention, identities, transactions)
+
+    @Bean
+    fun getDocumentRetention(
+        retention: DocumentRetentionRepository,
+        documents: DocumentRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetDocumentRetention(retention, documents, identities, transactions)
+
+    @Bean
+    fun getDocumentRetentionHistory(
+        retention: DocumentRetentionRepository,
+        documents: DocumentRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetDocumentRetentionHistory(retention, documents, identities, transactions)
 }

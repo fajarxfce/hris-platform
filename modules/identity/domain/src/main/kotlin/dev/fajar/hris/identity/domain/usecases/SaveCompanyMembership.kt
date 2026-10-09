@@ -113,7 +113,9 @@ class SaveCompanyMembership(
             val added = effectivePermissions - previousGrants
             if (
                 added.any {
-                    (it.startsWith("payroll.") && it != "payroll.self.read") || it == "expenses.pay"
+                    (it.startsWith("payroll.") && it != "payroll.self.read") ||
+                        it == "expenses.pay" ||
+                        it == "documents.retention"
                 }
             ) {
                 if (accountId == actor.accountId)

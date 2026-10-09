@@ -57,10 +57,10 @@ abstract class WorkPeriodApiFixture : ApiIntegrationTest() {
         }
     }
 
-    protected fun fixture(): Fixture {
+    protected fun fixture(email: String = "admin@example.test"): Fixture {
         clock.set(Instant.parse("2026-10-01T03:00:00Z"))
         val admin = client()
-        val csrf = login(admin)
+        val csrf = login(admin, email)
         val account =
             UUID.fromString(
                 json.readTree(get(admin, "/api/v1/me").body()).get("account").get("id").asString()

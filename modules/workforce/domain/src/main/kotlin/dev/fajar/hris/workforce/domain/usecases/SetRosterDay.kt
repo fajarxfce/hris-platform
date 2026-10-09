@@ -1,6 +1,10 @@
 package dev.fajar.hris.workforce.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.domain.entities.*
 import dev.fajar.hris.workforce.domain.policies.*
@@ -15,6 +19,9 @@ class SetRosterDay(
     private val people: PeopleRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
+    private val companies: CompanyRepository,
+    private val members: MembershipRepository,
+    private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
 ) {
     fun execute(
@@ -48,19 +55,39 @@ class SetRosterDay(
                     reason,
                 ),
             )
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
-            }
             val lock = schedules.lock(company)
             if (lock is Result.Failed) return@run lock
-            val mutable =
-                periods
-                    .lockMonth(company, java.time.YearMonth.from(date), false)
-                    .flatMap(::requireMutablePeriod)
+            val period =
+                if ((replay as Result.Success).value == null)
+                    periods.lockMonth(company, java.time.YearMonth.from(date), false)
+                else Result.Success(null)
+            if (period is Result.Failed) return@run period
+            val peopleGuard = people.lockReportingLines(company, shared = true)
+            if (peopleGuard is Result.Failed) return@run peopleGuard
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
+            val authorized =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (authorized is Result.Failed) return@run authorized
+            val live = (authorized as Result.Success).value
+            val permission = live.requirePermission("workforce.manage")
+            if (permission is Result.Failed) return@run permission
+            replay.value?.let {
+                return@run Result.Success(it)
+            }
+            val mutable = requireMutablePeriod(requireNotNull((period as Result.Success).value))
             if (mutable is Result.Failed) return@run mutable
             val employee = people.find(company, employeeId, date)
             if (employee is Result.Failed) return@run employee

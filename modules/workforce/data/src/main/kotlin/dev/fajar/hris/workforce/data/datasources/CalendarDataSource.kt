@@ -5,7 +5,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface CalendarDataSource {
-    fun lock(companyId: UUID)
+    fun lock(companyId: UUID, shared: Boolean)
 
     fun scheduleVersion(companyId: UUID, employeeId: UUID): Long?
 

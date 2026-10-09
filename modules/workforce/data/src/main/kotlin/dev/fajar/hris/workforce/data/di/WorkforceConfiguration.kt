@@ -46,12 +46,20 @@ class WorkforceConfiguration {
         schedules: ScheduleRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = SaveShift(schedules, operations, journal, transactions)
+    ) = SaveShift(schedules, operations, journal, companies, members, identities, transactions)
 
     @Bean
-    fun listShifts(schedules: ScheduleRepository, transactions: TransactionRunner) =
-        ListShifts(schedules, transactions)
+    fun listShifts(
+        schedules: ScheduleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = ListShifts(schedules, companies, members, identities, transactions)
 
     @Bean
     fun assignSchedule(
@@ -60,8 +68,22 @@ class WorkforceConfiguration {
         people: PeopleRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = AssignWeeklySchedule(periods, schedules, people, operations, journal, transactions)
+    ) =
+        AssignWeeklySchedule(
+            periods,
+            schedules,
+            people,
+            operations,
+            journal,
+            companies,
+            members,
+            identities,
+            transactions,
+        )
 
     @Bean
     fun setRosterDay(
@@ -70,16 +92,33 @@ class WorkforceConfiguration {
         people: PeopleRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = SetRosterDay(periods, schedules, people, operations, journal, transactions)
+    ) =
+        SetRosterDay(
+            periods,
+            schedules,
+            people,
+            operations,
+            journal,
+            companies,
+            members,
+            identities,
+            transactions,
+        )
 
     @Bean
     fun employeeCalendar(
         schedules: ScheduleRepository,
         people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetEmployeeCalendar(schedules, people, transactions, clock)
+    ) = GetEmployeeCalendar(schedules, people, companies, members, identities, transactions, clock)
 
     @Bean
     fun saveHoliday(
@@ -87,12 +126,30 @@ class WorkforceConfiguration {
         schedules: ScheduleRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = SaveWorkHoliday(periods, schedules, operations, journal, transactions)
+    ) =
+        SaveWorkHoliday(
+            periods,
+            schedules,
+            operations,
+            journal,
+            companies,
+            members,
+            identities,
+            transactions,
+        )
 
     @Bean
-    fun listHolidays(schedules: ScheduleRepository, transactions: TransactionRunner) =
-        ListWorkHolidays(schedules, transactions)
+    fun listHolidays(
+        schedules: ScheduleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = ListWorkHolidays(schedules, companies, members, identities, transactions)
 
     @Bean
     fun attendanceSource(sql: DSLContext): AttendanceDataSource = PostgresAttendanceDataSource(sql)

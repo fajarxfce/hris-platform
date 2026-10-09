@@ -7,7 +7,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface ScheduleRepository {
-    fun lock(companyId: UUID): Result<Unit>
+    fun lock(companyId: UUID, shared: Boolean = false): Result<Unit>
 
     fun findShift(companyId: UUID, id: UUID): Result<ShiftDefinition?>
 

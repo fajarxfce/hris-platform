@@ -10,9 +10,9 @@ import java.util.UUID
 import org.jooq.DSLContext
 
 class PostgresCalendarDataSource(private val sql: DSLContext) : CalendarDataSource {
-    override fun lock(companyId: UUID) {
-        sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "calendar:$companyId")
-            .execute()
+    override fun lock(companyId: UUID, shared: Boolean) {
+        val function = if (shared) "pg_advisory_xact_lock_shared" else "pg_advisory_xact_lock"
+        sql.query("select $function(hashtextextended(?,0))", "calendar:$companyId").execute()
     }
 
     override fun scheduleVersion(companyId: UUID, employeeId: UUID): Long? =

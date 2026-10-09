@@ -20,8 +20,8 @@ class StoredScheduleRepository(
     private val holidaySource: HolidayDataSource,
     private val json: ObjectMapper,
 ) : ScheduleRepository {
-    override fun lock(companyId: UUID): Result<Unit> = safeDatabaseCall {
-        calendars.lock(companyId)
+    override fun lock(companyId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
+        calendars.lock(companyId, shared)
     }
 
     override fun findShift(companyId: UUID, id: UUID): Result<ShiftDefinition?> = safeDatabaseCall {

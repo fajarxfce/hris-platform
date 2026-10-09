@@ -1,6 +1,9 @@
 package dev.fajar.hris.expenses.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.documents.domain.entities.DocumentReferenceKind
+import dev.fajar.hris.documents.domain.entities.DocumentReferenceOrigin
+import dev.fajar.hris.documents.domain.repositories.DocumentReferenceRepository
 import dev.fajar.hris.expenses.domain.entities.*
 import dev.fajar.hris.expenses.domain.policies.*
 import dev.fajar.hris.expenses.domain.repositories.*
@@ -15,6 +18,7 @@ class SaveExpenseDraft(
     private val claims: ExpenseClaimRepository,
     private val policies: ExpensePolicyRepository,
     private val documents: dev.fajar.hris.documents.domain.repositories.DocumentRepository,
+    private val references: DocumentReferenceRepository,
     private val people: PeopleRepository,
     private val units: OrganizationRepository,
     private val companies: CompanyRepository,
@@ -35,6 +39,7 @@ class SaveExpenseDraft(
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         val valid = validateExpenseDraft(input)
         if (valid is Result.Failed) return valid
+        val receiptIds = input.lines.flatMap { it.receiptRevisionIds }.toSet()
         val key =
             OperationKey(
                 "expenses.draft_save",
@@ -69,6 +74,10 @@ class SaveExpenseDraft(
             val unitLock = units.lockStructure(company)
             if (unitLock is Result.Failed) return@run unitLock
 
+            if (receiptIds.isNotEmpty()) {
+                val documentLock = documents.lock(company)
+                if (documentLock is Result.Failed) return@run documentLock
+            }
             val companyLock = companies.lock(company)
             if (companyLock is Result.Failed) return@run companyLock
             val memberLock = members.lock(company)
@@ -149,7 +158,7 @@ class SaveExpenseDraft(
                         Failure(FailureKind.VALIDATION, "expense_cost_center_unavailable")
                     )
             }
-            for (revisionId in input.lines.flatMap { it.receiptRevisionIds }.toSet()) {
+            for (revisionId in receiptIds) {
                 val foundRevision = documents.revision(company, revisionId)
                 if (foundRevision is Result.Failed) return@run foundRevision
                 val revision =
@@ -201,26 +210,43 @@ class SaveExpenseDraft(
                     input.reason,
                     now,
                 )
-            claims.saveDraft(actor, claim, draft, input.expectedVersion).flatMap { receipt ->
-                operations
-                    .record(actor, key, receipt)
-                    .flatMap {
-                        journal.record(
-                            actor,
-                            ChangeRecord(
-                                "expense_claim",
+            claims
+                .saveDraft(actor, claim, draft, input.expectedVersion)
+                .flatMap { receipt ->
+                    references
+                        .retain(
+                            company,
+                            DocumentReferenceOrigin(
+                                DocumentReferenceKind.EXPENSE_DRAFT,
                                 claim.id,
-                                "expenses.draft_saved",
-                                mapOf(
-                                    "employmentId" to employee.id.toString(),
-                                    "revision" to draft.revision.toString(),
-                                ),
-                                input.reason,
+                                draft.revision,
                             ),
+                            receiptIds,
+                            actor.accountId,
+                            now,
                         )
-                    }
-                    .map { receipt }
-            }
+                        .map { receipt }
+                }
+                .flatMap { receipt ->
+                    operations
+                        .record(actor, key, receipt)
+                        .flatMap {
+                            journal.record(
+                                actor,
+                                ChangeRecord(
+                                    "expense_claim",
+                                    claim.id,
+                                    "expenses.draft_saved",
+                                    mapOf(
+                                        "employmentId" to employee.id.toString(),
+                                        "revision" to draft.revision.toString(),
+                                    ),
+                                    input.reason,
+                                ),
+                            )
+                        }
+                        .map { receipt }
+                }
         }
     }
 }

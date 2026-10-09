@@ -49,3 +49,5 @@ Feature data adapters map transport DTOs. Pure use cases own application policy.
 ## Verification
 
 Compile-time project boundaries and architecture checks complement behavior tests. PostgreSQL integration tests cover actual RLS, transactions, constraints, migrations, concurrent writes, and rollback. Payroll uses official golden fixtures and immutable rule versions. UI tests exercise company switching, permissions, lifecycle, keyboard focus, and screenshots. Performance is measured against the documented budget.
+
+Business document references belong to the documents domain contract and are registered by consuming use cases in their business transaction. Consumers hold the company document guard before registering evidence; retention must hold that same guard when checking references and retiring content. The registry does not depend on consuming repositories. Mandatory consumer references also have database constraints, so forgetting registration cannot produce an unprotected committed receipt.

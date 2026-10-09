@@ -2,6 +2,7 @@ package dev.fajar.hris.expenses.data.di
 
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.documents.domain.repositories.DocumentReferenceRepository
 import dev.fajar.hris.documents.domain.repositories.DocumentRepository
 import dev.fajar.hris.expenses.data.datasources.*
 import dev.fajar.hris.expenses.data.repositories.*
@@ -81,6 +82,7 @@ class ExpenseConfiguration {
         claims: ExpenseClaimRepository,
         policies: ExpensePolicyRepository,
         documents: DocumentRepository,
+        references: DocumentReferenceRepository,
         people: PeopleRepository,
         units: OrganizationRepository,
         companies: CompanyRepository,
@@ -95,6 +97,7 @@ class ExpenseConfiguration {
             claims,
             policies,
             documents,
+            references,
             people,
             units,
             companies,

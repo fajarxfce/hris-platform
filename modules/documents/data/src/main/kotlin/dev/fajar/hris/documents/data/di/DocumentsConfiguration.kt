@@ -351,4 +351,12 @@ class DocumentsConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
     ) = GetDocumentInventoryPages(inventory, identities, transactions)
+
+    @Bean
+    fun documentReferenceSource(sql: DSLContext): DocumentReferenceDataSource =
+        PostgresDocumentReferenceDataSource(sql)
+
+    @Bean
+    fun documentReferences(source: DocumentReferenceDataSource): DocumentReferenceRepository =
+        StoredDocumentReferenceRepository(source)
 }

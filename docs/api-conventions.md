@@ -128,3 +128,18 @@ Mobile synchronization:
 - `GET /companies/{companyId}/sync/changes`: required opaque `cursor`, `limit` (default 100, maximum 200). Returns UPSERT/DELETE references, continuation state, pending-publication status, and polling guidance.
 
 The initial collections are owned expense claims and leave requests. Each page rechecks live account/company scope. See [synchronization](synchronization.md) for local atomic cursor storage, bootstrap limits, key rotation, retention, access invalidation, and post-commit publication.
+
+Payroll configuration:
+
+- `PUT /companies/{companyId}/payroll/policy`: effectiveFrom/effectiveUntil (`yyyy-MM`, same calendar year), incomeTaxRuleId, insuranceRuleId, minimumMonthlyWage, healthWageCap, pensionWageCap, contributionRounding, reviewReferences, expectedVersion, reason. Requires `payroll.policy.manage`, recent authentication/MFA, and an idempotency key.
+- `GET /companies/{companyId}/payroll/policy?asOf=yyyy-MM`: selected effective revision and current optimistic version. Expired coverage returns `payroll_policy_not_effective` with safe `validFrom`/`validUntil` parameters.
+- `GET /companies/{companyId}/payroll/policy/history`: numeric revision `after`, limit 50/default and 200/maximum.
+- `GET /companies/{companyId}/payroll/income-tax-rules`: immutable rule versions, sources, decimal-string rates/thresholds, PTKP categories, and validity.
+- `PUT /companies/{companyId}/payroll/employees/{employeeId}/compensation`: effectiveFrom (`yyyy-MM`), terms, expectedVersion, expectedEmploymentVersion, reason. Requires `payroll.compensation.manage`, recent authentication/MFA, and an idempotency key. Own compensation changes are denied.
+- `GET /companies/{companyId}/payroll/employees/{employeeId}/compensation?asOf=yyyy-MM`: selected terms and current/applied versions.
+- `GET /companies/{companyId}/payroll/employees/{employeeId}/compensation/history`: numeric revision `after` and bounded limit.
+- `GET /companies/{companyId}/payroll/compensations?asOf=yyyy-MM`: UUID employment `after`, bounded limit, and the selected compensation for each employment.
+
+Terms include basicSalary, at most twenty fixedEarnings (`code`, `name`, `amount`, `taxable`), treatment (`GROSS`, `GROSS_UP`, `NET`), tax (`residency`, `ptkp`, `residenceCountry`, optional subjectiveFrom/subjectiveUntil, verifiedOn, verificationReference), insuranceWage, insurancePrograms, optional insuranceExemptionReason, accidentRisk, additionalHealthDependents, additionalRetirementContribution, qualifiedDonation, and otherNetDeduction. All money is an IDR decimal string. Validation includes stable field codes without rejected values. See [payroll rules](payroll-rules.md) for calculation and configuration semantics.
+
+Compensation reads require `payroll.read` or `payroll.compensation.manage`; policy management alone does not expose salary. Company access and current credential/permission intersection apply on every read and command. A previous successful operation replays its receipt while current authority remains valid; a failed operation can be retried with corrected data. Configuration history is immutable. The initial mobile sync collections do not yet include compensation or payroll output.

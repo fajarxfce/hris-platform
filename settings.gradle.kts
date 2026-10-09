@@ -46,3 +46,5 @@ include(":modules:documents:domain", ":modules:documents:data", ":modules:docume
 include(":modules:expenses:domain", ":modules:expenses:data", ":modules:expenses:delivery")
 
 include(":modules:sync:domain", ":modules:sync:data", ":modules:sync:delivery")
+
+include(":modules:payroll:domain", ":modules:payroll:data", ":modules:payroll:delivery")

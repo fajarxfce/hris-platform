@@ -119,5 +119,5 @@ object PermissionCatalog {
             finance +
             manager +
             employee +
-            setOf("documents.retention")
+            setOf("documents.retention", "payroll.policy.manage", "payroll.compensation.manage")
 }

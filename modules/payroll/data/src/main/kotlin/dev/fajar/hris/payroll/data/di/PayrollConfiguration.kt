@@ -1,0 +1,170 @@
+package dev.fajar.hris.payroll.data.di
+
+import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.payroll.data.datasources.*
+import dev.fajar.hris.payroll.data.repositories.*
+import dev.fajar.hris.payroll.domain.repositories.*
+import dev.fajar.hris.payroll.domain.usecases.*
+import dev.fajar.hris.people.domain.repositories.PeopleRepository
+import java.time.Clock
+import org.jooq.DSLContext
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import tools.jackson.databind.ObjectMapper
+
+@Configuration(proxyBeanMethods = false)
+class PayrollConfiguration {
+    @Bean
+    fun payrollPolicySource(sql: DSLContext): PayrollPolicyDataSource =
+        PostgresPayrollPolicyDataSource(sql)
+
+    @Bean
+    fun compensationSource(sql: DSLContext): CompensationDataSource =
+        PostgresCompensationDataSource(sql)
+
+    @Bean
+    fun payrollPolicies(
+        source: PayrollPolicyDataSource,
+        json: ObjectMapper,
+    ): PayrollPolicyRepository = StoredPayrollPolicyRepository(source, json)
+
+    @Bean
+    fun compensations(source: CompensationDataSource, json: ObjectMapper): CompensationRepository =
+        StoredCompensationRepository(source, json)
+
+    @Bean
+    fun getCompensationHistory(
+        policies: PayrollPolicyRepository,
+        compensations: CompensationRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) =
+        GetCompensationHistory(
+            policies,
+            compensations,
+            companies,
+            members,
+            identities,
+            transactions,
+        )
+
+    @Bean
+    fun getEmployeeCompensation(
+        policies: PayrollPolicyRepository,
+        compensations: CompensationRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) =
+        GetEmployeeCompensation(
+            policies,
+            compensations,
+            companies,
+            members,
+            identities,
+            transactions,
+        )
+
+    @Bean
+    fun getPayrollPolicy(
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetPayrollPolicy(policies, companies, members, identities, transactions)
+
+    @Bean
+    fun getPayrollPolicyHistory(
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetPayrollPolicyHistory(policies, companies, members, identities, transactions)
+
+    @Bean
+    fun listEmployeeCompensations(
+        policies: PayrollPolicyRepository,
+        compensations: CompensationRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) =
+        ListEmployeeCompensations(
+            policies,
+            compensations,
+            companies,
+            members,
+            identities,
+            transactions,
+        )
+
+    @Bean
+    fun listPayrollIncomeTaxRules(
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = ListPayrollIncomeTaxRules(policies, companies, members, identities, transactions)
+
+    @Bean
+    fun saveEmployeeCompensation(
+        policies: PayrollPolicyRepository,
+        compensations: CompensationRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        SaveEmployeeCompensation(
+            policies,
+            compensations,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun savePayrollPolicy(
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        SavePayrollPolicy(
+            policies,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+}

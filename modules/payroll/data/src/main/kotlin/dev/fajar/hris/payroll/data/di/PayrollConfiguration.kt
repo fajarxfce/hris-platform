@@ -560,6 +560,7 @@ class PayrollConfiguration {
         compensation: CompensationRepository,
         inputs: PayrollInputRepository,
         openings: PayrollTaxOpeningRepository,
+        assessments: PayrollAssessmentRepository,
     ) =
         AdvancePayrollCalculation(
             runs,
@@ -577,6 +578,7 @@ class PayrollConfiguration {
             compensation,
             inputs,
             openings,
+            assessments,
         )
 
     @Bean
@@ -938,4 +940,14 @@ class PayrollConfiguration {
             transactions,
             runs,
         )
+
+    @Bean
+    fun payrollAssessmentSource(sql: DSLContext): PayrollAssessmentDataSource =
+        PostgresPayrollAssessmentDataSource(sql)
+
+    @Bean
+    fun payrollAssessments(
+        source: PayrollAssessmentDataSource,
+        json: ObjectMapper,
+    ): PayrollAssessmentRepository = StoredPayrollAssessmentRepository(source, json)
 }

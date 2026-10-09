@@ -14,6 +14,8 @@ class PayrollRunProbe {
     @Volatile var omitResult = false
     @Volatile var omitCounter = false
     @Volatile var afterResult: (() -> Unit)? = null
+    @Volatile var beforeResult: ((PayrollRunResultsRecord) -> Unit)? = null
+    @Volatile var targetSnapshot: ((List<PayrollRunTargetsRecord>) -> Unit)? = null
     @Volatile var snapshot: ((String?) -> String?)? = null
 
     fun clear() {
@@ -22,6 +24,8 @@ class PayrollRunProbe {
         omitResult = false
         omitCounter = false
         afterResult = null
+        beforeResult = null
+        targetSnapshot = null
         snapshot = null
     }
 }
@@ -38,11 +42,13 @@ class PayrollRunProbeConfiguration {
     ): PayrollRunDataSource =
         object : PayrollRunDataSource by source {
             override fun insertTargets(rows: List<PayrollRunTargetsRecord>) {
+                probe.targetSnapshot?.invoke(rows)
                 if (probe.invalidTarget) rows.first().employmentVersion += 1
                 if (!probe.omitTargets) source.insertTargets(rows)
             }
 
             override fun insertResult(row: PayrollRunResultsRecord) {
+                probe.beforeResult?.invoke(row)
                 if (!probe.omitResult) source.insertResult(row)
                 probe.afterResult?.invoke()
             }

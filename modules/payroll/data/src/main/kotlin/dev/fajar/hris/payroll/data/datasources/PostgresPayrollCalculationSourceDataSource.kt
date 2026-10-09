@@ -26,7 +26,7 @@ class PostgresPayrollCalculationSourceDataSource(private val sql: DSLContext) :
                     ) ORDER BY m.employment_id LIMIT 5001
                 )
                 SELECT e.id,e.employee_number,p.legal_name,e.version,c.revision compensation_revision,
-                    i.id input_id,i.version input_revision,o.id opening_id,o.version opening_revision
+                    i.id input_id,i.version input_revision,o.id opening_id,o.version opening_revision,a.id previous_assessment_id
                 FROM selected m
                 JOIN LATERAL (
                     SELECT e.id,e.employee_number,e.person_id,e.version FROM employments e
@@ -48,6 +48,11 @@ class PostgresPayrollCalculationSourceDataSource(private val sql: DSLContext) :
                     SELECT o.id,o.version FROM payroll_tax_openings o
                     WHERE o.company_id=? AND o.employment_id=e.id AND o.tax_year=? LIMIT 1
                 ) o ON true
+                LEFT JOIN LATERAL (
+                    SELECT a.id FROM payroll_assessments a
+                    WHERE a.company_id=? AND a.person_id=e.person_id AND a.tax_month>=? AND a.tax_month<?
+                    ORDER BY a.tax_month DESC LIMIT 1
+                ) a ON true
                 ORDER BY e.id
                 """,
                 company,
@@ -62,6 +67,9 @@ class PostgresPayrollCalculationSourceDataSource(private val sql: DSLContext) :
                 month,
                 company,
                 month.year,
+                company,
+                LocalDate.of(month.year, 1, 1),
+                LocalDate.of(month.year + 1, 1, 1),
             )
             .fetch { r ->
                 PayrollRunTargetRow(
@@ -74,6 +82,7 @@ class PostgresPayrollCalculationSourceDataSource(private val sql: DSLContext) :
                     r.get("input_revision", Long::class.javaObjectType),
                     r.get("opening_id", UUID::class.java),
                     r.get("opening_revision", Long::class.javaObjectType),
+                    r.get("previous_assessment_id", UUID::class.java),
                 )
             }
 

@@ -51,15 +51,17 @@ class PostgresPayrollFinalizationDataSource(private val sql: DSLContext) :
                 )
                 SELECT count(*) FILTER(WHERE e.version<>t.employment_version)::integer changed,
                  (count(*)-count(DISTINCT e.person_id))::integer duplicates,
-                 count(*) FILTER(WHERE EXISTS(SELECT 1 FROM payroll_assessments a WHERE a.company_id=r.company_id AND a.person_id=e.person_id
-                   AND a.tax_month>=date_trunc('year',r.earnings_month)::date AND a.tax_month<(date_trunc('year',r.earnings_month)+interval '1 year')::date))::integer assessed,
+                 count(*) FILTER(WHERE t.previous_assessment_id IS DISTINCT FROM a.id)::integer assessed,
                  count(*) FILTER(WHERE (o.calculation->'holiday'->>'amount')::numeric>0 AND EXISTS(SELECT 1 FROM payroll_assessments a WHERE a.company_id=r.company_id AND a.person_id=e.person_id
                    AND a.holiday_year=extract(year FROM (o.calculation->'holiday'->>'holidayDate')::date)::integer AND a.holiday_kind=o.facts->'input'->'holidayAllowance'->>'kind'))::integer holidays
                 FROM run_scope r
-                 CROSS JOIN LATERAL(SELECT t.ordinal,t.employment_id,t.employment_version FROM payroll_run_targets t
+                 CROSS JOIN LATERAL(SELECT t.ordinal,t.employment_id,t.employment_version,t.previous_assessment_id FROM payroll_run_targets t
                    WHERE t.company_id=r.company_id AND t.run_id=r.id ORDER BY t.ordinal LIMIT 5000) t
                  CROSS JOIN LATERAL(SELECT e.person_id,e.version FROM employments e WHERE e.company_id=r.company_id AND e.id=t.employment_id LIMIT 1) e
                  CROSS JOIN LATERAL(SELECT o.facts,o.calculation FROM payroll_run_results o WHERE o.company_id=r.company_id AND o.run_id=r.id AND o.ordinal=t.ordinal LIMIT 1) o
+                 LEFT JOIN LATERAL(SELECT a.id FROM payroll_assessments a WHERE a.company_id=r.company_id AND a.person_id=e.person_id
+                   AND a.tax_month>=date_trunc('year',r.earnings_month)::date AND a.tax_month<(date_trunc('year',r.earnings_month)+interval '1 year')::date
+                   ORDER BY a.tax_month DESC LIMIT 1) a ON true
                 """
                     .trimIndent(),
                 company,

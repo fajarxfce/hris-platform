@@ -28,6 +28,7 @@ class AdvancePayrollCalculation(
     private val compensation: CompensationRepository,
     private val inputs: PayrollInputRepository,
     private val openings: PayrollTaxOpeningRepository,
+    private val assessments: PayrollAssessmentRepository,
 ) {
     fun execute(actor: Actor, lease: JobLease): Result<JobStep> {
         val scope = validatePayrollRunJob(actor, lease)
@@ -189,51 +190,66 @@ class AdvancePayrollCalculation(
                                     "payroll_compensation_snapshot_missing",
                                 )
                             )
-                    val through =
-                        maxOf(
-                            run.earningsMonth.atEndOfMonth(),
-                            reviewedInput.terms.holidayAllowance?.holidayDate
-                                ?: run.earningsMonth.atEndOfMonth(),
-                        )
-                    val employment =
-                        people.effectiveRevisions(
-                            company,
-                            target.employeeId,
-                            run.earningsMonth.atDay(1),
-                            through,
-                        )
-                    if (employment is Result.Failed) return@run employment
-                    val work =
-                        sources.workDays(
-                            company,
-                            run.workJobId,
-                            target.employeeId,
+                    val previous =
+                        target.previousAssessmentId?.let { assessments.taxHistory(company, it) }
+                            ?: Result.Success(null)
+                    if (previous is Result.Failed) return@run previous
+                    val history =
+                        derivePayrollTaxHistory(
+                            target,
                             run.earningsMonth,
+                            reviewedOpening,
+                            terms.terms.tax,
+                            (previous as Result.Success).value,
                         )
-                    if (work is Result.Failed) return@run work
-                    val days = (work as Result.Success).value
-                    val leave = sources.leaveDays(company, target.employeeId, run.earningsMonth)
-                    if (leave is Result.Failed) return@run leave
-                    if (days == null)
-                        Result.Failed(
-                            Failure(FailureKind.CONFLICT, "payroll_workforce_employee_missing")
-                        )
+                    if (history is Result.Failed) history
                     else {
-                        val snapshot =
-                            PayrollCalculationFacts(
-                                run.earningsMonth,
-                                run.incomeDueDate,
-                                run.plannedPaymentDate,
-                                policy.copy(version = run.policyRevision),
-                                terms.terms,
-                                reviewedInput.terms,
-                                (employment as Result.Success).value.map { it.terms },
-                                days,
-                                (leave as Result.Success).value,
-                                reviewedOpening.terms,
+                        val through =
+                            maxOf(
+                                run.earningsMonth.atEndOfMonth(),
+                                reviewedInput.terms.holidayAllowance?.holidayDate
+                                    ?: run.earningsMonth.atEndOfMonth(),
                             )
-                        facts = snapshot
-                        calculateMonthlyPayroll(snapshot)
+                        val employment =
+                            people.effectiveRevisions(
+                                company,
+                                target.employeeId,
+                                run.earningsMonth.atDay(1),
+                                through,
+                            )
+                        if (employment is Result.Failed) return@run employment
+                        val work =
+                            sources.workDays(
+                                company,
+                                run.workJobId,
+                                target.employeeId,
+                                run.earningsMonth,
+                            )
+                        if (work is Result.Failed) return@run work
+                        val days = (work as Result.Success).value
+                        val leave = sources.leaveDays(company, target.employeeId, run.earningsMonth)
+                        if (leave is Result.Failed) return@run leave
+                        if (days == null)
+                            Result.Failed(
+                                Failure(FailureKind.CONFLICT, "payroll_workforce_employee_missing")
+                            )
+                        else {
+                            val snapshot =
+                                PayrollCalculationFacts(
+                                    run.earningsMonth,
+                                    run.incomeDueDate,
+                                    run.plannedPaymentDate,
+                                    policy.copy(version = run.policyRevision),
+                                    terms.terms,
+                                    reviewedInput.terms,
+                                    (employment as Result.Success).value.map { it.terms },
+                                    days,
+                                    (leave as Result.Success).value,
+                                    (history as Result.Success).value,
+                                )
+                            facts = snapshot
+                            calculateMonthlyPayroll(snapshot)
+                        }
                     }
                 }
             val value = (outcome as? Result.Success)?.value

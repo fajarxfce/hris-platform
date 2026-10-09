@@ -42,7 +42,7 @@ class StoredPayrollFinalizationRepository(private val source: PayrollFinalizatio
                 PayrollPublicationReadiness(
                     it.changedEmployments,
                     it.duplicatePeople,
-                    it.assessedPeople,
+                    it.staleTaxHistories,
                     it.assessedHolidays,
                 )
             }

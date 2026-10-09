@@ -45,7 +45,7 @@ A stopped job can be resumed by its original author with current assurance, obse
 
 To correct input, first stop a running job, then abandon its run with observed run and period versions. A completed calculation can also be abandoned after any pending or approved review has been explicitly withdrawn. Abandonment preserves evidence, reopens the period as `DRAFT`, and releases its source cutoffs. Start a new run to reassess corrected input; resume does not rewind an existing result. A period retains at most twenty runs. Changes to its immutable roster/payment metadata still require cancelling and replacing the draft.
 
-The current tax-history source is an independently verified opening through the preceding month. Finalized history chaining, employee payslip delivery, payments, and amendments remain subsequent work. Do not simulate that chain by overwriting a frozen opening.
+The first tax-history source is an independently verified opening through the preceding month. Subsequent same-year months use the exact previously finalized assessment, retaining the original opening. Employee payslip delivery, payments, and amendments remain subsequent work; a frozen opening is never overwritten to simulate a monthly continuation.
 
 ## Source cutoffs
 
@@ -90,3 +90,12 @@ The worker locks its lease before the company payroll, people, approval, and acc
 One database transaction inserts thin immutable assessment references to all successful retained results, marks the finalization published, changes run and period to `FINALIZED`, retains period history, completes the job, and records audit/outbox. No employee is published early. The operation uses set-based source validation and checks completeness at the publication header, without loading 5,000 complete calculation payloads in the application. Deferred references prevent unpublished rows from committing. Cancellation, a lost lease, missing effects, or an audit failure rolls back publication.
 
 The calculation job, counters, facts, and results remain unchanged. The run exposes `finalizationId`; the separate finalization detail exposes its own finite job progress and nullable `publishedAt`. A lost HTTP response can be recovered using the same command ID/key and payload. There is no hidden retry that changes an observed version. Finalization establishes assessment evidence, not a bank payment. Finalized payroll cannot be withdrawn, abandoned, edited, or cancelled; corrections require a subsequent referenced amendment.
+
+
+## Finalized tax continuity
+
+Each run target retains `previousAssessmentId`, selected from the latest published assessment for the same company, person, and tax year. Selection remains part of the source cutoff. An initial run uses its independently verified opening; a continuing run requires the same employment, original opening ID/revision, and unchanged residency, PTKP, and subjective tax period. The previous assessment must be from the immediately preceding month and must not be a terminal reconciliation. Gaps, out-of-order months, same-year rehire, and changed tax registration require explicit review instead of resetting cumulative amounts.
+
+Continuity reads one retained tax projection. It adds the previous result's assessed taxable gross (including tax/deduction allowances), actual withholding, retirement contributions, donations, and one employment month to that result's cumulative input history. Previous-employer credits remain included exactly once. It neither recursively loads all earlier payslips nor recalculates reviewed results. December or employment-ending reconciliation can retain a negative tax deduction/refund; that terminal record does not become a new ordinary monthly opening. A new tax year requires a separately verified opening.
+
+Before publication, the latest assessment must still match the captured reference. `payroll_tax_history_changed` requires withdrawal/recalculation against current evidence. The database also validates target references and the arithmetic retained in successful result snapshots; a missing or forged lineage rolls back its checkpoint. The positive THR company/person/year/kind guard applies across monthly runs, including when a later input incorrectly declares that no earlier THR was paid.

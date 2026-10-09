@@ -35,8 +35,8 @@ fun requirePayrollPublicationSources(readiness: PayrollPublicationReadiness): Re
             Result.Failed(Failure(FailureKind.CONFLICT, "payroll_person_duplicated"))
         readiness.assessedHolidays > 0 ->
             Result.Failed(Failure(FailureKind.CONFLICT, "payroll_holiday_already_assessed"))
-        readiness.assessedPeople > 0 ->
-            Result.Failed(Failure(FailureKind.CONFLICT, "payroll_tax_history_review_required"))
+        readiness.staleTaxHistories > 0 ->
+            Result.Failed(Failure(FailureKind.CONFLICT, "payroll_tax_history_changed"))
         else -> Result.Success(Unit)
     }
 

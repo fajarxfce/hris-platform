@@ -1,14 +1,21 @@
 package dev.fajar.hris.jobs.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import java.util.UUID
 
 class RequestJobCancellation(
     private val jobs: JobRepository,
     private val transactions: TransactionRunner,
     private val journal: ChangeJournalRepository,
+    private val companies: CompanyRepository,
+    private val members: MembershipRepository,
+    private val identities: IdentityRepository,
 ) {
     fun execute(actor: Actor, id: UUID, expectedVersion: Long): Result<BackgroundJob> {
         val company =
@@ -18,9 +25,22 @@ class RequestJobCancellation(
             val found = jobs.find(company, id, true)
             if (found is Result.Failed) return@run found
             val job = (found as Result.Success).value
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
+            val access =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (access is Result.Failed) return@run access
+            val current = (access as Result.Success).value
             if (
                 job == null ||
-                    (job.request.actorId != actor.accountId && "jobs.manage" !in actor.permissions)
+                    (job.request.actorId != actor.accountId &&
+                        "jobs.manage" !in current.permissions)
             )
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "job_not_found"))
             if (job.cancellationRequested) return@run Result.Success(job)

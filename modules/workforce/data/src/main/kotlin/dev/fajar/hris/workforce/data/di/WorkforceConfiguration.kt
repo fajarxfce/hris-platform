@@ -1,16 +1,21 @@
 package dev.fajar.hris.workforce.data.di
 
+import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.data.datasources.*
 import dev.fajar.hris.workforce.data.repositories.StoredAttendanceCorrectionRepository
 import dev.fajar.hris.workforce.data.repositories.StoredAttendanceRepository
+import dev.fajar.hris.workforce.data.repositories.StoredOvertimeRepository
 import dev.fajar.hris.workforce.data.repositories.StoredScheduleRepository
 import dev.fajar.hris.workforce.data.repositories.StoredWorkPeriodRepository
 import dev.fajar.hris.workforce.domain.repositories.AttendanceCorrectionRepository
 import dev.fajar.hris.workforce.domain.repositories.AttendanceRepository
+import dev.fajar.hris.workforce.domain.repositories.OvertimeRepository
 import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
 import dev.fajar.hris.workforce.domain.repositories.WorkPeriodRepository
 import dev.fajar.hris.workforce.domain.usecases.*
@@ -225,6 +230,9 @@ class WorkforceConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        overtime: OvertimeRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
     ) =
         StartWorkPeriodClose(
             periods,
@@ -236,6 +244,9 @@ class WorkforceConfiguration {
             journal,
             transactions,
             clock,
+            overtime,
+            identities,
+            members,
         )
 
     @Bean
@@ -248,6 +259,7 @@ class WorkforceConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        overtime: OvertimeRepository,
     ) =
         AdvanceWorkPeriodClose(
             periods,
@@ -258,6 +270,7 @@ class WorkforceConfiguration {
             journal,
             transactions,
             clock,
+            overtime,
         )
 
     @Bean
@@ -288,4 +301,157 @@ class WorkforceConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
     ) = GetWorkPeriodSnapshot(periods, people, transactions, clock)
+
+    @Bean fun overtimeSource(sql: DSLContext): OvertimeDataSource = PostgresOvertimeDataSource(sql)
+
+    @Bean
+    fun overtime(source: OvertimeDataSource, json: ObjectMapper): OvertimeRepository =
+        StoredOvertimeRepository(source, json)
+
+    @Bean
+    fun planOvertime(
+        overtime: OvertimeRepository,
+        periods: WorkPeriodRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        schedules: ScheduleRepository,
+    ) =
+        PlanOvertimeRequest(
+            overtime,
+            periods,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            schedules,
+        )
+
+    @Bean
+    fun submitOvertimeActual(
+        overtime: OvertimeRepository,
+        periods: WorkPeriodRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        approvals: ApprovalRepository,
+    ) =
+        SubmitOvertimeActual(
+            overtime,
+            periods,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            approvals,
+        )
+
+    @Bean
+    fun withdrawOvertime(
+        overtime: OvertimeRepository,
+        periods: WorkPeriodRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        approvals: ApprovalRepository,
+    ) =
+        WithdrawOvertimeRequest(
+            overtime,
+            periods,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            approvals,
+        )
+
+    @Bean
+    fun decideOvertime(
+        overtime: OvertimeRepository,
+        periods: WorkPeriodRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        approvals: ApprovalRepository,
+    ) =
+        DecideOvertimeRequest(
+            overtime,
+            periods,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            approvals,
+        )
+
+    @Bean
+    fun getOvertime(
+        overtime: OvertimeRepository,
+        periods: WorkPeriodRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        approvals: ApprovalRepository,
+    ) =
+        GetOvertimeRequest(
+            overtime,
+            periods,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            approvals,
+        )
+
+    @Bean
+    fun listOvertime(
+        overtime: OvertimeRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = ListOvertimeRequests(overtime, people, companies, members, identities, transactions, clock)
 }

@@ -17,6 +17,7 @@ class AdvanceWorkPeriodClose(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val overtime: OvertimeRepository,
 ) {
     fun execute(actor: Actor, lease: JobLease): Result<JobStep> {
         val request = lease.job.request
@@ -101,6 +102,8 @@ class AdvanceWorkPeriodClose(
             if (entries is Result.Failed) return@run entries
             val changes = corrections.latest(company, employeeId, from, until)
             if (changes is Result.Failed) return@run changes
+            val approvedOvertime = overtime.approved(company, employeeId, period.month)
+            if (approvedOvertime is Result.Failed) return@run approvedOvertime
             val snapshot =
                 snapshotWorkPeriod(
                     employeeId,
@@ -108,6 +111,7 @@ class AdvanceWorkPeriodClose(
                     (calendar as Result.Success).value,
                     (entries as Result.Success).value,
                     (changes as Result.Success).value,
+                    (approvedOvertime as Result.Success).value,
                 )
             if (snapshot is Result.Failed) return@run snapshot
             periods.saveSnapshot(company, request.id, (snapshot as Result.Success).value).flatMap {

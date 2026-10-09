@@ -30,6 +30,19 @@ fun WorkPeriodSnapshot.toData() =
                 it.schedule.toData(),
                 it.evidenceIds,
                 it.correctionId,
+                it.overtime.map { item ->
+                    ApprovedOvertimeData(
+                        item.requestId,
+                        item.revision,
+                        OvertimeIntervalData(
+                            item.actual.startsAt,
+                            item.actual.endsAt,
+                            item.actual.breakMinutes,
+                        ),
+                        item.approvedMinutes,
+                        item.schedule.toData(),
+                    )
+                },
             )
         },
     )
@@ -46,6 +59,19 @@ fun WorkPeriodSnapshotData.toSnapshot() =
                 it.schedule.toDay(),
                 it.evidenceIds,
                 it.correctionId,
+                it.overtime.map { item ->
+                    ApprovedOvertime(
+                        item.requestId,
+                        item.revision,
+                        OvertimeInterval(
+                            item.actual.startsAt,
+                            item.actual.endsAt,
+                            item.actual.breakMinutes,
+                        ),
+                        item.approvedMinutes,
+                        item.schedule.toDay(),
+                    )
+                },
             )
         },
     )

@@ -2,12 +2,13 @@
 
 Synchronization provides a bounded, authorized change feed for local-first clients. It is an invalidation protocol: references identify which canonical resources to fetch or remove. It does not expose audit payloads or replace feature commands, idempotency receipts, and optimistic versions.
 
-The first supported collections are:
+The supported collections are:
 
 | Collection | Required permission | Audience | Canonical resource |
 | --- | --- | --- | --- |
 | `EXPENSE_CLAIMS` | `expenses.self.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}` |
 | `LEAVE_REQUESTS` | `leave.self.manage` | Current account's employments or immutable request owner | `/api/v1/companies/{companyId}/leave/requests/{id}` |
+| `OVERTIME_REQUESTS` | `overtime.self.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/overtime/{id}` |
 
 All request statuses are included. A cancellation or withdrawal is an `UPSERT` with a new version, not a deletion. Team/company administration rights do not grant an employee-wide export. Documents, attendance, balances, schedules, approval inboxes, payroll, and communication are not registered sync collections yet. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
 

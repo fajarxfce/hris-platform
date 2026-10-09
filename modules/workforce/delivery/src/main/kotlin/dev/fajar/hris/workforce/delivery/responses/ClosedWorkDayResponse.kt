@@ -10,4 +10,5 @@ data class ClosedWorkDayResponse(
     val schedule: ScheduledDayResponse,
     val evidenceIds: List<UUID>,
     val correctionId: UUID?,
+    val overtime: List<ApprovedOvertimeResponse>,
 )

@@ -19,6 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 class WorkPeriodHttpTest : WorkPeriodApiFixture() {
     @Autowired private lateinit var advance: AdvanceWorkPeriodClose
     @Autowired private lateinit var abort: AbortWorkPeriodClose
+    @Autowired private lateinit var overtime: OvertimeRepository
     @Autowired private lateinit var periods: WorkPeriodRepository
     @Autowired private lateinit var jobs: JobRepository
     @Autowired private lateinit var schedules: ScheduleRepository
@@ -210,6 +211,7 @@ class WorkPeriodHttpTest : WorkPeriodApiFixture() {
                 journal,
                 transactions,
                 clock,
+                overtime,
             )
         val outcome = guarded.execute(f.actor, lease)
         assertTrue(outcome is Result.Failed, outcome.toString())

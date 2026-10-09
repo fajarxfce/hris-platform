@@ -18,6 +18,7 @@ fun snapshotWorkPeriod(
     calendar: EmployeeCalendar,
     entries: List<AttendanceEntry>,
     corrections: List<AttendanceCorrection>,
+    overtime: List<OvertimeRequest> = emptyList(),
 ): Result<WorkPeriodSnapshot> {
     if (period.status != WorkPeriodStatus.PROCESSING || period.jobId == null)
         return Result.Failed(Failure(FailureKind.CONFLICT, "work_period_not_processing"))
@@ -28,6 +29,20 @@ fun snapshotWorkPeriod(
             calendar.days.map { it.workDate }.distinct().size != calendar.days.size
     )
         return Result.Failed(Failure(FailureKind.UNEXPECTED, "period_calendar_inconsistent"))
+    if (
+        overtime.size > 128 ||
+            overtime.map { it.id }.distinct().size != overtime.size ||
+            overtime.any {
+                it.employeeId != employeeId ||
+                    YearMonth.from(it.workDate) != period.month ||
+                    it.status != OvertimeStatus.APPROVED ||
+                    it.actual == null ||
+                    it.approvalId == null ||
+                    it.approvedMinutes != it.actual.workedMinutes
+            }
+    )
+        return Result.Failed(Failure(FailureKind.CONFLICT, "period_overtime_inconsistent"))
+    val overtimeByDate = overtime.groupBy { it.workDate }
     val evidence =
         entries.filterNot {
             it.status == AttendanceStatus.PENDING && it.initial.closingJobId == period.jobId
@@ -69,6 +84,15 @@ fun snapshotWorkPeriod(
                 schedule,
                 summary.entries.map { it.capture.id },
                 summary.correction?.id,
+                overtimeByDate[date].orEmpty().map {
+                    ApprovedOvertime(
+                        it.id,
+                        it.version,
+                        requireNotNull(it.actual),
+                        it.approvedMinutes,
+                        it.schedule,
+                    )
+                },
             )
     }
     return Result.Success(WorkPeriodSnapshot(employeeId, period.month, days.toList()))

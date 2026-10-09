@@ -140,7 +140,10 @@ class MobileSyncAccessHttpTest : MobileSyncApiFixture() {
                     initial.copy(permissions = initial.permissions + "leave.self.manage")
                 )
             )
-        assertEquals(SyncCollection.entries.toSet(), expanded.collections)
+        assertEquals(
+            setOf(SyncCollection.EXPENSE_CLAIMS, SyncCollection.LEAVE_REQUESTS),
+            expanded.collections,
+        )
         database()
             .update("update accounts set security_version=security_version+1 where id=?", f.account)
         val revoked = bootstrapUseCase.execute(initial)

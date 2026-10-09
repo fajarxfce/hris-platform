@@ -1,6 +1,6 @@
 # Mobile API contract
 
-The versioned API serves web and native clients. Native authentication, idempotent commands, optimistic versions, bounded pagination, resumable documents, and structured problems are implemented. [Incremental synchronization](synchronization.md) is implemented for owned expense claims and leave requests. Other list endpoints do not implicitly provide a consistent snapshot or change cursor.
+The versioned API serves web and native clients. Native authentication, idempotent commands, optimistic versions, bounded pagination, resumable documents, and structured problems are implemented. [Incremental synchronization](synchronization.md) is implemented for owned expense claims, leave requests, and overtime requests. Other list endpoints do not implicitly provide a consistent snapshot or change cursor.
 
 ## Localizable errors
 

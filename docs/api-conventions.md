@@ -127,7 +127,7 @@ Mobile synchronization:
 - `GET /companies/{companyId}/sync/bootstrap`: optional opaque `cursor`, `limit` (default 100, maximum 200). Returns authorized collection references and either the next bootstrap page or the initial changes cursor.
 - `GET /companies/{companyId}/sync/changes`: required opaque `cursor`, `limit` (default 100, maximum 200). Returns UPSERT/DELETE references, continuation state, pending-publication status, and polling guidance.
 
-The initial collections are owned expense claims and leave requests. Each page rechecks live account/company scope. See [synchronization](synchronization.md) for local atomic cursor storage, bootstrap limits, key rotation, retention, access invalidation, and post-commit publication.
+The registered collections are owned expense claims, leave requests, and overtime requests. Each page rechecks live account/company scope. See [synchronization](synchronization.md) for local atomic cursor storage, bootstrap limits, key rotation, retention, access invalidation, and post-commit publication.
 
 Payroll configuration:
 
@@ -143,3 +143,17 @@ Payroll configuration:
 Terms include basicSalary, at most twenty fixedEarnings (`code`, `name`, `amount`, `taxable`), treatment (`GROSS`, `GROSS_UP`, `NET`), tax (`residency`, `ptkp`, `residenceCountry`, optional subjectiveFrom/subjectiveUntil, verifiedOn, verificationReference), insuranceWage, insurancePrograms, optional insuranceExemptionReason, accidentRisk, additionalHealthDependents, additionalRetirementContribution, qualifiedDonation, and otherNetDeduction. All money is an IDR decimal string. Validation includes stable field codes without rejected values. See [payroll rules](payroll-rules.md) for calculation and configuration semantics.
 
 Compensation reads require `payroll.read` or `payroll.compensation.manage`; policy management alone does not expose salary. Company access and current credential/permission intersection apply on every read and command. A previous successful operation replays its receipt while current authority remains valid; a failed operation can be retried with corrected data. Configuration history is immutable. The initial mobile sync collections do not yet include compensation or payroll output.
+
+
+## Overtime commands
+
+All paths below are under `/api/v1/companies/{companyId}/workforce/overtime`. Mutations require `Idempotency-Key`.
+
+- `POST /`: `{id, employeeId, expectedEmploymentVersion, workDate, requested:{startsAt,endsAt,breakMinutes}, reason}` creates a plan with a frozen schedule. Instants must be aligned to whole minutes.
+- `POST /{id}/actual`: `{expectedVersion, actual:{startsAt,endsAt,breakMinutes}, reason}` submits completed actual time and creates staged review.
+- `POST /{id}/decisions`: `{expectedVersion, decision:"APPROVE"|"REJECT", reason}` advances independent review.
+- `POST /{id}/withdraw`: `{expectedVersion, reason}` withdraws a plan/pending request.
+- `GET /{id}?historyAfter=2&historyLimit=50`: returns `request`, its `approval`, a bounded `history`, and currently available `actions`.
+- `GET /?employeeId=...&from=yyyy-MM-dd&until=yyyy-MM-dd&status=PENDING&after=uuid&limit=50`: at most 62 dates and 200 results. Non-administrative lists require an authorized employee scope. Assigned approvers use the approval inbox and exact request URL.
+
+Stable failures include `overtime_overlap`, `overtime_month_capacity`, `overtime_not_ended`, `overtime_outside_requested_window`, `overtime_resolution_required`, `work_period_locked`, and `stale_employment_version`. Error messages are translated by the client. A plan has zero approved minutes; only a completed approval contributes time to a closing snapshot. API interval limits are resource/validation bounds, not a statutory overtime rate rule.

@@ -1,6 +1,8 @@
 package dev.fajar.hris.workforce.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
@@ -21,6 +23,9 @@ class StartWorkPeriodClose(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val overtime: OvertimeRepository,
+    private val identities: IdentityRepository,
+    private val members: MembershipRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -43,6 +48,27 @@ class StartWorkPeriodClose(
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
+            val scheduleLock = schedules.lock(company)
+            if (scheduleLock is Result.Failed) return@run scheduleLock
+            val found = periods.lockMonth(company, month, true)
+            if (found is Result.Failed) return@run found
+            val period = (found as Result.Success).value
+            val peopleLock = people.lockReportingLines(company, shared = true)
+            if (peopleLock is Result.Failed) return@run peopleLock
+            val companyLock = companies.lock(company, shared = true)
+            if (companyLock is Result.Failed) return@run companyLock
+            val memberLock = members.lock(company, shared = true)
+            if (memberLock is Result.Failed) return@run memberLock
+            val accountLock = identities.lockAccount(actor.accountId, shared = true)
+            if (accountLock is Result.Failed) return@run accountLock
+            val checked =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
+            val permission = live.requirePermission("workforce.close")
+            if (permission is Result.Failed) return@run permission
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
@@ -54,15 +80,16 @@ class StartWorkPeriodClose(
             val now = clock.instant()
             if (month >= YearMonth.from(now.atZone(ZoneId.of(settings.timezone))))
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "work_period_not_ended"))
-            val scheduleLock = schedules.lock(company)
-            if (scheduleLock is Result.Failed) return@run scheduleLock
-            val found = periods.lockMonth(company, month, true)
-            if (found is Result.Failed) return@run found
-            val period = (found as Result.Success).value
             if (period.version != version)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
             val mutable = requireMutablePeriod(period)
             if (mutable is Result.Failed) return@run mutable
+            val pendingOvertime = overtime.unresolved(company, month)
+            if (pendingOvertime is Result.Failed) return@run pendingOvertime
+            if ((pendingOvertime as Result.Success).value)
+                return@run Result.Failed(
+                    Failure(FailureKind.CONFLICT, "overtime_resolution_required")
+                )
             val queueLock = jobs.lockQueue(company)
             if (queueLock is Result.Failed) return@run queueLock
             val pending = jobs.pendingCount(company)

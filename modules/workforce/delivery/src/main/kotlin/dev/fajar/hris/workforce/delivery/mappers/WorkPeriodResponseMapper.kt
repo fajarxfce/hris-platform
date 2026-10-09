@@ -28,6 +28,7 @@ fun WorkPeriodSnapshot.toResponse() =
                 it.schedule.toResponse(),
                 it.evidenceIds,
                 it.correctionId,
+                it.overtime.map { item -> item.toResponse() },
             )
         },
     )

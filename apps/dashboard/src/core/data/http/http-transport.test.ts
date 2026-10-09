@@ -119,6 +119,25 @@ describe("cookie API transport", () => {
 });
 
 describe("response and repository boundaries", () => {
+  it("preserves maintenance codes across finite retry hints and ignores invalid optional hints", async () => {
+    for (const delay of [86_401, 604_800, 604_801, -1, "invalid"]) {
+      const response = await safeHttpCall(signal(), async () => {
+        throw new HttpResponseError(503, {
+          code: "company_maintenance",
+          retryAfterSeconds: delay,
+          parameters: { endsAt: "2026-10-17T00:00:00Z" },
+          detail: "Internal maintenance configuration",
+        });
+      });
+      expect(response).toMatchObject({ ok: false, failure: { code: "company_maintenance" } });
+      if (response.ok) throw new Error("Expected the provider failure");
+      expect(response.failure.retryAfterSeconds).toBe(
+        typeof delay === "number" && delay >= 0 && delay <= 604_800 ? delay : undefined,
+      );
+      expect(JSON.stringify(response)).not.toContain("Internal maintenance");
+    }
+  });
+
   it("bounds chunked bodies and cancels the unread stream", async () => {
     const cancel = vi.fn();
     const stream = new ReadableStream({

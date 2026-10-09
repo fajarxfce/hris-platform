@@ -8,7 +8,7 @@ const problemSchema = z.object({
   fields: z.record(z.string().max(200), z.string().max(100)).default({}),
   parameters: z.record(z.string().max(100), z.string().max(1000)).default({}),
   correlationId: z.uuid().nullish(),
-  retryAfterSeconds: z.number().int().min(0).max(86_400).optional(),
+  retryAfterSeconds: z.number().int().min(0).max(604_800).optional().catch(undefined),
 });
 
 /** Repository boundary: both acquisition and DTO mapping belong inside the operation. */

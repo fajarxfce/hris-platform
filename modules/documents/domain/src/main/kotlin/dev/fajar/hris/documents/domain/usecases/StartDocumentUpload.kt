@@ -127,7 +127,7 @@ class StartDocumentUpload(
                             !pendingJob.cancellationRequested
                     ) {
                         val stoppedJob =
-                            jobs.requestCancellation(company, validationId, pendingJob.version)
+                            jobs.requestCancellation(company, validationId, pendingJob.version, now)
                         if (stoppedJob is Result.Failed) return@run stoppedJob
                         if ((stoppedJob as Result.Success).value == null)
                             return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))

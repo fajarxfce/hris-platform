@@ -12,4 +12,5 @@ data class BackgroundJob(
     val failureCode: String?,
     val finishedAt: Instant?,
     val version: Long,
+    val availableAt: Instant = request.scheduledFor ?: request.createdAt,
 )

@@ -94,7 +94,8 @@ class CancelEmployeeImport(
                 )
             val active = job.status in setOf(JobStatus.QUEUED, JobStatus.RUNNING)
             if (active && !job.cancellationRequested) {
-                val cancelled = jobs.requestCancellation(company, job.request.id, job.version)
+                val cancelled =
+                    jobs.requestCancellation(company, job.request.id, job.version, clock.instant())
                 if (cancelled is Result.Failed) return@run cancelled
                 if ((cancelled as Result.Success).value == null)
                     return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_job_version"))

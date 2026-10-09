@@ -26,6 +26,7 @@ interface JobRepository {
         companyId: UUID,
         id: UUID,
         expectedVersion: Long,
+        requestedAt: Instant,
     ): Result<BackgroundJob?>
 
     fun claim(

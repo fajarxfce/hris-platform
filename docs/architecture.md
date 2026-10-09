@@ -46,6 +46,8 @@ Private S3-compatible object storage holds documents; the self-hosted distributi
 
 Spring Batch provides persistent checkpoints for payroll/import/export. An outbox dispatches external delivery after commit. Jobs are idempotent, bounded, interruptible, and owned by the application lifecycle. Retries are explicit and failures stay inspectable. User-facing job use cases coordinate identity and company repository contracts for live access checks. Cancellation locks the job before company/member/account guards, matching worker lock order. Global worker leasing remains a separate capability boundary.
 
+Optional job schedules are immutable UTC instants persisted separately from retry availability. Feature use cases decide scheduling policy and supply the request; datasources only persist it. The first cancellation advances eligibility to the use case's current instant so the worker can release feature resources. Repeated cancellation never advances a subsequent cleanup retry. PostgreSQL prevents reversing cancellation or moving an uncancelled job ahead of its original schedule. Application restart requires no in-memory timer reconstruction.
+
 ## API and clients
 
 /api/v1 is the public prefix; company resources use /companies/{companyId}. OpenAPI describes DTOs, error codes, pagination, optimistic versions, and idempotency. Money uses decimal strings; timestamps use UTC with explicit IANA schedule zones. Default/max list sizes are 50/200.

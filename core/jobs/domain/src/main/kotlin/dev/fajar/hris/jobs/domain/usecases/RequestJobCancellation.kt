@@ -7,6 +7,7 @@ import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import java.time.Clock
 import java.util.UUID
 
 class RequestJobCancellation(
@@ -16,6 +17,7 @@ class RequestJobCancellation(
     private val companies: CompanyRepository,
     private val members: MembershipRepository,
     private val identities: IdentityRepository,
+    private val clock: Clock,
 ) {
     fun execute(actor: Actor, id: UUID, expectedVersion: Long): Result<BackgroundJob> {
         val company =
@@ -48,7 +50,8 @@ class RequestJobCancellation(
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "job_already_finished"))
             if (job.version != expectedVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
-            jobs.requestCancellation(company, id, expectedVersion).flatMap { changed ->
+            jobs.requestCancellation(company, id, expectedVersion, clock.instant()).flatMap {
+                changed ->
                 if (changed == null) Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
                 else
                     journal

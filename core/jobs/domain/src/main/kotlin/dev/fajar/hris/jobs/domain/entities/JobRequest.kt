@@ -16,4 +16,5 @@ data class JobRequest(
     val createdAt: Instant,
     val totalItems: Int,
     val progressMode: JobProgressMode = JobProgressMode.FIXED_TOTAL,
+    val scheduledFor: Instant? = null,
 )

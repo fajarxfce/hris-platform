@@ -47,8 +47,9 @@ class PostgresJobRepository(private val source: JobDataSource, private val json:
         companyId: UUID,
         id: UUID,
         expectedVersion: Long,
+        requestedAt: Instant,
     ): Result<BackgroundJob?> = safeDatabaseCall {
-        source.requestCancellation(companyId, id, expectedVersion)?.toJob(json)
+        source.requestCancellation(companyId, id, expectedVersion, requestedAt)?.toJob(json)
     }
 
     override fun claim(

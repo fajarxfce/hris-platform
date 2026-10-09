@@ -22,7 +22,12 @@ interface JobDataSource {
         beforeId: UUID?,
     ): List<BackgroundJobsRecord>
 
-    fun requestCancellation(companyId: UUID, id: UUID, expectedVersion: Long): BackgroundJobsRecord?
+    fun requestCancellation(
+        companyId: UUID,
+        id: UUID,
+        expectedVersion: Long,
+        requestedAt: Instant,
+    ): BackgroundJobsRecord?
 
     fun claim(
         owner: UUID,

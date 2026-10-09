@@ -50,7 +50,8 @@ class JobsConfiguration {
         companies: CompanyRepository,
         members: MembershipRepository,
         identities: IdentityRepository,
-    ) = RequestJobCancellation(jobs, transactions, journal, companies, members, identities)
+        clock: java.time.Clock,
+    ) = RequestJobCancellation(jobs, transactions, journal, companies, members, identities, clock)
 
     @Bean
     fun leaseJobs(

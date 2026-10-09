@@ -101,7 +101,12 @@ class JobQueueHttpTest : ApiIntegrationTest() {
         )
     }
 
-    private fun create(f: Fixture, total: Int = 2): BackgroundJob {
+    private fun create(
+        f: Fixture,
+        total: Int = 2,
+        scheduledFor: Instant? = null,
+        createdAt: Instant = Instant.now(),
+    ): BackgroundJob {
         val request =
             JobRequest(
                 UUID.randomUUID(),
@@ -113,8 +118,9 @@ class JobQueueHttpTest : ApiIntegrationTest() {
                 f.actor.authenticatedAt,
                 0,
                 f.actor.correlationId,
-                Instant.now(),
+                createdAt,
                 total,
+                scheduledFor = scheduledFor,
             )
         val result = transactions.run(f.actor) { jobs.create(request) }
         assertTrue(result is Result.Success, result.toString())
@@ -156,6 +162,123 @@ class JobQueueHttpTest : ApiIntegrationTest() {
         val result = worker.leaseJobs.execute(owner, size, 60, setOf(JobKind.WORKFORCE_CLOSE))
         assertTrue(result is Result.Success, result.toString())
         return (result as Result.Success).value
+    }
+
+    @Test
+    fun futureSchedulesAreNotLeasedAndImmediateJobsDoNotUseTheirCreationDateAsASchedule() {
+        val f = fixture()
+        val now = Instant.now().truncatedTo(java.time.temporal.ChronoUnit.MICROS)
+        val future = create(f, scheduledFor = now.plusSeconds(86400))
+        val due = create(f, scheduledFor = now.minusSeconds(60))
+        val immediate = create(f, createdAt = now.plusSeconds(86400))
+        assertEquals(now.plusSeconds(86400), future.request.scheduledFor)
+        assertEquals(future.request.scheduledFor, future.availableAt)
+        assertNull(immediate.request.scheduledFor)
+        assertTrue(immediate.availableAt.isBefore(immediate.request.createdAt))
+        val worker = worker()
+        assertEquals(
+            setOf(due.request.id, immediate.request.id),
+            claim(worker).map { it.job.request.id }.toSet(),
+        )
+        assertTrue(claim(worker).isEmpty())
+        val detail =
+            get(f.client, "/api/v1/companies/${f.actor.companyId}/jobs/${future.request.id}")
+        assertEquals(200, detail.statusCode(), detail.body())
+        val response = json.readTree(detail.body())
+        assertEquals(
+            future.request.scheduledFor,
+            Instant.parse(response.get("scheduledFor").asString()),
+        )
+        assertEquals(future.availableAt, Instant.parse(response.get("availableAt").asString()))
+        assertEquals(0, response.get("attempts").asInt())
+    }
+
+    @Test
+    fun cancellingAFutureJobWakesCleanupOnceAndDuplicateCancellationPreservesRetryBackoff() {
+        val f = fixture()
+        val job = create(f, scheduledFor = Instant.now().plusSeconds(86400))
+        val worker = worker()
+        assertTrue(claim(worker).isEmpty())
+        val path = "/api/v1/companies/${f.actor.companyId}/jobs/${job.request.id}"
+        val accepted = post(f.client, "$path/cancel", """{"expectedVersion":0}""", f.csrf)
+        assertEquals(200, accepted.statusCode(), accepted.body())
+        val lease = claim(worker).single()
+        assertTrue(lease.job.cancellationRequested)
+        assertEquals(job.request.scheduledFor, lease.job.request.scheduledFor)
+        assertTrue(lease.job.availableAt.isBefore(requireNotNull(job.request.scheduledFor)))
+        assertEquals(
+            Result.Success(true),
+            worker.transactions.run(f.actor) {
+                worker.jobs.defer(lease, 300, "cleanup_unavailable")
+            },
+        )
+        val deferred = json.readTree(get(f.client, path).body())
+        val replay = post(f.client, "$path/cancel", """{"expectedVersion":0}""", f.csrf)
+        assertEquals(200, replay.statusCode(), replay.body())
+        assertEquals(deferred.get("availableAt"), json.readTree(replay.body()).get("availableAt"))
+        assertEquals(deferred.get("version"), json.readTree(replay.body()).get("version"))
+        assertTrue(claim(worker).isEmpty())
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from audit_entries where resource_id=? and action='jobs.cancellation_requested'",
+                    Int::class.java,
+                    job.request.id,
+                ),
+        )
+        assertThrows(org.springframework.dao.DataAccessException::class.java) {
+            database()
+                .update(
+                    "update background_jobs set cancellation_requested=false where id=?",
+                    job.request.id,
+                )
+        }
+    }
+
+    @Test
+    fun scheduleCannotBeRewrittenOrAdvancedAndFailedCancellationRollsBackItsWakeup() {
+        val f = fixture()
+        val job = create(f, scheduledFor = Instant.now().plusSeconds(86400))
+        assertThrows(org.springframework.dao.DataAccessException::class.java) {
+            database()
+                .update(
+                    "update background_jobs set scheduled_for=scheduled_for+interval '1 day' where id=?",
+                    job.request.id,
+                )
+        }
+        assertThrows(org.springframework.dao.DataAccessException::class.java) {
+            database()
+                .update("update background_jobs set available_at=now() where id=?", job.request.id)
+        }
+        assertThrows(org.springframework.dao.DataAccessException::class.java) {
+            database()
+                .update(
+                    "update background_jobs set available_at='infinity' where id=?",
+                    job.request.id,
+                )
+        }
+        val failed =
+            transactions.run(f.actor) {
+                jobs
+                    .requestCancellation(
+                        requireNotNull(f.actor.companyId),
+                        job.request.id,
+                        job.version,
+                        Instant.now(),
+                    )
+                    .flatMap {
+                        assertNotNull(it)
+                        Result.Failed(Failure(FailureKind.UNAVAILABLE, "test_transaction_failed"))
+                    }
+            }
+        assertTrue(failed is Result.Failed)
+        val retained =
+            transactions.run(f.actor) {
+                jobs.find(requireNotNull(f.actor.companyId), job.request.id)
+            }
+        assertEquals(Result.Success(job), retained)
+        assertTrue(claim(worker()).isEmpty())
     }
 
     @Test

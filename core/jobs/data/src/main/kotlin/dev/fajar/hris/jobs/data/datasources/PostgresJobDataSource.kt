@@ -57,14 +57,23 @@ class PostgresJobDataSource(private val sql: DSLContext) : JobDataSource {
         companyId: UUID,
         id: UUID,
         expectedVersion: Long,
+        requestedAt: Instant,
     ): BackgroundJobsRecord? =
         sql.update(J)
             .set(J.CANCELLATION_REQUESTED, true)
+            .set(
+                J.AVAILABLE_AT,
+                DSL.least(
+                    J.AVAILABLE_AT,
+                    DSL.`val`(OffsetDateTime.ofInstant(requestedAt, ZoneOffset.UTC)),
+                ),
+            )
             .set(J.VERSION, J.VERSION.plus(1))
             .where(J.ID.eq(id))
             .and(J.COMPANY_ID.eq(companyId))
             .and(J.VERSION.eq(expectedVersion))
             .and(J.STATUS.`in`("QUEUED", "RUNNING"))
+            .and(J.CANCELLATION_REQUESTED.isFalse)
             .returning()
             .fetchOne()
 

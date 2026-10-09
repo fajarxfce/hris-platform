@@ -20,6 +20,8 @@ fun BackgroundJob.toResponse(actor: Actor): JobResponse =
         finishedAt?.toString(),
         version,
         availableJobActions(actor, this),
+        request.scheduledFor?.toString(),
+        availableAt.toString(),
     )
 
 fun JobPage.toResponse(actor: Actor): JobPageResponse =

@@ -16,4 +16,6 @@ data class JobResponse(
     val finishedAt: String?,
     val version: Long,
     val availableActions: List<String>,
+    val scheduledFor: String?,
+    val availableAt: String,
 )

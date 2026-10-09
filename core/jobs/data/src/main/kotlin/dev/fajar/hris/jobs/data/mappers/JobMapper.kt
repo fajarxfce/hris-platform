@@ -31,6 +31,7 @@ fun BackgroundJobsRecord.toJob(json: ObjectMapper): BackgroundJob =
             createdAt.toInstant(),
             totalItems,
             JobProgressMode.valueOf(progressMode),
+            scheduledFor?.toInstant(),
         ),
         JobStatus.valueOf(status),
         attempts,
@@ -40,6 +41,7 @@ fun BackgroundJobsRecord.toJob(json: ObjectMapper): BackgroundJob =
         failureCode,
         finishedAt?.toInstant(),
         version,
+        availableAt.toInstant(),
     )
 
 fun JobRequest.toRecord(json: ObjectMapper): BackgroundJobsRecord =
@@ -56,4 +58,8 @@ fun JobRequest.toRecord(json: ObjectMapper): BackgroundJobsRecord =
         it.createdAt = OffsetDateTime.ofInstant(createdAt, ZoneOffset.UTC)
         it.totalItems = totalItems
         it.progressMode = progressMode.name
+        if (scheduledFor != null) {
+            it.scheduledFor = OffsetDateTime.ofInstant(scheduledFor, ZoneOffset.UTC)
+            it.availableAt = it.scheduledFor
+        }
     }

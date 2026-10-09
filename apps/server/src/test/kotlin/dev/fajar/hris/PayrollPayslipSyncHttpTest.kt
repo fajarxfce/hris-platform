@@ -18,7 +18,7 @@ class PayrollPayslipSyncHttpTest : PayrollFinalizationApiFixture() {
         val publisher = mobileSyncTestWorker(postgres.jdbcUrl, database())
         val bootstrap = payrollBody(get(p.owner.client, "$path/bootstrap"))
         assertEquals(
-            listOf("PAYSLIPS"),
+            listOf("PAYROLL_PAYMENTS", "PAYSLIPS"),
             bootstrap["collections"].iterator().asSequence().map { it.asString() }.toList(),
         )
         assertEquals(0, bootstrap["items"].size())

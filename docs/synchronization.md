@@ -11,12 +11,15 @@ The supported collections are:
 | `LEAVE_BALANCES` | `leave.self.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/leave/balances/{id}` |
 | `OVERTIME_REQUESTS` | `overtime.self.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/overtime/{id}` |
 | `PAYSLIPS` | `payroll.self.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}` |
+| `PAYROLL_PAYMENTS` | `payroll.self.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}/payments` |
 
 Balance projections have stable IDs and versions. A year closing can publish several versions of its source balance and a destination update in one transaction; fetching a reference returns the latest committed account. Empty accounts are exposed only after a movement or explicit closing. Adding the balance collection invalidates older scope fingerprints and requires bootstrap.
 
 All request statuses are included. A cancellation or withdrawal is an `UPSERT` with a new version, not a deletion. Team/company administration rights do not grant an employee-wide export. Documents, attendance, schedules, approval inboxes, unfinalized payroll, and communication are not registered sync collections yet. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
 
 Payslips reference immutable finalized assessments and have version `0`. Publication captures the entire run's references in one transaction; rollback or cancellation exposes none. The feed carries IDs, never salary amounts or calculation evidence. New collection authorization changes the scope fingerprint, so existing published assessments are discovered through a fresh bootstrap. Company-wide `payroll.read` does not grant employee sync; that projection requires `payroll.self.read`.
+
+Payroll payment references use the assessment ID, but belong to a separate collection and monotonically increasing progress version. Preparation, release, cancellation, and reconciliation capture changes atomically. A retry after a confirmed failure retains earlier attempts and advances the same progress resource. Bank destinations and transaction references are excluded from employee progress and sync. Before the first attempt, the canonical progress resource returns an empty version `0`; no payment reference is needed in bootstrap yet. Adding this collection requires replacing older scope fingerprints through bootstrap.
 
 ## Configuration
 

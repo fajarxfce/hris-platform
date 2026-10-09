@@ -51,6 +51,7 @@ dependencies {
     testImplementation(libs.spring.oauth2.client)
     testImplementation(libs.bouncycastle)
     testImplementation(libs.spring.test)
+    testImplementation(libs.spring.flyway)
     testImplementation(libs.spring.webmvc.test)
     testImplementation(libs.testcontainers.postgresql)
     testImplementation(libs.testcontainers.junit)

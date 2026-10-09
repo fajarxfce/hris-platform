@@ -980,4 +980,258 @@ class PayrollConfiguration {
             transactions,
             clock,
         )
+
+    @Bean
+    fun payrollPaymentSource(sql: DSLContext): PayrollPaymentDataSource =
+        PostgresPayrollPaymentDataSource(sql)
+
+    @Bean
+    fun payrollPayments(source: PayrollPaymentDataSource): PayrollPaymentRepository =
+        StoredPayrollPaymentRepository(source)
+
+    @Bean
+    fun getPayrollPaymentBatch(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetPayrollPaymentBatch(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
+    fun getPayrollPaymentHistory(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetPayrollPaymentHistory(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
+    fun getPayrollPaymentResults(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetPayrollPaymentResults(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
+    fun getPayrollPaymentExport(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetPayrollPaymentExport(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
+    fun listPayrollPaymentBatches(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListPayrollPaymentBatches(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
+    fun listPayrollPayables(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListPayrollPayables(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
+    fun preparePayrollPaymentBatch(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        PreparePayrollPaymentBatch(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            operations = operations,
+            journal = journal,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
+    fun releasePayrollPaymentBatch(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ReleasePayrollPaymentBatch(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            operations = operations,
+            journal = journal,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
+    fun cancelPayrollPaymentBatch(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        CancelPayrollPaymentBatch(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            operations = operations,
+            journal = journal,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
+    fun reconcilePayrollPaymentBatch(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ReconcilePayrollPaymentBatch(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            operations = operations,
+            journal = journal,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
+    fun getPayrollPayslipPayments(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetPayrollPayslipPayments(payments, people, companies, members, identities, transactions)
 }

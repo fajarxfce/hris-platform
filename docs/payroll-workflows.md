@@ -1,6 +1,6 @@
 # Payroll preparation, calculation, and review
 
-Period preparation, independently verified inputs, durable monthly calculation, source cutoffs, staged review, immutable finalization, and payslip reads are implemented. Payment processing is a subsequent step. Approval retains sign-off on calculated results; it does not establish payment.
+Period preparation, independently verified inputs, durable monthly calculation, source cutoffs, staged review, immutable finalization, payslip reads, and [payment preparation/reconciliation](payroll-payments.md) are implemented. Approval retains sign-off on calculated results; it does not establish payment.
 
 ## Periods
 
@@ -111,4 +111,4 @@ A payslip projects an immutable published assessment and its retained calculatio
 
 Lists contain lightweight monetary summaries without full calculation JSON. The inclusive month range defaults to the latest twelve company-local months and permits at most 36 months, within 2024–2100. Pagination is newest tax month first, then assessment ID, with default/max limits 50/200. Keep the same month/filter parameters when following `nextCursor`. A list cursor is a position, not authorization or a synchronization token. Publication of a newer month does not disturb an older page chain; use the sync protocol to reconcile newly published records.
 
-The `PAYSLIPS` change-feed collection carries owned immutable references. An assessment, its finalization, and its sync invalidation commit together; no employee can observe half a payroll publication. The existing bounded worker assigns public positions after commit. Client caches remain account/company scoped and must be replaced after access/collection changes. See [synchronization](synchronization.md). PDF delivery and payment processing are separate capabilities.
+The `PAYSLIPS` change-feed collection carries owned immutable references. An assessment, its finalization, and its sync invalidation commit together; no employee can observe half a payroll publication. The existing bounded worker assigns public positions after commit. Client caches remain account/company scoped and must be replaced after access/collection changes. See [synchronization](synchronization.md). [Payment progress](payroll-payments.md) has its own versions and collection; PDF representation remains subsequent work.

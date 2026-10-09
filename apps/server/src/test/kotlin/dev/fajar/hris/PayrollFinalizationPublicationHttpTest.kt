@@ -3,6 +3,8 @@ package dev.fajar.hris
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.jobs.domain.entities.*
 import java.time.Duration
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.UUID
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -119,6 +121,25 @@ class PayrollFinalizationPublicationHttpTest : PayrollFinalizationApiFixture() {
         assertEquals("FINALIZED", runView(f.calculation, f.run)["run"]["status"].asString())
         println(
             "Published 5000 retained payroll references in ${elapsed.toMillis()} ms; references acquired at ${Duration.ofNanos(referencesAt-started).toMillis()} ms"
+        )
+        val payer =
+            payrollMember(
+                f.calculation.people.payroll.company,
+                setOf("company.read", "payroll.pay"),
+            )
+        val day = LocalDate.now(clock.withZone(ZoneId.of("Asia/Jakarta")))
+        val listingStarted = System.nanoTime()
+        val payables =
+            payrollBody(
+                get(
+                    payer.client,
+                    "/api/v1/companies/${f.calculation.people.payroll.company}/payroll/payments/payables?from=$day&until=$day&limit=200",
+                )
+            )
+        assertEquals(200, payables["items"].size())
+        assertFalse(payables["nextCursor"].isNull)
+        println(
+            "Listed 200 payable references from 5000 published assessments in ${Duration.ofNanos(System.nanoTime()-listingStarted).toMillis()} ms"
         )
     }
 

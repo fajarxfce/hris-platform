@@ -11,7 +11,10 @@ fun selfSyncCollections(permissions: Set<String>): Set<SyncCollection> = buildSe
         add(SyncCollection.LEAVE_REQUESTS)
         add(SyncCollection.LEAVE_BALANCES)
     }
-    if ("payroll.self.read" in permissions) add(SyncCollection.PAYSLIPS)
+    if ("payroll.self.read" in permissions) {
+        add(SyncCollection.PAYSLIPS)
+        add(SyncCollection.PAYROLL_PAYMENTS)
+    }
     if ("overtime.self.manage" in permissions) add(SyncCollection.OVERTIME_REQUESTS)
 }
 

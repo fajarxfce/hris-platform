@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*
 class PayrollPayslipController(
     private val get: GetPayrollPayslip,
     private val list: ListPayrollPayslips,
+    private val payments: GetPayrollPayslipPayments,
 ) {
     @GetMapping
     fun list(
@@ -31,4 +32,8 @@ class PayrollPayslipController(
     @GetMapping("/{id}")
     fun get(actor: Actor, @PathVariable id: UUID): PayrollPayslipResponse =
         get.execute(actor, id).response().toResponse()
+
+    @GetMapping("/{id}/payments")
+    fun payments(actor: Actor, @PathVariable id: UUID): PayrollPaymentProgressResponse =
+        payments.execute(actor, id).response().toResponse()
 }

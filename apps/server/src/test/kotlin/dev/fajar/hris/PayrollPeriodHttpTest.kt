@@ -22,7 +22,7 @@ class PayrollPeriodHttpTest : PayrollPeriodApiFixture() {
         val path = periodsPath(f) + "/$id"
         val first = payrollBody(get(f.reviewer.client, "$path?limit=1"))
         assertEquals("2026-09", first["period"]["earningsMonth"].asString())
-        assertEquals("2026-10", first["period"]["taxMonth"].asString())
+        assertEquals("2026-10", first["period"]["plannedPaymentMonth"].asString())
         assertEquals(2, first["period"]["participantCount"].asInt())
         assertTrue(first["members"]["items"][0]["inputStatus"].isNull)
         val next =

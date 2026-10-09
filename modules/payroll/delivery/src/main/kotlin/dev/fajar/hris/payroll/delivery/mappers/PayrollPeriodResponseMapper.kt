@@ -8,7 +8,7 @@ fun PayrollPeriod.toResponse() =
     PayrollPeriodResponse(
         id,
         earningsMonth.toString(),
-        taxMonth.toString(),
+        plannedPaymentMonth.toString(),
         plannedPaymentDate,
         timezone,
         participantCount,

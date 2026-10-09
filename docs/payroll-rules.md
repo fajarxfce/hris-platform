@@ -49,7 +49,7 @@ Mutations require recent authentication and recent MFA when enforcement is enabl
 
 Policy and compensation revisions, operation receipts, audit, and outbox entries commit atomically. Optimistic versions reject competing edits. Database constraints require every header version to have its immutable revision. History and pagination retain company RLS. Failed validation or a rolled-back transaction does not consume the operation ID.
 
-Configuration and the pure calculation library are implemented. Period input capture, durable calculation runs, approval, finalization, payslips, payments, amendments, and measured performance are subsequent implementation steps.
+Configuration, period/input preparation, and the pure calculation library are implemented. Durable calculation runs, approval, finalization, payslips, payments, amendments, and measured performance are subsequent implementation steps.
 
 ## Earnings and pay basis
 
@@ -72,3 +72,17 @@ An employment's first payroll year can start with explicit opening evidence, inc
 A replacement always creates a draft revision and requires independent verification again. Verification preserves the exact submitted terms. Header, immutable revision, audit/outbox, and operation receipt commit together; the database rejects an incomplete or rewritten revision. Commands use observed opening/employment versions and idempotency keys. A replay returns its original receipt while current scope and independence remain valid. An opening retains at most 1,000 revisions; lists/history use bounded pages. Importing these facts does not calculate or finalize payroll. Run capture and finalized-period history consumption are the next integration step.
 
 Period draft and monthly input preparation are described in [payroll workflows](payroll-workflows.md).
+
+## Monthly composition
+
+`calculateMonthlyPayroll` combines reviewed compensation, monthly inputs, effective employment terms, closed workforce days, approved leave, and tax history. It is a pure domain policy. Acquiring, authorizing, freezing, and persisting these facts belongs to the run use cases and repositories.
+
+The ordinary monthly rule requires a reviewed income due date within the earnings month. A planned transfer in the following month does not move an earlier liability into that later tax month. Inputs must represent the same tax month; former-employee payments or liabilities in other months need an explicit supported correction or separate assessment. THR uses its statutory due month, so a liability from another month cannot silently join an ordinary later-month calculation. This follows PMK 168/2023 article 19; it does not imply that a planned date proves payment.
+
+Calendar proration counts employed calendar days. Scheduled proration uses an explicit reviewed denominator and checks it against a complete monthly schedule. Approved unpaid leave reduces only its affected half-day slots. Paid leave preserves pay. Missing/absent attendance requires an explicit paid/unpaid resolution for each uncovered half; a resolution cannot override accepted work or an approved leave decision. Missing schedule evidence, ambiguous suspension, an unsupported contract, or empty employment coverage blocks calculation with a stable code.
+
+Basic and fixed lines are prorated and rounded separately. Variable cash lines retain their reviewed amounts and tax classification. `regularNonFixedWage` is an overtime wage-base reference; its actual cash belongs in the monthly variable lines and is not added twice. Approved overtime intervals on each date share the first-hour band. Exempt employees retain their reviewed exemption. The monthly amount policy does not certify weekly working-time, meal/rest, or sector compliance.
+
+The composition adds employer health, accident, and death contributions to taxable noncash income, excludes employer retirement/old-age contributions from that tax base, and classifies employee retirement/old-age contributions as deductible. Employee health and other net deductions remain distinct. References: PMK 168/2023 articles 5, 7, and 10. Insurance wage and enrolment remain explicit, including for a partial month. Other declared noncash values represent assessed benefit values; `employerCost` includes those values and employer contributions, rather than claiming to establish an accounting expense valuation.
+
+Tax history must cover the preceding tax month and match the verified residency/PTKP assessment. Missing history is not treated as zero. December, an employment ending in the month, or the end of subjective obligation invokes final reconciliation; employment start alone does not shorten subjective obligation. The result retains earning lines, proration, overtime bands, THR, contributions, exact tax inputs, tax allowances/refunds, deductions, and take-home pay. Built-in component kinds and failure parameters remain unlocalized for clients.

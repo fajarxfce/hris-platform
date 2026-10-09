@@ -4,7 +4,7 @@ Period drafts and independently verified monthly inputs are implemented. Calcula
 
 ## Periods
 
-A period records its earnings month, planned payment date, company timezone, original author, and 1–5,000 selected employment IDs. The payment date determines the intended tax month; it is separate from the month in which work was performed. Actual bank settlement is not established by this date. The date must fall between the first day of the earnings month and 62 days after that month's end.
+A period records its earnings month, planned payment date, company timezone, original author, and 1–5,000 selected employment IDs. Its `plannedPaymentMonth` describes the planned transfer, not an established tax period. PMK 168/2023 article 19 uses the earlier payment or income-liability event. Calculation therefore requires a reviewed income due date; actual bank settlement is not established by a draft. The planned payment date must fall between the first day of the earnings month and 62 days after that month's end.
 
 One active draft is admitted per company and earnings month. Its participant list and payment metadata are immutable. To change either, cancel the draft and create a replacement. Monthly inputs belong to the employment and earnings month, so replacement does not discard their verified history. At most twenty drafts, including cancelled ones, are retained for one company/month.
 

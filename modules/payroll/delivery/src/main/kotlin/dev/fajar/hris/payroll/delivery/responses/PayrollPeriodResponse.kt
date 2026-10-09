@@ -6,7 +6,7 @@ import java.util.UUID
 data class PayrollPeriodResponse(
     val id: UUID,
     val earningsMonth: String,
-    val taxMonth: String,
+    val plannedPaymentMonth: String,
     val plannedPaymentDate: LocalDate,
     val timezone: String,
     val participantCount: Int,

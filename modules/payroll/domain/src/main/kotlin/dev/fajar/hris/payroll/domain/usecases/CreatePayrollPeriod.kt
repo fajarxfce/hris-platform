@@ -125,7 +125,7 @@ class CreatePayrollPeriod(
                             "payroll.period_created",
                             mapOf(
                                 "earningsMonth" to month.toString(),
-                                "taxMonth" to period.taxMonth.toString(),
+                                "plannedPaymentMonth" to period.plannedPaymentMonth.toString(),
                                 "participants" to employees.size.toString(),
                             ),
                             reason,

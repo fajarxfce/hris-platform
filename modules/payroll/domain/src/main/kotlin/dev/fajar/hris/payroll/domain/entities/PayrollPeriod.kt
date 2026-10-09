@@ -14,6 +14,6 @@ data class PayrollPeriod(
     val status: PayrollPeriodStatus,
     val version: Long,
 ) {
-    val taxMonth: YearMonth
+    val plannedPaymentMonth: YearMonth
         get() = YearMonth.from(plannedPaymentDate)
 }

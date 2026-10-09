@@ -129,7 +129,7 @@ class PayrollInputPolicyTest {
                 PayrollPeriodStatus.DRAFT,
                 0,
             )
-        assertEquals(YearMonth.of(2027, 1), period.taxMonth)
+        assertEquals(YearMonth.of(2027, 1), period.plannedPaymentMonth)
         assertEquals(
             Result.Success(Unit),
             validatePayrollPeriod(

@@ -7,7 +7,7 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 interface AttendanceDataSource {
-    fun lockDay(company: UUID, employee: UUID, date: LocalDate)
+    fun lockDay(company: UUID, employee: UUID, date: LocalDate, shared: Boolean)
 
     fun lockWindows(company: UUID, employee: UUID)
 

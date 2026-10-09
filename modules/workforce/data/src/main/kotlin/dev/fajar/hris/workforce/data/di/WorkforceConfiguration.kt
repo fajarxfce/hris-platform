@@ -164,9 +164,21 @@ class WorkforceConfiguration {
         people: PeopleRepository,
         companies: CompanyRepository,
         operations: OperationRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = IssueAttendanceCaptureWindow(attendance, people, companies, operations, transactions, clock)
+    ) =
+        IssueAttendanceCaptureWindow(
+            attendance,
+            people,
+            companies,
+            operations,
+            members,
+            identities,
+            transactions,
+            clock,
+        )
 
     @Bean
     fun recordAttendance(
@@ -178,6 +190,8 @@ class WorkforceConfiguration {
         companies: CompanyRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
     ) =
@@ -190,6 +204,8 @@ class WorkforceConfiguration {
             companies,
             operations,
             journal,
+            members,
+            identities,
             transactions,
             clock,
         )
@@ -202,6 +218,9 @@ class WorkforceConfiguration {
         people: PeopleRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
     ) =
@@ -212,6 +231,9 @@ class WorkforceConfiguration {
             people,
             operations,
             journal,
+            companies,
+            members,
+            identities,
             transactions,
             clock,
         )
@@ -221,9 +243,22 @@ class WorkforceConfiguration {
         attendance: AttendanceRepository,
         corrections: AttendanceCorrectionRepository,
         people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetEmployeeAttendance(attendance, corrections, people, transactions, clock)
+    ) =
+        GetEmployeeAttendance(
+            attendance,
+            corrections,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+        )
 
     @Bean
     fun attendanceCorrectionSource(sql: DSLContext): AttendanceCorrectionDataSource =
@@ -245,6 +280,8 @@ class WorkforceConfiguration {
         companies: CompanyRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
     ) =
@@ -257,6 +294,8 @@ class WorkforceConfiguration {
             companies,
             operations,
             journal,
+            members,
+            identities,
             transactions,
             clock,
         )
@@ -265,9 +304,21 @@ class WorkforceConfiguration {
     fun correctionHistory(
         corrections: AttendanceCorrectionRepository,
         people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetAttendanceCorrectionHistory(corrections, people, transactions, clock)
+    ) =
+        GetAttendanceCorrectionHistory(
+            corrections,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+        )
 
     @Bean
     fun workPeriodSource(sql: DSLContext): WorkPeriodDataSource = PostgresWorkPeriodDataSource(sql)

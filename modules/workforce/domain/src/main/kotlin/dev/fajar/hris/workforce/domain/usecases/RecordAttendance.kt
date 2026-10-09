@@ -1,6 +1,10 @@
 package dev.fajar.hris.workforce.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.domain.entities.*
 import dev.fajar.hris.workforce.domain.policies.*
@@ -14,9 +18,11 @@ class RecordAttendance(
     private val corrections: AttendanceCorrectionRepository,
     private val schedules: ScheduleRepository,
     private val people: PeopleRepository,
-    private val companies: dev.fajar.hris.organization.domain.repositories.CompanyRepository,
+    private val companies: CompanyRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
+    private val members: MembershipRepository,
+    private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
 ) {
@@ -46,16 +52,42 @@ class RecordAttendance(
                     capture.location?.mocked?.toString(),
                 ),
             )
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            if ((replay as Result.Success).value == null) {
+                val valid = validateAttendanceCapture(capture, clock.instant())
+                if (valid is Result.Failed) return@run valid
             }
+            val scheduleGuard = schedules.lock(company, shared = true)
+            if (scheduleGuard is Result.Failed) return@run scheduleGuard
+            val periodResult =
+                if (replay.value == null)
+                    periods.lockMonth(company, YearMonth.from(capture.workDate), false)
+                else Result.Success(null)
+            if (periodResult is Result.Failed) return@run periodResult
+            val dayGuard = attendance.lockDay(company, capture.employeeId, capture.workDate)
+            if (dayGuard is Result.Failed) return@run dayGuard
+            val peopleGuard = people.lockReportingLines(company, shared = true)
+            if (peopleGuard is Result.Failed) return@run peopleGuard
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
+            val authorized =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (authorized is Result.Failed) return@run authorized
+            val live = (authorized as Result.Success).value
+            val permission = live.requirePermission("attendance.self.record")
+            if (permission is Result.Failed) return@run permission
             val now = clock.instant()
-            val valid = validateAttendanceCapture(capture, now)
-            if (valid is Result.Failed) return@run valid
             val foundCompany = companies.find(company)
             if (foundCompany is Result.Failed) return@run foundCompany
             val settings =
@@ -64,20 +96,25 @@ class RecordAttendance(
             val today = now.atZone(ZoneId.of(settings.timezone)).toLocalDate()
             val found = people.find(company, capture.employeeId, today)
             if (found is Result.Failed) return@run found
-            val employee = (found as Result.Success).value
-            if (
-                employee?.person?.accountId != actor.accountId || !employee.terms.isWorkingOn(today)
-            )
+            val employee =
+                (found as Result.Success).value
+                    ?: return@run Result.Failed(
+                        Failure(FailureKind.NOT_FOUND, "employee_not_found")
+                    )
+            if (employee.person.accountId != live.accountId)
+                return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
+            replay.value?.let {
+                return@run Result.Success(it)
+            }
+            val valid = validateAttendanceCapture(capture, now)
+            if (valid is Result.Failed) return@run valid
+            if (!employee.terms.isWorkingOn(today))
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
             val historical = people.find(company, capture.employeeId, capture.workDate)
             if (historical is Result.Failed) return@run historical
             if ((historical as Result.Success).value?.terms?.isWorkingOn(capture.workDate) != true)
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "employee_unavailable"))
-            val periodResult = periods.lockMonth(company, YearMonth.from(capture.workDate), false)
-            if (periodResult is Result.Failed) return@run periodResult
-            val period = (periodResult as Result.Success).value
-            val lock = attendance.lockDay(company, capture.employeeId, capture.workDate)
-            if (lock is Result.Failed) return@run lock
+            val period = requireNotNull((periodResult as Result.Success).value)
             val previous =
                 attendance.entries(company, capture.employeeId, capture.workDate, capture.workDate)
             if (previous is Result.Failed) return@run previous

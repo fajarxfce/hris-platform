@@ -1,6 +1,10 @@
 package dev.fajar.hris.workforce.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.domain.entities.*
 import dev.fajar.hris.workforce.domain.policies.*
@@ -12,6 +16,9 @@ class GetEmployeeAttendance(
     private val attendance: AttendanceRepository,
     private val corrections: AttendanceCorrectionRepository,
     private val people: PeopleRepository,
+    private val companies: CompanyRepository,
+    private val members: MembershipRepository,
+    private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
 ) {
@@ -29,8 +36,29 @@ class GetEmployeeAttendance(
                     parameters = mapOf("maximumDays" to "31"),
                 )
             )
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         return transactions.run(actor) {
+            for (offset in 0..java.time.temporal.ChronoUnit.DAYS.between(from, until)) {
+                val dayGuard =
+                    attendance.lockDay(company, employeeId, from.plusDays(offset), shared = true)
+                if (dayGuard is Result.Failed) return@run dayGuard
+            }
+            val peopleGuard = people.lockReportingLines(company, shared = true)
+            if (peopleGuard is Result.Failed) return@run peopleGuard
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
+            val authorized =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (authorized is Result.Failed) return@run authorized
+            val live = (authorized as Result.Success).value
             people.find(company, employeeId, until).flatMap { employee ->
                 if (employee == null)
                     return@flatMap Result.Failed(
@@ -38,8 +66,8 @@ class GetEmployeeAttendance(
                     )
                 people.findAtInstant(company, employeeId, clock.instant()).flatMap { current ->
                     if (
-                        !canReadWorkforce(actor, employee, current) &&
-                            !canReviewAttendance(actor, current, employee.person.accountId)
+                        !canReadWorkforce(live, employee, current) &&
+                            !canReviewAttendance(live, current, employee.person.accountId)
                     )
                         Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
                     else

@@ -11,11 +11,9 @@ import java.util.UUID
 import org.jooq.DSLContext
 
 class PostgresAttendanceDataSource(private val sql: DSLContext) : AttendanceDataSource {
-    override fun lockDay(company: UUID, employee: UUID, date: LocalDate) {
-        sql.query(
-                "select pg_advisory_xact_lock(hashtextextended(?,0))",
-                "attendance:$company:$employee:$date",
-            )
+    override fun lockDay(company: UUID, employee: UUID, date: LocalDate, shared: Boolean) {
+        val function = if (shared) "pg_advisory_xact_lock_shared" else "pg_advisory_xact_lock"
+        sql.query("select $function(hashtextextended(?,0))", "attendance:$company:$employee:$date")
             .execute()
     }
 

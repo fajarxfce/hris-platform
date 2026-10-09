@@ -15,10 +15,12 @@ class StoredAttendanceRepository(
     private val source: AttendanceDataSource,
     private val json: ObjectMapper,
 ) : AttendanceRepository {
-    override fun lockDay(companyId: UUID, employeeId: UUID, date: LocalDate): Result<Unit> =
-        safeDatabaseCall {
-            source.lockDay(companyId, employeeId, date)
-        }
+    override fun lockDay(
+        companyId: UUID,
+        employeeId: UUID,
+        date: LocalDate,
+        shared: Boolean,
+    ): Result<Unit> = safeDatabaseCall { source.lockDay(companyId, employeeId, date, shared) }
 
     override fun lockWindows(companyId: UUID, employeeId: UUID): Result<Unit> = safeDatabaseCall {
         source.lockWindows(companyId, employeeId)

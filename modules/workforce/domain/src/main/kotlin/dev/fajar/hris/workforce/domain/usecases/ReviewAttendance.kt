@@ -1,6 +1,10 @@
 package dev.fajar.hris.workforce.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.domain.entities.*
 import dev.fajar.hris.workforce.domain.policies.*
@@ -15,6 +19,9 @@ class ReviewAttendance(
     private val people: PeopleRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
+    private val companies: CompanyRepository,
+    private val members: MembershipRepository,
+    private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
 ) {
@@ -39,28 +46,62 @@ class ReviewAttendance(
                 operationId,
                 listOf(id.toString(), version.toString(), decision.name, reason),
             )
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
-            }
             val found = attendance.find(company, id)
             if (found is Result.Failed) return@run found
+            val observed = (found as Result.Success).value
+            val periodResult =
+                if (observed != null)
+                    periods.lockMonth(company, YearMonth.from(observed.capture.workDate), false)
+                else Result.Success(null)
+            if (periodResult is Result.Failed) return@run periodResult
+            if (observed != null) {
+                val dayGuard =
+                    attendance.lockDay(
+                        company,
+                        observed.capture.employeeId,
+                        observed.capture.workDate,
+                    )
+                if (dayGuard is Result.Failed) return@run dayGuard
+            }
+            val peopleGuard = people.lockReportingLines(company, shared = true)
+            if (peopleGuard is Result.Failed) return@run peopleGuard
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
+            val authorized =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (authorized is Result.Failed) return@run authorized
+            val live = (authorized as Result.Success).value
+            if (
+                "attendance.verify" !in live.permissions &&
+                    "attendance.team.verify" !in live.permissions
+            )
+                return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
             val original =
-                (found as Result.Success).value
+                observed
                     ?: return@run Result.Failed(
                         Failure(FailureKind.NOT_FOUND, "attendance_not_found")
                     )
             val capture = original.capture
             val current = people.findAtInstant(company, capture.employeeId, clock.instant())
             if (current is Result.Failed) return@run current
-            if (!canReviewAttendance(actor, (current as Result.Success).value, original.accountId))
+            if (!canReviewAttendance(live, (current as Result.Success).value, original.accountId))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "attendance_review_denied"))
-            val periodResult = periods.lockMonth(company, YearMonth.from(capture.workDate), false)
-            if (periodResult is Result.Failed) return@run periodResult
-            val period = (periodResult as Result.Success).value
+            (replay as Result.Success).value?.let {
+                return@run Result.Success(it)
+            }
+            val period = requireNotNull((periodResult as Result.Success).value)
             if (
                 period.status == WorkPeriodStatus.PROCESSING ||
                     (period.status == WorkPeriodStatus.CLOSED &&
@@ -68,8 +109,6 @@ class ReviewAttendance(
                             original.initial.closingJobId != period.jobId))
             )
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "work_period_locked"))
-            val lock = attendance.lockDay(company, capture.employeeId, capture.workDate)
-            if (lock is Result.Failed) return@run lock
             val previous =
                 attendance.entries(company, capture.employeeId, capture.workDate, capture.workDate)
             if (previous is Result.Failed) return@run previous

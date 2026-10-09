@@ -78,7 +78,7 @@ abstract class WorkforceAccessApiFixture : WorkPeriodApiFixture() {
         return id
     }
 
-    protected fun anotherEmployee(f: Fixture): UUID {
+    protected fun anotherEmployee(f: Fixture, account: UUID? = null): UUID {
         val id = UUID.randomUUID()
         val response =
             command(
@@ -91,6 +91,7 @@ abstract class WorkforceAccessApiFixture : WorkPeriodApiFixture() {
                         "person" to
                             mapOf(
                                 "id" to UUID.randomUUID(),
+                                "accountId" to account,
                                 "legalName" to "Another employee",
                                 "nationality" to "ID",
                             ),

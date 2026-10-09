@@ -7,7 +7,12 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface AttendanceRepository {
-    fun lockDay(companyId: UUID, employeeId: UUID, date: LocalDate): Result<Unit>
+    fun lockDay(
+        companyId: UUID,
+        employeeId: UUID,
+        date: LocalDate,
+        shared: Boolean = false,
+    ): Result<Unit>
 
     fun lockWindows(companyId: UUID, employeeId: UUID): Result<Unit>
 

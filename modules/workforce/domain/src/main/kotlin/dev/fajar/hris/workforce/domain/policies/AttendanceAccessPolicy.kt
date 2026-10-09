@@ -10,6 +10,7 @@ fun canReviewAttendance(
     ownerAccountId: java.util.UUID?,
 ): Boolean =
     actor.accountId != ownerAccountId &&
+        actor.accountId != current?.person?.accountId &&
         ("attendance.verify" in actor.permissions ||
             ("attendance.team.verify" in actor.permissions &&
                 current?.managerAccountId == actor.accountId &&

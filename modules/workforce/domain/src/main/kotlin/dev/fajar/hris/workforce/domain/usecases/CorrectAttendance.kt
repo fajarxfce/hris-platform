@@ -1,6 +1,9 @@
 package dev.fajar.hris.workforce.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.domain.entities.*
@@ -18,6 +21,8 @@ class CorrectAttendance(
     private val companies: CompanyRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
+    private val members: MembershipRepository,
+    private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
 ) {
@@ -36,7 +41,9 @@ class CorrectAttendance(
         if (access is Result.Failed) return access
         if ((expectedVersion ?: 0) < 0)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_version"))
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         val key =
             OperationKey(
                 "attendance.correct",
@@ -54,10 +61,55 @@ class CorrectAttendance(
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
-            (replay as Result.Success).value?.let {
+            if ((replay as Result.Success).value == null) {
+                val valid =
+                    validateAttendanceCorrection(
+                        date,
+                        clockIn,
+                        clockOut,
+                        breakMinutes,
+                        reason,
+                        clock.instant(),
+                    )
+                if (valid is Result.Failed) return@run valid
+            }
+            val scheduleGuard = schedules.lock(company, shared = true)
+            if (scheduleGuard is Result.Failed) return@run scheduleGuard
+            val period =
+                if (replay.value == null) periods.lockMonth(company, YearMonth.from(date), false)
+                else Result.Success(null)
+            if (period is Result.Failed) return@run period
+            val dayGuard = attendance.lockDay(company, employeeId, date)
+            if (dayGuard is Result.Failed) return@run dayGuard
+            val peopleGuard = people.lockReportingLines(company, shared = true)
+            if (peopleGuard is Result.Failed) return@run peopleGuard
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
+            val authorized =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (authorized is Result.Failed) return@run authorized
+            val live = (authorized as Result.Success).value
+            val permission = live.requirePermission("attendance.correct")
+            if (permission is Result.Failed) return@run permission
+            val now = clock.instant()
+            val employeeResult = people.find(company, employeeId, date)
+            if (employeeResult is Result.Failed) return@run employeeResult
+            val employee =
+                (employeeResult as Result.Success).value
+                    ?: return@run Result.Failed(
+                        Failure(FailureKind.NOT_FOUND, "employee_not_found")
+                    )
+            if (employee.person.accountId == actor.accountId)
+                return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "self_correction_denied"))
+            replay.value?.let {
                 return@run Result.Success(it)
             }
-            val now = clock.instant()
             val valid =
                 validateAttendanceCorrection(date, clockIn, clockOut, breakMinutes, reason, now)
             if (valid is Result.Failed) return@run valid
@@ -70,24 +122,10 @@ class CorrectAttendance(
                 return@run Result.Failed(
                     Failure(FailureKind.VALIDATION, "future_attendance_correction")
                 )
-            val employeeResult = people.find(company, employeeId, date)
-            if (employeeResult is Result.Failed) return@run employeeResult
-            val employee =
-                (employeeResult as Result.Success).value
-                    ?: return@run Result.Failed(
-                        Failure(FailureKind.NOT_FOUND, "employee_not_found")
-                    )
-            if (employee.person.accountId == actor.accountId)
-                return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "self_correction_denied"))
             if (!employee.terms.isWorkingOn(date))
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "employee_unavailable"))
-            val mutable =
-                periods
-                    .lockMonth(company, YearMonth.from(date), false)
-                    .flatMap(::requireMutablePeriod)
+            val mutable = requireMutablePeriod(requireNotNull((period as Result.Success).value))
             if (mutable is Result.Failed) return@run mutable
-            val lock = attendance.lockDay(company, employeeId, date)
-            if (lock is Result.Failed) return@run lock
             val entriesResult = attendance.entries(company, employeeId, date, date)
             if (entriesResult is Result.Failed) return@run entriesResult
             val entries = (entriesResult as Result.Success).value

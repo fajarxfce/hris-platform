@@ -18,6 +18,12 @@ An audience selects exactly one kind: the whole company, selected branches, sele
 
 Named groups contain explicit employment IDs, rather than person or account IDs. Up to 128 groups per company and 5,000 distinct members per group are supported. Group definitions and membership lists are versioned together, with up to 1,000 retained revisions per group. Archival is an inactive revision, not deletion of historical evidence.
 
+## Audience preview
+
+Administrators can preview a saved draft or queued announcement using its observed version. The response contains the current eligible recipient count, evaluation instant, company-local date, and referenced group/unit versions. It contains no recipient identities and creates no job, receipt, or audit mutation. Empty audiences return zero; selections exceeding 5,000 fail explicitly.
+
+A preview does not reserve future membership. Scheduled publication evaluates current eligibility again when its worker executes. Published/archived messages expose their retained publication count instead of a new preview. The preview requires current management access, including after pending guards.
+
 ## Publication and retention policy
 
 At publication, resolve the current company-local employment date, selected groups/units, account bindings, and active memberships. Only active/probationary employees with an active account and announcement-read permission are recipients. Deduplicate accounts with multiple matching employments. Abort without a partial inbox if the bounded recipient selection exceeds 5,000 or its audience is no longer valid.

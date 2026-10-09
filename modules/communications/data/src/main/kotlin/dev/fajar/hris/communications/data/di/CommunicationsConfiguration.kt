@@ -313,4 +313,30 @@ class CommunicationsConfiguration {
             journal,
             clock,
         )
+
+    @Bean
+    fun previewAnnouncementAudience(
+        announcements: AnnouncementRepository,
+        groups: AudienceGroupRepository,
+        audience: AnnouncementAudienceRepository,
+        people: PeopleRepository,
+        organization: OrganizationRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        PreviewAnnouncementAudience(
+            announcements,
+            groups,
+            audience,
+            people,
+            organization,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+        )
 }

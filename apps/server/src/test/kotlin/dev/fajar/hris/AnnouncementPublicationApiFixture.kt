@@ -103,6 +103,7 @@ abstract class AnnouncementPublicationApiFixture : PeopleApiFixture() {
     protected fun member(
         f: Fixture,
         permissions: List<String> = listOf("announcements.read"),
+        start: String = "2026-01-01",
     ): Member {
         val id = UUID.randomUUID()
         database()
@@ -124,7 +125,7 @@ abstract class AnnouncementPublicationApiFixture : PeopleApiFixture() {
                 id,
                 permission,
             )
-        val employment = employee(f.browser, f.csrf, f.company, account = id)
+        val employment = employee(f.browser, f.csrf, f.company, account = id, start = start)
         val browser = client()
         return Member(id, employment, browser, login(browser, "$id@example.test"))
     }

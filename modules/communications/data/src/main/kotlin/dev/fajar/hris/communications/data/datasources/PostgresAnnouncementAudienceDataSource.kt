@@ -25,7 +25,7 @@ class PostgresAnnouncementAudienceDataSource(private val sql: DSLContext) :
                 "DEPARTMENT" -> e.DEPARTMENT_ID.`in`(query.targetIds)
                 "GROUP" ->
                     e.ID.`in`(
-                        sql.select(
+                        sql.selectDistinct(
                                 DSL.field(
                                     "{0}::uuid",
                                     UUID::class.java,

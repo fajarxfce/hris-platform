@@ -20,6 +20,7 @@ class AnnouncementController(
     private val queue: QueueAnnouncement,
     private val reset: ReturnAnnouncementToDraft,
     private val archive: ArchiveAnnouncement,
+    private val preview: PreviewAnnouncementAudience,
 ) {
     @PutMapping("/{id}")
     fun save(
@@ -112,4 +113,12 @@ class AnnouncementController(
             .execute(actor, operationId, id, body.expectedVersion, body.reason)
             .response()
             .toResponse()
+
+    @GetMapping("/{id}/audience-preview")
+    fun preview(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestParam expectedVersion: Long,
+    ): AnnouncementAudiencePreviewResponse =
+        preview.execute(actor, id, expectedVersion).response().toResponse()
 }

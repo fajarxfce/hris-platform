@@ -93,6 +93,11 @@ class AnnouncementPublicationCapacityTest : AnnouncementPublicationApiFixture() 
         val f = fixture()
         seedRecipients(f, 5001)
         val id = draft(f)
+        error(
+            get(f.browser, "${f.path}/$id/audience-preview?expectedVersion=0"),
+            409,
+            "announcement_audience_limit",
+        )
         ok(publish(f, id))
         failure(advance.execute(f.actor, claim().single()), "announcement_audience_limit")
         assertEquals(0, count(f, "announcement_publications"))
@@ -113,6 +118,12 @@ class AnnouncementPublicationCapacityTest : AnnouncementPublicationApiFixture() 
                 )
         val groups = (1..32).map { group(f, members = employees.map { requireNotNull(it) }) }
         val id = draft(f, "GROUP", groups)
+        val previewStarted = System.nanoTime()
+        val preview = ok(get(f.browser, "${f.path}/$id/audience-preview?expectedVersion=0"))
+        assertEquals(5000, preview["recipientCount"].asInt())
+        println(
+            "announcement_group_preview_32x5000 elapsed_ms=${Duration.ofNanos(System.nanoTime() - previewStarted).toMillis()}"
+        )
         ok(publish(f, id))
         val lease = claim().single()
         val start = System.nanoTime()

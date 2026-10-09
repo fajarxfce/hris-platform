@@ -10,8 +10,8 @@ import java.util.UUID
 
 class StoredOrganizationRepository(private val source: OrganizationDataSource) :
     OrganizationRepository {
-    override fun lockStructure(companyId: UUID): Result<Unit> = safeDatabaseCall {
-        source.lock(companyId)
+    override fun lockStructure(companyId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
+        source.lock(companyId, shared)
     }
 
     override fun find(companyId: UUID, id: UUID): Result<OrganizationUnit?> = safeDatabaseCall {

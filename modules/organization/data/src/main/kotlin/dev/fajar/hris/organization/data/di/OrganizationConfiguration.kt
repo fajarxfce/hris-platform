@@ -2,7 +2,7 @@ package dev.fajar.hris.organization.data.di
 
 import dev.fajar.hris.core.database.datasources.OperationReceiptDataSource
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.data.datasources.*
 import dev.fajar.hris.organization.data.repositories.StoredCompanyRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
@@ -27,16 +27,31 @@ class OrganizationConfiguration {
     @Bean
     fun saveUnit(
         units: dev.fajar.hris.organization.domain.repositories.OrganizationRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
-    ) = SaveOrganizationUnit(units, operations, journal, transactions)
+    ) =
+        SaveOrganizationUnit(
+            units,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+        )
 
     @Bean
     fun listUnits(
         units: dev.fajar.hris.organization.domain.repositories.OrganizationRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListOrganizationUnits(units, transactions)
+    ) = ListOrganizationUnits(units, companies, members, identities, transactions)
 
     @Bean fun companySource(sql: DSLContext): CompanyDataSource = PostgresCompanyDataSource(sql)
 
@@ -56,13 +71,19 @@ class OrganizationConfiguration {
     ) = CreateCompany(companies, identities, transactions, journal)
 
     @Bean
-    fun getCompany(companies: CompanyRepository, transactions: TransactionRunner) =
-        GetCompany(companies, transactions)
+    fun getCompany(
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetCompany(companies, members, identities, transactions)
 
     @Bean
     fun updateCompany(
         companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
         journal: ChangeJournalRepository,
-    ) = UpdateCompany(companies, transactions, journal)
+    ) = UpdateCompany(companies, members, identities, transactions, journal)
 }

@@ -7,8 +7,12 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresOrganizationDataSource(private val sql: DSLContext) : OrganizationDataSource {
-    override fun lock(companyId: UUID) {
-        sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "organization:$companyId")
+    override fun lock(companyId: UUID, shared: Boolean) {
+        sql.query(
+                if (shared) "select pg_advisory_xact_lock_shared(hashtextextended(?,0))"
+                else "select pg_advisory_xact_lock(hashtextextended(?,0))",
+                "organization:$companyId",
+            )
             .execute()
     }
 

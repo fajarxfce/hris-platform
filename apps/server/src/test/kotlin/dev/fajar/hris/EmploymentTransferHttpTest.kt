@@ -9,9 +9,53 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import org.springframework.dao.DataAccessException
 
-@Import(AccountLockProbeConfiguration::class)
+@Import(AccountLockProbeConfiguration::class, StructureLockProbeConfiguration::class)
 class EmploymentTransferHttpTest : PeopleApiFixture() {
     @Autowired private lateinit var accessProbe: AccountLockProbe
+    @Autowired private lateinit var structureProbe: StructureLockProbe
+
+    @Test
+    fun transferAndOrganizationChangesAcquireStructureBeforeCompanyGuards() {
+        val admin = client()
+        val csrf = login(admin)
+        val source = company(admin, csrf)
+        val target = company(admin, csrf)
+        val id = employee(admin, csrf, source)
+        val barrier = StructureLockProbe.Barrier(target)
+        structureProbe.current.set(barrier)
+        Executors.newSingleThreadExecutor().use { pool ->
+            val pending =
+                pool.submit<java.net.http.HttpResponse<String>> {
+                    transfer(admin, csrf, source, id, target, UUID.randomUUID())
+                }
+            try {
+                assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                val unit =
+                    command(
+                        admin,
+                        "/api/v1/companies/$target/organization-units/${UUID.randomUUID()}",
+                        json.writeValueAsString(
+                            mapOf(
+                                "code" to "TEAM",
+                                "name" to "Team",
+                                "kind" to "DEPARTMENT",
+                                "active" to true,
+                            )
+                        ),
+                        csrf,
+                        UUID.randomUUID(),
+                        "PUT",
+                    )
+                assertEquals(200, unit.statusCode(), unit.body())
+                barrier.release.countDown()
+                val moved = pending.get(10, TimeUnit.SECONDS)
+                assertEquals(200, moved.statusCode(), moved.body())
+            } finally {
+                barrier.release.countDown()
+                structureProbe.current.set(null)
+            }
+        }
+    }
 
     private fun account(): UUID {
         val id = UUID.randomUUID()

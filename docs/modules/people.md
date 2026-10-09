@@ -30,6 +30,8 @@ Sensitive profiles have separate `people.profile.read` and `people.profile.manag
 
 `GET .../profile/history` uses ascending revision cursors with a maximum page size of 200. Migrated initial profiles have no recorded actor; subsequent revisions retain the actual actor and reason. Company access to a shared person permits reads only when the company has that person's employment and the actor has the required grant. The owner company remains responsible for edits.
 
+Profile reads/edits hold people, company, membership, and account guards and recheck the original/live permission intersection before acquisition or receipt replay. Organization-unit reads/edits similarly protect the structure before validating live company access. Company creation revalidates platform credentials and `companies.create`; company settings revalidate current company authority. A previously committed receipt does not bypass current authorization.
+
 ## Scheduled employment changes
 
 Future employment revisions can be cancelled through `POST /companies/{companyId}/employees/{id}/revisions/{revision}/cancel`, with an expected employment version, idempotency key, and reason. Cancellation is an immutable record; the original revision remains in history with its cancellation metadata. Effective reads, leave eligibility, and current reporting access exclude cancelled revisions. Version counters continue increasing even though cancelled revisions are not applied.

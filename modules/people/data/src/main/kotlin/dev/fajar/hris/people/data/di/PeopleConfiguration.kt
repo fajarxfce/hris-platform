@@ -59,23 +59,48 @@ class PeopleConfiguration {
         StoredPeopleRepository(source, profiles)
 
     @Bean
-    fun getPersonProfile(profiles: PersonProfileRepository, transactions: TransactionRunner) =
-        GetPersonProfile(profiles, transactions)
+    fun getPersonProfile(
+        profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+    ) = GetPersonProfile(profiles, people, companies, members, identities, transactions)
 
     @Bean
     fun getPersonProfileHistory(
         profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetPersonProfileHistory(profiles, transactions)
+    ) = GetPersonProfileHistory(profiles, people, companies, members, identities, transactions)
 
     @Bean
     fun savePersonProfile(
         profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = SavePersonProfile(profiles, operations, journal, transactions, clock)
+    ) =
+        SavePersonProfile(
+            profiles,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+        )
 
     @Bean
     fun createEmployee(

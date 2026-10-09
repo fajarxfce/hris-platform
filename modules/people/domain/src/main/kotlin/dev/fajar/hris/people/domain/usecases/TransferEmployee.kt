@@ -80,12 +80,12 @@ class TransferEmployee(
                 val locked = people.lockReportingLines(company)
                 if (locked is Result.Failed) return@run locked
             }
+            val structure = units.lockStructure(command.targetCompanyId)
+            if (structure is Result.Failed) return@run structure
             for (company in scopes) {
                 val locked = companies.lock(company)
                 if (locked is Result.Failed) return@run locked
             }
-            val structure = units.lockStructure(command.targetCompanyId)
-            if (structure is Result.Failed) return@run structure
             for (company in scopes) {
                 val locked = members.lock(company)
                 if (locked is Result.Failed) return@run locked

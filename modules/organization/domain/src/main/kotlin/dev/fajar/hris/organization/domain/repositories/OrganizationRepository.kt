@@ -5,7 +5,7 @@ import dev.fajar.hris.organization.domain.entities.*
 import java.util.UUID
 
 interface OrganizationRepository {
-    fun lockStructure(companyId: UUID): Result<Unit>
+    fun lockStructure(companyId: UUID, shared: Boolean = false): Result<Unit>
 
     fun find(companyId: UUID, id: UUID): Result<OrganizationUnit?>
 

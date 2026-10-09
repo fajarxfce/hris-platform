@@ -1,15 +1,22 @@
 package dev.fajar.hris.people.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.entities.PersonProfile
 import dev.fajar.hris.people.domain.policies.validatePerson
-import dev.fajar.hris.people.domain.repositories.PersonProfileRepository
+import dev.fajar.hris.people.domain.repositories.*
 import java.time.Clock
 import java.time.LocalDate
 import java.util.UUID
 
 class SavePersonProfile(
     private val profiles: PersonProfileRepository,
+    private val people: PeopleRepository,
+    private val companies: CompanyRepository,
+    private val members: MembershipRepository,
+    private val identities: IdentityRepository,
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
@@ -44,13 +51,32 @@ class SavePersonProfile(
                     reason,
                 ),
             )
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
+            val peopleGuard = people.lockReportingLines(company)
+            if (peopleGuard is Result.Failed) return@run peopleGuard
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
+            val checked =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanyCommandActor(actor, it)
+                }
+            if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
+            val permission = live.requirePermission("people.profile.manage")
+            if (permission is Result.Failed) return@run permission
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
-            val found = profiles.findForEmployee(requireNotNull(actor.companyId), employeeId)
+            val found = profiles.findForEmployee(company, employeeId)
             if (found is Result.Failed) return@run found
             val existing =
                 (found as Result.Success).value

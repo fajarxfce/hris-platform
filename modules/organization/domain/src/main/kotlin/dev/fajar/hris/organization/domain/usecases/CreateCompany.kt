@@ -2,6 +2,7 @@ package dev.fajar.hris.organization.domain.usecases
 
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.policies.PermissionCatalog
+import dev.fajar.hris.identity.domain.policies.validatePlatformCommandActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.organization.domain.entities.Company
 import dev.fajar.hris.organization.domain.policies.validateCompany
@@ -36,6 +37,14 @@ class CreateCompany(
         if (validation is Result.Failed) return validation
         val scope = actor.copy(companyId = company.id)
         return transactions.run(scope) {
+            val guard = identities.lockAccount(actor.accountId, shared = true)
+            if (guard is Result.Failed) return@run guard
+            val checked =
+                identities
+                    .access(actor.accountId, null)
+                    .flatMap { validatePlatformCommandActor(actor, it) }
+                    .flatMap { it.requirePermission("companies.create") }
+            if (checked is Result.Failed) return@run checked
             companies.create(scope, operationId, company).flatMap { receipt ->
                 if (receipt.replayed) Result.Success(receipt)
                 else

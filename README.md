@@ -26,6 +26,7 @@ See [development](docs/development.md) for Docker access, migrations, and local 
 - [Outbound email](docs/mail.md)
 - [Private object storage](docs/storage.md)
 - [API conventions](docs/api-conventions.md)
+- [Mobile and offline clients](docs/mobile-api.md)
 - [Dashboard design](docs/dashboard.md)
 - [Delivery and validation](docs/delivery.md)
 

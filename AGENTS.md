@@ -10,6 +10,7 @@ Read docs/architecture.md, docs/product.md, and docs/delivery.md before changing
 - Centralize repeated technical error mapping in named public safe functions. Acquisition and mapping share the boundary. Preserve cancellation/interruption and failure classification. No hidden retry, permission, session, or lifecycle policy in safe functions.
 - TransactionRunner must roll back on a failed Result. Business writes, audit, outbox, and idempotency receipts commit atomically where required. External delivery happens after commit.
 - Always enforce actor/company/resource scope server-side. RLS context is transaction-local. Migration credentials must not be used by application runtime.
+- Preserve stable API error codes and safe unlocalized parameters. Clients translate errors. Mobile commands require idempotency and observed versions; synchronization must handle commit ordering, bounded cursors, deleted data, and revoked access without leaking another account/company partition.
 - Keep money decimal and time/zone policy explicit. Final payroll and submitted policy snapshots are immutable; corrections are new records.
 - Use Gradle conventions, a version catalog, and type-safe projects accessors. Generated sources stay in build directories. Do not create one module per use case.
 - React pages render state and forward actions. Feature controllers own use cases, state, effects, and cancellation. SDK I/O stays in data. Scope caches by account/company and cancel obsolete requests.

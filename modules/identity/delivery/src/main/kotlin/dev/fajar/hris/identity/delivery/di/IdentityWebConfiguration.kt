@@ -105,6 +105,15 @@ class IdentityWebConfiguration {
                 ApiAuthenticationFailureHandler(json)
                     .onAuthenticationFailure(request, response, error)
             }
+            it.accessDeniedHandler { request, response, _ ->
+                dev.fajar.hris.core.http.writeApiProblem(
+                    request,
+                    response,
+                    json,
+                    org.springframework.http.HttpStatus.FORBIDDEN,
+                    "access_denied",
+                )
+            }
         }
         http.addFilterBefore(
             NativeAccessFilter(resolve, json),
@@ -161,15 +170,12 @@ class IdentityWebConfiguration {
                     .onAuthenticationFailure(request, response, error)
             }
             it.accessDeniedHandler { request, response, _ ->
-                response.status = 403
-                response.contentType = "application/problem+json"
-                json.writeValue(
-                    response.outputStream,
-                    mapOf(
-                        "status" to 403,
-                        "code" to "access_denied",
-                        "correlationId" to request.getAttribute("hris.correlationId")?.toString(),
-                    ),
+                dev.fajar.hris.core.http.writeApiProblem(
+                    request,
+                    response,
+                    json,
+                    org.springframework.http.HttpStatus.FORBIDDEN,
+                    "access_denied",
                 )
             }
         }
@@ -181,7 +187,7 @@ class IdentityWebConfiguration {
                 response.status = 204
             }
         }
-        oidc.ifAvailable { it.configure(http) }
+        oidc.ifAvailable { it.configure(http, json) }
         http.addFilterAt(authentication, UsernamePasswordAuthenticationFilter::class.java)
         return http.build()
     }

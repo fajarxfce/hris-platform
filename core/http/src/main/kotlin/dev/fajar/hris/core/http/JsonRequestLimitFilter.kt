@@ -26,15 +26,13 @@ class JsonRequestLimitFilter(private val json: ObjectMapper) : OncePerRequestFil
             return
         }
         if (request.contentLengthLong > MAXIMUM_BYTES) {
-            response.status = 413
-            response.contentType = "application/problem+json"
-            json.writeValue(
-                response.outputStream,
-                mapOf(
-                    "status" to 413,
-                    "code" to "request_body_too_large",
-                    "correlationId" to request.getAttribute("hris.correlationId")?.toString(),
-                ),
+            writeApiProblem(
+                request,
+                response,
+                json,
+                org.springframework.http.HttpStatus.CONTENT_TOO_LARGE,
+                "request_body_too_large",
+                parameters = mapOf("maximumBytes" to MAXIMUM_BYTES.toString()),
             )
             return
         }

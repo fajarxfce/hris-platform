@@ -1,7 +1,10 @@
 package dev.fajar.hris.identity.delivery.security
 
+import dev.fajar.hris.core.domain.FailureKind
+import dev.fajar.hris.core.http.writeApiProblem
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.authentication.AuthenticationFailureHandler
 import tools.jackson.databind.ObjectMapper
@@ -16,22 +19,21 @@ class ApiAuthenticationFailureHandler(private val json: ObjectMapper) :
         val failure = (error as? IdentityAuthenticationException)?.failure
         val status =
             when (failure?.kind) {
-                dev.fajar.hris.core.domain.FailureKind.RATE_LIMITED -> 429
-                dev.fajar.hris.core.domain.FailureKind.UNAVAILABLE -> 503
-                dev.fajar.hris.core.domain.FailureKind.UNEXPECTED -> 500
-                dev.fajar.hris.core.domain.FailureKind.VALIDATION -> 400
-                else -> 401
+                FailureKind.RATE_LIMITED -> HttpStatus.TOO_MANY_REQUESTS
+                FailureKind.UNAVAILABLE -> HttpStatus.SERVICE_UNAVAILABLE
+                FailureKind.UNEXPECTED -> HttpStatus.INTERNAL_SERVER_ERROR
+                FailureKind.VALIDATION -> HttpStatus.BAD_REQUEST
+                else -> HttpStatus.UNAUTHORIZED
             }
-        if (status == 429) response.setHeader("Retry-After", "900")
-        response.status = status
-        response.contentType = "application/problem+json"
-        json.writeValue(
-            response.outputStream,
-            mapOf(
-                "status" to status,
-                "code" to (failure?.code ?: "authentication_required"),
-                "correlationId" to request.getAttribute("hris.correlationId")?.toString(),
-            ),
+        writeApiProblem(
+            request,
+            response,
+            json,
+            status,
+            failure?.code ?: "authentication_required",
+            failure?.fields.orEmpty(),
+            failure?.parameters.orEmpty(),
+            retryAfterSeconds = if (status == HttpStatus.TOO_MANY_REQUESTS) 900 else null,
         )
     }
 }

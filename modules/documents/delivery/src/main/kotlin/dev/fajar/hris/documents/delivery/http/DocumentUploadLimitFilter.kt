@@ -1,6 +1,7 @@
 package dev.fajar.hris.documents.delivery.http
 
 import dev.fajar.hris.core.http.BoundedBodyRequest
+import dev.fajar.hris.core.http.writeApiProblem
 import dev.fajar.hris.documents.domain.policies.DOCUMENT_CHUNK_BYTES
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -29,29 +30,24 @@ class DocumentUploadLimitFilter(private val json: ObjectMapper) : OncePerRequest
             return
         }
         if (request.contentLengthLong > DOCUMENT_CHUNK_BYTES) {
-            response.status = 413
-            response.contentType = "application/problem+json"
-            json.writeValue(
-                response.outputStream,
-                mapOf(
-                    "status" to 413,
-                    "code" to "request_body_too_large",
-                    "correlationId" to request.getAttribute("hris.correlationId")?.toString(),
-                ),
+            writeApiProblem(
+                request,
+                response,
+                json,
+                org.springframework.http.HttpStatus.CONTENT_TOO_LARGE,
+                "request_body_too_large",
+                parameters = mapOf("maximumBytes" to DOCUMENT_CHUNK_BYTES.toString()),
             )
             return
         }
         if (!capacity.tryAcquire()) {
-            response.status = 429
-            response.contentType = "application/problem+json"
-            response.setHeader("Retry-After", "1")
-            json.writeValue(
-                response.outputStream,
-                mapOf(
-                    "status" to 429,
-                    "code" to "document_upload_busy",
-                    "correlationId" to request.getAttribute("hris.correlationId")?.toString(),
-                ),
+            writeApiProblem(
+                request,
+                response,
+                json,
+                org.springframework.http.HttpStatus.TOO_MANY_REQUESTS,
+                "document_upload_busy",
+                retryAfterSeconds = 1,
             )
             return
         }

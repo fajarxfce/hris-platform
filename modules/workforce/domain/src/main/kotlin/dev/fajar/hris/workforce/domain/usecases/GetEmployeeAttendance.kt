@@ -22,7 +22,13 @@ class GetEmployeeAttendance(
         until: LocalDate,
     ): Result<List<AttendanceDay>> {
         if (java.time.temporal.ChronoUnit.DAYS.between(from, until) !in 0..30)
-            return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_attendance_range"))
+            return Result.Failed(
+                Failure(
+                    FailureKind.VALIDATION,
+                    "invalid_attendance_range",
+                    parameters = mapOf("maximumDays" to "31"),
+                )
+            )
         val company = requireNotNull(actor.companyId)
         return transactions.run(actor) {
             people.find(company, employeeId, until).flatMap { employee ->

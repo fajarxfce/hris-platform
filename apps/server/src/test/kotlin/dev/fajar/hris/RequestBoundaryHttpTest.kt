@@ -86,6 +86,14 @@ class RequestBoundaryHttpTest : ApiIntegrationTest() {
                 "request_body_too_large",
                 json.readTree(response.body()).get("code").asString(),
             )
+            assertEquals(
+                "1048576",
+                json.readTree(response.body()).get("parameters").get("maximumBytes").asString(),
+            )
+            assertTrue(json.readTree(response.body()).get("fields").isObject)
+            assertTrue(
+                response.headers().firstValue("Cache-Control").orElse("").contains("no-store")
+            )
             assertFalse(response.body().contains("OVERSIZED"))
             assertEquals(200, get(client, "/api/v1/me").statusCode())
         }

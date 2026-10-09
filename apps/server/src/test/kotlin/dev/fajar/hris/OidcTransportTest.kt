@@ -31,11 +31,15 @@ class OidcTransportTest {
 
     @Test
     fun callbackCapacityHasNoWaitingQueueAndReleasesPermitsAfterFailure() {
-        val filter = OidcCallbackLimitFilter()
+        val json = tools.jackson.databind.json.JsonMapper.builder().build()
+        val filter = OidcCallbackLimitFilter(json)
         val entered = CountDownLatch(8)
         val release = CountDownLatch(1)
         fun request() =
-            MockHttpServletRequest().apply { servletPath = "/login/oauth2/code/company" }
+            MockHttpServletRequest().apply {
+                servletPath = "/login/oauth2/code/company"
+                setAttribute("hris.correlationId", java.util.UUID.randomUUID())
+            }
         Executors.newFixedThreadPool(8).use { pool ->
             val waiting =
                 (1..8).map {
@@ -59,6 +63,17 @@ class OidcTransportTest {
                     FilterChain { _, _ -> fail("Saturated callback must not execute") },
                 )
                 assertEquals(503, response.status)
+                val problem = json.readTree(response.contentAsString)
+                assertEquals(
+                    "urn:hris:problem:sign_in_capacity_exceeded",
+                    problem.get("type").asString(),
+                )
+                assertEquals("no-store", response.getHeader("Cache-Control"))
+                assertEquals("1", response.getHeader("Retry-After"))
+                assertEquals(1, problem.get("retryAfterSeconds").asInt())
+                assertTrue(problem.get("fields").isObject)
+                assertTrue(problem.get("parameters").isObject)
+                java.util.UUID.fromString(problem.get("correlationId").asString())
             } finally {
                 release.countDown()
             }

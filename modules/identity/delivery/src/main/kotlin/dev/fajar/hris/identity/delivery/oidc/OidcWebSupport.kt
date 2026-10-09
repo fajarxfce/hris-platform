@@ -90,7 +90,7 @@ class OidcWebSupport(
     private val users = ApplicationOidcUserService(signIn, clock)
     private val success = OidcSessionSuccessHandler(contexts)
 
-    fun configure(security: HttpSecurity) {
+    fun configure(security: HttpSecurity, json: tools.jackson.databind.ObjectMapper) {
         security.oauth2Login { oauth ->
             oauth.loginPage("/login")
             oauth.withObjectPostProcessor(
@@ -132,7 +132,7 @@ class OidcWebSupport(
             }
         }
         security.addFilterBefore(
-            OidcCallbackLimitFilter(),
+            OidcCallbackLimitFilter(json),
             OAuth2LoginAuthenticationFilter::class.java,
         )
     }

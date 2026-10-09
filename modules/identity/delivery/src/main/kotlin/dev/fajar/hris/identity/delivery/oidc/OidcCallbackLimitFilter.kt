@@ -6,7 +6,8 @@ import jakarta.servlet.http.HttpServletResponse
 import java.util.concurrent.Semaphore
 import org.springframework.web.filter.OncePerRequestFilter
 
-class OidcCallbackLimitFilter : OncePerRequestFilter() {
+class OidcCallbackLimitFilter(private val json: tools.jackson.databind.ObjectMapper) :
+    OncePerRequestFilter() {
     private val capacity = Semaphore(8)
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean =
@@ -18,10 +19,14 @@ class OidcCallbackLimitFilter : OncePerRequestFilter() {
         chain: FilterChain,
     ) {
         if (!capacity.tryAcquire()) {
-            response.status = 503
-            response.contentType = "application/problem+json"
-            response.setHeader("Cache-Control", "no-store")
-            response.writer.write("{\"status\":503,\"code\":\"sign_in_capacity_exceeded\"}")
+            dev.fajar.hris.core.http.writeApiProblem(
+                request,
+                response,
+                json,
+                org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE,
+                "sign_in_capacity_exceeded",
+                retryAfterSeconds = 1,
+            )
             return
         }
         try {

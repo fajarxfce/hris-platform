@@ -71,4 +71,6 @@ Supported keys are `PEOPLE`, `WORKFORCE` (including overtime), `LEAVE`, `EXPENSE
 
 Admission precedes the business handler. Already admitted requests and durably accepted jobs may complete; configuration changes do not interrupt their transactions. Workers retain their execution access and lease policies. The feature-to-policy mapping belongs to the application composition; datasources perform persistence.
 
+Global group reports have no company path parameter. Their use case checks the same client policy for every selected company under ordered policy/access guards. A typed HTTP argument supplies the authenticated transport and parsed build headers; client query values cannot replace this context. A blocked company rejects the whole report and adds its ID to safe error parameters. See [reporting](reporting.md).
+
 Writes acquire the policy guard before company, membership, and account guards, then recheck access and recent authentication before replay or mutation. Head, revision, receipt, audit, and event commit atomically. Effective reads retain the shared policy guard through the current-revision and next-activation queries. The server needs no policy polling loop or in-memory scheduler.

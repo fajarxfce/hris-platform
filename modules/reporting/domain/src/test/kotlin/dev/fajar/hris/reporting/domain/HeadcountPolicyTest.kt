@@ -10,6 +10,23 @@ import org.junit.jupiter.api.Test
 
 class HeadcountPolicyTest {
     @Test
+    fun groupSelectionIsBoundedDistinctAndCopiedInStableOrder() {
+        val first = UUID.randomUUID()
+        val second = UUID.randomUUID()
+        for (selection in
+            listOf(emptyList(), listOf(first, first), List(33) { UUID.randomUUID() })) {
+            val result = validateHeadcountCompanies(selection) as Result.Failed
+            assertEquals("invalid_report_companies", result.failure.code)
+        }
+        val selected = mutableListOf(second, first)
+        val result = validateHeadcountCompanies(selected) as Result.Success
+        selected.clear()
+        assertEquals(listOf(first, second).sorted(), result.value)
+        val maximum = List(32) { UUID.randomUUID() }
+        assertEquals(Result.Success(maximum.sorted()), validateHeadcountCompanies(maximum))
+    }
+
+    @Test
     fun reportAccessRequiresBothReportAndCompanyWideSourcePermission() {
         val actor =
             Actor(

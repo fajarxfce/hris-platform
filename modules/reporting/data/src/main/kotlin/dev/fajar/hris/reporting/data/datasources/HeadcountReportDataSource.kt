@@ -5,5 +5,9 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface HeadcountReportDataSource {
-    fun count(companyId: UUID, asOf: LocalDate, statuses: Set<String>): List<HeadcountAggregateRow>
+    fun count(
+        companies: Set<UUID>,
+        asOf: LocalDate,
+        statuses: Set<String>,
+    ): List<HeadcountAggregateRow>
 }

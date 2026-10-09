@@ -358,4 +358,199 @@ class PostgresIsolationTest {
             transactions.run(actor(companyA), companyA) { Result.Success(Unit) }
         }
     }
+
+    @Test
+    fun reportReadScopeIsBoundedToSelectedEmploymentInputsAndNeverGrantsCompanyWrites() {
+        admin.update(
+            "insert into accounts(id,email,display_name) values(?,?,'Report scope fixture') on conflict do nothing",
+            actorId,
+            "$actorId@example.test",
+        )
+        val third = UUID.randomUUID()
+        admin.update(
+            "insert into companies(id,code,name,timezone) values(?,?,'Report third','UTC')",
+            third,
+            "R${third.toString().take(8)}",
+        )
+        for (company in listOf(companyA, companyB, third)) {
+            val person = UUID.randomUUID()
+            val employment = UUID.randomUUID()
+            admin.update(
+                "insert into persons(id,owner_company_id,legal_name,nationality) values(?,?,'Private profile','ID')",
+                person,
+                company,
+            )
+            admin.update(
+                "insert into employments(company_id,id,person_id,employee_number) values(?,?,?,?)",
+                company,
+                employment,
+                person,
+                "R${employment.toString().take(8)}",
+            )
+            admin.update(
+                "insert into employment_revisions(company_id,employment_id,revision,effective_from,contract_kind,start_date,status,actor_id,reason) values(?,?,0,'2026-01-01','PERMANENT','2026-01-01','ACTIVE',?,'Read scope fixture')",
+                company,
+                employment,
+                actorId,
+            )
+        }
+        val result =
+            transactions.run(actor(null), setOf(companyB, companyA)) {
+                for (table in listOf("employments", "employment_revisions")) {
+                    assertEquals(
+                        setOf(companyA, companyB),
+                        jdbc
+                            .queryForList(
+                                "select distinct company_id from $table",
+                                UUID::class.java,
+                            )
+                            .toSet(),
+                    )
+                }
+                assertEquals(
+                    0,
+                    jdbc.queryForObject("select count(*) from persons", Int::class.java),
+                )
+                assertEquals(
+                    0,
+                    jdbc.queryForObject("select count(*) from companies", Int::class.java),
+                )
+                assertEquals(
+                    0,
+                    jdbc.update(
+                        "update employments set employee_number='FORBIDDEN' where company_id=?",
+                        companyA,
+                    ),
+                )
+                Result.Success(Unit)
+            }
+        assertEquals(Result.Success(Unit), result)
+        val denied =
+            transactions.run(actor(null), setOf(companyA)) {
+                safeDatabaseCall {
+                    jdbc.update(
+                        "insert into employments(company_id,id,person_id,employee_number) select company_id,?,person_id,'FORBIDDEN' from employments where company_id=? limit 1",
+                        UUID.randomUUID(),
+                        companyA,
+                    )
+                }
+            }
+        assertEquals(Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied")), denied)
+        assertEquals(
+            0,
+            admin.queryForObject(
+                "select count(*) from employments where employee_number='FORBIDDEN'",
+                Int::class.java,
+            ),
+        )
+        assertEquals(0, jdbc.queryForObject("select count(*) from employments", Int::class.java))
+    }
+
+    @Test
+    fun reportScopeClearsAfterFailureCancellationAndConnectionReuse() {
+        val rejected = Result.Failed(Failure(FailureKind.CONFLICT, "report_rejected"))
+        assertEquals(
+            rejected,
+            transactions.run(actor(null), setOf(companyA, companyB)) { rejected },
+        )
+        assertThrows(CancellationException::class.java) {
+            transactions.run<Unit>(actor(null), setOf(companyA)) { throw CancellationException() }
+        }
+        assertEquals(
+            0,
+            jdbc.queryForObject("select cardinality(current_read_company_ids())", Int::class.java),
+        )
+        // Even a preexisting connection setting is replaced by every ordinary transaction owner.
+        jdbc.queryForObject(
+            "select set_config('hris.read_company_ids',?,false)",
+            String::class.java,
+            "{$companyB}",
+        )
+        try {
+            assertEquals(
+                Result.Success(0),
+                transactions.run(actor(companyA)) {
+                    Result.Success(
+                        jdbc.queryForObject(
+                            "select cardinality(current_read_company_ids())",
+                            Int::class.java,
+                        )
+                    )
+                },
+            )
+            assertEquals(
+                Result.Success(0),
+                transactions.run(actor(companyA), companyB) {
+                    Result.Success(
+                        jdbc.queryForObject(
+                            "select cardinality(current_read_company_ids())",
+                            Int::class.java,
+                        )
+                    )
+                },
+            )
+        } finally {
+            jdbc.queryForObject(
+                "select set_config('hris.read_company_ids','',false)",
+                String::class.java,
+            )
+        }
+        assertEquals(
+            0,
+            jdbc.queryForObject("select cardinality(current_read_company_ids())", Int::class.java),
+        )
+    }
+
+    @Test
+    fun invalidReportScopesNeverStartAnOperationAndDatabaseContextRejectsMalformedArrays() {
+        for (selection in listOf(emptySet(), List(33) { UUID.randomUUID() }.toSet())) {
+            assertThrows(IllegalArgumentException::class.java) {
+                transactions.run<Unit>(actor(null), selection) {
+                    fail("invalid read scope entered")
+                }
+            }
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            transactions.run<Unit>(actor(companyA), setOf(companyB)) {
+                fail("company actor entered group scope")
+            }
+        }
+        assertEquals(
+            Result.Success(32),
+            transactions.run(actor(null), List(32) { UUID.randomUUID() }.toSet()) {
+                Result.Success(
+                    jdbc.queryForObject(
+                        "select cardinality(current_read_company_ids())",
+                        Int::class.java,
+                    )
+                )
+            },
+        )
+        for (value in
+            listOf(
+                "{{$companyA}}",
+                "{$companyA,NULL}",
+                List(33) { UUID.randomUUID() }.joinToString(",", "{", "}"),
+            )) {
+            val result =
+                transactions.run(actor(null)) {
+                    safeDatabaseCall {
+                        jdbc.queryForObject(
+                            "select set_config('hris.read_company_ids',?,true)",
+                            String::class.java,
+                            value,
+                        )
+                        jdbc.queryForObject(
+                            "select cardinality(current_read_company_ids())",
+                            Int::class.java,
+                        )
+                    }
+                }
+            assertInstanceOf(Result.Failed::class.java, result)
+        }
+        assertEquals(
+            0,
+            jdbc.queryForObject("select cardinality(current_read_company_ids())", Int::class.java),
+        )
+    }
 }

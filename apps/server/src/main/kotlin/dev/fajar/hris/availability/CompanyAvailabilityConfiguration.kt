@@ -11,6 +11,15 @@ class CompanyAvailabilityConfiguration {
     @Bean
     fun companyAvailability(check: CheckCompanyAvailability): WebMvcConfigurer =
         object : WebMvcConfigurer {
+            override fun addArgumentResolvers(
+                resolvers:
+                    MutableList<
+                        org.springframework.web.method.support.HandlerMethodArgumentResolver
+                    >
+            ) {
+                resolvers.add(ClientRequestArgumentResolver())
+            }
+
             override fun addInterceptors(registry: InterceptorRegistry) {
                 registry
                     .addInterceptor(CompanyAvailabilityInterceptor(check))

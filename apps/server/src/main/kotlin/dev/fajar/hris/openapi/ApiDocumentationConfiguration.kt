@@ -1,5 +1,6 @@
 package dev.fajar.hris.openapi
 
+import dev.fajar.hris.administration.domain.entities.ClientRequest
 import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.identity.delivery.security.PendingMfaAllowed
 import dev.fajar.hris.identity.delivery.security.SessionTransport
@@ -22,7 +23,11 @@ import org.springframework.security.web.csrf.CsrfToken
 class ApiDocumentationConfiguration {
     init {
         SpringDocUtils.getConfig()
-            .addRequestWrapperToIgnore(Actor::class.java, CsrfToken::class.java)
+            .addRequestWrapperToIgnore(
+                Actor::class.java,
+                CsrfToken::class.java,
+                ClientRequest::class.java,
+            )
             .replaceWithSchema(
                 YearMonth::class.java,
                 StringSchema().pattern("^[0-9]{4}-(0[1-9]|1[0-2])$").example("2026-10"),
@@ -64,6 +69,10 @@ class ApiDocumentationConfiguration {
         operation.addExtension(
             "x-hris-company-admission",
             feature !in dev.fajar.hris.availability.companyPolicyExemptPackages,
+        )
+        operation.addExtension(
+            "x-hris-group-admission",
+            handler.methodParameters.any { it.parameterType == ClientRequest::class.java },
         )
         operation
     }

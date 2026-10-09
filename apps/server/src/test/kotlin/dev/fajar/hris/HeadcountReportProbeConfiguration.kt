@@ -35,14 +35,14 @@ class HeadcountReportProbeConfiguration {
     ): HeadcountReportDataSource =
         object : HeadcountReportDataSource by delegate {
             override fun count(
-                companyId: UUID,
+                companies: Set<UUID>,
                 asOf: LocalDate,
                 statuses: Set<String>,
             ): List<HeadcountAggregateRow> {
-                val result = delegate.count(companyId, asOf, statuses)
+                val result = delegate.count(companies, asOf, statuses)
                 probe.afterRead
                     .get()
-                    ?.takeIf { it.company == companyId }
+                    ?.takeIf { it.company in companies }
                     ?.let {
                         it.entered.countDown()
                         check(it.release.await(5, TimeUnit.SECONDS))

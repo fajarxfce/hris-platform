@@ -189,6 +189,27 @@ class ApiContractHttpTest : PeopleApiFixture() {
             paths["/api/v1/companies/{companyId}/client-policy"]["get"]["x-hris-company-admission"]
                 .asBoolean()
         )
+        val groupReport = paths["/api/v1/reports/headcount"]["get"]
+        assertTrue(groupReport["x-hris-company-admission"].asBoolean())
+        assertTrue(groupReport["x-hris-group-admission"].asBoolean())
+        val groupParameters =
+            groupReport["parameters"].iterator().asSequence().associateBy { it["name"].asString() }
+        assertEquals(
+            setOf(
+                "companies",
+                "asOf",
+                "X-HRIS-Client-Platform",
+                "X-HRIS-Client-Build",
+                "X-Request-ID",
+            ),
+            groupParameters.keys,
+        )
+        val selectedCompanies = groupParameters.getValue("companies")
+        assertEquals(1, selectedCompanies["schema"]["minItems"].asInt())
+        assertEquals(32, selectedCompanies["schema"]["maxItems"].asInt())
+        assertTrue(selectedCompanies["schema"]["uniqueItems"].asBoolean())
+        assertEquals("uuid", selectedCompanies["schema"]["items"]["format"].asString())
+        assertFalse(selectedCompanies["explode"].asBoolean())
         assertTrue(mutation["x-hris-idempotency-key"].asBoolean())
         val permissions =
             mutation["security"]

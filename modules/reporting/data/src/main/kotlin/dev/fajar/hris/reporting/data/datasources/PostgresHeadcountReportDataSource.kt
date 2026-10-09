@@ -7,14 +7,14 @@ import org.jooq.DSLContext
 
 class PostgresHeadcountReportDataSource(private val sql: DSLContext) : HeadcountReportDataSource {
     override fun count(
-        companyId: UUID,
+        companies: Set<UUID>,
         asOf: LocalDate,
         statuses: Set<String>,
     ): List<HeadcountAggregateRow> =
         sql.fetch(
                 """
                 with effective as materialized (
-                    select e.person_id, r.status, r.contract_kind
+                    select e.company_id, e.person_id, r.status, r.contract_kind
                     from employments e
                     join lateral (
                         select h.status, h.contract_kind, h.start_date, h.end_date
@@ -28,18 +28,21 @@ class PostgresHeadcountReportDataSource(private val sql: DSLContext) : Headcount
                           )
                         order by h.effective_from desc,h.revision desc limit 1
                     ) r on true
-                    where e.company_id=?::uuid and r.status=any(?::varchar[])
+                    where e.company_id=any(?::uuid[]) and r.status=any(?::varchar[])
                       and r.start_date<=?::date and (r.end_date is null or r.end_date>=?::date)
                 )
-                select case when grouping(status)=0 then 'STATUS'
+                select company_id, case when grouping(status)=0 then 'STATUS'
                             when grouping(contract_kind)=0 then 'CONTRACT' else 'TOTAL' end as dimension,
                        coalesce(status,contract_kind) as key,
                        count(*) as employments,count(distinct person_id) as persons
-                from effective group by grouping sets ((),(status),(contract_kind))
+                from effective group by grouping sets (
+                    (),(status),(contract_kind),
+                    (company_id),(company_id,status),(company_id,contract_kind)
+                )
                 """
                     .trimIndent(),
                 asOf,
-                companyId,
+                companies.toTypedArray(),
                 statuses.toTypedArray(),
                 asOf,
                 asOf,
@@ -50,6 +53,7 @@ class PostgresHeadcountReportDataSource(private val sql: DSLContext) : Headcount
                     it.get("key", String::class.java),
                     requireNotNull(it.get("employments", Long::class.java)),
                     requireNotNull(it.get("persons", Long::class.java)),
+                    it.get("company_id", UUID::class.java),
                 )
             }
 }

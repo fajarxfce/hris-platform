@@ -9,6 +9,7 @@ fun List<HeadcountAggregateRow>.toHeadcountCounts(): HeadcountCounts {
     val rows = associateBy { it.dimension to it.key }
     check(rows.size == size)
     check(all { it.employments >= 0 && it.persons in 0..it.employments })
+    check(all { (it.employments == 0L) == (it.persons == 0L) })
     val total = requireNotNull(rows["TOTAL" to null])
     val allowed =
         setOf(

@@ -143,8 +143,9 @@ fun completeApiContract(api: OpenAPI) {
                 }
             operation.addExtension("x-hris-authentication-required", path !in publicPaths)
             val companyAdmission =
-                "{companyId}" in path &&
-                    operation.extensions?.get("x-hris-company-admission") == true
+                ("{companyId}" in path &&
+                    operation.extensions?.get("x-hris-company-admission") == true) ||
+                    operation.extensions?.get("x-hris-group-admission") == true
             operation.addExtension("x-hris-company-admission", companyAdmission)
             if (companyAdmission) {
                 operation.addParametersItem(
@@ -209,6 +210,19 @@ fun completeApiContract(api: OpenAPI) {
                         parameter.schema?.minimum = BigDecimal.ONE
                         parameter.schema?.maximum = BigDecimal(200)
                     }
+                    "companies" ->
+                        if (path == "/api/v1/reports/headcount") {
+                            parameter.schema =
+                                ArraySchema()
+                                    .items(StringSchema().format("uuid"))
+                                    .minItems(1)
+                                    .maxItems(32)
+                                    .uniqueItems(true)
+                            parameter.style = Parameter.StyleEnum.FORM
+                            parameter.explode = false
+                            parameter.description =
+                                "One to 32 distinct company IDs. Every company requires current reports.read and people.read permission and passes client availability checks; the entire request fails when any selected scope is unavailable."
+                        }
                     "collections" ->
                         if ("/sync/" in path) {
                             parameter.style = Parameter.StyleEnum.FORM

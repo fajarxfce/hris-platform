@@ -25,4 +25,20 @@ The result is bounded to fixed scalar counts. The database query uses effective-
 
 The dashboard exposes this report at `/reports/headcount` with an applied date filter, localized counts, and request ownership scoped to account/company. See [dashboard](dashboard.md) for browser behavior and checks.
 
-Group aggregation, other source metrics, immutable export jobs, and drill-down are subsequent capabilities. A client must not sum `persons` across companies and label it a unique group headcount.
+## Group headcount
+
+`GET /api/v1/reports/headcount?companies={firstId},{secondId}&asOf=2026-10-01`
+
+Select one to 32 distinct company IDs. The global route does not grant platform administrators implicit access: every selected company requires active membership and both `reports.read` and `people.read`. Invalid or duplicate selections return `invalid_report_companies`. Missing access or unavailable client policy fails the entire request; companies are never silently omitted from totals.
+
+The response contains `asOf`, `evaluatedAt`, `definitionVersion`, `totals`, and an ordered `companies` list of `{companyId, counts}`. Each count object uses the definition above. Employment/status/contract totals equal the sum of company buckets. `totals.persons` is a database distinct count across the selected companies, so one person employed by two companies counts once globally and once in each company. Empty selected companies are present with zero counts. Names and profile data are not returned.
+
+The use case captures company grants, then acquires ordered policy, company, membership, and account guards. It rechecks those grants, active access, credential version, and MFA assurance after waiting. Client build, `REPORTING` availability, and maintenance are evaluated for every company. The authenticated transport supplies whether the caller is native; query parameters cannot override it. Paired `X-HRIS-Client-Platform` and `X-HRIS-Client-Build` headers follow the [client policy contract](client-policy.md). Availability failures include a safe `companyId` parameter so a mobile client can identify the blocked selection and translate the existing code.
+
+An explicit transaction port adds bounded SELECT scope only to employment history and client policy inputs. It does not add mutation permissions, expose person profiles, or bypass RLS. One SQL statement produces the complete group snapshot, with cancellation and the standard finite database timeouts. Ordinary and cross-company mutation transactions clear this extra read scope. Cache identity must include the account, sorted company selection, date, and definition version; replace the complete group result atomically and discard it when access is revoked.
+
+Other source metrics, immutable export jobs, and drill-down are subsequent capabilities.
+
+## Validation
+
+The company/group reporting check passed architecture and format checks, server/worker builds, and 61 tests: 10 reporting domain/data, 15 database, and 36 HTTP/PostgreSQL. Coverage includes shared persons, empty companies, effective history, selection bounds, RLS read/write isolation, pooled context cleanup, native/browser build gates, maintenance, module flags, permission and credential revocation while waiting, expired MFA, coherent concurrent snapshots, and cancellation. OpenAPI validates 228 paths and 254 operations. No group browser workflow, device validation, deployment, or group-report performance benchmark is claimed by this backend check.

@@ -13,7 +13,10 @@ class PostgresTransactionRunner(
     private val jdbc: JdbcTemplate,
     private val statementTimeout: java.time.Duration = java.time.Duration.ofSeconds(15),
     private val lockTimeout: java.time.Duration = java.time.Duration.ofSeconds(5),
-) : TransactionRunner, dev.fajar.hris.core.domain.CrossCompanyTransactionRunner {
+) :
+    TransactionRunner,
+    dev.fajar.hris.core.domain.CrossCompanyTransactionRunner,
+    dev.fajar.hris.core.domain.CompanyReadTransactionRunner {
     init {
         require(statementTimeout.toMillis() in 1..300_000)
         require(lockTimeout.toMillis() in 1..statementTimeout.toMillis())
@@ -22,7 +25,7 @@ class PostgresTransactionRunner(
     private val transaction = TransactionTemplate(manager).apply { timeout = 30 }
 
     override fun <T> run(actor: Actor, operation: () -> Result<T>): Result<T> =
-        runScoped(actor, null, operation)
+        runScoped(actor, null, emptySet(), operation)
 
     override fun <T> run(
         actor: Actor,
@@ -30,12 +33,22 @@ class PostgresTransactionRunner(
         operation: () -> Result<T>,
     ): Result<T> {
         require(actor.companyId != null && actor.companyId != secondaryCompanyId)
-        return runScoped(actor, secondaryCompanyId, operation)
+        return runScoped(actor, secondaryCompanyId, emptySet(), operation)
+    }
+
+    override fun <T> run(
+        actor: Actor,
+        companies: Set<java.util.UUID>,
+        operation: () -> Result<T>,
+    ): Result<T> {
+        require(actor.companyId == null && companies.size in 1..32)
+        return runScoped(actor, null, companies.toSet(), operation)
     }
 
     private fun <T> runScoped(
         actor: Actor,
         secondaryCompanyId: java.util.UUID?,
+        readCompanies: Set<java.util.UUID>,
         operation: () -> Result<T>,
     ): Result<T> =
         try {
@@ -76,6 +89,11 @@ class PostgresTransactionRunner(
                         "select set_config('hris.secondary_company_id', ?, true)",
                         String::class.java,
                         secondaryCompanyId?.toString() ?: "",
+                    )
+                    jdbc.queryForObject(
+                        "select set_config('hris.read_company_ids', ?, true)",
+                        String::class.java,
+                        readCompanies.sorted().joinToString(",", "{", "}"),
                     )
                     val result = operation()
                     if (Thread.currentThread().isInterrupted) throw InterruptedException()

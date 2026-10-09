@@ -11,29 +11,31 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class HeadcountReportRepositoryTest {
-    private fun repository(operation: () -> List<HeadcountAggregateRow>) =
+    private fun repository(operation: (Set<UUID>) -> List<HeadcountAggregateRow>) =
         StoredHeadcountReportRepository(
             object : HeadcountReportDataSource {
                 override fun count(
-                    companyId: UUID,
+                    companies: Set<UUID>,
                     asOf: LocalDate,
                     statuses: Set<String>,
                 ): List<HeadcountAggregateRow> {
                     assertEquals(setOf("ACTIVE", "PROBATION", "SUSPENDED"), statuses)
-                    return operation()
+                    return operation(companies)
                 }
             }
         )
 
     @Test
     fun missingBucketsAreZeroAndPersonCountsAreTakenFromTheDistinctAggregate() {
-        val repository = repository {
-            listOf(
-                HeadcountAggregateRow("TOTAL", null, 3, 2),
-                HeadcountAggregateRow("STATUS", "ACTIVE", 2, 2),
-                HeadcountAggregateRow("STATUS", "SUSPENDED", 1, 1),
-                HeadcountAggregateRow("CONTRACT", "PERMANENT", 3, 2),
-            )
+        val repository = repository { companies ->
+            val rows =
+                listOf(
+                    HeadcountAggregateRow("TOTAL", null, 3, 2),
+                    HeadcountAggregateRow("STATUS", "ACTIVE", 2, 2),
+                    HeadcountAggregateRow("STATUS", "SUSPENDED", 1, 1),
+                    HeadcountAggregateRow("CONTRACT", "PERMANENT", 3, 2),
+                )
+            rows + rows.map { it.copy(companyId = companies.single()) }
         }
         val counts =
             (repository.count(UUID.randomUUID(), LocalDate.parse("2026-10-01")) as Result.Success)

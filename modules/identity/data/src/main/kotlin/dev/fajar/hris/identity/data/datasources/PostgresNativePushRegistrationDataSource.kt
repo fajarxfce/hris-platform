@@ -22,4 +22,21 @@ class PostgresNativePushRegistrationDataSource(private val sql: DSLContext) :
                 .and(R.ACCOUNT_ID.eq(record.accountId))
                 .and(R.VERSION.eq(expectedVersion))
                 .execute()
+
+    override fun listEnabled(
+        accountId: UUID,
+        registeredBefore: java.time.Instant,
+        after: UUID?,
+        limit: Int,
+    ): List<NativePushRegistrationsRecord> =
+        sql.selectFrom(R)
+            .where(
+                R.ACCOUNT_ID.eq(accountId),
+                R.ENABLED.isTrue,
+                R.REGISTERED_AT.le(registeredBefore.atOffset(java.time.ZoneOffset.UTC)),
+                after?.let { R.SESSION_ID.gt(it) } ?: org.jooq.impl.DSL.noCondition(),
+            )
+            .orderBy(R.SESSION_ID)
+            .limit(limit)
+            .fetch()
 }

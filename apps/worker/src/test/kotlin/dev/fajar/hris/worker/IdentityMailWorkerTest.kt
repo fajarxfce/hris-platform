@@ -10,6 +10,7 @@ import dev.fajar.hris.mail.data.repositories.SmtpMailRepository
 import dev.fajar.hris.mail.domain.entities.OutboundMail
 import dev.fajar.hris.mail.domain.repositories.MailRepository
 import dev.fajar.hris.worker.mail.*
+import dev.fajar.hris.worker.runtime.DeadlineTask
 import jakarta.mail.Session
 import jakarta.mail.internet.MimeMessage
 import java.io.ByteArrayInputStream
@@ -460,7 +461,7 @@ class IdentityMailWorkerTest {
         val timers = ScheduledThreadPoolExecutor(1).apply { removeOnCancelPolicy = true }
         try {
             Executors.newSingleThreadExecutor().use { executor ->
-                val completed = TimedMailDelivery {}
+                val completed = DeadlineTask {}
                 completed.watch(timers.schedule({ completed.cancel(true) }, 1, TimeUnit.HOURS))
                 executor.execute(completed)
                 completed.get(3, TimeUnit.SECONDS)
@@ -477,7 +478,7 @@ class IdentityMailWorkerTest {
                 assertFalse(completed.cancel(true))
                 release.countDown()
                 assertTrue(next.get(3, TimeUnit.SECONDS))
-                val cancelled = TimedMailDelivery {}
+                val cancelled = DeadlineTask {}
                 cancelled.cancel(true)
                 cancelled.watch(timers.schedule({ cancelled.cancel(true) }, 1, TimeUnit.HOURS))
                 assertTrue(timers.queue.isEmpty())

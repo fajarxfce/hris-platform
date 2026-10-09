@@ -7,4 +7,11 @@ interface NativePushRegistrationDataSource {
     fun find(accountId: UUID, sessionId: UUID): NativePushRegistrationsRecord?
 
     fun save(record: NativePushRegistrationsRecord, expectedVersion: Long?): Int
+
+    fun listEnabled(
+        accountId: UUID,
+        registeredBefore: java.time.Instant,
+        after: UUID?,
+        limit: Int,
+    ): List<NativePushRegistrationsRecord>
 }

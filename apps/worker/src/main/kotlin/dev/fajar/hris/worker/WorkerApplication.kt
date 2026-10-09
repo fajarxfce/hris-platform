@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Import
 
 @SpringBootApplication
 @Import(
+    dev.fajar.hris.push.data.di.PushConfiguration::class,
     DatabaseConfiguration::class,
     dev.fajar.hris.sync.data.di.SyncConfiguration::class,
     dev.fajar.hris.documents.data.di.DocumentsConfiguration::class,

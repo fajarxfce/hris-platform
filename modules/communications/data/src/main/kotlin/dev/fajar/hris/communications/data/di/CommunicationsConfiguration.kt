@@ -339,4 +339,58 @@ class CommunicationsConfiguration {
             transactions,
             clock,
         )
+
+    @Bean
+    fun inboxPushSource(sql: DSLContext): InboxPushDataSource = PostgresInboxPushDataSource(sql)
+
+    @Bean
+    fun inboxPush(source: InboxPushDataSource): InboxPushRepository =
+        StoredInboxPushRepository(source)
+
+    @Bean
+    fun inboxPushPolicy(environment: org.springframework.core.env.Environment) =
+        dev.fajar.hris.communications.domain.entities.InboxPushPolicy(
+            environment.getProperty("HRIS_FCM_ENABLED", Boolean::class.java, false)
+        )
+
+    @Bean
+    fun leaseInboxPush(
+        dispatches: InboxPushRepository,
+        transactions: TransactionRunner,
+        journal: ChangeJournalRepository,
+        policy: dev.fajar.hris.communications.domain.entities.InboxPushPolicy,
+        clock: Clock,
+    ) = LeaseInboxPush(dispatches, transactions, journal, policy, clock)
+
+    @Bean
+    fun deliverInboxPush(
+        dispatches: InboxPushRepository,
+        inbox: InboxRepository,
+        announcements: AnnouncementRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        sessions: NativeSessionRepository,
+        registrations: NativePushRegistrationRepository,
+        push: dev.fajar.hris.push.domain.repositories.PushRepository,
+        transactions: TransactionRunner,
+        journal: ChangeJournalRepository,
+        policy: dev.fajar.hris.communications.domain.entities.InboxPushPolicy,
+        clock: Clock,
+    ) =
+        DeliverInboxPush(
+            dispatches,
+            inbox,
+            announcements,
+            companies,
+            members,
+            identities,
+            sessions,
+            registrations,
+            push,
+            transactions,
+            journal,
+            policy,
+            clock,
+        )
 }

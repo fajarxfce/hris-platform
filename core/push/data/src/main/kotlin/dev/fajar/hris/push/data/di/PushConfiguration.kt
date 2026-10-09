@@ -18,6 +18,7 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class PushConfiguration {
     @Bean(destroyMethod = "shutdownNow")
+    @org.springframework.context.annotation.Lazy
     fun pushHttpClient(): HttpClient =
         HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(3))
@@ -27,7 +28,8 @@ class PushConfiguration {
     @Bean
     fun pushRepository(
         environment: Environment,
-        pushHttpClient: HttpClient,
+        @org.springframework.beans.factory.annotation.Qualifier("pushHttpClient")
+        clients: org.springframework.beans.factory.ObjectProvider<HttpClient>,
         json: ObjectMapper,
         clock: Clock,
     ): PushRepository {
@@ -35,6 +37,7 @@ class PushConfiguration {
             return PushRepository {
                 Result.Failed(Failure(FailureKind.UNAVAILABLE, "push_not_configured"))
             }
+        val pushHttpClient = clients.getObject()
         val project = environment.getRequiredProperty("HRIS_FCM_PROJECT_ID")
         val credentials =
             readGooglePushCredentials(

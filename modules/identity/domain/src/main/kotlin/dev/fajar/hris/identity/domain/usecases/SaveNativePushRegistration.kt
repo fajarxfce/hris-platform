@@ -65,7 +65,7 @@ class SaveNativePushRegistration(
             val previous = (loaded as Result.Success).value
             if (previous?.version != input.expectedVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
-            if (previous != null && previous.version >= 10000)
+            if (previous != null && previous.version >= 9999)
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "push_registration_version_limit")
                 )

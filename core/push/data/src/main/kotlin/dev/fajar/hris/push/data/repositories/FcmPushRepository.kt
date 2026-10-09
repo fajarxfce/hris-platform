@@ -18,6 +18,6 @@ class FcmPushRepository(
     override fun send(message: PushMessage): Result<PushOutcome> = safePushCall {
         val token = credentials.accessToken()
         val body = json.writeValueAsBytes(fcmMessage(message, clock.instant()))
-        fcmOutcome(source.send(token, body), json)
+        fcmOutcome(source.send(token, body), json, clock.instant())
     }
 }

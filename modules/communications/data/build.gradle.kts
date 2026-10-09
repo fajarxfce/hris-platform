@@ -1,6 +1,7 @@
 plugins { id("hris.spring") }
 
 dependencies {
+    implementation(projects.core.push.domain)
     implementation(projects.core.jobs.domain)
     implementation(projects.modules.communications.domain)
     implementation(projects.modules.identity.domain)

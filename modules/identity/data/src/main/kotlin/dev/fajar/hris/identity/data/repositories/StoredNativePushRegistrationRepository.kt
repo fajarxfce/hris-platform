@@ -34,4 +34,26 @@ class StoredNativePushRegistrationRepository(
             }
         store.save(record, expectedVersion) == 1
     }
+
+    override fun listEnabled(
+        accountId: UUID,
+        registeredBefore: java.time.Instant,
+        after: UUID?,
+        limit: Int,
+    ): Result<List<NativePushRegistration>> = safeIdentityCall {
+        store.listEnabled(accountId, registeredBefore, after, limit).map {
+            it.toNativePushRegistration()
+        }
+    }
+
+    override fun token(accountId: UUID, sessionId: UUID, expectedVersion: Long): Result<String?> =
+        safeIdentityCall {
+            val row = store.find(accountId, sessionId)
+            if (row == null || !row.enabled || row.version != expectedVersion) null
+            else
+                crypto.decrypt(
+                    "hris:push:$accountId:$sessionId:$expectedVersion",
+                    requireNotNull(row.tokenEncrypted),
+                )
+        }
 }

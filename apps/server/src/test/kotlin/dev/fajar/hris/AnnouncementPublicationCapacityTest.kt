@@ -74,8 +74,70 @@ class AnnouncementPublicationCapacityTest : AnnouncementPublicationApiFixture() 
             "announcement_publication_5000 elapsed_ms=${elapsed.toMillis()} stages_ms=${publicationProbe.timings}"
         )
         assertEquals(5000, count(f, "inbox_items"))
+        assertEquals(5000, count(f, "inbox_push_dispatches"))
         assertEquals(5000, view(f, id)["recipientCount"].asInt())
         assertEquals("SUCCEEDED", job(f, lease.job.request.id)["status"].asString())
+        val pushOwners = (1..5).map { UUID.randomUUID() }
+        val workerJdbc =
+            org.springframework.jdbc.core.JdbcTemplate(
+                org.springframework.jdbc.datasource.DriverManagerDataSource(
+                    postgres.jdbcUrl,
+                    "hris_communications_fixture_worker",
+                    "fixture-worker-only",
+                )
+            )
+        try {
+            val ready = java.util.concurrent.CountDownLatch(3)
+            val startClaims = java.util.concurrent.CountDownLatch(1)
+            val concurrent =
+                java.util.concurrent.Executors.newFixedThreadPool(3).use { pool ->
+                    val calls =
+                        pushOwners.take(3).map { owner ->
+                            pool.submit<Int> {
+                                ready.countDown()
+                                check(startClaims.await(5, java.util.concurrent.TimeUnit.SECONDS))
+                                requireNotNull(
+                                    workerJdbc.queryForObject(
+                                        "select count(*) from claim_inbox_push(?,8,120,8)",
+                                        Int::class.java,
+                                        owner,
+                                    )
+                                )
+                            }
+                        }
+                    assertTrue(ready.await(5, java.util.concurrent.TimeUnit.SECONDS))
+                    startClaims.countDown()
+                    calls.sumOf { it.get(10, java.util.concurrent.TimeUnit.SECONDS) }
+                }
+            assertTrue(concurrent in 1..16)
+            for (owner in pushOwners.drop(3)) workerJdbc.queryForObject(
+                "select count(*) from claim_inbox_push(?,8,120,8)",
+                Int::class.java,
+                owner,
+            )
+            assertEquals(
+                16,
+                database()
+                    .queryForObject(
+                        "select count(*) from inbox_push_dispatches where state='LEASED'",
+                        Int::class.java,
+                    ),
+            )
+            assertEquals(
+                0,
+                workerJdbc.queryForObject(
+                    "select count(*) from claim_inbox_push(?,1,120,8)",
+                    Int::class.java,
+                    UUID.randomUUID(),
+                ),
+            )
+        } finally {
+            for (owner in pushOwners) database()
+                .update(
+                    "update inbox_push_dispatches set state='FAILED',finished_at=now(),failure_code='fixture_cleanup',lease_owner=null,lease_token=null,lease_until=null where lease_owner=?",
+                    owner,
+                )
+        }
         ok(action(f, id, "archive", 2))
         assertEquals(
             5000,
@@ -135,6 +197,7 @@ class AnnouncementPublicationCapacityTest : AnnouncementPublicationApiFixture() 
             "announcement_groups_32x5000 elapsed_ms=${elapsed.toMillis()} stages_ms=${publicationProbe.timings}"
         )
         assertEquals(5000, count(f, "inbox_items"))
+        assertEquals(5000, count(f, "inbox_push_dispatches"))
         assertEquals(
             32,
             database()

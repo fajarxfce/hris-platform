@@ -1,8 +1,8 @@
-package dev.fajar.hris.worker.mail
+package dev.fajar.hris.worker.push
 
+import dev.fajar.hris.communications.domain.usecases.DeliverInboxPush
+import dev.fajar.hris.communications.domain.usecases.LeaseInboxPush
 import dev.fajar.hris.core.domain.Result
-import dev.fajar.hris.identity.domain.usecases.DeliverIdentityMail
-import dev.fajar.hris.identity.domain.usecases.LeaseIdentityMail
 import dev.fajar.hris.worker.runtime.DeadlineTask
 import java.time.Instant
 import java.util.UUID
@@ -13,13 +13,13 @@ import org.springframework.context.SmartLifecycle
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 
-/** Owns a dedicated executor and scheduler; no queued or retained per-delivery registry. */
-class IdentityMailWorker(
-    private val lease: LeaseIdentityMail,
-    private val deliver: DeliverIdentityMail,
+/** Owns bounded task/timer pools; retained progress lives in PostgreSQL, not a process registry. */
+class InboxPushWorker(
+    private val lease: LeaseInboxPush,
+    private val deliver: DeliverInboxPush,
     private val tasks: ThreadPoolTaskExecutor,
     private val timers: ThreadPoolTaskScheduler,
-    private val settings: IdentityMailWorkerSettings = IdentityMailWorkerSettings(),
+    private val settings: InboxPushWorkerSettings = InboxPushWorkerSettings(),
 ) : SmartLifecycle {
     private val owner = UUID.randomUUID()
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -29,7 +29,7 @@ class IdentityMailWorker(
 
     @Synchronized
     override fun start() {
-        check(!started) { "Mail worker cannot be restarted" }
+        check(!started) { "Push worker cannot be restarted" }
         started = true
         running = true
         try {
@@ -43,11 +43,12 @@ class IdentityMailWorker(
     private fun poll() {
         if (!running) return
         try {
-            val capacity = (2 - tasks.activeCount).coerceIn(0, 2)
+            val capacity =
+                (settings.parallelism - tasks.activeCount).coerceIn(0, settings.parallelism)
             if (capacity == 0) return
             val claimed = lease.execute(owner, capacity)
             if (claimed is Result.Failed) {
-                logger.warn("Mail claim failed code={}", claimed.failure.code)
+                logger.warn("Push claim failed code={}", claimed.failure.code)
                 return
             }
             for (item in (claimed as Result.Success).value) {
@@ -56,13 +57,13 @@ class IdentityMailWorker(
                     try {
                         val result = deliver.execute(item)
                         if (result is Result.Failed)
-                            logger.warn("Mail delivery failed code={}", result.failure.code)
-                    } catch (error: InterruptedException) {
+                            logger.warn("Push delivery failed code={}", result.failure.code)
+                    } catch (_: InterruptedException) {
                         Thread.currentThread().interrupt()
                     } catch (_: CancellationException) {
-                        /* The fenced lease is recoverable after expiry. */
+                        /* The expired fenced lease is recoverable. */
                     } catch (error: Exception) {
-                        logger.warn("Mail delivery stopped category={}", error.javaClass.name)
+                        logger.warn("Push delivery stopped category={}", error.javaClass.name)
                     }
                 }
                 try {
@@ -81,9 +82,9 @@ class IdentityMailWorker(
         } catch (_: InterruptedException) {
             Thread.currentThread().interrupt()
         } catch (_: CancellationException) {
-            /* Shutdown cancels the current claim. */
+            /* Shutdown cancels a pending claim. */
         } catch (error: Exception) {
-            if (running) logger.warn("Mail poll stopped category={}", error.javaClass.name)
+            if (running) logger.warn("Push poll stopped category={}", error.javaClass.name)
         }
     }
 

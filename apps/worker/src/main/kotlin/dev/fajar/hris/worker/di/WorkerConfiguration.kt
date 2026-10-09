@@ -217,4 +217,52 @@ class WorkerConfiguration {
         advance: AdvanceAnnouncementPublication,
         abort: AbortAnnouncementPublication,
     ): JobTask = AnnouncementPublicationTask(resolve, advance, abort)
+
+    @Bean
+    fun inboxPushSettings(policy: dev.fajar.hris.communications.domain.entities.InboxPushPolicy) =
+        dev.fajar.hris.worker.push.InboxPushWorkerSettings(
+            pollInterval =
+                if (policy.enabled) java.time.Duration.ofMillis(250)
+                else java.time.Duration.ofSeconds(2)
+        )
+
+    @Bean
+    fun inboxPushTasks(settings: dev.fajar.hris.worker.push.InboxPushWorkerSettings) =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor().apply {
+            corePoolSize = settings.parallelism
+            maxPoolSize = settings.parallelism
+            setQueueCapacity(0)
+            setThreadNamePrefix("hris-push-")
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(10)
+            setStrictEarlyShutdown(true)
+        }
+
+    @Bean
+    fun inboxPushTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 2
+            setThreadNamePrefix("hris-push-control-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(5)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = ["hris.worker.enabled"],
+        havingValue = "true",
+        matchIfMissing = true,
+    )
+    fun inboxPushWorker(
+        lease: LeaseInboxPush,
+        deliver: DeliverInboxPush,
+        @org.springframework.beans.factory.annotation.Qualifier("inboxPushTasks")
+        tasks: org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor,
+        @org.springframework.beans.factory.annotation.Qualifier("inboxPushTimers")
+        timers: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+        settings: dev.fajar.hris.worker.push.InboxPushWorkerSettings,
+    ) = dev.fajar.hris.worker.push.InboxPushWorker(lease, deliver, tasks, timers, settings)
 }

@@ -5,7 +5,11 @@ import dev.fajar.hris.push.data.datasources.PushHttpResponse
 import dev.fajar.hris.push.domain.entities.PushOutcome
 import tools.jackson.databind.ObjectMapper
 
-fun fcmOutcome(response: PushHttpResponse, json: ObjectMapper): Result<PushOutcome> {
+fun fcmOutcome(
+    response: PushHttpResponse,
+    json: ObjectMapper,
+    now: java.time.Instant,
+): Result<PushOutcome> {
     if (response.status == 200) {
         val name = json.readTree(response.body).get("name")?.asString()
         return if (
@@ -18,7 +22,7 @@ fun fcmOutcome(response: PushHttpResponse, json: ObjectMapper): Result<PushOutco
         else Result.Failed(Failure(FailureKind.UNEXPECTED, "push_response_invalid"))
     }
     if (response.status == 429) {
-        val seconds = response.retryAfter?.toLongOrNull()?.takeIf { it in 1..3600 }?.toString()
+        val seconds = pushRetryAfterSeconds(response.retryAfter, now)?.toString()
         return Result.Failed(
             Failure(
                 FailureKind.RATE_LIMITED,
@@ -54,4 +58,26 @@ fun fcmOutcome(response: PushHttpResponse, json: ObjectMapper): Result<PushOutco
             return Result.Failed(Failure(FailureKind.UNEXPECTED, "push_credentials_rejected"))
     }
     return Result.Failed(Failure(FailureKind.UNEXPECTED, "push_delivery_rejected"))
+}
+
+/** Converts the HTTP delay/date syntax to safe numeric metadata; worker policy decides retry. */
+fun pushRetryAfterSeconds(value: String?, now: java.time.Instant): Long? {
+    if (value == null || value.isBlank() || value.length > 128) return null
+    val seconds =
+        if (value.all { it in '0'..'9' }) value.toLongOrNull()?.coerceAtMost(86400) ?: 86400
+        else
+            try {
+                java.time.Duration.between(
+                        now,
+                        java.time.ZonedDateTime.parse(
+                                value,
+                                java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME,
+                            )
+                            .toInstant(),
+                    )
+                    .seconds
+            } catch (_: java.time.format.DateTimeParseException) {
+                return null
+            }
+    return seconds.takeIf { it > 0 }?.coerceAtMost(86400)
 }

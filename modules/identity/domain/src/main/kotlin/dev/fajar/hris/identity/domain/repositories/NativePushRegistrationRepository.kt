@@ -12,4 +12,13 @@ interface NativePushRegistrationRepository {
         token: String?,
         expectedVersion: Long?,
     ): Result<Boolean>
+
+    fun listEnabled(
+        accountId: UUID,
+        registeredBefore: java.time.Instant,
+        after: UUID?,
+        limit: Int,
+    ): Result<List<NativePushRegistration>>
+
+    fun token(accountId: UUID, sessionId: UUID, expectedVersion: Long): Result<String?>
 }

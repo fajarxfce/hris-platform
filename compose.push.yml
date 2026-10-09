@@ -1,0 +1,13 @@
+services:
+  worker:
+    environment:
+      HRIS_FCM_ENABLED: ${HRIS_FCM_ENABLED:-false}
+      HRIS_FCM_PROJECT_ID: ${HRIS_FCM_PROJECT_ID:?Set HRIS_FCM_PROJECT_ID}
+      HRIS_FCM_CREDENTIALS_FILE: /run/hris/fcm-service-account.json
+    volumes:
+      - type: bind
+        source: ${HRIS_FCM_SERVICE_ACCOUNT_FILE:?Set the FCM service-account file path}
+        target: /run/hris/fcm-service-account.json
+        read_only: true
+        bind:
+          create_host_path: false

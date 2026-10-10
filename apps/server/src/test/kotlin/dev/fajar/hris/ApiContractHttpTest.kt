@@ -160,6 +160,16 @@ class ApiContractHttpTest : PeopleApiFixture() {
             paths["/api/v1/auth/native/exchange"]["post"]["x-hris-session-transport"].asString(),
         )
         assertEquals(0, paths["/api/v1/auth/native/refresh"]["post"]["security"].size())
+        assertEquals(0, paths["/api/v1/auth/native/login"]["post"]["security"].size())
+        assertFalse(
+            paths["/api/v1/auth/native/login"]["post"]["x-hris-authentication-required"].asBoolean()
+        )
+        assertTrue(paths["/api/v1/auth/native/login"]["post"]["x-hris-idempotency-key"].asBoolean())
+        assertEquals(
+            "NATIVE",
+            paths["/api/v1/auth/native/mfa/enrollment"]["post"]["x-hris-session-transport"]
+                .asString(),
+        )
         assertTrue(
             paths["/api/v1/auth/native/refresh"]["post"]["x-hris-idempotency-key"].asBoolean()
         )

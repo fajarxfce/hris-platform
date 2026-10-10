@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/v1/auth/native")
 class NativeSessionController(
-    private val exchange: ExchangeNativeSession,
+    private val exchange: IssueNativeSession,
     private val refresh: RefreshNativeSession,
     private val list: ListNativeSessions,
     private val revoke: RevokeNativeSession,

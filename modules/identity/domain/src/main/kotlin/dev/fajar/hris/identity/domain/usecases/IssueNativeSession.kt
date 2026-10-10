@@ -7,7 +7,7 @@ import dev.fajar.hris.identity.domain.repositories.*
 import java.time.Clock
 import java.util.UUID
 
-class ExchangeNativeSession(
+class IssueNativeSession(
     private val sessions: NativeSessionRepository,
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
@@ -16,7 +16,12 @@ class ExchangeNativeSession(
     private val policy: NativeSessionPolicy,
     private val security: IdentitySecurityPolicy,
 ) {
-    fun execute(actor: Actor, operationId: UUID, deviceName: String): Result<NativeTokens> {
+    fun execute(
+        actor: Actor,
+        operationId: UUID,
+        deviceName: String,
+        purpose: NativeSessionPurpose = NativeSessionPurpose.VERIFIED_EXCHANGE,
+    ): Result<NativeTokens> {
         val name = deviceName.trim()
         if (name.length !in 1..100 || name.any { it.isISOControl() })
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_device_name"))
@@ -45,7 +50,11 @@ class ExchangeNativeSession(
                     now,
                     security,
                 )
-            if (assurance is Result.Failed) return@run assurance
+            // A freshly verified password can create a pending native session. Every business
+            // request still passes ResolveActor's live MFA gate; the browser exchange must
+            // already satisfy that gate. A request cannot select its own issuance purpose.
+            if (purpose == NativeSessionPurpose.VERIFIED_EXCHANGE && assurance is Result.Failed)
+                return@run assurance
             val existing = sessions.findExchange(actor.accountId, operationId)
             if (existing is Result.Failed) return@run existing
             val previous = (existing as Result.Success).value

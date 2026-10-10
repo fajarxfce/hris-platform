@@ -42,6 +42,9 @@ Offline attendance remains evidence awaiting verification. Preserve the original
 
 ## Authentication and cache scope
 
+See [native authentication](native-authentication.md) for direct password login,
+pending MFA, enrollment, credential rotation, and response-loss recovery.
+
 Use bearer sessions for native requests and keep refresh credentials in platform secure storage. Access tokens are short lived; refresh tokens rotate. Use one refresh operation at a time per session, persist the response atomically, and reuse its operation ID if that refresh response is lost. Competing independent refresh commands may trigger reuse protection. A revoked session requires authentication; repeated refresh loops must stop. MFA and recent-authentication failures require their specific authentication flow.
 
 Namespace local data by backend origin, account, company, and client schema. Encrypt sensitive local data according to the device policy. Cancel obsolete requests before switching partitions, and reject late results whose account/company/session generation no longer matches. A 403 `company_access_denied` requires removing that company's cached data and stopping its outbox. Other denied resources must be removed when their access is lost. Logout clears credentials and account caches; never replay an old account's commands after another login.

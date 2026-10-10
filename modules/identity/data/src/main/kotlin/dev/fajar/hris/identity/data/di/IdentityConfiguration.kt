@@ -217,7 +217,7 @@ class IdentityConfiguration {
         clock: Clock,
         policy: dev.fajar.hris.identity.domain.entities.NativeSessionPolicy,
         security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
-    ) = ExchangeNativeSession(sessions, identities, transactions, journal, clock, policy, security)
+    ) = IssueNativeSession(sessions, identities, transactions, journal, clock, policy, security)
 
     @Bean
     fun resolveNative(

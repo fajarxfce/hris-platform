@@ -51,6 +51,7 @@ class IdentityWebConfiguration {
                     .addPathPatterns("/api/v1/**")
                     .excludePathPatterns(
                         "/api/v1/auth/csrf",
+                        "/api/v1/auth/native/login",
                         "/api/v1/auth/native/refresh",
                         "/api/v1/auth/providers",
                         "/api/v1/auth/password-recovery",
@@ -76,7 +77,8 @@ class IdentityWebConfiguration {
         http.securityMatcher(
             org.springframework.security.web.util.matcher.RequestMatcher { request ->
                 request.getHeader("Authorization") != null ||
-                    request.servletPath == "/api/v1/auth/native/refresh"
+                    request.servletPath in
+                        setOf("/api/v1/auth/native/refresh", "/api/v1/auth/native/login")
             }
         )
         http.sessionManagement {
@@ -95,7 +97,7 @@ class IdentityWebConfiguration {
         http.formLogin { it.disable() }
         http.httpBasic { it.disable() }
         http.authorizeHttpRequests {
-            it.requestMatchers("/api/v1/auth/native/refresh")
+            it.requestMatchers("/api/v1/auth/native/refresh", "/api/v1/auth/native/login")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

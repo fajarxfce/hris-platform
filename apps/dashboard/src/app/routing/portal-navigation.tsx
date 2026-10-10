@@ -16,10 +16,12 @@ import { administrationMessages } from "../../features/administration/presentati
 import { clientPolicyMessages } from "../../features/administration/presentation/i18n/client-policy-messages";
 import type { CompanyAccess } from "../../features/identity/domain/entities/session";
 import { jobMessages } from "../../features/jobs/presentation/i18n/job-messages";
+import { canReadAssignedLifecycle } from "../../features/lifecycle/domain/policies/lifecycle-case-policy";
 import {
   canManageLifecycle,
   canReadLifecycle,
 } from "../../features/lifecycle/domain/policies/lifecycle-template-policy";
+import { lifecycleCaseMessages } from "../../features/lifecycle/presentation/i18n/lifecycle-case-messages";
 import { lifecycleMessages } from "../../features/lifecycle/presentation/i18n/lifecycle-messages";
 import { canReadOrganization } from "../../features/organization/domain/policies/organization-unit-policy";
 import { organizationMessages } from "../../features/organization/presentation/i18n/organization-messages";
@@ -57,6 +59,24 @@ export function portalNavigation(
             },
           ]
         : []),
+    ...(canReadLifecycle(permissions)
+      ? [
+          {
+            to: "/people/lifecycle/cases",
+            label: lifecycleCaseMessages(locale).title,
+            icon: <People20Regular />,
+          },
+        ]
+      : []),
+    ...(canReadAssignedLifecycle(permissions)
+      ? [
+          {
+            to: "/people/lifecycle/tasks",
+            label: lifecycleCaseMessages(locale).queue,
+            icon: <TaskListSquareLtr20Regular />,
+          },
+        ]
+      : []),
     ...(canReadLifecycle(permissions)
       ? [
           {

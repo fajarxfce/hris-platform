@@ -21,6 +21,21 @@ const LifecycleTemplatesScreen = lazy(() =>
     (module) => ({ default: module.LifecycleTemplatesScreen }),
   ),
 );
+const LifecycleCasesScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/lifecycle-cases-screen").then(
+    (module) => ({ default: module.LifecycleCasesScreen }),
+  ),
+);
+const LifecycleCaseScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/lifecycle-case-screen").then((module) => ({
+    default: module.LifecycleCaseScreen,
+  })),
+);
+const AssignedLifecycleTasksScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/assigned-lifecycle-tasks-screen").then(
+    (module) => ({ default: module.AssignedLifecycleTasksScreen }),
+  ),
+);
 const LifecycleTemplateScreen = lazy(() =>
   import("../../features/lifecycle/presentation/bindings/lifecycle-template-screen").then(
     (module) => ({ default: module.LifecycleTemplateScreen }),
@@ -141,6 +156,50 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/people/lifecycle/cases"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LifecycleCasesScreen
+              accountId={accountId}
+              access={access}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/lifecycle/cases/:caseId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LifecycleCaseScreen
+              accountId={accountId}
+              access={access}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/lifecycle/tasks"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <AssignedLifecycleTasksScreen
+              accountId={accountId}
+              access={access}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/people/lifecycle/templates"
         element={

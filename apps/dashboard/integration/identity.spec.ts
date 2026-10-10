@@ -432,6 +432,7 @@ test("real API sessions, MFA, organization, people, lifecycle, reports, audit, p
   expect(templateBefore.status()).toBe(200);
   expect(await templateBefore.json()).toMatchObject({ version: 0, code: "BROWSER_ONBOARD" });
   const transitionId = randomUUID();
+  const lifecycleActor = await (await context.request.get("/api/v1/me")).json();
   csrf = await (await context.request.get("/api/v1/auth/csrf")).json();
   const transition = await context.request.post(
     `/api/v1/companies/${companies[1]}/lifecycle/cases`,
@@ -443,7 +444,7 @@ test("real API sessions, MFA, organization, people, lifecycle, reports, audit, p
         templateId,
         templateVersion: 0,
         targetDate: new Date().toISOString().slice(0, 10),
-        assignees: {},
+        assignees: { equipment: lifecycleActor.account.id },
         reason: "Browser onboarding",
       },
     },
@@ -500,6 +501,49 @@ test("real API sessions, MFA, organization, people, lifecycle, reports, audit, p
     `/api/v1/companies/${companies[0]}/lifecycle/templates/${templateId}`,
   );
   expect(foreignTemplate.status()).toBe(404);
+  expect(Object.keys(retainedChecklist.employee).sort()).toEqual(["employeeNumber", "id", "name"]);
+  expect(retainedChecklist.employee.id).toBe(employeeId);
+  await page.getByRole("link", { name: "Tugas saya", exact: true }).click();
+  const assignedTasks = page.getByRole("table", { name: "Tugas saya", exact: true });
+  await expect(assignedTasks.getByRole("row")).toHaveCount(2);
+  await expect(assignedTasks).toContainText(retainedChecklist.employee.name);
+  await assignedTasks
+    .getByRole("button", {
+      name: `Lihat tugas: Review equipment · ${retainedChecklist.employee.name}`,
+      exact: true,
+    })
+    .click();
+  const taskDetails = page.getByRole("dialog", { name: "Review equipment", exact: true });
+  await expect(taskDetails).toContainText(retainedChecklist.employee.employeeNumber);
+  await expect(taskDetails).toContainText("Anda");
+  await taskDetails.getByRole("button", { name: "Tutup", exact: true }).click();
+  await page.getByRole("link", { name: "Proses lifecycle", exact: true }).click();
+  const lifecycleCases = page.getByRole("table", { name: "Daftar proses", exact: true });
+  await expect(lifecycleCases.getByRole("row")).toHaveCount(2);
+  await lifecycleCases
+    .getByRole("button", {
+      name: `Buka proses: ${retainedChecklist.employee.name} · ${retainedChecklist.employee.employeeNumber}`,
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByRole("table", { name: "Checklist", exact: true }).getByRole("row"),
+  ).toHaveCount(2);
+  await expect(page.getByRole("main")).toContainText("Browser checklist");
+  await expect(page.getByRole("main")).not.toContainText("Browser revised checklist");
+  await page.getByRole("tab", { name: "Riwayat", exact: true }).click();
+  const lifecycleHistory = page.getByRole("table", { name: "Riwayat", exact: true });
+  await expect(lifecycleHistory.getByRole("row")).toHaveCount(2);
+  await lifecycleHistory.getByRole("button", { name: "Lihat perubahan: 0", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Detail perubahan", exact: true })).toContainText(
+    "Browser onboarding",
+  );
+  await page.getByRole("button", { name: "Tutup", exact: true }).click();
+  expect(
+    (
+      await context.request.get(`/api/v1/companies/${companies[0]}/lifecycle/cases/${transitionId}`)
+    ).status(),
+  ).toBe(404);
   await page.getByRole("link", { name: "Policy client", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText(
     "Belum ada konfigurasi perusahaan yang disimpan.",

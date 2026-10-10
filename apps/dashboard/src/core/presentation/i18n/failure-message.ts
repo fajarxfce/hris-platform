@@ -2,6 +2,14 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  lifecycle_case_not_found: [
+    "This lifecycle case is unavailable in the selected company.",
+    "Proses lifecycle tidak tersedia di perusahaan yang dipilih.",
+  ],
+  lifecycle_access_required: [
+    "You do not have access to these lifecycle tasks.",
+    "Anda tidak memiliki akses ke tugas lifecycle ini.",
+  ],
   invalid_lifecycle_template: [
     "Check the template name, code, reason, and checklist. Use 1–64 tasks with unique keys and due offsets from −90 to 365 days.",
     "Periksa nama, kode, alasan, dan checklist template. Gunakan 1–64 tugas dengan key unik dan offset −90 hingga 365 hari.",

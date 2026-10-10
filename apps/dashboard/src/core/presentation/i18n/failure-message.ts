@@ -2,6 +2,46 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  offboarding_access_required: [
+    "You do not have access to review or complete offboarding.",
+    "Anda tidak memiliki akses untuk meninjau atau menyelesaikan offboarding.",
+  ],
+  invalid_offboarding: [
+    "Review the offboarding details and provide a reason of up to 1,000 characters.",
+    "Periksa detail offboarding dan masukkan alasan maksimal 1.000 karakter.",
+  ],
+  stale_employment_version: [
+    "This employment has changed. Reload the review before completing offboarding.",
+    "Employment sudah berubah. Muat ulang tinjauan sebelum menyelesaikan offboarding.",
+  ],
+  offboarding_terms_changed: [
+    "The last working date does not match the employment terms. Review the employment and case dates.",
+    "Hari kerja terakhir tidak sesuai dengan ketentuan employment. Periksa tanggal employment dan proses.",
+  ],
+  other_lifecycle_cases_pending: [
+    "Complete or cancel the other open lifecycle cases for this employment first.",
+    "Selesaikan atau batalkan proses lifecycle lain yang masih terbuka untuk employment ini.",
+  ],
+  offboarding_date_not_reached: [
+    "Offboarding can be completed after the last working date in the company timezone.",
+    "Offboarding dapat diselesaikan setelah hari kerja terakhir dalam zona waktu perusahaan.",
+  ],
+  cannot_complete_own_offboarding: [
+    "Another authorized operator must complete your offboarding.",
+    "Offboarding Anda harus diselesaikan oleh operator lain yang berwenang.",
+  ],
+  scheduled_employment_changes_pending: [
+    "Resolve the scheduled employment revisions before completing offboarding.",
+    "Selesaikan revisi employment yang terjadwal sebelum menyelesaikan offboarding.",
+  ],
+  reporting_reassignment_required: [
+    "Reassign current and scheduled reporting lines before completing offboarding.",
+    "Alihkan hubungan pelaporan yang aktif dan terjadwal sebelum menyelesaikan offboarding.",
+  ],
+  last_company_administrator: [
+    "Assign another active company administrator before removing this access.",
+    "Tetapkan administrator perusahaan aktif lainnya sebelum mencabut akses ini.",
+  ],
   invalid_lifecycle_case: [
     "Choose a template, a target date between 1900 and 2200, and a reason of up to 1,000 characters.",
     "Pilih template, tanggal target antara tahun 1900 dan 2200, serta alasan maksimal 1.000 karakter.",

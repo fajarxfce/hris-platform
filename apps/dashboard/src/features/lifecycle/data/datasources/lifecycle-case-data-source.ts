@@ -16,8 +16,21 @@ import type {
 import type { LifecycleHistoryPageDto } from "../models/lifecycle-event-dto";
 import type { LifecycleTaskAssignmentDto } from "../models/lifecycle-task-assignment-dto";
 import type { LifecycleTaskChangeDto } from "../models/lifecycle-task-change-dto";
+import type { OffboardingCompletionDto, OffboardingReviewDto } from "../models/offboarding-dto";
 
 export interface LifecycleCaseDataSource {
+  offboardingReview(
+    company: string,
+    id: string,
+    signal: AbortSignal,
+  ): Promise<OffboardingReviewDto>;
+  completeOffboarding(
+    company: string,
+    id: string,
+    operation: string,
+    change: OffboardingCompletionDto,
+    signal: AbortSignal,
+  ): Promise<LifecycleCaseReceiptDto>;
   cancel(
     company: string,
     id: string,

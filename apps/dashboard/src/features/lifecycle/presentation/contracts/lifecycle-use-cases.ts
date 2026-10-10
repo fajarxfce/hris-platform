@@ -1,6 +1,7 @@
 import type { AssignLifecycleTask } from "../../domain/usecases/assign-lifecycle-task";
 import type { CancelLifecycleCase } from "../../domain/usecases/cancel-lifecycle-case";
 import type { ChangeLifecycleTask } from "../../domain/usecases/change-lifecycle-task";
+import type { CompleteOffboarding } from "../../domain/usecases/complete-offboarding";
 import type { CompleteOnboarding } from "../../domain/usecases/complete-onboarding";
 import type { LoadAssignedLifecycleTasks } from "../../domain/usecases/load-assigned-lifecycle-tasks";
 import type { LoadLifecycleAssignees } from "../../domain/usecases/load-lifecycle-assignees";
@@ -9,10 +10,13 @@ import type { LoadLifecycleCases } from "../../domain/usecases/load-lifecycle-ca
 import type { LoadLifecycleHistory } from "../../domain/usecases/load-lifecycle-history";
 import type { LoadLifecycleTemplate } from "../../domain/usecases/load-lifecycle-template";
 import type { LoadLifecycleTemplates } from "../../domain/usecases/load-lifecycle-templates";
+import type { LoadOffboardingReview } from "../../domain/usecases/load-offboarding-review";
 import type { SaveLifecycleTemplate } from "../../domain/usecases/save-lifecycle-template";
 import type { StartLifecycleCase } from "../../domain/usecases/start-lifecycle-case";
 
 export type LifecycleUseCases = Readonly<{
+  loadOffboardingReview: Pick<LoadOffboardingReview, "execute">;
+  completeOffboarding: Pick<CompleteOffboarding, "execute">;
   cancelCase: Pick<CancelLifecycleCase, "execute">;
   completeOnboarding: Pick<CompleteOnboarding, "execute">;
   startCase: Pick<StartLifecycleCase, "execute">;

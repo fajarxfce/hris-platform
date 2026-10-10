@@ -6,6 +6,7 @@ import type { LifecycleCaseFilter } from "../../domain/entities/lifecycle-case-s
 import type { LifecycleCaseStart } from "../../domain/entities/lifecycle-case-start";
 import type { LifecycleTaskAssignment } from "../../domain/entities/lifecycle-task-assignment";
 import type { LifecycleTaskChange } from "../../domain/entities/lifecycle-task-change";
+import type { OffboardingCompletion } from "../../domain/entities/offboarding-completion";
 import type { LifecycleCaseRepository } from "../../domain/repositories/lifecycle-case-repository";
 import type { LifecycleCaseDataSource } from "../datasources/lifecycle-case-data-source";
 import { toAssignedLifecycleTaskPage } from "../mappers/assigned-lifecycle-task-mapper";
@@ -22,9 +23,34 @@ import {
 import { toLifecycleHistory } from "../mappers/lifecycle-history-mapper";
 import { toLifecycleTaskAssignmentDto } from "../mappers/lifecycle-task-assignment-mapper";
 import { toLifecycleTaskChangeDto } from "../mappers/lifecycle-task-change-mapper";
+import { toOffboardingCompletionDto, toOffboardingReview } from "../mappers/offboarding-mapper";
 
 export class RemoteLifecycleCaseRepository implements LifecycleCaseRepository {
   constructor(private readonly source: LifecycleCaseDataSource) {}
+  offboardingReview(company: CompanyId, id: LifecycleCaseId, signal: AbortSignal) {
+    return safeHttpCall(signal, async () =>
+      toOffboardingReview(await this.source.offboardingReview(company, id, signal), company, id),
+    );
+  }
+  completeOffboarding(
+    company: CompanyId,
+    operation: OperationId,
+    change: OffboardingCompletion,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toLifecycleCaseReceipt(
+        await this.source.completeOffboarding(
+          company,
+          change.caseId,
+          operation,
+          toOffboardingCompletionDto(change),
+          signal,
+        ),
+        change,
+      ),
+    );
+  }
   cancel(
     company: CompanyId,
     operation: OperationId,

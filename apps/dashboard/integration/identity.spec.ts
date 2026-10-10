@@ -880,6 +880,147 @@ test("real API sessions, MFA, organization, people, lifecycle, reports, audit, p
     action: "COMPLETED",
     reason: "Browser onboarding completed",
   });
+  const departingEmployee = randomUUID();
+  const departingNumber = `OFFB-${departingEmployee.slice(0, 8).toUpperCase()}`;
+  const departingEmployeePath = `/api/v1/companies/${companies[1]}/employees/${departingEmployee}`;
+  csrf = await (await context.request.get("/api/v1/auth/csrf")).json();
+  const departureEmployee = await context.request.post(
+    `/api/v1/companies/${companies[1]}/employees`,
+    {
+      headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
+      data: {
+        id: departingEmployee,
+        employeeNumber: departingNumber,
+        person: { id: randomUUID(), legalName: "Offboarding fixture employee", nationality: "ID" },
+        terms: {
+          effectiveFrom: "2026-01-01",
+          startDate: "2026-01-01",
+          status: "ACTIVE",
+          contract: "PERMANENT",
+        },
+        reason: "Browser offboarding review fixture",
+      },
+    },
+  );
+  expect(departureEmployee.status()).toBe(200);
+  const departureCaseId = randomUUID();
+  const departurePath = `${caseCreationPath}/${departureCaseId}`;
+  const departureCase = await context.request.post(caseCreationPath, {
+    headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
+    data: {
+      id: departureCaseId,
+      employmentId: departingEmployee,
+      templateId: offboardingTemplateId,
+      templateVersion: 0,
+      targetDate: "2026-10-03",
+      assignees: {},
+      reason: "Browser departure review fixture",
+    },
+  });
+  expect(departureCase.status()).toBe(200);
+  for (const [key, status, version] of [
+    ["equipment_return", "DONE", 0],
+    ["exit_meeting", "WAIVED", 1],
+  ] as const) {
+    const resolved = await context.request.put(`${departurePath}/tasks/${key}`, {
+      headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
+      data: { expectedVersion: version, status, reason: "Departure checklist reviewed" },
+    });
+    expect(resolved.status()).toBe(200);
+  }
+  await page.getByRole("link", { name: "Proses lifecycle", exact: true }).click();
+  await lifecycleCases
+    .getByRole("button", {
+      name: `Buka proses: Offboarding fixture employee · ${departingNumber}`,
+      exact: true,
+    })
+    .click();
+  await page.getByRole("link", { name: "Tinjau offboarding", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Tinjau offboarding", exact: true })).toContainText(
+    "Versi employment",
+  );
+  const departureReviewResponse = await context.request.get(`${departurePath}/offboarding-review`);
+  expect(departureReviewResponse.status()).toBe(200);
+  const departureReview = await departureReviewResponse.json();
+  expect(departureReview).toMatchObject({
+    case: { id: departureCaseId, version: 2 },
+    employmentVersion: 0,
+  });
+  expect(Object.keys(departureReview).sort()).toEqual(["case", "employmentVersion", "today"]);
+  expect(Object.keys(departureReview.case.employee).sort()).toEqual([
+    "employeeNumber",
+    "id",
+    "name",
+  ]);
+  await page.getByLabel("Alasan", { exact: true }).fill("Browser departure completion");
+  const interveningRevision = await context.request.post(`${departingEmployeePath}/revisions`, {
+    headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
+    data: {
+      version: 0,
+      terms: {
+        effectiveFrom: departureReview.today,
+        startDate: "2026-01-01",
+        status: "ACTIVE",
+        contract: "PERMANENT",
+      },
+      reason: "Concurrent employment revision before browser completion",
+    },
+  });
+  expect(interveningRevision.status()).toBe(200);
+  await page.getByRole("button", { name: "Selesaikan offboarding", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText("Employment sudah berubah.");
+  await page.getByRole("button", { name: "Muat ulang tinjauan", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "Tinggalkan halaman?", exact: true })
+    .getByRole("button", { name: "Tinggalkan halaman", exact: true })
+    .click();
+  await expect(page.getByLabel("Alasan", { exact: true })).toHaveValue("");
+  await page.getByLabel("Alasan", { exact: true }).fill("Browser updated departure completion");
+  const offboardingWrites: { operation: string | undefined; body: unknown }[] = [];
+  await page.route(`**${departurePath}/complete-offboarding`, async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    offboardingWrites.push({
+      operation: route.request().headers()["idempotency-key"],
+      body: route.request().postDataJSON(),
+    });
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toMatchObject({ id: departureCaseId, version: 3 });
+    if (offboardingWrites.length === 1) return route.abort("connectionfailed");
+    return route.fulfill({ response });
+  });
+  await page.getByRole("button", { name: "Selesaikan offboarding", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Hasil belum terkonfirmasi.");
+  await page.getByRole("button", { name: "Ulangi penyelesaian awal", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Offboarding selesai.");
+  expect(offboardingWrites).toHaveLength(2);
+  expect(offboardingWrites[1]).toEqual(offboardingWrites[0]);
+  expect(offboardingWrites[0]?.body).toEqual({
+    expectedVersion: 2,
+    employmentVersion: 1,
+    reason: "Browser updated departure completion",
+  });
+  await page.unroute(`**${departurePath}/complete-offboarding`);
+  const endedEmployment = await context.request.get(`${departingEmployeePath}?asOf=2100-01-01`);
+  expect(endedEmployment.status()).toBe(200);
+  expect(await endedEmployment.json()).toMatchObject({
+    version: 2,
+    terms: { status: "ENDED", endDate: "2026-10-03" },
+  });
+  const offboardingHistory = await (
+    await context.request.get(`${departurePath}/history?after=2`)
+  ).json();
+  expect(offboardingHistory.items).toHaveLength(1);
+  expect(offboardingHistory.items[0]).toMatchObject({
+    version: 3,
+    action: "COMPLETED",
+    reason: "Browser updated departure completion",
+  });
+  await page.getByRole("link", { name: "Buka proses", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Ringkasan", exact: true })).toContainText(
+    "Selesai",
+  );
+  await expect(page.getByRole("link", { name: "Tinjau offboarding", exact: true })).toHaveCount(0);
   await page.getByRole("link", { name: "Policy client", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText(
     "Belum ada konfigurasi perusahaan yang disimpan.",

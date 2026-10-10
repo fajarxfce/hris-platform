@@ -10,8 +10,21 @@ import type { LifecycleHistoryPage } from "../entities/lifecycle-event";
 import type { LifecycleTaskAssignment } from "../entities/lifecycle-task-assignment";
 import type { LifecycleTaskChange } from "../entities/lifecycle-task-change";
 import type { AssignedLifecycleTaskPage } from "../entities/lifecycle-task-context";
+import type { OffboardingCompletion } from "../entities/offboarding-completion";
+import type { OffboardingReview } from "../entities/offboarding-review";
 
 export interface LifecycleCaseRepository {
+  offboardingReview(
+    company: CompanyId,
+    id: LifecycleCaseId,
+    signal: AbortSignal,
+  ): Promise<Result<OffboardingReview>>;
+  completeOffboarding(
+    company: CompanyId,
+    operation: OperationId,
+    change: OffboardingCompletion,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
   cancel(
     company: CompanyId,
     operation: OperationId,

@@ -17,10 +17,38 @@ import {
 import { lifecycleHistoryPageDto } from "../models/lifecycle-event-dto";
 import type { LifecycleTaskAssignmentDto } from "../models/lifecycle-task-assignment-dto";
 import type { LifecycleTaskChangeDto } from "../models/lifecycle-task-change-dto";
+import { type OffboardingCompletionDto, offboardingReviewDto } from "../models/offboarding-dto";
 import type { LifecycleCaseDataSource } from "./lifecycle-case-data-source";
 
 export class HttpLifecycleCaseDataSource implements LifecycleCaseDataSource {
   constructor(private readonly http: HttpClient) {}
+  async offboardingReview(company: string, id: string, signal: AbortSignal) {
+    return offboardingReviewDto.parse(
+      await this.http.request(
+        { path: `/api/v1/companies/${company}/lifecycle/cases/${id}/offboarding-review` },
+        signal,
+      ),
+    );
+  }
+  async completeOffboarding(
+    company: string,
+    id: string,
+    operation: string,
+    change: OffboardingCompletionDto,
+    signal: AbortSignal,
+  ) {
+    return lifecycleCaseReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/lifecycle/cases/${id}/complete-offboarding`,
+          method: "POST",
+          operationId: operation,
+          body: change,
+        },
+        signal,
+      ),
+    );
+  }
   async cancel(
     company: string,
     id: string,

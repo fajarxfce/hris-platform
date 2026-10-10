@@ -6,6 +6,7 @@ import { RemoteLifecycleTemplateRepository } from "../data/repositories/remote-l
 import { AssignLifecycleTask } from "../domain/usecases/assign-lifecycle-task";
 import { CancelLifecycleCase } from "../domain/usecases/cancel-lifecycle-case";
 import { ChangeLifecycleTask } from "../domain/usecases/change-lifecycle-task";
+import { CompleteOffboarding } from "../domain/usecases/complete-offboarding";
 import { CompleteOnboarding } from "../domain/usecases/complete-onboarding";
 import { LoadAssignedLifecycleTasks } from "../domain/usecases/load-assigned-lifecycle-tasks";
 import { LoadLifecycleAssignees } from "../domain/usecases/load-lifecycle-assignees";
@@ -14,6 +15,7 @@ import { LoadLifecycleCases } from "../domain/usecases/load-lifecycle-cases";
 import { LoadLifecycleHistory } from "../domain/usecases/load-lifecycle-history";
 import { LoadLifecycleTemplate } from "../domain/usecases/load-lifecycle-template";
 import { LoadLifecycleTemplates } from "../domain/usecases/load-lifecycle-templates";
+import { LoadOffboardingReview } from "../domain/usecases/load-offboarding-review";
 import { SaveLifecycleTemplate } from "../domain/usecases/save-lifecycle-template";
 import { StartLifecycleCase } from "../domain/usecases/start-lifecycle-case";
 
@@ -23,6 +25,8 @@ export function createLifecycleFeature(http: HttpClient) {
   );
   const cases = new RemoteLifecycleCaseRepository(new HttpLifecycleCaseDataSource(http));
   return {
+    loadOffboardingReview: new LoadOffboardingReview(cases),
+    completeOffboarding: new CompleteOffboarding(cases),
     cancelCase: new CancelLifecycleCase(cases),
     completeOnboarding: new CompleteOnboarding(cases),
     startCase: new StartLifecycleCase(cases),

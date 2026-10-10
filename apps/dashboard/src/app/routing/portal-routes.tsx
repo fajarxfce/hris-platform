@@ -36,6 +36,11 @@ const LifecycleCaseScreen = lazy(() =>
     default: module.LifecycleCaseScreen,
   })),
 );
+const OffboardingScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/offboarding-screen").then((module) => ({
+    default: module.OffboardingScreen,
+  })),
+);
 const AssignedLifecycleTasksScreen = lazy(() =>
   import("../../features/lifecycle/presentation/bindings/assigned-lifecycle-tasks-screen").then(
     (module) => ({ default: module.AssignedLifecycleTasksScreen }),
@@ -197,6 +202,22 @@ export function PortalRoutes({
         element={
           <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
             <LifecycleCaseScreen
+              accountId={accountId}
+              access={access}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/lifecycle/cases/:caseId/offboarding"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <OffboardingScreen
               accountId={accountId}
               access={access}
               lifecycle={lifecycle}

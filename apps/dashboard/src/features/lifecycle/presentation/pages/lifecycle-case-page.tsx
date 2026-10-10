@@ -1,3 +1,4 @@
+import { useRestoreFocusTarget } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
@@ -11,6 +12,7 @@ import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { lifecycleCaseActionMessages } from "../i18n/lifecycle-case-action-messages";
 import { lifecycleCaseMessages } from "../i18n/lifecycle-case-messages";
+import { offboardingMessages } from "../i18n/offboarding-messages";
 import type { LifecycleCaseState } from "../models/lifecycle-case-state";
 import type { lifecycleCaseView } from "../models/lifecycle-case-view";
 
@@ -30,6 +32,7 @@ export function LifecycleCasePage({
   canCompleteOnboarding,
   onCancel,
   onCompleteOnboarding,
+  offboardingTo,
 }: {
   state: LifecycleCaseState;
   view: ReturnType<typeof lifecycleCaseView> | null;
@@ -46,6 +49,7 @@ export function LifecycleCasePage({
   canCompleteOnboarding: boolean;
   onCancel: () => void;
   onCompleteOnboarding: () => void;
+  offboardingTo: string | null;
 }) {
   const text = lifecycleCaseMessages(locale);
   const actions = lifecycleCaseActionMessages(locale);
@@ -58,6 +62,11 @@ export function LifecycleCasePage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
+            {tab === "overview" && offboardingTo && (
+              <Link {...restore} to={offboardingTo}>
+                {offboardingMessages(locale).review}
+              </Link>
+            )}
             {tab === "overview" && canCancel && (
               <>
                 <AppButton {...restore} onClick={onCancel}>
@@ -129,5 +138,3 @@ export function LifecycleCasePage({
     </section>
   );
 }
-
-import { useRestoreFocusTarget } from "@fluentui/react-components";

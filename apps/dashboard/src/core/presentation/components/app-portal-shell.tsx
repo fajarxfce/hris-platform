@@ -19,6 +19,7 @@ type Props = {
   accountName: string;
   companies: readonly { id: string; name: string }[];
   companyId: string | null;
+  companySelectionDisabled?: boolean;
   onCompanySelected: (id: string) => void;
   onLocaleChanged: (locale: Locale) => void;
   onThemeChanged: () => void;
@@ -49,11 +50,12 @@ export function AppPortalShell(props: Props) {
         />
         <span className="app-wordmark">{text.product}</span>
         <Select
+          select={{ ...restoreFocus, "aria-label": text.company }}
           className="app-company-select"
           aria-label={text.company}
           value={props.companyId ?? ""}
           onChange={(_, data) => props.onCompanySelected(data.value)}
-          disabled={props.companies.length === 0}
+          disabled={props.companies.length === 0 || (props.companySelectionDisabled ?? false)}
         >
           {props.companies.length === 0 && <option value="">{text.noCompanies}</option>}
           {props.companies.map((company) => (
@@ -82,6 +84,7 @@ export function AppPortalShell(props: Props) {
           />
         )}
         <AppButton
+          {...restoreFocus}
           appearance="subtle"
           icon={<SignOut20Regular />}
           aria-label={text.signOut}
@@ -92,6 +95,7 @@ export function AppPortalShell(props: Props) {
         <nav id="app-main-navigation" aria-label={text.navigation}>
           {props.navigation.map((item) => (
             <NavLink
+              {...restoreFocus}
               key={item.to}
               to={item.to}
               end

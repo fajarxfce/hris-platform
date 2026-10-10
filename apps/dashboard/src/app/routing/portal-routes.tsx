@@ -25,6 +25,11 @@ const OrganizationUnitScreen = lazy(() =>
     (module) => ({ default: module.OrganizationUnitScreen }),
   ),
 );
+const OrganizationEditorScreen = lazy(() =>
+  import("../../features/organization/presentation/bindings/organization-editor-screen").then(
+    (module) => ({ default: module.OrganizationEditorScreen }),
+  ),
+);
 
 const JobsScreen = lazy(() =>
   import("../../features/jobs/presentation/bindings/jobs-screen").then((module) => ({
@@ -72,6 +77,7 @@ export function PortalRoutes({
   organization,
   people,
   locale,
+  nextIdentifier,
 }: {
   accountId: AccountId;
   company: CompanyMembership | null;
@@ -83,11 +89,35 @@ export function PortalRoutes({
   organization: OrganizationUseCases;
   people: PeopleUseCases;
   locale: Locale;
+  nextIdentifier: () => string;
 }) {
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
       <Route path="/" element={<OverviewPage company={company} locale={locale} />} />
+      {[
+        { path: "/organization/units/new", creating: true },
+        { path: "/organization/units/:unitId/edit", creating: false },
+      ].map(({ path, creating }) => (
+        <Route
+          key={path}
+          path={path}
+          element={
+            <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+              <OrganizationEditorScreen
+                accountId={accountId}
+                access={access}
+                organization={organization}
+                companyName={company.name}
+                timezone={company.timezone}
+                locale={locale}
+                creating={creating}
+                nextIdentifier={nextIdentifier}
+              />
+            </Suspense>
+          }
+        />
+      ))}
       <Route
         path="/organization/units"
         element={

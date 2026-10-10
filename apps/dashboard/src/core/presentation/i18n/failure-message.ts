@@ -2,6 +2,34 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_organization_unit: [
+    "Enter a name and a code of 2–32 letters, numbers, underscores or hyphens.",
+    "Masukkan nama dan kode 2–32 huruf, angka, underscore, atau tanda hubung.",
+  ],
+  invalid_unit_timezone: [
+    "Enter a valid IANA timezone for a branch.",
+    "Masukkan zona waktu IANA yang valid untuk cabang.",
+  ],
+  organization_cycle_or_depth: [
+    "Choose a parent outside this unit’s descendants and within the hierarchy limit.",
+    "Pilih induk di luar turunan unit ini dan dalam batas hierarki.",
+  ],
+  parent_unavailable: [
+    "The parent is unavailable or inactive. Review the selection.",
+    "Induk tidak tersedia atau nonaktif. Periksa pilihan induk.",
+  ],
+  invalid_parent_kind: [
+    "The selected parent type is not allowed for this unit.",
+    "Jenis induk yang dipilih tidak sesuai untuk unit ini.",
+  ],
+  unit_kind_immutable: [
+    "An existing unit’s type cannot be changed.",
+    "Jenis unit yang sudah ada tidak dapat diubah.",
+  ],
+  data_conflict: [
+    "A record with these values already exists or conflicts with another record.",
+    "Data dengan nilai ini sudah ada atau tidak sesuai dengan data lain.",
+  ],
   authentication_required: ["Sign in to continue.", "Masuk untuk melanjutkan."],
   invalid_credentials: ["The email or password is incorrect.", "Email atau password tidak sesuai."],
   invalid_credentials_input: [

@@ -1,6 +1,20 @@
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 
 const en = {
+  create: "Create unit",
+  edit: "Edit unit",
+  save: "Save",
+  saving: "Saving",
+  saved: "Unit saved.",
+  reload: "Reload latest",
+  retrySave: "Retry save",
+  operation: "Operation ID",
+  unconfirmed:
+    "The save outcome is not confirmed. Retry with the same change to recover its result.",
+  chooseParent: "Choose parent unit",
+  clearParent: "Remove parent",
+  select: "Select",
+  parentResults: "Available parents",
   title: "Organization",
   directory: "Organization units",
   details: "Unit details",
@@ -34,6 +48,20 @@ const en = {
   next: "Next page",
 };
 const id: Record<keyof typeof en, string> = {
+  create: "Buat unit",
+  edit: "Edit unit",
+  save: "Simpan",
+  saving: "Menyimpan",
+  saved: "Unit tersimpan.",
+  reload: "Muat data terbaru",
+  retrySave: "Coba simpan kembali",
+  operation: "ID operasi",
+  unconfirmed:
+    "Hasil penyimpanan belum dipastikan. Coba kembali dengan perubahan yang sama untuk memastikan hasilnya.",
+  chooseParent: "Pilih unit induk",
+  clearParent: "Hapus induk",
+  select: "Pilih",
+  parentResults: "Pilihan induk",
   title: "Organisasi",
   directory: "Unit organisasi",
   details: "Detail unit",

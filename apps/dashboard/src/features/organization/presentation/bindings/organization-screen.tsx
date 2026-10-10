@@ -4,6 +4,7 @@ import type { AccountId } from "../../../../core/domain/identifiers";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { OrganizationUnitSearchInput } from "../../domain/entities/organization-unit-search";
+import { canManageOrganization } from "../../domain/policies/organization-change-policy";
 import type { OrganizationUseCases } from "../contracts/organization-use-cases";
 import { OrganizationDirectoryController } from "../controllers/organization-directory-controller";
 import { useOrganizationFilters } from "../controllers/use-organization-filters";
@@ -90,6 +91,11 @@ function OrganizationBinding({
       companyName={companyName}
       locale={locale}
       firstPage={search.after === null}
+      createTo={
+        canManageOrganization(access.permissions)
+          ? `/organization/units/new?${organizationSearchParameters(search, access.companyId)}`
+          : null
+      }
       onRefresh={controller.refresh}
       onFirst={() => onSearch({ ...search, after: null })}
       onNext={() => {

@@ -1,13 +1,13 @@
 import { MessageBar, MessageBarBody, useRestoreFocusTarget } from "@fluentui/react-components";
 import { useContext } from "react";
 import type { Failure } from "../../domain/result";
-import { AccountVerificationContext } from "../contracts/account-verification";
+import { WorkspaceSessionContext } from "../contracts/workspace-session";
 import { failureMessage } from "../i18n/failure-message";
 import { type Locale, messages } from "../i18n/messages";
 import { AppButton } from "./app-button";
 
 export function AppFailure({ failure, locale }: { failure: Failure | null; locale: Locale }) {
-  const requestVerification = useContext(AccountVerificationContext);
+  const requestVerification = useContext(WorkspaceSessionContext)?.verifyAccount;
   const restoreFocus = useRestoreFocusTarget();
   if (!failure) return null;
   return (

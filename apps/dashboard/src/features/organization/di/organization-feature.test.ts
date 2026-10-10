@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import type { HttpClient } from "../../../core/data/http/http-client";
 import { HttpResponseError } from "../../../core/data/http/http-response-error";
-import type { CompanyId } from "../../../core/domain/identifiers";
+import type { CompanyId, OperationId } from "../../../core/domain/identifiers";
 import type { OrganizationUnitDto } from "../data/models/organization-unit-dto";
+import type { OrganizationUnitChange } from "../domain/entities/organization-unit-change";
 import { createOrganizationFeature } from "./organization-feature";
 
 const companyId = "10000000-0000-4000-8000-000000000001" as CompanyId;
@@ -30,6 +31,103 @@ const details = () => ({
 });
 
 describe("organization feature boundary", () => {
+  it("normalizes commands before I/O and sends only the DTO, observed version and operation key", async () => {
+    const request = vi
+      .fn<HttpClient["request"]>()
+      .mockResolvedValue({ id: id().toUpperCase(), version: 0 });
+    const feature = createOrganizationFeature({ request });
+    const operation = id(99) as OperationId;
+    const change: OrganizationUnitChange = {
+      id: id().toUpperCase(),
+      code: " sales_n ",
+      name: " North sales ",
+      kind: "DEPARTMENT",
+      parentId: id(2).toUpperCase(),
+      timezone: null,
+      active: true,
+      expectedVersion: null,
+    };
+    for (const permissions of [[], ["company.read"], ["company.manage"]])
+      expect(
+        await feature.saveUnit.execute({ ...access, permissions }, operation, change, signal()),
+      ).toMatchObject({ ok: false, failure: { code: "access_denied" } });
+    const grants = { ...access, permissions: ["company.read", "company.manage"] };
+    for (const invalid of [
+      { ...change, id: "../escape" },
+      { ...change, code: "A" },
+      { ...change, name: " " },
+      { ...change, expectedVersion: -1 },
+      { ...change, expectedVersion: Number.MAX_SAFE_INTEGER },
+      { ...change, timezone: "Asia/Jakarta" },
+      { ...change, parentId: change.id },
+    ])
+      expect(await feature.saveUnit.execute(grants, operation, invalid, signal())).toMatchObject({
+        ok: false,
+      });
+    expect(request).not.toHaveBeenCalled();
+    const result = await feature.saveUnit.execute(grants, operation, change, signal());
+    expect(result).toEqual({ ok: true, value: { id: id(), version: 0 } });
+    expect(request.mock.lastCall?.[0]).toEqual({
+      path: `/api/v1/companies/${companyId}/organization-units/${id()}`,
+      method: "PUT",
+      operationId: operation,
+      body: {
+        code: "SALES_N",
+        name: "North sales",
+        kind: "DEPARTMENT",
+        parentId: id(2),
+        timezone: null,
+        active: true,
+        expectedVersion: null,
+      },
+    });
+    if (result.ok) expect(Object.isFrozen(result.value)).toBe(true);
+  });
+  it("does not accept an unrelated or mismatched receipt and preserves command failures and cancellation", async () => {
+    const request = vi.fn<HttpClient["request"]>();
+    const feature = createOrganizationFeature({ request });
+    const change: OrganizationUnitChange = {
+      id: id(),
+      code: "SALES",
+      name: "Sales",
+      kind: "DEPARTMENT",
+      parentId: null,
+      timezone: null,
+      active: false,
+      expectedVersion: 7,
+    };
+    const grants = { ...access, permissions: ["company.read", "company.manage"] };
+    for (const receipt of [
+      { id: id(2), version: 8 },
+      { id: id(), version: 7 },
+      { id: id(), version: 9 },
+      { id: id(), version: -1 },
+    ]) {
+      request.mockResolvedValueOnce(receipt);
+      expect(
+        await feature.saveUnit.execute(grants, id(99) as OperationId, change, signal()),
+      ).toMatchObject({ ok: false, failure: { code: "invalid_response" } });
+    }
+    request.mockRejectedValueOnce(
+      new HttpResponseError(409, {
+        code: "stale_version",
+        correlationId: id(9),
+        detail: "PRIVATE",
+      }),
+    );
+    const result = await feature.saveUnit.execute(grants, id(99) as OperationId, change, signal());
+    expect(result).toMatchObject({
+      ok: false,
+      failure: { code: "stale_version", correlationId: id(9) },
+    });
+    expect(JSON.stringify(result)).not.toContain("PRIVATE");
+    const cancelled = new AbortController();
+    cancelled.abort();
+    expect(() =>
+      feature.saveUnit.execute(grants, id(99) as OperationId, change, cancelled.signal),
+    ).toThrow();
+    expect(request).toHaveBeenCalledTimes(5);
+  });
   it("checks permission, identity, bounded literal filters and compatible cursors before I/O", async () => {
     const request = vi
       .fn<HttpClient["request"]>()

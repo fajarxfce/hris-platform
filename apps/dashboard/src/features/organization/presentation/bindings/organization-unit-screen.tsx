@@ -3,6 +3,7 @@ import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import type { AccountId } from "../../../../core/domain/identifiers";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import { canManageOrganization } from "../../domain/policies/organization-change-policy";
 import type { OrganizationUseCases } from "../contracts/organization-use-cases";
 import { OrganizationUnitController } from "../controllers/organization-unit-controller";
 import {
@@ -87,6 +88,11 @@ function OrganizationUnitBinding({
       locale={locale}
       backTo={backTo}
       onRefresh={controller.refresh}
+      editTo={
+        state.details && canManageOrganization(access.permissions)
+          ? `/organization/units/${state.details.unit.id}/edit?${parameters}`
+          : null
+      }
       parentTo={
         state.details?.parent
           ? `/organization/units/${state.details.parent.id}?${parameters}`

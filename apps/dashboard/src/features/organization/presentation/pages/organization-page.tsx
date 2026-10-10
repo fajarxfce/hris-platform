@@ -1,5 +1,6 @@
 import { Text } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -22,6 +23,7 @@ export function OrganizationPage({
   companyName,
   locale,
   firstPage,
+  createTo,
   onRefresh,
   onFirst,
   onNext,
@@ -33,6 +35,7 @@ export function OrganizationPage({
   companyName: string;
   locale: Locale;
   firstPage: boolean;
+  createTo: string | null;
   onRefresh: () => void;
   onFirst: () => void;
   onNext: () => void;
@@ -46,13 +49,16 @@ export function OrganizationPage({
         title={text.title}
         context={companyName}
         actions={
-          <AppButton
-            icon={<ArrowClockwise20Regular />}
-            disabled={state.stage === "loading"}
-            onClick={onRefresh}
-          >
-            {shared.refresh}
-          </AppButton>
+          <>
+            {createTo && <Link to={createTo}>{text.create}</Link>}
+            <AppButton
+              icon={<ArrowClockwise20Regular />}
+              disabled={state.stage === "loading"}
+              onClick={onRefresh}
+            >
+              {shared.refresh}
+            </AppButton>
+          </>
         }
       />
       <form onSubmit={filters.apply} noValidate>

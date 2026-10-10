@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { FetchHttpClient } from "../core/data/http/fetch-http-client";
 import type { OperationId } from "../core/domain/identifiers";
 import { AppErrorBoundary } from "../core/presentation/components/app-error-boundary";
@@ -34,21 +34,35 @@ const identity = new IdentityController(
 );
 const root = document.getElementById("root");
 if (!root) throw new Error("Application root is missing");
-createRoot(root).render(
+const router = createBrowserRouter([
+  {
+    path: "*",
+    element: (
+      <AppErrorBoundary locale="en" onReload={() => window.location.reload()}>
+        <Application
+          identity={identity}
+          reporting={reporting}
+          administration={administration}
+          jobs={jobs}
+          organization={organization}
+          people={people}
+          nextIdentifier={() => crypto.randomUUID()}
+        />
+      </AppErrorBoundary>
+    ),
+  },
+]);
+const applicationRoot = createRoot(root);
+applicationRoot.render(
   <StrictMode>
     <QueryClientProvider client={queries}>
-      <BrowserRouter>
-        <AppErrorBoundary locale="en" onReload={() => window.location.reload()}>
-          <Application
-            identity={identity}
-            reporting={reporting}
-            administration={administration}
-            jobs={jobs}
-            organization={organization}
-            people={people}
-          />
-        </AppErrorBoundary>
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </QueryClientProvider>
   </StrictMode>,
 );
+if (import.meta.hot)
+  import.meta.hot.dispose(() => {
+    applicationRoot.unmount();
+    router.dispose();
+    queries.clear();
+  });

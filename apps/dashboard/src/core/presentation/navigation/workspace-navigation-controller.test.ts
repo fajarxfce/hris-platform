@@ -1,0 +1,76 @@
+import { describe, expect, it, vi } from "vitest";
+import { WorkspaceNavigationController } from "./workspace-navigation-controller";
+
+describe("workspace departure ownership", () => {
+  it("retains the first intent, permits cancellation and executes confirmation only once", () => {
+    const navigation = new WorkspaceNavigationController();
+    const proceed = vi.fn();
+    const cancel = vi.fn();
+    const second = vi.fn();
+    navigation.protect("editor", "dirty");
+    navigation.request(proceed, cancel);
+    navigation.request(proceed, cancel);
+    navigation.request(vi.fn(), second);
+    expect(second).toHaveBeenCalledOnce();
+    expect(proceed).not.toHaveBeenCalled();
+    navigation.stay();
+    expect(cancel).toHaveBeenCalledOnce();
+    navigation.request(proceed, cancel);
+    navigation.leave();
+    navigation.leave();
+    expect(proceed).toHaveBeenCalledOnce();
+    expect(navigation.getSnapshot()).toEqual({ protection: "dirty", deciding: false });
+  });
+  it("suspension cancels the decision but retains protection without replaying it after verification", () => {
+    const navigation = new WorkspaceNavigationController();
+    const proceed = vi.fn();
+    const cancel = vi.fn();
+    navigation.protect("editor", "unconfirmed");
+    navigation.request(proceed, cancel);
+    navigation.suspend(true);
+    navigation.leave();
+    navigation.request(proceed, cancel);
+    expect(cancel).toHaveBeenCalledTimes(2);
+    navigation.suspend(false);
+    expect(proceed).not.toHaveBeenCalled();
+    expect(navigation.getSnapshot()).toEqual({ protection: "unconfirmed", deciding: false });
+    navigation.request(proceed, cancel);
+    navigation.leave();
+    expect(proceed).toHaveBeenCalledOnce();
+  });
+  it("record completion or owner removal cancels obsolete decisions and never runs an old callback", () => {
+    const navigation = new WorkspaceNavigationController();
+    const proceed = vi.fn();
+    const cancel = vi.fn();
+    navigation.protect("editor", "pending");
+    navigation.request(proceed, cancel);
+    navigation.protect("editor", "none");
+    navigation.leave();
+    expect(proceed).not.toHaveBeenCalled();
+    expect(cancel).toHaveBeenCalledOnce();
+    navigation.protect("editor", "dirty");
+    navigation.request(proceed, cancel);
+    navigation.release("another");
+    expect(navigation.getSnapshot().deciding).toBe(true);
+    navigation.release("editor");
+    navigation.protect("new-editor", "dirty");
+    navigation.leave();
+    expect(proceed).not.toHaveBeenCalled();
+    expect(navigation.getSnapshot()).toEqual({ protection: "dirty", deciding: false });
+    navigation.reset();
+    navigation.request(proceed);
+    expect(proceed).toHaveBeenCalledOnce();
+  });
+  it("bounds registration to one editor and releases subscriptions independently", () => {
+    const navigation = new WorkspaceNavigationController();
+    const notify = vi.fn();
+    const unsubscribe = navigation.subscribe(notify);
+    navigation.protect("first", "dirty");
+    expect(() => navigation.protect("second", "dirty")).toThrow();
+    unsubscribe();
+    const changes = notify.mock.calls.length;
+    navigation.reset();
+    navigation.protect("second", "pending");
+    expect(notify).toHaveBeenCalledTimes(changes);
+  });
+});

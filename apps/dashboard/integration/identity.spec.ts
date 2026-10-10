@@ -132,6 +132,46 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
   const previousCsrf = csrf.token;
   csrf = await (await context.request.get("/api/v1/auth/csrf")).json();
   expect(csrf.token).not.toBe(previousCsrf);
+  await page.getByRole("link", { name: "Buat unit", exact: true }).click();
+  await page.getByLabel("Kode", { exact: true }).fill("SUPPORT");
+  await page.getByLabel("Nama", { exact: true }).fill("Browser support");
+  await page.getByRole("button", { name: "Pilih unit induk", exact: true }).click();
+  const parentPicker = page.getByRole("dialog", { name: "Pilih unit induk", exact: true });
+  await parentPicker
+    .getByRole("button", { name: "Pilih: Browser office (HQ)", exact: true })
+    .click();
+  let committedUnit: { id: string; version: number } | null = null;
+  await page.route(
+    "**/api/v1/companies/*/organization-units/*",
+    async (route) => {
+      const response = await route.fetch();
+      expect(response.status()).toBe(200);
+      committedUnit = await response.json();
+      await route.abort("failed");
+    },
+    { times: 1 },
+  );
+  await page.getByRole("button", { name: "Simpan", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Hasil penyimpanan belum dipastikan");
+  await page.getByRole("button", { name: "Coba simpan kembali", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Unit tersimpan.");
+  await page.getByRole("link", { name: "Lihat detail", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Browser support", exact: true })).toBeVisible();
+  expect(committedUnit).toMatchObject({ version: 0 });
+  await page.getByRole("link", { name: "Edit unit", exact: true }).click();
+  await page.getByRole("combobox", { name: "Status", exact: true }).selectOption("false");
+  await page.getByRole("button", { name: "Simpan", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Unit tersimpan.");
+  await page.getByRole("link", { name: "Lihat detail", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Ringkasan", exact: true })).toContainText(
+    "Nonaktif",
+  );
+  await expect(
+    page
+      .getByRole("region", { name: "Ringkasan", exact: true })
+      .locator(".app-property-row")
+      .filter({ hasText: "Versi" }),
+  ).toContainText("1");
   const employeeId = randomUUID();
   const created = await context.request.post(`/api/v1/companies/${companies[1]}/employees`, {
     headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },

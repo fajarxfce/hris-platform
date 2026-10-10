@@ -18,6 +18,7 @@ export function OrganizationUnitPage({
   locale,
   backTo,
   parentTo,
+  editTo,
   onRefresh,
 }: {
   state: OrganizationUnitState;
@@ -29,6 +30,7 @@ export function OrganizationUnitPage({
   locale: Locale;
   backTo: string;
   parentTo: string | null;
+  editTo: string | null;
   onRefresh: () => void;
 }) {
   const text = organizationMessages(locale);
@@ -41,6 +43,7 @@ export function OrganizationUnitPage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
+            {editTo && <Link to={editTo}>{text.edit}</Link>}
             <AppButton
               icon={<ArrowClockwise20Regular />}
               disabled={state.stage === "loading"}

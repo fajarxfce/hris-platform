@@ -342,6 +342,8 @@ class PeopleConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
     ) =
         SaveLifecycleTemplate(
             lifecycle,
@@ -351,6 +353,8 @@ class PeopleConfiguration {
             operations,
             journal,
             transactions,
+            security,
+            clock,
         )
 
     @Bean
@@ -363,6 +367,7 @@ class PeopleConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         StartLifecycleCase(
@@ -374,6 +379,7 @@ class PeopleConfiguration {
             operations,
             journal,
             transactions,
+            security,
             clock,
         )
 
@@ -384,7 +390,18 @@ class PeopleConfiguration {
         identities: IdentityRepository,
         members: MembershipRepository,
         transactions: TransactionRunner,
-    ) = ListLifecycleTemplates(lifecycle, companies, identities, members, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListLifecycleTemplates(
+            lifecycle,
+            companies,
+            identities,
+            members,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun getLifecycleCase(
@@ -394,7 +411,19 @@ class PeopleConfiguration {
         members: MembershipRepository,
         people: PeopleRepository,
         transactions: TransactionRunner,
-    ) = GetLifecycleCase(lifecycle, companies, identities, members, people, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetLifecycleCase(
+            lifecycle,
+            companies,
+            identities,
+            members,
+            people,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun listLifecycleCases(
@@ -404,7 +433,19 @@ class PeopleConfiguration {
         members: MembershipRepository,
         people: PeopleRepository,
         transactions: TransactionRunner,
-    ) = ListLifecycleCases(lifecycle, companies, identities, members, people, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListLifecycleCases(
+            lifecycle,
+            companies,
+            identities,
+            members,
+            people,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun getLifecycleHistory(
@@ -414,7 +455,19 @@ class PeopleConfiguration {
         members: MembershipRepository,
         people: PeopleRepository,
         transactions: TransactionRunner,
-    ) = GetLifecycleHistory(lifecycle, companies, identities, members, people, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetLifecycleHistory(
+            lifecycle,
+            companies,
+            identities,
+            members,
+            people,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun listAssignedLifecycleTasks(
@@ -424,7 +477,19 @@ class PeopleConfiguration {
         members: MembershipRepository,
         people: PeopleRepository,
         transactions: TransactionRunner,
-    ) = ListAssignedLifecycleTasks(lifecycle, companies, identities, members, people, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListAssignedLifecycleTasks(
+            lifecycle,
+            companies,
+            identities,
+            members,
+            people,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun changeLifecycleTask(
@@ -436,6 +501,7 @@ class PeopleConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         ChangeLifecycleTask(
@@ -447,6 +513,7 @@ class PeopleConfiguration {
             operations,
             journal,
             transactions,
+            security,
             clock,
         )
 
@@ -460,6 +527,7 @@ class PeopleConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         AssignLifecycleTask(
@@ -471,6 +539,7 @@ class PeopleConfiguration {
             operations,
             journal,
             transactions,
+            security,
             clock,
         )
 
@@ -484,6 +553,7 @@ class PeopleConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         CancelLifecycleCase(
@@ -495,6 +565,7 @@ class PeopleConfiguration {
             operations,
             journal,
             transactions,
+            security,
             clock,
         )
 
@@ -508,6 +579,7 @@ class PeopleConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         CompleteOnboarding(
@@ -519,6 +591,7 @@ class PeopleConfiguration {
             operations,
             journal,
             transactions,
+            security,
             clock,
         )
 

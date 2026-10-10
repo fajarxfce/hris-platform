@@ -4,6 +4,7 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.*
 import dev.fajar.hris.identity.domain.policies.requireRecentAuthentication
 import dev.fajar.hris.identity.domain.policies.requireRecentMfa
+import dev.fajar.hris.identity.domain.policies.validateSessionAssurance
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.entities.*
@@ -85,6 +86,15 @@ class CompleteOffboarding(
                 return@run Result.Failed(
                     Failure(FailureKind.FORBIDDEN, "offboarding_access_required")
                 )
+            val assurance =
+                validateSessionAssurance(
+                    access.account,
+                    access.securityPermissions,
+                    actor.mfaVerifiedAt,
+                    clock.instant(),
+                    security,
+                )
+            if (assurance is Result.Failed) return@run assurance
             val recent =
                 if (security.enforceMfa)
                     requireRecentMfa(actor, clock.instant(), security.recentAuthenticationAge)

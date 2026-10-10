@@ -304,3 +304,7 @@ Validation: architecture, Biome, strict TypeScript, 128 unit/controller tests, a
 ## Keyboard skip navigation
 
 The shell now uses a keyboard skip control that focuses its owned main element without creating native hash-history entries outside the router. This removes the observed blocker warning and preserves Back protection for edited forms. Architecture/Biome/TypeScript, 128 unit/controller tests, the production build, and 16 relevant browser tests passed. The complete 77-test suite and real API run passed immediately before this isolated focus change; they were not repeated for it.
+
+### Employment assurance after access waits
+
+Employee creation, detail/directory/history reads, revisions, and scheduled-revision cancellation now validate current MFA after ordered resource and access guards, including receipt replay. Six controlled PostgreSQL regressions first reproduced accepted expired proofs, then passed after the boundary change. Renewed proof permits the original command once; an expired replay cannot reveal its receipt or advance the aggregate. The focused run passed 39 tests (8 domain and 31 PostgreSQL-backed server tests), architecture/format checks, and both application boot jars. This includes employment access, cancellation, transfer, and profile assurance coverage. No deployment or device validation was performed.

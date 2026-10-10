@@ -1,7 +1,8 @@
 package dev.fajar.hris.people.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -18,6 +19,7 @@ class CancelEmploymentRevision(
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
+    private val security: IdentitySecurityPolicy,
     private val clock: Clock,
 ) {
     fun execute(
@@ -55,7 +57,7 @@ class CancelEmploymentRevision(
             val checked =
                 identities
                     .access(actor.accountId, company)
-                    .flatMap { validateCompanyCommandActor(actor, it) }
+                    .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
                     .flatMap { it.requirePermission("people.manage") }
             if (checked is Result.Failed) return@run checked
             (replay as Result.Success).value?.let {

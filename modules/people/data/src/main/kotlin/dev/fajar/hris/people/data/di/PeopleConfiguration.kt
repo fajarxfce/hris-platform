@@ -138,6 +138,7 @@ class PeopleConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         CreateEmployee(
@@ -149,6 +150,7 @@ class PeopleConfiguration {
             operations,
             journal,
             transactions,
+            security,
             clock,
         )
 
@@ -164,6 +166,8 @@ class PeopleConfiguration {
         transactions: TransactionRunner,
         transfers: EmploymentTransferRepository,
         lifecycle: LifecycleRepository,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
     ) =
         ReviseEmployment(
             people,
@@ -176,6 +180,8 @@ class PeopleConfiguration {
             transactions,
             transfers,
             lifecycle,
+            security,
+            clock,
         )
 
     @Bean
@@ -185,8 +191,9 @@ class PeopleConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
-    ) = GetEmployee(people, companies, members, identities, transactions, clock)
+    ) = GetEmployee(people, companies, members, identities, transactions, security, clock)
 
     @Bean
     fun listEmployees(
@@ -195,8 +202,9 @@ class PeopleConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
-    ) = ListEmployees(people, companies, members, identities, transactions, clock)
+    ) = ListEmployees(people, companies, members, identities, transactions, security, clock)
 
     @Bean
     fun employmentHistory(
@@ -205,7 +213,9 @@ class PeopleConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetEmploymentHistory(people, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetEmploymentHistory(people, companies, members, identities, transactions, security, clock)
 
     @Bean
     fun cancelEmploymentRevision(
@@ -216,6 +226,7 @@ class PeopleConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         CancelEmploymentRevision(
@@ -226,6 +237,7 @@ class PeopleConfiguration {
             operations,
             journal,
             transactions,
+            security,
             clock,
         )
 

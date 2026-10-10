@@ -36,6 +36,8 @@ Sensitive profiles have separate `people.profile.read` and `people.profile.manag
 
 Profile reads, history, and edits hold people, company, membership, and account guards and recheck the original/live permission intersection and current MFA assurance before acquisition or receipt replay. A proof that expires while waiting requires renewal, even when a matching committed receipt exists. Organization-unit reads/edits similarly protect the structure before validating live company access. Company creation revalidates platform credentials and `companies.create`; company settings revalidate current company authority. A previously committed receipt does not bypass current authorization.
 
+Employee creation, detail/directory/history reads, employment revisions, and scheduled-revision cancellation also check current MFA after their ordered resource/access guards. An expired request must renew its proof before reading data, changing employment, or replaying a receipt. The original permissions remain an upper bound on renewed live access.
+
 Employment creation, revisions, cancellation, directory/detail reads, and history/transfer reads use the same live-access boundary. Directory visibility is recomputed from the remaining permissions after waiting; losing company-wide read access can narrow a response to the caller's own employment. Creation locks linked accounts in stable ID order and rechecks their active company membership. Reads require an explicit `asOf` date where the effective employment view is requested.
 
 ## Scheduled employment changes

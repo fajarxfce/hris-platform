@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { FetchHttpClient } from "../core/data/http/fetch-http-client";
+import { createBrowserFiles } from "../core/di/browser-files";
 import type { OperationId } from "../core/domain/identifiers";
 import { AppErrorBoundary } from "../core/presentation/components/app-error-boundary";
 import { createAdministrationFeature } from "../features/administration/di/administration-feature";
@@ -27,7 +28,7 @@ const reporting = createReportingFeature(http);
 const administration = createAdministrationFeature(http);
 const jobs = createJobsFeature(http);
 const organization = createOrganizationFeature(http);
-const people = createPeopleFeature(http);
+const people = createPeopleFeature(http, createBrowserFiles());
 const lifecycle = createLifecycleFeature(http);
 const identity = new IdentityController(
   createIdentityFeature(http),

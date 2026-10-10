@@ -5,6 +5,7 @@ import type {
   EmployeeImportApplication,
   EmployeeImportChange,
 } from "../../domain/entities/employee-import-change";
+import type { EmployeeImportStart } from "../../domain/entities/employee-import-start";
 import type { EmployeeImportRepository } from "../../domain/repositories/employee-import-repository";
 import type { EmployeeImportDataSource } from "../datasources/employee-import-data-source";
 import { toEmployeeImportReceipt } from "../mappers/employee-import-change-mapper";
@@ -13,8 +14,30 @@ import {
   toEmployeeImportAttempts,
   toEmployeeImportRows,
 } from "../mappers/employee-import-results-mapper";
+import { toEmployeeImportStartedReceipt } from "../mappers/employee-import-start-mapper";
 
 export class RemoteEmployeeImportRepository implements EmployeeImportRepository {
+  start(
+    company: CompanyId,
+    operation: OperationId,
+    input: EmployeeImportStart,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toEmployeeImportStartedReceipt(
+        await this.source.start(
+          company,
+          operation,
+          { id: input.id, fileName: input.file.name, csv: input.file.text, reason: input.reason },
+          signal,
+        ),
+        input.id,
+      ),
+    );
+  }
+  template(company: CompanyId, signal: AbortSignal) {
+    return safeHttpCall(signal, () => this.source.template(company, signal));
+  }
   apply(
     company: CompanyId,
     operation: OperationId,

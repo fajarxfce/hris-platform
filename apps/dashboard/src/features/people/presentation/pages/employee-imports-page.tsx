@@ -1,10 +1,12 @@
 import { Text } from "@fluentui/react-components";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
 import { AppLoading } from "../../../../core/presentation/components/app-loading";
 import { AppPageHeader } from "../../../../core/presentation/components/app-page-header";
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { employeeImportCreationMessages } from "../i18n/employee-import-creation-messages";
 import { employeeImportMessages } from "../i18n/employee-import-messages";
 import type { employeeImportsView } from "../models/employee-import-view";
 import type { EmployeeImportsState } from "../models/employee-imports-state";
@@ -15,6 +17,7 @@ export function EmployeeImportsPage({
   companyName,
   locale,
   firstPage,
+  createTo,
   onRefresh,
   onFirst,
   onNext,
@@ -25,6 +28,7 @@ export function EmployeeImportsPage({
   companyName: string;
   locale: Locale;
   firstPage: boolean;
+  createTo: string | null;
   onRefresh: () => void;
   onFirst: () => void;
   onNext: () => void;
@@ -37,9 +41,12 @@ export function EmployeeImportsPage({
         title={text.title}
         context={companyName}
         actions={
-          <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
-            {messages(locale).refresh}
-          </AppButton>
+          <>
+            {createTo && <Link to={createTo}>{employeeImportCreationMessages(locale).create}</Link>}
+            <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
+              {messages(locale).refresh}
+            </AppButton>
+          </>
         }
       />
       <AppFailure failure={state.failure} locale={locale} />

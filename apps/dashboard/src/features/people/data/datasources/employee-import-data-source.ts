@@ -4,8 +4,16 @@ import type {
   EmployeeImportRowsDto,
   EmployeeImportSummaryDto,
 } from "../models/employee-import-dto";
+import type { EmployeeImportStartDto } from "../models/employee-import-start-dto";
 
 export interface EmployeeImportDataSource {
+  start(
+    company: string,
+    operation: string,
+    input: EmployeeImportStartDto,
+    signal: AbortSignal,
+  ): Promise<EmployeeImportReceiptDto>;
+  template(company: string, signal: AbortSignal): Promise<string>;
   apply(
     company: string,
     id: string,

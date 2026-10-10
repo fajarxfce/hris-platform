@@ -2,6 +2,47 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  file_read_timeout: [
+    "Reading the file timed out. Choose it again.",
+    "Waktu pembacaan file habis. Pilih kembali file tersebut.",
+  ],
+  employee_import_file_required: ["Choose a CSV file first.", "Pilih file CSV terlebih dahulu."],
+  employee_import_file_invalid: [
+    "Choose a .csv file with a name of up to 120 characters.",
+    "Pilih file .csv dengan nama maksimal 120 karakter.",
+  ],
+  employee_import_size_limit: [
+    "The CSV must contain data and be no larger than 512 KiB.",
+    "CSV harus berisi data dan berukuran maksimal 512 KiB.",
+  ],
+  invalid_employee_csv: [
+    "Check the CSV headers and format. Use at most 5,000 rows and 1,024 characters per cell.",
+    "Periksa header dan format CSV. Gunakan maksimal 5.000 baris dan 1.024 karakter per sel.",
+  ],
+  employee_csv_failure: [
+    "The CSV could not be processed. Try again or contact your administrator.",
+    "CSV tidak dapat diproses. Coba lagi atau hubungi administrator.",
+  ],
+  file_size_limit: [
+    "The selected file exceeds the size limit.",
+    "File terpilih melebihi batas ukuran.",
+  ],
+  file_encoding_invalid: [
+    "Save the file as UTF-8 and choose it again.",
+    "Simpan file sebagai UTF-8, lalu pilih kembali.",
+  ],
+  file_access_denied: [
+    "The browser could not access the file. Check access and try again.",
+    "Browser tidak dapat mengakses file. Periksa akses, lalu coba lagi.",
+  ],
+  file_unavailable: [
+    "The file could not be read. Choose it again.",
+    "File tidak dapat dibaca. Pilih kembali file tersebut.",
+  ],
+  request_body_too_large: [
+    "The encoded request exceeds the API size limit. Use a smaller file.",
+    "Permintaan yang dienkode melebihi batas API. Gunakan file yang lebih kecil.",
+  ],
   invalid_employee_import: [
     "Review the import details and provide a reason of up to 1,000 characters.",
     "Periksa detail import dan masukkan alasan maksimal 1.000 karakter.",

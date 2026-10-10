@@ -1,4 +1,6 @@
 import type { HttpClient } from "../../../core/data/http/http-client";
+import { createBrowserFiles } from "../../../core/di/browser-files";
+import type { FileRepository } from "../../../core/domain/files/file-repository";
 import { HttpEmployeeDataSource } from "../data/datasources/http-employee-data-source";
 import { HttpEmployeeImportDataSource } from "../data/datasources/http-employee-import-data-source";
 import { HttpPersonProfileDataSource } from "../data/datasources/http-person-profile-data-source";
@@ -9,6 +11,7 @@ import { ApplyEmployeeImport } from "../domain/usecases/apply-employee-import";
 import { CancelEmployeeImport } from "../domain/usecases/cancel-employee-import";
 import { CancelEmploymentRevision } from "../domain/usecases/cancel-employment-revision";
 import { CreateEmployee } from "../domain/usecases/create-employee";
+import { DownloadEmployeeImportTemplate } from "../domain/usecases/download-employee-import-template";
 import { LoadEmployee } from "../domain/usecases/load-employee";
 import { LoadEmployeeImport } from "../domain/usecases/load-employee-import";
 import { LoadEmployeeImportAttempts } from "../domain/usecases/load-employee-import-attempts";
@@ -23,12 +26,20 @@ import { LoadPersonProfileHistory } from "../domain/usecases/load-person-profile
 import { ResumeEmployeeImport } from "../domain/usecases/resume-employee-import";
 import { ReviseEmployment } from "../domain/usecases/revise-employment";
 import { SavePersonProfile } from "../domain/usecases/save-person-profile";
+import { SelectEmployeeImportFile } from "../domain/usecases/select-employee-import-file";
+import { StartEmployeeImport } from "../domain/usecases/start-employee-import";
 
-export function createPeopleFeature(http: HttpClient) {
+export function createPeopleFeature(
+  http: HttpClient,
+  files: FileRepository = createBrowserFiles(),
+) {
   const imports = new RemoteEmployeeImportRepository(new HttpEmployeeImportDataSource(http));
   const employees = new RemoteEmployeeRepository(new HttpEmployeeDataSource(http));
   const profiles = new RemotePersonProfileRepository(new HttpPersonProfileDataSource(http));
   return {
+    selectEmployeeImportFile: new SelectEmployeeImportFile(files),
+    startEmployeeImport: new StartEmployeeImport(imports),
+    downloadEmployeeImportTemplate: new DownloadEmployeeImportTemplate(imports, files),
     applyEmployeeImport: new ApplyEmployeeImport(imports),
     resumeEmployeeImport: new ResumeEmployeeImport(imports),
     cancelEmployeeImport: new CancelEmployeeImport(imports),

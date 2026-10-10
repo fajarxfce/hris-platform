@@ -4,6 +4,7 @@ import type { AccountId } from "../../../../core/domain/identifiers";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import { canImportEmployees } from "../../domain/policies/employee-import-policy";
 import type { PeopleUseCases } from "../contracts/people-use-cases";
 import { EmployeeImportsController } from "../controllers/employee-imports-controller";
 import { employeeImportParameters } from "../models/employee-import-route";
@@ -75,6 +76,11 @@ function EmployeeImportsBinding({
       companyName={companyName}
       locale={locale}
       firstPage={after === null}
+      createTo={
+        canImportEmployees(access.permissions)
+          ? `/people/imports/new?${employeeImportParameters(access.companyId, after)}`
+          : null
+      }
       onRefresh={controller.refresh}
       onFirst={() => onPage(null)}
       onNext={() => {

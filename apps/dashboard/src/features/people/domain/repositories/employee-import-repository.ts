@@ -8,9 +8,17 @@ import type {
   EmployeeImportChange,
 } from "../entities/employee-import-change";
 import type { EmployeeImportRows } from "../entities/employee-import-row";
+import type { EmployeeImportStart } from "../entities/employee-import-start";
 import type { EmployeeImportSummary } from "../entities/employee-import-summary";
 
 export interface EmployeeImportRepository {
+  start(
+    company: CompanyId,
+    operation: OperationId,
+    input: EmployeeImportStart,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
+  template(company: CompanyId, signal: AbortSignal): Promise<Result<string>>;
   apply(
     company: CompanyId,
     operation: OperationId,

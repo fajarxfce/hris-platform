@@ -10,9 +10,47 @@ import {
   employeeImportRowsDto,
   employeeImportSummaryDto,
 } from "../models/employee-import-dto";
+import {
+  type EmployeeImportStartDto,
+  employeeImportTemplateDto,
+  employeeImportTemplateMaximumBytes,
+} from "../models/employee-import-start-dto";
 import type { EmployeeImportDataSource } from "./employee-import-data-source";
 
 export class HttpEmployeeImportDataSource implements EmployeeImportDataSource {
+  async start(
+    company: string,
+    operation: string,
+    input: EmployeeImportStartDto,
+    signal: AbortSignal,
+  ) {
+    return employeeImportReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/employee-imports`,
+          method: "POST",
+          operationId: operation,
+          body: input,
+        },
+        signal,
+      ),
+    );
+  }
+  async template(company: string, signal: AbortSignal) {
+    return employeeImportTemplateDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/employee-imports/template`,
+          response: {
+            type: "text",
+            mediaType: "text/csv",
+            maximumBytes: employeeImportTemplateMaximumBytes,
+          },
+        },
+        signal,
+      ),
+    );
+  }
   async apply(
     company: string,
     id: string,

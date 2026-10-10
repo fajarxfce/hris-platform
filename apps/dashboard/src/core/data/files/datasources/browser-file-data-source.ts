@@ -6,7 +6,15 @@ export class BrowserFileDataSource implements FileDataSource {
   constructor(
     private readonly document: Document,
     private readonly createReader: () => FileReader = () => new FileReader(),
-  ) {}
+    private readonly readTimeoutMilliseconds = 15_000,
+  ) {
+    if (
+      !Number.isInteger(readTimeoutMilliseconds) ||
+      readTimeoutMilliseconds < 1 ||
+      readTimeoutMilliseconds > 60_000
+    )
+      throw new RangeError("Invalid file read deadline");
+  }
 
   select(accept: string, signal: AbortSignal): Promise<File | null> {
     signal.throwIfAborted();
@@ -56,6 +64,7 @@ export class BrowserFileDataSource implements FileDataSource {
     const reader = this.createReader();
     return new Promise((resolve, reject) => {
       const clean = () => {
+        clearTimeout(deadline);
         reader.onload = null;
         reader.onerror = null;
         reader.onabort = null;
@@ -66,6 +75,11 @@ export class BrowserFileDataSource implements FileDataSource {
         reader.abort();
         reject(signal.reason);
       };
+      const deadline = setTimeout(() => {
+        clean();
+        reader.abort();
+        reject(new DOMException("File read timed out", "TimeoutError"));
+      }, this.readTimeoutMilliseconds);
       reader.onload = () => {
         clean();
         try {

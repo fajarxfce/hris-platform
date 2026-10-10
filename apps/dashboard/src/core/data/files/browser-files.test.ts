@@ -12,10 +12,29 @@ const selectedInput = () => {
   return input;
 };
 afterEach(() => {
+  vi.useRealTimers();
   vi.restoreAllMocks();
   document.body.replaceChildren();
 });
 describe("browser file resource ownership", () => {
+  it("bounds file reading time and releases the reader on timeout", async () => {
+    vi.useFakeTimers();
+    const reader = new FileReader();
+    vi.spyOn(reader, "readAsArrayBuffer").mockImplementation(() => {});
+    const aborted = vi.spyOn(reader, "abort");
+    const source = new BrowserFileDataSource(document, () => reader, 20);
+    const owner = new AbortController();
+    const pending = safeFileCall(owner.signal, () =>
+      source.readText(new File(["name"], "input.csv"), 64, owner.signal),
+    );
+    await vi.advanceTimersByTimeAsync(20);
+    expect(await pending).toMatchObject({ ok: false, failure: { code: "file_read_timeout" } });
+    expect(aborted).toHaveBeenCalledOnce();
+    expect(reader.onload).toBeNull();
+    expect(reader.onerror).toBeNull();
+    expect(reader.onabort).toBeNull();
+    expect(vi.getTimerCount()).toBe(0);
+  });
   it("removes its picker and listeners after selection or native cancellation", async () => {
     const source = new BrowserFileDataSource(document);
     const owner = new AbortController();

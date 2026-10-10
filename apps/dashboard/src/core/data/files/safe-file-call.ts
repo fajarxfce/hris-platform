@@ -14,6 +14,8 @@ export async function safeFileCall<T>(
   } catch (error) {
     signal.throwIfAborted();
     if (error instanceof DOMException && error.name === "AbortError") throw error;
+    if (error instanceof DOMException && error.name === "TimeoutError")
+      return failed("file_read_timeout");
     if (error instanceof FileSizeLimitError) return failed("file_size_limit");
     if (error instanceof FileEncodingError) return failed("file_encoding_invalid");
     if (error instanceof DOMException && ["NotAllowedError", "SecurityError"].includes(error.name))

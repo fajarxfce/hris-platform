@@ -7,7 +7,8 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.documents.domain.entities.*
 import dev.fajar.hris.documents.domain.repositories.DocumentReferenceRepository
 import dev.fajar.hris.documents.domain.repositories.DocumentRepository
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.leave.domain.entities.*
@@ -39,6 +40,7 @@ class SubmitLeaveRequest(
     private val documents: DocumentRepository,
     private val references: DocumentReferenceRepository,
     private val cutoffs: PayrollCutoffRepository,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -94,7 +96,7 @@ class SubmitLeaveRequest(
             if (accountLock is Result.Failed) return@run accountLock
             val checkedActor =
                 identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (checkedActor is Result.Failed) return@run checkedActor
             val live = (checkedActor as Result.Success).value

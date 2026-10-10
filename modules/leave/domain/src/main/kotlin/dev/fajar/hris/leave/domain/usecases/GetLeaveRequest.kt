@@ -3,7 +3,8 @@ package dev.fajar.hris.leave.domain.usecases
 import dev.fajar.hris.approvals.domain.policies.isAssignedApprover
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.leave.domain.entities.*
@@ -24,6 +25,7 @@ class GetLeaveRequest(
     private val transactions: TransactionRunner,
     private val clock: Clock,
     private val cutoffs: PayrollCutoffRepository,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -46,9 +48,19 @@ class GetLeaveRequest(
             if (lock is Result.Failed) return@run lock
             val cutoffLock = cutoffs.lock(company)
             if (cutoffLock is Result.Failed) return@run cutoffLock
+            val peopleGuard = people.lockReportingLines(company, shared = true)
+            if (peopleGuard is Result.Failed) return@run peopleGuard
+            val approvalGuard = approvals.lock(company, shared = true)
+            if (approvalGuard is Result.Failed) return@run approvalGuard
+            val companyGuard = identities.lockCompany(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
             val checked =
                 identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value

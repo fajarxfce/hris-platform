@@ -22,6 +22,8 @@ Approval consumes a reservation only after its final stage. Rejection or withdra
 
 Request detail exposes server-calculated actions. Current HR/team/self scope or a permitted snapshotted approver/delegate controls access. A delegated approver loses access when the source membership or approval permission is revoked. Summary and history reads are paginated.
 
+Request lists and details revalidate current access and session assurance after acquiring their resource/access guards. Detail reads hold the shared approval guard, so a reassignment cannot combine an old workflow version with new assignees or actions. Submission, decisions, withdrawal, and cancellation use the same post-wait assurance check before mutation or receipt replay. Cancellation of pending application work releases transaction-owned guards.
+
 ## Attachments
 
 Submission accepts up to three distinct `attachmentRevisionIds`. Each revision must already be `READY`, belong to a `PERSONAL` document for the same employment, and remain available in the selected company. The selected policy's `attachmentRequired` flag defaults to false. Missing required evidence and unavailable evidence have stable validation codes; a foreign revision is not identified in the response.

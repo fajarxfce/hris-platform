@@ -4,6 +4,7 @@ import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.documents.domain.repositories.DocumentReferenceRepository
 import dev.fajar.hris.documents.domain.repositories.DocumentRepository
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
@@ -244,6 +245,7 @@ class LeaveConfiguration {
         documents: DocumentRepository,
         references: DocumentReferenceRepository,
         cutoffs: PayrollCutoffRepository,
+        security: IdentitySecurityPolicy,
     ) =
         SubmitLeaveRequest(
             requests,
@@ -262,6 +264,7 @@ class LeaveConfiguration {
             documents,
             references,
             cutoffs,
+            security,
         )
 
     @Bean
@@ -278,6 +281,7 @@ class LeaveConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         cutoffs: PayrollCutoffRepository,
+        security: IdentitySecurityPolicy,
     ) =
         DecideLeaveRequest(
             requests,
@@ -292,6 +296,7 @@ class LeaveConfiguration {
             transactions,
             clock,
             cutoffs,
+            security,
         )
 
     @Bean
@@ -307,6 +312,7 @@ class LeaveConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         cutoffs: PayrollCutoffRepository,
+        security: IdentitySecurityPolicy,
     ) =
         WithdrawLeaveRequest(
             requests,
@@ -320,6 +326,7 @@ class LeaveConfiguration {
             transactions,
             clock,
             cutoffs,
+            security,
         )
 
     @Bean
@@ -336,6 +343,7 @@ class LeaveConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         cutoffs: PayrollCutoffRepository,
+        security: IdentitySecurityPolicy,
     ) =
         RequestLeaveCancellation(
             requests,
@@ -350,6 +358,7 @@ class LeaveConfiguration {
             transactions,
             clock,
             cutoffs,
+            security,
         )
 
     @Bean
@@ -363,6 +372,7 @@ class LeaveConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         cutoffs: PayrollCutoffRepository,
+        security: IdentitySecurityPolicy,
     ) =
         GetLeaveRequest(
             requests,
@@ -374,6 +384,7 @@ class LeaveConfiguration {
             transactions,
             clock,
             cutoffs,
+            security,
         )
 
     @Bean
@@ -382,7 +393,10 @@ class LeaveConfiguration {
         people: PeopleRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = ListLeaveRequests(requests, people, transactions, clock)
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        security: IdentitySecurityPolicy,
+    ) = ListLeaveRequests(requests, people, transactions, clock, identities, members, security)
 
     @Bean
     fun getLeaveAttachmentDownload(

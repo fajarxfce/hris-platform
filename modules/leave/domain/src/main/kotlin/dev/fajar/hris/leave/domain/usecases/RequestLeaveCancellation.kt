@@ -4,7 +4,8 @@ import dev.fajar.hris.approvals.domain.entities.*
 import dev.fajar.hris.approvals.domain.policies.*
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.leave.domain.entities.*
@@ -29,6 +30,7 @@ class RequestLeaveCancellation(
     private val transactions: TransactionRunner,
     private val clock: Clock,
     private val cutoffs: PayrollCutoffRepository,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -74,7 +76,7 @@ class RequestLeaveCancellation(
             if (accountLock is Result.Failed) return@run accountLock
             val checkedActor =
                 identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (checkedActor is Result.Failed) return@run checkedActor
             val live = (checkedActor as Result.Success).value

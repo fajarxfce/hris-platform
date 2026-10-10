@@ -32,6 +32,8 @@ Lifecycle case operations acquire people guards before case locks, followed by c
 
 Approval aggregate reads acquire the shared approval guard before company, membership, and actor-account guards. They observe headers and assignment overrides coherently; mutations retain the exclusive approval guard. Both readers and administrative commands revalidate live session assurance after waiting, including before returning an existing operation receipt.
 
+Leave request details acquire the employee ledger and cutoff guards, then shared people, approval, company, membership, and actor-account guards. Request history and effective approvers remain coherent while reassignment waits. Leave directories acquire shared people and access guards before checking current employee scope. Request submission, decisions, withdrawal, cancellation, and these readers revalidate current MFA after their guards; an earlier proof cannot authorize a later mutation or receipt replay.
+
 Import recovery and cancellation acquire the previous job before the import header, matching worker order. Import reads protect the header and row outcomes with a shared resource guard before access guards. Privileged commands recheck recent authentication after a pending resource or queue acquisition; an earlier check cannot authorize work indefinitely.
 
 Business changes, audit, outbox, and idempotency receipts share their transaction. Receipt keys bind company or account scope, actor, operation, and payload hash. Account receipts cannot be read through a company scope or by another actor. Repeated identical commands return the committed outcome; key/payload mismatches fail. Optimistic versions reject obsolete updates. A lost response never implies that the transaction rolled back.

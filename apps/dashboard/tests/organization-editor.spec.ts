@@ -256,3 +256,27 @@ for (const code of ["session_revoked", "company_access_denied"]) {
     expect(api.commits).toBe(1);
   });
 }
+
+test("keyboard skip focus preserves router history and Back still protects an edited form", async ({
+  page,
+}) => {
+  await installOrganizationEditorApi(page);
+  const warnings: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "warning") warnings.push(message.text());
+  });
+  await page.goto("/organization/units");
+  await page.getByRole("link", { name: "Create unit", exact: true }).click();
+  await page.getByLabel("Name", { exact: true }).fill("Unsaved unit");
+  const currentUrl = page.url();
+  await page.getByRole("button", { name: "Skip to content", exact: true }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("main")).toBeFocused();
+  await expect(page).toHaveURL(currentUrl);
+  await page.goBack();
+  await departure(page).getByRole("button", { name: "Stay on this page", exact: true }).click();
+  await expect(page.getByLabel("Name", { exact: true })).toHaveValue("Unsaved unit");
+  expect(warnings.some((message) => message.includes("use a blocker on a POP navigation"))).toBe(
+    false,
+  );
+});

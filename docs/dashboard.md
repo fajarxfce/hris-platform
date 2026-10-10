@@ -36,6 +36,8 @@ Verification owns no business command and never resubmits one. If proof delivery
 
 The authorized workspace owns one pending navigation decision. Editors declare dirty, pending, or unconfirmed changes; route navigation, Back, company selection, and header logout require an explicit Leave or Stay decision. Reload/close uses the browser's native unsaved-changes prompt. Identity checks suspend pending decisions, and scope changes discard them with the editor. A security/recovery screen keeps sign-out available. These prompts protect browser memory only; confirming departure or closing the process does not retain a recoverable draft or prove that a pending server operation was cancelled.
 
+The keyboard skip control moves focus to the owned main content element without adding a native hash-history entry. This keeps browser history inside the router's navigation protection.
+
 ## Company and group headcount
 
 `/reports/headcount?asOf=2026-10-01` loads the [group headcount API](reporting.md), initially selecting the active company. The default date uses that company's time zone. The controlled form can select one to 32 companies and keeps edits separate from the applied URL filters. Apply stores the date and a sorted `companies` selection; browser history restores both. The report shows distinct people, employment records, status, and contract totals with the source definition's historical limits. A group also displays company-level counts. The unique-person total comes from the backend and is never summed from company buckets.

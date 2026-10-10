@@ -103,9 +103,11 @@ test("the responsive shell offers keyboard navigation and an honest empty compan
   await expect(page.getByRole("heading", { name: "No company access" })).toBeVisible();
   await expect(page.getByRole("combobox", { name: "Company", exact: true })).toBeDisabled();
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();
+  await expect(page.getByRole("button", { name: "Skip to content" })).toBeFocused();
+  const currentUrl = page.url();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("main")).toBeFocused();
+  await expect(page).toHaveURL(currentUrl);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );

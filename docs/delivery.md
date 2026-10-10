@@ -299,3 +299,8 @@ Validation: 24 relevant tests passed (eight people-domain tests and 16 server/Po
 Separate profile routes now support sensitive reads, bounded immutable history, and owner-company editing with a required reason. Ordinary employee views do not preload sensitive fields. Profile receipts bind the person ID and profile version independently of employment, and uncertain submissions use explicit idempotent recovery. Permission loss, company changes, and disposal clear private state and reject late responses.
 
 Validation: architecture, Biome, strict TypeScript, 128 unit/controller tests, and all 77 Chromium browser tests passed. The production build passed; its entry chunk is 513.49 kB minified (150.82 kB gzip), retaining the existing size advisory. Light/dark desktop and mobile screenshots were inspected. One real-API/PostgreSQL browser test passed in 55.2 seconds, including profile edits, immutable history, and an unchanged employment version. All 105 local documentation links resolve. No runtime performance benchmark or deployment was performed.
+
+
+## Keyboard skip navigation
+
+The shell now uses a keyboard skip control that focuses its owned main element without creating native hash-history entries outside the router. This removes the observed blocker warning and preserves Back protection for edited forms. Architecture/Biome/TypeScript, 128 unit/controller tests, the production build, and 16 relevant browser tests passed. The complete 77-test suite and real API run passed immediately before this isolated focus change; they were not repeated for it.

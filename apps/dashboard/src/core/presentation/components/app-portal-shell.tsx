@@ -4,7 +4,7 @@ import {
   ShieldCheckmark20Regular,
   SignOut20Regular,
 } from "@fluentui/react-icons";
-import type { ReactNode } from "react";
+import { type ReactNode, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import { type Locale, messages } from "../i18n/messages";
 import { AppButton } from "./app-button";
@@ -33,12 +33,13 @@ type Props = {
 
 export function AppPortalShell(props: Props) {
   const restoreFocus = useRestoreFocusTarget();
+  const content = useRef<HTMLElement>(null);
   const text = messages(props.locale);
   return (
     <div className={`app-portal${props.collapsed ? " app-portal-collapsed" : ""}`}>
-      <a href="#main-content" className="app-skip-link">
+      <AppButton className="app-skip-link" onClick={() => content.current?.focus()}>
         {text.skipToContent}
-      </a>
+      </AppButton>
       <header className="app-topbar">
         <AppButton
           appearance="subtle"
@@ -111,7 +112,7 @@ export function AppPortalShell(props: Props) {
           ))}
         </nav>
       </aside>
-      <main id="main-content" tabIndex={-1} className="app-workspace">
+      <main ref={content} id="main-content" tabIndex={-1} className="app-workspace">
         {props.children}
       </main>
     </div>

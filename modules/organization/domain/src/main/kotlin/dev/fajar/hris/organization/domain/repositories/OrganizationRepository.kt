@@ -11,12 +11,7 @@ interface OrganizationRepository {
 
     fun ancestors(companyId: UUID, parentId: UUID): Result<List<OrganizationUnit>>
 
-    fun list(
-        companyId: UUID,
-        kind: UnitKind?,
-        after: String?,
-        limit: Int,
-    ): Result<Page<OrganizationUnit>>
+    fun list(companyId: UUID, search: OrganizationUnitSearch): Result<Page<OrganizationUnit>>
 
     fun save(companyId: UUID, change: UnitChange): Result<MutationReceipt>
 }

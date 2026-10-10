@@ -25,14 +25,22 @@ class StoredOrganizationRepository(private val source: OrganizationDataSource) :
 
     override fun list(
         companyId: UUID,
-        kind: UnitKind?,
-        after: String?,
-        limit: Int,
+        search: OrganizationUnitSearch,
     ): Result<Page<OrganizationUnit>> = safeDatabaseCall {
-        val rows = source.list(companyId, kind?.name, after, limit + 1)
+        val rows =
+            source.list(
+                companyId,
+                search.kind?.name,
+                search.query,
+                search.active,
+                search.after?.substringBefore(':'),
+                search.after?.substringAfter(':'),
+                search.limit + 1,
+            )
         Page(
-            rows.take(limit).map { it.toUnit() },
-            if (rows.size > limit) rows[limit - 1].let { "${it.kind}:${it.code}" } else null,
+            rows.take(search.limit).map { it.toUnit() },
+            if (rows.size > search.limit) rows[search.limit - 1].let { "${it.kind}:${it.code}" }
+            else null,
         )
     }
 

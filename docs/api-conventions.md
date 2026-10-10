@@ -22,7 +22,8 @@ List defaults and limits are 50 and 200. Public cursors are endpoint-specific; c
 
 Organization and people:
 
-- `GET /companies/{companyId}/organization-units`: optional kind, after, limit.
+- `GET /companies/{companyId}/organization-units`: optional kind, query, active, after, and limit (default 50, maximum 200). Query is a case-insensitive literal name/code search of up to 120 characters. Continuations use `KIND:CODE`, matching the database's kind/code ordering and the selected kind when supplied. Separate pages are live reads, not a synchronization snapshot.
+- `GET /companies/{companyId}/organization-units/{id}`: current `{companyId, unit, parent}` detail, including inactive units. Parent is null for a root unit; otherwise both records are read under the same structure guard. Requires `company.read`, as does the list. Foreign/unknown units return `organization_unit_not_found` after company authorization.
 - `PUT /companies/{companyId}/organization-units/{id}`: code, name, kind, optional parentId/timezone, active, expectedVersion. A null expectedVersion creates a new UUID resource; an existing version updates it. Kind is immutable. Branches require an IANA timezone. Requires `company.manage` and an idempotency key.
 - `POST /companies/{companyId}/employees`: id, employeeNumber, person, terms, reason. The person object has a distinct UUID, optional accountId, legalName, birthDate, nationality (ISO alpha-2), and optional email. Terms include effectiveFrom, contract, startDate/endDate, status, and optional organization/manager IDs. Requires `people.manage` and an idempotency key.
 - `GET /companies/{companyId}/employees?asOf=YYYY-MM-DD`: query, after, limit. `people.read`, `people.team.read`, and `people.self.read` select company, direct-report, and self visibility respectively.

@@ -2,11 +2,13 @@ package dev.fajar.hris.organization.data.di
 
 import dev.fajar.hris.core.database.datasources.OperationReceiptDataSource
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.data.datasources.*
 import dev.fajar.hris.organization.data.repositories.StoredCompanyRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.organization.domain.usecases.*
+import java.time.Clock
 import org.jooq.DSLContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -33,6 +35,8 @@ class OrganizationConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
     ) =
         SaveOrganizationUnit(
             units,
@@ -42,6 +46,8 @@ class OrganizationConfiguration {
             operations,
             journal,
             transactions,
+            security,
+            clock,
         )
 
     @Bean
@@ -51,7 +57,20 @@ class OrganizationConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListOrganizationUnits(units, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListOrganizationUnits(units, companies, members, identities, transactions, security, clock)
+
+    @Bean
+    fun getUnit(
+        units: dev.fajar.hris.organization.domain.repositories.OrganizationRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetOrganizationUnit(units, companies, members, identities, transactions, security, clock)
 
     @Bean fun companySource(sql: DSLContext): CompanyDataSource = PostgresCompanyDataSource(sql)
 

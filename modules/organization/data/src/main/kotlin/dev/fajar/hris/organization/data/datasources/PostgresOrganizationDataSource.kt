@@ -35,15 +35,21 @@ class PostgresOrganizationDataSource(private val sql: DSLContext) : Organization
     override fun list(
         companyId: UUID,
         kind: String?,
-        after: String?,
+        query: String,
+        active: Boolean?,
+        afterKind: String?,
+        afterCode: String?,
         limit: Int,
     ): List<OrganizationUnitsRecord> =
         sql.selectFrom(U)
             .where(U.COMPANY_ID.eq(companyId))
             .and(kind?.let { U.KIND.eq(it) } ?: DSL.noCondition())
+            .and(U.NAME.containsIgnoreCase(query).or(U.CODE.containsIgnoreCase(query)))
+            .and(active?.let { U.ACTIVE.eq(it) } ?: DSL.noCondition())
             .and(
-                after?.let { DSL.concat(U.KIND, DSL.inline(":"), U.CODE).gt(it) }
-                    ?: DSL.noCondition()
+                if (afterKind != null && afterCode != null)
+                    DSL.row(U.KIND, U.CODE).gt(DSL.row(afterKind, afterCode))
+                else DSL.noCondition()
             )
             .orderBy(U.KIND, U.CODE)
             .limit(limit)

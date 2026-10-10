@@ -13,7 +13,10 @@ interface OrganizationDataSource {
     fun list(
         companyId: UUID,
         kind: String?,
-        after: String?,
+        query: String,
+        active: Boolean?,
+        afterKind: String?,
+        afterCode: String?,
         limit: Int,
     ): List<OrganizationUnitsRecord>
 

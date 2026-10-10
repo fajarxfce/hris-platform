@@ -232,6 +232,7 @@ class LifecycleAccessHttpTest : LifecycleApiFixture() {
                 "detail",
                 "history",
                 "assigned",
+                "assignees",
                 "credentials",
                 "membership",
             )) {
@@ -243,6 +244,7 @@ class LifecycleAccessHttpTest : LifecycleApiFixture() {
                         "cases" -> "/cases?limit=1"
                         "history" -> "/cases/${f.case}/history"
                         "assigned" -> "/tasks/assigned"
+                        "assignees" -> "/assignees"
                         else -> "/cases/${f.case}"
                     }
             val result =
@@ -263,6 +265,7 @@ class LifecycleAccessHttpTest : LifecycleApiFixture() {
                                         f.company,
                                         f.account,
                                     )
+                            "assignees" -> remove(f, "people.lifecycle.manage")
                             "assigned" -> {
                                 remove(f, "people.lifecycle.perform")
                                 remove(f, "people.lifecycle.manage")

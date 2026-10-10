@@ -490,6 +490,16 @@ class PeopleConfiguration {
         )
 
     @Bean
+    fun listLifecycleAssignees(
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListLifecycleAssignees(companies, identities, members, transactions, security, clock)
+
+    @Bean
     fun listAssignedLifecycleTasks(
         lifecycle: LifecycleRepository,
         companies: CompanyRepository,

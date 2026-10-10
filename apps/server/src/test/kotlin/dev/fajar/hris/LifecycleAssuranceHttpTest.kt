@@ -40,6 +40,7 @@ class LifecycleAssuranceHttpTest : LifecycleApiFixture() {
                 "list",
                 "history",
                 "assigned",
+                "assignees",
                 "save",
                 "start",
                 "change",
@@ -134,6 +135,8 @@ class LifecycleAssuranceHttpTest : LifecycleApiFixture() {
                 security,
                 clock,
             )
+        val assignees =
+            ListLifecycleAssignees(companies, identities, members, transactions, security, clock)
         val assigned =
             ListAssignedLifecycleTasks(
                 lifecycle,
@@ -276,6 +279,7 @@ class LifecycleAssuranceHttpTest : LifecycleApiFixture() {
                 "list" -> list.execute(current, employment, null, null, 50)
                 "history" -> history.execute(current, id, null, 50)
                 "assigned" -> assigned.execute(current, null, 50)
+                "assignees" -> assignees.execute(current, "", null, 50)
                 "save" -> save.execute(current, key, definition, null, "Checklist assurance")
                 "start" ->
                     start.execute(
@@ -336,7 +340,16 @@ class LifecycleAssuranceHttpTest : LifecycleApiFixture() {
             assertInstanceOf(Result.Success::class.java, accepted, accepted.toString())
             assertEquals("mfa_required", (invoke(actor) as? Result.Failed)?.failure?.code)
             val read =
-                operation in setOf("templates", "template", "get", "list", "history", "assigned")
+                operation in
+                    setOf(
+                        "templates",
+                        "template",
+                        "get",
+                        "list",
+                        "history",
+                        "assigned",
+                        "assignees",
+                    )
             val replay = invoke(fresh)
             if (read) assertEquals(accepted, replay)
             else {

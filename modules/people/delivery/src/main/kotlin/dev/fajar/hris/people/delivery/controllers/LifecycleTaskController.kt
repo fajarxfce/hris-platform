@@ -15,7 +15,22 @@ class LifecycleTaskController(
     private val change: ChangeLifecycleTask,
     private val assign: AssignLifecycleTask,
     private val assigned: ListAssignedLifecycleTasks,
+    private val assignees: ListLifecycleAssignees,
 ) {
+    @GetMapping("/assignees")
+    fun assignees(
+        actor: Actor,
+        @RequestParam(defaultValue = "") query: String,
+        @RequestParam(required = false) after: UUID?,
+        @RequestParam(defaultValue = "50") limit: Int,
+    ): Page<LifecycleAssigneeResponse> =
+        assignees.execute(actor, query, after, limit).response().let {
+            Page(
+                it.items.map { member -> LifecycleAssigneeResponse(member.id, member.displayName) },
+                it.nextCursor,
+            )
+        }
+
     @PutMapping("/cases/{id}/tasks/{taskKey}")
     fun change(
         actor: Actor,

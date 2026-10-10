@@ -4,7 +4,9 @@ import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.data.datasources.MembershipDataSource
 import dev.fajar.hris.identity.data.mappers.toMember
+import dev.fajar.hris.identity.data.mappers.toMemberReference
 import dev.fajar.hris.identity.domain.entities.MemberAccount
+import dev.fajar.hris.identity.domain.entities.MemberReference
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import java.util.UUID
 
@@ -33,6 +35,20 @@ class StoredMembershipRepository(private val source: MembershipDataSource) : Mem
                 if (rows.size > limit) rows[limit - 1].id.toString() else null,
             )
         }
+
+    override fun activeReferences(
+        companyId: UUID,
+        permissions: Set<String>,
+        query: String,
+        after: UUID?,
+        limit: Int,
+    ): Result<Page<MemberReference>> = safeDatabaseCall {
+        val rows = source.activeReferences(companyId, permissions, query, after, limit + 1)
+        Page(
+            rows.take(limit).map { it.toMemberReference() },
+            if (rows.size > limit) rows[limit - 1].id.toString() else null,
+        )
+    }
 
     override fun candidates(
         companyId: UUID,

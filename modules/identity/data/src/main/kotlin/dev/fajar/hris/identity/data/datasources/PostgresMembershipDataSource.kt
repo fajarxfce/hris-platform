@@ -47,6 +47,35 @@ class PostgresMembershipDataSource(private val sql: DSLContext) : MembershipData
             .limit(limit)
             .fetch { it.toMemberRow() }
 
+    override fun activeReferences(
+        companyId: UUID,
+        permissions: Set<String>,
+        query: String,
+        after: UUID?,
+        limit: Int,
+    ): List<MemberReferenceRow> =
+        sql.select(A.ID, A.DISPLAY_NAME)
+            .from(M)
+            .join(A)
+            .on(A.ID.eq(M.ACCOUNT_ID))
+            .where(M.COMPANY_ID.eq(companyId))
+            .and(M.ACTIVE.isTrue)
+            .and(A.ACTIVE.isTrue)
+            .and(A.DISPLAY_NAME.containsIgnoreCase(query))
+            .and(after?.let { A.ID.gt(it) } ?: DSL.noCondition())
+            .and(
+                DSL.exists(
+                    sql.selectOne()
+                        .from(P)
+                        .where(P.COMPANY_ID.eq(M.COMPANY_ID))
+                        .and(P.ACCOUNT_ID.eq(A.ID))
+                        .and(P.PERMISSION.`in`(permissions))
+                )
+            )
+            .orderBy(A.ID)
+            .limit(limit)
+            .fetch { MemberReferenceRow(it.value1(), it.value2()) }
+
     override fun candidates(
         companyId: UUID,
         accountIds: Set<UUID>,

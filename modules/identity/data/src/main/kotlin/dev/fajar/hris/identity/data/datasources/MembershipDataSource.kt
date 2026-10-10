@@ -11,6 +11,14 @@ interface MembershipDataSource {
 
     fun list(companyId: UUID, after: UUID?, limit: Int): List<MemberRow>
 
+    fun activeReferences(
+        companyId: UUID,
+        permissions: Set<String>,
+        query: String,
+        after: UUID?,
+        limit: Int,
+    ): List<MemberReferenceRow>
+
     fun candidates(
         companyId: UUID,
         accountIds: Set<UUID>,

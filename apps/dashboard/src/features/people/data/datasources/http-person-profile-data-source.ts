@@ -1,5 +1,6 @@
 import type { HttpClient } from "../../../../core/data/http/http-client";
 import {
+  type PersonAccountBindingDto,
   type PersonProfileChangeDto,
   personProfileDto,
   personProfileHistoryDto,
@@ -9,6 +10,25 @@ import type { PersonProfileDataSource } from "./person-profile-data-source";
 
 export class HttpPersonProfileDataSource implements PersonProfileDataSource {
   constructor(private readonly http: HttpClient) {}
+  async bindAccount(
+    companyId: string,
+    employeeId: string,
+    operation: string,
+    input: PersonAccountBindingDto,
+    signal: AbortSignal,
+  ) {
+    return personProfileReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${companyId}/employees/${employeeId}/account-link`,
+          method: "POST",
+          operationId: operation,
+          body: input,
+        },
+        signal,
+      ),
+    );
+  }
   async get(companyId: string, employeeId: string, signal: AbortSignal) {
     return personProfileDto.parse(
       await this.http.request(

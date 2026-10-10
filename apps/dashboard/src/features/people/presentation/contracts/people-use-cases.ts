@@ -1,3 +1,4 @@
+import type { BindPersonAccount } from "../../domain/usecases/bind-person-account";
 import type { CancelEmploymentRevision } from "../../domain/usecases/cancel-employment-revision";
 import type { CreateEmployee } from "../../domain/usecases/create-employee";
 import type { LoadEmployee } from "../../domain/usecases/load-employee";
@@ -11,6 +12,7 @@ import type { ReviseEmployment } from "../../domain/usecases/revise-employment";
 import type { SavePersonProfile } from "../../domain/usecases/save-person-profile";
 
 export type PeopleUseCases = Readonly<{
+  bindPersonAccount: Pick<BindPersonAccount, "execute">;
   selectEmployeeImportFile: Pick<SelectEmployeeImportFile, "execute">;
   startEmployeeImport: Pick<StartEmployeeImport, "execute">;
   downloadEmployeeImportTemplate: Pick<DownloadEmployeeImportTemplate, "execute">;

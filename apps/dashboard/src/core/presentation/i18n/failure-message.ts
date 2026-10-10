@@ -2,6 +2,30 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  person_account_link_access_required: [
+    "Your account cannot link employee accounts.",
+    "Akun Anda tidak dapat menghubungkan akun karyawan.",
+  ],
+  independent_account_binding_required: [
+    "Another administrator must link your account.",
+    "Akun Anda harus dihubungkan oleh administrator lain.",
+  ],
+  person_account_already_bound: [
+    "This employee already has a linked account. Reload the profile.",
+    "Karyawan ini sudah memiliki akun terhubung. Muat ulang profil.",
+  ],
+  invalid_account_binding: [
+    "Choose an account and enter a reason of up to 1,000 characters.",
+    "Pilih akun dan isi alasan maksimal 1.000 karakter.",
+  ],
+  account_membership_required: [
+    "The selected account needs active company access. Reload the review.",
+    "Akun terpilih memerlukan akses perusahaan yang aktif. Muat ulang review.",
+  ],
+  company_member_not_found: [
+    "This company account is no longer available. Refresh the directory.",
+    "Akun perusahaan ini tidak lagi tersedia. Muat ulang daftar akun.",
+  ],
   leave_adjustment_unavailable: [
     "This balance cannot be adjusted. Check your access, employee and balance year.",
     "Saldo ini tidak dapat disesuaikan. Periksa akses, karyawan, dan tahun saldo.",

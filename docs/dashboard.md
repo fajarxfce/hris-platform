@@ -368,3 +368,25 @@ access, refresh failures, and pending reads during a company change. A separate
 browser exercised password sign-in, MFA, directory/detail reads, and logout against
 the local server using fictional development data. Both membership reads returned
 200. No external invitations or messages were sent.
+
+## Employee account binding
+
+An unbound employee profile offers **Link account** to an independent operator with
+profile-management, identity-management, and account-linking permissions in the
+profile's owning company. The review selects an active account with active company
+membership from bounded pages. The operator's account and inactive accounts are
+excluded; an empty filtered page still permits moving to the next source page.
+
+The command pins the selected account, observed profile version, reason, and
+operation ID. Duplicate submission is disabled. A lost response keeps that exact
+submission read-only for explicit receipt recovery, including after a later
+conflict. Definite conflicts require a fresh review; an existing binding cannot be
+replaced through this form. Dirty/pending departure protection and workspace
+cancellation follow the existing feature boundaries.
+
+The real API browser scenario uses an independent native employee session. Before
+linking, its own employment directory is empty and profile access is denied. After
+one committed binding and a deliberately lost response, replay preserves one new
+history revision, the native account can read its profile, and a colleague's
+profile remains inaccessible. Company directory reads remain self-scoped for the
+employee, while the administrator's self directory stays empty.

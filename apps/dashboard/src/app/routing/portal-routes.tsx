@@ -31,6 +31,12 @@ const CompanyMemberScreen = lazy(() =>
   })),
 );
 
+const PersonAccountBindingScreen = lazy(() =>
+  import("../../features/people/presentation/bindings/person-account-binding-screen").then(
+    (module) => ({ default: module.PersonAccountBindingScreen }),
+  ),
+);
+
 const LeaveBalancesScreen = lazy(() =>
   import("../../features/leave/presentation/bindings/leave-balances-screen").then((module) => ({
     default: module.LeaveBalancesScreen,
@@ -313,6 +319,22 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/people/employees/:employeeId/account-link"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <PersonAccountBindingScreen
+              accountId={accountId}
+              access={access}
+              people={people}
+              loadMembers={identityAdministration.loadCompanyMembers}
+              companyName={company.name}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/administration/members"
         element={

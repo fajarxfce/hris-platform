@@ -71,7 +71,7 @@ export function toPersonProfileChangeDto(change: PersonProfileChange): PersonPro
 }
 export function toPersonProfileReceipt(
   dto: PersonProfileReceiptDto,
-  change: PersonProfileChange,
+  change: Pick<PersonProfileChange, "personId" | "expectedVersion">,
 ): MutationReceipt {
   if (dto.id.toLowerCase() !== change.personId || dto.version !== change.expectedVersion + 1)
     throw new InvalidHttpResponseError();

@@ -684,3 +684,21 @@ and applied role snapshots independently of employee profiles. Architecture chec
 browser also completed password/MFA authentication, real membership reads, and
 logout. The WireGuard dashboard is available at the configured VPN interface on
 port 5173, with the API proxy targeting the loopback Compose port 8088.
+
+## Employee account linking dashboard
+
+The profile-owned binding review selects an eligible account and records the
+observed version, reason, and immutable operation ID. Current scope, independent
+authorship, and one-time binding remain server-enforced. Filtered pagination,
+dirty departure, duplicate prevention, ambiguous-outcome recovery, cancellation,
+and stale results are covered by the feature controllers and tests.
+
+Architecture, format, TypeScript, 669 unit/controller tests in 96 files, and the
+production build passed. Seventeen distinct targeted browser cases passed across
+the profile regression and corrected-selector runs, including all four final
+binding cases. The isolated real API/PostgreSQL scenario passed: a committed but
+unacknowledged command replays without an extra revision, the linked native
+employee obtains only its own profile, and neither a colleague's profile nor a
+fabricated administrator employment becomes accessible. The database fixture and
+native session are disposed after testing. The existing bundle-size advisory
+remains; no device or runtime performance measurement is claimed.

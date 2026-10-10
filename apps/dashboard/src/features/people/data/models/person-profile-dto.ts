@@ -38,3 +38,8 @@ export type PersonProfileChangeDto = Omit<
 };
 export const personProfileReceiptDto = z.object({ id: z.uuid(), version });
 export type PersonProfileReceiptDto = z.infer<typeof personProfileReceiptDto>;
+export type PersonAccountBindingDto = Readonly<{
+  accountId: string;
+  expectedVersion: number;
+  reason: string;
+}>;

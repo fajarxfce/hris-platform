@@ -8,6 +8,7 @@ import { RemoteEmployeeImportRepository } from "../data/repositories/remote-empl
 import { RemoteEmployeeRepository } from "../data/repositories/remote-employee-repository";
 import { RemotePersonProfileRepository } from "../data/repositories/remote-person-profile-repository";
 import { ApplyEmployeeImport } from "../domain/usecases/apply-employee-import";
+import { BindPersonAccount } from "../domain/usecases/bind-person-account";
 import { CancelEmployeeImport } from "../domain/usecases/cancel-employee-import";
 import { CancelEmploymentRevision } from "../domain/usecases/cancel-employment-revision";
 import { CreateEmployee } from "../domain/usecases/create-employee";
@@ -37,6 +38,7 @@ export function createPeopleFeature(
   const employees = new RemoteEmployeeRepository(new HttpEmployeeDataSource(http));
   const profiles = new RemotePersonProfileRepository(new HttpPersonProfileDataSource(http));
   return {
+    bindPersonAccount: new BindPersonAccount(profiles),
     selectEmployeeImportFile: new SelectEmployeeImportFile(files),
     startEmployeeImport: new StartEmployeeImport(imports),
     downloadEmployeeImportTemplate: new DownloadEmployeeImportTemplate(imports, files),

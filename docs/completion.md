@@ -23,7 +23,7 @@ and the employee workflows below remain separate acceptance work.
 | --- | --- |
 | Mobile identity | Native OIDC handoff, physical device validation |
 | Mobile foundation | Encrypted company/account cache, HRIS sync and durable outbox, availability, background execution, deep links and push registration |
-| People | Dashboard account binding and company transfers; scheduled lifecycle execution |
+| People | Dashboard company transfers; scheduled lifecycle execution. Initial employee/account binding is implemented and verified with native self-profile access. |
 | Workforce | Dashboard shifts, schedules, rosters, holidays, attendance reviews/corrections, overtime and closing; bulk/reset and late corrections; mobile calendar, verified/offline attendance and overtime requests |
 | Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry; mobile balances, requests, evidence and cancellation |
 | Documents | Dashboard document/upload/processing/retention workflows; mobile scoped resumable upload/download and evidence acquisition |

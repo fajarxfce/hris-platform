@@ -1,4 +1,5 @@
 import type {
+  PersonAccountBindingDto,
   PersonProfileChangeDto,
   PersonProfileDto,
   PersonProfileHistoryDto,
@@ -6,6 +7,13 @@ import type {
 } from "../models/person-profile-dto";
 
 export interface PersonProfileDataSource {
+  bindAccount(
+    companyId: string,
+    employeeId: string,
+    operation: string,
+    input: PersonAccountBindingDto,
+    signal: AbortSignal,
+  ): Promise<PersonProfileReceiptDto>;
   get(companyId: string, employeeId: string, signal: AbortSignal): Promise<PersonProfileDto>;
   history(
     companyId: string,

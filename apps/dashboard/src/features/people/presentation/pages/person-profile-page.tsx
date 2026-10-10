@@ -8,6 +8,7 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { personAccountBindingMessages } from "../i18n/person-account-binding-messages";
 import { personProfileMessages } from "../i18n/person-profile-messages";
 import type { PersonProfileState } from "../models/person-profile-state";
 import type { personProfileView } from "../models/person-profile-view";
@@ -19,6 +20,7 @@ export function PersonProfilePage({
   locale,
   backTo,
   editTo,
+  linkAccountTo,
   owned,
   tab,
   canReadHistory,
@@ -32,6 +34,7 @@ export function PersonProfilePage({
   locale: Locale;
   backTo: string;
   editTo: string | null;
+  linkAccountTo: string | null;
   owned: boolean;
   tab: "overview" | "history";
   canReadHistory: boolean;
@@ -54,6 +57,11 @@ export function PersonProfilePage({
             {editTo && (
               <Link {...restore} to={editTo}>
                 {text.edit}
+              </Link>
+            )}
+            {linkAccountTo && (
+              <Link {...restore} to={linkAccountTo}>
+                {personAccountBindingMessages(locale).title}
               </Link>
             )}
             {(tab === "overview" || state.profile === null) && (

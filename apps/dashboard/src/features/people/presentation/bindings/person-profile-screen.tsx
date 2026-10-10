@@ -6,6 +6,7 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { CompanyAccess, CompanyMembership } from "../../../identity/domain/entities/session";
 import { canReadEmployees } from "../../domain/policies/employee-policy";
+import { canLinkPersonAccount } from "../../domain/policies/person-account-binding-policy";
 import {
   canManagePersonProfile,
   canReadProfileHistory,
@@ -126,6 +127,11 @@ function PersonProfileDetailsBinding(
       backTo={props.backTo}
       editTo={
         state.profile && canManagePersonProfile(props.access, state.profile) ? props.editTo : null
+      }
+      linkAccountTo={
+        state.profile && canLinkPersonAccount(props.access, state.profile)
+          ? `/people/employees/${encodeURIComponent(props.employeeId)}/account-link?company=${props.access.companyId}`
+          : null
       }
       owned={state.profile?.ownerCompanyId === props.access.companyId}
       tab={props.tab}

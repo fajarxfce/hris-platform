@@ -46,6 +46,10 @@ The request freezes document/revision IDs, file name, media type, byte count, an
 
 Metadata and content revalidate session assurance after shared resource/access guards. Content rechecks it again after storage returns. Expired MFA therefore blocks the current download even if it was valid when the request started; renewed verification permits a new read.
 
+## Balance adjustment review
+
+Ledger details include `availableActions`. `ADJUST` requires current independent `leave.manage`, an open account/year, and employee/policy definitions applicable by December 31 of that year. Missing accounts can be reviewed at version zero; inactive types remain eligible for accounting corrections. The read evaluates these conditions under its existing resource/access guards and intersects original/current grants. Availability is a review hint; the command independently rechecks access, expected version, amount, reason, and balance limits before committing or replaying a receipt.
+
 ## Entitlements and year closing
 
 A balance has a stable `accountId`, optimistic `version`, and `closed` flag. The immutable ledger is the accounting source; a database projection updates available, reserved, and consumed half-days atomically. A missing account reads as an open zero balance at version zero. It is created by the first movement or an explicit empty-year closing. Direct balance edits and writes to closed years are rejected. Migration backfills existing ledger totals and versions without rewriting history.

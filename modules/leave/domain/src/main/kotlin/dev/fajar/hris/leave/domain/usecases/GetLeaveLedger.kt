@@ -5,6 +5,7 @@ import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
+import dev.fajar.hris.leave.domain.entities.LeaveBalanceAction
 import dev.fajar.hris.leave.domain.entities.LeaveEmployeeReference
 import dev.fajar.hris.leave.domain.entities.LeaveLedger
 import dev.fajar.hris.leave.domain.policies.canReadLeaveAccount
@@ -81,6 +82,25 @@ class GetLeaveLedger(
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
             val current = currentResult.value
             ledger.balance(company, employeeId, typeId, year).flatMap { balance ->
+                val actions =
+                    if (
+                        "leave.manage" in live.permissions &&
+                            ownerResult.value != live.accountId &&
+                            !balance.closed
+                    ) {
+                        val employment =
+                            people.find(company, employeeId, LocalDate.of(year, 12, 31))
+                        if (employment is Result.Failed) return@flatMap employment
+                        val applicable =
+                            policies.effective(company, typeId, LocalDate.of(year, 12, 31))
+                        if (applicable is Result.Failed) return@flatMap applicable
+                        if (
+                            (employment as Result.Success).value != null &&
+                                (applicable as Result.Success).value != null
+                        )
+                            setOf(LeaveBalanceAction.ADJUST)
+                        else emptySet()
+                    } else emptySet()
                 ledger.entries(company, employeeId, typeId, year, after, limit).map {
                     LeaveLedger(
                         balance,
@@ -93,6 +113,7 @@ class GetLeaveLedger(
                         definition.id,
                         definition.code,
                         definition.policy.name,
+                        actions,
                     )
                 }
             }

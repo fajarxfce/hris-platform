@@ -46,4 +46,5 @@ fun LeaveLedger.toResponse(): LeaveLedgerResponse =
         typeId,
         typeCode,
         typeName,
+        availableActions.map { it.name }.toSet(),
     )

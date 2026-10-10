@@ -10,4 +10,5 @@ data class LeaveLedger(
     val typeId: UUID,
     val typeCode: String,
     val typeName: String,
+    val availableActions: Set<LeaveBalanceAction>,
 )

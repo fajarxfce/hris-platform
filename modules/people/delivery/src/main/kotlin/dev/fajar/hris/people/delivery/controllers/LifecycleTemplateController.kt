@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*
 class LifecycleTemplateController(
     private val save: SaveLifecycleTemplate,
     private val list: ListLifecycleTemplates,
+    private val get: GetLifecycleTemplate,
 ) {
     @PutMapping("/templates/{id}")
     fun save(
@@ -26,6 +27,10 @@ class LifecycleTemplateController(
             .execute(actor, key, body.toTemplate(id), body.expectedVersion, body.reason)
             .response()
             .toResponse()
+
+    @GetMapping("/templates/{id}")
+    fun get(actor: Actor, @PathVariable id: UUID): LifecycleTemplateResponse =
+        get.execute(actor, id).response().toResponse()
 
     @GetMapping("/templates")
     fun list(

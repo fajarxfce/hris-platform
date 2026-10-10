@@ -404,6 +404,26 @@ class PeopleConfiguration {
         )
 
     @Bean
+    fun getLifecycleTemplate(
+        lifecycle: LifecycleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetLifecycleTemplate(
+            lifecycle,
+            companies,
+            identities,
+            members,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun getLifecycleCase(
         lifecycle: LifecycleRepository,
         companies: CompanyRepository,

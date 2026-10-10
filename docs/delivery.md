@@ -347,3 +347,10 @@ A company-wide employment read now returns the effective employee plus bounded c
 Lifecycle use cases now recheck applicable MFA after acquiring resource and access guards, before returning data, committing a mutation, or replaying a receipt. Offboarding retains its additional recent-authentication requirement. A controlled account-lock probe expires the original proof, verifies rejection without a receipt, renews the proof, and checks the committed receipt can only be replayed with current assurance.
 
 Validation: architecture and format checks, 34 selected server tests (including 12 assurance cases), eight people domain tests, and both server/worker builds passed. The initial probe reproduced 11 accepted operations with an expired proof; offboarding already rejected that proof through its stricter recent-authentication gate. Documentation link validation checked 108 local references.
+
+
+## Scoped lifecycle template details
+
+Added `GET /api/v1/companies/{companyId}/lifecycle/templates/{id}` for direct template review and versioned editing. The use case owns shared template/access guards, live read permission and MFA checks, and company-scoped not-found behavior. It reuses the existing repository contract and preserves case snapshots.
+
+Validation: 42 selected server tests and eight people domain tests passed, including seven new detail tests and the additional pending-read MFA probe. Tests cover current definitions, unchanged existing cases, foreign-company IDs, read permission, credential/account/membership revocation during waits, and cancellation releasing guards before an edit. Architecture/format checks, OpenAPI registered-route validation, and server/worker builds passed.

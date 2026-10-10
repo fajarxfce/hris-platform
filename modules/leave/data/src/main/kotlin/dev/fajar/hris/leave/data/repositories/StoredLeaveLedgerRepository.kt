@@ -29,6 +29,20 @@ class StoredLeaveLedgerRepository(private val source: LeaveLedgerDataSource) :
         row?.toBalance() ?: LeaveBalance(year, 0, 0, 0)
     }
 
+    override fun list(
+        companyId: UUID,
+        employeeId: UUID,
+        year: Int,
+        after: String?,
+        limit: Int,
+    ): Result<Page<LeaveBalanceSummary>> = safeDatabaseCall {
+        val rows = source.list(companyId, employeeId, year, after, limit + 1)
+        Page(
+            rows.take(limit).map { it.toSummary() },
+            if (rows.size > limit) rows[limit - 1].typeCode else null,
+        )
+    }
+
     override fun entries(
         companyId: UUID,
         employeeId: UUID,

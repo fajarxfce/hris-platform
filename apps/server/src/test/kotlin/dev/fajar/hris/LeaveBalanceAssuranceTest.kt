@@ -14,7 +14,6 @@ import java.util.UUID
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,7 +31,9 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
     @Autowired private lateinit var requests: LeaveRequestRepository
 
     @ParameterizedTest
-    @ValueSource(strings = ["ledger", "account", "entitlements", "adjust", "accrue", "close"])
+    @ValueSource(
+        strings = ["list", "ledger", "account", "entitlements", "adjust", "accrue", "close"]
+    )
     fun readsCommandsAndReceiptsRequireUnexpiredAssuranceAfterAcquisition(operation: String) {
         val f = preparedBalance()
         val actor = balanceOperator(f, assurance = true)
@@ -74,7 +75,9 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["ledger", "account", "entitlements", "adjust", "accrue", "close"])
+    @ValueSource(
+        strings = ["list", "ledger", "account", "entitlements", "adjust", "accrue", "close"]
+    )
     fun aPreviouslyResolvedBalanceGrantCannotSurviveRevocation(operation: String) {
         val f = preparedBalance()
         val actor = balanceOperator(f, assurance = true).copy(mfaVerifiedAt = clock.instant())
@@ -96,6 +99,7 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
                     barrier.release.countDown()
                     val expected =
                         when (operation) {
+                            "list",
                             "ledger" -> "employee_not_found"
                             "account",
                             "entitlements" -> "leave_account_not_found"
@@ -117,11 +121,12 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
         }
     }
 
-    @Test
-    fun cancellationDuringAcquisitionReleasesTheBalanceAndAccessGuards() {
+    @ParameterizedTest
+    @ValueSource(strings = ["list", "ledger"])
+    fun cancellationDuringAcquisitionReleasesTheBalanceAndAccessGuards(operation: String) {
         val f = preparedBalance()
         val actor = balanceOperator(f, assurance = true).copy(mfaVerifiedAt = clock.instant())
-        val read = invocation(f, "ledger")
+        val read = invocation(f, operation)
         val barrier = AccountLockProbe.Barrier(actor.accountId)
         accountProbe.current.set(barrier)
         try {
@@ -188,6 +193,20 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
         val id = UUID.randomUUID()
         val security = IdentitySecurityPolicy()
         return when (operation) {
+            "list" -> { actor ->
+                    ListEmployeeLeaveBalances(
+                            ledgerRepository,
+                            policies,
+                            people,
+                            companies,
+                            members,
+                            identities,
+                            transactions,
+                            clock,
+                            security,
+                        )
+                        .execute(actor, f.employee, 2026, null, 20)
+                }
             "ledger" -> { actor ->
                     GetLeaveLedger(
                             ledgerRepository,

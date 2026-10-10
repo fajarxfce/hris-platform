@@ -42,4 +42,8 @@ fun LeaveLedger.toResponse(): LeaveLedgerResponse =
             },
             entries.nextCursor,
         ),
+        employee.toResponse(),
+        typeId,
+        typeCode,
+        typeName,
     )

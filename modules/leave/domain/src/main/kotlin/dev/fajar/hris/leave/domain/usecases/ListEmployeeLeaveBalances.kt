@@ -5,36 +5,39 @@ import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
+import dev.fajar.hris.leave.domain.entities.EmployeeLeaveBalances
 import dev.fajar.hris.leave.domain.entities.LeaveEmployeeReference
-import dev.fajar.hris.leave.domain.entities.LeaveLedger
 import dev.fajar.hris.leave.domain.policies.canReadLeaveAccount
 import dev.fajar.hris.leave.domain.repositories.LeaveLedgerRepository
 import dev.fajar.hris.leave.domain.repositories.LeavePolicyRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
-import java.time.*
+import java.time.Clock
 import java.util.UUID
 
-class GetLeaveLedger(
+class ListEmployeeLeaveBalances(
     private val ledger: LeaveLedgerRepository,
     private val policies: LeavePolicyRepository,
     private val people: PeopleRepository,
-    private val transactions: TransactionRunner,
-    private val clock: Clock,
     private val companies: CompanyRepository,
     private val members: MembershipRepository,
     private val identities: IdentityRepository,
+    private val transactions: TransactionRunner,
+    private val clock: Clock,
     private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
         employeeId: UUID,
-        typeId: UUID,
         year: Int,
-        after: UUID?,
+        after: String?,
         limit: Int,
-    ): Result<LeaveLedger> {
-        if (year !in 1900..2200 || limit !in 1..200)
+    ): Result<EmployeeLeaveBalances> {
+        if (
+            year !in 1900..2200 ||
+                limit !in 1..200 ||
+                (after != null && !after.matches(Regex("[A-Z][A-Z0-9_-]{0,31}")))
+        )
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_page"))
         val company = requireNotNull(actor.companyId)
         return transactions.run(actor) {
@@ -56,45 +59,27 @@ class GetLeaveLedger(
                 }
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
-            val type = policies.find(company, typeId)
-            if (type is Result.Failed) return@run type
-            val definition =
-                (type as Result.Success).value
-                    ?: return@run Result.Failed(
-                        Failure(FailureKind.NOT_FOUND, "leave_type_not_found")
-                    )
-            val ownerResult = people.accountForEmployee(company, employeeId)
-            if (ownerResult is Result.Failed) return@run ownerResult
+            val owner = people.accountForEmployee(company, employeeId)
+            if (owner is Result.Failed) return@run owner
             val currentResult = people.findAtInstant(company, employeeId, clock.instant())
             if (currentResult is Result.Failed) return@run currentResult
-            if (
-                !canReadLeaveAccount(
-                    live,
-                    (currentResult as Result.Success).value,
-                    (ownerResult as Result.Success).value,
-                )
-            )
+            val current = (currentResult as Result.Success).value
+            if (!canReadLeaveAccount(live, current, (owner as Result.Success).value))
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
             val exists = people.currentVersion(company, employeeId)
             if (exists is Result.Failed) return@run exists
             if ((exists as Result.Success).value == null)
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
-            val current = currentResult.value
-            ledger.balance(company, employeeId, typeId, year).flatMap { balance ->
-                ledger.entries(company, employeeId, typeId, year, after, limit).map {
-                    LeaveLedger(
-                        balance,
-                        it,
-                        LeaveEmployeeReference(
-                            employeeId,
-                            current?.employeeNumber,
-                            current?.person?.legalName,
-                        ),
-                        definition.id,
-                        definition.code,
-                        definition.policy.name,
-                    )
-                }
+            ledger.list(company, employeeId, year, after, limit).map {
+                EmployeeLeaveBalances(
+                    LeaveEmployeeReference(
+                        employeeId,
+                        current?.employeeNumber,
+                        current?.person?.legalName,
+                    ),
+                    year,
+                    it,
+                )
             }
         }
     }

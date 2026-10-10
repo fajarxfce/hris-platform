@@ -11,6 +11,14 @@ interface LeaveLedgerRepository {
 
     fun balance(companyId: UUID, employeeId: UUID, typeId: UUID, year: Int): Result<LeaveBalance>
 
+    fun list(
+        companyId: UUID,
+        employeeId: UUID,
+        year: Int,
+        after: String?,
+        limit: Int,
+    ): Result<Page<LeaveBalanceSummary>>
+
     fun entries(
         companyId: UUID,
         employeeId: UUID,

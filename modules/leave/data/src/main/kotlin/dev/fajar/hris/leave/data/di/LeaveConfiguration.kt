@@ -244,6 +244,30 @@ class LeaveConfiguration {
         )
 
     @Bean
+    fun listEmployeeLeaveBalances(
+        ledger: LeaveLedgerRepository,
+        policies: LeavePolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListEmployeeLeaveBalances(
+            ledger,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun getLeaveLedger(
         ledger: LeaveLedgerRepository,
         policies: LeavePolicyRepository,

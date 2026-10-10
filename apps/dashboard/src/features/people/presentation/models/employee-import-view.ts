@@ -48,6 +48,11 @@ export function employeeImportView(
     properties: [
       { label: text.fileName, value: batch.fileName },
       { label: text.status, value: text[batch.status] },
+      { label: text.jobStatus, value: text[summary.jobStatus] },
+      {
+        label: text.cancellationRequested,
+        value: summary.cancellationRequested ? text.yes : text.no,
+      },
       { label: text.rowCount, value: count.format(batch.rowCount) },
       { label: text.version, value: count.format(batch.version) },
       { label: `${text.createdAt} (${timezone})`, value: time.format(new Date(batch.createdAt)) },

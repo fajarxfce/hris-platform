@@ -5,6 +5,8 @@ import { HttpPersonProfileDataSource } from "../data/datasources/http-person-pro
 import { RemoteEmployeeImportRepository } from "../data/repositories/remote-employee-import-repository";
 import { RemoteEmployeeRepository } from "../data/repositories/remote-employee-repository";
 import { RemotePersonProfileRepository } from "../data/repositories/remote-person-profile-repository";
+import { ApplyEmployeeImport } from "../domain/usecases/apply-employee-import";
+import { CancelEmployeeImport } from "../domain/usecases/cancel-employee-import";
 import { CancelEmploymentRevision } from "../domain/usecases/cancel-employment-revision";
 import { CreateEmployee } from "../domain/usecases/create-employee";
 import { LoadEmployee } from "../domain/usecases/load-employee";
@@ -18,6 +20,7 @@ import { LoadEmploymentHistory } from "../domain/usecases/load-employment-histor
 import { LoadEmploymentRevision } from "../domain/usecases/load-employment-revision";
 import { LoadPersonProfile } from "../domain/usecases/load-person-profile";
 import { LoadPersonProfileHistory } from "../domain/usecases/load-person-profile-history";
+import { ResumeEmployeeImport } from "../domain/usecases/resume-employee-import";
 import { ReviseEmployment } from "../domain/usecases/revise-employment";
 import { SavePersonProfile } from "../domain/usecases/save-person-profile";
 
@@ -26,6 +29,9 @@ export function createPeopleFeature(http: HttpClient) {
   const employees = new RemoteEmployeeRepository(new HttpEmployeeDataSource(http));
   const profiles = new RemotePersonProfileRepository(new HttpPersonProfileDataSource(http));
   return {
+    applyEmployeeImport: new ApplyEmployeeImport(imports),
+    resumeEmployeeImport: new ResumeEmployeeImport(imports),
+    cancelEmployeeImport: new CancelEmployeeImport(imports),
     loadEmployeeImports: new LoadEmployeeImports(imports),
     loadEmployeeImport: new LoadEmployeeImport(imports),
     loadEmployeeImportRows: new LoadEmployeeImportRows(imports),

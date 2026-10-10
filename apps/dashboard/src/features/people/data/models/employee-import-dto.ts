@@ -21,6 +21,9 @@ export const employeeImportPageDto = z.object({
 export const employeeImportSummaryDto = z.object({
   batch: employeeImportDto,
   counts: z.partialRecord(rowStatus, z.number().int().min(0).max(5000)),
+  jobStatus: z.enum(["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"]),
+  cancellationRequested: z.boolean(),
+  availableActions: z.array(z.enum(["apply", "resume", "cancel"])).max(3),
 });
 const proposalDate = z.string().regex(/^[+-]?\d{4,9}-\d{2}-\d{2}$/u);
 const proposalDto = z.object({

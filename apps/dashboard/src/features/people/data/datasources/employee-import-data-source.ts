@@ -6,6 +6,27 @@ import type {
 } from "../models/employee-import-dto";
 
 export interface EmployeeImportDataSource {
+  apply(
+    company: string,
+    id: string,
+    operation: string,
+    change: EmployeeImportApplicationDto,
+    signal: AbortSignal,
+  ): Promise<EmployeeImportReceiptDto>;
+  resume(
+    company: string,
+    id: string,
+    operation: string,
+    change: EmployeeImportChangeDto,
+    signal: AbortSignal,
+  ): Promise<EmployeeImportReceiptDto>;
+  cancel(
+    company: string,
+    id: string,
+    operation: string,
+    change: EmployeeImportChangeDto,
+    signal: AbortSignal,
+  ): Promise<EmployeeImportReceiptDto>;
   list(company: string, after: string | null, signal: AbortSignal): Promise<EmployeeImportPageDto>;
   summary(company: string, id: string, signal: AbortSignal): Promise<EmployeeImportSummaryDto>;
   rows(
@@ -21,3 +42,9 @@ export interface EmployeeImportDataSource {
     signal: AbortSignal,
   ): Promise<EmployeeImportAttemptsDto>;
 }
+
+import type {
+  EmployeeImportApplicationDto,
+  EmployeeImportChangeDto,
+  EmployeeImportReceiptDto,
+} from "../models/employee-import-change-dto";

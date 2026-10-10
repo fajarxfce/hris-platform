@@ -2,6 +2,50 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_employee_import: [
+    "Review the import details and provide a reason of up to 1,000 characters.",
+    "Periksa detail import dan masukkan alasan maksimal 1.000 karakter.",
+  ],
+  employee_import_action_unavailable: [
+    "This action is unavailable. Reload the review to check current progress.",
+    "Aksi ini tidak tersedia. Muat ulang tinjauan untuk memeriksa progres terbaru.",
+  ],
+  employee_import_not_ready: [
+    "The import is not ready to apply. Reload the review.",
+    "Import belum siap diterapkan. Muat ulang tinjauan.",
+  ],
+  employee_import_has_no_ready_rows: [
+    "There are no ready rows to apply.",
+    "Tidak ada baris siap untuk diterapkan.",
+  ],
+  employee_import_has_invalid_rows: [
+    "Some rows are invalid. Confirm that they should be skipped before applying ready rows.",
+    "Sebagian baris tidak valid. Konfirmasikan untuk melewatinya sebelum menerapkan baris siap.",
+  ],
+  employee_import_job_not_stopped: [
+    "The job has not stopped. Reload the review before resuming.",
+    "Job belum berhenti. Muat ulang tinjauan sebelum melanjutkan.",
+  ],
+  employee_import_is_terminal: [
+    "This import is already completed or cancelled.",
+    "Import ini sudah selesai atau dibatalkan.",
+  ],
+  employee_import_job_missing: [
+    "The import job is unavailable. Contact your administrator.",
+    "Job import tidak tersedia. Hubungi administrator.",
+  ],
+  employee_import_job_mismatch: [
+    "The import job could not be verified. Contact your administrator.",
+    "Job import tidak dapat diverifikasi. Hubungi administrator.",
+  ],
+  job_queue_full: [
+    "The job queue is full. Try again later.",
+    "Antrean job penuh. Coba lagi nanti.",
+  ],
+  stale_job_version: [
+    "The job has changed. Reload the review.",
+    "Job sudah berubah. Muat ulang tinjauan.",
+  ],
   employee_import_access_required: [
     "You do not have access to employee imports.",
     "Anda tidak memiliki akses ke import karyawan.",

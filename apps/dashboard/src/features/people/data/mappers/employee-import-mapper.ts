@@ -61,5 +61,13 @@ export function toEmployeeImportSummary(
     Object.values(counts).reduce((sum, count) => sum + count, 0) !== batch.rowCount
   )
     throw new InvalidHttpResponseError();
-  return Object.freeze({ batch, counts });
+  if (new Set(dto.availableActions).size !== dto.availableActions.length)
+    throw new InvalidHttpResponseError();
+  return Object.freeze({
+    batch,
+    counts,
+    jobStatus: dto.jobStatus,
+    cancellationRequested: dto.cancellationRequested,
+    availableActions: Object.freeze([...dto.availableActions]),
+  });
 }

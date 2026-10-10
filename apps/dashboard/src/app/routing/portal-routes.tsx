@@ -94,6 +94,11 @@ const EmployeeImportScreen = lazy(() =>
     default: module.EmployeeImportScreen,
   })),
 );
+const EmployeeImportTransitionScreen = lazy(() =>
+  import("../../features/people/presentation/bindings/employee-import-transition-screen").then(
+    (module) => ({ default: module.EmployeeImportTransitionScreen }),
+  ),
+);
 const EmployeeDetailsScreen = lazy(() =>
   import("../../features/people/presentation/bindings/employee-details-screen").then((module) => ({
     default: module.EmployeeDetailsScreen,
@@ -176,6 +181,26 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      {(["apply", "resume", "cancel"] as const).map((action) => (
+        <Route
+          key={action}
+          path={`/people/imports/:importId/${action}`}
+          element={
+            <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+              <EmployeeImportTransitionScreen
+                accountId={accountId}
+                access={access}
+                people={people}
+                action={action}
+                companyName={company.name}
+                timezone={company.timezone}
+                locale={locale}
+                nextIdentifier={nextIdentifier}
+              />
+            </Suspense>
+          }
+        />
+      ))}
       <Route
         path="/people/imports"
         element={

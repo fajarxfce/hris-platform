@@ -15,6 +15,11 @@ const permissions = [
   "people.profile.manage",
 ];
 const access = { companyId: company, permissions };
+const jobContext = {
+  jobStatus: "SUCCEEDED",
+  cancellationRequested: false,
+  availableActions: ["apply", "cancel"],
+};
 const signal = () => new AbortController().signal;
 const batch = {
   id,
@@ -103,7 +108,7 @@ describe("employee import read boundary", () => {
     const request = vi
       .fn<HttpClient["request"]>()
       .mockResolvedValueOnce({ items: [batch], nextCursor: null })
-      .mockResolvedValueOnce({ batch, counts: { READY: 1, INVALID: 1 } })
+      .mockResolvedValueOnce({ batch, counts: { READY: 1, INVALID: 1 }, ...jobContext })
       .mockResolvedValueOnce({
         items: [{ jobId: job, phase: "PREVIEW", actorId: actor, createdAt: batch.createdAt }],
         nextCursor: null,
@@ -122,6 +127,8 @@ describe("employee import read boundary", () => {
     if (!summary.ok) throw new Error("Expected summary");
     expect(Object.isFrozen(summary.value.batch)).toBe(true);
     expect(Object.isFrozen(summary.value.counts)).toBe(true);
+    expect(Object.isFrozen(summary.value.availableActions)).toBe(true);
+    expect(summary.value.availableActions).toEqual(["apply", "cancel"]);
     expect(
       await feature.loadEmployeeImportAttempts.execute(access, id, null, signal()),
     ).toMatchObject({ ok: true });
@@ -167,8 +174,10 @@ describe("employee import read boundary", () => {
       { batch: { ...batch, id: job }, counts: { READY: 2 } },
       { batch, counts: { READY: 3 } },
       { batch: { ...batch, version: Number.MAX_SAFE_INTEGER + 1 }, counts: { READY: 2 } },
+      { batch, counts: { READY: 2 }, jobStatus: "UNKNOWN" },
+      { batch, counts: { READY: 2 }, availableActions: ["apply", "apply"] },
     ]) {
-      request.mockResolvedValueOnce(invalid);
+      request.mockResolvedValueOnce({ ...jobContext, ...invalid });
       expect(await feature.loadEmployeeImport.execute(access, id, signal())).toMatchObject({
         ok: false,
         failure: { code: "invalid_response" },

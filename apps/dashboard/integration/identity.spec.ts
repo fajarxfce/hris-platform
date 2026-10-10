@@ -1065,6 +1065,38 @@ test("real API sessions, MFA, organization, people, lifecycle, reports, audit, p
   expect(queuedImport).toMatchObject({
     batch: { id: importId, version: 0, status: "PREVIEWING" },
     counts: { PENDING: 2 },
+    jobStatus: "QUEUED",
+    cancellationRequested: false,
+    availableActions: ["cancel"],
+  });
+  await page.getByRole("link", { name: "Batalkan import", exact: true }).click();
+  await page.getByLabel("Alasan", { exact: true }).fill("Browser import cancellation");
+  const importCancellations: { operation: string | undefined; body: unknown }[] = [];
+  await page.route(`**${importPath}/${importId}/cancel`, async (route) => {
+    importCancellations.push({
+      operation: route.request().headers()["idempotency-key"],
+      body: route.request().postDataJSON(),
+    });
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toMatchObject({ id: importId, version: 1 });
+    if (importCancellations.length === 1) return route.abort("connectionfailed");
+    return route.fulfill({ response });
+  });
+  await page.getByRole("button", { name: "Batalkan import", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Hasil belum terkonfirmasi.");
+  await page.getByRole("button", { name: "Ulangi permintaan awal", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Pembatalan diminta.");
+  expect(importCancellations).toHaveLength(2);
+  expect(importCancellations[1]).toEqual(importCancellations[0]);
+  await page.unroute(`**${importPath}/${importId}/cancel`);
+  await page.getByRole("link", { name: "Buka import", exact: true }).click();
+  await expect(page.getByRole("link", { name: "Batalkan import", exact: true })).toHaveCount(0);
+  expect(await (await context.request.get(`${importPath}/${importId}`)).json()).toMatchObject({
+    batch: { version: 1, status: "PREVIEWING" },
+    jobStatus: "QUEUED",
+    cancellationRequested: true,
+    availableActions: [],
   });
   await page.getByRole("link", { name: "Policy client", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText(

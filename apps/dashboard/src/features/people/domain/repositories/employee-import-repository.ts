@@ -1,11 +1,34 @@
-import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
+import type { MutationReceipt } from "../../../../core/domain/mutation-receipt";
 import type { Result } from "../../../../core/domain/result";
 import type { EmployeeImportId, EmployeeImportPage } from "../entities/employee-import";
 import type { EmployeeImportAttempts } from "../entities/employee-import-attempt";
+import type {
+  EmployeeImportApplication,
+  EmployeeImportChange,
+} from "../entities/employee-import-change";
 import type { EmployeeImportRows } from "../entities/employee-import-row";
 import type { EmployeeImportSummary } from "../entities/employee-import-summary";
 
 export interface EmployeeImportRepository {
+  apply(
+    company: CompanyId,
+    operation: OperationId,
+    change: EmployeeImportApplication,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
+  resume(
+    company: CompanyId,
+    operation: OperationId,
+    change: EmployeeImportChange,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
+  cancel(
+    company: CompanyId,
+    operation: OperationId,
+    change: EmployeeImportChange,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
   list(
     company: CompanyId,
     after: string | null,

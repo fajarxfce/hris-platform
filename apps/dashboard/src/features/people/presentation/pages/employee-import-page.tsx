@@ -18,6 +18,7 @@ export function EmployeeImportPage({
   companyName,
   locale,
   backTo,
+  actions,
   tab,
   onTab,
   onRefresh,
@@ -28,6 +29,7 @@ export function EmployeeImportPage({
   companyName: string;
   locale: Locale;
   backTo: string;
+  actions: readonly { action: string; label: string; to: string }[];
   tab: "overview" | "rows" | "attempts";
   onTab: (tab: string) => void;
   onRefresh: () => void;
@@ -42,6 +44,11 @@ export function EmployeeImportPage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
+            {actions.map((action) => (
+              <Link key={action.action} to={action.to}>
+                {action.label}
+              </Link>
+            ))}
             {(tab === "overview" || !state.summary) && (
               <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
                 {messages(locale).refresh}

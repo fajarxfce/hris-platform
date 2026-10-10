@@ -2,6 +2,7 @@ import { expect, type Page } from "@playwright/test";
 import type {
   EmployeeImportDto,
   EmployeeImportRowDto,
+  EmployeeImportSummaryDto,
 } from "../src/features/people/data/models/employee-import-dto";
 import { companyIds, installIdentityApi } from "./identity-api";
 
@@ -29,7 +30,13 @@ export async function installEmployeeImportApi(
   page: Page,
   permissions = employeeImportPermissions,
 ) {
-  const identity = await installIdentityApi(page, { signedIn: true, permissions });
+  const identity = await installIdentityApi(page, {
+    signedIn: true,
+    mfa: true,
+    mfaConfigured: true,
+    mfaVerified: true,
+    permissions,
+  });
   const records = new Map<string, EmployeeImportDto[]>(
     companyIds.map((company, companyIndex) => [
       company,
@@ -89,6 +96,19 @@ export async function installEmployeeImportApi(
       };
     });
   const reads: URL[] = [];
+  const contexts = new Map<string, Omit<EmployeeImportSummaryDto, "batch">>(
+    [...records.values()].flatMap((items) =>
+      items.map((item): [string, Omit<EmployeeImportSummaryDto, "batch">] => [
+        item.id,
+        {
+          counts: { READY: 25, INVALID: 2 },
+          jobStatus: "SUCCEEDED",
+          cancellationRequested: false,
+          availableActions: ["apply", "cancel"],
+        },
+      ]),
+    ),
+  );
   let held: { kind: string; gate: ReturnType<typeof gate> } | null = null;
   let failure: { kind: string; code: string; status: number } | null = null;
   await page.route("**/api/v1/companies/*/employee-imports**", async (route) => {
@@ -126,7 +146,7 @@ export async function installEmployeeImportApi(
         items: remaining.slice(0, limit),
         nextCursor: remaining.length > limit ? remaining[limit - 1]?.id : null,
       };
-    } else if (kind === "summary") payload = { batch: record, counts: { READY: 25, INVALID: 2 } };
+    } else if (kind === "summary") payload = { batch: record, ...contexts.get(id ?? "") };
     else if (kind === "rows") {
       expect(limit).toBe(25);
       const remaining = rowValues(company === companyIds[0] ? 0 : 1).filter(
@@ -163,6 +183,7 @@ export async function installEmployeeImportApi(
     identity,
     reads,
     records,
+    contexts,
     hold: (kind: string) => {
       const pending = gate();
       held = { kind, gate: pending };

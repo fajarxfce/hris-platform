@@ -16,6 +16,9 @@ const access = {
 };
 const page = Object.freeze({ items: Object.freeze([]), nextCursor: null });
 const summary: EmployeeImportSummary = {
+  jobStatus: "SUCCEEDED",
+  cancellationRequested: false,
+  availableActions: ["apply", "cancel"],
   batch: {
     id,
     companyId,

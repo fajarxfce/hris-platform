@@ -6,6 +6,7 @@ import { useWorkspaceRevalidation } from "../../../../core/presentation/session/
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { PeopleUseCases } from "../contracts/people-use-cases";
 import { EmployeeImportController } from "../controllers/employee-import-controller";
+import { employeeImportTransitionMessages } from "../i18n/employee-import-transition-messages";
 import { employeeImportParameters } from "../models/employee-import-route";
 import { employeeImportView } from "../models/employee-import-view";
 import { EmployeeImportPage } from "../pages/employee-import-page";
@@ -25,7 +26,11 @@ type Props = {
 export function EmployeeImportScreen(props: Props) {
   const { importId = "" } = useParams();
   const [parameters, setParameters] = useSearchParams();
-  const backTo = `/people/imports?${employeeImportParameters(props.access.companyId, parameters.get("company") === props.access.companyId ? parameters.get("after") : null)}`;
+  const query = employeeImportParameters(
+    props.access.companyId,
+    parameters.get("company") === props.access.companyId ? parameters.get("after") : null,
+  ).toString();
+  const backTo = `/people/imports?${query}`;
   if (parameters.has("company") && parameters.get("company") !== props.access.companyId)
     return <Navigate to={backTo} replace />;
   if (!parameters.has("company")) {
@@ -45,6 +50,7 @@ export function EmployeeImportScreen(props: Props) {
       {...props}
       id={importId}
       backTo={backTo}
+      query={query}
       tab={tab}
       rowsAfter={parameters.get("rowsAfter")}
       attemptsAfter={parameters.get("attemptsAfter")}
@@ -65,6 +71,7 @@ function EmployeeImportBinding({
   locale,
   id,
   backTo,
+  query,
   tab,
   rowsAfter,
   attemptsAfter,
@@ -72,6 +79,7 @@ function EmployeeImportBinding({
 }: Props & {
   id: string;
   backTo: string;
+  query: string;
   tab: "overview" | "rows" | "attempts";
   rowsAfter: string | null;
   attemptsAfter: string | null;
@@ -102,6 +110,13 @@ function EmployeeImportBinding({
       companyName={companyName}
       locale={locale}
       backTo={backTo}
+      actions={
+        state.summary?.availableActions.map((action) => ({
+          action,
+          label: employeeImportTransitionMessages(locale)[action],
+          to: `/people/imports/${encodeURIComponent(id)}/${action}?${query}`,
+        })) ?? []
+      }
       tab={tab}
       onTab={(selected) => onParameter("tab", selected)}
       onRefresh={controller.refresh}

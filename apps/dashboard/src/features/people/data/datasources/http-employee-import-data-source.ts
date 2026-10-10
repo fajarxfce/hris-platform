@@ -1,5 +1,10 @@
 import type { HttpClient } from "../../../../core/data/http/http-client";
 import {
+  type EmployeeImportApplicationDto,
+  type EmployeeImportChangeDto,
+  employeeImportReceiptDto,
+} from "../models/employee-import-change-dto";
+import {
   employeeImportAttemptsDto,
   employeeImportPageDto,
   employeeImportRowsDto,
@@ -8,6 +13,63 @@ import {
 import type { EmployeeImportDataSource } from "./employee-import-data-source";
 
 export class HttpEmployeeImportDataSource implements EmployeeImportDataSource {
+  async apply(
+    company: string,
+    id: string,
+    operation: string,
+    change: EmployeeImportApplicationDto,
+    signal: AbortSignal,
+  ) {
+    return employeeImportReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/employee-imports/${id}/apply`,
+          method: "POST",
+          operationId: operation,
+          body: change,
+        },
+        signal,
+      ),
+    );
+  }
+  async resume(
+    company: string,
+    id: string,
+    operation: string,
+    change: EmployeeImportChangeDto,
+    signal: AbortSignal,
+  ) {
+    return employeeImportReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/employee-imports/${id}/resume`,
+          method: "POST",
+          operationId: operation,
+          body: change,
+        },
+        signal,
+      ),
+    );
+  }
+  async cancel(
+    company: string,
+    id: string,
+    operation: string,
+    change: EmployeeImportChangeDto,
+    signal: AbortSignal,
+  ) {
+    return employeeImportReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/employee-imports/${id}/cancel`,
+          method: "POST",
+          operationId: operation,
+          body: change,
+        },
+        signal,
+      ),
+    );
+  }
   constructor(private readonly http: HttpClient) {}
   async list(company: string, after: string | null, signal: AbortSignal) {
     const query = new URLSearchParams({ limit: "10" });

@@ -43,6 +43,10 @@ jobs:
   dashboard:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     defaults:
       run:
         working-directory: apps/dashboard
@@ -57,11 +61,12 @@ jobs:
       - run: npm run check
       - run: npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - run: npm run test:e2e -- --shard=${{ matrix.shard }}/2
+        timeout-minutes: 15
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: dashboard-test-reports
+          name: dashboard-test-reports-${{ matrix.shard }}
           path: apps/dashboard/playwright-report/
   dashboard-integration:
     needs: [backend, dashboard]

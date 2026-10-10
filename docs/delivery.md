@@ -562,3 +562,9 @@ Root formatting and architecture checks, sixteen leave-domain tests, twenty API/
 Authenticated HTTP acquisition now validates exact file size, media type, and ETag before native handoff. It coalesces fragments into bounded 64 KiB blocks, preserves cancellation and safe JSON failures, and bounds size, deadlines, empty chunks, and loop progress. Native file I/O owns and releases its temporary object URL, anchor, abort listener, and short handoff timer. Text and JSON retain their existing 1 MiB bounds.
 
 Dashboard architecture, Biome, TypeScript, 495 unit/controller tests in 82 files, and the production build passed. Sixteen new cases cover fragmented buffers, integrity metadata, truncated/excessive content, pending cancellation, timeouts, native dispatch failure, cleanup, and bounds before I/O. The existing main-bundle advisory remains. These infrastructure checks do not yet validate a feature download in a browser or measure heap use.
+
+### Browser CI partitioning
+
+The prior dashboard job exhausted its twenty-minute budget after completing 262 of 289 browser scenarios. The complete suite now runs in two independent matrix shards with separate reports, a fifteen-minute browser step, and the existing twenty-minute job boundary. Checks and build run in each job, both shards must pass before API integration, and one shard's failure does not cancel the other's report. No retries or disabled tests were introduced.
+
+Actionlint passed. Playwright discovery verified that the current 299 scenarios partition exactly into 150 and 149 tests with no omission or overlap. Remote execution of the new matrix remains to be observed.

@@ -806,7 +806,18 @@ class PeopleConfiguration {
         transactions: TransactionRunner,
         security: IdentitySecurityPolicy,
         clock: Clock,
-    ) = GetEmployeeImport(imports, companies, members, identities, transactions, security, clock)
+        jobs: JobRepository,
+    ) =
+        GetEmployeeImport(
+            imports,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+            jobs,
+        )
 
     @Bean
     fun listEmployeeImports(

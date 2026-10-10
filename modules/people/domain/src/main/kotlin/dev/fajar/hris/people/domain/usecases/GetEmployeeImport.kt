@@ -4,6 +4,7 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.*
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.policies.*
@@ -19,6 +20,7 @@ class GetEmployeeImport(
     private val transactions: TransactionRunner,
     private val security: IdentitySecurityPolicy,
     private val clock: Clock,
+    private val jobs: JobRepository,
 ) {
     fun execute(actor: Actor, id: UUID): Result<EmployeeImportSummary> {
         val access = requireEmployeeImportAccess(actor)
@@ -47,7 +49,39 @@ class GetEmployeeImport(
                     ?: return@run Result.Failed(
                         Failure(FailureKind.NOT_FOUND, "employee_import_not_found")
                     )
-            imports.counts(company, id).map { EmployeeImportSummary(batch, it) }
+            val counts = imports.counts(company, id)
+            if (counts is Result.Failed) return@run counts
+            // Lease owners lock the job before the import; this observation must not lock it.
+            val foundJob = jobs.find(company, batch.jobId)
+            if (foundJob is Result.Failed) return@run foundJob
+            val job =
+                (foundJob as Result.Success).value
+                    ?: return@run Result.Failed(
+                        Failure(FailureKind.CONFLICT, "employee_import_job_missing")
+                    )
+            if (
+                job.request.kind !in
+                    setOf(JobKind.EMPLOYEE_IMPORT_PREVIEW, JobKind.EMPLOYEE_IMPORT_APPLY) ||
+                    job.request.values["importId"] != id.toString()
+            )
+                return@run Result.Failed(
+                    Failure(FailureKind.CONFLICT, "employee_import_job_mismatch")
+                )
+            val observedCounts = (counts as Result.Success).value
+            Result.Success(
+                EmployeeImportSummary(
+                    batch,
+                    observedCounts,
+                    job.status,
+                    job.cancellationRequested,
+                    availableEmployeeImportActions(
+                        batch.status,
+                        observedCounts,
+                        job.status,
+                        job.cancellationRequested,
+                    ),
+                )
+            )
         }
     }
 }

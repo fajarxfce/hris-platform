@@ -3,6 +3,7 @@ package dev.fajar.hris
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.policies.employeeImportPermissions
 import dev.fajar.hris.people.domain.repositories.EmployeeImportRepository
@@ -23,6 +24,7 @@ class EmployeeImportAssuranceHttpTest : EmployeeImportApiFixture() {
     @Autowired private lateinit var identities: IdentityRepository
     @Autowired private lateinit var transactions: TransactionRunner
     @Autowired private lateinit var accountProbe: AccountLockProbe
+    @Autowired private lateinit var jobs: JobRepository
 
     @ParameterizedTest
     @ValueSource(strings = ["list", "summary", "rows", "attempts"])
@@ -71,6 +73,7 @@ class EmployeeImportAssuranceHttpTest : EmployeeImportApiFixture() {
                 transactions,
                 security,
                 clock,
+                jobs,
             )
         val rows =
             GetEmployeeImportRows(

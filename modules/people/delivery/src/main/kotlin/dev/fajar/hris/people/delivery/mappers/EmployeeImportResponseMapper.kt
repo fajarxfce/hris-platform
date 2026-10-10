@@ -18,7 +18,13 @@ fun EmployeeImport.toResponse() =
     )
 
 fun EmployeeImportSummary.toResponse() =
-    EmployeeImportSummaryResponse(batch.toResponse(), counts.mapKeys { it.key.name })
+    EmployeeImportSummaryResponse(
+        batch.toResponse(),
+        counts.mapKeys { it.key.name },
+        jobStatus.name,
+        cancellationRequested,
+        availableActions,
+    )
 
 fun EmployeeDraft.toImportResponse() =
     EmployeeImportProposalResponse(

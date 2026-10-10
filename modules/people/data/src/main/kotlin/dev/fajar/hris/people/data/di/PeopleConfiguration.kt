@@ -804,7 +804,9 @@ class PeopleConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetEmployeeImport(imports, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetEmployeeImport(imports, companies, members, identities, transactions, security, clock)
 
     @Bean
     fun listEmployeeImports(
@@ -813,7 +815,9 @@ class PeopleConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListEmployeeImports(imports, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListEmployeeImports(imports, companies, members, identities, transactions, security, clock)
 
     @Bean
     fun getEmployeeImportRows(
@@ -822,7 +826,18 @@ class PeopleConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetEmployeeImportRows(imports, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetEmployeeImportRows(
+            imports,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun getEmployeeImportAttempts(
@@ -831,7 +846,18 @@ class PeopleConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetEmployeeImportAttempts(imports, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetEmployeeImportAttempts(
+            imports,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun getEmployeeImportTemplate(input: EmployeeImportInputRepository) =

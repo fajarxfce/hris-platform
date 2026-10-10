@@ -5,6 +5,7 @@ import dev.fajar.hris.identity.domain.entities.AccountAccess
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.requireRecentAuthentication
 import dev.fajar.hris.identity.domain.policies.requireRecentMfa
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.people.domain.entities.*
 import java.time.Instant
 import java.time.LocalDate
@@ -82,3 +83,14 @@ fun requireEmployeeImportAssurance(
 ): Result<Unit> =
     if (security.enforceMfa) requireRecentMfa(actor, now, security.recentAuthenticationAge)
     else requireRecentAuthentication(actor, now, security.recentAuthenticationAge)
+
+/** Interactive reads also recheck MFA after waiting; workers retain their execution policy. */
+fun validateEmployeeImportSessionActor(
+    actor: Actor,
+    access: AccountAccess?,
+    now: Instant,
+    security: IdentitySecurityPolicy,
+): Result<Unit> =
+    validateEmployeeImportActor(actor, access).flatMap {
+        validateCompanySessionActor(actor, access, now, security).map { Unit }
+    }

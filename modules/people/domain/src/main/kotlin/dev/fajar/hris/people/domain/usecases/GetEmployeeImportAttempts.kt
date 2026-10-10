@@ -1,12 +1,14 @@
 package dev.fajar.hris.people.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.policies.*
 import dev.fajar.hris.people.domain.repositories.*
+import java.time.Clock
 import java.util.UUID
 
 class GetEmployeeImportAttempts(
@@ -15,6 +17,8 @@ class GetEmployeeImportAttempts(
     private val members: MembershipRepository,
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
+    private val security: IdentitySecurityPolicy,
+    private val clock: Clock,
 ) {
     fun execute(
         actor: Actor,
@@ -39,7 +43,7 @@ class GetEmployeeImportAttempts(
             if (accountGuard is Result.Failed) return@run accountGuard
             val authorized =
                 identities.access(actor.accountId, company).flatMap {
-                    validateEmployeeImportActor(actor, it)
+                    validateEmployeeImportSessionActor(actor, it, clock.instant(), security)
                 }
             if (authorized is Result.Failed) return@run authorized
             val found = imports.find(company, id)

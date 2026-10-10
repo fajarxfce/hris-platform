@@ -1,9 +1,11 @@
+import { maximumBinaryFileBytes } from "../../domain/files/binary-file";
 import type { HttpClient, HttpRequest } from "./http-client";
 import {
   HttpResponseError,
   InvalidHttpResponseError,
   RequestBodyTooLargeError,
 } from "./http-response-error";
+import { readBinaryResponse } from "./read-binary-response";
 import { readJsonResponse } from "./read-json-response";
 import { readTextResponse } from "./read-text-response";
 
@@ -45,13 +47,26 @@ export class FetchHttpClient implements HttpClient {
     ) {
       throw new TypeError("Invalid API path");
     }
+    const representation = request.response;
+    const budget =
+      representation?.type === "binary" ? representation.byteLength : representation?.maximumBytes;
     if (
-      request.response &&
-      (!Number.isSafeInteger(request.response.maximumBytes) ||
-        request.response.maximumBytes < 1 ||
-        request.response.maximumBytes > maximumBytes)
+      budget !== undefined &&
+      (!Number.isSafeInteger(budget) ||
+        budget < 1 ||
+        budget > (representation?.type === "binary" ? maximumBinaryFileBytes : maximumBytes))
     )
       throw new RangeError("Invalid response budget");
+    if (
+      representation?.type === "binary" &&
+      (representation.etag.length < 1 ||
+        representation.etag.length > 512 ||
+        !/^[a-z0-9!#$&^_.+-]+\/[a-z0-9!#$&^_.+-]+$/u.test(representation.mediaType))
+    )
+      throw new TypeError("Invalid binary representation");
+    const timeout = request.timeoutMilliseconds ?? this.deadlineMilliseconds;
+    if (!Number.isInteger(timeout) || timeout < 1 || timeout > 60_000)
+      throw new RangeError("Invalid request deadline");
     const body = request.body === undefined ? undefined : JSON.stringify(request.body);
     if (body !== undefined && new TextEncoder().encode(body).byteLength > maximumBytes)
       throw new RequestBodyTooLargeError();
@@ -60,7 +75,7 @@ export class FetchHttpClient implements HttpClient {
     signal.addEventListener("abort", onAbort, { once: true });
     const deadline = setTimeout(
       () => controller.abort(new DOMException("Request timed out", "TimeoutError")),
-      this.deadlineMilliseconds,
+      timeout,
     );
     try {
       const method = request.method ?? "GET";
@@ -128,10 +143,14 @@ export class FetchHttpClient implements HttpClient {
       cache: "no-store",
       redirect: "error",
     });
-    const value =
-      response.ok && representation
-        ? await readTextResponse(response, representation.maximumBytes, [representation.mediaType])
-        : await readJsonResponse(response, maximumBytes);
+    let value: unknown;
+    if (!response.ok || !representation) value = await readJsonResponse(response, maximumBytes);
+    else if (representation.type === "binary")
+      value = await readBinaryResponse(response, representation, signal);
+    else
+      value = await readTextResponse(response, representation.maximumBytes, [
+        representation.mediaType,
+      ]);
     signal.throwIfAborted();
     if (!response.ok) throw new HttpResponseError(response.status, value);
     return value;

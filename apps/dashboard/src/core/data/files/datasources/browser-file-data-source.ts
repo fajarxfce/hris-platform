@@ -1,4 +1,5 @@
 import { FileEncodingError, FileSizeLimitError } from "../file-errors";
+import type { BinaryFileDownloadDto } from "../models/binary-file-dto";
 import type { TextFileDownloadDto, TextFileDto } from "../models/text-file-dto";
 import type { FileDataSource } from "./file-data-source";
 
@@ -7,6 +8,7 @@ export class BrowserFileDataSource implements FileDataSource {
     private readonly document: Document,
     private readonly createReader: () => FileReader = () => new FileReader(),
     private readonly readTimeoutMilliseconds = 15_000,
+    private readonly objectUrls: Pick<typeof URL, "createObjectURL" | "revokeObjectURL"> = URL,
   ) {
     if (
       !Number.isInteger(readTimeoutMilliseconds) ||
@@ -130,6 +132,57 @@ export class BrowserFileDataSource implements FileDataSource {
       anchor.click();
     } finally {
       anchor.remove();
+    }
+  }
+
+  async downloadBinary(file: BinaryFileDownloadDto, signal: AbortSignal): Promise<void> {
+    signal.throwIfAborted();
+    if (
+      !Number.isSafeInteger(file.byteLength) ||
+      file.byteLength < 1 ||
+      file.byteLength > 100 * 1024 * 1024 ||
+      file.parts.length < 1 ||
+      file.parts.length > 1600 ||
+      file.parts.some((part) => part.byteLength < 1 || part.byteLength > 64 * 1024) ||
+      file.parts.reduce((size, part) => size + part.byteLength, 0) !== file.byteLength
+    )
+      throw new FileSizeLimitError();
+    const anchor = this.document.createElement("a");
+    const url = this.objectUrls.createObjectURL(
+      new Blob([...file.parts], { type: file.mediaType }),
+    );
+    try {
+      anchor.download = file.name;
+      anchor.hidden = true;
+      anchor.href = url;
+      await new Promise<void>((resolve, reject) => {
+        const clean = () => {
+          clearTimeout(timer);
+          signal.removeEventListener("abort", aborted);
+        };
+        const completed = () => {
+          clean();
+          resolve();
+        };
+        const aborted = () => {
+          clean();
+          reject(signal.reason);
+        };
+        // Retain the URL briefly while the browser accepts the native download, then release it.
+        const timer = setTimeout(completed, 1000);
+        signal.addEventListener("abort", aborted, { once: true });
+        try {
+          this.document.body.append(anchor);
+          signal.throwIfAborted();
+          anchor.click();
+        } catch (error) {
+          clean();
+          reject(error);
+        }
+      });
+    } finally {
+      anchor.remove();
+      this.objectUrls.revokeObjectURL(url);
     }
   }
 }

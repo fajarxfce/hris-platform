@@ -291,6 +291,10 @@ The independent approval API scenario exercises templates, delegations, and reas
 
 Response mapping rejects repeated dates, inconsistent quantities, invalid intervals, duplicate assignments, non-progressing pages, and history newer than the current request. Controllers clear snapshots while reloading, abort obsolete work, and reject late results after disposal or company replacement. Locale/theme changes update presentation without repeating the request. Evidence downloads remain a subsequent capability.
 
+## Binary downloads
+
+Binary file acquisition uses the authenticated HTTP transport, including current client-admission headers, private cache behavior, cancellation, and explicit deadlines of at most sixty seconds. The transport validates the expected media type, ETag, and exact byte count, retaining at most 100 MiB in 64 KiB blocks. Stream reads, empty responses, and retained block counts are bounded. Native downloads own one short-lived object URL and release their anchor, timer, and abort listener after dispatch or failure. This primitive reports browser handoff, not completion of an operating-system save; feature controllers own the acquisition lifetime.
+
 ## Leave request actions
 
 `/leave/requests/:requestId/:intent` provides separate approval, rejection, withdrawal, and cancellation reviews. The detail command bar intersects current grants with the server's available actions; the server owns resource assignment, delegation, and maker exclusions. Each action route acquires the current request independently of the retained history page. It displays the submitted working intervals, half-day charge, current request version, and whether the decision concerns the original leave or its cancellation.

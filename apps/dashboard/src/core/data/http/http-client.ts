@@ -3,7 +3,10 @@ export type HttpRequest = Readonly<{
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
   operationId?: string;
-  response?: Readonly<{ type: "text"; mediaType: "text/csv"; maximumBytes: number }>;
+  timeoutMilliseconds?: number;
+  response?:
+    | Readonly<{ type: "text"; mediaType: "text/csv"; maximumBytes: number }>
+    | Readonly<{ type: "binary"; mediaType: string; byteLength: number; etag: string }>;
 }>;
 
 export interface HttpClient {

@@ -556,3 +556,9 @@ Dashboard architecture, Biome, TypeScript, all 479 unit/controller tests in 80 f
 Attachment metadata and content now recheck current MFA after shared resource/access guards. Content repeats authorization after external storage acquisition, before returning bytes. The shared approval guard preserves coherence with assignment changes while allowing concurrent readers.
 
 Root formatting and architecture checks, sixteen leave-domain tests, twenty API/PostgreSQL tests, and both application JAR builds passed. Three new controlled-wait cases cover MFA expiry during metadata acquisition, before storage, and after storage, followed by successful renewed reads. Existing attachment scoping, immutable references, access/credential revocation, reassignment, interruption cleanup, corruption, and HTTP Range/ETag tests passed. This change does not itself add browser downloads or establish throughput results.
+
+### Bounded binary download infrastructure
+
+Authenticated HTTP acquisition now validates exact file size, media type, and ETag before native handoff. It coalesces fragments into bounded 64 KiB blocks, preserves cancellation and safe JSON failures, and bounds size, deadlines, empty chunks, and loop progress. Native file I/O owns and releases its temporary object URL, anchor, abort listener, and short handoff timer. Text and JSON retain their existing 1 MiB bounds.
+
+Dashboard architecture, Biome, TypeScript, 495 unit/controller tests in 82 files, and the production build passed. Sixteen new cases cover fragmented buffers, integrity metadata, truncated/excessive content, pending cancellation, timeouts, native dispatch failure, cleanup, and bounds before I/O. The existing main-bundle advisory remains. These infrastructure checks do not yet validate a feature download in a browser or measure heap use.

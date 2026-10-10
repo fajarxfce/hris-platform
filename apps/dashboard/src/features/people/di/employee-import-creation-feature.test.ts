@@ -35,7 +35,10 @@ function fixture() {
     request,
     selectText,
     downloadText,
-    feature: createPeopleFeature({ request }, { selectText, downloadText }),
+    feature: createPeopleFeature(
+      { request },
+      { selectText, downloadText, downloadBinary: vi.fn() },
+    ),
   };
 }
 describe("employee import file and preview boundary", () => {

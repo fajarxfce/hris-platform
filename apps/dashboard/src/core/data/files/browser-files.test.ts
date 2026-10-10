@@ -164,7 +164,12 @@ describe("file repository boundaries", () => {
     const readText = vi
       .fn<FileDataSource["readText"]>()
       .mockResolvedValue({ name: file.name, text: "name", byteLength: 4 });
-    const repo = new BrowserFileRepository({ select, readText, downloadText: vi.fn() });
+    const repo = new BrowserFileRepository({
+      select,
+      readText,
+      downloadText: vi.fn(),
+      downloadBinary: vi.fn(),
+    });
     const options = { accept: ".csv", maximumBytes: 64 };
     expect(await repo.selectText(options, signal())).toEqual({ ok: true, value: null });
     expect(readText).not.toHaveBeenCalled();

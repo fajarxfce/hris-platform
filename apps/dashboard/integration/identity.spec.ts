@@ -35,6 +35,7 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
   await page.getByRole("button", { name: "Verify", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Recovery codes" })).toBeVisible();
   await expect(page.locator(".app-recovery-codes li")).toHaveCount(10);
+  const recoveryCodes = await page.locator(".app-recovery-codes li code").allTextContents();
   await page.getByRole("button", { name: "I have saved the codes" }).click();
   await expect(page.getByRole("heading", { name: "No company access" })).toBeVisible();
 
@@ -63,7 +64,7 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
   await expect(page.getByRole("main")).not.toContainText("Browser North");
   await page.getByRole("combobox", { name: "Language" }).selectOption("id");
   await expect(page.getByRole("heading", { name: "Ringkasan" })).toBeVisible();
-  const csrf = (await (await context.request.get("/api/v1/auth/csrf")).json()) as {
+  let csrf = (await (await context.request.get("/api/v1/auth/csrf")).json()) as {
     headerName: string;
     token: string;
   };
@@ -112,6 +113,25 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
   await expect(page.getByRole("status")).toHaveText("Unit ini tidak memiliki induk.");
   await page.getByRole("link", { name: "Kembali ke organisasi", exact: true }).click();
   await expect(page.getByLabel("Nama atau kode", { exact: true })).toHaveValue("r&d_100%");
+  const unsubmittedFilter = page.getByLabel("Nama atau kode", { exact: true });
+  await unsubmittedFilter.fill("Unsubmitted organization filter");
+  await unsubmittedFilter.evaluate((input) =>
+    input.setAttribute("data-retention-probe", "retained"),
+  );
+  await page
+    .getByRole("banner")
+    .getByRole("button", { name: "Verifikasi akun", exact: true })
+    .click();
+  const verification = page.getByRole("dialog", { name: "Verifikasi akun", exact: true });
+  await verification.getByRole("button", { name: "Gunakan recovery code", exact: true }).click();
+  await verification.getByLabel("Recovery code", { exact: true }).fill(recoveryCodes[0] ?? "");
+  await verification.getByRole("button", { name: "Verifikasi", exact: true }).click();
+  await expect(verification).toHaveCount(0);
+  await expect(unsubmittedFilter).toHaveValue("Unsubmitted organization filter");
+  await expect(unsubmittedFilter).toHaveAttribute("data-retention-probe", "retained");
+  const previousCsrf = csrf.token;
+  csrf = await (await context.request.get("/api/v1/auth/csrf")).json();
+  expect(csrf.token).not.toBe(previousCsrf);
   const employeeId = randomUUID();
   const created = await context.request.post(`/api/v1/companies/${companies[1]}/employees`, {
     headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },

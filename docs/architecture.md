@@ -66,6 +66,8 @@ The mobile change feed is scoped by actor/company/permission and covers owned ex
 
 Feature data adapters map transport DTOs. Pure use cases own application policy. Feature controllers/hooks coordinate state, events, effects, and cancellation. Pages render state. TanStack Query keys include account and company; navigation cancels obsolete work. React Hook Form owns form mechanics; validation affecting business remains in the domain/backend.
 
+The dashboard identity controller owns one last-authorized presentation workspace, separately from pending session metadata. Revalidation hides that workspace until both session and company access succeed. Redacted MFA metadata cannot authorize restoration. Equivalent live scope retains the mounted feature; changed credentials, memberships, company metadata, or grants invalidate it. Immutable identity mappings prevent retained scope from changing through shared DTO references. Verification never owns or replays a business command.
+
 Server delivery also owns output representations such as CSV and PDF. The payslip PDF adapter consumes the domain snapshot returned by the existing authorized use case; it does not call repositories, perform payroll policy, or move PDFBox types into domain. Its delivery configuration owns a bounded renderer, and each request closes its document/content resources. Storage publication would be a separate data/application capability, not a hidden renderer side effect.
 
 ## Verification

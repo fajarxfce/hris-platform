@@ -1,9 +1,11 @@
 import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
 import type { Failure } from "../../../../core/domain/result";
 import type { MfaVerification } from "../../domain/entities/mfa";
+import type { CompanyAccess, Session } from "../../domain/entities/session";
 import type { SignInCredentials } from "../../domain/entities/sign-in";
 import type { IdentityUseCases } from "../contracts/identity-use-cases";
 import { type IdentityState, initialIdentityState } from "../models/identity-state";
+import { sameWorkspaceAccess, sameWorkspaceMemberships } from "../models/identity-workspace";
 
 /** Owns screen requests and one-use secrets for one mounted application. */
 export class IdentityController {
@@ -13,6 +15,7 @@ export class IdentityController {
   #pending: AbortController | null = null;
   #providers: AbortController | null = null;
   #enrollmentId: OperationId | null = null;
+  #workspaceRevision = 0;
 
   constructor(
     private readonly useCases: IdentityUseCases,
@@ -53,6 +56,19 @@ export class IdentityController {
     });
   };
 
+  requestVerification = async (): Promise<void> => {
+    if (this.#state.busy || this.#state.stage !== "ready") return;
+    await this.runOwned(async (signal) => {
+      this.update({ stage: "loading", access: null, verification: "requested" });
+      await this.resolveSession(signal, true);
+    });
+  };
+
+  cancelVerification = async (): Promise<void> => {
+    if (this.#state.busy || this.#state.verification !== "requested") return;
+    await this.refreshSession();
+  };
+
   signIn = async (credentials: SignInCredentials): Promise<void> => {
     if (this.#state.busy || this.#state.stage !== "signedOut") return;
     await this.runOwned(async (signal) => {
@@ -60,7 +76,7 @@ export class IdentityController {
       if (signal.aborted) return;
       if (!result.ok) return this.update({ failure: result.failure });
       this.clearPrivateCache();
-      this.update({ stage: "loading" });
+      this.update({ stage: "loading", workspace: null });
       await this.resolveSession(signal);
     });
   };
@@ -85,13 +101,20 @@ export class IdentityController {
         this.#state.stage !== "loading")
     )
       return;
+    if (this.#state.stage === "ready" && companyId === this.#state.companyId) return;
     this.clearPrivateCache();
     await this.runOwned(async (signal) => {
-      this.update({ stage: "loading", companyId, access: null });
+      this.update({
+        stage: "loading",
+        companyId,
+        access: null,
+        workspace: null,
+        verification: null,
+      });
       const access = await this.useCases.loadCompanyAccess.execute(session, companyId, signal);
       if (signal.aborted) return;
       if (!access.ok) return this.update({ stage: "unavailable", failure: access.failure });
-      this.update({ stage: "ready", access: access.value });
+      this.acceptWorkspace(session, companyId, access.value);
     });
   };
 
@@ -112,7 +135,7 @@ export class IdentityController {
           this.#enrollmentId = null;
           this.update({ enrollment: null });
         }
-        return this.update({ failure: result.failure });
+        return this.reportVerificationFailure(result.failure);
       }
       this.update({ enrollment: result.value });
     });
@@ -133,7 +156,7 @@ export class IdentityController {
           this.#enrollmentId = null;
           this.update({ enrollment: null });
         }
-        return this.update({ failure: result.failure });
+        return this.reportVerificationFailure(result.failure);
       }
       await this.acceptVerification(result.value, signal);
     });
@@ -144,7 +167,7 @@ export class IdentityController {
     await this.runOwned(async (signal) => {
       const result = await this.useCases.verifyMfa.execute(code, recovery, signal);
       if (signal.aborted) return;
-      if (!result.ok) return this.update({ failure: result.failure });
+      if (!result.ok) return this.reportVerificationFailure(result.failure);
       await this.acceptVerification(result.value, signal);
     });
   };
@@ -158,6 +181,21 @@ export class IdentityController {
   private update(patch: Partial<IdentityState>): void {
     this.#state = { ...this.#state, ...patch };
     for (const listener of this.#listeners) listener();
+  }
+
+  private reportVerificationFailure(failure: Failure): void {
+    if (!["authentication_required", "session_revoked", "unauthenticated"].includes(failure.code)) {
+      this.update({ failure });
+      return;
+    }
+    this.#enrollmentId = null;
+    this.clearPrivateCache();
+    this.update({
+      ...initialIdentityState,
+      stage: "signedOut",
+      busy: true,
+      providers: this.#state.providers,
+    });
   }
 
   private async runOwned(operation: (signal: AbortSignal) => Promise<void>): Promise<void> {
@@ -184,39 +222,120 @@ export class IdentityController {
     }
   }
 
-  private async resolveSession(signal: AbortSignal): Promise<void> {
+  private async resolveSession(signal: AbortSignal, requestVerification = false): Promise<void> {
     const result = await this.useCases.loadSession.execute(signal);
     if (signal.aborted) return;
     if (!result.ok) {
-      this.clearPrivateCache();
       const signedOut = ["authentication_required", "session_revoked", "unauthenticated"].includes(
         result.failure.code,
       );
+      if (!signedOut)
+        return this.update({ stage: "unavailable", access: null, failure: result.failure });
+      this.clearPrivateCache();
       return this.update({
         ...initialIdentityState,
         providers: this.#state.providers,
         busy: true,
-        stage: signedOut ? "signedOut" : "unavailable",
-        failure: signedOut ? null : result.failure,
+        stage: "signedOut",
+        failure: null,
       });
     }
     const session = result.value;
     const sameAccount = session.account.id === this.#state.session?.account.id;
+    if (!sameAccount) {
+      this.#enrollmentId = null;
+      this.clearPrivateCache();
+      this.update({ workspace: null });
+    }
+    // The API deliberately redacts memberships and grants until MFA succeeds.
+    // Keep the former scope hidden; only a complete post-verification read may restore it.
+    if (session.assurance.required && !session.assurance.verified) {
+      this.update({
+        session,
+        access: null,
+        enrollment: null,
+        stage: "challenge",
+        verification: "required",
+        ...(sameAccount ? {} : { companyId: null }),
+      });
+      return;
+    }
     const selected = sameAccount ? this.#state.companyId : null;
     const companyId =
       session.companies.find((company) => company.id === selected)?.id ??
       session.companies[0]?.id ??
       null;
-    this.clearPrivateCache();
-    if (!sameAccount) this.#enrollmentId = null;
-    this.update({ session, companyId, access: null, enrollment: null });
-    if (session.assurance.required && !session.assurance.verified)
-      return this.update({ stage: "challenge" });
-    if (!companyId) return this.update({ stage: "ready" });
+    const workspace = this.#state.workspace;
+    const retain = workspace !== null && sameWorkspaceMemberships(workspace, session, companyId);
+    if (!retain) this.clearPrivateCache();
+    this.update({
+      session,
+      companyId,
+      access: null,
+      enrollment: null,
+      workspace: retain ? workspace : null,
+    });
+    if (requestVerification) return this.update({ stage: "challenge", verification: "requested" });
+    if (!companyId) return this.acceptWorkspace(session, companyId, null);
     const access = await this.useCases.loadCompanyAccess.execute(session, companyId, signal);
     if (signal.aborted) return;
-    if (!access.ok) return this.update({ stage: "unavailable", failure: access.failure });
-    this.update({ stage: "ready", access: access.value });
+    if (!access.ok) {
+      if (
+        ["mfa_required", "mfa_setup_required", "recent_authentication_required"].includes(
+          access.failure.code,
+        )
+      )
+        return this.update({ stage: "challenge", verification: "required", failure: null });
+      const revoked = ["authentication_required", "session_revoked", "unauthenticated"].includes(
+        access.failure.code,
+      );
+      const denied = ["access_denied", "company_access_denied"].includes(access.failure.code);
+      if (revoked || denied) this.clearPrivateCache();
+      if (revoked)
+        return this.update({
+          ...initialIdentityState,
+          stage: "signedOut",
+          busy: true,
+          providers: this.#state.providers,
+        });
+      return this.update({
+        stage: "unavailable",
+        failure: access.failure,
+        ...(denied ? { workspace: null } : {}),
+      });
+    }
+    this.acceptWorkspace(session, companyId, access.value);
+  }
+
+  private acceptWorkspace(
+    session: Session,
+    companyId: CompanyId | null,
+    access: CompanyAccess | null,
+  ): void {
+    const previous = this.#state.workspace;
+    const retained =
+      previous !== null &&
+      sameWorkspaceMemberships(previous, session, companyId) &&
+      sameWorkspaceAccess(previous.access, access);
+    if (!retained) this.clearPrivateCache();
+    const workspace = retained
+      ? previous
+      : Object.freeze({
+          revision: ++this.#workspaceRevision,
+          accountId: session.account.id,
+          company: session.companies.find((company) => company.id === companyId) ?? null,
+          companies: session.companies,
+          platformPermissions: session.permissions,
+          access,
+        });
+    this.update({
+      stage: "ready",
+      session,
+      companyId,
+      workspace,
+      access: workspace.access,
+      verification: null,
+    });
   }
 
   private async acceptVerification(

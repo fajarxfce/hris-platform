@@ -96,6 +96,253 @@ function fixture(current: Result<Session> = success(session)) {
 }
 
 describe("identity screen lifecycle", () => {
+  it.each(["begin", "confirm"])(
+    "purges retained scope when %s enrollment reports revoked credentials",
+    async (step) => {
+      const f = fixture();
+      await vi.waitFor(() => expect(f.controller.getSnapshot().stage).toBe("ready"));
+      await f.controller.requestVerification();
+      expect(f.controller.getSnapshot().workspace).not.toBeNull();
+      if (step === "begin") {
+        f.useCases.beginEnrollment.execute.mockResolvedValueOnce(failed("session_revoked"));
+        await f.controller.beginEnrollment();
+      } else {
+        await f.controller.beginEnrollment();
+        f.useCases.confirmEnrollment.execute.mockResolvedValueOnce(failed("session_revoked"));
+        await f.controller.confirmEnrollment("123456");
+      }
+      expect(f.controller.getSnapshot()).toMatchObject({
+        stage: "signedOut",
+        workspace: null,
+        session: null,
+        enrollment: null,
+        recoveryCodes: [],
+      });
+    },
+  );
+
+  it("retains the same workspace and request inputs until both foreground checks complete", async () => {
+    const f = fixture();
+    await vi.waitFor(() => expect(f.controller.getSnapshot().stage).toBe("ready"));
+    const workspace = f.controller.getSnapshot().workspace;
+    const access = f.controller.getSnapshot().access;
+    const current = pending<Result<Session>>();
+    const grants = pending<Result<CompanyAccess>>();
+    f.useCases.loadSession.execute.mockReturnValueOnce(current.promise);
+    f.useCases.loadCompanyAccess.execute.mockReturnValueOnce(grants.promise);
+    f.clear.mockClear();
+    const refresh = f.controller.refreshSession();
+    expect(f.controller.getSnapshot()).toMatchObject({ stage: "loading", access: null, workspace });
+    current.resolve(
+      success({ ...session, account: { ...session.account, displayName: "Updated display name" } }),
+    );
+    await vi.waitFor(() => expect(f.useCases.loadCompanyAccess.execute).toHaveBeenCalledTimes(2));
+    expect(f.controller.getSnapshot().stage).toBe("loading");
+    expect(f.controller.getSnapshot().workspace).toBe(workspace);
+    grants.resolve(success({ companyId: company, permissions: ["people.read"] }));
+    await refresh;
+    expect(f.controller.getSnapshot().workspace).toBe(workspace);
+    expect(f.controller.getSnapshot().access).toBe(access);
+    expect(f.controller.getSnapshot().stage).toBe("ready");
+    expect(f.clear).not.toHaveBeenCalled();
+  });
+
+  it("retains hidden scope across redacted MFA metadata and restores it only after fresh company access", async () => {
+    const verified: Session = {
+      ...session,
+      account: { ...session.account, mfaConfigured: true },
+      assurance: { ...session.assurance, required: true, verified: true },
+    };
+    const f = fixture(success(verified));
+    await vi.waitFor(() => expect(f.controller.getSnapshot().stage).toBe("ready"));
+    const workspace = f.controller.getSnapshot().workspace;
+    f.useCases.loadSession.execute.mockResolvedValueOnce(
+      success({
+        ...verified,
+        companies: [],
+        permissions: [],
+        assurance: { ...verified.assurance, verified: false },
+      }),
+    );
+    await f.controller.refreshSession();
+    expect(f.controller.getSnapshot()).toMatchObject({
+      stage: "challenge",
+      verification: "required",
+      companyId: company,
+      access: null,
+    });
+    expect(f.controller.getSnapshot().workspace).toBe(workspace);
+    expect(f.useCases.loadCompanyAccess.execute).toHaveBeenCalledTimes(1);
+    const grants = pending<Result<CompanyAccess>>();
+    f.useCases.loadCompanyAccess.execute.mockReturnValueOnce(grants.promise);
+    const verification = f.controller.verifyMfa("123456", false);
+    await vi.waitFor(() => expect(f.useCases.loadCompanyAccess.execute).toHaveBeenCalledTimes(2));
+    expect(f.controller.getSnapshot()).toMatchObject({
+      stage: "loading",
+      verification: "required",
+      access: null,
+    });
+    expect(f.controller.getSnapshot().workspace).toBe(workspace);
+    grants.resolve(success({ companyId: company, permissions: ["people.read"] }));
+    await verification;
+    expect(f.controller.getSnapshot()).toMatchObject({ stage: "ready", verification: null });
+    expect(f.controller.getSnapshot().workspace).toBe(workspace);
+    expect(f.useCases.verifyMfa.execute).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps a successful MFA proof separate from failed scope recovery and retries only the read", async () => {
+    const f = fixture(
+      success({ ...session, account: { ...session.account, mfaConfigured: true } }),
+    );
+    await vi.waitFor(() => expect(f.controller.getSnapshot().stage).toBe("ready"));
+    const workspace = f.controller.getSnapshot().workspace;
+    await f.controller.requestVerification();
+    expect(f.controller.getSnapshot().verification).toBe("requested");
+    f.useCases.loadCompanyAccess.execute.mockResolvedValueOnce(failed("connection_unavailable"));
+    await f.controller.verifyMfa("123456", false);
+    expect(f.controller.getSnapshot()).toMatchObject({
+      stage: "unavailable",
+      access: null,
+      verification: "requested",
+    });
+    expect(f.controller.getSnapshot().workspace).toBe(workspace);
+    await f.controller.refreshSession();
+    expect(f.controller.getSnapshot().workspace).toBe(workspace);
+    expect(f.controller.getSnapshot().stage).toBe("ready");
+    expect(f.useCases.verifyMfa.execute).toHaveBeenCalledTimes(1);
+  });
+
+  it("replaces the workspace on account, company, membership, timezone or permission changes", async () => {
+    for (const change of [
+      "account",
+      "company",
+      "membership",
+      "timezone",
+      "companyPermission",
+      "platformPermission",
+    ]) {
+      const f = fixture();
+      await vi.waitFor(() => expect(f.controller.getSnapshot().stage).toBe("ready"));
+      const workspace = f.controller.getSnapshot().workspace;
+      const next: Session = {
+        ...session,
+        account:
+          change === "account"
+            ? { ...session.account, id: "10000000-0000-4000-8000-000000000009" as AccountId }
+            : session.account,
+        companies:
+          change === "company"
+            ? session.companies.filter((item) => item.id === other)
+            : change === "membership"
+              ? session.companies.filter((item) => item.id === company)
+              : change === "timezone"
+                ? session.companies.map((item) =>
+                    item.id === company ? { ...item, timezone: "UTC" } : item,
+                  )
+                : session.companies,
+        permissions: change === "platformPermission" ? ["companies.create"] : session.permissions,
+      };
+      f.useCases.loadSession.execute.mockResolvedValueOnce(success(next));
+      if (change === "companyPermission")
+        f.useCases.loadCompanyAccess.execute.mockResolvedValueOnce(
+          success({ companyId: company, permissions: [] }),
+        );
+      f.clear.mockClear();
+      await f.controller.refreshSession();
+      expect(f.controller.getSnapshot().workspace).not.toBe(workspace);
+      expect(f.controller.getSnapshot().workspace?.revision).toBeGreaterThan(
+        workspace?.revision ?? 0,
+      );
+      expect(f.clear).toHaveBeenCalled();
+      f.controller.deactivate();
+    }
+  });
+
+  it("does not treat reordered equivalent grants or memberships as a new workspace", async () => {
+    const f = fixture();
+    f.useCases.loadCompanyAccess.execute.mockResolvedValue(
+      success({ companyId: company, permissions: ["people.read", "company.read"] }),
+    );
+    await vi.waitFor(() => expect(f.controller.getSnapshot().stage).toBe("ready"));
+    const workspace = f.controller.getSnapshot().workspace;
+    f.useCases.loadSession.execute.mockResolvedValueOnce(
+      success({ ...session, companies: [...session.companies].reverse() }),
+    );
+    f.useCases.loadCompanyAccess.execute.mockResolvedValueOnce(
+      success({ companyId: company, permissions: ["company.read", "people.read"] }),
+    );
+    await f.controller.refreshSession();
+    expect(f.controller.getSnapshot().workspace).toBe(workspace);
+  });
+
+  it("cannot dismiss an optional verification into a session that now requires MFA", async () => {
+    const f = fixture();
+    await vi.waitFor(() => expect(f.controller.getSnapshot().stage).toBe("ready"));
+    const workspace = f.controller.getSnapshot().workspace;
+    await f.controller.requestVerification();
+    expect(f.controller.getSnapshot().verification).toBe("requested");
+    f.useCases.loadSession.execute.mockResolvedValueOnce(
+      success({
+        ...session,
+        companies: [],
+        assurance: { ...session.assurance, required: true, verified: false },
+      }),
+    );
+    await f.controller.cancelVerification();
+    expect(f.controller.getSnapshot()).toMatchObject({
+      stage: "challenge",
+      verification: "required",
+      access: null,
+    });
+    expect(f.controller.getSnapshot().workspace).toBe(workspace);
+    const reads = f.useCases.loadSession.execute.mock.calls.length;
+    await f.controller.cancelVerification();
+    expect(f.useCases.loadSession.execute).toHaveBeenCalledTimes(reads);
+    expect(f.useCases.verifyMfa.execute).not.toHaveBeenCalled();
+  });
+
+  it("purges retained form scope when verification or the following access read detects revocation", async () => {
+    for (const failureAt of ["proof", "access", "session"]) {
+      const f = fixture();
+      await vi.waitFor(() => expect(f.controller.getSnapshot().stage).toBe("ready"));
+      await f.controller.requestVerification();
+      if (failureAt === "proof")
+        f.useCases.verifyMfa.execute.mockResolvedValueOnce(failed("session_revoked"));
+      if (failureAt === "session")
+        f.useCases.loadSession.execute.mockResolvedValueOnce(failed("session_revoked"));
+      if (failureAt === "access")
+        f.useCases.loadCompanyAccess.execute.mockResolvedValueOnce(failed("company_access_denied"));
+      await f.controller.verifyMfa("123456", false);
+      expect(f.controller.getSnapshot().workspace).toBeNull();
+      expect(f.controller.getSnapshot().access).toBeNull();
+      expect(f.controller.getSnapshot().stage).toBe(
+        failureAt === "access" ? "unavailable" : "signedOut",
+      );
+      f.controller.deactivate();
+    }
+  });
+
+  it("cancels pending verification on logout and cannot restore its previous workspace", async () => {
+    const f = fixture();
+    await vi.waitFor(() => expect(f.controller.getSnapshot().stage).toBe("ready"));
+    await f.controller.requestVerification();
+    const proof = pending<Awaited<ReturnType<IdentityUseCases["verifyMfa"]["execute"]>>>();
+    f.useCases.verifyMfa.execute.mockReturnValueOnce(proof.promise);
+    const verifying = f.controller.verifyMfa("123456", false);
+    const proofSignal = f.useCases.verifyMfa.execute.mock.lastCall?.[2];
+    const reads = f.useCases.loadSession.execute.mock.calls.length;
+    await f.controller.signOut();
+    expect(proofSignal?.aborted).toBe(true);
+    proof.resolve(success({ verifiedAt: "2026-10-09T00:00:00Z", recoveryCodes: [] }));
+    await verifying;
+    expect(f.controller.getSnapshot()).toMatchObject({
+      stage: "signedOut",
+      session: null,
+      workspace: null,
+    });
+    expect(f.useCases.loadSession.execute).toHaveBeenCalledTimes(reads);
+  });
+
   it("cancels a previous company request and rejects its late permissions", async () => {
     const f = fixture();
     await vi.waitFor(() => expect(f.controller.getSnapshot().stage).toBe("ready"));

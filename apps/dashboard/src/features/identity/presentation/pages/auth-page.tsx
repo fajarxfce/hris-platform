@@ -1,4 +1,4 @@
-import { Text, Title2 } from "@fluentui/react-components";
+import { Title2 } from "@fluentui/react-components";
 import { Eye20Regular, EyeOff20Regular } from "@fluentui/react-icons";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -8,6 +8,8 @@ import { type Locale, messages } from "../../../../core/presentation/i18n/messag
 import type { IdentityController } from "../controllers/identity-controller";
 import type { AuthForms } from "../controllers/use-auth-forms";
 import type { IdentityState } from "../models/identity-state";
+import { MfaChallengeContent } from "./mfa-challenge-content";
+import { MfaRecoveryContent } from "./mfa-recovery-content";
 
 type Props = {
   state: IdentityState;
@@ -73,68 +75,17 @@ export function AuthPage({ state, actions, forms, locale }: Props) {
         {state.stage === "challenge" && (
           <>
             <Title2 as="h1">{text.verification}</Title2>
-            <AppFailure failure={state.failure} locale={locale} />
-            {!state.session?.account.mfaConfigured && (
-              <>
-                <Text>{text.setupDescription}</Text>
-                <AppButton
-                  onClick={actions.beginEnrollment}
-                  disabled={state.busy || !state.session?.assurance.setupAvailable}
-                >
-                  {text.setupAuthenticator}
-                </AppButton>
-                {state.enrollment && (
-                  <div className="app-enrollment-key">
-                    <Text size={200}>{text.enrollmentKey}</Text>
-                    <code>{state.enrollment.secret}</code>
-                  </div>
-                )}
-              </>
-            )}
-            {(state.session?.account.mfaConfigured || state.enrollment) && (
-              <form className="app-form" onSubmit={forms.submitChallenge}>
-                <AppTextField
-                  label={forms.recovery ? text.recoveryCode : text.authenticatorCode}
-                  {...forms.code}
-                  autoComplete="one-time-code"
-                  inputMode={forms.recovery ? "text" : "numeric"}
-                  maxLength={forms.recovery ? 100 : 6}
-                  required
-                  disabled={state.busy}
-                />
-                <AppButton type="submit" appearance="primary" disabled={state.busy}>
-                  {text.verify}
-                </AppButton>
-                {state.session?.account.mfaConfigured && (
-                  <AppButton
-                    appearance="transparent"
-                    disabled={state.busy}
-                    onClick={forms.toggleRecovery}
-                  >
-                    {forms.recovery ? text.useAuthenticator : text.useRecoveryCode}
-                  </AppButton>
-                )}
-              </form>
-            )}
-            <AppButton appearance="transparent" onClick={actions.signOut}>
-              {text.signOut}
-            </AppButton>
+            <MfaChallengeContent state={state} actions={actions} form={forms} locale={locale} />
           </>
         )}
         {state.stage === "recoveryCodes" && (
           <>
             <Title2 as="h1">{text.recoveryCodes}</Title2>
-            <Text>{text.recoveryDescription}</Text>
-            <ul className="app-recovery-codes">
-              {state.recoveryCodes.map((code) => (
-                <li key={code}>
-                  <code>{code}</code>
-                </li>
-              ))}
-            </ul>
-            <AppButton appearance="primary" onClick={actions.acknowledgeRecoveryCodes}>
-              {text.recoverySaved}
-            </AppButton>
+            <MfaRecoveryContent
+              codes={state.recoveryCodes}
+              onSaved={actions.acknowledgeRecoveryCodes}
+              locale={locale}
+            />
           </>
         )}
         {state.stage === "unavailable" && (

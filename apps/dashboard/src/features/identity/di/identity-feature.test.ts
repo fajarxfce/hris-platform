@@ -34,6 +34,32 @@ function fixture() {
 }
 
 describe("identity feature boundaries", () => {
+  it("retains immutable normalized identity and grant snapshots for owned workspace state", async () => {
+    const { feature, request } = fixture();
+    request.mockResolvedValueOnce({
+      ...sessionDto,
+      account: { ...sessionDto.account, id: sessionDto.account.id.toUpperCase() },
+      companies: sessionDto.companies.map((company) => ({
+        ...company,
+        id: company.id.toUpperCase(),
+      })),
+    });
+    const session = await feature.loadSession.execute(signal());
+    if (!session.ok) throw new Error("Session fixture rejected");
+    expect(session.value.account.id).toBe(sessionDto.account.id);
+    expect(session.value.companies[0]?.id).toBe(companyId);
+    expect(Reflect.set(session.value.account, "displayName", "replaced")).toBe(false);
+    expect(Reflect.set(session.value.companies, "0", { id: otherCompanyId })).toBe(false);
+    expect(Reflect.set(session.value.permissions, "0", "payroll.manage")).toBe(false);
+    request.mockResolvedValueOnce({
+      companyId: companyId.toUpperCase(),
+      permissions: ["people.read"],
+    });
+    const access = await feature.loadCompanyAccess.execute(session.value, companyId, signal());
+    if (!access.ok) throw new Error("Access fixture rejected");
+    expect(Reflect.set(access.value.permissions, "0", "payroll.manage")).toBe(false);
+    expect(access.value.permissions).toEqual(["people.read"]);
+  });
   it("keeps sign-in success separate from a later bootstrap request", async () => {
     const { feature, request } = fixture();
     request.mockResolvedValueOnce({ mfaConfigured: true });

@@ -1,5 +1,9 @@
-import { Avatar, Select } from "@fluentui/react-components";
-import { Navigation20Regular, SignOut20Regular } from "@fluentui/react-icons";
+import { Avatar, Select, useRestoreFocusTarget } from "@fluentui/react-components";
+import {
+  Navigation20Regular,
+  ShieldCheckmark20Regular,
+  SignOut20Regular,
+} from "@fluentui/react-icons";
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import { type Locale, messages } from "../i18n/messages";
@@ -20,11 +24,14 @@ type Props = {
   onThemeChanged: () => void;
   onNavigationToggled: () => void;
   onSignOut: () => void;
+  onVerifyAccount?: (() => void) | undefined;
+  verificationDisabled?: boolean;
   navigation: readonly AppNavigationItem[];
   children: ReactNode;
 };
 
 export function AppPortalShell(props: Props) {
+  const restoreFocus = useRestoreFocusTarget();
   const text = messages(props.locale);
   return (
     <div className={`app-portal${props.collapsed ? " app-portal-collapsed" : ""}`}>
@@ -64,6 +71,16 @@ export function AppPortalShell(props: Props) {
         />
         <Avatar className="app-account-avatar" name={props.accountName} size={28} />
         <span className="app-account-name">{props.accountName}</span>
+        {props.onVerifyAccount && (
+          <AppButton
+            {...restoreFocus}
+            appearance="subtle"
+            icon={<ShieldCheckmark20Regular />}
+            aria-label={text.verification}
+            onClick={props.onVerifyAccount}
+            disabled={props.verificationDisabled ?? false}
+          />
+        )}
         <AppButton
           appearance="subtle"
           icon={<SignOut20Regular />}

@@ -17,6 +17,10 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Verifikasi akun untuk melanjutkan.",
   ],
   mfa_required: ["Verify your account to continue.", "Verifikasi akun untuk melanjutkan."],
+  mfa_setup_required: [
+    "Set up an authenticator to continue.",
+    "Siapkan authenticator untuk melanjutkan.",
+  ],
   invalid_mfa_code: ["Enter a valid verification code.", "Masukkan kode verifikasi yang valid."],
   mfa_code_invalid: [
     "The verification code is incorrect or has expired.",

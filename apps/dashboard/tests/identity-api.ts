@@ -11,14 +11,20 @@ export async function installIdentityApi(
   options: {
     signedIn?: boolean;
     mfa?: boolean;
+    mfaConfigured?: boolean;
+    mfaVerified?: boolean;
     failLogin?: string;
     noCompanies?: boolean;
     permissions?: readonly string[];
   } = {},
 ) {
   let signedIn = options.signedIn ?? false;
-  let verified = !options.mfa;
-  let configured = false;
+  let required = options.mfa ?? false;
+  let verified = options.mfaVerified ?? !required;
+  let configured = options.mfaConfigured ?? false;
+  let permissions = options.permissions ?? ["company.read", "people.read"];
+  let accessFailure: string | null = null;
+  const reads = { session: 0, access: 0 };
   let csrf = 0;
   const commands: { path: string; body: unknown; csrf: string | undefined }[] = [];
   const unhandled: string[] = [];
@@ -65,6 +71,7 @@ export async function installIdentityApi(
       return respond({ authenticated: false });
     }
     if (path === "/api/v1/me") {
+      reads.session += 1;
       if (!signedIn)
         return respond({ code: "authentication_required", fields: {}, parameters: {} }, 401);
       return respond({
@@ -74,17 +81,18 @@ export async function installIdentityApi(
           displayName: "Sample Reviewer",
           mfaConfigured: configured,
         },
-        companies: options.noCompanies
-          ? []
-          : companyIds.map((id, index) => ({
-              id,
-              code: index === 0 ? "NORTH" : "SOUTH",
-              name: index === 0 ? "North Company" : "South Company",
-              timezone: "Asia/Jakarta",
-            })),
+        companies:
+          options.noCompanies || (required && !verified)
+            ? []
+            : companyIds.map((id, index) => ({
+                id,
+                code: index === 0 ? "NORTH" : "SOUTH",
+                name: index === 0 ? "North Company" : "South Company",
+                timezone: "Asia/Jakarta",
+              })),
         permissions: [],
         assurance: {
-          required: Boolean(options.mfa),
+          required,
           verified,
           setupAvailable: true,
           validUntil: null,
@@ -93,10 +101,13 @@ export async function installIdentityApi(
       });
     }
     if (path.endsWith("/me/access")) {
+      reads.access += 1;
+      if (required && !verified) return respond({ code: "mfa_required" }, 403);
+      if (accessFailure) return respond({ code: accessFailure }, 403);
       const companyId = path.split("/")[4];
       return respond({
         companyId,
-        permissions: options.permissions ?? ["company.read", "people.read"],
+        permissions,
       });
     }
     if (path === "/api/v1/auth/mfa/enrollment") {
@@ -112,8 +123,39 @@ export async function installIdentityApi(
       verified = true;
       return respond({ verifiedAt: "2026-10-01T00:00:00Z", recoveryCodes });
     }
+    if (path === "/api/v1/auth/mfa/verify") {
+      if (!signedIn) return respond({ code: "session_revoked" }, 401);
+      if (request.postDataJSON().code === "000000")
+        return respond({ code: "invalid_mfa_code" }, 401);
+      configured = true;
+      verified = true;
+      return respond({ verifiedAt: "2026-10-01T00:00:00Z", recoveryCodes: [] });
+    }
     unhandled.push(`${method} ${path}`);
     return respond({ code: "unexpected_fixture_request", fields: {}, parameters: {} }, 500);
   });
-  return { commands, unhandled, recoveryCodes };
+  return {
+    commands,
+    unhandled,
+    recoveryCodes,
+    reads,
+    expireMfa: () => {
+      required = true;
+      verified = false;
+    },
+    renewMfa: () => {
+      required = true;
+      configured = true;
+      verified = true;
+    },
+    revoke: () => {
+      signedIn = false;
+    },
+    setPermissions: (next: readonly string[]) => {
+      permissions = next;
+    },
+    denyAccess: (code: string | null) => {
+      accessFailure = code;
+    },
+  };
 }

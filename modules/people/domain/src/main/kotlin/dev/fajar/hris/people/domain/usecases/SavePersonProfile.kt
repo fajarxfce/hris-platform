@@ -1,7 +1,8 @@
 package dev.fajar.hris.people.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.entities.PersonProfile
@@ -20,6 +21,7 @@ class SavePersonProfile(
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
+    private val security: IdentitySecurityPolicy,
     private val clock: Clock,
 ) {
     fun execute(
@@ -67,7 +69,7 @@ class SavePersonProfile(
             if (accountGuard is Result.Failed) return@run accountGuard
             val checked =
                 identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value

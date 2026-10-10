@@ -66,7 +66,19 @@ class PeopleConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetPersonProfile(profiles, people, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetPersonProfile(
+            profiles,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun getPersonProfileHistory(
@@ -76,7 +88,19 @@ class PeopleConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetPersonProfileHistory(profiles, people, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetPersonProfileHistory(
+            profiles,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun savePersonProfile(
@@ -88,6 +112,7 @@ class PeopleConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         SavePersonProfile(
@@ -99,6 +124,7 @@ class PeopleConfiguration {
             operations,
             journal,
             transactions,
+            security,
             clock,
         )
 

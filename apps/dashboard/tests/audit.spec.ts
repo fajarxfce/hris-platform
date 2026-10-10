@@ -172,8 +172,8 @@ test("audit applies explicit filters, handles empty results and recovers invalid
   expect(api.requests).toEqual([]);
   await page.getByRole("button", { name: "Reset filters", exact: true }).click();
   await expect(page.getByRole("table", { name: "Events", exact: true })).toBeVisible();
-  await page.getByLabel("Action code", { exact: true }).fill("employment.updated");
   const loaded = api.requests.length;
+  await page.getByLabel("Action code", { exact: true }).fill("employment.updated");
   expect(api.requests).toHaveLength(loaded);
   await page.getByRole("button", { name: "Apply", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText("No events match these filters.");
@@ -187,10 +187,25 @@ test("audit applies explicit filters, handles empty results and recovers invalid
   await page.getByLabel("Until (UTC)", { exact: true }).fill("2026-10-01T07:30");
   await page.getByLabel("Resource type", { exact: true }).fill("employment");
   await page.getByLabel("Resource ID", { exact: true }).fill(resourceId);
+  const filteredResponse = page.waitForResponse((result) => {
+    const url = new URL(result.url());
+    return (
+      result.request().method() === "GET" &&
+      url.pathname === `/api/v1/companies/${companyIds[0]}/audit-events` &&
+      url.searchParams.get("from") === "2026-09-10T07:30:00Z"
+    );
+  });
   await page.getByRole("button", { name: "Apply", exact: true }).click();
+  const filtered = await filteredResponse;
+  expect(filtered.status()).toBe(200);
+  expect(Object.fromEntries(new URL(filtered.url()).searchParams)).toEqual({
+    from: "2026-09-10T07:30:00Z",
+    until: "2026-10-01T07:30:00Z",
+    resourceType: "employment",
+    resourceId,
+    limit: "50",
+  });
   await expect(page.getByRole("table", { name: "Events", exact: true })).toBeVisible();
-  expect(api.requests.at(-1)?.searchParams.get("from")).toBe("2026-09-10T07:30:00Z");
-  expect(api.requests.at(-1)?.searchParams.get("until")).toBe("2026-10-01T07:30:00Z");
   api.fail("invalid_audit_cursor");
   await page.getByRole("button", { name: "Refresh", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText("Reset the filters to start again.");

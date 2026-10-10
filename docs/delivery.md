@@ -407,3 +407,10 @@ The production dashboard build passed. The main bundle is 609.61 kB minified / 1
 Company member directories, role template catalogs, and membership-grant details now recheck MFA after acquiring their company/member/account guards. They use the shared domain session policy with the current clock and live access, preserving the original/live permission intersection. An entry-time proof cannot authorize a response after expiring during a wait. The existing `mfa_required` response supports account verification followed by a new read.
 
 Validation passed architecture and format checks, 31 HTTP/PostgreSQL tests and 17 identity domain tests, and both API/worker builds in one Gradle run (2 minutes 22 seconds). Three new HTTP scenarios hold the account acquisition, advance the policy clock beyond MFA validity, assert a safe 403 response, then verify the factor and successfully read again. Related membership revocation, role/grant consistency, identity administration, and MFA behavior remain covered. No route or database migration changed.
+
+
+## Audit filter response synchronization
+
+The dashboard CI run for lifecycle assignment exposed a timing-dependent audit assertion: the existing table could still be visible before the updated filter request was observed by the test. Its trace contains the successful response with the correct UTC window and resource filters. The test now waits for that specific response and validates its complete query. It also records the request count before editing, so the explicit-search assertion checks that typing does not fetch.
+
+Dashboard architecture, Biome, strict TypeScript, and all 249 unit/controller tests passed. All six audit browser scenarios passed (22.8 seconds), covering pagination, filter recovery, access revocation, pending work, and focus. The change is limited to test synchronization; the subsequent CI run remains to be observed.

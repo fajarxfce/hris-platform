@@ -26,6 +26,14 @@ Request lists and details revalidate current access and session assurance after 
 
 The [dashboard request directory and detail review](../dashboard.md#leave-request-review) are implemented, including status/employee filters, submitted schedule and policy, approval/cancellation references, evidence metadata, and bounded history navigation. Company readers enter from navigation; scoped readers enter from employee details, and assigned approvers can follow their inbox's source link. [Guarded browser actions](../dashboard.md#leave-request-actions) support approval, rejection, withdrawal, and cancellation with explicit current-version review and original-command receipt recovery. [Evidence downloads](../dashboard.md#leave-evidence-downloads) are available from both details and action reviews with owned cancellation and current server authorization. Submission, policies, and balance administration remain subsequent dashboard capabilities.
 
+## Administrative policy review
+
+`GET /leave/policies` returns the latest stored revision of each type, including future and inactive definitions. It requires current `leave.manage`, supports an optional `active` filter, and pages by stable type code with a maximum of 200 rows. This is separate from `/leave/types?asOf=...`, which retains effective-date selection for request preparation. A policy's `version` is its latest saved head; `appliedRevision` identifies the selected definition and can differ in an effective-date response.
+
+`GET /leave/policies/{id}` returns the current head and immutable history with actor, reason, recorded time, and complete policy terms. `historyAfter` selects older revision numbers and `historyLimit` bounds the page to 200. Selecting older history never changes the current head. A shared policy guard keeps both queries coherent while a writer waits. Separate directory/history requests are live reads, rather than a durable snapshot of an entire catalog.
+
+Administrative readers and effective type selection acquire shared policy, company, membership, and account guards in that order. Original/live grants and current MFA are revalidated afterward. Saving through the existing `PUT /leave/types/{id}` keeps its exclusive policy guard and checks current assurance before a mutation or original receipt is returned. Self/team access to effective types does not authorize administrative revision reasons.
+
 ## Attachments
 
 Submission accepts up to three distinct `attachmentRevisionIds`. Each revision must already be `READY`, belong to a `PERSONAL` document for the same employment, and remain available in the selected company. The selected policy's `attachmentRequired` flag defaults to false. Missing required evidence and unavailable evidence have stable validation codes; a foreign revision is not identified in the response.

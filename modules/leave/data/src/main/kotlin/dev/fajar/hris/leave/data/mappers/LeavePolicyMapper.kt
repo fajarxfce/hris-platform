@@ -3,6 +3,7 @@ package dev.fajar.hris.leave.data.mappers
 import dev.fajar.hris.leave.data.models.*
 import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.people.domain.entities.ContractKind
+import dev.fajar.hris.schema.tables.records.LeaveTypeRevisionsRecord
 import tools.jackson.databind.ObjectMapper
 
 fun LeavePolicy.toData(): LeavePolicyData =
@@ -46,4 +47,15 @@ fun LeaveTypeRow.toType(json: ObjectMapper): LeaveType =
         active,
         version,
         revision,
+    )
+
+fun LeaveTypeRevisionsRecord.toPolicyRevision(json: ObjectMapper): LeavePolicyRevision =
+    LeavePolicyRevision(
+        requireNotNull(revision),
+        requireNotNull(effectiveFrom),
+        json.readValue(requireNotNull(details).data(), LeavePolicyData::class.java).toPolicy(),
+        requireNotNull(active),
+        requireNotNull(actorId),
+        requireNotNull(reason),
+        requireNotNull(recordedAt).toInstant(),
     )

@@ -16,7 +16,9 @@ class StoredLeavePolicyRepository(
     private val source: LeavePolicyDataSource,
     private val json: ObjectMapper,
 ) : LeavePolicyRepository {
-    override fun lock(companyId: UUID): Result<Unit> = safeDatabaseCall { source.lock(companyId) }
+    override fun lock(companyId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
+        source.lock(companyId, shared)
+    }
 
     override fun find(companyId: UUID, id: UUID): Result<LeaveType?> = safeDatabaseCall {
         source.find(companyId, id)?.toType(json)
@@ -37,6 +39,32 @@ class StoredLeavePolicyRepository(
         Page(
             rows.take(limit).map { it.toType(json) },
             if (rows.size > limit) rows[limit - 1].code else null,
+        )
+    }
+
+    override fun catalog(
+        companyId: UUID,
+        active: Boolean?,
+        after: String?,
+        limit: Int,
+    ): Result<Page<LeaveType>> = safeDatabaseCall {
+        val rows = source.catalog(companyId, active, after, limit + 1)
+        Page(
+            rows.take(limit).map { it.toType(json) },
+            if (rows.size > limit) rows[limit - 1].code else null,
+        )
+    }
+
+    override fun history(
+        companyId: UUID,
+        id: UUID,
+        after: Long?,
+        limit: Int,
+    ): Result<Page<LeavePolicyRevision>> = safeDatabaseCall {
+        val rows = source.history(companyId, id, after, limit + 1)
+        Page(
+            rows.take(limit).map { it.toPolicyRevision(json) },
+            if (rows.size > limit) rows[limit - 1].revision.toString() else null,
         )
     }
 

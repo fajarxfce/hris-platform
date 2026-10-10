@@ -6,32 +6,33 @@ import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.leave.domain.entities.LeaveType
-import dev.fajar.hris.leave.domain.policies.canReadLeaveTypes
 import dev.fajar.hris.leave.domain.repositories.LeavePolicyRepository
 import java.time.Clock
-import java.time.LocalDate
 
-class ListLeaveTypes(
+/**
+ * Administrative heads include future and archived definitions, unlike effective type selection.
+ */
+class ListLeavePolicies(
     private val policies: LeavePolicyRepository,
-    private val transactions: TransactionRunner,
     private val identities: IdentityRepository,
     private val members: MembershipRepository,
+    private val transactions: TransactionRunner,
     private val clock: Clock,
     private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
-        asOf: LocalDate,
+        active: Boolean?,
         after: String?,
         limit: Int,
     ): Result<Page<LeaveType>> {
-        if (!canReadLeaveTypes(actor))
-            return Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
-        if (limit !in 1..200 || (after?.length ?: 0) > 32 || asOf.year !in 1900..2200)
-            return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_page"))
+        val initial = actor.requirePermission("leave.manage")
+        if (initial is Result.Failed) return initial
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
+        if (limit !in 1..200 || (after != null && !after.matches(Regex("[A-Z][A-Z0-9_-]{0,31}"))))
+            return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_page"))
         return transactions.run(actor) {
             val policyGuard = policies.lock(company, shared = true)
             if (policyGuard is Result.Failed) return@run policyGuard
@@ -46,9 +47,9 @@ class ListLeaveTypes(
                     validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (checked is Result.Failed) return@run checked
-            if (!canReadLeaveTypes((checked as Result.Success).value))
-                return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
-            policies.list(company, asOf, after, limit)
+            val permission = (checked as Result.Success).value.requirePermission("leave.manage")
+            if (permission is Result.Failed) return@run permission
+            policies.catalog(company, active, after, limit)
         }
     }
 }

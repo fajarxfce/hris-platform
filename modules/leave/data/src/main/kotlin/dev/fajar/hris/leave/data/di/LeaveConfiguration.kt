@@ -153,11 +153,50 @@ class LeaveConfiguration {
         companies: CompanyRepository,
         members: MembershipRepository,
         identities: IdentityRepository,
-    ) = SaveLeaveType(policies, operations, journal, transactions, companies, members, identities)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        SaveLeaveType(
+            policies,
+            operations,
+            journal,
+            transactions,
+            companies,
+            members,
+            identities,
+            clock,
+            security,
+        )
 
     @Bean
-    fun listLeaveTypes(policies: LeavePolicyRepository, transactions: TransactionRunner) =
-        ListLeaveTypes(policies, transactions)
+    fun listLeaveTypes(
+        policies: LeavePolicyRepository,
+        transactions: TransactionRunner,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = ListLeaveTypes(policies, transactions, identities, members, clock, security)
+
+    @Bean
+    fun listLeavePolicies(
+        policies: LeavePolicyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = ListLeavePolicies(policies, identities, members, transactions, clock, security)
+
+    @Bean
+    fun getLeavePolicy(
+        policies: LeavePolicyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = GetLeavePolicy(policies, identities, members, transactions, clock, security)
 
     @Bean
     fun adjustLeaveBalance(

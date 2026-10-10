@@ -11,9 +11,9 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresLeavePolicyDataSource(private val sql: DSLContext) : LeavePolicyDataSource {
-    override fun lock(company: UUID) {
-        sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "leave-policy:$company")
-            .execute()
+    override fun lock(company: UUID, shared: Boolean) {
+        val function = if (shared) "pg_advisory_xact_lock_shared" else "pg_advisory_xact_lock"
+        sql.query("select $function(hashtextextended(?,0))", "leave-policy:$company").execute()
     }
 
     override fun find(company: UUID, id: UUID): LeaveTypeRow? =
@@ -44,6 +44,35 @@ class PostgresLeavePolicyDataSource(private val sql: DSLContext) : LeavePolicyDa
             .orderBy(T.CODE, R.EFFECTIVE_FROM.desc(), R.REVISION.desc())
             .limit(limit)
             .fetch { it.toLeaveTypeRow() }
+
+    override fun catalog(
+        company: UUID,
+        active: Boolean?,
+        after: String?,
+        limit: Int,
+    ): List<LeaveTypeRow> =
+        selectLeaveTypes(sql)
+            .where(T.COMPANY_ID.eq(company))
+            .and(R.REVISION.eq(T.VERSION))
+            .and(active?.let { R.ACTIVE.eq(it) } ?: DSL.noCondition())
+            .and(after?.let { T.CODE.gt(it) } ?: DSL.noCondition())
+            .orderBy(T.CODE)
+            .limit(limit)
+            .fetch { it.toLeaveTypeRow() }
+
+    override fun history(
+        company: UUID,
+        id: UUID,
+        after: Long?,
+        limit: Int,
+    ): List<LeaveTypeRevisionsRecord> =
+        sql.selectFrom(R)
+            .where(R.COMPANY_ID.eq(company))
+            .and(R.TYPE_ID.eq(id))
+            .and(after?.let { R.REVISION.lt(it) } ?: DSL.noCondition())
+            .orderBy(R.REVISION.desc())
+            .limit(limit)
+            .fetch()
 
     override fun insert(row: LeaveTypesRecord) {
         sql.insertInto(T).set(row).execute()

@@ -25,7 +25,7 @@ Native bearer sessions use `ANDROID` or `IOS`; browser sessions use `WEB`. Build
 
 ## Failure handling
 
-The dashboard sends `WEB` and its compiled build number. Set `HRIS_DASHBOARD_BUILD` when running its development server or build; the default is `1`. A new distributed build should use a higher number before raising the corresponding company minimum. The frontend translates availability codes without automatically replaying failed commands. The [client policy review screen](dashboard.md#client-policy-review) displays effective values, the configured head, and named immutable revisions. Browser editing remains subsequent work.
+The dashboard sends `WEB` and its compiled build number. Set `HRIS_DASHBOARD_BUILD` when running its development server or build; the default is `1`. A new distributed build should use a higher number before raising the corresponding company minimum. The frontend translates availability codes without automatically replaying failed commands. The [client policy review screen](dashboard.md#client-policy-review) displays effective values, the configured head, and named immutable revisions. The [routed editor](dashboard.md#client-policy-editing) uses the configured head, explicit UTC fields, protected version reloads, and immutable receipt recovery. It remains available for authorized recovery during maintenance/build restrictions.
 
 The dashboard accepts finite retry metadata up to the seven-day maintenance limit. An invalid optional retry hint is ignored without discarding the stable failure code or its safe localization parameters.
 

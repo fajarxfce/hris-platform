@@ -73,6 +73,7 @@ export function PortalWorkspace(
             <WorkspaceSessionContext value={sessionActions}>
               <AppWorkspaceSurface visible={state.stage === "ready"}>
                 <PortalRoutes
+                  clientBuild={props.clientBuild}
                   accountId={state.workspace.accountId}
                   companies={state.workspace.companies}
                   access={state.workspace.access}

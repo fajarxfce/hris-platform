@@ -4,6 +4,7 @@ import { HttpClientPolicyDataSource } from "../data/datasources/http-client-poli
 import { RemoteAuditRepository } from "../data/repositories/remote-audit-repository";
 import { RemoteClientPolicyRepository } from "../data/repositories/remote-client-policy-repository";
 import { LoadClientPolicyReview } from "../domain/usecases/load-client-policy-review";
+import { SaveClientPolicy } from "../domain/usecases/save-client-policy";
 import { SearchAuditEvents } from "../domain/usecases/search-audit-events";
 
 export function createAdministrationFeature(http: HttpClient) {
@@ -13,5 +14,6 @@ export function createAdministrationFeature(http: HttpClient) {
   return {
     searchAudit: new SearchAuditEvents(audits),
     loadClientPolicy: new LoadClientPolicyReview(policies),
+    saveClientPolicy: new SaveClientPolicy(policies),
   };
 }

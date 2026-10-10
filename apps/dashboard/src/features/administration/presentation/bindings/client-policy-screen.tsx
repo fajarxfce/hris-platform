@@ -72,6 +72,7 @@ function ClientPolicyBinding({
       locale={locale}
       companyName={companyName}
       onRefresh={controller.refresh}
+      editTo={`/settings/client-policy/edit?${new URLSearchParams({ company: access.companyId })}`}
     />
   );
 }

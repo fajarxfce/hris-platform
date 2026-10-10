@@ -1,5 +1,6 @@
 import { Text } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -10,6 +11,7 @@ import { AppResourceTable } from "../../../../core/presentation/components/app-r
 import { AppTextField } from "../../../../core/presentation/components/app-text-field";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useClientPolicyVersion } from "../controllers/use-client-policy-version";
+import { clientPolicyEditorMessages } from "../i18n/client-policy-editor-messages";
 import { clientPolicyMessages } from "../i18n/client-policy-messages";
 import type { ClientPolicyState } from "../models/client-policy-state";
 import type { ClientPolicyView } from "../models/client-policy-view";
@@ -21,6 +23,7 @@ export function ClientPolicyPage({
   locale,
   companyName,
   onRefresh,
+  editTo,
 }: {
   state: ClientPolicyState;
   view: ClientPolicyView | null;
@@ -28,6 +31,7 @@ export function ClientPolicyPage({
   locale: Locale;
   companyName: string;
   onRefresh: () => void;
+  editTo: string;
 }) {
   const text = clientPolicyMessages(locale);
   const shared = messages(locale);
@@ -37,13 +41,18 @@ export function ClientPolicyPage({
         title={text.title}
         context={`${companyName} / ${text.settings}`}
         actions={
-          <AppButton
-            icon={<ArrowClockwise20Regular />}
-            onClick={onRefresh}
-            disabled={state.stage === "loading"}
-          >
-            {shared.refresh}
-          </AppButton>
+          <>
+            {state.stage === "ready" && (
+              <Link to={editTo}>{clientPolicyEditorMessages(locale).edit}</Link>
+            )}
+            <AppButton
+              icon={<ArrowClockwise20Regular />}
+              onClick={onRefresh}
+              disabled={state.stage === "loading"}
+            >
+              {shared.refresh}
+            </AppButton>
+          </>
         }
       />
       <form onSubmit={history.apply} noValidate>

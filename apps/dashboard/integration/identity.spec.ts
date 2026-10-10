@@ -417,21 +417,43 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
     "Belum ada konfigurasi perusahaan yang disimpan.",
   );
   const policyPath = `/api/v1/companies/${companies[1]}/settings/client-policy`;
-  for (const version of [0, 1]) {
-    const response = await context.request.put(policyPath, {
-      headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
-      data: {
-        expectedVersion: version === 0 ? null : 0,
-        activateAt: version === 0 ? null : new Date(Date.now() + 600_000).toISOString(),
-        disabledModules: version === 0 ? ["EXPENSES"] : ["PAYROLL"],
-        minimumBuilds: { android: version + 1, ios: 0, web: 0 },
-        maintenance: null,
-        reason: `Browser policy revision ${version}`,
-      },
+  await page.getByRole("link", { name: "Edit policy terbaru", exact: true }).click();
+  await page.getByRole("checkbox", { name: "Pengeluaran", exact: true }).uncheck();
+  await page.getByLabel("Android", { exact: true }).fill("1");
+  await page.getByLabel("Alasan", { exact: true }).fill("Browser policy revision 0");
+  await page.getByRole("button", { name: "Simpan policy", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Policy tersimpan.");
+  await page.getByRole("link", { name: "Lihat revisi tersimpan", exact: true }).click();
+  await page.getByRole("link", { name: "Edit policy terbaru", exact: true }).click();
+  await page.getByLabel("Aktivasi", { exact: true }).selectOption("SCHEDULED");
+  await page
+    .getByLabel("Mulai berlaku (UTC)", { exact: true })
+    .fill(new Date(Date.now() + 600_000).toISOString());
+  await page.getByRole("checkbox", { name: "Pengeluaran", exact: true }).check();
+  await page.getByRole("checkbox", { name: "Payroll", exact: true }).uncheck();
+  await page.getByLabel("Android", { exact: true }).fill("2");
+  await page.getByLabel("Alasan", { exact: true }).fill("Browser policy revision 1");
+  const policyWrites: { operation: string | undefined; body: unknown }[] = [];
+  await page.route(`**${policyPath}`, async (route) => {
+    if (route.request().method() !== "PUT") return route.fallback();
+    policyWrites.push({
+      operation: route.request().headers()["idempotency-key"],
+      body: route.request().postDataJSON(),
     });
+    const response = await route.fetch();
     expect(response.status()).toBe(200);
-  }
-  await page.getByRole("button", { name: "Muat ulang", exact: true }).click();
+    expect(await response.json()).toMatchObject({ id: companies[1], version: 1 });
+    if (policyWrites.length === 1) return route.abort("connectionfailed");
+    return route.fulfill({ response });
+  });
+  await page.getByRole("button", { name: "Simpan policy", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Hasil penyimpanan belum terkonfirmasi.");
+  await page.getByRole("button", { name: "Ulangi penyimpanan awal", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Policy tersimpan.");
+  expect(policyWrites).toHaveLength(2);
+  expect(policyWrites[1]).toEqual(policyWrites[0]);
+  await page.unroute(`**${policyPath}`);
+  await page.getByRole("link", { name: "Lihat revisi tersimpan", exact: true }).click();
   const effectivePolicy = page.getByRole("region", { name: "Policy efektif", exact: true });
   await expect(
     effectivePolicy
@@ -451,6 +473,41 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
   await page.getByLabel("Revisi", { exact: true }).fill("0");
   await page.getByRole("button", { name: "Lihat revisi", exact: true }).click();
   await expect(policyConfiguration).toContainText("Browser policy revision 0");
+  for (const [maintenance, build, code, status] of [
+    [true, "0", "company_maintenance", 503],
+    [false, "2", "client_update_required", 403],
+    [false, "0", null, 200],
+  ] as const) {
+    await page.getByRole("link", { name: "Edit policy terbaru", exact: true }).click();
+    await page.getByLabel("Aktivasi", { exact: true }).selectOption("IMMEDIATE");
+    await page.getByLabel("Web", { exact: true }).fill(build);
+    await page
+      .getByRole("checkbox", { name: "Jadwalkan maintenance", exact: true })
+      .setChecked(maintenance);
+    if (maintenance) {
+      await page
+        .getByLabel("Mulai maintenance (UTC)", { exact: true })
+        .fill(new Date(Date.now() - 60_000).toISOString());
+      await page
+        .getByLabel("Akhir maintenance (UTC)", { exact: true })
+        .fill(new Date(Date.now() + 600_000).toISOString());
+    }
+    await page
+      .getByLabel("Alasan", { exact: true })
+      .fill(`Browser policy recovery ${build} ${maintenance}`);
+    await page.getByRole("button", { name: "Simpan policy", exact: true }).click();
+    await expect(page.getByRole("status")).toContainText("Policy tersimpan.");
+    await page.getByRole("link", { name: "Lihat revisi tersimpan", exact: true }).click();
+    await expect(policyConfiguration).toContainText("Browser policy recovery");
+    const business = await context.request.get(
+      `/api/v1/companies/${companies[1]}/employees?asOf=${employmentEffectiveDate}`,
+      {
+        headers: { "X-HRIS-Client-Platform": "WEB", "X-HRIS-Client-Build": "1" },
+      },
+    );
+    expect(business.status()).toBe(status);
+    if (code) expect(await business.json()).toMatchObject({ code });
+  }
   const announcementPath = `/api/v1/companies/${companies[1]}/announcements/${randomUUID()}`;
   const draft = await context.request.put(announcementPath, {
     headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },

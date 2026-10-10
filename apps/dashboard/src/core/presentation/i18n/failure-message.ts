@@ -2,6 +2,26 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_client_policy: [
+    "Check the highlighted policy values.",
+    "Periksa nilai policy yang ditandai.",
+  ],
+  client_policy_activation_expired: [
+    "The activation time has passed. Choose a new time or immediate activation.",
+    "Waktu aktivasi sudah lewat. Pilih waktu baru atau aktivasi langsung.",
+  ],
+  client_policy_activation_too_late: [
+    "Schedule activation within 365 days.",
+    "Jadwalkan aktivasi dalam 365 hari.",
+  ],
+  client_policy_revision_limit: [
+    "The company has reached its policy revision limit.",
+    "Perusahaan sudah mencapai batas revisi policy.",
+  ],
+  client_policy_clock_regressed: [
+    "The server clock must recover before another policy can be saved.",
+    "Jam server harus pulih sebelum policy lain dapat disimpan.",
+  ],
   invalid_employment_revision: [
     "Choose a valid employment revision.",
     "Pilih revisi employment yang valid.",

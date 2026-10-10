@@ -6,6 +6,7 @@ import type { PeopleUseCases } from "../features/people/presentation/contracts/p
 import type { ReportingUseCases } from "../features/reporting/presentation/contracts/reporting-use-cases";
 
 export type ApplicationDependencies = Readonly<{
+  clientBuild: number;
   identity: IdentityController;
   reporting: ReportingUseCases;
   administration: AdministrationUseCases;

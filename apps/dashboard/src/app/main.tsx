@@ -40,6 +40,7 @@ const router = createBrowserRouter([
     element: (
       <AppErrorBoundary locale="en" onReload={() => window.location.reload()}>
         <Application
+          clientBuild={__HRIS_DASHBOARD_BUILD__}
           identity={identity}
           reporting={reporting}
           administration={administration}

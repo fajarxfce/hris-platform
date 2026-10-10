@@ -14,7 +14,7 @@ Reference: https://learn.microsoft.com/en-us/azure/azure-portal/azure-portal-ove
 
 ## Implemented foundation
 
-`apps/dashboard` provides password sign-in, configured SSO entry links, session bootstrap, authenticator enrollment/verification, and explicit acknowledgement of one-use recovery codes. The portal includes current-company selection, an authorized company overview, organization directories, parent details and editing, employee onboarding, directories, employment history, dated revisions and scheduled revision cancellation, separately authorized personal profiles with editing/history, company/group headcount reports, audit metadata search, client policy review, a job monitor with cancellation, responsive navigation, and English/Indonesian light/dark interfaces. Other business resource screens listed above remain subsequent work; the overview does not invent statistics.
+`apps/dashboard` provides password sign-in, configured SSO entry links, session bootstrap, authenticator enrollment/verification, and explicit acknowledgement of one-use recovery codes. The portal includes current-company selection, an authorized company overview, organization directories, parent details and editing, employee onboarding, directories, employment history, dated revisions and scheduled revision cancellation, separately authorized personal profiles with editing/history, company/group headcount reports, audit metadata search, client policy review and versioned editing, a job monitor with cancellation, responsive navigation, and English/Indonesian light/dark interfaces. Other business resource screens listed above remain subsequent work; the overview does not invent statistics.
 
 Feature datasources validate transport DTOs; repositories map them inside the HTTP failure boundary; use cases own policy; the identity controller owns requests and presentation state. Pages render that state. Shared `AppXxx` components wrap Fluent controls. The import checker rejects domain/framework dependencies, data access from presentation, repository peers, and use-case peers. These static checks complement review of orchestration and resource ownership.
 
@@ -58,7 +58,17 @@ There is no polling or cumulative page cache. Refresh, filter changes, company/a
 
 `/settings/client-policy` shows the [company settings snapshot](client-policy.md): effective modules, minimum builds, maintenance status, evaluation time, and the latest configured revision. A scheduled head remains distinct from the revision currently enforced by the server. The revision form accepts an explicit immutable revision from 0 to 9999; its company and selection live in the URL, and Back/Forward restores the controlled input. The latest revision needs one settings request; a named historical revision uses a second authorized read.
 
-The feature requires `settings.manage`. Its controller owns one pending review, cancels both stages on replacement/disposal, and clears configuration on refresh or access failure. Company changes discard the previous company's revision selection. Repository mapping validates bounded builds, distinct modules, maintenance intervals, version relationships, and coherent effective values before creating immutable entities. Locale/theme changes only reformat the loaded snapshot. Refresh is explicit; this screen has no polling or local policy cache. Configuration editing remains subsequent work.
+The feature requires `settings.manage`. Its controller owns one pending review, cancels both stages on replacement/disposal, and clears configuration on refresh or access failure. Company changes discard the previous company's revision selection. Repository mapping validates bounded builds, distinct modules, maintenance intervals, version relationships, and coherent effective values before creating immutable entities. Locale/theme changes only reformat the loaded snapshot. Refresh is explicit; this screen has no polling or local policy cache.
+
+## Client policy editing
+
+`/settings/client-policy/edit` loads the latest configured head through the same guarded settings snapshot, including when opened from an older history entry. The form keeps the configured revision separate from the effective revision. It supports explicit immediate/scheduled activation, eight module switches, minimum Android/iOS/Web builds, a bounded maintenance window, and a required reason. UTC timestamp fields retain the exact acquired precision without conversion through the browser timezone. A future head initially retains its schedule; an already effective head proposes immediate activation. Selecting immediate activation creates a higher revision that supersedes older schedules.
+
+The domain validates bounded builds/revisions, supported distinct modules, UTC ranges, maintenance duration, and safe reasons before I/O. Current activation time, permission, MFA, and version checks remain server decisions. Data maps a complete replacement payload and requires a receipt identifying the selected company at the next revision. A first configuration uses a null expected version and returns revision zero. The displayed dashboard build comes from the same application configuration used by the HTTP transport.
+
+The controller pins one configured version, immutable payload, and operation key. A definite conflict requires an explicit protected reload; validation failures leave the form editable. An uncertain outcome remains read-only through verification or subsequent activation/version rejections until explicit retry recovers the original receipt. Saved-revision navigation is a separate read. Requests, field values, reasons, and pending commands are owned by the current workspace and discarded on departure or revoked scope. Locale/theme changes and equivalent identity revalidation retain the form; explicit reloading resets it even if the server returns identical values.
+
+Settings remain independently authorized during maintenance or minimum-build restrictions. The editor displays the current dashboard build and explains a proposed Web minimum that exceeds it. Authorized operators can save another immediate revision to restore availability; changing a flag never grants resource permissions. The browser does not persist commands or perform automatic retries.
 
 ## Job monitor
 
@@ -122,7 +132,7 @@ Each submission captures the loaded profile version, person ID, payload, and one
 
 ## Commands
 
-The shared HTTP transport sends `X-HRIS-Client-Platform: WEB` with the compiled `HRIS_DASHBOARD_BUILD` (default `1`, bounded integer). Set this build-time value consistently for distributed dashboard artifacts. Company policy can require an update or pause business requests during maintenance; availability errors have English/Indonesian messages. Policy editing and company preflight screens remain subsequent business workflows.
+The shared HTTP transport sends `X-HRIS-Client-Platform: WEB` with the compiled `HRIS_DASHBOARD_BUILD` (default `1`, bounded integer). Set this build-time value consistently for distributed dashboard artifacts. Company policy can require an update or pause business requests during maintenance; availability errors have English/Indonesian messages. Company preflight screens remain subsequent business workflows.
 
 From `apps/dashboard`:
 

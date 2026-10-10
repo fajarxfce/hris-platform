@@ -86,7 +86,14 @@ const ClientPolicyScreen = lazy(() =>
   ),
 );
 
+const ClientPolicyEditorScreen = lazy(() =>
+  import("../../features/administration/presentation/bindings/client-policy-editor-screen").then(
+    (module) => ({ default: module.ClientPolicyEditorScreen }),
+  ),
+);
+
 export function PortalRoutes({
+  clientBuild,
   accountId,
   company,
   companies,
@@ -99,6 +106,7 @@ export function PortalRoutes({
   locale,
   nextIdentifier,
 }: {
+  clientBuild: number;
   accountId: AccountId;
   company: CompanyMembership | null;
   companies: readonly CompanyMembership[];
@@ -114,6 +122,22 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/settings/client-policy/edit"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ClientPolicyEditorScreen
+              accountId={accountId}
+              access={access}
+              administration={administration}
+              companyName={company.name}
+              locale={locale}
+              clientBuild={clientBuild}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route path="/" element={<OverviewPage company={company} locale={locale} />} />
       <Route
         path="/people/employees/:employeeId/revisions/:revision/cancel"

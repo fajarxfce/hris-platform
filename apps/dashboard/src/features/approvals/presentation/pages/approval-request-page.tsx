@@ -19,6 +19,7 @@ export function ApprovalRequestPage({
   locale,
   backTo,
   reassignTo,
+  resourceTo,
   onRefresh,
 }: {
   state: ApprovalRequestState;
@@ -27,6 +28,7 @@ export function ApprovalRequestPage({
   locale: Locale;
   backTo: string;
   reassignTo: string | null;
+  resourceTo: string | null;
   onRefresh: () => void;
 }) {
   const text = approvalMessages(locale);
@@ -38,6 +40,7 @@ export function ApprovalRequestPage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
+            {resourceTo && <Link to={resourceTo}>{text.sourceRequest}</Link>}
             {reassignTo && (
               <Link to={reassignTo}>{approvalReassignmentMessages(locale).action}</Link>
             )}

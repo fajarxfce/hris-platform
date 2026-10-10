@@ -1,0 +1,30 @@
+import type { AccountId, CompanyId } from "../../../../core/domain/identifiers";
+import type { LeaveAttachment } from "./leave-attachment";
+import type { LeaveDay } from "./leave-day";
+import type { LeaveHistory } from "./leave-history";
+import type { LeavePolicy } from "./leave-policy";
+import type { LeaveRequestId, LeaveStatus } from "./leave-request";
+import type { LeaveWorkflow } from "./leave-workflow";
+
+export const leaveActions = ["DECIDE", "WITHDRAW", "REQUEST_CANCELLATION"] as const;
+export type LeaveRequestDetails = Readonly<{
+  id: LeaveRequestId;
+  companyId: CompanyId;
+  employeeId: string;
+  employeeNumber: string;
+  employeeName: string;
+  ownerAccountId: AccountId | null;
+  authorId: AccountId;
+  submittedAt: string;
+  policy: LeavePolicy;
+  days: readonly LeaveDay[];
+  chargedDays: string;
+  reason: string;
+  status: LeaveStatus;
+  version: number;
+  approval: LeaveWorkflow;
+  cancellation: LeaveWorkflow | null;
+  history: LeaveHistory;
+  availableActions: readonly (typeof leaveActions)[number][];
+  attachments: readonly LeaveAttachment[];
+}>;

@@ -4,6 +4,7 @@ import type { AccountId } from "../../../../core/domain/identifiers";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import { canBrowseEmployeeLeave } from "../../../leave/domain/policies/leave-read-policy";
 import { canPrepareLifecycleCase } from "../../../lifecycle/domain/policies/lifecycle-case-start-policy";
 import { canReadEmploymentHistory } from "../../domain/policies/employee-policy";
 import { canManageEmployment } from "../../domain/policies/employment-policy";
@@ -56,6 +57,11 @@ export function EmployeeDetailsScreen(props: Props) {
       asOf={search.asOf}
       today={today}
       backTo={backTo}
+      leaveTo={
+        canBrowseEmployeeLeave(props.access.permissions)
+          ? `/leave/requests?${new URLSearchParams({ company: props.access.companyId, employee: employeeId })}`
+          : null
+      }
       startLifecycleTo={
         canPrepareLifecycleCase(props.access.permissions)
           ? `/people/employees/${encodeURIComponent(employeeId)}/lifecycle/new?${new URLSearchParams({ company: props.access.companyId, asOf: search.asOf })}`
@@ -103,6 +109,7 @@ function EmployeeDetailsBinding({
   profileTo,
   editEmploymentTo,
   startLifecycleTo,
+  leaveTo,
   tab,
   after,
   onTab,
@@ -115,6 +122,7 @@ function EmployeeDetailsBinding({
   profileTo: string | null;
   editEmploymentTo: string | null;
   startLifecycleTo: string | null;
+  leaveTo: string | null;
   tab: EmployeeTab;
   after: string | null;
   onTab: (tab: string) => void;
@@ -147,6 +155,7 @@ function EmployeeDetailsBinding({
       profileTo={profileTo}
       editEmploymentTo={editEmploymentTo}
       startLifecycleTo={startLifecycleTo}
+      leaveTo={leaveTo}
       tab={tab}
       canReadHistory={canReadEmploymentHistory(access.permissions)}
       onTab={onTab}

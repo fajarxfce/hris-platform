@@ -11,11 +11,24 @@ import type {
   CompanyMembership,
 } from "../../features/identity/domain/entities/session";
 import type { JobsUseCases } from "../../features/jobs/presentation/contracts/jobs-use-cases";
+import type { LeaveUseCases } from "../../features/leave/presentation/contracts/leave-use-cases";
 import type { LifecycleUseCases } from "../../features/lifecycle/presentation/contracts/lifecycle-use-cases";
 import type { OrganizationUseCases } from "../../features/organization/presentation/contracts/organization-use-cases";
 import { OverviewPage } from "../../features/overview/presentation/pages/overview-page";
 import type { PeopleUseCases } from "../../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../../features/reporting/presentation/contracts/reporting-use-cases";
+import { approvalResourceRoute } from "./approval-resource-route";
+
+const LeaveRequestsScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-requests-screen").then((module) => ({
+    default: module.LeaveRequestsScreen,
+  })),
+);
+const LeaveRequestScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-request-screen").then((module) => ({
+    default: module.LeaveRequestScreen,
+  })),
+);
 
 const ApprovalDelegationsScreen = lazy(() =>
   import("../../features/approvals/presentation/bindings/approval-delegations-screen").then(
@@ -214,6 +227,7 @@ export function PortalRoutes({
   administration,
   approvals,
   jobs,
+  leave,
   organization,
   people,
   lifecycle,
@@ -229,6 +243,7 @@ export function PortalRoutes({
   administration: AdministrationUseCases;
   approvals: ApprovalsUseCases;
   jobs: JobsUseCases;
+  leave: LeaveUseCases;
   organization: OrganizationUseCases;
   people: PeopleUseCases;
   lifecycle: LifecycleUseCases;
@@ -238,6 +253,35 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/leave/requests"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveRequestsScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/requests/:requestId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveRequestScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/approvals/:approvalId/reassign"
         element={
@@ -401,6 +445,7 @@ export function PortalRoutes({
         element={
           <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
             <ApprovalRequestScreen
+              resourceRoute={approvalResourceRoute}
               accountId={accountId}
               access={access}
               approvals={approvals}

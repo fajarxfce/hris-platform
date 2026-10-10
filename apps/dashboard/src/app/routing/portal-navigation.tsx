@@ -1,5 +1,6 @@
 import {
   ApprovalsApp20Regular,
+  CalendarCheckmark20Regular,
   ClipboardTaskListLtr20Regular,
   DataBarVertical20Regular,
   History20Regular,
@@ -25,6 +26,8 @@ import { approvalMessages } from "../../features/approvals/presentation/i18n/app
 import { approvalTemplateMessages } from "../../features/approvals/presentation/i18n/approval-template-messages";
 import type { CompanyAccess } from "../../features/identity/domain/entities/session";
 import { jobMessages } from "../../features/jobs/presentation/i18n/job-messages";
+import { canBrowseCompanyLeave } from "../../features/leave/domain/policies/leave-read-policy";
+import { leaveMessages } from "../../features/leave/presentation/i18n/leave-messages";
 import { canReadAssignedLifecycle } from "../../features/lifecycle/domain/policies/lifecycle-case-policy";
 import {
   canManageLifecycle,
@@ -50,6 +53,15 @@ export function portalNavigation(
   const permissions = access?.permissions ?? [];
   return [
     { to: "/", label: text.overview, icon: <Home20Regular /> },
+    ...(canBrowseCompanyLeave(permissions)
+      ? [
+          {
+            to: "/leave/requests",
+            label: leaveMessages(locale).requests,
+            icon: <CalendarCheckmark20Regular />,
+          },
+        ]
+      : []),
     ...(canReadApprovalInbox(permissions)
       ? [
           {

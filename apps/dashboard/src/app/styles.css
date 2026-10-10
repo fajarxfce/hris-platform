@@ -156,6 +156,17 @@ a {
   gap: 24px;
   min-width: 0;
 }
+.app-resource-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 16px;
+}
+.app-leave-workflow {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
 .app-tab-panel {
   padding-top: 20px;
 }

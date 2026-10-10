@@ -492,6 +492,18 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Select 1–25 different approvers and enter a reason.",
     "Pilih 1–25 approver berbeda dan masukkan alasan.",
   ],
+  invalid_leave_query: [
+    "Choose a valid employee, status and page.",
+    "Pilih karyawan, status, dan halaman yang valid.",
+  ],
+  leave_request_not_found: [
+    "This leave request is unavailable.",
+    "Permintaan cuti ini tidak tersedia.",
+  ],
+  employee_scope_required: [
+    "Open leave requests from an employee record.",
+    "Buka permintaan cuti dari data karyawan.",
+  ],
   approval_changed: [
     "The approval changed or is no longer pending. Reload the current request.",
     "Approval berubah atau tidak lagi menunggu. Muat ulang permintaan terkini.",

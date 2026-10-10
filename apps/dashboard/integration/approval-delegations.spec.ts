@@ -3,8 +3,9 @@ import { expect, test } from "@playwright/test";
 import { reviewApprovalReassignment } from "./approval-reassignment";
 import { reviewApprovalTemplate } from "./approval-template";
 import { authenticatorCode } from "./fixtures/authenticator";
+import { reviewLeaveRequests } from "./leave-requests";
 
-test("real API templates, delegations and expense reassignment recover receipts and respect company scope", async ({
+test("real API approval administration and leave review recover receipts and respect company scope", async ({
   page,
   context,
 }) => {
@@ -94,6 +95,7 @@ test("real API templates, delegations and expense reassignment recover receipts 
     ).status(),
   ).toBe(404);
   await reviewApprovalReassignment(page, context, company, delegate);
+  await reviewLeaveRequests(page, context, company, otherCompany, delegate);
   await page.getByRole("link", { name: "My delegations", exact: true }).click();
   await page
     .getByRole("table", { name: "My delegations", exact: true })

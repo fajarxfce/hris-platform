@@ -24,6 +24,8 @@ Request detail exposes server-calculated actions. Current HR/team/self scope or 
 
 Request lists and details revalidate current access and session assurance after acquiring their resource/access guards. Detail reads hold the shared approval guard, so a reassignment cannot combine an old workflow version with new assignees or actions. Submission, decisions, withdrawal, and cancellation use the same post-wait assurance check before mutation or receipt replay. Cancellation of pending application work releases transaction-owned guards.
 
+The [dashboard request directory and detail review](../dashboard.md#leave-request-review) are implemented, including status/employee filters, submitted schedule and policy, approval/cancellation references, evidence metadata, and bounded history navigation. Company readers enter from navigation; scoped readers enter from employee details, and assigned approvers can follow their inbox's source link. Browser decision forms, evidence downloads, policies, and balance administration remain subsequent capabilities.
+
 ## Attachments
 
 Submission accepts up to three distinct `attachmentRevisionIds`. Each revision must already be `READY`, belong to a `PERSONAL` document for the same employment, and remain available in the selected company. The selected policy's `attachmentRequired` flag defaults to false. Missing required evidence and unavailable evidence have stable validation codes; a foreign revision is not identified in the response.

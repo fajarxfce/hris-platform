@@ -4,6 +4,7 @@ import type { AccountId } from "../../../../core/domain/identifiers";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import type { ApprovalRequest } from "../../domain/entities/approval-request";
 import { canReassignApproval } from "../../domain/policies/approval-reassignment-policy";
 import type { ApprovalsUseCases } from "../contracts/approvals-use-cases";
 import { ApprovalRequestController } from "../controllers/approval-request-controller";
@@ -18,6 +19,7 @@ type Props = {
   companyName: string;
   timezone: string;
   locale: Locale;
+  resourceRoute: (request: ApprovalRequest) => string | null;
 };
 export function ApprovalRequestScreen(props: Props) {
   const { approvalId = "" } = useParams();
@@ -50,6 +52,7 @@ function ApprovalRequestBinding({
   id,
   backTo,
   reassignTo,
+  resourceRoute,
 }: Props & {
   id: string;
   backTo: string;
@@ -81,6 +84,7 @@ function ApprovalRequestBinding({
       locale={locale}
       backTo={backTo}
       reassignTo={state.request && canReassignApproval(access, state.request) ? reassignTo : null}
+      resourceTo={state.request ? resourceRoute(state.request) : null}
       onRefresh={controller.refresh}
     />
   );

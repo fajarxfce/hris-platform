@@ -482,3 +482,9 @@ Validation: dashboard architecture, Biome, strict TypeScript, and 343 unit/contr
 Added file repository/datasource contracts, owned native selection and UTF-8 reading, and bounded CSV downloads without object-URL registries or cleanup timers. The repository coordinates selection and acquisition; `safeFileCall` preserves cancellation and maps size, encoding, and access failures. CSV HTTP reads share the cookie transport, deadlines, bounded stream cleanup, and JSON error contract. Encoded request bodies exceeding the API's 1 MiB limit fail locally before CSRF or command delivery.
 
 Validation: architecture, Biome, strict TypeScript, and 360 unit/controller tests across 63 files passed. New tests cover native cancellation, delayed aborts, picker/read/download cleanup, UTF-8 boundaries and BOM preservation, maximum acquisition size, immutable mappings, chunked response limits, safe errors, and expanded JSON rejection without network calls. Feature submission UI is integrated in subsequent work.
+
+## Separate browser and API integration CI budgets
+
+Run `38044161387` passed all 196 browser scenarios, then exhausted the dashboard job's 20-minute budget during API integration. The browser suite took 13 minutes 45 seconds and the duplicate server build took another four minutes. The integration job now consumes `apps-server.jar` from the checked backend job in the same workflow run. Browser verification retains its 20-minute budget; API integration owns a separate 15-minute budget and report artifact. The JAR artifact is retained for one day and is not a release or deployment.
+
+Validation: actionlint 1.7.12 passed; the artifact name/path matches the existing integration fixture. Execution of the revised workflow remains a CI check after push.

@@ -18,6 +18,35 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class ApprovalConfiguration {
     @Bean
+    fun getApprovalTemplate(
+        approvals: ApprovalRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = GetApprovalTemplate(approvals, identities, members, transactions, clock, security)
+
+    @Bean
+    fun getApprovalDelegation(
+        approvals: ApprovalRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = GetApprovalDelegation(approvals, identities, members, transactions, clock, security)
+
+    @Bean
+    fun listApprovalAssignees(
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = ListApprovalAssignees(identities, members, transactions, clock, security)
+
+    @Bean
     fun approvalPolicies(sql: DSLContext): ApprovalPolicyDataSource =
         PostgresApprovalPolicyDataSource(sql)
 

@@ -1,6 +1,12 @@
 package dev.fajar.hris.approvals.domain.policies
 
 import dev.fajar.hris.approvals.domain.entities.ApprovalKind
+import dev.fajar.hris.core.domain.Actor
+
+fun canSelectApprovalAssignees(actor: Actor, kind: ApprovalKind): Boolean =
+    "approvals.manage" in actor.permissions ||
+        ("approvals.read" in actor.permissions &&
+            approvalPermissions(kind).any { it in actor.permissions })
 
 fun approvalPermissions(kind: ApprovalKind): Set<String> =
     when (kind) {

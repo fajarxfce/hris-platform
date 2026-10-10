@@ -100,6 +100,14 @@ class StoredApprovalRepository(
             policies.find(companyId, id)?.toTemplate(json)
         }
 
+    override fun findTemplateRevision(
+        companyId: UUID,
+        id: UUID,
+        revision: Long,
+    ): Result<ApprovalTemplate?> = safeDatabaseCall {
+        policies.find(companyId, id, revision)?.toTemplate(json)
+    }
+
     override fun saveTemplate(actor: Actor, change: TemplateChange): Result<MutationReceipt> {
         val company = requireNotNull(actor.companyId)
         val expected = change.expectedVersion

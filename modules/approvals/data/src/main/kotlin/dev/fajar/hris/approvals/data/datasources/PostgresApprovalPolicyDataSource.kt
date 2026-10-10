@@ -52,7 +52,7 @@ class PostgresApprovalPolicyDataSource(private val sql: DSLContext) : ApprovalPo
             .fetch { TemplateRow(it.into(T), it.into(R)) }
     }
 
-    override fun find(companyId: UUID, id: UUID): TemplateRow? =
+    override fun find(companyId: UUID, id: UUID, revision: Long?): TemplateRow? =
         sql.select(T.asterisk(), R.asterisk())
             .from(T)
             .join(R)
@@ -60,6 +60,7 @@ class PostgresApprovalPolicyDataSource(private val sql: DSLContext) : ApprovalPo
             .and(R.TEMPLATE_ID.eq(T.ID))
             .where(T.COMPANY_ID.eq(companyId))
             .and(T.ID.eq(id))
+            .and(revision?.let { R.REVISION.eq(it) } ?: DSL.noCondition())
             .orderBy(R.REVISION.desc())
             .limit(1)
             .fetchOne { TemplateRow(it.into(T), it.into(R)) }

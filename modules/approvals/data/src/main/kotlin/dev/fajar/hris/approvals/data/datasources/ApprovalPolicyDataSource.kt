@@ -16,7 +16,7 @@ interface ApprovalPolicyDataSource {
         limit: Int,
     ): List<TemplateRow>
 
-    fun find(companyId: UUID, id: UUID): TemplateRow?
+    fun find(companyId: UUID, id: UUID, revision: Long? = null): TemplateRow?
 
     fun insert(row: ApprovalTemplatesRecord)
 

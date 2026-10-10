@@ -21,7 +21,36 @@ class ApprovalController(
     private val reassign: ReassignApproval,
     private val delegations: ListMyDelegations,
     private val saveDelegation: SaveApprovalDelegation,
+    private val getTemplate: GetApprovalTemplate,
+    private val getDelegation: GetApprovalDelegation,
+    private val assignees: ListApprovalAssignees,
 ) {
+    @GetMapping("/templates/{id}")
+    fun template(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestParam(required = false) revision: Long?,
+    ): TemplateResponse = getTemplate.execute(actor, id, revision).response().toResponse()
+
+    @GetMapping("/delegations/{id}")
+    fun delegation(actor: Actor, @PathVariable id: UUID): DelegationResponse =
+        getDelegation.execute(actor, id).response().toResponse()
+
+    @GetMapping("/assignees")
+    fun assignees(
+        actor: Actor,
+        @RequestParam kind: ApprovalKind,
+        @RequestParam(defaultValue = "") query: String,
+        @RequestParam(required = false) after: UUID?,
+        @RequestParam(defaultValue = "50") limit: Int,
+    ): Page<ApprovalAssigneeResponse> =
+        assignees.execute(actor, kind, query, after, limit).response().let { page ->
+            Page(
+                page.items.map { ApprovalAssigneeResponse(it.id, it.displayName) },
+                page.nextCursor,
+            )
+        }
+
     @GetMapping("/templates")
     fun templates(
         actor: Actor,

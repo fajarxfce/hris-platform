@@ -40,6 +40,9 @@ class ApprovalAssuranceTest : ApprovalApiFixture() {
                 "saveTemplate",
                 "saveDelegation",
                 "reassign",
+                "templateDetail",
+                "delegationDetail",
+                "assignees",
             ]
     )
     fun proofExpiringDuringAccountAcquisitionCannotAuthorizeReadsWritesOrReceiptReplay(
@@ -56,6 +59,12 @@ class ApprovalAssuranceTest : ApprovalApiFixture() {
             )
         val security = IdentitySecurityPolicy(enforceMfa = true)
         val id = UUID.randomUUID()
+        if (operation == "templateDetail") assertEquals(200, saveTemplate(f, id).statusCode())
+        if (operation == "delegationDetail")
+            assertEquals(
+                200,
+                saveDelegation(f, id, delegationBody(f, reviewer.account)).statusCode(),
+            )
         val key = UUID.randomUUID()
         val actor =
             Actor(
@@ -93,6 +102,29 @@ class ApprovalAssuranceTest : ApprovalApiFixture() {
             )
         val invoke: (Actor) -> Result<*> = { current ->
             when (operation) {
+                "templateDetail" ->
+                    GetApprovalTemplate(
+                            approvals,
+                            identities,
+                            members,
+                            transactions,
+                            clock,
+                            security,
+                        )
+                        .execute(current, id, null)
+                "delegationDetail" ->
+                    GetApprovalDelegation(
+                            approvals,
+                            identities,
+                            members,
+                            transactions,
+                            clock,
+                            security,
+                        )
+                        .execute(current, id)
+                "assignees" ->
+                    ListApprovalAssignees(identities, members, transactions, clock, security)
+                        .execute(current, ApprovalKind.LEAVE, "", null, 10)
                 "inbox" ->
                     ListApprovalInbox(approvals, identities, members, transactions, clock, security)
                         .execute(current, null, 20)

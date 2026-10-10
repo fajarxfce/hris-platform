@@ -44,6 +44,8 @@ interface ApprovalRepository {
 
     fun findTemplate(companyId: UUID, id: UUID): Result<ApprovalTemplate?>
 
+    fun findTemplateRevision(companyId: UUID, id: UUID, revision: Long): Result<ApprovalTemplate?>
+
     fun templates(
         companyId: UUID,
         kind: ApprovalKind,

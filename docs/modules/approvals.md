@@ -42,3 +42,11 @@ Policy selection reads at most 201 active effective templates, and delegated dec
 ## Dashboard
 
 The [approval inbox and stage review](../dashboard.md#approval-inbox-and-request-stages) are implemented. Template editing, delegation management, reassignment, decision history, and business-specific review actions remain subsequent workflows.
+
+## Administration detail and assignee lookup
+
+`GET /approvals/templates/{id}` returns the latest configuration to an approval administrator. `?revision=N` selects an exact retained rule revision. `version` is the current editable header version; `appliedRevision`, effective date, category, minimum amount, and stages identify the selected rules. Name and activation are current header fields. Editing must fetch the latest configuration rather than treat an older effective revision as the current draft.
+
+`GET /approvals/delegations/{id}` requires `approvals.read` and ownership as delegator/recipient, or `approvals.manage`. Exact details remain available after deactivation or expiry. Missing, foreign-company, and unowned records use the same not-found result. Both detail readers hold the shared approval/access guards and check live MFA after waiting.
+
+`GET /approvals/assignees?kind=...&query=...&after=...&limit=...` returns only `{id, displayName}` references. The caller needs `approvals.manage`, or `approvals.read` plus the decision permission for the selected kind. The query is limited to 120 characters and pages to 200 entries. Results require an active company membership, active account, and a matching decision permission. Lookup uses shared company/membership/account access guards and never acquires or returns email addresses, credentials, or permission lists. A lookup result does not authorize a future assignment: business commands still check current access, request ownership, and maker exclusions.

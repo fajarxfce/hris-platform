@@ -30,7 +30,7 @@ When a workflow needs both organization structure and company guards, acquire st
 
 Lifecycle case operations acquire people guards before case locks, followed by company, membership, and ordered account guards. Template operations acquire the template guard before access guards. Shared case reads cannot hold access guards while waiting for a writer that needs them. Multi-query aggregate reads need their resource guard; paginated case/task projections instead use one bounded SQL snapshot.
 
-Interactive approval reads acquire the shared approval guard before company, membership, and actor-account guards. They observe headers and assignment overrides coherently; mutations retain the exclusive approval guard. Both readers and administrative commands revalidate live session assurance after waiting, including before returning an existing operation receipt.
+Approval aggregate reads acquire the shared approval guard before company, membership, and actor-account guards. They observe headers and assignment overrides coherently; mutations retain the exclusive approval guard. Both readers and administrative commands revalidate live session assurance after waiting, including before returning an existing operation receipt.
 
 Import recovery and cancellation acquire the previous job before the import header, matching worker order. Import reads protect the header and row outcomes with a shared resource guard before access guards. Privileged commands recheck recent authentication after a pending resource or queue acquisition; an earlier check cannot authorize work indefinitely.
 

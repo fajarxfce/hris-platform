@@ -310,3 +310,11 @@ Details and decision reviews download selected PDF, JPEG, or PNG evidence throug
 One controller owns one pending acquisition. Explicit cancellation, request reload, company replacement, disposal, or decision submission aborts it and ignores late outcomes. A failure from an older request snapshot cannot redact its replacement or overwrite a completed decision. A current access failure clears private review details without discarding an uncertain command receipt. MFA renewal retains the review and reason but never automatically repeats a download.
 
 Binary blocks never enter presentation state, query caches, or browser persistence. The file datasource releases its object URL, listener, timer, and temporary anchor after handoff or cancellation. The UI reports that the download started; cancelling cannot retract a file already handed to the operating system. Uploaded evidence creation remains part of the subsequent document/submission workflows.
+
+## Leave policy review
+
+`/leave/policies` requires `leave.manage` and lists the latest saved policy definitions, including future and disabled policies. Twenty-item pages use the server's type-code cursor. Status filters apply explicitly and reset pagination. Detail links and browser Back/Forward retain company, filter, and directory cursor; changing company discards the old scope.
+
+`/leave/policies/:policyId` shows the latest head separately from immutable revision history. Each twenty-revision history page retains that latest head. Selecting a loaded revision focuses an inline region with its full terms, effective date, actor, recorded time, and reason without another request. The administrative API is distinct from the effective-date `/leave/types` lookup used when preparing a request.
+
+Mapping verifies exact identity, latest/applied revision consistency, calendar dates, bounded decimal entitlements, unique contracts, contiguous history, and cursor progress. Controllers cancel superseded reads and clear selected evidence during refresh, access failure, disposal, or company replacement. Equivalent MFA renewal does not repeat a failed read automatically. Locale/theme updates retain the current read and selection. Policy creation/editing and balance administration remain subsequent dashboard workflows.

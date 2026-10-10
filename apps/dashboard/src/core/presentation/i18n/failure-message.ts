@@ -2,6 +2,10 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  leave_type_not_found: [
+    "This leave policy is no longer available.",
+    "Kebijakan cuti ini tidak lagi tersedia.",
+  ],
   leave_attachment_not_found: [
     "This evidence is no longer accessible. Refresh the request.",
     "Bukti ini tidak lagi dapat diakses. Muat ulang permintaan.",

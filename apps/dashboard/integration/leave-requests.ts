@@ -8,7 +8,7 @@ export async function reviewLeaveRequests(
   otherCompany: string,
   reviewer: string,
 ) {
-  const { base, employee, request, employeeName } = await createLeaveScenario(
+  const { base, employee, type, request, employeeName } = await createLeaveScenario(
     context,
     company,
     reviewer,
@@ -25,6 +25,21 @@ export async function reviewLeaveRequests(
   expect(
     (
       await context.request.get(`/api/v1/companies/${otherCompany}/leave/requests/${request}`)
+    ).status(),
+  ).toBe(404);
+  await page.getByRole("link", { name: "Leave policies", exact: true }).click();
+  const policies = page.getByRole("table", { name: "Leave policies", exact: true });
+  await expect(policies).toContainText("Browser annual leave");
+  await policies.getByRole("button", { name: "View: Browser annual leave", exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`/leave/policies/${type}\\?company=${company}$`, "u"));
+  await expect(page.getByRole("region", { name: "Policy terms", exact: true })).toContainText(
+    "Browser annual leave",
+  );
+  await page.getByRole("button", { name: "View: Revision 0", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Revision 0", exact: true })).toBeFocused();
+  expect(
+    (
+      await context.request.get(`/api/v1/companies/${otherCompany}/leave/policies/${type}`)
     ).status(),
   ).toBe(404);
   await page.getByRole("link", { name: "Employees", exact: true }).click();

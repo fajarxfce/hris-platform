@@ -1021,6 +1021,51 @@ test("real API sessions, MFA, organization, people, lifecycle, reports, audit, p
     "Selesai",
   );
   await expect(page.getByRole("link", { name: "Tinjau offboarding", exact: true })).toHaveCount(0);
+  const importId = randomUUID();
+  const importPath = `/api/v1/companies/${companies[1]}/employee-imports`;
+  csrf = await (await context.request.get("/api/v1/auth/csrf")).json();
+  const importStarted = await context.request.post(importPath, {
+    headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
+    data: {
+      id: importId,
+      fileName: "browser-employees.csv",
+      reason: "Browser import preview fixture",
+      csv: "employee_number,legal_name,nationality,start_date,contract\nIMP01,Import fixture employee,ID,2026-01-01,PERMANENT\nIMP02,Invalid import date,ID,invalid,PERMANENT",
+    },
+  });
+  expect(importStarted.status()).toBe(200);
+  expect(await importStarted.json()).toMatchObject({ id: importId, version: 0 });
+  await page.getByRole("link", { name: "Import karyawan", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Lihat import: browser-employees.csv", exact: true })
+    .click();
+  await expect(page.getByRole("region", { name: "Ringkasan", exact: true })).toContainText(
+    "Menyiapkan preview",
+  );
+  await expect(page.getByRole("region", { name: "Baris", exact: true })).toContainText("Tertunda");
+  await page.getByRole("tab", { name: "Baris", exact: true }).click();
+  await expect(page.getByRole("table", { name: "Baris", exact: true })).toContainText(
+    "Import fixture employee",
+  );
+  await page.getByRole("button", { name: "Lihat baris: 1 · IMP01", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Detail baris", exact: true })).toContainText(
+    "2026-01-01",
+  );
+  await page.getByRole("button", { name: "Tutup", exact: true }).click();
+  await page.getByRole("button", { name: "Lihat baris: 2 · IMP02", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Detail baris", exact: true })).toContainText(
+    "Usulan tidak dapat dibuat dari baris ini.",
+  );
+  await page.getByRole("button", { name: "Tutup", exact: true }).click();
+  await page.getByRole("tab", { name: "Percobaan", exact: true }).click();
+  await expect(page.getByRole("table", { name: "Percobaan", exact: true })).toContainText(
+    "Preview",
+  );
+  const queuedImport = await (await context.request.get(`${importPath}/${importId}`)).json();
+  expect(queuedImport).toMatchObject({
+    batch: { id: importId, version: 0, status: "PREVIEWING" },
+    counts: { PENDING: 2 },
+  });
   await page.getByRole("link", { name: "Policy client", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText(
     "Belum ada konfigurasi perusahaan yang disimpan.",

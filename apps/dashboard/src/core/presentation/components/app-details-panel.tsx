@@ -33,7 +33,7 @@ export function AppDetailsPanel({
       open={open && visible}
       position="end"
       size="medium"
-      style={{ width: "min(480px, 100vw)" }}
+      style={{ width: "480px", maxWidth: "100%" }}
       onOpenChange={(_event, data) => {
         if (!data.open) onClose();
       }}

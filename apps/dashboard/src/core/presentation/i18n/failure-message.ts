@@ -2,6 +2,14 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  employee_import_access_required: [
+    "You do not have access to employee imports.",
+    "Anda tidak memiliki akses ke import karyawan.",
+  ],
+  employee_import_not_found: [
+    "This import is unavailable in the selected company.",
+    "Import ini tidak tersedia di perusahaan yang dipilih.",
+  ],
   offboarding_access_required: [
     "You do not have access to review or complete offboarding.",
     "Anda tidak memiliki akses untuk meninjau atau menyelesaikan offboarding.",

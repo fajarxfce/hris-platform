@@ -10,7 +10,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "check": "python3 ../../tool/check_dashboard_architecture.py && biome check . && tsc --noEmit && vitest run",
+    "check": "python3 ../../tool/test_dashboard_architecture.py && python3 ../../tool/check_dashboard_architecture.py && biome check . && tsc --noEmit && vitest run",
     "format": "biome check --write .",
     "test": "vitest run",
     "test:e2e": "playwright test",

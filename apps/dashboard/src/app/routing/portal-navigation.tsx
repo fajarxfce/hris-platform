@@ -26,8 +26,10 @@ import { lifecycleMessages } from "../../features/lifecycle/presentation/i18n/li
 import { canReadOrganization } from "../../features/organization/domain/policies/organization-unit-policy";
 import { organizationMessages } from "../../features/organization/presentation/i18n/organization-messages";
 import { canCreateEmployee } from "../../features/people/domain/policies/employee-creation-policy";
+import { canImportEmployees } from "../../features/people/domain/policies/employee-import-policy";
 import { canReadEmployees } from "../../features/people/domain/policies/employee-policy";
 import { employeeCreationMessages } from "../../features/people/presentation/i18n/employee-creation-messages";
+import { employeeImportMessages } from "../../features/people/presentation/i18n/employee-import-messages";
 import { canReadHeadcount } from "../../features/reporting/domain/policies/headcount-policy";
 
 /** Navigation visibility uses the same client policy as the feature; the API enforces access. */
@@ -59,6 +61,15 @@ export function portalNavigation(
             },
           ]
         : []),
+    ...(canImportEmployees(permissions)
+      ? [
+          {
+            to: "/people/imports",
+            label: employeeImportMessages(locale).title,
+            icon: <ClipboardTaskListLtr20Regular />,
+          },
+        ]
+      : []),
     ...(canReadLifecycle(permissions)
       ? [
           {

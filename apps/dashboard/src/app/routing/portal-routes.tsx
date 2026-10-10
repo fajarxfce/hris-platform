@@ -84,6 +84,16 @@ const EmployeesScreen = lazy(() =>
     default: module.EmployeesScreen,
   })),
 );
+const EmployeeImportsScreen = lazy(() =>
+  import("../../features/people/presentation/bindings/employee-imports-screen").then((module) => ({
+    default: module.EmployeeImportsScreen,
+  })),
+);
+const EmployeeImportScreen = lazy(() =>
+  import("../../features/people/presentation/bindings/employee-import-screen").then((module) => ({
+    default: module.EmployeeImportScreen,
+  })),
+);
 const EmployeeDetailsScreen = lazy(() =>
   import("../../features/people/presentation/bindings/employee-details-screen").then((module) => ({
     default: module.EmployeeDetailsScreen,
@@ -166,6 +176,36 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/people/imports"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <EmployeeImportsScreen
+              accountId={accountId}
+              access={access}
+              people={people}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/imports/:importId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <EmployeeImportScreen
+              accountId={accountId}
+              access={access}
+              people={people}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/people/employees/:employeeId/lifecycle/new"
         element={

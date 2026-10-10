@@ -15,7 +15,8 @@ def check_dashboard(root: Path) -> list[str]:
         parts = relative.parts
         text = source.read_text()
         imports = re.findall(r"\bfrom\s+[\"']([^\"']+)[\"']", text)
-        imports += re.findall(r"\bimport\s*(?:\(\s*)?[\"']([^\"']+)[\"']", text)
+        imports += re.findall(r"(?m)^\s*import\s*[\"']([^\"']+)[\"']", text)
+        imports += re.findall(r"\bimport\s*\(\s*[\"']([^\"']+)[\"']", text)
         for imported in imports:
             target = (source.parent / imported).resolve() if imported.startswith(".") else None
             target_parts = target.relative_to(source_root).parts if target and target.is_relative_to(source_root) else ()

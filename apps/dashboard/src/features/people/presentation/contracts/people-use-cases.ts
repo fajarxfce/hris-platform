@@ -11,6 +11,10 @@ import type { ReviseEmployment } from "../../domain/usecases/revise-employment";
 import type { SavePersonProfile } from "../../domain/usecases/save-person-profile";
 
 export type PeopleUseCases = Readonly<{
+  loadEmployeeImports: Pick<LoadEmployeeImports, "execute">;
+  loadEmployeeImport: Pick<LoadEmployeeImport, "execute">;
+  loadEmployeeImportRows: Pick<LoadEmployeeImportRows, "execute">;
+  loadEmployeeImportAttempts: Pick<LoadEmployeeImportAttempts, "execute">;
   loadEmploymentRevision: Pick<LoadEmploymentRevision, "execute">;
   cancelEmploymentRevision: Pick<CancelEmploymentRevision, "execute">;
   loadEmploymentDetails: Pick<LoadEmploymentDetails, "execute">;
@@ -23,3 +27,8 @@ export type PeopleUseCases = Readonly<{
   loadPersonProfileHistory: Pick<LoadPersonProfileHistory, "execute">;
   savePersonProfile: Pick<SavePersonProfile, "execute">;
 }>;
+
+import type { LoadEmployeeImport } from "../../domain/usecases/load-employee-import";
+import type { LoadEmployeeImportAttempts } from "../../domain/usecases/load-employee-import-attempts";
+import type { LoadEmployeeImportRows } from "../../domain/usecases/load-employee-import-rows";
+import type { LoadEmployeeImports } from "../../domain/usecases/load-employee-imports";

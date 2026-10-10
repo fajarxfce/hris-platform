@@ -36,3 +36,7 @@ Expense submissions supply their complete retained maker set. Migration V48 deri
 A company can have 200 active templates and 1,000 total definitions per approval kind. An account can have 200 active, unexpired delegations and 1,000 total unexpired delegations in its company. Future delegation periods reserve capacity. Deactivation releases active capacity; expiry releases unexpired capacity. Existing definitions can still be edited/deactivated if legacy data exceeds a limit, while adding or reactivating beyond capacity is rejected.
 
 Policy selection reads at most 201 active effective templates, and delegated decisions read at most 201 current active delegations. The additional row detects overflow: selection/decision fails explicitly instead of choosing from a truncated set. Paged administration remains available to repair oversized data. Reasons, optimistic versions, audit, and original operation receipts remain transactional.
+
+## Dashboard
+
+The [approval inbox and stage review](../dashboard.md#approval-inbox-and-request-stages) are implemented. Template editing, delegation management, reassignment, decision history, and business-specific review actions remain subsequent workflows.

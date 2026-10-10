@@ -1,4 +1,5 @@
 import {
+  ApprovalsApp20Regular,
   ClipboardTaskListLtr20Regular,
   DataBarVertical20Regular,
   History20Regular,
@@ -14,6 +15,8 @@ import { canReadAudit } from "../../features/administration/domain/policies/audi
 import { canReadClientSettings } from "../../features/administration/domain/policies/client-settings-policy";
 import { administrationMessages } from "../../features/administration/presentation/i18n/administration-messages";
 import { clientPolicyMessages } from "../../features/administration/presentation/i18n/client-policy-messages";
+import { canReadApprovalInbox } from "../../features/approvals/domain/policies/approval-read-policy";
+import { approvalMessages } from "../../features/approvals/presentation/i18n/approval-messages";
 import type { CompanyAccess } from "../../features/identity/domain/entities/session";
 import { jobMessages } from "../../features/jobs/presentation/i18n/job-messages";
 import { canReadAssignedLifecycle } from "../../features/lifecycle/domain/policies/lifecycle-case-policy";
@@ -41,6 +44,15 @@ export function portalNavigation(
   const permissions = access?.permissions ?? [];
   return [
     { to: "/", label: text.overview, icon: <Home20Regular /> },
+    ...(canReadApprovalInbox(permissions)
+      ? [
+          {
+            to: "/approvals",
+            label: approvalMessages(locale).title,
+            icon: <ApprovalsApp20Regular />,
+          },
+        ]
+      : []),
     ...(canReadOrganization(permissions)
       ? [
           {

@@ -79,6 +79,7 @@ export function PortalWorkspace(
                   access={state.workspace.access}
                   reporting={props.reporting}
                   administration={props.administration}
+                  approvals={props.approvals}
                   jobs={props.jobs}
                   organization={props.organization}
                   people={props.people}

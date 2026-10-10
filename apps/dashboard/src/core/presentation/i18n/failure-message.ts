@@ -2,6 +2,10 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  approval_not_found: [
+    "The approval request was not found or is no longer accessible.",
+    "Permintaan approval tidak ditemukan atau tidak dapat diakses.",
+  ],
   file_read_timeout: [
     "Reading the file timed out. Choose it again.",
     "Waktu pembacaan file habis. Pilih kembali file tersebut.",

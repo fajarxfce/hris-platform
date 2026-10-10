@@ -7,6 +7,7 @@ import { createBrowserFiles } from "../core/di/browser-files";
 import type { OperationId } from "../core/domain/identifiers";
 import { AppErrorBoundary } from "../core/presentation/components/app-error-boundary";
 import { createAdministrationFeature } from "../features/administration/di/administration-feature";
+import { createApprovalsFeature } from "../features/approvals/di/approvals-feature";
 import { createIdentityFeature } from "../features/identity/di/identity-feature";
 import { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
 import { createJobsFeature } from "../features/jobs/di/jobs-feature";
@@ -26,6 +27,7 @@ const queries = new QueryClient({
 const http = new FetchHttpClient(undefined, { clientBuild: __HRIS_DASHBOARD_BUILD__ });
 const reporting = createReportingFeature(http);
 const administration = createAdministrationFeature(http);
+const approvals = createApprovalsFeature(http);
 const jobs = createJobsFeature(http);
 const organization = createOrganizationFeature(http);
 const people = createPeopleFeature(http, createBrowserFiles());
@@ -47,6 +49,7 @@ const router = createBrowserRouter([
           identity={identity}
           reporting={reporting}
           administration={administration}
+          approvals={approvals}
           jobs={jobs}
           organization={organization}
           people={people}

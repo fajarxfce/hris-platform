@@ -5,6 +5,7 @@ import { AppLoading } from "../../core/presentation/components/app-loading";
 import { AppPageHeader } from "../../core/presentation/components/app-page-header";
 import { type Locale, messages } from "../../core/presentation/i18n/messages";
 import type { AdministrationUseCases } from "../../features/administration/presentation/contracts/administration-use-cases";
+import type { ApprovalsUseCases } from "../../features/approvals/presentation/contracts/approvals-use-cases";
 import type {
   CompanyAccess,
   CompanyMembership,
@@ -15,6 +16,17 @@ import type { OrganizationUseCases } from "../../features/organization/presentat
 import { OverviewPage } from "../../features/overview/presentation/pages/overview-page";
 import type { PeopleUseCases } from "../../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../../features/reporting/presentation/contracts/reporting-use-cases";
+
+const ApprovalInboxScreen = lazy(() =>
+  import("../../features/approvals/presentation/bindings/approval-inbox-screen").then((module) => ({
+    default: module.ApprovalInboxScreen,
+  })),
+);
+const ApprovalRequestScreen = lazy(() =>
+  import("../../features/approvals/presentation/bindings/approval-request-screen").then(
+    (module) => ({ default: module.ApprovalRequestScreen }),
+  ),
+);
 
 const LifecycleTemplatesScreen = lazy(() =>
   import("../../features/lifecycle/presentation/bindings/lifecycle-templates-screen").then(
@@ -162,6 +174,7 @@ export function PortalRoutes({
   access,
   reporting,
   administration,
+  approvals,
   jobs,
   organization,
   people,
@@ -176,6 +189,7 @@ export function PortalRoutes({
   access: CompanyAccess | null;
   reporting: ReportingUseCases;
   administration: AdministrationUseCases;
+  approvals: ApprovalsUseCases;
   jobs: JobsUseCases;
   organization: OrganizationUseCases;
   people: PeopleUseCases;
@@ -186,6 +200,36 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/approvals"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ApprovalInboxScreen
+              accountId={accountId}
+              access={access}
+              approvals={approvals}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/approvals/:approvalId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ApprovalRequestScreen
+              accountId={accountId}
+              access={access}
+              approvals={approvals}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/people/imports/new"
         element={

@@ -247,3 +247,11 @@ The file datasource owns the native picker, bounded reader, and download dispatc
 Public presentation state contains file metadata only. One controller owns the CSV and one immutable submission until acknowledgement or disposal. No CSV is logged, cached in browser storage, or automatically retried. Unknown delivery retains the exact CSV, reason, import identity, and operation ID through MFA renewal; a later rejection does not reopen editing until the original outcome is acknowledged. Known initial validation/encoded-size failures permit correction with a new operation. Leaving or changing account/company scope aborts pending acquisition and removes the retained file. This is in-memory recovery, not durable offline submission.
 
 The browser starts a bounded text download without a retained object URL. Its status confirms dispatch, not completion of a save to disk. The HTTP transport's 1 MiB encoded JSON limit can require a smaller file when escaping expands the request; it rejects that condition before CSRF or command delivery.
+
+## Approval inbox and request stages
+
+`/approvals` presents the current account's bounded inbox, including blocked requests available to approval administrators. `/approvals/:approvalId` reads the submitted request, effective stage assignments, and current status. Authors and beneficiaries can open an authorized direct link without an inbox grant; the backend resolves ownership and delegated access.
+
+Pages retain company-bound cursors and acquire at most twenty requests. Invalid or non-progressing pages, mismatched identifiers, oversized assignments, and malformed timestamps become safe failures. Controllers cancel superseded reads and clear snapshots during refresh, access failure, and disposal. Company replacement discards the previous request and cursor. Screens support English/Indonesian, dark mode, and contained mobile tables.
+
+This view does not issue a generic approval decision. Leave, expense, overtime, and payroll workflows own their decisions and atomic business consequences. The displayed stages are the current assignment projection, not an invented decision history.

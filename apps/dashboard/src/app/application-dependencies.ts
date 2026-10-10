@@ -1,4 +1,5 @@
 import type { AdministrationUseCases } from "../features/administration/presentation/contracts/administration-use-cases";
+import type { ApprovalsUseCases } from "../features/approvals/presentation/contracts/approvals-use-cases";
 import type { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
 import type { JobsUseCases } from "../features/jobs/presentation/contracts/jobs-use-cases";
 import type { LifecycleUseCases } from "../features/lifecycle/presentation/contracts/lifecycle-use-cases";
@@ -11,6 +12,7 @@ export type ApplicationDependencies = Readonly<{
   identity: IdentityController;
   reporting: ReportingUseCases;
   administration: AdministrationUseCases;
+  approvals: ApprovalsUseCases;
   jobs: JobsUseCases;
   organization: OrganizationUseCases;
   people: PeopleUseCases;

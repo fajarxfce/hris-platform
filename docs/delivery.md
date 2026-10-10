@@ -324,3 +324,9 @@ A company-wide employment read now returns the effective employee plus bounded c
 - Real PostgreSQL/browser validation exposed the existing employment-history sort mismatch after a second revision. The client and fixtures now follow the API's descending cursor, including revision zero and strict continuation progress. The repeated integration passed with one persisted revision after a deliberately lost acknowledgement; historical terms and headcount remained unchanged.
 - Dashboard architecture, formatting, TypeScript, and all 156 unit/contract tests passed. All 92 Chromium browser tests passed (4.2 minutes), and the real API/PostgreSQL browser scenario passed (57.1 seconds). Production build passed; desktop light/dark and 390-pixel screenshots were inspected. All 107 local documentation links resolved.
 - The production entry chunk is approximately 521 kB minified (153 kB gzip), retaining Vite's existing size advisory. No large-company performance measurement or live deployment is claimed.
+
+
+### Single employment revision review
+
+- Added a scoped revision detail API with one coherent employment version, immutable revision/cancellation evidence, company-local date, and current cancellation availability. Read and management authority remain independent; a grant acquired while waiting does not expand the original request.
+- All 42 selected tests passed across the people domain and server contract, employment access, assurance, details, cancellation, and single-revision suites. New cases cover company isolation, the local midnight boundary, permissions gained/revoked during a pending read, credential revocation, cancellation cleanup, and MFA expiry after access waits. Architecture/format checks and both application JARs passed.

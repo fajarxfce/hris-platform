@@ -240,6 +240,17 @@ class PeopleConfiguration {
     ) = GetEmploymentHistory(people, companies, members, identities, transactions, security, clock)
 
     @Bean
+    fun getEmploymentRevision(
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetEmploymentRevision(people, companies, members, identities, transactions, security, clock)
+
+    @Bean
     fun cancelEmploymentRevision(
         people: PeopleRepository,
         companies: CompanyRepository,

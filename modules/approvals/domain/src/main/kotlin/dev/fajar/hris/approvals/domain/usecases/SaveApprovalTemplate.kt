@@ -107,9 +107,11 @@ class SaveApprovalTemplate(
             val named = change.stages.flatMap { it.accountIds }.toSet()
             val candidates = members.candidates(company, named, emptySet(), 201)
             if (candidates is Result.Failed) return@run candidates
+            val scoped = (candidates as Result.Success).value
+            if (!scoped.map { it.id }.toSet().containsAll(named))
+                return@run Result.Failed(Failure(FailureKind.VALIDATION, "approver_unavailable"))
             val eligible =
-                (candidates as Result.Success)
-                    .value
+                scoped
                     .filter {
                         it.accountActive &&
                             it.membershipActive &&

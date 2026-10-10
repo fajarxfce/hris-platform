@@ -135,9 +135,12 @@ class SaveApprovalDelegation(
                     3,
                 )
             if (candidates is Result.Failed) return@run candidates
+            val scoped = (candidates as Result.Success).value
+            if (scoped.map { it.id }.toSet() != setOf(delegation.fromAccount, delegation.toAccount))
+                return@run Result.Failed(Failure(FailureKind.VALIDATION, "approver_unavailable"))
             if (
                 delegation.active &&
-                    (candidates as Result.Success).value.count {
+                    scoped.count {
                         it.accountActive &&
                             it.membershipActive &&
                             it.permissions.any { p -> p in approvalPermissions(delegation.kind) }

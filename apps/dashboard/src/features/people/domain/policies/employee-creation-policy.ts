@@ -1,8 +1,8 @@
-import { isCalendarDate } from "../../../../core/domain/calendar-date";
 import { isUuid } from "../../../../core/domain/identifiers";
 import { type Failure, failed, type Result, success } from "../../../../core/domain/result";
 import type { EmployeeCreation } from "../entities/employee-creation";
 import { isEmployeeNumber } from "./employee-policy";
+import { validateEmploymentTerms } from "./employment-policy";
 import { normalizePersonFields } from "./person-profile-policy";
 
 export const canCreateEmployee = (permissions: readonly string[]): boolean =>
@@ -16,36 +16,17 @@ export function normalizeEmployeeCreation(input: EmployeeCreation): Result<Emplo
   if (!person.ok) return person;
   const reason = input.reason.trim();
   if (!reason || reason.length > 1000) return failed("reason_required");
-  if (
-    !isCalendarDate(input.startDate) ||
-    (input.endDate !== null && (!isCalendarDate(input.endDate) || input.endDate < input.startDate))
-  )
-    return failed("invalid_employment_dates");
-  if (
-    !["PERMANENT", "FIXED_TERM"].includes(input.contract) ||
-    !["ACTIVE", "PROBATION", "SUSPENDED", "ENDED"].includes(input.status)
-  )
-    return failed("invalid_employee_creation");
-  if (input.contract === "FIXED_TERM" && (input.endDate === null || input.status === "PROBATION"))
-    return failed("invalid_fixed_term_contract");
-  if (input.status === "ENDED" && input.endDate === null) return failed("end_date_required");
-  if (
-    [
-      input.branchId,
-      input.departmentId,
-      input.positionId,
-      input.costCenterId,
-      input.managerId,
-    ].some((id) => id !== null && !isUuid(id))
-  )
-    return failed("invalid_employee_creation");
-  if (input.managerId === input.employeeId) return failed("manager_unavailable");
+  const terms = validateEmploymentTerms({ ...input, effectiveFrom: input.startDate });
+  if (!terms.ok) return terms;
+  if (input.managerId?.toLowerCase() === input.employeeId.toLowerCase())
+    return failed("manager_unavailable");
   return success(Object.freeze({ ...input, ...person.value, employeeNumber, reason }));
 }
 
 export function employeeCreationWasRejected(failure: Failure): boolean {
   return [
     "invalid_employee_creation",
+    "invalid_employment_change",
     "invalid_employee_number",
     "invalid_person",
     "reason_required",

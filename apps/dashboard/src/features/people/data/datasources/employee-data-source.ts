@@ -4,9 +4,27 @@ import type {
 } from "../models/employee-creation-dto";
 import type { EmployeeDto, EmployeePageDto } from "../models/employee-dto";
 import type { EmployeeSearchDto } from "../models/employee-search-dto";
+import type {
+  EmploymentChangeDto,
+  EmploymentChangeReceiptDto,
+} from "../models/employment-change-dto";
+import type { EmploymentDetailsDto } from "../models/employment-details-dto";
 import type { EmploymentHistoryPageDto } from "../models/employment-revision-dto";
 
 export interface EmployeeDataSource {
+  details(
+    companyId: string,
+    id: string,
+    asOf: string,
+    signal: AbortSignal,
+  ): Promise<EmploymentDetailsDto>;
+  revise(
+    companyId: string,
+    id: string,
+    operation: string,
+    change: EmploymentChangeDto,
+    signal: AbortSignal,
+  ): Promise<EmploymentChangeReceiptDto>;
   create(
     companyId: string,
     operation: string,

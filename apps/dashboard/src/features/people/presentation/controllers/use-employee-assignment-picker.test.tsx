@@ -46,6 +46,12 @@ const employee: Employee = {
   },
 };
 const clients: QueryClient[] = [];
+type PickerInput = {
+  company: CompanyId;
+  kind: EmployeeAssignmentKind;
+  date: string;
+  excluded?: string;
+};
 afterEach(() => {
   cleanup();
   for (const client of clients.splice(0)) client.clear();
@@ -66,8 +72,18 @@ function fixture(kind: EmployeeAssignmentKind = "BRANCH") {
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   );
-  const rendered = renderHook(
-    ({ company, kind, date }: { company: CompanyId; kind: EmployeeAssignmentKind; date: string }) =>
+  const rendered = renderHook<ReturnType<typeof useEmployeeAssignmentPicker>, PickerInput>(
+    ({
+      company,
+      kind,
+      date,
+      excluded,
+    }: {
+      company: CompanyId;
+      kind: EmployeeAssignmentKind;
+      date: string;
+      excluded?: string;
+    }) =>
       useEmployeeAssignmentPicker(
         accountId,
         { companyId: company, permissions: ["company.read", "people.read"] },
@@ -75,6 +91,7 @@ function fixture(kind: EmployeeAssignmentKind = "BRANCH") {
         date,
         units,
         employees,
+        excluded,
       ),
     { wrapper, initialProps: { company: companyId, kind, date: "2027-01-01" } },
   );
@@ -155,7 +172,7 @@ describe("bounded assignment query ownership", () => {
     await waitFor(() => expect(f.result.current.options).toHaveLength(1));
     expect(f.units.execute).toHaveBeenCalledTimes(3);
   });
-  it("uses the requested start date and includes only working managers", async () => {
+  it("uses the proposed effective date and includes only eligible managers", async () => {
     const f = fixture("MANAGER");
     await waitFor(() => expect(f.result.current.options).toHaveLength(1));
     f.employees.execute.mockResolvedValueOnce(
@@ -179,5 +196,8 @@ describe("bounded assignment query ownership", () => {
     await waitFor(() => expect(f.result.current.options).toHaveLength(2));
     expect(f.employees.execute.mock.lastCall?.[1].asOf).toBe("2027-06-01");
     expect(f.units.execute).not.toHaveBeenCalled();
+    f.rerender({ company: companyId, kind: "MANAGER", date: "2027-06-01", excluded: employee.id });
+    await waitFor(() => expect(f.result.current.loading).toBe(false));
+    expect(f.result.current.options).toHaveLength(0);
   });
 });

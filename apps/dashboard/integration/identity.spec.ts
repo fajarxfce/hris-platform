@@ -282,6 +282,51 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
     "Browser onboarding fixture",
   );
   await page.getByRole("button", { name: "Tutup", exact: true }).click();
+  await page.getByRole("link", { name: "Edit employment", exact: true }).click();
+  await expect(page.getByLabel("Tanggal mulai", { exact: true })).toHaveValue("2026-01-01");
+  await expect(page.getByText("HQ · Browser office", { exact: true })).toBeVisible();
+  await expect(page.getByText("RND · R&D_100%", { exact: true })).toBeVisible();
+  await page.getByLabel("Berlaku sejak", { exact: true }).fill("2026-11-01");
+  await page.getByRole("combobox", { name: "Status", exact: true }).selectOption("SUSPENDED");
+  await page.getByLabel("Alasan", { exact: true }).fill("Approved browser employment change");
+  const revisionAttempts: { operation: string | undefined; payload: string | null }[] = [];
+  await page.route("**/api/v1/companies/*/employees/*/revisions", async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    revisionAttempts.push({
+      operation: route.request().headers()["idempotency-key"],
+      payload: route.request().postData(),
+    });
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toEqual({ id: employeeId, version: 1 });
+    if (revisionAttempts.length === 1) await route.abort("failed");
+    else await route.fulfill({ response });
+  });
+  await page.getByRole("button", { name: "Simpan revisi", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Hasil revisi belum terkonfirmasi");
+  await page.getByRole("button", { name: "Coba revisi kembali", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Revisi employment tersimpan.");
+  expect(revisionAttempts).toHaveLength(2);
+  expect(revisionAttempts[1]).toEqual(revisionAttempts[0]);
+  const historicalEmployment = await context.request.get(
+    `/api/v1/companies/${companies[1]}/employees/${employeeId}/employment?asOf=2026-10-01`,
+  );
+  expect(historicalEmployment.status()).toBe(200);
+  expect(await historicalEmployment.json()).toMatchObject({
+    employee: { version: 1, appliedRevision: 0, terms: { status: "ACTIVE" } },
+  });
+  await page.getByRole("link", { name: "Lihat detail", exact: true }).click();
+  await expect(page).toHaveURL(/asOf=2026-11-01/u);
+  await expect(page.getByRole("region", { name: "Employment", exact: true })).toContainText(
+    "Ditangguhkan",
+  );
+  await page.getByRole("tab", { name: "Riwayat employment", exact: true }).click();
+  await expect(employmentHistory.getByRole("row")).toHaveCount(3);
+  await employmentHistory.getByRole("button", { name: "Lihat detail: 1", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Detail revisi", exact: true })).toContainText(
+    "Approved browser employment change",
+  );
+  await page.getByRole("button", { name: "Tutup", exact: true }).click();
   await page.getByRole("link", { name: "Laporan", exact: true }).click();
   await page.getByLabel("Tanggal laporan", { exact: true }).fill("2026-10-01");
   await page.getByRole("button", { name: "Terapkan", exact: true }).click();
@@ -310,8 +355,12 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
   await page.getByLabel("ID resource", { exact: true }).fill(employeeId);
   await page.getByRole("button", { name: "Terapkan", exact: true }).click();
   const audit = page.getByRole("table", { name: "Event", exact: true });
-  await expect(audit.getByRole("row")).toHaveCount(2);
-  await audit.getByRole("button", { name: /^Lihat detail:/u }).click();
+  await expect(audit.getByRole("row")).toHaveCount(3);
+  await audit
+    .getByRole("row")
+    .filter({ hasText: "people.employment_revised" })
+    .getByRole("button", { name: /^Lihat detail:/u })
+    .click();
   const details = page.getByRole("dialog", { name: "Event audit", exact: true });
   await expect(details).toContainText(employeeId);
   await expect(details).toContainText(companies[1] ?? "");

@@ -5,7 +5,7 @@ import type { AccountId } from "../../../../core/domain/identifiers";
 import { failed, type Result, success } from "../../../../core/domain/result";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { LoadOrganizationUnits } from "../../../organization/domain/usecases/load-organization-units";
-import { isWorkingOn } from "../../domain/policies/employee-policy";
+import { isEligibleManager } from "../../domain/policies/employee-policy";
 import type { LoadEmployees } from "../../domain/usecases/load-employees";
 import type {
   EmployeeAssignmentKind,
@@ -20,9 +20,10 @@ export function useEmployeeAssignmentPicker(
   accountId: AccountId,
   access: CompanyAccess,
   kind: EmployeeAssignmentKind,
-  startDate: string,
+  effectiveDate: string,
   loadUnits: Pick<LoadOrganizationUnits, "execute">,
   loadEmployees: Pick<LoadEmployees, "execute">,
+  excludedEmployeeId?: string,
 ) {
   const [search, apply] = useReducer((_old: Search, next: Search) => next, {
     query: "",
@@ -37,16 +38,21 @@ export function useEmployeeAssignmentPicker(
       access.companyId,
       access.permissions,
       kind,
-      kind === "MANAGER" ? startDate : null,
+      kind === "MANAGER" ? effectiveDate : null,
       search,
+      excludedEmployeeId ?? null,
     ],
     queryFn: async ({ signal }): Promise<Result<Options>> => {
       if (kind === "MANAGER") {
-        const result = await loadEmployees.execute(access, { ...search, asOf: startDate }, signal);
+        const result = await loadEmployees.execute(
+          access,
+          { ...search, asOf: effectiveDate },
+          signal,
+        );
         if (!result.ok) return result;
         return success({
           items: result.value.items
-            .filter((employee) => isWorkingOn(employee.terms, startDate))
+            .filter((employee) => isEligibleManager(employee, effectiveDate, excludedEmployeeId))
             .map((employee) => ({
               id: employee.id,
               label: `${employee.employeeNumber} · ${employee.legalName}`,

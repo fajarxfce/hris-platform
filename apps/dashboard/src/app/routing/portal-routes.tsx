@@ -52,6 +52,11 @@ const EmployeeCreationScreen = lazy(() =>
     default: module.EmployeeCreationScreen,
   })),
 );
+const EmploymentEditorScreen = lazy(() =>
+  import("../../features/people/presentation/bindings/employment-editor-screen").then((module) => ({
+    default: module.EmploymentEditorScreen,
+  })),
+);
 const PersonProfileScreen = lazy(() =>
   import("../../features/people/presentation/bindings/person-profile-screen").then((module) => ({
     default: module.PersonProfileScreen,
@@ -105,6 +110,23 @@ export function PortalRoutes({
   return (
     <Routes>
       <Route path="/" element={<OverviewPage company={company} locale={locale} />} />
+      <Route
+        path="/people/employees/:employeeId/employment/edit"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <EmploymentEditorScreen
+              accountId={accountId}
+              access={access}
+              people={people}
+              loadUnits={organization.loadUnits}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/people/employees/new"
         element={

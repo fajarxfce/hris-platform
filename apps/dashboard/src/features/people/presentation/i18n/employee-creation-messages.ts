@@ -30,7 +30,7 @@ const en = {
   name: "Name",
   code: "Code",
   accessHint: "Directory access is required to choose an assignment.",
-  managerDate: "Managers are listed for the employment start date.",
+  managerDate: "Managers are listed for the selected effective date.",
 };
 const id: typeof en = {
   create: "Buat karyawan",
@@ -62,6 +62,6 @@ const id: typeof en = {
   name: "Nama",
   code: "Kode",
   accessHint: "Akses direktori diperlukan untuk memilih penempatan.",
-  managerDate: "Manager ditampilkan berdasarkan tanggal mulai employment.",
+  managerDate: "Manager ditampilkan berdasarkan tanggal efektif yang dipilih.",
 };
 export const employeeCreationMessages = (locale: Locale) => (locale === "id" ? id : en);

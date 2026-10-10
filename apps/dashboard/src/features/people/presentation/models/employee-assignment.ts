@@ -5,6 +5,7 @@ export type EmployeeAssignmentOption = Readonly<{
   id: string;
   label: string;
   cells: readonly string[];
+  referenceStatus?: "inactive" | "notWorking" | "unavailable";
 }>;
 export const assignmentFieldNames = {
   BRANCH: "branch",

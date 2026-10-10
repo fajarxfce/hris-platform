@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useSyncExternalStore } from "react";
-import { Navigate, useSearchParams } from "react-router-dom";
+import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import type { AccountId } from "../../../../core/domain/identifiers";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
@@ -7,11 +7,11 @@ import { useWorkspaceRevalidation } from "../../../../core/presentation/session/
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import { canReadOrganization } from "../../../organization/domain/policies/organization-unit-policy";
 import type { LoadOrganizationUnits } from "../../../organization/domain/usecases/load-organization-units";
-import { canReadEmployees } from "../../domain/policies/employee-policy";
 import type { PeopleUseCases } from "../contracts/people-use-cases";
-import { EmployeeCreationController } from "../controllers/employee-creation-controller";
-import { useEmployeeCreationForm } from "../controllers/use-employee-creation-form";
-import { EmployeeCreationPage } from "../pages/employee-creation-page";
+import { EmploymentEditorController } from "../controllers/employment-editor-controller";
+import { useEmploymentEditorForm } from "../controllers/use-employment-editor-form";
+import { employeeSearchFromParameters, employeeSearchParameters } from "../models/employee-route";
+import { EmploymentEditorPage } from "../pages/employment-editor-page";
 import { EmployeeAssignmentPicker } from "./employee-assignment-picker";
 
 type Props = {
@@ -24,40 +24,40 @@ type Props = {
   locale: Locale;
   nextIdentifier: () => string;
 };
-export function EmployeeCreationScreen(props: Props) {
+export function EmploymentEditorScreen(props: Props) {
+  const { employeeId = "" } = useParams();
   const [parameters] = useSearchParams();
   const today = useMemo(() => companyDate(props.timezone, new Date()), [props.timezone]);
-  const backTo = canReadEmployees(props.access.permissions)
-    ? `/people/employees?${new URLSearchParams({ company: props.access.companyId, asOf: today })}`
-    : "/";
+  const search = employeeSearchFromParameters(parameters, props.access.companyId, today);
+  const canonical = employeeSearchParameters(search, props.access.companyId);
   if (parameters.has("company") && parameters.get("company") !== props.access.companyId)
-    return <Navigate to={backTo} replace />;
-  if (!parameters.has("company"))
-    return (
-      <Navigate
-        to={`/people/employees/new?${new URLSearchParams({ company: props.access.companyId })}`}
-        replace
-      />
-    );
+    return <Navigate to={`/people/employees?${canonical}`} replace />;
+  const path = `/people/employees/${encodeURIComponent(employeeId)}`;
+  if (!parameters.has("company") || !parameters.has("asOf"))
+    return <Navigate to={`${path}/employment/edit?${canonical}`} replace />;
   return (
-    <EmployeeCreationBinding
-      key={`${props.accountId}:${props.access.companyId}`}
+    <EmploymentEditorBinding
+      key={`${props.accountId}:${props.access.companyId}:${employeeId}:${search.asOf}`}
       {...props}
-      today={today}
-      backTo={backTo}
+      employeeId={employeeId}
+      asOf={search.asOf}
+      backTo={`${path}?${canonical}`}
     />
   );
 }
-
-function EmployeeCreationBinding(props: Props & { today: string; backTo: string }) {
+function EmploymentEditorBinding(
+  props: Props & { employeeId: string; asOf: string; backTo: string },
+) {
   const controller = useMemo(
     () =>
-      new EmployeeCreationController(
-        props.people.createEmployee,
+      new EmploymentEditorController(
+        props.people,
         props.access,
+        props.employeeId,
+        props.asOf,
         props.nextIdentifier,
       ),
-    [props.people.createEmployee, props.access, props.nextIdentifier],
+    [props.people, props.access, props.employeeId, props.asOf, props.nextIdentifier],
   );
   const state = useSyncExternalStore(
     controller.subscribe,
@@ -68,15 +68,15 @@ function EmployeeCreationBinding(props: Props & { today: string; backTo: string 
     controller.activate();
     return controller.deactivate;
   }, [controller]);
-  const form = useEmployeeCreationForm(controller, state, props.today);
+  const form = useEmploymentEditorForm(controller, state);
   useWorkspaceRevalidation(state.failure);
   const detailTo =
-    state.receipt && state.startDate && canReadEmployees(props.access.permissions)
-      ? `/people/employees/${encodeURIComponent(state.receipt.id)}?${new URLSearchParams({ company: props.access.companyId, asOf: state.startDate > props.today ? state.startDate : props.today })}`
+    state.receipt && state.savedDate
+      ? `/people/employees/${encodeURIComponent(state.receipt.id)}?${new URLSearchParams({ company: props.access.companyId, asOf: state.savedDate })}`
       : null;
   return (
     <>
-      <EmployeeCreationPage
+      <EmploymentEditorPage
         state={state}
         form={form}
         companyName={props.companyName}
@@ -84,17 +84,19 @@ function EmployeeCreationBinding(props: Props & { today: string; backTo: string 
         backTo={props.backTo}
         detailTo={detailTo}
         canChooseOrganization={canReadOrganization(props.access.permissions)}
-        canChooseManager={canReadEmployees(props.access.permissions)}
         onRetry={controller.retrySave}
       />
       {form.picker && form.editable && (
         <EmployeeAssignmentPicker
-          key={`${form.picker}:${form.startDate.value}`}
-          {...props}
+          key={`${form.picker}:${form.effectiveFrom.value}`}
+          accountId={props.accountId}
+          access={props.access}
           kind={form.picker}
-          effectiveDate={form.startDate.value}
+          effectiveDate={form.effectiveFrom.value}
+          excludedEmployeeId={props.employeeId}
+          loadUnits={props.loadUnits}
           loadEmployees={props.people.loadEmployees}
-          excludedEmployeeId={controller.employeeId}
+          locale={props.locale}
           onSelect={form.select}
           onClose={form.closePicker}
         />

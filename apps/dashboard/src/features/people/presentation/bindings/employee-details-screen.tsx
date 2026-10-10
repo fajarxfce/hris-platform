@@ -5,6 +5,7 @@ import { companyDate } from "../../../../core/presentation/dates/company-date";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import { canReadEmploymentHistory } from "../../domain/policies/employee-policy";
+import { canManageEmployment } from "../../domain/policies/employment-policy";
 import { canReadPersonProfile } from "../../domain/policies/person-profile-policy";
 import type { PeopleUseCases } from "../contracts/people-use-cases";
 import { EmployeeDetailsController } from "../controllers/employee-details-controller";
@@ -53,6 +54,11 @@ export function EmployeeDetailsScreen(props: Props) {
       id={employeeId}
       asOf={search.asOf}
       backTo={backTo}
+      editEmploymentTo={
+        canManageEmployment(props.access.permissions)
+          ? `/people/employees/${encodeURIComponent(employeeId)}/employment/edit?${employeeSearchParameters(search, props.access.companyId)}`
+          : null
+      }
       profileTo={
         canReadPersonProfile(props.access.permissions)
           ? `/people/employees/${encodeURIComponent(employeeId)}/profile?${employeeSearchParameters(search, props.access.companyId)}`
@@ -87,6 +93,7 @@ function EmployeeDetailsBinding({
   asOf,
   backTo,
   profileTo,
+  editEmploymentTo,
   tab,
   after,
   onTab,
@@ -96,6 +103,7 @@ function EmployeeDetailsBinding({
   asOf: string;
   backTo: string;
   profileTo: string | null;
+  editEmploymentTo: string | null;
   tab: EmployeeTab;
   after: string | null;
   onTab: (tab: string) => void;
@@ -126,6 +134,7 @@ function EmployeeDetailsBinding({
       locale={locale}
       backTo={backTo}
       profileTo={profileTo}
+      editEmploymentTo={editEmploymentTo}
       tab={tab}
       canReadHistory={canReadEmploymentHistory(access.permissions)}
       onTab={onTab}

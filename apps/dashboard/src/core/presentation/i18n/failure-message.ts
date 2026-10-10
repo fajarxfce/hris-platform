@@ -2,6 +2,26 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_employment_change: [
+    "Check the employment terms and use the latest version.",
+    "Periksa data employment dan gunakan versi terbaru.",
+  ],
+  employment_start_immutable: [
+    "The employment start date cannot be changed.",
+    "Tanggal mulai employment tidak dapat diubah.",
+  ],
+  employment_offboarded: [
+    "This employment has completed offboarding. Review its lifecycle record.",
+    "Employment sudah menyelesaikan offboarding. Periksa data lifecycle-nya.",
+  ],
+  transferred_employment_closed: [
+    "This employment was closed by a company transfer.",
+    "Employment ini ditutup oleh transfer perusahaan.",
+  ],
+  reporting_cycle_or_depth: [
+    "The manager selection creates a reporting cycle or exceeds the hierarchy limit.",
+    "Pilihan manager membentuk siklus pelaporan atau melewati batas hierarki.",
+  ],
   invalid_employee_creation: [
     "Check the employee and assignment details.",
     "Periksa data karyawan dan penempatannya.",
@@ -31,8 +51,8 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Penempatan organisasi tidak tersedia. Periksa kembali pilihan penempatan.",
   ],
   manager_unavailable: [
-    "Choose a manager who is working on the employment start date.",
-    "Pilih manager yang bekerja pada tanggal mulai employment.",
+    "Choose a manager who is working on the proposed effective date.",
+    "Pilih manager yang bekerja pada tanggal efektif yang diajukan.",
   ],
   person_profile_not_found: [
     "The profile was not found or is no longer accessible.",

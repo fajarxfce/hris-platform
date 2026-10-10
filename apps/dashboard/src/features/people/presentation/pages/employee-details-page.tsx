@@ -9,6 +9,7 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { employmentMessages } from "../i18n/employment-messages";
 import { peopleMessages } from "../i18n/people-messages";
 import { personProfileMessages } from "../i18n/person-profile-messages";
 import type { EmployeeDetailsState } from "../models/employee-details-state";
@@ -21,6 +22,7 @@ export function EmployeeDetailsPage({
   locale,
   backTo,
   profileTo,
+  editEmploymentTo,
   tab,
   canReadHistory,
   history,
@@ -33,6 +35,7 @@ export function EmployeeDetailsPage({
   locale: Locale;
   backTo: string;
   profileTo: string | null;
+  editEmploymentTo: string | null;
   tab: "overview" | "history";
   canReadHistory: boolean;
   history: ReactNode;
@@ -49,6 +52,9 @@ export function EmployeeDetailsPage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
+            {editEmploymentTo && state.employee && (
+              <Link to={editEmploymentTo}>{employmentMessages(locale).edit}</Link>
+            )}
             {profileTo && state.employee && (
               <Link to={profileTo}>{personProfileMessages(locale).title}</Link>
             )}

@@ -273,16 +273,18 @@ a {
 .app-portal-collapsed .app-nav-item span {
   display: none;
 }
-.app-skip-link {
+.app-portal > .app-skip-link {
   position: fixed;
+  clip-path: inset(50%);
   top: -60px;
   left: 12px;
   z-index: 10;
   background: var(--colorNeutralBackground1);
   padding: 8px 16px;
 }
-.app-skip-link:focus {
+.app-portal > .app-skip-link:focus {
   top: 4px;
+  clip-path: none;
 }
 .app-auth-layout {
   display: grid;

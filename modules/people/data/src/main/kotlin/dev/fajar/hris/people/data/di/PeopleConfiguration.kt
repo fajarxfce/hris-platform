@@ -207,6 +207,28 @@ class PeopleConfiguration {
     ) = ListEmployees(people, companies, members, identities, transactions, security, clock)
 
     @Bean
+    fun getEmploymentDetails(
+        people: PeopleRepository,
+        units: OrganizationRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetEmploymentDetails(
+            people,
+            units,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun employmentHistory(
         people: PeopleRepository,
         companies: CompanyRepository,

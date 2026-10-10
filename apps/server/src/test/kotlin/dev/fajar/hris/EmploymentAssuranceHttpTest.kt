@@ -31,7 +31,7 @@ class EmploymentAssuranceHttpTest : PeopleApiFixture() {
     @Autowired private lateinit var accountProbe: AccountLockProbe
 
     @ParameterizedTest
-    @ValueSource(strings = ["get", "list", "history", "create", "revise", "cancel"])
+    @ValueSource(strings = ["get", "list", "history", "details", "create", "revise", "cancel"])
     fun proofExpiryDuringAnAccessWaitRequiresRenewalBeforeReadWriteOrReceiptReplay(
         operation: String
     ) {
@@ -75,6 +75,17 @@ class EmploymentAssuranceHttpTest : PeopleApiFixture() {
             )
         val security = IdentitySecurityPolicy(enforceMfa = true)
         val get = GetEmployee(people, companies, members, identities, transactions, security, clock)
+        val details =
+            GetEmploymentDetails(
+                people,
+                units,
+                companies,
+                members,
+                identities,
+                transactions,
+                security,
+                clock,
+            )
         val list =
             ListEmployees(people, companies, members, identities, transactions, security, clock)
         val history =
@@ -155,6 +166,7 @@ class EmploymentAssuranceHttpTest : PeopleApiFixture() {
         val invoke = { current: Actor ->
             when (operation) {
                 "get" -> get.execute(current, existing, LocalDate.parse("2026-10-01"))
+                "details" -> details.execute(current, existing, LocalDate.parse("2026-10-01"))
                 "list" -> list.execute(current, LocalDate.parse("2026-10-01"), "", null, 50)
                 "history" -> history.execute(current, existing, null, 50)
                 "create" ->

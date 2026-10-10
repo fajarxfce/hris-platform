@@ -11,11 +11,23 @@ import type {
 } from "../../features/identity/domain/entities/session";
 import type { JobsUseCases } from "../../features/jobs/presentation/contracts/jobs-use-cases";
 import { OverviewPage } from "../../features/overview/presentation/pages/overview-page";
+import type { PeopleUseCases } from "../../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../../features/reporting/presentation/contracts/reporting-use-cases";
 
 const JobsScreen = lazy(() =>
   import("../../features/jobs/presentation/bindings/jobs-screen").then((module) => ({
     default: module.JobsScreen,
+  })),
+);
+
+const EmployeesScreen = lazy(() =>
+  import("../../features/people/presentation/bindings/employees-screen").then((module) => ({
+    default: module.EmployeesScreen,
+  })),
+);
+const EmployeeDetailsScreen = lazy(() =>
+  import("../../features/people/presentation/bindings/employee-details-screen").then((module) => ({
+    default: module.EmployeeDetailsScreen,
   })),
 );
 
@@ -45,6 +57,7 @@ export function PortalRoutes({
   reporting,
   administration,
   jobs,
+  people,
   locale,
 }: {
   accountId: AccountId;
@@ -54,12 +67,43 @@ export function PortalRoutes({
   reporting: ReportingUseCases;
   administration: AdministrationUseCases;
   jobs: JobsUseCases;
+  people: PeopleUseCases;
   locale: Locale;
 }) {
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
       <Route path="/" element={<OverviewPage company={company} locale={locale} />} />
+      <Route
+        path="/people/employees"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <EmployeesScreen
+              accountId={accountId}
+              access={access}
+              people={people}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/employees/:employeeId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <EmployeeDetailsScreen
+              accountId={accountId}
+              access={access}
+              people={people}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/administration/jobs"
         element={

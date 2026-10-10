@@ -14,7 +14,7 @@ function authenticatorCode(secret: string): string {
   return ((digest.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).toString().padStart(6, "0");
 }
 
-test("real API sessions, MFA, reports, audit, policy, job cancellation and logout", async ({
+test("real API sessions, MFA, people, reports, audit, policy, job cancellation and logout", async ({
   page,
   context,
 }) => {
@@ -84,6 +84,31 @@ test("real API sessions, MFA, reports, audit, policy, job cancellation and logou
     },
   });
   expect(created.status()).toBe(200);
+  await page.getByRole("link", { name: "Karyawan", exact: true }).click();
+  await page.getByLabel("Tanggal efektif", { exact: true }).fill("2026-10-01");
+  await page.getByRole("button", { name: "Terapkan", exact: true }).click();
+  const directory = page.getByRole("table", { name: "Direktori karyawan", exact: true });
+  await expect(directory.getByRole("row")).toHaveCount(2);
+  await directory
+    .getByRole("button", {
+      name: "Lihat detail: Report fixture employee (BROWSER-REPORT)",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Report fixture employee", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("region", { name: "Employment", exact: true })).toContainText(
+    "BROWSER-REPORT",
+  );
+  await page.getByRole("tab", { name: "Riwayat employment", exact: true }).click();
+  const employmentHistory = page.getByRole("table", { name: "Riwayat employment", exact: true });
+  await expect(employmentHistory.getByRole("row")).toHaveCount(2);
+  await employmentHistory.getByRole("button", { name: "Lihat detail: 0", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Detail revisi", exact: true })).toContainText(
+    "Browser report fixture",
+  );
+  await page.getByRole("button", { name: "Tutup", exact: true }).click();
   await page.getByRole("link", { name: "Laporan", exact: true }).click();
   await page.getByLabel("Tanggal laporan", { exact: true }).fill("2026-10-01");
   await page.getByRole("button", { name: "Terapkan", exact: true }).click();

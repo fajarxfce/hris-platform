@@ -70,6 +70,19 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Choose a valid date between 1900 and 2100.",
     "Pilih tanggal yang valid antara tahun 1900 dan 2100.",
   ],
+  invalid_employee_date: ["Choose a valid effective date.", "Pilih tanggal efektif yang valid."],
+  invalid_employee_search: [
+    "Use up to 120 characters for the search.",
+    "Gunakan maksimal 120 karakter untuk pencarian.",
+  ],
+  invalid_page: [
+    "This page link is invalid. Return to the first page.",
+    "Link halaman tidak valid. Kembali ke halaman pertama.",
+  ],
+  employee_not_found: [
+    "The employee was not found for this date or is no longer accessible.",
+    "Karyawan tidak ditemukan untuk tanggal ini atau tidak dapat diakses.",
+  ],
   invalid_report_companies: [
     "Select between 1 and 32 different companies.",
     "Pilih 1 hingga 32 perusahaan yang berbeda.",

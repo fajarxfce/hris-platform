@@ -2,6 +2,7 @@ import {
   DataBarVertical20Regular,
   History20Regular,
   Home20Regular,
+  People20Regular,
   Settings20Regular,
   TaskListSquareLtr20Regular,
 } from "@fluentui/react-icons";
@@ -13,6 +14,7 @@ import { administrationMessages } from "../../features/administration/presentati
 import { clientPolicyMessages } from "../../features/administration/presentation/i18n/client-policy-messages";
 import type { CompanyAccess } from "../../features/identity/domain/entities/session";
 import { jobMessages } from "../../features/jobs/presentation/i18n/job-messages";
+import { canReadEmployees } from "../../features/people/domain/policies/employee-policy";
 import { canReadHeadcount } from "../../features/reporting/domain/policies/headcount-policy";
 
 /** Navigation visibility uses the same client policy as the feature; the API enforces access. */
@@ -24,6 +26,9 @@ export function portalNavigation(
   const permissions = access?.permissions ?? [];
   return [
     { to: "/", label: text.overview, icon: <Home20Regular /> },
+    ...(canReadEmployees(permissions)
+      ? [{ to: "/people/employees", label: text.people, icon: <People20Regular /> }]
+      : []),
     ...(access
       ? [
           {

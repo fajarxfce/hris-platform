@@ -17,7 +17,7 @@ export function AppResourceTable({
 }: {
   title: string;
   columns: readonly Readonly<{ id: string; label: string; numeric?: boolean }>[];
-  rows: readonly Readonly<{ id: string; cells: readonly string[] }>[];
+  rows: readonly Readonly<{ id: string; actionLabel?: string; cells: readonly string[] }>[];
   action?: Readonly<{ label: string; onOpen: (id: string) => void }>;
 }) {
   const restoreFocus = useRestoreFocusTarget();
@@ -56,7 +56,7 @@ export function AppResourceTable({
                     <AppButton
                       {...restoreFocus}
                       appearance="subtle"
-                      aria-label={`${action.label}: ${row.id}`}
+                      aria-label={`${action.label}: ${row.actionLabel ?? row.id}`}
                       onClick={() => action.onOpen(row.id)}
                     >
                       {action.label}

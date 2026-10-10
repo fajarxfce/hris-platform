@@ -11,6 +11,7 @@ import type { AdministrationUseCases } from "../features/administration/presenta
 import { AuthScreen } from "../features/identity/presentation/bindings/auth-screen";
 import type { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
 import type { JobsUseCases } from "../features/jobs/presentation/contracts/jobs-use-cases";
+import type { PeopleUseCases } from "../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../features/reporting/presentation/contracts/reporting-use-cases";
 import { useIdentityLifecycle } from "./lifecycle/use-identity-lifecycle";
 import { portalNavigation } from "./routing/portal-navigation";
@@ -21,11 +22,13 @@ export function Application({
   reporting,
   administration,
   jobs,
+  people,
 }: {
   identity: IdentityController;
   reporting: ReportingUseCases;
   administration: AdministrationUseCases;
   jobs: JobsUseCases;
+  people: PeopleUseCases;
 }) {
   const state = useSyncExternalStore(
     identity.subscribe,
@@ -70,6 +73,7 @@ export function Application({
               reporting={reporting}
               administration={administration}
               jobs={jobs}
+              people={people}
               company={
                 state.session.companies.find((company) => company.id === state.companyId) ?? null
               }

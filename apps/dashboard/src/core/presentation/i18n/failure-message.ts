@@ -2,6 +2,30 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_lifecycle_change: [
+    "Select a task status and provide a reason of up to 1,000 characters.",
+    "Pilih status tugas dan masukkan alasan maksimal 1.000 karakter.",
+  ],
+  lifecycle_task_not_found: [
+    "This task is no longer available. Reload the task list.",
+    "Tugas ini tidak lagi tersedia. Muat ulang daftar tugas.",
+  ],
+  lifecycle_task_not_assigned: [
+    "This task is no longer assigned to you. Reload the task list.",
+    "Tugas ini tidak lagi ditetapkan untuk Anda. Muat ulang daftar tugas.",
+  ],
+  lifecycle_case_not_open: [
+    "This case is no longer open. Reload the task list.",
+    "Proses ini tidak lagi terbuka. Muat ulang daftar tugas.",
+  ],
+  lifecycle_task_cannot_be_waived: [
+    "Only a lifecycle manager can waive an optional task.",
+    "Hanya pengelola lifecycle yang dapat mengecualikan tugas opsional.",
+  ],
+  lifecycle_task_unchanged: [
+    "This task already has that status. Reload the task list.",
+    "Status tugas sudah sama. Muat ulang daftar tugas.",
+  ],
   lifecycle_case_not_found: [
     "This lifecycle case is unavailable in the selected company.",
     "Proses lifecycle tidak tersedia di perusahaan yang dipilih.",

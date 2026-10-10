@@ -9,7 +9,7 @@ import { AssignedLifecycleTasksController } from "../controllers/assigned-lifecy
 import { assignedLifecycleTasksView, lifecycleTaskView } from "../models/lifecycle-case-view";
 import { lifecycleAfter, lifecycleParameters } from "../models/lifecycle-route";
 import { AssignedLifecycleTasksPage } from "../pages/assigned-lifecycle-tasks-page";
-import { LifecycleTaskPanel } from "../pages/lifecycle-task-panel";
+import { LifecycleTaskBinding } from "./lifecycle-task-binding";
 
 type Props = {
   accountId: AccountId;
@@ -18,6 +18,7 @@ type Props = {
   companyName: string;
   timezone: string;
   locale: Locale;
+  nextIdentifier: () => string;
 };
 export function AssignedLifecycleTasksScreen(props: Props) {
   const [parameters, setParameters] = useSearchParams();
@@ -84,11 +85,19 @@ function AssignedLifecycleTasksBinding(
         onOpen={controller.openTask}
       />
       {state.selectedTask && task && (
-        <LifecycleTaskPanel
-          title={state.selectedTask.task.title}
+        <LifecycleTaskBinding
+          accountId={props.accountId}
+          access={props.access}
+          change={props.lifecycle.changeTask}
+          context={state.selectedTask}
           properties={task}
           locale={props.locale}
+          nextIdentifier={props.nextIdentifier}
           onClose={controller.closeTask}
+          onReload={() => {
+            controller.closeTask();
+            void controller.refresh();
+          }}
         />
       )}
     </>

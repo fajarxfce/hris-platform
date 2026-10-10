@@ -1,3 +1,4 @@
+import type { ChangeLifecycleTask } from "../../domain/usecases/change-lifecycle-task";
 import type { LoadAssignedLifecycleTasks } from "../../domain/usecases/load-assigned-lifecycle-tasks";
 import type { LoadLifecycleCase } from "../../domain/usecases/load-lifecycle-case";
 import type { LoadLifecycleCases } from "../../domain/usecases/load-lifecycle-cases";
@@ -7,6 +8,7 @@ import type { LoadLifecycleTemplates } from "../../domain/usecases/load-lifecycl
 import type { SaveLifecycleTemplate } from "../../domain/usecases/save-lifecycle-template";
 
 export type LifecycleUseCases = Readonly<{
+  changeTask: Pick<ChangeLifecycleTask, "execute">;
   loadCases: Pick<LoadLifecycleCases, "execute">;
   loadCase: Pick<LoadLifecycleCase, "execute">;
   loadHistory: Pick<LoadLifecycleHistory, "execute">;

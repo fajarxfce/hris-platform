@@ -516,7 +516,34 @@ test("real API sessions, MFA, organization, people, lifecycle, reports, audit, p
   const taskDetails = page.getByRole("dialog", { name: "Review equipment", exact: true });
   await expect(taskDetails).toContainText(retainedChecklist.employee.employeeNumber);
   await expect(taskDetails).toContainText("Anda");
-  await taskDetails.getByRole("button", { name: "Tutup", exact: true }).click();
+  const taskPath = `/api/v1/companies/${companies[1]}/lifecycle/cases/${transitionId}/tasks/equipment`;
+  const taskWrites: { operation: string | undefined; body: unknown }[] = [];
+  await page.route(`**${taskPath}`, async (route) => {
+    if (route.request().method() !== "PUT") return route.fallback();
+    taskWrites.push({
+      operation: route.request().headers()["idempotency-key"],
+      body: route.request().postDataJSON(),
+    });
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toMatchObject({ id: transitionId, version: 1 });
+    if (taskWrites.length === 1) return route.abort("connectionfailed");
+    return route.fulfill({ response });
+  });
+  await taskDetails.getByLabel("Alasan", { exact: true }).fill("Browser equipment received");
+  await taskDetails.getByRole("button", { name: "Simpan tugas", exact: true }).click();
+  await expect(taskDetails.getByRole("status")).toContainText("Penyimpanan belum terkonfirmasi.");
+  await taskDetails.getByRole("button", { name: "Coba simpan kembali", exact: true }).click();
+  await expect(taskDetails).toHaveCount(0);
+  expect(taskWrites).toHaveLength(2);
+  expect(taskWrites[1]).toEqual(taskWrites[0]);
+  expect(taskWrites[0]?.body).toEqual({
+    expectedVersion: 0,
+    status: "DONE",
+    reason: "Browser equipment received",
+  });
+  await page.unroute(`**${taskPath}`);
+  await expect(page.getByRole("status")).toHaveText("Tidak ada tugas tertunda untuk Anda.");
   await page.getByRole("link", { name: "Proses lifecycle", exact: true }).click();
   const lifecycleCases = page.getByRole("table", { name: "Daftar proses", exact: true });
   await expect(lifecycleCases.getByRole("row")).toHaveCount(2);
@@ -533,12 +560,39 @@ test("real API sessions, MFA, organization, people, lifecycle, reports, audit, p
   await expect(page.getByRole("main")).not.toContainText("Browser revised checklist");
   await page.getByRole("tab", { name: "Riwayat", exact: true }).click();
   const lifecycleHistory = page.getByRole("table", { name: "Riwayat", exact: true });
-  await expect(lifecycleHistory.getByRole("row")).toHaveCount(2);
+  await expect(lifecycleHistory.getByRole("row")).toHaveCount(3);
   await lifecycleHistory.getByRole("button", { name: "Lihat perubahan: 0", exact: true }).click();
   await expect(page.getByRole("dialog", { name: "Detail perubahan", exact: true })).toContainText(
     "Browser onboarding",
   );
   await page.getByRole("button", { name: "Tutup", exact: true }).click();
+  await lifecycleHistory.getByRole("button", { name: "Lihat perubahan: 1", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Detail perubahan", exact: true })).toContainText(
+    "Browser equipment received",
+  );
+  await page.getByRole("button", { name: "Tutup", exact: true }).click();
+  await page.getByRole("tab", { name: "Ringkasan", exact: true }).click();
+  await page.getByRole("button", { name: "Lihat tugas: Review equipment", exact: true }).click();
+  await taskDetails.getByLabel("Status baru", { exact: true }).selectOption("PENDING");
+  await taskDetails.getByLabel("Alasan", { exact: true }).fill("Browser equipment recheck");
+  await taskDetails.getByRole("button", { name: "Simpan tugas", exact: true }).click();
+  await expect(taskDetails).toHaveCount(0);
+  const taskCasePath = `/api/v1/companies/${companies[1]}/lifecycle/cases/${transitionId}`;
+  const reopenedCase = await (await context.request.get(taskCasePath)).json();
+  expect(reopenedCase).toMatchObject({
+    version: 2,
+    tasks: [{ key: "equipment", status: "PENDING", completedBy: null, completedAt: null }],
+  });
+  const taskHistory = await (await context.request.get(`${taskCasePath}/history?after=0`)).json();
+  expect(
+    taskHistory.items.map((event: { version: number; action: string }) => [
+      event.version,
+      event.action,
+    ]),
+  ).toEqual([
+    [1, "TASK_DONE"],
+    [2, "TASK_PENDING"],
+  ]);
   expect(
     (
       await context.request.get(`/api/v1/companies/${companies[0]}/lifecycle/cases/${transitionId}`)

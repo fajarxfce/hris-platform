@@ -9,8 +9,8 @@ import { LifecycleCaseController } from "../controllers/lifecycle-case-controlle
 import { lifecycleCaseParameters, lifecycleCaseSearch } from "../models/lifecycle-case-route";
 import { lifecycleCaseView, lifecycleTaskView } from "../models/lifecycle-case-view";
 import { LifecycleCasePage } from "../pages/lifecycle-case-page";
-import { LifecycleTaskPanel } from "../pages/lifecycle-task-panel";
 import { LifecycleHistoryBinding } from "./lifecycle-history-binding";
+import { LifecycleTaskBinding } from "./lifecycle-task-binding";
 
 type Props = {
   accountId: AccountId;
@@ -19,6 +19,7 @@ type Props = {
   companyName: string;
   timezone: string;
   locale: Locale;
+  nextIdentifier: () => string;
 };
 export function LifecycleCaseScreen(props: Props) {
   const { caseId = "" } = useParams();
@@ -125,11 +126,19 @@ function LifecycleCaseBinding(
         }
       />
       {state.selectedTask && task && (
-        <LifecycleTaskPanel
-          title={state.selectedTask.task.title}
+        <LifecycleTaskBinding
+          accountId={props.accountId}
+          access={props.access}
+          change={props.lifecycle.changeTask}
+          context={state.selectedTask}
           properties={task}
           locale={props.locale}
+          nextIdentifier={props.nextIdentifier}
           onClose={controller.closeTask}
+          onReload={() => {
+            controller.closeTask();
+            void controller.refresh();
+          }}
         />
       )}
     </>

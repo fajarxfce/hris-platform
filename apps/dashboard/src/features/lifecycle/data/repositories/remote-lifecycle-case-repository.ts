@@ -1,15 +1,40 @@
 import { safeHttpCall } from "../../../../core/data/http/safe-http-call";
-import type { AccountId, CompanyId } from "../../../../core/domain/identifiers";
+import type { AccountId, CompanyId, OperationId } from "../../../../core/domain/identifiers";
 import type { LifecycleCaseId } from "../../domain/entities/lifecycle-case";
 import type { LifecycleCaseFilter } from "../../domain/entities/lifecycle-case-search";
+import type { LifecycleTaskChange } from "../../domain/entities/lifecycle-task-change";
 import type { LifecycleCaseRepository } from "../../domain/repositories/lifecycle-case-repository";
 import type { LifecycleCaseDataSource } from "../datasources/lifecycle-case-data-source";
 import { toAssignedLifecycleTaskPage } from "../mappers/assigned-lifecycle-task-mapper";
 import { toLifecycleCaseDetails, toLifecycleCasePage } from "../mappers/lifecycle-case-mapper";
 import { toLifecycleHistory } from "../mappers/lifecycle-history-mapper";
+import {
+  toLifecycleTaskChangeDto,
+  toLifecycleTaskReceipt,
+} from "../mappers/lifecycle-task-change-mapper";
 
 export class RemoteLifecycleCaseRepository implements LifecycleCaseRepository {
   constructor(private readonly source: LifecycleCaseDataSource) {}
+  changeTask(
+    company: CompanyId,
+    operation: OperationId,
+    change: LifecycleTaskChange,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toLifecycleTaskReceipt(
+        await this.source.changeTask(
+          company,
+          change.caseId,
+          change.taskKey,
+          operation,
+          toLifecycleTaskChangeDto(change),
+          signal,
+        ),
+        change,
+      ),
+    );
+  }
   list(company: CompanyId, filter: LifecycleCaseFilter, signal: AbortSignal) {
     return safeHttpCall(signal, async () =>
       toLifecycleCasePage(await this.source.list(company, filter, signal), company, filter),

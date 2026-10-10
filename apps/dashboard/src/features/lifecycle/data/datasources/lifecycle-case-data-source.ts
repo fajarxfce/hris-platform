@@ -5,8 +5,20 @@ import type {
   LifecycleCaseQuery,
 } from "../models/lifecycle-case-dto";
 import type { LifecycleHistoryPageDto } from "../models/lifecycle-event-dto";
+import type {
+  LifecycleTaskChangeDto,
+  LifecycleTaskReceiptDto,
+} from "../models/lifecycle-task-change-dto";
 
 export interface LifecycleCaseDataSource {
+  changeTask(
+    company: string,
+    id: string,
+    key: string,
+    operation: string,
+    change: LifecycleTaskChangeDto,
+    signal: AbortSignal,
+  ): Promise<LifecycleTaskReceiptDto>;
   list(
     company: string,
     query: LifecycleCaseQuery,

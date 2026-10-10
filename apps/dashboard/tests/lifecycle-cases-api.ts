@@ -1,5 +1,6 @@
 import { expect, type Page } from "@playwright/test";
 import type { LifecycleCaseDto } from "../src/features/lifecycle/data/models/lifecycle-case-dto";
+import type { LifecycleHistoryPageDto } from "../src/features/lifecycle/data/models/lifecycle-event-dto";
 import { companyIds, installIdentityApi } from "./identity-api";
 
 export const lifecycleAccountId = "20000000-0000-4000-8000-000000000001";
@@ -67,6 +68,25 @@ export async function installLifecycleCasesApi(
       options.empty ? [] : Array.from({ length: 21 }, (_, n) => lifecycleCaseSeed(index, n + 1)),
     ]),
   );
+  const events = new Map<string, LifecycleHistoryPageDto["items"]>(
+    [...records.values()].flatMap((cases) =>
+      cases.map((record) => [
+        record.id,
+        Array.from(
+          { length: record.version + 1 },
+          (_, version): LifecycleHistoryPageDto["items"][number] => ({
+            version,
+            taskKey: version === 0 ? null : "equipment",
+            action: version === 0 ? "CREATED" : version % 2 === 0 ? "TASK_PENDING" : "TASK_DONE",
+            assigneeId: lifecycleAccountId,
+            actorId: lifecycleAccountId,
+            reason: version === 0 ? "Employee transition" : "Equipment verification",
+            recordedAt: "2026-10-01T01:00:00Z",
+          }),
+        ),
+      ]),
+    ),
+  );
   const reads: URL[] = [];
   const completedReads: URL[] = [];
   // Strict Mode probes cancellation on mount. Count completed requests separately from attempts.
@@ -107,16 +127,21 @@ export async function installLifecycleCasesApi(
       if (url.pathname.endsWith("/tasks/assigned")) {
         expect(url.searchParams.get("limit")).toBe("50");
         const after = url.searchParams.get("after");
-        const items = source.slice(0, 17).flatMap((item) =>
-          item.tasks.map((task) => ({
-            caseId: item.id,
-            employmentId: item.employmentId,
-            employee: item.employee,
-            caseVersion: item.version,
-            kind: item.kind,
-            task,
-          })),
-        );
+        const items = source
+          .filter((item) => item.status === "OPEN")
+          .slice(0, 17)
+          .flatMap((item) =>
+            item.tasks
+              .filter((task) => task.status === "PENDING" && task.assigneeId === lifecycleAccountId)
+              .map((task) => ({
+                caseId: item.id,
+                employmentId: item.employmentId,
+                employee: item.employee,
+                caseVersion: item.version,
+                kind: item.kind,
+                task,
+              })),
+          );
         const filtered = items.filter(
           (item) => after === null || `${item.caseId}:${item.task.key}` > after,
         );
@@ -135,15 +160,7 @@ export async function installLifecycleCasesApi(
         if (url.pathname.endsWith("/history")) {
           expect(url.searchParams.get("limit")).toBe("50");
           const after = Number(url.searchParams.get("after") ?? -1);
-          const items = Array.from({ length: record.version + 1 }, (_, version) => ({
-            version,
-            taskKey: version === 0 ? null : "equipment",
-            action: version === 0 ? "CREATED" : version % 2 === 0 ? "TASK_PENDING" : "TASK_DONE",
-            assigneeId: lifecycleAccountId,
-            actorId: lifecycleAccountId,
-            reason: version === 0 ? "Employee transition" : "Equipment verification",
-            recordedAt: "2026-10-01T01:00:00Z",
-          })).filter((event) => event.version > after);
+          const items = (events.get(record.id) ?? []).filter((event) => event.version > after);
           payload = {
             items: items.slice(0, 50),
             nextCursor: items.length > 50 ? String(items[49]?.version) : null,
@@ -180,6 +197,7 @@ export async function installLifecycleCasesApi(
     reads,
     completedReads,
     records,
+    events,
     failReads(code: string | null) {
       readFailure = code;
     },

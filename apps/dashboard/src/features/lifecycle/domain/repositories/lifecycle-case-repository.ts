@@ -1,11 +1,19 @@
-import type { AccountId, CompanyId } from "../../../../core/domain/identifiers";
+import type { AccountId, CompanyId, OperationId } from "../../../../core/domain/identifiers";
+import type { MutationReceipt } from "../../../../core/domain/mutation-receipt";
 import type { Result } from "../../../../core/domain/result";
 import type { LifecycleCase, LifecycleCaseId, LifecycleCasePage } from "../entities/lifecycle-case";
 import type { LifecycleCaseFilter } from "../entities/lifecycle-case-search";
 import type { LifecycleHistoryPage } from "../entities/lifecycle-event";
+import type { LifecycleTaskChange } from "../entities/lifecycle-task-change";
 import type { AssignedLifecycleTaskPage } from "../entities/lifecycle-task-context";
 
 export interface LifecycleCaseRepository {
+  changeTask(
+    company: CompanyId,
+    operation: OperationId,
+    change: LifecycleTaskChange,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
   list(
     company: CompanyId,
     filter: LifecycleCaseFilter,

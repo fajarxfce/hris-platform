@@ -106,7 +106,7 @@ class PayrollCalculationWorkerTest {
             )
         database()
             .update(
-                "insert into accounts(id,email,display_name) values(?,?,'Payroll operator')",
+                "insert into accounts(id,email,display_name,mfa_secret_encrypted) values(?,?,'Payroll operator','fixture-enrolled')",
                 account,
                 "$account@example.test",
             )

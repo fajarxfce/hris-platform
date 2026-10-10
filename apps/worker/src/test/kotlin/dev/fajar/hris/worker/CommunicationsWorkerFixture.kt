@@ -95,7 +95,7 @@ abstract class CommunicationsWorkerFixture {
             "Communication worker fixture",
         )
         db.update(
-            "insert into accounts(id,email,display_name) values(?,?,'Communication operator')",
+            "insert into accounts(id,email,display_name,mfa_secret_encrypted) values(?,?,'Communication operator','fixture-enrolled')",
             account,
             "$account@example.test",
         )

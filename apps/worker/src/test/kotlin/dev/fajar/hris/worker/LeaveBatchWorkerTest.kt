@@ -96,7 +96,7 @@ class LeaveBatchWorkerTest {
             )
         database()
             .update(
-                "insert into accounts(id,email,display_name) values(?,?,'Leave operator')",
+                "insert into accounts(id,email,display_name,mfa_secret_encrypted) values(?,?,'Leave operator','fixture-enrolled')",
                 account,
                 "$account@example.test",
             )

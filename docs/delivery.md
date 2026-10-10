@@ -330,3 +330,9 @@ A company-wide employment read now returns the effective employee plus bounded c
 
 - Added a scoped revision detail API with one coherent employment version, immutable revision/cancellation evidence, company-local date, and current cancellation availability. Read and management authority remain independent; a grant acquired while waiting does not expand the original request.
 - All 42 selected tests passed across the people domain and server contract, employment access, assurance, details, cancellation, and single-revision suites. New cases cover company isolation, the local midnight boundary, permissions gained/revoked during a pending read, credential revocation, cancellation cleanup, and MFA expiry after access waits. Architecture/format checks and both application JARs passed.
+
+
+### Worker fixture assurance alignment
+
+- CI exposed 16 worker test failures during employee fixture creation: test actors carried recent MFA proof, but their stored operator accounts had no enrollment. The communication, leave, and payroll fixtures now record their test-only enrollment alongside that proof, matching the live-access boundary. Production MFA policy is unchanged.
+- All 38 worker tests passed, including publication/push, payroll, leave, imports, storage cleanup/validation, synchronization, SMTP, and worker lifecycle cases. Architecture and format checks passed. The preceding employment server/domain selection passed 42 tests; the dashboard revision editor passed 156 unit tests, 92 browser tests, and the real API scenario.

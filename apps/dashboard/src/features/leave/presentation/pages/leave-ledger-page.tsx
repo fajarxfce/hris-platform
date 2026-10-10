@@ -8,6 +8,7 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { leaveAdjustmentMessages } from "../i18n/leave-adjustment-messages";
 import { leaveBalanceMessages } from "../i18n/leave-balance-messages";
 import type {
   leaveBalanceEmployeeView,
@@ -27,6 +28,7 @@ export function LeaveLedgerPage({
   timezone,
   locale,
   backTo,
+  adjustTo,
   firstPage,
   onRefresh,
   onFirst,
@@ -43,6 +45,7 @@ export function LeaveLedgerPage({
   timezone: string;
   locale: Locale;
   backTo: string;
+  adjustTo: string | null;
   firstPage: boolean;
   onRefresh: () => void;
   onFirst: () => void;
@@ -57,6 +60,7 @@ export function LeaveLedgerPage({
         context={companyName}
         actions={
           <>
+            {adjustTo && <Link to={adjustTo}>{leaveAdjustmentMessages(locale).title}</Link>}
             <Link to={backTo}>{text.back}</Link>
             <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
               {messages(locale).refresh}

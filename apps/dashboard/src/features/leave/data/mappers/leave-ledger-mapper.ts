@@ -13,7 +13,11 @@ export function toLeaveLedger(
   year: number,
   after: string | null,
 ): LeaveLedger {
-  if (raw.employee.id.toLowerCase() !== employee || raw.typeId.toLowerCase() !== type)
+  if (
+    raw.employee.id.toLowerCase() !== employee ||
+    raw.typeId.toLowerCase() !== type ||
+    new Set(raw.availableActions).size !== raw.availableActions.length
+  )
     throw new InvalidHttpResponseError();
   let previous: { at: bigint; id: string } | null = null;
   const entries = raw.entries.items.map((row) => {
@@ -45,6 +49,9 @@ export function toLeaveLedger(
   return Object.freeze({
     companyId,
     employee: Object.freeze({ ...raw.employee, id: employee }),
+    availableActions: Object.freeze(
+      raw.availableActions.filter((action): action is "ADJUST" => action === "ADJUST"),
+    ),
     typeId: type,
     typeCode: raw.typeCode,
     typeName: raw.typeName,

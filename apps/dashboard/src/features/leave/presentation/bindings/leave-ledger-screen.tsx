@@ -6,6 +6,7 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { LeaveBalanceQuery } from "../../domain/entities/leave-balance-query";
+import { canAdjustLeaveBalance } from "../../domain/policies/leave-balance-adjustment-policy";
 import type { LeaveUseCases } from "../contracts/leave-use-cases";
 import { LeaveLedgerController } from "../controllers/leave-ledger-controller";
 import { balanceParameters, balanceQuery } from "../models/leave-balance-route";
@@ -51,6 +52,7 @@ export function LeaveLedgerScreen(props: Props) {
       typeId={typeId}
       query={query}
       backTo={`${path}?${balanceParameters(props.access.companyId, { year: query.year, after: directoryAfter })}`}
+      adjustTo={`${path}/${encodeURIComponent(typeId)}/adjust?${balanceParameters(props.access.companyId, query, directoryAfter)}`}
       onPage={(after) =>
         setParameters(
           balanceParameters(props.access.companyId, { ...query, after }, directoryAfter),
@@ -69,12 +71,14 @@ function LeaveLedgerBinding({
   typeId,
   query,
   backTo,
+  adjustTo,
   onPage,
 }: Props & {
   employeeId: string;
   typeId: string;
   query: LeaveBalanceQuery;
   backTo: string;
+  adjustTo: string;
   onPage: (after: string | null) => void;
 }) {
   const controller = useMemo(
@@ -126,6 +130,7 @@ function LeaveLedgerBinding({
       timezone={timezone}
       locale={locale}
       backTo={backTo}
+      adjustTo={state.ledger && canAdjustLeaveBalance(access, state.ledger) ? adjustTo : null}
       firstPage={query.after === null}
       onRefresh={controller.refresh}
       onFirst={() => onPage(null)}

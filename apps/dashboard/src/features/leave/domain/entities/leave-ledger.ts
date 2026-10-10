@@ -7,6 +7,7 @@ export type LeaveLedger = LeaveBalanceSummary &
   Readonly<{
     companyId: CompanyId;
     employee: LeaveEmployeeReference;
+    availableActions: readonly "ADJUST"[];
     entries: readonly LeaveLedgerEntry[];
     nextCursor: string | null;
   }>;

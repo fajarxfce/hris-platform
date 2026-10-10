@@ -24,6 +24,20 @@ const LeaveBalancesScreen = lazy(() =>
     default: module.LeaveBalancesScreen,
   })),
 );
+const LeaveAdjustmentCatalogScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-adjustment-catalog-screen").then(
+    (module) => ({
+      default: module.LeaveAdjustmentCatalogScreen,
+    }),
+  ),
+);
+const LeaveBalanceAdjustmentScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-balance-adjustment-screen").then(
+    (module) => ({
+      default: module.LeaveBalanceAdjustmentScreen,
+    }),
+  ),
+);
 const LeaveLedgerScreen = lazy(() =>
   import("../../features/leave/presentation/bindings/leave-ledger-screen").then((module) => ({
     default: module.LeaveLedgerScreen,
@@ -285,6 +299,37 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/leave/employees/:employeeId/balances/adjust"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveAdjustmentCatalogScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/employees/:employeeId/balances/:typeId/adjust"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveBalanceAdjustmentScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/leave/employees/:employeeId/balances"
         element={

@@ -6,9 +6,11 @@ import { HttpLeaveRequestDataSource } from "../data/datasources/http-leave-reque
 import { RemoteLeaveBalanceRepository } from "../data/repositories/remote-leave-balance-repository";
 import { RemoteLeavePolicyRepository } from "../data/repositories/remote-leave-policy-repository";
 import { RemoteLeaveRequestRepository } from "../data/repositories/remote-leave-request-repository";
+import { AdjustLeaveBalance } from "../domain/usecases/adjust-leave-balance";
 import { DecideLeaveRequest } from "../domain/usecases/decide-leave-request";
 import { DownloadLeaveAttachment } from "../domain/usecases/download-leave-attachment";
 import { LoadEmployeeLeaveBalances } from "../domain/usecases/load-employee-leave-balances";
+import { LoadLeaveAdjustmentCatalog } from "../domain/usecases/load-leave-adjustment-catalog";
 import { LoadLeaveLedger } from "../domain/usecases/load-leave-ledger";
 import { LoadLeavePolicies } from "../domain/usecases/load-leave-policies";
 import { LoadLeavePolicy } from "../domain/usecases/load-leave-policy";
@@ -16,6 +18,7 @@ import { LoadLeaveRequest } from "../domain/usecases/load-leave-request";
 import { LoadLeaveRequests } from "../domain/usecases/load-leave-requests";
 import { RequestLeaveCancellation } from "../domain/usecases/request-leave-cancellation";
 import { ReviewLeaveAction } from "../domain/usecases/review-leave-action";
+import { ReviewLeaveBalanceAdjustment } from "../domain/usecases/review-leave-balance-adjustment";
 import { SaveLeavePolicy } from "../domain/usecases/save-leave-policy";
 import { WithdrawLeaveRequest } from "../domain/usecases/withdraw-leave-request";
 
@@ -27,6 +30,9 @@ export function createLeaveFeature(
   const policies = new RemoteLeavePolicyRepository(new HttpLeavePolicyDataSource(http));
   const balances = new RemoteLeaveBalanceRepository(new HttpLeaveBalanceDataSource(http));
   return {
+    adjustBalance: new AdjustLeaveBalance(balances),
+    reviewBalanceAdjustment: new ReviewLeaveBalanceAdjustment(balances),
+    loadAdjustmentCatalog: new LoadLeaveAdjustmentCatalog(balances, policies),
     loadBalances: new LoadEmployeeLeaveBalances(balances),
     loadLedger: new LoadLeaveLedger(balances),
     savePolicy: new SaveLeavePolicy(policies),

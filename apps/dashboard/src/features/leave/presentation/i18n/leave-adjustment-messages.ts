@@ -1,0 +1,51 @@
+import type { Locale } from "../../../../core/presentation/i18n/messages";
+
+const en = {
+  title: "Adjust leave balance",
+  choose: "Choose leave type",
+  catalog: "Leave types",
+  catalogHint: "Availability is checked for the selected balance year when you open a review.",
+  empty: "No leave types on this page.",
+  review: "Review balance",
+  backToTypes: "Back to leave types",
+  backToLedger: "Back to ledger",
+  days: "Change in days",
+  daysHint:
+    "Use a positive value to add days or a negative value to deduct them. Half-days are supported.",
+  daysError: "Enter a nonzero half-day amount between -366 and 366.",
+  reason: "Reason",
+  reasonError: "Enter a reason of up to 1,000 characters.",
+  confirm: "Record adjustment",
+  reload: "Reload review",
+  saving: "Recording adjustment…",
+  saved: "Adjustment recorded.",
+  view: "View current balance",
+  unconfirmed: "The outcome is not confirmed. Retry this adjustment before starting another.",
+  retry: "Retry adjustment",
+  operation: "Operation ID",
+};
+const id: typeof en = {
+  title: "Sesuaikan saldo cuti",
+  choose: "Pilih jenis cuti",
+  catalog: "Jenis cuti",
+  catalogHint: "Ketersediaan diperiksa untuk tahun saldo yang dipilih saat review dibuka.",
+  empty: "Tidak ada jenis cuti di halaman ini.",
+  review: "Tinjau saldo",
+  backToTypes: "Kembali ke jenis cuti",
+  backToLedger: "Kembali ke riwayat",
+  days: "Perubahan hari",
+  daysHint:
+    "Gunakan nilai positif untuk menambah hari atau negatif untuk mengurangi. Kelipatan setengah hari didukung.",
+  daysError: "Masukkan jumlah bukan nol dalam kelipatan setengah hari, antara -366 dan 366.",
+  reason: "Alasan",
+  reasonError: "Isi alasan, maksimal 1.000 karakter.",
+  confirm: "Catat penyesuaian",
+  reload: "Muat ulang review",
+  saving: "Mencatat penyesuaian…",
+  saved: "Penyesuaian tercatat.",
+  view: "Lihat saldo terkini",
+  unconfirmed: "Hasil belum terkonfirmasi. Coba ulang penyesuaian ini sebelum membuat yang baru.",
+  retry: "Coba ulang penyesuaian",
+  operation: "ID operasi",
+};
+export const leaveAdjustmentMessages = (locale: Locale) => (locale === "id" ? id : en);

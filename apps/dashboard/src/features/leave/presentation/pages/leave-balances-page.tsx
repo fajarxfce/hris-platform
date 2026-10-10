@@ -9,6 +9,7 @@ import { AppResourceTable } from "../../../../core/presentation/components/app-r
 import { AppTextField } from "../../../../core/presentation/components/app-text-field";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useLeaveBalanceFilters } from "../controllers/use-leave-balance-filters";
+import { leaveAdjustmentMessages } from "../i18n/leave-adjustment-messages";
 import { leaveBalanceMessages } from "../i18n/leave-balance-messages";
 import type { leaveBalanceEmployeeView, leaveBalancesView } from "../models/leave-balance-view";
 import type { LeaveBalancesState } from "../models/leave-balances-state";
@@ -21,6 +22,7 @@ export function LeaveBalancesPage({
   locale,
   filters,
   requestsTo,
+  adjustTo,
   firstPage,
   onRefresh,
   onFirst,
@@ -34,6 +36,7 @@ export function LeaveBalancesPage({
   locale: Locale;
   filters: ReturnType<typeof useLeaveBalanceFilters>;
   requestsTo: string;
+  adjustTo: string | null;
   firstPage: boolean;
   onRefresh: () => void;
   onFirst: () => void;
@@ -48,6 +51,7 @@ export function LeaveBalancesPage({
         context={companyName}
         actions={
           <>
+            {adjustTo && <Link to={adjustTo}>{leaveAdjustmentMessages(locale).title}</Link>}
             <Link to={requestsTo}>{text.requests}</Link>
             <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
               {messages(locale).refresh}

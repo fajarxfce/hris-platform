@@ -2,6 +2,35 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  leave_adjustment_unavailable: [
+    "This balance cannot be adjusted. Check your access, employee and balance year.",
+    "Saldo ini tidak dapat disesuaikan. Periksa akses, karyawan, dan tahun saldo.",
+  ],
+  invalid_leave_adjustment: [
+    "Check the adjustment amount and reason.",
+    "Periksa jumlah penyesuaian dan alasannya.",
+  ],
+  invalid_leave_days: [
+    "Enter a valid number of whole or half-days.",
+    "Masukkan jumlah hari atau setengah hari yang valid.",
+  ],
+  stale_balance_version: [
+    "The balance changed. Reload the review before recording this adjustment.",
+    "Saldo berubah. Muat ulang review sebelum mencatat penyesuaian ini.",
+  ],
+  insufficient_leave_balance: [
+    "This adjustment would exceed the balance limits. Check the amount.",
+    "Penyesuaian ini melewati batas saldo. Periksa jumlahnya.",
+  ],
+  leave_balance_limit: ["The balance limit has been reached.", "Batas saldo telah tercapai."],
+  self_adjustment_denied: [
+    "An independent administrator must adjust your balance.",
+    "Saldo Anda harus disesuaikan oleh administrator lain.",
+  ],
+  leave_type_unavailable: [
+    "This leave type is unavailable for the selected year.",
+    "Jenis cuti tidak tersedia untuk tahun yang dipilih.",
+  ],
   leave_type_not_found: [
     "This leave policy is no longer available.",
     "Kebijakan cuti ini tidak lagi tersedia.",

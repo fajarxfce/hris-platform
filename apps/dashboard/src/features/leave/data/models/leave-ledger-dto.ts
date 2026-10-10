@@ -34,6 +34,15 @@ export const leaveLedgerEntryDto = z.object({
 });
 export const leaveLedgerDto = leaveBalanceSummaryDto.extend({
   employee: leaveEmployeeReferenceDto,
+  availableActions: z
+    .array(
+      z
+        .string()
+        .max(64)
+        .regex(/^[A-Z][A-Z_]*$/u),
+    )
+    .max(16)
+    .default([]),
   entries: z.object({
     items: z.array(leaveLedgerEntryDto).max(20),
     nextCursor: z.uuid().nullable(),

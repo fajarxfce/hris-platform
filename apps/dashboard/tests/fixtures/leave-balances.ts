@@ -62,6 +62,7 @@ export function balanceLedger(year = 2026, type = balanceTypeId()): LeaveLedgerD
   return {
     ...summary,
     employee: directory.employee,
+    availableActions: summary.balance.closed ? [] : ["ADJUST"],
     entries: {
       items: Array.from({ length: year === 2027 ? 0 : 23 }, (_, index) => ({
         id: balanceEntryId(index + 1),

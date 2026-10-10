@@ -6,13 +6,12 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { LeaveBalanceQuery } from "../../domain/entities/leave-balance-query";
-import { canManageLeaveBalances } from "../../domain/policies/leave-balance-adjustment-policy";
 import type { LeaveUseCases } from "../contracts/leave-use-cases";
-import { LeaveBalancesController } from "../controllers/leave-balances-controller";
-import { useLeaveBalanceFilters } from "../controllers/use-leave-balance-filters";
+import { LeaveAdjustmentCatalogController } from "../controllers/leave-adjustment-catalog-controller";
 import { balanceParameters, balanceQuery } from "../models/leave-balance-route";
-import { leaveBalanceEmployeeView, leaveBalancesView } from "../models/leave-balance-view";
-import { LeaveBalancesPage } from "../pages/leave-balances-page";
+import { leaveBalanceEmployeeView } from "../models/leave-balance-view";
+import { leavePoliciesView } from "../models/leave-policy-view";
+import { LeaveAdjustmentCatalogPage } from "../pages/leave-adjustment-catalog-page";
 
 type Props = {
   accountId: AccountId;
@@ -22,7 +21,7 @@ type Props = {
   timezone: string;
   locale: Locale;
 };
-export function LeaveBalancesScreen(props: Props) {
+export function LeaveAdjustmentCatalogScreen(props: Props) {
   const { employeeId = "" } = useParams();
   const [parameters, setParameters] = useSearchParams();
   const navigate = useNavigate();
@@ -31,44 +30,58 @@ export function LeaveBalancesScreen(props: Props) {
     [props.timezone],
   );
   const query = useMemo(() => balanceQuery(parameters, defaultYear), [parameters, defaultYear]);
+  const directoryAfter = parameters.get("directoryAfter");
   const path = `/leave/employees/${encodeURIComponent(employeeId)}/balances`;
   if (parameters.has("company") && parameters.get("company") !== props.access.companyId)
     return <Navigate to="/" replace />;
   if (!parameters.has("company") || !parameters.has("year"))
-    return <Navigate to={`${path}?${balanceParameters(props.access.companyId, query)}`} replace />;
+    return (
+      <Navigate
+        to={`${path}/adjust?${balanceParameters(props.access.companyId, query, directoryAfter)}`}
+        replace
+      />
+    );
   return (
-    <LeaveBalancesBinding
+    <LeaveAdjustmentCatalogBinding
       key={`${props.accountId}:${props.access.companyId}:${employeeId}`}
       {...props}
       employeeId={employeeId}
       query={query}
-      onQuery={(value) => setParameters(balanceParameters(props.access.companyId, value))}
+      backTo={`${path}?${balanceParameters(props.access.companyId, { year: query.year, after: directoryAfter })}`}
+      onPage={(after) =>
+        setParameters(
+          balanceParameters(props.access.companyId, { ...query, after }, directoryAfter),
+        )
+      }
       onOpen={(id) =>
         navigate(
-          `${path}/${encodeURIComponent(id)}?${balanceParameters(props.access.companyId, { year: query.year, after: null }, query.after)}`,
+          `${path}/${encodeURIComponent(id)}/adjust?${balanceParameters(props.access.companyId, query, directoryAfter)}&source=types`,
         )
       }
     />
   );
 }
-function LeaveBalancesBinding({
+function LeaveAdjustmentCatalogBinding({
   access,
   leave,
   companyName,
   locale,
   employeeId,
   query,
-  onQuery,
+  backTo,
+  onPage,
   onOpen,
 }: Props & {
   employeeId: string;
   query: LeaveBalanceQuery;
-  onQuery: (query: LeaveBalanceQuery) => void;
+  backTo: string;
+  onPage: (after: string | null) => void;
   onOpen: (id: string) => void;
 }) {
   const controller = useMemo(
-    () => new LeaveBalancesController(leave.loadBalances, access, employeeId, query),
-    [leave.loadBalances, access, employeeId, query],
+    () =>
+      new LeaveAdjustmentCatalogController(leave.loadAdjustmentCatalog, access, employeeId, query),
+    [leave.loadAdjustmentCatalog, access, employeeId, query],
   );
   const state = useSyncExternalStore(
     controller.subscribe,
@@ -80,35 +93,30 @@ function LeaveBalancesBinding({
     return controller.deactivate;
   }, [controller]);
   useWorkspaceRevalidation(state.failure);
-  const filters = useLeaveBalanceFilters(query, onQuery);
   const rows = useMemo(
-    () => (state.page ? leaveBalancesView(state.page, locale) : []),
-    [state.page, locale],
+    () => (state.catalog ? leavePoliciesView(state.catalog.policies, locale) : []),
+    [state.catalog, locale],
   );
   const employee = useMemo(
     () =>
-      state.page ? leaveBalanceEmployeeView(state.page.employee, state.page.year, locale) : null,
-    [state.page, locale],
+      state.catalog
+        ? leaveBalanceEmployeeView(state.catalog.employee, state.catalog.year, locale)
+        : null,
+    [state.catalog, locale],
   );
   return (
-    <LeaveBalancesPage
+    <LeaveAdjustmentCatalogPage
       state={state}
       rows={rows}
       employee={employee}
       companyName={companyName}
       locale={locale}
-      filters={filters}
-      requestsTo={`/leave/requests?${new URLSearchParams({ company: access.companyId, employee: employeeId })}`}
-      adjustTo={
-        state.page && canManageLeaveBalances(access.permissions)
-          ? `/leave/employees/${encodeURIComponent(employeeId)}/balances/adjust?${balanceParameters(access.companyId, { year: query.year, after: null }, query.after)}`
-          : null
-      }
+      backTo={backTo}
       firstPage={query.after === null}
       onRefresh={controller.refresh}
-      onFirst={() => onQuery({ ...query, after: null })}
+      onFirst={() => onPage(null)}
       onNext={() => {
-        if (state.page?.nextCursor) onQuery({ ...query, after: state.page.nextCursor });
+        if (state.catalog?.policies.nextCursor) onPage(state.catalog.policies.nextCursor);
       }}
       onOpen={onOpen}
     />

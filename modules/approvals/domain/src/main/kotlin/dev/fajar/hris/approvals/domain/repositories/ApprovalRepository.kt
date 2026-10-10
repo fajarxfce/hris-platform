@@ -7,7 +7,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface ApprovalRepository {
-    fun lock(companyId: UUID): Result<Unit>
+    fun lock(companyId: UUID, shared: Boolean = false): Result<Unit>
 
     fun countTemplates(
         companyId: UUID,

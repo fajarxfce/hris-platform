@@ -5,6 +5,7 @@ import dev.fajar.hris.approvals.data.repositories.StoredApprovalRepository
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.approvals.domain.usecases.*
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
@@ -45,6 +46,8 @@ class ApprovalConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         SaveApprovalTemplate(
             approvals,
@@ -54,22 +57,29 @@ class ApprovalConfiguration {
             operations,
             journal,
             transactions,
+            clock,
+            security,
         )
 
     @Bean
     fun listApprovalTemplates(
         approvals: ApprovalRepository,
         identities: IdentityRepository,
+        members: MembershipRepository,
         transactions: TransactionRunner,
-    ) = ListApprovalTemplates(approvals, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = ListApprovalTemplates(approvals, identities, members, transactions, clock, security)
 
     @Bean
     fun listApprovalInbox(
         approvals: ApprovalRepository,
         identities: IdentityRepository,
+        members: MembershipRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = ListApprovalInbox(approvals, identities, transactions, clock)
+        security: IdentitySecurityPolicy,
+    ) = ListApprovalInbox(approvals, identities, members, transactions, clock, security)
 
     @Bean
     fun getApprovalRequest(
@@ -78,7 +88,8 @@ class ApprovalConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         members: MembershipRepository,
-    ) = GetApprovalRequest(approvals, members, identities, transactions, clock)
+        security: IdentitySecurityPolicy,
+    ) = GetApprovalRequest(approvals, members, identities, transactions, clock, security)
 
     @Bean
     fun reassignApproval(
@@ -89,6 +100,8 @@ class ApprovalConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         ReassignApproval(
             approvals,
@@ -98,6 +111,8 @@ class ApprovalConfiguration {
             operations,
             journal,
             transactions,
+            clock,
+            security,
         )
 
     @Bean
@@ -110,6 +125,7 @@ class ApprovalConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         SaveApprovalDelegation(
             approvals,
@@ -120,13 +136,16 @@ class ApprovalConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
     fun listMyDelegations(
         approvals: ApprovalRepository,
         identities: IdentityRepository,
+        members: MembershipRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = ListMyDelegations(approvals, identities, transactions, clock)
+        security: IdentitySecurityPolicy,
+    ) = ListMyDelegations(approvals, identities, members, transactions, clock, security)
 }

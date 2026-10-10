@@ -5,7 +5,7 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 interface ApprovalRequestDataSource {
-    fun lock(companyId: UUID)
+    fun lock(companyId: UUID, shared: Boolean)
 
     fun insert(row: ApprovalRequestsRecord)
 

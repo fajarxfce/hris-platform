@@ -4,7 +4,8 @@ import dev.fajar.hris.approvals.domain.entities.*
 import dev.fajar.hris.approvals.domain.policies.approvalPermissions
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
@@ -21,6 +22,7 @@ class SaveApprovalDelegation(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -78,7 +80,7 @@ class SaveApprovalDelegation(
             }
             val currentActor =
                 identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (currentActor is Result.Failed) return@run currentActor
             val live = (currentActor as Result.Success).value

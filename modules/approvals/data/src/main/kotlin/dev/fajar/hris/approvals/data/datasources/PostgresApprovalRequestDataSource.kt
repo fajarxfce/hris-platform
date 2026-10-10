@@ -15,9 +15,9 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresApprovalRequestDataSource(private val sql: DSLContext) : ApprovalRequestDataSource {
-    override fun lock(companyId: UUID) {
-        sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "approvals:$companyId")
-            .execute()
+    override fun lock(companyId: UUID, shared: Boolean) {
+        val function = if (shared) "pg_advisory_xact_lock_shared" else "pg_advisory_xact_lock"
+        sql.query("select $function(hashtextextended(?,0))", "approvals:$companyId").execute()
     }
 
     override fun insert(row: ApprovalRequestsRecord) {

@@ -20,7 +20,9 @@ class StoredApprovalRepository(
     private val delegationSource: DelegationDataSource,
     private val json: ObjectMapper,
 ) : ApprovalRepository {
-    override fun lock(companyId: UUID): Result<Unit> = safeDatabaseCall { requests.lock(companyId) }
+    override fun lock(companyId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
+        requests.lock(companyId, shared)
+    }
 
     override fun countTemplates(
         companyId: UUID,

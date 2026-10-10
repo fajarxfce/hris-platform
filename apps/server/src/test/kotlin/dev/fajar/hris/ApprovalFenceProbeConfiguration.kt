@@ -45,10 +45,10 @@ class ApprovalFenceProbeConfiguration {
         probe: ApprovalFenceProbe,
     ): ApprovalRepository =
         object : ApprovalRepository by delegate {
-            override fun lock(companyId: UUID): Result<Unit> {
+            override fun lock(companyId: UUID, shared: Boolean): Result<Unit> {
                 probe.observedLock.get()?.takeIf { it.company == companyId }?.entered?.countDown()
                 probe.beforeLock.get()?.awaitOnce(companyId)
-                return delegate.lock(companyId)
+                return delegate.lock(companyId, shared)
             }
 
             override fun decide(

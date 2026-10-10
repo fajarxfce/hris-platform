@@ -4,10 +4,12 @@ import dev.fajar.hris.approvals.domain.entities.*
 import dev.fajar.hris.approvals.domain.policies.*
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import java.time.Clock
 import java.util.UUID
 
 class SaveApprovalTemplate(
@@ -18,6 +20,8 @@ class SaveApprovalTemplate(
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
+    private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(actor: Actor, operationId: UUID, request: TemplateChange): Result<MutationReceipt> {
         val access = actor.requirePermission("approvals.manage")
@@ -68,7 +72,7 @@ class SaveApprovalTemplate(
             }
             val currentActor =
                 identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (currentActor is Result.Failed) return@run currentActor
             val live = (currentActor as Result.Success).value

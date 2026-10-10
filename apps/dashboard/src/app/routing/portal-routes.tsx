@@ -47,6 +47,11 @@ const EmployeeDetailsScreen = lazy(() =>
     default: module.EmployeeDetailsScreen,
   })),
 );
+const EmployeeCreationScreen = lazy(() =>
+  import("../../features/people/presentation/bindings/employee-creation-screen").then((module) => ({
+    default: module.EmployeeCreationScreen,
+  })),
+);
 const PersonProfileScreen = lazy(() =>
   import("../../features/people/presentation/bindings/person-profile-screen").then((module) => ({
     default: module.PersonProfileScreen,
@@ -100,6 +105,23 @@ export function PortalRoutes({
   return (
     <Routes>
       <Route path="/" element={<OverviewPage company={company} locale={locale} />} />
+      <Route
+        path="/people/employees/new"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <EmployeeCreationScreen
+              accountId={accountId}
+              access={access}
+              people={people}
+              loadUnits={organization.loadUnits}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       {[
         { path: "/people/employees/:employeeId/profile", mode: "read" as const },
         { path: "/people/employees/:employeeId/profile/edit", mode: "edit" as const },

@@ -3,6 +3,7 @@ import { HttpEmployeeDataSource } from "../data/datasources/http-employee-data-s
 import { HttpPersonProfileDataSource } from "../data/datasources/http-person-profile-data-source";
 import { RemoteEmployeeRepository } from "../data/repositories/remote-employee-repository";
 import { RemotePersonProfileRepository } from "../data/repositories/remote-person-profile-repository";
+import { CreateEmployee } from "../domain/usecases/create-employee";
 import { LoadEmployee } from "../domain/usecases/load-employee";
 import { LoadEmployees } from "../domain/usecases/load-employees";
 import { LoadEmploymentHistory } from "../domain/usecases/load-employment-history";
@@ -14,6 +15,7 @@ export function createPeopleFeature(http: HttpClient) {
   const employees = new RemoteEmployeeRepository(new HttpEmployeeDataSource(http));
   const profiles = new RemotePersonProfileRepository(new HttpPersonProfileDataSource(http));
   return {
+    createEmployee: new CreateEmployee(employees),
     loadEmployees: new LoadEmployees(employees),
     loadEmployee: new LoadEmployee(employees),
     loadEmploymentHistory: new LoadEmploymentHistory(employees),

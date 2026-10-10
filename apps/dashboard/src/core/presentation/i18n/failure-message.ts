@@ -2,6 +2,38 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_employee_creation: [
+    "Check the employee and assignment details.",
+    "Periksa data karyawan dan penempatannya.",
+  ],
+  invalid_employee_number: [
+    "Use an employee number of 2–32 letters, numbers, underscores or hyphens.",
+    "Gunakan nomor karyawan 2–32 huruf, angka, underscore, atau tanda hubung.",
+  ],
+  reason_required: [
+    "Enter a reason of up to 1,000 characters.",
+    "Masukkan alasan maksimal 1.000 karakter.",
+  ],
+  invalid_employment_dates: [
+    "Choose valid employment dates. The end cannot precede the start.",
+    "Pilih tanggal employment yang valid. Tanggal berakhir tidak boleh sebelum tanggal mulai.",
+  ],
+  invalid_fixed_term_contract: [
+    "A fixed-term contract requires an end date and cannot use probation status.",
+    "Kontrak waktu tertentu memerlukan tanggal berakhir dan tidak dapat memakai status masa percobaan.",
+  ],
+  end_date_required: [
+    "An ended employment requires an end date.",
+    "Employment yang berakhir memerlukan tanggal berakhir.",
+  ],
+  organization_assignment_unavailable: [
+    "An organization assignment is no longer available. Review the selection.",
+    "Penempatan organisasi tidak tersedia. Periksa kembali pilihan penempatan.",
+  ],
+  manager_unavailable: [
+    "Choose a manager who is working on the employment start date.",
+    "Pilih manager yang bekerja pada tanggal mulai employment.",
+  ],
   person_profile_not_found: [
     "The profile was not found or is no longer accessible.",
     "Profil tidak ditemukan atau tidak dapat diakses.",

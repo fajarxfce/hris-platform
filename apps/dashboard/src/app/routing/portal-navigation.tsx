@@ -17,7 +17,9 @@ import type { CompanyAccess } from "../../features/identity/domain/entities/sess
 import { jobMessages } from "../../features/jobs/presentation/i18n/job-messages";
 import { canReadOrganization } from "../../features/organization/domain/policies/organization-unit-policy";
 import { organizationMessages } from "../../features/organization/presentation/i18n/organization-messages";
+import { canCreateEmployee } from "../../features/people/domain/policies/employee-creation-policy";
 import { canReadEmployees } from "../../features/people/domain/policies/employee-policy";
+import { employeeCreationMessages } from "../../features/people/presentation/i18n/employee-creation-messages";
 import { canReadHeadcount } from "../../features/reporting/domain/policies/headcount-policy";
 
 /** Navigation visibility uses the same client policy as the feature; the API enforces access. */
@@ -40,7 +42,15 @@ export function portalNavigation(
       : []),
     ...(canReadEmployees(permissions)
       ? [{ to: "/people/employees", label: text.people, icon: <People20Regular /> }]
-      : []),
+      : canCreateEmployee(permissions)
+        ? [
+            {
+              to: "/people/employees/new",
+              label: employeeCreationMessages(locale).create,
+              icon: <People20Regular />,
+            },
+          ]
+        : []),
     ...(access
       ? [
           {

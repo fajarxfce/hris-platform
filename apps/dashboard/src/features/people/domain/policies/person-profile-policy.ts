@@ -1,8 +1,12 @@
 import { isCalendarDate } from "../../../../core/domain/calendar-date";
+import { isUuid } from "../../../../core/domain/identifiers";
 import { type Failure, failed, type Result, success } from "../../../../core/domain/result";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
-import type { PersonProfile, PersonProfileChange } from "../entities/person-profile";
-import { isEmployeeId } from "./employee-policy";
+import type {
+  PersonProfile,
+  PersonProfileChange,
+  PersonProfileFields,
+} from "../entities/person-profile";
 
 export const canReadPersonProfile = (permissions: readonly string[]): boolean =>
   permissions.includes("people.profile.read") || permissions.includes("people.self.read");
@@ -18,24 +22,28 @@ export const isProfileRevisionCursor = (value: string): boolean =>
 export function normalizePersonProfileChange(
   input: PersonProfileChange,
 ): Result<PersonProfileChange> {
+  const reason = input.reason.trim();
+  if (
+    !isUuid(input.personId) ||
+    !isUuid(input.ownerCompanyId) ||
+    !Number.isSafeInteger(input.expectedVersion) ||
+    input.expectedVersion < 0 ||
+    input.expectedVersion === Number.MAX_SAFE_INTEGER ||
+    !reason ||
+    reason.length > 1000
+  )
+    return failed("invalid_profile_change");
+  const fields = normalizePersonFields(input);
+  return fields.ok ? success(Object.freeze({ ...input, ...fields.value, reason })) : fields;
+}
+
+export function normalizePersonFields(input: PersonProfileFields): Result<PersonProfileFields> {
   const change = Object.freeze({
-    ...input,
     legalName: input.legalName.trim(),
     nationality: input.nationality.trim().toUpperCase(),
     email: input.email?.trim().toLowerCase() || null,
     birthDate: input.birthDate || null,
-    reason: input.reason.trim(),
   });
-  if (
-    !isEmployeeId(change.personId) ||
-    !isEmployeeId(change.ownerCompanyId) ||
-    !Number.isSafeInteger(change.expectedVersion) ||
-    change.expectedVersion < 0 ||
-    change.expectedVersion === Number.MAX_SAFE_INTEGER ||
-    !change.reason ||
-    change.reason.length > 1000
-  )
-    return failed("invalid_profile_change");
   const fields: Record<string, string> = {};
   if (!change.legalName || change.legalName.length > 200) fields.legalName = "invalid_name";
   if (!/^[A-Z]{2}$/u.test(change.nationality)) fields.nationality = "invalid_country";

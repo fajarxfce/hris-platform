@@ -1,6 +1,12 @@
 import { isCalendarDate } from "../../../../core/domain/calendar-date";
 import type { Failure } from "../../../../core/domain/result";
 import type { EmployeeSearch } from "../entities/employee-search";
+import type { EmploymentTerms } from "../entities/employment-terms";
+
+export const isWorkingOn = (terms: EmploymentTerms, date: string): boolean =>
+  (terms.status === "ACTIVE" || terms.status === "PROBATION") &&
+  terms.startDate <= date &&
+  (terms.endDate === null || terms.endDate >= date);
 
 export const canReadEmployees = (permissions: readonly string[]): boolean =>
   permissions.some((permission) =>

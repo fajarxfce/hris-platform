@@ -1,3 +1,4 @@
+import type { CreateEmployee } from "../../domain/usecases/create-employee";
 import type { LoadEmployee } from "../../domain/usecases/load-employee";
 import type { LoadEmployees } from "../../domain/usecases/load-employees";
 import type { LoadEmploymentHistory } from "../../domain/usecases/load-employment-history";
@@ -6,6 +7,7 @@ import type { LoadPersonProfileHistory } from "../../domain/usecases/load-person
 import type { SavePersonProfile } from "../../domain/usecases/save-person-profile";
 
 export type PeopleUseCases = Readonly<{
+  createEmployee: Pick<CreateEmployee, "execute">;
   loadEmployees: Pick<LoadEmployees, "execute">;
   loadEmployee: Pick<LoadEmployee, "execute">;
   loadEmploymentHistory: Pick<LoadEmploymentHistory, "execute">;

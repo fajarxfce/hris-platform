@@ -1,14 +1,32 @@
 import { safeHttpCall } from "../../../../core/data/http/safe-http-call";
-import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
 import type { EmployeeId } from "../../domain/entities/employee";
+import type { EmployeeCreation } from "../../domain/entities/employee-creation";
 import type { EmployeeSearch } from "../../domain/entities/employee-search";
 import type { EmployeeRepository } from "../../domain/repositories/employee-repository";
 import type { EmployeeDataSource } from "../datasources/employee-data-source";
+import {
+  toEmployeeCreationDto,
+  toEmployeeCreationReceipt,
+} from "../mappers/employee-creation-mapper";
 import { toEmployee, toEmployeePage } from "../mappers/employee-mapper";
 import { toEmploymentHistoryPage } from "../mappers/employment-history-mapper";
 
 export class RemoteEmployeeRepository implements EmployeeRepository {
   constructor(private readonly source: EmployeeDataSource) {}
+  create(
+    companyId: CompanyId,
+    operation: OperationId,
+    input: EmployeeCreation,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toEmployeeCreationReceipt(
+        await this.source.create(companyId, operation, toEmployeeCreationDto(input), signal),
+        input,
+      ),
+    );
+  }
   list(companyId: CompanyId, search: EmployeeSearch, signal: AbortSignal) {
     return safeHttpCall(signal, async () =>
       toEmployeePage(await this.source.list(companyId, search, signal), companyId, search),

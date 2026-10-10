@@ -1,5 +1,6 @@
 import { Text } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -9,6 +10,7 @@ import { AppResourceTable } from "../../../../core/presentation/components/app-r
 import { AppTextField } from "../../../../core/presentation/components/app-text-field";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useEmployeeFilters } from "../controllers/use-employee-filters";
+import { employeeCreationMessages } from "../i18n/employee-creation-messages";
 import { peopleMessages } from "../i18n/people-messages";
 import type { EmployeeDirectoryState } from "../models/employee-directory-state";
 import type { employeeDirectoryView } from "../models/employee-view";
@@ -24,6 +26,7 @@ export function EmployeesPage({
   onFirst,
   onNext,
   onOpen,
+  createTo,
 }: {
   state: EmployeeDirectoryState;
   rows: ReturnType<typeof employeeDirectoryView>;
@@ -35,6 +38,7 @@ export function EmployeesPage({
   onFirst: () => void;
   onNext: () => void;
   onOpen: (id: string) => void;
+  createTo: string | null;
 }) {
   const text = peopleMessages(locale);
   const shared = messages(locale);
@@ -44,13 +48,16 @@ export function EmployeesPage({
         title={text.title}
         context={companyName}
         actions={
-          <AppButton
-            icon={<ArrowClockwise20Regular />}
-            disabled={state.stage === "loading"}
-            onClick={onRefresh}
-          >
-            {shared.refresh}
-          </AppButton>
+          <div className="app-form-actions">
+            {createTo && <Link to={createTo}>{employeeCreationMessages(locale).create}</Link>}
+            <AppButton
+              icon={<ArrowClockwise20Regular />}
+              disabled={state.stage === "loading"}
+              onClick={onRefresh}
+            >
+              {shared.refresh}
+            </AppButton>
+          </div>
         }
       />
       <form onSubmit={filters.apply} noValidate>

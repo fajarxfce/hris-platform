@@ -5,6 +5,7 @@ import { companyDate } from "../../../../core/presentation/dates/company-date";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { EmployeeSearch } from "../../domain/entities/employee-search";
+import { canCreateEmployee } from "../../domain/policies/employee-creation-policy";
 import type { PeopleUseCases } from "../contracts/people-use-cases";
 import { EmployeeDirectoryController } from "../controllers/employee-directory-controller";
 import { useEmployeeFilters } from "../controllers/use-employee-filters";
@@ -89,6 +90,11 @@ function EmployeesBinding({
       filters={filters}
       companyName={companyName}
       locale={locale}
+      createTo={
+        canCreateEmployee(access.permissions)
+          ? `/people/employees/new?${new URLSearchParams({ company: access.companyId })}`
+          : null
+      }
       firstPage={search.after === null}
       onRefresh={controller.refresh}
       onFirst={() => onSearch({ ...search, after: null })}

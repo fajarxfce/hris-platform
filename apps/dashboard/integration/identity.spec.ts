@@ -172,24 +172,56 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
       .locator(".app-property-row")
       .filter({ hasText: "Versi" }),
   ).toContainText("1");
-  const employeeId = randomUUID();
-  const created = await context.request.post(`/api/v1/companies/${companies[1]}/employees`, {
-    headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
-    data: {
-      id: employeeId,
-      employeeNumber: "BROWSER-REPORT",
-      person: { id: randomUUID(), legalName: "Report fixture employee", nationality: "ID" },
-      terms: {
-        effectiveFrom: "2026-01-01",
-        startDate: "2026-01-01",
-        status: "ACTIVE",
-        contract: "PERMANENT",
-      },
-      reason: "Browser report fixture",
-    },
-  });
-  expect(created.status()).toBe(200);
   await page.getByRole("link", { name: "Karyawan", exact: true }).click();
+  await page.getByRole("link", { name: "Buat karyawan", exact: true }).click();
+  await page.getByLabel("Nama lengkap", { exact: true }).fill("Report fixture employee");
+  await page.getByLabel("Kewarganegaraan", { exact: true }).fill("ID");
+  await page.getByLabel("Nomor karyawan", { exact: true }).fill("BROWSER-REPORT");
+  await page.getByLabel("Tanggal mulai", { exact: true }).fill("2026-01-01");
+  await page.getByLabel("Alasan", { exact: true }).fill("Browser onboarding fixture");
+  await page.getByRole("button", { name: "Pilih Cabang", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "Pilih Cabang", exact: true })
+    .getByRole("button", { name: "Pilih: HQ · Browser office", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Pilih Departemen", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "Pilih Departemen", exact: true })
+    .getByRole("button", { name: "Pilih: RND · R&D_100%", exact: true })
+    .click();
+  let employeeId = "";
+  let creationAttempts = 0;
+  await page.route("**/api/v1/companies/*/employees", async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    creationAttempts += 1;
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    const receipt = await response.json();
+    expect(receipt.version).toBe(0);
+    if (creationAttempts === 1) {
+      employeeId = receipt.id;
+      await route.abort("failed");
+    } else {
+      expect(receipt.id).toBe(employeeId);
+      await route.fulfill({ response });
+    }
+  });
+  await page.getByRole("button", { name: "Buat karyawan", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Hasil pembuatan belum terkonfirmasi");
+  await page.getByRole("button", { name: "Coba pembuatan kembali", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Karyawan dibuat.");
+  expect(creationAttempts).toBe(2);
+  const employeeSnapshot = await (
+    await context.request.get(
+      `/api/v1/companies/${companies[1]}/employees/${employeeId}?asOf=2026-10-01`,
+    )
+  ).json();
+  expect(employeeSnapshot).toMatchObject({
+    version: 0,
+    appliedRevision: 0,
+    terms: { branchId, departmentId, managerId: null },
+  });
+  await page.getByRole("link", { name: "Kembali", exact: true }).click();
   await page.getByLabel("Tanggal efektif", { exact: true }).fill("2026-10-01");
   await page.getByRole("button", { name: "Terapkan", exact: true }).click();
   const directory = page.getByRole("table", { name: "Direktori karyawan", exact: true });
@@ -247,7 +279,7 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
   await expect(employmentHistory.getByRole("row")).toHaveCount(2);
   await employmentHistory.getByRole("button", { name: "Lihat detail: 0", exact: true }).click();
   await expect(page.getByRole("dialog", { name: "Detail revisi", exact: true })).toContainText(
-    "Browser report fixture",
+    "Browser onboarding fixture",
   );
   await page.getByRole("button", { name: "Tutup", exact: true }).click();
   await page.getByRole("link", { name: "Laporan", exact: true }).click();

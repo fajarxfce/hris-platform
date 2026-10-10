@@ -1,4 +1,8 @@
 import type { HttpClient } from "../../../../core/data/http/http-client";
+import {
+  type EmployeeCreationDto,
+  employeeCreationReceiptDto,
+} from "../models/employee-creation-dto";
 import { employeeDto, employeePageDto } from "../models/employee-dto";
 import type { EmployeeSearchDto } from "../models/employee-search-dto";
 import { employmentHistoryPageDto } from "../models/employment-revision-dto";
@@ -6,6 +10,24 @@ import type { EmployeeDataSource } from "./employee-data-source";
 
 export class HttpEmployeeDataSource implements EmployeeDataSource {
   constructor(private readonly http: HttpClient) {}
+  async create(
+    companyId: string,
+    operation: string,
+    input: EmployeeCreationDto,
+    signal: AbortSignal,
+  ) {
+    return employeeCreationReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${companyId}/employees`,
+          method: "POST",
+          operationId: operation,
+          body: input,
+        },
+        signal,
+      ),
+    );
+  }
   async list(companyId: string, search: EmployeeSearchDto, signal: AbortSignal) {
     const query = new URLSearchParams({ asOf: search.asOf, query: search.query, limit: "50" });
     if (search.after !== null) query.set("after", search.after);

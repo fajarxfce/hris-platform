@@ -34,9 +34,9 @@ export function toEmploymentHistoryPage(
   after: string | null,
 ): EmploymentHistoryPage {
   const items = dto.items.map(toEmploymentRevision);
-  let previous = after === null ? -1 : Number(after);
+  let previous = after === null ? Infinity : Number(after);
   for (const item of items) {
-    if (item.revision <= previous) throw new InvalidHttpResponseError();
+    if (item.revision >= previous) throw new InvalidHttpResponseError();
     previous = item.revision;
   }
   if (

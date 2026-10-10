@@ -42,21 +42,21 @@ async function installPeople(page: Page, paginate = false) {
     if (url.pathname.endsWith("/history")) {
       expect(url.searchParams.get("limit")).toBe("50");
       const after = url.searchParams.get("after");
-      const first = after === null ? 0 : Number(after) + 1;
-      const count = paginate && after === null ? 50 : 2;
+      const first = after === null ? (paginate ? 51 : 1) : Number(after) - 1;
+      const count = Math.min(50, first + 1);
       return route.fulfill({
         json: {
           items: Array.from({ length: count }, (_, index) => ({
-            revision: first + index,
+            revision: first - index,
             terms: {
               ...employee(company).terms,
-              effectiveFrom: index === 0 ? "2026-01-01" : "2027-01-01",
+              effectiveFrom: first - index === 0 ? "2026-01-01" : "2027-01-01",
             },
             actorId: "PRIVATE ACTOR",
-            reason: index === 0 ? "Initial employment" : "Scheduled contract review",
+            reason: first - index === 0 ? "Initial employment" : "Scheduled contract review",
             recordedAt: "2026-01-01T00:00:00.000123Z",
             cancellation:
-              index === 0
+              first - index === 0
                 ? null
                 : {
                     actorId: "PRIVATE ACTOR",
@@ -64,7 +64,7 @@ async function installPeople(page: Page, paginate = false) {
                     recordedAt: "2026-02-01T00:00:00Z",
                   },
           })),
-          nextCursor: count === 50 ? "49" : null,
+          nextCursor: count === 50 ? String(first - count + 1) : null,
         },
       });
     }
@@ -226,7 +226,7 @@ test("directory filters and both cursors follow URL navigation without speculati
   await expect(history.getByRole("row")).toHaveCount(51);
   await page.getByRole("button", { name: "Next page", exact: true }).click();
   await expect(history.getByRole("row")).toHaveCount(3);
-  expect(api.requests.at(-1)?.searchParams.get("after")).toBe("49");
+  expect(api.requests.at(-1)?.searchParams.get("after")).toBe("2");
   await page.getByRole("button", { name: "First page", exact: true }).click();
   await expect(history.getByRole("row")).toHaveCount(51);
   await page.getByRole("link", { name: "Back to employees", exact: true }).click();

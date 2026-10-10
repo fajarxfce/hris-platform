@@ -212,8 +212,8 @@ describe("people feature contracts", () => {
     };
     const request = vi
       .fn<HttpClient["request"]>()
-      .mockResolvedValueOnce({ items: [revision(), cancelled], nextCursor: null })
-      .mockResolvedValueOnce({ items: [cancelled], nextCursor: null });
+      .mockResolvedValueOnce({ items: [cancelled, revision()], nextCursor: null })
+      .mockResolvedValueOnce({ items: [revision()], nextCursor: null });
     const feature = createPeopleFeature({ request });
     const result = await feature.loadEmploymentHistory.execute(
       access,
@@ -222,34 +222,38 @@ describe("people feature contracts", () => {
       signal(),
     );
     if (!result.ok) throw new Error("History fixture was rejected");
-    expect(result.value.items.map((item) => item.revision)).toEqual([0, 2]);
-    expect(Object.isFrozen(result.value.items[1]?.cancellation)).toBe(true);
+    expect(result.value.items.map((item) => item.revision)).toEqual([2, 0]);
+    expect(Object.isFrozen(result.value.items[0]?.cancellation)).toBe(true);
     expect(JSON.stringify(result)).not.toContain("PRIVATE");
     expect(
-      await feature.loadEmploymentHistory.execute(access, employeeId(), "0", signal()),
+      await feature.loadEmploymentHistory.execute(access, employeeId(), "2", signal()),
     ).toMatchObject({ ok: true });
     expect(request.mock.lastCall?.[0].path).toBe(
-      `/api/v1/companies/${companyId}/employees/${employeeId()}/history?limit=50&after=0`,
+      `/api/v1/companies/${companyId}/employees/${employeeId()}/history?limit=50&after=2`,
     );
     request.mockResolvedValueOnce({
-      items: Array.from({ length: 50 }, (_, index) => revision(index)),
-      nextCursor: "49",
+      items: Array.from({ length: 50 }, (_, index) => revision(49 - index)),
+      nextCursor: "0",
     });
     expect(
       await feature.loadEmploymentHistory.execute(access, employeeId(), null, signal()),
-    ).toMatchObject({ ok: true, value: { nextCursor: "49" } });
+    ).toMatchObject({ ok: true, value: { nextCursor: "0" } });
     for (const page of [
-      { items: [revision(3), revision(2)], nextCursor: null },
+      { items: [revision(2), revision(3)], nextCursor: null },
       { items: [revision(2), revision(2)], nextCursor: null },
       { items: [revision(2)], nextCursor: "2" },
-      { items: [revision()], nextCursor: null },
+      { items: [revision(4)], nextCursor: null },
       { items: [{ ...revision(2), revision: Number.MAX_SAFE_INTEGER + 1 }], nextCursor: null },
     ]) {
       request.mockResolvedValueOnce(page);
       expect(
-        await feature.loadEmploymentHistory.execute(access, employeeId(), "0", signal()),
+        await feature.loadEmploymentHistory.execute(access, employeeId(), "4", signal()),
       ).toMatchObject({ ok: false, failure: { code: "invalid_response" } });
     }
+    request.mockResolvedValueOnce({ items: [], nextCursor: null });
+    expect(
+      await feature.loadEmploymentHistory.execute(access, employeeId(), "0", signal()),
+    ).toEqual({ ok: true, value: { items: [], nextCursor: null } });
   });
 
   it("preserves localizable failures, propagates cancellation and never retries", async () => {

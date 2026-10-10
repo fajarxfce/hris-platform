@@ -6,6 +6,10 @@ import {
   lifecycleCaseDto,
   lifecycleCasePageDto,
 } from "../models/lifecycle-case-dto";
+import {
+  type LifecycleCaseStartDto,
+  lifecycleCaseStartReceiptDto,
+} from "../models/lifecycle-case-start-dto";
 import { lifecycleHistoryPageDto } from "../models/lifecycle-event-dto";
 import type { LifecycleTaskAssignmentDto } from "../models/lifecycle-task-assignment-dto";
 import {
@@ -16,6 +20,24 @@ import type { LifecycleCaseDataSource } from "./lifecycle-case-data-source";
 
 export class HttpLifecycleCaseDataSource implements LifecycleCaseDataSource {
   constructor(private readonly http: HttpClient) {}
+  async start(
+    company: string,
+    operation: string,
+    command: LifecycleCaseStartDto,
+    signal: AbortSignal,
+  ) {
+    return lifecycleCaseStartReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/lifecycle/cases`,
+          method: "POST",
+          operationId: operation,
+          body: command,
+        },
+        signal,
+      ),
+    );
+  }
   async assignees(company: string, query: string, after: string | null, signal: AbortSignal) {
     const parameters = new URLSearchParams({ limit: "50", query });
     if (after !== null) parameters.set("after", after);

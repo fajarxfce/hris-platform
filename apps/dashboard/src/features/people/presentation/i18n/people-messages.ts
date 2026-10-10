@@ -2,6 +2,7 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 
 const en = {
   title: "Employees",
+  startLifecycle: "Start lifecycle case",
   directory: "Employee directory",
   details: "Employee details",
   query: "Name or employee number",
@@ -53,6 +54,7 @@ const en = {
 };
 const id: typeof en = {
   title: "Karyawan",
+  startLifecycle: "Mulai proses lifecycle",
   directory: "Direktori karyawan",
   details: "Detail karyawan",
   query: "Nama atau nomor karyawan",

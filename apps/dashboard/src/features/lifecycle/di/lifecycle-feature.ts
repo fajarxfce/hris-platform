@@ -13,6 +13,7 @@ import { LoadLifecycleHistory } from "../domain/usecases/load-lifecycle-history"
 import { LoadLifecycleTemplate } from "../domain/usecases/load-lifecycle-template";
 import { LoadLifecycleTemplates } from "../domain/usecases/load-lifecycle-templates";
 import { SaveLifecycleTemplate } from "../domain/usecases/save-lifecycle-template";
+import { StartLifecycleCase } from "../domain/usecases/start-lifecycle-case";
 
 export function createLifecycleFeature(http: HttpClient) {
   const templates = new RemoteLifecycleTemplateRepository(
@@ -20,6 +21,7 @@ export function createLifecycleFeature(http: HttpClient) {
   );
   const cases = new RemoteLifecycleCaseRepository(new HttpLifecycleCaseDataSource(http));
   return {
+    startCase: new StartLifecycleCase(cases),
     loadAssignees: new LoadLifecycleAssignees(cases),
     assignTask: new AssignLifecycleTask(cases),
     changeTask: new ChangeLifecycleTask(cases),

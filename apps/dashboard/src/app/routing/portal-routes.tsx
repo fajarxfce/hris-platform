@@ -21,6 +21,11 @@ const LifecycleTemplatesScreen = lazy(() =>
     (module) => ({ default: module.LifecycleTemplatesScreen }),
   ),
 );
+const LifecycleCaseCreationScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/lifecycle-case-creation-screen").then(
+    (module) => ({ default: module.LifecycleCaseCreationScreen }),
+  ),
+);
 const LifecycleCasesScreen = lazy(() =>
   import("../../features/lifecycle/presentation/bindings/lifecycle-cases-screen").then(
     (module) => ({ default: module.LifecycleCasesScreen }),
@@ -156,6 +161,23 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/people/employees/:employeeId/lifecycle/new"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LifecycleCaseCreationScreen
+              accountId={accountId}
+              access={access}
+              loadEmployee={people.loadEmployee}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/people/lifecycle/cases"
         element={

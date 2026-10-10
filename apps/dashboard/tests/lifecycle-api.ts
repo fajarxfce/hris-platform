@@ -158,6 +158,7 @@ export async function installLifecycleApi(
   });
   return {
     identity,
+    templates: records,
     reads,
     writes,
     get commits() {

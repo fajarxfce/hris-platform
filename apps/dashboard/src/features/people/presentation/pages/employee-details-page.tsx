@@ -23,6 +23,7 @@ export function EmployeeDetailsPage({
   backTo,
   profileTo,
   editEmploymentTo,
+  startLifecycleTo,
   tab,
   canReadHistory,
   history,
@@ -36,6 +37,7 @@ export function EmployeeDetailsPage({
   backTo: string;
   profileTo: string | null;
   editEmploymentTo: string | null;
+  startLifecycleTo: string | null;
   tab: "overview" | "history";
   canReadHistory: boolean;
   history: ReactNode;
@@ -52,6 +54,9 @@ export function EmployeeDetailsPage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
+            {startLifecycleTo && state.employee && (
+              <Link to={startLifecycleTo}>{text.startLifecycle}</Link>
+            )}
             {editEmploymentTo && state.employee && (
               <Link to={editEmploymentTo}>{employmentMessages(locale).edit}</Link>
             )}

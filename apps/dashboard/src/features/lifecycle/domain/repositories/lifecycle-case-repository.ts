@@ -4,12 +4,19 @@ import type { Result } from "../../../../core/domain/result";
 import type { LifecycleAssigneePage } from "../entities/lifecycle-assignee";
 import type { LifecycleCase, LifecycleCaseId, LifecycleCasePage } from "../entities/lifecycle-case";
 import type { LifecycleCaseFilter } from "../entities/lifecycle-case-search";
+import type { LifecycleCaseStart } from "../entities/lifecycle-case-start";
 import type { LifecycleHistoryPage } from "../entities/lifecycle-event";
 import type { LifecycleTaskAssignment } from "../entities/lifecycle-task-assignment";
 import type { LifecycleTaskChange } from "../entities/lifecycle-task-change";
 import type { AssignedLifecycleTaskPage } from "../entities/lifecycle-task-context";
 
 export interface LifecycleCaseRepository {
+  start(
+    company: CompanyId,
+    operation: OperationId,
+    command: LifecycleCaseStart,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
   assignees(
     company: CompanyId,
     query: string,

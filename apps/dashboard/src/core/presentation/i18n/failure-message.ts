@@ -2,6 +2,22 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_lifecycle_case: [
+    "Choose a template, a target date between 1900 and 2200, and a reason of up to 1,000 characters.",
+    "Pilih template, tanggal target antara tahun 1900 dan 2200, serta alasan maksimal 1.000 karakter.",
+  ],
+  lifecycle_template_unavailable: [
+    "Choose an active template from the selected company.",
+    "Pilih template aktif dari perusahaan yang dipilih.",
+  ],
+  stale_template_version: [
+    "This template has changed. Choose it again and review the updated checklist.",
+    "Template sudah berubah. Pilih kembali dan periksa checklist terbaru.",
+  ],
+  employment_unavailable: [
+    "This employment is unavailable on the target date. Review the date and employee details.",
+    "Employment tidak tersedia pada tanggal target. Periksa tanggal dan detail karyawan.",
+  ],
   invalid_lifecycle_assignment: [
     "Choose a member or remove the assignee, and provide a reason of up to 1,000 characters.",
     "Pilih anggota atau hapus penanggung jawab, lalu masukkan alasan maksimal 1.000 karakter.",

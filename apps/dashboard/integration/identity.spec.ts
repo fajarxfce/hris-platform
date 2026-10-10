@@ -669,6 +669,116 @@ test("real API sessions, MFA, organization, people, lifecycle, reports, audit, p
       await context.request.get(`/api/v1/companies/${companies[0]}/lifecycle/cases/${transitionId}`)
     ).status(),
   ).toBe(404);
+  const offboardingTemplateId = randomUUID();
+  csrf = await (await context.request.get("/api/v1/auth/csrf")).json();
+  const offboardingTemplate = await context.request.put(
+    `/api/v1/companies/${companies[1]}/lifecycle/templates/${offboardingTemplateId}`,
+    {
+      headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
+      data: {
+        expectedVersion: null,
+        code: "BROWSER_OFFBOARD",
+        name: "Browser offboarding",
+        kind: "OFFBOARDING",
+        active: true,
+        tasks: [
+          { key: "equipment_return", title: "Return equipment", required: true, dueDays: 0 },
+          { key: "exit_meeting", title: "Exit meeting", required: false, dueDays: -1 },
+        ],
+        reason: "Browser offboarding fixture",
+      },
+    },
+  );
+  expect(offboardingTemplate.status()).toBe(200);
+  await page.getByRole("link", { name: "Karyawan", exact: true }).click();
+  await page.getByLabel("Tanggal efektif", { exact: true }).fill("2026-10-01");
+  await page
+    .getByLabel("Nama atau nomor karyawan", { exact: true })
+    .fill(retainedChecklist.employee.employeeNumber);
+  await page.getByRole("button", { name: "Terapkan", exact: true }).click();
+  await page
+    .getByRole("button", {
+      name: `Lihat detail: ${retainedChecklist.employee.name} (${retainedChecklist.employee.employeeNumber})`,
+      exact: true,
+    })
+    .click();
+  await page.getByRole("link", { name: "Mulai proses lifecycle", exact: true }).click();
+  await page.getByRole("button", { name: "Pilih template", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "Pilih template", exact: true })
+    .getByRole("button", { name: "Pilih: Browser offboarding (BROWSER_OFFBOARD)", exact: true })
+    .click();
+  await page.getByLabel("Tanggal target", { exact: true }).fill("2026-10-03");
+  await expect(page.getByRole("table", { name: "Checklist", exact: true })).toContainText(
+    "2 Okt 2026",
+  );
+  await page.getByLabel("Alasan", { exact: true }).fill("Browser departure checklist");
+  const caseCreationPath = `/api/v1/companies/${companies[1]}/lifecycle/cases`;
+  const caseCreations: { operation: string | undefined; body: unknown }[] = [];
+  let newCaseId = "";
+  await page.route(`**${caseCreationPath}`, async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    const body = route.request().postDataJSON();
+    caseCreations.push({ operation: route.request().headers()["idempotency-key"], body });
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    const receipt = await response.json();
+    expect(receipt).toMatchObject({ id: body.id, version: 0 });
+    newCaseId = receipt.id;
+    if (caseCreations.length === 1) return route.abort("connectionfailed");
+    return route.fulfill({ response });
+  });
+  await page.getByRole("button", { name: "Mulai proses", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Hasil belum terkonfirmasi.");
+  await page.getByRole("button", { name: "Ulangi request awal", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Proses lifecycle dimulai.");
+  expect(caseCreations).toHaveLength(2);
+  expect(caseCreations[1]).toEqual(caseCreations[0]);
+  expect(caseCreations[0]?.body).toEqual({
+    id: newCaseId,
+    employmentId: employeeId,
+    templateId: offboardingTemplateId,
+    templateVersion: 0,
+    targetDate: "2026-10-03",
+    assignees: {},
+    reason: "Browser departure checklist",
+  });
+  await page.unroute(`**${caseCreationPath}`);
+  await page.getByRole("link", { name: "Buka proses", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Ringkasan", exact: true })).toContainText(
+    "Browser offboarding",
+  );
+  const createdCase = await (await context.request.get(`${caseCreationPath}/${newCaseId}`)).json();
+  expect(createdCase).toMatchObject({
+    id: newCaseId,
+    employmentId: employeeId,
+    kind: "OFFBOARDING",
+    version: 0,
+    status: "OPEN",
+    templateVersion: 0,
+  });
+  expect(
+    createdCase.tasks.map(
+      (task: { key: string; dueDate: string; assigneeId: string | null; status: string }) => [
+        task.key,
+        task.dueDate,
+        task.assigneeId,
+        task.status,
+      ],
+    ),
+  ).toEqual([
+    ["equipment_return", "2026-10-03", null, "PENDING"],
+    ["exit_meeting", "2026-10-02", null, "PENDING"],
+  ]);
+  const createdHistory = await (
+    await context.request.get(`${caseCreationPath}/${newCaseId}/history`)
+  ).json();
+  expect(createdHistory.items).toHaveLength(1);
+  expect(createdHistory.items[0]).toMatchObject({
+    version: 0,
+    action: "CREATED",
+    reason: "Browser departure checklist",
+  });
   await page.getByRole("link", { name: "Policy client", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText(
     "Belum ada konfigurasi perusahaan yang disimpan.",

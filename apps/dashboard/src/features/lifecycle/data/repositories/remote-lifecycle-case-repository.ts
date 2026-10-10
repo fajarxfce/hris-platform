@@ -2,6 +2,7 @@ import { safeHttpCall } from "../../../../core/data/http/safe-http-call";
 import type { AccountId, CompanyId, OperationId } from "../../../../core/domain/identifiers";
 import type { LifecycleCaseId } from "../../domain/entities/lifecycle-case";
 import type { LifecycleCaseFilter } from "../../domain/entities/lifecycle-case-search";
+import type { LifecycleCaseStart } from "../../domain/entities/lifecycle-case-start";
 import type { LifecycleTaskAssignment } from "../../domain/entities/lifecycle-task-assignment";
 import type { LifecycleTaskChange } from "../../domain/entities/lifecycle-task-change";
 import type { LifecycleCaseRepository } from "../../domain/repositories/lifecycle-case-repository";
@@ -9,6 +10,10 @@ import type { LifecycleCaseDataSource } from "../datasources/lifecycle-case-data
 import { toAssignedLifecycleTaskPage } from "../mappers/assigned-lifecycle-task-mapper";
 import { toLifecycleAssigneePage } from "../mappers/lifecycle-assignee-mapper";
 import { toLifecycleCaseDetails, toLifecycleCasePage } from "../mappers/lifecycle-case-mapper";
+import {
+  toLifecycleCaseStartDto,
+  toLifecycleCaseStartReceipt,
+} from "../mappers/lifecycle-case-start-mapper";
 import { toLifecycleHistory } from "../mappers/lifecycle-history-mapper";
 import { toLifecycleTaskAssignmentDto } from "../mappers/lifecycle-task-assignment-mapper";
 import {
@@ -18,6 +23,19 @@ import {
 
 export class RemoteLifecycleCaseRepository implements LifecycleCaseRepository {
   constructor(private readonly source: LifecycleCaseDataSource) {}
+  start(
+    company: CompanyId,
+    operation: OperationId,
+    command: LifecycleCaseStart,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toLifecycleCaseStartReceipt(
+        await this.source.start(company, operation, toLifecycleCaseStartDto(command), signal),
+        command.id,
+      ),
+    );
+  }
   assignees(company: CompanyId, query: string, after: string | null, signal: AbortSignal) {
     return safeHttpCall(signal, async () =>
       toLifecycleAssigneePage(

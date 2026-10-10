@@ -5,6 +5,10 @@ import type {
   LifecycleCasePageDto,
   LifecycleCaseQuery,
 } from "../models/lifecycle-case-dto";
+import type {
+  LifecycleCaseStartDto,
+  LifecycleCaseStartReceiptDto,
+} from "../models/lifecycle-case-start-dto";
 import type { LifecycleHistoryPageDto } from "../models/lifecycle-event-dto";
 import type { LifecycleTaskAssignmentDto } from "../models/lifecycle-task-assignment-dto";
 import type {
@@ -13,6 +17,12 @@ import type {
 } from "../models/lifecycle-task-change-dto";
 
 export interface LifecycleCaseDataSource {
+  start(
+    company: string,
+    operation: string,
+    command: LifecycleCaseStartDto,
+    signal: AbortSignal,
+  ): Promise<LifecycleCaseStartReceiptDto>;
   assignees(
     company: string,
     query: string,

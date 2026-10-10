@@ -3,6 +3,7 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 const en = {
   title: "Employees",
   leaveRequests: "Leave requests",
+  leaveBalances: "Leave balances",
   startLifecycle: "Start lifecycle case",
   directory: "Employee directory",
   details: "Employee details",
@@ -56,6 +57,7 @@ const en = {
 const id: typeof en = {
   title: "Karyawan",
   leaveRequests: "Permintaan cuti",
+  leaveBalances: "Saldo cuti",
   startLifecycle: "Mulai proses lifecycle",
   directory: "Direktori karyawan",
   details: "Detail karyawan",

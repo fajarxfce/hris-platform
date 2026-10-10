@@ -57,6 +57,11 @@ export function EmployeeDetailsScreen(props: Props) {
       asOf={search.asOf}
       today={today}
       backTo={backTo}
+      balancesTo={
+        canBrowseEmployeeLeave(props.access.permissions)
+          ? `/leave/employees/${encodeURIComponent(employeeId)}/balances?${new URLSearchParams({ company: props.access.companyId, year: search.asOf.slice(0, 4) })}`
+          : null
+      }
       leaveTo={
         canBrowseEmployeeLeave(props.access.permissions)
           ? `/leave/requests?${new URLSearchParams({ company: props.access.companyId, employee: employeeId })}`
@@ -110,6 +115,7 @@ function EmployeeDetailsBinding({
   editEmploymentTo,
   startLifecycleTo,
   leaveTo,
+  balancesTo,
   tab,
   after,
   onTab,
@@ -123,6 +129,7 @@ function EmployeeDetailsBinding({
   editEmploymentTo: string | null;
   startLifecycleTo: string | null;
   leaveTo: string | null;
+  balancesTo: string | null;
   tab: EmployeeTab;
   after: string | null;
   onTab: (tab: string) => void;
@@ -156,6 +163,7 @@ function EmployeeDetailsBinding({
       editEmploymentTo={editEmploymentTo}
       startLifecycleTo={startLifecycleTo}
       leaveTo={leaveTo}
+      balancesTo={balancesTo}
       tab={tab}
       canReadHistory={canReadEmploymentHistory(access.permissions)}
       onTab={onTab}

@@ -4,8 +4,10 @@ import type { AccountId } from "../../../../core/domain/identifiers";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import { canBrowseEmployeeLeave } from "../../domain/policies/leave-read-policy";
 import type { LeaveUseCases } from "../contracts/leave-use-cases";
 import { LeaveRequestController } from "../controllers/leave-request-controller";
+import { leaveBalanceMessages } from "../i18n/leave-balance-messages";
 import { leaveActionLinks } from "../models/leave-action-view";
 import { leaveRequestView } from "../models/leave-request-view";
 import { leaveParameters, leaveQuery } from "../models/leave-route";
@@ -102,6 +104,14 @@ function LeaveRequestBinding({
         : [],
     [access, state.request, locale, actionPath, actionQuery],
   );
+  const balanceLinks = useMemo(() => {
+    const request = state.request;
+    if (!request || !canBrowseEmployeeLeave(access.permissions)) return [];
+    return [...new Set(request.days.map((day) => day.workDate.slice(0, 4)))].sort().map((year) => ({
+      label: `${leaveBalanceMessages(locale).ledger} · ${year}`,
+      to: `/leave/employees/${request.employeeId}/balances/${request.policy.typeId}?${new URLSearchParams({ company: access.companyId, year })}`,
+    }));
+  }, [state.request, access, locale]);
   return (
     <LeaveRequestPage
       state={state}
@@ -117,6 +127,7 @@ function LeaveRequestBinding({
           />
         ) : null
       }
+      balanceLinks={balanceLinks}
       actions={actions}
       companyName={companyName}
       locale={locale}

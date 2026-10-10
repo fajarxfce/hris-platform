@@ -15,6 +15,7 @@ export function LeaveRequestPage({
   state,
   view,
   actions,
+  balanceLinks,
   evidence,
   companyName,
   locale,
@@ -28,6 +29,7 @@ export function LeaveRequestPage({
 }: {
   state: LeaveRequestState;
   view: ReturnType<typeof leaveRequestView> | null;
+  balanceLinks: readonly Readonly<{ label: string; to: string }>[];
   actions: readonly Readonly<{ intent: string; label: string; to: string }>[];
   evidence: ReactNode;
   companyName: string;
@@ -49,6 +51,11 @@ export function LeaveRequestPage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
+            {balanceLinks.map((link) => (
+              <Link key={link.to} to={link.to}>
+                {link.label}
+              </Link>
+            ))}
             {actions.map((action) => (
               <Link key={action.intent} to={action.to}>
                 {action.label}

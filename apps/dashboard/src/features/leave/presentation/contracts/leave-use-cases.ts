@@ -1,5 +1,7 @@
 import type { DecideLeaveRequest } from "../../domain/usecases/decide-leave-request";
 import type { DownloadLeaveAttachment } from "../../domain/usecases/download-leave-attachment";
+import type { LoadEmployeeLeaveBalances } from "../../domain/usecases/load-employee-leave-balances";
+import type { LoadLeaveLedger } from "../../domain/usecases/load-leave-ledger";
 import type { LoadLeavePolicies } from "../../domain/usecases/load-leave-policies";
 import type { LoadLeavePolicy } from "../../domain/usecases/load-leave-policy";
 import type { LoadLeaveRequest } from "../../domain/usecases/load-leave-request";
@@ -10,6 +12,8 @@ import type { SaveLeavePolicy } from "../../domain/usecases/save-leave-policy";
 import type { WithdrawLeaveRequest } from "../../domain/usecases/withdraw-leave-request";
 
 export type LeaveUseCases = Readonly<{
+  loadBalances: Pick<LoadEmployeeLeaveBalances, "execute">;
+  loadLedger: Pick<LoadLeaveLedger, "execute">;
   savePolicy: Pick<SaveLeavePolicy, "execute">;
   loadPolicies: Pick<LoadLeavePolicies, "execute">;
   loadPolicy: Pick<LoadLeavePolicy, "execute">;

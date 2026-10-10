@@ -1,11 +1,15 @@
 import type { HttpClient } from "../../../core/data/http/http-client";
 import type { FileRepository } from "../../../core/domain/files/file-repository";
+import { HttpLeaveBalanceDataSource } from "../data/datasources/http-leave-balance-data-source";
 import { HttpLeavePolicyDataSource } from "../data/datasources/http-leave-policy-data-source";
 import { HttpLeaveRequestDataSource } from "../data/datasources/http-leave-request-data-source";
+import { RemoteLeaveBalanceRepository } from "../data/repositories/remote-leave-balance-repository";
 import { RemoteLeavePolicyRepository } from "../data/repositories/remote-leave-policy-repository";
 import { RemoteLeaveRequestRepository } from "../data/repositories/remote-leave-request-repository";
 import { DecideLeaveRequest } from "../domain/usecases/decide-leave-request";
 import { DownloadLeaveAttachment } from "../domain/usecases/download-leave-attachment";
+import { LoadEmployeeLeaveBalances } from "../domain/usecases/load-employee-leave-balances";
+import { LoadLeaveLedger } from "../domain/usecases/load-leave-ledger";
 import { LoadLeavePolicies } from "../domain/usecases/load-leave-policies";
 import { LoadLeavePolicy } from "../domain/usecases/load-leave-policy";
 import { LoadLeaveRequest } from "../domain/usecases/load-leave-request";
@@ -21,7 +25,10 @@ export function createLeaveFeature(
 ) {
   const requests = new RemoteLeaveRequestRepository(new HttpLeaveRequestDataSource(http));
   const policies = new RemoteLeavePolicyRepository(new HttpLeavePolicyDataSource(http));
+  const balances = new RemoteLeaveBalanceRepository(new HttpLeaveBalanceDataSource(http));
   return {
+    loadBalances: new LoadEmployeeLeaveBalances(balances),
+    loadLedger: new LoadLeaveLedger(balances),
     savePolicy: new SaveLeavePolicy(policies),
     loadPolicies: new LoadLeavePolicies(policies),
     loadPolicy: new LoadLeavePolicy(policies),

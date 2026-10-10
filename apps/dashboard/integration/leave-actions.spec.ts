@@ -151,6 +151,33 @@ test("real API leave decisions recover receipts and preserve staged reservations
       balance: { availableDays: "2", reservedDays: "0", consumedDays: "0" },
     });
 
+    // Balance review uses its own scoped API; a reviewer needs no policy-management grant.
+    await reviewPage
+      .getByRole("link", { name: `Balance ledger · ${scenario.date.slice(0, 4)}`, exact: true })
+      .click();
+    const balanceSummary = reviewPage.getByRole("region", { name: "Current balance", exact: true });
+    await expect(balanceSummary).toContainText("Browser annual leave");
+    const movementTable = reviewPage.getByRole("table", {
+      name: "Balance movements (Asia/Jakarta)",
+      exact: true,
+    });
+    await expect(movementTable.getByRole("row")).toHaveCount(5);
+    await movementTable.getByRole("button", { name: /^View movement: Refund/ }).click();
+    await expect(
+      reviewPage.getByRole("region", { name: "Selected movement", exact: true }),
+    ).toBeFocused();
+    await expect(
+      reviewPage.getByRole("link", { name: "View leave request", exact: true }),
+    ).toHaveAttribute("href", `${detail}&employee=${scenario.employee}`);
+    await reviewPage.getByRole("link", { name: "Back to balances", exact: true }).click();
+    const balanceTable = reviewPage.getByRole("table", { name: "Leave balances", exact: true });
+    await expect(balanceTable.getByRole("row")).toHaveCount(2);
+    await expect(balanceTable.getByRole("row").nth(1)).toContainText("Browser annual leave");
+    await balanceTable
+      .getByRole("button", { name: "View ledger: Browser annual leave", exact: true })
+      .click();
+    await expect(balanceSummary).toBeVisible();
+
     const next = randomUUID();
     expect(
       (

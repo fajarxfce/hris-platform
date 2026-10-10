@@ -19,6 +19,17 @@ import type { PeopleUseCases } from "../../features/people/presentation/contract
 import type { ReportingUseCases } from "../../features/reporting/presentation/contracts/reporting-use-cases";
 import { approvalResourceRoute } from "./approval-resource-route";
 
+const LeaveBalancesScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-balances-screen").then((module) => ({
+    default: module.LeaveBalancesScreen,
+  })),
+);
+const LeaveLedgerScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-ledger-screen").then((module) => ({
+    default: module.LeaveLedgerScreen,
+  })),
+);
+
 const LeavePoliciesScreen = lazy(() =>
   import("../../features/leave/presentation/bindings/leave-policies-screen").then((module) => ({
     default: module.LeavePoliciesScreen,
@@ -274,6 +285,36 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/leave/employees/:employeeId/balances"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveBalancesScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/employees/:employeeId/balances/:typeId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveLedgerScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/leave/policies/new"
         element={

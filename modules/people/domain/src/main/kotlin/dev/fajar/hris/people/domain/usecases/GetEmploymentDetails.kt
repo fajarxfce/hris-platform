@@ -6,12 +6,13 @@ import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.*
 import dev.fajar.hris.people.domain.entities.*
+import dev.fajar.hris.people.domain.policies.canReadOwnEmployment
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import java.time.Clock
 import java.time.LocalDate
 import java.util.UUID
 
-/** Company-wide employment detail with current reference labels under a common read scope. */
+/** Authorized employment detail with current reference labels under a common read scope. */
 class GetEmploymentDetails(
     private val people: PeopleRepository,
     private val units: OrganizationRepository,
@@ -23,8 +24,8 @@ class GetEmploymentDetails(
     private val clock: Clock,
 ) {
     fun execute(actor: Actor, id: UUID, asOf: LocalDate): Result<EmploymentDetails> {
-        val access = actor.requirePermission("people.read")
-        if (access is Result.Failed) return access
+        if (!canReadOwnEmployment(actor.permissions))
+            return Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
@@ -40,11 +41,13 @@ class GetEmploymentDetails(
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
             val checked =
-                identities
-                    .access(actor.accountId, company)
-                    .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
-                    .flatMap { it.requirePermission("people.read") }
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
+                }
             if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
+            if (!canReadOwnEmployment(live.permissions))
+                return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
             val found = people.find(company, id, asOf)
             if (found is Result.Failed) return@run found
             val employee =
@@ -52,6 +55,8 @@ class GetEmploymentDetails(
                     ?: return@run Result.Failed(
                         Failure(FailureKind.NOT_FOUND, "employee_not_found")
                     )
+            if ("people.read" !in live.permissions && employee.person.accountId != live.accountId)
+                return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
             val references = mutableMapOf<UUID, EmploymentUnitReference?>()
             for (unitId in
                 listOfNotNull(

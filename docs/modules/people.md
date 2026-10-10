@@ -38,7 +38,7 @@ Profile reads, history, and edits hold people, company, membership, and account 
 
 Employee creation, detail/directory/history reads, employment revisions, and scheduled-revision cancellation also check current MFA after their ordered resource/access guards. An expired request must renew its proof before reading data, changing employment, or replaying a receipt. The original permissions remain an upper bound on renewed live access.
 
-`GET /companies/{companyId}/employees/{employeeId}/employment?asOf=YYYY-MM-DD` provides company-wide employment details for `people.read`. It returns the effective employee and current labels/availability for its four organization assignments and manager in one guarded transaction. People and structure guards precede company, membership, and account guards; current permissions and MFA are checked after waiting. Reference acquisition is limited to those assigned IDs in the same company. Missing references remain null, archived units remain identifiable, and manager summaries omit private profile/account data. The employment version is the current aggregate version while `appliedRevision` follows the selected date. Current reference labels are not historical organization snapshots. Team/self readers retain the existing scoped employee endpoint and cannot use this richer company-wide projection.
+`GET /companies/{companyId}/employees/{employeeId}/employment?asOf=YYYY-MM-DD` provides company-wide employment details for `people.read`, or the linked person's own employment for `people.self.read`. Other employee IDs remain not found for a self-only reader. It returns the effective employee and current labels/availability for its four organization assignments and manager in one guarded transaction. People and structure guards precede company, membership, and account guards; current permissions and MFA are checked after waiting. Reference acquisition is limited to those assigned IDs in the same company. Missing references remain null, archived units remain identifiable, and manager summaries omit private profile/account data. The employment version is the current aggregate version while `appliedRevision` follows the selected date. Current reference labels are not historical organization snapshots. Team/self readers retain the existing scoped employee endpoint and cannot use this richer company-wide projection.
 
 Employment creation, revisions, cancellation, directory/detail reads, and history/transfer reads use the same live-access boundary. Directory visibility is recomputed from the remaining permissions after waiting; losing company-wide read access can narrow a response to the caller's own employment. Creation locks linked accounts in stable ID order and rechecks their active company membership. Reads require an explicit `asOf` date where the effective employment view is requested.
 
@@ -119,3 +119,19 @@ The dashboard exposes company-scoped lifecycle template catalogs, details, creat
 ## Lifecycle case and task dashboard
 
 The dashboard provides company-scoped case lists, employee/checklist details, on-demand immutable transition history, and the current account's pending task queue. Reads retain bounded pages and minimal employee context without acquiring private profiles. Task and history panels dispose with their account/company owner; a lost case-read grant clears the overview. See [case and task views](../dashboard.md#lifecycle-case-and-task-views). Task completion, reopening, and manager waiver of optional tasks are implemented with observed versions, required reasons, and explicit recovery of uncertain receipts. See [task changes](../dashboard.md#lifecycle-task-changes). Managers can assign pending tasks through a bounded company member picker or explicitly remove an assignee, with the same version and receipt protections. See [task assignment](../dashboard.md#lifecycle-task-assignment). Managers can [start cases](../dashboard.md#starting-lifecycle-cases), [cancel cases and complete onboarding](../dashboard.md#cancelling-cases-and-completing-onboarding). The [offboarding review](../dashboard.md#offboarding-review-and-completion) acquires the server company date and both observed versions before completing employment, with protected reload and explicit recovery of uncertain completion receipts.
+
+## Mobile employment discovery
+
+`GET /api/v1/companies/{companyId}/me/employments` returns the signed-in person's
+effective employments, the server date in the company timezone, and bounded cursor
+pagination (20 entries by default, at most 50). It accepts no account selector and
+always applies self scope, including when the actor also has directory permissions.
+An unlinked account receives an empty page. Future employment that has not become
+effective is not included. Each request needs `people.self.read` or `people.read`.
+
+The use case reuses the people repository's scoped directory projection after
+shared people, company, membership, and account guards. It rechecks current
+credentials, original/live access, and MFA after waiting. The datasource performs
+the query; it does not infer scope or application policy. The response omits
+birth date and nationality. Assignment labels and the separately authorized
+private profile are acquired only when the client opens an employment.

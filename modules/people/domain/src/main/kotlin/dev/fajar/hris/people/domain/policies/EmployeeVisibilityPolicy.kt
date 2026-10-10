@@ -3,6 +3,9 @@ package dev.fajar.hris.people.domain.policies
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.people.domain.entities.EmployeeVisibility
 
+fun canReadOwnEmployment(permissions: Set<String>): Boolean =
+    "people.self.read" in permissions || "people.read" in permissions
+
 fun employeeVisibility(permissions: Set<String>): Result<EmployeeVisibility> =
     when {
         "people.read" in permissions -> Result.Success(EmployeeVisibility.ALL)

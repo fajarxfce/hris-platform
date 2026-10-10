@@ -185,7 +185,7 @@ class EmploymentDetailsHttpTest : PeopleApiFixture() {
     }
 
     @Test
-    fun companyWideReadIsRequiredAndForeignEmployeesAndScopesCannotBeResolved() {
+    fun anUnlinkedSelfReaderCannotResolveOtherEmployeesOrForeignScopes() {
         val f = fixture()
         val otherCompany = company(f.admin, f.csrf)
         val otherEmployee = employee(f.admin, f.csrf, otherCompany)
@@ -214,7 +214,7 @@ class EmploymentDetailsHttpTest : PeopleApiFixture() {
                 permission,
             )
         val denied = get(f.reader, f.path)
-        assertEquals(403, denied.statusCode(), denied.body())
+        assertEquals(404, denied.statusCode(), denied.body())
         assertFalse(denied.body().contains("Main office"))
         assertFalse(denied.body().contains("Employment detail fixture"))
     }

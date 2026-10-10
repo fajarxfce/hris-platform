@@ -10,12 +10,19 @@ validation. A generated module or route does not complete a capability. Each
 workflow must enforce current scope, handle response loss and cancellation,
 provide localized errors, and pass the relevant real API and UI checks.
 
+Mobile native password sign-in, MFA enrollment/verification, recovery acknowledgement,
+secure refresh, company selection, current access, product flavors, localizable API
+problems, and restrained navigation transitions are connected in
+[the mobile application](https://github.com/fajarxfce/hris-mobile/commit/7692ed7).
+Automated UI/API checks and the Android dev build passed. Physical device validation
+and the employee workflows below remain separate acceptance work.
+
 ## Remaining delivery sequence
 
 | Area | Remaining end-to-end work |
 | --- | --- |
-| Mobile identity | Native sign-in, MFA, secure rotation, company selection, current access, session management, OIDC handoff |
-| Mobile foundation | Product identity and flavors, API problems, encrypted company/account cache, bounded sync and durable outbox, availability, background execution, deep links and push registration |
+| Mobile identity | Remote session revocation/management, native OIDC handoff, physical device validation |
+| Mobile foundation | Encrypted company/account cache, HRIS sync and durable outbox, availability, background execution, deep links and push registration |
 | People | Dashboard account binding and company transfers; scheduled lifecycle execution; mobile self profile and assignments |
 | Workforce | Dashboard shifts, schedules, rosters, holidays, attendance reviews/corrections, overtime and closing; bulk/reset and late corrections; mobile calendar, verified/offline attendance and overtime requests |
 | Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry; mobile balances, requests, evidence and cancellation |

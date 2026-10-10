@@ -387,7 +387,8 @@ a {
 }
 .app-lifecycle-template-editor,
 .app-approval-template-editor,
-.app-approval-delegation-editor {
+.app-approval-delegation-editor,
+.app-approval-reassignment {
   gap: 20px;
 }
 .app-lifecycle-template-editor .app-page-header,
@@ -398,12 +399,16 @@ a {
 .app-approval-template-editor h2,
 .app-approval-delegation-editor .app-page-header,
 .app-approval-delegation-editor p,
-.app-approval-delegation-editor h2 {
+.app-approval-delegation-editor h2,
+.app-approval-reassignment .app-page-header,
+.app-approval-reassignment p,
+.app-approval-reassignment h2 {
   margin: 0;
 }
 .app-lifecycle-template-editor .app-editor-form,
 .app-approval-template-editor .app-editor-form,
-.app-approval-delegation-editor .app-editor-form {
+.app-approval-delegation-editor .app-editor-form,
+.app-approval-reassignment .app-editor-form {
   margin-top: 0;
   gap: 20px;
 }
@@ -483,11 +488,13 @@ a {
 }
 
 .app-approval-template-editor,
-.app-approval-delegation-editor {
+.app-approval-delegation-editor,
+.app-approval-reassignment {
   max-width: 1080px;
 }
 .app-approval-template-editor .app-editor-form,
-.app-approval-delegation-editor .app-editor-form {
+.app-approval-delegation-editor .app-editor-form,
+.app-approval-reassignment .app-editor-form {
   min-width: 0;
 }
 .app-approval-accounts {

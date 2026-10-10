@@ -4,7 +4,8 @@ import { type BrowserContext, expect, type Page } from "@playwright/test";
 export async function reviewApprovalTemplate(
   page: Page,
   context: BrowserContext,
-  companies: readonly string[],
+  company: string,
+  otherCompany: string,
 ) {
   await page.getByRole("link", { name: "Approval templates", exact: true }).click();
   await page.getByRole("link", { name: "Create approval template", exact: true }).click();
@@ -24,7 +25,7 @@ export async function reviewApprovalTemplate(
   await expect(page.getByRole("status")).toContainText("Template saved.");
   await page.getByRole("link", { name: "View template", exact: true }).click();
   const id = new URL(page.url()).pathname.split("/").at(-1);
-  const path = `/api/v1/companies/${companies[1]}/approvals/templates/${id}`;
+  const path = `/api/v1/companies/${company}/approvals/templates/${id}`;
   const response = await context.request.get(path);
   expect(response.status()).toBe(200);
   expect(await response.json()).toMatchObject({
@@ -57,7 +58,7 @@ export async function reviewApprovalTemplate(
   });
   expect(
     (
-      await context.request.get(`/api/v1/companies/${companies[0]}/approvals/templates/${id}`)
+      await context.request.get(`/api/v1/companies/${otherCompany}/approvals/templates/${id}`)
     ).status(),
   ).toBe(404);
   await page.getByRole("link", { name: "Overview", exact: true }).click();

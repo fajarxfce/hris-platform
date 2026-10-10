@@ -4,6 +4,7 @@ import type { AccountId } from "../../../../core/domain/identifiers";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import { canReassignApproval } from "../../domain/policies/approval-reassignment-policy";
 import type { ApprovalsUseCases } from "../contracts/approvals-use-cases";
 import { ApprovalRequestController } from "../controllers/approval-request-controller";
 import { approvalParameters } from "../models/approval-route";
@@ -36,6 +37,7 @@ export function ApprovalRequestScreen(props: Props) {
       {...props}
       id={approvalId}
       backTo={backTo}
+      reassignTo={`/approvals/${encodeURIComponent(approvalId)}/reassign?${query}`}
     />
   );
 }
@@ -47,9 +49,11 @@ function ApprovalRequestBinding({
   locale,
   id,
   backTo,
+  reassignTo,
 }: Props & {
   id: string;
   backTo: string;
+  reassignTo: string;
 }) {
   const controller = useMemo(
     () => new ApprovalRequestController(approvals.loadRequest, access, id),
@@ -76,6 +80,7 @@ function ApprovalRequestBinding({
       companyName={companyName}
       locale={locale}
       backTo={backTo}
+      reassignTo={state.request && canReassignApproval(access, state.request) ? reassignTo : null}
       onRefresh={controller.refresh}
     />
   );

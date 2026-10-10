@@ -2,13 +2,14 @@ import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 import type { EmployeeImportStartDto } from "../src/features/people/data/models/employee-import-start-dto";
-import { reviewApprovalTemplate } from "./approval-template";
 import { authenticatorCode } from "./fixtures/authenticator";
 
-test("real API sessions, MFA, approvals, organization, people, lifecycle, reports, audit, policy, jobs and logout", async ({
+test("real API sessions, MFA, organization, people, lifecycle, reports, audit, policy, jobs and logout", async ({
   page,
   context,
 }) => {
+  // This cumulative workflow exceeded 90 seconds on CI; individual assertions remain bounded.
+  test.setTimeout(120_000);
   await page.goto("/");
   await page.getByLabel("Email", { exact: true }).fill("browser-admin@example.invalid");
   await page.getByLabel("Password", { exact: true }).fill("Incorrect fixture password");
@@ -53,7 +54,6 @@ test("real API sessions, MFA, approvals, organization, people, lifecycle, report
     .selectOption(companies[1] ?? "");
   await expect(page.getByRole("main")).toContainText("Browser South");
   await expect(page.getByRole("main")).not.toContainText("Browser North");
-  await reviewApprovalTemplate(page, context, companies);
   await page.getByRole("combobox", { name: "Language" }).selectOption("id");
   await expect(page.getByRole("heading", { name: "Ringkasan" })).toBeVisible();
   let csrf = (await (await context.request.get("/api/v1/auth/csrf")).json()) as {

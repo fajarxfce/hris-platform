@@ -14,6 +14,8 @@ import { LoadApprovalInbox } from "../domain/usecases/load-approval-inbox";
 import { LoadApprovalRequest } from "../domain/usecases/load-approval-request";
 import { LoadApprovalTemplate } from "../domain/usecases/load-approval-template";
 import { LoadApprovalTemplates } from "../domain/usecases/load-approval-templates";
+import { ReassignApproval } from "../domain/usecases/reassign-approval";
+import { ReviewApprovalReassignment } from "../domain/usecases/review-approval-reassignment";
 import { SaveApprovalDelegation } from "../domain/usecases/save-approval-delegation";
 import { SaveApprovalTemplate } from "../domain/usecases/save-approval-template";
 
@@ -26,6 +28,8 @@ export function createApprovalsFeature(http: HttpClient) {
     new HttpApprovalDelegationDataSource(http),
   );
   return {
+    reviewReassignment: new ReviewApprovalReassignment(approvals),
+    reassign: new ReassignApproval(approvals),
     loadDelegations: new LoadApprovalDelegations(delegations),
     loadDelegation: new LoadApprovalDelegation(delegations),
     loadDelegationForEdit: new LoadApprovalDelegationForEdit(delegations),

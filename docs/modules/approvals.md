@@ -43,7 +43,7 @@ Policy selection reads at most 201 active effective templates, and delegated dec
 
 ## Dashboard
 
-The [approval inbox and stage review](../dashboard.md#approval-inbox-and-request-stages) and [template administration](../dashboard.md#approval-template-administration) are implemented. Templates support effective-date filters, exact rule revisions, ordered stages, bounded approver lookup, protected editing, and explicit receipt recovery. [Owned delegation management](../dashboard.md#approval-delegations) is also implemented. Reassignment, decision history, and business-specific review actions remain subsequent workflows.
+The [approval inbox and stage review](../dashboard.md#approval-inbox-and-request-stages) and [template administration](../dashboard.md#approval-template-administration) are implemented. Templates support effective-date filters, exact rule revisions, ordered stages, bounded approver lookup, protected editing, and explicit receipt recovery. [Owned delegation management](../dashboard.md#approval-delegations) and [current-stage reassignment](../dashboard.md#approval-reassignment) are also implemented. Decision history and business-specific review actions remain subsequent workflows.
 
 ## Administration detail and assignee lookup
 

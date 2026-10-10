@@ -488,6 +488,14 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Enter an amount in decimal notation.",
     "Masukkan nominal dalam format desimal.",
   ],
+  invalid_approval_reassignment: [
+    "Select 1–25 different approvers and enter a reason.",
+    "Pilih 1–25 approver berbeda dan masukkan alasan.",
+  ],
+  approval_changed: [
+    "The approval changed or is no longer pending. Reload the current request.",
+    "Approval berubah atau tidak lagi menunggu. Muat ulang permintaan terkini.",
+  ],
   invalid_delegation: [
     "Check both accounts, the reason, and a period of up to 90 days. An enabled delegation must end in the future.",
     "Periksa kedua akun, alasan, dan periode maksimal 90 hari. Delegasi yang diaktifkan harus berakhir setelah waktu saat ini.",

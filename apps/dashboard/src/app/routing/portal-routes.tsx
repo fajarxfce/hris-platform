@@ -49,6 +49,12 @@ const ApprovalTemplateEditorScreen = lazy(() =>
   ),
 );
 
+const ApprovalReassignmentScreen = lazy(() =>
+  import("../../features/approvals/presentation/bindings/approval-reassignment-screen").then(
+    (module) => ({ default: module.ApprovalReassignmentScreen }),
+  ),
+);
+
 const ApprovalInboxScreen = lazy(() =>
   import("../../features/approvals/presentation/bindings/approval-inbox-screen").then((module) => ({
     default: module.ApprovalInboxScreen,
@@ -232,6 +238,21 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/approvals/:approvalId/reassign"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ApprovalReassignmentScreen
+              accountId={accountId}
+              access={access}
+              approvals={approvals}
+              companyName={company.name}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/approvals/delegations"
         element={

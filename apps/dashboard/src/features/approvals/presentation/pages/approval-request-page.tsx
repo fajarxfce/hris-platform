@@ -8,6 +8,7 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { approvalMessages } from "../i18n/approval-messages";
+import { approvalReassignmentMessages } from "../i18n/approval-reassignment-messages";
 import type { ApprovalRequestState } from "../models/approval-request-state";
 import type { approvalRequestView } from "../models/approval-view";
 
@@ -17,6 +18,7 @@ export function ApprovalRequestPage({
   companyName,
   locale,
   backTo,
+  reassignTo,
   onRefresh,
 }: {
   state: ApprovalRequestState;
@@ -24,6 +26,7 @@ export function ApprovalRequestPage({
   companyName: string;
   locale: Locale;
   backTo: string;
+  reassignTo: string | null;
   onRefresh: () => void;
 }) {
   const text = approvalMessages(locale);
@@ -35,6 +38,9 @@ export function ApprovalRequestPage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
+            {reassignTo && (
+              <Link to={reassignTo}>{approvalReassignmentMessages(locale).action}</Link>
+            )}
             <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
               {messages(locale).refresh}
             </AppButton>

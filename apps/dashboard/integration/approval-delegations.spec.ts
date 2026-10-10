@@ -1,8 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
+import { reviewApprovalReassignment } from "./approval-reassignment";
+import { reviewApprovalTemplate } from "./approval-template";
 import { authenticatorCode } from "./fixtures/authenticator";
 
-test("real API delegation creation, uncertain receipt recovery, disabled account cleanup and company isolation", async ({
+test("real API templates, delegations and expense reassignment recover receipts and respect company scope", async ({
   page,
   context,
 }) => {
@@ -42,13 +44,14 @@ test("real API delegation creation, uncertain receipt recovery, disabled account
     data: {
       active: true,
       expectedVersion: null,
-      permissions: ["approvals.read", "leave.approve"],
+      permissions: ["approvals.read", "leave.approve", "expenses.approve"],
       reason: "Browser delegation fixture",
     },
   });
   expect(granted.status()).toBe(200);
   await page.reload();
   await page.getByRole("combobox", { name: "Company", exact: true }).selectOption(company);
+  await reviewApprovalTemplate(page, context, company, otherCompany);
   await page.getByRole("link", { name: "My delegations", exact: true }).click();
   await page.getByRole("link", { name: "Create delegation", exact: true }).click();
   await page.getByRole("button", { name: "Select delegate", exact: true }).click();
@@ -90,6 +93,12 @@ test("real API delegation creation, uncertain receipt recovery, disabled account
       await context.request.get(`/api/v1/companies/${otherCompany}/approvals/delegations/${id}`)
     ).status(),
   ).toBe(404);
+  await reviewApprovalReassignment(page, context, company, delegate);
+  await page.getByRole("link", { name: "My delegations", exact: true }).click();
+  await page
+    .getByRole("table", { name: "My delegations", exact: true })
+    .getByRole("button", { name: new RegExp(`${id}$`, "u") })
+    .click();
   const revoked = await context.request.put(`/api/v1/companies/${company}/members/${delegate}`, {
     headers: headers(),
     data: {

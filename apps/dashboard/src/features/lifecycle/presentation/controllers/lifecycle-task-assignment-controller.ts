@@ -1,38 +1,34 @@
-import type { AccountId, OperationId } from "../../../../core/domain/identifiers";
+import type { OperationId } from "../../../../core/domain/identifiers";
 import type { MutationReceipt } from "../../../../core/domain/mutation-receipt";
 import { failed, type Result } from "../../../../core/domain/result";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
-import type { LifecycleTaskStatus } from "../../domain/entities/lifecycle-task";
-import type { LifecycleTaskChange } from "../../domain/entities/lifecycle-task-change";
+import type { LifecycleTaskAssignment } from "../../domain/entities/lifecycle-task-assignment";
 import type { LifecycleTaskContext } from "../../domain/entities/lifecycle-task-context";
-import {
-  availableLifecycleTaskStatuses,
-  lifecycleTaskMutationWasRejected,
-} from "../../domain/policies/lifecycle-task-change-policy";
+import { canAssignLifecycleTask } from "../../domain/policies/lifecycle-task-assignment-policy";
+import { lifecycleTaskMutationWasRejected } from "../../domain/policies/lifecycle-task-change-policy";
 import type { LifecycleUseCases } from "../contracts/lifecycle-use-cases";
 import {
   initialLifecycleTaskEditorState,
   type LifecycleTaskEditorState,
 } from "../models/lifecycle-task-editor-state";
 
-export type LifecycleTaskFields = Pick<LifecycleTaskChange, "status" | "reason">;
-type Submission = Readonly<{ operation: OperationId; input: LifecycleTaskChange }>;
+export type LifecycleTaskAssignmentFields = Pick<LifecycleTaskAssignment, "assigneeId" | "reason">;
+type Submission = Readonly<{ operation: OperationId; input: LifecycleTaskAssignment }>;
 
-export class LifecycleTaskEditorController {
+export class LifecycleTaskAssignmentController {
   #state = initialLifecycleTaskEditorState;
   #active = false;
   #pending: AbortController | null = null;
   #submission: Submission | null = null;
   #listeners = new Set<() => void>();
-  readonly statuses: readonly LifecycleTaskStatus[];
+  readonly assignable: boolean;
   constructor(
-    private readonly change: LifecycleUseCases["changeTask"],
+    private readonly change: LifecycleUseCases["assignTask"],
     private readonly access: CompanyAccess,
-    account: AccountId,
     private readonly context: LifecycleTaskContext,
     private readonly nextIdentifier: () => string,
   ) {
-    this.statuses = availableLifecycleTaskStatuses(access, account, context);
+    this.assignable = canAssignLifecycleTask(access, context);
   }
   getSnapshot = (): LifecycleTaskEditorState => this.#state;
   subscribe = (listener: () => void): (() => void) => {
@@ -49,22 +45,15 @@ export class LifecycleTaskEditorController {
     this.#submission = null;
     this.publish(initialLifecycleTaskEditorState);
   };
-  save = async (fields: LifecycleTaskFields): Promise<void> => {
-    if (!this.#active || this.#state.stage !== "editing" || this.statuses.length === 0) return;
-    if (!this.statuses.includes(fields.status)) {
-      this.publish({
-        ...this.#state,
-        failure: { code: "invalid_lifecycle_change", fields: {}, parameters: {} },
-      });
-      return;
-    }
+  save = async (fields: LifecycleTaskAssignmentFields): Promise<void> => {
+    if (!this.#active || this.#state.stage !== "editing" || !this.assignable) return;
     this.#submission = Object.freeze({
       operation: this.nextIdentifier() as OperationId,
       input: Object.freeze({
         caseId: this.context.caseId,
         taskKey: this.context.task.key,
         expectedVersion: this.context.caseVersion,
-        status: fields.status,
+        assigneeId: fields.assigneeId,
         reason: fields.reason,
       }),
     });
@@ -117,8 +106,7 @@ export class LifecycleTaskEditorController {
             "lifecycle_task_not_found",
             "lifecycle_task_not_assigned",
             "lifecycle_case_not_open",
-            "lifecycle_task_unchanged",
-            "lifecycle_task_cannot_be_waived",
+            "lifecycle_task_not_assignable",
           ].includes(result.failure.code)
             ? "conflict"
             : "editing",

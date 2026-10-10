@@ -6,11 +6,13 @@ export type LifecycleCaseState = Readonly<{
   stage: "loading" | "ready" | "unavailable";
   case: LifecycleCase | null;
   selectedTask: LifecycleTaskContext | null;
+  taskPanel: "status" | "assignment";
   failure: Failure | null;
 }>;
 export const initialLifecycleCaseState: LifecycleCaseState = Object.freeze({
   stage: "loading",
   case: null,
   selectedTask: null,
+  taskPanel: "status",
   failure: null,
 });

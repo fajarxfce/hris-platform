@@ -56,9 +56,12 @@ export function normalizeLifecycleTaskChange(
 }
 
 /** A rejected retry does not resolve a previously unacknowledged command. */
-export function lifecycleTaskChangeWasRejected(failure: Failure): boolean {
+export function lifecycleTaskMutationWasRejected(failure: Failure): boolean {
   return [
     "invalid_lifecycle_change",
+    "invalid_lifecycle_assignment",
+    "lifecycle_assignee_unavailable",
+    "lifecycle_task_not_assignable",
     "lifecycle_access_required",
     "lifecycle_case_not_found",
     "lifecycle_task_not_found",

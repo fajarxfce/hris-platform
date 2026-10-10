@@ -243,3 +243,29 @@ describe("lifecycle read ownership", () => {
     ).toEqual({ status: "invalid", employmentId: null, after: "broken" });
   });
 });
+
+it("switches task panels without replacing the observed context or acquiring another case", async () => {
+  const execute = vi
+    .fn<LifecycleUseCases["loadCase"]["execute"]>()
+    .mockResolvedValue(success(record));
+  const controller = new LifecycleCaseController(
+    { execute },
+    { companyId, permissions: [...access.permissions, "people.lifecycle.manage"] },
+    id,
+  );
+  controller.activate();
+  await vi.waitFor(() => expect(controller.getSnapshot().stage).toBe("ready"));
+  controller.openTask("equipment");
+  const context = controller.getSnapshot().selectedTask;
+  controller.openTaskAssignment();
+  expect(controller.getSnapshot().taskPanel).toBe("assignment");
+  controller.showTaskDetails();
+  expect(controller.getSnapshot().taskPanel).toBe("status");
+  expect(controller.getSnapshot().selectedTask).toBe(context);
+  controller.openTaskAssignment();
+  await controller.refresh();
+  expect(execute).toHaveBeenCalledOnce();
+  controller.closeTask();
+  expect(controller.getSnapshot()).toMatchObject({ selectedTask: null, taskPanel: "status" });
+  controller.deactivate();
+});

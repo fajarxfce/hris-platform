@@ -9,6 +9,7 @@ import { AssignedLifecycleTasksController } from "../controllers/assigned-lifecy
 import { assignedLifecycleTasksView, lifecycleTaskView } from "../models/lifecycle-case-view";
 import { lifecycleAfter, lifecycleParameters } from "../models/lifecycle-route";
 import { AssignedLifecycleTasksPage } from "../pages/assigned-lifecycle-tasks-page";
+import { LifecycleTaskAssignmentBinding } from "./lifecycle-task-assignment-binding";
 import { LifecycleTaskBinding } from "./lifecycle-task-binding";
 
 type Props = {
@@ -84,22 +85,40 @@ function AssignedLifecycleTasksBinding(
         }}
         onOpen={controller.openTask}
       />
-      {state.selectedTask && task && (
-        <LifecycleTaskBinding
-          accountId={props.accountId}
-          access={props.access}
-          change={props.lifecycle.changeTask}
-          context={state.selectedTask}
-          properties={task}
-          locale={props.locale}
-          nextIdentifier={props.nextIdentifier}
-          onClose={controller.closeTask}
-          onReload={() => {
-            controller.closeTask();
-            void controller.refresh();
-          }}
-        />
-      )}
+      {state.selectedTask &&
+        task &&
+        (state.taskPanel === "assignment" ? (
+          <LifecycleTaskAssignmentBinding
+            accountId={props.accountId}
+            access={props.access}
+            actions={props.lifecycle}
+            context={state.selectedTask}
+            locale={props.locale}
+            nextIdentifier={props.nextIdentifier}
+            onClose={controller.closeTask}
+            onBack={controller.showTaskDetails}
+            onReload={() => {
+              controller.closeTask();
+              void controller.refresh();
+            }}
+          />
+        ) : (
+          <LifecycleTaskBinding
+            accountId={props.accountId}
+            access={props.access}
+            change={props.lifecycle.changeTask}
+            context={state.selectedTask}
+            properties={task}
+            locale={props.locale}
+            nextIdentifier={props.nextIdentifier}
+            onClose={controller.closeTask}
+            onAssign={controller.openTaskAssignment}
+            onReload={() => {
+              controller.closeTask();
+              void controller.refresh();
+            }}
+          />
+        ))}
     </>
   );
 }

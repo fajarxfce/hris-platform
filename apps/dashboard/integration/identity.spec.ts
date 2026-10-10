@@ -593,6 +593,77 @@ test("real API sessions, MFA, organization, people, lifecycle, reports, audit, p
     [1, "TASK_DONE"],
     [2, "TASK_PENDING"],
   ]);
+  await page.getByRole("button", { name: "Lihat tugas: Review equipment", exact: true }).click();
+  await taskDetails.getByRole("button", { name: "Tetapkan tugas", exact: true }).click();
+  const assignment = page.getByRole("dialog", {
+    name: "Tetapkan tugas: Review equipment",
+    exact: true,
+  });
+  await assignment.getByRole("button", { name: "Hapus penanggung jawab", exact: true }).click();
+  await assignment.getByLabel("Alasan", { exact: true }).fill("Browser remove assignee");
+  await assignment.getByRole("button", { name: "Simpan penugasan", exact: true }).click();
+  await expect(assignment).toHaveCount(0);
+  const unassignedCase = await (await context.request.get(taskCasePath)).json();
+  expect(unassignedCase).toMatchObject({
+    version: 3,
+    tasks: [{ key: "equipment", status: "PENDING", assigneeId: null }],
+  });
+  await page.getByRole("button", { name: "Lihat tugas: Review equipment", exact: true }).click();
+  await taskDetails.getByRole("button", { name: "Tetapkan tugas", exact: true }).click();
+  await assignment.getByRole("button", { name: "Pilih anggota", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "Pilih anggota", exact: true })
+    .getByRole("button", {
+      name: `Pilih: ${lifecycleActor.account.displayName} · ${lifecycleActor.account.id}`,
+      exact: true,
+    })
+    .click();
+  await assignment.getByLabel("Alasan", { exact: true }).fill("Browser reassign equipment");
+  const assignmentWrites: { operation: string | undefined; body: unknown }[] = [];
+  await page.route(`**${taskPath}/assignee`, async (route) => {
+    if (route.request().method() !== "PUT") return route.fallback();
+    assignmentWrites.push({
+      operation: route.request().headers()["idempotency-key"],
+      body: route.request().postDataJSON(),
+    });
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toMatchObject({ id: transitionId, version: 4 });
+    if (assignmentWrites.length === 1) return route.abort("connectionfailed");
+    return route.fulfill({ response });
+  });
+  await assignment.getByRole("button", { name: "Simpan penugasan", exact: true }).click();
+  await expect(assignment.getByRole("status")).toContainText("Penyimpanan belum terkonfirmasi.");
+  await assignment.getByRole("button", { name: "Coba simpan kembali", exact: true }).click();
+  await expect(assignment).toHaveCount(0);
+  expect(assignmentWrites).toHaveLength(2);
+  expect(assignmentWrites[1]).toEqual(assignmentWrites[0]);
+  expect(assignmentWrites[0]?.body).toEqual({
+    expectedVersion: 3,
+    assigneeId: lifecycleActor.account.id,
+    reason: "Browser reassign equipment",
+  });
+  await page.unroute(`**${taskPath}/assignee`);
+  const assignedCase = await (await context.request.get(taskCasePath)).json();
+  expect(assignedCase).toMatchObject({
+    version: 4,
+    tasks: [{ key: "equipment", status: "PENDING", assigneeId: lifecycleActor.account.id }],
+  });
+  const assignmentHistory = await (
+    await context.request.get(`${taskCasePath}/history?after=2`)
+  ).json();
+  expect(
+    assignmentHistory.items.map(
+      (event: { version: number; action: string; assigneeId: string | null }) => [
+        event.version,
+        event.action,
+        event.assigneeId,
+      ],
+    ),
+  ).toEqual([
+    [3, "ASSIGNED", null],
+    [4, "ASSIGNED", lifecycleActor.account.id],
+  ]);
   expect(
     (
       await context.request.get(`/api/v1/companies/${companies[0]}/lifecycle/cases/${transitionId}`)

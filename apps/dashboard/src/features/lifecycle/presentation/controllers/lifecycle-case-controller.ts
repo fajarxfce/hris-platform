@@ -1,5 +1,6 @@
 import type { Failure } from "../../../../core/domain/result";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import { canAssignLifecycleTask } from "../../domain/policies/lifecycle-task-assignment-policy";
 import type { LifecycleUseCases } from "../contracts/lifecycle-use-cases";
 import { initialLifecycleCaseState, type LifecycleCaseState } from "../models/lifecycle-case-state";
 
@@ -53,8 +54,20 @@ export class LifecycleCaseController {
       }),
     });
   };
+  openTaskAssignment = (): void => {
+    if (
+      this.#active &&
+      this.#state.selectedTask &&
+      canAssignLifecycleTask(this.access, this.#state.selectedTask)
+    )
+      this.publish({ ...this.#state, taskPanel: "assignment" });
+  };
+  showTaskDetails = (): void => {
+    if (this.#active && this.#state.selectedTask)
+      this.publish({ ...this.#state, taskPanel: "status" });
+  };
   closeTask = (): void => {
-    if (this.#active) this.publish({ ...this.#state, selectedTask: null });
+    if (this.#active) this.publish({ ...this.#state, selectedTask: null, taskPanel: "status" });
   };
   /** History uses the same case-read grant; its revocation also invalidates the overview. */
   reportScopeFailure = (failure: Failure): void => {

@@ -11,6 +11,7 @@ export function useLifecycleTaskForm(
   state: LifecycleTaskEditorState,
   onClose: () => void,
   onReload: () => void,
+  onAssign: () => void,
 ) {
   const form = useForm<LifecycleTaskFields>({
     defaultValues: { status: controller.statuses[0] ?? "DONE", reason: "" },
@@ -32,6 +33,7 @@ export function useLifecycleTaskForm(
     editable: state.stage === "editing" && controller.statuses.length > 0,
     submit: form.handleSubmit(controller.save),
     close: () => depart(onClose),
+    assign: () => depart(onAssign),
     reload: () => depart(onReload),
   };
 }

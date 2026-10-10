@@ -1,4 +1,5 @@
 import type { HttpClient } from "../../../../core/data/http/http-client";
+import { lifecycleAssigneePageDto } from "../models/lifecycle-assignee-dto";
 import {
   assignedLifecycleTaskPageDto,
   type LifecycleCaseQuery,
@@ -6,6 +7,7 @@ import {
   lifecycleCasePageDto,
 } from "../models/lifecycle-case-dto";
 import { lifecycleHistoryPageDto } from "../models/lifecycle-event-dto";
+import type { LifecycleTaskAssignmentDto } from "../models/lifecycle-task-assignment-dto";
 import {
   type LifecycleTaskChangeDto,
   lifecycleTaskReceiptDto,
@@ -14,6 +16,36 @@ import type { LifecycleCaseDataSource } from "./lifecycle-case-data-source";
 
 export class HttpLifecycleCaseDataSource implements LifecycleCaseDataSource {
   constructor(private readonly http: HttpClient) {}
+  async assignees(company: string, query: string, after: string | null, signal: AbortSignal) {
+    const parameters = new URLSearchParams({ limit: "50", query });
+    if (after !== null) parameters.set("after", after);
+    return lifecycleAssigneePageDto.parse(
+      await this.http.request(
+        { path: `/api/v1/companies/${company}/lifecycle/assignees?${parameters}` },
+        signal,
+      ),
+    );
+  }
+  async assignTask(
+    company: string,
+    id: string,
+    key: string,
+    operation: string,
+    change: LifecycleTaskAssignmentDto,
+    signal: AbortSignal,
+  ) {
+    return lifecycleTaskReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/lifecycle/cases/${id}/tasks/${key}/assignee`,
+          method: "PUT",
+          operationId: operation,
+          body: change,
+        },
+        signal,
+      ),
+    );
+  }
   async changeTask(
     company: string,
     id: string,

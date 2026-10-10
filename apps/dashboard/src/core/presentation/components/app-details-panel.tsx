@@ -4,6 +4,7 @@ import {
   DrawerHeaderTitle,
   OverlayDrawer,
   useRestoreFocusSource,
+  useRestoreFocusTarget,
 } from "@fluentui/react-components";
 import { Dismiss20Regular } from "@fluentui/react-icons";
 import { type ReactNode, useContext } from "react";
@@ -24,6 +25,7 @@ export function AppDetailsPanel({
   children: ReactNode;
 }) {
   const restoreFocus = useRestoreFocusSource();
+  const restoreClose = useRestoreFocusTarget();
   const visible = useContext(WorkspaceVisibilityContext);
   return (
     <OverlayDrawer
@@ -40,6 +42,7 @@ export function AppDetailsPanel({
         <DrawerHeaderTitle
           action={
             <AppButton
+              {...restoreClose}
               appearance="subtle"
               icon={<Dismiss20Regular />}
               aria-label={closeLabel}

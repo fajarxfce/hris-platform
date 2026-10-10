@@ -168,6 +168,7 @@ test("a definite conflict requires an explicit departure before loading a curren
   await panel.getByRole("button", { name: "Reload task list", exact: true }).click();
   const departure = page.getByRole("dialog", { name: "Leave this page?", exact: true });
   await departure.getByRole("button", { name: "Stay on this page", exact: true }).click();
+  await expect(panel.getByRole("button", { name: "Reload task list", exact: true })).toBeFocused();
   await expect(panel.getByLabel("Reason", { exact: true })).toHaveValue("Original review");
   await panel.getByRole("button", { name: "Reload task list", exact: true }).click();
   await departure.getByRole("button", { name: "Leave page", exact: true }).click();
@@ -215,6 +216,7 @@ test("closing a pending task requires consent and its late completion cannot ent
     await panel.getByRole("button", { name: "Close", exact: true }).click();
     const departure = page.getByRole("dialog", { name: "Leave this page?", exact: true });
     await departure.getByRole("button", { name: "Stay on this page", exact: true }).click();
+    await expect(panel.getByRole("button", { name: "Close", exact: true })).toBeFocused();
     expect(api.writes).toHaveLength(1);
     await panel.getByRole("button", { name: "Close", exact: true }).click();
     await departure.getByRole("button", { name: "Leave page", exact: true }).click();

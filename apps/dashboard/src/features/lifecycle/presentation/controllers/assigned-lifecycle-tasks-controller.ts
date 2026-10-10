@@ -1,5 +1,6 @@
 import type { AccountId } from "../../../../core/domain/identifiers";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import { canAssignLifecycleTask } from "../../domain/policies/lifecycle-task-assignment-policy";
 import type { LifecycleUseCases } from "../contracts/lifecycle-use-cases";
 import {
   type AssignedLifecycleTasksState,
@@ -38,8 +39,20 @@ export class AssignedLifecycleTasksController {
     if (this.#active && this.#state.stage === "ready" && !this.#state.selectedTask && task)
       this.publish({ ...this.#state, selectedTask: task });
   };
+  openTaskAssignment = (): void => {
+    if (
+      this.#active &&
+      this.#state.selectedTask &&
+      canAssignLifecycleTask(this.access, this.#state.selectedTask)
+    )
+      this.publish({ ...this.#state, taskPanel: "assignment" });
+  };
+  showTaskDetails = (): void => {
+    if (this.#active && this.#state.selectedTask)
+      this.publish({ ...this.#state, taskPanel: "status" });
+  };
   closeTask = (): void => {
-    if (this.#active) this.publish({ ...this.#state, selectedTask: null });
+    if (this.#active) this.publish({ ...this.#state, selectedTask: null, taskPanel: "status" });
   };
   refresh = async (): Promise<void> => {
     if (!this.#active || this.#state.selectedTask) return;

@@ -10,6 +10,7 @@ import { lifecycleCaseParameters, lifecycleCaseSearch } from "../models/lifecycl
 import { lifecycleCaseView, lifecycleTaskView } from "../models/lifecycle-case-view";
 import { LifecycleCasePage } from "../pages/lifecycle-case-page";
 import { LifecycleHistoryBinding } from "./lifecycle-history-binding";
+import { LifecycleTaskAssignmentBinding } from "./lifecycle-task-assignment-binding";
 import { LifecycleTaskBinding } from "./lifecycle-task-binding";
 
 type Props = {
@@ -125,22 +126,40 @@ function LifecycleCaseBinding(
           ) : null
         }
       />
-      {state.selectedTask && task && (
-        <LifecycleTaskBinding
-          accountId={props.accountId}
-          access={props.access}
-          change={props.lifecycle.changeTask}
-          context={state.selectedTask}
-          properties={task}
-          locale={props.locale}
-          nextIdentifier={props.nextIdentifier}
-          onClose={controller.closeTask}
-          onReload={() => {
-            controller.closeTask();
-            void controller.refresh();
-          }}
-        />
-      )}
+      {state.selectedTask &&
+        task &&
+        (state.taskPanel === "assignment" ? (
+          <LifecycleTaskAssignmentBinding
+            accountId={props.accountId}
+            access={props.access}
+            actions={props.lifecycle}
+            context={state.selectedTask}
+            locale={props.locale}
+            nextIdentifier={props.nextIdentifier}
+            onClose={controller.closeTask}
+            onBack={controller.showTaskDetails}
+            onReload={() => {
+              controller.closeTask();
+              void controller.refresh();
+            }}
+          />
+        ) : (
+          <LifecycleTaskBinding
+            accountId={props.accountId}
+            access={props.access}
+            change={props.lifecycle.changeTask}
+            context={state.selectedTask}
+            properties={task}
+            locale={props.locale}
+            nextIdentifier={props.nextIdentifier}
+            onClose={controller.closeTask}
+            onAssign={controller.openTaskAssignment}
+            onReload={() => {
+              controller.closeTask();
+              void controller.refresh();
+            }}
+          />
+        ))}
     </>
   );
 }

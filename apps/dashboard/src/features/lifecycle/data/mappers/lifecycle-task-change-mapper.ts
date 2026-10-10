@@ -15,7 +15,7 @@ export function toLifecycleTaskChangeDto(change: LifecycleTaskChange): Lifecycle
 }
 export function toLifecycleTaskReceipt(
   dto: LifecycleTaskReceiptDto,
-  change: LifecycleTaskChange,
+  change: Pick<LifecycleTaskChange, "caseId" | "expectedVersion">,
 ): MutationReceipt {
   if (dto.id.toLowerCase() !== change.caseId || dto.version !== change.expectedVersion + 1)
     throw new InvalidHttpResponseError();

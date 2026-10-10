@@ -2,6 +2,18 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_lifecycle_assignment: [
+    "Choose a member or remove the assignee, and provide a reason of up to 1,000 characters.",
+    "Pilih anggota atau hapus penanggung jawab, lalu masukkan alasan maksimal 1.000 karakter.",
+  ],
+  lifecycle_assignee_unavailable: [
+    "This member is no longer eligible. Choose another member.",
+    "Anggota ini tidak lagi memenuhi syarat. Pilih anggota lain.",
+  ],
+  lifecycle_task_not_assignable: [
+    "Only a pending task can be assigned to a different member. Reload the task list.",
+    "Hanya tugas tertunda yang dapat dialihkan ke anggota lain. Muat ulang daftar tugas.",
+  ],
   invalid_lifecycle_change: [
     "Select a task status and provide a reason of up to 1,000 characters.",
     "Pilih status tugas dan masukkan alasan maksimal 1.000 karakter.",

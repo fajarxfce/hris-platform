@@ -116,3 +116,21 @@ export function lifecycleTaskView(
         ]),
   ];
 }
+
+export function lifecycleTaskAssignmentView(
+  context: LifecycleTaskContext,
+  account: AccountId,
+  locale: Locale,
+) {
+  const text = lifecycleCaseMessages(locale);
+  return [
+    { label: text.employee, value: context.employee.name },
+    { label: text.employeeNumber, value: context.employee.employeeNumber },
+    {
+      label: text.assignee,
+      value:
+        context.task.assigneeId === account ? text.you : (context.task.assigneeId ?? text.none),
+    },
+    { label: text.version, value: new Intl.NumberFormat(locale).format(context.caseVersion) },
+  ];
+}

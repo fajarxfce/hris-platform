@@ -4,6 +4,7 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { LifecycleTaskContext } from "../../domain/entities/lifecycle-task-context";
+import { canAssignLifecycleTask } from "../../domain/policies/lifecycle-task-assignment-policy";
 import type { LifecycleUseCases } from "../contracts/lifecycle-use-cases";
 import { LifecycleTaskEditorController } from "../controllers/lifecycle-task-editor-controller";
 import { useLifecycleTaskForm } from "../controllers/use-lifecycle-task-form";
@@ -19,6 +20,7 @@ export function LifecycleTaskBinding({
   nextIdentifier,
   onClose,
   onReload,
+  onAssign,
 }: {
   accountId: AccountId;
   access: CompanyAccess;
@@ -29,6 +31,7 @@ export function LifecycleTaskBinding({
   nextIdentifier: () => string;
   onClose: () => void;
   onReload: () => void;
+  onAssign: () => void;
 }) {
   const controller = useMemo(
     () => new LifecycleTaskEditorController(change, access, accountId, context, nextIdentifier),
@@ -43,7 +46,7 @@ export function LifecycleTaskBinding({
     controller.activate();
     return controller.deactivate;
   }, [controller]);
-  const form = useLifecycleTaskForm(controller, state, onClose, onReload);
+  const form = useLifecycleTaskForm(controller, state, onClose, onReload, onAssign);
   useWorkspaceRevalidation(state.failure);
   useEffect(() => {
     if (state.stage === "saved") onReload();
@@ -54,6 +57,7 @@ export function LifecycleTaskBinding({
       properties={properties}
       locale={locale}
       statuses={controller.statuses}
+      assignable={canAssignLifecycleTask(access, context)}
       state={state}
       form={form}
       onRetry={controller.retry}

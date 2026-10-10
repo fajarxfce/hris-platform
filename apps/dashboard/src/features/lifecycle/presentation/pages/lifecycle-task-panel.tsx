@@ -1,4 +1,4 @@
-import { MessageBar, MessageBarBody } from "@fluentui/react-components";
+import { MessageBar, MessageBarBody, useRestoreFocusTarget } from "@fluentui/react-components";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppDetailsPanel } from "../../../../core/presentation/components/app-details-panel";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -17,6 +17,7 @@ export function LifecycleTaskPanel({
   properties,
   locale,
   statuses,
+  assignable,
   state,
   form,
   onRetry,
@@ -25,15 +26,22 @@ export function LifecycleTaskPanel({
   properties: readonly Readonly<{ label: string; value: string }>[];
   locale: Locale;
   statuses: readonly LifecycleTaskStatus[];
+  assignable: boolean;
   state: LifecycleTaskEditorState;
   form: ReturnType<typeof useLifecycleTaskForm>;
   onRetry: () => void;
 }) {
   const text = lifecycleCaseMessages(locale);
+  const restoreFocus = useRestoreFocusTarget();
   return (
     <AppDetailsPanel open={true} title={title} closeLabel={text.close} onClose={form.close}>
       <div className="app-report-content" aria-busy={state.stage === "saving"}>
         <AppPropertyList title={text.task} items={properties} />
+        {assignable && (
+          <AppButton {...restoreFocus} onClick={form.assign} disabled={!form.editable}>
+            {text.assignTask}
+          </AppButton>
+        )}
         <AppFailure failure={state.failure} locale={locale} />
         {state.stage === "unconfirmed" && (
           <MessageBar intent="warning" role="status">
@@ -69,7 +77,9 @@ export function LifecycleTaskPanel({
                 {text.saveTask}
               </AppButton>
               {(state.stage === "editing" || state.stage === "conflict") && (
-                <AppButton onClick={form.reload}>{text.reloadTask}</AppButton>
+                <AppButton {...restoreFocus} onClick={form.reload}>
+                  {text.reloadTask}
+                </AppButton>
               )}
             </div>
           </form>

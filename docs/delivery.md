@@ -400,3 +400,10 @@ Validation passed dashboard architecture, Biome and strict TypeScript checks, al
 Regression checks exposed missing focus-return targets when cancelling a dialog over a task drawer. The shared close button and task controls now declare those targets. Five targeted keyboard/focus cases and the full browser suite passed; staying preserves the form and restores focus inside its panel. The mobile assignment/picker screenshots were inspected.
 
 The production dashboard build passed. The main bundle is 609.61 kB minified / 175.16 kB gzip and retains Vite's 500 kB chunk advisory; runtime performance has not been benchmarked. All 114 local documentation links resolve. Case initiation and case completion remain subsequent browser workflows.
+
+
+## Membership read assurance after access waits
+
+Company member directories, role template catalogs, and membership-grant details now recheck MFA after acquiring their company/member/account guards. They use the shared domain session policy with the current clock and live access, preserving the original/live permission intersection. An entry-time proof cannot authorize a response after expiring during a wait. The existing `mfa_required` response supports account verification followed by a new read.
+
+Validation passed architecture and format checks, 31 HTTP/PostgreSQL tests and 17 identity domain tests, and both API/worker builds in one Gradle run (2 minutes 22 seconds). Three new HTTP scenarios hold the account acquisition, advance the policy clock beyond MFA validity, assert a safe 403 response, then verify the factor and successfully read again. Related membership revocation, role/grant consistency, identity administration, and MFA behavior remain covered. No route or database migration changed.

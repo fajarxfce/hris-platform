@@ -2,10 +2,12 @@ package dev.fajar.hris.identity.domain.usecases
 
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.CompanyRoleTemplate
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.identity.domain.repositories.RoleTemplateRepository
+import java.time.Clock
 import java.util.UUID
 
 class ListRoleTemplates(
@@ -13,6 +15,8 @@ class ListRoleTemplates(
     private val identities: IdentityRepository,
     private val members: MembershipRepository,
     private val transactions: TransactionRunner,
+    private val security: IdentitySecurityPolicy,
+    private val clock: Clock,
 ) {
     fun execute(actor: Actor, after: UUID?, limit: Int): Result<Page<CompanyRoleTemplate>> {
         val access = actor.requirePermission("identity.manage")
@@ -31,7 +35,7 @@ class ListRoleTemplates(
             if (accountGuard is Result.Failed) return@run accountGuard
             val checked =
                 identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value

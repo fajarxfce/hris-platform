@@ -39,7 +39,9 @@ class IdentityConfiguration {
         members: dev.fajar.hris.identity.domain.repositories.MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListCompanyMembers(members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListCompanyMembers(members, identities, transactions, security, clock)
 
     @Bean
     fun saveMembership(
@@ -326,7 +328,9 @@ class IdentityConfiguration {
         identities: IdentityRepository,
         members: MembershipRepository,
         transactions: TransactionRunner,
-    ) = ListRoleTemplates(roles, identities, members, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListRoleTemplates(roles, identities, members, transactions, security, clock)
 
     @Bean
     fun saveRoleTemplate(
@@ -356,7 +360,9 @@ class IdentityConfiguration {
         roles: RoleTemplateRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetCompanyMemberGrant(members, roles, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetCompanyMemberGrant(members, roles, identities, transactions, security, clock)
 
     @Bean
     fun accountAdministrationSource(sql: DSLContext): AccountAdministrationDataSource =

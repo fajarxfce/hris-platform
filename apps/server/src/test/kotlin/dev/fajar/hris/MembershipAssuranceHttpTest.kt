@@ -1,17 +1,74 @@
 package dev.fajar.hris
 
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import java.net.http.HttpResponse
 import java.util.UUID
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 
 @Import(AccountLockProbeConfiguration::class)
 class MembershipAssuranceHttpTest : MfaApiFixture() {
     @Autowired private lateinit var probe: AccountLockProbe
+    @Autowired private lateinit var security: IdentitySecurityPolicy
+
+    @ParameterizedTest
+    @ValueSource(strings = ["members", "roles", "grant"])
+    fun memberAndRoleReadsRecheckMfaAfterWaitingAndRecoverWithAFreshProof(mode: String) {
+        val enrolled = enroll(fixture())
+        val f = enrolled.fixture
+        val created =
+            command(
+                f.client,
+                "/api/v1/companies",
+                json.writeValueAsString(
+                    mapOf(
+                        "code" to "M${UUID.randomUUID().toString().take(8)}",
+                        "name" to "Member read assurance",
+                        "timezone" to "UTC",
+                    )
+                ),
+                f.csrf,
+                UUID.randomUUID(),
+            )
+        assertEquals(200, created.statusCode(), created.body())
+        val company = UUID.fromString(json.readTree(created.body())["id"].asString())
+        val path =
+            "/api/v1/companies/$company/" +
+                when (mode) {
+                    "members" -> "members"
+                    "roles" -> "role-templates"
+                    else -> "members/${f.account}"
+                }
+        val initial = get(f.client, path)
+        assertEquals(200, initial.statusCode(), initial.body())
+        val barrier = AccountLockProbe.Barrier(f.account)
+        probe.current.set(barrier)
+        Executors.newSingleThreadExecutor().use { pool ->
+            val pending = pool.submit<HttpResponse<String>> { get(f.client, path) }
+            try {
+                assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                clock.set(clock.instant().plus(security.maximumMfaAge).plusSeconds(1))
+                barrier.release.countDown()
+                val denied = pending.get(10, TimeUnit.SECONDS)
+                assertEquals(403, denied.statusCode(), "$mode ${denied.body()}")
+                assertEquals("mfa_required", json.readTree(denied.body())["code"].asString())
+                assertFalse(denied.body().contains(f.email))
+            } finally {
+                barrier.release.countDown()
+                probe.current.set(null)
+            }
+        }
+        val verified = verify(f, totp(enrolled.secret, clock.instant()))
+        assertEquals(200, verified.statusCode(), verified.body())
+        val recovered = get(f.client, path)
+        assertEquals(200, recovered.statusCode(), recovered.body())
+    }
 
     @Test
     fun expiredMfaDuringPendingRoleAndMembershipChangesAlsoBlocksReceipts() {

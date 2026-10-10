@@ -2,6 +2,7 @@ import {
   DataBarVertical20Regular,
   History20Regular,
   Home20Regular,
+  Organization20Regular,
   People20Regular,
   Settings20Regular,
   TaskListSquareLtr20Regular,
@@ -14,6 +15,8 @@ import { administrationMessages } from "../../features/administration/presentati
 import { clientPolicyMessages } from "../../features/administration/presentation/i18n/client-policy-messages";
 import type { CompanyAccess } from "../../features/identity/domain/entities/session";
 import { jobMessages } from "../../features/jobs/presentation/i18n/job-messages";
+import { canReadOrganization } from "../../features/organization/domain/policies/organization-unit-policy";
+import { organizationMessages } from "../../features/organization/presentation/i18n/organization-messages";
 import { canReadEmployees } from "../../features/people/domain/policies/employee-policy";
 import { canReadHeadcount } from "../../features/reporting/domain/policies/headcount-policy";
 
@@ -26,6 +29,15 @@ export function portalNavigation(
   const permissions = access?.permissions ?? [];
   return [
     { to: "/", label: text.overview, icon: <Home20Regular /> },
+    ...(canReadOrganization(permissions)
+      ? [
+          {
+            to: "/organization/units",
+            label: organizationMessages(locale).title,
+            icon: <Organization20Regular />,
+          },
+        ]
+      : []),
     ...(canReadEmployees(permissions)
       ? [{ to: "/people/employees", label: text.people, icon: <People20Regular /> }]
       : []),

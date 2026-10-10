@@ -9,6 +9,7 @@ import { createAdministrationFeature } from "../features/administration/di/admin
 import { createIdentityFeature } from "../features/identity/di/identity-feature";
 import { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
 import { createJobsFeature } from "../features/jobs/di/jobs-feature";
+import { createOrganizationFeature } from "../features/organization/di/organization-feature";
 import { createPeopleFeature } from "../features/people/di/people-feature";
 import { createReportingFeature } from "../features/reporting/di/reporting-feature";
 import { Application } from "./application";
@@ -24,6 +25,7 @@ const http = new FetchHttpClient(undefined, { clientBuild: __HRIS_DASHBOARD_BUIL
 const reporting = createReportingFeature(http);
 const administration = createAdministrationFeature(http);
 const jobs = createJobsFeature(http);
+const organization = createOrganizationFeature(http);
 const people = createPeopleFeature(http);
 const identity = new IdentityController(
   createIdentityFeature(http),
@@ -42,6 +44,7 @@ createRoot(root).render(
             reporting={reporting}
             administration={administration}
             jobs={jobs}
+            organization={organization}
             people={people}
           />
         </AppErrorBoundary>

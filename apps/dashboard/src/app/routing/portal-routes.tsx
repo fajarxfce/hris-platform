@@ -10,9 +10,21 @@ import type {
   CompanyMembership,
 } from "../../features/identity/domain/entities/session";
 import type { JobsUseCases } from "../../features/jobs/presentation/contracts/jobs-use-cases";
+import type { OrganizationUseCases } from "../../features/organization/presentation/contracts/organization-use-cases";
 import { OverviewPage } from "../../features/overview/presentation/pages/overview-page";
 import type { PeopleUseCases } from "../../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../../features/reporting/presentation/contracts/reporting-use-cases";
+
+const OrganizationScreen = lazy(() =>
+  import("../../features/organization/presentation/bindings/organization-screen").then(
+    (module) => ({ default: module.OrganizationScreen }),
+  ),
+);
+const OrganizationUnitScreen = lazy(() =>
+  import("../../features/organization/presentation/bindings/organization-unit-screen").then(
+    (module) => ({ default: module.OrganizationUnitScreen }),
+  ),
+);
 
 const JobsScreen = lazy(() =>
   import("../../features/jobs/presentation/bindings/jobs-screen").then((module) => ({
@@ -57,6 +69,7 @@ export function PortalRoutes({
   reporting,
   administration,
   jobs,
+  organization,
   people,
   locale,
 }: {
@@ -67,6 +80,7 @@ export function PortalRoutes({
   reporting: ReportingUseCases;
   administration: AdministrationUseCases;
   jobs: JobsUseCases;
+  organization: OrganizationUseCases;
   people: PeopleUseCases;
   locale: Locale;
 }) {
@@ -74,6 +88,34 @@ export function PortalRoutes({
   return (
     <Routes>
       <Route path="/" element={<OverviewPage company={company} locale={locale} />} />
+      <Route
+        path="/organization/units"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <OrganizationScreen
+              accountId={accountId}
+              access={access}
+              organization={organization}
+              companyName={company.name}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/organization/units/:unitId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <OrganizationUnitScreen
+              accountId={accountId}
+              access={access}
+              organization={organization}
+              companyName={company.name}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/people/employees"
         element={

@@ -159,15 +159,20 @@ a {
 .app-tab-panel {
   padding-top: 20px;
 }
-.app-directory-filters {
+.app-directory-filters,
+.app-organization-filters {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(160px, 200px) auto;
   gap: 16px;
   width: 100%;
   align-items: end;
 }
-.app-directory-filters > * {
+.app-directory-filters > *,
+.app-organization-filters > * {
   min-width: 0;
+}
+.app-organization-filters {
+  grid-template-columns: minmax(0, 1fr) repeat(2, minmax(120px, 170px)) auto;
 }
 .app-multi-select {
   width: min(320px, 100%);
@@ -376,7 +381,8 @@ a {
   .app-audit-filters {
     grid-template-columns: minmax(0, 1fr);
   }
-  .app-directory-filters {
+  .app-directory-filters,
+  .app-organization-filters {
     grid-template-columns: minmax(0, 1fr);
   }
   .app-property-list {

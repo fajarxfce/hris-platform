@@ -14,7 +14,7 @@ function authenticatorCode(secret: string): string {
   return ((digest.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).toString().padStart(6, "0");
 }
 
-test("real API sessions, MFA, people, reports, audit, policy, job cancellation and logout", async ({
+test("real API sessions, MFA, organization, people, reports, audit, policy, jobs and logout", async ({
   page,
   context,
 }) => {
@@ -67,6 +67,51 @@ test("real API sessions, MFA, people, reports, audit, policy, job cancellation a
     headerName: string;
     token: string;
   };
+  const branchId = randomUUID();
+  const departmentId = randomUUID();
+  for (const { id: unitId, ...unit } of [
+    {
+      id: branchId,
+      code: "HQ",
+      name: "Browser office",
+      kind: "BRANCH",
+      parentId: null,
+      timezone: "Asia/Jakarta",
+    },
+    {
+      id: departmentId,
+      code: "RND",
+      name: "R&D_100%",
+      kind: "DEPARTMENT",
+      parentId: branchId,
+      timezone: null,
+    },
+  ]) {
+    const saved = await context.request.put(
+      `/api/v1/companies/${companies[1]}/organization-units/${unitId}`,
+      {
+        headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
+        data: { ...unit, active: true, expectedVersion: null },
+      },
+    );
+    expect(saved.status()).toBe(200);
+  }
+  await page.getByRole("link", { name: "Organisasi", exact: true }).click();
+  await page.getByLabel("Nama atau kode", { exact: true }).fill("r&d_100%");
+  await page.getByRole("combobox", { name: "Jenis", exact: true }).selectOption("DEPARTMENT");
+  await page.getByRole("combobox", { name: "Status", exact: true }).selectOption("true");
+  await page.getByRole("button", { name: "Terapkan", exact: true }).click();
+  const units = page.getByRole("table", { name: "Unit organisasi", exact: true });
+  await expect(units.getByRole("row")).toHaveCount(2);
+  await units.getByRole("button", { name: "Lihat detail: R&D_100% (RND)", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Unit induk", exact: true })).toContainText(
+    "Browser office",
+  );
+  await page.getByRole("link", { name: "Buka unit induk", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Browser office", exact: true })).toBeVisible();
+  await expect(page.getByRole("status")).toHaveText("Unit ini tidak memiliki induk.");
+  await page.getByRole("link", { name: "Kembali ke organisasi", exact: true }).click();
+  await expect(page.getByLabel("Nama atau kode", { exact: true })).toHaveValue("r&d_100%");
   const employeeId = randomUUID();
   const created = await context.request.post(`/api/v1/companies/${companies[1]}/employees`, {
     headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },

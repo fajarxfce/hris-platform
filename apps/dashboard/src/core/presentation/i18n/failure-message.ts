@@ -75,6 +75,22 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Use up to 120 characters for the search.",
     "Gunakan maksimal 120 karakter untuk pencarian.",
   ],
+  invalid_organization_search: [
+    "Use up to 120 characters for the search.",
+    "Gunakan maksimal 120 karakter untuk pencarian.",
+  ],
+  invalid_organization_filter: [
+    "Choose a valid unit type and status.",
+    "Pilih jenis dan status unit yang valid.",
+  ],
+  organization_unit_not_found: [
+    "The organization unit was not found or is no longer accessible.",
+    "Unit organisasi tidak ditemukan atau tidak dapat diakses.",
+  ],
+  organization_structure_unavailable: [
+    "The organization structure is unavailable. Please retry.",
+    "Struktur organisasi tidak tersedia. Silakan coba lagi.",
+  ],
   invalid_page: [
     "This page link is invalid. Return to the first page.",
     "Link halaman tidak valid. Kembali ke halaman pertama.",

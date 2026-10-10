@@ -17,6 +17,15 @@ class RevokeNativeSession(
         transactions.run(actor.copy(companyId = null)) {
             val account = sessions.lockAccount(actor.accountId)
             if (account is Result.Failed) return@run account
+            val current = (account as Result.Success).value
+            if (
+                current == null ||
+                    !current.active ||
+                    current.id != actor.accountId ||
+                    (actor.credentialVersion != null &&
+                        actor.credentialVersion != current.securityVersion)
+            )
+                return@run Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "session_revoked"))
             val session = sessions.lock(sessionId, actor.accountId)
             if (session is Result.Failed) return@run session
             if ((session as Result.Success).value == null)

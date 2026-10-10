@@ -647,3 +647,18 @@ post-wait MFA checks are retained. Architecture/format checks, eight people doma
 tests, and 24 selected HTTP/PostgreSQL tests passed, including route/OpenAPI coverage,
 self discovery, reference details, access revocation, company dates, bounded pages,
 and proof expiry during pending reads. Server and worker JARs were built.
+
+
+### Native session revocation guard
+
+Revocation now rechecks account activation and credential version after waiting
+for its account guard. Two new PostgreSQL regressions prove that a withdrawn
+account or credential cannot revoke a target session or commit its audit entry.
+Architecture/format checks and 21 native-session, native-password/MFA, and API
+contract tests passed; server and worker JARs were built.
+
+HRIS Mobile also provides self-profile and assignment reads at `39dc8dc`, with
+account/company ownership, cancellation, bounded pages, and in-place MFA renewal.
+Its full check, Android dev build, and Wasm compilation passed; nine people
+domain/data tests and seven app UI tests passed. Device validation is recorded
+separately and remains pending.

@@ -12,8 +12,8 @@ provide localized errors, and pass the relevant real API and UI checks.
 
 Mobile native password sign-in, MFA enrollment/verification, recovery acknowledgement,
 secure refresh, company selection, current access, product flavors, localizable API
-problems, and restrained navigation transitions are connected in
-[the mobile application](https://github.com/fajarxfce/hris-mobile/commit/7692ed7).
+problems, restrained navigation transitions, and self-profile/assignment reads are connected in
+[the mobile application](https://github.com/fajarxfce/hris-mobile/commit/39dc8dc).
 Automated UI/API checks and the Android dev build passed. Physical device validation
 and the employee workflows below remain separate acceptance work.
 
@@ -23,7 +23,7 @@ and the employee workflows below remain separate acceptance work.
 | --- | --- |
 | Mobile identity | Remote session revocation/management, native OIDC handoff, physical device validation |
 | Mobile foundation | Encrypted company/account cache, HRIS sync and durable outbox, availability, background execution, deep links and push registration |
-| People | Dashboard account binding and company transfers; scheduled lifecycle execution; mobile self profile and assignments |
+| People | Dashboard account binding and company transfers; scheduled lifecycle execution |
 | Workforce | Dashboard shifts, schedules, rosters, holidays, attendance reviews/corrections, overtime and closing; bulk/reset and late corrections; mobile calendar, verified/offline attendance and overtime requests |
 | Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry; mobile balances, requests, evidence and cancellation |
 | Documents | Dashboard document/upload/processing/retention workflows; mobile scoped resumable upload/download and evidence acquisition |

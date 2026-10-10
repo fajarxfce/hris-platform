@@ -25,7 +25,9 @@ A successful password response may represent a pending MFA session. Such a
 session can inspect its own `/me` assurance, enroll or verify MFA, inspect/end
 native sessions, and refresh its tokens. It cannot read company directories or
 perform business operations. `/me` redacts companies and permissions until
-verification succeeds. Every subsequent business request rechecks live MFA
+verification succeeds. `account.mfaConfigured` distinguishes enrollment from a
+verification challenge. `assurance.setupAvailable` describes server capability and
+may remain true after enrollment. Every subsequent business request rechecks live MFA
 requirements, account credentials, company membership, and permissions.
 
 - `POST /api/v1/auth/native/mfa/enrollment` accepts an idempotency key and returns
@@ -56,7 +58,10 @@ token after a lost response, and replace the credentials atomically. One
 application owner serializes rotation. A revoked session or expired replay
 window requires fresh authentication, not an unbounded refresh loop.
 
-`DELETE /api/v1/auth/native/sessions/{sessionId}` revokes a device session.
+`DELETE /api/v1/auth/native/sessions/{sessionId}` revokes an owned device session.
+The command rechecks account activation and credential version after acquiring
+the account guard, before changing the target session. An account or credential
+withdrawn during that wait cannot commit revocation or its audit record.
 Local sign-out must also cancel account-owned work and clear its local data and
 credentials. An offline local sign-out cannot claim remote revocation.
 

@@ -17,6 +17,7 @@ class PayrollRunProbe {
     @Volatile var beforeResult: ((PayrollRunResultsRecord) -> Unit)? = null
     @Volatile var targetSnapshot: ((List<PayrollRunTargetsRecord>) -> Unit)? = null
     @Volatile var snapshot: ((String?) -> String?)? = null
+    @Volatile var afterCutoffLock: ((UUID) -> Unit)? = null
 
     fun clear() {
         invalidTarget = false
@@ -27,12 +28,26 @@ class PayrollRunProbe {
         beforeResult = null
         targetSnapshot = null
         snapshot = null
+        afterCutoffLock = null
     }
 }
 
 @TestConfiguration(proxyBeanMethods = false)
 class PayrollRunProbeConfiguration {
     @Bean fun payrollRunProbe() = PayrollRunProbe()
+
+    @Bean
+    @Primary
+    fun probedPayrollCutoffSource(
+        @Qualifier("payrollCutoffSource") source: PayrollCutoffDataSource,
+        probe: PayrollRunProbe,
+    ): PayrollCutoffDataSource =
+        object : PayrollCutoffDataSource by source {
+            override fun lock(company: UUID) {
+                source.lock(company)
+                probe.afterCutoffLock?.invoke(company)
+            }
+        }
 
     @Bean
     @Primary

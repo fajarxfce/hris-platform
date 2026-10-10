@@ -2,6 +2,7 @@ package dev.fajar.hris
 
 import dev.fajar.hris.core.domain.*
 import java.util.UUID
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.Assertions.*
@@ -273,22 +274,30 @@ class PayrollRunCutoffHttpTest : PayrollRunApiFixture() {
     fun aLeaveSubmissionHoldingItsCutoffGuardCommitsBeforeACompetingPayrollStart() {
         val setup = leaveSetup()
         val f = closeForPayroll(setup)
-        val barrier = AccountLockProbe.Barrier(setup.f.payroll.owner.account)
-        accountProbe.current.set(barrier)
+        val entered = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        // Account acquisition also occurs during client admission, before the cutoff exists.
+        // Pause only after this submission owns its transaction's actual cutoff guard.
+        runProbe.afterCutoffLock = { company ->
+            if (company == setup.f.payroll.company) {
+                entered.countDown()
+                check(release.await(5, TimeUnit.SECONDS))
+            }
+        }
         Executors.newFixedThreadPool(2).use { executor ->
             val leave =
                 executor.submit<java.net.http.HttpResponse<String>> {
                     submitLeave(setup, UUID.randomUUID())
                 }
             try {
-                assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                assertTrue(entered.await(5, TimeUnit.SECONDS))
                 val run = executor.submit<java.net.http.HttpResponse<String>> { createRun(f) }
-                barrier.release.countDown()
+                release.countDown()
                 payrollBody(leave.get(10, TimeUnit.SECONDS))
                 payrollError(run.get(10, TimeUnit.SECONDS), 409, "payroll_leave_decision_pending")
             } finally {
-                barrier.release.countDown()
-                accountProbe.current.set(null)
+                release.countDown()
+                runProbe.afterCutoffLock = null
             }
         }
         assertEquals(0, count(f.people.payroll.company, "payroll_runs"))

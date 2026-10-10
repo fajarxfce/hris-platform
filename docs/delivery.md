@@ -568,3 +568,9 @@ Dashboard architecture, Biome, TypeScript, 495 unit/controller tests in 82 files
 The prior dashboard job exhausted its twenty-minute budget after completing 262 of 289 browser scenarios. The complete suite now runs in two independent matrix shards with separate reports, a fifteen-minute browser step, and the existing twenty-minute job boundary. Checks and build run in each job, both shards must pass before API integration, and one shard's failure does not cancel the other's report. No retries or disabled tests were introduced.
 
 Actionlint passed. Playwright discovery verified that the current 299 scenarios partition exactly into 150 and 149 tests with no omission or overlap. Remote execution of the new matrix remains to be observed.
+
+### Payroll cutoff contention fixture
+
+CI exposed a test ordering error: the leave submission could pause at account acquisition during client admission, before holding its cutoff guard. Payroll could then legitimately win. The fixture now pauses after the real cutoff datasource has acquired the transaction-owned guard, with bounded latches and unconditional cleanup. Production transaction behavior was not changed for this test failure.
+
+Root formatting and architecture checks and all twenty-four PayrollRun API/PostgreSQL tests across six classes passed in 2 minutes 46 seconds. Coverage includes cutoff contention, current access, source snapshots, calculation, receipt replay, rollback, and recovery. The complete remote backend suite remains a separate CI check.

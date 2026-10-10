@@ -6,6 +6,7 @@ import { useWorkspaceRevalidation } from "../../../../core/presentation/session/
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { LeaveUseCases } from "../contracts/leave-use-cases";
 import { LeaveRequestController } from "../controllers/leave-request-controller";
+import { leaveActionLinks } from "../models/leave-action-view";
 import { leaveRequestView } from "../models/leave-request-view";
 import { leaveParameters, leaveQuery } from "../models/leave-route";
 import { LeaveRequestPage } from "../pages/leave-request-page";
@@ -41,6 +42,8 @@ export function LeaveRequestScreen(props: Props) {
       id={requestId}
       historyAfter={historyAfter}
       backTo={`/leave/requests?${canonical}`}
+      actionPath={`/leave/requests/${encodeURIComponent(requestId)}`}
+      actionQuery={canonical}
       onHistory={(after) => setParameters(leaveParameters(props.access.companyId, query, after))}
       onApproval={(id) =>
         navigate(`/approvals/${encodeURIComponent(id)}?company=${props.access.companyId}`)
@@ -57,12 +60,16 @@ function LeaveRequestBinding({
   timezone,
   companyName,
   backTo,
+  actionPath,
+  actionQuery,
   onHistory,
   onApproval,
 }: Props & {
   id: string;
   historyAfter: string | null;
   backTo: string;
+  actionPath: string;
+  actionQuery: string;
   onHistory: (after: string | null) => void;
   onApproval: (id: string) => void;
 }) {
@@ -84,10 +91,21 @@ function LeaveRequestBinding({
     () => (state.request ? leaveRequestView(state.request, locale, timezone) : null),
     [state.request, locale, timezone],
   );
+  const actions = useMemo(
+    () =>
+      state.request
+        ? leaveActionLinks(access, state.request, locale).map((action) => ({
+            ...action,
+            to: `${actionPath}/${action.intent}?${actionQuery}`,
+          }))
+        : [],
+    [access, state.request, locale, actionPath, actionQuery],
+  );
   return (
     <LeaveRequestPage
       state={state}
       view={view}
+      actions={actions}
       companyName={companyName}
       locale={locale}
       timezone={timezone}

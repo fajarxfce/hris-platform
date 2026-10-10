@@ -2,6 +2,70 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  leave_action_unavailable: [
+    "This action is no longer available. Review the current leave request.",
+    "Tindakan tidak lagi tersedia. Periksa permintaan cuti terkini.",
+  ],
+  invalid_leave_decision: [
+    "Enter a reason when rejecting leave, using at most 1,000 characters.",
+    "Isi alasan penolakan cuti, maksimal 1.000 karakter.",
+  ],
+  invalid_leave_withdrawal: [
+    "Enter a withdrawal reason of up to 1,000 characters.",
+    "Isi alasan penarikan, maksimal 1.000 karakter.",
+  ],
+  invalid_leave_cancellation: [
+    "Enter a cancellation reason of up to 1,000 characters.",
+    "Isi alasan pembatalan, maksimal 1.000 karakter.",
+  ],
+  decision_reason_required: [
+    "Enter a decision reason of up to 1,000 characters.",
+    "Isi alasan keputusan, maksimal 1.000 karakter.",
+  ],
+  leave_not_pending: [
+    "This leave request is no longer pending. Reload the current version.",
+    "Permintaan cuti tidak lagi menunggu. Muat versi terkini.",
+  ],
+  leave_not_approved: [
+    "Cancellation requires approved leave. Reload the current request.",
+    "Pembatalan memerlukan cuti yang disetujui. Muat permintaan terkini.",
+  ],
+  approval_not_pending: [
+    "This approval stage is no longer pending. Reload the request.",
+    "Tahap approval tidak lagi menunggu. Muat ulang permintaan.",
+  ],
+  approval_unavailable: [
+    "The approval cannot be reviewed. Reload or contact an administrator.",
+    "Approval tidak dapat ditinjau. Muat ulang atau hubungi administrator.",
+  ],
+  self_approval_denied: [
+    "This request requires an independent approver.",
+    "Permintaan ini memerlukan approver independen.",
+  ],
+  not_assigned_approver: [
+    "You are no longer assigned to this approval stage. Reload the request.",
+    "Anda tidak lagi ditugaskan pada tahap ini. Muat ulang permintaan.",
+  ],
+  payroll_period_frozen: [
+    "This change is blocked by a frozen payroll period.",
+    "Perubahan terhalang periode payroll yang telah dikunci.",
+  ],
+  leave_year_closed: [
+    "The leave year is closed. Contact your administrator.",
+    "Tahun cuti telah ditutup. Hubungi administrator.",
+  ],
+  approval_policy_missing: [
+    "No applicable approval policy is configured. Contact your administrator.",
+    "Kebijakan approval yang sesuai belum tersedia. Hubungi administrator.",
+  ],
+  approval_policy_empty: [
+    "The approval policy needs at least one stage. Contact your administrator.",
+    "Kebijakan approval memerlukan minimal satu tahap. Hubungi administrator.",
+  ],
+  ambiguous_approval_policy: [
+    "Multiple approval policies match. Contact your administrator.",
+    "Beberapa kebijakan approval berlaku bersamaan. Hubungi administrator.",
+  ],
   approval_not_found: [
     "The approval request was not found or is no longer accessible.",
     "Permintaan approval tidak ditemukan atau tidak dapat diakses.",

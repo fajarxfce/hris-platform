@@ -13,6 +13,7 @@ import type { leaveRequestView } from "../models/leave-request-view";
 export function LeaveRequestPage({
   state,
   view,
+  actions,
   companyName,
   locale,
   timezone,
@@ -25,6 +26,7 @@ export function LeaveRequestPage({
 }: {
   state: LeaveRequestState;
   view: ReturnType<typeof leaveRequestView> | null;
+  actions: readonly Readonly<{ intent: string; label: string; to: string }>[];
   companyName: string;
   locale: Locale;
   timezone: string;
@@ -44,6 +46,11 @@ export function LeaveRequestPage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
+            {actions.map((action) => (
+              <Link key={action.intent} to={action.to}>
+                {action.label}
+              </Link>
+            ))}
             <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
               {messages(locale).refresh}
             </AppButton>

@@ -24,6 +24,11 @@ const LeaveRequestsScreen = lazy(() =>
     default: module.LeaveRequestsScreen,
   })),
 );
+const LeaveActionScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-action-screen").then((module) => ({
+    default: module.LeaveActionScreen,
+  })),
+);
 const LeaveRequestScreen = lazy(() =>
   import("../../features/leave/presentation/bindings/leave-request-screen").then((module) => ({
     default: module.LeaveRequestScreen,
@@ -253,6 +258,22 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/leave/requests/:requestId/:intent"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveActionScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/leave/requests"
         element={

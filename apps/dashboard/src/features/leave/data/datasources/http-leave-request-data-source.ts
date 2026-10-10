@@ -1,10 +1,72 @@
 import type { HttpClient } from "../../../../core/data/http/http-client";
+import {
+  type LeaveRequestChangeDto,
+  type LeaveRequestDecisionDto,
+  leaveReceiptDto,
+} from "../models/leave-request-change-dto";
 import { leaveRequestDetailsDto } from "../models/leave-request-details-dto";
 import { leaveRequestPageDto } from "../models/leave-request-summary-dto";
 import type { LeaveRequestDataSource } from "./leave-request-data-source";
 
 export class HttpLeaveRequestDataSource implements LeaveRequestDataSource {
   constructor(private readonly http: HttpClient) {}
+  async decide(
+    company: string,
+    id: string,
+    operation: string,
+    body: LeaveRequestDecisionDto,
+    signal: AbortSignal,
+  ) {
+    return leaveReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/leave/requests/${id}/decisions`,
+          method: "POST",
+          operationId: operation,
+          body,
+        },
+        signal,
+      ),
+    );
+  }
+  async withdraw(
+    company: string,
+    id: string,
+    operation: string,
+    body: LeaveRequestChangeDto,
+    signal: AbortSignal,
+  ) {
+    return leaveReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/leave/requests/${id}/withdraw`,
+          method: "POST",
+          operationId: operation,
+          body,
+        },
+        signal,
+      ),
+    );
+  }
+  async requestCancellation(
+    company: string,
+    id: string,
+    operation: string,
+    body: LeaveRequestChangeDto,
+    signal: AbortSignal,
+  ) {
+    return leaveReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/leave/requests/${id}/cancellation`,
+          method: "POST",
+          operationId: operation,
+          body,
+        },
+        signal,
+      ),
+    );
+  }
   async list(
     company: string,
     employee: string | null,

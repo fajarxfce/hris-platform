@@ -2,6 +2,26 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_lifecycle_template: [
+    "Check the template name, code, reason, and checklist. Use 1–64 tasks with unique keys and due offsets from −90 to 365 days.",
+    "Periksa nama, kode, alasan, dan checklist template. Gunakan 1–64 tugas dengan key unik dan offset −90 hingga 365 hari.",
+  ],
+  lifecycle_template_not_found: [
+    "This template is unavailable in the selected company.",
+    "Template tidak tersedia di perusahaan yang dipilih.",
+  ],
+  lifecycle_template_exists: [
+    "This template already exists. Reload its current version.",
+    "Template sudah tersedia. Muat ulang versi terbarunya.",
+  ],
+  lifecycle_template_limit: [
+    "This company has reached its limit of 128 templates.",
+    "Perusahaan sudah mencapai batas 128 template.",
+  ],
+  lifecycle_template_identity_immutable: [
+    "The template code and type cannot be changed.",
+    "Kode dan jenis template tidak dapat diubah.",
+  ],
   invalid_client_policy: [
     "Check the highlighted policy values.",
     "Periksa nilai policy yang ditandai.",

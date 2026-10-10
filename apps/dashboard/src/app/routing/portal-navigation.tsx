@@ -1,4 +1,5 @@
 import {
+  ClipboardTaskListLtr20Regular,
   DataBarVertical20Regular,
   History20Regular,
   Home20Regular,
@@ -15,6 +16,11 @@ import { administrationMessages } from "../../features/administration/presentati
 import { clientPolicyMessages } from "../../features/administration/presentation/i18n/client-policy-messages";
 import type { CompanyAccess } from "../../features/identity/domain/entities/session";
 import { jobMessages } from "../../features/jobs/presentation/i18n/job-messages";
+import {
+  canManageLifecycle,
+  canReadLifecycle,
+} from "../../features/lifecycle/domain/policies/lifecycle-template-policy";
+import { lifecycleMessages } from "../../features/lifecycle/presentation/i18n/lifecycle-messages";
 import { canReadOrganization } from "../../features/organization/domain/policies/organization-unit-policy";
 import { organizationMessages } from "../../features/organization/presentation/i18n/organization-messages";
 import { canCreateEmployee } from "../../features/people/domain/policies/employee-creation-policy";
@@ -48,6 +54,23 @@ export function portalNavigation(
               to: "/people/employees/new",
               label: employeeCreationMessages(locale).create,
               icon: <People20Regular />,
+            },
+          ]
+        : []),
+    ...(canReadLifecycle(permissions)
+      ? [
+          {
+            to: "/people/lifecycle/templates",
+            label: lifecycleMessages(locale).title,
+            icon: <ClipboardTaskListLtr20Regular />,
+          },
+        ]
+      : canManageLifecycle(permissions)
+        ? [
+            {
+              to: "/people/lifecycle/templates/new",
+              label: lifecycleMessages(locale).create,
+              icon: <ClipboardTaskListLtr20Regular />,
             },
           ]
         : []),

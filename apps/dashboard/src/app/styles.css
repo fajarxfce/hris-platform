@@ -385,6 +385,21 @@ a {
   align-items: center;
   gap: 8px;
 }
+.app-lifecycle-template-editor {
+  gap: 20px;
+}
+.app-lifecycle-template-editor .app-page-header,
+.app-lifecycle-template-editor p,
+.app-lifecycle-template-editor h2 {
+  margin: 0;
+}
+.app-lifecycle-template-editor .app-editor-form {
+  margin-top: 0;
+  gap: 20px;
+}
+.app-lifecycle-task .app-form-actions {
+  margin-top: 12px;
+}
 @media (max-width: 720px) {
   .app-editor-fields {
     grid-template-columns: minmax(0, 1fr);

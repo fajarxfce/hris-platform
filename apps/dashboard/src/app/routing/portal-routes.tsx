@@ -10,10 +10,27 @@ import type {
   CompanyMembership,
 } from "../../features/identity/domain/entities/session";
 import type { JobsUseCases } from "../../features/jobs/presentation/contracts/jobs-use-cases";
+import type { LifecycleUseCases } from "../../features/lifecycle/presentation/contracts/lifecycle-use-cases";
 import type { OrganizationUseCases } from "../../features/organization/presentation/contracts/organization-use-cases";
 import { OverviewPage } from "../../features/overview/presentation/pages/overview-page";
 import type { PeopleUseCases } from "../../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../../features/reporting/presentation/contracts/reporting-use-cases";
+
+const LifecycleTemplatesScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/lifecycle-templates-screen").then(
+    (module) => ({ default: module.LifecycleTemplatesScreen }),
+  ),
+);
+const LifecycleTemplateScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/lifecycle-template-screen").then(
+    (module) => ({ default: module.LifecycleTemplateScreen }),
+  ),
+);
+const LifecycleTemplateEditorScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/lifecycle-template-editor-screen").then(
+    (module) => ({ default: module.LifecycleTemplateEditorScreen }),
+  ),
+);
 
 const OrganizationScreen = lazy(() =>
   import("../../features/organization/presentation/bindings/organization-screen").then(
@@ -103,6 +120,7 @@ export function PortalRoutes({
   jobs,
   organization,
   people,
+  lifecycle,
   locale,
   nextIdentifier,
 }: {
@@ -116,12 +134,73 @@ export function PortalRoutes({
   jobs: JobsUseCases;
   organization: OrganizationUseCases;
   people: PeopleUseCases;
+  lifecycle: LifecycleUseCases;
   locale: Locale;
   nextIdentifier: () => string;
 }) {
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/people/lifecycle/templates"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LifecycleTemplatesScreen
+              accountId={accountId}
+              access={access}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/lifecycle/templates/:templateId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LifecycleTemplateScreen
+              accountId={accountId}
+              access={access}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/lifecycle/templates/new"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LifecycleTemplateEditorScreen
+              accountId={accountId}
+              access={access}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              locale={locale}
+              creating={true}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/lifecycle/templates/:templateId/edit"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LifecycleTemplateEditorScreen
+              accountId={accountId}
+              access={access}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              locale={locale}
+              creating={false}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/settings/client-policy/edit"
         element={

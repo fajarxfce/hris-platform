@@ -14,7 +14,7 @@ function authenticatorCode(secret: string): string {
   return ((digest.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).toString().padStart(6, "0");
 }
 
-test("real API sessions, MFA, organization, people, reports, audit, policy, jobs and logout", async ({
+test("real API sessions, MFA, organization, people, lifecycle, reports, audit, policy, jobs and logout", async ({
   page,
   context,
 }) => {
@@ -412,6 +412,94 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
   await expect(details).not.toContainText("Report fixture employee");
   await expect(details).not.toContainText("Browser report fixture");
   await page.getByRole("button", { name: "Tutup", exact: true }).click();
+  await page.getByRole("link", { name: "Template lifecycle", exact: true }).click();
+  await page.getByRole("link", { name: "Buat template", exact: true }).click();
+  await page.getByLabel("Kode", { exact: true }).fill("BROWSER_ONBOARD");
+  await page.getByLabel("Nama", { exact: true }).fill("Browser checklist");
+  const firstTask = page.getByRole("group", { name: "Tugas 1", exact: true });
+  await firstTask.getByLabel("Key", { exact: true }).fill("equipment");
+  await firstTask.getByLabel("Judul tugas", { exact: true }).fill("Review equipment");
+  await firstTask.getByLabel("Offset jatuh tempo (hari)", { exact: true }).fill("-2");
+  await page.getByLabel("Alasan", { exact: true }).fill("Browser lifecycle template");
+  await page.getByRole("button", { name: "Simpan template", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Template tersimpan.");
+  await page.getByRole("link", { name: "Lihat template", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Browser checklist", exact: true })).toBeVisible();
+  const templateId = new URL(page.url()).pathname.split("/").at(-1);
+  expect(templateId).toMatch(/^[0-9a-f-]{36}$/u);
+  const templatePath = `/api/v1/companies/${companies[1]}/lifecycle/templates/${templateId}`;
+  const templateBefore = await context.request.get(templatePath);
+  expect(templateBefore.status()).toBe(200);
+  expect(await templateBefore.json()).toMatchObject({ version: 0, code: "BROWSER_ONBOARD" });
+  const transitionId = randomUUID();
+  csrf = await (await context.request.get("/api/v1/auth/csrf")).json();
+  const transition = await context.request.post(
+    `/api/v1/companies/${companies[1]}/lifecycle/cases`,
+    {
+      headers: { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() },
+      data: {
+        id: transitionId,
+        employmentId: employeeId,
+        templateId,
+        templateVersion: 0,
+        targetDate: new Date().toISOString().slice(0, 10),
+        assignees: {},
+        reason: "Browser onboarding",
+      },
+    },
+  );
+  expect(transition.status()).toBe(200);
+  await page.getByRole("link", { name: "Edit template", exact: true }).click();
+  await page.getByLabel("Nama", { exact: true }).fill("Browser revised checklist");
+  await page.getByRole("button", { name: "Tambah tugas", exact: true }).click();
+  const addedTask = page.getByRole("group", { name: "Tugas 2", exact: true });
+  await addedTask.getByLabel("Key", { exact: true }).fill("welcome");
+  await addedTask.getByLabel("Judul tugas", { exact: true }).fill("Welcome session");
+  await addedTask.getByRole("checkbox", { name: "Wajib", exact: true }).uncheck();
+  await page.getByLabel("Alasan", { exact: true }).fill("Revise browser checklist");
+  const templateWrites: { operation: string | undefined; body: unknown }[] = [];
+  await page.route(`**${templatePath}`, async (route) => {
+    if (route.request().method() !== "PUT") return route.fallback();
+    templateWrites.push({
+      operation: route.request().headers()["idempotency-key"],
+      body: route.request().postDataJSON(),
+    });
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toMatchObject({ id: templateId, version: 1 });
+    if (templateWrites.length === 1) return route.abort("connectionfailed");
+    return route.fulfill({ response });
+  });
+  await page.getByRole("button", { name: "Simpan template", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Hasil penyimpanan belum terkonfirmasi.");
+  await page.getByRole("button", { name: "Ulangi penyimpanan awal", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Template tersimpan.");
+  expect(templateWrites).toHaveLength(2);
+  expect(templateWrites[1]).toEqual(templateWrites[0]);
+  await page.unroute(`**${templatePath}`);
+  await page.getByRole("link", { name: "Lihat template", exact: true }).click();
+  await expect(page.getByRole("table", { name: "Checklist", exact: true })).toContainText(
+    "Welcome session",
+  );
+  const templateAfter = await context.request.get(templatePath);
+  expect(await templateAfter.json()).toMatchObject({
+    version: 1,
+    name: "Browser revised checklist",
+  });
+  const retainedTransition = await context.request.get(
+    `/api/v1/companies/${companies[1]}/lifecycle/cases/${transitionId}`,
+  );
+  expect(retainedTransition.status()).toBe(200);
+  const retainedChecklist = await retainedTransition.json();
+  expect(retainedChecklist).toMatchObject({
+    templateVersion: 0,
+    templateName: "Browser checklist",
+  });
+  expect(retainedChecklist.tasks).toHaveLength(1);
+  const foreignTemplate = await context.request.get(
+    `/api/v1/companies/${companies[0]}/lifecycle/templates/${templateId}`,
+  );
+  expect(foreignTemplate.status()).toBe(404);
   await page.getByRole("link", { name: "Policy client", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText(
     "Belum ada konfigurasi perusahaan yang disimpan.",

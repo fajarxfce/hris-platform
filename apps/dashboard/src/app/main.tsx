@@ -9,6 +9,7 @@ import { createAdministrationFeature } from "../features/administration/di/admin
 import { createIdentityFeature } from "../features/identity/di/identity-feature";
 import { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
 import { createJobsFeature } from "../features/jobs/di/jobs-feature";
+import { createLifecycleFeature } from "../features/lifecycle/di/lifecycle-feature";
 import { createOrganizationFeature } from "../features/organization/di/organization-feature";
 import { createPeopleFeature } from "../features/people/di/people-feature";
 import { createReportingFeature } from "../features/reporting/di/reporting-feature";
@@ -27,6 +28,7 @@ const administration = createAdministrationFeature(http);
 const jobs = createJobsFeature(http);
 const organization = createOrganizationFeature(http);
 const people = createPeopleFeature(http);
+const lifecycle = createLifecycleFeature(http);
 const identity = new IdentityController(
   createIdentityFeature(http),
   () => crypto.randomUUID() as OperationId,
@@ -47,6 +49,7 @@ const router = createBrowserRouter([
           jobs={jobs}
           organization={organization}
           people={people}
+          lifecycle={lifecycle}
           nextIdentifier={() => crypto.randomUUID()}
         />
       </AppErrorBoundary>

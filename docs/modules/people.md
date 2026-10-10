@@ -103,3 +103,8 @@ Company/membership and account administration locks serialize binding against tr
 ## Dashboard employee creation
 
 The dashboard supports authorized new-person/employee intake with initial contract dates, status, organization assignments, and a manager. Assignment searches are bounded and use the proposed start date for manager eligibility. Domain policy and the API validate assignments independently; source data remains owned by organization and people repositories. One immutable command retains distinct person/employee identifiers and its idempotency key through an uncertain response or MFA renewal. Account binding, transfers, and lifecycle tasks remain separate workflows. See [dashboard behavior](../dashboard.md#employee-creation).
+
+
+## Lifecycle template dashboard
+
+The dashboard now exposes company-scoped lifecycle template catalogs, details, creation, and versioned checklist editing. It retains one 20-template page, uses direct detail reads, and preserves task rows and immutable commands through uncertain saves. See [lifecycle template behavior](../dashboard.md#lifecycle-templates). Case initiation, task assignment/completion, and offboarding remain separate browser workflows.

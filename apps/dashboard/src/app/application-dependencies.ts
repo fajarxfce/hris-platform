@@ -1,6 +1,7 @@
 import type { AdministrationUseCases } from "../features/administration/presentation/contracts/administration-use-cases";
 import type { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
 import type { JobsUseCases } from "../features/jobs/presentation/contracts/jobs-use-cases";
+import type { LifecycleUseCases } from "../features/lifecycle/presentation/contracts/lifecycle-use-cases";
 import type { OrganizationUseCases } from "../features/organization/presentation/contracts/organization-use-cases";
 import type { PeopleUseCases } from "../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../features/reporting/presentation/contracts/reporting-use-cases";
@@ -13,5 +14,6 @@ export type ApplicationDependencies = Readonly<{
   jobs: JobsUseCases;
   organization: OrganizationUseCases;
   people: PeopleUseCases;
+  lifecycle: LifecycleUseCases;
   nextIdentifier: () => string;
 }>;

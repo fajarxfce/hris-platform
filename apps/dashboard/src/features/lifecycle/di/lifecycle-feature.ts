@@ -4,7 +4,9 @@ import { HttpLifecycleTemplateDataSource } from "../data/datasources/http-lifecy
 import { RemoteLifecycleCaseRepository } from "../data/repositories/remote-lifecycle-case-repository";
 import { RemoteLifecycleTemplateRepository } from "../data/repositories/remote-lifecycle-template-repository";
 import { AssignLifecycleTask } from "../domain/usecases/assign-lifecycle-task";
+import { CancelLifecycleCase } from "../domain/usecases/cancel-lifecycle-case";
 import { ChangeLifecycleTask } from "../domain/usecases/change-lifecycle-task";
+import { CompleteOnboarding } from "../domain/usecases/complete-onboarding";
 import { LoadAssignedLifecycleTasks } from "../domain/usecases/load-assigned-lifecycle-tasks";
 import { LoadLifecycleAssignees } from "../domain/usecases/load-lifecycle-assignees";
 import { LoadLifecycleCase } from "../domain/usecases/load-lifecycle-case";
@@ -21,6 +23,8 @@ export function createLifecycleFeature(http: HttpClient) {
   );
   const cases = new RemoteLifecycleCaseRepository(new HttpLifecycleCaseDataSource(http));
   return {
+    cancelCase: new CancelLifecycleCase(cases),
+    completeOnboarding: new CompleteOnboarding(cases),
     startCase: new StartLifecycleCase(cases),
     loadAssignees: new LoadLifecycleAssignees(cases),
     assignTask: new AssignLifecycleTask(cases),

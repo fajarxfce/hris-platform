@@ -1,6 +1,10 @@
 import type { HttpClient } from "../../../../core/data/http/http-client";
 import { lifecycleAssigneePageDto } from "../models/lifecycle-assignee-dto";
 import {
+  type LifecycleCaseChangeDto,
+  lifecycleCaseReceiptDto,
+} from "../models/lifecycle-case-change-dto";
+import {
   assignedLifecycleTaskPageDto,
   type LifecycleCaseQuery,
   lifecycleCaseDto,
@@ -12,14 +16,49 @@ import {
 } from "../models/lifecycle-case-start-dto";
 import { lifecycleHistoryPageDto } from "../models/lifecycle-event-dto";
 import type { LifecycleTaskAssignmentDto } from "../models/lifecycle-task-assignment-dto";
-import {
-  type LifecycleTaskChangeDto,
-  lifecycleTaskReceiptDto,
-} from "../models/lifecycle-task-change-dto";
+import type { LifecycleTaskChangeDto } from "../models/lifecycle-task-change-dto";
 import type { LifecycleCaseDataSource } from "./lifecycle-case-data-source";
 
 export class HttpLifecycleCaseDataSource implements LifecycleCaseDataSource {
   constructor(private readonly http: HttpClient) {}
+  async cancel(
+    company: string,
+    id: string,
+    operation: string,
+    change: LifecycleCaseChangeDto,
+    signal: AbortSignal,
+  ) {
+    return lifecycleCaseReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/lifecycle/cases/${id}/cancel`,
+          method: "POST",
+          operationId: operation,
+          body: change,
+        },
+        signal,
+      ),
+    );
+  }
+  async completeOnboarding(
+    company: string,
+    id: string,
+    operation: string,
+    change: LifecycleCaseChangeDto,
+    signal: AbortSignal,
+  ) {
+    return lifecycleCaseReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/lifecycle/cases/${id}/complete-onboarding`,
+          method: "POST",
+          operationId: operation,
+          body: change,
+        },
+        signal,
+      ),
+    );
+  }
   async start(
     company: string,
     operation: string,
@@ -56,7 +95,7 @@ export class HttpLifecycleCaseDataSource implements LifecycleCaseDataSource {
     change: LifecycleTaskAssignmentDto,
     signal: AbortSignal,
   ) {
-    return lifecycleTaskReceiptDto.parse(
+    return lifecycleCaseReceiptDto.parse(
       await this.http.request(
         {
           path: `/api/v1/companies/${company}/lifecycle/cases/${id}/tasks/${key}/assignee`,
@@ -76,7 +115,7 @@ export class HttpLifecycleCaseDataSource implements LifecycleCaseDataSource {
     change: LifecycleTaskChangeDto,
     signal: AbortSignal,
   ) {
-    return lifecycleTaskReceiptDto.parse(
+    return lifecycleCaseReceiptDto.parse(
       await this.http.request(
         {
           path: `/api/v1/companies/${company}/lifecycle/cases/${id}/tasks/${key}`,

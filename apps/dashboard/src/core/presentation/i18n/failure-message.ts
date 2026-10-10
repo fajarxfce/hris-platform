@@ -31,8 +31,16 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Hanya tugas tertunda yang dapat dialihkan ke anggota lain. Muat ulang daftar tugas.",
   ],
   invalid_lifecycle_change: [
-    "Select a task status and provide a reason of up to 1,000 characters.",
-    "Pilih status tugas dan masukkan alasan maksimal 1.000 karakter.",
+    "Check the lifecycle action and provide a reason of up to 1,000 characters.",
+    "Periksa tindakan lifecycle dan masukkan alasan maksimal 1.000 karakter.",
+  ],
+  required_lifecycle_tasks_pending: [
+    "Complete every required task before completing this case. Reload the checklist.",
+    "Selesaikan semua tugas wajib sebelum menyelesaikan proses. Muat ulang checklist.",
+  ],
+  lifecycle_tasks_unresolved: [
+    "Resolve the remaining tasks before completing this case. Reload the checklist.",
+    "Selesaikan tugas yang tersisa sebelum menyelesaikan proses. Muat ulang checklist.",
   ],
   lifecycle_task_not_found: [
     "This task is no longer available. Reload the task list.",

@@ -65,6 +65,57 @@ function deferred<T>() {
 }
 
 describe("lifecycle read ownership", () => {
+  it("keeps case actions and task panels mutually exclusive and pins the case until the panel closes", async () => {
+    const load = vi
+      .fn<LifecycleUseCases["loadCase"]["execute"]>()
+      .mockResolvedValue(success(record));
+    const manager = {
+      companyId,
+      permissions: ["people.lifecycle.read", "people.lifecycle.manage"],
+    };
+    const controller = new LifecycleCaseController({ execute: load }, manager, id);
+    controller.activate();
+    await vi.waitFor(() => expect(controller.getSnapshot().stage).toBe("ready"));
+    controller.openOnboardingCompletion();
+    expect(controller.getSnapshot().caseAction).toBeNull();
+    controller.openCancellation();
+    controller.openTask("equipment");
+    await controller.refresh();
+    expect(controller.getSnapshot()).toMatchObject({ caseAction: "cancel", selectedTask: null });
+    expect(load).toHaveBeenCalledOnce();
+    controller.closeCaseAction();
+    controller.openTask("equipment");
+    controller.openCancellation();
+    expect(controller.getSnapshot().caseAction).toBeNull();
+    controller.closeTask();
+    load.mockResolvedValueOnce(
+      success({
+        ...record,
+        version: 3,
+        tasks: record.tasks.map((task) => ({
+          ...task,
+          status: "DONE",
+          completedBy: accountId,
+          completedAt: "2026-10-01T01:00:00Z",
+        })),
+      }),
+    );
+    await controller.refresh();
+    controller.openOnboardingCompletion();
+    controller.openCancellation();
+    expect(controller.getSnapshot()).toMatchObject({
+      caseAction: "completeOnboarding",
+      case: { version: 3 },
+    });
+    controller.reportScopeFailure({ code: "session_revoked", fields: {}, parameters: {} });
+    expect(controller.getSnapshot()).toMatchObject({
+      stage: "unavailable",
+      case: null,
+      caseAction: null,
+    });
+    expect(load).toHaveBeenCalledTimes(2);
+    controller.deactivate();
+  });
   it("pins a selected task to the observed case and discards superseded reads and scope failures", async () => {
     const first = deferred<Result<LifecycleCase>>();
     const execute = vi

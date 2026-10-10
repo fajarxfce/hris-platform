@@ -1,5 +1,6 @@
 import type { Failure } from "../../../../core/domain/result";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import { lifecycleCaseActions } from "../../domain/policies/lifecycle-case-change-policy";
 import { canAssignLifecycleTask } from "../../domain/policies/lifecycle-task-assignment-policy";
 import type { LifecycleUseCases } from "../contracts/lifecycle-use-cases";
 import { initialLifecycleCaseState, type LifecycleCaseState } from "../models/lifecycle-case-state";
@@ -37,6 +38,7 @@ export class LifecycleCaseController {
       !this.#active ||
       this.#state.stage !== "ready" ||
       this.#state.selectedTask ||
+      this.#state.caseAction ||
       !details ||
       !task
     )
@@ -69,6 +71,35 @@ export class LifecycleCaseController {
   closeTask = (): void => {
     if (this.#active) this.publish({ ...this.#state, selectedTask: null, taskPanel: "status" });
   };
+  openCancellation = (): void => {
+    const details = this.#state.case;
+    if (
+      !this.#active ||
+      this.#state.stage !== "ready" ||
+      this.#state.selectedTask ||
+      this.#state.caseAction ||
+      !details ||
+      !lifecycleCaseActions(this.access, details).cancel
+    )
+      return;
+    this.publish({ ...this.#state, caseAction: "cancel" });
+  };
+  openOnboardingCompletion = (): void => {
+    const details = this.#state.case;
+    if (
+      !this.#active ||
+      this.#state.stage !== "ready" ||
+      this.#state.selectedTask ||
+      this.#state.caseAction ||
+      !details ||
+      !lifecycleCaseActions(this.access, details).completeOnboarding
+    )
+      return;
+    this.publish({ ...this.#state, caseAction: "completeOnboarding" });
+  };
+  closeCaseAction = (): void => {
+    if (this.#active) this.publish({ ...this.#state, caseAction: null });
+  };
   /** History uses the same case-read grant; its revocation also invalidates the overview. */
   reportScopeFailure = (failure: Failure): void => {
     if (
@@ -90,7 +121,7 @@ export class LifecycleCaseController {
     this.publish({ ...initialLifecycleCaseState, stage: "unavailable", failure });
   };
   refresh = async (): Promise<void> => {
-    if (!this.#active || this.#state.selectedTask) return;
+    if (!this.#active || this.#state.selectedTask || this.#state.caseAction) return;
     this.#pending?.abort();
     const pending = new AbortController();
     this.#pending = pending;

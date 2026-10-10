@@ -1,6 +1,7 @@
 import { safeHttpCall } from "../../../../core/data/http/safe-http-call";
 import type { AccountId, CompanyId, OperationId } from "../../../../core/domain/identifiers";
 import type { LifecycleCaseId } from "../../domain/entities/lifecycle-case";
+import type { LifecycleCaseChange } from "../../domain/entities/lifecycle-case-change";
 import type { LifecycleCaseFilter } from "../../domain/entities/lifecycle-case-search";
 import type { LifecycleCaseStart } from "../../domain/entities/lifecycle-case-start";
 import type { LifecycleTaskAssignment } from "../../domain/entities/lifecycle-task-assignment";
@@ -9,6 +10,10 @@ import type { LifecycleCaseRepository } from "../../domain/repositories/lifecycl
 import type { LifecycleCaseDataSource } from "../datasources/lifecycle-case-data-source";
 import { toAssignedLifecycleTaskPage } from "../mappers/assigned-lifecycle-task-mapper";
 import { toLifecycleAssigneePage } from "../mappers/lifecycle-assignee-mapper";
+import {
+  toLifecycleCaseChangeDto,
+  toLifecycleCaseReceipt,
+} from "../mappers/lifecycle-case-change-mapper";
 import { toLifecycleCaseDetails, toLifecycleCasePage } from "../mappers/lifecycle-case-mapper";
 import {
   toLifecycleCaseStartDto,
@@ -16,13 +21,48 @@ import {
 } from "../mappers/lifecycle-case-start-mapper";
 import { toLifecycleHistory } from "../mappers/lifecycle-history-mapper";
 import { toLifecycleTaskAssignmentDto } from "../mappers/lifecycle-task-assignment-mapper";
-import {
-  toLifecycleTaskChangeDto,
-  toLifecycleTaskReceipt,
-} from "../mappers/lifecycle-task-change-mapper";
+import { toLifecycleTaskChangeDto } from "../mappers/lifecycle-task-change-mapper";
 
 export class RemoteLifecycleCaseRepository implements LifecycleCaseRepository {
   constructor(private readonly source: LifecycleCaseDataSource) {}
+  cancel(
+    company: CompanyId,
+    operation: OperationId,
+    change: LifecycleCaseChange,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toLifecycleCaseReceipt(
+        await this.source.cancel(
+          company,
+          change.caseId,
+          operation,
+          toLifecycleCaseChangeDto(change),
+          signal,
+        ),
+        change,
+      ),
+    );
+  }
+  completeOnboarding(
+    company: CompanyId,
+    operation: OperationId,
+    change: LifecycleCaseChange,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toLifecycleCaseReceipt(
+        await this.source.completeOnboarding(
+          company,
+          change.caseId,
+          operation,
+          toLifecycleCaseChangeDto(change),
+          signal,
+        ),
+        change,
+      ),
+    );
+  }
   start(
     company: CompanyId,
     operation: OperationId,
@@ -52,7 +92,7 @@ export class RemoteLifecycleCaseRepository implements LifecycleCaseRepository {
     signal: AbortSignal,
   ) {
     return safeHttpCall(signal, async () =>
-      toLifecycleTaskReceipt(
+      toLifecycleCaseReceipt(
         await this.source.assignTask(
           company,
           change.caseId,
@@ -72,7 +112,7 @@ export class RemoteLifecycleCaseRepository implements LifecycleCaseRepository {
     signal: AbortSignal,
   ) {
     return safeHttpCall(signal, async () =>
-      toLifecycleTaskReceipt(
+      toLifecycleCaseReceipt(
         await this.source.changeTask(
           company,
           change.caseId,

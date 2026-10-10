@@ -1,5 +1,7 @@
 import type { AssignLifecycleTask } from "../../domain/usecases/assign-lifecycle-task";
+import type { CancelLifecycleCase } from "../../domain/usecases/cancel-lifecycle-case";
 import type { ChangeLifecycleTask } from "../../domain/usecases/change-lifecycle-task";
+import type { CompleteOnboarding } from "../../domain/usecases/complete-onboarding";
 import type { LoadAssignedLifecycleTasks } from "../../domain/usecases/load-assigned-lifecycle-tasks";
 import type { LoadLifecycleAssignees } from "../../domain/usecases/load-lifecycle-assignees";
 import type { LoadLifecycleCase } from "../../domain/usecases/load-lifecycle-case";
@@ -11,6 +13,8 @@ import type { SaveLifecycleTemplate } from "../../domain/usecases/save-lifecycle
 import type { StartLifecycleCase } from "../../domain/usecases/start-lifecycle-case";
 
 export type LifecycleUseCases = Readonly<{
+  cancelCase: Pick<CancelLifecycleCase, "execute">;
+  completeOnboarding: Pick<CompleteOnboarding, "execute">;
   startCase: Pick<StartLifecycleCase, "execute">;
   loadAssignees: Pick<LoadLifecycleAssignees, "execute">;
   assignTask: Pick<AssignLifecycleTask, "execute">;

@@ -1,5 +1,9 @@
 import type { LifecycleAssigneePageDto } from "../models/lifecycle-assignee-dto";
 import type {
+  LifecycleCaseChangeDto,
+  LifecycleCaseReceiptDto,
+} from "../models/lifecycle-case-change-dto";
+import type {
   AssignedLifecycleTaskPageDto,
   LifecycleCaseDto,
   LifecycleCasePageDto,
@@ -11,12 +15,23 @@ import type {
 } from "../models/lifecycle-case-start-dto";
 import type { LifecycleHistoryPageDto } from "../models/lifecycle-event-dto";
 import type { LifecycleTaskAssignmentDto } from "../models/lifecycle-task-assignment-dto";
-import type {
-  LifecycleTaskChangeDto,
-  LifecycleTaskReceiptDto,
-} from "../models/lifecycle-task-change-dto";
+import type { LifecycleTaskChangeDto } from "../models/lifecycle-task-change-dto";
 
 export interface LifecycleCaseDataSource {
+  cancel(
+    company: string,
+    id: string,
+    operation: string,
+    change: LifecycleCaseChangeDto,
+    signal: AbortSignal,
+  ): Promise<LifecycleCaseReceiptDto>;
+  completeOnboarding(
+    company: string,
+    id: string,
+    operation: string,
+    change: LifecycleCaseChangeDto,
+    signal: AbortSignal,
+  ): Promise<LifecycleCaseReceiptDto>;
   start(
     company: string,
     operation: string,
@@ -36,7 +51,7 @@ export interface LifecycleCaseDataSource {
     operation: string,
     change: LifecycleTaskAssignmentDto,
     signal: AbortSignal,
-  ): Promise<LifecycleTaskReceiptDto>;
+  ): Promise<LifecycleCaseReceiptDto>;
   changeTask(
     company: string,
     id: string,
@@ -44,7 +59,7 @@ export interface LifecycleCaseDataSource {
     operation: string,
     change: LifecycleTaskChangeDto,
     signal: AbortSignal,
-  ): Promise<LifecycleTaskReceiptDto>;
+  ): Promise<LifecycleCaseReceiptDto>;
   list(
     company: string,
     query: LifecycleCaseQuery,

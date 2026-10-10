@@ -3,6 +3,7 @@ import type { MutationReceipt } from "../../../../core/domain/mutation-receipt";
 import type { Result } from "../../../../core/domain/result";
 import type { LifecycleAssigneePage } from "../entities/lifecycle-assignee";
 import type { LifecycleCase, LifecycleCaseId, LifecycleCasePage } from "../entities/lifecycle-case";
+import type { LifecycleCaseChange } from "../entities/lifecycle-case-change";
 import type { LifecycleCaseFilter } from "../entities/lifecycle-case-search";
 import type { LifecycleCaseStart } from "../entities/lifecycle-case-start";
 import type { LifecycleHistoryPage } from "../entities/lifecycle-event";
@@ -11,6 +12,18 @@ import type { LifecycleTaskChange } from "../entities/lifecycle-task-change";
 import type { AssignedLifecycleTaskPage } from "../entities/lifecycle-task-context";
 
 export interface LifecycleCaseRepository {
+  cancel(
+    company: CompanyId,
+    operation: OperationId,
+    change: LifecycleCaseChange,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
+  completeOnboarding(
+    company: CompanyId,
+    operation: OperationId,
+    change: LifecycleCaseChange,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
   start(
     company: CompanyId,
     operation: OperationId,

@@ -779,6 +779,107 @@ test("real API sessions, MFA, organization, people, lifecycle, reports, audit, p
     action: "CREATED",
     reason: "Browser departure checklist",
   });
+  await page.getByRole("button", { name: "Batalkan proses", exact: true }).click();
+  const cancellation = page.getByRole("dialog", { name: "Batalkan proses", exact: true });
+  await cancellation.getByLabel("Alasan", { exact: true }).fill("Browser departure cancelled");
+  const cancelPath = `${caseCreationPath}/${newCaseId}/cancel`;
+  const cancellationWrites: { operation: string | undefined; body: unknown }[] = [];
+  await page.route(`**${cancelPath}`, async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    cancellationWrites.push({
+      operation: route.request().headers()["idempotency-key"],
+      body: route.request().postDataJSON(),
+    });
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toMatchObject({ id: newCaseId, version: 1 });
+    if (cancellationWrites.length === 1) return route.abort("connectionfailed");
+    return route.fulfill({ response });
+  });
+  await cancellation.getByRole("button", { name: "Batalkan proses", exact: true }).click();
+  await expect(cancellation.getByRole("status")).toContainText("Hasil belum terkonfirmasi.");
+  await cancellation.getByRole("button", { name: "Ulangi tindakan awal", exact: true }).click();
+  await expect(cancellation).toHaveCount(0);
+  expect(cancellationWrites).toHaveLength(2);
+  expect(cancellationWrites[1]).toEqual(cancellationWrites[0]);
+  expect(cancellationWrites[0]?.body).toEqual({
+    expectedVersion: 0,
+    reason: "Browser departure cancelled",
+  });
+  await page.unroute(`**${cancelPath}`);
+  const cancelledCase = await (
+    await context.request.get(`${caseCreationPath}/${newCaseId}`)
+  ).json();
+  expect(cancelledCase).toMatchObject({ id: newCaseId, version: 1, status: "CANCELLED" });
+  expect(cancelledCase.tasks).toEqual(createdCase.tasks);
+  const cancelledHistory = await (
+    await context.request.get(`${caseCreationPath}/${newCaseId}/history?after=0`)
+  ).json();
+  expect(cancelledHistory.items).toHaveLength(1);
+  expect(cancelledHistory.items[0]).toMatchObject({
+    version: 1,
+    action: "CANCELLED",
+    reason: "Browser departure cancelled",
+  });
+  await page.getByRole("link", { name: "Proses lifecycle", exact: true }).click();
+  await expect(lifecycleCases.getByRole("row")).toHaveCount(2);
+  await lifecycleCases
+    .getByRole("button", {
+      name: `Buka proses: ${retainedChecklist.employee.name} · ${retainedChecklist.employee.employeeNumber}`,
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Selesaikan onboarding", exact: true }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Lihat tugas: Review equipment", exact: true }).click();
+  await taskDetails.getByLabel("Alasan", { exact: true }).fill("Browser equipment verified");
+  await taskDetails.getByRole("button", { name: "Simpan tugas", exact: true }).click();
+  await expect(taskDetails).toHaveCount(0);
+  await page.getByRole("button", { name: "Selesaikan onboarding", exact: true }).click();
+  const completion = page.getByRole("dialog", { name: "Selesaikan onboarding", exact: true });
+  await completion.getByLabel("Alasan", { exact: true }).fill("Browser onboarding completed");
+  const completionPath = `${taskCasePath}/complete-onboarding`;
+  const completionWrites: { operation: string | undefined; body: unknown }[] = [];
+  await page.route(`**${completionPath}`, async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    completionWrites.push({
+      operation: route.request().headers()["idempotency-key"],
+      body: route.request().postDataJSON(),
+    });
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toMatchObject({ id: transitionId, version: 6 });
+    if (completionWrites.length === 1) return route.abort("connectionfailed");
+    return route.fulfill({ response });
+  });
+  await completion.getByRole("button", { name: "Selesaikan onboarding", exact: true }).click();
+  await expect(completion.getByRole("status")).toContainText("Hasil belum terkonfirmasi.");
+  await completion.getByRole("button", { name: "Ulangi tindakan awal", exact: true }).click();
+  await expect(completion).toHaveCount(0);
+  expect(completionWrites).toHaveLength(2);
+  expect(completionWrites[1]).toEqual(completionWrites[0]);
+  expect(completionWrites[0]?.body).toEqual({
+    expectedVersion: 5,
+    reason: "Browser onboarding completed",
+  });
+  await page.unroute(`**${completionPath}`);
+  const completedCase = await (await context.request.get(taskCasePath)).json();
+  expect(completedCase).toMatchObject({
+    version: 6,
+    status: "COMPLETED",
+    tasks: [{ key: "equipment", status: "DONE", assigneeId: lifecycleActor.account.id }],
+  });
+  const completionHistory = await (
+    await context.request.get(`${taskCasePath}/history?after=4`)
+  ).json();
+  expect(completionHistory.items).toHaveLength(2);
+  expect(completionHistory.items[0]).toMatchObject({ version: 5, action: "TASK_DONE" });
+  expect(completionHistory.items[1]).toMatchObject({
+    version: 6,
+    action: "COMPLETED",
+    reason: "Browser onboarding completed",
+  });
   await page.getByRole("link", { name: "Policy client", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText(
     "Belum ada konfigurasi perusahaan yang disimpan.",

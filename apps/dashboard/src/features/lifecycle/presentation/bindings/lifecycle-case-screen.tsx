@@ -4,11 +4,13 @@ import type { AccountId } from "../../../../core/domain/identifiers";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import { lifecycleCaseActions } from "../../domain/policies/lifecycle-case-change-policy";
 import type { LifecycleUseCases } from "../contracts/lifecycle-use-cases";
 import { LifecycleCaseController } from "../controllers/lifecycle-case-controller";
 import { lifecycleCaseParameters, lifecycleCaseSearch } from "../models/lifecycle-case-route";
 import { lifecycleCaseView, lifecycleTaskView } from "../models/lifecycle-case-view";
 import { LifecycleCasePage } from "../pages/lifecycle-case-page";
+import { LifecycleCaseActionBinding } from "./lifecycle-case-action-binding";
 import { LifecycleHistoryBinding } from "./lifecycle-history-binding";
 import { LifecycleTaskAssignmentBinding } from "./lifecycle-task-assignment-binding";
 import { LifecycleTaskBinding } from "./lifecycle-task-binding";
@@ -98,6 +100,9 @@ function LifecycleCaseBinding(
         : null,
     [state.selectedTask, props.accountId, props.locale, props.timezone],
   );
+  const actions = state.case
+    ? lifecycleCaseActions(props.access, state.case)
+    : { cancel: false, completeOnboarding: false };
   return (
     <>
       <LifecycleCasePage
@@ -111,6 +116,10 @@ function LifecycleCaseBinding(
         onTab={props.onTab}
         onRefresh={controller.refresh}
         onOpenTask={controller.openTask}
+        canCancel={actions.cancel}
+        canCompleteOnboarding={actions.completeOnboarding}
+        onCancel={controller.openCancellation}
+        onCompleteOnboarding={controller.openOnboardingCompletion}
         history={
           state.case && props.tab === "history" ? (
             <LifecycleHistoryBinding
@@ -126,6 +135,22 @@ function LifecycleCaseBinding(
           ) : null
         }
       />
+      {state.case && state.caseAction && (
+        <LifecycleCaseActionBinding
+          access={props.access}
+          actions={props.lifecycle}
+          details={state.case}
+          action={state.caseAction}
+          locale={props.locale}
+          timezone={props.timezone}
+          nextIdentifier={props.nextIdentifier}
+          onClose={controller.closeCaseAction}
+          onReload={() => {
+            controller.closeCaseAction();
+            void controller.refresh();
+          }}
+        />
+      )}
       {state.selectedTask &&
         task &&
         (state.taskPanel === "assignment" ? (

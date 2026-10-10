@@ -9,6 +9,7 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { lifecycleCaseActionMessages } from "../i18n/lifecycle-case-action-messages";
 import { lifecycleCaseMessages } from "../i18n/lifecycle-case-messages";
 import type { LifecycleCaseState } from "../models/lifecycle-case-state";
 import type { lifecycleCaseView } from "../models/lifecycle-case-view";
@@ -25,6 +26,10 @@ export function LifecycleCasePage({
   onTab,
   onRefresh,
   onOpenTask,
+  canCancel,
+  canCompleteOnboarding,
+  onCancel,
+  onCompleteOnboarding,
 }: {
   state: LifecycleCaseState;
   view: ReturnType<typeof lifecycleCaseView> | null;
@@ -37,8 +42,14 @@ export function LifecycleCasePage({
   onTab: (tab: string) => void;
   onRefresh: () => void;
   onOpenTask: (key: string) => void;
+  canCancel: boolean;
+  canCompleteOnboarding: boolean;
+  onCancel: () => void;
+  onCompleteOnboarding: () => void;
 }) {
   const text = lifecycleCaseMessages(locale);
+  const actions = lifecycleCaseActionMessages(locale);
+  const restore = useRestoreFocusTarget();
   return (
     <section aria-busy={state.stage === "loading"}>
       <AppPageHeader
@@ -47,6 +58,23 @@ export function LifecycleCasePage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
+            {tab === "overview" && canCancel && (
+              <>
+                <AppButton {...restore} onClick={onCancel}>
+                  {actions.cancel}
+                </AppButton>
+                {state.case?.kind === "ONBOARDING" && (
+                  <AppButton
+                    {...restore}
+                    onClick={onCompleteOnboarding}
+                    disabled={!canCompleteOnboarding}
+                    title={canCompleteOnboarding ? undefined : actions.pendingTasks}
+                  >
+                    {actions.completeOnboarding}
+                  </AppButton>
+                )}
+              </>
+            )}
             <AppButton
               icon={<ArrowClockwise20Regular />}
               disabled={state.stage === "loading"}
@@ -101,3 +129,5 @@ export function LifecycleCasePage({
     </section>
   );
 }
+
+import { useRestoreFocusTarget } from "@fluentui/react-components";

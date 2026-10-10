@@ -40,6 +40,7 @@ export function LeavePolicyScreen(props: Props) {
       id={policyId}
       historyAfter={historyAfter}
       backTo={backTo}
+      editTo={`/leave/policies/${encodeURIComponent(policyId)}/edit?${directory}`}
       onHistory={(after) => {
         const next = new URLSearchParams(directory);
         if (after !== null) next.set("historyAfter", after);
@@ -57,11 +58,13 @@ function LeavePolicyBinding({
   timezone,
   companyName,
   backTo,
+  editTo,
   onHistory,
 }: Props & {
   id: string;
   historyAfter: string | null;
   backTo: string;
+  editTo: string;
   onHistory: (after: string | null) => void;
 }) {
   const controller = useMemo(
@@ -104,6 +107,7 @@ function LeavePolicyBinding({
       timezone={timezone}
       backTo={backTo}
       firstHistory={historyAfter === null}
+      editTo={state.review ? editTo : null}
       onRefresh={controller.refresh}
       onLatest={() => onHistory(null)}
       onOlder={() => {

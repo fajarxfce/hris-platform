@@ -29,6 +29,11 @@ const LeavePolicyScreen = lazy(() =>
     default: module.LeavePolicyScreen,
   })),
 );
+const LeavePolicyEditorScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-policy-editor-screen").then(
+    (module) => ({ default: module.LeavePolicyEditorScreen }),
+  ),
+);
 
 const LeaveRequestsScreen = lazy(() =>
   import("../../features/leave/presentation/bindings/leave-requests-screen").then((module) => ({
@@ -269,6 +274,40 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/leave/policies/new"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeavePolicyEditorScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              creating={true}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/policies/:policyId/edit"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeavePolicyEditorScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              creating={false}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/leave/policies"
         element={

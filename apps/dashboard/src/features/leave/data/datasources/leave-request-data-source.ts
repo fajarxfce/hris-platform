@@ -1,7 +1,7 @@
 import type { BinaryResponseDto } from "../../../../core/data/http/binary-response-dto";
 import type { LeaveAttachmentDto } from "../models/leave-attachment-dto";
+import type { LeaveReceiptDto } from "../models/leave-receipt-dto";
 import type {
-  LeaveReceiptDto,
   LeaveRequestChangeDto,
   LeaveRequestDecisionDto,
 } from "../models/leave-request-change-dto";

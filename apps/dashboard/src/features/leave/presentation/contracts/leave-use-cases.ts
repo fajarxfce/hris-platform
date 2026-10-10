@@ -6,9 +6,11 @@ import type { LoadLeaveRequest } from "../../domain/usecases/load-leave-request"
 import type { LoadLeaveRequests } from "../../domain/usecases/load-leave-requests";
 import type { RequestLeaveCancellation } from "../../domain/usecases/request-leave-cancellation";
 import type { ReviewLeaveAction } from "../../domain/usecases/review-leave-action";
+import type { SaveLeavePolicy } from "../../domain/usecases/save-leave-policy";
 import type { WithdrawLeaveRequest } from "../../domain/usecases/withdraw-leave-request";
 
 export type LeaveUseCases = Readonly<{
+  savePolicy: Pick<SaveLeavePolicy, "execute">;
   loadPolicies: Pick<LoadLeavePolicies, "execute">;
   loadPolicy: Pick<LoadLeavePolicy, "execute">;
   downloadAttachment: Pick<DownloadLeaveAttachment, "execute">;

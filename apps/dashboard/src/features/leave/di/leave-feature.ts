@@ -12,6 +12,7 @@ import { LoadLeaveRequest } from "../domain/usecases/load-leave-request";
 import { LoadLeaveRequests } from "../domain/usecases/load-leave-requests";
 import { RequestLeaveCancellation } from "../domain/usecases/request-leave-cancellation";
 import { ReviewLeaveAction } from "../domain/usecases/review-leave-action";
+import { SaveLeavePolicy } from "../domain/usecases/save-leave-policy";
 import { WithdrawLeaveRequest } from "../domain/usecases/withdraw-leave-request";
 
 export function createLeaveFeature(
@@ -21,6 +22,7 @@ export function createLeaveFeature(
   const requests = new RemoteLeaveRequestRepository(new HttpLeaveRequestDataSource(http));
   const policies = new RemoteLeavePolicyRepository(new HttpLeavePolicyDataSource(http));
   return {
+    savePolicy: new SaveLeavePolicy(policies),
     loadPolicies: new LoadLeavePolicies(policies),
     loadPolicy: new LoadLeavePolicy(policies),
     downloadAttachment: new DownloadLeaveAttachment(requests, files),

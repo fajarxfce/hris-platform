@@ -7,6 +7,7 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { leavePolicyEditorMessages } from "../i18n/leave-policy-editor-messages";
 import { leavePolicyMessages } from "../i18n/leave-policy-messages";
 import type { LeavePolicyState } from "../models/leave-policy-state";
 import type { leavePolicyRevisionView, leavePolicyView } from "../models/leave-policy-view";
@@ -20,6 +21,7 @@ export function LeavePolicyPage({
   locale,
   timezone,
   backTo,
+  editTo,
   firstHistory,
   onRefresh,
   onLatest,
@@ -34,6 +36,7 @@ export function LeavePolicyPage({
   locale: Locale;
   timezone: string;
   backTo: string;
+  editTo: string | null;
   firstHistory: boolean;
   onRefresh: () => void;
   onLatest: () => void;
@@ -49,6 +52,7 @@ export function LeavePolicyPage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
+            {editTo && <Link to={editTo}>{leavePolicyEditorMessages(locale).edit}</Link>}
             <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
               {messages(locale).refresh}
             </AppButton>

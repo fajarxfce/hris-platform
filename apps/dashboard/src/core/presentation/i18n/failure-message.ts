@@ -6,6 +6,15 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "This leave policy is no longer available.",
     "Kebijakan cuti ini tidak lagi tersedia.",
   ],
+  invalid_leave_policy: ["Check the leave policy fields.", "Periksa isian kebijakan cuti."],
+  invalid_leave_accrual_policy: [
+    "Check the entitlement and carryover limits.",
+    "Periksa hak cuti dan batas carryover.",
+  ],
+  leave_type_code_immutable: [
+    "The policy code cannot be changed. Load its current version.",
+    "Kode kebijakan tidak dapat diubah. Muat versi terbarunya.",
+  ],
   leave_attachment_not_found: [
     "This evidence is no longer accessible. Refresh the request.",
     "Bukti ini tidak lagi dapat diakses. Muat ulang permintaan.",

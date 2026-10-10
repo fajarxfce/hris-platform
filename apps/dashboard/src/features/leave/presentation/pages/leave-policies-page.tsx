@@ -1,4 +1,5 @@
 import { Text } from "@fluentui/react-components";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
 import { AppLoading } from "../../../../core/presentation/components/app-loading";
@@ -7,6 +8,7 @@ import { AppResourceTable } from "../../../../core/presentation/components/app-r
 import { AppSelect } from "../../../../core/presentation/components/app-select";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useLeavePolicyFilters } from "../controllers/use-leave-policy-filters";
+import { leavePolicyEditorMessages } from "../i18n/leave-policy-editor-messages";
 import { leavePolicyMessages } from "../i18n/leave-policy-messages";
 import type { LeavePoliciesState } from "../models/leave-policies-state";
 import type { leavePoliciesView } from "../models/leave-policy-view";
@@ -17,6 +19,7 @@ export function LeavePoliciesPage({
   companyName,
   locale,
   filters,
+  createTo,
   firstPage,
   onRefresh,
   onFirst,
@@ -28,6 +31,7 @@ export function LeavePoliciesPage({
   companyName: string;
   locale: Locale;
   filters: ReturnType<typeof useLeavePolicyFilters>;
+  createTo: string | null;
   firstPage: boolean;
   onRefresh: () => void;
   onFirst: () => void;
@@ -41,9 +45,12 @@ export function LeavePoliciesPage({
         title={text.title}
         context={companyName}
         actions={
-          <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
-            {messages(locale).refresh}
-          </AppButton>
+          <>
+            {createTo && <Link to={createTo}>{leavePolicyEditorMessages(locale).create}</Link>}
+            <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
+              {messages(locale).refresh}
+            </AppButton>
+          </>
         }
       />
       <AppFailure failure={state.failure} locale={locale} />

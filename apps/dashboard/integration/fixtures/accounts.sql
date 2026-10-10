@@ -22,14 +22,19 @@ SELECT fixture.id::uuid, fixture.email, fixture.name, bootstrap.password_hash
 FROM accounts bootstrap
 CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000003', 'browser-leave-admin@example.invalid', 'Browser Leave Admin'),
-  ('a0000000-0000-4000-8000-000000000004', 'browser-leave-reviewer@example.invalid', 'Browser Leave Reviewer')
+  ('a0000000-0000-4000-8000-000000000004', 'browser-leave-reviewer@example.invalid', 'Browser Leave Reviewer'),
+  ('a0000000-0000-4000-8000-000000000005', 'browser-policy-admin@example.invalid', 'Browser Policy Admin')
 ) AS fixture(id, email, name)
 WHERE bootstrap.email = 'browser-admin@example.invalid'
 ON CONFLICT DO NOTHING;
 
 INSERT INTO platform_permissions(account_id, permission)
-SELECT 'a0000000-0000-4000-8000-000000000003', permission
+SELECT fixture.account_id::uuid, permission
 FROM platform_permissions
-WHERE account_id = (SELECT id FROM accounts WHERE email = 'browser-admin@example.invalid')
+CROSS JOIN (VALUES
+  ('a0000000-0000-4000-8000-000000000003'),
+  ('a0000000-0000-4000-8000-000000000005')
+) AS fixture(account_id)
+WHERE platform_permissions.account_id = (SELECT id FROM accounts WHERE email = 'browser-admin@example.invalid')
 ON CONFLICT DO NOTHING;
 COMMIT;

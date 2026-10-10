@@ -1,10 +1,10 @@
 import { binaryResponseDto } from "../../../../core/data/http/binary-response-dto";
 import type { HttpClient } from "../../../../core/data/http/http-client";
 import type { LeaveAttachmentDto } from "../models/leave-attachment-dto";
-import {
-  type LeaveRequestChangeDto,
-  type LeaveRequestDecisionDto,
-  leaveReceiptDto,
+import { leaveReceiptDto } from "../models/leave-receipt-dto";
+import type {
+  LeaveRequestChangeDto,
+  LeaveRequestDecisionDto,
 } from "../models/leave-request-change-dto";
 import { leaveRequestDetailsDto } from "../models/leave-request-details-dto";
 import { leaveRequestPageDto } from "../models/leave-request-summary-dto";

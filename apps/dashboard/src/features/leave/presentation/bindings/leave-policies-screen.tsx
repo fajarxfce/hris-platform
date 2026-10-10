@@ -5,6 +5,7 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { LeavePolicyQuery } from "../../domain/entities/leave-policy-definition";
+import { canManageLeavePolicies } from "../../domain/policies/leave-read-policy";
 import type { LeaveUseCases } from "../contracts/leave-use-cases";
 import { LeavePoliciesController } from "../controllers/leave-policies-controller";
 import { useLeavePolicyFilters } from "../controllers/use-leave-policy-filters";
@@ -78,6 +79,11 @@ function LeavePoliciesBinding({
       companyName={companyName}
       locale={locale}
       filters={filters}
+      createTo={
+        canManageLeavePolicies(access.permissions)
+          ? `/leave/policies/new?${leavePolicyParameters(access.companyId, query)}`
+          : null
+      }
       firstPage={query.after === null}
       onRefresh={controller.refresh}
       onFirst={() => onQuery({ ...query, after: null })}

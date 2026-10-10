@@ -1,7 +1,7 @@
 import { InvalidHttpResponseError } from "../../../../core/data/http/http-response-error";
 import type { MutationReceipt } from "../../../../core/domain/mutation-receipt";
 import type { LeaveRequestChange } from "../../domain/entities/leave-request-action";
-import type { LeaveReceiptDto } from "../models/leave-request-change-dto";
+import type { LeaveReceiptDto } from "../models/leave-receipt-dto";
 
 export function toLeaveReceipt(
   receipt: LeaveReceiptDto,

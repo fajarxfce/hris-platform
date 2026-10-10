@@ -2,6 +2,26 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_employment_revision: [
+    "Choose a valid employment revision.",
+    "Pilih revisi employment yang valid.",
+  ],
+  invalid_revision_cancellation: [
+    "Check the revision and reload its current version.",
+    "Periksa revisi dan muat ulang versi terbarunya.",
+  ],
+  employment_revision_not_found: [
+    "The employment revision is unavailable.",
+    "Revisi employment tidak tersedia.",
+  ],
+  revision_already_cancelled: [
+    "This revision has already been cancelled. Reload its details.",
+    "Revisi ini sudah dibatalkan. Muat ulang detailnya.",
+  ],
+  effective_revision_cannot_be_cancelled: [
+    "This revision has already taken effect and cannot be cancelled.",
+    "Revisi ini sudah berlaku dan tidak dapat dibatalkan.",
+  ],
   invalid_employment_change: [
     "Check the employment terms and use the latest version.",
     "Periksa data employment dan gunakan versi terbaru.",
@@ -19,8 +39,8 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Employment ini ditutup oleh transfer perusahaan.",
   ],
   reporting_cycle_or_depth: [
-    "The manager selection creates a reporting cycle or exceeds the hierarchy limit.",
-    "Pilihan manager membentuk siklus pelaporan atau melewati batas hierarki.",
+    "This employment change creates a reporting cycle or exceeds the hierarchy limit.",
+    "Perubahan employment membentuk siklus pelaporan atau melewati batas hierarki.",
   ],
   invalid_employee_creation: [
     "Check the employee and assignment details.",

@@ -1,6 +1,8 @@
 import type { Page } from "@playwright/test";
+import type { EmploymentCancellationDto } from "../src/features/people/data/models/employment-cancellation-dto";
 import type { EmploymentChangeDto } from "../src/features/people/data/models/employment-change-dto";
 import type { AssignedEmploymentTermsDto } from "../src/features/people/data/models/employment-details-dto";
+import type { EmploymentRevisionDto } from "../src/features/people/data/models/employment-revision-dto";
 import { companyIds, installIdentityApi } from "./identity-api";
 
 export const employmentId = "40000000-0000-4000-8000-000000000001";
@@ -50,7 +52,9 @@ export async function installEmploymentApi(
     mfaVerified: true,
     permissions,
   });
-  const histories = companyIds.map(() => [
+  const histories: (Omit<EmploymentRevisionDto, "terms"> & {
+    terms: AssignedEmploymentTermsDto;
+  })[][] = companyIds.map(() => [
     {
       revision: 0,
       terms: initialTerms,
@@ -74,6 +78,14 @@ export async function installEmploymentApi(
     csrf: string | undefined;
     body: EmploymentChangeDto;
   }[] = [];
+  const cancellations: {
+    company: string;
+    revision: number;
+    operation: string | undefined;
+    csrf: string | undefined;
+    body: EmploymentCancellationDto;
+  }[] = [];
+  let companyDate = "2026-10-01";
   const receipts = new Map<string, { payload: string; receipt: { id: string; version: number } }>();
   let rejection: string | null = null;
   let lost = false;
@@ -107,6 +119,13 @@ export async function installEmploymentApi(
     const company = url.pathname.split("/")[4] ?? "";
     const id = url.pathname.split("/")[6];
     const action = url.pathname.split("/")[7];
+    const selectedRevision = url.pathname.split("/")[8];
+    const selected =
+      selectedRevision === undefined
+        ? null
+        : histories[(companyIds as readonly string[]).indexOf(company)]?.find(
+            (item) => item.revision === Number(selectedRevision),
+          );
     const index = (companyIds as readonly string[]).indexOf(company);
     const history = histories[index];
     const version = versions[index];
@@ -114,10 +133,32 @@ export async function installEmploymentApi(
       return route.fulfill({ status: 404, json: { code: "employee_not_found" } });
     if (request.method() === "GET") {
       reads.push(url);
+      if (action === "revisions") {
+        if (!selected)
+          return route.fulfill({ status: 404, json: { code: "employment_revision_not_found" } });
+        const response = structuredClone({
+          employeeId: employmentId,
+          version,
+          companyDate,
+          revision: selected,
+          canCancel:
+            selected.revision > 0 &&
+            selected.cancellation === null &&
+            selected.terms.effectiveFrom > companyDate,
+        });
+        const waiting = held?.kind === "read" ? held.gate : null;
+        if (waiting) {
+          held = null;
+          waiting.enter();
+          await waiting.held;
+        }
+        if (readFailure) return route.fulfill({ status: 503, json: { code: readFailure } });
+        return route.fulfill({ json: response });
+      }
       const asOf = url.searchParams.get("asOf") ?? "2026-10-01";
       const applied =
         history
-          .filter((item) => item.terms.effectiveFrom <= asOf)
+          .filter((item) => item.cancellation === null && item.terms.effectiveFrom <= asOf)
           .toSorted(
             (a, b) =>
               b.terms.effectiveFrom.localeCompare(a.terms.effectiveFrom) || b.revision - a.revision,
@@ -185,6 +226,56 @@ export async function installEmploymentApi(
       return route.fulfill({ json: response });
     }
     if (request.method() !== "POST" || action !== "revisions") return route.fallback();
+    if (url.pathname.endsWith("/cancel") && selectedRevision) {
+      const body = request.postDataJSON() as EmploymentCancellationDto;
+      const operation = request.headers()["idempotency-key"];
+      cancellations.push({
+        company,
+        revision: Number(selectedRevision),
+        operation,
+        csrf: request.headers()["x-csrf-token"],
+        body,
+      });
+      if (rejection) {
+        const code = rejection;
+        rejection = null;
+        return route.fulfill({ status: 409, json: { code, detail: "PRIVATE TECHNICAL ERROR" } });
+      }
+      const key = `${company}:cancel:${operation}`;
+      const payload = JSON.stringify({ revision: selectedRevision, body });
+      let saved = receipts.get(key);
+      if (saved && saved.payload !== payload)
+        return route.fulfill({ status: 409, json: { code: "operation_payload_mismatch" } });
+      if (!saved) {
+        if (body.expectedVersion !== version)
+          return route.fulfill({ status: 409, json: { code: "stale_version" } });
+        if (!selected)
+          return route.fulfill({ status: 404, json: { code: "employment_revision_not_found" } });
+        if (selected.cancellation)
+          return route.fulfill({ status: 409, json: { code: "revision_already_cancelled" } });
+        if (selected.revision === 0 || selected.terms.effectiveFrom <= companyDate)
+          return route.fulfill({
+            status: 409,
+            json: { code: "effective_revision_cannot_be_cancelled" },
+          });
+        selected.cancellation = { reason: body.reason, recordedAt: "2026-10-01T00:00:00Z" };
+        versions[index] = version + 1;
+        saved = { payload, receipt: { id: employmentId, version: version + 1 } };
+        receipts.set(key, saved);
+        commits += 1;
+      }
+      const waiting = held?.kind === "save" ? held.gate : null;
+      if (waiting) {
+        held = null;
+        waiting.enter();
+        await waiting.held;
+      }
+      if (lost) {
+        lost = false;
+        return route.abort("failed");
+      }
+      return route.fulfill({ json: saved.receipt });
+    }
     const body = request.postDataJSON() as EmploymentChangeDto;
     const operation = request.headers()["idempotency-key"];
     writes.push({ company, operation, csrf: request.headers()["x-csrf-token"], body });
@@ -229,6 +320,10 @@ export async function installEmploymentApi(
     identity,
     reads,
     writes,
+    cancellations,
+    setCompanyDate: (date: string) => {
+      companyDate = date;
+    },
     get commits() {
       return commits;
     },

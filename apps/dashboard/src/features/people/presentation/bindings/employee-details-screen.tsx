@@ -53,6 +53,7 @@ export function EmployeeDetailsScreen(props: Props) {
       {...props}
       id={employeeId}
       asOf={search.asOf}
+      today={today}
       backTo={backTo}
       editEmploymentTo={
         canManageEmployment(props.access.permissions)
@@ -91,6 +92,7 @@ function EmployeeDetailsBinding({
   locale,
   id,
   asOf,
+  today,
   backTo,
   profileTo,
   editEmploymentTo,
@@ -101,6 +103,7 @@ function EmployeeDetailsBinding({
 }: Props & {
   id: string;
   asOf: string;
+  today: string;
   backTo: string;
   profileTo: string | null;
   editEmploymentTo: string | null;
@@ -145,6 +148,8 @@ function EmployeeDetailsBinding({
           loadHistory={people.loadEmploymentHistory}
           id={id}
           after={after}
+          asOf={asOf}
+          today={today}
           locale={locale}
           onPage={onHistoryPage}
           onScopeFailure={controller.reportScopeFailure}

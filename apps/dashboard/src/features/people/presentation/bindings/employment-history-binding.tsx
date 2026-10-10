@@ -2,6 +2,7 @@ import { useEffect, useMemo, useSyncExternalStore } from "react";
 import type { Failure } from "../../../../core/domain/result";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import { canReviewEmploymentCancellation } from "../../domain/policies/employment-cancellation-policy";
 import type { PeopleUseCases } from "../contracts/people-use-cases";
 import { EmploymentHistoryController } from "../controllers/employment-history-controller";
 import { employmentHistoryView, employmentRevisionView } from "../models/employment-history-view";
@@ -12,6 +13,8 @@ export function EmploymentHistoryBinding({
   loadHistory,
   id,
   after,
+  asOf,
+  today,
   locale,
   onPage,
   onScopeFailure,
@@ -20,6 +23,8 @@ export function EmploymentHistoryBinding({
   loadHistory: PeopleUseCases["loadEmploymentHistory"];
   id: string;
   after: string | null;
+  asOf: string;
+  today: string;
   locale: Locale;
   onPage: (after: string | null) => void;
   onScopeFailure: (failure: Failure) => void;
@@ -53,6 +58,11 @@ export function EmploymentHistoryBinding({
       state={state}
       rows={rows}
       revision={revision}
+      cancelTo={
+        state.selected && canReviewEmploymentCancellation(access.permissions, state.selected, today)
+          ? `/people/employees/${encodeURIComponent(id)}/revisions/${state.selected.revision}/cancel?${new URLSearchParams({ company: access.companyId, asOf })}`
+          : null
+      }
       locale={locale}
       firstPage={after === null}
       onRefresh={controller.refresh}

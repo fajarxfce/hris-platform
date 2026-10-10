@@ -286,7 +286,8 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
   await expect(page.getByLabel("Tanggal mulai", { exact: true })).toHaveValue("2026-01-01");
   await expect(page.getByText("HQ · Browser office", { exact: true })).toBeVisible();
   await expect(page.getByText("RND · R&D_100%", { exact: true })).toBeVisible();
-  await page.getByLabel("Berlaku sejak", { exact: true }).fill("2026-11-01");
+  const employmentEffectiveDate = `${new Date().getUTCFullYear() + 1}-01-01`;
+  await page.getByLabel("Berlaku sejak", { exact: true }).fill(employmentEffectiveDate);
   await page.getByRole("combobox", { name: "Status", exact: true }).selectOption("SUSPENDED");
   await page.getByLabel("Alasan", { exact: true }).fill("Approved browser employment change");
   const revisionAttempts: { operation: string | undefined; payload: string | null }[] = [];
@@ -316,7 +317,7 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
     employee: { version: 1, appliedRevision: 0, terms: { status: "ACTIVE" } },
   });
   await page.getByRole("link", { name: "Lihat detail", exact: true }).click();
-  await expect(page).toHaveURL(/asOf=2026-11-01/u);
+  await expect(page).toHaveURL(new RegExp(`asOf=${employmentEffectiveDate}`, "u"));
   await expect(page.getByRole("region", { name: "Employment", exact: true })).toContainText(
     "Ditangguhkan",
   );
@@ -325,6 +326,50 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
   await employmentHistory.getByRole("button", { name: "Lihat detail: 1", exact: true }).click();
   await expect(page.getByRole("dialog", { name: "Detail revisi", exact: true })).toContainText(
     "Approved browser employment change",
+  );
+  await page.getByRole("button", { name: "Tutup", exact: true }).click();
+  await employmentHistory.getByRole("button", { name: "Lihat detail: 1", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "Detail revisi", exact: true })
+    .getByRole("link", { name: "Tinjau pembatalan", exact: true })
+    .click();
+  await expect(page.getByRole("region", { name: "Revisi", exact: true })).toContainText(
+    "Approved browser employment change",
+  );
+  await page.getByLabel("Alasan pembatalan", { exact: true }).fill("Cancelled browser schedule");
+  const cancellationAttempts: { operation: string | undefined; payload: string | null }[] = [];
+  await page.route("**/api/v1/companies/*/employees/*/revisions/*/cancel", async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    cancellationAttempts.push({
+      operation: route.request().headers()["idempotency-key"],
+      payload: route.request().postData(),
+    });
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toEqual({ id: employeeId, version: 2 });
+    if (cancellationAttempts.length === 1) await route.abort("failed");
+    else await route.fulfill({ response });
+  });
+  await page.getByRole("button", { name: "Batalkan revisi", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Hasil pembatalan belum terkonfirmasi");
+  await page.getByRole("button", { name: "Coba pembatalan kembali", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Revisi employment dibatalkan.");
+  expect(cancellationAttempts).toHaveLength(2);
+  expect(cancellationAttempts[1]).toEqual(cancellationAttempts[0]);
+  const effectiveAfterCancellation = await context.request.get(
+    `/api/v1/companies/${companies[1]}/employees/${employeeId}?asOf=${employmentEffectiveDate}`,
+  );
+  expect(effectiveAfterCancellation.status()).toBe(200);
+  expect(await effectiveAfterCancellation.json()).toMatchObject({
+    version: 2,
+    appliedRevision: 0,
+    terms: { status: "ACTIVE" },
+  });
+  await page.getByRole("link", { name: "Lihat riwayat", exact: true }).click();
+  await expect(employmentHistory.getByRole("row")).toHaveCount(3);
+  await employmentHistory.getByRole("button", { name: "Lihat detail: 1", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Detail revisi", exact: true })).toContainText(
+    "Cancelled browser schedule",
   );
   await page.getByRole("button", { name: "Tutup", exact: true }).click();
   await page.getByRole("link", { name: "Laporan", exact: true }).click();
@@ -355,10 +400,10 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
   await page.getByLabel("ID resource", { exact: true }).fill(employeeId);
   await page.getByRole("button", { name: "Terapkan", exact: true }).click();
   const audit = page.getByRole("table", { name: "Event", exact: true });
-  await expect(audit.getByRole("row")).toHaveCount(3);
+  await expect(audit.getByRole("row")).toHaveCount(4);
   await audit
     .getByRole("row")
-    .filter({ hasText: "people.employment_revised" })
+    .filter({ hasText: "people.revision_cancelled" })
     .getByRole("button", { name: /^Lihat detail:/u })
     .click();
   const details = page.getByRole("dialog", { name: "Event audit", exact: true });

@@ -5,16 +5,46 @@ import {
 } from "../models/employee-creation-dto";
 import { employeeDto, employeePageDto } from "../models/employee-dto";
 import type { EmployeeSearchDto } from "../models/employee-search-dto";
+import type { EmploymentCancellationDto } from "../models/employment-cancellation-dto";
 import {
   type EmploymentChangeDto,
   employmentChangeReceiptDto,
 } from "../models/employment-change-dto";
 import { employmentDetailsDto } from "../models/employment-details-dto";
+import { employmentRevisionDetailsDto } from "../models/employment-revision-details-dto";
 import { employmentHistoryPageDto } from "../models/employment-revision-dto";
 import type { EmployeeDataSource } from "./employee-data-source";
 
 export class HttpEmployeeDataSource implements EmployeeDataSource {
   constructor(private readonly http: HttpClient) {}
+  async revision(companyId: string, id: string, revision: number, signal: AbortSignal) {
+    return employmentRevisionDetailsDto.parse(
+      await this.http.request(
+        { path: `/api/v1/companies/${companyId}/employees/${id}/revisions/${revision}` },
+        signal,
+      ),
+    );
+  }
+  async cancelRevision(
+    companyId: string,
+    id: string,
+    revision: number,
+    operation: string,
+    input: EmploymentCancellationDto,
+    signal: AbortSignal,
+  ) {
+    return employmentChangeReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${companyId}/employees/${id}/revisions/${revision}/cancel`,
+          method: "POST",
+          operationId: operation,
+          body: input,
+        },
+        signal,
+      ),
+    );
+  }
   async details(companyId: string, id: string, asOf: string, signal: AbortSignal) {
     const query = new URLSearchParams({ asOf });
     return employmentDetailsDto.parse(

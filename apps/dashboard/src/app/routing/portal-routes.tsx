@@ -62,6 +62,11 @@ const PersonProfileScreen = lazy(() =>
     default: module.PersonProfileScreen,
   })),
 );
+const EmploymentCancellationScreen = lazy(() =>
+  import("../../features/people/presentation/bindings/employment-cancellation-screen").then(
+    (module) => ({ default: module.EmploymentCancellationScreen }),
+  ),
+);
 
 const HeadcountScreen = lazy(() =>
   import("../../features/reporting/presentation/bindings/headcount-screen").then((module) => ({
@@ -110,6 +115,22 @@ export function PortalRoutes({
   return (
     <Routes>
       <Route path="/" element={<OverviewPage company={company} locale={locale} />} />
+      <Route
+        path="/people/employees/:employeeId/revisions/:revision/cancel"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <EmploymentCancellationScreen
+              accountId={accountId}
+              access={access}
+              people={people}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/people/employees/:employeeId/employment/edit"
         element={

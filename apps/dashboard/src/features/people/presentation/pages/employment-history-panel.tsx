@@ -1,5 +1,6 @@
 import { Text } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppDetailsPanel } from "../../../../core/presentation/components/app-details-panel";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -7,6 +8,7 @@ import { AppLoading } from "../../../../core/presentation/components/app-loading
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { employmentCancellationMessages } from "../i18n/employment-cancellation-messages";
 import { peopleMessages } from "../i18n/people-messages";
 import type { EmploymentHistoryState } from "../models/employment-history-state";
 import type {
@@ -18,6 +20,7 @@ export function EmploymentHistoryPanel({
   state,
   rows,
   revision,
+  cancelTo,
   locale,
   firstPage,
   onRefresh,
@@ -29,6 +32,7 @@ export function EmploymentHistoryPanel({
   state: EmploymentHistoryState;
   rows: ReturnType<typeof employmentHistoryView>;
   revision: ReturnType<typeof employmentRevisionView> | null;
+  cancelTo: string | null;
   locale: Locale;
   firstPage: boolean;
   onRefresh: () => void;
@@ -87,6 +91,7 @@ export function EmploymentHistoryPanel({
         onClose={onClose}
       >
         {revision && <AppPropertyList title={text.revision} items={revision} />}
+        {cancelTo && <Link to={cancelTo}>{employmentCancellationMessages(locale).review}</Link>}
       </AppDetailsPanel>
     </section>
   );

@@ -60,6 +60,8 @@ Whole-day policies require whole-day entitlement and carry limits. The carry lim
 
 A closed year cannot receive a new leave reservation, grant, adjustment, or cancellation refund. Request detail hides cancellation when its charged year has closed. A correction to a closed period needs a separate adjustment workflow; there is no endpoint that reopens or rewrites the old account. Current company, membership, credential, and employee binding are checked before a mutation or its original receipt is returned.
 
+Balance/ledger and entitlement views, independent adjustments, per-employee accrual posting, and year closing also validate current MFA after waiting for their resource and access guards. Expired assurance requires renewal before returning data, committing an effect, or recovering an existing receipt. An earlier successful admission check is insufficient for a later transaction result.
+
 `LEAVE_BALANCES` synchronization exposes owned account IDs and versions, with `/leave/balances/{id}` as the canonical read. It never sends ledger reasons in the change feed. Clients must refresh the account and discard older late responses. Registering the collection changes the authorized scope fingerprint, so previously issued employee cursors must re-bootstrap.
 
 ## Company entitlement batches

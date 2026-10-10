@@ -48,6 +48,7 @@ class LeaveConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         PostEmployeeLeaveAccrual(
             ledger,
@@ -61,6 +62,7 @@ class LeaveConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -77,6 +79,7 @@ class LeaveConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         requests: LeaveRequestRepository,
+        security: IdentitySecurityPolicy,
     ) =
         CloseEmployeeLeaveYear(
             ledger,
@@ -91,6 +94,7 @@ class LeaveConfiguration {
             transactions,
             clock,
             requests,
+            security,
         )
 
     @Bean
@@ -102,7 +106,18 @@ class LeaveConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetLeaveAccount(ledger, people, companies, members, identities, transactions, clock)
+        security: IdentitySecurityPolicy,
+    ) =
+        GetLeaveAccount(
+            ledger,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun getLeaveEntitlements(
@@ -115,6 +130,7 @@ class LeaveConfiguration {
         clock: Clock,
         entitlements: LeaveEntitlementRepository,
         policies: LeavePolicyRepository,
+        security: IdentitySecurityPolicy,
     ) =
         GetLeaveEntitlements(
             ledger,
@@ -126,6 +142,7 @@ class LeaveConfiguration {
             clock,
             entitlements,
             policies,
+            security,
         )
 
     @Bean
@@ -210,6 +227,7 @@ class LeaveConfiguration {
         companies: CompanyRepository,
         members: MembershipRepository,
         identities: IdentityRepository,
+        security: IdentitySecurityPolicy,
     ) =
         AdjustLeaveBalance(
             ledger,
@@ -222,6 +240,7 @@ class LeaveConfiguration {
             companies,
             members,
             identities,
+            security,
         )
 
     @Bean
@@ -234,6 +253,7 @@ class LeaveConfiguration {
         companies: CompanyRepository,
         members: MembershipRepository,
         identities: IdentityRepository,
+        security: IdentitySecurityPolicy,
     ) =
         GetLeaveLedger(
             ledger,
@@ -244,6 +264,7 @@ class LeaveConfiguration {
             companies,
             members,
             identities,
+            security,
         )
 
     @Bean

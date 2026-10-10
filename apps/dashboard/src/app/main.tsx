@@ -35,8 +35,9 @@ const leave = createLeaveFeature(http, files);
 const organization = createOrganizationFeature(http);
 const people = createPeopleFeature(http, files);
 const lifecycle = createLifecycleFeature(http);
+const identityFeature = createIdentityFeature(http);
 const identity = new IdentityController(
-  createIdentityFeature(http),
+  identityFeature,
   () => crypto.randomUUID() as OperationId,
   () => queries.clear(),
 );
@@ -50,6 +51,7 @@ const router = createBrowserRouter([
         <Application
           clientBuild={__HRIS_DASHBOARD_BUILD__}
           identity={identity}
+          identityAdministration={identityFeature}
           reporting={reporting}
           administration={administration}
           approvals={approvals}

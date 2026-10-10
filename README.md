@@ -18,7 +18,7 @@ Requires JDK 21, Docker, and Python 3.
 
 See [development](docs/development.md) for Docker access, migrations, and local runtime configuration.
 
-The dashboard requires Node.js 24 or newer. From `apps/dashboard`, run `npm ci`, then `npm run dev`. Its development proxy forwards same-origin API and SSO requests to the backend on port 8080. See [dashboard](docs/dashboard.md) for implemented screens and checks.
+The dashboard requires Node.js 24 or newer. From `apps/dashboard`, run `npm ci`, then `HRIS_API_PROXY=http://127.0.0.1:8088 npm run dev` for the Compose API. The development proxy forwards same-origin API and SSO requests; its default port 8080 also supports a backend started directly with Gradle. See [dashboard](docs/dashboard.md) for implemented screens and checks.
 
 ## Documentation
 

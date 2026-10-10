@@ -662,3 +662,25 @@ account/company ownership, cancellation, bounded pages, and in-place MFA renewal
 Its full check, Android dev build, and Wasm compilation passed; nine people
 domain/data tests and seven app UI tests passed. Device validation is recorded
 separately and remains pending.
+
+## Mobile sessions and company account review
+
+HRIS Mobile now lists native device sessions, confirms revocation of another
+session, and attempts server revocation before clearing the originating local
+identity. Token rotation cannot prevent local logout, and a late action cannot
+clear a replacement account. Cancellation finishes an admitted local deletion;
+a lost remote response does not claim successful server revocation. The generic
+identity-scoped storage contract and regression tests were also ported to Compose
+Fluent Starter. Mobile workspace checks, Android dev build, Wasm compilation,
+nine session-policy tests, three transport tests, and nine application-flow tests
+passed. A disposable family on the local API returned 204 on revocation and both
+its access and refresh tokens were subsequently rejected with 401. Physical-device
+acceptance remains pending.
+
+The dashboard provides company-account directories and versioned grant review.
+The company/cursor own each bounded page; detail reads expose direct permissions
+and applied role snapshots independently of employee profiles. Architecture checks,
+661 unit tests, build, and four targeted browser tests passed. The live development
+browser also completed password/MFA authentication, real membership reads, and
+logout. The WireGuard dashboard is available at the configured VPN interface on
+port 5173, with the API proxy targeting the loopback Compose port 8088.

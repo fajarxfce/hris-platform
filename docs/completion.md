@@ -11,9 +11,9 @@ workflow must enforce current scope, handle response loss and cancellation,
 provide localized errors, and pass the relevant real API and UI checks.
 
 Mobile native password sign-in, MFA enrollment/verification, recovery acknowledgement,
-secure refresh, company selection, current access, product flavors, localizable API
+secure refresh, device-session management and remote logout, company selection, current access, product flavors, localizable API
 problems, restrained navigation transitions, and self-profile/assignment reads are connected in
-[the mobile application](https://github.com/fajarxfce/hris-mobile/commit/39dc8dc).
+[the mobile application](https://github.com/fajarxfce/hris-mobile/commit/64dc2ab).
 Automated UI/API checks and the Android dev build passed. Physical device validation
 and the employee workflows below remain separate acceptance work.
 
@@ -21,7 +21,7 @@ and the employee workflows below remain separate acceptance work.
 
 | Area | Remaining end-to-end work |
 | --- | --- |
-| Mobile identity | Remote session revocation/management, native OIDC handoff, physical device validation |
+| Mobile identity | Native OIDC handoff, physical device validation |
 | Mobile foundation | Encrypted company/account cache, HRIS sync and durable outbox, availability, background execution, deep links and push registration |
 | People | Dashboard account binding and company transfers; scheduled lifecycle execution |
 | Workforce | Dashboard shifts, schedules, rosters, holidays, attendance reviews/corrections, overtime and closing; bulk/reset and late corrections; mobile calendar, verified/offline attendance and overtime requests |
@@ -30,7 +30,7 @@ and the employee workflows below remain separate acceptance work.
 | Expenses | Dashboard policies, claims, review, payment/reconciliation and corrections; mobile claims, receipts, submission and payment progress |
 | Payroll | Dashboard policies, compensation, inputs, calculation, review, finalization, payslips, payments and amendments; mobile finalized payslips and downloads |
 | Communications | Dashboard audience groups, drafts, previews, schedules, publication and recovery; mobile inbox, acknowledgement and push hints |
-| Identity administration | Dashboard users, roles, memberships, invitations, provider bindings and sessions |
+| Identity administration | Dashboard platform users, role/membership changes, invitations, provider bindings and sessions; company membership and grant review is implemented |
 | Reporting | Attendance, leave, overtime, expenses and payroll reports, authorized bounded exports and export history |
 | Operations | Integration status, backup/restore verification, reference-workload measurements, deployment and complete run instructions |
 

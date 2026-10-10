@@ -10,6 +10,7 @@ import type {
   CompanyAccess,
   CompanyMembership,
 } from "../../features/identity/domain/entities/session";
+import type { IdentityAdministrationUseCases } from "../../features/identity/presentation/contracts/identity-administration-use-cases";
 import type { JobsUseCases } from "../../features/jobs/presentation/contracts/jobs-use-cases";
 import type { LeaveUseCases } from "../../features/leave/presentation/contracts/leave-use-cases";
 import type { LifecycleUseCases } from "../../features/lifecycle/presentation/contracts/lifecycle-use-cases";
@@ -18,6 +19,17 @@ import { OverviewPage } from "../../features/overview/presentation/pages/overvie
 import type { PeopleUseCases } from "../../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../../features/reporting/presentation/contracts/reporting-use-cases";
 import { approvalResourceRoute } from "./approval-resource-route";
+
+const CompanyMembersScreen = lazy(() =>
+  import("../../features/identity/presentation/bindings/company-members-screen").then((module) => ({
+    default: module.CompanyMembersScreen,
+  })),
+);
+const CompanyMemberScreen = lazy(() =>
+  import("../../features/identity/presentation/bindings/company-member-screen").then((module) => ({
+    default: module.CompanyMemberScreen,
+  })),
+);
 
 const LeaveBalancesScreen = lazy(() =>
   import("../../features/leave/presentation/bindings/leave-balances-screen").then((module) => ({
@@ -266,6 +278,7 @@ const ClientPolicyEditorScreen = lazy(() =>
 export function PortalRoutes({
   clientBuild,
   accountId,
+  identityAdministration,
   company,
   companies,
   access,
@@ -282,6 +295,7 @@ export function PortalRoutes({
 }: {
   clientBuild: number;
   accountId: AccountId;
+  identityAdministration: IdentityAdministrationUseCases;
   company: CompanyMembership | null;
   companies: readonly CompanyMembership[];
   access: CompanyAccess | null;
@@ -299,6 +313,34 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/administration/members"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <CompanyMembersScreen
+              accountId={accountId}
+              access={access}
+              actions={identityAdministration}
+              companyName={company.name}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/administration/members/:memberId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <CompanyMemberScreen
+              accountId={accountId}
+              access={access}
+              actions={identityAdministration}
+              companyName={company.name}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/leave/employees/:employeeId/balances/adjust"
         element={

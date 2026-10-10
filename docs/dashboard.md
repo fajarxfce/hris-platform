@@ -344,3 +344,27 @@ The form records an independent adjustment in nonzero half-day increments, up to
 A definite version conflict disables saving until an explicit new review. Re-review preserves the amount/reason and requires another save; it never resubmits automatically. Access or assurance failures hide the private review. One immutable command and operation ID survive an ambiguous outcome, including a later MFA or version rejection. Only its original receipt acknowledges that outcome. The receipt identifies an immutable ledger movement at version zero, not a new balance version; the success link loads the current balance separately.
 
 Drafts, pending writes, and unconfirmed outcomes use the workspace departure guard. Account/company replacement and disposal abort owned work and suppress late results. Equivalent verification, language, and theme changes retain the form without starting another command. Commands remain in memory; browser cancellation does not reverse a server commit or provide durable offline recovery.
+
+## Company account review
+
+`/administration/members` lists the active company's accounts with separate global
+account and company-access status. Each page contains at most 50 accounts; the exact
+company and cursor live in the URL. Details read the observed membership version,
+effective/direct permissions, and the immutable applied role versions. Changing a
+role elsewhere does not rewrite the displayed membership snapshot. The API's
+`active` field maps explicitly to domain `membershipActive`.
+
+The feature requires `identity.manage`, uses the feature's datasource/repository/use-case
+boundaries, and acquires no employee profiles. Account/company changes and disposal
+cancel reads; refresh and failed access remove prior accounts and grants. Repeated
+or malformed cursors, duplicate identities, wrong-account details, and oversized
+payloads are rejected. Language/theme changes only reformat the current snapshot.
+Account creation, role/membership changes, invitations, and employee linkage are
+separate commands.
+
+Validation includes the dashboard architecture checks, 661 unit tests, production
+build, and four browser scenarios for pagination, responsive/localized views, denied
+access, refresh failures, and pending reads during a company change. A separate
+browser exercised password sign-in, MFA, directory/detail reads, and logout against
+the local server using fictional development data. Both membership reads returned
+200. No external invitations or messages were sent.

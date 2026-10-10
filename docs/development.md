@@ -14,6 +14,17 @@ Run ./gradlew format to format handwritten Kotlin. Architecture checks run with 
 
 Copy .env.example to .env and generate distinct secrets. Run docker compose up --build -d after building both application jars. PostgreSQL and API bind localhost only. A migration container owns schema changes; runtime receives only hris_app credentials without superuser/BYPASSRLS. For private Garage/ClamAV services, follow [document service configuration](storage.md#private-document-services) and include `compose.documents.yml`. TLS deployment is configured separately.
 
+For a dashboard on a private WireGuard interface, run from `apps/dashboard`:
+
+```sh
+HRIS_API_PROXY=http://127.0.0.1:8088 npm run dev -- --host 10.77.77.1 --port 5173 --strictPort
+```
+
+Use the server's actual VPN address. The dashboard and its same-origin API proxy
+are then available on that interface; the database and direct API remain on
+loopback. Local HTTP development uses `HRIS_SECURE_COOKIES=false` in the ignored
+environment file. Deployed environments retain secure cookies and HTTPS.
+
 Changing a secret in .env does not rotate an existing PostgreSQL role password. Rotate credentials explicitly, preserving the named volume. Never delete the database volume to apply an application upgrade.
 
 ## Validation records

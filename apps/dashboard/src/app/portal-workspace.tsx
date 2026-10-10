@@ -75,6 +75,7 @@ export function PortalWorkspace(
                 <PortalRoutes
                   clientBuild={props.clientBuild}
                   accountId={state.workspace.accountId}
+                  identityAdministration={props.identityAdministration}
                   companies={state.workspace.companies}
                   access={state.workspace.access}
                   reporting={props.reporting}

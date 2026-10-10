@@ -1,0 +1,53 @@
+import type { Locale } from "../../../../core/presentation/i18n/messages";
+
+export function companyMemberMessages(locale: Locale) {
+  return locale === "id"
+    ? {
+        title: "Akun perusahaan",
+        directory: "Daftar akun",
+        name: "Nama",
+        email: "Email",
+        account: "Status akun",
+        membership: "Akses perusahaan",
+        active: "Aktif",
+        inactive: "Nonaktif",
+        empty: "Belum ada akun dalam perusahaan ini.",
+        view: "Lihat akses",
+        first: "Halaman pertama",
+        next: "Halaman berikutnya",
+        page: "Halaman akun",
+        back: "Kembali ke akun",
+        details: "Akses akun",
+        identifier: "ID akun",
+        version: "Versi",
+        direct: "Permission langsung",
+        effective: "Permission efektif",
+        roles: "Role yang diterapkan",
+        none: "Tidak ada",
+        roleVersion: "Versi role",
+      }
+    : {
+        title: "Company accounts",
+        directory: "Account directory",
+        name: "Name",
+        email: "Email",
+        account: "Account status",
+        membership: "Company access",
+        active: "Active",
+        inactive: "Inactive",
+        empty: "No accounts in this company.",
+        view: "View access",
+        first: "First page",
+        next: "Next page",
+        page: "Account pagination",
+        back: "Back to accounts",
+        details: "Account access",
+        identifier: "Account ID",
+        version: "Version",
+        direct: "Direct permissions",
+        effective: "Effective permissions",
+        roles: "Applied roles",
+        none: "None",
+        roleVersion: "Role version",
+      };
+}

@@ -17,7 +17,7 @@ export default defineConfig({
   webServer: [
     {
       command: "python3 ../../tool/dashboard_backend_fixture.py",
-      url: "http://127.0.0.1:18080/api/v1/auth/csrf",
+      wait: { stdout: /Browser API fixture ready;/u },
       reuseExistingServer: false,
       timeout: 120_000,
       gracefulShutdown: { signal: "SIGTERM", timeout: 30_000 },

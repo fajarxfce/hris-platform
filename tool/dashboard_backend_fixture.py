@@ -10,6 +10,8 @@ import signal
 import subprocess
 import sys
 import time
+from urllib.error import URLError
+from urllib.request import urlopen
 
 
 root = Path(__file__).resolve().parents[1]
@@ -21,8 +23,8 @@ logs = root / ".work/dashboard-integration"
 environment_file = logs / "postgres.env"
 
 
-def command(arguments):
-    return subprocess.run(arguments, text=True, capture_output=True, check=True, timeout=90).stdout.strip()
+def command(arguments, *, input=None):
+    return subprocess.run(arguments, input=input, text=True, capture_output=True, check=True, timeout=90).stdout.strip()
 
 
 def stop(_signal, _frame):
@@ -86,7 +88,35 @@ def main():
     }
     with (logs / "backend.log").open("w") as output:
         api = subprocess.Popen(["java", "-jar", str(jar)], env=environment, stdout=output, stderr=subprocess.STDOUT)
-        print("Started isolated browser API fixture; diagnostics: .work/dashboard-integration/backend.log", flush=True)
+        # Wait for the bootstrap transaction before provisioning separate scenario accounts.
+        # All setup is limited to the container owned by this process.
+        sql = docker + ["exec", "-i", container, "psql", "-U", "fixture_migrator", "-d", "hris_browser", "-v", "ON_ERROR_STOP=1"]
+        deadline = time.monotonic() + 90
+        while time.monotonic() < deadline:
+            if api.poll() is not None:
+                raise RuntimeError("Fixture API exited during account setup")
+            ready = subprocess.run(sql + ["-Atqc", "SELECT count(*) FROM accounts a JOIN platform_permissions p ON p.account_id=a.id WHERE a.email='browser-admin@example.invalid' AND p.permission='identity.manage'"], text=True, capture_output=True, timeout=5)
+            if ready.returncode == 0 and ready.stdout.strip() == "1":
+                break
+            time.sleep(0.5)
+        else:
+            raise RuntimeError("Fixture account setup timed out")
+        command(sql, input=(root / "apps/dashboard/integration/fixtures/accounts.sql").read_text())
+        deadline = time.monotonic() + 30
+        while time.monotonic() < deadline:
+            if api.poll() is not None:
+                raise RuntimeError("Fixture API exited during readiness check")
+            try:
+                with urlopen("http://127.0.0.1:18080/api/v1/auth/csrf", timeout=2) as response:
+                    if response.status == 200:
+                        response.read(4096)
+                        break
+            except (URLError, TimeoutError):
+                pass
+            time.sleep(0.5)
+        else:
+            raise RuntimeError("Fixture API readiness timed out")
+        print("Browser API fixture ready; diagnostics: .work/dashboard-integration/backend.log", flush=True)
         deadline = time.monotonic() + 600
         while time.monotonic() < deadline:
             if api.poll() is not None:

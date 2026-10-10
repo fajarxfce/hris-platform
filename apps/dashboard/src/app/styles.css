@@ -386,7 +386,8 @@ a {
   gap: 8px;
 }
 .app-lifecycle-template-editor,
-.app-approval-template-editor {
+.app-approval-template-editor,
+.app-approval-delegation-editor {
   gap: 20px;
 }
 .app-lifecycle-template-editor .app-page-header,
@@ -394,11 +395,15 @@ a {
 .app-lifecycle-template-editor h2,
 .app-approval-template-editor .app-page-header,
 .app-approval-template-editor p,
-.app-approval-template-editor h2 {
+.app-approval-template-editor h2,
+.app-approval-delegation-editor .app-page-header,
+.app-approval-delegation-editor p,
+.app-approval-delegation-editor h2 {
   margin: 0;
 }
 .app-lifecycle-template-editor .app-editor-form,
-.app-approval-template-editor .app-editor-form {
+.app-approval-template-editor .app-editor-form,
+.app-approval-delegation-editor .app-editor-form {
   margin-top: 0;
   gap: 20px;
 }
@@ -477,10 +482,12 @@ a {
   overflow-wrap: anywhere;
 }
 
-.app-approval-template-editor {
+.app-approval-template-editor,
+.app-approval-delegation-editor {
   max-width: 1080px;
 }
-.app-approval-template-editor .app-editor-form {
+.app-approval-template-editor .app-editor-form,
+.app-approval-delegation-editor .app-editor-form {
   min-width: 0;
 }
 .app-approval-accounts {

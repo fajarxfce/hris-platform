@@ -6,6 +6,7 @@ import {
   Home20Regular,
   Organization20Regular,
   People20Regular,
+  PeopleSwap20Regular,
   Settings20Regular,
   TaskListSquareLtr20Regular,
 } from "@fluentui/react-icons";
@@ -19,6 +20,7 @@ import {
   canManageApprovals,
   canReadApprovalInbox,
 } from "../../features/approvals/domain/policies/approval-read-policy";
+import { approvalDelegationMessages } from "../../features/approvals/presentation/i18n/approval-delegation-messages";
 import { approvalMessages } from "../../features/approvals/presentation/i18n/approval-messages";
 import { approvalTemplateMessages } from "../../features/approvals/presentation/i18n/approval-template-messages";
 import type { CompanyAccess } from "../../features/identity/domain/entities/session";
@@ -54,6 +56,15 @@ export function portalNavigation(
             to: "/approvals",
             label: approvalMessages(locale).title,
             icon: <ApprovalsApp20Regular />,
+          },
+        ]
+      : []),
+    ...(canReadApprovalInbox(permissions)
+      ? [
+          {
+            to: "/approvals/delegations",
+            label: approvalDelegationMessages(locale).title,
+            icon: <PeopleSwap20Regular />,
           },
         ]
       : []),

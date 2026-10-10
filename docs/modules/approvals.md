@@ -43,7 +43,7 @@ Policy selection reads at most 201 active effective templates, and delegated dec
 
 ## Dashboard
 
-The [approval inbox and stage review](../dashboard.md#approval-inbox-and-request-stages) and [template administration](../dashboard.md#approval-template-administration) are implemented. Templates support effective-date filters, exact rule revisions, ordered stages, bounded approver lookup, protected editing, and explicit receipt recovery. Delegation management, reassignment, decision history, and business-specific review actions remain subsequent workflows.
+The [approval inbox and stage review](../dashboard.md#approval-inbox-and-request-stages) and [template administration](../dashboard.md#approval-template-administration) are implemented. Templates support effective-date filters, exact rule revisions, ordered stages, bounded approver lookup, protected editing, and explicit receipt recovery. [Owned delegation management](../dashboard.md#approval-delegations) is also implemented. Reassignment, decision history, and business-specific review actions remain subsequent workflows.
 
 ## Administration detail and assignee lookup
 
@@ -52,3 +52,6 @@ The [approval inbox and stage review](../dashboard.md#approval-inbox-and-request
 `GET /approvals/delegations/{id}` requires `approvals.read` and ownership as delegator/recipient, or `approvals.manage`. Exact details remain available after deactivation or expiry. Missing, foreign-company, and unowned records use the same not-found result. Both detail readers hold the shared approval/access guards and check live MFA after waiting.
 
 `GET /approvals/assignees?kind=...&query=...&after=...&limit=...` returns only `{id, displayName}` references. The caller needs `approvals.manage`, or `approvals.read` plus the decision permission for the selected kind. The query is limited to 120 characters and pages to 200 entries. Results require an active company membership, active account, and a matching decision permission. Lookup uses shared company/membership/account access guards and never acquires or returns email addresses, credentials, or permission lists. A lookup result does not authorize a future assignment: business commands still check current access, request ownership, and maker exclusions.
+
+
+The dashboard now also provides owned delegation lists, retained details, and versioned creation/editing. The delegator or an authorized administrator may edit; recipients have read access only. Company timezone input resolves to UTC explicitly, and an unchanged stored instant retains its precision. The server remains authoritative for live account eligibility, expiry, concurrent versions, and the 90-day elapsed-time limit. Inactive records may retain revoked local account references so they can be disabled without inventing a replacement approver.

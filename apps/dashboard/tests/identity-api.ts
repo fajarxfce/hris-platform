@@ -16,6 +16,7 @@ export async function installIdentityApi(
     failLogin?: string;
     noCompanies?: boolean;
     permissions?: readonly string[];
+    timezone?: string;
   } = {},
 ) {
   let signedIn = options.signedIn ?? false;
@@ -88,7 +89,7 @@ export async function installIdentityApi(
                 id,
                 code: index === 0 ? "NORTH" : "SOUTH",
                 name: index === 0 ? "North Company" : "South Company",
-                timezone: "Asia/Jakarta",
+                timezone: options.timezone ?? "Asia/Jakarta",
               })),
         permissions: [],
         assurance: {

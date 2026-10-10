@@ -488,6 +488,26 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Enter an amount in decimal notation.",
     "Masukkan nominal dalam format desimal.",
   ],
+  invalid_delegation: [
+    "Check both accounts, the reason, and a period of up to 90 days. An enabled delegation must end in the future.",
+    "Periksa kedua akun, alasan, dan periode maksimal 90 hari. Delegasi yang diaktifkan harus berakhir setelah waktu saat ini.",
+  ],
+  delegator_immutable: [
+    "The delegator changed. Reload the current delegation.",
+    "Pemberi delegasi berubah. Muat ulang delegasi terkini.",
+  ],
+  approval_delegation_not_found: [
+    "The delegation is unavailable in this company.",
+    "Delegasi tidak tersedia di perusahaan ini.",
+  ],
+  approval_delegation_limit: [
+    "An account has reached its delegation limit. Review existing delegations.",
+    "Akun telah mencapai batas delegasi. Periksa delegasi yang ada.",
+  ],
+  approval_delegation_capacity: [
+    "An account has reached its enabled delegation limit. Disable an existing delegation first.",
+    "Akun telah mencapai batas delegasi yang diaktifkan. Nonaktifkan delegasi yang ada terlebih dahulu.",
+  ],
   invalid_approval_template: [
     "Check the template name, dates, amount, stages, and reason.",
     "Periksa nama template, tanggal, nominal, tahap, dan alasan.",

@@ -17,6 +17,22 @@ import { OverviewPage } from "../../features/overview/presentation/pages/overvie
 import type { PeopleUseCases } from "../../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../../features/reporting/presentation/contracts/reporting-use-cases";
 
+const ApprovalDelegationsScreen = lazy(() =>
+  import("../../features/approvals/presentation/bindings/approval-delegations-screen").then(
+    (module) => ({ default: module.ApprovalDelegationsScreen }),
+  ),
+);
+const ApprovalDelegationScreen = lazy(() =>
+  import("../../features/approvals/presentation/bindings/approval-delegation-screen").then(
+    (module) => ({ default: module.ApprovalDelegationScreen }),
+  ),
+);
+const ApprovalDelegationEditorScreen = lazy(() =>
+  import("../../features/approvals/presentation/bindings/approval-delegation-editor-screen").then(
+    (module) => ({ default: module.ApprovalDelegationEditorScreen }),
+  ),
+);
+
 const ApprovalTemplatesScreen = lazy(() =>
   import("../../features/approvals/presentation/bindings/approval-templates-screen").then(
     (module) => ({ default: module.ApprovalTemplatesScreen }),
@@ -216,6 +232,70 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/approvals/delegations"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ApprovalDelegationsScreen
+              accountId={accountId}
+              access={access}
+              approvals={approvals}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/approvals/delegations/:delegationId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ApprovalDelegationScreen
+              accountId={accountId}
+              access={access}
+              approvals={approvals}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/approvals/delegations/new"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ApprovalDelegationEditorScreen
+              accountId={accountId}
+              access={access}
+              approvals={approvals}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              creating={true}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/approvals/delegations/:delegationId/edit"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ApprovalDelegationEditorScreen
+              accountId={accountId}
+              access={access}
+              approvals={approvals}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              creating={false}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/approvals/templates"
         element={

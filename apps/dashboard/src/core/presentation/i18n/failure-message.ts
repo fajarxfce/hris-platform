@@ -2,6 +2,22 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  person_profile_not_found: [
+    "The profile was not found or is no longer accessible.",
+    "Profil tidak ditemukan atau tidak dapat diakses.",
+  ],
+  profile_owner_required: [
+    "Edit this profile from its owning company.",
+    "Edit profil melalui perusahaan pemiliknya.",
+  ],
+  invalid_person: [
+    "Check the highlighted personal details.",
+    "Periksa data pribadi yang ditandai.",
+  ],
+  invalid_profile_change: [
+    "Enter a reason of up to 1,000 characters and use the latest profile version.",
+    "Masukkan alasan maksimal 1.000 karakter dan gunakan versi profil terbaru.",
+  ],
   invalid_organization_unit: [
     "Enter a name and a code of 2–32 letters, numbers, underscores or hyphens.",
     "Masukkan nama dan kode 2–32 huruf, angka, underscore, atau tanda hubung.",

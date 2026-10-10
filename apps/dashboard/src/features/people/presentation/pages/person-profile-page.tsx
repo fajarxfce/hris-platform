@@ -1,5 +1,4 @@
-import { Text } from "@fluentui/react-components";
-import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Text, useRestoreFocusTarget } from "@fluentui/react-components";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
@@ -9,87 +8,88 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
-import { peopleMessages } from "../i18n/people-messages";
 import { personProfileMessages } from "../i18n/person-profile-messages";
-import type { EmployeeDetailsState } from "../models/employee-details-state";
-import type { employeeDetailsView } from "../models/employee-view";
+import type { PersonProfileState } from "../models/person-profile-state";
+import type { personProfileView } from "../models/person-profile-view";
 
-export function EmployeeDetailsPage({
+export function PersonProfilePage({
   state,
   view,
   companyName,
   locale,
   backTo,
-  profileTo,
+  editTo,
+  owned,
   tab,
   canReadHistory,
   history,
   onTab,
   onRefresh,
 }: {
-  state: EmployeeDetailsState;
-  view: ReturnType<typeof employeeDetailsView> | null;
+  state: PersonProfileState;
+  view: ReturnType<typeof personProfileView> | null;
   companyName: string;
   locale: Locale;
   backTo: string;
-  profileTo: string | null;
+  editTo: string | null;
+  owned: boolean;
   tab: "overview" | "history";
   canReadHistory: boolean;
   history: ReactNode;
   onTab: (tab: string) => void;
   onRefresh: () => void;
 }) {
-  const text = peopleMessages(locale);
-  const shared = messages(locale);
+  const text = personProfileMessages(locale);
+  const restore = useRestoreFocusTarget();
   return (
     <section aria-busy={state.stage === "loading"}>
       <AppPageHeader
-        title={state.employee?.legalName ?? text.details}
+        title={state.profile?.legalName ?? text.title}
         context={`${companyName} / ${text.title}`}
         actions={
           <>
-            <Link to={backTo}>{text.back}</Link>
-            {profileTo && state.employee && (
-              <Link to={profileTo}>{personProfileMessages(locale).title}</Link>
+            <Link {...restore} to={backTo}>
+              {text.back}
+            </Link>
+            {editTo && (
+              <Link {...restore} to={editTo}>
+                {text.edit}
+              </Link>
             )}
-            {(tab === "overview" || state.employee === null) && (
-              <AppButton
-                icon={<ArrowClockwise20Regular />}
-                disabled={state.stage === "loading"}
-                onClick={onRefresh}
-              >
-                {shared.refresh}
+            {(tab === "overview" || state.profile === null) && (
+              <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
+                {messages(locale).refresh}
               </AppButton>
             )}
           </>
         }
       />
       <AppFailure failure={state.failure} locale={locale} />
-      {state.stage === "loading" && <AppLoading label={shared.loading} />}
+      {state.stage === "loading" && <AppLoading label={messages(locale).loading} />}
       {view && (
         <>
           <AppTabs
-            id="employee"
+            id="person-profile"
             label={text.sections}
+            selected={tab}
+            onSelected={onTab}
             tabs={[
               { id: "overview", label: text.overview },
               ...(canReadHistory ? [{ id: "history", label: text.history }] : []),
             ]}
-            selected={tab}
-            onSelected={onTab}
           />
           <div
             className="app-report-content app-tab-panel"
-            id="employee-panel"
+            id="person-profile-panel"
             role="tabpanel"
-            aria-labelledby={`employee-tab-${tab}`}
+            aria-labelledby={`person-profile-tab-${tab}`}
           >
             {tab === "history" ? (
               history
             ) : (
               <>
-                <AppPropertyList title={text.employment} items={view} />
-                <Text className="app-muted">{text.profileNote}</Text>
+                <AppPropertyList title={text.privateData} items={view} />
+                {!owned && <Text className="app-muted">{text.ownerNote}</Text>}
               </>
             )}
           </div>

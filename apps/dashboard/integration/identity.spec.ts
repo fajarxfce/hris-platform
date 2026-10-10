@@ -203,6 +203,42 @@ test("real API sessions, MFA, organization, people, reports, audit, policy, jobs
   await expect(
     page.getByRole("heading", { name: "Report fixture employee", exact: true }),
   ).toBeVisible();
+  await page.getByRole("link", { name: "Profil pribadi", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Data pribadi", exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Edit profil", exact: true }).click();
+  await page.getByLabel("Tanggal lahir", { exact: true }).fill("1995-06-07");
+  await page.getByLabel("Email", { exact: true }).fill("profile@internal");
+  await page
+    .getByLabel("Alasan perubahan", { exact: true })
+    .fill("Verified browser profile correction");
+  await page.getByRole("button", { name: "Simpan", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Profil tersimpan.");
+  await page.getByRole("link", { name: "Lihat profil", exact: true }).click();
+  const profileResponse = await context.request.get(
+    `/api/v1/companies/${companies[1]}/employees/${employeeId}/profile`,
+  );
+  expect(profileResponse.status()).toBe(200);
+  const profileSnapshot = await profileResponse.json();
+  expect(profileSnapshot).toMatchObject({
+    version: 1,
+    birthDate: "1995-06-07",
+    email: "profile@internal",
+  });
+  expect(profileSnapshot.personId).not.toBe(employeeId);
+  const employmentResponse = await context.request.get(
+    `/api/v1/companies/${companies[1]}/employees/${employeeId}?asOf=2026-10-01`,
+  );
+  expect(employmentResponse.status()).toBe(200);
+  expect(await employmentResponse.json()).toMatchObject({ version: 0, appliedRevision: 0 });
+  await page.getByRole("tab", { name: "Riwayat profil", exact: true }).click();
+  const profileHistory = page.getByRole("table", { name: "Riwayat profil", exact: true });
+  await expect(profileHistory.getByRole("row")).toHaveCount(3);
+  await profileHistory.getByRole("button", { name: "Lihat revisi: 1", exact: true }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Detail revisi profil", exact: true }),
+  ).toContainText("Verified browser profile correction");
+  await page.getByRole("button", { name: "Tutup", exact: true }).click();
+  await page.getByRole("link", { name: "Kembali", exact: true }).click();
   await expect(page.getByRole("region", { name: "Employment", exact: true })).toContainText(
     "BROWSER-REPORT",
   );

@@ -5,6 +5,7 @@ import { companyDate } from "../../../../core/presentation/dates/company-date";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import { canReadEmploymentHistory } from "../../domain/policies/employee-policy";
+import { canReadPersonProfile } from "../../domain/policies/person-profile-policy";
 import type { PeopleUseCases } from "../contracts/people-use-cases";
 import { EmployeeDetailsController } from "../controllers/employee-details-controller";
 import {
@@ -52,6 +53,11 @@ export function EmployeeDetailsScreen(props: Props) {
       id={employeeId}
       asOf={search.asOf}
       backTo={backTo}
+      profileTo={
+        canReadPersonProfile(props.access.permissions)
+          ? `/people/employees/${encodeURIComponent(employeeId)}/profile?${employeeSearchParameters(search, props.access.companyId)}`
+          : null
+      }
       tab={tab}
       after={parameters.get("historyAfter")}
       onTab={(selected) => {
@@ -80,6 +86,7 @@ function EmployeeDetailsBinding({
   id,
   asOf,
   backTo,
+  profileTo,
   tab,
   after,
   onTab,
@@ -88,6 +95,7 @@ function EmployeeDetailsBinding({
   id: string;
   asOf: string;
   backTo: string;
+  profileTo: string | null;
   tab: EmployeeTab;
   after: string | null;
   onTab: (tab: string) => void;
@@ -117,6 +125,7 @@ function EmployeeDetailsBinding({
       companyName={companyName}
       locale={locale}
       backTo={backTo}
+      profileTo={profileTo}
       tab={tab}
       canReadHistory={canReadEmploymentHistory(access.permissions)}
       onTab={onTab}

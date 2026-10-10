@@ -480,7 +480,46 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "This page is no longer available for these filters. Reset the filters to start again.",
     "Halaman tidak tersedia untuk filter ini. Reset filter untuk memulai kembali.",
   ],
-  invalid_revision: ["Enter a revision from 0 to 9999.", "Masukkan revisi dari 0 hingga 9999."],
+  invalid_revision: [
+    "Enter a valid non-negative revision number.",
+    "Masukkan nomor revisi nonnegatif yang valid.",
+  ],
+  invalid_decimal_amount: [
+    "Enter an amount in decimal notation.",
+    "Masukkan nominal dalam format desimal.",
+  ],
+  invalid_approval_template: [
+    "Check the template name, dates, amount, stages, and reason.",
+    "Periksa nama template, tanggal, nominal, tahap, dan alasan.",
+  ],
+  invalid_approval_stage: [
+    "Check the assignment and approvers for each stage.",
+    "Periksa penugasan dan approver pada setiap tahap.",
+  ],
+  approval_template_not_found: [
+    "The approval template or revision was not found.",
+    "Template approval atau revisinya tidak ditemukan.",
+  ],
+  approval_kind_immutable: [
+    "The approval type cannot be changed. Reload the current template.",
+    "Jenis approval tidak dapat diubah. Muat ulang template terkini.",
+  ],
+  approver_unavailable: [
+    "An approver is no longer available. Review the selected accounts.",
+    "Approver tidak lagi tersedia. Periksa akun yang dipilih.",
+  ],
+  payroll_approval_assignment_invalid: [
+    "Payroll stages require selected accounts or payroll review permission.",
+    "Tahap payroll memerlukan akun pilihan atau permission review payroll.",
+  ],
+  approval_template_limit: [
+    "The company has reached the approval template limit.",
+    "Jumlah template approval perusahaan telah mencapai batas.",
+  ],
+  approval_policy_capacity: [
+    "The approval policy has reached its capacity. Contact an administrator.",
+    "Kapasitas kebijakan approval telah tercapai. Hubungi administrator.",
+  ],
   invalid_pagination: [
     "This page link is invalid. Return to the first page.",
     "Link halaman tidak valid. Kembali ke halaman pertama.",

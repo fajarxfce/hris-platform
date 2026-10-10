@@ -17,6 +17,22 @@ import { OverviewPage } from "../../features/overview/presentation/pages/overvie
 import type { PeopleUseCases } from "../../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../../features/reporting/presentation/contracts/reporting-use-cases";
 
+const ApprovalTemplatesScreen = lazy(() =>
+  import("../../features/approvals/presentation/bindings/approval-templates-screen").then(
+    (module) => ({ default: module.ApprovalTemplatesScreen }),
+  ),
+);
+const ApprovalTemplateScreen = lazy(() =>
+  import("../../features/approvals/presentation/bindings/approval-template-screen").then(
+    (module) => ({ default: module.ApprovalTemplateScreen }),
+  ),
+);
+const ApprovalTemplateEditorScreen = lazy(() =>
+  import("../../features/approvals/presentation/bindings/approval-template-editor-screen").then(
+    (module) => ({ default: module.ApprovalTemplateEditorScreen }),
+  ),
+);
+
 const ApprovalInboxScreen = lazy(() =>
   import("../../features/approvals/presentation/bindings/approval-inbox-screen").then((module) => ({
     default: module.ApprovalInboxScreen,
@@ -200,6 +216,70 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/approvals/templates"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ApprovalTemplatesScreen
+              accountId={accountId}
+              access={access}
+              approvals={approvals}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/approvals/templates/:templateId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ApprovalTemplateScreen
+              accountId={accountId}
+              access={access}
+              approvals={approvals}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/approvals/templates/new"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ApprovalTemplateEditorScreen
+              accountId={accountId}
+              access={access}
+              approvals={approvals}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              creating={true}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/approvals/templates/:templateId/edit"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ApprovalTemplateEditorScreen
+              accountId={accountId}
+              access={access}
+              approvals={approvals}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              creating={false}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/approvals"
         element={

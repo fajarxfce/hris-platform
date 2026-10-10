@@ -385,15 +385,20 @@ a {
   align-items: center;
   gap: 8px;
 }
-.app-lifecycle-template-editor {
+.app-lifecycle-template-editor,
+.app-approval-template-editor {
   gap: 20px;
 }
 .app-lifecycle-template-editor .app-page-header,
 .app-lifecycle-template-editor p,
-.app-lifecycle-template-editor h2 {
+.app-lifecycle-template-editor h2,
+.app-approval-template-editor .app-page-header,
+.app-approval-template-editor p,
+.app-approval-template-editor h2 {
   margin: 0;
 }
-.app-lifecycle-template-editor .app-editor-form {
+.app-lifecycle-template-editor .app-editor-form,
+.app-approval-template-editor .app-editor-form {
   margin-top: 0;
   gap: 20px;
 }
@@ -470,4 +475,26 @@ a {
   align-content: start;
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.app-approval-template-editor {
+  max-width: 1080px;
+}
+.app-approval-template-editor .app-editor-form {
+  min-width: 0;
+}
+.app-approval-accounts {
+  display: grid;
+  gap: 8px;
+  padding-inline-start: 20px;
+}
+.app-approval-accounts li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.app-approval-accounts .app-reference {
+  flex: 1;
+  min-width: 0;
 }

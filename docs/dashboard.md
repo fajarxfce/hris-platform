@@ -255,3 +255,13 @@ The browser starts a bounded text download without a retained object URL. Its st
 Pages retain company-bound cursors and acquire at most twenty requests. Invalid or non-progressing pages, mismatched identifiers, oversized assignments, and malformed timestamps become safe failures. Controllers cancel superseded reads and clear snapshots during refresh, access failure, and disposal. Company replacement discards the previous request and cursor. Screens support English/Indonesian, dark mode, and contained mobile tables.
 
 This view does not issue a generic approval decision. Leave, expense, overtime, and payroll workflows own their decisions and atomic business consequences. The displayed stages are the current assignment projection, not an invented decision history.
+
+## Approval template administration
+
+`/approvals/templates` requires `approvals.manage`. Its twenty-item pages retain company, approval kind, effective date, and cursor. Detail links expose exact rule revisions. Current name, active status, and editable version are distinguished from the selected rules revision; editing always fetches the latest configuration. Cross-company navigation discards the previous record and cursor.
+
+The editor supports up to eight ordered manager, named-account, or permission stages. Payroll excludes manager assignment. Changing a new template's approval kind resets incompatible stages. Named stages select up to twenty-five accounts through a cancellable, ten-item lookup; only active company accounts with the relevant decision permission are returned. Account identifiers are retained when reopening a saved definition. Display names are lookup labels and never enter mutation payloads.
+
+Amounts remain decimal strings throughout transport and presentation, including values beyond JavaScript's exact integer range. Expense and payroll thresholds are IDR; leave and overtime selection uses zero. Dates, category codes, stage assignments, reason, observed version, and operation identity are validated before delivery. The backend remains authoritative for eligibility, capacity, access, and policy selection.
+
+Each save owns a detached, immutable submission. Unknown outcomes retain the same payload and operation through explicit retry, MFA renewal, and subsequent conflict replies; verification does not automatically retry a write. A definite initial conflict requires a protected reload. Unsaved or unresolved work participates in the shared navigation guard. Superseded reads and closed account pickers are aborted, and late replies cannot repopulate a disposed or different-company screen. No automatic polling or browser persistence is added.

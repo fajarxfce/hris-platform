@@ -163,7 +163,9 @@ test("invalid and missing revisions recover explicitly without automatic retries
   await installIdentityApi(page, { signedIn: true, permissions });
   const api = await installPolicies(page);
   await page.goto(`${path}?version=10000`);
-  await expect(page.getByRole("alert")).toContainText("Enter a revision from 0 to 9999.");
+  await expect(page.getByRole("alert")).toContainText(
+    "Enter a valid non-negative revision number.",
+  );
   expect(api.requests).toEqual([]);
   await page.getByRole("button", { name: "Latest revision", exact: true }).click();
   await expect(page.getByRole("region", { name: "Effective policy", exact: true })).toBeVisible();

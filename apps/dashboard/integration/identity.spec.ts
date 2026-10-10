@@ -2,6 +2,7 @@ import { createHmac, randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 import type { EmployeeImportStartDto } from "../src/features/people/data/models/employee-import-start-dto";
+import { reviewApprovalTemplate } from "./approval-template";
 
 function authenticatorCode(secret: string): string {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
@@ -16,7 +17,7 @@ function authenticatorCode(secret: string): string {
   return ((digest.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).toString().padStart(6, "0");
 }
 
-test("real API sessions, MFA, organization, people, lifecycle, reports, audit, policy, jobs and logout", async ({
+test("real API sessions, MFA, approvals, organization, people, lifecycle, reports, audit, policy, jobs and logout", async ({
   page,
   context,
 }) => {
@@ -64,6 +65,7 @@ test("real API sessions, MFA, organization, people, lifecycle, reports, audit, p
     .selectOption(companies[1] ?? "");
   await expect(page.getByRole("main")).toContainText("Browser South");
   await expect(page.getByRole("main")).not.toContainText("Browser North");
+  await reviewApprovalTemplate(page, context, companies);
   await page.getByRole("combobox", { name: "Language" }).selectOption("id");
   await expect(page.getByRole("heading", { name: "Ringkasan" })).toBeVisible();
   let csrf = (await (await context.request.get("/api/v1/auth/csrf")).json()) as {

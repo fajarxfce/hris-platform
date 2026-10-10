@@ -6,7 +6,8 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.documents.domain.entities.*
 import dev.fajar.hris.documents.domain.policies.*
 import dev.fajar.hris.documents.domain.repositories.DocumentRepository
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.leave.domain.policies.canReadLeaveRequest
@@ -26,6 +27,7 @@ class GetLeaveAttachmentDownload(
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(actor: Actor, requestId: UUID, revisionId: UUID): Result<DocumentDownload> {
         val company =
@@ -34,7 +36,7 @@ class GetLeaveAttachmentDownload(
         return transactions.run(actor) {
             val peopleLock = people.lockReportingLines(company, shared = true)
             if (peopleLock is Result.Failed) return@run peopleLock
-            val approvalLock = approvals.lock(company)
+            val approvalLock = approvals.lock(company, shared = true)
             if (approvalLock is Result.Failed) return@run approvalLock
             val companyLock = companies.lock(company, shared = true)
             if (companyLock is Result.Failed) return@run companyLock
@@ -44,7 +46,7 @@ class GetLeaveAttachmentDownload(
             if (accountLock is Result.Failed) return@run accountLock
             val checked =
                 identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value

@@ -34,6 +34,8 @@ The request freezes document/revision IDs, file name, media type, byte count, an
 
 `GET` and `HEAD /api/v1/companies/{companyId}/leave/requests/{requestId}/attachments/{revisionId}/content` support bounded Range downloads and ETag validation. Access follows current request scope or an independently assigned approver/delegate; it does not require a broad personal-document grant. Each storage read is outside the SQL transaction, verifies content integrity, and rechecks current access before returning bytes. Responses are private and must not be cached outside the account/company partition.
 
+Metadata and content revalidate session assurance after shared resource/access guards. Content rechecks it again after storage returns. Expired MFA therefore blocks the current download even if it was valid when the request started; renewed verification permits a new read.
+
 ## Entitlements and year closing
 
 A balance has a stable `accountId`, optimistic `version`, and `closed` flag. The immutable ledger is the accounting source; a database projection updates available, reserved, and consumed half-days atomically. A missing account reads as an open zero balance at version zero. It is created by the first movement or an explicit empty-year closing. Direct balance edits and writes to closed years are rejected. Migration backfills existing ledger totals and versions without rewriting history.

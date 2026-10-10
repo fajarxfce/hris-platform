@@ -409,6 +409,7 @@ class LeaveConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         GetLeaveAttachmentDownload(
             requests,
@@ -420,6 +421,7 @@ class LeaveConfiguration {
             identities,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -433,6 +435,7 @@ class LeaveConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
         storage: ObjectStorageRepository,
     ) =
         ReadLeaveAttachmentContent(
@@ -446,6 +449,7 @@ class LeaveConfiguration {
             transactions,
             clock,
             storage,
+            security,
         )
 
     @Bean

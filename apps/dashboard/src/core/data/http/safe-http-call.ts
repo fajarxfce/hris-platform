@@ -1,7 +1,11 @@
 import { z } from "zod";
 import type { Failure, Result } from "../../domain/result";
 import { failed, success } from "../../domain/result";
-import { HttpResponseError, InvalidHttpResponseError } from "./http-response-error";
+import {
+  HttpResponseError,
+  InvalidHttpResponseError,
+  RequestBodyTooLargeError,
+} from "./http-response-error";
 
 const problemSchema = z.object({
   code: z.string().regex(/^[a-z][a-z0-9_]{0,99}$/u),
@@ -26,6 +30,7 @@ export async function safeHttpCall<T>(
     if (error instanceof DOMException && error.name === "AbortError") throw error;
     if (error instanceof DOMException && error.name === "TimeoutError")
       return failed("request_timeout");
+    if (error instanceof RequestBodyTooLargeError) return failed("request_body_too_large");
     if (error instanceof HttpResponseError) {
       const parsed = problemSchema.safeParse(error.problem);
       if (parsed.success) {
@@ -49,6 +54,8 @@ export async function safeHttpCall<T>(
           return failed("resource_not_found");
         case 409:
           return failed("request_conflict");
+        case 413:
+          return failed("request_body_too_large");
         case 429:
           return failed("request_rate_limited");
         default:

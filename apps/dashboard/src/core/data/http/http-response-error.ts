@@ -14,3 +14,10 @@ export class InvalidHttpResponseError extends Error {
     this.name = "InvalidHttpResponseError";
   }
 }
+
+export class RequestBodyTooLargeError extends Error {
+  constructor() {
+    super("Request body exceeds the transport limit");
+    this.name = "RequestBodyTooLargeError";
+  }
+}

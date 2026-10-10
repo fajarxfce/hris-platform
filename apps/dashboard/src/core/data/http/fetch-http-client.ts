@@ -1,6 +1,11 @@
 import type { HttpClient, HttpRequest } from "./http-client";
-import { HttpResponseError, InvalidHttpResponseError } from "./http-response-error";
+import {
+  HttpResponseError,
+  InvalidHttpResponseError,
+  RequestBodyTooLargeError,
+} from "./http-response-error";
 import { readJsonResponse } from "./read-json-response";
+import { readTextResponse } from "./read-text-response";
 
 const maximumBytes = 1024 * 1024;
 
@@ -40,6 +45,16 @@ export class FetchHttpClient implements HttpClient {
     ) {
       throw new TypeError("Invalid API path");
     }
+    if (
+      request.response &&
+      (!Number.isSafeInteger(request.response.maximumBytes) ||
+        request.response.maximumBytes < 1 ||
+        request.response.maximumBytes > maximumBytes)
+    )
+      throw new RangeError("Invalid response budget");
+    const body = request.body === undefined ? undefined : JSON.stringify(request.body);
+    if (body !== undefined && new TextEncoder().encode(body).byteLength > maximumBytes)
+      throw new RequestBodyTooLargeError();
     const controller = new AbortController();
     const onAbort = () => controller.abort(signal.reason);
     signal.addEventListener("abort", onAbort, { once: true });
@@ -76,16 +91,19 @@ export class FetchHttpClient implements HttpClient {
         }
         headers.set(csrf.headerName, csrf.token);
       }
-      let body: string | undefined;
-      if (request.body !== undefined) {
-        body = JSON.stringify(request.body);
-        if (new TextEncoder().encode(body).byteLength > maximumBytes) {
-          throw new RangeError("Request body is too large");
-        }
+      if (body !== undefined) {
         headers.set("Content-Type", "application/json");
       }
       if (request.operationId) headers.set("Idempotency-Key", request.operationId);
-      return await this.send(request.path, method, headers, body, controller.signal);
+      if (request.response) headers.set("Accept", request.response.mediaType);
+      return await this.send(
+        request.path,
+        method,
+        headers,
+        body,
+        controller.signal,
+        request.response,
+      );
     } finally {
       clearTimeout(deadline);
       signal.removeEventListener("abort", onAbort);
@@ -98,6 +116,7 @@ export class FetchHttpClient implements HttpClient {
     headers: Headers,
     body: string | undefined,
     signal: AbortSignal,
+    representation?: HttpRequest["response"],
   ): Promise<unknown> {
     signal.throwIfAborted();
     const response = await this.fetcher(path, {
@@ -109,7 +128,10 @@ export class FetchHttpClient implements HttpClient {
       cache: "no-store",
       redirect: "error",
     });
-    const value = await readJsonResponse(response, maximumBytes);
+    const value =
+      response.ok && representation
+        ? await readTextResponse(response, representation.maximumBytes, [representation.mediaType])
+        : await readJsonResponse(response, maximumBytes);
     signal.throwIfAborted();
     if (!response.ok) throw new HttpResponseError(response.status, value);
     return value;

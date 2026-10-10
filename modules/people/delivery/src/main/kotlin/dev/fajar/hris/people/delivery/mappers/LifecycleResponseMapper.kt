@@ -26,24 +26,34 @@ fun LifecycleTask.toResponse() =
         completedAt,
     )
 
-fun LifecycleCase.toResponse() =
+fun LifecycleEmployeeReference.toResponse() = LifecycleEmployeeResponse(id, employeeNumber, name)
+
+fun LifecycleCaseDetails.toResponse() =
     LifecycleCaseResponse(
-        id,
-        employmentId,
-        kind.name,
-        targetDate,
-        templateId,
-        templateVersion,
-        templateName,
-        status.name,
-        version,
-        createdBy,
-        createdAt,
-        tasks.map { it.toResponse() },
+        case.id,
+        case.employmentId,
+        case.kind.name,
+        case.targetDate,
+        case.templateId,
+        case.templateVersion,
+        case.templateName,
+        case.status.name,
+        case.version,
+        case.createdBy,
+        case.createdAt,
+        case.tasks.map { it.toResponse() },
+        employee.toResponse(),
     )
 
 fun LifecycleEvent.toResponse() =
     LifecycleEventResponse(version, taskKey, action.name, assigneeId, actorId, reason, recordedAt)
 
 fun AssignedLifecycleTask.toResponse() =
-    AssignedLifecycleTaskResponse(caseId, employmentId, kind.name, caseVersion, task.toResponse())
+    AssignedLifecycleTaskResponse(
+        caseId,
+        employmentId,
+        kind.name,
+        caseVersion,
+        task.toResponse(),
+        employee.toResponse(),
+    )

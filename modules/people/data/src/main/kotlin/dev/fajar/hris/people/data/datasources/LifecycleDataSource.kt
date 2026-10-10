@@ -23,6 +23,8 @@ interface LifecycleDataSource {
 
     fun case(companyId: UUID, id: UUID): LifecycleCasesRecord?
 
+    fun caseDetails(companyId: UUID, id: UUID): LifecycleCaseRow?
+
     fun cases(
         companyId: UUID,
         employeeId: UUID?,

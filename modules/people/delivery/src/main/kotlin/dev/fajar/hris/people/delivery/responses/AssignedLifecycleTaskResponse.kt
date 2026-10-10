@@ -8,4 +8,5 @@ data class AssignedLifecycleTaskResponse(
     val kind: String,
     val caseVersion: Long,
     val task: LifecycleTaskResponse,
+    val employee: LifecycleEmployeeResponse,
 )

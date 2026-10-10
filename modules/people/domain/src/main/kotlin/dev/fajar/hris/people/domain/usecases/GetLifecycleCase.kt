@@ -21,7 +21,7 @@ class GetLifecycleCase(
     private val security: IdentitySecurityPolicy,
     private val clock: Clock,
 ) {
-    fun execute(actor: Actor, id: UUID): Result<LifecycleCase> {
+    fun execute(actor: Actor, id: UUID): Result<LifecycleCaseDetails> {
         val access = actor.requirePermission("people.lifecycle.read")
         if (access is Result.Failed) return access
         val company =
@@ -46,7 +46,7 @@ class GetLifecycleCase(
             val live = (checked as Result.Success).value
             val permission = live.requirePermission("people.lifecycle.read")
             if (permission is Result.Failed) return@run permission
-            lifecycle.case(company, id).flatMap {
+            lifecycle.caseDetails(company, id).flatMap {
                 if (it == null)
                     Result.Failed(Failure(FailureKind.NOT_FOUND, "lifecycle_case_not_found"))
                 else Result.Success(it)

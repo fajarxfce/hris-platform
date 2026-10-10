@@ -17,4 +17,5 @@ data class LifecycleCaseResponse(
     val createdBy: UUID,
     val createdAt: Instant,
     val tasks: List<LifecycleTaskResponse>,
+    val employee: LifecycleEmployeeResponse,
 )

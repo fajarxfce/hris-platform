@@ -8,4 +8,5 @@ data class AssignedLifecycleTask(
     val kind: LifecycleKind,
     val caseVersion: Long,
     val task: LifecycleTask,
+    val employee: LifecycleEmployeeReference,
 )

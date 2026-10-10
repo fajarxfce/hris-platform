@@ -1,10 +1,12 @@
 package dev.fajar.hris.people.data.datasources
 
+import dev.fajar.hris.schema.Tables.EMPLOYMENTS as M
 import dev.fajar.hris.schema.Tables.LIFECYCLE_CASES as C
 import dev.fajar.hris.schema.Tables.LIFECYCLE_EVENTS as E
 import dev.fajar.hris.schema.Tables.LIFECYCLE_TASKS as K
 import dev.fajar.hris.schema.Tables.LIFECYCLE_TEMPLATES as T
 import dev.fajar.hris.schema.Tables.LIFECYCLE_TEMPLATE_REVISIONS as R
+import dev.fajar.hris.schema.Tables.PERSONS as P
 import dev.fajar.hris.schema.tables.records.*
 import java.util.UUID
 import org.jooq.DSLContext
@@ -63,6 +65,30 @@ class PostgresLifecycleDataSource(private val sql: DSLContext) : LifecycleDataSo
     override fun case(companyId: UUID, id: UUID) =
         sql.selectFrom(C).where(C.COMPANY_ID.eq(companyId)).and(C.ID.eq(id)).fetchOne()
 
+    override fun caseDetails(companyId: UUID, id: UUID) =
+        sql.select(
+                C,
+                DSL.multiset(
+                    DSL.selectFrom(K)
+                        .where(K.COMPANY_ID.eq(companyId))
+                        .and(K.CASE_ID.eq(C.ID))
+                        .orderBy(K.KEY)
+                        .limit(64)
+                ),
+                M.EMPLOYEE_NUMBER,
+                P.LEGAL_NAME,
+            )
+            .from(C)
+            .join(M)
+            .on(M.COMPANY_ID.eq(C.COMPANY_ID).and(M.ID.eq(C.EMPLOYMENT_ID)))
+            .join(P)
+            .on(P.ID.eq(M.PERSON_ID))
+            .where(C.COMPANY_ID.eq(companyId))
+            .and(C.ID.eq(id))
+            .fetchOne {
+                LifecycleCaseRow(it.value1(), it.value2().toList(), it.value3(), it.value4())
+            }
+
     override fun cases(
         companyId: UUID,
         employeeId: UUID?,
@@ -79,15 +105,21 @@ class PostgresLifecycleDataSource(private val sql: DSLContext) : LifecycleDataSo
                         .orderBy(K.KEY)
                         .limit(64)
                 ),
+                M.EMPLOYEE_NUMBER,
+                P.LEGAL_NAME,
             )
             .from(C)
+            .join(M)
+            .on(M.COMPANY_ID.eq(C.COMPANY_ID).and(M.ID.eq(C.EMPLOYMENT_ID)))
+            .join(P)
+            .on(P.ID.eq(M.PERSON_ID))
             .where(C.COMPANY_ID.eq(companyId))
             .and(employeeId?.let { C.EMPLOYMENT_ID.eq(it) } ?: DSL.noCondition())
             .and(status?.let { C.STATUS.eq(it) } ?: DSL.noCondition())
             .and(after?.let { C.ID.gt(it) } ?: DSL.noCondition())
             .orderBy(C.ID)
             .limit(limit)
-            .fetch { LifecycleCaseRow(it.value1(), it.value2().toList()) }
+            .fetch { LifecycleCaseRow(it.value1(), it.value2().toList(), it.value3(), it.value4()) }
 
     override fun completedOffboardingDate(companyId: UUID, employeeId: UUID) =
         sql.select(C.TARGET_DATE)
@@ -172,10 +204,14 @@ class PostgresLifecycleDataSource(private val sql: DSLContext) : LifecycleDataSo
         afterKey: String?,
         limit: Int,
     ) =
-        sql.select(C.fields().toList() + K.fields().toList())
+        sql.select(C, K, M.EMPLOYEE_NUMBER, P.LEGAL_NAME)
             .from(K)
             .join(C)
             .on(C.COMPANY_ID.eq(K.COMPANY_ID).and(C.ID.eq(K.CASE_ID)))
+            .join(M)
+            .on(M.COMPANY_ID.eq(C.COMPANY_ID).and(M.ID.eq(C.EMPLOYMENT_ID)))
+            .join(P)
+            .on(P.ID.eq(M.PERSON_ID))
             .where(K.COMPANY_ID.eq(companyId))
             .and(K.ASSIGNEE_ID.eq(accountId))
             .and(K.STATUS.eq("PENDING"))
@@ -186,5 +222,5 @@ class PostgresLifecycleDataSource(private val sql: DSLContext) : LifecycleDataSo
             )
             .orderBy(K.CASE_ID, K.KEY)
             .limit(limit)
-            .fetch { AssignedLifecycleRow(it.into(C), it.into(K)) }
+            .fetch { AssignedLifecycleRow(it.value1(), it.value2(), it.value3(), it.value4()) }
 }

@@ -77,6 +77,10 @@ class StoredLifecycleRepository(
         source.case(companyId, id)?.toLifecycleCase(source.tasks(companyId, setOf(id)))
     }
 
+    override fun caseDetails(companyId: UUID, id: UUID) = safeDatabaseCall {
+        source.caseDetails(companyId, id)?.toLifecycleCaseDetails()
+    }
+
     override fun cases(
         companyId: UUID,
         employeeId: UUID?,
@@ -86,7 +90,7 @@ class StoredLifecycleRepository(
     ) = safeDatabaseCall {
         val rows = source.cases(companyId, employeeId, status?.name, after, limit + 1)
         Page(
-            rows.take(limit).map { it.case.toLifecycleCase(it.tasks) },
+            rows.take(limit).map { it.toLifecycleCaseDetails() },
             if (rows.size > limit) rows[limit - 1].case.id.toString() else null,
         )
     }
@@ -189,6 +193,11 @@ class StoredLifecycleRepository(
                         LifecycleKind.valueOf(it.case.kind),
                         it.case.version,
                         it.task.toLifecycleTask(),
+                        LifecycleEmployeeReference(
+                            it.case.employmentId,
+                            it.employeeNumber,
+                            it.employeeName,
+                        ),
                     )
                 },
                 if (rows.size > limit) "${rows[limit-1].case.id}:${rows[limit-1].task.key}"

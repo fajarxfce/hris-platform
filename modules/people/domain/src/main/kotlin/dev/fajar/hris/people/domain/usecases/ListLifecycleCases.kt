@@ -27,7 +27,7 @@ class ListLifecycleCases(
         status: LifecycleStatus?,
         after: UUID?,
         limit: Int,
-    ): Result<Page<LifecycleCase>> {
+    ): Result<Page<LifecycleCaseDetails>> {
         val access = actor.requirePermission("people.lifecycle.read")
         if (access is Result.Failed) return access
         if (limit !in 1..200) return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_page"))

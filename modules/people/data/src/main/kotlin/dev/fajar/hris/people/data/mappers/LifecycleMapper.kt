@@ -1,5 +1,6 @@
 package dev.fajar.hris.people.data.mappers
 
+import dev.fajar.hris.people.data.datasources.LifecycleCaseRow
 import dev.fajar.hris.people.data.models.LifecycleTaskDefinitionData
 import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.schema.tables.records.*
@@ -71,6 +72,12 @@ fun LifecycleCasesRecord.toLifecycleCase(tasks: List<LifecycleTasksRecord>) =
         createdBy,
         createdAt.toInstant(),
         tasks.map { it.toLifecycleTask() },
+    )
+
+fun LifecycleCaseRow.toLifecycleCaseDetails() =
+    LifecycleCaseDetails(
+        case.toLifecycleCase(tasks),
+        LifecycleEmployeeReference(case.employmentId, employeeNumber, employeeName),
     )
 
 fun LifecycleTask.toRow(company: UUID, case: UUID) =

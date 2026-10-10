@@ -25,13 +25,15 @@ interface LifecycleRepository {
 
     fun case(companyId: UUID, id: UUID): Result<LifecycleCase?>
 
+    fun caseDetails(companyId: UUID, id: UUID): Result<LifecycleCaseDetails?>
+
     fun cases(
         companyId: UUID,
         employeeId: UUID?,
         status: LifecycleStatus?,
         after: UUID?,
         limit: Int,
-    ): Result<Page<LifecycleCase>>
+    ): Result<Page<LifecycleCaseDetails>>
 
     fun completedOffboardingDate(companyId: UUID, employeeId: UUID): Result<LocalDate?>
 

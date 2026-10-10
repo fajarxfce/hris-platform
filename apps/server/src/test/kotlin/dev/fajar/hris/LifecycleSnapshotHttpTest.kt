@@ -45,6 +45,8 @@ class LifecycleSnapshotHttpTest : LifecycleApiFixture() {
         assertEquals(1, body["items"].size())
         assertEquals(ids[0].toString(), body["nextCursor"].asString())
         assertEquals(0, body["items"][0]["version"].asLong())
+        assertEquals(body["items"][0]["employmentId"], body["items"][0]["employee"]["id"])
+        assertEquals("Example employee", body["items"][0]["employee"]["name"].asString())
         assertEquals(2, body["items"][0]["tasks"].size())
         assertTrue(
             body["items"][0]["tasks"].iterator().asSequence().all {
@@ -53,6 +55,7 @@ class LifecycleSnapshotHttpTest : LifecycleApiFixture() {
         )
         val current = json.readTree(get(browser, "${api(company)}/cases/${ids[0]}").body())
         assertEquals(1, current["version"].asLong())
+        assertEquals(body["items"][0]["employee"], current["employee"])
         assertEquals("DONE", current["tasks"][0]["status"].asString())
         val next =
             json.readTree(get(browser, "${api(company)}/cases?limit=1&after=${ids[0]}").body())

@@ -14,7 +14,10 @@ fun validateApprovalTemplate(change: TemplateChange): Result<Unit> {
             (change.category?.length ?: 0) > 80 ||
             change.minimumAmount.signum() < 0 ||
             change.minimumAmount.scale() !in 0..2 ||
-            change.minimumAmount.precision() > 18 ||
+            change.minimumAmount.precision() > 20 ||
+            change.minimumAmount.stripTrailingZeros().let { amount ->
+                amount.precision() + maxOf(0, -amount.scale())
+            } > 18 ||
             change.stages.size !in 1..8
     )
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_approval_template"))

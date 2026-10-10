@@ -48,6 +48,7 @@ class LifecycleAssuranceHttpTest : LifecycleApiFixture() {
                 "cancel",
                 "onboarding",
                 "offboarding",
+                "offboarding-review",
             ]
     )
     fun expiringProofCannotAuthorizeAReadMutationOrReceiptAfterAnAccessWait(operation: String) {
@@ -70,7 +71,9 @@ class LifecycleAssuranceHttpTest : LifecycleApiFixture() {
                 "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
                 account,
             )
-        val kind = if (operation == "offboarding") "OFFBOARDING" else "ONBOARDING"
+        val kind =
+            if (operation in setOf("offboarding", "offboarding-review")) "OFFBOARDING"
+            else "ONBOARDING"
         val template = template(browser, csrf, company, kind)
         val targetDate = if (operation == "offboarding") "2026-09-30" else "2026-10-01"
         val id =
@@ -104,6 +107,17 @@ class LifecycleAssuranceHttpTest : LifecycleApiFixture() {
             )
         val get =
             GetLifecycleCase(
+                lifecycle,
+                companies,
+                identities,
+                members,
+                people,
+                transactions,
+                security,
+                clock,
+            )
+        val review =
+            GetOffboardingReview(
                 lifecycle,
                 companies,
                 identities,
@@ -276,6 +290,7 @@ class LifecycleAssuranceHttpTest : LifecycleApiFixture() {
                 "templates" -> templates.execute(current, null, 50)
                 "template" -> getTemplate.execute(current, template)
                 "get" -> get.execute(current, id)
+                "offboarding-review" -> review.execute(current, id)
                 "list" -> list.execute(current, employment, null, null, 50)
                 "history" -> history.execute(current, id, null, 50)
                 "assigned" -> assigned.execute(current, null, 50)
@@ -345,6 +360,7 @@ class LifecycleAssuranceHttpTest : LifecycleApiFixture() {
                         "templates",
                         "template",
                         "get",
+                        "offboarding-review",
                         "list",
                         "history",
                         "assigned",

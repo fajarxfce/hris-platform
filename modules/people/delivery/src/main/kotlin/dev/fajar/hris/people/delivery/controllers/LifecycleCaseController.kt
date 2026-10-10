@@ -17,6 +17,7 @@ class LifecycleCaseController(
     private val get: GetLifecycleCase,
     private val list: ListLifecycleCases,
     private val history: GetLifecycleHistory,
+    private val offboardingReview: GetOffboardingReview,
     private val cancel: CancelLifecycleCase,
     private val completeOnboarding: CompleteOnboarding,
     private val completeOffboarding: CompleteOffboarding,
@@ -88,4 +89,8 @@ class LifecycleCaseController(
             .execute(actor, key, id, body.expectedVersion, body.employmentVersion, body.reason)
             .response()
             .toResponse()
+
+    @GetMapping("/cases/{id}/offboarding-review")
+    fun offboardingReview(actor: Actor, @PathVariable id: UUID): OffboardingReviewResponse =
+        offboardingReview.execute(actor, id).response().toResponse()
 }

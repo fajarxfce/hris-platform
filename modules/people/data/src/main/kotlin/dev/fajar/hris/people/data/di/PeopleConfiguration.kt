@@ -446,6 +446,28 @@ class PeopleConfiguration {
         )
 
     @Bean
+    fun getOffboardingReview(
+        lifecycle: LifecycleRepository,
+        companies: CompanyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        people: PeopleRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetOffboardingReview(
+            lifecycle,
+            companies,
+            identities,
+            members,
+            people,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun listLifecycleCases(
         lifecycle: LifecycleRepository,
         companies: CompanyRepository,

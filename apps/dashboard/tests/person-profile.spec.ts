@@ -214,22 +214,30 @@ for (const kind of ["profile", "history"] as const) {
   });
 }
 
-test("private-read permissions, profile ownership and direct editor links cannot grant each other access", async ({
-  page,
-}) => {
+test("private profile reads require their own grant before I/O", async ({ page }) => {
   const api = await installPersonProfileApi(page, { permissions: ["people.read"] });
   await page.goto(profilePath);
   await expect(page.getByRole("alert")).toContainText("You do not have access");
   expect(api.reads).toHaveLength(0);
-  api.identity.setPermissions(["people.profile.read"]);
-  await page.reload();
+  expect(api.writes).toHaveLength(0);
+});
+
+test("a profile read grant does not authorize a direct editor link", async ({ page }) => {
+  const api = await installPersonProfileApi(page, { permissions: ["people.profile.read"] });
+  await page.goto(profilePath);
   await expect(page.getByRole("region", { name: "Personal data", exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Edit profile", exact: true })).toHaveCount(0);
   const count = api.reads.length;
   await page.goto(`${profilePath}/edit`);
   await expect(page.getByRole("alert")).toContainText("You do not have access");
   expect(api.reads).toHaveLength(count);
-  api.identity.setPermissions(["people.profile.read", "people.profile.manage"]);
+  expect(api.writes).toHaveLength(0);
+});
+
+test("a management grant cannot edit a profile owned by another company", async ({ page }) => {
+  const api = await installPersonProfileApi(page, {
+    permissions: ["people.profile.read", "people.profile.manage"],
+  });
   api.replaceProfile({ ownerCompanyId: companyIds[1] });
   await page.goto(profilePath);
   await expect(

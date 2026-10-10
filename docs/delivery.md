@@ -452,3 +452,7 @@ Validation: architecture, Biome, strict TypeScript, and all 307 unit/controller 
 Import directory, summary, row, and attempt use cases now check the current interactive session assurance after their resource/access guards. Import-specific permission and credential failures retain their existing classifications. The shared company-session policy prevents a proof that expires while waiting from exposing private proposals. Worker execution authority remains independent of interactive MFA lifetime.
 
 Validation passed root formatting and architecture checks, eight people-domain tests, 22 PostgreSQL/server tests (import behavior, access, four controlled MFA-expiry/renewal cases, and the API contract), and server/worker boot JAR builds. These checks do not establish deployment or performance results.
+
+## Independent private-profile access scenarios
+
+The browser permission test now isolates missing read access, a read-only direct editor link, and editing from a non-owning company. The previous combined test exhausted its 30-second CI budget after five full navigations took 5.2–5.5 seconds each; its final assertion had only 637 milliseconds remaining. The downloaded trace identifies the cumulative navigation time. The three independent scenarios passed locally with the same per-test timeout and no retries.

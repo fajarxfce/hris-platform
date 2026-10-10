@@ -1,73 +1,78 @@
-import type { Failure } from "../../../../core/domain/result";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { LeaveAttachmentSource } from "../../domain/entities/leave-attachment";
 import type { LeaveUseCases } from "../contracts/leave-use-cases";
-import { initialLeaveRequestState, type LeaveRequestState } from "../models/leave-request-state";
+import {
+  initialLeaveAttachmentsState,
+  type LeaveAttachmentsState,
+} from "../models/leave-attachments-state";
 
-export class LeaveRequestController {
-  #state = initialLeaveRequestState;
+export class LeaveAttachmentsController {
   #active = false;
   #pending: AbortController | null = null;
+  #state = initialLeaveAttachmentsState;
   #listeners = new Set<() => void>();
   constructor(
-    private readonly load: LeaveUseCases["loadRequest"],
+    private readonly download: LeaveUseCases["downloadAttachment"],
     private readonly access: CompanyAccess,
-    private readonly id: string,
-    private readonly historyAfter: string | null,
+    private readonly request: LeaveAttachmentSource,
   ) {}
-  getSnapshot = (): LeaveRequestState => this.#state;
+  getSnapshot = (): LeaveAttachmentsState => this.#state;
   subscribe = (listener: () => void): (() => void) => {
     this.#listeners.add(listener);
     return () => this.#listeners.delete(listener);
   };
   activate = (): void => {
-    if (this.#active) return;
     this.#active = true;
-    void this.refresh();
-  };
-  revoke = (observed: LeaveAttachmentSource, failure: Failure): void => {
-    if (!this.#active || this.#state.request !== observed) return;
-    this.#pending?.abort();
-    this.#pending = null;
-    this.publish({ stage: "unavailable", request: null, failure });
   };
   deactivate = (): void => {
     this.#active = false;
+    this.cancel();
+  };
+  cancel = (): void => {
     this.#pending?.abort();
     this.#pending = null;
-    this.publish(initialLeaveRequestState);
+    this.publish(initialLeaveAttachmentsState);
   };
-  refresh = async (): Promise<void> => {
-    if (!this.#active) return;
-    this.#pending?.abort();
+  open = async (revisionId: string): Promise<void> => {
+    if (!this.#active || this.#pending || this.#state.stage === "unavailable") return;
     const pending = new AbortController();
     this.#pending = pending;
-    this.publish(initialLeaveRequestState);
+    this.publish({ stage: "downloading", revisionId, failure: null });
     try {
-      const result = await this.load.execute(
+      const result = await this.download.execute(
         this.access,
-        this.id,
-        this.historyAfter,
+        this.request,
+        revisionId,
         pending.signal,
       );
       if (pending.signal.aborted || this.#pending !== pending) return;
       this.publish(
         result.ok
-          ? { stage: "ready", request: result.value, failure: null }
-          : { stage: "unavailable", request: null, failure: result.failure },
+          ? { stage: "started", revisionId, failure: null }
+          : {
+              stage: [
+                "access_denied",
+                "company_access_denied",
+                "leave_attachment_not_found",
+              ].includes(result.failure.code)
+                ? "unavailable"
+                : "failed",
+              revisionId,
+              failure: result.failure,
+            },
       );
     } catch {
       if (!pending.signal.aborted && this.#pending === pending)
         this.publish({
-          stage: "unavailable",
-          request: null,
+          stage: "failed",
+          revisionId,
           failure: { code: "unexpected_error", fields: {}, parameters: {} },
         });
     } finally {
       if (this.#pending === pending) this.#pending = null;
     }
   };
-  private publish(state: LeaveRequestState): void {
+  private publish(state: LeaveAttachmentsState): void {
     this.#state = state;
     for (const listener of this.#listeners) listener();
   }

@@ -1,4 +1,5 @@
 import { MessageBar, MessageBarBody, useRestoreFocusTarget } from "@fluentui/react-components";
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -18,6 +19,7 @@ export function LeaveActionPage({
   state,
   form,
   view,
+  evidence,
   copy,
   companyName,
   locale,
@@ -28,6 +30,7 @@ export function LeaveActionPage({
   state: LeaveActionState;
   form: ReturnType<typeof useLeaveActionForm>;
   view: ReturnType<typeof leaveActionView> | null;
+  evidence: ReactNode;
   copy: ReturnType<typeof leaveActionCopy>;
   companyName: string;
   locale: Locale;
@@ -94,6 +97,7 @@ export function LeaveActionPage({
             rows={view.days}
           />
           <AppPropertyList title={text.workflow} items={view.workflow} />
+          {evidence}
           <form className="app-editor-form" onSubmit={form.submit} noValidate>
             <p>{copy.hint}</p>
             <AppTextField

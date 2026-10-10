@@ -10,6 +10,7 @@ import { leaveActionLinks } from "../models/leave-action-view";
 import { leaveRequestView } from "../models/leave-request-view";
 import { leaveParameters, leaveQuery } from "../models/leave-route";
 import { LeaveRequestPage } from "../pages/leave-request-page";
+import { LeaveEvidenceDownloads } from "./leave-evidence-downloads";
 
 type Props = {
   accountId: AccountId;
@@ -105,6 +106,17 @@ function LeaveRequestBinding({
     <LeaveRequestPage
       state={state}
       view={view}
+      evidence={
+        state.request && state.request.attachments.length > 0 ? (
+          <LeaveEvidenceDownloads
+            download={leave.downloadAttachment}
+            access={access}
+            request={state.request}
+            locale={locale}
+            onUnavailable={controller.revoke}
+          />
+        ) : null
+      }
       actions={actions}
       companyName={companyName}
       locale={locale}

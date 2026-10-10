@@ -162,7 +162,8 @@ a {
   align-items: end;
   gap: 16px;
 }
-.app-leave-workflow {
+.app-leave-workflow,
+.app-leave-evidence {
   display: grid;
   gap: 12px;
   min-width: 0;

@@ -52,6 +52,48 @@ function fixture(intent: LeaveRequestIntent = "approve") {
   return { controller, request, review, decide, withdraw, cancel, next };
 }
 describe("leave action ownership", () => {
+  it("evidence revocation preserves an uncertain command and cannot overwrite acknowledgement", async () => {
+    const f = fixture();
+    const failure = { code: "leave_attachment_not_found", fields: {}, parameters: {} };
+    await vi.waitFor(() => expect(f.controller.getSnapshot().stage).toBe("reviewing"));
+    f.decide.mockResolvedValueOnce(failed("connection_unavailable"));
+    await f.controller.confirm("Original review");
+    f.controller.revokeReview(f.request, failure);
+    expect(f.controller.getSnapshot()).toMatchObject({
+      stage: "unconfirmed",
+      review: null,
+      failure: { code: "connection_unavailable" },
+    });
+    await f.controller.retry();
+    f.controller.revokeReview(f.request, failure);
+    expect(f.controller.getSnapshot()).toMatchObject({
+      stage: "saved",
+      failure: null,
+      receipt: { version: 1 },
+    });
+    expect(f.next).toHaveBeenCalledOnce();
+    expect(f.decide.mock.calls[1]?.slice(0, 5)).toEqual(f.decide.mock.calls[0]?.slice(0, 5));
+    f.controller.deactivate();
+  });
+  it("evidence revocation clears the active review without redacting a newer one", async () => {
+    const f = fixture();
+    const failure = { code: "leave_attachment_not_found", fields: {}, parameters: {} };
+    await vi.waitFor(() => expect(f.controller.getSnapshot().stage).toBe("reviewing"));
+    const replacement = { ...f.request, version: 1 };
+    f.review.mockResolvedValueOnce(success(replacement));
+    await f.controller.refresh();
+    f.controller.revokeReview(f.request, failure);
+    expect(f.controller.getSnapshot().review).toBe(replacement);
+    f.controller.revokeReview(replacement, failure);
+    expect(f.controller.getSnapshot()).toMatchObject({
+      stage: "unavailable",
+      review: null,
+      failure,
+    });
+    await f.controller.confirm("No access");
+    expect(f.decide).not.toHaveBeenCalled();
+    f.controller.deactivate();
+  });
   it("captures only immutable command scope and prevents duplicate submission or refresh", async () => {
     const f = fixture();
     await vi.waitFor(() => expect(f.controller.getSnapshot().stage).toBe("reviewing"));

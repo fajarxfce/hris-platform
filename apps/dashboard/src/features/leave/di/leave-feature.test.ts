@@ -25,7 +25,7 @@ function firstFixtureItem<T>(items: readonly T[]): T {
 describe("leave request boundary", () => {
   it("requires company or employee scope before listing and rejects malformed filters locally", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const feature = createLeaveFeature({ request });
+    const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
     expect(
       await feature.loadRequests.execute({ ...access, permissions: [] }, query, signal()),
     ).toMatchObject({ ok: false, failure: { code: "access_denied" } });
@@ -59,7 +59,7 @@ describe("leave request boundary", () => {
     const request = vi
       .fn<HttpClient["request"]>()
       .mockResolvedValue({ items: raw.map(leaveSummary), nextCursor: null });
-    const feature = createLeaveFeature({ request });
+    const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
     const result = await feature.loadRequests.execute(access, query, signal());
     expect(result).toMatchObject({
       ok: true,
@@ -93,12 +93,10 @@ describe("leave request boundary", () => {
     const raw = leaveRecord();
     raw.approval.requesterId = null;
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(raw);
-    const result = await createLeaveFeature({ request }).loadRequest.execute(
-      { ...access, permissions: [] },
-      raw.id.toUpperCase(),
-      null,
-      signal(),
-    );
+    const result = await createLeaveFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+    ).loadRequest.execute({ ...access, permissions: [] }, raw.id.toUpperCase(), null, signal());
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     firstFixtureItem(raw.days).chargedMinutes = 100;
@@ -121,7 +119,7 @@ describe("leave request boundary", () => {
       ...raw,
       history: { items: raw.history.items.slice(0, 20), nextCursor: "4" },
     });
-    const feature = createLeaveFeature({ request });
+    const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
     expect(await feature.loadRequest.execute(access, raw.id, null, signal())).toMatchObject({
       ok: true,
       value: { version: 23, history: { nextCursor: "4" } },
@@ -193,14 +191,19 @@ describe("leave request boundary", () => {
     mutate(raw);
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(raw);
     expect(
-      await createLeaveFeature({ request }).loadRequest.execute(access, leaveId(), null, signal()),
+      await createLeaveFeature({ request }, { downloadBinary: vi.fn() }).loadRequest.execute(
+        access,
+        leaveId(),
+        null,
+        signal(),
+      ),
     ).toMatchObject({ ok: false, failure: { code: "invalid_response" } });
   });
   it("rejects repeated list cursors, foreign employee projections and out-of-order pages", async () => {
     const first = leaveSummary(leaveRecord());
     const second = leaveSummary(leaveRecord(0, 2));
     const request = vi.fn<HttpClient["request"]>();
-    const feature = createLeaveFeature({ request });
+    const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
     for (const items of [
       [first, first],
       [second, first],
@@ -230,7 +233,7 @@ describe("leave request boundary", () => {
       .mockRejectedValue(
         new HttpResponseError(404, { code: "leave_request_not_found", detail: "PRIVATE" }),
       );
-    const feature = createLeaveFeature({ request });
+    const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
     expect(await feature.loadRequest.execute(access, leaveId(), null, signal())).toMatchObject({
       ok: false,
       failure: { code: "leave_request_not_found" },

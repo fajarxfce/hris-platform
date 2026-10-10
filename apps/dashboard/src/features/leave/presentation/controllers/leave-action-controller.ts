@@ -1,7 +1,8 @@
 import type { OperationId } from "../../../../core/domain/identifiers";
 import type { MutationReceipt } from "../../../../core/domain/mutation-receipt";
-import { failed, type Result } from "../../../../core/domain/result";
+import { type Failure, failed, type Result } from "../../../../core/domain/result";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import type { LeaveAttachmentSource } from "../../domain/entities/leave-attachment";
 import type {
   LeaveActionSnapshot,
   LeaveRequestIntent,
@@ -42,6 +43,16 @@ export class LeaveActionController {
     if (this.#active) return;
     this.#active = true;
     void this.refresh();
+  };
+  revokeReview = (observed: LeaveAttachmentSource, failure: Failure): void => {
+    if (!this.#active || this.#state.review !== observed) return;
+    if (this.#submission) {
+      this.publish({ ...this.#state, review: null });
+      return;
+    }
+    this.#pending?.abort();
+    this.#pending = null;
+    this.publish({ ...this.#state, stage: "unavailable", review: null, failure });
   };
   deactivate = (): void => {
     this.#active = false;

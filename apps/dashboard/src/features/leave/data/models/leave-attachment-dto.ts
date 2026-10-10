@@ -8,3 +8,4 @@ export const leaveAttachmentDto = z.object({
   size: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
   sha256: z.string().regex(/^[0-9a-f]{64}$/u),
 });
+export type LeaveAttachmentDto = z.infer<typeof leaveAttachmentDto>;

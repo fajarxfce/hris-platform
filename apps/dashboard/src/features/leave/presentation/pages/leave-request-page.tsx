@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -14,6 +15,7 @@ export function LeaveRequestPage({
   state,
   view,
   actions,
+  evidence,
   companyName,
   locale,
   timezone,
@@ -27,6 +29,7 @@ export function LeaveRequestPage({
   state: LeaveRequestState;
   view: ReturnType<typeof leaveRequestView> | null;
   actions: readonly Readonly<{ intent: string; label: string; to: string }>[];
+  evidence: ReactNode;
   companyName: string;
   locale: Locale;
   timezone: string;
@@ -98,17 +101,7 @@ export function LeaveRequestPage({
                 />
               </section>
             ))}
-            {view.attachments.length > 0 && (
-              <AppResourceTable
-                title={text.attachments}
-                columns={[
-                  { id: "file", label: text.file },
-                  { id: "type", label: text.mediaType },
-                  { id: "size", label: text.bytes, numeric: true },
-                ]}
-                rows={view.attachments}
-              />
-            )}
+            {evidence}
             <AppResourceTable
               title={text.history}
               columns={[

@@ -1,4 +1,5 @@
 import type { Locale } from "../../../../core/presentation/i18n/messages";
+import type { LeaveAttachment } from "../../domain/entities/leave-attachment";
 import type { LeaveRequestPage } from "../../domain/entities/leave-request";
 import type { LeaveRequestDetails } from "../../domain/entities/leave-request-details";
 import { leaveMessages } from "../i18n/leave-messages";
@@ -100,9 +101,14 @@ export function leaveRequestView(request: LeaveRequestDetails, locale: Locale, t
         ],
       })),
     })),
-    attachments: request.attachments.map((attachment) => ({
-      id: attachment.revisionId,
-      cells: [attachment.fileName, attachment.mediaType, number.format(attachment.size)],
-    })),
   };
+}
+
+export function leaveAttachmentRows(attachments: readonly LeaveAttachment[], locale: Locale) {
+  const number = new Intl.NumberFormat(locale);
+  return attachments.map((attachment) => ({
+    id: attachment.revisionId,
+    actionLabel: attachment.fileName,
+    cells: [attachment.fileName, attachment.mediaType, number.format(attachment.size)],
+  }));
 }

@@ -1,3 +1,5 @@
+import type { BinaryResponseDto } from "../../../../core/data/http/binary-response-dto";
+import type { LeaveAttachmentDto } from "../models/leave-attachment-dto";
 import type {
   LeaveReceiptDto,
   LeaveRequestChangeDto,
@@ -7,6 +9,12 @@ import type { LeaveRequestDetailsDto } from "../models/leave-request-details-dto
 import type { LeaveRequestPageDto } from "../models/leave-request-summary-dto";
 
 export interface LeaveRequestDataSource {
+  downloadAttachment(
+    company: string,
+    request: string,
+    attachment: Pick<LeaveAttachmentDto, "revisionId" | "mediaType" | "size" | "sha256">,
+    signal: AbortSignal,
+  ): Promise<BinaryResponseDto>;
   decide(
     company: string,
     id: string,

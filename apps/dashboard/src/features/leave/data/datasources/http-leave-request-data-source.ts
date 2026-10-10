@@ -1,4 +1,6 @@
+import { binaryResponseDto } from "../../../../core/data/http/binary-response-dto";
 import type { HttpClient } from "../../../../core/data/http/http-client";
+import type { LeaveAttachmentDto } from "../models/leave-attachment-dto";
 import {
   type LeaveRequestChangeDto,
   type LeaveRequestDecisionDto,
@@ -10,6 +12,28 @@ import type { LeaveRequestDataSource } from "./leave-request-data-source";
 
 export class HttpLeaveRequestDataSource implements LeaveRequestDataSource {
   constructor(private readonly http: HttpClient) {}
+  async downloadAttachment(
+    company: string,
+    request: string,
+    attachment: Pick<LeaveAttachmentDto, "revisionId" | "mediaType" | "size" | "sha256">,
+    signal: AbortSignal,
+  ) {
+    return binaryResponseDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/leave/requests/${request}/attachments/${attachment.revisionId}/content`,
+          timeoutMilliseconds: 60_000,
+          response: {
+            type: "binary",
+            mediaType: attachment.mediaType,
+            byteLength: attachment.size,
+            etag: `"${attachment.revisionId}-${attachment.sha256}"`,
+          },
+        },
+        signal,
+      ),
+    );
+  }
   async decide(
     company: string,
     id: string,

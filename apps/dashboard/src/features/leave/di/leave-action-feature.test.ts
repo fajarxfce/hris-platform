@@ -27,7 +27,7 @@ function snapshot(
 describe("leave action boundaries", () => {
   it("checks current grants, identifiers and company scope before acquisition or commands", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const feature = createLeaveFeature({ request });
+    const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
     const readOnly = { ...access, permissions: ["leave.read"] };
     const review = snapshot();
     for (const intent of ["approve", "reject", "withdraw", "cancel"] as const)
@@ -67,7 +67,7 @@ describe("leave action boundaries", () => {
   it("reads a fresh resource before review and uses server assignment rather than broad read grants", async () => {
     const record = leaveRecord();
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(record);
-    const feature = createLeaveFeature({ request });
+    const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
     const teamApprover = { ...access, permissions: ["leave.team.approve"] };
     expect(
       await feature.reviewAction.execute(
@@ -103,7 +103,7 @@ describe("leave action boundaries", () => {
       const request = vi
         .fn<HttpClient["request"]>()
         .mockResolvedValue({ id: review.id, version: 4 });
-      const feature = createLeaveFeature({ request });
+      const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
       const execute = () =>
         intent === "approve" || intent === "reject"
           ? feature.decide.execute(
@@ -147,7 +147,7 @@ describe("leave action boundaries", () => {
     const request = vi
       .fn<HttpClient["request"]>()
       .mockResolvedValue({ id: snapshot().id, version: 4 });
-    const feature = createLeaveFeature({ request });
+    const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
     for (const reason of ["", "  ", "x".repeat(1001)]) {
       expect(
         await feature.decide.execute(access, operation, snapshot(), "REJECT", reason, signal()),
@@ -193,7 +193,7 @@ describe("leave action boundaries", () => {
   });
   it("rejects unavailable or terminal actions even with forged available-action flags", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const feature = createLeaveFeature({ request });
+    const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
     const approved = { ...snapshot(), status: "APPROVED" as const };
     expect(
       await feature.decide.execute(access, operation, approved, "APPROVE", "", signal()),
@@ -214,7 +214,7 @@ describe("leave action boundaries", () => {
   });
   it("checks receipt identity/version and preserves safe failures and cancellation", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const feature = createLeaveFeature({ request });
+    const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
     for (const receipt of [
       { id: snapshot().id, version: 3 },
       { id: operation, version: 4 },
@@ -261,7 +261,7 @@ describe("leave action boundaries", () => {
       return record;
     });
     await expect(
-      createLeaveFeature({ request }).reviewAction.execute(
+      createLeaveFeature({ request }, { downloadBinary: vi.fn() }).reviewAction.execute(
         access,
         record.id,
         "approve",

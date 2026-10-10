@@ -23,6 +23,27 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
+it("evidence revocation clears only the observed request, never a refreshed snapshot", async () => {
+  const detail = toLeaveRequestDetails(leaveRecord(), companyId, null);
+  const replacement = { ...detail, version: 1 };
+  const load = vi.fn<LeaveUseCases["loadRequest"]["execute"]>().mockResolvedValue(success(detail));
+  const controller = new LeaveRequestController({ execute: load }, access, detail.id, null);
+  const failure = { code: "leave_attachment_not_found", fields: {}, parameters: {} };
+  controller.activate();
+  await vi.waitFor(() => expect(controller.getSnapshot().request).toBe(detail));
+  load.mockResolvedValueOnce(success(replacement));
+  await controller.refresh();
+  controller.revoke(detail, failure);
+  expect(controller.getSnapshot().request).toBe(replacement);
+  controller.revoke(replacement, failure);
+  expect(controller.getSnapshot()).toEqual({ stage: "unavailable", request: null, failure });
+  await controller.refresh();
+  expect(controller.getSnapshot().request).toBe(detail);
+  controller.deactivate();
+  controller.revoke(detail, failure);
+  expect(controller.getSnapshot().failure).toBeNull();
+});
+
 it("detail refresh aborts obsolete work and cannot restore stale data after a new access failure", async () => {
   const detail = toLeaveRequestDetails(leaveRecord(), companyId, null);
   const load = vi.fn<LeaveUseCases["loadRequest"]["execute"]>().mockResolvedValue(success(detail));

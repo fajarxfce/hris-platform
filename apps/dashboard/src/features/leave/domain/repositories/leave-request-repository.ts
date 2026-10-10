@@ -1,6 +1,8 @@
+import type { BinaryFileContent } from "../../../../core/domain/files/binary-file";
 import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
 import type { MutationReceipt } from "../../../../core/domain/mutation-receipt";
 import type { Result } from "../../../../core/domain/result";
+import type { LeaveAttachment } from "../entities/leave-attachment";
 import type {
   LeaveRequestId,
   LeaveRequestPage,
@@ -10,6 +12,12 @@ import type { LeaveRequestChange, LeaveRequestDecision } from "../entities/leave
 import type { LeaveRequestDetails } from "../entities/leave-request-details";
 
 export interface LeaveRequestRepository {
+  downloadAttachment(
+    company: CompanyId,
+    request: LeaveRequestId,
+    attachment: LeaveAttachment,
+    signal: AbortSignal,
+  ): Promise<Result<BinaryFileContent>>;
   decide(
     company: CompanyId,
     operation: OperationId,

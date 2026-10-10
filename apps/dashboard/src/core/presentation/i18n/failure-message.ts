@@ -2,6 +2,18 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  leave_attachment_not_found: [
+    "This evidence is no longer accessible. Refresh the request.",
+    "Bukti ini tidak lagi dapat diakses. Muat ulang permintaan.",
+  ],
+  leave_attachment_unavailable: [
+    "This evidence is unavailable. Refresh the request or contact your administrator.",
+    "Bukti tidak tersedia. Muat ulang permintaan atau hubungi administrator.",
+  ],
+  document_content_integrity_failure: [
+    "The file could not be verified. Try again or contact your administrator.",
+    "File tidak dapat diverifikasi. Coba lagi atau hubungi administrator.",
+  ],
   leave_action_unavailable: [
     "This action is no longer available. Review the current leave request.",
     "Tindakan tidak lagi tersedia. Periksa permintaan cuti terkini.",

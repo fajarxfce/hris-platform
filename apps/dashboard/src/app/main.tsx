@@ -30,9 +30,10 @@ const reporting = createReportingFeature(http);
 const administration = createAdministrationFeature(http);
 const approvals = createApprovalsFeature(http);
 const jobs = createJobsFeature(http);
-const leave = createLeaveFeature(http);
+const files = createBrowserFiles();
+const leave = createLeaveFeature(http, files);
 const organization = createOrganizationFeature(http);
-const people = createPeopleFeature(http, createBrowserFiles());
+const people = createPeopleFeature(http, files);
 const lifecycle = createLifecycleFeature(http);
 const identity = new IdentityController(
   createIdentityFeature(http),

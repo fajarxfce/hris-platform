@@ -14,6 +14,7 @@ import { useLeaveActionForm } from "../controllers/use-leave-action-form";
 import { leaveActionCopy, leaveActionView } from "../models/leave-action-view";
 import { leaveParameters, leaveQuery } from "../models/leave-route";
 import { LeaveActionPage } from "../pages/leave-action-page";
+import { LeaveEvidenceDownloads } from "./leave-evidence-downloads";
 
 type Props = {
   accountId: AccountId;
@@ -80,6 +81,18 @@ function LeaveActionBinding(
       state={state}
       form={form}
       view={view}
+      evidence={
+        state.review && state.review.attachments.length > 0 ? (
+          <LeaveEvidenceDownloads
+            download={leave.downloadAttachment}
+            access={access}
+            request={state.review}
+            locale={locale}
+            disabled={!form.editable}
+            onUnavailable={controller.revokeReview}
+          />
+        ) : null
+      }
       copy={leaveActionCopy(intent, state.phase, locale)}
       companyName={props.companyName}
       locale={locale}

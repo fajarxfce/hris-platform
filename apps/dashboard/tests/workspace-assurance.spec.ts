@@ -38,6 +38,96 @@ async function workspace(page: Page) {
   return { identity, requests, field };
 }
 
+test("retained detail portals are hidden during access checks and cannot trap the recovery screen", async ({
+  page,
+}) => {
+  const identity = await installIdentityApi(page, {
+    signedIn: true,
+    mfa: true,
+    mfaConfigured: true,
+    mfaVerified: true,
+    permissions: ["company.read", "audit.read"],
+  });
+  const resourceId = "30000000-0000-4000-8000-000000000001";
+  let auditReads = 0;
+  await page.route("**/api/v1/companies/*/audit-events?*", async (route) => {
+    auditReads += 1;
+    const query = new URL(route.request().url()).searchParams;
+    await route.fulfill({
+      json: {
+        companyId: companyIds[0],
+        from: query.get("from"),
+        until: query.get("until"),
+        evaluatedAt: "2026-10-10T00:00:00Z",
+        nextCursor: null,
+        items: [
+          {
+            id: "40000000-0000-4000-8000-000000000001",
+            companyId: companyIds[0],
+            actorId: "20000000-0000-4000-8000-000000000001",
+            resourceType: "employment",
+            resourceId,
+            action: "employment.created",
+            correlationId: "50000000-0000-4000-8000-000000000001",
+            recordedAt: "2026-09-25T03:15:00Z",
+          },
+        ],
+      },
+    });
+  });
+  await page.goto(
+    "/administration/audit?from=2026-09-01T00%3A00%3A00Z&until=2026-10-01T00%3A00%3A00Z",
+  );
+  await page
+    .getByRole("table")
+    .getByRole("button", { name: /^View details:/u })
+    .click();
+  const detail = page.getByRole("dialog", { name: "Audit event", exact: true });
+  await expect(detail).toContainText(resourceId);
+  const initialReads = auditReads;
+  let release!: () => void;
+  let entered!: () => void;
+  const held = new Promise<void>((done) => {
+    release = done;
+  });
+  const started = new Promise<void>((done) => {
+    entered = done;
+  });
+  await page.route(
+    `**/api/v1/companies/${companyIds[0]}/me/access`,
+    async (route) => {
+      entered();
+      await held;
+      await route.fulfill({ status: 503, json: { code: "connection_unavailable" } });
+    },
+    { times: 1 },
+  );
+  try {
+    await page.evaluate(() => window.dispatchEvent(new Event("online")));
+    await started;
+    await expect(detail).toHaveCount(0);
+    release();
+    await expect(page.getByRole("alert")).toContainText("Unable to connect");
+    const retry = page.getByRole("button", { name: "Retry", exact: true });
+    await retry.focus();
+    await page.keyboard.press("Enter");
+    await expect(detail).toContainText(resourceId);
+    expect(auditReads).toBe(initialReads);
+    identity.expireMfa();
+    await page.evaluate(() => window.dispatchEvent(new Event("online")));
+    const verification = page.getByRole("dialog", { name: "Account verification", exact: true });
+    await expect(verification).toBeVisible();
+    await expect(detail).toHaveCount(0);
+    identity.revoke();
+    await verification.getByLabel("Authenticator code", { exact: true }).fill("123456");
+    await verification.getByRole("button", { name: "Verify", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Sign in", exact: true })).toBeVisible();
+    await expect(page.getByText(resourceId, { exact: true })).toHaveCount(0);
+  } finally {
+    release();
+  }
+});
+
 test("foreground and reconnect checks preserve a mounted draft after both identity and access succeed", async ({
   page,
 }) => {

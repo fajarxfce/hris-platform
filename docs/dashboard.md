@@ -26,7 +26,7 @@ Application messages translate stable failure codes; unknown codes receive a gen
 
 ## Session verification and retained forms
 
-The application owns the verification dialog across workspace removal. Closing clears its contents immediately, pending content changes keep focus inside, and cancellation restores the triggering control.
+The application owns the verification dialog across workspace removal. Closing clears its contents immediately, pending content changes keep focus inside, and cancellation restores the triggering control. Feature portals mount inside the retained workspace. Detail and confirmation overlays suspend with its visibility, so pending or failed identity checks cannot leave a private drawer visible or trap focus away from recovery controls.
 
 Foreground/reconnect checks retain one previously authorized workspace in memory while its content is hidden and inert. An unchanged account, company membership set, company metadata, platform grants, and selected-company grants restore the same mounted feature owners and controlled inputs. Equivalent ordering does not invalidate that scope. A changed account/company/permission partition, known revocation, logout, or application disposal removes it and clears private query state. Business values are not refreshed by this identity check; each feature retains its explicit Refresh action.
 

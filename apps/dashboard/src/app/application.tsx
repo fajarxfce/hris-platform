@@ -6,6 +6,7 @@ import { AppFailure } from "../core/presentation/components/app-failure";
 import { AppLoading } from "../core/presentation/components/app-loading";
 import { AppPortalShell } from "../core/presentation/components/app-portal-shell";
 import { AppPreferences } from "../core/presentation/components/app-preferences";
+import { AppWorkspaceSurface } from "../core/presentation/components/app-workspace-surface";
 import { AccountVerificationContext } from "../core/presentation/contracts/account-verification";
 import { type Locale, messages } from "../core/presentation/i18n/messages";
 import type { AdministrationUseCases } from "../features/administration/presentation/contracts/administration-use-cases";
@@ -79,7 +80,7 @@ export function Application({
         >
           {state.workspace && (
             <AccountVerificationContext value={identity.requestVerification}>
-              <div hidden={state.stage !== "ready"} inert={state.stage !== "ready"}>
+              <AppWorkspaceSurface visible={state.stage === "ready"}>
                 <PortalRoutes
                   key={state.workspace.revision}
                   accountId={state.workspace.accountId}
@@ -93,7 +94,7 @@ export function Application({
                   company={state.workspace.company}
                   locale={locale}
                 />
-              </div>
+              </AppWorkspaceSurface>
             </AccountVerificationContext>
           )}
           {state.stage === "loading" && state.verification === null && (

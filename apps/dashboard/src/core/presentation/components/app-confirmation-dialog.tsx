@@ -7,7 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@fluentui/react-components";
-import type { ReactElement } from "react";
+import { type ReactElement, useContext } from "react";
+import { WorkspaceVisibilityContext } from "../contracts/workspace-visibility";
 import { AppButton } from "./app-button";
 
 export function AppConfirmationDialog({
@@ -31,9 +32,10 @@ export function AppConfirmationDialog({
   onDismiss: () => void;
   trigger: ReactElement;
 }) {
+  const visible = useContext(WorkspaceVisibilityContext);
   return (
     <Dialog
-      open={open}
+      open={open && visible}
       onOpenChange={(_event, data) => {
         if (!data.open) onDismiss();
       }}

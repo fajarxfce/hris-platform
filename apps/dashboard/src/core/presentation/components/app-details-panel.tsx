@@ -6,7 +6,8 @@ import {
   useRestoreFocusSource,
 } from "@fluentui/react-components";
 import { Dismiss20Regular } from "@fluentui/react-icons";
-import type { ReactNode } from "react";
+import { type ReactNode, useContext } from "react";
+import { WorkspaceVisibilityContext } from "../contracts/workspace-visibility";
 import { AppButton } from "./app-button";
 
 export function AppDetailsPanel({
@@ -23,10 +24,11 @@ export function AppDetailsPanel({
   children: ReactNode;
 }) {
   const restoreFocus = useRestoreFocusSource();
+  const visible = useContext(WorkspaceVisibilityContext);
   return (
     <OverlayDrawer
       {...restoreFocus}
-      open={open}
+      open={open && visible}
       position="end"
       size="medium"
       style={{ width: "min(480px, 100vw)" }}

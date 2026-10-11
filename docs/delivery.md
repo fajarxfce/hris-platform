@@ -1224,3 +1224,30 @@ Architecture, formatting, type checks and 844 tests passed. Six browser scenario
 covered attendance behavior, detail selection, search, collapsed navigation,
 Indonesian labels and a 390-pixel viewport. Existing command departure protection
 remains in its workspace owner.
+
+## Employee attendance and mobile services
+
+[HRIS Mobile](https://github.com/fajarxfce/hris-mobile/commit/b9f7e1e) now provides
+clock-in/out, attendance history, foreground location evidence and encrypted
+offline commands. Permission and capture policy belong to use cases; platform
+adapters only perform the requested OS operations. Commands retain their original
+ID and evidence through retry and process restart. Company access is rechecked
+after pending work and before publication or delivery.
+
+Mobile root checks passed 366 JVM/UI tests. The workforce and location browser
+suites passed 25 tests, and Android dev plus production Web builds passed. API 35
+emulator acceptance covered denied/permanently denied permission, Settings
+recovery, offline clock-in, force-stop/reopen, retry and online clock-out. The real
+dev API retained exactly two entries, both pending review, and zero accepted
+minutes. The emulator used simulated location; this does not validate physical
+GPS accuracy or iOS permission behavior. No active application location request
+remained after leaving the screen.
+
+Home, Services and Account keep mobile navigation stable. Services groups admitted
+destinations by purpose, while each feature retains its own route and MVI owner.
+English/Indonesian, light/dark and 130% text captures were inspected. The validated
+dev APK was installed on the authorized Android phone using `--install-only`;
+installation metadata was verified without driving the phone UI.
+
+The complete platform workflow also passed
+[backend, all four browser shards and API/database integration](https://github.com/fajarxfce/hris-platform/actions/runs/38139796471).

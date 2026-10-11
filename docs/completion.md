@@ -23,6 +23,12 @@ The [employee work calendar](https://github.com/fajarxfce/hris-mobile/commit/cff
 now shows weekly shifts, roster overrides and days off, with a bounded encrypted
 offline snapshot independent of People availability. API 24/API 35 emulator checks
 covered week navigation, overnight work, company isolation and offline restoration.
+Employee [attendance capture](https://github.com/fajarxfce/hris-mobile/commit/a871170)
+now retains encrypted clock-in/out commands before submission, restores offline
+captures after process restart and reuses original evidence on retry. API 35
+emulator acceptance covered permission recovery, offline delivery and pending
+review using simulated location. Home, Services and Account provide stable mobile
+navigation as more employee workflows are connected.
 Automated UI/API checks and the Android dev build passed. Android 16 device checks
 covered password sign-in, company isolation, profiles, inbox reading, offline
 content, offline process restoration with company isolation, queued acknowledgement
@@ -37,7 +43,7 @@ retain their own acceptance work.
 | Mobile identity | Native OIDC handoff and external-provider acceptance. Android MFA and device-session workflows are validated; iOS physical acceptance remains separate. |
 | Mobile foundation | Additional business replicas and durable commands, background restoration, deep links and push registration. Bounded encrypted company admission, company availability, the employee inbox and HRIS sync client are implemented. |
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
-| Workforce | Dashboard company-wide exception queues, correction history, overtime and closing; bulk/reset and late corrections; mobile verified/offline attendance and overtime requests. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections, and the mobile work calendar are implemented and verified against the real API. |
+| Workforce | Dashboard company-wide exception queues, correction history, overtime and closing; bulk/reset and late corrections; mobile overtime requests and physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections, and mobile work calendars plus online/offline capture are implemented and verified against the real API. |
 | Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry; mobile balances, requests, evidence and cancellation |
 | Documents | Dashboard document/upload/processing/retention workflows; mobile scoped resumable upload/download and evidence acquisition |
 | Expenses | Dashboard policies, claims, review, payment/reconciliation and corrections; mobile claims, receipts, submission and payment progress |

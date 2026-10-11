@@ -60,8 +60,11 @@ editing. Forms retain original selected shift revisions across catalog paging,
 use the corresponding schedule/roster version and recover explicitly after an
 unknown response. Bulk editing and roster reset remain separate work. The mobile employee
 application provides its own [weekly calendar](https://github.com/fajarxfce/hris-mobile/blob/main/docs/workforce.md)
-with a bounded encrypted offline snapshot; attendance and overtime commands remain
-separate mobile workflows.
+with a bounded encrypted offline snapshot. Its attendance route also supports
+foreground location evidence, online capture windows, encrypted offline commands,
+process restoration and idempotent retry. Employee mobile screens distinguish a
+saved command, server receipt and pending/accepted attendance. Overtime commands
+remain a separate mobile increment.
 
 Calendar precedence is explicit roster, active holiday, then the effective weekly pattern. A null roster shift means an explicit day off. Calendars distinguish work, off, and unassigned dates. Overnight shifts retain their starting work date. Nonexistent DST local times return a dated validation failure; ambiguous local times use the earlier offset and elapsed UTC minutes. Calendar reads are bounded to 62 days and holiday queries to 366 days.
 

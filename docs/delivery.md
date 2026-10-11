@@ -1337,7 +1337,13 @@ The contract suite was rerun after declaring its history default explicitly.
 Five new scenarios cover owner-only access, foreign-company isolation, history
 progress, revocation while waiting, and MFA expiry/renewal. API and worker dev
 containers were rebuilt without resetting PostgreSQL; API health is `UP` and both
-processes have zero restarts. Mobile request detail presentation remains in progress.
+processes have zero restarts. Mobile request details and revision history are
+implemented in [HRIS Mobile eee789e](https://github.com/fajarxfce/hris-mobile/commit/eee789e).
+Its root checks passed 491 desktop tests, and the affected 20 presentation tests
+passed in Chromium. Android dev and production Web builds passed. A real
+fictional pending half-day request was checked on the API 35 emulator, including
+offline process restoration, online recovery, light/dark appearance and 200%
+text. Mobile submission and other transactional flows remain separate work.
 
 ## Independent browser integration scenarios
 
@@ -1350,3 +1356,5 @@ Biome, TypeScript and all three affected real API/browser scenarios passed local
 identity/lifecycle in approximately 60 seconds, import in 13 seconds and policy/jobs
 in 19 seconds. The previous CI timeout is not counted as a pass. The remaining
 browser scenarios passed in that CI run and were not rerun for this test-only move.
+Run `38174844731` at `9abf9e08` subsequently passed backend verification, all four
+dashboard shards and the complete real API/dashboard integration job.

@@ -787,3 +787,11 @@ current and historical reads, previews, edits, publication/recovery, archival,
 recipient read/acknowledgement, original receipts, and MFA expiry during queue
 admission. They verify denied results, unchanged evidence, and recovery after
 fresh verification.
+
+## Browser operation identifiers
+
+Operation identifiers now work on private HTTP development origins that lack
+`crypto.randomUUID()`, using browser secure random values with the version-4 UUID
+layout. A direct browser check at the WireGuard development origin confirmed the
+missing API and available secure randomness. Four unit tests and a browser MFA
+enrollment scenario passed, including an unavailable UUID API and entropy failure.

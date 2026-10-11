@@ -25,6 +25,11 @@ are then available on that interface; the database and direct API remain on
 loopback. Local HTTP development uses `HRIS_SECURE_COOKIES=false` in the ignored
 environment file. Deployed environments retain secure cookies and HTTPS.
 
+Private HTTP origins do not expose `crypto.randomUUID()` in every browser. The
+dashboard uses `crypto.getRandomValues()` for RFC 9562 version-4 operation IDs when
+that API is unavailable. Both paths require browser-provided secure randomness;
+there is no weak-random fallback.
+
 Changing a secret in .env does not rotate an existing PostgreSQL role password. Rotate credentials explicitly, preserving the named volume. Never delete the database volume to apply an application upgrade.
 
 ## Validation records

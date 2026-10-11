@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { FetchHttpClient } from "../core/data/http/fetch-http-client";
+import { createBrowserUuid } from "../core/data/identifiers/create-browser-uuid";
 import { createBrowserFiles } from "../core/di/browser-files";
 import type { OperationId } from "../core/domain/identifiers";
 import { AppErrorBoundary } from "../core/presentation/components/app-error-boundary";
@@ -40,7 +41,7 @@ const lifecycle = createLifecycleFeature(http);
 const identityFeature = createIdentityFeature(http);
 const identity = new IdentityController(
   identityFeature,
-  () => crypto.randomUUID() as OperationId,
+  () => createBrowserUuid() as OperationId,
   () => queries.clear(),
 );
 const root = document.getElementById("root");
@@ -63,7 +64,7 @@ const router = createBrowserRouter([
           organization={organization}
           people={people}
           lifecycle={lifecycle}
-          nextIdentifier={() => crypto.randomUUID()}
+          nextIdentifier={createBrowserUuid}
         />
       </AppErrorBoundary>
     ),

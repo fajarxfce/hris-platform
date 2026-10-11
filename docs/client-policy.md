@@ -6,7 +6,7 @@ Client policy controls module availability, minimum client builds, and scheduled
 
 `GET /api/v1/companies/{companyId}/client-policy` is available to a current company member, including during maintenance or when their build is obsolete. It returns:
 
-- `schemaVersion: 1` and the active nullable `version`.
+- `schemaVersion: 1` and the active nullable `version` (revisions start at zero).
 - `enabledModules`, `minimumBuilds: {android, ios, web}`, and optional `maintenance: {startsAt, endsAt}`.
 - `maintenanceActive`, `serverTime`, and `validUntil` in UTC.
 

@@ -14,20 +14,24 @@ Mobile native password sign-in, MFA enrollment/verification, recovery acknowledg
 secure refresh, device-session management and remote logout, company selection, current access, product flavors, localizable API
 problems, restrained navigation transitions, self-profile/assignment reads, and an
 encrypted, synchronized employee inbox with durable read/acknowledgement actions are connected in
-[the mobile application](https://github.com/fajarxfce/hris-mobile/commit/308481c).
+[the mobile application](https://github.com/fajarxfce/hris-mobile/commit/bab8734).
 An encrypted company admission also restores the selected workspace offline,
 with bounded session/MFA lifetime and live access revalidation on foreground entry.
+Company policy controls maintenance, minimum builds and module availability, with
+fresh admission before inbox synchronization and command delivery.
 Automated UI/API checks and the Android dev build passed. Android 16 device checks
 covered password sign-in, company isolation, profiles, inbox reading, offline
-content, offline process restoration with company isolation, and queued acknowledgement recovery. Native MFA,
-external providers and the employee workflows below retain their own acceptance work.
+content, offline process restoration with company isolation, queued acknowledgement
+recovery, company availability, MFA enrollment/verification and recovery-code login,
+and device-session revocation. External providers and the employee workflows below
+retain their own acceptance work.
 
 ## Remaining delivery sequence
 
 | Area | Remaining end-to-end work |
 | --- | --- |
-| Mobile identity | Native OIDC handoff; physical MFA and device-session workflow validation |
-| Mobile foundation | Additional business replicas and durable commands, availability, background restoration, deep links and push registration. Bounded encrypted company admission, the employee inbox and HRIS sync client are implemented. |
+| Mobile identity | Native OIDC handoff and external-provider acceptance. Android MFA and device-session workflows are validated; iOS physical acceptance remains separate. |
+| Mobile foundation | Additional business replicas and durable commands, background restoration, deep links and push registration. Bounded encrypted company admission, company availability, the employee inbox and HRIS sync client are implemented. |
 | People | Dashboard company transfers; scheduled lifecycle execution. Initial employee/account binding is implemented and verified with native self-profile access. |
 | Workforce | Dashboard shifts, schedules, rosters, holidays, attendance reviews/corrections, overtime and closing; bulk/reset and late corrections; mobile calendar, verified/offline attendance and overtime requests |
 | Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry; mobile balances, requests, evidence and cancellation |

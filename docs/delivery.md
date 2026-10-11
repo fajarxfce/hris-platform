@@ -914,3 +914,38 @@ first company's content. Foreground revalidation retained the open detail after
 reconnection. The temporary device proxy was stopped and the normal dev connection
 restored. Clock/MFA expiry uses deterministic tests; iOS device and background
 execution acceptance remain separate.
+
+## Mobile company availability and identity acceptance
+
+[HRIS Mobile](https://github.com/fajarxfce/hris-mobile/commit/bab8734) stores company
+client policy inside the encrypted workspace. Maintenance and minimum builds gate
+protected routes; module flags hide affected content and actions. A policy-only
+renewal preserves workspace identity. Inbox synchronization and command delivery
+require fresh policy before transport, retaining pending operations when availability
+blocks them. Known scheduled maintenance and admission expiry have finite observation
+deadlines, including when refresh fails.
+
+The mobile root check and Android dev build passed. The assembled application passed
+24 Compose tests, three application-MVI tests and one link-parser test. Workspace
+domain tests passed on JVM and Chromium (21 each), with six SQLite/encryption tests
+on JVM and three mapper tests on each target. Inbox domain tests passed on both targets
+(37 each). Coverage includes revision zero, fractional deadlines, late results,
+cancellation, scope replacement and retained commands. Shared bootstrap state
+ownership and recovery coverage were also updated in
+[Compose Fluent Starter](https://github.com/fajarxfce/compose-fluent-starter/commit/038d516);
+its root check, Android build and Linux/Apple/Windows CI passed.
+
+Android 16 checks used the real dev API. They verified minimum-build and maintenance
+gates, an unaffected company, explicit recovery, disabled content while Inbox was
+open, and restored content with its acknowledgement intact after re-enabling the
+modules. Original company policy values were restored afterward.
+
+Device checks also covered invalid/valid MFA proofs, authenticator enrollment with
+a separate fictional account, acknowledgement of recovery codes, process restoration,
+and recovery-code sign-in. Proofs were generated from fixture setup secrets; this
+does not claim an external authenticator-app check. A disposable device session
+survived cancellation of its revocation confirmation, then returned
+`401 native_session_invalid` after explicit revocation. The temporary MFA account
+was signed out and its company grant disabled, and the original employee account was
+restored. External SSO, push delivery, iOS devices and workload measurements retain
+their separate acceptance work.

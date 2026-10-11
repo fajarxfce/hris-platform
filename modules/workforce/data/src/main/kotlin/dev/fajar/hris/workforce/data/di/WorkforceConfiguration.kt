@@ -78,6 +78,17 @@ class WorkforceConfiguration {
     ) = ListShifts(schedules, companies, members, identities, transactions, security, clock)
 
     @Bean
+    fun getShift(
+        schedules: ScheduleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetShift(schedules, companies, members, identities, transactions, security, clock)
+
+    @Bean
     fun assignSchedule(
         periods: WorkPeriodRepository,
         schedules: ScheduleRepository,

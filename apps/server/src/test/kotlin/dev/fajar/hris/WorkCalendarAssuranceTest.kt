@@ -31,7 +31,16 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
     @ParameterizedTest
     @ValueSource(
         strings =
-            ["shifts", "holidays", "calendar", "save-shift", "save-holiday", "weekly", "roster"]
+            [
+                "shifts",
+                "shift-detail",
+                "holidays",
+                "calendar",
+                "save-shift",
+                "save-holiday",
+                "weekly",
+                "roster",
+            ]
     )
     fun expiryDuringAnAccountWaitCannotAuthorizeCalendarReadsWritesOrReceiptReplay(mode: String) {
         val f = isolatedFixture()
@@ -97,6 +106,17 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                             clock,
                         )
                         .execute(current, "", null, 50)
+                "shift-detail" ->
+                    GetShift(
+                            schedules,
+                            companies,
+                            members,
+                            identities,
+                            transactions,
+                            security,
+                            clock,
+                        )
+                        .execute(current, shift)
                 "holidays" ->
                     ListWorkHolidays(
                             schedules,

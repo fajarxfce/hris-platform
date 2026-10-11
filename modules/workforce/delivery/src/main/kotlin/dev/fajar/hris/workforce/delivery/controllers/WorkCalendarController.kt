@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*
 class WorkCalendarController(
     private val saveShift: SaveShift,
     private val shifts: ListShifts,
+    private val shift: GetShift,
     private val assign: AssignWeeklySchedule,
     private val roster: SetRosterDay,
     private val calendar: GetEmployeeCalendar,
@@ -32,6 +33,10 @@ class WorkCalendarController(
         shifts.execute(actor, query, after, limit).response().let {
             Page(it.items.map { shift -> shift.toResponse() }, it.nextCursor)
         }
+
+    @GetMapping("/shifts/{id}")
+    fun shift(actor: Actor, @PathVariable id: UUID): ShiftResponse =
+        shift.execute(actor, id).response().toResponse()
 
     @PutMapping("/shifts/{id}")
     fun saveShift(

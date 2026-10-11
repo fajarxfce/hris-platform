@@ -14,6 +14,11 @@ Acceptance: duplicate/offline events, checkout across midnight, timezone transit
 
 Versioned shift templates, effective weekly assignments, explicit daily roster overrides, holidays, and scoped calendar reads are implemented. Published schedules store shift snapshots; changing a template does not rewrite them. Selecting a shift requires its observed version. Assignment, roster, shift, and holiday revisions are append-only and audited.
 
+`GET /workforce/shifts/{id}` returns one current template and its observed version,
+including inactive templates, under `workforce.read`. A missing ID and an ID from
+another company both return `shift_not_found`. The read uses the shared schedule
+and access guards and rechecks session assurance before releasing the result.
+
 Calendar precedence is explicit roster, active holiday, then the effective weekly pattern. A null roster shift means an explicit day off. Calendars distinguish work, off, and unassigned dates. Overnight shifts retain their starting work date. Nonexistent DST local times return a dated validation failure; ambiguous local times use the earlier offset and elapsed UTC minutes. Calendar reads are bounded to 62 days and holiday queries to 366 days.
 
 Calendar commands and reads revalidate live company membership, credentials, the original/live permission intersection, and current MFA age under guards. A proof that expires while a request waits cannot authorize its result or an existing command receipt. Receipts require current authority but do not reapply a successful command's mutable period or shift checks. Calendar reads hold a shared schedule guard across their component queries; concurrent readers can proceed while schedule writers wait. Assignment and roster commands protect employment references before checking eligibility. The lock order is schedule, applicable months, people, company, membership, then account.

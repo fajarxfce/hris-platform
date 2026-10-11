@@ -61,6 +61,18 @@ class ApiContractHttpTest : PeopleApiFixture() {
         assertFalse(schema.has("recipients"))
     }
 
+    @Test
+    fun shiftDetailsAdvertiseCompanyAdmissionAndTheirCurrentVersion() {
+        val api = contract()
+        val operation = api["paths"]["/api/v1/companies/{companyId}/workforce/shifts/{id}"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val schema = api["components"]["schemas"]["ShiftResponse"]["properties"]
+        assertTrue(schema.has("id"))
+        assertTrue(schema.has("details"))
+        assertTrue(schema.has("active"))
+        assertTrue(schema.has("version"))
+    }
+
     private fun checkReferences(root: JsonNode, node: JsonNode, depth: Int = 0) {
         assertTrue(depth < 64)
         if (node.isObject) {

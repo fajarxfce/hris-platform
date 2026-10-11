@@ -1007,3 +1007,15 @@ together with 23 workforce-domain tests, formatting and architecture checks.
 The first corrected run exposed four incorrect test expectations for the receipt's
 `replayed` flag; the focused rerun passed after fixing those assertions. These are
 isolated PostgreSQL tests, not new dashboard or mobile acceptance.
+
+## Shift detail API
+
+The shift detail endpoint returns the current version and active state under
+current company access. Foreign and missing IDs share one not-found response.
+Shared readers can proceed concurrently; cancelling a pending detail releases
+its schedule/access guards and permits a later writer.
+
+Nineteen selected integration and API-contract tests passed, including the new
+detail read, revoked grants/credentials after admission, cancellation cleanup,
+inactive templates, and eight calendar MFA expiry scenarios. Formatting and
+architecture checks passed. Dashboard shift management remains the next step.

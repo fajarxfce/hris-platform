@@ -24,20 +24,30 @@ fun validateImmediateTransfer(
     sourceToday: LocalDate,
     targetToday: LocalDate,
 ): Result<Unit> {
-    if (
-        sourceToday != targetToday ||
-            command.terms.startDate != sourceToday ||
-            command.terms.effectiveFrom != sourceToday
-    )
+    val eligible = validateTransferSource(source, sourceToday, targetToday)
+    if (eligible is Result.Failed) return eligible
+    if (command.terms.startDate != sourceToday || command.terms.effectiveFrom != sourceToday)
         return Result.Failed(
             Failure(FailureKind.VALIDATION, "transfer_requires_current_company_date")
         )
-    if (!source.terms.isWorkingOn(sourceToday) || !source.terms.startDate.isBefore(sourceToday))
-        return Result.Failed(Failure(FailureKind.CONFLICT, "source_employment_not_transferable"))
     if (
         command.terms.status !in setOf(EmploymentStatus.ACTIVE, EmploymentStatus.PROBATION) ||
             command.terms.managerId == command.targetEmploymentId
     )
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_transfer_terms"))
+    return Result.Success(Unit)
+}
+
+fun validateTransferSource(
+    source: Employee,
+    sourceToday: LocalDate,
+    targetToday: LocalDate,
+): Result<Unit> {
+    if (sourceToday != targetToday)
+        return Result.Failed(
+            Failure(FailureKind.VALIDATION, "transfer_requires_current_company_date")
+        )
+    if (!source.terms.isWorkingOn(sourceToday) || !source.terms.startDate.isBefore(sourceToday))
+        return Result.Failed(Failure(FailureKind.CONFLICT, "source_employment_not_transferable"))
     return Result.Success(Unit)
 }

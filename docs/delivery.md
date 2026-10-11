@@ -952,3 +952,17 @@ their separate acceptance work.
 
 
 Transfer admission and authority: 34 selected HTTP/PostgreSQL and API-contract tests passed, together with formatting and architecture checks. Regressions first reproduced destination People-disable bypass, adoption of an offboarding grant during a pending request, and expired MFA on transfer-history reads. The corrected transaction checks both company policies before mutation/replay and intersects captured/live authority. Tests also cover destination maintenance and client builds, unchanged original replay, secondary policy SELECT scope, denied secondary writes, third-company isolation, and context cleanup. This entry records isolated integration tests; the dashboard transfer workflow remains subsequent work.
+
+## Scoped employment transfer review
+
+The transfer-review endpoint supplies the current source version, both company
+dates from one server instant, and current destination picker permissions.
+It checks both company policies, intersected grants and MFA after acquiring its
+guards. It neither acquires private profiles nor reserves mutation eligibility.
+
+Forty-one distinct HTTP/PostgreSQL and API-contract tests and eight people-domain
+tests passed, together with formatting, architecture checks and both application
+JAR builds. Six review tests cover response scope, date eligibility, destination
+availability, added/removed grants during a wait and cancellation cleanup. The
+assurance suite also verifies MFA expiry while review waits on the account guard.
+Cancellation releases both company policy guards and permits subsequent writes.

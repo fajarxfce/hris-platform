@@ -6,6 +6,7 @@ import dev.fajar.hris.core.http.*
 import dev.fajar.hris.people.delivery.mappers.*
 import dev.fajar.hris.people.delivery.requests.EmploymentTransferRequest
 import dev.fajar.hris.people.delivery.responses.EmploymentTransferResponse
+import dev.fajar.hris.people.delivery.responses.EmploymentTransferReviewResponse
 import dev.fajar.hris.people.domain.entities.EmploymentTransferCommand
 import dev.fajar.hris.people.domain.usecases.*
 import java.util.UUID
@@ -16,7 +17,17 @@ import org.springframework.web.bind.annotation.*
 class EmploymentTransferController(
     private val transfer: TransferEmployee,
     private val history: GetEmploymentTransfers,
+    private val review: GetEmploymentTransferReview,
 ) {
+    @GetMapping("/transfer-review")
+    fun review(
+        actor: Actor,
+        client: ClientRequest,
+        @PathVariable id: UUID,
+        @RequestParam targetCompanyId: UUID,
+    ): EmploymentTransferReviewResponse =
+        review.execute(actor, id, targetCompanyId, client).response().toResponse()
+
     @PostMapping("/transfer")
     fun transfer(
         actor: Actor,

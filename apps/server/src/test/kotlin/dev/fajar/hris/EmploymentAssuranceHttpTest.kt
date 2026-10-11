@@ -1,5 +1,7 @@
 package dev.fajar.hris
 
+import dev.fajar.hris.administration.domain.entities.ClientRequest
+import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
@@ -26,6 +28,8 @@ class EmploymentAssuranceHttpTest : PeopleApiFixture() {
     @Autowired private lateinit var operations: OperationRepository
     @Autowired private lateinit var journal: ChangeJournalRepository
     @Autowired private lateinit var transactions: TransactionRunner
+    @Autowired private lateinit var transferTransactions: CrossCompanyTransactionRunner
+    @Autowired private lateinit var clientPolicies: CompanyClientPolicyRepository
     @Autowired private lateinit var transfers: EmploymentTransferRepository
     @Autowired private lateinit var lifecycle: LifecycleRepository
     @Autowired private lateinit var accountProbe: AccountLockProbe
@@ -39,6 +43,7 @@ class EmploymentAssuranceHttpTest : PeopleApiFixture() {
                 "self",
                 "history",
                 "transfers",
+                "transfer-review",
                 "details",
                 "revision",
                 "create",
@@ -52,6 +57,7 @@ class EmploymentAssuranceHttpTest : PeopleApiFixture() {
         val browser = client()
         val csrf = login(browser)
         val company = company(browser, csrf)
+        val destination = if (operation == "transfer-review") company(browser, csrf) else null
         val existing = employee(browser, csrf, company)
         val baseline = if (operation == "cancel") 1L else 0L
         if (operation == "cancel") {
@@ -74,21 +80,37 @@ class EmploymentAssuranceHttpTest : PeopleApiFixture() {
                 account,
                 "$account@example.test",
             )
-        database()
-            .update(
-                "insert into company_memberships(company_id,account_id) values(?,?)",
-                company,
-                account,
-            )
-        for (permission in listOf("people.read", "people.manage")) database()
-            .update(
-                "insert into membership_permissions(company_id,account_id,permission) values(?,?,?)",
-                company,
-                account,
-                permission,
-            )
+        val permissions =
+            setOf("people.read", "people.manage") +
+                if (destination != null) setOf("people.transfer") else emptySet()
+        for (scope in listOfNotNull(company, destination)) {
+            database()
+                .update(
+                    "insert into company_memberships(company_id,account_id) values(?,?)",
+                    scope,
+                    account,
+                )
+            for (permission in permissions) database()
+                .update(
+                    "insert into membership_permissions(company_id,account_id,permission) values(?,?,?)",
+                    scope,
+                    account,
+                    permission,
+                )
+        }
         val security = IdentitySecurityPolicy(enforceMfa = true)
         val get = GetEmployee(people, companies, members, identities, transactions, security, clock)
+        val transferReview =
+            GetEmploymentTransferReview(
+                people,
+                clientPolicies,
+                companies,
+                members,
+                identities,
+                transferTransactions,
+                security,
+                clock,
+            )
         val transferHistory =
             GetEmploymentTransfers(
                 transfers,
@@ -187,7 +209,7 @@ class EmploymentAssuranceHttpTest : PeopleApiFixture() {
             Actor(
                 account,
                 company,
-                setOf("people.read", "people.manage"),
+                permissions,
                 clock.instant(),
                 UUID.randomUUID(),
                 credentialVersion = 0,
@@ -216,6 +238,13 @@ class EmploymentAssuranceHttpTest : PeopleApiFixture() {
                 "self" -> self.execute(current, null, 20)
                 "history" -> history.execute(current, existing, null, 50)
                 "transfers" -> transferHistory.execute(current, existing)
+                "transfer-review" ->
+                    transferReview.execute(
+                        current,
+                        existing,
+                        requireNotNull(destination),
+                        ClientRequest(null, false),
+                    )
                 "revision" -> revision.execute(current, existing, 0)
                 "create" ->
                     create.execute(

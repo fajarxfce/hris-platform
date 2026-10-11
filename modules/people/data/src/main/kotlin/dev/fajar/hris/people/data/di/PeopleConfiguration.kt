@@ -317,6 +317,28 @@ class PeopleConfiguration {
         )
 
     @Bean
+    fun getEmploymentTransferReview(
+        people: PeopleRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: CrossCompanyTransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetEmploymentTransferReview(
+            people,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun transferEmployee(
         people: PeopleRepository,
         transfers: EmploymentTransferRepository,

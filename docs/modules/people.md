@@ -54,6 +54,18 @@ Only revisions after today in the owning company's timezone can be cancelled. In
 
 `POST /companies/{companyId}/employees/{id}/transfer` creates a new destination employment and ends the source employment in one transaction. It accepts a stable destination employment ID, destination employee number and terms, expected source version, reason, and idempotency key. The original person, profile ownership, account, and employment history are preserved. `GET .../employees/{id}/transfers` returns the incoming/outgoing transfer records visible from that company. Transfer records are immutable.
 
+`GET .../employees/{id}/transfer-review?targetCompanyId={id}` returns the current
+source employment/version, both company names/timezones and calendar dates from
+one server instant, and the destination grants available to this request. It
+requires source `people.read` and transfer-management access in both companies.
+Ordered shared policy guards precede the source people guard and ordered access
+guards. Original/live grants, current MFA and both company client policies are
+rechecked after waiting. The read excludes private profile fields and does not
+acquire destination employee or organization directories. Each picker requires
+its own destination read grant. This review supplies current command context;
+the transfer still independently checks assignments, other employments, lifecycle
+cases, reporting lines and linked-account access before committing.
+
 This operation implements an immediate transfer: the effective/start date must be today in both companies, and the source must have started before today. Future revisions and current or scheduled reporting dependents must be cancelled/reassigned first. The destination cannot have another open or scheduled employment for the same person. A transferred source employment cannot be reopened through ordinary revision; a later employment must have its own identity. Target unit kinds, manager eligibility, employment terms, and employee number uniqueness are validated.
 
 The actor needs `people.manage` and `people.transfer` in both companies, recent authentication, and recent MFA when enabled. Company, membership, and current account access are pinned and rechecked inside the transaction. A linked account must already have an active destination membership. Transfer never copies role grants or activates a global account. If no other current or planned employment remains in the source company, `people.offboard` is additionally required and its membership is deactivated with a frozen grant history. Self-removal and removal of the last active company administrator are rejected. Other company memberships remain unchanged.

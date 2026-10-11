@@ -10,6 +10,8 @@ import type { OrganizationUseCases } from "../features/organization/presentation
 import type { PeopleUseCases } from "../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../features/reporting/presentation/contracts/reporting-use-cases";
 
+import type { WorkforceUseCases } from "../features/workforce/presentation/contracts/workforce-use-cases";
+
 export type ApplicationDependencies = Readonly<{
   clientBuild: number;
   identity: IdentityController;
@@ -21,6 +23,7 @@ export type ApplicationDependencies = Readonly<{
   jobs: JobsUseCases;
   leave: LeaveUseCases;
   organization: OrganizationUseCases;
+  workforce: WorkforceUseCases;
   people: PeopleUseCases;
   lifecycle: LifecycleUseCases;
   nextIdentifier: () => string;

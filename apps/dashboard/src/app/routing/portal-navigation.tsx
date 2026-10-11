@@ -1,6 +1,7 @@
 import {
   ApprovalsApp20Regular,
   CalendarCheckmark20Regular,
+  CalendarClock20Regular,
   ClipboardTaskListLtr20Regular,
   DataBarVertical20Regular,
   History20Regular,
@@ -52,6 +53,8 @@ import { canReadEmployees } from "../../features/people/domain/policies/employee
 import { employeeCreationMessages } from "../../features/people/presentation/i18n/employee-creation-messages";
 import { employeeImportMessages } from "../../features/people/presentation/i18n/employee-import-messages";
 import { canReadHeadcount } from "../../features/reporting/domain/policies/headcount-policy";
+import { canReadShifts } from "../../features/workforce/domain/policies/shift-policy";
+import { shiftMessages } from "../../features/workforce/presentation/i18n/shift-messages";
 
 /** Navigation visibility uses the same client policy as the feature; the API enforces access. */
 export function portalNavigation(
@@ -62,6 +65,15 @@ export function portalNavigation(
   const permissions = access?.permissions ?? [];
   return [
     { to: "/", label: text.overview, icon: <Home20Regular /> },
+    ...(canReadShifts(permissions)
+      ? [
+          {
+            to: "/workforce/shifts",
+            label: shiftMessages(locale).title,
+            icon: <CalendarClock20Regular />,
+          },
+        ]
+      : []),
     ...(canManageAnnouncements(permissions)
       ? [
           {

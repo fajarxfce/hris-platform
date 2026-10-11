@@ -2,6 +2,31 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  shift_not_found: [
+    "This shift is unavailable in the current company.",
+    "Shift tidak tersedia di perusahaan ini.",
+  ],
+  invalid_shift: [
+    "Review the shift code, name, work mode and timezone.",
+    "Periksa kode, nama, mode kerja, dan zona waktu shift.",
+  ],
+  invalid_shift_change: [
+    "Review the shift version and enter a reason of up to 1,000 characters.",
+    "Periksa versi shift dan isi alasan maksimal 1.000 karakter.",
+  ],
+  invalid_shift_duration: [
+    "Use whole-minute times and a break shorter than the shift. Start and end times must differ.",
+    "Gunakan jam dalam menit penuh dan durasi istirahat lebih pendek dari shift. Jam mulai dan selesai harus berbeda.",
+  ],
+  invalid_location_accuracy: [
+    "GPS accuracy must be between 1 and 10,000 metres.",
+    "Akurasi GPS harus antara 1 dan 10.000 meter.",
+  ],
+  invalid_geofence: [
+    "Review the coordinates and area radius. An area restriction requires location capture.",
+    "Periksa koordinat dan radius area. Pembatasan area memerlukan lokasi wajib.",
+  ],
+
   invalid_announcement_command: ["Review the publication fields.", "Periksa isian publikasi."],
   invalid_announcement_schedule: [
     "Choose a publication time within the next 365 days.",

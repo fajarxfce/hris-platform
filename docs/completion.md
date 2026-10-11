@@ -33,7 +33,7 @@ retain their own acceptance work.
 | Mobile identity | Native OIDC handoff and external-provider acceptance. Android MFA and device-session workflows are validated; iOS physical acceptance remains separate. |
 | Mobile foundation | Additional business replicas and durable commands, background restoration, deep links and push registration. Bounded encrypted company admission, company availability, the employee inbox and HRIS sync client are implemented. |
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
-| Workforce | Dashboard shifts, schedules, rosters, holidays, attendance reviews/corrections, overtime and closing; bulk/reset and late corrections; mobile calendar, verified/offline attendance and overtime requests |
+| Workforce | Dashboard schedules, rosters, holidays, attendance reviews/corrections, overtime and closing; bulk/reset and late corrections; mobile calendar, verified/offline attendance and overtime requests. Shift templates, details and editing are implemented and verified against the real API. |
 | Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry; mobile balances, requests, evidence and cancellation |
 | Documents | Dashboard document/upload/processing/retention workflows; mobile scoped resumable upload/download and evidence acquisition |
 | Expenses | Dashboard policies, claims, review, payment/reconciliation and corrections; mobile claims, receipts, submission and payment progress |

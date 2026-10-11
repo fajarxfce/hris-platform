@@ -19,6 +19,10 @@ including inactive templates, under `workforce.read`. A missing ID and an ID fro
 another company both return `shift_not_found`. The read uses the shared schedule
 and access guards and rechecks session assurance before releasing the result.
 
+The dashboard provides shift search, current details and versioned create/edit
+forms, with explicit request recovery after response loss. Scheduling and employee
+calendar screens remain separate delivery work.
+
 Calendar precedence is explicit roster, active holiday, then the effective weekly pattern. A null roster shift means an explicit day off. Calendars distinguish work, off, and unassigned dates. Overnight shifts retain their starting work date. Nonexistent DST local times return a dated validation failure; ambiguous local times use the earlier offset and elapsed UTC minutes. Calendar reads are bounded to 62 days and holiday queries to 366 days.
 
 Calendar commands and reads revalidate live company membership, credentials, the original/live permission intersection, and current MFA age under guards. A proof that expires while a request waits cannot authorize its result or an existing command receipt. Receipts require current authority but do not reapply a successful command's mutable period or shift checks. Calendar reads hold a shared schedule guard across their component queries; concurrent readers can proceed while schedule writers wait. Assignment and roster commands protect employment references before checking eligibility. The lock order is schedule, applicable months, people, company, membership, then account.

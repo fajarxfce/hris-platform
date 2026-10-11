@@ -85,6 +85,7 @@ export function PortalWorkspace(
                   jobs={props.jobs}
                   leave={props.leave}
                   organization={props.organization}
+                  workforce={props.workforce}
                   people={props.people}
                   lifecycle={props.lifecycle}
                   company={state.workspace.company}

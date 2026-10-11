@@ -18,6 +18,7 @@ import { createLifecycleFeature } from "../features/lifecycle/di/lifecycle-featu
 import { createOrganizationFeature } from "../features/organization/di/organization-feature";
 import { createPeopleFeature } from "../features/people/di/people-feature";
 import { createReportingFeature } from "../features/reporting/di/reporting-feature";
+import { createWorkforceFeature } from "../features/workforce/di/workforce-feature";
 import { Application } from "./application";
 import "./styles.css";
 
@@ -36,6 +37,7 @@ const jobs = createJobsFeature(http);
 const files = createBrowserFiles();
 const leave = createLeaveFeature(http, files);
 const organization = createOrganizationFeature(http);
+const workforce = createWorkforceFeature(http);
 const people = createPeopleFeature(http, files);
 const lifecycle = createLifecycleFeature(http);
 const identityFeature = createIdentityFeature(http);
@@ -62,6 +64,7 @@ const router = createBrowserRouter([
           jobs={jobs}
           leave={leave}
           organization={organization}
+          workforce={workforce}
           people={people}
           lifecycle={lifecycle}
           nextIdentifier={createBrowserUuid}

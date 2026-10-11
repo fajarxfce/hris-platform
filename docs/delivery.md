@@ -1019,3 +1019,21 @@ Nineteen selected integration and API-contract tests passed, including the new
 detail read, revoked grants/credentials after admission, cancellation cleanup,
 inactive templates, and eight calendar MFA expiry scenarios. Formatting and
 architecture checks passed. Dashboard shift management remains the next step.
+
+## Shift management dashboard
+
+The dashboard now provides bounded shift search, current details and versioned
+editing. It supports overnight shifts, work modes and location policy. Changes
+retain one immutable request until a known receipt, including across MFA renewal.
+Confirmed reload clears discarded fields even when the fetched values are identical.
+
+Architecture, formatting, TypeScript and 793 dashboard tests passed. The ten new
+feature tests and six browser scenarios passed again after removing lint warnings
+from the new test code. The production build passed; its 729 kB main chunk retains
+the existing size advisory. Light desktop and dark mobile screenshots were inspected.
+
+The real browser/API/PostgreSQL scenario passed. It deliberately loses a response
+after a shift is committed, recovers the same receipt, assigns the original shift,
+then edits and deactivates the template. The employee calendar retains revision zero
+and the original overnight interval. Its isolated database was cleaned up. No mobile
+runtime or physical-device interaction was part of this increment.

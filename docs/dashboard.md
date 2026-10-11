@@ -12,6 +12,21 @@ Primary screens: organization and employee directory; roster and attendance exce
 
 Reference: https://learn.microsoft.com/en-us/azure/azure-portal/azure-portal-overview
 
+## Shift templates
+
+The Workforce route owns a bounded shift directory, current details, and create/edit
+forms. Templates include overnight times, breaks, IANA timezone, work mode, active
+state and location requirements. A reason accompanies each observed-version change.
+Existing assignments retain their saved shift snapshots, including after a template
+is edited or deactivated.
+
+Forms keep one immutable operation through an unknown outcome and MFA renewal.
+Only an explicit retry resends it. Definite conflicts require a protected reload;
+discarding edits also resets fields when the server values have not changed.
+Company changes cancel request owners and cannot restore old company content from
+a late response. Read-only grants hide mutation controls, and use cases enforce
+the same client permission boundary before transport.
+
 ## Implemented foundation
 
 `apps/dashboard` provides password sign-in, configured SSO entry links, session bootstrap, authenticator enrollment/verification, and explicit acknowledgement of one-use recovery codes. The portal includes current-company selection, an authorized company overview, organization directories, parent details and editing, employee onboarding, directories, employment history, dated revisions and scheduled revision cancellation, separately authorized personal profiles with editing/history, lifecycle template catalogs and checklist editing, scoped case/checklist/history views, assigned-task queues, versioned task changes and assignment, company/group headcount reports, audit metadata search, client policy review and versioned editing, a job monitor with cancellation, employee CSV intake, result review and guarded apply/resume/cancel actions, responsive navigation, and English/Indonesian light/dark interfaces. Other business resource screens listed above remain subsequent work; the overview does not invent statistics.

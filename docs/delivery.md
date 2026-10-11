@@ -949,3 +949,6 @@ survived cancellation of its revocation confirmation, then returned
 was signed out and its company grant disabled, and the original employee account was
 restored. External SSO, push delivery, iOS devices and workload measurements retain
 their separate acceptance work.
+
+
+Transfer admission and authority: 34 selected HTTP/PostgreSQL and API-contract tests passed, together with formatting and architecture checks. Regressions first reproduced destination People-disable bypass, adoption of an offboarding grant during a pending request, and expired MFA on transfer-history reads. The corrected transaction checks both company policies before mutation/replay and intersects captured/live authority. Tests also cover destination maintenance and client builds, unchanged original replay, secondary policy SELECT scope, denied secondary writes, third-company isolation, and context cleanup. This entry records isolated integration tests; the dashboard transfer workflow remains subsequent work.

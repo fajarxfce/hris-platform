@@ -1,9 +1,13 @@
 package dev.fajar.hris.people.domain.usecases
 
+import dev.fajar.hris.administration.domain.entities.*
+import dev.fajar.hris.administration.domain.policies.*
+import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.*
 import dev.fajar.hris.identity.domain.policies.requireRecentAuthentication
 import dev.fajar.hris.identity.domain.policies.requireRecentMfa
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.entities.UnitKind
 import dev.fajar.hris.organization.domain.repositories.*
@@ -11,7 +15,6 @@ import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.policies.*
 import dev.fajar.hris.people.domain.repositories.*
 import java.time.Clock
-import java.time.LocalDate
 import java.time.ZoneId
 import java.util.UUID
 
@@ -19,6 +22,7 @@ class TransferEmployee(
     private val people: PeopleRepository,
     private val lifecycle: LifecycleRepository,
     private val transfers: EmploymentTransferRepository,
+    private val policies: CompanyClientPolicyRepository,
     private val companies: CompanyRepository,
     private val units: OrganizationRepository,
     private val identities: IdentityRepository,
@@ -35,12 +39,13 @@ class TransferEmployee(
         operationId: UUID,
         id: UUID,
         input: EmploymentTransferCommand,
+        client: ClientRequest,
     ): Result<MutationReceipt> {
         val sourceCompany =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
-        if (!actor.permissions.containsAll(setOf("people.manage", "people.transfer")))
-            return Result.Failed(Failure(FailureKind.FORBIDDEN, "transfer_access_required"))
+        val permission = validateTransferAccess(actor)
+        if (permission is Result.Failed) return permission
         if (input.targetCompanyId == sourceCompany || input.expectedVersion < 0)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_employment_transfer"))
         val command = input.copy(employeeNumber = input.employeeNumber.trim().uppercase())
@@ -74,8 +79,37 @@ class TransferEmployee(
             )
         val scopes = listOf(sourceCompany, command.targetCompanyId).sorted()
         return transactions.run(actor, command.targetCompanyId) {
+            // Capture destination authority before waiting on command/resource guards.
+            val destinationAccess = identities.access(actor.accountId, command.targetCompanyId)
+            if (destinationAccess is Result.Failed) return@run destinationAccess
+            val originalTarget = (destinationAccess as Result.Success).value
+            val captured =
+                validateCompanySessionActor(
+                    actor.copy(
+                        companyId = command.targetCompanyId,
+                        permissions = originalTarget?.permissions.orEmpty(),
+                    ),
+                    originalTarget,
+                    clock.instant(),
+                    security,
+                )
+            if (captured is Result.Failed)
+                return@run Result.Failed(
+                    captured.failure.copy(
+                        parameters =
+                            captured.failure.parameters +
+                                ("companyId" to command.targetCompanyId.toString())
+                    )
+                )
+            val capturedTarget = (captured as Result.Success).value
+            val targetPermission = validateTransferAccess(capturedTarget)
+            if (targetPermission is Result.Failed) return@run targetPermission
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
+            for (company in scopes) {
+                val guard = policies.lock(company, shared = true)
+                if (guard is Result.Failed) return@run guard
+            }
             for (company in scopes) {
                 val locked = people.lockReportingLines(company)
                 if (locked is Result.Failed) return@run locked
@@ -92,26 +126,48 @@ class TransferEmployee(
             }
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
-            val sourceAccess = identities.access(actor.accountId, sourceCompany)
-            if (sourceAccess is Result.Failed) return@run sourceAccess
-            val targetAccess = identities.access(actor.accountId, command.targetCompanyId)
-            if (targetAccess is Result.Failed) return@run targetAccess
-            val allowed =
-                validateTransferActor(
-                    actor,
-                    (sourceAccess as Result.Success).value,
-                    (targetAccess as Result.Success).value,
-                )
-            if (allowed is Result.Failed) return@run allowed
+            val now = clock.instant()
+            val liveScopes = linkedMapOf<UUID, Actor>()
+            for (company in scopes) {
+                val original = if (company == sourceCompany) actor else capturedTarget
+                val live =
+                    identities.access(actor.accountId, company).flatMap {
+                        validateCompanySessionActor(original, it, now, security)
+                    }
+                if (live is Result.Failed)
+                    return@run Result.Failed(
+                        live.failure.copy(
+                            parameters =
+                                live.failure.parameters + ("companyId" to company.toString())
+                        )
+                    )
+                val current = (live as Result.Success).value
+                val allowed = validateTransferAccess(current)
+                if (allowed is Result.Failed) return@run allowed
+                liveScopes[company] = current
+                val available =
+                    policies.effective(company, now).flatMap {
+                        validateClientAvailability(
+                            clientPolicyStatus(it, now),
+                            setOf(CompanyModule.PEOPLE),
+                            client.version,
+                            client.native,
+                        )
+                    }
+                if (available is Result.Failed)
+                    return@run Result.Failed(
+                        available.failure.copy(
+                            parameters =
+                                available.failure.parameters + ("companyId" to company.toString())
+                        )
+                    )
+            }
+            val sourceActor = liveScopes.getValue(sourceCompany)
+            val targetActor = liveScopes.getValue(command.targetCompanyId)
             val recent =
                 if (security.enforceMfa)
-                    requireRecentMfa(actor, clock.instant(), security.recentAuthenticationAge)
-                else
-                    requireRecentAuthentication(
-                        actor,
-                        clock.instant(),
-                        security.recentAuthenticationAge,
-                    )
+                    requireRecentMfa(sourceActor, now, security.recentAuthenticationAge)
+                else requireRecentAuthentication(sourceActor, now, security.recentAuthenticationAge)
             if (recent is Result.Failed) return@run recent
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
@@ -126,8 +182,8 @@ class TransferEmployee(
             val targetZone =
                 (destination as Result.Success).value?.timezone
                     ?: return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "company_not_found"))
-            val today = LocalDate.now(clock.withZone(ZoneId.of(sourceZone)))
-            val targetToday = LocalDate.now(clock.withZone(ZoneId.of(targetZone)))
+            val today = now.atZone(ZoneId.of(sourceZone)).toLocalDate()
+            val targetToday = now.atZone(ZoneId.of(targetZone)).toLocalDate()
             val found = people.find(sourceCompany, id, today)
             if (found is Result.Failed) return@run found
             val employee =
@@ -219,7 +275,7 @@ class TransferEmployee(
                     )
                         null
                     else {
-                        if ("people.offboard" !in sourceAccess.value?.permissions.orEmpty())
+                        if ("people.offboard" !in sourceActor.permissions)
                             return@run Result.Failed(
                                 Failure(FailureKind.FORBIDDEN, "offboarding_access_required")
                             )
@@ -257,9 +313,9 @@ class TransferEmployee(
                     status = EmploymentStatus.ENDED,
                     managerId = null,
                 )
-            val revised = people.revise(actor, id, command.expectedVersion, ended, command.reason)
+            val revised =
+                people.revise(sourceActor, id, command.expectedVersion, ended, command.reason)
             if (revised is Result.Failed) return@run revised
-            val targetActor = actor.copy(companyId = command.targetCompanyId)
             val created =
                 people.createForPerson(
                     targetActor,

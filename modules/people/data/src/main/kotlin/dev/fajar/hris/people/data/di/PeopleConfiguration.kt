@@ -1,5 +1,6 @@
 package dev.fajar.hris.people.data.di
 
+import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
@@ -301,12 +302,25 @@ class PeopleConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetEmploymentTransfers(transfers, people, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetEmploymentTransfers(
+            transfers,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun transferEmployee(
         people: PeopleRepository,
         transfers: EmploymentTransferRepository,
+        policies: CompanyClientPolicyRepository,
         lifecycle: LifecycleRepository,
         companies: CompanyRepository,
         units: OrganizationRepository,
@@ -323,6 +337,7 @@ class PeopleConfiguration {
             people,
             lifecycle,
             transfers,
+            policies,
             companies,
             units,
             identities,

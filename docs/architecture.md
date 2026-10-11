@@ -22,6 +22,14 @@ TransactionRunner is a domain port implemented using Spring transactions. A fail
 
 An explicitly injected CrossCompanyTransactionRunner supports atomic employment transfers. It installs one secondary company for a bounded transaction, with RLS policies limited to transfer inputs, employment writes, and audit/outbox inserts. Ordinary transactions explicitly clear that secondary scope. Transfer use cases lock companies/memberships in stable order and recheck live access to both companies before mutation or replay. This is not a global RLS bypass.
 
+Transfers capture destination authority before command/resource waits and intersect
+both companies' original and live grants afterward. Shared client-policy guards are
+acquired in company-ID order before people, destination structure, and access guards.
+Maintenance, minimum builds, People availability, credentials and MFA are checked
+for both companies before mutation or receipt replay. The secondary scope adds only
+SELECT access to client settings; it cannot modify them or read a third company's
+settings. Transfer-history reads also recheck session assurance after their guards.
+
 CompanyReadTransactionRunner provides a separate, explicit SELECT scope for group reporting. A global actor may select one to 32 companies; the use case must authorize every selection before reading report inputs. Policies are limited to employment history and company client settings, with no additional write scope. Company policy, company, membership, and account guards are acquired in that order, with company IDs sorted within each stage. Original and current grants, credentials, MFA assurance, and per-company client availability are checked after waiting. One SQL snapshot computes global and per-company counts without loading profiles. Every other transaction owner clears the read selection, and transaction-local context is discarded on success, failure, or cancellation.
 
 Audit search belongs to administration. Its datasource selects an explicit metadata projection; reasons and change payloads are not acquired. Repository mapping and finite overfetch pagination share the database failure boundary. The use case owns time/filter policy, cursor compatibility, and current audit access/MFA checks. Immutable cursor records permit stable descending timestamp/ID navigation without blocking audit writers, while separate pages remain live reads. This history view does not substitute for commit-ordered mobile synchronization.

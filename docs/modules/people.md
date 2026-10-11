@@ -58,7 +58,14 @@ This operation implements an immediate transfer: the effective/start date must b
 
 The actor needs `people.manage` and `people.transfer` in both companies, recent authentication, and recent MFA when enabled. Company, membership, and current account access are pinned and rechecked inside the transaction. A linked account must already have an active destination membership. Transfer never copies role grants or activates a global account. If no other current or planned employment remains in the source company, `people.offboard` is additionally required and its membership is deactivated with a frozen grant history. Self-removal and removal of the last active company administrator are rejected. Other company memberships remain unchanged.
 
-Both company employment locks are acquired in stable order. A narrowly scoped secondary-company transaction grants only the required read/write access; unrelated tables and third companies stay inaccessible. Employment changes, transfer metadata, membership changes, both audit/outbox records, and the original response receipt commit together. Cancellation, revoked credentials, version conflicts, or a failed destination write roll everything back. Replaying a committed request still requires current access to both companies. Leave balances, compensation, submitted requests, and historical payroll are not copied or recalculated by a transfer; their modules retain ownership.
+Shared client-policy guards and both company employment locks are acquired in stable order, followed by destination structure and access guards. A narrowly scoped secondary-company transaction grants only the required read/write access; unrelated tables and third companies stay inaccessible. Client-policy access in that secondary scope is SELECT-only. Employment changes, transfer metadata, membership changes, both audit/outbox records, and the original response receipt commit together. Cancellation, revoked credentials, version conflicts, or a failed destination write roll everything back. Replaying a committed request still requires current access to both companies. Leave balances, compensation, submitted requests, and historical payroll are not copied or recalculated by a transfer; their modules retain ownership.
+
+Both companies must admit the authenticated client build, remain outside maintenance,
+and have People enabled before mutation or receipt replay. Availability failures
+identify the affected company through a safe `companyId` parameter. Original and
+current grants are intersected; an offboarding grant added while a request waits
+requires a new request. Incoming/outgoing history revalidates current MFA after
+its access guards before returning records.
 
 ## Lifecycle checklists
 

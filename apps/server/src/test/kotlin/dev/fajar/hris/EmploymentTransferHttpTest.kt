@@ -15,6 +15,64 @@ class EmploymentTransferHttpTest : PeopleApiFixture() {
     @Autowired private lateinit var structureProbe: StructureLockProbe
 
     @Test
+    fun anOffboardingGrantAddedWhileTheTransferWaitsRequiresANewRequest() {
+        val admin = client()
+        val adminCsrf = login(admin)
+        val source = company(admin, adminCsrf)
+        val target = company(admin, adminCsrf)
+        val operator = account()
+        val subject = account()
+        val grants = setOf("people.read", "people.manage", "people.transfer")
+        membership(source, operator, grants)
+        membership(target, operator, grants)
+        membership(source, subject, setOf("people.self.read"))
+        membership(target, subject, setOf("people.self.read"))
+        val id = employee(admin, adminCsrf, source, account = subject)
+        val browser = client()
+        val csrf = login(browser, "$operator@example.test")
+        val destination = UUID.randomUUID()
+        val key = UUID.randomUUID()
+        val barrier = StructureLockProbe.Barrier(target)
+        structureProbe.current.set(barrier)
+        Executors.newSingleThreadExecutor().use { pool ->
+            val pending =
+                pool.submit<java.net.http.HttpResponse<String>> {
+                    transfer(browser, csrf, source, id, target, destination, key = key)
+                }
+            try {
+                assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                database()
+                    .update(
+                        "insert into membership_permissions(company_id,account_id,permission) values(?,?,'people.offboard')",
+                        source,
+                        operator,
+                    )
+                barrier.release.countDown()
+                val blocked = pending.get(10, TimeUnit.SECONDS)
+                assertEquals(403, blocked.statusCode(), blocked.body())
+                assertEquals(
+                    "offboarding_access_required",
+                    json.readTree(blocked.body())["code"].asString(),
+                )
+            } finally {
+                barrier.release.countDown()
+                structureProbe.current.set(null)
+            }
+        }
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from employment_transfers where id=?",
+                    Int::class.java,
+                    key,
+                ),
+        )
+        val retry = transfer(browser, csrf, source, id, target, destination, key = key)
+        assertEquals(200, retry.statusCode(), retry.body())
+    }
+
+    @Test
     fun transferAndOrganizationChangesAcquireStructureBeforeCompanyGuards() {
         val admin = client()
         val csrf = login(admin)

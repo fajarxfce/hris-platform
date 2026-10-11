@@ -1,5 +1,6 @@
 package dev.fajar.hris.people.delivery.controllers
 
+import dev.fajar.hris.administration.domain.entities.ClientRequest
 import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.core.http.*
 import dev.fajar.hris.people.delivery.mappers.*
@@ -19,6 +20,7 @@ class EmploymentTransferController(
     @PostMapping("/transfer")
     fun transfer(
         actor: Actor,
+        client: ClientRequest,
         @PathVariable id: UUID,
         @RequestHeader("Idempotency-Key") key: UUID,
         @RequestBody body: EmploymentTransferRequest,
@@ -36,6 +38,7 @@ class EmploymentTransferController(
                     body.terms.toTerms(),
                     body.reason,
                 ),
+                client,
             )
             .response()
             .toResponse()

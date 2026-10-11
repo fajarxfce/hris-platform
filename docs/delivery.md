@@ -1178,3 +1178,17 @@ restarted. The dashboard and its same-origin API proxy returned HTTP 200 on the
 WireGuard interface. Its dev process is now owned by a user service independently
 of the terminal. No phone installation or UI interaction was performed for this
 dashboard increment.
+
+## Attendance session assurance
+
+Attendance windows, capture, independent review, corrections, daily evidence and
+correction history now revalidate MFA age after waiting for resource/access guards.
+Replay retains the original operation and still requires current assurance.
+
+All 41 focused API tests, 25 workforce domain tests and 38 worker tests passed.
+Six PostgreSQL scenarios expire MFA during an account wait, assert no command
+receipt was committed, renew verification and check original receipt replay.
+Existing access, concurrent review, frozen schedules, cancellation and aggregate
+read tests also passed. Architecture, formatting and API/worker JAR builds passed.
+This validates the backend boundary; dashboard and mobile attendance delivery
+remain their own increments.

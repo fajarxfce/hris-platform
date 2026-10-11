@@ -73,6 +73,10 @@ The first event freezes that work date's schedule. One accepted clock-in/out pai
 
 Capture, window issuance, verification, corrections, and attendance reads revalidate live credentials, company membership, and original permissions after acquiring their guards. Current reporting assignments determine team access. Verification excludes both the original event owner and the currently bound employee account. New capture/windows require working employment; an original receipt still requires current ownership and permission, without repeating the successful command's expired time checks. Replaying a capture window never extends its expiry.
 
+These interactive operations and correction-history reads also recheck current MFA
+age after waiting for resource and account guards. Renewed verification can retry
+the original operation; an expired proof cannot release evidence or replay a receipt.
+
 Capture time limits and server proof expiry are evaluated again after pending resource/access acquisition. `receivedAt` reflects that decision time. Aggregate reads acquire shared employee/day guards in ascending date order, bounded to 31 days, before people and access guards. This prevents old event state from being combined with a new correction while allowing concurrent readers. Correction history is one bounded immutable-record query.
 
 Capture accepts up to 31 days of offline history, tolerates at most 30 seconds of future clock skew, and bounds one date to 32 raw events. Employee reads cover at most 31 days. Location evidence includes declared accuracy/mock status and is not a guarantee against a compromised device. Capture-window issuance is bounded to ten per employee per minute.

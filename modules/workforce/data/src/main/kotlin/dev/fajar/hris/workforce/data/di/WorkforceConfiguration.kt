@@ -292,6 +292,7 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         IssueAttendanceCaptureWindow(
@@ -302,6 +303,7 @@ class WorkforceConfiguration {
             members,
             identities,
             transactions,
+            security,
             clock,
         )
 
@@ -318,6 +320,7 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         RecordAttendance(
@@ -332,6 +335,7 @@ class WorkforceConfiguration {
             members,
             identities,
             transactions,
+            security,
             clock,
         )
 
@@ -347,6 +351,7 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         ReviewAttendance(
@@ -360,6 +365,7 @@ class WorkforceConfiguration {
             members,
             identities,
             transactions,
+            security,
             clock,
         )
 
@@ -372,6 +378,7 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         GetEmployeeAttendance(
@@ -382,6 +389,7 @@ class WorkforceConfiguration {
             members,
             identities,
             transactions,
+            security,
             clock,
         )
 
@@ -408,6 +416,7 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         CorrectAttendance(
@@ -422,6 +431,7 @@ class WorkforceConfiguration {
             members,
             identities,
             transactions,
+            security,
             clock,
         )
 
@@ -433,6 +443,7 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
         GetAttendanceCorrectionHistory(
@@ -442,6 +453,7 @@ class WorkforceConfiguration {
             members,
             identities,
             transactions,
+            security,
             clock,
         )
 

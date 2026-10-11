@@ -52,6 +52,10 @@ that expires while waiting cannot authorize calendar data, a mutation, or receip
 replay. This uses the identity domain's pure policy with an explicit clock and
 security configuration; background execution retains its separate authority.
 
+Attendance capture, capture windows, verification, corrections, daily reads and
+correction history apply the same interactive assurance policy after their guards.
+An original receipt retains its data but still requires current session assurance.
+
 Leave request details acquire the employee ledger and cutoff guards, then shared people, approval, company, membership, and actor-account guards. Request history and effective approvers remain coherent while reassignment waits. Leave directories acquire shared people and access guards before checking current employee scope. Request submission, decisions, withdrawal, cancellation, and these readers revalidate current MFA after their guards; an earlier proof cannot authorize a later mutation or receipt replay.
 
 Leave attachment metadata and content use shared people, approval, and access guards. Content is read from storage outside the SQL transaction and reauthorized afterward, including current MFA age. A proof that expires during a guard or storage wait cannot release metadata or bytes. Read guards continue to serialize against approval mutations without excluding other authorized readers.

@@ -490,3 +490,8 @@ sections for people, time and attendance, requests, communications and administr
 Local menu search filters only authorized entries. A detail route selects its most
 specific visible ancestor; the existing departure guard still owns navigation.
 The sidebar scrolls independently and retains an icon rail on narrow viewports.
+
+The compact rail ignores the desktop search while its field is hidden. Returning
+to the wider sidebar restores the query. The media-query subscription belongs to
+the workspace hook and is released with it. Both resize directions have a browser
+regression test; architecture, type checks and 844 unit tests passed.

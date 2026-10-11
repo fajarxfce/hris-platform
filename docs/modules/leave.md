@@ -128,3 +128,18 @@ through the selected policy; actual evidence and approval routing are validated 
 submission. A preview cannot authorize an offline request or promise a future
 balance. Submission retains its independent transaction and original-operation
 receipt semantics.
+
+The preview also returns an opaque content `revision`. Clients retain it with the
+reviewed dates and send it as `previewRevision` on submission. It covers company,
+employee, timezone, effective policy revision, selected/excluded dates, resolved
+shift facts and annual ledger versions. Reordering the same selected dates does
+not change the revision. It is an optimistic precondition, not an access token.
+
+Submission shares the schedule and policy guards while it holds the employee
+ledger and access guards. A changed preview returns `leave_preview_changed`
+without reserving days or recording a command receipt. Malformed revisions return
+`invalid_leave_preview`. An original committed operation replays its receipt
+before evaluating today's preview; its payload includes the original revision.
+The field is optional for existing direct-submit consumers, which retain the
+same server-side eligibility, authorization and accounting checks. New clients
+that show a preview should always send its revision.

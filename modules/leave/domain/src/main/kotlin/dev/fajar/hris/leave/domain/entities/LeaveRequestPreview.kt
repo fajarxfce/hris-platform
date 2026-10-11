@@ -13,4 +13,5 @@ data class LeaveRequestPreview(
     val days: List<LeaveDay>,
     val excludedDates: List<LocalDate>,
     val balances: List<LeavePreviewBalance>,
+    val revision: String,
 )

@@ -50,6 +50,7 @@ class SubmitLeaveRequest(
         days: List<RequestedLeaveDay>,
         reason: String,
         attachmentRevisionIds: List<UUID> = emptyList(),
+        previewRevision: String? = null,
     ): Result<MutationReceipt> {
         if ("leave.manage" !in actor.permissions && "leave.self.manage" !in actor.permissions)
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
@@ -57,6 +58,8 @@ class SubmitLeaveRequest(
         if (valid is Result.Failed) return valid
         val attachmentInput = validateLeaveAttachmentIds(attachmentRevisionIds)
         if (attachmentInput is Result.Failed) return attachmentInput
+        if (previewRevision != null && !Regex("[0-9a-f]{64}").matches(previewRevision))
+            return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_leave_preview"))
         val key =
             OperationKey(
                 "leave.request_submit",
@@ -65,9 +68,11 @@ class SubmitLeaveRequest(
                     days
                         .sortedBy { it.workDate }
                         .flatMap { listOf(it.workDate.toString(), it.portion.name) } +
-                    if (attachmentRevisionIds.isEmpty()) emptyList()
+                    (if (attachmentRevisionIds.isEmpty()) emptyList()
                     else
-                        listOf("attachments") + attachmentRevisionIds.map { it.toString() }.sorted(),
+                        listOf("attachments") +
+                            attachmentRevisionIds.map { it.toString() }.sorted()) +
+                    (previewRevision?.let { listOf("preview", it) } ?: emptyList()),
             )
         val company = requireNotNull(actor.companyId)
         val from = days.minOf { it.workDate }
@@ -77,8 +82,12 @@ class SubmitLeaveRequest(
             if (replay is Result.Failed) return@run replay
             val lock = ledger.lock(company, employeeId)
             if (lock is Result.Failed) return@run lock
+            val scheduleGuard = schedules.lock(company, shared = true)
+            if (scheduleGuard is Result.Failed) return@run scheduleGuard
             val cutoffLock = cutoffs.lock(company)
             if (cutoffLock is Result.Failed) return@run cutoffLock
+            val policyGuard = policies.lock(company, shared = true)
+            if (policyGuard is Result.Failed) return@run policyGuard
             val peopleLock = people.lockReportingLines(company)
             if (peopleLock is Result.Failed) return@run peopleLock
             if (attachmentRevisionIds.isNotEmpty()) {
@@ -191,12 +200,33 @@ class SubmitLeaveRequest(
             val overlap = validateLeaveOverlap(charged, (occupied as Result.Success).value)
             if (overlap is Result.Failed) return@run overlap
             val movements = leaveLedgerMovements(charged, LeaveBalanceEffect.RESERVE)
+            val balances = mutableListOf<LeavePreviewBalance>()
             for (movement in movements) {
                 val balance = ledger.balance(company, employeeId, typeId, movement.year)
                 if (balance is Result.Failed) return@run balance
                 val enough = validateLeaveMovement((balance as Result.Success).value, movement)
                 if (enough is Result.Failed) return@run enough
+                balances += LeavePreviewBalance(balance.value, movement.reservedDelta)
             }
+            if (
+                previewRevision != null &&
+                    previewRevision !=
+                        leavePreviewRevision(
+                            company,
+                            employeeId,
+                            settings.timezone,
+                            LeavePolicySnapshot(
+                                type.id,
+                                type.code,
+                                type.appliedRevision,
+                                type.policy,
+                            ),
+                            days,
+                            charged,
+                            balances,
+                        )
+            )
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "leave_preview_changed"))
             val context =
                 ApprovalContext(
                     UUID.randomUUID(),

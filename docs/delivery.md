@@ -1391,3 +1391,21 @@ sent it after reconnecting and withdrew the pending cancellation. Reservations a
 consumption matched the server ledger throughout. The validated APK was installed
 on the connected phone with advance notice and without launching its UI. New
 mobile request creation and evidence transfer remain separate work.
+
+## Leave confirmation against reviewed facts
+
+Preview returns an opaque content revision covering selected dates, effective
+policy, resolved calendar and annual balances. Submission can require that
+revision, shares the source guards through commit, and rejects changed facts
+without creating a request, reservation or receipt. Original committed operations
+retain their receipt replay independently of later policy or calendar changes.
+Existing direct-submit consumers retain their current authorization and accounting
+checks; the optional precondition does not grant access.
+
+Architecture, formatting, all 20 Leave domain tests, 58 focused API/contract tests,
+and both application JAR builds pass. Two new domain tests and nine HTTP/PostgreSQL
+tests cover stable input ordering, changed identity/date/policy/shift/ledger facts,
+failed-precondition rollback and recovery, competing confirmations, replay after
+withdrawal and policy replacement, pending source guards and interruption cleanup.
+No new DI graph or database schema was introduced. Mobile command persistence and
+the creation interface remain their own integration work.

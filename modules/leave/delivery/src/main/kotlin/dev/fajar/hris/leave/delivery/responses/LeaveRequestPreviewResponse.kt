@@ -13,4 +13,10 @@ data class LeaveRequestPreviewResponse(
     val chargedDays: String,
     val excludedDates: List<LocalDate>,
     val balances: List<LeavePreviewBalanceResponse>,
+    @field:io.swagger.v3.oas.annotations.media.Schema(
+        pattern = "[0-9a-f]{64}",
+        minLength = 64,
+        maxLength = 64,
+    )
+    val revision: String,
 )

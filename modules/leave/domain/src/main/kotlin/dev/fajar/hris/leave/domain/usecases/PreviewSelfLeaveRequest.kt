@@ -149,6 +149,15 @@ class PreviewSelfLeaveRequest(
                     charged,
                     (selected - included).sorted(),
                     balances.toList(),
+                    leavePreviewRevision(
+                        company,
+                        employeeId,
+                        settings.timezone,
+                        LeavePolicySnapshot(type.id, type.code, type.appliedRevision, type.policy),
+                        days,
+                        charged,
+                        balances,
+                    ),
                 )
             )
         }

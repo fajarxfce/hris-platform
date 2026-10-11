@@ -23,4 +23,5 @@ fun LeaveRequestPreview.toResponse(): LeaveRequestPreviewResponse =
                 it.balance.version,
             )
         },
+        revision,
     )

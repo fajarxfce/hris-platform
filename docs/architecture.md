@@ -62,6 +62,14 @@ Leave attachment metadata and content use shared people, approval, and access gu
 
 Leave policy administration acquires the shared policy guard before company, membership, and account guards. One current-head/history review remains coherent across its queries; concurrent readers share the guard and writers retain exclusive ownership. Effective type selection uses the same access/assurance fence while preserving date-based selection. Policy saves revalidate current MFA before mutation or receipt replay. Administrative history requires `leave.manage`, separately from the broader effective-type lookup used by employees and approvers.
 
+Leave submission takes the employee ledger guard, then shared schedule, cutoff,
+shared leave-policy, people, document/approval and access guards. The cutoff and
+other existing mutation guards retain their original exclusive mode. A preview
+content revision compares reviewed policy, schedule and balance facts under those
+guards before any business write. It is a pure domain precondition; authorization
+and idempotency remain independent. Original receipts replay before current-plan
+comparison, so a later policy/calendar change cannot invalidate a committed retry.
+
 Employee leave preparation acquires the shared ledger and schedule guards, the
 existing cutoff guard, then shared policy, people, company, membership and account
 guards. The order preserves schedule-before-period and policy-before-people

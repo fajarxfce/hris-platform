@@ -287,6 +287,7 @@ abstract class LeaveApiFixture : DocumentValidationApiFixture() {
         days: List<Pair<String, String>>,
         key: UUID = UUID.randomUUID(),
         attachments: List<UUID> = emptyList(),
+        previewRevision: String? = null,
     ): HttpResponse<String> =
         command(
             f.worker,
@@ -299,6 +300,7 @@ abstract class LeaveApiFixture : DocumentValidationApiFixture() {
                     "days" to days.map { mapOf("workDate" to it.first, "portion" to it.second) },
                     "reason" to "Personal leave",
                     "attachmentRevisionIds" to attachments,
+                    "previewRevision" to previewRevision,
                 )
             ),
             f.workerCsrf,

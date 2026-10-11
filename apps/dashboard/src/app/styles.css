@@ -531,3 +531,8 @@ a {
   overflow-wrap: anywhere;
   line-height: 1.65;
 }
+
+.app-announcement-editor .app-page-header,
+.app-announcement-editor .app-editor-form {
+  margin: 0;
+}

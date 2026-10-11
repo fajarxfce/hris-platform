@@ -87,6 +87,11 @@ function AnnouncementListBinding({
       state={state}
       rows={rows}
       history={historyId !== null}
+      createTo={
+        historyId === null
+          ? `${announcementsPath}/new?${announcementParameters(access.companyId)}`
+          : null
+      }
       companyName={props.companyName}
       locale={props.locale}
       firstPage={after === null}

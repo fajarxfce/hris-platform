@@ -6,6 +6,7 @@ import { AppLoading } from "../../../../core/presentation/components/app-loading
 import { AppPageHeader } from "../../../../core/presentation/components/app-page-header";
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { announcementEditorMessages } from "../i18n/announcement-editor-messages";
 import { announcementMessages } from "../i18n/announcement-messages";
 import type { AnnouncementState } from "../models/announcement-state";
 import type { announcementView } from "../models/announcement-view";
@@ -19,6 +20,7 @@ export function AnnouncementPage({
   backTo,
   historyTo,
   currentTo,
+  editTo,
   jobTo,
   onRefresh,
 }: {
@@ -30,6 +32,7 @@ export function AnnouncementPage({
   backTo: string;
   historyTo: string;
   currentTo: string | null;
+  editTo: string | null;
   jobTo: string | null;
   onRefresh: () => void;
 }) {
@@ -43,6 +46,7 @@ export function AnnouncementPage({
           <>
             <Link to={backTo}>{text.back}</Link>
             {currentTo && <Link to={currentTo}>{text.current}</Link>}
+            {editTo && <Link to={editTo}>{announcementEditorMessages(locale).edit}</Link>}
             {state.announcement && <Link to={historyTo}>{text.history}</Link>}
             {jobTo && <Link to={jobTo}>{text.job}</Link>}
             <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>

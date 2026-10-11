@@ -10,4 +10,5 @@ export type CommunicationsScreenProps = Readonly<{
   companyName: string;
   timezone: string;
   locale: Locale;
+  nextIdentifier: () => string;
 }>;

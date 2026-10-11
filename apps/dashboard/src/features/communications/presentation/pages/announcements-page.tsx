@@ -6,6 +6,7 @@ import { AppLoading } from "../../../../core/presentation/components/app-loading
 import { AppPageHeader } from "../../../../core/presentation/components/app-page-header";
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { announcementEditorMessages } from "../i18n/announcement-editor-messages";
 import { announcementMessages } from "../i18n/announcement-messages";
 import type { AnnouncementListState } from "../models/announcement-list-state";
 import type { announcementRows } from "../models/announcement-view";
@@ -17,6 +18,7 @@ export function AnnouncementsPage({
   companyName,
   locale,
   backTo,
+  createTo,
   firstPage,
   onRefresh,
   onFirst,
@@ -29,6 +31,7 @@ export function AnnouncementsPage({
   companyName: string;
   locale: Locale;
   backTo: string | null;
+  createTo: string | null;
   firstPage: boolean;
   onRefresh: () => void;
   onFirst: () => void;
@@ -45,6 +48,7 @@ export function AnnouncementsPage({
         actions={
           <>
             {backTo && <Link to={backTo}>{text.current}</Link>}
+            {createTo && <Link to={createTo}>{announcementEditorMessages(locale).create}</Link>}
             <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
               {messages(locale).refresh}
             </AppButton>

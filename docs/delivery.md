@@ -795,3 +795,24 @@ Operation identifiers now work on private HTTP development origins that lack
 layout. A direct browser check at the WireGuard development origin confirmed the
 missing API and available secure randomness. Four unit tests and a browser MFA
 enrollment scenario passed, including an unavailable UUID API and entropy failure.
+
+## Announcement draft authoring
+
+The dashboard can create and edit announcement drafts with plain-text content,
+acknowledgement requirements, and company/branch/department/group audiences. Reference
+searches and selected labels use bounded pages in the selected company. Controllers
+retain immutable commands across lost responses, reject late results after disposal,
+and require explicit conflict review. A failed label lookup preserves the draft.
+MFA renewal and language changes preserve inputs; account/company replacement cancels
+obsolete work. Unsaved and uncertain commands participate in departure protection.
+
+Architecture, Biome, TypeScript, 710 unit/controller tests in 101 files, and the
+production build passed. Eleven browser scenarios passed, including uncertain saves,
+MFA renewal, conflict review, label retry, company replacement, denied access, English
+and Indonesian copy, and a 390-pixel dark layout. The updated screenshot was reviewed.
+The real API/PostgreSQL/worker scenario passed in 1.1 minutes: a dashboard save committed
+with its response deliberately lost, an explicit identical retry recovered the receipt,
+and history contained one draft revision. Publication, job review, native inbox delivery,
+read replay, acknowledgement conflicts, withdrawal, and permission revocation also
+passed. The existing bundle-size advisory remains; no device or external push validation
+is claimed. Group management and publication actions are still separate work.

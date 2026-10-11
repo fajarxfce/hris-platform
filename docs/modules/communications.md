@@ -45,10 +45,16 @@ cancels the previous request and clears its content; a late result cannot restor
 it. Messages are rendered as plain text. Dates use the selected company timezone,
 with English and Indonesian copy and responsive light/dark layouts.
 
-Audience editing, publication review, schedules, and recovery are separate
-workflows still being implemented. The mobile inbox currently synchronizes and
-reads encrypted correspondence; read/acknowledgement commands and push navigation
-remain separate work.
+Draft creation and editing support bounded named audience selection, acknowledgements,
+and revision reasons. Current-company reference searches and selected-label lookups
+retain one page. A failed lookup preserves the draft. Pending and ambiguous saves
+retain one immutable operation and payload; an explicit retry can recover the original
+receipt. A stale revision requires reviewing current data before editing. Departure
+protection and MFA renewal retain the mounted form without silently replaying a save.
+
+Group management, publication review, schedules, and recovery are separate workflows
+still being implemented. The mobile inbox currently synchronizes and reads encrypted
+correspondence; read/acknowledgement commands and push navigation remain separate work.
 
 ## Audience references
 

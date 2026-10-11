@@ -82,28 +82,42 @@ test("publication reaches the native inbox and sync preserves receipts, withdraw
     ).status(),
   ).toBe(200);
 
-  const announcement = randomUUID();
-  const announcements = `${base}/announcements/${announcement}`;
-  expect(
-    (
-      await context.request.put(announcements, {
-        headers: headers(),
-        data: {
-          title: "Office closure",
-          body: "The office will be closed on Friday.",
-          audience: { kind: "COMPANY", targetIds: [] },
-          acknowledgementRequired: true,
-          reason: "Worker delivery fixture",
-        },
-      })
-    ).status(),
-  ).toBe(200);
   await page.goto(`/communications/announcements?company=${company}`);
   await page.getByRole("combobox", { name: "Company", exact: true }).selectOption(company);
-  await expect(
-    page.getByRole("button", { name: "View: Office closure", exact: true }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "View: Office closure", exact: true }).click();
+  await page.getByRole("link", { name: "New announcement", exact: true }).click();
+  await page.getByLabel("Title", { exact: true }).fill("Office closure");
+  await page.getByLabel("Message", { exact: true }).fill("The office will be closed on Friday.");
+  await page.getByLabel("Reason", { exact: true }).fill("Worker delivery fixture");
+  await page.getByRole("checkbox", { name: "Require acknowledgement", exact: true }).check();
+  const draftWrites: { operation: string | undefined; body: unknown }[] = [];
+  let dropDraftResponse = true;
+  await page.route(`**/api/v1/companies/${company}/announcements/*`, async (route) => {
+    if (route.request().method() !== "PUT") return route.continue();
+    draftWrites.push({
+      operation: route.request().headers()["idempotency-key"],
+      body: route.request().postDataJSON(),
+    });
+    if (!dropDraftResponse) return route.continue();
+    dropDraftResponse = false;
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    await response.dispose();
+    return route.abort("failed");
+  });
+  await page.getByRole("button", { name: "Save draft", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("The save result could not be confirmed");
+  await page.getByRole("button", { name: "Check save result", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Draft saved.");
+  expect(draftWrites).toHaveLength(2);
+  expect(draftWrites[1]).toEqual(draftWrites[0]);
+  await page.getByRole("link", { name: "View announcement", exact: true }).click();
+  const announcement = new URL(page.url()).pathname.split("/").at(-1);
+  expect(announcement).toMatch(/^[0-9a-f-]{36}$/u);
+  const announcements = `${base}/announcements/${announcement}`;
+  expect(await (await context.request.get(`${announcements}/history`)).json()).toMatchObject({
+    items: [{ version: 0 }],
+    nextCursor: null,
+  });
   await expect(page.getByRole("region", { name: "Message", exact: true })).toContainText(
     "The office will be closed on Friday.",
   );

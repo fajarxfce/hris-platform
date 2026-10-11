@@ -2,6 +2,23 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_announcement: ["Review the announcement fields.", "Periksa isian pengumuman."],
+  invalid_audience_reference_search: [
+    "Review the search or selected references.",
+    "Periksa pencarian atau referensi terpilih.",
+  ],
+  announcement_audience_unavailable: [
+    "One or more audience references are unavailable. Review the selection.",
+    "Sebagian referensi penerima tidak tersedia. Periksa pilihan.",
+  ],
+  announcement_not_draft: [
+    "Only a draft announcement can be edited.",
+    "Hanya draft pengumuman yang dapat diedit.",
+  ],
+  announcement_revision_limit: [
+    "This announcement has reached its revision limit.",
+    "Pengumuman ini telah mencapai batas revisi.",
+  ],
   announcement_not_found: [
     "This announcement is unavailable in the current company.",
     "Pengumuman tidak tersedia di perusahaan ini.",

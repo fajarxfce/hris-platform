@@ -338,6 +338,7 @@ export function PortalRoutes({
               accountId={accountId}
               access={access}
               communications={communications}
+              nextIdentifier={nextIdentifier}
               companyName={company.name}
               timezone={company.timezone}
               locale={locale}

@@ -76,6 +76,11 @@ function AnnouncementBinding({
       backTo={`${announcementsPath}?${announcementParameters(access.companyId, after)}`}
       historyTo={`${resource}/history?${pinned}`}
       currentTo={revision === null ? null : `${resource}?${pinned}`}
+      editTo={
+        revision === null && state.announcement?.status === "DRAFT"
+          ? `${resource}/edit?${pinned}`
+          : null
+      }
       jobTo={
         state.announcement?.publicationJobId
           ? `/administration/jobs?${pinned}&job=${state.announcement.publicationJobId}`

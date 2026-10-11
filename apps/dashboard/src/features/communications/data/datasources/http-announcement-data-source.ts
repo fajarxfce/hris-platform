@@ -1,9 +1,30 @@
 import type { HttpClient } from "../../../../core/data/http/http-client";
+import type { AnnouncementChangeDto } from "../models/announcement-change-dto";
 import { announcementDto, announcementPageDto } from "../models/announcement-dto";
+import { communicationsReceiptDto } from "../models/communications-receipt-dto";
 import type { AnnouncementDataSource } from "./announcement-data-source";
 
 export class HttpAnnouncementDataSource implements AnnouncementDataSource {
   constructor(private readonly http: HttpClient) {}
+  async save(
+    company: string,
+    id: string,
+    operation: string,
+    change: AnnouncementChangeDto,
+    signal: AbortSignal,
+  ) {
+    return communicationsReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/announcements/${id}`,
+          method: "PUT",
+          operationId: operation,
+          body: change,
+        },
+        signal,
+      ),
+    );
+  }
   async list(company: string, after: string | null, signal: AbortSignal) {
     const query = new URLSearchParams({ limit: "50" });
     if (after !== null) query.set("after", after);

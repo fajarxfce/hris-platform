@@ -1,9 +1,17 @@
-import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
+import type { MutationReceipt } from "../../../../core/domain/mutation-receipt";
 import type { Result } from "../../../../core/domain/result";
 import type { Announcement, AnnouncementId } from "../entities/announcement";
+import type { AnnouncementChange } from "../entities/announcement-change";
 import type { AnnouncementPage } from "../entities/announcement-page";
 
 export interface AnnouncementRepository {
+  save(
+    company: CompanyId,
+    operation: OperationId,
+    change: AnnouncementChange,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
   list(
     company: CompanyId,
     after: string | null,

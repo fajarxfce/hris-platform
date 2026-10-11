@@ -1338,3 +1338,15 @@ Five new scenarios cover owner-only access, foreign-company isolation, history
 progress, revocation while waiting, and MFA expiry/renewal. API and worker dev
 containers were rebuilt without resetting PostgreSQL; API health is `UP` and both
 processes have zero restarts. Mobile request detail presentation remains in progress.
+
+## Independent browser integration scenarios
+
+CI reached logout in the cumulative identity workflow but exhausted its two-minute
+budget. Its trace contained no long-running business request. CSV import and client
+policy/job recovery now run independently, with separate fixture accounts,
+companies and MFA enrollment. Existing assertions and per-operation timeouts remain.
+
+Biome, TypeScript and all three affected real API/browser scenarios passed locally:
+identity/lifecycle in approximately 60 seconds, import in 13 seconds and policy/jobs
+in 19 seconds. The previous CI timeout is not counted as a pass. The remaining
+browser scenarios passed in that CI run and were not rerun for this test-only move.

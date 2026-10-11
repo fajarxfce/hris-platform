@@ -1,7 +1,8 @@
 package dev.fajar.hris.workforce.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
@@ -9,6 +10,7 @@ import dev.fajar.hris.workforce.domain.entities.WorkHoliday
 import dev.fajar.hris.workforce.domain.entities.WorkPeriod
 import dev.fajar.hris.workforce.domain.policies.*
 import dev.fajar.hris.workforce.domain.repositories.*
+import java.time.Clock
 import java.util.UUID
 
 class SaveWorkHoliday(
@@ -20,6 +22,8 @@ class SaveWorkHoliday(
     private val members: MembershipRepository,
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
+    private val security: IdentitySecurityPolicy,
+    private val clock: Clock,
 ) {
     fun execute(
         actor: Actor,
@@ -82,7 +86,7 @@ class SaveWorkHoliday(
             if (accountGuard is Result.Failed) return@run accountGuard
             val authorized =
                 identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (authorized is Result.Failed) return@run authorized
             val live = (authorized as Result.Success).value

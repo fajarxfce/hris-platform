@@ -993,3 +993,17 @@ fixture database and native session were cleaned up.
 The dev API and worker were rebuilt and restarted with migration 64 while preserving
 the existing PostgreSQL volume. API health and the WireGuard dashboard returned
 HTTP 200. No mobile runtime changed in this increment and no release was created.
+
+## Work calendar session assurance
+
+Shift and holiday directories, employee calendars, and shift/holiday/weekly/roster
+commands now recheck current MFA after acquiring their guards. Seven regression
+cases first reproduced acceptance of proofs that expired during an account wait.
+Renewed proofs succeed; write retries retain their original ID and version while
+requiring current assurance before returning the receipt.
+
+Sixteen distinct calendar integration tests passed across the focused runs,
+together with 23 workforce-domain tests, formatting and architecture checks.
+The first corrected run exposed four incorrect test expectations for the receipt's
+`replayed` flag; the focused rerun passed after fixing those assertions. These are
+isolated PostgreSQL tests, not new dashboard or mobile acceptance.

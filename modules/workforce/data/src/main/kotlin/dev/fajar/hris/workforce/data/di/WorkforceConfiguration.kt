@@ -2,6 +2,7 @@ package dev.fajar.hris.workforce.data.di
 
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
@@ -50,7 +51,20 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = SaveShift(schedules, operations, journal, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        SaveShift(
+            schedules,
+            operations,
+            journal,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun listShifts(
@@ -59,7 +73,9 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListShifts(schedules, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListShifts(schedules, companies, members, identities, transactions, security, clock)
 
     @Bean
     fun assignSchedule(
@@ -72,6 +88,8 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
     ) =
         AssignWeeklySchedule(
             periods,
@@ -83,6 +101,8 @@ class WorkforceConfiguration {
             members,
             identities,
             transactions,
+            security,
+            clock,
         )
 
     @Bean
@@ -96,6 +116,8 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
     ) =
         SetRosterDay(
             periods,
@@ -107,6 +129,8 @@ class WorkforceConfiguration {
             members,
             identities,
             transactions,
+            security,
+            clock,
         )
 
     @Bean
@@ -117,8 +141,19 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
-    ) = GetEmployeeCalendar(schedules, people, companies, members, identities, transactions, clock)
+    ) =
+        GetEmployeeCalendar(
+            schedules,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun saveHoliday(
@@ -130,6 +165,8 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
     ) =
         SaveWorkHoliday(
             periods,
@@ -140,6 +177,8 @@ class WorkforceConfiguration {
             members,
             identities,
             transactions,
+            security,
+            clock,
         )
 
     @Bean
@@ -149,7 +188,9 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListWorkHolidays(schedules, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListWorkHolidays(schedules, companies, members, identities, transactions, security, clock)
 
     @Bean
     fun attendanceSource(sql: DSLContext): AttendanceDataSource = PostgresAttendanceDataSource(sql)

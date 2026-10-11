@@ -50,6 +50,12 @@ Business tests explicitly disable MFA/rate enforcement so they can isolate their
 
 ## Background worker
 
+The API and worker compose separate Spring application graphs. Changes to shared
+module constructor bindings must be tested in both entry points. Run the affected
+API tests and `./gradlew :apps:worker:test`; building both JARs alone cannot detect
+a missing module configuration in the worker. Keep configuration ownership in the
+module and import it from each application that composes that graph.
+
 The worker is a separate non-web process with a two-thread executor, a two-job limit per company, and a four-job deployment limit. API and worker use distinct database logins. The worker login inherits the queue/Batch capability; it cannot bypass company RLS on business tables. Default leases last 60 seconds and renew every 15 seconds. A job is bounded to 30 minutes and at most eight attempts. Only transient unavailability is retried, with explicit capped delay.
 
 For an existing local database, add `HRIS_WORKER_DATABASE_PASSWORD` to `.env`, recreate the database container to load the new environment/mount without deleting its volume, then run `docker compose exec -T database sh /docker-entrypoint-initdb.d/20-worker.sh`. This script creates the worker role if absent and explicitly sets its password to the configured value. Apply migrations before starting the API and worker. Fresh volumes perform role setup automatically.

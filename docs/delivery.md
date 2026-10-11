@@ -1037,3 +1037,21 @@ after a shift is committed, recovers the same receipt, assigns the original shif
 then edits and deactivates the template. The employee calendar retains revision zero
 and the original overnight interval. Its isolated database was cleaned up. No mobile
 runtime or physical-device interaction was part of this increment.
+
+## Worker composition after transfer policy changes
+
+GitHub CI exposed a missing Administration configuration in the worker's application
+graph after transfer review began consuming company client policy. The API's 916
+tests passed on that commit, but all 38 worker tests failed during context startup.
+The dev worker was also restarting; it was stopped while the composition was repaired.
+Building the JARs had not detected this runtime dependency failure.
+
+The worker now imports the owning module configuration and declares its data/domain
+dependencies. No worker SQL privilege or background execution policy was expanded.
+All 38 worker tests, formatting, architecture checks and its JAR build passed.
+Repository instructions now require validation of both application contexts when
+shared module DI changes.
+
+The repaired API and worker were then rebuilt in the dev Compose stack, preserving
+the PostgreSQL volume. The worker logged successful startup with zero restarts;
+API health was `UP`, and the WireGuard dashboard returned HTTP 200.

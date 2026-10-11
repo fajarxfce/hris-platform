@@ -1,5 +1,6 @@
 package dev.fajar.hris.worker
 
+import dev.fajar.hris.administration.data.di.AdministrationConfiguration
 import dev.fajar.hris.approvals.data.di.ApprovalConfiguration
 import dev.fajar.hris.communications.data.di.CommunicationsConfiguration
 import dev.fajar.hris.core.database.DatabaseConfiguration
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.Import
 @Import(
     dev.fajar.hris.push.data.di.PushConfiguration::class,
     DatabaseConfiguration::class,
+    AdministrationConfiguration::class,
     dev.fajar.hris.sync.data.di.SyncConfiguration::class,
     dev.fajar.hris.documents.data.di.DocumentsConfiguration::class,
     dev.fajar.hris.storage.data.di.ObjectStorageConfiguration::class,

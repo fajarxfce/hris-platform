@@ -2,6 +2,44 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_announcement_command: ["Review the publication fields.", "Periksa isian publikasi."],
+  invalid_announcement_schedule: [
+    "Choose a publication time within the next 365 days.",
+    "Pilih waktu publikasi dalam 365 hari ke depan.",
+  ],
+  announcement_action_unavailable: [
+    "This action is unavailable in the current publication state.",
+    "Tindakan ini tidak tersedia pada kondisi publikasi saat ini.",
+  ],
+  announcement_publication_unavailable: [
+    "Publication status could not be loaded.",
+    "Status publikasi belum dapat dimuat.",
+  ],
+  announcement_preview_unavailable: [
+    "Audience preview is only available for draft or queued announcements.",
+    "Pratinjau penerima tersedia untuk draft atau pengumuman dalam antrean.",
+  ],
+  announcement_archived: ["This announcement is archived.", "Pengumuman ini sudah diarsipkan."],
+  announcement_attempt_limit: [
+    "This announcement has reached its publication attempt limit.",
+    "Pengumuman ini telah mencapai batas percobaan publikasi.",
+  ],
+  announcement_publication_active: [
+    "Stop the publication job before archiving.",
+    "Hentikan job publikasi sebelum mengarsipkan.",
+  ],
+  announcement_publication_not_stopped: [
+    "The publication job must finish cancellation or fail before returning to draft.",
+    "Job publikasi harus selesai dibatalkan atau gagal sebelum dikembalikan ke draft.",
+  ],
+  announcement_audience_empty: [
+    "No eligible recipients were available at publication.",
+    "Tidak ada penerima yang memenuhi syarat saat publikasi.",
+  ],
+  announcement_audience_limit: [
+    "The audience exceeds the publication limit.",
+    "Jumlah penerima melebihi batas publikasi.",
+  ],
   invalid_announcement: ["Review the announcement fields.", "Periksa isian pengumuman."],
   invalid_audience_group: ["Review the audience group fields.", "Periksa isian grup penerima."],
   audience_group_not_found: ["The audience group is unavailable.", "Grup penerima tidak tersedia."],

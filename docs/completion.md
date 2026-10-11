@@ -30,7 +30,7 @@ and the employee workflows below remain separate acceptance work.
 | Documents | Dashboard document/upload/processing/retention workflows; mobile scoped resumable upload/download and evidence acquisition |
 | Expenses | Dashboard policies, claims, review, payment/reconciliation and corrections; mobile claims, receipts, submission and payment progress |
 | Payroll | Dashboard policies, compensation, inputs, calculation, review, finalization, payslips, payments and amendments; mobile finalized payslips and downloads |
-| Communications | Dashboard previews, schedules, publication and recovery; mobile read/acknowledgement commands and push hints. Dashboard audience groups, draft creation/editing, bounded named audience selection, directories, message/revision review, job navigation, and the mobile inbox reader are implemented. |
+| Communications | Mobile read/acknowledgement commands and push hints. Dashboard audience groups, drafts, bounded named audience selection, publication review, preview, scheduling, cancellation/recovery and archival, and the mobile inbox reader are implemented. |
 | Identity administration | Dashboard platform users, role/membership changes, invitations, provider bindings and sessions; company membership and grant review is implemented |
 | Reporting | Attendance, leave, overtime, expenses and payroll reports, authorized bounded exports and export history |
 | Operations | Integration status, backup/restore verification, reference-workload measurements, deployment and complete run instructions |

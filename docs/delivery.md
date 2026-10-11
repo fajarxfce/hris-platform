@@ -851,3 +851,24 @@ recovery, archival, company isolation, pending credential revocation, MFA expiry
 after guards and job acquisition, and a review completing while another transaction
 holds the job row. OpenAPI includes the endpoint and company admission. Dashboard
 publication workflows are being connected separately.
+
+## Dashboard publication workflows
+
+Announcement managers can review eligibility and job status, preview recipients,
+publish immediately or schedule in the company timezone, return stopped work to
+draft, and archive correspondence. Each command requires an observed version,
+reason and confirmation. Pending or uncertain outcomes retain one immutable
+operation; verification and later rejection cannot replace it. Definite conflicts
+require a fresh review. Company replacement cancels pending reads and clears content.
+
+Architecture, Biome, TypeScript, 761 unit/controller tests in 105 files, and the
+production build passed. Six new browser scenarios and ten existing announcement
+regressions passed. They cover explicit preview, company/browser timezone differences,
+confirmation, response loss, MFA, stale versions, disposal, denied access, localization
+and a reviewed 390-pixel dark layout. The final real API/PostgreSQL/worker scenario
+passed in 1.4 minutes. It creates a named audience and draft, loses and recovers the
+original draft and scheduled-publication responses, cancels the scheduled job through
+the dashboard, waits for worker acknowledgement, returns to draft, publishes again,
+and archives through the dashboard. Native recipient isolation, read replay,
+acknowledgement conflicts, withdrawal and permission revocation also pass. The existing
+bundle-size advisory remains. No physical device or external push validation is claimed.

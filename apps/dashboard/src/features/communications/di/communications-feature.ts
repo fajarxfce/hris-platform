@@ -5,12 +5,17 @@ import { HttpAudienceReferenceDataSource } from "../data/datasources/http-audien
 import { RemoteAnnouncementRepository } from "../data/repositories/remote-announcement-repository";
 import { RemoteAudienceGroupRepository } from "../data/repositories/remote-audience-group-repository";
 import { RemoteAudienceReferenceRepository } from "../data/repositories/remote-audience-reference-repository";
+import { ArchiveAnnouncement } from "../domain/usecases/archive-announcement";
 import { LoadAnnouncement } from "../domain/usecases/load-announcement";
 import { LoadAnnouncementHistory } from "../domain/usecases/load-announcement-history";
+import { LoadAnnouncementReview } from "../domain/usecases/load-announcement-review";
 import { LoadAnnouncements } from "../domain/usecases/load-announcements";
 import { LoadAudienceGroup } from "../domain/usecases/load-audience-group";
 import { LoadAudienceGroups } from "../domain/usecases/load-audience-groups";
 import { LoadAudienceReferences } from "../domain/usecases/load-audience-references";
+import { PreviewAnnouncementAudience } from "../domain/usecases/preview-announcement-audience";
+import { PublishAnnouncement } from "../domain/usecases/publish-announcement";
+import { ReturnAnnouncementToDraft } from "../domain/usecases/return-announcement-to-draft";
 import { SaveAnnouncement } from "../domain/usecases/save-announcement";
 import { SaveAudienceGroup } from "../domain/usecases/save-audience-group";
 
@@ -21,6 +26,11 @@ export function createCommunicationsFeature(http: HttpClient) {
     new HttpAudienceReferenceDataSource(http),
   );
   return {
+    loadReview: new LoadAnnouncementReview(announcements),
+    previewAudience: new PreviewAnnouncementAudience(announcements),
+    publish: new PublishAnnouncement(announcements),
+    archive: new ArchiveAnnouncement(announcements),
+    returnToDraft: new ReturnAnnouncementToDraft(announcements),
     loadGroup: new LoadAudienceGroup(groups),
     loadGroups: new LoadAudienceGroups(groups),
     saveGroup: new SaveAudienceGroup(groups),

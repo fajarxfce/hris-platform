@@ -1,5 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { AnnouncementCommandScreen } from "../bindings/announcement-command-screen";
 import { AnnouncementEditorScreen } from "../bindings/announcement-editor-screen";
+import { AnnouncementPublicationScreen } from "../bindings/announcement-publication-screen";
 import { AnnouncementScreen } from "../bindings/announcement-screen";
 import { AnnouncementsScreen } from "../bindings/announcements-screen";
 import { AudienceGroupEditorScreen } from "../bindings/audience-group-editor-screen";
@@ -11,6 +13,22 @@ import { announcementParameters, announcementsPath } from "../models/announcemen
 export function CommunicationsRoutes(props: CommunicationsScreenProps) {
   return (
     <Routes>
+      <Route
+        path="announcements/:announcementId/publication"
+        element={<AnnouncementPublicationScreen {...props} />}
+      />
+      <Route
+        path="announcements/:announcementId/publish"
+        element={<AnnouncementCommandScreen {...props} kind="PUBLISH" />}
+      />
+      <Route
+        path="announcements/:announcementId/archive"
+        element={<AnnouncementCommandScreen {...props} kind="ARCHIVE" />}
+      />
+      <Route
+        path="announcements/:announcementId/return-to-draft"
+        element={<AnnouncementCommandScreen {...props} kind="RETURN_TO_DRAFT" />}
+      />
       <Route path="audience-groups" element={<AudienceGroupsScreen {...props} />} />
       <Route
         path="audience-groups/new"

@@ -65,9 +65,16 @@ loaded per page and 5,000 retained IDs per definition. Current labels do not rew
 historical membership. Response loss retains the original command, while a definite
 version conflict requires explicit review before another edit.
 
-Publication review, schedules, and recovery are separate workflows still being
-implemented. The mobile inbox currently synchronizes and reads encrypted
-correspondence; read/acknowledgement commands and push navigation remain separate work.
+Publication review displays current server-authorized actions and minimal job status.
+Preview is explicit. Publishing supports immediate delivery or an unambiguous time in
+the company timezone. Publish, return to draft, and archive each require a reason and
+confirmation; command controllers retain their observed version and operation through
+response loss and MFA renewal. Definitive conflicts require a new review and preview.
+Cancellation uses the existing job workflow; a worker must confirm a terminal status
+before recovery. Review refreshes are explicit and do not poll automatically.
+
+The mobile inbox currently synchronizes and reads encrypted correspondence;
+read/acknowledgement commands and push navigation remain separate work.
 
 ## Audience references
 

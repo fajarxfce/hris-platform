@@ -159,17 +159,83 @@ test("publication reaches the native inbox and sync preserves receipts, withdraw
   await page.getByRole("link", { name: "Revision history", exact: true }).click();
   await page.getByRole("button", { name: "View: Office closure · Version 0", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("Historical revision");
-  expect(
-    await (await context.request.get(`${announcements}/audience-preview?expectedVersion=0`)).json(),
-  ).toMatchObject({ recipientCount: 1 });
-  expect(
-    (
-      await context.request.post(`${announcements}/publish`, {
-        headers: headers(),
-        data: { expectedVersion: 0, reason: "Publish reviewed notice" },
-      })
-    ).status(),
-  ).toBe(200);
+  await page.getByRole("link", { name: "Current version", exact: true }).click();
+  await page.getByRole("link", { name: "Publication review", exact: true }).click();
+  await page.getByRole("button", { name: "Preview audience", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Eligible audience", exact: true })).toContainText(
+    "1",
+  );
+  await page.getByRole("link", { name: "Publish announcement", exact: true }).click();
+  await page.getByRole("checkbox", { name: "Schedule publication", exact: true }).check();
+  const scheduled = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Jakarta",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+    .format(new Date(Date.now() + 86_400_000))
+    .replace(" ", "T");
+  await page.getByLabel("Date and time · Asia/Jakarta", { exact: true }).fill(scheduled);
+  await page.getByLabel("Reason", { exact: true }).fill("Schedule reviewed notice");
+  const publicationWrites: { operation: string | undefined; body: unknown }[] = [];
+  let dropPublicationResponse = true;
+  await page.route(`**${announcements}/publish`, async (route) => {
+    publicationWrites.push({
+      operation: route.request().headers()["idempotency-key"],
+      body: route.request().postDataJSON(),
+    });
+    if (!dropPublicationResponse) return route.continue();
+    dropPublicationResponse = false;
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    await response.dispose();
+    return route.abort("failed");
+  });
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  expect(publicationWrites).toHaveLength(0);
+  await page.getByRole("dialog").getByRole("button", { name: "Confirm", exact: true }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "The command result could not be confirmed" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Check command result", exact: true }).click();
+  await page.getByRole("link", { name: "View publication", exact: true }).click();
+  expect(publicationWrites).toHaveLength(2);
+  expect(publicationWrites[1]).toEqual(publicationWrites[0]);
+  await expect(page.getByRole("region", { name: "Publication job", exact: true })).toContainText(
+    "Queued",
+  );
+  await expect(page.getByRole("link", { name: "Return to draft", exact: true })).toHaveCount(0);
+  await page.getByRole("link", { name: "Publication job", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "Job details", exact: true });
+  await panel.getByRole("button", { name: "Request cancellation", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "Cancel this job?", exact: true })
+    .getByRole("button", { name: "Request cancellation", exact: true })
+    .click();
+  const job = new URL(page.url()).searchParams.get("job");
+  await expect
+    .poll(
+      async () => {
+        const response = await context.request.get(`${base}/jobs/${job}`);
+        expect(response.status()).toBe(200);
+        return ((await response.json()) as { status: string }).status;
+      },
+      { timeout: 25_000, intervals: [1000] },
+    )
+    .toBe("CANCELLED");
+  await page.goBack();
+  await page.getByRole("link", { name: "Return to draft", exact: true }).click();
+  await page.getByLabel("Reason", { exact: true }).fill("Review publication timing");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Confirm", exact: true }).click();
+  await page.getByRole("link", { name: "View publication", exact: true }).click();
+  await page.getByRole("link", { name: "Publish announcement", exact: true }).click();
+  await page.getByLabel("Reason", { exact: true }).fill("Publish reviewed notice");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Confirm", exact: true }).click();
+  await page.getByRole("link", { name: "View publication", exact: true }).click();
   await expect
     .poll(
       async () => {
@@ -182,9 +248,10 @@ test("publication reaches the native inbox and sync preserves receipts, withdraw
     .toBe("PUBLISHED");
   expect(await (await context.request.get(announcements)).json()).toMatchObject({
     recipientCount: 1,
-    version: 2,
+    version: 4,
+    publicationAttempts: 2,
   });
-  await page.getByRole("link", { name: "Current version", exact: true }).click();
+  await page.getByRole("link", { name: "Announcement", exact: true }).click();
   await expect(
     page.getByRole("region", { name: "Publication · Asia/Jakarta", exact: true }),
   ).toContainText("Published");
@@ -317,14 +384,13 @@ test("publication reaches the native inbox and sync preserves receipts, withdraw
     expect(acknowledged.acknowledgedAt).toBeTruthy();
     await drain();
     observed.length = 0;
-    expect(
-      (
-        await context.request.post(`${announcements}/archive`, {
-          headers: headers(),
-          data: { expectedVersion: 2, reason: "Withdraw outdated correspondence" },
-        })
-      ).status(),
-    ).toBe(200);
+    await page.goBack();
+    await page.getByRole("link", { name: "Publication review", exact: true }).click();
+    await page.getByRole("link", { name: "Archive announcement", exact: true }).click();
+    await page.getByLabel("Reason", { exact: true }).fill("Withdraw outdated correspondence");
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Confirm", exact: true }).click();
+    await expect(page.getByRole("status")).toContainText("Announcement archived.");
     expect((await request.get(resource, { headers: native })).status()).toBe(404);
     expect((await request.post(`${resource}/read`, read)).status()).toBe(404);
     await drain();

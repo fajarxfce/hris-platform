@@ -8,6 +8,7 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { announcementEditorMessages } from "../i18n/announcement-editor-messages";
 import { announcementMessages } from "../i18n/announcement-messages";
+import { announcementPublicationMessages } from "../i18n/announcement-publication-messages";
 import type { AnnouncementState } from "../models/announcement-state";
 import type { announcementView } from "../models/announcement-view";
 
@@ -20,6 +21,7 @@ export function AnnouncementPage({
   backTo,
   historyTo,
   currentTo,
+  publicationTo,
   editTo,
   jobTo,
   onRefresh,
@@ -32,6 +34,7 @@ export function AnnouncementPage({
   backTo: string;
   historyTo: string;
   currentTo: string | null;
+  publicationTo: string | null;
   editTo: string | null;
   jobTo: string | null;
   onRefresh: () => void;
@@ -46,6 +49,9 @@ export function AnnouncementPage({
           <>
             <Link to={backTo}>{text.back}</Link>
             {currentTo && <Link to={currentTo}>{text.current}</Link>}
+            {publicationTo && (
+              <Link to={publicationTo}>{announcementPublicationMessages(locale).title}</Link>
+            )}
             {editTo && <Link to={editTo}>{announcementEditorMessages(locale).edit}</Link>}
             {state.announcement && <Link to={historyTo}>{text.history}</Link>}
             {jobTo && <Link to={jobTo}>{text.job}</Link>}

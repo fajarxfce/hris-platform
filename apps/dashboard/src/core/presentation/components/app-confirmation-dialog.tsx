@@ -46,10 +46,15 @@ export function AppConfirmationDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogContent>{message}</DialogContent>
           <DialogActions>
-            <AppButton onClick={onDismiss} disabled={busy}>
+            <AppButton onClick={onDismiss} disabled={busy} disabledFocusable={busy}>
               {dismissLabel}
             </AppButton>
-            <AppButton appearance="primary" onClick={onConfirm} disabled={busy}>
+            <AppButton
+              appearance="primary"
+              onClick={onConfirm}
+              disabled={busy}
+              disabledFocusable={busy}
+            >
               {confirmLabel}
             </AppButton>
           </DialogActions>

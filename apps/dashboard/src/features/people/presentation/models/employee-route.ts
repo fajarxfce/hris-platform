@@ -25,4 +25,4 @@ export function employeeSearchParameters(
   return parameters;
 }
 
-export type EmployeeTab = "overview" | "history";
+export type EmployeeTab = "overview" | "history" | "transfers";

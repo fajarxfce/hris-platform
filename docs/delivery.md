@@ -966,3 +966,30 @@ JAR builds. Six review tests cover response scope, date eligibility, destination
 availability, added/removed grants during a wait and cancellation cleanup. The
 assurance suite also verifies MFA expiry while review waits on the account guard.
 Cancellation releases both company policy guards and permits subsequent writes.
+
+## Employee transfer dashboard
+
+Employee details now link to an immediate company transfer with destination-scoped
+assignments, explicit confirmation and immutable request recovery. The Transfers
+tab loads incoming/outgoing history on demand. Reloading a conflicting review
+clears discarded fields; language and theme changes retain current edits. Busy
+confirmation buttons remain keyboard-focusable without accepting another action,
+and long tab lists scroll within the mobile viewport.
+
+Dashboard architecture, formatting, TypeScript, 783 unit/controller tests and the
+production build passed. Sixty-four distinct browser scenarios passed across the
+transfer, employee, employment-revision, lifecycle, offboarding and account-linking
+workflows. The initial pass identified the form reset and mobile tab overflow;
+both were corrected. Two other browser cases timed out during that pass and passed
+on the focused rerun. Light desktop and dark mobile screenshots were inspected.
+
+The real browser/API/PostgreSQL scenario passed using isolated fictional accounts.
+It selects a destination branch, commits a transfer, deliberately loses its response,
+and recovers one identical receipt. Source history records one transfer; the person,
+profile owner and account stay unchanged. Native access to the source company is
+denied afterward while the new destination employment remains readable. The owned
+fixture database and native session were cleaned up.
+
+The dev API and worker were rebuilt and restarted with migration 64 while preserving
+the existing PostgreSQL volume. API health and the WireGuard dashboard returned
+HTTP 200. No mobile runtime changed in this increment and no release was created.

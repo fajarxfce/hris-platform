@@ -10,9 +10,11 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { employmentMessages } from "../i18n/employment-messages";
+import { employmentTransferMessages } from "../i18n/employment-transfer-messages";
 import { peopleMessages } from "../i18n/people-messages";
 import { personProfileMessages } from "../i18n/person-profile-messages";
 import type { EmployeeDetailsState } from "../models/employee-details-state";
+import type { EmployeeTab } from "../models/employee-route";
 import type { employeeDetailsView } from "../models/employee-view";
 
 export function EmployeeDetailsPage({
@@ -23,12 +25,14 @@ export function EmployeeDetailsPage({
   backTo,
   profileTo,
   editEmploymentTo,
+  transferTo,
   startLifecycleTo,
   leaveTo,
   balancesTo,
   tab,
   canReadHistory,
   history,
+  transfers,
   onTab,
   onRefresh,
 }: {
@@ -39,12 +43,14 @@ export function EmployeeDetailsPage({
   backTo: string;
   profileTo: string | null;
   editEmploymentTo: string | null;
+  transferTo: string | null;
   startLifecycleTo: string | null;
   leaveTo: string | null;
   balancesTo: string | null;
-  tab: "overview" | "history";
+  tab: EmployeeTab;
   canReadHistory: boolean;
   history: ReactNode;
+  transfers: ReactNode;
   onTab: (tab: string) => void;
   onRefresh: () => void;
 }) {
@@ -65,6 +71,9 @@ export function EmployeeDetailsPage({
             )}
             {editEmploymentTo && state.employee && (
               <Link to={editEmploymentTo}>{employmentMessages(locale).edit}</Link>
+            )}
+            {transferTo && state.employee && (
+              <Link to={transferTo}>{employmentTransferMessages(locale).title}</Link>
             )}
             {profileTo && state.employee && (
               <Link to={profileTo}>{personProfileMessages(locale).title}</Link>
@@ -90,7 +99,12 @@ export function EmployeeDetailsPage({
             label={text.sections}
             tabs={[
               { id: "overview", label: text.overview },
-              ...(canReadHistory ? [{ id: "history", label: text.history }] : []),
+              ...(canReadHistory
+                ? [
+                    { id: "history", label: text.history },
+                    { id: "transfers", label: employmentTransferMessages(locale).tab },
+                  ]
+                : []),
             ]}
             selected={tab}
             onSelected={onTab}
@@ -101,7 +115,9 @@ export function EmployeeDetailsPage({
             role="tabpanel"
             aria-labelledby={`employee-tab-${tab}`}
           >
-            {tab === "history" ? (
+            {tab === "transfers" ? (
+              transfers
+            ) : tab === "history" ? (
               history
             ) : (
               <>

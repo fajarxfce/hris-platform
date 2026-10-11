@@ -15,6 +15,7 @@ export function AppTabs({
 }) {
   return (
     <TabList
+      className="app-tabs"
       aria-label={label}
       selectedValue={selected}
       onTabSelect={(_event, data) => {

@@ -168,6 +168,11 @@ a {
   gap: 12px;
   min-width: 0;
 }
+.app-tabs {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
 .app-tab-panel {
   padding-top: 20px;
 }

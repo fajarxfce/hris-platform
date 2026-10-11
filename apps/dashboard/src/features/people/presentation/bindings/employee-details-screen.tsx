@@ -3,11 +3,12 @@ import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import type { AccountId } from "../../../../core/domain/identifiers";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
-import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import type { CompanyAccess, CompanyMembership } from "../../../identity/domain/entities/session";
 import { canBrowseEmployeeLeave } from "../../../leave/domain/policies/leave-read-policy";
 import { canPrepareLifecycleCase } from "../../../lifecycle/domain/policies/lifecycle-case-start-policy";
 import { canReadEmploymentHistory } from "../../domain/policies/employee-policy";
 import { canManageEmployment } from "../../domain/policies/employment-policy";
+import { canTransferEmployment } from "../../domain/policies/employment-transfer-policy";
 import { canReadPersonProfile } from "../../domain/policies/person-profile-policy";
 import type { PeopleUseCases } from "../contracts/people-use-cases";
 import { EmployeeDetailsController } from "../controllers/employee-details-controller";
@@ -19,11 +20,13 @@ import {
 import { employeeDetailsView } from "../models/employee-view";
 import { EmployeeDetailsPage } from "../pages/employee-details-page";
 import { EmploymentHistoryBinding } from "./employment-history-binding";
+import { EmploymentTransfersBinding } from "./employment-transfers-binding";
 
 type Props = {
   accountId: AccountId;
   access: CompanyAccess;
   people: PeopleUseCases;
+  companies: readonly CompanyMembership[];
   companyName: string;
   timezone: string;
   locale: Locale;
@@ -45,10 +48,13 @@ export function EmployeeDetailsScreen(props: Props) {
       <Navigate to={`/people/employees/${encodeURIComponent(employeeId)}?${canonical}`} replace />
     );
   }
-  const tab =
-    canReadEmploymentHistory(props.access.permissions) && parameters.get("tab") === "history"
-      ? "history"
-      : "overview";
+  const tab: EmployeeTab = canReadEmploymentHistory(props.access.permissions)
+    ? parameters.get("tab") === "transfers"
+      ? "transfers"
+      : parameters.get("tab") === "history"
+        ? "history"
+        : "overview"
+    : "overview";
   return (
     <EmployeeDetailsBinding
       key={`${props.accountId}:${props.access.companyId}:${employeeId}:${search.asOf}`}
@@ -77,6 +83,11 @@ export function EmployeeDetailsScreen(props: Props) {
           ? `/people/employees/${encodeURIComponent(employeeId)}/employment/edit?${employeeSearchParameters(search, props.access.companyId)}`
           : null
       }
+      transferTo={
+        canTransferEmployment(props.access.permissions)
+          ? `/people/employees/${encodeURIComponent(employeeId)}/transfer?${new URLSearchParams({ company: props.access.companyId })}`
+          : null
+      }
       profileTo={
         canReadPersonProfile(props.access.permissions)
           ? `/people/employees/${encodeURIComponent(employeeId)}/profile?${employeeSearchParameters(search, props.access.companyId)}`
@@ -88,7 +99,7 @@ export function EmployeeDetailsScreen(props: Props) {
         const next = new URLSearchParams(parameters);
         next.set("company", props.access.companyId);
         next.set("asOf", search.asOf);
-        if (selected === "history") next.set("tab", "history");
+        if (selected === "history" || selected === "transfers") next.set("tab", selected);
         else next.delete("tab");
         setParameters(next);
       }}
@@ -105,6 +116,7 @@ export function EmployeeDetailsScreen(props: Props) {
 function EmployeeDetailsBinding({
   access,
   people,
+  companies,
   companyName,
   locale,
   id,
@@ -113,6 +125,7 @@ function EmployeeDetailsBinding({
   backTo,
   profileTo,
   editEmploymentTo,
+  transferTo,
   startLifecycleTo,
   leaveTo,
   balancesTo,
@@ -127,6 +140,7 @@ function EmployeeDetailsBinding({
   backTo: string;
   profileTo: string | null;
   editEmploymentTo: string | null;
+  transferTo: string | null;
   startLifecycleTo: string | null;
   leaveTo: string | null;
   balancesTo: string | null;
@@ -161,6 +175,7 @@ function EmployeeDetailsBinding({
       backTo={backTo}
       profileTo={profileTo}
       editEmploymentTo={editEmploymentTo}
+      transferTo={transferTo}
       startLifecycleTo={startLifecycleTo}
       leaveTo={leaveTo}
       balancesTo={balancesTo}
@@ -178,6 +193,16 @@ function EmployeeDetailsBinding({
           today={today}
           locale={locale}
           onPage={onHistoryPage}
+          onScopeFailure={controller.reportScopeFailure}
+        />
+      }
+      transfers={
+        <EmploymentTransfersBinding
+          access={access}
+          load={people.loadEmploymentTransfers}
+          id={id}
+          companies={companies}
+          locale={locale}
           onScopeFailure={controller.reportScopeFailure}
         />
       }

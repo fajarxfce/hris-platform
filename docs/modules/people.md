@@ -66,6 +66,11 @@ its own destination read grant. This review supplies current command context;
 the transfer still independently checks assignments, other employments, lifecycle
 cases, reporting lines and linked-account access before committing.
 
+The [dashboard transfer workflow](../dashboard.md#employment-transfers) provides
+destination-scoped choices, explicit confirmation, idempotent recovery and an
+incoming/outgoing history tab. The UI uses the reviewed source version and dates;
+it does not copy source assignments or infer destination authority from the source.
+
 This operation implements an immediate transfer: the effective/start date must be today in both companies, and the source must have started before today. Future revisions and current or scheduled reporting dependents must be cancelled/reassigned first. The destination cannot have another open or scheduled employment for the same person. A transferred source employment cannot be reopened through ordinary revision; a later employment must have its own identity. Target unit kinds, manager eligibility, employment terms, and employee number uniqueness are validated.
 
 The actor needs `people.manage` and `people.transfer` in both companies, recent authentication, and recent MFA when enabled. Company, membership, and current account access are pinned and rechecked inside the transaction. A linked account must already have an active destination membership. Transfer never copies role grants or activates a global account. If no other current or planned employment remains in the source company, `people.offboard` is additionally required and its membership is deactivated with a frozen grant history. Self-removal and removal of the last active company administrator are rejected. Other company memberships remain unchanged.

@@ -114,6 +114,30 @@ The original employment start date is read-only and pinned by the controller. A 
 
 Save captures the current aggregate version, not the historical applied revision, together with one immutable operation and payload. A definite conflict requires protected reloading before another proposal. Unknown outcomes remain read-only through MFA or later rejection until explicit retry acknowledges the original receipt. Acknowledgement and detail loading have separate ownership. The saved detail link selects the proposal's effective date. Scope replacement and disposal abort pending work, clear private state, and ignore late completions. Locale/theme changes retain dirty fields and assignment choices; no form data is persisted in browser storage.
 
+## Employment transfers
+
+`/people/employees/{id}/transfer` requires source `people.read`, `people.manage`
+and `people.transfer`. Choosing a destination loads the [scoped transfer
+review](modules/people.md#cross-company-transfers). Both dates come from the
+server; this workflow performs an immediate transfer. Destination employee
+number, contract, end date, status, assignments and reason form the proposal.
+Assignments begin empty and use the destination's independently authorized
+directories. Source assignments and role grants are not copied.
+
+Confirmation pins the reviewed source version, destination employment ID and
+operation ID. A lost response retains that exact proposal for explicit recovery,
+including through MFA renewal or a later rejected retry. Definitive version/date
+conflicts require a protected review reload, which clears discarded fields.
+Locale/theme changes retain edits. Source workspace authority and a destination
+access failure remain distinct; changing scope disposes pending reads and commands.
+Busy confirmations retain keyboard focus while preventing duplicate actions.
+
+The employment detail's Transfers tab loads at most two immutable incoming/outgoing
+records on demand. It requires company-wide `people.read`; a counterpart name is
+shown only from the current session's company memberships. The successful command
+links to source history without acquiring a destination profile. Browser commands
+remain in memory, rather than claiming durable offline submission.
+
 ## Scheduled employment revision cancellation
 
 `/people/employees/{id}/revisions/{revision}/cancel` requires `people.read` and `people.manage`. A history drawer links eligible scheduled revisions to a separate review. That review acquires the selected revision, current aggregate version, current company date, and available action in one guarded API snapshot. The server's date and capability determine whether cancellation can be submitted; the historical view date and browser clock cannot authorize it. Revision zero, effective revisions, and existing cancellation evidence remain readable without a cancellation action.

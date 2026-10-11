@@ -255,6 +255,13 @@ const EmploymentEditorScreen = lazy(() =>
     default: module.EmploymentEditorScreen,
   })),
 );
+const EmploymentTransferScreen = lazy(() =>
+  import("../../features/people/presentation/bindings/employment-transfer-screen").then(
+    (module) => ({
+      default: module.EmploymentTransferScreen,
+    }),
+  ),
+);
 const PersonProfileScreen = lazy(() =>
   import("../../features/people/presentation/bindings/person-profile-screen").then((module) => ({
     default: module.PersonProfileScreen,
@@ -988,6 +995,23 @@ export function PortalRoutes({
         }
       />
       <Route
+        path="/people/employees/:employeeId/transfer"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <EmploymentTransferScreen
+              accountId={accountId}
+              access={access}
+              people={people}
+              companies={companies}
+              loadUnits={organization.loadUnits}
+              companyName={company.name}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
         path="/people/employees/new"
         element={
           <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
@@ -1102,6 +1126,7 @@ export function PortalRoutes({
               accountId={accountId}
               access={access}
               people={people}
+              companies={companies}
               companyName={company.name}
               timezone={company.timezone}
               locale={locale}

@@ -3,9 +3,11 @@ import { createBrowserFiles } from "../../../core/di/browser-files";
 import type { FileRepository } from "../../../core/domain/files/file-repository";
 import { HttpEmployeeDataSource } from "../data/datasources/http-employee-data-source";
 import { HttpEmployeeImportDataSource } from "../data/datasources/http-employee-import-data-source";
+import { HttpEmploymentTransferDataSource } from "../data/datasources/http-employment-transfer-data-source";
 import { HttpPersonProfileDataSource } from "../data/datasources/http-person-profile-data-source";
 import { RemoteEmployeeImportRepository } from "../data/repositories/remote-employee-import-repository";
 import { RemoteEmployeeRepository } from "../data/repositories/remote-employee-repository";
+import { RemoteEmploymentTransferRepository } from "../data/repositories/remote-employment-transfer-repository";
 import { RemotePersonProfileRepository } from "../data/repositories/remote-person-profile-repository";
 import { ApplyEmployeeImport } from "../domain/usecases/apply-employee-import";
 import { BindPersonAccount } from "../domain/usecases/bind-person-account";
@@ -22,6 +24,8 @@ import { LoadEmployees } from "../domain/usecases/load-employees";
 import { LoadEmploymentDetails } from "../domain/usecases/load-employment-details";
 import { LoadEmploymentHistory } from "../domain/usecases/load-employment-history";
 import { LoadEmploymentRevision } from "../domain/usecases/load-employment-revision";
+import { LoadEmploymentTransferReview } from "../domain/usecases/load-employment-transfer-review";
+import { LoadEmploymentTransfers } from "../domain/usecases/load-employment-transfers";
 import { LoadPersonProfile } from "../domain/usecases/load-person-profile";
 import { LoadPersonProfileHistory } from "../domain/usecases/load-person-profile-history";
 import { ResumeEmployeeImport } from "../domain/usecases/resume-employee-import";
@@ -29,6 +33,7 @@ import { ReviseEmployment } from "../domain/usecases/revise-employment";
 import { SavePersonProfile } from "../domain/usecases/save-person-profile";
 import { SelectEmployeeImportFile } from "../domain/usecases/select-employee-import-file";
 import { StartEmployeeImport } from "../domain/usecases/start-employee-import";
+import { TransferEmployee } from "../domain/usecases/transfer-employee";
 
 export function createPeopleFeature(
   http: HttpClient,
@@ -36,8 +41,14 @@ export function createPeopleFeature(
 ) {
   const imports = new RemoteEmployeeImportRepository(new HttpEmployeeImportDataSource(http));
   const employees = new RemoteEmployeeRepository(new HttpEmployeeDataSource(http));
+  const transfers = new RemoteEmploymentTransferRepository(
+    new HttpEmploymentTransferDataSource(http),
+  );
   const profiles = new RemotePersonProfileRepository(new HttpPersonProfileDataSource(http));
   return {
+    loadEmploymentTransferReview: new LoadEmploymentTransferReview(transfers),
+    loadEmploymentTransfers: new LoadEmploymentTransfers(transfers),
+    transferEmployee: new TransferEmployee(transfers),
     bindPersonAccount: new BindPersonAccount(profiles),
     selectEmployeeImportFile: new SelectEmployeeImportFile(files),
     startEmployeeImport: new StartEmployeeImport(imports),

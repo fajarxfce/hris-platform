@@ -343,12 +343,12 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Offboarding Anda harus diselesaikan oleh operator lain yang berwenang.",
   ],
   scheduled_employment_changes_pending: [
-    "Resolve the scheduled employment revisions before completing offboarding.",
-    "Selesaikan revisi employment yang terjadwal sebelum menyelesaikan offboarding.",
+    "Resolve the scheduled employment revisions before ending this employment.",
+    "Selesaikan revisi employment yang terjadwal sebelum mengakhiri employment ini.",
   ],
   reporting_reassignment_required: [
-    "Reassign current and scheduled reporting lines before completing offboarding.",
-    "Alihkan hubungan pelaporan yang aktif dan terjadwal sebelum menyelesaikan offboarding.",
+    "Reassign current and scheduled reporting lines before ending this employment.",
+    "Alihkan hubungan pelaporan yang aktif dan terjadwal sebelum mengakhiri employment ini.",
   ],
   last_company_administrator: [
     "Assign another active company administrator before removing this access.",
@@ -497,6 +497,38 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
   transferred_employment_closed: [
     "This employment was closed by a company transfer.",
     "Employment ini ditutup oleh transfer perusahaan.",
+  ],
+  transfer_access_required: [
+    "You need employee management and transfer access in both companies.",
+    "Anda memerlukan izin pengelolaan dan transfer karyawan di kedua perusahaan.",
+  ],
+  invalid_employment_transfer: [
+    "Choose a different destination company and reload the current employment.",
+    "Pilih perusahaan tujuan yang berbeda dan muat ulang employment saat ini.",
+  ],
+  invalid_transfer_terms: [
+    "Review the destination employment terms. The employment must start on the transfer date.",
+    "Periksa ketentuan employment tujuan. Employment harus dimulai pada tanggal transfer.",
+  ],
+  transfer_requires_current_company_date: [
+    "Both companies must have the same current date. Reload the review before transferring.",
+    "Tanggal saat ini di kedua perusahaan harus sama. Muat ulang tinjauan sebelum transfer.",
+  ],
+  source_employment_not_transferable: [
+    "Only a current employment that started before today can be transferred.",
+    "Hanya employment aktif yang dimulai sebelum hari ini yang dapat ditransfer.",
+  ],
+  destination_employment_exists: [
+    "This person already has a current or planned employment in the destination company.",
+    "Orang ini sudah memiliki employment aktif atau terencana di perusahaan tujuan.",
+  ],
+  destination_membership_required: [
+    "Assign the employee's account access to the destination company first.",
+    "Berikan akses akun karyawan ke perusahaan tujuan terlebih dahulu.",
+  ],
+  open_lifecycle_cases_pending: [
+    "Complete or cancel the open lifecycle cases before transferring this employment.",
+    "Selesaikan atau batalkan proses lifecycle yang masih terbuka sebelum transfer employment ini.",
   ],
   reporting_cycle_or_depth: [
     "This employment change creates a reporting cycle or exceeds the hierarchy limit.",

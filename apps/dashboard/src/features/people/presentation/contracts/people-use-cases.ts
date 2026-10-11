@@ -6,12 +6,18 @@ import type { LoadEmployees } from "../../domain/usecases/load-employees";
 import type { LoadEmploymentDetails } from "../../domain/usecases/load-employment-details";
 import type { LoadEmploymentHistory } from "../../domain/usecases/load-employment-history";
 import type { LoadEmploymentRevision } from "../../domain/usecases/load-employment-revision";
+import type { LoadEmploymentTransferReview } from "../../domain/usecases/load-employment-transfer-review";
+import type { LoadEmploymentTransfers } from "../../domain/usecases/load-employment-transfers";
 import type { LoadPersonProfile } from "../../domain/usecases/load-person-profile";
 import type { LoadPersonProfileHistory } from "../../domain/usecases/load-person-profile-history";
 import type { ReviseEmployment } from "../../domain/usecases/revise-employment";
 import type { SavePersonProfile } from "../../domain/usecases/save-person-profile";
+import type { TransferEmployee } from "../../domain/usecases/transfer-employee";
 
 export type PeopleUseCases = Readonly<{
+  loadEmploymentTransferReview: Pick<LoadEmploymentTransferReview, "execute">;
+  loadEmploymentTransfers: Pick<LoadEmploymentTransfers, "execute">;
+  transferEmployee: Pick<TransferEmployee, "execute">;
   bindPersonAccount: Pick<BindPersonAccount, "execute">;
   selectEmployeeImportFile: Pick<SelectEmployeeImportFile, "execute">;
   startEmployeeImport: Pick<StartEmployeeImport, "execute">;

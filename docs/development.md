@@ -63,3 +63,9 @@ For an existing local database, add `HRIS_WORKER_DATABASE_PASSWORD` to `.env`, r
 Run the worker directly with `./gradlew :apps:worker:bootRun`, using `HRIS_DATABASE_URL`, `HRIS_WORKER_DATABASE_USER`, and `HRIS_WORKER_DATABASE_PASSWORD`. Do not use migration credentials for either application. `hris.worker.enabled=false` disables scheduling for controlled maintenance/test contexts; it is not a substitute for draining already-running workers. Shutdown cancels timers, interrupts owned work, and waits at most 40 seconds. Expired leases become available for recovery, and every business checkpoint rejects stale ownership.
 
 Spring Batch metadata stores attempt execution/checkpoint diagnostics separately from the company job projection. The public API uses the latter and never exposes Batch tables or raw job parameters. Metadata retention/archival is a separate operational policy; no unbounded in-memory job registry is retained.
+
+The dashboard browser suite runs in four CI shards, each retaining a 15-minute
+step timeout. The previous two-shard allocation reached that limit as the suite
+grew; one shard completed 204 scenarios in 15.1 minutes before the runner timed it
+out. Sharding distributes the work without removing tests or extending a hung
+scenario's timeout.

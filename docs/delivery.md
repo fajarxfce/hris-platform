@@ -891,3 +891,26 @@ surviving force-stop/restart before successful retry. The temporary device proxy
 was removed afterward. Native MFA, external push, iOS devices, and performance
 measurements are separate acceptance work; these observations do not complete
 the other mobile workflows in [completion](completion.md).
+
+## Offline mobile workspace
+
+[HRIS Mobile](https://github.com/fajarxfce/hris-mobile/commit/308481c) now restores
+the selected company from an encrypted, session-owned snapshot. Domain policy
+bounds admission by one hour, session-family expiry and required MFA assurance.
+Foreground and worker checks revalidate live access; transport failure cannot
+extend admission. Compare-and-set publication rejects stale selections and account
+replacement, while unchanged renewals retain the route and inbox generation.
+
+The mobile root check, Android dev build, 21 Compose tests, three application-MVI
+tests and one link-parser test passed. Workspace domain tests passed on JVM and
+Chromium (12 each), with five real SQLite/encryption tests; inbox domain tests
+passed on both targets (30 each). The reusable atomic snapshot storage primitive
+and its regressions were ported to Compose Fluent Starter; CI passed in both
+repositories for that foundation change.
+
+The Android 16 device reopened its company and inbox after force-stop with the
+API connection disabled. A replacement company also restored offline without the
+first company's content. Foreground revalidation retained the open detail after
+reconnection. The temporary device proxy was stopped and the normal dev connection
+restored. Clock/MFA expiry uses deterministic tests; iOS device and background
+execution acceptance remain separate.

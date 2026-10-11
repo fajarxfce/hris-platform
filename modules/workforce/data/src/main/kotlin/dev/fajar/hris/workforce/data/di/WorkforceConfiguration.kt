@@ -224,6 +224,17 @@ class WorkforceConfiguration {
     ) = ListWorkHolidays(schedules, companies, members, identities, transactions, security, clock)
 
     @Bean
+    fun getHoliday(
+        schedules: ScheduleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetWorkHoliday(schedules, companies, members, identities, transactions, security, clock)
+
+    @Bean
     fun attendanceSource(sql: DSLContext): AttendanceDataSource = PostgresAttendanceDataSource(sql)
 
     @Bean

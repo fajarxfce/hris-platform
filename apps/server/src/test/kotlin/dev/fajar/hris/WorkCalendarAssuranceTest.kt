@@ -36,6 +36,7 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                 "shift-detail",
                 "self-directory",
                 "holidays",
+                "holiday-detail",
                 "calendar",
                 "save-shift",
                 "save-holiday",
@@ -46,6 +47,7 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
     fun expiryDuringAnAccountWaitCannotAuthorizeCalendarReadsWritesOrReceiptReplay(mode: String) {
         val f = isolatedFixture()
         val shift = createShift(f)
+        val holiday = if (mode == "holiday-detail") createHoliday(f) else null
         val account = UUID.randomUUID()
         database()
             .update(
@@ -140,6 +142,17 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                             clock,
                         )
                         .execute(current, day.minusMonths(1), day)
+                "holiday-detail" ->
+                    GetWorkHoliday(
+                            schedules,
+                            companies,
+                            members,
+                            identities,
+                            transactions,
+                            security,
+                            clock,
+                        )
+                        .execute(current, requireNotNull(holiday))
                 "calendar" ->
                     GetEmployeeCalendar(
                             schedules,

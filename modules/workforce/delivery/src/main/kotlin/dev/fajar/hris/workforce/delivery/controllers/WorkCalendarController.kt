@@ -22,6 +22,7 @@ class WorkCalendarController(
     private val calendar: GetEmployeeCalendar,
     private val saveHoliday: SaveWorkHoliday,
     private val holidays: ListWorkHolidays,
+    private val holiday: GetWorkHoliday,
 ) {
     @GetMapping("/shifts")
     fun shifts(
@@ -114,6 +115,10 @@ class WorkCalendarController(
         @RequestParam until: LocalDate,
     ): List<WorkHolidayResponse> =
         holidays.execute(actor, from, until).response().map { it.toResponse() }
+
+    @GetMapping("/holidays/{id}")
+    fun holiday(actor: Actor, @PathVariable id: UUID): WorkHolidayResponse =
+        holiday.execute(actor, id).response().toResponse()
 
     @PutMapping("/holidays/{id}")
     fun saveHoliday(

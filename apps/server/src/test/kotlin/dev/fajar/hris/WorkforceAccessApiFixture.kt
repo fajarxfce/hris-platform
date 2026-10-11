@@ -78,6 +78,28 @@ abstract class WorkforceAccessApiFixture : WorkPeriodApiFixture() {
         return id
     }
 
+    protected fun createHoliday(f: Fixture): UUID {
+        val id = UUID.randomUUID()
+        val response =
+            command(
+                f.admin,
+                "${f.path}/holidays/$id",
+                json.writeValueAsString(
+                    mapOf(
+                        "workDate" to "2026-10-02",
+                        "name" to "Company holiday",
+                        "active" to true,
+                        "reason" to "Calendar setup",
+                    )
+                ),
+                f.csrf,
+                UUID.randomUUID(),
+                "PUT",
+            )
+        assertEquals(200, response.statusCode(), response.body())
+        return id
+    }
+
     protected fun anotherEmployee(f: Fixture, account: UUID? = null): UUID {
         val id = UUID.randomUUID()
         val response =

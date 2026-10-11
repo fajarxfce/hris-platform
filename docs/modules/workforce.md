@@ -27,6 +27,12 @@ including inactive templates, under `workforce.read`. A missing ID and an ID fro
 another company both return `shift_not_found`. The read uses the shared schedule
 and access guards and rechecks session assurance before releasing the result.
 
+`GET /workforce/holidays/{id}` returns one current holiday, including an inactive
+date, under `company.read`. Missing and foreign IDs both return `holiday_not_found`.
+It holds the shared calendar/access guards and rechecks live membership, original
+permissions, credentials and MFA before reading the current revision. Cancelling
+a pending read releases those guards.
+
 The dashboard provides shift search, current details and versioned create/edit
 forms, with explicit request recovery after response loss. Scheduling and employee
 calendar administration screens remain separate delivery work. The mobile employee

@@ -1102,3 +1102,15 @@ The physical phone was unavailable over ADB during delivery; no phone UI was dri
 Validated updates use install-only when it reconnects. API health remained `UP`
 and the worker had zero restarts. The preceding backend CI run passed all backend,
 dashboard and integration jobs. No release was created.
+
+## Company holiday detail API
+
+The workforce API now exposes current holiday details for versioned dashboard
+editing. Missing and foreign IDs share the same response. Reads recheck live
+membership, original permissions, credentials and MFA after shared resource/access
+guards; cancellation releases the guards without excluding other readers.
+
+All 22 focused API, assurance and contract tests and 38 worker tests passed, along
+with architecture/format checks and both application JAR builds. The initial test
+invocation lacked Docker group access; the documented group-aware invocation
+completed successfully. Dashboard authoring and deployment are separate work.

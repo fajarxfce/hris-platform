@@ -11,6 +11,8 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 
@@ -22,6 +24,91 @@ class AnnouncementInboxHttpTest : AnnouncementPublicationApiFixture() {
             registry.add("HRIS_IDENTITY_KEYS") {
                 "v1:" + Base64.getEncoder().encodeToString(ByteArray(32) { 23 })
             }
+        }
+    }
+
+    @Test
+    fun unreadTotalIncludesUnloadedPagesAndChangesOnlyForTheOwningAccount() {
+        val f = fixture()
+        val recipient = member(f)
+        val other = member(f)
+        val first = draft(f)
+        published(f, first)
+        published(f, draft(f))
+        val path = "${f.inbox}/unread-count"
+        assertEquals(2L, ok(get(recipient.browser, path))["unreadCount"].asLong())
+        val page = ok(get(recipient.browser, "${f.inbox}?limit=1"))
+        assertEquals(1, page["items"].size())
+        assertFalse(page["nextCursor"].isNull)
+        val item = UUID.fromString(page["items"][0]["id"].asString())
+        ok(get(recipient.browser, "${f.inbox}/$item"))
+        assertEquals(2L, ok(get(recipient.browser, path))["unreadCount"].asLong())
+        val key = UUID.randomUUID()
+        ok(inboxAction(f, recipient, item, "read", 0, key))
+        ok(inboxAction(f, recipient, item, "read", 0, key))
+        assertEquals(1L, ok(get(recipient.browser, path))["unreadCount"].asLong())
+        assertEquals(2L, ok(get(other.browser, path))["unreadCount"].asLong())
+        ok(action(f, first, "archive", 2))
+        assertEquals(1L, ok(get(other.browser, path))["unreadCount"].asLong())
+        val remaining = UUID.fromString(inbox(f, other).single()["id"].asString())
+        ok(inboxAction(f, other, remaining, "acknowledge", 0))
+        assertEquals(0L, ok(get(other.browser, path))["unreadCount"].asLong())
+        val foreign = fixture()
+        assertEquals(403, get(recipient.browser, "${foreign.inbox}/unread-count").statusCode())
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["permission", "credential", "membership"])
+    fun unreadCountRechecksAccessAfterWaiting(change: String) {
+        val f = fixture()
+        val recipient = member(f)
+        published(f, draft(f))
+        val barrier = AccountLockProbe.Barrier(recipient.account)
+        accountProbe.current.set(barrier)
+        try {
+            Executors.newSingleThreadExecutor().use { executor ->
+                val pending =
+                    executor.submit<HttpResponse<String>> {
+                        get(recipient.browser, "${f.inbox}/unread-count")
+                    }
+                try {
+                    assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                    when (change) {
+                        "credential" ->
+                            database()
+                                .update(
+                                    "update accounts set security_version=security_version+1 where id=?",
+                                    recipient.account,
+                                )
+                        "membership" ->
+                            database()
+                                .update(
+                                    "update company_memberships set active=false where company_id=? and account_id=?",
+                                    f.company,
+                                    recipient.account,
+                                )
+                        else ->
+                            database()
+                                .update(
+                                    "delete from membership_permissions where company_id=? and account_id=?",
+                                    f.company,
+                                    recipient.account,
+                                )
+                    }
+                } finally {
+                    barrier.release.countDown()
+                }
+                val response = pending.get(15, TimeUnit.SECONDS)
+                assertEquals(
+                    if (change == "credential") 401 else 403,
+                    response.statusCode(),
+                    response.body(),
+                )
+                assertFalse(response.body().contains("unreadCount"))
+            }
+        } finally {
+            accountProbe.current.set(null)
+            barrier.release.countDown()
         }
     }
 

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*
 class InboxController(
     private val get: GetInboxItem,
     private val list: ListInbox,
+    private val countUnread: CountUnreadInbox,
     private val update: UpdateInboxItem,
 ) {
     @GetMapping
@@ -26,6 +27,10 @@ class InboxController(
         list.execute(actor, after, limit).response().let {
             Page(it.items.map { item -> item.toResponse() }, it.nextCursor)
         }
+
+    @GetMapping("/unread-count")
+    fun unreadCount(actor: Actor): UnreadInboxResponse =
+        UnreadInboxResponse(countUnread.execute(actor).response())
 
     @GetMapping("/{id}")
     fun get(actor: Actor, @PathVariable id: UUID): InboxItemResponse =

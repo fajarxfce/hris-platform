@@ -10,6 +10,10 @@ import java.time.Instant
 import java.util.UUID
 
 class StoredInboxRepository(private val source: InboxDataSource) : InboxRepository {
+    override fun countUnread(companyId: UUID, accountId: UUID): Result<Long> = safeDatabaseCall {
+        source.countUnread(companyId, accountId)
+    }
+
     override fun find(
         companyId: UUID,
         accountId: UUID,

@@ -53,6 +53,7 @@ class CommunicationsAssuranceTest : AnnouncementPublicationApiFixture() {
                 "archive",
                 "return",
                 "inbox",
+                "unread",
                 "item",
                 "read",
                 "ack",
@@ -64,7 +65,7 @@ class CommunicationsAssuranceTest : AnnouncementPublicationApiFixture() {
         val group = group(f, members = emptyList())
         var actor = f.actor
         var itemId = UUID.randomUUID()
-        if (mode in setOf("inbox", "item", "read", "ack")) {
+        if (mode in setOf("inbox", "unread", "item", "read", "ack")) {
             val recipient = member(f)
             published(f, id)
             itemId = UUID.fromString(inbox(f, recipient)[0]["id"].asString())
@@ -288,6 +289,19 @@ class CommunicationsAssuranceTest : AnnouncementPublicationApiFixture() {
                     }
                 "inbox" -> { current ->
                         ListInbox(
+                                inboxRepository,
+                                announcements,
+                                companies,
+                                members,
+                                identities,
+                                transactions,
+                                clock,
+                                security,
+                            )
+                            .execute(current)
+                    }
+                "unread" -> { current ->
+                        CountUnreadInbox(
                                 inboxRepository,
                                 announcements,
                                 companies,

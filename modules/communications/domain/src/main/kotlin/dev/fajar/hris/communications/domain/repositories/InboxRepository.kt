@@ -6,6 +6,8 @@ import java.time.Instant
 import java.util.UUID
 
 interface InboxRepository {
+    fun countUnread(companyId: UUID, accountId: UUID): Result<Long>
+
     fun find(companyId: UUID, accountId: UUID, id: UUID, lock: Boolean = false): Result<InboxItem?>
 
     fun list(companyId: UUID, accountId: UUID, after: UUID?, limit: Int): Result<Page<InboxSummary>>

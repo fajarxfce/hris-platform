@@ -93,3 +93,15 @@ lookup cannot be combined with text search or a cursor; foreign/missing IDs are
 omitted. Each page is one SQL snapshot under company RLS. Access and current MFA
 are rechecked after access guards. These labels do not reserve a recipient or
 authorize later saves, previews, or publication.
+
+## Unread inbox total
+
+`GET /api/v1/companies/{companyId}/inbox/unread-count` returns `{unreadCount}` for
+all nonwithdrawn, unread items owned by the current account. The total is independent
+of loaded pages. Opening a message does not mark it read; only the existing explicit
+read/acknowledgement commands change that state. Archival removes withdrawn items.
+
+The read uses the same company, account, inbox permission and live session/MFA
+checks as the inbox, after shared resource/access guards. One SQL aggregate uses
+the company/owner index without acquiring message content. Counts are advisory
+current reads; clients refresh after confirmed commands and foreground recovery.

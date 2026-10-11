@@ -11,6 +11,17 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresInboxDataSource(private val sql: DSLContext) : InboxDataSource {
+    override fun countUnread(companyId: UUID, accountId: UUID): Long =
+        requireNotNull(
+            sql.select(DSL.count().cast(Long::class.java))
+                .from(I)
+                .where(I.COMPANY_ID.eq(companyId))
+                .and(I.OWNER_ACCOUNT_ID.eq(accountId))
+                .and(I.WITHDRAWN.isFalse)
+                .and(I.READ_AT.isNull)
+                .fetchOne(0, Long::class.java)
+        )
+
     override fun find(companyId: UUID, accountId: UUID, id: UUID, lock: Boolean): InboxItemRow? {
         val query =
             sql.select(

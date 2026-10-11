@@ -403,6 +403,28 @@ class CommunicationsConfiguration {
         )
 
     @Bean
+    fun countUnreadInbox(
+        inbox: InboxRepository,
+        announcements: AnnouncementRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        CountUnreadInbox(
+            inbox,
+            announcements,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun updateInboxItem(
         inbox: InboxRepository,
         announcements: AnnouncementRepository,

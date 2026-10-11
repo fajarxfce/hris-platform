@@ -1276,3 +1276,15 @@ Eleven directory scenarios and eleven API-contract tests passed, including liter
 search, combined filtering/paging, minimal fields, company isolation and revoked
 credentials/grants/MFA after a wait. All 38 worker tests, architecture/formatting
 and API/worker JAR builds passed. Mobile presentation is delivered separately.
+
+## Unread inbox total
+
+A separate account/company-scoped read returns the total unread inbox independently
+of loaded pages. Confirmed read/acknowledgement commands and announcement archival
+update the result; opening a detail remains a read-only action.
+
+Nine inbox API scenarios and 21 communication-assurance scenarios passed, including
+unloaded pages, another account's read state, replay, archival, access revocation
+and MFA expiry while waiting. Directory and API-contract tests also passed, for
+52 focused API tests, plus all 38 worker tests. Architecture/formatting and both
+application JAR builds passed. Mobile badge delivery remains separate.

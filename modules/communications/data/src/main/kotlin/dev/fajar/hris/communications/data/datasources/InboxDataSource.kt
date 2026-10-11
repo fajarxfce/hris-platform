@@ -5,6 +5,8 @@ import java.time.Instant
 import java.util.UUID
 
 interface InboxDataSource {
+    fun countUnread(companyId: UUID, accountId: UUID): Long
+
     fun find(companyId: UUID, accountId: UUID, id: UUID, lock: Boolean): InboxItemRow?
 
     fun list(companyId: UUID, accountId: UUID, after: UUID?, limit: Int): List<InboxSummaryRow>

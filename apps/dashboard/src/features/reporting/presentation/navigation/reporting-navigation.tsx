@@ -1,0 +1,18 @@
+import { DataBarVertical20Regular } from "@fluentui/react-icons";
+import type { AppNavigationItem } from "../../../../core/presentation/components/app-portal-shell";
+import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import { canReadHeadcount } from "../../domain/policies/headcount-policy";
+
+export function reportingNavigation(
+  access: CompanyAccess | null,
+  locale: Locale,
+): readonly AppNavigationItem[] {
+  const permissions = access?.permissions ?? [];
+  const text = messages(locale);
+  return [
+    ...(canReadHeadcount(permissions)
+      ? [{ to: "/reports/headcount", label: text.reports, icon: <DataBarVertical20Regular /> }]
+      : []),
+  ];
+}

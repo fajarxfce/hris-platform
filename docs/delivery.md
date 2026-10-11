@@ -1212,3 +1212,15 @@ a lost response, and resolved a competing correction into a new 435-minute revis
 Original timestamps and both correction-history records remained available.
 The database and API fixture were disposed after the scenario. Mobile capture is
 the next delivery increment; browser fixtures do not validate physical GPS.
+
+## Grouped dashboard navigation
+
+Feature-owned navigation definitions replace the flat application menu. Grouped
+sections, local search and longest-ancestor selection support additional modules
+without turning the shell into a feature controller. Empty or unauthorized sections
+are absent; company scope replacement disposes the search owner.
+
+Architecture, formatting, type checks and 844 tests passed. Six browser scenarios
+covered attendance behavior, detail selection, search, collapsed navigation,
+Indonesian labels and a 390-pixel viewport. Existing command departure protection
+remains in its workspace owner.

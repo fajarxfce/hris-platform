@@ -13,6 +13,7 @@ import type { IdentityState } from "../features/identity/presentation/models/ide
 import type { ApplicationDependencies } from "./application-dependencies";
 import { portalNavigation } from "./routing/portal-navigation";
 import { PortalRoutes } from "./routing/portal-routes";
+import { useNavigationMenu } from "./routing/use-navigation-menu";
 import { useWorkspaceNavigation } from "./routing/use-workspace-navigation";
 
 /** Keyed by the authorized workspace: revocation discards navigation decisions with the form. */
@@ -29,6 +30,10 @@ export function PortalWorkspace(
 ) {
   const { state, identity, locale } = props;
   const navigation = useWorkspaceNavigation(state.workspace !== null && state.stage !== "ready");
+  const menu = useNavigationMenu(
+    portalNavigation(state.workspace?.access ?? state.access, locale),
+    props.collapsed,
+  );
   const sessionActions = useMemo(
     () => ({ verifyAccount: identity.requestVerification, revalidate: identity.refreshSession }),
     [identity],
@@ -66,7 +71,10 @@ export function PortalWorkspace(
           state.session.account.mfaConfigured ? identity.requestVerification : undefined
         }
         verificationDisabled={state.busy || state.stage !== "ready"}
-        navigation={portalNavigation(state.workspace?.access ?? state.access, locale)}
+        navigation={menu.sections}
+        activeDestination={menu.activeDestination}
+        navigationQuery={menu.query}
+        onNavigationQueryChanged={menu.setQuery}
       >
         {state.workspace && (
           <WorkspaceNavigationContext value={navigation.controller}>

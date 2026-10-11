@@ -25,6 +25,8 @@ a {
   background: var(--colorNeutralBackground2);
 }
 .app-topbar {
+  position: sticky;
+  top: 0;
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
@@ -80,9 +82,38 @@ a {
   text-overflow: ellipsis;
 }
 .app-sidebar {
+  position: sticky;
+  top: 48px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  align-self: start;
   padding: 12px 0;
   border-right: 1px solid var(--colorNeutralStroke2);
   background: var(--colorNeutralBackground1);
+}
+.app-navigation-search {
+  padding: 0 12px 12px;
+}
+.app-navigation-search .fui-Input {
+  width: 100%;
+  min-width: 0;
+}
+.app-navigation-heading {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--colorNeutralForeground3);
+  margin: 18px 16px 6px;
+}
+.app-navigation-empty {
+  padding: 0 16px;
+}
+.app-portal-collapsed .app-navigation-heading {
+  display: none;
+}
+.app-portal-collapsed .app-navigation-section + .app-navigation-section {
+  border-top: 1px solid var(--colorNeutralStroke2);
+  margin-top: 8px;
+  padding-top: 8px;
 }
 .app-nav-item {
   display: flex;
@@ -447,6 +478,15 @@ a {
   }
 }
 @media (max-width: 800px) {
+  .app-navigation-search,
+  .app-navigation-heading {
+    display: none;
+  }
+  .app-navigation-section + .app-navigation-section {
+    border-top: 1px solid var(--colorNeutralStroke2);
+    margin-top: 8px;
+    padding-top: 8px;
+  }
   .app-portal {
     grid-template-columns: 56px minmax(0, 1fr);
   }
@@ -488,6 +528,10 @@ a {
   }
 }
 @media (max-width: 480px) {
+  .app-sidebar {
+    top: 92px;
+    max-height: calc(100dvh - 92px);
+  }
   .app-company-select {
     width: 128px;
   }

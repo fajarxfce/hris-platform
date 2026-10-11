@@ -9,8 +9,14 @@ import { NavLink } from "react-router-dom";
 import { type Locale, messages } from "../i18n/messages";
 import { AppButton } from "./app-button";
 import { AppPreferences } from "./app-preferences";
+import { AppTextField } from "./app-text-field";
 
 export type AppNavigationItem = Readonly<{ to: string; label: string; icon: ReactNode }>;
+export type AppNavigationSection = Readonly<{
+  id: string;
+  label: string | null;
+  items: readonly AppNavigationItem[];
+}>;
 
 type Props = {
   locale: Locale;
@@ -27,7 +33,10 @@ type Props = {
   onSignOut: () => void;
   onVerifyAccount?: (() => void) | undefined;
   verificationDisabled?: boolean;
-  navigation: readonly AppNavigationItem[];
+  navigation: readonly AppNavigationSection[];
+  activeDestination: string | null;
+  navigationQuery: string;
+  onNavigationQueryChanged: (value: string) => void;
   children: ReactNode;
 };
 
@@ -93,23 +102,45 @@ export function AppPortalShell(props: Props) {
         />
       </header>
       <aside className="app-sidebar">
+        {!props.collapsed && (
+          <div className="app-navigation-search">
+            <AppTextField
+              label={text.searchNavigation}
+              value={props.navigationQuery}
+              maxLength={80}
+              onChange={(_, data) => props.onNavigationQueryChanged(data.value)}
+            />
+          </div>
+        )}
         <nav id="app-main-navigation" aria-label={text.navigation}>
-          {props.navigation.map((item) => (
-            <NavLink
-              {...restoreFocus}
-              key={item.to}
-              to={item.to}
-              end
-              className={({ isActive }) =>
-                `app-nav-item${isActive ? " app-nav-item-selected" : ""}`
-              }
-              title={item.label}
-              aria-label={item.label}
+          {props.navigation.map((section) => (
+            <section
+              key={section.id}
+              className="app-navigation-section"
+              aria-label={section.label ?? undefined}
             >
-              {item.icon}
-              <span>{item.label}</span>
-            </NavLink>
+              {section.label && <h2 className="app-navigation-heading">{section.label}</h2>}
+              {section.items.map((item) => (
+                <NavLink
+                  {...restoreFocus}
+                  key={item.to}
+                  to={item.to}
+                  end={props.activeDestination !== item.to}
+                  className={`app-nav-item${props.activeDestination === item.to ? " app-nav-item-selected" : ""}`}
+                  title={item.label}
+                  aria-label={item.label}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </NavLink>
+              ))}
+            </section>
           ))}
+          {props.navigation.length === 0 && (
+            <p className="app-navigation-empty" role="status">
+              {text.noResults}
+            </p>
+          )}
         </nav>
       </aside>
       <main ref={content} id="main-content" tabIndex={-1} className="app-workspace">

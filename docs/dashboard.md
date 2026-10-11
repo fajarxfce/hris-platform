@@ -484,3 +484,9 @@ one committed binding and a deliberately lost response, replay preserves one new
 history revision, the native account can read its profile, and a colleague's
 profile remains inaccessible. Company directory reads remain self-scoped for the
 employee, while the administrator's self directory stays empty.
+
+Navigation entries are owned by their features. The portal composes accessible
+sections for people, time and attendance, requests, communications and administration.
+Local menu search filters only authorized entries. A detail route selects its most
+specific visible ancestor; the existing departure guard still owns navigation.
+The sidebar scrolls independently and retains an icon rail on narrow viewports.

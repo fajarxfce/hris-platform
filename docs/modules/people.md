@@ -159,3 +159,22 @@ credentials, original/live access, and MFA after waiting. The datasource perform
 the query; it does not infer scope or application policy. The response omits
 birth date and nationality. Assignment labels and the separately authorized
 private profile are acquired only when the client opens an employment.
+
+## Company employee directory
+
+`GET /api/v1/companies/{companyId}/employees/directory` provides a minimal coworker
+list under `people.directory.read` or `people.read`. It returns the server's company
+date/timezone and an `employees` page containing only ID, employee number, name,
+position, and department. Personal contact details, account identity, profile fields,
+and contract terms are excluded. This permission does not authorize their endpoints.
+
+The use case selects active/probation employments that are working on the company
+date, after shared people/company/member/account guards and live credential,
+permission, and MFA validation. One bounded SQL snapshot selects assignment labels.
+Search matches literal name/employee-number text (`query`, at most 120 characters).
+Pagination uses the last employee number (`after`, 1–32 characters) with a default
+of 20 and maximum of 50 rows. Each page is a current read, not an export snapshot.
+
+New employee and manager role-template assignments include `people.directory.read`.
+Existing memberships retain their grants until an authorized administrator explicitly
+updates them; deploying this endpoint does not expand previously assigned access.

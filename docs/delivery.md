@@ -1251,3 +1251,16 @@ installation metadata was verified without driving the phone UI.
 
 The complete platform workflow also passed
 [backend, all four browser shards and API/database integration](https://github.com/fajarxfce/hris-platform/actions/runs/38139796471).
+
+## Company coworker directory
+
+The company directory exposes current coworkers through a separate minimal read
+projection. It returns name, employee number and assignment labels without granting
+private profile access. Search is literal, pages are bounded, and live credentials,
+membership, permissions and MFA are rechecked after access guards.
+
+Architecture and formatting checks, people/identity domain tests, 26 focused API
+tests and all 38 worker tests passed. The six new directory scenarios cover minimal
+fields, company isolation, pagination, date policy, literal search, revoked access
+after a lock wait and expired MFA. API and worker JAR builds passed. Mobile UI and
+device acceptance are recorded in the mobile repository.

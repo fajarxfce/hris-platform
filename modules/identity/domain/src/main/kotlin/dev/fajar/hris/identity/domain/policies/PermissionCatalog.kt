@@ -101,6 +101,7 @@ object PermissionCatalog {
         )
     val manager =
         setOf(
+            "people.directory.read",
             "company.read",
             "people.team.read",
             "workforce.team.read",
@@ -115,6 +116,7 @@ object PermissionCatalog {
         )
     val employee =
         setOf(
+            "people.directory.read",
             "announcements.read",
             "company.read",
             "people.self.read",

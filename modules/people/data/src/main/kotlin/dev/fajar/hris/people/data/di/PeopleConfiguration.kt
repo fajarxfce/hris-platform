@@ -48,6 +48,36 @@ class PeopleConfiguration {
     @Bean fun peopleSource(sql: DSLContext): PeopleDataSource = PostgresPeopleDataSource(sql)
 
     @Bean
+    fun directorySource(sql: DSLContext): CompanyDirectoryDataSource =
+        PostgresCompanyDirectoryDataSource(sql)
+
+    @Bean
+    fun companyDirectory(source: CompanyDirectoryDataSource): CompanyDirectoryRepository =
+        StoredCompanyDirectoryRepository(source)
+
+    @Bean
+    fun listCompanyDirectory(
+        directory: CompanyDirectoryRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListCompanyDirectory(
+            directory,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun profilesSource(sql: DSLContext): PersonProfileDataSource =
         PostgresPersonProfileDataSource(sql)
 

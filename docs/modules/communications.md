@@ -26,6 +26,13 @@ A preview does not reserve future membership. Scheduled publication evaluates cu
 
 ## Publication and retention policy
 
+`GET /announcements/{id}/publication-review` returns current content, minimal linked
+job status, and available actions in the selected company. Management permission
+does not grant general job access or expose job inputs/credentials. Stopped jobs
+can expose recovery; cancellation requests alone do not permit reset or archival.
+The response respects revision/attempt limits and current MFA. Recipient preview
+remains a separate read, and commands revalidate the reviewed state.
+
 At publication, resolve the current company-local employment date, selected groups/units, account bindings, and active memberships. Only active/probationary employees with an active account and announcement-read permission are recipients. Deduplicate accounts with multiple matching employments. Abort without a partial inbox if the bounded recipient selection exceeds 5,000 or its audience is no longer valid.
 
 Store the recipient snapshot and inbox before attempting an external notification. The publisher's original credential version and current grant must still be valid when the worker runs. Queued content is frozen. An optional UTC schedule must have microsecond precision, lie within the next 365 days, and remains immutable on its job. Publication uses one bounded transaction for the recipient snapshot, inbox, published revision, fenced job completion, audit, and outbox. A failure exposes no partial publication. Cancelling a queued publication requests worker acknowledgement; returning it to draft requires a terminal failed/cancelled job. A new schedule creates a new retained job request. An announcement permits at most eight publication attempts; no automatic reset starts a new attempt. A successful publication cannot return to draft. Revision limits reserve capacity for publication and archival.

@@ -19,6 +19,28 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class CommunicationsConfiguration {
     @Bean
+    fun getAnnouncementReview(
+        announcements: AnnouncementRepository,
+        jobs: JobRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetAnnouncementReview(
+            announcements,
+            jobs,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun audienceReferenceSource(sql: DSLContext): AudienceReferenceDataSource =
         PostgresAudienceReferenceDataSource(sql)
 

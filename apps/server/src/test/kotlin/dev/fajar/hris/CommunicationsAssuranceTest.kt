@@ -6,6 +6,7 @@ import dev.fajar.hris.communications.domain.usecases.*
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.entities.BackgroundJob
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.*
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -40,6 +41,7 @@ class CommunicationsAssuranceTest : AnnouncementPublicationApiFixture() {
                 "announcements",
                 "message",
                 "message_revision",
+                "publication_review",
                 "history",
                 "groups",
                 "group",
@@ -223,6 +225,19 @@ class CommunicationsAssuranceTest : AnnouncementPublicationApiFixture() {
                                 ),
                             )
                     }
+                "publication_review" -> { current ->
+                        GetAnnouncementReview(
+                                announcements,
+                                jobs,
+                                companies,
+                                members,
+                                identities,
+                                transactions,
+                                clock,
+                                security,
+                            )
+                            .execute(current, id)
+                    }
                 "publish" -> { current ->
                         QueueAnnouncement(
                                 announcements,
@@ -359,6 +374,51 @@ class CommunicationsAssuranceTest : AnnouncementPublicationApiFixture() {
             assertEquals(Result.Success(originalReceipt.copy(replayed = true)), renewed)
             for ((table, before) in recorded) assertEquals(before, count(f, table), table)
         }
+    }
+
+    @Test
+    fun publicationReviewRechecksAssuranceAfterReadingItsJob() {
+        val f = fixture()
+        val id = draft(f)
+        ok(publish(f, id, scheduledFor = clock.instant().plusSeconds(900)))
+        database()
+            .update(
+                "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
+                f.actor.accountId,
+            )
+        val actor =
+            f.actor.copy(
+                mfaVerifiedAt = clock.instant().minus(security.maximumMfaAge).plusSeconds(1)
+            )
+        val delayed =
+            object : JobRepository by jobs {
+                override fun find(
+                    companyId: UUID,
+                    id: UUID,
+                    lock: Boolean,
+                ): Result<BackgroundJob?> {
+                    val result = jobs.find(companyId, id, lock)
+                    clock.set(clock.instant().plusSeconds(2))
+                    return result
+                }
+            }
+        val review =
+            GetAnnouncementReview(
+                announcements,
+                delayed,
+                companies,
+                members,
+                identities,
+                transactions,
+                clock,
+                security,
+            )
+        val before = count(f, "audit_entries")
+        failure(review.execute(actor, id), "mfa_required")
+        assertEquals(before, count(f, "audit_entries"))
+        assertTrue(
+            review.execute(actor.copy(mfaVerifiedAt = clock.instant()), id) is Result.Success
+        )
     }
 
     @Test

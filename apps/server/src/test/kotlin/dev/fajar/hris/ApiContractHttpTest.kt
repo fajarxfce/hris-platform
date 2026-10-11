@@ -47,6 +47,20 @@ class ApiContractHttpTest : PeopleApiFixture() {
         assertEquals(200, parameters.getValue("limit")["schema"]["maximum"].asInt())
     }
 
+    @Test
+    fun publicationReviewUsesCompanyAdmissionAndItsOwnResponseContract() {
+        val api = contract()
+        val operation =
+            api["paths"]["/api/v1/companies/{companyId}/announcements/{id}/publication-review"][
+                "get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val schema = api["components"]["schemas"]["AnnouncementReviewResponse"]["properties"]
+        assertTrue(schema.has("announcement"))
+        assertTrue(schema.has("publicationJob"))
+        assertTrue(schema.has("availableActions"))
+        assertFalse(schema.has("recipients"))
+    }
+
     private fun checkReferences(root: JsonNode, node: JsonNode, depth: Int = 0) {
         assertTrue(depth < 64)
         if (node.isObject) {

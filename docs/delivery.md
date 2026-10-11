@@ -834,3 +834,20 @@ worker scenario passed in 1.2 minutes after adding group creation, deactivation,
 reactivation, historical review, and publication to the named group. It also verified
 the original draft receipt and native inbox delivery/replay/withdrawal. No physical
 device or external push validation is claimed.
+
+## Publication review API
+
+Announcement managers can review current content, minimal publication-job status,
+and available actions without acquiring unrelated job-directory permission. Job
+inspection links retain their separate authority. Read capabilities respect
+publication state, cancellation acknowledgement, revision/attempt limits, current
+scope and MFA; commands remain authoritative. The review checks assurance again
+after the job read and never locks a job after acquiring the announcement guard.
+
+Architecture and format checks, 13 communications-domain tests, 41 selected
+HTTP/PostgreSQL/API-contract tests, and both application JAR builds passed in the
+final run. Tests cover minimal projections, independent job authority, failed-job
+recovery, archival, company isolation, pending credential revocation, MFA expiry
+after guards and job acquisition, and a review completing while another transaction
+holds the job row. OpenAPI includes the endpoint and company admission. Dashboard
+publication workflows are being connected separately.

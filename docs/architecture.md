@@ -101,6 +101,14 @@ A bounded immutable publication stores one recipient-account map and references 
 
 Interactive announcement, audience-group, and inbox reads and commands revalidate live session assurance after their resource/access guards, including before original receipt replay. Publication admission checks assurance again after acquiring the job queue; a proof that expires during either wait cannot authorize a write. Background publication continues to use its execution authority and credential checks, separately from interactive MFA age.
 
+Publication review holds the shared announcement and access guards, then reads its
+linked job without acquiring a job lock. This avoids reversing the worker's
+job-before-announcement order. The use case validates the linked company, resource,
+and job kind and checks MFA again after the read. It returns minimal job status and
+current actions under announcement-management authority; general job inspection
+still requires ownership or `jobs.read`. These capabilities are a live review,
+not a reservation. Mutations independently revalidate scope and observed versions.
+
 Inbox synchronization uses account ownership exclusively. Its captured change rows have no employment ID; database constraints retain employment ownership for the older collections. Statement-level triggers record bounded inbox insert/update sets atomically, while the existing worker still assigns publication positions after commit. Omitting collection selection retains the original six-collection projection.
 
 

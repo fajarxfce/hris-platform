@@ -21,6 +21,7 @@ class AnnouncementController(
     private val reset: ReturnAnnouncementToDraft,
     private val archive: ArchiveAnnouncement,
     private val preview: PreviewAnnouncementAudience,
+    private val review: GetAnnouncementReview,
 ) {
     @PutMapping("/{id}")
     fun save(
@@ -49,6 +50,10 @@ class AnnouncementController(
     @GetMapping("/{id}")
     fun get(actor: Actor, @PathVariable id: UUID): AnnouncementResponse =
         get.execute(actor, id).response().toResponse()
+
+    @GetMapping("/{id}/publication-review")
+    fun review(actor: Actor, @PathVariable id: UUID): AnnouncementReviewResponse =
+        review.execute(actor, id).response().toResponse()
 
     @GetMapping("/{id}/revisions/{version}")
     fun revision(

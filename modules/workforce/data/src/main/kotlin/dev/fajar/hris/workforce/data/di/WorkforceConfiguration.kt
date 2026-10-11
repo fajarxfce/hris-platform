@@ -145,6 +145,26 @@ class WorkforceConfiguration {
         )
 
     @Bean
+    fun selfWorkforceEmployments(
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListSelfWorkforceEmployments(
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun employeeCalendar(
         schedules: ScheduleRepository,
         people: PeopleRepository,

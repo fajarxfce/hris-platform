@@ -209,8 +209,10 @@ fun completeApiContract(api: OpenAPI) {
                         operation.addExtension("x-hris-idempotency-key", true)
                     }
                     "limit" -> {
-                        parameter.schema?.minimum = BigDecimal.ONE
-                        parameter.schema?.maximum = BigDecimal(200)
+                        parameter.schema?.let { schema ->
+                            if (schema.minimum == null) schema.minimum = BigDecimal.ONE
+                            if (schema.maximum == null) schema.maximum = BigDecimal(200)
+                        }
                     }
                     "companies" ->
                         if (path == "/api/v1/reports/headcount") {

@@ -73,6 +73,28 @@ class ApiContractHttpTest : PeopleApiFixture() {
         assertTrue(schema.has("version"))
     }
 
+    @Test
+    fun selfWorkforceDiscoveryHasItsOwnMinimalCompanyAdmittedContract() {
+        val api = contract()
+        val operation =
+            api["paths"]["/api/v1/companies/{companyId}/workforce/me/employments"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val directory = api["components"]["schemas"]["SelfWorkforceDirectoryResponse"]["properties"]
+        val parameters =
+            operation["parameters"].iterator().asSequence().associateBy { it["name"].asString() }
+        assertEquals(50, parameters.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals(32, parameters.getValue("after")["schema"]["maxLength"].asInt())
+        assertTrue(directory.has("accountId"))
+        assertTrue(directory.has("companyId"))
+        assertTrue(directory.has("asOf"))
+        assertTrue(directory.has("timezone"))
+        val reference = api["components"]["schemas"]["WorkforceEmploymentResponse"]["properties"]
+        assertEquals(
+            setOf("id", "employeeNumber", "status", "version"),
+            reference.properties().map { it.key }.toSet(),
+        )
+    }
+
     private fun checkReferences(root: JsonNode, node: JsonNode, depth: Int = 0) {
         assertTrue(depth < 64)
         if (node.isObject) {

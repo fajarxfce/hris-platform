@@ -1055,3 +1055,22 @@ shared module DI changes.
 The repaired API and worker were then rebuilt in the dev Compose stack, preserving
 the PostgreSQL volume. The worker logged successful startup with zero restarts;
 API health was `UP`, and the WireGuard dashboard returned HTTP 200.
+
+## Workforce self-service discovery
+
+Workforce now exposes a bounded directory of the signed-in account's employment
+references, with company-local date and timezone. It omits personal-profile fields
+and remains available when People is disabled. Calendar reads still independently
+authorize the selected employment. OpenAPI retains endpoint-specific pagination
+bounds instead of overwriting them with the general list maximum.
+
+Twenty-five focused API/assurance/contract tests and all 38 worker tests passed.
+They cover native build admission, independent module availability, foreign scopes,
+revoked credentials/membership/permissions after admission, grant replacement,
+MFA expiry and cancellation cleanup. The nine API contract tests passed again after
+adding explicit pagination metadata; formatting, architecture and both application
+JAR builds also passed. A full recompilation initially exceeded the temporary
+PostgreSQL startup wait and passed on retry after stopping the emulator.
+
+The dedicated Android emulator also booted and restored the employee workspace
+against the dev API. No physical-phone interaction was part of this increment.

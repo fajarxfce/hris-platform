@@ -5,6 +5,7 @@ import type { CommunicationsScreenProps } from "../contracts/communications-scre
 import { AnnouncementListController } from "../controllers/announcement-list-controller";
 import { announcementParameters, announcementsPath } from "../models/announcement-route";
 import { announcementRows } from "../models/announcement-view";
+import { audienceGroupsPath } from "../models/audience-group-view";
 import { AnnouncementsPage } from "../pages/announcements-page";
 
 export function AnnouncementsScreen(props: CommunicationsScreenProps & { history?: boolean }) {
@@ -87,6 +88,11 @@ function AnnouncementListBinding({
       state={state}
       rows={rows}
       history={historyId !== null}
+      groupsTo={
+        historyId === null
+          ? `${audienceGroupsPath}?${announcementParameters(access.companyId)}`
+          : null
+      }
       createTo={
         historyId === null
           ? `${announcementsPath}/new?${announcementParameters(access.companyId)}`

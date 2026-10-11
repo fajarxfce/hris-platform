@@ -8,6 +8,7 @@ import { AppResourceTable } from "../../../../core/presentation/components/app-r
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { announcementEditorMessages } from "../i18n/announcement-editor-messages";
 import { announcementMessages } from "../i18n/announcement-messages";
+import { audienceGroupMessages } from "../i18n/audience-group-messages";
 import type { AnnouncementListState } from "../models/announcement-list-state";
 import type { announcementRows } from "../models/announcement-view";
 
@@ -19,6 +20,7 @@ export function AnnouncementsPage({
   locale,
   backTo,
   createTo,
+  groupsTo,
   firstPage,
   onRefresh,
   onFirst,
@@ -32,6 +34,7 @@ export function AnnouncementsPage({
   locale: Locale;
   backTo: string | null;
   createTo: string | null;
+  groupsTo: string | null;
   firstPage: boolean;
   onRefresh: () => void;
   onFirst: () => void;
@@ -48,6 +51,7 @@ export function AnnouncementsPage({
         actions={
           <>
             {backTo && <Link to={backTo}>{text.current}</Link>}
+            {groupsTo && <Link to={groupsTo}>{audienceGroupMessages(locale).title}</Link>}
             {createTo && <Link to={createTo}>{announcementEditorMessages(locale).create}</Link>}
             <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
               {messages(locale).refresh}

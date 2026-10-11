@@ -52,8 +52,14 @@ retain one immutable operation and payload; an explicit retry can recover the or
 receipt. A stale revision requires reviewing current data before editing. Departure
 protection and MFA renewal retain the mounted form without silently replaying a save.
 
-Group management, publication review, schedules, and recovery are separate workflows
-still being implemented. The mobile inbox currently synchronizes and reads encrypted
+Audience group directories, creation, revision review, editing and activation are
+implemented. Member selection uses employment references, with at most 50 labels
+loaded per page and 5,000 retained IDs per definition. Current labels do not rewrite
+historical membership. Response loss retains the original command, while a definite
+version conflict requires explicit review before another edit.
+
+Publication review, schedules, and recovery are separate workflows still being
+implemented. The mobile inbox currently synchronizes and reads encrypted
 correspondence; read/acknowledgement commands and push navigation remain separate work.
 
 ## Audience references

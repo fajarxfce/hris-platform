@@ -816,3 +816,21 @@ and history contained one draft revision. Publication, job review, native inbox 
 read replay, acknowledgement conflicts, withdrawal, and permission revocation also
 passed. The existing bundle-size advisory remains; no device or external push validation
 is claimed. Group management and publication actions are still separate work.
+
+## Audience group administration
+
+The dashboard provides bounded group directories, current and historical definitions,
+creation, editing and activation. Employment selection supports up to 5,000 IDs with
+one page of 50 current labels. Read-only revision views cannot mutate membership.
+Conflicts require protected review; uncertain saves preserve one immutable operation
+through later rejection. Company changes cancel reads and discard private state.
+
+Architecture, Biome, TypeScript, all 734 unit/controller tests in 103 files, and the
+production build passed. Five group browser scenarios and ten existing announcement
+regressions passed in the final targeted runs. Coverage includes finite pagination,
+revision zero, deactivation conflicts, lost responses, late company data, denied
+access, localization, and a reviewed 390-pixel dark screenshot. The real API/PostgreSQL/
+worker scenario passed in 1.2 minutes after adding group creation, deactivation,
+reactivation, historical review, and publication to the named group. It also verified
+the original draft receipt and native inbox delivery/replay/withdrawal. No physical
+device or external push validation is claimed.

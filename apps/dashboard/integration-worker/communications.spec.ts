@@ -82,13 +82,46 @@ test("publication reaches the native inbox and sync preserves receipts, withdraw
     ).status(),
   ).toBe(200);
 
-  await page.goto(`/communications/announcements?company=${company}`);
+  await page.goto(`/communications/audience-groups?company=${company}`);
   await page.getByRole("combobox", { name: "Company", exact: true }).selectOption(company);
+  await page.getByRole("link", { name: "New audience group", exact: true }).click();
+  await page.getByLabel("Name", { exact: true }).fill("Inbox recipients");
+  await page.getByRole("button", { name: "Add: Fictional Inbox Employee", exact: true }).click();
+  await page.getByLabel("Reason", { exact: true }).fill("Publication audience fixture");
+  await page.getByRole("button", { name: "Save group", exact: true }).click();
+  await page.getByRole("link", { name: "View audience group", exact: true }).click();
+  const group = new URL(page.url()).pathname.split("/").at(-1);
+  if (!group) throw new Error("Missing saved group identifier");
+  for (const active of [false, true]) {
+    await page.getByRole("link", { name: "Edit audience group", exact: true }).click();
+    await page.getByRole("checkbox", { name: "Active", exact: true }).setChecked(active);
+    await page
+      .getByLabel("Reason", { exact: true })
+      .fill(active ? "Reopen delivery audience" : "Review inactive definition");
+    await page.getByRole("button", { name: "Save group", exact: true }).click();
+    await page.getByRole("link", { name: "View audience group", exact: true }).click();
+  }
+  expect(
+    await (await context.request.get(`${base}/communications/audience-groups/${group}`)).json(),
+  ).toMatchObject({
+    id: group,
+    version: 2,
+    active: true,
+    employmentIds: [employee],
+  });
+  await page.getByRole("link", { name: "Previous revision", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Group details", exact: true })).toContainText(
+    "Inactive",
+  );
+  await page.getByRole("main").getByRole("link", { name: "Audience groups", exact: true }).click();
+  await page.getByRole("main").getByRole("link", { name: "Announcements", exact: true }).click();
   await page.getByRole("link", { name: "New announcement", exact: true }).click();
   await page.getByLabel("Title", { exact: true }).fill("Office closure");
   await page.getByLabel("Message", { exact: true }).fill("The office will be closed on Friday.");
   await page.getByLabel("Reason", { exact: true }).fill("Worker delivery fixture");
   await page.getByRole("checkbox", { name: "Require acknowledgement", exact: true }).check();
+  await page.getByRole("combobox", { name: "Audience", exact: true }).selectOption("GROUP");
+  await page.getByRole("button", { name: "Add: Inbox recipients", exact: true }).click();
   const draftWrites: { operation: string | undefined; body: unknown }[] = [];
   let dropDraftResponse = true;
   await page.route(`**/api/v1/companies/${company}/announcements/*`, async (route) => {
@@ -105,7 +138,9 @@ test("publication reaches the native inbox and sync preserves receipts, withdraw
     return route.abort("failed");
   });
   await page.getByRole("button", { name: "Save draft", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText("The save result could not be confirmed");
+  await expect(
+    page.getByRole("status").filter({ hasText: "The save result could not be confirmed" }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Check save result", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("Draft saved.");
   expect(draftWrites).toHaveLength(2);

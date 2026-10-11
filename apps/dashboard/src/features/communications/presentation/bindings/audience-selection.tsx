@@ -11,16 +11,17 @@ export function AudienceSelection(
     kind: AudienceReferenceKind;
     ids: readonly string[];
     maximum: number;
-    enabled: boolean;
-    onChange: (ids: readonly string[]) => void;
-  },
+  } & (
+      | { readOnly: true; enabled?: never; onChange?: never }
+      | { readOnly?: false; enabled: boolean; onChange: (ids: readonly string[]) => void }
+    ),
 ) {
   const picker = useAudienceReferencePicker(
     props.accountId,
     props.access,
     props.kind,
     props.communications.loadReferences,
-    props.enabled,
+    props.readOnly !== true && props.enabled,
   );
   const selected = useSelectedAudienceReferences(
     props.accountId,
@@ -65,10 +66,12 @@ export function AudienceSelection(
       availableRows={availableRows}
       count={props.ids.length}
       maximum={props.maximum}
-      enabled={props.enabled}
+      enabled={props.readOnly !== true && props.enabled}
+      readOnly={props.readOnly === true}
       locale={props.locale}
       onAdd={(id) => {
         if (
+          props.readOnly !== true &&
           props.enabled &&
           props.ids.length < props.maximum &&
           available.some((item) => item.id === id)
@@ -76,7 +79,8 @@ export function AudienceSelection(
           props.onChange([...props.ids, id]);
       }}
       onRemove={(id) => {
-        if (props.enabled) props.onChange(props.ids.filter((item) => item !== id));
+        if (props.readOnly !== true && props.enabled)
+          props.onChange(props.ids.filter((item) => item !== id));
       }}
     />
   );

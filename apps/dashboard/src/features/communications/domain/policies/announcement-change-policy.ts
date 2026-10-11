@@ -1,6 +1,7 @@
 import { isUuid } from "../../../../core/domain/identifiers";
 import type { Failure } from "../../../../core/domain/result";
 import type { AnnouncementChange } from "../entities/announcement-change";
+import { communicationsCommandWasRejected } from "./communications-command-policy";
 
 export function normalizeAnnouncementChange(input: AnnouncementChange): AnnouncementChange {
   return Object.freeze({
@@ -49,30 +50,11 @@ export function validateAnnouncementChange(input: AnnouncementChange): Failure |
 
 /** A later rejection never resolves an earlier request whose committed response was lost. */
 export const announcementSaveWasRejected = (failure: Failure): boolean =>
+  communicationsCommandWasRejected(failure) ||
   [
     "invalid_announcement",
-    "invalid_version",
     "announcement_audience_unavailable",
     "announcement_not_draft",
     "announcement_not_found",
     "announcement_revision_limit",
-    "stale_version",
-    "data_conflict",
-    "access_denied",
-    "company_access_denied",
-    "company_required",
-    "authentication_required",
-    "session_revoked",
-    "unauthenticated",
-    "mfa_required",
-    "mfa_setup_required",
-    "recent_authentication_required",
-    "csrf_invalid",
-    "company_module_disabled",
-    "company_maintenance",
-    "client_update_required",
-    "client_version_required",
-    "invalid_client_version",
-    "request_rate_limited",
-    "request_body_too_large",
   ].includes(failure.code);

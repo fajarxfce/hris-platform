@@ -6,32 +6,25 @@ import { AppCheckbox } from "../../../../core/presentation/components/app-checkb
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
 import { AppLoading } from "../../../../core/presentation/components/app-loading";
 import { AppPageHeader } from "../../../../core/presentation/components/app-page-header";
-import { AppSelect } from "../../../../core/presentation/components/app-select";
 import { AppTextArea } from "../../../../core/presentation/components/app-text-area";
 import { AppTextField } from "../../../../core/presentation/components/app-text-field";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
-import type { AudienceKind } from "../../domain/entities/announcement";
-import type { useAnnouncementForm } from "../controllers/use-announcement-form";
-import {
-  announcementEditorMessages,
-  announcementFieldError,
-} from "../i18n/announcement-editor-messages";
-import { announcementMessages } from "../i18n/announcement-messages";
-import type { AnnouncementEditorState } from "../models/announcement-editor-state";
+import type { useAudienceGroupForm } from "../controllers/use-audience-group-form";
+import { audienceGroupFieldError, audienceGroupMessages } from "../i18n/audience-group-messages";
+import type { AudienceGroupEditorState } from "../models/audience-group-editor-state";
 
-export function AnnouncementEditorPage(props: {
-  state: AnnouncementEditorState;
-  form: ReturnType<typeof useAnnouncementForm>;
-  selection: ReactNode;
+export function AudienceGroupEditorPage(props: {
+  state: AudienceGroupEditorState;
+  form: ReturnType<typeof useAudienceGroupForm>;
+  members: ReactNode;
   creating: boolean;
-  companyName: string;
   locale: Locale;
+  companyName: string;
   backTo: string;
   savedTo: string | null;
   onRetry: () => void;
 }) {
-  const text = announcementEditorMessages(props.locale);
-  const read = announcementMessages(props.locale);
+  const text = audienceGroupMessages(props.locale);
   const { state, form } = props;
   return (
     <section
@@ -41,7 +34,7 @@ export function AnnouncementEditorPage(props: {
       <AppPageHeader
         title={props.creating ? text.create : text.edit}
         context={props.companyName}
-        actions={<Link to={props.backTo}>{read.back}</Link>}
+        actions={<Link to={props.backTo}>{text.back}</Link>}
       />
       <AppFailure failure={state.failure} locale={props.locale} />
       {state.stage === "loading" && <AppLoading label={messages(props.locale).loading} />}
@@ -60,17 +53,17 @@ export function AnnouncementEditorPage(props: {
         </MessageBar>
       )}
       {state.stage === "saved" && (
-        <MessageBar intent="success" layout="multiline" role="status">
+        <MessageBar intent="success" role="status">
           <MessageBarBody>
-            {text.saved} {props.savedTo && <Link to={props.savedTo}>{text.view}</Link>}
+            {text.saved} {props.savedTo && <Link to={props.savedTo}>{text.viewSaved}</Link>}
           </MessageBarBody>
         </MessageBar>
       )}
       {state.stage !== "loading" && state.stage !== "unavailable" && state.stage !== "saved" && (
         <>
-          {state.announcement && (
+          {state.group && (
             <p>
-              {text.basedOn}: {state.announcement.version}
+              {text.basedOn}: {state.group.version}
             </p>
           )}
           {state.stage === "conflict" && (
@@ -80,55 +73,35 @@ export function AnnouncementEditorPage(props: {
           )}
           <form className="app-editor-form" onSubmit={form.submit} noValidate>
             <AppTextField
-              label={text.title}
-              {...form.title}
-              maxLength={200}
+              label={text.name}
+              {...form.name}
+              maxLength={120}
               required
               readOnly={!form.editable}
-              error={announcementFieldError(state.failure?.fields.title, props.locale)}
+              error={audienceGroupFieldError(state.failure?.fields.name, props.locale)}
             />
-            <AppTextArea
-              label={text.body}
-              {...form.body}
-              maxLength={16000}
-              rows={8}
-              resize="vertical"
-              required
-              readOnly={!form.editable}
-              error={announcementFieldError(state.failure?.fields.body, props.locale)}
-            />
-            <AppSelect
-              label={text.audience}
-              {...form.audienceKind}
-              disabled={!form.editable}
-              onChange={(_, data) => form.changeKind(data.value as AudienceKind)}
-              error={announcementFieldError(
-                state.failure?.fields["audience.targetIds"] ??
-                  state.failure?.fields["audience.kind"],
-                props.locale,
-              )}
-            >
-              <option value="COMPANY">{read.COMPANY}</option>
-              <option value="BRANCH">{read.BRANCH}</option>
-              <option value="DEPARTMENT">{read.DEPARTMENT}</option>
-              <option value="GROUP">{read.GROUP}</option>
-            </AppSelect>
-            {props.selection}
             <AppCheckbox
-              label={text.acknowledgement}
-              checked={form.acknowledgementRequired.value}
+              label={text.active}
+              checked={form.active.value}
               disabled={!form.editable}
-              ref={form.acknowledgementRequired.ref}
-              onBlur={form.acknowledgementRequired.onBlur}
-              onChange={(_, data) => form.acknowledgementRequired.onChange(data.checked === true)}
+              ref={form.active.ref}
+              onBlur={form.active.onBlur}
+              onChange={(_, data) => form.active.onChange(data.checked === true)}
             />
+            <p>{text.eligibility}</p>
+            {props.members}
+            {state.failure?.fields.employmentIds && (
+              <p role="alert">
+                {audienceGroupFieldError(state.failure.fields.employmentIds, props.locale)}
+              </p>
+            )}
             <AppTextArea
               label={text.reason}
               {...form.reason}
               maxLength={1000}
               required
               readOnly={!form.editable}
-              error={announcementFieldError(state.failure?.fields.reason, props.locale)}
+              error={audienceGroupFieldError(state.failure?.fields.reason, props.locale)}
             />
             <div className="app-form-actions">
               <AppButton type="submit" appearance="primary" disabled={!form.editable}>

@@ -3,6 +3,20 @@ import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
   invalid_announcement: ["Review the announcement fields.", "Periksa isian pengumuman."],
+  invalid_audience_group: ["Review the audience group fields.", "Periksa isian grup penerima."],
+  audience_group_not_found: ["The audience group is unavailable.", "Grup penerima tidak tersedia."],
+  audience_group_employee_unavailable: [
+    "A selected employee is unavailable in this company.",
+    "Karyawan yang dipilih tidak tersedia di perusahaan ini.",
+  ],
+  audience_group_limit: [
+    "This company has reached its audience group limit.",
+    "Jumlah grup penerima perusahaan telah mencapai batas.",
+  ],
+  audience_group_revision_limit: [
+    "This group has reached its revision limit.",
+    "Grup ini telah mencapai batas revisi.",
+  ],
   invalid_audience_reference_search: [
     "Review the search or selected references.",
     "Periksa pencarian atau referensi terpilih.",

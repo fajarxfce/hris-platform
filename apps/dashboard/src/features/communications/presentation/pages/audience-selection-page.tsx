@@ -17,6 +17,7 @@ export function AudienceSelectionPage(props: {
   count: number;
   maximum: number;
   enabled: boolean;
+  readOnly: boolean;
   locale: Locale;
   onAdd: (id: string) => void;
   onRemove: (id: string) => void;
@@ -44,7 +45,9 @@ export function AudienceSelectionPage(props: {
             { id: "status", label: text.status },
           ]}
           rows={props.selectedRows}
-          action={{ label: text.remove, onOpen: props.onRemove, disabled: !props.enabled }}
+          {...(props.readOnly
+            ? {}
+            : { action: { label: text.remove, onOpen: props.onRemove, disabled: !props.enabled } })}
         />
       ) : (
         <p>{text.none}</p>

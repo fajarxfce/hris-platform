@@ -3,9 +3,11 @@ package dev.fajar.hris.communications.domain.usecases
 import dev.fajar.hris.communications.domain.entities.*
 import dev.fajar.hris.communications.domain.repositories.*
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import java.time.Clock
 import java.util.UUID
 
 class ListAnnouncements(
@@ -14,6 +16,8 @@ class ListAnnouncements(
     private val members: MembershipRepository,
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
+    private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -45,7 +49,7 @@ class ListAnnouncements(
             val authorized =
                 identities
                     .access(actor.accountId, company)
-                    .flatMap { validateCompanyCommandActor(actor, it) }
+                    .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
                     .flatMap { it.requirePermission("announcements.manage") }
             if (authorized is Result.Failed) return@run authorized
             announcements.list(company, after, limit)

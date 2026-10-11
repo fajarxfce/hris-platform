@@ -771,3 +771,19 @@ Coverage includes minimal projections, future employments, activation, literal
 wildcards, pagination, invalid/oversized selections, foreign resources, runtime
 RLS, revoked credentials/grants, and MFA expiry during pending acquisition. The
 endpoint's bounded inputs and company admission are included in OpenAPI.
+
+## Communications session assurance
+
+All interactive announcement, group, and inbox operations now check current MFA
+after pending resource/access guards, including receipt recovery. Publication
+checks again after queue admission. A failed check rolls back its transaction and
+does not consume an operation ID; renewed verification can explicitly retry the
+original command. Background execution retains its separate execution authority.
+
+Architecture and format checks, eight communications-domain tests, 66 selected
+HTTP/PostgreSQL tests, two publication-worker tests, and both application JARs
+passed. The run completed in 4 minutes 34 seconds. Eighteen new regressions cover
+current and historical reads, previews, edits, publication/recovery, archival,
+recipient read/acknowledgement, original receipts, and MFA expiry during queue
+admission. They verify denied results, unchanged evidence, and recovery after
+fresh verification.

@@ -4,7 +4,8 @@ import dev.fajar.hris.communications.domain.entities.*
 import dev.fajar.hris.communications.domain.policies.*
 import dev.fajar.hris.communications.domain.repositories.*
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import java.time.Clock
@@ -21,6 +22,7 @@ class UpdateInboxItem(
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -58,7 +60,7 @@ class UpdateInboxItem(
             val checked =
                 identities
                     .access(actor.accountId, company)
-                    .flatMap { validateCompanyCommandActor(actor, it) }
+                    .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
                     .flatMap { it.requirePermission("announcements.read") }
             if (checked is Result.Failed) return@run checked
             val item =

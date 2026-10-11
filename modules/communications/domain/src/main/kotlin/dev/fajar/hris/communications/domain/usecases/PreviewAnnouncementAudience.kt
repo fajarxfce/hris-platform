@@ -4,7 +4,8 @@ import dev.fajar.hris.communications.domain.entities.*
 import dev.fajar.hris.communications.domain.policies.*
 import dev.fajar.hris.communications.domain.repositories.*
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.*
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -24,6 +25,7 @@ class PreviewAnnouncementAudience(
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -55,7 +57,7 @@ class PreviewAnnouncementAudience(
             val access =
                 identities
                     .access(actor.accountId, company)
-                    .flatMap { validateCompanyCommandActor(actor, it) }
+                    .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
                     .flatMap { it.requirePermission("announcements.manage") }
             if (access is Result.Failed) return@run access
             val found = announcements.find(company, id)

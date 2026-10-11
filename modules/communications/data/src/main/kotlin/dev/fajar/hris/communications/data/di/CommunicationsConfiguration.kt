@@ -5,6 +5,7 @@ import dev.fajar.hris.communications.data.repositories.*
 import dev.fajar.hris.communications.domain.repositories.*
 import dev.fajar.hris.communications.domain.usecases.*
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.*
@@ -65,6 +66,7 @@ class CommunicationsConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         SaveAnnouncement(
             announcements,
@@ -77,6 +79,7 @@ class CommunicationsConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -90,6 +93,7 @@ class CommunicationsConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         SaveAudienceGroup(
             groups,
@@ -101,6 +105,7 @@ class CommunicationsConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -110,7 +115,18 @@ class CommunicationsConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetAnnouncement(announcements, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetAnnouncement(
+            announcements,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun listAnnouncements(
@@ -119,7 +135,18 @@ class CommunicationsConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListAnnouncements(announcements, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListAnnouncements(
+            announcements,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun listAnnouncementHistory(
@@ -128,7 +155,18 @@ class CommunicationsConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListAnnouncementHistory(announcements, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListAnnouncementHistory(
+            announcements,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun getAudienceGroup(
@@ -137,7 +175,9 @@ class CommunicationsConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetAudienceGroup(groups, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = GetAudienceGroup(groups, companies, members, identities, transactions, clock, security)
 
     @Bean
     fun listAudienceGroups(
@@ -146,7 +186,9 @@ class CommunicationsConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListAudienceGroups(groups, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = ListAudienceGroups(groups, companies, members, identities, transactions, clock, security)
 
     @Bean
     fun announcementAudienceSource(sql: DSLContext): AnnouncementAudienceDataSource =
@@ -184,6 +226,7 @@ class CommunicationsConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         QueueAnnouncement(
             announcements,
@@ -197,6 +240,7 @@ class CommunicationsConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -249,6 +293,7 @@ class CommunicationsConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         ReturnAnnouncementToDraft(
             announcements,
@@ -260,6 +305,7 @@ class CommunicationsConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -274,6 +320,7 @@ class CommunicationsConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         ArchiveAnnouncement(
             announcements,
@@ -286,6 +333,7 @@ class CommunicationsConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -296,7 +344,19 @@ class CommunicationsConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetInboxItem(inbox, announcements, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetInboxItem(
+            inbox,
+            announcements,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun listInbox(
@@ -306,7 +366,19 @@ class CommunicationsConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListInbox(inbox, announcements, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListInbox(
+            inbox,
+            announcements,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun updateInboxItem(
@@ -319,6 +391,7 @@ class CommunicationsConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         UpdateInboxItem(
             inbox,
@@ -330,6 +403,7 @@ class CommunicationsConfiguration {
             operations,
             journal,
             clock,
+            security,
         )
 
     @Bean
@@ -344,6 +418,7 @@ class CommunicationsConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         PreviewAnnouncementAudience(
             announcements,
@@ -356,6 +431,7 @@ class CommunicationsConfiguration {
             identities,
             transactions,
             clock,
+            security,
         )
 
     @Bean

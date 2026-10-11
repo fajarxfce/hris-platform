@@ -4,7 +4,8 @@ import dev.fajar.hris.communications.domain.entities.*
 import dev.fajar.hris.communications.domain.policies.*
 import dev.fajar.hris.communications.domain.repositories.*
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.organization.domain.repositories.OrganizationRepository
@@ -22,6 +23,7 @@ class SaveAnnouncement(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -74,7 +76,7 @@ class SaveAnnouncement(
             val authorized =
                 identities
                     .access(actor.accountId, company)
-                    .flatMap { validateCompanyCommandActor(actor, it) }
+                    .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
                     .flatMap { it.requirePermission("announcements.manage") }
             if (authorized is Result.Failed) return@run authorized
             (replay as Result.Success).value?.let {

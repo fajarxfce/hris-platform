@@ -4,7 +4,8 @@ import dev.fajar.hris.communications.domain.entities.*
 import dev.fajar.hris.communications.domain.policies.*
 import dev.fajar.hris.communications.domain.repositories.*
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
@@ -25,6 +26,7 @@ class QueueAnnouncement(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -66,7 +68,7 @@ class QueueAnnouncement(
             if (access is Result.Failed) return@run access
             val identity = (access as Result.Success).value
             val checked =
-                validateCompanyCommandActor(actor, identity).flatMap {
+                validateCompanySessionActor(actor, identity, clock.instant(), security).flatMap {
                     it.requirePermission("announcements.manage")
                 }
             if (checked is Result.Failed) return@run checked
@@ -118,7 +120,10 @@ class QueueAnnouncement(
             if (pending is Result.Failed) return@run pending
             if ((pending as Result.Success).value >= 100)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "job_queue_full"))
-            val now = clock.instant().truncatedTo(ChronoUnit.MICROS)
+            val checkedAt = clock.instant()
+            val assurance = validateCompanySessionActor(actor, identity, checkedAt, security)
+            if (assurance is Result.Failed) return@run assurance
+            val now = checkedAt.truncatedTo(ChronoUnit.MICROS)
             val schedule = validateAnnouncementSchedule(scheduledFor, now)
             if (schedule is Result.Failed) return@run schedule
             val job =

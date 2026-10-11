@@ -99,6 +99,8 @@ Publication workers acquire their job lease before announcement, audience-group,
 
 A bounded immutable publication stores one recipient-account map and references frozen content. Inbox insertion uses one SQL insert/select. Statement-level validation materializes the recipient map once, while a deferred constraint requires the full inbox, published revision, and successful fenced job checkpoint in the same commit. Inbox identity and read/acknowledgement timestamps are monotonic; archival retains rows with a withdrawal marker. Audience policy lives in the publication use case; the datasource executes a supplied raw recipient query. Group queries expand the selected immutable member lists as a set, and publication-reference validation uses scoped existence checks so it can use identity indexes.
 
+Interactive announcement, audience-group, and inbox reads and commands revalidate live session assurance after their resource/access guards, including before original receipt replay. Publication admission checks assurance again after acquiring the job queue; a proof that expires during either wait cannot authorize a write. Background publication continues to use its execution authority and credential checks, separately from interactive MFA age.
+
 Inbox synchronization uses account ownership exclusively. Its captured change rows have no employment ID; database constraints retain employment ownership for the older collections. Statement-level triggers record bounded inbox insert/update sets atomically, while the existing worker still assigns publication positions after commit. Omitting collection selection retains the original six-collection projection.
 
 

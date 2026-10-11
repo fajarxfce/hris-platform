@@ -6,4 +6,5 @@ dependencies {
     implementation(projects.modules.administration.domain)
     implementation(projects.modules.organization.domain)
     implementation(projects.core.http)
+    implementation(libs.swagger.annotations)
 }

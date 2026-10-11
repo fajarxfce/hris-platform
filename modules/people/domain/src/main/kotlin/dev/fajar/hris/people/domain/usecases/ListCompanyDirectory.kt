@@ -10,6 +10,7 @@ import dev.fajar.hris.people.domain.repositories.*
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneId
+import java.util.UUID
 
 class ListCompanyDirectory(
     private val directory: CompanyDirectoryRepository,
@@ -21,7 +22,13 @@ class ListCompanyDirectory(
     private val security: IdentitySecurityPolicy,
     private val clock: Clock,
 ) {
-    fun execute(actor: Actor, query: String, after: String?, limit: Int): Result<CompanyDirectory> {
+    fun execute(
+        actor: Actor,
+        query: String,
+        after: String?,
+        limit: Int,
+        departmentId: UUID? = null,
+    ): Result<CompanyDirectory> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
@@ -64,6 +71,7 @@ class ListCompanyDirectory(
                         query.trim(),
                         after,
                         limit,
+                        departmentId,
                     )
                     .map { CompanyDirectory(today, current.timezone, it) }
             }

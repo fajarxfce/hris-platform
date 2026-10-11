@@ -4,21 +4,33 @@ import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.core.domain.Page
 import dev.fajar.hris.core.http.response
 import dev.fajar.hris.people.delivery.responses.CompanyDirectoryResponse
+import dev.fajar.hris.people.delivery.responses.DirectoryDepartmentResponse
+import dev.fajar.hris.people.delivery.responses.DirectoryDepartmentsResponse
 import dev.fajar.hris.people.delivery.responses.DirectoryEmployeeResponse
+import dev.fajar.hris.people.domain.usecases.FindDirectoryDepartments
 import dev.fajar.hris.people.domain.usecases.ListCompanyDirectory
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Schema
+import java.util.UUID
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/companies/{companyId}/employees/directory")
-class CompanyDirectoryController(private val list: ListCompanyDirectory) {
+class CompanyDirectoryController(
+    private val list: ListCompanyDirectory,
+    private val findDepartments: FindDirectoryDepartments,
+) {
     @GetMapping
     fun list(
         actor: Actor,
         @RequestParam(defaultValue = "") query: String,
         @RequestParam(required = false) after: String?,
-        @RequestParam(defaultValue = "20") limit: Int,
+        @Parameter(schema = Schema(minimum = "1", maximum = "50"))
+        @RequestParam(defaultValue = "20")
+        limit: Int,
+        @RequestParam(required = false) departmentId: UUID?,
     ): CompanyDirectoryResponse =
-        list.execute(actor, query, after, limit).response().let {
+        list.execute(actor, query, after, limit, departmentId).response().let {
             CompanyDirectoryResponse(
                 it.asOf,
                 it.timezone,
@@ -34,6 +46,21 @@ class CompanyDirectoryController(private val list: ListCompanyDirectory) {
                     },
                     it.employees.nextCursor,
                 ),
+            )
+        }
+
+    @GetMapping("/departments")
+    fun departments(
+        actor: Actor,
+        @RequestParam(defaultValue = "") query: String,
+        @Parameter(schema = Schema(minimum = "1", maximum = "50"))
+        @RequestParam(defaultValue = "50")
+        limit: Int,
+    ): DirectoryDepartmentsResponse =
+        findDepartments.execute(actor, query, limit).response().let {
+            DirectoryDepartmentsResponse(
+                it.items.map { row -> DirectoryDepartmentResponse(row.id, row.name) },
+                it.hasMore,
             )
         }
 }

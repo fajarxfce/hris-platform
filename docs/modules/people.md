@@ -178,3 +178,14 @@ of 20 and maximum of 50 rows. Each page is a current read, not an export snapsho
 New employee and manager role-template assignments include `people.directory.read`.
 Existing memberships retain their grants until an authorized administrator explicitly
 updates them; deploying this endpoint does not expand previously assigned access.
+
+The optional `departmentId` directory filter is applied before keyset pagination.
+A foreign or unused ID produces an empty company-scoped result. Name/number search
+and the department selection can be combined.
+
+`GET /employees/directory/departments?query=...&limit=50` uses the same directory
+permission and live assurance checks. It returns only `{id, name}` for departments
+assigned to eligible current coworkers. Results are ordered by name/ID, use literal
+search of at most 120 characters, and are bounded to 1–50 entries. `hasMore` tells
+the client to narrow its search; this endpoint does not expose an organization
+tree or require organization administration access.

@@ -1264,3 +1264,15 @@ tests and all 38 worker tests passed. The six new directory scenarios cover mini
 fields, company isolation, pagination, date policy, literal search, revoked access
 after a lock wait and expired MFA. API and worker JAR builds passed. Mobile UI and
 device acceptance are recorded in the mobile repository.
+
+## Coworker department filtering
+
+The directory supports a company-scoped department filter before pagination and a
+bounded, searchable lookup of departments assigned to current coworkers. Both
+reads use minimal directory permission and recheck live session assurance. OpenAPI
+retains their explicit 1–50 page limits.
+
+Eleven directory scenarios and eleven API-contract tests passed, including literal
+search, combined filtering/paging, minimal fields, company isolation and revoked
+credentials/grants/MFA after a wait. All 38 worker tests, architecture/formatting
+and API/worker JAR builds passed. Mobile presentation is delivered separately.

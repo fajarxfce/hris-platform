@@ -34,6 +34,21 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun coworkerDirectoryDocumentsItsOwnBoundedPagesAndFilter() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/employees/directory"
+        for (path in listOf(base, "$base/departments")) {
+            val parameters =
+                api["paths"][path]["get"]["parameters"].iterator().asSequence().associateBy {
+                    it["name"].asString()
+                }
+            assertEquals(50, parameters.getValue("limit")["schema"]["maximum"].asInt())
+            assertEquals(1, parameters.getValue("limit")["schema"]["minimum"].asInt())
+            if (path == base) assertTrue(parameters.containsKey("departmentId"))
+        }
+    }
+
+    @Test
     fun audienceReferenceSelectionsHaveExplicitBoundsAndCompanyAdmission() {
         val api = contract()
         val operation =

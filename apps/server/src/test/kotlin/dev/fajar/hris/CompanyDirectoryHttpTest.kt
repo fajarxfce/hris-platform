@@ -7,6 +7,7 @@ import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.*
+import dev.fajar.hris.people.domain.usecases.FindDirectoryDepartments
 import dev.fajar.hris.people.domain.usecases.ListCompanyDirectory
 import java.net.http.HttpClient
 import java.net.http.HttpResponse
@@ -117,6 +118,43 @@ class CompanyDirectoryHttpTest : PeopleApiFixture() {
         assertEquals(active.toString(), items[0]["id"].asString())
         assertEquals("Engineering", items[0]["department"].asString())
         assertEquals("Mobile engineer", items[0]["position"].asString())
+        val path = "/api/v1/companies/$company/employees/directory"
+        val lookup = get(member.client, "$path/departments")
+        assertEquals(200, lookup.statusCode(), lookup.body())
+        val choices = json.readTree(lookup.body())
+        assertEquals(1, choices["items"].size())
+        assertEquals(2, choices["items"][0].size())
+        assertEquals(department.toString(), choices["items"][0]["id"].asString())
+        assertFalse(choices["hasMore"].asBoolean())
+        assertEquals(
+            1,
+            json
+                .readTree(get(member.client, "$path?departmentId=$department").body())["employees"][
+                    "items"]
+                .size(),
+        )
+        assertEquals(
+            0,
+            json
+                .readTree(get(member.client, "$path?departmentId=${UUID.randomUUID()}").body())[
+                    "employees"]["items"]
+                .size(),
+        )
+        for (literal in listOf("%25", "_", "no-such-department")) {
+            val response = get(member.client, "$path/departments?query=$literal")
+            assertEquals(200, response.statusCode(), response.body())
+            assertEquals(0, json.readTree(response.body())["items"].size())
+        }
+        assertEquals(
+            1,
+            json
+                .readTree(get(member.client, "$path/departments?query=engineer").body())["items"]
+                .size(),
+        )
+        for (invalid in listOf("limit=0", "limit=51", "query=${"x".repeat(121)}")) {
+            assertEquals(422, get(member.client, "$path/departments?$invalid").statusCode())
+        }
+
         assertEquals(5, items[0].size())
         for (privateField in
             listOf("birthDate", "nationality", "email", "accountId", "contract", "salary")) {
@@ -138,7 +176,14 @@ class CompanyDirectoryHttpTest : PeopleApiFixture() {
             403,
             get(member.client, "/api/v1/companies/$foreign/employees/directory").statusCode(),
         )
+        assertEquals(
+            403,
+            get(member.client, "/api/v1/companies/$foreign/employees/directory/departments")
+                .statusCode(),
+        )
         val selfOnly = member(company, "people.self.read")
+        assertEquals(403, get(selfOnly.client, "$path/departments").statusCode())
+
         assertEquals(
             403,
             get(selfOnly.client, "/api/v1/companies/$company/employees/directory").statusCode(),
@@ -189,9 +234,100 @@ class CompanyDirectoryHttpTest : PeopleApiFixture() {
         }
     }
 
+    @Test
+    fun departmentFilterAppliesBeforePaginationAndLookupOmitsUnusedUnits() {
+        val admin = client()
+        val csrf = login(admin)
+        val company = company(admin, csrf)
+        val member = member(company)
+        val departments =
+            listOf("Engineering", "Operations", "Unused").map { name ->
+                val id = UUID.randomUUID()
+                val created =
+                    command(
+                        admin,
+                        "/api/v1/companies/$company/organization-units/$id",
+                        json.writeValueAsString(
+                            mapOf(
+                                "code" to name,
+                                "kind" to "DEPARTMENT",
+                                "name" to name,
+                                "active" to true,
+                            )
+                        ),
+                        csrf,
+                        UUID.randomUUID(),
+                        "PUT",
+                    )
+                assertEquals(200, created.statusCode(), created.body())
+                id
+            }
+        val expected =
+            (0..2)
+                .map { index ->
+                    val id = employee(admin, csrf, company)
+                    val response =
+                        revise(
+                            admin,
+                            csrf,
+                            company,
+                            id,
+                            0,
+                            terms("2026-09-01") +
+                                mapOf("departmentId" to departments[if (index < 2) 0 else 1]),
+                        )
+                    assertEquals(200, response.statusCode(), response.body())
+                    id.toString()
+                }
+                .take(2)
+                .toSet()
+        val path = "/api/v1/companies/$company/employees/directory"
+        val first =
+            json
+                .readTree(
+                    get(member.client, "$path?departmentId=${departments[0]}&limit=1").body()
+                )["employees"]
+        assertEquals(1, first["items"].size())
+        val cursor = first["nextCursor"].asString()
+        val second =
+            json
+                .readTree(
+                    get(member.client, "$path?departmentId=${departments[0]}&limit=1&after=$cursor")
+                        .body()
+                )["employees"]
+        assertEquals(1, second["items"].size())
+        assertTrue(second["nextCursor"].isNull)
+        assertEquals(
+            expected,
+            setOf(first["items"][0]["id"].asString(), second["items"][0]["id"].asString()),
+        )
+        val lookup = json.readTree(get(member.client, "$path/departments?limit=1").body())
+        assertEquals("Engineering", lookup["items"][0]["name"].asString())
+        assertTrue(lookup["hasMore"].asBoolean())
+        val narrowed =
+            json.readTree(get(member.client, "$path/departments?query=operations&limit=1").body())
+        assertEquals(departments[1].toString(), narrowed["items"][0]["id"].asString())
+        assertFalse(narrowed["hasMore"].asBoolean())
+        val all = json.readTree(get(member.client, "$path/departments").body())
+        assertEquals(2, all["items"].size())
+        assertFalse(all["hasMore"].asBoolean())
+    }
+
     @ParameterizedTest
-    @ValueSource(strings = ["permission", "credential", "membership"])
-    fun directoryRechecksAccessAfterWaiting(change: String) {
+    @ValueSource(
+        strings =
+            [
+                "list:permission",
+                "list:credential",
+                "list:membership",
+                "departments:permission",
+                "departments:credential",
+                "departments:membership",
+            ]
+    )
+    fun directoryRechecksAccessAfterWaiting(scenario: String) {
+        val (operation, change) = scenario.split(":")
+
         val admin = client()
         val csrf = login(admin)
         val company = company(admin, csrf)
@@ -202,7 +338,10 @@ class CompanyDirectoryHttpTest : PeopleApiFixture() {
         Executors.newSingleThreadExecutor().use { executor ->
             val pending =
                 executor.submit<HttpResponse<String>> {
-                    get(member.client, "/api/v1/companies/$company/employees/directory")
+                    get(
+                        member.client,
+                        "/api/v1/companies/$company/employees/directory${if (operation == "departments") "/departments" else ""}",
+                    )
                 }
             try {
                 assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
@@ -242,8 +381,9 @@ class CompanyDirectoryHttpTest : PeopleApiFixture() {
         }
     }
 
-    @Test
-    fun directoryRejectsMfaThatExpiresDuringAccessAcquisition() {
+    @ParameterizedTest
+    @ValueSource(booleans = [false, true])
+    fun directoryRejectsMfaThatExpiresDuringAccessAcquisition(departments: Boolean) {
         val admin = client()
         val csrf = login(admin)
         val company = company(admin, csrf)
@@ -266,6 +406,17 @@ class CompanyDirectoryHttpTest : PeopleApiFixture() {
                 security,
                 clock,
             )
+        val departmentTarget =
+            FindDirectoryDepartments(
+                context.getBean(CompanyDirectoryRepository::class.java),
+                context.getBean(PeopleRepository::class.java),
+                context.getBean(CompanyRepository::class.java),
+                context.getBean(MembershipRepository::class.java),
+                context.getBean(IdentityRepository::class.java),
+                context.getBean(TransactionRunner::class.java),
+                security,
+                clock,
+            )
         val actor =
             Actor(
                 member.id,
@@ -279,7 +430,11 @@ class CompanyDirectoryHttpTest : PeopleApiFixture() {
         val barrier = AccountLockProbe.Barrier(member.id)
         accounts.current.set(barrier)
         Executors.newSingleThreadExecutor().use { executor ->
-            val pending = executor.submit<Result<*>> { target.execute(actor, "", null, 20) }
+            val pending =
+                executor.submit<Result<*>> {
+                    if (departments) departmentTarget.execute(actor, "", 20)
+                    else target.execute(actor, "", null, 20)
+                }
             try {
                 assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
                 clock.set(clock.instant().plusSeconds(2))
@@ -292,8 +447,10 @@ class CompanyDirectoryHttpTest : PeopleApiFixture() {
                 barrier.release.countDown()
             }
         }
+        val renewed = actor.copy(mfaVerifiedAt = clock.instant())
         assertTrue(
-            target.execute(actor.copy(mfaVerifiedAt = clock.instant()), "", null, 20)
+            (if (departments) departmentTarget.execute(renewed, "", 20)
+            else target.execute(renewed, "", null, 20))
                 is Result.Success
         )
     }

@@ -1,5 +1,6 @@
 package dev.fajar.hris.people.data.datasources
 
+import dev.fajar.hris.people.data.models.DirectoryDepartmentRow
 import dev.fajar.hris.people.data.models.DirectoryEmployeeRow
 import dev.fajar.hris.schema.tables.EmployeesAt.EMPLOYEES_AT
 import dev.fajar.hris.schema.tables.OrganizationUnits.ORGANIZATION_UNITS
@@ -16,6 +17,7 @@ class PostgresCompanyDirectoryDataSource(private val sql: DSLContext) : CompanyD
         query: String,
         after: String?,
         limit: Int,
+        departmentId: UUID?,
     ): List<DirectoryEmployeeRow> {
         val employees = EMPLOYEES_AT.call(companyId, asOf)
         val positions = ORGANIZATION_UNITS.`as`("directory_position")
@@ -42,6 +44,7 @@ class PostgresCompanyDirectoryDataSource(private val sql: DSLContext) : CompanyD
                 employees.LEGAL_NAME.containsIgnoreCase(query)
                     .or(employees.EMPLOYEE_NUMBER.containsIgnoreCase(query))
             )
+            .and(departmentId?.let { employees.DEPARTMENT_ID.eq(it) } ?: DSL.noCondition())
             .and(after?.let { employees.EMPLOYEE_NUMBER.gt(it) } ?: DSL.noCondition())
             .orderBy(employees.EMPLOYEE_NUMBER)
             .limit(limit)
@@ -52,6 +55,39 @@ class PostgresCompanyDirectoryDataSource(private val sql: DSLContext) : CompanyD
                     requireNotNull(row[employees.LEGAL_NAME]),
                     row[positions.NAME],
                     row[departments.NAME],
+                )
+            }
+    }
+
+    override fun departments(
+        companyId: UUID,
+        asOf: LocalDate,
+        statuses: Set<String>,
+        query: String,
+        limit: Int,
+    ): List<DirectoryDepartmentRow> {
+        val employees = EMPLOYEES_AT.call(companyId, asOf)
+        val departments = ORGANIZATION_UNITS
+        return sql.select(departments.ID, departments.NAME)
+            .from(departments)
+            .where(departments.COMPANY_ID.eq(companyId))
+            .and(departments.KIND.eq("DEPARTMENT"))
+            .and(departments.NAME.containsIgnoreCase(query))
+            .andExists(
+                sql.selectOne()
+                    .from(employees)
+                    .where(employees.COMPANY_ID.eq(companyId))
+                    .and(employees.DEPARTMENT_ID.eq(departments.ID))
+                    .and(employees.STATUS.`in`(statuses))
+                    .and(employees.START_DATE.le(asOf))
+                    .and(employees.END_DATE.isNull.or(employees.END_DATE.ge(asOf)))
+            )
+            .orderBy(departments.NAME, departments.ID)
+            .limit(limit)
+            .fetch {
+                DirectoryDepartmentRow(
+                    requireNotNull(it[departments.ID]),
+                    requireNotNull(it[departments.NAME]),
                 )
             }
     }

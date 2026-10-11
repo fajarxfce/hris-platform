@@ -78,6 +78,28 @@ class PeopleConfiguration {
         )
 
     @Bean
+    fun findDirectoryDepartments(
+        directory: CompanyDirectoryRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        FindDirectoryDepartments(
+            directory,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun profilesSource(sql: DSLContext): PersonProfileDataSource =
         PostgresPersonProfileDataSource(sql)
 

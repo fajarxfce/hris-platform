@@ -3,6 +3,8 @@ package dev.fajar.hris.people.data.repositories
 import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.Page
 import dev.fajar.hris.people.data.datasources.CompanyDirectoryDataSource
+import dev.fajar.hris.people.domain.entities.DirectoryDepartment
+import dev.fajar.hris.people.domain.entities.DirectoryDepartments
 import dev.fajar.hris.people.domain.entities.DirectoryEmployee
 import dev.fajar.hris.people.domain.entities.EmploymentStatus
 import dev.fajar.hris.people.domain.repositories.CompanyDirectoryRepository
@@ -18,14 +20,38 @@ class StoredCompanyDirectoryRepository(private val source: CompanyDirectoryDataS
         query: String,
         after: String?,
         limit: Int,
+        departmentId: UUID?,
     ) = safeDatabaseCall {
         val rows =
-            source.list(companyId, asOf, statuses.map { it.name }.toSet(), query, after, limit + 1)
+            source.list(
+                companyId,
+                asOf,
+                statuses.map { it.name }.toSet(),
+                query,
+                after,
+                limit + 1,
+                departmentId,
+            )
         Page(
             rows.take(limit).map {
                 DirectoryEmployee(it.id, it.employeeNumber, it.name, it.position, it.department)
             },
             if (rows.size > limit) rows[limit - 1].employeeNumber else null,
+        )
+    }
+
+    override fun departments(
+        companyId: UUID,
+        asOf: LocalDate,
+        statuses: Set<EmploymentStatus>,
+        query: String,
+        limit: Int,
+    ) = safeDatabaseCall {
+        val rows =
+            source.departments(companyId, asOf, statuses.map { it.name }.toSet(), query, limit + 1)
+        DirectoryDepartments(
+            rows.take(limit).map { DirectoryDepartment(it.id, it.name) },
+            rows.size > limit,
         )
     }
 }

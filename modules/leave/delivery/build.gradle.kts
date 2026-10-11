@@ -1,6 +1,7 @@
 plugins { id("hris.spring") }
 
 dependencies {
+    implementation(libs.swagger.annotations)
     implementation(projects.core.jobs.domain)
     implementation(projects.modules.documents.domain)
     implementation(projects.modules.leave.domain)

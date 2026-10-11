@@ -31,3 +31,7 @@ fun canReadLeaveRequest(actor: Actor, request: LeaveRequest, current: Employee?)
     "leave.read" in actor.permissions ||
         ("leave.self.manage" in actor.permissions && request.ownerAccountId == actor.accountId) ||
         (current != null && canReadLeave(actor, current, current))
+
+/** Discovery always returns the account's own references, including for HR readers. */
+fun canReadOwnLeave(permissions: Set<String>): Boolean =
+    "leave.self.manage" in permissions || "leave.read" in permissions

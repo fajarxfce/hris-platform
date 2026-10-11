@@ -85,3 +85,18 @@ Batch details include the current job state, counts, attempts, and paginated emp
 Payroll cutoffs are integrated into request submission, decisions, withdrawal, and cancellation, including available cancellation actions. Pending decisions on selected actual dates block a payroll start; active/calculated payroll freezes those absence facts until explicit abandonment. See [cutoff and recovery semantics](../payroll-workflows.md#source-cutoffs).
 
 Automatic scheduling and carry-bucket expiry dates remain subsequent work. Current expiry occurs at explicit year closing; no expiry date or statutory entitlement is invented by a default policy.
+
+## Employee application discovery
+
+`GET /api/v1/companies/{companyId}/leave/me/employments` returns the signed-in
+account's minimal employment references, with the company-local `asOf` date and
+timezone. It requires `leave.self.manage` or `leave.read`; the latter never expands
+this self-service lookup to other accounts. Pages contain at most 50 items, with
+an employee-number cursor of at most 32 characters. The Leave module admits this
+route independently of People and Workforce availability. Individual balances,
+requests and commands retain their own resource authorization.
+
+The use case holds shared people, company, membership and account guards, in that
+order, and revalidates original/live permissions, credentials and MFA after
+waiting. No profile fields are returned, and no business data is duplicated in a
+new datasource or repository.

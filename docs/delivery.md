@@ -1296,5 +1296,28 @@ reported test failure. The preceding run of the same backend implementation
 completed in approximately 33 minutes; only the dashboard attendance fixture
 had changed. The Gradle step now has a bounded 45-minute budget, with five
 additional minutes for report upload and action cleanup. No tests are skipped.
-The new hosted run remains the validation of this budget; a timeout is not
-reported as a passing test result.
+Run `38167573675` at `b310f11f` subsequently passed backend verification, all four
+dashboard shards, and the real API/dashboard integration job. Backend completed
+in approximately 33 minutes. The earlier timeout is not counted as a test pass.
+
+## Leave self-service discovery
+
+Leave now exposes a bounded account-owned employment directory with company date
+and timezone, independently of People and Workforce module availability. The
+reader returns only minimal employment references and rechecks original/live
+permission, membership, credentials and MFA after shared resource/access guards.
+
+All 29 focused API/contract/leave tests and 38 worker tests passed, along with
+architecture, formatting and both application JAR builds. Tests cover native
+minimum-build admission, independent module admission, foreign account/company
+isolation, bounded pagination, revoked and replaced grants, MFA expiry during
+a pending read, and cancellation releasing guards. The MFA test supplies enforced
+security explicitly; the general business HTTP fixture disables that enforcement.
+API and worker dev containers were rebuilt without resetting PostgreSQL. API
+health is `UP`, both processes have zero restarts, and a real fictional employee
+session confirmed denied discovery before its grant and successful discovery
+after an audited versioned membership update. The first company returns one owned
+employment and empty balance/request/type pages; the second returns no employment.
+Probe sessions were explicitly logged out. A fictional annual-leave policy and
+12.5-day allowance were subsequently created through audited API commands for
+mobile acceptance. Mobile leave screens and device acceptance are subsequent work.

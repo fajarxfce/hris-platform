@@ -27,8 +27,13 @@ Employee [attendance capture](https://github.com/fajarxfce/hris-mobile/commit/a8
 now retains encrypted clock-in/out commands before submission, restores offline
 captures after process restart and reuses original evidence on retry. API 35
 emulator acceptance covered permission recovery, offline delivery and pending
-review using simulated location. Home, Services and Account provide stable mobile
-navigation as more employee workflows are connected.
+review using simulated location. Home, Inbox, Employees and Account now provide stable mobile navigation; All
+services opens its own page. The [monthly attendance view](https://github.com/fajarxfce/hris-mobile/commit/fce9c07)
+shows read-only metrics and history with a month filter, while Home retains capture
+and its durable queue. Employees has search and department filtering, and Inbox
+shows the full account-owned unread total. API 35 checks covered encrypted monthly
+offline restoration and explicit queued capture replay; the validated update was
+installed on the phone without interacting with its UI.
 Automated UI/API checks and the Android dev build passed. Android 16 device checks
 covered password sign-in, company isolation, profiles, inbox reading, offline
 content, offline process restoration with company isolation, queued acknowledgement

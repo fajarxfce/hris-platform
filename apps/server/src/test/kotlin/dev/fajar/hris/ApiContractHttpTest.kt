@@ -111,6 +111,27 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun selfLeaveDiscoveryHasItsOwnMinimalCompanyAdmittedContract() {
+        val api = contract()
+        val operation = api["paths"]["/api/v1/companies/{companyId}/leave/me/employments"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val directory = api["components"]["schemas"]["SelfLeaveDirectoryResponse"]["properties"]
+        val parameters =
+            operation["parameters"].iterator().asSequence().associateBy { it["name"].asString() }
+        assertEquals(50, parameters.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals(32, parameters.getValue("after")["schema"]["maxLength"].asInt())
+        assertTrue(directory.has("accountId"))
+        assertTrue(directory.has("companyId"))
+        assertTrue(directory.has("asOf"))
+        assertTrue(directory.has("timezone"))
+        val reference = api["components"]["schemas"]["LeaveEmploymentResponse"]["properties"]
+        assertEquals(
+            setOf("id", "employeeNumber", "status", "version"),
+            reference.properties().map { it.key }.toSet(),
+        )
+    }
+
+    @Test
     fun employeeCalendarReviewDescribesMinimalReferencesAndObservedAssignments() {
         val api = contract()
         val directory = api["paths"]["/api/v1/companies/{companyId}/workforce/employees"]["get"]

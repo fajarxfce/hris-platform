@@ -26,6 +26,26 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class LeaveConfiguration {
     @Bean
+    fun listSelfLeaveEmployments(
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListSelfLeaveEmployments(
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun leaveEntitlementSource(sql: DSLContext): LeaveEntitlementDataSource =
         PostgresLeaveEntitlementDataSource(sql)
 

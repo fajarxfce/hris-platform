@@ -1288,3 +1288,13 @@ unloaded pages, another account's read state, replay, archival, access revocatio
 and MFA expiry while waiting. Directory and API-contract tests also passed, for
 52 focused API tests, plus all 38 worker tests. Architecture/formatting and both
 application JAR builds passed. Mobile badge delivery remains separate.
+
+## Hosted backend verification budget
+
+The backend job for `7dbe5f44` reached the 35-minute Gradle limit without a
+reported test failure. The preceding run of the same backend implementation
+completed in approximately 33 minutes; only the dashboard attendance fixture
+had changed. The Gradle step now has a bounded 45-minute budget, with five
+additional minutes for report upload and action cleanup. No tests are skipped.
+The new hosted run remains the validation of this budget; a timeout is not
+reported as a passing test result.

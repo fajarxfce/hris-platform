@@ -32,6 +32,13 @@ jobs:
           compression-level: 0
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
+          name: hris-worker-integration-jar
+          path: apps/worker/build/libs/apps-worker.jar
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
           name: hris-openapi-v1
           path: apps/server/build/generated/openapi/hris-v1.json
           if-no-files-found: error
@@ -90,11 +97,19 @@ jobs:
         with:
           name: hris-api-integration-jar
           path: apps/server/build/libs
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: hris-worker-integration-jar
+          path: apps/worker/build/libs
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:integration
+      - run: npm run test:integration:worker
+        timeout-minutes: 5
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: dashboard-integration-test-reports
-          path: apps/dashboard/integration-report/
+          path: |
+            apps/dashboard/integration-report/
+            apps/dashboard/worker-integration-report/

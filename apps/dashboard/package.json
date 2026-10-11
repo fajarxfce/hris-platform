@@ -14,7 +14,8 @@
     "format": "biome check --write .",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "test:integration": "playwright test --config playwright.integration.config.ts"
+    "test:integration": "playwright test --config playwright.integration.config.ts",
+    "test:integration:worker": "playwright test --config playwright.worker-integration.config.ts"
   },
   "dependencies": {
     "@fluentui/react-components": "9.74.9",

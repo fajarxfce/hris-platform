@@ -8,6 +8,8 @@
       "!playwright-report",
       "!integration-report",
       "!integration-test-results",
+      "!worker-integration-report",
+      "!worker-integration-test-results",
       "!test-results"
     ]
   },

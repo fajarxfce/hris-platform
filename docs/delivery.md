@@ -702,3 +702,28 @@ employee obtains only its own profile, and neither a colleague's profile nor a
 fabricated administrator employment becomes accessible. The database fixture and
 native session are disposed after testing. The existing bundle-size advisory
 remains; no device or runtime performance measurement is claimed.
+
+## Native inbox and worker integration
+
+A separate browser integration fixture runs the real API, PostgreSQL, and worker
+with distinct non-bypass runtime roles. It owns its database and processes,
+disables external delivery, generates temporary identity/cursor keys, and removes
+the fixture on completion. Existing browser scenarios continue without a worker.
+
+The integration scenario passed against the packaged applications. A reviewed
+announcement reaches the intended employee's native inbox; explicit INBOX sync
+returns only that recipient's references. Read replay retains one version,
+acknowledgement rejects an obsolete version, and archival removes canonical
+access and publishes a tombstone. A different account/company cannot read the
+message, and revoking read access rejects subsequent synchronization.
+
+Run after building both application JARs:
+
+```sh
+cd apps/dashboard
+npm run test:integration:worker
+```
+
+CI downloads both verified JARs and runs this scenario separately from the
+ordinary browser/API suite. This does not exercise a physical mobile device or
+an external push provider.

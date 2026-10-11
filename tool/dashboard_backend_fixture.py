@@ -1,4 +1,4 @@
-"""Own an isolated real API/PostgreSQL fixture for browser integration tests."""
+"""Own isolated API/PostgreSQL processes, optionally with the real worker."""
 
 import base64
 import os
@@ -17,9 +17,13 @@ from urllib.request import urlopen
 root = Path(__file__).resolve().parents[1]
 docker = shlex.split(os.environ.get("HRIS_TEST_DOCKER_COMMAND", "docker"))
 jar = root / "apps/server/build/libs/apps-server.jar"
+worker_jar = root / "apps/worker/build/libs/apps-worker.jar"
+with_worker = os.environ.get("HRIS_TEST_WITH_WORKER") == "1"
+port = 18081 if with_worker else 18080
 container = None
 api = None
-logs = root / ".work/dashboard-integration"
+worker = None
+logs = root / (".work/worker-integration" if with_worker else ".work/dashboard-integration")
 environment_file = logs / "postgres.env"
 
 
@@ -32,9 +36,11 @@ def stop(_signal, _frame):
 
 
 def main():
-    global container, api
+    global container, api, worker
     if not jar.is_file():
         raise RuntimeError("Build the API with ./gradlew :apps:server:bootJar first")
+    if with_worker and not worker_jar.is_file():
+        raise RuntimeError("Build the worker with ./gradlew :apps:worker:bootJar first")
     os.umask(0o077)
     logs.mkdir(parents=True, exist_ok=True)
     for event in (signal.SIGINT, signal.SIGTERM):
@@ -42,7 +48,10 @@ def main():
     database_password = secrets.token_urlsafe(24)
     environment_file.write_text(f"POSTGRES_PASSWORD={database_password}\n")
     initialization = logs / "runtime-role.sql"
-    initialization.write_text((root / "apps/server/src/test/resources/runtime-role.sql").read_text())
+    roles = (root / "apps/server/src/test/resources/runtime-role.sql").read_text()
+    if with_worker:
+        roles += (root / "apps/worker/src/test/resources/worker-role.sql").read_text()
+    initialization.write_text(roles)
     initialization.chmod(0o644)
     created = command(docker + [
         "run", "-d", "--label", "dev.fajar.hris.fixture=dashboard",
@@ -78,13 +87,16 @@ def main():
         "HRIS_BOOTSTRAP_PASSWORD": "Browser-fixture-password-123!",
         "HRIS_IDENTITY_KEYS": f"v1:{base64.b64encode(secrets.token_bytes(32)).decode()}",
         "HRIS_IDENTITY_ACTIVE_KEY": "v1",
+        "HRIS_SYNC_KEYS": f"v1:{base64.b64encode(secrets.token_bytes(32)).decode()}",
+        "HRIS_SYNC_ACTIVE_KEY": "v1",
         "HRIS_SECURE_COOKIES": "false",  # Loopback HTTP fixture only.
         "HRIS_OIDC_ENABLED": "false",
         "HRIS_MAIL_ENABLED": "false",
         "HRIS_STORAGE_ENABLED": "false",
         "HRIS_DOCUMENT_SCANNER_ENABLED": "false",
+        "HRIS_FCM_ENABLED": "false",
         "SERVER_ADDRESS": "127.0.0.1",
-        "SERVER_PORT": "18080",
+        "SERVER_PORT": str(port),
     }
     with (logs / "backend.log").open("w") as output:
         api = subprocess.Popen(["java", "-jar", str(jar)], env=environment, stdout=output, stderr=subprocess.STDOUT)
@@ -107,7 +119,7 @@ def main():
             if api.poll() is not None:
                 raise RuntimeError("Fixture API exited during readiness check")
             try:
-                with urlopen("http://127.0.0.1:18080/api/v1/auth/csrf", timeout=2) as response:
+                with urlopen(f"http://127.0.0.1:{port}/api/v1/auth/csrf", timeout=2) as response:
                     if response.status == 200:
                         response.read(4096)
                         break
@@ -116,11 +128,26 @@ def main():
             time.sleep(0.5)
         else:
             raise RuntimeError("Fixture API readiness timed out")
-        print("Browser API fixture ready; diagnostics: .work/dashboard-integration/backend.log", flush=True)
+        if with_worker:
+            worker_environment = {
+                key: value for key, value in environment.items()
+                if not key.startswith(("HRIS_MIGRATION", "HRIS_BOOTSTRAP", "HRIS_SYNC_"))
+            } | {
+                "HRIS_WORKER_DATABASE_USER": "hris_worker_test",
+                "HRIS_WORKER_DATABASE_PASSWORD": "worker-fixture-only",
+            }
+            with (logs / "worker.log").open("w") as worker_output:
+                worker = subprocess.Popen(
+                    ["java", "-jar", str(worker_jar)], env=worker_environment,
+                    stdout=worker_output, stderr=subprocess.STDOUT,
+                )
+        print(f"Browser API fixture ready; diagnostics: {logs.relative_to(root)}/backend.log", flush=True)
         deadline = time.monotonic() + 600
         while time.monotonic() < deadline:
             if api.poll() is not None:
                 raise RuntimeError("Fixture API exited; inspect its local diagnostics")
+            if worker is not None and worker.poll() is not None:
+                raise RuntimeError("Fixture worker exited; inspect its local diagnostics")
             time.sleep(0.5)
         raise RuntimeError("Fixture lifetime budget expired")
 
@@ -136,13 +163,14 @@ except (RuntimeError, subprocess.SubprocessError) as failure:
     exit_code = 1
 finally:
     try:
-        if api is not None and api.poll() is None:
-            api.terminate()
-            try:
-                api.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                api.kill()
-                api.wait(timeout=5)
+        for process in (worker, api):
+            if process is not None and process.poll() is None:
+                process.terminate()
+                try:
+                    process.wait(timeout=10)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait(timeout=5)
     finally:
         try:
             if container:

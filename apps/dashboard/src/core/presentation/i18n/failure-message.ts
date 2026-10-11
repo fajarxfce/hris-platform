@@ -2,6 +2,22 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  holiday_not_found: [
+    "This holiday is unavailable in the current company.",
+    "Hari libur tidak tersedia di perusahaan ini.",
+  ],
+  invalid_holiday: [
+    "Enter a valid date, a name of up to 200 characters and a reason of up to 1,000 characters.",
+    "Isi tanggal yang valid, nama maksimal 200 karakter, dan alasan maksimal 1.000 karakter.",
+  ],
+  invalid_calendar_range: [
+    "Review the date range and its allowed length. The end must not precede the start.",
+    "Periksa rentang tanggal dan batas durasinya. Tanggal akhir tidak boleh sebelum tanggal awal.",
+  ],
+  work_period_locked: [
+    "This work period is closed and cannot be changed.",
+    "Periode kerja ini sudah ditutup dan tidak dapat diubah.",
+  ],
   shift_not_found: [
     "This shift is unavailable in the current company.",
     "Shift tidak tersedia di perusahaan ini.",

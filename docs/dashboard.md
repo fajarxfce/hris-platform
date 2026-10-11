@@ -27,6 +27,21 @@ Company changes cancel request owners and cannot restore old company content fro
 a late response. Read-only grants hide mutation controls, and use cases enforce
 the same client permission boundary before transport.
 
+## Company holidays
+
+`/workforce/holidays` provides a date-filtered directory, current details and
+versioned create/edit forms. The initial range uses the company's current year;
+each query includes at most 366 calendar dates. Date-only values are formatted
+without shifting them into the browser timezone. Both active and inactive records
+remain visible. Active holidays override weekly schedules; roster overrides retain
+precedence, and closed work periods cannot be changed.
+
+Reading requires `company.read`; authoring additionally requires `workforce.manage`.
+The form retains one operation and payload after an unknown response, including
+through MFA renewal. An explicit conflict requires reloading the current revision.
+Route and company changes own cancellation and protected draft departure. This is
+an in-memory browser workflow, without durable draft storage or automatic retries.
+
 ## Implemented foundation
 
 `apps/dashboard` provides password sign-in, configured SSO entry links, session bootstrap, authenticator enrollment/verification, and explicit acknowledgement of one-use recovery codes. The portal includes current-company selection, an authorized company overview, organization directories, parent details and editing, employee onboarding, directories, employment history, dated revisions and scheduled revision cancellation, separately authorized personal profiles with editing/history, lifecycle template catalogs and checklist editing, scoped case/checklist/history views, assigned-task queues, versioned task changes and assignment, company/group headcount reports, audit metadata search, client policy review and versioned editing, a job monitor with cancellation, employee CSV intake, result review and guarded apply/resume/cancel actions, responsive navigation, and English/Indonesian light/dark interfaces. Other business resource screens listed above remain subsequent work; the overview does not invent statistics.

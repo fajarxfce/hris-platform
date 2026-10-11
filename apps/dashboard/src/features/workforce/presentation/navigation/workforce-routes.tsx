@@ -1,4 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { HolidayEditorScreen } from "../bindings/holiday-editor-screen";
+import { HolidayScreen } from "../bindings/holiday-screen";
+import { HolidaysScreen } from "../bindings/holidays-screen";
 import { ShiftEditorScreen } from "../bindings/shift-editor-screen";
 import { ShiftScreen } from "../bindings/shift-screen";
 import { ShiftsScreen } from "../bindings/shifts-screen";
@@ -8,6 +11,13 @@ import { shiftParameters, shiftsPath } from "../models/shift-route";
 export function WorkforceRoutes(props: WorkforceScreenProps) {
   return (
     <Routes>
+      <Route path="holidays" element={<HolidaysScreen {...props} />} />
+      <Route path="holidays/new" element={<HolidayEditorScreen {...props} creating />} />
+      <Route
+        path="holidays/:holidayId/edit"
+        element={<HolidayEditorScreen {...props} creating={false} />}
+      />
+      <Route path="holidays/:holidayId" element={<HolidayScreen {...props} />} />
       <Route path="shifts" element={<ShiftsScreen {...props} />} />
       <Route path="shifts/new" element={<ShiftEditorScreen {...props} creating />} />
       <Route

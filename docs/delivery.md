@@ -1114,3 +1114,27 @@ All 22 focused API, assurance and contract tests and 38 worker tests passed, alo
 with architecture/format checks and both application JAR builds. The initial test
 invocation lacked Docker group access; the documented group-aware invocation
 completed successfully. Dashboard authoring and deployment are separate work.
+
+## Company holiday dashboard
+
+The dashboard now provides bounded holiday filters, current details and versioned
+creation/editing. Dates retain their calendar value across browser timezones.
+Unknown save outcomes retain one operation through explicit retry and MFA renewal;
+definite version conflicts require a protected reload. Company changes cancel
+the previous owner and cannot restore its data from a late response.
+
+Dashboard architecture, formatting, type checks and all 806 tests passed. Twelve
+holiday/shift browser scenarios passed; the six holiday scenarios passed again
+after refining shared error copy. English/Indonesian and light/dark captures were
+inspected, including a 390-pixel viewport. The production build succeeded with the
+existing shared chunk-size warning.
+
+A browser scenario against isolated PostgreSQL and the real API verified one
+committed holiday after a deliberately lost response, concurrent-version recovery,
+and activation/deactivation effects on the employee calendar. API and worker dev
+containers were updated from the validated JARs; their hashes matched, API health
+was `UP`, both processes had zero restarts and the VPN dashboard returned HTTP 200.
+
+The previously validated mobile calendar APK was installed on the authorized phone
+with `--install-only`; installation and package metadata were checked without
+driving its UI. Subsequent phone installations require advance notice to the user.

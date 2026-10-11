@@ -91,7 +91,12 @@ test("offline evidence requires independent review, replays one decision, and pr
   });
   expect(directory.status()).toBe(200);
   const { asOf } = (await directory.json()) as { asOf: string };
-  const workDate = new Date(Date.parse(`${asOf}T00:00:00Z`) - 86_400_000)
+  // Yesterday's overnight shift can still be in progress before 06:00 company time.
+  // Both captured events must be in the past, including runs just after midnight.
+  const workDate = new Date(Date.parse(`${asOf}T00:00:00Z`) - 2 * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+  const clockOutDate = new Date(Date.parse(`${workDate}T00:00:00Z`) + 86_400_000)
     .toISOString()
     .slice(0, 10);
   const employeeBase = `${base}/workforce/employees/${employee}`;
@@ -223,7 +228,7 @@ test("offline evidence requires independent review, replays one decision, and pr
   await expect(page.getByLabel("Record an absence", { exact: true })).toBeChecked();
   await page.getByLabel("Record an absence", { exact: true }).uncheck();
   await page.getByLabel("Clock-in", { exact: true }).fill(`${workDate}T22:15`);
-  await page.getByLabel("Clock-out", { exact: true }).fill(`${asOf}T06:00`);
+  await page.getByLabel("Clock-out", { exact: true }).fill(`${clockOutDate}T06:00`);
   await page.getByLabel("Break (minutes)", { exact: true }).fill("30");
   await page.getByLabel("Reason", { exact: true }).fill("Final independent correction");
   await page.getByRole("button", { name: "Record correction", exact: true }).click();

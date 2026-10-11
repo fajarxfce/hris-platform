@@ -129,6 +129,11 @@ class ApiContractHttpTest : PeopleApiFixture() {
             setOf("id", "employeeNumber", "status", "version"),
             reference.properties().map { it.key }.toSet(),
         )
+        val details = api["paths"]["/api/v1/companies/{companyId}/leave/me/requests/{id}"]["get"]
+        assertTrue(details["x-hris-company-admission"].asBoolean())
+        val historyLimit = details["parameters"].single { it["name"].asString() == "historyLimit" }
+        assertEquals(50, historyLimit["schema"]["maximum"].asInt())
+        assertEquals(10, historyLimit["schema"]["default"].asInt())
     }
 
     @Test

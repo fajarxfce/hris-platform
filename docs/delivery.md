@@ -1320,4 +1320,21 @@ after an audited versioned membership update. The first company returns one owne
 employment and empty balance/request/type pages; the second returns no employment.
 Probe sessions were explicitly logged out. A fictional annual-leave policy and
 12.5-day allowance were subsequently created through audited API commands for
-mobile acceptance. Mobile leave screens and device acceptance are subsequent work.
+mobile acceptance. The mobile balance/history screen and API 35 acceptance are
+now recorded in [HRIS Mobile](https://github.com/fajarxfce/hris-mobile/blob/main/docs/leave.md).
+
+## Employee leave request details API
+
+Self-service request details now use an explicit owner-only read scope. A company
+HR reader or assigned approver cannot use this route to broaden the employee
+view. Existing resource/access guards, live credentials and MFA checks remain
+shared with administrative details. Revision pagination preserves current header
+metadata and uses a documented default of 10, with a maximum of 50 history rows.
+
+Validation covered 41 focused HTTP/contract tests, 16 leave domain tests and all
+38 worker tests, plus architecture, formatting and both application JAR builds.
+The contract suite was rerun after declaring its history default explicitly.
+Five new scenarios cover owner-only access, foreign-company isolation, history
+progress, revocation while waiting, and MFA expiry/renewal. API and worker dev
+containers were rebuilt without resetting PostgreSQL; API health is `UP` and both
+processes have zero restarts. Mobile request detail presentation remains in progress.

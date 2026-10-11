@@ -9,6 +9,7 @@ import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.leave.domain.entities.LeavePortion
+import dev.fajar.hris.leave.domain.entities.LeaveRequestReadScope
 import dev.fajar.hris.leave.domain.entities.RequestedLeaveDay
 import dev.fajar.hris.leave.domain.repositories.*
 import dev.fajar.hris.leave.domain.usecases.*
@@ -21,6 +22,7 @@ import java.util.UUID
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -44,6 +46,72 @@ class LeaveRequestAssuranceTest : ApprovalApiFixture() {
     @Autowired private lateinit var documents: DocumentRepository
     @Autowired private lateinit var references: DocumentReferenceRepository
     @Autowired private lateinit var probe: AccountLockProbe
+
+    @Test
+    fun selfServiceRequiresRenewedMfaAfterWaitingForTheAccountGuard() {
+        val f = leaveFixture()
+        val id = pending(f)
+        val security = IdentitySecurityPolicy(enforceMfa = true)
+        val read =
+            GetLeaveRequest(
+                requests,
+                ledger,
+                people,
+                approvals,
+                members,
+                identities,
+                transactions,
+                clock,
+                cutoffs,
+                security,
+            )
+        database()
+            .update(
+                "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
+                f.account,
+            )
+        val actor =
+            Actor(
+                f.account,
+                f.company,
+                setOf("leave.self.manage"),
+                clock.instant(),
+                UUID.randomUUID(),
+                credentialVersion = 0,
+                mfaVerifiedAt = clock.instant().minus(security.maximumMfaAge).plusSeconds(1),
+            )
+        val barrier = AccountLockProbe.Barrier(f.account)
+        probe.current.set(barrier)
+        try {
+            Executors.newSingleThreadExecutor().use { pool ->
+                val pending =
+                    pool.submit<Result<*>> {
+                        read.execute(actor, id, null, 10, LeaveRequestReadScope.SELF)
+                    }
+                try {
+                    assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                    clock.set(clock.instant().plusSeconds(2))
+                    barrier.release.countDown()
+                    val result = pending.get(10, TimeUnit.SECONDS)
+                    assertEquals("mfa_required", (result as? Result.Failed)?.failure?.code)
+                } finally {
+                    barrier.release.countDown()
+                }
+            }
+        } finally {
+            probe.current.set(null)
+            barrier.release.countDown()
+        }
+        assertTrue(
+            read.execute(
+                actor.copy(mfaVerifiedAt = clock.instant()),
+                id,
+                null,
+                10,
+                LeaveRequestReadScope.SELF,
+            ) is Result.Success
+        )
+    }
 
     @ParameterizedTest
     @ValueSource(strings = ["list", "details"])

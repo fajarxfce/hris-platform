@@ -32,8 +32,10 @@ class GetLeaveRequest(
         id: UUID,
         historyAfter: Long?,
         historyLimit: Int,
+        scope: LeaveRequestReadScope = LeaveRequestReadScope.AUTHORIZED,
     ): Result<LeaveRequestDetails> {
-        if ((historyAfter ?: 0) < 0 || historyLimit !in 1..200)
+        val maximum = if (scope == LeaveRequestReadScope.SELF) 50 else 200
+        if ((historyAfter ?: 0) < 0 || historyLimit !in 1..maximum)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_page"))
         val company = requireNotNull(actor.companyId)
         return transactions.run(actor) {
@@ -93,6 +95,11 @@ class GetLeaveRequest(
             val currentResult = people.findAtInstant(company, employeeId, now)
             if (currentResult is Result.Failed) return@run currentResult
             val current = (currentResult as Result.Success).value
+            if (
+                scope == LeaveRequestReadScope.SELF &&
+                    !canReadOwnLeaveRequest(live, request, current)
+            )
+                return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "leave_request_not_found"))
             val scoped = canReadLeaveRequest(live, request, current)
             val active =
                 if (request.status == LeaveStatus.CANCELLATION_PENDING) requireNotNull(cancellation)

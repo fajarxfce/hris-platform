@@ -34,6 +34,11 @@ and its durable queue. Employees has search and department filtering, and Inbox
 shows the full account-owned unread total. API 35 checks covered encrypted monthly
 offline restoration and explicit queued capture replay; the validated update was
 installed on the phone without interacting with its UI.
+The [mobile Leave page](https://github.com/fajarxfce/hris-mobile/commit/db842e5)
+now provides annual balances, filtered request history and an encrypted offline
+view. API 35 acceptance covered process restoration, online recovery, both
+languages/themes and large text. Protected reads stay gated across pending and
+failed retries; the validated update was installed on the phone without opening it.
 Automated UI/API checks and the Android dev build passed. Android 16 device checks
 covered password sign-in, company isolation, profiles, inbox reading, offline
 content, offline process restoration with company isolation, queued acknowledgement
@@ -49,7 +54,7 @@ retain their own acceptance work.
 | Mobile foundation | Additional business replicas and durable commands, background restoration, deep links and push registration. Bounded encrypted company admission, company availability, the employee inbox and HRIS sync client are implemented. |
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
 | Workforce | Dashboard company-wide exception queues, correction history, overtime and closing; bulk/reset and late corrections; mobile overtime requests and physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections, and mobile work calendars plus online/offline capture are implemented and verified against the real API. |
-| Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry; mobile balances, requests, evidence and cancellation |
+| Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry; mobile request details, submission, evidence and cancellation. Mobile balances and filtered request history are implemented. |
 | Documents | Dashboard document/upload/processing/retention workflows; mobile scoped resumable upload/download and evidence acquisition |
 | Expenses | Dashboard policies, claims, review, payment/reconciliation and corrections; mobile claims, receipts, submission and payment progress |
 | Payroll | Dashboard policies, compensation, inputs, calculation, review, finalization, payslips, payments and amendments; mobile finalized payslips and downloads |

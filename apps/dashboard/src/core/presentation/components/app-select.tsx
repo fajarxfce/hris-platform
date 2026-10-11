@@ -9,6 +9,7 @@ export const AppSelect = forwardRef<HTMLSelectElement, Props>(function AppSelect
 ) {
   return (
     <Field
+      className="app-select-field"
       label={label}
       validationState={error ? "error" : "none"}
       validationMessage={error ?? null}

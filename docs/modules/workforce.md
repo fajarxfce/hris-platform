@@ -54,8 +54,11 @@ a pending read releases those guards.
 The dashboard provides shift search, a bounded company-holiday directory, current
 details and versioned create/edit forms, with explicit request recovery after
 response loss. Holiday activation and deactivation apply to employee calendars
-under the existing precedence and closed-period rules. Scheduling and employee
-calendar administration screens remain separate delivery work. The mobile employee
+under the existing precedence and closed-period rules. The employee calendar
+directory and review now support effective weekly assignments and per-date roster
+editing. Forms retain original selected shift revisions across catalog paging,
+use the corresponding schedule/roster version and recover explicitly after an
+unknown response. Bulk editing and roster reset remain separate work. The mobile employee
 application provides its own [weekly calendar](https://github.com/fajarxfce/hris-mobile/blob/main/docs/workforce.md)
 with a bounded encrypted offline snapshot; attendance and overtime commands remain
 separate mobile workflows.

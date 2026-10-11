@@ -1153,3 +1153,28 @@ independent module admission, credential/grant/MFA changes while waiting, shared
 read guards and cancellation cleanup. Calendar resolution bounds its date loop
 without advancing beyond the last date. Formatting, architecture checks and both
 application JAR builds passed. Dashboard scheduling forms are the next increment.
+
+## Dashboard employee calendars and scheduling
+
+The dashboard now provides bounded employee selection, coherent calendar review,
+effective weekly assignments and daily roster editing. Shift selections retain
+their original snapshots across catalog paging and search. Weekly writes observe
+the global schedule version; roster writes observe the individual date, including
+an existing explicit day off. Unknown outcomes retain one immutable request through
+MFA renewal, while definite conflicts require a protected reload.
+
+Architecture, formatting, type checks and all 826 tests passed. Nineteen calendar,
+shift and holiday browser scenarios passed. English/light and Indonesian/dark
+screenshots were inspected, including a 390-pixel viewport; browser testing found
+and verified a shared select-width correction for long option text. The production
+build passed with the existing shared chunk-size warning.
+
+An isolated PostgreSQL/API browser scenario verified receipt replay after a
+committed response was deliberately lost, retained future assignments and original
+shift snapshots, explicit selection of a revised template, and conflicting daily
+roster edits followed by reload. The API and worker dev containers were updated
+from the previously validated JARs; API health was `UP` and neither process had
+restarted. The dashboard and its same-origin API proxy returned HTTP 200 on the
+WireGuard interface. Its dev process is now owned by a user service independently
+of the terminal. No phone installation or UI interaction was performed for this
+dashboard increment.

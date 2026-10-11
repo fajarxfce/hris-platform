@@ -2,6 +2,26 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_schedule_change: [
+    "Review the effective date, selected shifts and reason.",
+    "Periksa tanggal berlaku, pilihan shift, dan alasan.",
+  ],
+  invalid_roster_change: [
+    "Review the work date, selected shift and reason.",
+    "Periksa tanggal kerja, pilihan shift, dan alasan.",
+  ],
+  shift_changed: [
+    "A selected shift has changed. Reload and select its current revision.",
+    "Shift yang dipilih telah berubah. Muat ulang dan pilih revisi terbarunya.",
+  ],
+  shift_unavailable: [
+    "A selected shift is no longer active in this company.",
+    "Shift yang dipilih sudah tidak aktif di perusahaan ini.",
+  ],
+  employee_unavailable: [
+    "The employee is not eligible for this action on the selected date.",
+    "Karyawan tidak memenuhi syarat untuk tindakan ini pada tanggal yang dipilih.",
+  ],
   holiday_not_found: [
     "This holiday is unavailable in the current company.",
     "Hari libur tidak tersedia di perusahaan ini.",

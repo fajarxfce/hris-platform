@@ -42,6 +42,26 @@ through MFA renewal. An explicit conflict requires reloading the current revisio
 Route and company changes own cancellation and protected draft departure. This is
 an in-memory browser workflow, without durable draft storage or automatic retries.
 
+## Employee calendars and scheduling
+
+`/workforce/calendars` selects employees with bounded name/number search and an
+explicit company date. The calendar shows at most 62 days, including overnight
+hours, timezone, planned time, and the source of each assignment. Its separate
+weekly-pattern table retains the original shift revisions at the range start.
+
+Reading requires `workforce.read`; editing also requires `workforce.manage`.
+Weekly changes take effect at the selected range's first date and use the global
+schedule version, including future assignments. Later effective assignments keep
+their dates. A daily roster instead uses that date's own observed version; an
+explicit day off remains a versioned override of the weekly pattern and holidays.
+
+Shift selection holds one catalog page and at most seven selected snapshots.
+Searching or paging does not replace a selection with a newer template revision.
+Changed templates require explicitly selecting an active revision. Definite
+conflicts require protected reload; unknown outcomes retain the exact operation
+and payload through MFA renewal and explicit retry. Company changes cancel the
+previous owner and discard its query cache. Browser drafts are not durable storage.
+
 ## Implemented foundation
 
 `apps/dashboard` provides password sign-in, configured SSO entry links, session bootstrap, authenticator enrollment/verification, and explicit acknowledgement of one-use recovery codes. The portal includes current-company selection, an authorized company overview, organization directories, parent details and editing, employee onboarding, directories, employment history, dated revisions and scheduled revision cancellation, separately authorized personal profiles with editing/history, lifecycle template catalogs and checklist editing, scoped case/checklist/history views, assigned-task queues, versioned task changes and assignment, company/group headcount reports, audit metadata search, client policy review and versioned editing, a job monitor with cancellation, employee CSV intake, result review and guarded apply/resume/cancel actions, responsive navigation, and English/Indonesian light/dark interfaces. Other business resource screens listed above remain subsequent work; the overview does not invent statistics.

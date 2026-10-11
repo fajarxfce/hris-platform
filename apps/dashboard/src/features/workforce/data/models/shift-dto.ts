@@ -34,6 +34,7 @@ export const shiftReceiptDto = z.object({
   version: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
 });
 export type ShiftDto = z.infer<typeof shiftDto>;
+export type ShiftDetailsDto = z.infer<typeof shiftDetailsDto>;
 export type ShiftPageDto = z.infer<typeof shiftPageDto>;
 export type ShiftReceiptDto = z.infer<typeof shiftReceiptDto>;
 export type ShiftSearchDto = Readonly<{ query: string; after: string | null }>;

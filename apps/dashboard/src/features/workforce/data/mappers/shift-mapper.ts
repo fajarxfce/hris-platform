@@ -1,25 +1,34 @@
 import { InvalidHttpResponseError } from "../../../../core/data/http/http-response-error";
 import type { CompanyId } from "../../../../core/domain/identifiers";
-import type { ShiftDefinition, ShiftId } from "../../domain/entities/shift-definition";
+import type {
+  ShiftDefinition,
+  ShiftDetails,
+  ShiftId,
+} from "../../domain/entities/shift-definition";
 import type { ShiftPage } from "../../domain/entities/shift-page";
 import type { ShiftSearch } from "../../domain/entities/shift-search";
 import { isShiftCode, validateShiftDetails } from "../../domain/policies/shift-policy";
-import type { ShiftDto, ShiftPageDto } from "../models/shift-dto";
+import type { ShiftDetailsDto, ShiftDto, ShiftPageDto } from "../models/shift-dto";
+
+export function toShiftDetails(dto: ShiftDetailsDto): ShiftDetails {
+  const details = Object.freeze({
+    ...dto,
+    startsAt: dto.startsAt.slice(0, 5),
+    endsAt: dto.endsAt.slice(0, 5),
+    fence: dto.fence ? Object.freeze({ ...dto.fence }) : null,
+  });
+  if (!validateShiftDetails(details).ok) throw new InvalidHttpResponseError();
+  return details;
+}
 
 export function toShift(
   dto: ShiftDto,
   companyId: CompanyId,
   expectedId?: ShiftId,
 ): ShiftDefinition {
-  const details = Object.freeze({
-    ...dto.details,
-    startsAt: dto.details.startsAt.slice(0, 5),
-    endsAt: dto.details.endsAt.slice(0, 5),
-    fence: dto.details.fence ? Object.freeze({ ...dto.details.fence }) : null,
-  });
+  const details = toShiftDetails(dto.details);
   const id = dto.id.toLowerCase() as ShiftId;
-  if (!validateShiftDetails(details).ok || (expectedId !== undefined && id !== expectedId))
-    throw new InvalidHttpResponseError();
+  if (expectedId !== undefined && id !== expectedId) throw new InvalidHttpResponseError();
   return Object.freeze({ id, companyId, details, active: dto.active, version: dto.version });
 }
 

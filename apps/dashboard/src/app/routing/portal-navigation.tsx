@@ -5,6 +5,7 @@ import {
   DataBarVertical20Regular,
   History20Regular,
   Home20Regular,
+  Megaphone20Regular,
   Organization20Regular,
   People20Regular,
   PeopleSwap20Regular,
@@ -24,6 +25,8 @@ import {
 import { approvalDelegationMessages } from "../../features/approvals/presentation/i18n/approval-delegation-messages";
 import { approvalMessages } from "../../features/approvals/presentation/i18n/approval-messages";
 import { approvalTemplateMessages } from "../../features/approvals/presentation/i18n/approval-template-messages";
+import { canManageAnnouncements } from "../../features/communications/domain/policies/announcement-read-policy";
+import { announcementMessages } from "../../features/communications/presentation/i18n/announcement-messages";
 import type { CompanyAccess } from "../../features/identity/domain/entities/session";
 import { canManageCompanyMembers } from "../../features/identity/domain/policies/company-member-policy";
 import { companyMemberMessages } from "../../features/identity/presentation/i18n/company-member-messages";
@@ -59,6 +62,15 @@ export function portalNavigation(
   const permissions = access?.permissions ?? [];
   return [
     { to: "/", label: text.overview, icon: <Home20Regular /> },
+    ...(canManageAnnouncements(permissions)
+      ? [
+          {
+            to: "/communications/announcements",
+            label: announcementMessages(locale).title,
+            icon: <Megaphone20Regular />,
+          },
+        ]
+      : []),
     ...(canManageCompanyMembers(permissions)
       ? [
           {

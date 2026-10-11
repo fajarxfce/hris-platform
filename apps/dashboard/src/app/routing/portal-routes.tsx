@@ -6,6 +6,7 @@ import { AppPageHeader } from "../../core/presentation/components/app-page-heade
 import { type Locale, messages } from "../../core/presentation/i18n/messages";
 import type { AdministrationUseCases } from "../../features/administration/presentation/contracts/administration-use-cases";
 import type { ApprovalsUseCases } from "../../features/approvals/presentation/contracts/approvals-use-cases";
+import type { CommunicationsUseCases } from "../../features/communications/presentation/contracts/communications-use-cases";
 import type {
   CompanyAccess,
   CompanyMembership,
@@ -19,6 +20,14 @@ import { OverviewPage } from "../../features/overview/presentation/pages/overvie
 import type { PeopleUseCases } from "../../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../../features/reporting/presentation/contracts/reporting-use-cases";
 import { approvalResourceRoute } from "./approval-resource-route";
+
+const CommunicationsRoutes = lazy(() =>
+  import("../../features/communications/presentation/navigation/communications-routes").then(
+    (module) => ({
+      default: module.CommunicationsRoutes,
+    }),
+  ),
+);
 
 const CompanyMembersScreen = lazy(() =>
   import("../../features/identity/presentation/bindings/company-members-screen").then((module) => ({
@@ -291,6 +300,7 @@ export function PortalRoutes({
   reporting,
   administration,
   approvals,
+  communications,
   jobs,
   leave,
   organization,
@@ -308,6 +318,7 @@ export function PortalRoutes({
   reporting: ReportingUseCases;
   administration: AdministrationUseCases;
   approvals: ApprovalsUseCases;
+  communications: CommunicationsUseCases;
   jobs: JobsUseCases;
   leave: LeaveUseCases;
   organization: OrganizationUseCases;
@@ -319,6 +330,21 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/communications/*"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <CommunicationsRoutes
+              accountId={accountId}
+              access={access}
+              communications={communications}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/people/employees/:employeeId/account-link"
         element={

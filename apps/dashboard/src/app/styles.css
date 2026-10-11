@@ -524,3 +524,10 @@ a {
   flex: 1;
   min-width: 0;
 }
+
+.app-announcement-body {
+  max-width: 80ch;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.65;
+}

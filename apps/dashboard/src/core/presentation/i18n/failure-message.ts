@@ -2,6 +2,10 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  announcement_not_found: [
+    "This announcement is unavailable in the current company.",
+    "Pengumuman tidak tersedia di perusahaan ini.",
+  ],
   person_account_link_access_required: [
     "Your account cannot link employee accounts.",
     "Akun Anda tidak dapat menghubungkan akun karyawan.",

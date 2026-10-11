@@ -35,3 +35,17 @@ Published announcements are ordinary company correspondence. Group removal or a 
 Read and acknowledgement timestamps are explicit commands with optimistic versions and idempotency. A GET must not mark a notification read. Acknowledgement also marks an unread item read. Repeating an already applied state is a no-op, while an obsolete observed version requires refresh. Native bearer clients use the same endpoints and access checks. Account-owned inbox synchronization is available through explicit `INBOX` selection. Read/acknowledgement produce versioned updates; archival produces a tombstone. [Bounded FCM dispatch](../push.md) is implemented after commit, with live session/access checks, per-device checkpoints, explicit retry/expiry, and version-guarded token retirement. Push payloads identify an inbox/resource without payroll, document, or personal-data content; resolving a deep link requires fresh authorization.
 
 The employee permission catalog includes `announcements.read`. Existing memberships and saved role-template snapshots do not acquire new permissions automatically; administrators must grant or explicitly reapply the intended access.
+
+## Dashboard review
+
+The announcements directory, current message, immutable revision history, and
+publication-job link are available under Communications. Reads require current
+management access and retain only one bounded page. Account/company replacement
+cancels the previous request and clears its content; a late result cannot restore
+it. Messages are rendered as plain text. Dates use the selected company timezone,
+with English and Indonesian copy and responsive light/dark layouts.
+
+Audience editing, publication review, schedules, and recovery are separate
+workflows still being implemented. The mobile inbox currently synchronizes and
+reads encrypted correspondence; read/acknowledgement commands and push navigation
+remain separate work.

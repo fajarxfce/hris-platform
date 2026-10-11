@@ -36,6 +36,7 @@ test("publication reaches the native inbox and sync preserves receipts, withdraw
   }
   const company = companies[0];
   const other = companies[1];
+  if (!company || !other) throw new Error("Fixture companies were not created");
   const base = `/api/v1/companies/${company}`;
   const account = "a0000000-0000-4000-8000-000000000008";
   for (const id of companies) {
@@ -97,6 +98,18 @@ test("publication reaches the native inbox and sync preserves receipts, withdraw
       })
     ).status(),
   ).toBe(200);
+  await page.goto(`/communications/announcements?company=${company}`);
+  await page.getByRole("combobox", { name: "Company", exact: true }).selectOption(company);
+  await expect(
+    page.getByRole("button", { name: "View: Office closure", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "View: Office closure", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Message", exact: true })).toContainText(
+    "The office will be closed on Friday.",
+  );
+  await page.getByRole("link", { name: "Revision history", exact: true }).click();
+  await page.getByRole("button", { name: "View: Office closure · Version 0", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Historical revision");
   expect(
     await (await context.request.get(`${announcements}/audience-preview?expectedVersion=0`)).json(),
   ).toMatchObject({ recipientCount: 1 });
@@ -122,6 +135,15 @@ test("publication reaches the native inbox and sync preserves receipts, withdraw
     recipientCount: 1,
     version: 2,
   });
+  await page.getByRole("link", { name: "Current version", exact: true }).click();
+  await expect(
+    page.getByRole("region", { name: "Publication · Asia/Jakarta", exact: true }),
+  ).toContainText("Published");
+  await page.getByRole("link", { name: "View publication job", exact: true }).click();
+  await expect(page).toHaveURL(/\/administration\/jobs\?company=.+&job=.+/);
+  await expect(page.getByRole("dialog", { name: "Job details", exact: true })).toContainText(
+    "Succeeded",
+  );
 
   // The native employee has no administrator cookies or management permission.
   const signedIn = await request.post("/api/v1/auth/native/login", {

@@ -62,6 +62,13 @@ Leave attachment metadata and content use shared people, approval, and access gu
 
 Leave policy administration acquires the shared policy guard before company, membership, and account guards. One current-head/history review remains coherent across its queries; concurrent readers share the guard and writers retain exclusive ownership. Effective type selection uses the same access/assurance fence while preserving date-based selection. Policy saves revalidate current MFA before mutation or receipt replay. Administrative history requires `leave.manage`, separately from the broader effective-type lookup used by employees and approvers.
 
+Employee leave preparation acquires the shared ledger and schedule guards, the
+existing cutoff guard, then shared policy, people, company, membership and account
+guards. The order preserves schedule-before-period and policy-before-people
+ownership. Its use case reuses pure submission policies and returns current facts
+without reserving a balance or constructing an approval. The employee route never
+broadens ownership through an administrative grant.
+
 Interactive leave balance, ledger, and entitlement reads revalidate current session assurance after resource and access guards. Independent adjustments, entitlement posting, and year closing use the same post-acquisition check before mutation or original receipt replay. A proof that expires while waiting cannot authorize the later result; cancellation unwinds the transaction and releases its guards.
 
 The employee balance directory and ledger acquire a shared employee-ledger guard, then the shared policy, people, and access guards. The directory datasource returns a bounded account/type projection in one query. Its repository maps rows and pagination inside the database failure boundary; the use case owns current employee scope and assurance. Minimal labels do not expose administrative policy revision reasons or require unrelated people-administration grants.

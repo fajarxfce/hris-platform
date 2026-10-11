@@ -17,7 +17,6 @@ import dev.fajar.hris.leave.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.payroll.domain.repositories.PayrollCutoffRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
-import dev.fajar.hris.workforce.domain.entities.ScheduledDay
 import dev.fajar.hris.workforce.domain.policies.resolveCalendar
 import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
 import java.time.*
@@ -143,19 +142,11 @@ class SubmitLeaveRequest(
                 schedules.calendar(company, employeeId, from, until).flatMap(::resolveCalendar)
             if (calendarResult is Result.Failed) return@run calendarResult
             val calendar = (calendarResult as Result.Success).value
-            val requestedDates = days.map { it.workDate }.toSet()
-            if (
-                calendar.days.any { it.workDate in requestedDates && it is ScheduledDay.Unassigned }
-            )
-                return@run Result.Failed(Failure(FailureKind.VALIDATION, "leave_schedule_missing"))
             val first =
-                calendar.days
-                    .filterIsInstance<ScheduledDay.Work>()
-                    .firstOrNull { it.workDate in requestedDates }
-                    ?.workDate
-                    ?: return@run Result.Failed(
-                        Failure(FailureKind.VALIDATION, "no_leave_working_days")
-                    )
+                when (val result = leavePolicyDate(days, calendar)) {
+                    is Result.Failed -> return@run result
+                    is Result.Success -> result.value
+                }
             val typeResult = policies.effective(company, typeId, first)
             if (typeResult is Result.Failed) return@run typeResult
             val type = (typeResult as Result.Success).value

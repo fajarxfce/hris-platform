@@ -1358,3 +1358,36 @@ in 19 seconds. The previous CI timeout is not counted as a pass. The remaining
 browser scenarios passed in that CI run and were not rerun for this test-only move.
 Run `38174844731` at `9abf9e08` subsequently passed backend verification, all four
 dashboard shards and the complete real API/dashboard integration job.
+
+## Employee leave preparation and mobile actions
+
+The owner-only preparation endpoint returns effective policy, exact working-day
+charges, excluded off dates and proposed balances before submission. Its use case
+shares date and eligibility policies with submission and keeps resource/access
+guards around its reads. It neither reserves entitlement nor creates a request,
+approval or operation receipt. Current ownership, module availability, credentials,
+permissions and MFA remain required after waits.
+
+Architecture, formatting, all 18 Leave domain tests, 35 focused HTTP/contract tests
+and both application JAR builds pass. The changed shared DI graph also passed all
+38 worker tests. Coverage includes exact portions and overnight dates, invalid or
+foreign selections, insufficient balance, existing occupancy, evidence requirements,
+module independence, revocation during a wait, MFA expiry/recovery and interruption
+cleanup. Repeated previews preserve the stored balance; a later actual submission
+uses the same charge rules. No load or memory benchmark is claimed.
+
+The API and worker development containers were rebuilt with zero restarts and
+healthy API status. A real employee preview charged 0.5 day for a selected working
+half-day and excluded the selected Saturday. Its proposed remaining balance was
+11.5 days while the stored available balance remained 12 days at the same version.
+The probe session was logged out; no development database reset was performed.
+
+Mobile withdrawal, cancellation and withdrawal of a pending cancellation are
+implemented in [2472964](https://github.com/fajarxfce/hris-mobile/commit/2472964).
+Root checks passed 531 desktop tests, the affected 29 presentation and two
+localization Chromium tests, and Android/Web builds. API 35 acceptance withdrew a
+pending half-day request, restored a cancellation after an offline process restart,
+sent it after reconnecting and withdrew the pending cancellation. Reservations and
+consumption matched the server ledger throughout. The validated APK was installed
+on the connected phone with advance notice and without launching its UI. New
+mobile request creation and evidence transfer remain separate work.

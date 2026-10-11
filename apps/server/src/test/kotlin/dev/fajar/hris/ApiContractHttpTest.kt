@@ -34,6 +34,25 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun selfLeavePreparationDocumentsItsBoundedReadWithoutAnIdempotencyRequirement() {
+        val api = contract()
+        val operation =
+            api["paths"]["/api/v1/companies/{companyId}/leave/me/requests/preview"]["post"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        assertFalse(
+            operation.path("parameters").any { it.path("name").asString() == "Idempotency-Key" }
+        )
+        val days = api["components"]["schemas"]["LeavePreviewRequest"]["properties"]["days"]
+        assertEquals(1, days["minItems"].asInt())
+        assertEquals(366, days["maxItems"].asInt())
+        val response = api["components"]["schemas"]["LeaveRequestPreviewResponse"]["properties"]
+        assertTrue(response.has("excludedDates"))
+        assertTrue(response.has("balances"))
+        assertTrue(response.has("evaluatedAt"))
+        assertFalse(response.has("approval"))
+    }
+
+    @Test
     fun coworkerDirectoryDocumentsItsOwnBoundedPagesAndFilter() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/employees/directory"

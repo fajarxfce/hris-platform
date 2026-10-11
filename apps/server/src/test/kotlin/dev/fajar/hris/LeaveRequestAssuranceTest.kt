@@ -47,12 +47,13 @@ class LeaveRequestAssuranceTest : ApprovalApiFixture() {
     @Autowired private lateinit var references: DocumentReferenceRepository
     @Autowired private lateinit var probe: AccountLockProbe
 
-    @Test
-    fun selfServiceRequiresRenewedMfaAfterWaitingForTheAccountGuard() {
+    @ParameterizedTest
+    @ValueSource(strings = ["details", "preview"])
+    fun selfServiceRequiresRenewedMfaAfterWaitingForTheAccountGuard(operation: String) {
         val f = leaveFixture()
         val id = pending(f)
         val security = IdentitySecurityPolicy(enforceMfa = true)
-        val read =
+        val details =
             GetLeaveRequest(
                 requests,
                 ledger,
@@ -65,6 +66,31 @@ class LeaveRequestAssuranceTest : ApprovalApiFixture() {
                 cutoffs,
                 security,
             )
+        val preview =
+            PreviewSelfLeaveRequest(
+                requests,
+                ledger,
+                policies,
+                people,
+                companies,
+                schedules,
+                identities,
+                members,
+                transactions,
+                clock,
+                cutoffs,
+                security,
+            )
+        val read: (Actor) -> Result<*> = { requestedActor ->
+            if (operation == "preview")
+                preview.execute(
+                    requestedActor,
+                    f.employee,
+                    f.type,
+                    listOf(RequestedLeaveDay(LocalDate.parse("2026-10-06"), LeavePortion.FULL)),
+                )
+            else details.execute(requestedActor, id, null, 10, LeaveRequestReadScope.SELF)
+        }
         database()
             .update(
                 "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
@@ -84,10 +110,7 @@ class LeaveRequestAssuranceTest : ApprovalApiFixture() {
         probe.current.set(barrier)
         try {
             Executors.newSingleThreadExecutor().use { pool ->
-                val pending =
-                    pool.submit<Result<*>> {
-                        read.execute(actor, id, null, 10, LeaveRequestReadScope.SELF)
-                    }
+                val pending = pool.submit<Result<*>> { read(actor) }
                 try {
                     assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
                     clock.set(clock.instant().plusSeconds(2))
@@ -102,15 +125,54 @@ class LeaveRequestAssuranceTest : ApprovalApiFixture() {
             probe.current.set(null)
             barrier.release.countDown()
         }
-        assertTrue(
-            read.execute(
-                actor.copy(mfaVerifiedAt = clock.instant()),
-                id,
-                null,
-                10,
-                LeaveRequestReadScope.SELF,
-            ) is Result.Success
-        )
+        assertTrue(read(actor.copy(mfaVerifiedAt = clock.instant())) is Result.Success)
+    }
+
+    @Test
+    fun cancellingPreparationReleasesItsGuardsWithoutReservingBalance() {
+        val f = leaveFixture()
+        pending(f)
+        val preview =
+            PreviewSelfLeaveRequest(
+                requests,
+                ledger,
+                policies,
+                people,
+                companies,
+                schedules,
+                identities,
+                members,
+                transactions,
+                clock,
+                cutoffs,
+                IdentitySecurityPolicy(enforceMfa = false),
+            )
+        val actor =
+            Actor(
+                f.account,
+                f.company,
+                setOf("leave.self.manage"),
+                clock.instant(),
+                UUID.randomUUID(),
+                credentialVersion = 0,
+            )
+        val days = listOf(RequestedLeaveDay(LocalDate.parse("2026-10-06"), LeavePortion.FULL))
+        val before = balance(f).toString()
+        val barrier = AccountLockProbe.Barrier(f.account)
+        probe.current.set(barrier)
+        Executors.newSingleThreadExecutor().use { pool ->
+            try {
+                val preparing =
+                    pool.submit<Result<*>> { preview.execute(actor, f.employee, f.type, days) }
+                assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                assertTrue(preparing.cancel(true))
+            } finally {
+                probe.current.set(null)
+                barrier.release.countDown()
+            }
+        }
+        assertTrue(preview.execute(actor, f.employee, f.type, days) is Result.Success)
+        assertEquals(before, balance(f).toString())
     }
 
     @ParameterizedTest

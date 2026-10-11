@@ -108,3 +108,23 @@ The use case holds shared people, company, membership and account guards, in tha
 order, and revalidates original/live permissions, credentials and MFA after
 waiting. No profile fields are returned, and no business data is duplicated in a
 new datasource or repository.
+
+## Employee request preparation
+
+`POST /leave/me/requests/preview` evaluates an account-owned date selection before
+submission. Its use case coordinates the existing ledger, schedule, policy,
+employment, cutoff and identity repositories. The same pure policies used by
+submission validate the date bounds, employment eligibility, portions, occupancy
+and available balance. The policy is selected on the first charged working date;
+off days and holidays are listed separately. Overnight dates retain their scheduled
+work date. Values use exact half-days and separate balance years.
+
+Preparation requires current `leave.self.manage` and active owned employment.
+It remains available when People or Workforce is disabled, subject to Leave's own
+company admission. Resource guards precede access guards, and current credentials,
+permissions and MFA are rechecked after waiting. No approval, request, reservation,
+command receipt or audit event is created by preview. Required evidence is reported
+through the selected policy; actual evidence and approval routing are validated by
+submission. A preview cannot authorize an offline request or promise a future
+balance. Submission retains its independent transaction and original-operation
+receipt semantics.

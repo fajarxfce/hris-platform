@@ -4,20 +4,39 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.people.domain.entities.EmploymentRevision
 import dev.fajar.hris.workforce.domain.entities.*
+import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 fun validateRequestedLeaveDays(days: List<RequestedLeaveDay>, reason: String): Result<Unit> {
+    if (reason.isBlank() || reason.length > 1000)
+        return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_leave_request"))
+    return validateLeaveDateSelection(days)
+}
+
+fun validateLeaveDateSelection(days: List<RequestedLeaveDay>): Result<Unit> {
     if (
         days.size !in 1..366 ||
             days.map { it.workDate }.toSet().size != days.size ||
-            days.any { it.workDate.year !in 1900..2200 } ||
-            reason.isBlank() ||
-            reason.length > 1000
+            days.any { it.workDate.year !in 1900..2200 }
     )
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_leave_request"))
     if (ChronoUnit.DAYS.between(days.minOf { it.workDate }, days.maxOf { it.workDate }) > 365)
         return Result.Failed(Failure(FailureKind.VALIDATION, "leave_range_too_large"))
     return Result.Success(Unit)
+}
+
+/** Effective policy follows the first selected working date, including an overnight shift. */
+fun leavePolicyDate(days: List<RequestedLeaveDay>, calendar: EmployeeCalendar): Result<LocalDate> {
+    val selected = days.map { it.workDate }.toSet()
+    if (calendar.days.any { it.workDate in selected && it is ScheduledDay.Unassigned })
+        return Result.Failed(Failure(FailureKind.VALIDATION, "leave_schedule_missing"))
+    val first =
+        calendar.days
+            .filterIsInstance<ScheduledDay.Work>()
+            .filter { it.workDate in selected }
+            .minOfOrNull { it.workDate }
+            ?: return Result.Failed(Failure(FailureKind.VALIDATION, "no_leave_working_days"))
+    return Result.Success(first)
 }
 
 fun planLeaveDays(

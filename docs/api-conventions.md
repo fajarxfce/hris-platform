@@ -108,6 +108,7 @@ Employee selection is bounded to 1–5,000 distinct IDs. Omitting it freezes the
 
 Leave requests:
 
+- `POST /companies/{companyId}/leave/me/requests/preview`: employeeId, typeId, and 1–366 explicit days (`{workDate, portion}`) spanning at most 366 calendar dates. Requires `leave.self.manage` and a current active employment owned by the account. Returns current policy, charged working dates, excluded off/holiday dates, exact half-day totals, and per-year available/requested/remaining balances with their observed versions. This read has no idempotency-key requirement or reservation effect; cookie clients still send CSRF proof. Submission independently revalidates current eligibility, evidence, approval routing, balance, overlap and payroll cutoffs.
 - `POST /companies/{companyId}/leave/requests`: id, employeeId, typeId, days (`{workDate, portion}`), optional attachmentRevisionIds (up to three distinct UUIDs), reason. Portions are FULL, FIRST_HALF, or SECOND_HALF. Requires own `leave.self.manage` or on-behalf `leave.manage`, with an idempotency key.
 - `GET /companies/{companyId}/leave/requests`: optional employeeId, status, after, limit. Company-wide lists require `leave.read`; self/current-team reads require an explicit employeeId.
 - `GET /companies/{companyId}/leave/requests/{id}`: optional historyAfter and historyLimit. Returns submitted policy/day snapshots, frozen attachment metadata, workflow state, version, availableActions, and bounded change history.

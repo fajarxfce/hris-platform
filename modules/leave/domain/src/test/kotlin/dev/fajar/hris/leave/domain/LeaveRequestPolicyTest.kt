@@ -64,6 +64,72 @@ class LeaveRequestPolicyTest {
             .value
 
     @Test
+    fun datePreparationHasFiniteBoundsWithoutRequiringASubmissionReason() {
+        val selected = listOf(RequestedLeaveDay(date, LeavePortion.FIRST_HALF))
+        assertTrue(validateLeaveDateSelection(selected) is Result.Success)
+        assertTrue(validateRequestedLeaveDays(selected, "") is Result.Failed)
+        assertTrue(validateRequestedLeaveDays(selected, "Personal leave") is Result.Success)
+        assertTrue(validateLeaveDateSelection(emptyList()) is Result.Failed)
+        assertTrue(validateLeaveDateSelection(selected + selected) is Result.Failed)
+        assertTrue(
+            validateLeaveDateSelection(
+                (0..365).map { RequestedLeaveDay(date.plusDays(it.toLong()), LeavePortion.FULL) }
+            )
+                is Result.Success
+        )
+        assertTrue(
+            validateLeaveDateSelection(
+                (0..366).map { RequestedLeaveDay(date.plusDays(it.toLong()), LeavePortion.FULL) }
+            )
+                is Result.Failed
+        )
+        assertTrue(
+            validateLeaveDateSelection(
+                selected + selected.map { it.copy(workDate = date.plusDays(366)) }
+            )
+                is Result.Failed
+        )
+    }
+
+    @Test
+    fun policyDateIgnoresUnselectedDaysAndSelectsTheEarliestWorkingDate() {
+        val selected =
+            listOf(
+                RequestedLeaveDay(date.plusDays(2), LeavePortion.FULL),
+                RequestedLeaveDay(date.plusDays(1), LeavePortion.FULL),
+                RequestedLeaveDay(date, LeavePortion.FIRST_HALF),
+            )
+        val calendar =
+            EmployeeCalendar(
+                0,
+                listOf(
+                    work(date.minusDays(1)),
+                    work(date.plusDays(2)),
+                    ScheduledDay.Off(
+                        date.plusDays(1),
+                        CalendarOrigin.HOLIDAY,
+                        0,
+                        UUID.randomUUID(),
+                    ),
+                    work(date),
+                ),
+            )
+        assertEquals(date, (leavePolicyDate(selected, calendar) as Result.Success).value)
+        val missing =
+            calendar.copy(
+                days =
+                    calendar.days.map {
+                        if (it.workDate == date.plusDays(1)) ScheduledDay.Unassigned(it.workDate)
+                        else it
+                    }
+            )
+        assertEquals(
+            "leave_schedule_missing",
+            (leavePolicyDate(selected, missing) as Result.Failed).failure.code,
+        )
+    }
+
+    @Test
     fun daysSkipHolidaysAndKeepTheOvernightWorkDate() {
         val result =
             planLeaveDays(

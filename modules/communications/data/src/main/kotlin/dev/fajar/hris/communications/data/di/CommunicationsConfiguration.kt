@@ -18,6 +18,24 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class CommunicationsConfiguration {
     @Bean
+    fun audienceReferenceSource(sql: DSLContext): AudienceReferenceDataSource =
+        PostgresAudienceReferenceDataSource(sql)
+
+    @Bean
+    fun audienceReferences(source: AudienceReferenceDataSource): AudienceReferenceRepository =
+        StoredAudienceReferenceRepository(source)
+
+    @Bean
+    fun listAudienceReferences(
+        references: AudienceReferenceRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+    ) = ListAudienceReferences(references, members, identities, transactions, clock, security)
+
+    @Bean
     fun announcementSource(sql: DSLContext): AnnouncementDataSource =
         PostgresAnnouncementDataSource(sql)
 

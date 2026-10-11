@@ -49,3 +49,21 @@ Audience editing, publication review, schedules, and recovery are separate
 workflows still being implemented. The mobile inbox currently synchronizes and
 reads encrypted correspondence; read/acknowledgement commands and push navigation
 remain separate work.
+
+## Audience references
+
+The company-scoped `communications/audience-references` endpoint discovers
+branches, departments, named groups, and employments with `announcements.manage`.
+It exposes only IDs, labels/codes, resource versions, and definition activation.
+Employment references include the employee number and name without profiles,
+account bindings, or contact details. Group membership may include an existing
+employment whose start date is still in the future; publication evaluates its
+eligibility separately. `active` is therefore null for employment references.
+
+Search is literal and case-insensitive, bounded to 120 characters and 50 entries
+by default (200 maximum), with ascending UUID pagination. Up to 50 selected IDs
+can be resolved in one request, including inactive saved definitions. Selected-ID
+lookup cannot be combined with text search or a cursor; foreign/missing IDs are
+omitted. Each page is one SQL snapshot under company RLS. Access and current MFA
+are rechecked after access guards. These labels do not reserve a recipient or
+authorize later saves, previews, or publication.

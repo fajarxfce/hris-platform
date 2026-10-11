@@ -33,6 +33,20 @@ class ApiContractHttpTest : PeopleApiFixture() {
         return json.readTree(response.body())
     }
 
+    @Test
+    fun audienceReferenceSelectionsHaveExplicitBoundsAndCompanyAdmission() {
+        val api = contract()
+        val operation =
+            api["paths"]["/api/v1/companies/{companyId}/communications/audience-references"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val parameters =
+            operation["parameters"].iterator().asSequence().associateBy { it["name"].asString() }
+        assertEquals(50, parameters.getValue("ids")["schema"]["maxItems"].asInt())
+        assertTrue(parameters.getValue("ids")["schema"]["uniqueItems"].asBoolean())
+        assertEquals(120, parameters.getValue("query")["schema"]["maxLength"].asInt())
+        assertEquals(200, parameters.getValue("limit")["schema"]["maximum"].asInt())
+    }
+
     private fun checkReferences(root: JsonNode, node: JsonNode, depth: Int = 0) {
         assertTrue(depth < 64)
         if (node.isObject) {

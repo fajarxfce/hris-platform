@@ -232,6 +232,25 @@ fun completeApiContract(api: OpenAPI) {
                             parameter.description =
                                 "Comma-separated supported collections. Persist this selection with the partition/cursor and send it on every page. Effective collections are intersected with current self-service permissions."
                         }
+                    "ids" ->
+                        if (path.endsWith("/communications/audience-references")) {
+                            parameter.schema =
+                                ArraySchema()
+                                    .items(StringSchema().format("uuid"))
+                                    .minItems(1)
+                                    .maxItems(50)
+                                    .uniqueItems(true)
+                            parameter.style = Parameter.StyleEnum.FORM
+                            parameter.explode = true
+                            parameter.description =
+                                "Resolve up to 50 selected references, including inactive definitions. Cannot be combined with query or after. Missing or foreign IDs are omitted. This lookup does not authorize saving or publication."
+                        }
+                    "query" ->
+                        if (path.endsWith("/communications/audience-references")) {
+                            parameter.schema?.maxLength = 120
+                            parameter.description =
+                                "Literal case-insensitive name or code search within the selected company. Employee results expose only an employment ID, employee number, name, and resource version."
+                        }
                     "cursor" ->
                         if ("/sync/" in path) {
                             parameter.description =

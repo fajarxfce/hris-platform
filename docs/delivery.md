@@ -753,3 +753,21 @@ list components, including regression tests, are published in Compose Fluent
 Starter at `ce582e8`, whose CI passed on the same platforms. Offline company
 admission, durable business commands, read/acknowledgement actions, and push
 integration remain open acceptance work.
+
+## Scoped audience reference discovery
+
+Communications now exposes bounded company references for selecting branches,
+departments, groups, and employments. The projection contains labels and IDs
+without private profiles or account bindings. Selected-ID lookup can label an
+inactive saved reference; it never grants permission to save or publish it.
+Literal search, finite pagination, same-company RLS, and current access/MFA after
+guard acquisition are enforced. Group membership remains separate from actual
+publication eligibility.
+
+Architecture and format checks and both application JAR builds passed. All seven
+new HTTP/PostgreSQL cases and six API-contract cases passed across the final
+targeted runs; thirteen existing authoring/preview regressions also passed.
+Coverage includes minimal projections, future employments, activation, literal
+wildcards, pagination, invalid/oversized selections, foreign resources, runtime
+RLS, revoked credentials/grants, and MFA expiry during pending acquisition. The
+endpoint's bounded inputs and company admission are included in OpenAPI.

@@ -95,6 +95,37 @@ class ApiContractHttpTest : PeopleApiFixture() {
         )
     }
 
+    @Test
+    fun employeeCalendarReviewDescribesMinimalReferencesAndObservedAssignments() {
+        val api = contract()
+        val directory = api["paths"]["/api/v1/companies/{companyId}/workforce/employees"]["get"]
+        assertTrue(directory["x-hris-company-admission"].asBoolean())
+        val parameters =
+            directory["parameters"].iterator().asSequence().associateBy { it["name"].asString() }
+        assertEquals(50, parameters.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals(32, parameters.getValue("after")["schema"]["maxLength"].asInt())
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("id", "employeeNumber", "legalName", "status", "version"),
+            schemas["WorkforceEmployeeResponse"]["properties"].properties().map { it.key }.toSet(),
+        )
+        assertEquals(
+            setOf("employee", "from", "until", "calendar", "assignmentAtStart"),
+            schemas["EmployeeCalendarReviewResponse"]["properties"]
+                .properties()
+                .map { it.key }
+                .toSet(),
+        )
+        assertEquals(
+            setOf("effectiveFrom", "revision", "days"),
+            schemas["ScheduleAssignmentResponse"]["properties"].properties().map { it.key }.toSet(),
+        )
+        val review =
+            api["paths"]["/api/v1/companies/{companyId}/workforce/employees/{id}/calendar/review"][
+                "get"]
+        assertTrue(review["x-hris-company-admission"].asBoolean())
+    }
+
     private fun checkReferences(root: JsonNode, node: JsonNode, depth: Int = 0) {
         assertTrue(depth < 64)
         if (node.isObject) {

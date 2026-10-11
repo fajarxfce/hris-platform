@@ -16,6 +16,24 @@ so disabling People does not prevent employees from opening their work calendar.
 Company access, credential versions and current MFA are rechecked after waiting.
 Both the requested page and subsequent calendar read authorize independently.
 
+Administrative selection uses `GET /workforce/employees?asOf=yyyy-MM-dd`, under
+`workforce.read`, with at most 50 employee references per page and bounded search.
+It returns only ID, employee number, legal name, employment status and version.
+The People feature's availability and profile permissions remain independent.
+
+`GET /workforce/employees/{id}/calendar/review?from=...&until=...` returns that
+reference, the resolved calendar, and the weekly assignment effective at `from`.
+One shared schedule/people/access transaction keeps its component queries coherent.
+The global `scheduleVersion` includes future assignments; `assignmentAtStart`
+retains the applicable date, revision and original shift snapshots. A roster day's
+origin/version distinguishes an explicit day off from holiday or weekly time off.
+The review requires `workforce.read`; self/team calendar readers retain their
+existing endpoint and scope. Missing and foreign employment IDs share one error.
+All reads recheck current session assurance after waiting and release their guards
+on cancellation. These observations do not reserve a later write: commands still
+require current authority, selected shift versions and the observed schedule or
+roster version.
+
 Acceptance: duplicate/offline events, checkout across midnight, timezone transitions, overlapping roster, immutable corrections, concurrent verification, and unverified records excluded from payroll.
 
 ## Implementation status

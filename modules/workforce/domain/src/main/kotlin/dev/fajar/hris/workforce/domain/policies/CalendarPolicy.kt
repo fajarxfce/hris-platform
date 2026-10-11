@@ -2,21 +2,29 @@ package dev.fajar.hris.workforce.domain.policies
 
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.workforce.domain.entities.*
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+
+fun effectiveScheduleAssignment(
+    assignments: List<ScheduleAssignment>,
+    date: LocalDate,
+): ScheduleAssignment? =
+    assignments
+        .filter { !it.effectiveFrom.isAfter(date) }
+        .maxWithOrNull(compareBy<ScheduleAssignment> { it.effectiveFrom }.thenBy { it.revision })
 
 fun resolveCalendar(facts: CalendarFacts): Result<EmployeeCalendar> {
+    val span = ChronoUnit.DAYS.between(facts.from, facts.until)
+    if (span !in 0..61)
+        return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_calendar_range"))
     val days = mutableListOf<ScheduledDay>()
     val roster = facts.roster.associateBy { it.workDate }
     val holidays = facts.holidays.filter { it.active }.associateBy { it.workDate }
-    var date = facts.from
-    while (!date.isAfter(facts.until)) {
+    for (offset in 0..span) {
+        val date = facts.from.plusDays(offset)
         val rosterDay = roster[date]
         val holiday = holidays[date]
-        val assignment =
-            facts.assignments
-                .filter { !it.effectiveFrom.isAfter(date) }
-                .maxWithOrNull(
-                    compareBy<ScheduleAssignment> { it.effectiveFrom }.thenBy { it.revision }
-                )
+        val assignment = effectiveScheduleAssignment(facts.assignments, date)
         val resolved: Result<ScheduledDay> =
             when {
                 rosterDay != null ->
@@ -41,7 +49,6 @@ fun resolveCalendar(facts: CalendarFacts): Result<EmployeeCalendar> {
             }
         if (resolved is Result.Failed) return resolved
         days += (resolved as Result.Success).value
-        date = date.plusDays(1)
     }
     return Result.Success(EmployeeCalendar(facts.scheduleVersion, days))
 }

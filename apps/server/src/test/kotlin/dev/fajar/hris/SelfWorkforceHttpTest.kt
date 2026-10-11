@@ -99,6 +99,11 @@ class SelfWorkforceHttpTest : ClientPolicyApiFixture() {
         )
         failure(get(owner.browser, "${f.root}/me/employments"), 403, "company_module_disabled")
         assertEquals(200, get(owner.browser, path).statusCode())
+        val directory = "${f.root}/workforce/employees?asOf=2026-10-01"
+        val review =
+            "${f.root}/workforce/employees/$own/calendar/review?from=2026-10-01&until=2026-10-07"
+        assertEquals(200, get(f.browser, directory).statusCode())
+        assertEquals(200, get(f.browser, review).statusCode())
         assertEquals(
             200,
             get(
@@ -109,6 +114,8 @@ class SelfWorkforceHttpTest : ClientPolicyApiFixture() {
         )
         assertEquals(200, save(f, 0, mapOf("disabledModules" to listOf("WORKFORCE"))).statusCode())
         val blocked = get(owner.browser, path)
+        failure(get(f.browser, directory), 403, "company_module_disabled")
+        failure(get(f.browser, review), 403, "company_module_disabled")
         failure(blocked, 403, "company_module_disabled")
         assertEquals("WORKFORCE", json.readTree(blocked.body())["parameters"]["module"].asString())
         assertEquals(

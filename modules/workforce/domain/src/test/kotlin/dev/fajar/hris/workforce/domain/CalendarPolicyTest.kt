@@ -115,6 +115,38 @@ class CalendarPolicyTest {
     }
 
     @Test
+    fun calendarRangesAreBoundedAndDoNotIncrementPastTheirLastDate() {
+        val from = LocalDate.parse("2026-10-01")
+        val facts =
+            CalendarFacts(from, from.plusDays(61), null, emptyList(), emptyList(), emptyList())
+        assertEquals(62, (resolveCalendar(facts) as Result.Success).value.days.size)
+        for (until in listOf(from.minusDays(1), from.plusDays(62))) {
+            assertEquals(
+                "invalid_calendar_range",
+                (resolveCalendar(facts.copy(until = until)) as Result.Failed).failure.code,
+            )
+        }
+        val maximum = resolveCalendar(facts.copy(from = LocalDate.MAX, until = LocalDate.MAX))
+        assertEquals(
+            ScheduledDay.Unassigned(LocalDate.MAX),
+            (maximum as Result.Success).value.days.single(),
+        )
+    }
+
+    @Test
+    fun effectiveAssignmentsChooseDateBeforeRevisionAndIgnoreFuturePatterns() {
+        val date = LocalDate.parse("2026-10-08")
+        val original = ScheduleAssignment(date, 0, emptyMap())
+        val correction = original.copy(revision = 2)
+        val older = ScheduleAssignment(date.minusDays(1), 3, emptyMap())
+        val future = ScheduleAssignment(date.plusDays(1), 4, emptyMap())
+        val assignments = listOf(future, correction, older, original)
+        assertEquals(correction, effectiveScheduleAssignment(assignments, date))
+        assertEquals(future, effectiveScheduleAssignment(assignments, date.plusDays(1)))
+        assertNull(effectiveScheduleAssignment(assignments, date.minusDays(2)))
+    }
+
+    @Test
     fun invalidLocationAndZeroLengthShiftsAreRejected() {
         assertTrue(validateShift(shift("08:00", "08:00").details) is Result.Failed)
         assertTrue(

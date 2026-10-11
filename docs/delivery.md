@@ -1138,3 +1138,18 @@ was `UP`, both processes had zero restarts and the VPN dashboard returned HTTP 2
 The previously validated mobile calendar APK was installed on the authorized phone
 with `--install-only`; installation and package metadata were checked without
 driving its UI. Subsequent phone installations require advance notice to the user.
+
+## Administrative work-calendar review
+
+Workforce now exposes bounded employee selection without personal-profile fields
+and a coherent calendar review with the effective weekly assignment and global
+schedule version. Original shift snapshots remain distinguishable from later
+template changes and future schedule assignments. The existing mobile calendar
+contract is unchanged.
+
+All 45 focused API/contract/access tests, 25 workforce domain tests and 38 worker
+tests passed. Coverage includes cross-company IDs, separate profile permissions,
+independent module admission, credential/grant/MFA changes while waiting, shared
+read guards and cancellation cleanup. Calendar resolution bounds its date loop
+without advancing beyond the last date. Formatting, architecture checks and both
+application JAR builds passed. Dashboard scheduling forms are the next increment.

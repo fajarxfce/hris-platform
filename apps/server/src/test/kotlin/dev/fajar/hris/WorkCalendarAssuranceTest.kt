@@ -35,6 +35,8 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                 "shifts",
                 "shift-detail",
                 "self-directory",
+                "employee-directory",
+                "calendar-review",
                 "holidays",
                 "holiday-detail",
                 "calendar",
@@ -98,6 +100,29 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
             )
         fun invoke(current: Actor): Result<*> =
             when (mode) {
+                "employee-directory" ->
+                    ListWorkforceEmployees(
+                            people,
+                            companies,
+                            members,
+                            identities,
+                            transactions,
+                            security,
+                            clock,
+                        )
+                        .execute(current, day, "", null, 50)
+                "calendar-review" ->
+                    GetEmployeeCalendarReview(
+                            schedules,
+                            people,
+                            companies,
+                            members,
+                            identities,
+                            transactions,
+                            security,
+                            clock,
+                        )
+                        .execute(current, f.employee, day, day)
                 "self-directory" ->
                     ListSelfWorkforceEmployments(
                             people,

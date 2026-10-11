@@ -1074,3 +1074,31 @@ PostgreSQL startup wait and passed on retry after stopping the emulator.
 
 The dedicated Android emulator also booted and restored the employee workspace
 against the dev API. No physical-phone interaction was part of this increment.
+
+## Mobile work calendar and emulator acceptance
+
+[HRIS Mobile cffb545](https://github.com/fajarxfce/hris-mobile/commit/cffb545) connects
+self-service employment discovery and weekly calendars to feature-owned MVI screens.
+It retains one encrypted snapshot per company under bounded workspace/session/MFA
+admission. Pending reads are cancellable, stale scopes cannot publish, and transport
+failure retains only still-admitted content. Workforce access remains independent
+of the People module.
+
+Mobile root checks passed 350 JVM/UI tests. The named-timezone regression passed
+in Chromium, and Android dev and production Web builds succeeded. API 24 and API 35
+emulators used the dev API for overnight shifts, roster days off, week navigation,
+company isolation, offline process restoration and recovery. English/Indonesian
+and light/dark captures were inspected. These are emulator results, not physical
+iOS acceptance or production Web authentication acceptance.
+
+The API 24 probe reproduced a missing Java time class in the previous APK. Core
+library desugaring corrected that failure without raising the supported minimum.
+That convention and the date-only formatter were also ported to Compose Fluent
+Starter in [5e3967c](https://github.com/fajarxfce/compose-fluent-starter/commit/5e3967c)
+and [ddc73ac](https://github.com/fajarxfce/compose-fluent-starter/commit/ddc73ac).
+The starter passed 197 tests, root checks and Android/Web builds.
+
+The physical phone was unavailable over ADB during delivery; no phone UI was driven.
+Validated updates use install-only when it reconnects. API health remained `UP`
+and the worker had zero restarts. The preceding backend CI run passed all backend,
+dashboard and integration jobs. No release was created.

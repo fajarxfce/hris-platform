@@ -29,7 +29,10 @@ and access guards and rechecks session assurance before releasing the result.
 
 The dashboard provides shift search, current details and versioned create/edit
 forms, with explicit request recovery after response loss. Scheduling and employee
-calendar screens remain separate delivery work.
+calendar administration screens remain separate delivery work. The mobile employee
+application provides its own [weekly calendar](https://github.com/fajarxfce/hris-mobile/blob/main/docs/workforce.md)
+with a bounded encrypted offline snapshot; attendance and overtime commands remain
+separate mobile workflows.
 
 Calendar precedence is explicit roster, active holiday, then the effective weekly pattern. A null roster shift means an explicit day off. Calendars distinguish work, off, and unassigned dates. Overnight shifts retain their starting work date. Nonexistent DST local times return a dated validation failure; ambiguous local times use the earlier offset and elapsed UTC minutes. Calendar reads are bounded to 62 days and holiday queries to 366 days.
 

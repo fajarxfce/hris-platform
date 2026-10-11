@@ -872,3 +872,22 @@ the dashboard, waits for worker acknowledgement, returns to draft, publishes aga
 and archives through the dashboard. Native recipient isolation, read replay,
 acknowledgement conflicts, withdrawal and permission revocation also pass. The existing
 bundle-size advisory remains. No physical device or external push validation is claimed.
+
+## Durable mobile inbox actions
+
+[HRIS Mobile](https://github.com/fajarxfce/hris-mobile/commit/3d4048b) now persists
+read and acknowledgement intents before transport, retaining the original operation
+and observed version through response loss, process termination and a new session.
+Account/company admission, bounded retries, conflict review and encrypted receipt
+retirement belong to domain use cases. Reusable atomic credential storage and its
+Android 7 correction were also ported to Compose Fluent Starter.
+
+The mobile root check, Android dev build, 23 assembled Compose tests, 28 inbox-domain
+tests on each JVM/browser target, and 13 JVM/two browser inbox-data tests passed.
+Android 16 device checks used a fictional employee and the actual dev API. They
+verified company isolation, profile/inbox reads, language persistence, admitted
+offline content, read state, confirmation cancellation, and an offline acknowledgement
+surviving force-stop/restart before successful retry. The temporary device proxy
+was removed afterward. Native MFA, external push, iOS devices, and performance
+measurements are separate acceptance work; these observations do not complete
+the other mobile workflows in [completion](completion.md).

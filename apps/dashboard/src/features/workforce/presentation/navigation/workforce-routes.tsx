@@ -1,4 +1,8 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { AttendanceDayScreen } from "../bindings/attendance-day-screen";
+import { AttendanceDirectoryScreen } from "../bindings/attendance-directory-screen";
+import { AttendanceEditorScreen } from "../bindings/attendance-editor-screen";
+import { EmployeeAttendanceScreen } from "../bindings/employee-attendance-screen";
 import { EmployeeCalendarScreen } from "../bindings/employee-calendar-screen";
 import { HolidayEditorScreen } from "../bindings/holiday-editor-screen";
 import { HolidayScreen } from "../bindings/holiday-screen";
@@ -15,6 +19,20 @@ import { shiftParameters, shiftsPath } from "../models/shift-route";
 export function WorkforceRoutes(props: WorkforceScreenProps) {
   return (
     <Routes>
+      <Route path="attendance" element={<AttendanceDirectoryScreen {...props} />} />
+      <Route path="attendance/:employeeId" element={<EmployeeAttendanceScreen {...props} />} />
+      <Route
+        path="attendance/:employeeId/days/:workDate"
+        element={<AttendanceDayScreen {...props} />}
+      />
+      <Route
+        path="attendance/:employeeId/days/:workDate/review/:entryId"
+        element={<AttendanceEditorScreen {...props} kind="review" />}
+      />
+      <Route
+        path="attendance/:employeeId/days/:workDate/correction"
+        element={<AttendanceEditorScreen {...props} kind="correction" />}
+      />
       <Route path="calendars" element={<WorkforceCalendarsScreen {...props} />} />
       <Route path="calendars/:employeeId" element={<EmployeeCalendarScreen {...props} />} />
       <Route path="calendars/:employeeId/schedule" element={<WeeklyScheduleScreen {...props} />} />

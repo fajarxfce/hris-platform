@@ -15,7 +15,7 @@ import {
   workforceEmployeeSearch,
 } from "../models/calendar-route";
 import { workforceEmployeeView } from "../models/calendar-view";
-import { WorkforceCalendarsPage } from "../pages/workforce-calendars-page";
+import { WorkforceEmployeesPage } from "../pages/workforce-employees-page";
 
 export function WorkforceCalendarsScreen(props: WorkforceScreenProps) {
   const [parameters, setParameters] = useSearchParams();
@@ -66,7 +66,7 @@ function WorkforceCalendarsBinding(
   );
   useWorkspaceRevalidation(state.failure);
   return (
-    <WorkforceCalendarsPage
+    <WorkforceEmployeesPage
       state={state}
       filters={filters}
       rows={rows}

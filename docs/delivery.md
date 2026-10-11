@@ -1192,3 +1192,23 @@ Existing access, concurrent review, frozen schedules, cancellation and aggregate
 read tests also passed. Architecture, formatting and API/worker JAR builds passed.
 This validates the backend boundary; dashboard and mobile attendance delivery
 remain their own increments.
+
+## Attendance dashboard
+
+The dashboard now provides employee attendance selection, bounded date review,
+daily evidence, independent verification and versioned corrections. Times use the
+company zone and frozen shift breaks; new corrections retain original punches.
+Unknown outcomes preserve one request through explicit retry and MFA renewal.
+
+Architecture, formatting, type checks and all 842 tests passed. Five new attendance
+browser scenarios and seven calendar scenarios passed. One existing calendar test
+now waits for the destination's loaded table before counting subsequent requests.
+English/light and Indonesian/dark captures were inspected at desktop and 390-pixel
+widths. Production build passed with the existing shared chunk-size warning.
+
+An isolated API/PostgreSQL browser scenario recorded two native offline punches,
+verified them independently into 450 accepted minutes, replayed one decision after
+a lost response, and resolved a competing correction into a new 435-minute revision.
+Original timestamps and both correction-history records remained available.
+The database and API fixture were disposed after the scenario. Mobile capture is
+the next delivery increment; browser fixtures do not validate physical GPS.

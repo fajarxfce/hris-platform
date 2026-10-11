@@ -62,6 +62,26 @@ conflicts require protected reload; unknown outcomes retain the exact operation
 and payload through MFA renewal and explicit retry. Company changes cancel the
 previous owner and discard its query cache. Browser drafts are not durable storage.
 
+## Attendance review and corrections
+
+`/workforce/attendance` selects employees without acquiring private profiles.
+Employee pages show at most 31 dates; a day displays frozen shift details, captured
+and received times, location evidence, review reasons and the latest correction.
+The employee reference and attendance are independently authorized reads.
+
+The dashboard requires `workforce.read`. Verification additionally requires
+`attendance.verify` or `attendance.team.verify`; corrections require
+`attendance.correct`. The API independently enforces current scope, reviewer
+independence, period status and observed versions. Pending evidence must be
+resolved before correcting a day. Whole-minute correction inputs use the company
+timezone, including overnight intervals, and preserve original capture evidence.
+
+Editors retain one immutable command during an uncertain outcome. MFA renewal
+does not send it again; explicit retry uses the original operation and payload.
+Definite conflicts require a protected reload. Account/company changes abort the
+owner and suppress late results. Correction-history browsing, company-wide
+exception queues, overtime and period closing remain separate screens.
+
 ## Implemented foundation
 
 `apps/dashboard` provides password sign-in, configured SSO entry links, session bootstrap, authenticator enrollment/verification, and explicit acknowledgement of one-use recovery codes. The portal includes current-company selection, an authorized company overview, organization directories, parent details and editing, employee onboarding, directories, employment history, dated revisions and scheduled revision cancellation, separately authorized personal profiles with editing/history, lifecycle template catalogs and checklist editing, scoped case/checklist/history views, assigned-task queues, versioned task changes and assignment, company/group headcount reports, audit metadata search, client policy review and versioned editing, a job monitor with cancellation, employee CSV intake, result review and guarded apply/resume/cancel actions, responsive navigation, and English/Indonesian light/dark interfaces. Other business resource screens listed above remain subsequent work; the overview does not invent statistics.

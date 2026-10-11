@@ -892,6 +892,47 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "This record has changed. Refresh before trying again.",
     "Data sudah berubah. Muat ulang sebelum mencoba lagi.",
   ],
+  invalid_attendance_range: ["Select a range of up to 31 days.", "Pilih rentang maksimal 31 hari."],
+  invalid_attendance_review: [
+    "Select a decision and provide a reason.",
+    "Pilih keputusan dan isi alasannya.",
+  ],
+  invalid_attendance_correction: [
+    "Check the attendance times, break and reason.",
+    "Periksa waktu presensi, istirahat, dan alasan.",
+  ],
+  invalid_attendance_local_time: [
+    "Enter valid, unambiguous times in the company timezone.",
+    "Masukkan waktu yang valid dan tidak ambigu dalam zona waktu perusahaan.",
+  ],
+  attendance_not_found: [
+    "The attendance record is no longer available.",
+    "Catatan presensi tidak tersedia.",
+  ],
+  attendance_review_denied: [
+    "You cannot review this attendance record or your own attendance.",
+    "Anda tidak dapat memverifikasi catatan ini atau presensi sendiri.",
+  ],
+  self_correction_denied: [
+    "Your attendance must be corrected by another authorized reviewer.",
+    "Koreksi presensi Anda harus dilakukan reviewer lain yang berwenang.",
+  ],
+  attendance_sequence_conflict: [
+    "Review the clock-in and clock-out sequence first.",
+    "Periksa urutan jam masuk dan pulang terlebih dahulu.",
+  ],
+  attendance_day_corrected: [
+    "This day has a correction. Review the latest record.",
+    "Hari ini sudah memiliki koreksi. Periksa catatan terbaru.",
+  ],
+  attendance_verification_required: [
+    "Resolve pending attendance before recording a correction.",
+    "Selesaikan verifikasi presensi sebelum mencatat koreksi.",
+  ],
+  future_attendance_correction: [
+    "Attendance cannot be corrected for a future work date.",
+    "Presensi untuk tanggal kerja mendatang belum dapat dikoreksi.",
+  ],
   request_conflict: [
     "The action conflicts with the current record. Refresh and review it.",
     "Tindakan tidak sesuai dengan kondisi data saat ini. Muat ulang dan periksa kembali.",

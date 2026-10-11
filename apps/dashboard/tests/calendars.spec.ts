@@ -191,7 +191,8 @@ test("read-only access rejects a pinned foreign calendar and invalid ranges befo
   await page
     .getByRole("button", { name: "View calendar: North Employee (EMP-001)", exact: true })
     .click();
-  await expect(page.getByRole("table").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "North Employee", exact: true })).toBeVisible();
+  await expect(page.getByRole("table", { name: "Work calendar", exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Edit weekly schedule", exact: true })).toHaveCount(
     0,
   );

@@ -5,6 +5,7 @@ import {
   CalendarStar20Regular,
   CalendarWorkWeek20Regular,
   ClipboardTaskListLtr20Regular,
+  Clock20Regular,
   DataBarVertical20Regular,
   History20Regular,
   Home20Regular,
@@ -55,9 +56,11 @@ import { canReadEmployees } from "../../features/people/domain/policies/employee
 import { employeeCreationMessages } from "../../features/people/presentation/i18n/employee-creation-messages";
 import { employeeImportMessages } from "../../features/people/presentation/i18n/employee-import-messages";
 import { canReadHeadcount } from "../../features/reporting/domain/policies/headcount-policy";
+import { canReadAttendance } from "../../features/workforce/domain/policies/attendance-policy";
 import { canReadCalendars } from "../../features/workforce/domain/policies/calendar-policy";
 import { canReadHolidays } from "../../features/workforce/domain/policies/holiday-policy";
 import { canReadShifts } from "../../features/workforce/domain/policies/shift-policy";
+import { attendanceMessages } from "../../features/workforce/presentation/i18n/attendance-messages";
 import { calendarMessages } from "../../features/workforce/presentation/i18n/calendar-messages";
 import { holidayMessages } from "../../features/workforce/presentation/i18n/holiday-messages";
 import { shiftMessages } from "../../features/workforce/presentation/i18n/shift-messages";
@@ -71,6 +74,15 @@ export function portalNavigation(
   const permissions = access?.permissions ?? [];
   return [
     { to: "/", label: text.overview, icon: <Home20Regular /> },
+    ...(canReadAttendance(permissions)
+      ? [
+          {
+            to: "/workforce/attendance",
+            label: attendanceMessages(locale).title,
+            icon: <Clock20Regular />,
+          },
+        ]
+      : []),
     ...(canReadCalendars(permissions)
       ? [
           {

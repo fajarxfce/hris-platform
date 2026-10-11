@@ -13,7 +13,7 @@ import type { useWorkforceEmployees } from "../controllers/use-workforce-employe
 import { calendarMessages } from "../i18n/calendar-messages";
 import type { workforceEmployeeView } from "../models/calendar-view";
 
-export function WorkforceCalendarsPage(props: {
+export function WorkforceEmployeesPage(props: {
   state: ReturnType<typeof useWorkforceEmployees>;
   filters: ReturnType<typeof useWorkforceEmployeeFilters>;
   rows: ReturnType<typeof workforceEmployeeView>;
@@ -23,13 +23,15 @@ export function WorkforceCalendarsPage(props: {
   onFirst: () => void;
   onNext: () => void;
   onOpen: (id: string) => void;
+  labels?: Readonly<{ title: string; directory: string; filters: string; view: string }>;
 }) {
   const { state, filters, locale } = props;
   const text = calendarMessages(locale);
+  const heading = props.labels ?? text;
   return (
     <section aria-busy={state.loading}>
       <AppPageHeader
-        title={text.title}
+        title={heading.title}
         context={props.companyName}
         actions={
           <AppButton
@@ -42,7 +44,7 @@ export function WorkforceCalendarsPage(props: {
         }
       />
       <form onSubmit={filters.apply} noValidate>
-        <AppCommandBar label={text.filters}>
+        <AppCommandBar label={heading.filters}>
           <div className="app-form-actions">
             <AppTextField label={text.query} maxLength={120} {...filters.query} />
             <AppTextField
@@ -67,14 +69,14 @@ export function WorkforceCalendarsPage(props: {
             <Text role="status">{text.empty}</Text>
           ) : (
             <AppResourceTable
-              title={text.directory}
+              title={heading.directory}
               columns={[
                 { id: "number", label: text.number },
                 { id: "name", label: text.name },
                 { id: "status", label: text.status },
               ]}
               rows={props.rows}
-              action={{ label: text.view, onOpen: props.onOpen }}
+              action={{ label: heading.view, onOpen: props.onOpen }}
             />
           ))}
         <fieldset className="app-pagination" aria-label={text.page}>

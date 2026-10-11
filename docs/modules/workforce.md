@@ -83,6 +83,14 @@ Capture accepts up to 31 days of offline history, tolerates at most 30 seconds o
 
 HR corrections are implemented as immutable revisions with optimistic versions and required reasons. They retain original evidence and snapshots, expose a paginated history, and prohibit self-correction. Pending evidence must be resolved first. Later punches on a corrected day remain pending and cannot overwrite the correction; reviewers can reject that evidence or HR can publish another explicit correction. An explicit absence has null clock-in/out and zero break minutes.
 
+The dashboard now exposes bounded employee attendance, daily capture evidence,
+independent review, and versioned corrections in the company timezone. Unknown
+outcomes retain their original request through verification and explicit retry.
+The real API/browser scenario covers offline clock-in/out verification, overnight
+totals, lost responses, a competing correction and preservation of raw evidence.
+Company-wide exception queues and correction-history browsing remain subsequent
+dashboard work.
+
 Overtime requests, actual-time submission, independent staged review, withdrawal, and closed-period snapshots are implemented. Late payroll adjustments, roster reset/bulk editing, and lifecycle cleanup remain planned. Accepted attendance totals are factual inputs; they are not a finalized payroll result.
 
 ## Monthly attendance closing

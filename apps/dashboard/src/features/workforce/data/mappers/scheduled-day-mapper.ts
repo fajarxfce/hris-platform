@@ -16,11 +16,12 @@ export function toShiftSnapshot(dto: ShiftSnapshotDto): ShiftSnapshot {
 export function toScheduledDay(
   dto: ScheduledDayDto,
   workDate: string,
-  scheduleVersion: number | null,
+  scheduleVersion?: number | null,
 ): ScheduledDay {
   if (
     dto.workDate !== workDate ||
-    (dto.origin === "PATTERN" &&
+    (scheduleVersion !== undefined &&
+      dto.origin === "PATTERN" &&
       (scheduleVersion === null ||
         dto.originVersion === null ||
         dto.originVersion > scheduleVersion))

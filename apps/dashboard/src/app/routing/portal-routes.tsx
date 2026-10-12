@@ -7,6 +7,7 @@ import { type Locale, messages } from "../../core/presentation/i18n/messages";
 import type { AdministrationUseCases } from "../../features/administration/presentation/contracts/administration-use-cases";
 import type { ApprovalsUseCases } from "../../features/approvals/presentation/contracts/approvals-use-cases";
 import type { CommunicationsUseCases } from "../../features/communications/presentation/contracts/communications-use-cases";
+import type { DocumentsUseCases } from "../../features/documents/presentation/contracts/documents-use-cases";
 import type {
   CompanyAccess,
   CompanyMembership,
@@ -304,6 +305,12 @@ const WorkforceRoutes = lazy(() =>
   })),
 );
 
+const DocumentsRoutes = lazy(() =>
+  import("../../features/documents/presentation/navigation/documents-routes").then((module) => ({
+    default: module.DocumentsRoutes,
+  })),
+);
+
 export function PortalRoutes({
   clientBuild,
   accountId,
@@ -315,6 +322,7 @@ export function PortalRoutes({
   administration,
   approvals,
   communications,
+  documents,
   jobs,
   leave,
   organization,
@@ -334,6 +342,7 @@ export function PortalRoutes({
   administration: AdministrationUseCases;
   approvals: ApprovalsUseCases;
   communications: CommunicationsUseCases;
+  documents: DocumentsUseCases;
   jobs: JobsUseCases;
   leave: LeaveUseCases;
   organization: OrganizationUseCases;
@@ -346,6 +355,21 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/documents/*"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <DocumentsRoutes
+              accountId={accountId}
+              access={access}
+              documents={documents}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/workforce/*"
         element={

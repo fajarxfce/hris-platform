@@ -1602,3 +1602,26 @@ The existing bounded binary transport and browser file handoff are reused; acqui
 buffers are cleared after handoff, mapping failure or late cancellation. File bytes
 do not enter presentation state or a query cache. The 33 feature boundary tests
 passed alongside dashboard architecture, formatting and TypeScript checks.
+
+## Dashboard document browsing and downloads
+
+Documents now owns its employee directory, folders, document history and revision
+routes. Fluent resource tables keep the published revision separate from unfinished
+replacement files. Company-pinned navigation, explicit refresh, locale/timezone
+formatting and download cancellation follow workspace ownership. Known content
+denials hide details through pending and failed refreshes; MFA recovery does not
+replay a download. Workspace suspension cancels an active file handoff.
+
+Architecture, formatting, TypeScript and all 890 dashboard unit tests passed,
+including 46 document boundary/query/controller cases. Eleven new browser scenarios
+and two navigation regressions passed against production output. Screens were
+inspected at desktop and narrow widths in light/dark themes. The real API/database
+browser scenario verified independent employee discovery, empty folders, HR-only
+upload metadata, revision cancellation and foreign-company rejection.
+
+The development API and worker were updated with document employee discovery while
+preserving private storage, antivirus and WireGuard bindings. A browser then read
+the existing fictional employee's published document and downloaded the actual
+worker-validated PDF. All 605 bytes matched its original file and SHA-256; the
+browser session was logged out and closed. This validates read/download behavior,
+not browser upload authoring or retention controls.

@@ -1,0 +1,39 @@
+import { Navigate, Route, Routes, useLocation, useSearchParams } from "react-router-dom";
+import { DocumentEmployeesScreen } from "../bindings/document-employees-screen";
+import { DocumentFolderScreen } from "../bindings/document-folder-screen";
+import { DocumentReviewScreen } from "../bindings/document-review-screen";
+import { DocumentRevisionScreen } from "../bindings/document-revision-screen";
+import type { DocumentsScreenProps } from "../contracts/documents-screen-props";
+import { documentHref } from "../models/document-route";
+
+export function DocumentsRoutes(props: DocumentsScreenProps) {
+  const [parameters] = useSearchParams(),
+    location = useLocation();
+  // Pin deep links before any feature read; changing company discards old resource references.
+  if (parameters.get("company") !== props.access.companyId) {
+    const scoped = new URLSearchParams(parameters);
+    scoped.set("company", props.access.companyId);
+    return (
+      <Navigate
+        replace
+        to={
+          parameters.has("company")
+            ? documentHref(props.access.companyId)
+            : `${location.pathname}?${scoped}`
+        }
+      />
+    );
+  }
+  return (
+    <Routes>
+      <Route index element={<DocumentEmployeesScreen {...props} />} />
+      <Route path="employees/:employeeId" element={<DocumentFolderScreen {...props} />} />
+      <Route
+        path=":documentId/revisions/:revisionId"
+        element={<DocumentRevisionScreen {...props} />}
+      />
+      <Route path=":documentId" element={<DocumentReviewScreen {...props} />} />
+      <Route path="*" element={<Navigate to={documentHref(props.access.companyId)} replace />} />
+    </Routes>
+  );
+}

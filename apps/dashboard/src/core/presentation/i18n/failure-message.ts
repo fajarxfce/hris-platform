@@ -2,6 +2,26 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  document_not_found: [
+    "This document is unavailable in the current company.",
+    "Dokumen tidak tersedia di perusahaan ini.",
+  ],
+  document_revision_not_found: [
+    "This revision is unavailable for the selected document.",
+    "Revisi tidak tersedia untuk dokumen ini.",
+  ],
+  document_access_denied: [
+    "You no longer have access to this document.",
+    "Anda tidak lagi memiliki akses ke dokumen ini.",
+  ],
+  document_not_ready: [
+    "This revision is not available for download. Refresh to check its current status.",
+    "Revisi belum tersedia untuk di-download. Muat ulang untuk memeriksa status terbaru.",
+  ],
+  invalid_document_page: [
+    "This page reference is invalid. Return to the first page.",
+    "Referensi halaman tidak valid. Kembali ke halaman pertama.",
+  ],
   invalid_schedule_change: [
     "Review the effective date, selected shifts and reason.",
     "Periksa tanggal berlaku, pilihan shift, dan alasan.",

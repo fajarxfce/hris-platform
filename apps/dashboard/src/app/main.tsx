@@ -10,6 +10,7 @@ import { AppErrorBoundary } from "../core/presentation/components/app-error-boun
 import { createAdministrationFeature } from "../features/administration/di/administration-feature";
 import { createApprovalsFeature } from "../features/approvals/di/approvals-feature";
 import { createCommunicationsFeature } from "../features/communications/di/communications-feature";
+import { createDocumentsFeature } from "../features/documents/di/documents-feature";
 import { createIdentityFeature } from "../features/identity/di/identity-feature";
 import { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
 import { createJobsFeature } from "../features/jobs/di/jobs-feature";
@@ -35,6 +36,7 @@ const approvals = createApprovalsFeature(http);
 const communications = createCommunicationsFeature(http);
 const jobs = createJobsFeature(http);
 const files = createBrowserFiles();
+const documents = createDocumentsFeature(http, files);
 const leave = createLeaveFeature(http, files);
 const organization = createOrganizationFeature(http);
 const workforce = createWorkforceFeature(http);
@@ -61,6 +63,7 @@ const router = createBrowserRouter([
           administration={administration}
           approvals={approvals}
           communications={communications}
+          documents={documents}
           jobs={jobs}
           leave={leave}
           organization={organization}

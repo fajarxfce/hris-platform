@@ -495,3 +495,27 @@ The compact rail ignores the desktop search while its field is hidden. Returning
 to the wider sidebar restores the query. The media-query subscription belongs to
 the workspace hook and is released with it. Both resize directions have a browser
 regression test; architecture, type checks and 844 unit tests passed.
+
+## Documents
+
+`/documents` provides bounded employee search under both `documents.read` and
+`people.profile.read`. Employee folders, document history and revision details have
+their own routes. They use the Documents discovery API without depending on the
+general People directory or its availability. A pinned route from another company
+returns to the current directory before acquiring any document.
+
+The published revision remains distinct from a replacement still uploading or
+being validated. Details show file metadata and bounded validation history;
+timestamps use the company timezone. English and Indonesian copy, Fluent command
+bars and resource tables support the existing themes and narrow navigation rail.
+
+Refresh hides prior data until the new read succeeds. Account, company, grant and
+route changes cancel obsolete reads. Download reauthorizes the revision and
+content; one controller owns cancellation without storing bytes in UI state.
+Hiding the authorized workspace also cancels its pending download. A known access
+or availability rejection hides the detail until a successful metadata refresh;
+MFA verification never repeats the download automatically. Browser handoff reports
+that a download started, not that the user saved it.
+
+Upload authoring, processing actions and retention administration remain separate
+workflows.

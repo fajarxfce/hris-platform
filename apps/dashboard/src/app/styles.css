@@ -594,3 +594,41 @@ a {
 .app-record-editor .app-editor-form {
   margin: 0;
 }
+
+.app-document-upload .app-report-content {
+  max-width: 760px;
+  gap: 20px;
+}
+.app-document-upload .app-editor-form {
+  margin-top: 0;
+  gap: 20px;
+}
+.app-document-file {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.app-document-file p {
+  margin: 0;
+  color: var(--colorNeutralForeground3);
+}
+.app-document-file-name {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.app-document-upload .app-loading {
+  padding: 12px 0;
+  justify-items: start;
+}
+.app-document-upload .app-editor-form > .app-form-actions {
+  border-top: 1px solid var(--colorNeutralStroke2);
+  padding-top: 16px;
+}
+.app-document-file legend {
+  padding: 0;
+  margin-bottom: 8px;
+  font-weight: 600;
+}

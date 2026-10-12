@@ -1714,3 +1714,28 @@ responses, immutable replacement identity, reserved operation recovery, invalid
 selection, cancelled acquisition and transport, and loss of upload eligibility.
 Architecture and TypeScript checks passed. The dashboard authoring controls and
 their live storage/worker acceptance are delivered separately.
+
+## Dashboard document authoring
+
+Employee folders and document details now provide upload and replacement forms.
+Revision details offer resume under current server capabilities. The page owns
+selection, progress, pause, immutable retry and file release; raw bytes stay in
+the file/HTTP boundaries. Changed companies cancel obsolete work, while equivalent
+MFA recovery retains a paused command without replay. Completion requires a
+separate validation action before publication. Fluent forms use concise localized
+copy and bounded layouts in both themes.
+
+Architecture, formatting, TypeScript and all 963 dashboard unit tests passed,
+including 99 document cases. Nine upload browser scenarios and twenty existing
+document scenarios passed against production output. Screens were inspected at
+desktop and narrow widths. The isolated API/database scenario created metadata
+through the browser, verified an actual reserved-part continuation when storage
+was unavailable, and recovered a lost cancellation receipt with company isolation.
+
+The development API and worker were updated while preserving private storage,
+antivirus and WireGuard bindings. Browser acceptance uploaded a 2,280,605-byte PDF,
+discarded its first committed part response, resumed from server progress, and
+published it through the actual inspection worker. Its authenticated download
+matched every byte and SHA-256. A replacement resumed after page departure and
+file reselection; cancellation retained the original published revision. Retention
+administration remains outstanding.

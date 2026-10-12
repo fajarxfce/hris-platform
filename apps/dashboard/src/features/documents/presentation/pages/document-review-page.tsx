@@ -5,6 +5,7 @@ import { AppResourceTable } from "../../../../core/presentation/components/app-r
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { DocumentReview } from "../../domain/entities/document-review";
 import { documentMessages } from "../i18n/document-messages";
+import { documentUploadMessages } from "../i18n/document-upload-messages";
 import type { DocumentReadState } from "../models/document-read-state";
 import type { documentProperties, documentRevisionRows } from "../models/document-view";
 import { DocumentPageFrame } from "../widgets/document-page-frame";
@@ -17,6 +18,7 @@ export function DocumentReviewPage(props: {
   locale: Locale;
   companyName: string;
   backTo: string;
+  uploadTo: string | null;
   publishedTo: string | null;
   firstPage: boolean;
   onFirst: () => void;
@@ -32,6 +34,11 @@ export function DocumentReviewPage(props: {
       context={`${props.companyName} / ${text.title}`}
       locale={props.locale}
       back={{ to: props.backTo, label: text.backFolder }}
+      actions={
+        props.uploadTo && (
+          <Link to={props.uploadTo}>{documentUploadMessages(props.locale).replacement}</Link>
+        )
+      }
     >
       {state.data && (
         <>

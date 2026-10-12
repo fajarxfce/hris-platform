@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { documentBytes } from "../tests/fixtures/documents";
 import { createAdminCompany } from "./fixtures/admin-company";
 
-test("real document employee discovery, upload metadata and cancellation remain company-scoped", async ({
+test("real browser upload, reserved part review and cancellation remain company-scoped", async ({
   page,
   context,
 }) => {
@@ -15,9 +15,7 @@ test("real document employee discovery, upload metadata and cancellation remain 
     "Browser Documents",
   );
   const base = `/api/v1/companies/${company}`,
-    employee = randomUUID(),
-    document = randomUUID(),
-    revision = randomUUID();
+    employee = randomUUID();
   const headers = () => ({ [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() });
   const enrolled = await context.request.post(`${base}/employees`, {
     headers: headers(),
@@ -46,23 +44,65 @@ test("real document employee discovery, upload metadata and cancellation remain 
     page.getByText("Belum ada dokumen untuk karyawan ini.", { exact: true }),
   ).toBeVisible();
   const bytes = documentBytes();
-  const started = await context.request.post(`${base}/documents/uploads`, {
-    headers: headers(),
-    data: {
-      documentId: document,
-      revisionId: revision,
-      employmentId: employee,
-      title: "Employment record",
-      classification: "HR_ONLY",
-      expectedDocumentVersion: 0,
-      fileName: "record.pdf",
-      mediaType: "application/pdf",
+  await page.getByRole("link", { name: "Upload dokumen", exact: true }).click();
+  await page.getByLabel("Judul", { exact: true }).fill("Employment record");
+  await page.getByLabel("Kategori", { exact: true }).selectOption("HR_ONLY");
+  await page.getByLabel("Alasan", { exact: true }).fill("Administrative record");
+  const chooser = page.waitForEvent("filechooser");
+  await page.getByRole("button", { name: "Pilih file", exact: true }).click();
+  await (await chooser).setFiles({
+    name: "record.pdf",
+    mimeType: "application/pdf",
+    buffer: Buffer.from(bytes),
+  });
+  await expect(page.getByRole("button", { name: "Ganti file", exact: true })).toBeEnabled();
+  const metadataResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === "POST" &&
+      response.url().endsWith(`${base}/documents/uploads`),
+  );
+  const partResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === "POST" &&
+      response.url().includes(`${base}/documents/revisions/`) &&
+      response.url().endsWith("/chunks"),
+  );
+  await page.getByRole("button", { name: "Mulai upload", exact: true }).click();
+  const started = await metadataResponse;
+  expect(started.status()).toBe(200);
+  const command = started.request().postDataJSON() as {
+    documentId: string;
+    revisionId: string;
+    sha256: string;
+  };
+  const document = command.documentId,
+    revision = command.revisionId;
+  expect(command.sha256).toBe(createHash("sha256").update(bytes).digest("hex"));
+  const header = await context.request.get(`${base}/documents/${document}`);
+  expect(await header.json()).toMatchObject({
+    employmentId: employee,
+    revisionCount: 1,
+    currentRevisionId: null,
+  });
+  const part = await partResponse;
+  // This isolated API has no object storage. Reservation and its recovery metadata are real.
+  expect(part.status()).toBe(503);
+  expect(await part.json()).toMatchObject({ code: "object_storage_not_configured" });
+  await expect(page.getByRole("status")).toContainText("Upload terhenti.");
+  const reserved = await context.request.get(`${base}/documents/revisions/${revision}`);
+  expect(await reserved.json()).toMatchObject({
+    uploadContinuation: {
+      operationId: part.request().headers()["idempotency-key"],
+      offset: 0,
       size: bytes.length,
-      sha256: createHash("sha256").update(bytes).digest("hex"),
-      reason: "Administrative record",
+      attempts: 1,
     },
   });
-  expect(started.status()).toBe(200);
+  await page.getByRole("link", { name: "Kembali", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Tinggalkan halaman", exact: true })
+    .click();
   await page.getByRole("button", { name: "Muat ulang", exact: true }).click();
   await page.getByRole("button", { name: "Buka dokumen: Employment record", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Employment record", exact: true })).toBeVisible();

@@ -1,9 +1,15 @@
 import { useMemo } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
+import { canCreateCompanyDocument } from "../../domain/policies/document-upload-policy";
 import type { DocumentsScreenProps } from "../contracts/documents-screen-props";
 import { useDocumentFolder } from "../controllers/use-document-reads";
-import { documentHref, documentParameters, documentPath } from "../models/document-route";
+import {
+  documentFolderPath,
+  documentHref,
+  documentParameters,
+  documentPath,
+} from "../models/document-route";
 import { documentRows } from "../models/document-view";
 import { DocumentFolderPage } from "../pages/document-folder-page";
 
@@ -23,6 +29,11 @@ export function DocumentFolderScreen(props: DocumentsScreenProps) {
       {...props}
       state={state}
       rows={rows}
+      uploadTo={
+        state.data && canCreateCompanyDocument(props.access.permissions)
+          ? documentHref(props.access.companyId, `${documentFolderPath(employeeId)}/upload`)
+          : null
+      }
       backTo={documentHref(props.access.companyId)}
       firstPage={after === null}
       onFirst={() => setParameters(documentParameters(props.access.companyId))}

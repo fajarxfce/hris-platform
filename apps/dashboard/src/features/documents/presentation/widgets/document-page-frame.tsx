@@ -17,6 +17,7 @@ export function DocumentPageFrame(props: {
   refresh: () => void;
   back?: Readonly<{ to: string; label: string }>;
   children?: ReactNode;
+  actions?: ReactNode;
 }) {
   return (
     <section aria-busy={props.loading}>
@@ -26,6 +27,7 @@ export function DocumentPageFrame(props: {
         actions={
           <>
             {props.back && <Link to={props.back.to}>{props.back.label}</Link>}
+            {props.actions}
             <AppButton
               appearance="subtle"
               icon={<ArrowClockwise20Regular />}

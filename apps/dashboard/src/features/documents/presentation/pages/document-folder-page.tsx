@@ -1,8 +1,10 @@
 import { Text } from "@fluentui/react-components";
+import { Link } from "react-router-dom";
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { DocumentFolder } from "../../domain/entities/document-folder";
 import { documentMessages } from "../i18n/document-messages";
+import { documentUploadMessages } from "../i18n/document-upload-messages";
 import type { DocumentReadState } from "../models/document-read-state";
 import type { documentRows } from "../models/document-view";
 import { DocumentPageFrame } from "../widgets/document-page-frame";
@@ -14,6 +16,7 @@ export function DocumentFolderPage(props: {
   locale: Locale;
   companyName: string;
   backTo: string;
+  uploadTo: string | null;
   firstPage: boolean;
   onFirst: () => void;
   onNext: () => void;
@@ -28,6 +31,11 @@ export function DocumentFolderPage(props: {
       context={`${props.companyName} / ${text.title}`}
       locale={props.locale}
       back={{ to: props.backTo, label: text.back }}
+      actions={
+        props.uploadTo && (
+          <Link to={props.uploadTo}>{documentUploadMessages(props.locale).new}</Link>
+        )
+      }
     >
       {state.data && (
         <>

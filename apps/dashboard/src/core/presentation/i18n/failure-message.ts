@@ -2,6 +2,82 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  object_storage_not_configured: [
+    "Document storage has not been configured. Contact an administrator.",
+    "Penyimpanan dokumen belum dikonfigurasi. Hubungi administrator.",
+  ],
+  object_storage_unavailable: [
+    "Document storage is unavailable. Try again later.",
+    "Penyimpanan dokumen belum tersedia. Coba lagi nanti.",
+  ],
+  object_storage_busy: [
+    "Document storage is busy. Wait briefly, then retry.",
+    "Penyimpanan dokumen sedang sibuk. Tunggu sebentar, lalu coba lagi.",
+  ],
+  object_storage_failure: [
+    "The file could not be stored. Retry the same upload.",
+    "File belum dapat disimpan. Coba lagi upload yang sama.",
+  ],
+  document_file_required: [
+    "Select a file before starting the upload.",
+    "Pilih file sebelum memulai upload.",
+  ],
+  invalid_document_file: [
+    "Select a PDF, JPG or PNG of up to 100 MiB with a valid file name.",
+    "Pilih PDF, JPG, atau PNG maksimal 100 MiB dengan nama file yang valid.",
+  ],
+  document_file_mismatch: [
+    "Select the same file used to start this upload. Its contents must match.",
+    "Pilih file yang digunakan untuk memulai upload ini. Isi file harus sama.",
+  ],
+  invalid_document_upload: [
+    "Enter a title of up to 160 characters, choose a category and provide a reason of up to 1,000 characters.",
+    "Isi judul maksimal 160 karakter, pilih kategori, dan masukkan alasan maksimal 1.000 karakter.",
+  ],
+  document_upload_active: [
+    "Another revision is still being processed. Complete or cancel it before uploading a replacement.",
+    "Revisi lain masih diproses. Selesaikan atau batalkan sebelum meng-upload penggantinya.",
+  ],
+  document_upload_capacity: [
+    "The upload limit has been reached. Complete or cancel an unfinished upload first.",
+    "Batas upload tercapai. Selesaikan atau batalkan upload yang belum selesai.",
+  ],
+  document_revision_limit: [
+    "This document has reached its revision limit.",
+    "Dokumen sudah mencapai batas jumlah revisi.",
+  ],
+  document_storage_quota: [
+    "The company document storage quota has been reached.",
+    "Kuota penyimpanan dokumen perusahaan sudah penuh.",
+  ],
+  document_identity_mismatch: [
+    "The document details changed. Reload before uploading a revision.",
+    "Detail dokumen berubah. Muat ulang sebelum meng-upload revisi.",
+  ],
+  document_chunk_in_progress: [
+    "The previous upload request is still active. Wait briefly, then retry.",
+    "Request upload sebelumnya masih aktif. Tunggu sebentar, lalu coba lagi.",
+  ],
+  document_chunk_reserved: [
+    "A file part is reserved by another request. Retry to check the current upload.",
+    "Bagian file sedang ditangani request lain. Coba lagi untuk memeriksa upload terbaru.",
+  ],
+  document_chunk_attempts_exhausted: [
+    "The upload attempt limit has been reached. Cancel this revision before replacing it.",
+    "Batas percobaan upload tercapai. Batalkan revisi ini sebelum menggantinya.",
+  ],
+  document_offset_mismatch: [
+    "Upload progress changed. Retry to continue from the confirmed position.",
+    "Progres upload berubah. Coba lagi untuk melanjutkan dari posisi yang sudah diterima.",
+  ],
+  document_chunk_digest_mismatch: [
+    "The file part could not be verified. Retry with the same file.",
+    "Bagian file tidak dapat diverifikasi. Coba lagi dengan file yang sama.",
+  ],
+  storage_unavailable: [
+    "Document storage is unavailable. Retry when the service is available.",
+    "Penyimpanan dokumen belum tersedia. Coba lagi saat layanan tersedia.",
+  ],
   file_capacity_exceeded: [
     "Close another upload before selecting a new file.",
     "Tutup upload lain sebelum memilih file baru.",

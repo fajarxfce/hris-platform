@@ -4,6 +4,7 @@ import { DocumentEmployeesScreen } from "../bindings/document-employees-screen";
 import { DocumentFolderScreen } from "../bindings/document-folder-screen";
 import { DocumentReviewScreen } from "../bindings/document-review-screen";
 import { DocumentRevisionScreen } from "../bindings/document-revision-screen";
+import { DocumentUploadScreen } from "../bindings/document-upload-screen";
 import type { DocumentsScreenProps } from "../contracts/documents-screen-props";
 import { documentHref } from "../models/document-route";
 
@@ -28,6 +29,18 @@ export function DocumentsRoutes(props: DocumentsScreenProps) {
   return (
     <Routes>
       <Route index element={<DocumentEmployeesScreen {...props} />} />
+      <Route
+        path="employees/:employeeId/upload"
+        element={<DocumentUploadScreen {...props} kind="new" />}
+      />
+      <Route
+        path=":documentId/upload"
+        element={<DocumentUploadScreen {...props} kind="replacement" />}
+      />
+      <Route
+        path=":documentId/revisions/:revisionId/upload"
+        element={<DocumentUploadScreen {...props} kind="resume" />}
+      />
       <Route path="employees/:employeeId" element={<DocumentFolderScreen {...props} />} />
       <Route
         path=":documentId/revisions/:revisionId/:intent"

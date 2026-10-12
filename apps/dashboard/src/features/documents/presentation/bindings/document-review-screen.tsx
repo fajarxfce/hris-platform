@@ -1,12 +1,14 @@
 import { useMemo } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
+import { canCreateCompanyDocument } from "../../domain/policies/document-upload-policy";
 import type { DocumentsScreenProps } from "../contracts/documents-screen-props";
 import { useDocumentReview } from "../controllers/use-document-reads";
 import {
   documentFolderPath,
   documentHref,
   documentParameters,
+  documentPath,
   documentRevisionPath,
 } from "../models/document-route";
 import { documentProperties, documentRevisionRows } from "../models/document-view";
@@ -35,6 +37,13 @@ export function DocumentReviewScreen(props: DocumentsScreenProps) {
       {...props}
       {...view}
       state={state}
+      uploadTo={
+        state.data &&
+        state.data.document.revisionCount < 100 &&
+        canCreateCompanyDocument(props.access.permissions)
+          ? documentHref(props.access.companyId, `${documentPath(documentId)}/upload`)
+          : null
+      }
       firstPage={after === null}
       backTo={documentHref(
         props.access.companyId,

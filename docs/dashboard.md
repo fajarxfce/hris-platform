@@ -529,4 +529,21 @@ conflicts require a new review. Departure protection covers edits and pending or
 unconfirmed commands; replacing the workspace cancels obsolete work. Known access
 loss hides metadata until a successful authorized review.
 
-Upload authoring and retention administration remain separate workflows.
+Employee folders provide **Upload document**; document details provide **Upload
+revision**. These administrative actions require both management grants as well
+as the existing read scope. Replacement uploads preserve the document's employee,
+title, category and observed version. **Resume upload** is available only from a
+current revision capability.
+
+The form accepts PDF, JPG and PNG files up to 100 MiB. It verifies the selected
+file, sends bounded parts and shows committed progress. Pause stops local work;
+explicit retry continues the same immutable command from current server progress.
+A lost response stays pinned through MFA recovery and later rejection. Upload
+completion links to validation without claiming the file is already published.
+
+The page owns its selected file until completion or departure. Closing it releases
+that local reference; an unfinished server revision remains in history. Resume
+requires selecting a file with identical content. Browser file references and
+commands are not persisted as an offline draft. Company replacement cancels the
+old owner; equivalent workspace suspension pauses delivery without replaying it.
+Retention administration remains separate delivery work.

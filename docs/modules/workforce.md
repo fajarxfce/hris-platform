@@ -199,3 +199,11 @@ without consuming the operation. The original receipt is recovered before
 comparing today's calendar, and changing or removing a sent revision cannot reuse
 that receipt key. The field remains optional for existing clients; their operation
 identity is unchanged. This content revision grants no permission or reservation.
+
+Dashboard planning contracts use the dedicated discovery and review endpoints.
+Domain validates requested intervals, company-local work dates, regular-shift
+overlap and immutable command context. A retained command needs employee identity,
+employment version and calendar preconditions, without retaining display names or
+shift metadata. Repository mapping rejects inconsistent reviews and receipts that
+do not identify the new request at revision zero. Read acquisition and mapping
+share the HTTP failure boundary, including cancellation and late responses.

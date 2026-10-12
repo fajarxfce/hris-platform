@@ -992,6 +992,46 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Choose valid dates covering up to 62 days and a valid overtime status.",
     "Pilih tanggal yang valid dengan rentang maksimal 62 hari dan status lembur yang valid.",
   ],
+  invalid_overtime_request: [
+    "Check the employee, requested time and reason.",
+    "Periksa karyawan, waktu yang diajukan, dan alasan.",
+  ],
+  invalid_overtime_planning_revision: [
+    "Review the work schedule again before creating this request.",
+    "Tinjau kembali jadwal kerja sebelum membuat pengajuan.",
+  ],
+  overtime_planning_changed: [
+    "The reviewed schedule has changed. Load the current schedule and check the requested time.",
+    "Jadwal yang ditinjau telah berubah. Muat jadwal terbaru dan periksa waktu yang diajukan.",
+  ],
+  overtime_date_out_of_range: [
+    "Choose a work date within the preceding 31 days or the next 90 days in the company timezone.",
+    "Pilih tanggal kerja dalam 31 hari sebelumnya atau 90 hari berikutnya sesuai timezone perusahaan.",
+  ],
+  overtime_employment_inactive: [
+    "This employee is not eligible for overtime on the selected date.",
+    "Karyawan tidak memenuhi syarat lembur pada tanggal yang dipilih.",
+  ],
+  overtime_schedule_missing: [
+    "Assign a work schedule or day off before creating an overtime request for this date.",
+    "Tetapkan jadwal kerja atau hari libur sebelum membuat pengajuan lembur untuk tanggal ini.",
+  ],
+  overtime_month_capacity: [
+    "This employee has reached the monthly overtime request limit.",
+    "Jumlah pengajuan lembur karyawan telah mencapai batas bulanan.",
+  ],
+  overtime_overlap: [
+    "The requested time overlaps another active overtime request.",
+    "Waktu yang diajukan tumpang tindih dengan pengajuan lembur aktif lainnya.",
+  ],
+  overtime_overlaps_shift: [
+    "Requested overtime must be outside the regular work shift.",
+    "Waktu lembur harus berada di luar shift kerja reguler.",
+  ],
+  overtime_work_date_mismatch: [
+    "Check the requested time against the selected work date and company timezone.",
+    "Periksa waktu yang diajukan sesuai tanggal kerja dan timezone perusahaan.",
+  ],
   overtime_request_not_found: [
     "The overtime request was not found or is no longer accessible.",
     "Pengajuan lembur tidak ditemukan atau tidak dapat diakses.",

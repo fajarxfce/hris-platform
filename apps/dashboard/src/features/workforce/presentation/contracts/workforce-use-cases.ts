@@ -7,13 +7,16 @@ import type { LoadCalendarReview } from "../../domain/usecases/load-calendar-rev
 import type { LoadEmployeeAttendance } from "../../domain/usecases/load-employee-attendance";
 import type { LoadHoliday } from "../../domain/usecases/load-holiday";
 import type { LoadHolidays } from "../../domain/usecases/load-holidays";
+import type { LoadOvertimePlanningEmployees } from "../../domain/usecases/load-overtime-planning-employees";
 import type { LoadOvertimeRequest } from "../../domain/usecases/load-overtime-request";
 import type { LoadOvertimeRequests } from "../../domain/usecases/load-overtime-requests";
 import type { LoadShift } from "../../domain/usecases/load-shift";
 import type { LoadShifts } from "../../domain/usecases/load-shifts";
 import type { LoadWorkforceEmployees } from "../../domain/usecases/load-workforce-employees";
+import type { PlanOvertimeRequest } from "../../domain/usecases/plan-overtime-request";
 import type { ReviewAttendance } from "../../domain/usecases/review-attendance";
 import type { ReviewOvertimeAction } from "../../domain/usecases/review-overtime-action";
+import type { ReviewOvertimePlan } from "../../domain/usecases/review-overtime-plan";
 import type { SaveHoliday } from "../../domain/usecases/save-holiday";
 import type { SaveShift } from "../../domain/usecases/save-shift";
 import type { SetRosterDay } from "../../domain/usecases/set-roster-day";
@@ -21,6 +24,9 @@ import type { SubmitOvertimeActual } from "../../domain/usecases/submit-overtime
 import type { WithdrawOvertimeRequest } from "../../domain/usecases/withdraw-overtime-request";
 
 export type WorkforceUseCases = Readonly<{
+  loadOvertimePlanningEmployees: Pick<LoadOvertimePlanningEmployees, "execute">;
+  reviewOvertimePlan: Pick<ReviewOvertimePlan, "execute">;
+  planOvertimeRequest: Pick<PlanOvertimeRequest, "execute">;
   reviewOvertimeAction: Pick<ReviewOvertimeAction, "execute">;
   submitOvertimeActual: Pick<SubmitOvertimeActual, "execute">;
   decideOvertimeRequest: Pick<DecideOvertimeRequest, "execute">;

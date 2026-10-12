@@ -1,7 +1,10 @@
 import { safeHttpCall } from "../../../../core/data/http/safe-http-call";
 import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
+import type { EmployeeId } from "../../../people/domain/entities/employee";
 import type { OvertimeActualSubmission } from "../../domain/entities/overtime-actual-submission";
 import type { OvertimeDecision } from "../../domain/entities/overtime-decision";
+import type { OvertimePlan } from "../../domain/entities/overtime-plan";
+import type { OvertimePlanningSearch } from "../../domain/entities/overtime-planning-search";
 import type { OvertimeRequestId } from "../../domain/entities/overtime-request";
 import type { OvertimeRequestChange } from "../../domain/entities/overtime-request-change";
 import type { OvertimeSearch } from "../../domain/entities/overtime-search";
@@ -15,9 +18,47 @@ import {
 } from "../mappers/overtime-action-mapper";
 import { toOvertimeDetails } from "../mappers/overtime-details-mapper";
 import { toOvertimePage } from "../mappers/overtime-page-mapper";
+import {
+  toOvertimePlanDto,
+  toOvertimePlanningReview,
+  toOvertimePlanReceipt,
+} from "../mappers/overtime-planning-mapper";
+import { toWorkforceEmployeePage } from "../mappers/workforce-employee-mapper";
 
 export class RemoteOvertimeRepository implements OvertimeRepository {
   constructor(private readonly source: OvertimeDataSource) {}
+  planningEmployees(company: CompanyId, search: OvertimePlanningSearch, signal: AbortSignal) {
+    return safeHttpCall(signal, async () =>
+      toWorkforceEmployeePage(
+        await this.source.planningEmployees(company, search, signal),
+        company,
+        { asOf: search.workDate, query: search.query, after: search.after },
+      ),
+    );
+  }
+  planningReview(
+    company: CompanyId,
+    employeeId: EmployeeId,
+    workDate: string,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toOvertimePlanningReview(
+        await this.source.planningReview(company, employeeId, workDate, signal),
+        company,
+        employeeId,
+        workDate,
+      ),
+    );
+  }
+  plan(company: CompanyId, operation: OperationId, plan: OvertimePlan, signal: AbortSignal) {
+    return safeHttpCall(signal, async () =>
+      toOvertimePlanReceipt(
+        await this.source.plan(company, operation, toOvertimePlanDto(plan), signal),
+        plan,
+      ),
+    );
+  }
   submitActual(
     company: CompanyId,
     operation: OperationId,

@@ -4,3 +4,5 @@ export type OvertimeInterval = Readonly<{
   breakMinutes: number;
   workedMinutes: number;
 }>;
+
+export type OvertimeIntervalInput = Readonly<Omit<OvertimeInterval, "workedMinutes">>;

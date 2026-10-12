@@ -1,3 +1,3 @@
-import type { OvertimeInterval } from "./overtime-interval";
+import type { OvertimeIntervalInput } from "./overtime-interval";
 
-export type OvertimeActualTime = Readonly<Omit<OvertimeInterval, "workedMinutes">>;
+export type OvertimeActualTime = OvertimeIntervalInput;

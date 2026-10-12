@@ -2103,3 +2103,23 @@ changed calendars, complete rejection rollback, fresh-review recovery, exact
 receipt replay, malformed revisions and foreign-company review references. Two
 new pure policy cases verify stable content and changes to scope, employment,
 timezone, schedule origin, holiday and shift evidence. No migration is required.
+
+## Dashboard overtime planning contracts
+
+Added domain/data contracts for employee discovery, planning review and request
+creation. The command pins the observed employment and calendar revision, uses
+company-local dates and shares interval limits with actual-time submission. A
+new request's receipt must retain its original ID and revision zero. Explicit
+retry performs no intervening read that could replace the original command.
+
+Architecture, Biome, TypeScript and all 1,323 dashboard unit tests passed. The 32
+new cases cover bounded discovery, independent grants, immutable review mapping,
+invalid responses, exact receipt identity, minute precision, breaks, overnight
+work, regular-shift overlap, daylight-saving dates and cancellation. Calendar-date
+formatting is now a shared pure domain function; its existing presentation API
+and tests remain compatible.
+
+Development API and worker images were rebuilt from validated JARs and restarted
+with the document-services and WireGuard overlays. Database, Garage and ClamAV
+remained healthy; API readiness was UP and the VPN dashboard returned HTTP 200.
+No migration or mobile APK changed. Dashboard planning presentation remains next.

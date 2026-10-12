@@ -18,13 +18,16 @@ import { LoadCalendarReview } from "../domain/usecases/load-calendar-review";
 import { LoadEmployeeAttendance } from "../domain/usecases/load-employee-attendance";
 import { LoadHoliday } from "../domain/usecases/load-holiday";
 import { LoadHolidays } from "../domain/usecases/load-holidays";
+import { LoadOvertimePlanningEmployees } from "../domain/usecases/load-overtime-planning-employees";
 import { LoadOvertimeRequest } from "../domain/usecases/load-overtime-request";
 import { LoadOvertimeRequests } from "../domain/usecases/load-overtime-requests";
 import { LoadShift } from "../domain/usecases/load-shift";
 import { LoadShifts } from "../domain/usecases/load-shifts";
 import { LoadWorkforceEmployees } from "../domain/usecases/load-workforce-employees";
+import { PlanOvertimeRequest } from "../domain/usecases/plan-overtime-request";
 import { ReviewAttendance } from "../domain/usecases/review-attendance";
 import { ReviewOvertimeAction } from "../domain/usecases/review-overtime-action";
+import { ReviewOvertimePlan } from "../domain/usecases/review-overtime-plan";
 import { SaveHoliday } from "../domain/usecases/save-holiday";
 import { SaveShift } from "../domain/usecases/save-shift";
 import { SetRosterDay } from "../domain/usecases/set-roster-day";
@@ -38,6 +41,9 @@ export function createWorkforceFeature(http: HttpClient) {
   const holidays = new RemoteHolidayRepository(new HttpHolidayDataSource(http));
   const overtime = new RemoteOvertimeRepository(new HttpOvertimeDataSource(http));
   return {
+    loadOvertimePlanningEmployees: new LoadOvertimePlanningEmployees(overtime),
+    reviewOvertimePlan: new ReviewOvertimePlan(overtime),
+    planOvertimeRequest: new PlanOvertimeRequest(overtime),
     reviewOvertimeAction: new ReviewOvertimeAction(overtime),
     submitOvertimeActual: new SubmitOvertimeActual(overtime),
     decideOvertimeRequest: new DecideOvertimeRequest(overtime),

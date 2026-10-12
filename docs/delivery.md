@@ -2146,3 +2146,19 @@ also passed, including lost-response recovery, maker exclusion, employee-owned
 reads and foreign-company rejection. The scenario cleaned up its disposable
 database. No additional backend deployment or mobile APK was needed. Monthly
 attendance closing is the next workforce dashboard increment.
+
+## Monthly closing session assurance
+
+Period lists, published employee snapshots, closing and recovery now validate
+current session assurance after their guards and before returning private data
+or committing. Late expiry rolls back the period, job, targets, journal and
+operation receipt together. Background execution retains its existing credential
+and fenced-lease checks.
+
+Architecture and Kotlin formatting checks, 39 workforce domain tests and 40
+selected API/contract tests passed. Twelve new database-backed cases cover expiry
+at a guard, expiry after acquisition, cancellation, rollback and explicit receipt
+recovery. Both application JARs built. The 38 worker cases passed across the main
+run and a focused rerun: five existing closing fixtures needed an enrolled MFA
+account and proof to invoke the newly protected interactive start command.
+No migration, development deployment or mobile APK changed in this increment.

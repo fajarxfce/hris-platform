@@ -56,6 +56,12 @@ Attendance capture, capture windows, verification, corrections, daily reads and
 correction history apply the same interactive assurance policy after their guards.
 An original receipt retains its data but still requires current session assurance.
 
+Interactive monthly attendance closing, recovery, period lists and published
+snapshot reads use the same post-guard session policy. They recheck assurance
+after acquisition and before returning private results or completing a write.
+A late failure rolls back period/job changes, targets, journal and receipt together.
+Background closing retains its separate initiating-credential and lease authority.
+
 Overtime reads and commands apply the identity session policy after their resource
 and access guards. They check current assurance again before releasing private
 results or completing a transaction, including receipt replay. A late failed

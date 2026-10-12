@@ -1,7 +1,8 @@
 package dev.fajar.hris.workforce.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.jobs.domain.entities.*
@@ -22,6 +23,8 @@ class RecoverWorkPeriod(
     private val members: MembershipRepository,
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
+    private val security: IdentitySecurityPolicy,
+    private val clock: Clock,
 ) {
     fun execute(
         actor: Actor,
@@ -62,16 +65,17 @@ class RecoverWorkPeriod(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val current = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, current, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val permission = live.requirePermission("workforce.close")
             if (permission is Result.Failed) return@run permission
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run validateCompanySessionActor(actor, current, clock.instant(), security)
+                    .map { receipt }
             }
             if (jobId == null)
                 return@run Result.Failed(
@@ -103,6 +107,9 @@ class RecoverWorkPeriod(
                         ),
                     )
                     .flatMap { operations.record(actor, key, receipt) }
+                    .flatMap {
+                        validateCompanySessionActor(actor, current, clock.instant(), security)
+                    }
                     .map { receipt }
             }
         }

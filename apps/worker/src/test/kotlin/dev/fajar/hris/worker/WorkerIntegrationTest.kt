@@ -94,7 +94,7 @@ class WorkerIntegrationTest {
             )
         database()
             .update(
-                "insert into accounts(id,email,display_name) values(?,?,'Worker operator')",
+                "insert into accounts(id,email,display_name,mfa_secret_encrypted) values(?,?,'Worker operator','fixture-enrolled')",
                 account,
                 "$account@example.test",
             )
@@ -118,6 +118,7 @@ class WorkerIntegrationTest {
                 Instant.now(),
                 UUID.randomUUID(),
                 credentialVersion = 0,
+                mfaVerifiedAt = Instant.now(),
             )
         val response =
             start.execute(

@@ -1,7 +1,8 @@
 package dev.fajar.hris.workforce.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
@@ -20,6 +21,7 @@ class GetWorkPeriodSnapshot(
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(actor: Actor, month: YearMonth, employeeId: UUID): Result<WorkPeriodSnapshot> {
         if (month.year !in 2000..2100)
@@ -36,10 +38,10 @@ class GetWorkPeriodSnapshot(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val employee = people.find(company, employeeId, month.atEndOfMonth())
@@ -62,7 +64,11 @@ class GetWorkPeriodSnapshot(
                     Failure(FailureKind.NOT_FOUND, "work_period_snapshot_unavailable")
                 )
             periods.snapshot(company, jobId, employeeId).flatMap { snapshot ->
-                snapshot?.let { Result.Success(it) }
+                snapshot?.let {
+                    validateCompanySessionActor(actor, access, clock.instant(), security).map {
+                        snapshot
+                    }
+                }
                     ?: Result.Failed(
                         Failure(FailureKind.NOT_FOUND, "work_period_snapshot_unavailable")
                     )

@@ -544,6 +544,7 @@ class WorkforceConfiguration {
         overtime: OvertimeRepository,
         identities: IdentityRepository,
         members: MembershipRepository,
+        security: IdentitySecurityPolicy,
     ) =
         StartWorkPeriodClose(
             periods,
@@ -558,6 +559,7 @@ class WorkforceConfiguration {
             overtime,
             identities,
             members,
+            security,
         )
 
     @Bean
@@ -608,6 +610,8 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
     ) =
         RecoverWorkPeriod(
             periods,
@@ -618,6 +622,8 @@ class WorkforceConfiguration {
             members,
             identities,
             transactions,
+            security,
+            clock,
         )
 
     @Bean
@@ -627,7 +633,9 @@ class WorkforceConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListWorkPeriods(periods, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListWorkPeriods(periods, companies, members, identities, transactions, security, clock)
 
     @Bean
     fun getWorkPeriodSnapshot(
@@ -638,7 +646,18 @@ class WorkforceConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetWorkPeriodSnapshot(periods, people, companies, members, identities, transactions, clock)
+        security: IdentitySecurityPolicy,
+    ) =
+        GetWorkPeriodSnapshot(
+            periods,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean fun overtimeSource(sql: DSLContext): OvertimeDataSource = PostgresOvertimeDataSource(sql)
 

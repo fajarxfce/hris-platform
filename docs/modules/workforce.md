@@ -130,6 +130,11 @@ Closing steps recheck the initiating credential version and live company/member/
 
 `GET /workforce/periods?from=yyyy-MM&until=yyyy-MM` covers up to 24 months. `GET /workforce/periods/{yyyy-MM}/employees/{id}` returns a closed employee snapshot under current HR/team/self scope. Employment or leave changes do not rewrite these facts; downstream payroll must validate their applicability separately.
 
+Interactive closing, recovery and these reads recheck current MFA after their
+guards and after acquisition. A proof that expires during the operation cannot
+release private data, a receipt, or partial closing state. Cancellation unwinds
+the transaction and its locks; a later explicit retry retains the same operation.
+
 
 ## Overtime requests
 

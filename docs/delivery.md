@@ -1532,3 +1532,18 @@ was persisted in the existing WireGuard firewall configuration. Other isolation
 rules were retained. An HTTP health request from the phone over WireGuard returned
 200. HRIS Mobile separately verified sign-in, company selection and process
 restoration on the emulator without ADB reverse; phone installation was install-only.
+
+## Mobile document upload
+
+[HRIS Mobile d4cdd58](https://github.com/fajarxfce/hris-mobile/commit/d4cdd58)
+adds scoped confirmation, encrypted resumable delivery, server processing status,
+explicit recovery and cancellation. Mobile root checks passed with 684 desktop/JVM
+tests, the sync/application Chromium suites passed 12 tests, and Android dev plus
+production Web builds passed. The API 35 emulator uploaded a 607-byte PDF to the
+running development API, reached server `READY` after inspection, and restored the
+local record after process restart. Phone ADB was unavailable for this increment.
+
+The integration exposed a foreground scheduler dependency cycle. Its correction
+and generated-DI regression also landed in Compose Fluent Starter, which passed
+its own root checks, sync Chromium suite and Android dev build. Authenticated mobile
+downloads and administrative document workflows retain their own delivery work.

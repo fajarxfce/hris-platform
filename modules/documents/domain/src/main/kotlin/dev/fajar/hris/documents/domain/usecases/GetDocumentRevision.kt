@@ -73,20 +73,63 @@ class GetDocumentRevision(
                 else Result.Success(null)
             if (job is Result.Failed) return@run job
             val currentJob = (job as Result.Success).value
+            val upload =
+                if (
+                    canManageDocument(live, document.classification, ownerAccountId) &&
+                        documentStatus(revision, clock.instant()) ==
+                            DocumentRevisionStatus.UPLOADING &&
+                        revision.uploadedBytes < revision.size
+                )
+                    documents.chunkAt(
+                        company,
+                        id,
+                        (revision.uploadedBytes / DOCUMENT_CHUNK_BYTES + 1).toInt(),
+                    )
+                else Result.Success(null)
+            if (upload is Result.Failed) return@run upload
+            val currentUpload = (upload as Result.Success).value
+            if (
+                currentUpload != null &&
+                    (currentUpload.revisionId != revision.id ||
+                        currentUpload.offset != revision.uploadedBytes ||
+                        currentUpload.size.toLong() !=
+                            minOf(
+                                DOCUMENT_CHUNK_BYTES.toLong(),
+                                revision.size - revision.uploadedBytes,
+                            ))
+            )
+                return@run Result.Failed(
+                    Failure(FailureKind.UNEXPECTED, "document_upload_state_invalid")
+                )
             val now = clock.instant()
             val assurance = validateCompanySessionActor(actor, identity, now, security)
             if (assurance is Result.Failed) return@run assurance
+            val actions =
+                documentRevisionActions(
+                    live,
+                    document.classification,
+                    ownerAccountId,
+                    revision,
+                    currentJob?.status,
+                    now,
+                    currentUpload,
+                )
             Result.Success(
                 DocumentRevisionDetails(
                     projectDocumentRevision(revision, currentJob, now),
-                    documentRevisionActions(
-                        live,
-                        document.classification,
-                        ownerAccountId,
-                        revision,
-                        currentJob?.status,
-                        now,
-                    ),
+                    actions,
+                    if (DocumentRevisionAction.UPLOAD_CONTENT in actions)
+                        currentUpload?.let {
+                            DocumentUploadContinuation(
+                                it.id,
+                                it.offset,
+                                it.size,
+                                it.sha256,
+                                it.attempts,
+                                it.leaseUntil?.takeIf { expiry -> expiry.isAfter(now) },
+                            )
+                        }
+                    else null,
                 )
             )
         }

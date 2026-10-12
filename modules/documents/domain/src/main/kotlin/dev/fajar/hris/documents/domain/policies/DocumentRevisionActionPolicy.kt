@@ -14,6 +14,7 @@ fun documentRevisionActions(
     revision: DocumentRevision,
     validationStatus: JobStatus?,
     at: Instant,
+    upload: DocumentUploadChunk? = null,
 ): List<DocumentRevisionAction> {
     if (
         !canManageDocument(actor, classification, ownerAccountId) ||
@@ -21,6 +22,15 @@ fun documentRevisionActions(
     )
         return emptyList()
     return buildList {
+        if (
+            documentStatus(revision, at) == DocumentRevisionStatus.UPLOADING &&
+                revision.uploadedBytes < revision.size &&
+                (upload == null ||
+                    (!upload.committed &&
+                        upload.createdBy == actor.accountId &&
+                        upload.attempts < 8))
+        )
+            add(DocumentRevisionAction.UPLOAD_CONTENT)
         if (
             documentStatus(revision, at) in ACTIVE_DOCUMENT_STATUSES &&
                 revision.uploadedBytes == revision.size &&

@@ -1683,3 +1683,19 @@ including 64 file/HTTP boundary cases. Twenty-six existing CSV-intake and docume
 browser scenarios passed against production output. The new input adapters still
 need their document-authoring UI and API acceptance; these checks do not establish
 whole-workflow upload performance.
+
+## Resumable document review
+
+Current revision details now expose upload eligibility and, when needed, the
+original reserved part request for its authorized operator. A different operator
+may cancel an unfinished upload but cannot acquire that request reference. History
+rows omit continuation metadata. Expiry, exhausted attempts and current grants
+limit eligibility; session assurance is checked again after reading pending work.
+
+Architecture, formatting, 18 document domain tests and 29 selected API/contract
+scenarios passed. Both application JARs built. The cases include interrupted
+storage, original request recovery, operator isolation, attempt exhaustion, MFA
+expiry and interrupted resource ownership. Dashboard TypeScript and 71 document
+tests passed; its mapper binds continuation metadata to the current part, freezes
+it, and safely ignores unsupported future capabilities. These contracts support
+the separate upload-authoring interface.

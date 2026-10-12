@@ -107,13 +107,101 @@ class DocumentRevisionActionPolicyTest {
 
     @Test
     fun incompleteOrExhaustedContentCannotStartValidation() {
-        for (value in
-            listOf(
+        assertEquals(
+            listOf(DocumentRevisionAction.UPLOAD_CONTENT, DocumentRevisionAction.CANCEL_UPLOAD),
+            documentRevisionActions(
+                actor,
+                DocumentClassification.PERSONAL,
+                null,
                 revision.copy(uploadedBytes = 0),
-                revision.copy(validationAttempts = 8),
-            )) assertEquals(
+                null,
+                now,
+            ),
+        )
+        assertEquals(
             cancel,
-            documentRevisionActions(actor, DocumentClassification.PERSONAL, null, value, null, now),
+            documentRevisionActions(
+                actor,
+                DocumentClassification.PERSONAL,
+                null,
+                revision.copy(validationAttempts = 8),
+                null,
+                now,
+            ),
+        )
+    }
+
+    @Test
+    fun uploadResumptionRequiresCurrentOwnershipAndAnUnexpiredIncompleteRevision() {
+        val incomplete = revision.copy(uploadedBytes = 0)
+        val owner = actor.copy(permissions = setOf("documents.self.upload"))
+        assertEquals(
+            listOf(DocumentRevisionAction.UPLOAD_CONTENT, DocumentRevisionAction.CANCEL_UPLOAD),
+            documentRevisionActions(
+                owner,
+                DocumentClassification.PERSONAL,
+                actor.accountId,
+                incomplete,
+                null,
+                now,
+            ),
+        )
+        for (classification in DocumentClassification.entries) {
+            assertTrue(
+                documentRevisionActions(
+                        owner,
+                        classification,
+                        UUID.randomUUID(),
+                        incomplete,
+                        null,
+                        now,
+                    )
+                    .isEmpty()
+            )
+            assertTrue(
+                documentRevisionActions(
+                        actor.copy(permissions = setOf("documents.manage")),
+                        classification,
+                        actor.accountId,
+                        incomplete,
+                        null,
+                        now,
+                    )
+                    .isEmpty()
+            )
+        }
+        assertTrue(
+            documentRevisionActions(
+                    owner,
+                    DocumentClassification.HR_ONLY,
+                    actor.accountId,
+                    incomplete,
+                    null,
+                    now,
+                )
+                .isEmpty()
+        )
+        assertEquals(
+            cancel,
+            documentRevisionActions(
+                actor,
+                DocumentClassification.PERSONAL,
+                null,
+                incomplete.copy(expiresAt = now),
+                null,
+                now,
+            ),
+        )
+        assertFalse(
+            documentRevisionActions(
+                    actor,
+                    DocumentClassification.PERSONAL,
+                    null,
+                    revision,
+                    null,
+                    now,
+                )
+                .contains(DocumentRevisionAction.UPLOAD_CONTENT)
         )
     }
 

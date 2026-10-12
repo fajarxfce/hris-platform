@@ -16,13 +16,23 @@ The upload/status/cancellation and durable validation APIs are implemented. Uplo
 
 Company routes use `/api/v1/companies/{companyId}/documents`. `POST /uploads` accepts stable document/revision UUIDs, employment ID, title, classification, expected document version, file name, media type, size, SHA-256, and reason. Use `Idempotency-Key` for every command. Metadata/history use `GET /{documentId}`, `GET /{documentId}/revisions`, and `GET /revisions/{revisionId}`. Lists require an `employmentId` and support bounded cursors.
 
-Revision details include `availableActions` (`VALIDATE`, `CANCEL_UPLOAD`) derived
+Revision details include `availableActions` (`UPLOAD_CONTENT`, `VALIDATE`, `CANCEL_UPLOAD`) derived
 from original/current management grants, the stored upload state, expiry, complete
 content and the previous validation job. An expired but still active upload remains
 explicitly cancellable; a revision already transitioned to `EXPIRED` does not.
-History rows carry no action capabilities. Detail capabilities are review guidance:
+`UPLOAD_CONTENT` permits resuming an incomplete, unexpired upload under current
+management or owner authority. A complete file instead becomes eligible for
+validation; at most two actions are available together. History rows carry no action
+capabilities. Detail capabilities are review guidance:
 commands independently enforce current access, observed versions and idempotent
 replay. Reading the validation job cannot extend an expired MFA proof.
+
+For an uncommitted part, `uploadContinuation` returns the original operation ID,
+offset, size, checksum, attempt count and optional retry time only to the same
+operator with current upload authority. It contains no storage key or attempt
+identity. Other operators can explicitly cancel the upload but cannot take over its
+reserved part. Exhausted parts remove upload availability. History does not expose
+continuation references. Reading this reference also rechecks MFA after waiting.
 
 Send `POST /revisions/{revisionId}/chunks` as `application/octet-stream` with `Upload-Offset`, `Upload-Checksum-Sha256` (lowercase hex), and a stable idempotency UUID for that chunk. Chunks are exactly 1 MiB except the final chunk. After a lost response, repeat the same chunk/key or fetch `uploadedBytes`; the original receipt remains stable even after later chunks commit. A mismatched offset or command payload returns a conflict. An active attempt returns `document_chunk_in_progress` with `fields.retryAt`. A failed attempt can be reclaimed after its 120-second lease using the same operation ID. Eight unsuccessful attempts require cancelling and starting a new revision; the server does not retry uploads silently.
 

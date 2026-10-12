@@ -4,6 +4,10 @@ import type {
   DocumentRevision,
   DocumentRevisionPage,
 } from "../../domain/entities/document-revision";
+import {
+  type DocumentRevisionAction,
+  documentRevisionActions,
+} from "../../domain/entities/document-revision-action";
 import type { DocumentValidationAttempt } from "../../domain/entities/document-validation-attempt";
 import type {
   DocumentRevisionDto,
@@ -12,11 +16,18 @@ import type {
 } from "../models/document-dto";
 
 export function toDocumentRevision(raw: DocumentRevisionDto, company: CompanyId): DocumentRevision {
+  const continuation = raw.uploadContinuation;
   if (
     new Set(raw.availableActions).size !== raw.availableActions.length ||
     raw.uploadedBytes > raw.size ||
     (raw.uploadedBytes !== raw.size && raw.uploadedBytes % raw.chunkSize !== 0) ||
-    (raw.status === "READY" && (raw.uploadedBytes !== raw.size || raw.validatedAt === null))
+    (raw.status === "READY" && (raw.uploadedBytes !== raw.size || raw.validatedAt === null)) ||
+    (raw.availableActions.includes("UPLOAD_CONTENT") &&
+      (raw.status !== "UPLOADING" || raw.uploadedBytes >= raw.size)) ||
+    (continuation !== null &&
+      (!raw.availableActions.includes("UPLOAD_CONTENT") ||
+        continuation.offset !== raw.uploadedBytes ||
+        continuation.size !== Math.min(raw.chunkSize, raw.size - raw.uploadedBytes)))
   )
     throw new InvalidHttpResponseError();
   const extension = raw.fileName.toLowerCase().split(".").at(-1);
@@ -35,7 +46,19 @@ export function toDocumentRevision(raw: DocumentRevisionDto, company: CompanyId)
     documentId: raw.documentId.toLowerCase(),
     createdBy: raw.createdBy.toLowerCase(),
     validationJobId: raw.validationJobId?.toLowerCase() ?? null,
-    availableActions: Object.freeze([...raw.availableActions]),
+    uploadContinuation:
+      continuation === null
+        ? null
+        : Object.freeze({
+            ...continuation,
+            operationId: continuation.operationId.toLowerCase(),
+          }),
+    // New server capabilities must not enable an unknown action or hide otherwise readable metadata.
+    availableActions: Object.freeze(
+      raw.availableActions.filter((value): value is DocumentRevisionAction =>
+        documentRevisionActions.includes(value as DocumentRevisionAction),
+      ),
+    ),
   });
 }
 export function toDocumentRevisions(

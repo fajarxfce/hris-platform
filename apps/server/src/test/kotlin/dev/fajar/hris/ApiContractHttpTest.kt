@@ -165,8 +165,15 @@ class ApiContractHttpTest : PeopleApiFixture() {
         assertEquals(2, actions["maxItems"].asInt())
         assertTrue(actions["uniqueItems"].asBoolean())
         assertEquals(
-            setOf("VALIDATE", "CANCEL_UPLOAD"),
+            setOf("UPLOAD_CONTENT", "VALIDATE", "CANCEL_UPLOAD"),
             actions["items"]["enum"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
+        assertTrue(schema.has("uploadContinuation"))
+        val continuation =
+            api["components"]["schemas"]["DocumentUploadContinuationResponse"]["properties"]
+        assertEquals(
+            setOf("operationId", "offset", "size", "sha256", "attempts", "retryAt"),
+            continuation.propertyNames().toSet(),
         )
     }
 

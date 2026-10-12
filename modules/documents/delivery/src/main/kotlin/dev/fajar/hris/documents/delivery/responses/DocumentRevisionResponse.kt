@@ -29,11 +29,12 @@ data class DocumentRevisionResponse(
     val failureCode: String?,
     val validatedAt: Instant?,
     @get:ArraySchema(
-        schema = Schema(allowableValues = ["VALIDATE", "CANCEL_UPLOAD"]),
+        schema = Schema(allowableValues = ["UPLOAD_CONTENT", "VALIDATE", "CANCEL_UPLOAD"]),
         maxItems = 2,
         uniqueItems = true,
     )
     val availableActions: List<String> = emptyList(),
+    val uploadContinuation: DocumentUploadContinuationResponse? = null,
 )
 
 fun DocumentRevision.toResponse() =
@@ -60,4 +61,9 @@ fun DocumentRevision.toResponse() =
     )
 
 fun DocumentRevisionDetails.toResponse(): DocumentRevisionResponse =
-    revision.toResponse().copy(availableActions = availableActions.map { it.name })
+    revision
+        .toResponse()
+        .copy(
+            availableActions = availableActions.map { it.name },
+            uploadContinuation = uploadContinuation?.toResponse(),
+        )

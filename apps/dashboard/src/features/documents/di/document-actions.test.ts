@@ -38,6 +38,82 @@ function uploading(): DocumentRevisionDto {
 const snapshot = (): DocumentRevisionSnapshot => toDocumentRevision(uploading(), access.companyId);
 
 describe("document command boundaries", () => {
+  it("binds a resumable command to the current file part and freezes its metadata", async () => {
+    const raw = {
+      ...uploading(),
+      uploadedBytes: 0,
+      availableActions: ["UPLOAD_CONTENT", "CANCEL_UPLOAD"],
+      uploadContinuation: {
+        operationId: documentId(81),
+        offset: 0,
+        size: uploading().size,
+        sha256: uploading().sha256,
+        attempts: 1,
+        retryAt: null,
+      },
+    };
+    const request = vi.fn<HttpClient["request"]>().mockResolvedValue(raw);
+    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const reviewed = await feature.reviewAction.execute(
+      access,
+      documentHeaderId,
+      documentRevisionId,
+      "cancel",
+      signal(),
+    );
+    expect(reviewed).toMatchObject({
+      ok: true,
+      value: { uploadContinuation: raw.uploadContinuation },
+    });
+    raw.uploadContinuation.operationId = documentId(82);
+    if (reviewed.ok) {
+      expect(reviewed.value.uploadContinuation?.operationId).toBe(documentId(81));
+      expect(Object.isFrozen(reviewed.value.uploadContinuation)).toBe(true);
+    }
+    for (const changed of [
+      { ...raw, availableActions: ["CANCEL_UPLOAD"] },
+      { ...raw, uploadContinuation: { ...raw.uploadContinuation, offset: 1 } },
+      { ...raw, uploadContinuation: { ...raw.uploadContinuation, size: raw.size + 1 } },
+      { ...raw, uploadContinuation: { ...raw.uploadContinuation, attempts: 8 } },
+      { ...raw, uploadedBytes: raw.size },
+      { ...raw, status: "CANCELLED" },
+    ]) {
+      request.mockResolvedValue(changed);
+      expect(
+        await feature.reviewAction.execute(
+          access,
+          documentHeaderId,
+          documentRevisionId,
+          "cancel",
+          signal(),
+        ),
+      ).toMatchObject({ ok: false, failure: { code: "invalid_response" } });
+    }
+  });
+  it("ignores unsupported server capabilities without inventing an action", async () => {
+    const request = vi
+      .fn<HttpClient["request"]>()
+      .mockResolvedValue({ ...uploading(), availableActions: ["FUTURE_ACTION", "CANCEL_UPLOAD"] });
+    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    expect(
+      await feature.reviewAction.execute(
+        access,
+        documentHeaderId,
+        documentRevisionId,
+        "cancel",
+        signal(),
+      ),
+    ).toMatchObject({ ok: true, value: { availableActions: ["CANCEL_UPLOAD"] } });
+    expect(
+      await feature.reviewAction.execute(
+        access,
+        documentHeaderId,
+        documentRevisionId,
+        "validate",
+        signal(),
+      ),
+    ).toMatchObject({ ok: false, failure: { code: "document_action_unavailable" } });
+  });
   it("requires read and management authority before acquiring a review", async () => {
     const request = vi.fn<HttpClient["request"]>();
     const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });

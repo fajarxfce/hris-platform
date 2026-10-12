@@ -283,6 +283,12 @@ class DocumentUploadHttpTest : DocumentApiFixture() {
             json.readTree(exhausted.body()).get("code").asString(),
         )
         assertEquals(8, storageProbe.calls.get())
+        val closed = revision(f, revision)
+        assertTrue(closed["uploadContinuation"].isNull)
+        assertEquals(
+            listOf("CANCEL_UPLOAD"),
+            closed["availableActions"].iterator().asSequence().map { it.asString() }.toList(),
+        )
         assertEquals(
             8,
             database()

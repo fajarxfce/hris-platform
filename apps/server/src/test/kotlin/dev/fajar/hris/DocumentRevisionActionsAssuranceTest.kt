@@ -1,6 +1,7 @@
 package dev.fajar.hris
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.documents.domain.repositories.DocumentRepository
 import dev.fajar.hris.documents.domain.usecases.GetDocumentRevision
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
@@ -8,15 +9,18 @@ import java.util.UUID
 import java.util.concurrent.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
+import org.junit.jupiter.params.provider.CsvSource
 
 class DocumentRevisionActionsAssuranceTest : DocumentAssuranceApiFixture() {
     @ParameterizedTest
-    @ValueSource(booleans = [false, true])
-    fun expiryOrCancellationWhileReadingTheJobCannotReleaseActionCapabilities(cancel: Boolean) {
+    @CsvSource("job,false", "job,true", "upload,false", "upload,true")
+    fun expiryOrCancellationWhileReadingRevisionWorkCannotReleaseActionCapabilities(
+        resource: String,
+        cancel: Boolean,
+    ) {
         val f = fixture()
-        val id = filled(f)
-        assertEquals(200, validate(f, id).statusCode())
+        val id = if (resource == "job") filled(f) else begin(f)
+        if (resource == "job") assertEquals(200, validate(f, id).statusCode())
         val security = IdentitySecurityPolicy(enforceMfa = true)
         val actor = enrolled(f, security)
         val entered = CountDownLatch(1)
@@ -26,13 +30,25 @@ class DocumentRevisionActionsAssuranceTest : DocumentAssuranceApiFixture() {
             object : JobRepository by jobs {
                 override fun find(companyId: UUID, id: UUID, lock: Boolean) =
                     jobs.find(companyId, id, lock).also {
-                        entered.countDown()
-                        check(release.await(5, TimeUnit.SECONDS))
+                        if (resource == "job") {
+                            entered.countDown()
+                            check(release.await(5, TimeUnit.SECONDS))
+                        }
+                    }
+            }
+        val heldDocuments =
+            object : DocumentRepository by documents {
+                override fun chunkAt(companyId: UUID, revisionId: UUID, ordinal: Int) =
+                    documents.chunkAt(companyId, revisionId, ordinal).also {
+                        if (resource == "upload") {
+                            entered.countDown()
+                            check(release.await(5, TimeUnit.SECONDS))
+                        }
                     }
             }
         val read =
             GetDocumentRevision(
-                documents,
+                heldDocuments,
                 held,
                 profiles,
                 people,

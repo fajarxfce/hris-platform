@@ -80,9 +80,28 @@ export const documentRevisionDto = z.object({
     .nullable(),
   validatedAt: instant.nullable(),
   availableActions: z
-    .array(z.enum(["VALIDATE", "CANCEL_UPLOAD"]))
-    .max(2)
+    .array(z.string().regex(/^[A-Z][A-Z_]{0,47}$/u))
+    .max(16)
     .default([]),
+  uploadContinuation: z
+    .object({
+      operationId: z.uuid(),
+      offset: z
+        .number()
+        .int()
+        .min(0)
+        .max(100 * 1024 * 1024),
+      size: z
+        .number()
+        .int()
+        .min(1)
+        .max(1024 * 1024),
+      sha256: z.string().regex(/^[0-9a-f]{64}$/u),
+      attempts: z.number().int().min(0).max(7),
+      retryAt: instant.nullable(),
+    })
+    .nullable()
+    .default(null),
 });
 export const documentRevisionPageDto = z.object({
   items: z.array(documentRevisionDto).max(20),

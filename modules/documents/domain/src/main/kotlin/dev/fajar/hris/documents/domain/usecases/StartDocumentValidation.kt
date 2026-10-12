@@ -56,10 +56,10 @@ class StartDocumentValidation(
             if (membershipLock is Result.Failed) return@run membershipLock
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
-            val current =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val access = identities.access(actor.accountId, company)
+            if (access is Result.Failed) return@run access
+            val identity = (access as Result.Success).value
+            val current = validateCompanySessionActor(actor, identity, clock.instant(), security)
             if (current is Result.Failed) return@run current
             val live = (current as Result.Success).value
             val found = documents.revision(company, revisionId)
@@ -120,6 +120,10 @@ class StartDocumentValidation(
             if ((pending as Result.Success).value >= 100)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "job_queue_full"))
             val now = clock.instant()
+            val assurance = validateCompanySessionActor(actor, identity, now, security)
+            if (assurance is Result.Failed) return@run assurance
+            if (documentStatus(revision, now) !in ACTIVE_DOCUMENT_STATUSES)
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "document_upload_closed"))
             val job =
                 JobRequest(
                     UUID.randomUUID(),

@@ -67,6 +67,11 @@ Transfers have a 60-second deadline. Saturation returns 429 with `Retry-After: 1
 
 `POST /inventory` starts a company scan with `runId`, `reason`, and `Idempotency-Key`. It requires `documents.inventory`, `jobs.retry`, and recent authentication/MFA. Existing memberships need an explicit grant; new company administrators receive the inventory capability. Inventory access does not grant document content access. `GET /inventory`, `GET /inventory/{runId}`, `/attempts`, and `/pages` expose bounded summaries and evidence without storage keys. Lists default to 50 and allow at most 100 records. Page history uses an integer `after`; run lists use a UUID cursor.
 
+Inventory reads preserve original/live grants and check current session MFA after
+shared company, membership and account guards. Starting or resuming a scan also
+rechecks session and recent authentication after the job queue wait. Validation
+admission similarly rechecks session MFA and upload expiry before creating its job.
+
 Each worker step lists at most 100 objects in the selected company's prefix, then rereads its lease, credentials, membership, permissions, and inventory version before committing. Storage I/O holds no SQL transaction. The cursor uses UTF-8 byte order and is private; unusual unknown keys remain representable without passing arbitrary keys into document-reference queries. This is a traversal of a changing bucket, not a snapshot. A later scan can find objects inserted behind the cursor.
 
 Only an exact, immutable upload attempt with a matching byte count can be recovered. Its object must have been modified at least 24 hours before the scan started, and the attempt must be superseded, cancelled, rejected, expired, or explicitly retired. Accepted `READY` content remains retained, including historical revisions. Active, recent, unknown, and inconsistent objects are preserved and counted separately. An existing cleanup registration, including a failed one, is never reset. Recovery queues deletion after another five-minute grace period; inventory itself performs no physical deletion. Cleanup registration, observed object evidence, page counts, job progress, and audit commit together.
@@ -88,6 +93,10 @@ Leave submissions register up to three accepted personal-document revisions for 
 ## Retention policies, archive, and legal hold
 
 Retention administration requires the explicit `documents.retention` grant. It is not part of the default company administrator role; a platform administrator must grant it to a different account. Content permissions remain separate. Every mutation requires recent authentication (recent MFA when enforced), an idempotency key, a reason, and a current version. Access is checked again after acquiring command guards, including for receipt replay.
+
+Retention metadata and policy/history reads require current session MFA after
+their access guards. Document retention snapshots take the shared document guard
+first; bounded policy and inventory projections do not acquire a job lock.
 
 `POST /retention-policies` accepts a stable `policyId`, `classification`, nullable `expectedVersion`, nullable `retentionDays`, and `reason`. A company has at most one policy for each classification. The first revision uses a null expected version; subsequent changes use the returned version. Classification is immutable. A null duration means indefinite retention; finite durations are 1–36,500 elapsed 24-hour days. No statutory duration is assumed. `GET /retention-policies` lists configured policies; `/retention-policies/{policyId}/history` returns their immutable, paginated revisions. Each policy permits 10,000 revisions.
 

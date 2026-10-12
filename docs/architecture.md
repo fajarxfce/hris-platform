@@ -138,6 +138,13 @@ use cases intersect original/live grants and revalidate session assurance after
 waits. Content acquisition holds no SQL transaction and repeats those checks
 before returning bytes. Background validation retains a separate execution policy.
 
+Document retention and inventory administration also revalidate session assurance
+after their shared access guards. Retention snapshots acquire the document guard
+before access guards; metadata projections never wait for a job lock while holding
+access. Validation/inventory admission retains the guarded identity snapshot and
+checks its proof again after the job queue wait, including the stricter recent
+authentication requirement for inventory. Expired upload admission creates no job.
+
 Announcement edits acquire the announcement guard, then audience-group and organization guards, before company/membership/account access guards. Group edits acquire their group guard before people and access guards. The bounded member list is stored in one immutable revision with database validation of its company references; lists select summary columns without materializing those arrays. A revision head and its immutable snapshot are linked by a deferred foreign key and commit with the operation receipt, audit, and outbox event.
 
 

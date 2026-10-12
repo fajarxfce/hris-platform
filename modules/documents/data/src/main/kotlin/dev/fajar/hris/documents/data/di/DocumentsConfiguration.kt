@@ -428,30 +428,42 @@ class DocumentsConfiguration {
     @Bean
     fun getDocumentInventory(
         inventory: DocumentInventoryRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetDocumentInventory(inventory, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = GetDocumentInventory(inventory, members, identities, transactions, clock, security)
 
     @Bean
     fun listDocumentInventories(
         inventory: DocumentInventoryRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListDocumentInventories(inventory, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = ListDocumentInventories(inventory, members, identities, transactions, clock, security)
 
     @Bean
     fun getDocumentInventoryAttempts(
         inventory: DocumentInventoryRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetDocumentInventoryAttempts(inventory, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = GetDocumentInventoryAttempts(inventory, members, identities, transactions, clock, security)
 
     @Bean
     fun getDocumentInventoryPages(
         inventory: DocumentInventoryRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetDocumentInventoryPages(inventory, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = GetDocumentInventoryPages(inventory, members, identities, transactions, clock, security)
 
     @Bean
     fun documentReferenceSource(sql: DSLContext): DocumentReferenceDataSource =
@@ -524,32 +536,70 @@ class DocumentsConfiguration {
     @Bean
     fun getDocumentRetentionPolicies(
         retention: DocumentRetentionRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetDocumentRetentionPolicies(retention, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = GetDocumentRetentionPolicies(retention, members, identities, transactions, clock, security)
 
     @Bean
     fun getDocumentRetentionPolicyHistory(
         retention: DocumentRetentionRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetDocumentRetentionPolicyHistory(retention, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetDocumentRetentionPolicyHistory(
+            retention,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun getDocumentRetention(
         retention: DocumentRetentionRepository,
         documents: DocumentRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetDocumentRetention(retention, documents, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetDocumentRetention(
+            retention,
+            documents,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun getDocumentRetentionHistory(
         retention: DocumentRetentionRepository,
         documents: DocumentRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetDocumentRetentionHistory(retention, documents, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetDocumentRetentionHistory(
+            retention,
+            documents,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun retireDocumentRevision(

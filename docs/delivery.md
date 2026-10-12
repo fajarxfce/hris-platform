@@ -1447,3 +1447,19 @@ API and worker development containers were rebuilt without resetting PostgreSQL;
 API health is `UP` and both processes have zero restarts. Retention/inventory
 administration has a separate assurance review; this increment does not complete
 document UI or physical storage acceptance.
+
+## Document administration and queued admission
+
+Retention and inventory metadata now preserve original/live permissions and current
+session MFA after shared access guards. Validation and inventory creation repeat
+their proof checks after waiting for the job queue; inventory retains its stricter
+recent-authentication requirement. An upload that expires during admission creates
+no validation job. Rejected operations can recover using the original operation ID
+after verification, without duplicating a job.
+
+Ten regression scenarios reproduced the prior behavior before the fix. The final
+26 new cases also cover proof renewal, pending credential/permission revocation,
+original grant boundaries, interruption cleanup and upload expiry. Formatting,
+architecture checks, 13 document domain tests, 73 affected API tests, all 38 worker
+tests and both application JAR builds passed. Development API/worker containers
+were rebuilt without resetting data; health is `UP` and both have zero restarts.

@@ -5,7 +5,7 @@ import dev.fajar.hris.documents.domain.entities.*
 import dev.fajar.hris.documents.domain.policies.*
 import dev.fajar.hris.documents.domain.repositories.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
@@ -66,10 +66,10 @@ class StartDocumentInventory(
             if (membershipLock is Result.Failed) return@run membershipLock
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val resolved = identities.access(actor.accountId, company)
+            if (resolved is Result.Failed) return@run resolved
+            val identity = (resolved as Result.Success).value
+            val checked = validateCompanySessionActor(actor, identity, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
 
@@ -120,6 +120,10 @@ class StartDocumentInventory(
             if ((pending as Result.Success).value >= 100)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "job_queue_full"))
             val now = clock.instant()
+            val assurance = validateCompanySessionActor(actor, identity, now, security)
+            if (assurance is Result.Failed) return@run assurance
+            val admission = validateDocumentInventoryCommand(live, now, security)
+            if (admission is Result.Failed) return@run admission
             val job =
                 JobRequest(
                     UUID.randomUUID(),

@@ -155,3 +155,9 @@ the transaction without retaining a reader's locks.
 Monthly closing holds the same month gate as overtime mutations and refuses unresolved plans/reviews. Closed employee snapshots include each approved request ID, version, actual interval, approved minutes, and original schedule. New plans and actual-time changes cannot enter a processing/closed month. These are verified time facts; statutory wage rates and payable eligibility belong to payroll.
 
 Employee-owned requests are registered as `OVERTIME_REQUESTS` in the [mobile change feed](../synchronization.md). Approver access is specific to assigned/delegated requests; it does not grant a directory export.
+
+Dashboard overtime contracts retain immutable employee display snapshots and
+requested, actual and approved time separately. Directories use bounded date,
+employee and status filters with exclusive UUID cursors; history uses descending
+revisions. The client validates structural consistency while the API retains
+current company, employee, reviewer and delegation authorization.

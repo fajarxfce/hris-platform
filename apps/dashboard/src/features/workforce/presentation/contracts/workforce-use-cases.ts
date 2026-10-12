@@ -6,6 +6,8 @@ import type { LoadCalendarReview } from "../../domain/usecases/load-calendar-rev
 import type { LoadEmployeeAttendance } from "../../domain/usecases/load-employee-attendance";
 import type { LoadHoliday } from "../../domain/usecases/load-holiday";
 import type { LoadHolidays } from "../../domain/usecases/load-holidays";
+import type { LoadOvertimeRequest } from "../../domain/usecases/load-overtime-request";
+import type { LoadOvertimeRequests } from "../../domain/usecases/load-overtime-requests";
 import type { LoadShift } from "../../domain/usecases/load-shift";
 import type { LoadShifts } from "../../domain/usecases/load-shifts";
 import type { LoadWorkforceEmployees } from "../../domain/usecases/load-workforce-employees";
@@ -15,6 +17,8 @@ import type { SaveShift } from "../../domain/usecases/save-shift";
 import type { SetRosterDay } from "../../domain/usecases/set-roster-day";
 
 export type WorkforceUseCases = Readonly<{
+  loadOvertimeRequests: Pick<LoadOvertimeRequests, "execute">;
+  loadOvertimeRequest: Pick<LoadOvertimeRequest, "execute">;
   loadAttendanceExceptions: Pick<LoadAttendanceExceptions, "execute">;
   loadAttendanceCorrectionHistory: Pick<LoadAttendanceCorrectionHistory, "execute">;
   loadEmployeeAttendance: Pick<LoadEmployeeAttendance, "execute">;

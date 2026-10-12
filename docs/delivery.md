@@ -1980,3 +1980,20 @@ acquisition and transaction completion, original-key recovery, cancellation and
 concurrent detail readers. Existing access, delegation, overlapping windows,
 period closing, immutable history and replay checks also passed. No API response
 shape, database migration or mobile APK changed in this increment.
+
+## Dashboard overtime read contracts
+
+Workforce now has dashboard domain and data contracts for bounded overtime
+directories and individual requests. Administrative directory access remains
+separate from employee scope and assigned/delegated review. DTO mapping validates
+requested/actual durations, status and approval references, immutable history and
+exclusive page progress. Acquisition and mapping share the HTTP failure boundary;
+cancellation before or after I/O prevents late results from reaching presentation.
+
+All 1,220 dashboard unit tests passed with architecture, formatting and TypeScript
+checks. The 63 added boundary cases include malformed or oversized responses,
+filter mismatches, stale cursors, original snapshot preservation, mutable caller
+input, limited directory grants, MFA errors and late cancellation/failure. The
+validated API and worker were deployed with the document and WireGuard overlays
+preserved; the VPN API and dashboard returned HTTP 200. Dashboard overtime pages
+remain the next increment; no mobile APK changed.

@@ -2,10 +2,12 @@ import type { HttpClient } from "../../../core/data/http/http-client";
 import { HttpAttendanceDataSource } from "../data/datasources/http-attendance-data-source";
 import { HttpCalendarDataSource } from "../data/datasources/http-calendar-data-source";
 import { HttpHolidayDataSource } from "../data/datasources/http-holiday-data-source";
+import { HttpOvertimeDataSource } from "../data/datasources/http-overtime-data-source";
 import { HttpShiftDataSource } from "../data/datasources/http-shift-data-source";
 import { RemoteAttendanceRepository } from "../data/repositories/remote-attendance-repository";
 import { RemoteCalendarRepository } from "../data/repositories/remote-calendar-repository";
 import { RemoteHolidayRepository } from "../data/repositories/remote-holiday-repository";
+import { RemoteOvertimeRepository } from "../data/repositories/remote-overtime-repository";
 import { RemoteShiftRepository } from "../data/repositories/remote-shift-repository";
 import { AssignWeeklySchedule } from "../domain/usecases/assign-weekly-schedule";
 import { CorrectAttendance } from "../domain/usecases/correct-attendance";
@@ -15,6 +17,8 @@ import { LoadCalendarReview } from "../domain/usecases/load-calendar-review";
 import { LoadEmployeeAttendance } from "../domain/usecases/load-employee-attendance";
 import { LoadHoliday } from "../domain/usecases/load-holiday";
 import { LoadHolidays } from "../domain/usecases/load-holidays";
+import { LoadOvertimeRequest } from "../domain/usecases/load-overtime-request";
+import { LoadOvertimeRequests } from "../domain/usecases/load-overtime-requests";
 import { LoadShift } from "../domain/usecases/load-shift";
 import { LoadShifts } from "../domain/usecases/load-shifts";
 import { LoadWorkforceEmployees } from "../domain/usecases/load-workforce-employees";
@@ -28,7 +32,10 @@ export function createWorkforceFeature(http: HttpClient) {
   const calendars = new RemoteCalendarRepository(new HttpCalendarDataSource(http));
   const shifts = new RemoteShiftRepository(new HttpShiftDataSource(http));
   const holidays = new RemoteHolidayRepository(new HttpHolidayDataSource(http));
+  const overtime = new RemoteOvertimeRepository(new HttpOvertimeDataSource(http));
   return {
+    loadOvertimeRequests: new LoadOvertimeRequests(overtime),
+    loadOvertimeRequest: new LoadOvertimeRequest(overtime),
     loadAttendanceExceptions: new LoadAttendanceExceptions(attendance),
     loadAttendanceCorrectionHistory: new LoadAttendanceCorrectionHistory(attendance, calendars),
     loadEmployeeAttendance: new LoadEmployeeAttendance(attendance, calendars),

@@ -988,6 +988,14 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "This page link is invalid. Return to the first page.",
     "Link halaman tidak valid. Kembali ke halaman pertama.",
   ],
+  invalid_overtime_page: [
+    "Choose valid dates covering up to 62 days and a valid overtime status.",
+    "Pilih tanggal yang valid dengan rentang maksimal 62 hari dan status lembur yang valid.",
+  ],
+  overtime_request_not_found: [
+    "The overtime request was not found or is no longer accessible.",
+    "Pengajuan lembur tidak ditemukan atau tidak dapat diakses.",
+  ],
   employee_not_found: [
     "The employee was not found for this date or is no longer accessible.",
     "Karyawan tidak ditemukan untuk tanggal ini atau tidak dapat diakses.",

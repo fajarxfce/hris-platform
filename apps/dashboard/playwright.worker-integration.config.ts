@@ -24,11 +24,11 @@ export default defineConfig({
       gracefulShutdown: { signal: "SIGTERM", timeout: 60_000 },
     },
     {
-      command: "npm run dev -- --port 4175 --strictPort",
+      command: "npm run build && npm run preview -- --port 4175 --strictPort",
       env: { HRIS_API_PROXY: "http://127.0.0.1:18081" },
       url: "http://127.0.0.1:4175",
       reuseExistingServer: false,
-      timeout: 30_000,
+      timeout: 120_000,
     },
   ],
 });

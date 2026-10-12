@@ -69,3 +69,11 @@ step timeout. The previous two-shard allocation reached that limit as the suite
 grew; one shard completed 204 scenarios in 15.1 minutes before the runner timed it
 out. Sharding distributes the work without removing tests or extending a hung
 scenario's timeout.
+
+Browser suites build the dashboard and serve that production output with Vite
+preview on their isolated test ports. This also applies to real API/worker
+integration, preserving each fixture's same-origin proxy. The server startup budget
+includes compilation; scenario and assertion timeouts remain unchanged. Run
+`npm run test:e2e` from `apps/dashboard` for the complete browser suite, or supply
+Playwright file/shard arguments. `npm run dev` remains the interactive development
+server on the separately configured development port.

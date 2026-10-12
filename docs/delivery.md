@@ -1463,3 +1463,18 @@ original grant boundaries, interruption cleanup and upload expiry. Formatting,
 architecture checks, 13 document domain tests, 73 affected API tests, all 38 worker
 tests and both application JAR builds passed. Development API/worker containers
 were rebuilt without resetting data; health is `UP` and both have zero restarts.
+
+## Dashboard browser acceptance against production output
+
+Browser suites now build and serve the production dashboard on their isolated
+test ports, including the API and worker fixtures. This removes the development
+module graph from browser acceptance while preserving proxy routing and existing
+scenario/assertion timeouts. CI no longer builds the same dashboard separately
+before the suite's own build.
+
+The preceding CI run passed the backend and three browser shards; the fourth
+timed out loading the malformed leave-policy scenario before application content
+appeared. Its trace contained 465 development module requests. After the change,
+all 409 browser scenarios, 13 real API scenarios and the real worker publication
+scenario passed locally. Configuration formatting also passed. This is validation
+of the production artifact and does not establish a runtime performance claim.

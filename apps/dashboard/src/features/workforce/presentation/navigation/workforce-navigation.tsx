@@ -3,6 +3,7 @@ import {
   CalendarStar20Regular,
   CalendarWorkWeek20Regular,
   Clock20Regular,
+  Warning20Regular,
 } from "@fluentui/react-icons";
 import type { AppNavigationItem } from "../../../../core/presentation/components/app-portal-shell";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
@@ -11,10 +12,12 @@ import { canReadAttendance } from "../../domain/policies/attendance-policy";
 import { canReadCalendars } from "../../domain/policies/calendar-policy";
 import { canReadHolidays } from "../../domain/policies/holiday-policy";
 import { canReadShifts } from "../../domain/policies/shift-policy";
+import { attendanceExceptionMessages } from "../i18n/attendance-exception-messages";
 import { attendanceMessages } from "../i18n/attendance-messages";
 import { calendarMessages } from "../i18n/calendar-messages";
 import { holidayMessages } from "../i18n/holiday-messages";
 import { shiftMessages } from "../i18n/shift-messages";
+import { attendanceExceptionsPath } from "../models/attendance-exception-route";
 
 export function workforceNavigation(
   access: CompanyAccess | null,
@@ -28,6 +31,11 @@ export function workforceNavigation(
             to: "/workforce/attendance",
             label: attendanceMessages(locale).title,
             icon: <Clock20Regular />,
+          },
+          {
+            to: attendanceExceptionsPath,
+            label: attendanceExceptionMessages(locale).title,
+            icon: <Warning20Regular />,
           },
         ]
       : []),

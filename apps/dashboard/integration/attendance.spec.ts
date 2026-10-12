@@ -4,6 +4,7 @@ import type {
   AttendanceCorrectionDto,
   AttendanceDayDto,
 } from "../src/features/workforce/data/models/attendance-dto";
+import type { AttendanceExceptionPageDto } from "../src/features/workforce/data/models/attendance-exception-dto";
 import { authenticatorCode } from "./fixtures/authenticator";
 
 test("offline evidence requires independent review, replays one decision, and preserves raw punches through a competing correction", async ({
@@ -176,7 +177,40 @@ test("offline evidence requires independent review, replays one decision, and pr
     return route.continue();
   });
   const dayPage = `/workforce/attendance/${employee}/days/${workDate}?company=${company}`;
-  await page.goto(dayPage);
+  const exceptionsPage = `/workforce/attendance/exceptions?company=${company}&from=${workDate}&until=${workDate}`;
+  const exceptionsApi = `${base}/workforce/attendance/exceptions?from=${workDate}&until=${workDate}`;
+  expect((await request.get(exceptionsApi, { headers: nativeHeaders })).status()).toBe(403);
+  await page.goto(exceptionsPage);
+  const exceptions = page.getByRole("table", { name: "Employee days", exact: true });
+  await expect(exceptions.getByRole("row")).toHaveCount(2);
+  await expect(exceptions.getByRole("cell", { name: "2", exact: true })).toBeVisible();
+  await expect(
+    exceptions.getByRole("cell", {
+      name: "Attendance Fixture Employee · ATTENDANCE-001",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      exceptions
+        .getByRole("button", { name: /^View day: ATTENDANCE-001,/u })
+        .evaluate((element) => {
+          const bounds = element.getBoundingClientRect();
+          const container = element.closest(".app-table-scroll")?.getBoundingClientRect();
+          return (
+            container !== undefined &&
+            bounds.left >= container.left &&
+            bounds.right <= container.right
+          );
+        }),
+    )
+    .toBe(true);
+  await page.screenshot({
+    path: "../../.work/dashboard-attendance-exceptions-real.png",
+    fullPage: true,
+    animations: "disabled",
+  });
+  await exceptions.getByRole("button", { name: /^View day: ATTENDANCE-001,/u }).click();
   await expect(
     page.getByRole("heading", { name: "Attendance Fixture Employee", exact: true }),
   ).toBeVisible();
@@ -191,7 +225,10 @@ test("offline evidence requires independent review, replays one decision, and pr
   await expect(page.getByRole("status")).toContainText("Attendance updated.");
   expect(reviewRequests).toHaveLength(2);
   expect(reviewRequests[0]).toEqual(reviewRequests[1]);
-  await page.goto(dayPage);
+  await page.goto(exceptionsPage);
+  await expect(exceptions.getByRole("cell", { name: "1", exact: true })).toBeVisible();
+  await expect(exceptions.getByRole("cell", { name: "Incomplete", exact: true })).toBeVisible();
+  await exceptions.getByRole("button", { name: /^View day: ATTENDANCE-001,/u }).click();
   await page
     .getByRole("region", { name: "Clock-out / Pending review", exact: true })
     .getByRole("button", { name: "Review event", exact: true })
@@ -203,6 +240,10 @@ test("offline evidence requires independent review, replays one decision, and pr
     await request.get(evidencePath, { headers: nativeHeaders })
   ).json()) as AttendanceDayDto[];
   expect(accepted[0]).toMatchObject({ pendingCount: 0, acceptedMinutes: 450, incomplete: false });
+  await page.goto(exceptionsPage);
+  await expect(
+    page.getByText("No attendance exceptions match these filters.", { exact: true }),
+  ).toBeVisible();
   await page.goto(dayPage);
   await page.getByRole("link", { name: "Correct day", exact: true }).click();
   await expect(page.getByLabel("Break (minutes)", { exact: true })).toHaveValue("30");
@@ -278,4 +319,52 @@ test("offline evidence requires independent review, replays one decision, and pr
   await page.getByRole("link", { name: "Back to attendance day", exact: true }).click();
   await expect(page.getByText("435", { exact: true })).toBeVisible();
   await expect(page.getByText("Final independent correction", { exact: true })).toBeVisible();
+
+  const lateId = randomUUID();
+  const late = await request.post(`${employeeBase}/attendance`, {
+    headers: { ...nativeHeaders, "Idempotency-Key": randomUUID() },
+    data: {
+      id: lateId,
+      workDate,
+      kind: "CLOCK_IN",
+      capturedAt: clockIn,
+      deviceId: device,
+      offline: true,
+    },
+  });
+  expect(late.status()).toBe(200);
+  const correctedQueue = (await (
+    await context.request.get(exceptionsApi)
+  ).json()) as AttendanceExceptionPageDto;
+  expect(correctedQueue.items).toHaveLength(1);
+  expect(correctedQueue.items[0]).toMatchObject({
+    employeeId: employee,
+    pendingCount: 1,
+    incomplete: false,
+    correctionVersion: 1,
+  });
+  await page.goto(`${exceptionsPage}&kind=PENDING`);
+  await expect(exceptions.getByRole("cell", { name: "Corrected", exact: true })).toBeVisible();
+  const rejected = await context.request.post(`${base}/workforce/attendance/${lateId}/review`, {
+    headers: headers(),
+    data: {
+      version: 0,
+      decision: "REJECT",
+      reason: "Late duplicate evidence after verified correction",
+    },
+  });
+  expect(rejected.status()).toBe(200);
+  await page.getByRole("button", { name: "Refresh", exact: true }).click();
+  await expect(
+    page.getByText("No attendance exceptions match these filters.", { exact: true }),
+  ).toBeVisible();
+  const finalDay = (await (
+    await request.get(evidencePath, { headers: nativeHeaders })
+  ).json()) as AttendanceDayDto[];
+  expect(finalDay[0]).toMatchObject({
+    acceptedMinutes: 435,
+    pendingCount: 0,
+    correction: { version: 1 },
+  });
+  expect(finalDay[0]?.entries).toHaveLength(3);
 });

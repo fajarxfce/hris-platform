@@ -1943,3 +1943,23 @@ cross-scope cursors, filter mismatches, late data, immutable mapping and access/
 failure preservation. The development API and worker were updated, with migration
 V65 applied and the private document/WireGuard services preserved. Loopback and VPN
 API checks and the VPN dashboard returned HTTP 200. No new mobile build was needed.
+
+## Dashboard attendance exception queue
+
+The dashboard now exposes an administrative employee-day review queue with bounded
+dates, pending/incomplete filters, keyset paging and links to attendance details.
+Company replacement clears the original query and cancels its request; filter
+changes reset pagination. Refresh and MFA recovery do not expose the previous page.
+Names and employee numbers share one column so desktop actions remain visible,
+while narrow layouts retain table scrolling within the page.
+
+All 1,157 dashboard unit tests passed with architecture, formatting and TypeScript
+checks, including eight new query-lifetime cases. All 22 attendance/navigation
+browser cases passed on the final layout. The real API/PostgreSQL scenario also
+passed: self-only access could not read the directory; independent clock-in/out
+reviews updated and resolved the queue; later evidence on a corrected day became
+pending again without replacing accepted minutes or the immutable corrections.
+The original lost-response and competing-correction checks continued to pass.
+Desktop and narrow light/dark views were inspected; desktop action visibility is
+also asserted against the actual API fixture. This dashboard increment needed no
+new mobile APK.

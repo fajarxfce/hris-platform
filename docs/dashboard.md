@@ -79,8 +79,7 @@ timezone, including overnight intervals, and preserve original capture evidence.
 Editors retain one immutable command during an uncertain outcome. MFA renewal
 does not send it again; explicit retry uses the original operation and payload.
 Definite conflicts require a protected reload. Account/company changes abort the
-owner and suppress late results. Company-wide exception queues, overtime and
-period closing remain separate screens.
+owner and suppress late results. Overtime and period closing remain separate screens.
 
 Each day links to `/workforce/attendance/{employeeId}/days/{workDate}/history`.
 The page keeps one descending page of at most 50 immutable corrections, including
@@ -90,6 +89,19 @@ filters survive the return to attendance; page cursors cannot cross company scop
 Refresh and route replacement remove the prior projection and cancel pending reads.
 MFA recovery does not automatically reacquire history. Locale/theme changes only
 reformat the authorized page, and unmount discards its query cache.
+
+`/workforce/attendance/exceptions` provides the company-wide review queue under
+`workforce.read`. A bounded date range and pending/incomplete filter select one
+50-row page. Each employee-day opens the existing, independently authorized day
+view; the queue does not infer absence or authorize a decision. A later pending
+event on a corrected day remains visible until independently resolved.
+
+Company replacement discards filters, cursor and pending results. A filter change
+returns to the first page. Refresh hides the previous projection; MFA recovery
+requires an explicit fresh read. The query is disposed on departure, while
+language/theme changes only reformat its current immutable page. Employee names
+and numbers share one column so actions fit the desktop review table; the same
+table scrolls within its own container on narrow layouts.
 
 ## Implemented foundation
 

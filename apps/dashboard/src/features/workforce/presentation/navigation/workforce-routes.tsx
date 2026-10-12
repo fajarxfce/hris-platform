@@ -3,6 +3,7 @@ import { AttendanceCorrectionHistoryScreen } from "../bindings/attendance-correc
 import { AttendanceDayScreen } from "../bindings/attendance-day-screen";
 import { AttendanceDirectoryScreen } from "../bindings/attendance-directory-screen";
 import { AttendanceEditorScreen } from "../bindings/attendance-editor-screen";
+import { AttendanceExceptionsScreen } from "../bindings/attendance-exceptions-screen";
 import { EmployeeAttendanceScreen } from "../bindings/employee-attendance-screen";
 import { EmployeeCalendarScreen } from "../bindings/employee-calendar-screen";
 import { HolidayEditorScreen } from "../bindings/holiday-editor-screen";
@@ -21,6 +22,7 @@ export function WorkforceRoutes(props: WorkforceScreenProps) {
   return (
     <Routes>
       <Route path="attendance" element={<AttendanceDirectoryScreen {...props} />} />
+      <Route path="attendance/exceptions" element={<AttendanceExceptionsScreen {...props} />} />
       <Route path="attendance/:employeeId" element={<EmployeeAttendanceScreen {...props} />} />
       <Route
         path="attendance/:employeeId/days/:workDate"

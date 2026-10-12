@@ -48,6 +48,17 @@ class DocumentsConfiguration {
     fun documents(source: DocumentDataSource): DocumentRepository = StoredDocumentRepository(source)
 
     @Bean
+    fun listDocumentEmployees(
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListDocumentEmployees(people, companies, members, identities, transactions, security, clock)
+
+    @Bean
     fun listSelfDocumentEmployments(
         people: PeopleRepository,
         companies: CompanyRepository,

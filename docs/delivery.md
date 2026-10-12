@@ -1568,6 +1568,23 @@ localization and five app Chromium tests. Android dev and production Web builds
 passed. API 35 acceptance downloaded a 607-byte PDF from the real development API,
 cancelled and reopened the native save dialog, saved an identical SHA-256 copy,
 and restored the encrypted completion after process restart. Screens were inspected.
-The current phone ADB connection timed out, so this update was validated on the
-emulator and has not yet been installed on the phone. Administrative document
+After the owner reconnected WireGuard, the validated APK was installed on the
+phone with `install-only`; no phone UI was driven. Administrative document
 workflows remain separate delivery work.
+
+## Document employee discovery
+
+Administrative Documents now exposes bounded employee search and exact-reference
+lookup under document and private-profile read grants. The current company
+date/timezone accompanies minimal display references; unrelated People availability
+and its general directory permission are not required. Foreign or missing exact
+references return the same empty page. The use case reuses repository contracts,
+preserves original/live authority and checks current MFA after access waits.
+
+Formatting, architecture, 13 document domain tests, nine data tests, 14 new
+employee-discovery API scenarios and 14 OpenAPI checks passed. Regression coverage
+also passed for owner-only catalogs and original-grant handling, together with all
+38 worker tests after the shared DI addition. Both application JARs built. The new
+cases cover scoped fields, literal search, bounded pagination, exact lookup,
+revocation while pending, expired MFA, interrupted ownership and independent module
+admission. Dashboard consumption remains the next increment.

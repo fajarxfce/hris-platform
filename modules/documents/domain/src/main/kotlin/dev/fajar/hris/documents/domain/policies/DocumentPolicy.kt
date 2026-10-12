@@ -10,12 +10,15 @@ const val DOCUMENT_CHUNK_BYTES = 1048576
 const val DOCUMENT_MAXIMUM_BYTES = 104857600L
 const val DOCUMENT_COMPANY_BYTES = 10737418240L
 
+fun canReadCompanyDocuments(actor: Actor): Boolean =
+    "documents.read" in actor.permissions && "people.profile.read" in actor.permissions
+
 fun canReadDocument(
     actor: Actor,
     classification: DocumentClassification,
     accountId: UUID?,
 ): Boolean =
-    ("documents.read" in actor.permissions && "people.profile.read" in actor.permissions) ||
+    canReadCompanyDocuments(actor) ||
         ("documents.self.read" in actor.permissions &&
             accountId == actor.accountId &&
             classification != DocumentClassification.HR_ONLY)

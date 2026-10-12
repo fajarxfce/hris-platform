@@ -6,6 +6,8 @@ import dev.fajar.hris.documents.delivery.requests.*
 import dev.fajar.hris.documents.delivery.responses.*
 import dev.fajar.hris.documents.domain.entities.StartDocumentUploadCommand
 import dev.fajar.hris.documents.domain.usecases.*
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Schema
 import java.util.UUID
 import org.springframework.web.bind.annotation.*
 
@@ -21,7 +23,36 @@ class DocumentController(
     private val list: ListDocuments,
     private val history: GetDocumentRevisions,
     private val validationHistory: GetDocumentValidationAttempts,
+    private val employees: ListDocumentEmployees,
 ) {
+    @GetMapping("/employees")
+    fun employees(
+        actor: Actor,
+        @Parameter(schema = Schema(maxLength = 120)) @RequestParam(defaultValue = "") query: String,
+        @Parameter(schema = Schema(pattern = "[A-Z0-9][A-Z0-9_-]{1,31}"))
+        @RequestParam(required = false)
+        after: String?,
+        @Parameter(
+            schema =
+                Schema(
+                    type = "integer",
+                    format = "int32",
+                    minimum = "1",
+                    maximum = "50",
+                    defaultValue = "20",
+                )
+        )
+        @RequestParam(defaultValue = "20")
+        limit: Int,
+        @Parameter(
+            description =
+                "Resolve one employment reference; cannot be combined with query or after."
+        )
+        @RequestParam(required = false)
+        employmentId: UUID?,
+    ): DocumentEmployeeDirectoryResponse =
+        employees.execute(actor, query, after, limit, employmentId).response().toResponse()
+
     @PostMapping("/uploads")
     fun start(
         actor: Actor,

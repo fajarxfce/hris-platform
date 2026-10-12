@@ -138,6 +138,13 @@ use cases intersect original/live grants and revalidate session assurance after
 waits. Content acquisition holds no SQL transaction and repeats those checks
 before returning bytes. Background validation retains a separate execution policy.
 
+Administrative document employee discovery reuses the People repository's bounded
+company projection under shared people and access guards. Its Documents use case
+requires current document and private-profile read grants and returns only display
+references. It does not invoke the People directory use case or require that
+unrelated module to be enabled. Self-service discovery retains its independent
+owner-only contract.
+
 Document retention and inventory administration also revalidate session assurance
 after their shared access guards. Retention snapshots acquire the document guard
 before access guards; metadata projections never wait for a job lock while holding

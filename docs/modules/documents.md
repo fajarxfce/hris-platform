@@ -33,6 +33,17 @@ validation resolves its execution authority separately from interactive MFA age.
 
 ## Self-service evidence catalog
 
+Administrative employee selection uses `GET /employees?query=...&after=...&limit=20`.
+It requires both `documents.read` and `people.profile.read`, independently of
+People module availability and the broader People directory grant. The response
+contains the current company date/timezone, normalized search and a bounded page
+of employment ID, employee number, name, status and version. It includes no contact,
+birth, nationality, account or assignment fields. Search is literal and limited
+to 120 characters; pages allow at most 50 rows. Current grants and MFA are checked
+after resource/access waits. `employmentId` resolves one reference for direct
+navigation and cannot be combined with search or a cursor; foreign and missing
+IDs both return an empty page. This lookup does not authorize a later content read.
+
 `GET /me/employments` returns the account's own employment references with the
 company date/time zone. It requires `documents.self.read` and Documents admission,
 independently of People or Leave module availability. Pages default to 20 and allow

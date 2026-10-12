@@ -2263,9 +2263,25 @@ gated after cleanup failure; current scope and finite read leases still apply.
 
 The mobile root checks passed with 805 desktop tests, 21 presentation Chromium
 cases and Android dev assembly. The preceding domain/data increment passed 66
-desktop and Chromium cases. API 35 emulator acceptance covered real development
+desktop and 53 Chromium cases. API 35 emulator acceptance covered real development
 requests, overnight dates, filters, offline process restoration and explicit
 recovery. A device-discovered hidden refresh message was corrected and covered by
 scrolled-layout regressions. After notice, the validated APK was installed on the
 authorized Android 16 phone with install-only delivery. This milestone covers
 employee reads; native command authoring and recovery remain in progress.
+
+## Native overtime planning preparation
+
+The mobile [preparation boundary](https://github.com/fajarxfce/hris-mobile/commit/c9da3a2)
+now obtains the current account's employment and reviewed calendar before a plan.
+It retains the server employment/content revisions and bounds review lifetime by
+current company/session policy. Application policies own duration, break, work-date,
+shift-overlap and actual-time validation; transport mapping remains in data.
+
+Mobile root checks passed with 825 desktop tests and Android dev assembly. Workforce
+passed 56 domain and 30 data desktop tests, plus 56 domain and 17 data Chromium
+cases. Twenty new cases cover acquisition ownership, cancellation, expiry,
+protocol bounds, overnight work, DST day boundaries and actual-time limits. A
+separate CI refresh-layout assertion was corrected to check retained scroll and
+reachable activity after the viewport changes. This boundary added no device
+flow or backend mutation; native durable commands and forms remain in progress.

@@ -4,8 +4,17 @@ import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.people.domain.entities.Employee
 import dev.fajar.hris.people.domain.entities.EmploymentStatus
 
-fun canReadOwnWorkforce(permissions: Set<String>): Boolean =
-    "attendance.self.record" in permissions || "workforce.read" in permissions
+fun canReadOwnWorkforceEmployments(permissions: Set<String>): Boolean =
+    permissions.any {
+        it in
+            setOf(
+                "attendance.self.record",
+                "workforce.read",
+                "overtime.self.manage",
+                "overtime.read",
+                "overtime.manage",
+            )
+    }
 
 fun canReadWorkforce(actor: Actor, employee: Employee, current: Employee?): Boolean =
     "workforce.read" in actor.permissions ||

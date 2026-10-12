@@ -1,10 +1,16 @@
 package dev.fajar.hris
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.domain.usecases.ListSelfWorkforceEmployments
 import java.net.http.HttpClient
 import java.net.http.HttpResponse
 import java.util.UUID
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.AfterEach
@@ -15,10 +21,16 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 
-@Import(AccountLockProbeConfiguration::class)
+@Import(AccountLockProbeConfiguration::class, OvertimePlanningProbeConfiguration::class)
 class SelfWorkforceHttpTest : ClientPolicyApiFixture() {
     @Autowired private lateinit var accounts: AccountLockProbe
     @Autowired private lateinit var list: ListSelfWorkforceEmployments
+    @Autowired private lateinit var acquisition: OvertimePlanningProbe
+    @Autowired private lateinit var people: PeopleRepository
+    @Autowired private lateinit var companies: CompanyRepository
+    @Autowired private lateinit var members: MembershipRepository
+    @Autowired private lateinit var identities: IdentityRepository
+    @Autowired private lateinit var transactions: TransactionRunner
 
     private data class Member(val id: UUID, val browser: HttpClient, val csrf: String)
 
@@ -50,6 +62,7 @@ class SelfWorkforceHttpTest : ClientPolicyApiFixture() {
     @AfterEach
     fun releaseAccountProbe() {
         accounts.current.getAndSet(null)?.release?.countDown()
+        acquisition.current.getAndSet(null)?.release?.countDown()
     }
 
     @Test
@@ -87,10 +100,11 @@ class SelfWorkforceHttpTest : ClientPolicyApiFixture() {
         failure(get(profileOnly.browser, path), 403, "access_denied")
     }
 
-    @Test
-    fun workforceHasIndependentModuleAdmissionAndNativeBuildRequirements() {
+    @ParameterizedTest
+    @ValueSource(strings = ["attendance.self.record", "overtime.self.manage"])
+    fun workforceHasIndependentModuleAdmissionAndNativeBuildRequirements(permission: String) {
         val f = fixture()
-        val owner = member(f.company)
+        val owner = member(f.company, permission)
         val own = employee(f.browser, f.csrf, f.company, account = owner.id)
         val path = "${f.root}/workforce/me/employments"
         assertEquals(
@@ -105,7 +119,7 @@ class SelfWorkforceHttpTest : ClientPolicyApiFixture() {
         assertEquals(200, get(f.browser, directory).statusCode())
         assertEquals(200, get(f.browser, review).statusCode())
         assertEquals(
-            200,
+            if (permission == "attendance.self.record") 200 else 404,
             get(
                     owner.browser,
                     "${f.root}/workforce/employees/$own/calendar?from=2026-10-01&until=2026-10-07",
@@ -244,5 +258,106 @@ class SelfWorkforceHttpTest : ClientPolicyApiFixture() {
         // A writer needs the exclusive people guard held by the interrupted read.
         employee(f.browser, f.csrf, f.company, account = owner.id)
         assertEquals(200, get(owner.browser, "${f.root}/workforce/me/employments").statusCode())
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["overtime.self.manage", "overtime.read", "overtime.manage"])
+    fun overtimeDiscoveryGrantsOnlyTheOwnersMinimalReferences(permission: String) {
+        val f = fixture()
+        val owner = member(f.company, permission)
+        val own = employee(f.browser, f.csrf, f.company, account = owner.id)
+        val other = employee(f.browser, f.csrf, f.company)
+        val response = get(owner.browser, "${f.root}/workforce/me/employments")
+        assertEquals(200, response.statusCode(), response.body())
+        val body = json.readTree(response.body())
+        val items = body["employments"]["items"]
+        assertEquals(1, items.size())
+        assertEquals(own.toString(), items[0]["id"].asString())
+        assertEquals(
+            setOf("id", "employeeNumber", "status", "version"),
+            items[0].properties().map { it.key }.toSet(),
+        )
+        assertFalse(response.body().contains(other.toString()))
+        val calendar =
+            "${f.root}/workforce/employees/$own/calendar?from=2026-10-01&until=2026-10-07"
+        failure(get(owner.browser, calendar), 404, "employee_not_found")
+        failure(get(owner.browser, "${f.root}/me/employments"), 403, "access_denied")
+        val requests = "${f.root}/workforce/overtime?from=2026-10-01&until=2026-10-07"
+        assertEquals(200, get(owner.browser, "$requests&employeeId=$own").statusCode())
+        if (permission == "overtime.self.manage") {
+            failure(get(owner.browser, "$requests&employeeId=$other"), 404, "employee_not_found")
+            failure(get(owner.browser, requests), 403, "employee_scope_required")
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [false, true])
+    fun lateExpiryAndCancellationDoNotReleaseAnAcquiredDirectory(cancel: Boolean) {
+        val f = fixture()
+        val reader =
+            ListSelfWorkforceEmployments(
+                people,
+                companies,
+                members,
+                identities,
+                transactions,
+                IdentitySecurityPolicy(),
+                clock,
+            )
+        val owner = member(f.company, "overtime.manage")
+        employee(f.browser, f.csrf, f.company, account = owner.id)
+        database()
+            .update(
+                "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
+                owner.id,
+            )
+        val actor =
+            Actor(
+                owner.id,
+                f.company,
+                setOf("overtime.manage"),
+                clock.instant(),
+                UUID.randomUUID(),
+                mfaVerifiedAt =
+                    clock.instant().minus(IdentitySecurityPolicy().maximumMfaAge).plusSeconds(1),
+                credentialVersion = 0,
+            )
+        val barrier = OvertimePlanningProbe.Barrier(f.company, review = false)
+        val finished = CountDownLatch(1)
+        acquisition.current.set(barrier)
+        Executors.newSingleThreadExecutor().use { pool ->
+            val pending =
+                pool.submit<Result<*>> {
+                    try {
+                        reader.execute(actor, null, 20)
+                    } finally {
+                        finished.countDown()
+                    }
+                }
+            try {
+                assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                if (cancel) {
+                    assertTrue(pending.cancel(true))
+                    assertTrue(finished.await(5, TimeUnit.SECONDS))
+                } else {
+                    clock.set(clock.instant().plusSeconds(2))
+                    barrier.release.countDown()
+                    assertEquals(
+                        "mfa_required",
+                        (pending.get(10, TimeUnit.SECONDS) as Result.Failed).failure.code,
+                    )
+                }
+            } finally {
+                barrier.release.countDown()
+                acquisition.current.set(null)
+            }
+            val recovered =
+                pool.submit<Result<*>> {
+                    reader.execute(actor.copy(mfaVerifiedAt = clock.instant()), null, 20)
+                }
+            assertTrue(recovered.get(10, TimeUnit.SECONDS) is Result.Success)
+        }
+        // A writer proves the interrupted reader released its shared people guard.
+        employee(f.browser, f.csrf, f.company)
     }
 }

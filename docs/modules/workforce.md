@@ -9,12 +9,14 @@ Overtime separates requested/actual/approved time. A payroll cutoff requires res
 Screens: roster, daily attendance, exceptions, offline verification, corrections, overtime, and closing.
 
 `GET /workforce/me/employments` selects only employments linked to the current
-account, under `attendance.self.record` or `workforce.read`. Its bounded directory
+account, under `attendance.self.record`, `workforce.read`, `overtime.self.manage`,
+`overtime.read` or `overtime.manage`. Its bounded directory
 returns employee number, status, observed version, company date and timezone;
 personal profiles are not included. The endpoint belongs to Workforce availability,
-so disabling People does not prevent employees from opening their work calendar.
-Company access, credential versions and current MFA are rechecked after waiting.
-Both the requested page and subsequent calendar read authorize independently.
+so disabling People does not prevent employees from opening their work calendar
+or overtime. Discovery does not grant calendar, profile or other employees' access.
+Company access, credential versions and current MFA are rechecked after waiting
+and after acquisition. Subsequent calendar and overtime reads authorize independently.
 
 Administrative selection uses `GET /workforce/employees?asOf=yyyy-MM-dd`, under
 `workforce.read`, with at most 50 employee references per page and bounded search.

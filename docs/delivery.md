@@ -2237,3 +2237,18 @@ tests and all 38 worker tests passed. Six new cases exercise proof expiry after
 acquisition, rollback, explicit recovery and cancellation, including reuse of the
 same executor thread after its interrupted transaction releases its guards.
 Both application JARs built. No endpoint contract or migration changed.
+
+## Overtime self-service employment discovery
+
+The minimal Workforce employment directory now accepts overtime self-management,
+read and management grants. It still returns only the current account's references
+and grants no calendar, profile or other employee access. The final acquisition
+also rechecks current session assurance before releasing the page.
+
+Architecture, formatting, 41 Workforce domain and 38 worker tests passed. The 43
+selected API/contract cases passed across the initial run and the focused 13-case
+directory rerun. New coverage includes overtime-only grants, native build/module
+admission, owner isolation, late MFA expiry and interrupted acquisition. The expiry
+fixture explicitly enables MFA because the general API setup policy disables it.
+Both application JARs built; no endpoint shape or migration changed. The preceding
+Jobs fix was deployed to the development API/worker and readiness returned UP.

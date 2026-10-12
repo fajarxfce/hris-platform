@@ -1498,3 +1498,20 @@ download matched the original content. The same self route rejected an account
 with only administrative grants. Probe sessions were closed and credentials remain
 in ignored development configuration. This does not complete the mobile file queue
 or establish production signature monitoring, backup recovery or load capacity.
+
+## Mobile leave evidence selection
+
+The mobile application now selects up to three owned, published personal-document
+revisions for leave submission. The catalog has bounded pages and expiring read
+admission. Closing the picker cancels acquisition; late callbacks cannot change a
+replacement form. A retained submission replays its original revision IDs.
+
+Mobile root checks passed with 616 desktop tests, together with 52 Leave and two
+localization Chromium tests, Android dev assembly and the production Web build.
+API 35 emulator acceptance selected an existing processed PDF under a policy
+requiring evidence. The API confirmed its original revision, size and digest,
+reserved one day, then restored the balance on withdrawal. The isolated test grant
+was reversed and its policy retired; document and request audit history remain.
+Light/dark appearance and 200% text were inspected. The phone was unavailable;
+no physical-phone interaction is claimed. File acquisition, scoped transfer and
+the dashboard document workflows remain separate delivery work.

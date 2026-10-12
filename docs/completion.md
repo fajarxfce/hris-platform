@@ -44,7 +44,10 @@ adds effective leave types, date/portion selection, server-reviewed calculations
 and durable submission. API 35 checks covered excluded dates, balance reservations,
 confirmation with transport blocked, process restoration, explicit delivery and
 withdrawal. The validated update was installed on the phone without launching it.
-Required document evidence remains its own integration work.
+The [document evidence selector](https://github.com/fajarxfce/hris-mobile/commit/c2a9d41)
+adds up to three owned, published revisions, including for leave types requiring
+evidence. API 35 acceptance verified original revision metadata, balance reservation
+and withdrawal. File acquisition and resumable transfer remain separate work.
 Automated UI/API checks and the Android dev build passed. Android 16 device checks
 covered password sign-in, company isolation, profiles, inbox reading, offline
 content, offline process restoration with company isolation, queued acknowledgement
@@ -60,7 +63,7 @@ retain their own acceptance work.
 | Mobile foundation | Additional business replicas and durable commands, background restoration, deep links and push registration. Bounded encrypted company admission, company availability, the employee inbox and HRIS sync client are implemented. |
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
 | Workforce | Dashboard company-wide exception queues, correction history, overtime and closing; bulk/reset and late corrections; mobile overtime requests and physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections, and mobile work calendars plus online/offline capture are implemented and verified against the real API. |
-| Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry; mobile evidence. Mobile balances, filtered request history, request details, submission and durable withdrawal/cancellation flows are implemented and verified against the development API. |
+| Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry. Mobile balances, filtered history, request details, submission with published document evidence, and durable withdrawal/cancellation flows are implemented and verified against the development API. |
 | Documents | Dashboard document/upload/processing/retention workflows; mobile scoped resumable upload/download and evidence acquisition |
 | Expenses | Dashboard policies, claims, review, payment/reconciliation and corrections; mobile claims, receipts, submission and payment progress |
 | Payroll | Dashboard policies, compensation, inputs, calculation, review, finalization, payslips, payments and amendments; mobile finalized payslips and downloads |

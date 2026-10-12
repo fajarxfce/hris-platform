@@ -2252,3 +2252,20 @@ admission, owner isolation, late MFA expiry and interrupted acquisition. The exp
 fixture explicitly enables MFA because the general API setup policy disables it.
 Both application JARs built; no endpoint shape or migration changed. The preceding
 Jobs fix was deployed to the development API/worker and readiness returned UP.
+
+## Native overtime reads
+
+[HRIS Mobile](https://github.com/fajarxfce/hris-mobile/commit/29eed7a) now exposes
+owned overtime requests, month/status filters and request details with the reviewed
+schedule, planned/actual/approved time and activity. Independent encrypted list
+and request snapshots retain bounded offline reads. Protected-read failures remain
+gated after cleanup failure; current scope and finite read leases still apply.
+
+The mobile root checks passed with 805 desktop tests, 21 presentation Chromium
+cases and Android dev assembly. The preceding domain/data increment passed 66
+desktop and Chromium cases. API 35 emulator acceptance covered real development
+requests, overnight dates, filters, offline process restoration and explicit
+recovery. A device-discovered hidden refresh message was corrected and covered by
+scrolled-layout regressions. After notice, the validated APK was installed on the
+authorized Android 16 phone with install-only delivery. This milestone covers
+employee reads; native command authoring and recovery remain in progress.

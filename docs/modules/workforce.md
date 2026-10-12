@@ -153,6 +153,13 @@ closed period metadata. The existing `employeeId`, `month` and `days` fields rem
 compatible. Display references use employment at month end and current identity
 labels; recorded daily facts and their calendar evidence remain immutable.
 
+Dashboard contracts validate period/attempt consistency, complete monthly results
+and immutable calendar evidence. Employee discovery reuses the shared reference
+page mapper, which only needs its observed cursor. Closing/recovery commands pin
+the original month, period version, reason and operation; explicit retry performs
+no fresh read or current-clock check. New form and monitoring views remain the
+next dashboard increment.
+
 
 ## Overtime requests
 

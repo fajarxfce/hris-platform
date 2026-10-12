@@ -2179,3 +2179,23 @@ new tests. Coverage includes company-local ended-month policy, minimal output,
 partial-result exclusion, pagination, foreign-company rejection, stopped-attempt
 recovery, nonblocking worker progress, late MFA expiry and cancellation. OpenAPI
 describes both new endpoints. No migration or mobile APK is required.
+
+## Dashboard closing contracts
+
+Added dashboard domain/data contracts for period overview, published employee
+discovery, monthly snapshots, closing and recovery. Mappers validate the complete
+month, scope, period/job identity, finite progress and historical time evidence.
+Factual totals retain worked time, recorded absence, missing attendance and
+approved overtime separately. Explicit retries retain the original command and
+observed version without a newer review or date replacing them.
+
+Architecture, Biome, TypeScript and all 1,372 dashboard unit tests passed. The 32
+new cases cover distinct grants, bounded queries, immutable mapping, malformed
+responses, missing versus recorded absence, leap-month length, exact receipts,
+later-date retry, scope/version rejection and cancellation. Shared attendance
+failure copy now also applies to closing.
+
+Development API and worker images were rebuilt from the validated JARs and
+restarted with the document-services and WireGuard overlays. API readiness was UP,
+the VPN dashboard returned HTTP 200 and database/Garage/ClamAV remained healthy.
+No migration or mobile APK changed. Dashboard closing presentation remains next.

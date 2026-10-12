@@ -22,7 +22,7 @@ export class RemoteCalendarRepository implements CalendarRepository {
       toWorkforceEmployeePage(
         await this.source.employees(company, search, signal),
         company,
-        search,
+        search.after,
       ),
     );
   }

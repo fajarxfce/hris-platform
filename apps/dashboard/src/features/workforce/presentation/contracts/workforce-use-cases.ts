@@ -1,4 +1,5 @@
 import type { AssignWeeklySchedule } from "../../domain/usecases/assign-weekly-schedule";
+import type { CloseWorkPeriod } from "../../domain/usecases/close-work-period";
 import type { CorrectAttendance } from "../../domain/usecases/correct-attendance";
 import type { DecideOvertimeRequest } from "../../domain/usecases/decide-overtime-request";
 import type { LoadAttendanceCorrectionHistory } from "../../domain/usecases/load-attendance-correction-history";
@@ -12,8 +13,12 @@ import type { LoadOvertimeRequest } from "../../domain/usecases/load-overtime-re
 import type { LoadOvertimeRequests } from "../../domain/usecases/load-overtime-requests";
 import type { LoadShift } from "../../domain/usecases/load-shift";
 import type { LoadShifts } from "../../domain/usecases/load-shifts";
+import type { LoadWorkPeriodEmployees } from "../../domain/usecases/load-work-period-employees";
+import type { LoadWorkPeriodOverview } from "../../domain/usecases/load-work-period-overview";
+import type { LoadWorkPeriodSnapshot } from "../../domain/usecases/load-work-period-snapshot";
 import type { LoadWorkforceEmployees } from "../../domain/usecases/load-workforce-employees";
 import type { PlanOvertimeRequest } from "../../domain/usecases/plan-overtime-request";
+import type { RecoverWorkPeriod } from "../../domain/usecases/recover-work-period";
 import type { ReviewAttendance } from "../../domain/usecases/review-attendance";
 import type { ReviewOvertimeAction } from "../../domain/usecases/review-overtime-action";
 import type { ReviewOvertimePlan } from "../../domain/usecases/review-overtime-plan";
@@ -24,6 +29,11 @@ import type { SubmitOvertimeActual } from "../../domain/usecases/submit-overtime
 import type { WithdrawOvertimeRequest } from "../../domain/usecases/withdraw-overtime-request";
 
 export type WorkforceUseCases = Readonly<{
+  loadWorkPeriodOverview: Pick<LoadWorkPeriodOverview, "execute">;
+  loadWorkPeriodEmployees: Pick<LoadWorkPeriodEmployees, "execute">;
+  loadWorkPeriodSnapshot: Pick<LoadWorkPeriodSnapshot, "execute">;
+  closeWorkPeriod: Pick<CloseWorkPeriod, "execute">;
+  recoverWorkPeriod: Pick<RecoverWorkPeriod, "execute">;
   loadOvertimePlanningEmployees: Pick<LoadOvertimePlanningEmployees, "execute">;
   reviewOvertimePlan: Pick<ReviewOvertimePlan, "execute">;
   planOvertimeRequest: Pick<PlanOvertimeRequest, "execute">;

@@ -32,7 +32,7 @@ export class RemoteOvertimeRepository implements OvertimeRepository {
       toWorkforceEmployeePage(
         await this.source.planningEmployees(company, search, signal),
         company,
-        { asOf: search.workDate, query: search.query, after: search.after },
+        search.after,
       ),
     );
   }

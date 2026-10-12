@@ -4,12 +4,15 @@ import { HttpCalendarDataSource } from "../data/datasources/http-calendar-data-s
 import { HttpHolidayDataSource } from "../data/datasources/http-holiday-data-source";
 import { HttpOvertimeDataSource } from "../data/datasources/http-overtime-data-source";
 import { HttpShiftDataSource } from "../data/datasources/http-shift-data-source";
+import { HttpWorkPeriodDataSource } from "../data/datasources/http-work-period-data-source";
 import { RemoteAttendanceRepository } from "../data/repositories/remote-attendance-repository";
 import { RemoteCalendarRepository } from "../data/repositories/remote-calendar-repository";
 import { RemoteHolidayRepository } from "../data/repositories/remote-holiday-repository";
 import { RemoteOvertimeRepository } from "../data/repositories/remote-overtime-repository";
 import { RemoteShiftRepository } from "../data/repositories/remote-shift-repository";
+import { RemoteWorkPeriodRepository } from "../data/repositories/remote-work-period-repository";
 import { AssignWeeklySchedule } from "../domain/usecases/assign-weekly-schedule";
+import { CloseWorkPeriod } from "../domain/usecases/close-work-period";
 import { CorrectAttendance } from "../domain/usecases/correct-attendance";
 import { DecideOvertimeRequest } from "../domain/usecases/decide-overtime-request";
 import { LoadAttendanceCorrectionHistory } from "../domain/usecases/load-attendance-correction-history";
@@ -23,8 +26,12 @@ import { LoadOvertimeRequest } from "../domain/usecases/load-overtime-request";
 import { LoadOvertimeRequests } from "../domain/usecases/load-overtime-requests";
 import { LoadShift } from "../domain/usecases/load-shift";
 import { LoadShifts } from "../domain/usecases/load-shifts";
+import { LoadWorkPeriodEmployees } from "../domain/usecases/load-work-period-employees";
+import { LoadWorkPeriodOverview } from "../domain/usecases/load-work-period-overview";
+import { LoadWorkPeriodSnapshot } from "../domain/usecases/load-work-period-snapshot";
 import { LoadWorkforceEmployees } from "../domain/usecases/load-workforce-employees";
 import { PlanOvertimeRequest } from "../domain/usecases/plan-overtime-request";
+import { RecoverWorkPeriod } from "../domain/usecases/recover-work-period";
 import { ReviewAttendance } from "../domain/usecases/review-attendance";
 import { ReviewOvertimeAction } from "../domain/usecases/review-overtime-action";
 import { ReviewOvertimePlan } from "../domain/usecases/review-overtime-plan";
@@ -40,7 +47,13 @@ export function createWorkforceFeature(http: HttpClient) {
   const shifts = new RemoteShiftRepository(new HttpShiftDataSource(http));
   const holidays = new RemoteHolidayRepository(new HttpHolidayDataSource(http));
   const overtime = new RemoteOvertimeRepository(new HttpOvertimeDataSource(http));
+  const periods = new RemoteWorkPeriodRepository(new HttpWorkPeriodDataSource(http));
   return {
+    loadWorkPeriodOverview: new LoadWorkPeriodOverview(periods),
+    loadWorkPeriodEmployees: new LoadWorkPeriodEmployees(periods),
+    loadWorkPeriodSnapshot: new LoadWorkPeriodSnapshot(periods),
+    closeWorkPeriod: new CloseWorkPeriod(periods),
+    recoverWorkPeriod: new RecoverWorkPeriod(periods),
     loadOvertimePlanningEmployees: new LoadOvertimePlanningEmployees(overtime),
     reviewOvertimePlan: new ReviewOvertimePlan(overtime),
     planOvertimeRequest: new PlanOvertimeRequest(overtime),

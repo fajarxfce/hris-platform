@@ -255,8 +255,48 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Periksa rentang tanggal dan batas durasinya. Tanggal akhir tidak boleh sebelum tanggal awal.",
   ],
   work_period_locked: [
-    "This work period is closed and cannot be changed.",
-    "Periode kerja ini sudah ditutup dan tidak dapat diubah.",
+    "This attendance period is locked. Review its closing status.",
+    "Periode presensi terkunci. Periksa status penutupannya.",
+  ],
+  invalid_work_period_range: [
+    "Select a valid month between January 2000 and December 2100.",
+    "Pilih bulan yang valid antara Januari 2000 dan Desember 2100.",
+  ],
+  invalid_work_period_close: [
+    "Review the period and enter a reason of up to 1,000 characters.",
+    "Periksa periode dan isi alasan maksimal 1.000 karakter.",
+  ],
+  invalid_work_period_recovery: [
+    "Review the stopped attempt and enter a reason of up to 1,000 characters.",
+    "Periksa proses yang berhenti dan isi alasan maksimal 1.000 karakter.",
+  ],
+  work_period_not_ended: [
+    "Only a completed month in the company timezone can be closed.",
+    "Penutupan hanya tersedia untuk bulan yang sudah berakhir di zona waktu perusahaan.",
+  ],
+  work_period_recovery_unavailable: [
+    "This period has no stopped attempt that needs recovery. Refresh its status.",
+    "Tidak ada proses berhenti yang perlu dipulihkan pada periode ini. Muat ulang statusnya.",
+  ],
+  work_period_snapshot_unavailable: [
+    "Published attendance results are unavailable for this employee and month.",
+    "Hasil presensi yang sudah ditutup belum tersedia untuk karyawan dan bulan ini.",
+  ],
+  work_period_employee_limit: [
+    "A closing attempt supports up to 5,000 employees.",
+    "Satu proses penutupan mendukung maksimal 5.000 karyawan.",
+  ],
+  work_period_snapshot_incomplete: [
+    "The attendance results are incomplete. Review the closing attempt.",
+    "Hasil presensi belum lengkap. Periksa proses penutupannya.",
+  ],
+  overtime_resolution_required: [
+    "Resolve outstanding overtime plans and reviews before closing this month.",
+    "Selesaikan pengajuan dan review lembur sebelum menutup bulan ini.",
+  ],
+  attendance_incomplete: [
+    "Complete the attendance clock-in and clock-out pairs before closing this month.",
+    "Lengkapi pasangan presensi masuk dan pulang sebelum menutup bulan ini.",
   ],
   shift_not_found: [
     "This shift is unavailable in the current company.",
@@ -1234,8 +1274,8 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Hari ini sudah memiliki koreksi. Periksa catatan terbaru.",
   ],
   attendance_verification_required: [
-    "Resolve pending attendance before recording a correction.",
-    "Selesaikan verifikasi presensi sebelum mencatat koreksi.",
+    "Resolve pending attendance verification before continuing.",
+    "Selesaikan verifikasi presensi yang tertunda terlebih dahulu.",
   ],
   future_attendance_correction: [
     "Attendance cannot be corrected for a future work date.",

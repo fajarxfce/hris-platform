@@ -5,7 +5,7 @@ import dev.fajar.hris.documents.domain.entities.*
 import java.util.UUID
 
 interface DocumentRepository {
-    fun lock(companyId: UUID): Result<Unit>
+    fun lock(companyId: UUID, shared: Boolean = false): Result<Unit>
 
     fun capacity(companyId: UUID, actorId: UUID): Result<DocumentCapacity>
 

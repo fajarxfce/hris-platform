@@ -5,6 +5,8 @@ import dev.fajar.hris.documents.domain.entities.*
 import dev.fajar.hris.documents.domain.policies.*
 import dev.fajar.hris.documents.domain.repositories.DocumentRepository
 import dev.fajar.hris.documents.domain.repositories.DocumentRetentionRepository
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.JobStatus
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
@@ -27,6 +29,7 @@ class StartDocumentUpload(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -70,7 +73,7 @@ class StartDocumentUpload(
             if (accountLock is Result.Failed) return@run accountLock
             val current =
                 identities.access(actor.accountId, company).flatMap {
-                    validateDocumentActor(actor, it)
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (current is Result.Failed) return@run current
             val live = (current as Result.Success).value

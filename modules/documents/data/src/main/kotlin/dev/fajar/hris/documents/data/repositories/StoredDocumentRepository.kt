@@ -13,7 +13,9 @@ import java.time.ZoneOffset
 import java.util.UUID
 
 class StoredDocumentRepository(private val source: DocumentDataSource) : DocumentRepository {
-    override fun lock(companyId: UUID) = safeDatabaseCall { source.lock(companyId) }
+    override fun lock(companyId: UUID, shared: Boolean) = safeDatabaseCall {
+        source.lock(companyId, shared)
+    }
 
     override fun capacity(companyId: UUID, actorId: UUID) = safeDatabaseCall {
         val r = source.capacity(companyId, actorId)

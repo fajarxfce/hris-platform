@@ -131,6 +131,13 @@ Business document references belong to the documents domain contract and are reg
 
 Document retention has its own versioned metadata aggregate. Use cases coordinate retention, document, identity, and audit repositories; no datasource or repository invokes another peer. Policy snapshots and lifecycle evidence are immutable. Upload and retention commands share the company document guard, then lock company, membership, and account access in that order. Archive requires explicit cancellation of unfinished processing rather than hiding that orchestration inside storage.
 
+Interactive document readers take shared people, applicable document, company,
+membership and actor-account guards in that order. Aggregate reads retain a
+coherent revision snapshot; directories use a bounded query. Read and upload
+use cases intersect original/live grants and revalidate session assurance after
+waits. Content acquisition holds no SQL transaction and repeats those checks
+before returning bytes. Background validation retains a separate execution policy.
+
 Announcement edits acquire the announcement guard, then audience-group and organization guards, before company/membership/account access guards. Group edits acquire their group guard before people and access guards. The bounded member list is stored in one immutable revision with database validation of its company references; lists select summary columns without materializing those arrays. A revision head and its immutable snapshot are linked by a deferred foreign key and commit with the operation receipt, audit, and outbox event.
 
 

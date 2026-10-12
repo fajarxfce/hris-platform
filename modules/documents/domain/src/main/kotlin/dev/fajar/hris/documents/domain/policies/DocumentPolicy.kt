@@ -30,9 +30,11 @@ fun canManageDocument(
             accountId == actor.accountId &&
             classification != DocumentClassification.HR_ONLY)
 
-fun validateDocumentActor(actor: Actor, access: AccountAccess?): Result<Actor> {
+/** Resolves current execution grants for an already scoped validation job. */
+fun validateDocumentJobActor(actor: Actor, access: AccountAccess?): Result<Actor> {
     if (
         access == null ||
+            access.account.id != actor.accountId ||
             !access.account.active ||
             (actor.credentialVersion != null &&
                 actor.credentialVersion != access.account.securityVersion)

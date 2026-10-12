@@ -5,7 +5,7 @@ import dev.fajar.hris.schema.tables.records.*
 import java.util.UUID
 
 interface DocumentDataSource {
-    fun lock(companyId: UUID)
+    fun lock(companyId: UUID, shared: Boolean = false)
 
     fun capacity(companyId: UUID, actorId: UUID): DocumentCapacityData
 

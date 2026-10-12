@@ -91,7 +91,7 @@ class DocumentValidationWorkerTest {
             )
         database()
             .update(
-                "insert into accounts(id,email,display_name) values(?,?,'Document operator')",
+                "insert into accounts(id,email,display_name,mfa_secret_encrypted) values(?,?,'Document operator','worker-fixture-enrolled')",
                 account,
                 "$account@example.test",
             )
@@ -139,6 +139,7 @@ class DocumentValidationWorkerTest {
                 Instant.now(),
                 UUID.randomUUID(),
                 credentialVersion = 0,
+                mfaVerifiedAt = Instant.now(),
             )
         val bytes = "%PDF-1.7\n%%EOF".toByteArray()
         val hash =

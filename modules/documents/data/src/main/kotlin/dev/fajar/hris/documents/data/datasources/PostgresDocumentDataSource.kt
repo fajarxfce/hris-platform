@@ -8,8 +8,9 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresDocumentDataSource(private val sql: DSLContext) : DocumentDataSource {
-    override fun lock(companyId: UUID) {
-        sql.execute("select pg_advisory_xact_lock(hashtextextended(?::text,7319))", companyId)
+    override fun lock(companyId: UUID, shared: Boolean) {
+        val operation = if (shared) "pg_advisory_xact_lock_shared" else "pg_advisory_xact_lock"
+        sql.execute("select $operation(hashtextextended(?::text,7319))", companyId)
     }
 
     override fun capacity(companyId: UUID, actorId: UUID): DocumentCapacityData {

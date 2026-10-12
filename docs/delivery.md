@@ -1427,3 +1427,23 @@ delivered it after reconnection. Withdrawal returned the available balance to it
 baseline. Dark mode and 200% text were inspected. The validated APK was installed
 on the connected phone using install-only. This does not claim physical-phone UI
 interaction, iOS acceptance or runtime performance measurements.
+
+## Document request scope and session assurance
+
+Interactive document metadata/content reads and upload commands now preserve the
+request's original permission boundary while checking live access and session MFA
+after resource waits. Shared aggregate readers coexist while writers wait. Content
+acquisition remains outside SQL transactions and rechecks authority before returning
+bytes; an expired proof after storage cannot publish upload progress. Background
+validation keeps separate execution authority.
+
+Formatting, architecture checks, 13 document domain tests, nine data tests, 126
+document/leave-evidence API tests and all 38 worker tests passed, together with both
+application JAR builds. Thirty-two new API regressions cover original grants,
+MFA expiry and renewal, receipt replay, pending permission/credential changes,
+shared readers, interrupted ownership and post-storage recovery. The initial
+original-grant probes reproduced the failure before the implementation change.
+API and worker development containers were rebuilt without resetting PostgreSQL;
+API health is `UP` and both processes have zero restarts. Retention/inventory
+administration has a separate assurance review; this increment does not complete
+document UI or physical storage acceptance.

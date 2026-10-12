@@ -5,9 +5,11 @@ import dev.fajar.hris.documents.data.datasources.*
 import dev.fajar.hris.documents.data.repositories.*
 import dev.fajar.hris.documents.domain.repositories.*
 import dev.fajar.hris.documents.domain.usecases.*
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.people.domain.repositories.PersonProfileRepository
 import dev.fajar.hris.storage.domain.repositories.*
 import java.time.Clock
@@ -59,6 +61,7 @@ class DocumentsConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         StartDocumentUpload(
             documents,
@@ -73,6 +76,7 @@ class DocumentsConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -88,6 +92,7 @@ class DocumentsConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         UploadDocumentChunk(
             documents,
@@ -101,6 +106,7 @@ class DocumentsConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -116,6 +122,7 @@ class DocumentsConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         CancelDocumentUpload(
             documents,
@@ -129,43 +136,90 @@ class DocumentsConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
     fun getDocument(
         documents: DocumentRepository,
         profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetDocument(documents, profiles, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = GetDocument(documents, profiles, people, members, identities, transactions, clock, security)
 
     @Bean
     fun getDocumentRevision(
         documents: DocumentRepository,
         jobs: JobRepository,
         profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetDocumentRevision(documents, jobs, profiles, identities, transactions, clock)
+        security: IdentitySecurityPolicy,
+    ) =
+        GetDocumentRevision(
+            documents,
+            jobs,
+            profiles,
+            people,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun listDocuments(
         documents: DocumentRepository,
         profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListDocuments(documents, profiles, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListDocuments(
+            documents,
+            profiles,
+            people,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun getDocumentRevisions(
         documents: DocumentRepository,
         jobs: JobRepository,
         profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetDocumentRevisions(documents, jobs, profiles, identities, transactions, clock)
+        security: IdentitySecurityPolicy,
+    ) =
+        GetDocumentRevisions(
+            documents,
+            jobs,
+            profiles,
+            people,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun startDocumentValidation(
@@ -179,6 +233,7 @@ class DocumentsConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         StartDocumentValidation(
             documents,
@@ -191,6 +246,7 @@ class DocumentsConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -233,26 +289,69 @@ class DocumentsConfiguration {
     fun getDocumentValidationAttempts(
         documents: DocumentRepository,
         profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetDocumentValidationAttempts(documents, profiles, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetDocumentValidationAttempts(
+            documents,
+            profiles,
+            people,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun getDocumentDownload(
         documents: DocumentRepository,
         profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetDocumentDownload(documents, profiles, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetDocumentDownload(
+            documents,
+            profiles,
+            people,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun readDocumentContent(
         documents: DocumentRepository,
         profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        members: MembershipRepository,
         identities: IdentityRepository,
         storage: ObjectStorageRepository,
         transactions: TransactionRunner,
-    ) = ReadDocumentContent(documents, profiles, identities, storage, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ReadDocumentContent(
+            documents,
+            profiles,
+            people,
+            members,
+            identities,
+            storage,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun documentInventorySource(sql: DSLContext): DocumentInventoryDataSource =

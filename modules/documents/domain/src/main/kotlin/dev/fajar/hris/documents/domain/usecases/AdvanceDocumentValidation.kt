@@ -55,7 +55,7 @@ class AdvanceDocumentValidation(
                 if (accountLock is Result.Failed) return@run accountLock
                 val current =
                     identities.access(actor.accountId, company).flatMap {
-                        validateDocumentActor(actor, it)
+                        validateDocumentJobActor(actor, it)
                     }
                 if (current is Result.Failed) return@run current
                 val live = (current as Result.Success).value
@@ -122,7 +122,7 @@ class AdvanceDocumentValidation(
             if (accountLock is Result.Failed) return@run accountLock
             val current =
                 identities.access(actor.accountId, company).flatMap {
-                    validateDocumentActor(actor, it)
+                    validateDocumentJobActor(actor, it)
                 }
             if (current is Result.Failed) return@run current
             val live = (current as Result.Success).value

@@ -24,6 +24,13 @@ File declarations are restricted to PDF, JPEG, and PNG, with a matching extensio
 
 Generic reads require `documents.read` and `people.profile.read`; writes require `documents.manage` and `people.profile.manage`. Self-service uses `documents.self.read` / `documents.self.upload` for the account linked to the employment. `HR_ONLY` documents are excluded from self-service. Finance access to claim receipts belongs to the expense workflow's resource authorization. Current credentials, membership, and grants are checked again before accepting pending writes. Responses contain metadata, never physical storage keys.
 
+Interactive metadata/content reads and upload commands intersect the original request's
+grants with current access. Shared read guards protect ownership and aggregate
+snapshots; writers retain exclusive guards. Current session MFA is checked after
+waiting, before receipt replay, and again after content storage I/O. A late response
+cannot release bytes or publish upload progress using an expired proof. Background
+validation resolves its execution authority separately from interactive MFA age.
+
 ## Content inspection adapter
 
 The content inspection adapter combines private storage chunks, Apache Tika 4.1 type detection, and ClamAV's INSTREAM protocol. It reports observed size, whole-file SHA-256, media type, scanner version, and verdict. The domain workflow decides whether that evidence permits publication. A clean scanner response alone does not establish a matching document type or digest.

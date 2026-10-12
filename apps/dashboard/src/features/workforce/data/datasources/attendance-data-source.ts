@@ -4,9 +4,18 @@ import type {
   AttendanceReceiptDto,
   AttendanceReviewDto,
 } from "../models/attendance-dto";
+import type {
+  AttendanceExceptionPageDto,
+  AttendanceExceptionSearchDto,
+} from "../models/attendance-exception-dto";
 import type { CalendarRangeDto } from "../models/calendar-dto";
 
 export interface AttendanceDataSource {
+  exceptions(
+    company: string,
+    search: AttendanceExceptionSearchDto,
+    signal: AbortSignal,
+  ): Promise<AttendanceExceptionPageDto>;
   corrections(
     company: string,
     employee: string,

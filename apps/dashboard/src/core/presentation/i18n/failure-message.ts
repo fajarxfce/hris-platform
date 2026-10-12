@@ -1113,6 +1113,10 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Data sudah berubah. Muat ulang sebelum mencoba lagi.",
   ],
   invalid_attendance_range: ["Select a range of up to 31 days.", "Pilih rentang maksimal 31 hari."],
+  invalid_attendance_filter: [
+    "Select a valid attendance status.",
+    "Pilih status attendance yang valid.",
+  ],
   invalid_attendance_review: [
     "Select a decision and provide a reason.",
     "Pilih keputusan dan isi alasannya.",

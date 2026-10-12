@@ -1926,3 +1926,20 @@ and MFA expiry at the account guard and after projection acquisition. Initial te
 failures corrected fixture assumptions about the credential column, validation
 HTTP status and disabled fixture MFA; the rerun passed with explicit enforced MFA.
 Dashboard queue delivery remains the next increment.
+
+## Dashboard attendance exception contracts
+
+The dashboard now has a Workforce use case and data boundary for exception pages.
+It validates the administrative grant, date range, filter and cursor bounds before
+acquisition. The mapper retains immutable company/query scope, validates exclusive
+date/employee ordering and continued-page progress, and rejects resolved or
+inconsistent facts. Pending and incomplete rows remain distinct from absence.
+Technical failures use the existing localized Result boundary; cancellation is
+propagated before and after acquisition.
+
+Architecture, formatting, TypeScript and all 1,149 dashboard unit tests passed,
+including 31 new boundary cases. The tests cover malformed and oversized pages,
+cross-scope cursors, filter mismatches, late data, immutable mapping and access/MFA
+failure preservation. The development API and worker were updated, with migration
+V65 applied and the private document/WireGuard services preserved. Loopback and VPN
+API checks and the VPN dashboard returned HTTP 200. No new mobile build was needed.

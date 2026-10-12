@@ -2,15 +2,26 @@ import { safeHttpCall } from "../../../../core/data/http/safe-http-call";
 import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
 import type { EmployeeId } from "../../../people/domain/entities/employee";
 import type { AttendanceCorrectionChange } from "../../domain/entities/attendance-correction-change";
+import type { AttendanceExceptionSearch } from "../../domain/entities/attendance-exception-search";
 import type { AttendanceReviewChange } from "../../domain/entities/attendance-review-change";
 import type { CalendarRange } from "../../domain/entities/calendar-range";
 import type { AttendanceRepository } from "../../domain/repositories/attendance-repository";
 import type { AttendanceDataSource } from "../datasources/attendance-data-source";
 import { toAttendanceCorrectionPage } from "../mappers/attendance-correction-page-mapper";
+import { toAttendanceExceptionPage } from "../mappers/attendance-exception-page-mapper";
 import { toAttendanceReceipt, toEmployeeAttendance } from "../mappers/attendance-mapper";
 
 export class RemoteAttendanceRepository implements AttendanceRepository {
   constructor(private readonly source: AttendanceDataSource) {}
+  exceptions(company: CompanyId, search: AttendanceExceptionSearch, signal: AbortSignal) {
+    return safeHttpCall(signal, async () =>
+      toAttendanceExceptionPage(
+        await this.source.exceptions(company, search, signal),
+        company,
+        search,
+      ),
+    );
+  }
   corrections(
     company: CompanyId,
     employee: EmployeeId,

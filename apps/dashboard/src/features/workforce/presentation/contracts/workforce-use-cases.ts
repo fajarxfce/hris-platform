@@ -1,6 +1,7 @@
 import type { AssignWeeklySchedule } from "../../domain/usecases/assign-weekly-schedule";
 import type { CorrectAttendance } from "../../domain/usecases/correct-attendance";
 import type { LoadAttendanceCorrectionHistory } from "../../domain/usecases/load-attendance-correction-history";
+import type { LoadAttendanceExceptions } from "../../domain/usecases/load-attendance-exceptions";
 import type { LoadCalendarReview } from "../../domain/usecases/load-calendar-review";
 import type { LoadEmployeeAttendance } from "../../domain/usecases/load-employee-attendance";
 import type { LoadHoliday } from "../../domain/usecases/load-holiday";
@@ -14,6 +15,7 @@ import type { SaveShift } from "../../domain/usecases/save-shift";
 import type { SetRosterDay } from "../../domain/usecases/set-roster-day";
 
 export type WorkforceUseCases = Readonly<{
+  loadAttendanceExceptions: Pick<LoadAttendanceExceptions, "execute">;
   loadAttendanceCorrectionHistory: Pick<LoadAttendanceCorrectionHistory, "execute">;
   loadEmployeeAttendance: Pick<LoadEmployeeAttendance, "execute">;
   reviewAttendance: Pick<ReviewAttendance, "execute">;

@@ -6,11 +6,26 @@ import {
   attendanceDaysDto,
   attendanceReceiptDto,
 } from "../models/attendance-dto";
+import {
+  type AttendanceExceptionSearchDto,
+  attendanceExceptionPageDto,
+} from "../models/attendance-exception-dto";
 import type { CalendarRangeDto } from "../models/calendar-dto";
 import type { AttendanceDataSource } from "./attendance-data-source";
 
 export class HttpAttendanceDataSource implements AttendanceDataSource {
   constructor(private readonly http: HttpClient) {}
+  async exceptions(company: string, search: AttendanceExceptionSearchDto, signal: AbortSignal) {
+    const query = new URLSearchParams({ from: search.from, until: search.until, limit: "50" });
+    if (search.kind !== null) query.set("kind", search.kind);
+    if (search.after !== null) query.set("after", search.after);
+    return attendanceExceptionPageDto.parse(
+      await this.http.request(
+        { path: `/api/v1/companies/${company}/workforce/attendance/exceptions?${query}` },
+        signal,
+      ),
+    );
+  }
   async corrections(
     company: string,
     employee: string,

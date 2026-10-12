@@ -4,11 +4,18 @@ import type { Result } from "../../../../core/domain/result";
 import type { EmployeeId } from "../../../people/domain/entities/employee";
 import type { AttendanceCorrectionChange } from "../entities/attendance-correction-change";
 import type { AttendanceCorrectionPage } from "../entities/attendance-correction-page";
+import type { AttendanceExceptionPage } from "../entities/attendance-exception-page";
+import type { AttendanceExceptionSearch } from "../entities/attendance-exception-search";
 import type { AttendanceReviewChange } from "../entities/attendance-review-change";
 import type { CalendarRange } from "../entities/calendar-range";
 import type { EmployeeAttendance } from "../entities/employee-attendance";
 
 export interface AttendanceRepository {
+  exceptions(
+    company: CompanyId,
+    search: AttendanceExceptionSearch,
+    signal: AbortSignal,
+  ): Promise<Result<AttendanceExceptionPage>>;
   corrections(
     company: CompanyId,
     employee: EmployeeId,

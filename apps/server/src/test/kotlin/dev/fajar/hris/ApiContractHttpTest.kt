@@ -34,6 +34,32 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun attendanceExceptionsHaveABoundedCompanyAdmittedMetadataContract() {
+        val api = contract()
+        val operation =
+            api["paths"]["/api/v1/companies/{companyId}/workforce/attendance/exceptions"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val parameters = operation["parameters"].associateBy { it["name"].asString() }
+        assertEquals(200, parameters.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals(160, parameters.getValue("after")["schema"]["maxLength"].asInt())
+        val properties = api["components"]["schemas"]["AttendanceExceptionResponse"]["properties"]
+        assertEquals(
+            setOf(
+                "employeeId",
+                "employeeNumber",
+                "employeeName",
+                "workDate",
+                "pendingCount",
+                "incomplete",
+                "correctionVersion",
+                "lastReceivedAt",
+            ),
+            properties.properties().map { it.key }.toSet(),
+        )
+        assertEquals(32, properties["pendingCount"]["maximum"].asInt())
+    }
+
+    @Test
     fun retirementReviewExposesDecisionMetadataWithoutContentAccess() {
         val api = contract()
         val operation =

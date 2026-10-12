@@ -84,6 +84,22 @@ Capture time limits and server proof expiry are evaluated again after pending re
 
 Capture accepts up to 31 days of offline history, tolerates at most 30 seconds of future clock skew, and bounds one date to 32 raw events. Employee reads cover at most 31 days. Location evidence includes declared accuracy/mock status and is not a guarantee against a compromised device. Capture-window issuance is bounded to ten per employee per minute.
 
+`GET /workforce/attendance/exceptions?from=...&until=...` requires company-wide
+`workforce.read`. It returns employee display references and dates with pending
+evidence or an incomplete accepted clock-in/out pair, plus the pending count,
+current correction version and latest evidence receipt time. Optional `kind`
+selects `PENDING` or `INCOMPLETE`; omission includes both. A correction resolves
+raw pair incompleteness but does not hide later pending evidence. Missing punches
+do not establish absence, and the directory does not calculate payable time.
+
+The range is at most 31 days; pages default to 50 rows and allow at most 200.
+Ordering is work date descending, then employee ID ascending. The opaque `after`
+cursor is bounded to 160 characters and retains its company, range and filter.
+Each page is one SQL snapshot, so earlier resolved rows do not invalidate its
+continuation. Pages are live observations, not a frozen export or action approval.
+The subsequent day read and review/correction command authorize independently.
+Locations, devices, personal profiles and raw evidence are not returned here.
+
 HR corrections are implemented as immutable revisions with optimistic versions and required reasons. They retain original evidence and snapshots, expose a paginated history, and prohibit self-correction. Pending evidence must be resolved first. Later punches on a corrected day remain pending and cannot overwrite the correction; reviewers can reject that evidence or HR can publish another explicit correction. An explicit absence has null clock-in/out and zero break minutes.
 
 The dashboard now exposes bounded employee attendance, daily capture evidence,

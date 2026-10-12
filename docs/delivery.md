@@ -1905,3 +1905,24 @@ remained separately readable and the final overnight total and raw punches staye
 intact. An initial run was interrupted to correct the test's save-link locator;
 the corrected run passed. Narrow light/dark and real-API desktop views were inspected.
 No backend or mobile build changed for this dashboard increment.
+
+## Company attendance exception API
+
+Workforce now provides a company-wide directory of pending attendance evidence and
+incomplete accepted clock-in/out pairs. One SQL snapshot returns bounded employee
+display references and factual counts, with date/filter-bound keyset pagination.
+Independent reviews can proceed while a page is being read; subsequent pages
+remain live observations. Corrected days retain visibility when new evidence is
+pending. The endpoint does not infer absence or expose location/device evidence.
+
+The use case requires original and current administrative read access under shared
+people/access guards and rechecks session assurance before releasing its result.
+Migration V65 adds the company/date/employee index without altering existing records
+or grants. Architecture and formatting checks and both application JAR builds
+passed, together with 36 workforce domain, 48 selected API/attendance and 38 worker
+tests. New cases cover cursor scope/order, resolved earlier rows, correction and
+review transitions, RLS isolation, cancelled reads, credential/grant revocation,
+and MFA expiry at the account guard and after projection acquisition. Initial test
+failures corrected fixture assumptions about the credential column, validation
+HTTP status and disabled fixture MFA; the rerun passed with explicit enforced MFA.
+Dashboard queue delivery remains the next increment.

@@ -56,7 +56,14 @@ fun summarizeAttendance(
                     .coerceAtLeast(0)
         },
         entries.count { it.status == AttendanceStatus.PENDING },
-        correction == null && ((start == null) != (end == null)),
+        attendancePairIncomplete(start != null, end != null, correction != null),
         correction,
     )
 }
+
+/** Both the day aggregate and bounded exception projection use the same factual definition. */
+fun attendancePairIncomplete(
+    hasSingleClockIn: Boolean,
+    hasSingleClockOut: Boolean,
+    corrected: Boolean,
+): Boolean = !corrected && hasSingleClockIn != hasSingleClockOut

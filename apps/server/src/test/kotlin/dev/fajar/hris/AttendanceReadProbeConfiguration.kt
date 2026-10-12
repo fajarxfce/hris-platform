@@ -1,5 +1,7 @@
 package dev.fajar.hris
 
+import dev.fajar.hris.workforce.domain.entities.AttendanceExceptionCursor
+import dev.fajar.hris.workforce.domain.entities.AttendanceExceptionKind
 import dev.fajar.hris.workforce.domain.repositories.AttendanceRepository
 import java.time.LocalDate
 import java.util.UUID
@@ -19,6 +21,14 @@ class AttendanceReadProbe {
     )
 
     val current = AtomicReference<Barrier?>()
+
+    fun afterRead(company: UUID) {
+        val barrier = current.get()
+        if (barrier != null && barrier.company == company && current.compareAndSet(barrier, null)) {
+            barrier.entered.countDown()
+            check(barrier.release.await(5, TimeUnit.SECONDS))
+        }
+    }
 }
 
 @TestConfiguration(proxyBeanMethods = false)
@@ -32,6 +42,18 @@ class AttendanceReadProbeConfiguration {
         probe: AttendanceReadProbe,
     ): AttendanceRepository =
         object : AttendanceRepository by delegate {
+            override fun exceptions(
+                companyId: UUID,
+                from: LocalDate,
+                until: LocalDate,
+                kind: AttendanceExceptionKind?,
+                after: AttendanceExceptionCursor?,
+                limit: Int,
+            ) =
+                delegate.exceptions(companyId, from, until, kind, after, limit).also {
+                    probe.afterRead(companyId)
+                }
+
             override fun entries(
                 companyId: UUID,
                 employeeId: UUID,
@@ -39,15 +61,7 @@ class AttendanceReadProbeConfiguration {
                 until: LocalDate,
             ) =
                 delegate.entries(companyId, employeeId, from, until).also {
-                    val barrier = probe.current.get()
-                    if (
-                        barrier != null &&
-                            barrier.company == companyId &&
-                            probe.current.compareAndSet(barrier, null)
-                    ) {
-                        barrier.entered.countDown()
-                        check(barrier.release.await(5, TimeUnit.SECONDS))
-                    }
+                    probe.afterRead(companyId)
                 }
         }
 }

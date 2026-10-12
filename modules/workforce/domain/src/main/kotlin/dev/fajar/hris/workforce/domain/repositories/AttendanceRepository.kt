@@ -7,6 +7,15 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface AttendanceRepository {
+    fun exceptions(
+        companyId: UUID,
+        from: LocalDate,
+        until: LocalDate,
+        kind: AttendanceExceptionKind?,
+        after: AttendanceExceptionCursor?,
+        limit: Int,
+    ): Result<Page<AttendanceException>>
+
     fun lockDay(
         companyId: UUID,
         employeeId: UUID,

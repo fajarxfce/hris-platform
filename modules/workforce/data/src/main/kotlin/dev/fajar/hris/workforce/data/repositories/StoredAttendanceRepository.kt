@@ -6,6 +6,7 @@ import dev.fajar.hris.schema.tables.records.AttendanceReviewsRecord
 import dev.fajar.hris.workforce.data.datasources.AttendanceDataSource
 import dev.fajar.hris.workforce.data.mappers.*
 import dev.fajar.hris.workforce.domain.entities.*
+import dev.fajar.hris.workforce.domain.policies.attendanceExceptionCursor
 import dev.fajar.hris.workforce.domain.repositories.AttendanceRepository
 import java.time.*
 import java.util.UUID
@@ -15,6 +16,33 @@ class StoredAttendanceRepository(
     private val source: AttendanceDataSource,
     private val json: ObjectMapper,
 ) : AttendanceRepository {
+    override fun exceptions(
+        companyId: UUID,
+        from: LocalDate,
+        until: LocalDate,
+        kind: AttendanceExceptionKind?,
+        after: AttendanceExceptionCursor?,
+        limit: Int,
+    ): Result<Page<AttendanceException>> = safeDatabaseCall {
+        val rows =
+            source.exceptions(
+                companyId,
+                from,
+                until,
+                kind?.name,
+                after?.workDate,
+                after?.employeeId,
+                limit + 1,
+            )
+        val items = rows.take(limit).map { it.toAttendanceException() }
+        Page(
+            items,
+            if (rows.size > limit)
+                attendanceExceptionCursor(companyId, from, until, kind, items.last())
+            else null,
+        )
+    }
+
     override fun lockDay(
         companyId: UUID,
         employeeId: UUID,

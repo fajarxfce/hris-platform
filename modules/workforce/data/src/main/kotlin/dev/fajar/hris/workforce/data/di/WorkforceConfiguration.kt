@@ -29,6 +29,28 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class WorkforceConfiguration {
     @Bean
+    fun attendanceExceptions(
+        attendance: AttendanceRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListAttendanceExceptions(
+            attendance,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun workforceEmployees(
         people: PeopleRepository,
         companies: CompanyRepository,

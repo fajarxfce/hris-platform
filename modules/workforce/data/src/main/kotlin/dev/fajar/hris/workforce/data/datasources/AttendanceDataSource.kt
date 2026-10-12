@@ -1,12 +1,23 @@
 package dev.fajar.hris.workforce.data.datasources
 
 import dev.fajar.hris.schema.tables.records.*
+import dev.fajar.hris.workforce.data.models.AttendanceExceptionRow
 import dev.fajar.hris.workforce.data.models.AttendanceRow
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
 interface AttendanceDataSource {
+    fun exceptions(
+        company: UUID,
+        from: LocalDate,
+        until: LocalDate,
+        kind: String?,
+        afterDate: LocalDate?,
+        afterEmployee: UUID?,
+        limit: Int,
+    ): List<AttendanceExceptionRow>
+
     fun lockDay(company: UUID, employee: UUID, date: LocalDate, shared: Boolean)
 
     fun lockWindows(company: UUID, employee: UUID)

@@ -3,6 +3,18 @@ package dev.fajar.hris.workforce.delivery.mappers
 import dev.fajar.hris.workforce.delivery.responses.*
 import dev.fajar.hris.workforce.domain.entities.*
 
+fun AttendanceException.toResponse(): AttendanceExceptionResponse =
+    AttendanceExceptionResponse(
+        employeeId,
+        employeeNumber,
+        employeeName,
+        workDate,
+        pendingCount,
+        incomplete,
+        correctionVersion,
+        lastReceivedAt,
+    )
+
 fun AttendanceCaptureWindow.toResponse(): AttendanceWindowResponse =
     AttendanceWindowResponse(id, employeeId, deviceId, issuedAt, expiresAt)
 

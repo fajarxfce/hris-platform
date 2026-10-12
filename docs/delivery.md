@@ -2285,3 +2285,31 @@ protocol bounds, overnight work, DST day boundaries and actual-time limits. A
 separate CI refresh-layout assertion was corrected to check retained scroll and
 reachable activity after the viewport changes. This boundary added no device
 flow or backend mutation; native durable commands and forms remain in progress.
+
+## Native overtime commands and forms
+
+The mobile [command foundation](https://github.com/fajarxfce/hris-mobile/commit/dd1d70b),
+[planning form](https://github.com/fajarxfce/hris-mobile/commit/a66c787) and
+[actual-time/withdrawal flow](https://github.com/fajarxfce/hris-mobile/commit/b58caf8)
+now retain immutable encrypted input before transport. Manual and worker delivery
+share bounded execution, original idempotency keys and observed versions. Uncertain
+commands cannot be replaced by another action; confirmed evidence remains until
+admitted request facts and revision-checked cleanup succeed. Company-local input
+uses explicit timezone/DST validation and the reviewed server schedule.
+
+The final mobile root checks passed with 903 desktop tests, five shared-presentation
+and 40 Workforce presentation Chromium tests, Android dev assembly and application
+Web compilation. API 35 acceptance created one reviewed plan, restored it offline,
+then retained and restored actual time after background process death. Explicit
+replay produced 85 worked minutes at version one. A timed-out detail read preserved
+its receipt and recovered through Open request. Back from withdrawal changed no
+record; explicit confirmation produced version two, one withdrawal entry and a
+cancelled approval. API reads verified the original evidence and distinct history.
+The development approval template was configured through the normal API.
+
+The typed enum navigation adapter and regressions also returned to
+[Compose Fluent Starter](https://github.com/fajarxfce/compose-fluent-starter/commit/76a5030),
+where 271 desktop tests, five Chromium tests, Android dev assembly and application
+Web compilation passed. After notice, the validated mobile APK was installed on
+the authorized Android 16 phone with install-only delivery. No backend code,
+migration, runtime deployment, release or physical-device UI interaction was required.

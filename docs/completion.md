@@ -61,7 +61,12 @@ adds owned requests with month/status filters, planned and actual time, frozen
 schedule evidence, approval progress and paged activity. API 35 acceptance covered
 overnight dates, encrypted list/detail restoration after process restart offline,
 and explicit recovery. The validated update was installed on the phone with
-install-only delivery. Native planning and actual-time commands remain next.
+install-only delivery. The [native overtime workflows](https://github.com/fajarxfce/hris-mobile/commit/b58caf8)
+now add reviewed-calendar planning, actual-time submission and withdrawal. Immutable
+encrypted commands retain original input and operation keys across response loss,
+offline process restoration and explicit replay. API 35 acceptance verified a real
+plan, actual time, cancelled approval and distinct versioned history entries; the
+validated APK was installed on the phone without opening it.
 Automated UI/API checks and the Android dev build passed. Android 16 device checks
 covered password sign-in, company isolation, profiles, inbox reading, offline
 content, offline process restoration with company isolation, queued acknowledgement
@@ -86,7 +91,7 @@ replay and competing hold were exercised without modifying development records.
 | Mobile identity | Native OIDC handoff and external-provider acceptance. Android MFA and device-session workflows are validated; iOS physical acceptance remains separate. |
 | Mobile foundation | Additional business replicas and durable commands, background restoration, deep links and push registration. Bounded encrypted company admission, company availability, the employee inbox and HRIS sync client are implemented. |
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
-| Workforce | Bulk/reset and late corrections; mobile overtime planning, actual-time submission and withdrawal; physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections and their history, company-wide exception review queues, overtime planning with reviewed calendars, directories/details/history, actual-time submission, independent review and withdrawal, dashboard monthly closing/recovery with published employee results, and mobile work calendars, overtime reads and online/offline capture are implemented and verified against the real API. |
+| Workforce | Bulk/reset and late corrections; physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections and their history, company-wide exception review queues, overtime planning with reviewed calendars, directories/details/history, actual-time submission, independent review and withdrawal, dashboard monthly closing/recovery with published employee results, and mobile work calendars, overtime planning/actual time/withdrawal with durable recovery, and online/offline capture are implemented and verified against the real API. |
 | Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry. Mobile balances, filtered history, request details, submission with published document evidence, and durable withdrawal/cancellation flows are implemented and verified against the development API. |
 | Expenses | Dashboard policies, claims, review, payment/reconciliation and corrections; mobile claims, receipts, submission and payment progress |
 | Payroll | Dashboard policies, compensation, inputs, calculation, review, finalization, payslips, payments and amendments; mobile finalized payslips and downloads |

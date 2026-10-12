@@ -1,4 +1,5 @@
 import {
+  CalendarCheckmark20Regular,
   CalendarClock20Regular,
   CalendarStar20Regular,
   CalendarWorkWeek20Regular,
@@ -14,14 +15,17 @@ import { canReadCalendars } from "../../domain/policies/calendar-policy";
 import { canReadHolidays } from "../../domain/policies/holiday-policy";
 import { canBrowseCompanyOvertime } from "../../domain/policies/overtime-read-policy";
 import { canReadShifts } from "../../domain/policies/shift-policy";
+import { canReadWorkPeriods } from "../../domain/policies/work-period-policy";
 import { attendanceExceptionMessages } from "../i18n/attendance-exception-messages";
 import { attendanceMessages } from "../i18n/attendance-messages";
 import { calendarMessages } from "../i18n/calendar-messages";
 import { holidayMessages } from "../i18n/holiday-messages";
 import { overtimeMessages } from "../i18n/overtime-messages";
 import { shiftMessages } from "../i18n/shift-messages";
+import { workPeriodMessages } from "../i18n/work-period-messages";
 import { attendanceExceptionsPath } from "../models/attendance-exception-route";
 import { overtimePath } from "../models/overtime-route";
+import { workPeriodsPath } from "../models/work-period-route";
 
 export function workforceNavigation(
   access: CompanyAccess | null,
@@ -29,6 +33,15 @@ export function workforceNavigation(
 ): readonly AppNavigationItem[] {
   const permissions = access?.permissions ?? [];
   return [
+    ...(canReadWorkPeriods(permissions)
+      ? [
+          {
+            to: workPeriodsPath,
+            label: workPeriodMessages(locale).title,
+            icon: <CalendarCheckmark20Regular />,
+          },
+        ]
+      : []),
     ...(canBrowseCompanyOvertime(permissions)
       ? [
           {

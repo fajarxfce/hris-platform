@@ -203,8 +203,11 @@ Input uses the request's timezone and domain interval policy. Receipt recovery
 retains the observed version and operation without acquiring a newer request;
 an ambiguous result cannot become editable after a later rejection. Access and MFA
 failures hide private details during recovery. New-plan authoring uses a dedicated
-employee picker and reviewed-calendar form; monthly closing remains subsequent
-dashboard work.
+employee picker and reviewed-calendar form. The dashboard also provides monthly
+closing, bounded progress observation, stopped-attempt recovery and published
+employee results. Closing and recovery retain their original commands through
+explicit receipt recovery. Missing attendance stays distinct from recorded
+absence; published overtime remains a time fact rather than a payable amount.
 
 Planning preparation uses `GET /workforce/overtime/planning/employees` with a
 work date, optional name/number query and bounded cursor. It requires

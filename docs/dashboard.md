@@ -668,4 +668,36 @@ Selection and time controls are read-only during submission or receipt recovery.
 Drafts participate in the shared navigation guard, and successful creation links
 to the resulting request. Browser commands remain in memory. The employee panel
 uses compact reference columns within the shared resource table; larger directory
-tables retain their default minimum width. Monthly closing remains subsequent work.
+tables retain their default minimum width.
+
+## Monthly attendance closing
+
+`/workforce/periods/:month` shows the month status, closing timezone and minimal
+job progress. The directory defaults to the preceding company-local month;
+eligibility comes from the server's current date and available actions. The page
+accepts `workforce.read` or `workforce.close`. Only an authorized published result
+opens employee discovery, with explicit name/number search and pages of 50.
+Job inspection links use the independently authorized Jobs screen.
+
+One visible page owns one overview request and at most 30 delayed progress reads,
+four seconds apart after completion. Reads do not overlap. Observation stops on
+terminal job state, error, disposal or a hidden document; exhaustion shows an
+explicit Refresh prompt. Returning to a visible document resumes only eligible
+progress. It never retries a denied read automatically. Failed reads clear the
+old private view, including throughout pending or failed manual recovery.
+
+Closing and stopped-attempt recovery have separate review routes and require a
+reason. Confirmation retains the observed version, month, original reviewed date,
+reason and one operation ID. An uncertain command remains fixed through MFA and
+later conflicts; explicit retry does not load a newer review first. A definite
+initial conflict requires a protected fresh review. Drafts and unconfirmed
+commands use the workspace departure guard and remain in browser memory.
+Recovery releases a stopped attempt for review; it does not start another job.
+
+`/workforce/periods/:month/employees/:employeeId` shows the published daily facts,
+historical timezone, accepted attendance and approved overtime minutes. Recorded
+absence and unrecorded scheduled days remain separate totals. Names and numbers
+come from authorized display references; no personal profile is acquired. Query
+ownership includes account, company, grants and the selected period/employee.
+Company replacement clears selections and aborts pending work. Locale and theme
+changes reformat the current observation without acquiring it again.

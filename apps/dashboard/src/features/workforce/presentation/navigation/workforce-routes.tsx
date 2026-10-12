@@ -18,6 +18,9 @@ import { ShiftEditorScreen } from "../bindings/shift-editor-screen";
 import { ShiftScreen } from "../bindings/shift-screen";
 import { ShiftsScreen } from "../bindings/shifts-screen";
 import { WeeklyScheduleScreen } from "../bindings/weekly-schedule-screen";
+import { WorkPeriodActionScreen } from "../bindings/work-period-action-screen";
+import { WorkPeriodScreen } from "../bindings/work-period-screen";
+import { WorkPeriodSnapshotScreen } from "../bindings/work-period-snapshot-screen";
 import { WorkforceCalendarsScreen } from "../bindings/workforce-calendars-screen";
 import type { WorkforceScreenProps } from "../contracts/workforce-screen-props";
 import { shiftParameters, shiftsPath } from "../models/shift-route";
@@ -25,6 +28,13 @@ import { shiftParameters, shiftsPath } from "../models/shift-route";
 export function WorkforceRoutes(props: WorkforceScreenProps) {
   return (
     <Routes>
+      <Route path="periods" element={<WorkPeriodScreen {...props} />} />
+      <Route path="periods/:month" element={<WorkPeriodScreen {...props} />} />
+      <Route path="periods/:month/:intent" element={<WorkPeriodActionScreen {...props} />} />
+      <Route
+        path="periods/:month/employees/:employeeId"
+        element={<WorkPeriodSnapshotScreen {...props} />}
+      />
       <Route path="overtime" element={<OvertimeRequestsScreen {...props} />} />
       <Route path="overtime/new" element={<OvertimePlanScreen {...props} />} />
       <Route path="overtime/:overtimeId" element={<OvertimeRequestScreen {...props} />} />

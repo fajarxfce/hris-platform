@@ -671,3 +671,34 @@ a {
   margin-bottom: 8px;
   font-weight: 600;
 }
+
+.app-work-period-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.app-work-period-heading h2 {
+  margin: 0;
+}
+.app-work-period-heading a {
+  margin-inline-start: auto;
+}
+.app-work-period-summary,
+.app-work-period-progress {
+  display: grid;
+  gap: 16px;
+}
+.app-work-period-progress {
+  max-width: 640px;
+}
+.app-work-period-action .app-editor-form {
+  max-width: 760px;
+}
+:where(.app-work-period-action) .app-editor-form p {
+  margin: 0;
+}
+.app-work-period-result > .app-page-header,
+.app-work-period-action > .app-page-header {
+  margin-bottom: 0;
+}

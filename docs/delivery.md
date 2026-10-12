@@ -2199,3 +2199,28 @@ Development API and worker images were rebuilt from the validated JARs and
 restarted with the document-services and WireGuard overlays. API readiness was UP,
 the VPN dashboard returned HTTP 200 and database/Garage/ClamAV remained healthy.
 No migration or mobile APK changed. Dashboard closing presentation remains next.
+
+## Dashboard monthly closing
+
+Added month selection, period/progress overview, closing and stopped-attempt
+recovery forms, bounded published employee search, and monthly daily results.
+Visibility/disposal cancels owned observation; progress has a finite update
+budget. Unconfirmed commands retain their original context and operation through
+MFA, later conflicts and explicit retry. Revoked read data stays hidden during
+recovery. Factual metrics distinguish recorded absence from missing attendance.
+
+Architecture, TypeScript and all 1,403 dashboard unit tests passed, including 31
+new ownership/termination/recovery cases. Final Biome checks passed after ordering
+the new CSS rules consistently. Eleven new browser scenarios passed; the affected
+holiday rejection and final light/dark layout checks were also run. Screenshots
+for the overview, closing form and employee result were inspected.
+
+The real API/PostgreSQL/worker browser scenario passed: pending offline evidence
+blocked closing, a lost response replayed its original receipt even after worker
+failure, independent rejection released the next explicit attempt, and the worker
+published immutable facts. It verified month-end employee discovery, original
+target progress, a new attempt/version, closed-period write rejection and employee
+self access without directory authority. The initial runs corrected test-only
+assumptions about the existing failure text and company-roster progress count.
+No additional backend build, migration, mobile APK or release was needed for the
+presentation change.

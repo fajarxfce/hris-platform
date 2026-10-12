@@ -175,7 +175,7 @@ test("company read access shows holidays but hides mutations and rejects a pinne
   expect(api.writes).toHaveLength(0);
 });
 
-test("invalid date ranges stop before transport and a closed work period remains a definite rejection", async ({
+test("invalid date ranges stop before transport and a locked work period remains a definite rejection", async ({
   page,
 }) => {
   const api = await installHolidaysApi(page);
@@ -193,7 +193,7 @@ test("invalid date ranges stop before transport and a closed work period remains
   await createForm(page);
   api.rejectNextSave("work_period_locked");
   await page.getByRole("button", { name: "Save", exact: true }).click();
-  await expect(page.getByRole("alert")).toContainText("This work period is closed");
+  await expect(page.getByRole("alert")).toContainText("This attendance period is locked");
   await expect(page.getByLabel("Name", { exact: true })).toHaveJSProperty("readOnly", false);
   expect(api.commits).toBe(0);
   await expect(page.getByRole("button", { name: "Retry save", exact: true })).toHaveCount(0);

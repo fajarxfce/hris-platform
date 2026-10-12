@@ -62,6 +62,14 @@ after acquisition and before returning private results or completing a write.
 A late failure rolls back period/job changes, targets, journal and receipt together.
 Background closing retains its separate initiating-credential and lease authority.
 
+Monthly closing overview projects the period and minimal job progress in one SQL
+snapshot under shared access guards. It neither creates period rows nor holds
+resource locks that exclude the worker. The use case chooses available actions
+from current grants, state and company-local date. Published employee discovery
+holds shared people/access guards and acquires only display references belonging
+to the closed attempt. It does not fetch profiles or snapshot bodies. Both reads
+revalidate current assurance before releasing their result.
+
 Overtime reads and commands apply the identity session policy after their resource
 and access guards. They check current assurance again before releasing private
 results or completing a transaction, including receipt replay. A late failed

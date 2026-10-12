@@ -36,6 +36,24 @@ class StoredWorkPeriodRepository(
         source.find(companyId, month.atDay(1), null)?.toPeriod()
     }
 
+    override fun state(companyId: UUID, month: YearMonth): Result<WorkPeriodState?> =
+        safeDatabaseCall {
+            source.state(companyId, month.atDay(1))?.toState()
+        }
+
+    override fun publishedEmployees(
+        companyId: UUID,
+        jobId: UUID,
+        asOf: LocalDate,
+        query: String,
+        after: String?,
+        limit: Int,
+    ): Result<Page<WorkforceEmployeeReference>> = safeDatabaseCall {
+        val rows = source.publishedEmployees(companyId, jobId, asOf, query, after, limit + 1)
+        val items = rows.take(limit).map { it.toReference() }
+        Page(items, if (rows.size > limit) items.last().employeeNumber else null)
+    }
+
     override fun forJob(companyId: UUID, jobId: UUID, exclusive: Boolean): Result<WorkPeriod?> =
         safeDatabaseCall {
             source.forJob(companyId, jobId, exclusive)?.toPeriod()

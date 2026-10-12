@@ -6,4 +6,6 @@ data class WorkPeriodSnapshotResponse(
     val employeeId: UUID,
     val month: String,
     val days: List<ClosedWorkDayResponse>,
+    val employee: WorkforceEmployeeResponse,
+    val period: WorkPeriodResponse,
 )

@@ -2,6 +2,7 @@ package dev.fajar.hris
 
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.workforce.domain.repositories.WorkPeriodRepository
+import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 import java.util.concurrent.CountDownLatch
@@ -47,6 +48,21 @@ class WorkPeriodProbeConfiguration {
         probe: WorkPeriodProbe,
     ): WorkPeriodRepository =
         object : WorkPeriodRepository by delegate {
+            override fun state(companyId: UUID, month: YearMonth) =
+                delegate.state(companyId, month).also { probe.acquired(companyId, "overview") }
+
+            override fun publishedEmployees(
+                companyId: UUID,
+                jobId: UUID,
+                asOf: LocalDate,
+                query: String,
+                after: String?,
+                limit: Int,
+            ) =
+                delegate.publishedEmployees(companyId, jobId, asOf, query, after, limit).also {
+                    probe.acquired(companyId, "employees")
+                }
+
             override fun list(companyId: UUID, from: YearMonth, until: YearMonth) =
                 delegate.list(companyId, from, until).also { probe.acquired(companyId, "list") }
 

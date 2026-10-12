@@ -3,6 +3,7 @@ package dev.fajar.hris.workforce.domain.repositories
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.workforce.domain.entities.*
 import java.time.Instant
+import java.time.LocalDate
 import java.time.YearMonth
 import java.util.UUID
 
@@ -12,6 +13,17 @@ interface WorkPeriodRepository {
     fun lockRange(companyId: UUID, from: YearMonth): Result<List<WorkPeriod>>
 
     fun find(companyId: UUID, month: YearMonth): Result<WorkPeriod?>
+
+    fun state(companyId: UUID, month: YearMonth): Result<WorkPeriodState?>
+
+    fun publishedEmployees(
+        companyId: UUID,
+        jobId: UUID,
+        asOf: LocalDate,
+        query: String,
+        after: String?,
+        limit: Int,
+    ): Result<Page<WorkforceEmployeeReference>>
 
     fun forJob(companyId: UUID, jobId: UUID, exclusive: Boolean): Result<WorkPeriod?>
 

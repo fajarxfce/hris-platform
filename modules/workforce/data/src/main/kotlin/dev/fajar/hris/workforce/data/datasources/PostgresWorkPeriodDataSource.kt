@@ -1,13 +1,97 @@
 package dev.fajar.hris.workforce.data.datasources
 
 import dev.fajar.hris.schema.Tables.*
+import dev.fajar.hris.schema.tables.BackgroundJobs.BACKGROUND_JOBS as J
+import dev.fajar.hris.schema.tables.EmployeesAt.EMPLOYEES_AT
 import dev.fajar.hris.schema.tables.records.*
+import dev.fajar.hris.workforce.data.models.*
 import java.time.LocalDate
 import java.util.UUID
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresWorkPeriodDataSource(private val sql: DSLContext) : WorkPeriodDataSource {
+    override fun state(companyId: UUID, month: LocalDate): WorkPeriodStateRow? =
+        sql.select(
+                WORK_PERIODS.fields().toList() +
+                    listOf(
+                        J.ID,
+                        J.ACTOR_ID,
+                        J.KIND,
+                        J.STATUS,
+                        J.TOTAL_ITEMS,
+                        J.COMPLETED_ITEMS,
+                        J.CANCELLATION_REQUESTED,
+                        J.FAILURE_CODE,
+                        J.CREATED_AT,
+                        J.FINISHED_AT,
+                    )
+            )
+            .from(WORK_PERIODS)
+            .leftJoin(J)
+            .on(J.COMPANY_ID.eq(WORK_PERIODS.COMPANY_ID).and(J.ID.eq(WORK_PERIODS.JOB_ID)))
+            .where(WORK_PERIODS.COMPANY_ID.eq(companyId), WORK_PERIODS.MONTH.eq(month))
+            .fetchOne { row ->
+                WorkPeriodStateRow(
+                    row.into(WORK_PERIODS),
+                    row[J.ID]?.let { id ->
+                        WorkPeriodAttemptRow(
+                            id,
+                            requireNotNull(row[J.ACTOR_ID]),
+                            requireNotNull(row[J.KIND]),
+                            requireNotNull(row[J.STATUS]),
+                            requireNotNull(row[J.TOTAL_ITEMS]),
+                            requireNotNull(row[J.COMPLETED_ITEMS]),
+                            requireNotNull(row[J.CANCELLATION_REQUESTED]),
+                            row[J.FAILURE_CODE],
+                            requireNotNull(row[J.CREATED_AT]),
+                            row[J.FINISHED_AT],
+                        )
+                    },
+                )
+            }
+
+    override fun publishedEmployees(
+        companyId: UUID,
+        jobId: UUID,
+        asOf: LocalDate,
+        query: String,
+        after: String?,
+        limit: Int,
+    ): List<WorkPeriodEmployeeRow> {
+        val employees = EMPLOYEES_AT.call(companyId, asOf)
+        return sql.select(
+                employees.ID,
+                employees.EMPLOYEE_NUMBER,
+                employees.LEGAL_NAME,
+                employees.STATUS,
+                employees.VERSION,
+            )
+            .from(WORK_PERIOD_SNAPSHOTS)
+            .join(employees)
+            .on(employees.ID.eq(WORK_PERIOD_SNAPSHOTS.EMPLOYMENT_ID))
+            .where(
+                WORK_PERIOD_SNAPSHOTS.COMPANY_ID.eq(companyId),
+                WORK_PERIOD_SNAPSHOTS.JOB_ID.eq(jobId),
+            )
+            .and(
+                employees.LEGAL_NAME.containsIgnoreCase(query)
+                    .or(employees.EMPLOYEE_NUMBER.containsIgnoreCase(query))
+            )
+            .and(after?.let { employees.EMPLOYEE_NUMBER.gt(it) } ?: DSL.noCondition())
+            .orderBy(employees.EMPLOYEE_NUMBER)
+            .limit(limit)
+            .fetch { row ->
+                WorkPeriodEmployeeRow(
+                    requireNotNull(row[employees.ID]),
+                    requireNotNull(row[employees.EMPLOYEE_NUMBER]),
+                    requireNotNull(row[employees.LEGAL_NAME]),
+                    requireNotNull(row[employees.STATUS]),
+                    requireNotNull(row[employees.VERSION]),
+                )
+            }
+    }
+
     override fun ensure(companyId: UUID, month: LocalDate) {
         sql.insertInto(WORK_PERIODS)
             .set(WORK_PERIODS.COMPANY_ID, companyId)

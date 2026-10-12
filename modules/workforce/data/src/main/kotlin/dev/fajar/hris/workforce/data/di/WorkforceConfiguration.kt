@@ -638,6 +638,48 @@ class WorkforceConfiguration {
     ) = ListWorkPeriods(periods, companies, members, identities, transactions, security, clock)
 
     @Bean
+    fun getWorkPeriodOverview(
+        periods: WorkPeriodRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetWorkPeriodOverview(
+            periods,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun listWorkPeriodEmployees(
+        periods: WorkPeriodRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListWorkPeriodEmployees(
+            periods,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun getWorkPeriodSnapshot(
         periods: WorkPeriodRepository,
         people: PeopleRepository,

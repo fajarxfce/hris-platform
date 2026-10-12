@@ -23,7 +23,11 @@ class GetWorkPeriodSnapshot(
     private val clock: Clock,
     private val security: IdentitySecurityPolicy,
 ) {
-    fun execute(actor: Actor, month: YearMonth, employeeId: UUID): Result<WorkPeriodSnapshot> {
+    fun execute(
+        actor: Actor,
+        month: YearMonth,
+        employeeId: UUID,
+    ): Result<WorkPeriodEmployeeSnapshot> {
         if (month.year !in 2000..2100)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_work_period_range"))
         val company =
@@ -66,7 +70,17 @@ class GetWorkPeriodSnapshot(
             periods.snapshot(company, jobId, employeeId).flatMap { snapshot ->
                 snapshot?.let {
                     validateCompanySessionActor(actor, access, clock.instant(), security).map {
-                        snapshot
+                        WorkPeriodEmployeeSnapshot(
+                            WorkforceEmployeeReference(
+                                historical.id,
+                                historical.employeeNumber,
+                                historical.person.legalName,
+                                historical.terms.status,
+                                historical.version,
+                            ),
+                            period,
+                            snapshot,
+                        )
                     }
                 }
                     ?: Result.Failed(

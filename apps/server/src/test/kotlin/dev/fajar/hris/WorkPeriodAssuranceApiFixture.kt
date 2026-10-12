@@ -41,9 +41,9 @@ abstract class WorkPeriodAssuranceApiFixture : WorkforceAccessApiFixture() {
 
     protected fun prepare(action: String): Scenario {
         val f = isolatedFixture()
-        if (action in setOf("recover", "snapshot")) {
+        if (action in setOf("recover", "snapshot", "employees")) {
             val lease = begin(f)
-            if (action == "snapshot") {
+            if (action in setOf("snapshot", "employees")) {
                 assertEquals(Result.Success(JobStep(1, false)), advance.execute(f.actor, lease))
                 assertEquals(Result.Success(JobStep(2, true)), advance.execute(f.actor, lease))
             } else {
@@ -72,6 +72,29 @@ abstract class WorkPeriodAssuranceApiFixture : WorkforceAccessApiFixture() {
     protected fun invoke(scene: Scenario, actor: Actor = scene.actor): Result<*> {
         val month = YearMonth.parse("2026-09")
         return when (scene.action) {
+            "overview" ->
+                GetWorkPeriodOverview(
+                        periods,
+                        companies,
+                        members,
+                        identities,
+                        transactions,
+                        security,
+                        clock,
+                    )
+                    .execute(actor, month)
+            "employees" ->
+                ListWorkPeriodEmployees(
+                        periods,
+                        people,
+                        companies,
+                        members,
+                        identities,
+                        transactions,
+                        security,
+                        clock,
+                    )
+                    .execute(actor, month, "", null, 50)
             "close" ->
                 StartWorkPeriodClose(
                         periods,

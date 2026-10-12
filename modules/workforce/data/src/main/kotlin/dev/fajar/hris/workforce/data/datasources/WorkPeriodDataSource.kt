@@ -1,6 +1,8 @@
 package dev.fajar.hris.workforce.data.datasources
 
 import dev.fajar.hris.schema.tables.records.*
+import dev.fajar.hris.workforce.data.models.WorkPeriodEmployeeRow
+import dev.fajar.hris.workforce.data.models.WorkPeriodStateRow
 import java.time.LocalDate
 import java.util.UUID
 
@@ -8,6 +10,17 @@ interface WorkPeriodDataSource {
     fun ensure(companyId: UUID, month: LocalDate)
 
     fun find(companyId: UUID, month: LocalDate, lock: String?): WorkPeriodsRecord?
+
+    fun state(companyId: UUID, month: LocalDate): WorkPeriodStateRow?
+
+    fun publishedEmployees(
+        companyId: UUID,
+        jobId: UUID,
+        asOf: LocalDate,
+        query: String,
+        after: String?,
+        limit: Int,
+    ): List<WorkPeriodEmployeeRow>
 
     fun forJob(companyId: UUID, jobId: UUID, lock: Boolean): WorkPeriodsRecord?
 

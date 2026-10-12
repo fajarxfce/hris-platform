@@ -22,7 +22,7 @@ class WorkPeriodAssuranceTest : WorkPeriodAssuranceApiFixture() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["close", "recover", "list", "snapshot"])
+    @ValueSource(strings = ["close", "recover", "list", "snapshot", "overview", "employees"])
     fun expiryAtTheAccountGuardCannotAuthorizeResultsChangesOrReceipts(action: String) {
         val scene = prepare(action)
         val actor =
@@ -66,7 +66,7 @@ class WorkPeriodAssuranceTest : WorkPeriodAssuranceApiFixture() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["close", "recover", "list", "snapshot"])
+    @ValueSource(strings = ["close", "recover", "list", "snapshot", "overview", "employees"])
     fun expiryAfterAcquisitionRejectsReadsAndRollsBackEveryClosingWrite(action: String) {
         val scene = prepare(action)
         val actor =
@@ -96,7 +96,7 @@ class WorkPeriodAssuranceTest : WorkPeriodAssuranceApiFixture() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["close", "recover", "list", "snapshot"])
+    @ValueSource(strings = ["close", "recover", "list", "snapshot", "overview", "employees"])
     fun cancellationReleasesOwnedResourcesAndTheOriginalCommandCanBeRetried(action: String) {
         val scene = prepare(action)
         val before = stored(scene)

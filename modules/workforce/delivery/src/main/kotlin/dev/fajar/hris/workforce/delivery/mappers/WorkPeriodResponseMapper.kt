@@ -16,11 +16,11 @@ fun WorkPeriod.toResponse() =
         failureCode,
     )
 
-fun WorkPeriodSnapshot.toResponse() =
+fun WorkPeriodEmployeeSnapshot.toResponse() =
     WorkPeriodSnapshotResponse(
-        employeeId,
-        month.toString(),
-        days.map {
+        snapshot.employeeId,
+        snapshot.month.toString(),
+        snapshot.days.map {
             ClosedWorkDayResponse(
                 it.workDate,
                 it.fact.name,
@@ -31,4 +31,6 @@ fun WorkPeriodSnapshot.toResponse() =
                 it.overtime.map { item -> item.toResponse() },
             )
         },
+        employee.toResponse(),
+        period.toResponse(),
     )

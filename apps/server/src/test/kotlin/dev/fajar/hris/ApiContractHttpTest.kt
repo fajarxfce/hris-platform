@@ -322,6 +322,43 @@ class ApiContractHttpTest : PeopleApiFixture() {
         assertTrue(review["x-hris-company-admission"].asBoolean())
     }
 
+    @Test
+    fun closingOverviewDescribesMinimalProgressAndBoundedPublishedEmployees() {
+        val api = contract()
+        val path = "/api/v1/companies/{companyId}/workforce/periods/{month}"
+        assertTrue(api["paths"][path]["get"]["x-hris-company-admission"].asBoolean())
+        val directory = api["paths"]["$path/employees"]["get"]
+        assertTrue(directory["x-hris-company-admission"].asBoolean())
+        val parameters = directory["parameters"].associateBy { it["name"].asString() }
+        assertEquals(50, parameters.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals(32, parameters.getValue("after")["schema"]["maxLength"].asInt())
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf(
+                "month",
+                "companyDate",
+                "companyTimezone",
+                "period",
+                "attempt",
+                "availableActions",
+            ),
+            schemas["WorkPeriodOverviewResponse"]["properties"].properties().map { it.key }.toSet(),
+        )
+        assertEquals(
+            setOf(
+                "id",
+                "status",
+                "totalEmployees",
+                "completedEmployees",
+                "cancellationRequested",
+                "failureCode",
+                "createdAt",
+                "finishedAt",
+            ),
+            schemas["WorkPeriodAttemptResponse"]["properties"].properties().map { it.key }.toSet(),
+        )
+    }
+
     private fun checkReferences(root: JsonNode, node: JsonNode, depth: Int = 0) {
         assertTrue(depth < 64)
         if (node.isObject) {

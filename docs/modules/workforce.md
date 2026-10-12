@@ -135,6 +135,24 @@ guards and after acquisition. A proof that expires during the operation cannot
 release private data, a receipt, or partial closing state. Cancellation unwinds
 the transaction and its locks; a later explicit retry retains the same operation.
 
+`GET /workforce/periods/{yyyy-MM}` returns the current period and minimal attempt
+progress from one SQL snapshot, plus the company date/timezone and available
+actions. It accepts `workforce.read` or `workforce.close`. An unstarted month has
+no period or attempt; viewing it creates nothing. Closing authority does not grant
+employee snapshots or inspection of another operator's general job details.
+
+`GET /workforce/periods/{yyyy-MM}/employees` requires `workforce.read` and a closed
+period. It selects published employee display references as of month end with
+name/number search and 50-row maximum pagination. Employees added after that
+attempt are absent from its results. Individual snapshot reads retain their
+existing HR/team/self authorization. The overview and discovery do not reserve
+eligibility; close/recover commands independently recheck current state.
+
+Individual snapshot responses also include the minimal employee reference and
+closed period metadata. The existing `employeeId`, `month` and `days` fields remain
+compatible. Display references use employment at month end and current identity
+labels; recorded daily facts and their calendar evidence remain immutable.
+
 
 ## Overtime requests
 

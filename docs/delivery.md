@@ -2162,3 +2162,20 @@ recovery. Both application JARs built. The 38 worker cases passed across the mai
 run and a focused rerun: five existing closing fixtures needed an enrolled MFA
 account and proof to invoke the newly protected interactive start command.
 No migration, development deployment or mobile APK changed in this increment.
+
+## Monthly closing overview and published employees
+
+Added a read-only monthly overview with one coherent period/job projection,
+minimal employee progress and current available actions. Viewing an unstarted
+month creates no row. Published employee discovery uses bounded name/number
+search, while snapshot details now include minimal employee and period metadata.
+The original daily-fact response fields remain compatible. Closing authority does
+not grant employee results or another operator's general job details.
+
+Architecture, Kotlin formatting, 41 workforce domain and 38 worker tests passed;
+both application JARs built. The 53 selected API/contract cases passed across the
+main check and focused six-case rerun after fixing Jackson array iteration in the
+new tests. Coverage includes company-local ended-month policy, minimal output,
+partial-result exclusion, pagination, foreign-company rejection, stopped-attempt
+recovery, nonblocking worker progress, late MFA expiry and cancellation. OpenAPI
+describes both new endpoints. No migration or mobile APK is required.

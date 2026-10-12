@@ -1625,3 +1625,19 @@ the existing fictional employee's published document and downloaded the actual
 worker-validated PDF. All 605 bytes matched its original file and SHA-256; the
 browser session was logged out and closed. This validates read/download behavior,
 not browser upload authoring or retention controls.
+
+## Current document revision actions
+
+Revision detail reads now return bounded validation/cancellation capabilities from
+the request's intersected management grants and current resource/job facts. Stored
+state stays separate from the displayed expiry projection, so an expired active
+upload can still be closed explicitly. History rows do not authorize actions.
+The existing command guards, observed versions and receipt replay remain in charge
+of each mutation. The detail use case rechecks MFA after reading the validation job.
+
+Architecture, formatting, 17 document domain tests, nine data tests and 58 selected
+API scenarios passed. Both application JARs built; constructor/DI
+composition did not change. Coverage includes current/original grants, incomplete
+content, active validation, the eight-attempt limit, publication, expired upload
+cancellation, MFA expiry during the job read, interruption and guard release.
+The added response field preserves the existing flat metadata contract.

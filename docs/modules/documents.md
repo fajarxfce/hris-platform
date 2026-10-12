@@ -16,6 +16,14 @@ The upload/status/cancellation and durable validation APIs are implemented. Uplo
 
 Company routes use `/api/v1/companies/{companyId}/documents`. `POST /uploads` accepts stable document/revision UUIDs, employment ID, title, classification, expected document version, file name, media type, size, SHA-256, and reason. Use `Idempotency-Key` for every command. Metadata/history use `GET /{documentId}`, `GET /{documentId}/revisions`, and `GET /revisions/{revisionId}`. Lists require an `employmentId` and support bounded cursors.
 
+Revision details include `availableActions` (`VALIDATE`, `CANCEL_UPLOAD`) derived
+from original/current management grants, the stored upload state, expiry, complete
+content and the previous validation job. An expired but still active upload remains
+explicitly cancellable; a revision already transitioned to `EXPIRED` does not.
+History rows carry no action capabilities. Detail capabilities are review guidance:
+commands independently enforce current access, observed versions and idempotent
+replay. Reading the validation job cannot extend an expired MFA proof.
+
 Send `POST /revisions/{revisionId}/chunks` as `application/octet-stream` with `Upload-Offset`, `Upload-Checksum-Sha256` (lowercase hex), and a stable idempotency UUID for that chunk. Chunks are exactly 1 MiB except the final chunk. After a lost response, repeat the same chunk/key or fetch `uploadedBytes`; the original receipt remains stable even after later chunks commit. A mismatched offset or command payload returns a conflict. An active attempt returns `document_chunk_in_progress` with `fields.retryAt`. A failed attempt can be reclaimed after its 120-second lease using the same operation ID. Eight unsuccessful attempts require cancelling and starting a new revision; the server does not retry uploads silently.
 
 File declarations are restricted to PDF, JPEG, and PNG, with a matching extension, safe file name, expected digest, and a 100 MiB maximum. An upload expires after 24 hours. Limits are ten active uploads per actor, 100 per company, 100 revisions per document, 10,000 document headers, and a 10 GiB company reservation budget. Every physical attempt counts toward the budget until cleanup acknowledges deletion. Four binary requests can run concurrently per API instance. Both declared and streamed bodies are bounded before allocation; body progress cannot extend the 30-second read budget, and socket inactivity is limited to five seconds.

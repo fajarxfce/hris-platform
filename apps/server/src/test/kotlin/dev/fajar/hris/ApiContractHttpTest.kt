@@ -156,6 +156,21 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun revisionDetailsAdvertiseBoundedCurrentActions() {
+        val api = contract()
+        val schema = api["components"]["schemas"]["DocumentRevisionResponse"]["properties"]
+        assertTrue(schema.has("status"))
+        assertTrue(schema.has("version"))
+        val actions = schema["availableActions"]
+        assertEquals(2, actions["maxItems"].asInt())
+        assertTrue(actions["uniqueItems"].asBoolean())
+        assertEquals(
+            setOf("VALIDATE", "CANCEL_UPLOAD"),
+            actions["items"]["enum"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
+    }
+
+    @Test
     fun shiftDetailsAdvertiseCompanyAdmissionAndTheirCurrentVersion() {
         val api = contract()
         val operation = api["paths"]["/api/v1/companies/{companyId}/workforce/shifts/{id}"]["get"]

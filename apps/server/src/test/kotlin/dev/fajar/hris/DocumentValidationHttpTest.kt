@@ -321,6 +321,14 @@ class DocumentValidationHttpTest : DocumentValidationApiFixture() {
             assertEquals("FAILED", jobStatus(lease))
         }
         val rejected = validate(f, id)
+        assertEquals(
+            listOf("CANCEL_UPLOAD"),
+            revision(f, id)["availableActions"]
+                .iterator()
+                .asSequence()
+                .map { it.asString() }
+                .toList(),
+        )
         assertEquals(409, rejected.statusCode(), rejected.body())
         assertEquals(
             "document_validation_attempts_exhausted",

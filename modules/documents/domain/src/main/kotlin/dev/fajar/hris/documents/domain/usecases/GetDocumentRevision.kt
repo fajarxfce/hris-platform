@@ -25,7 +25,7 @@ class GetDocumentRevision(
     private val clock: Clock,
     private val security: IdentitySecurityPolicy,
 ) {
-    fun execute(actor: Actor, id: UUID): Result<DocumentRevision> {
+    fun execute(actor: Actor, id: UUID): Result<DocumentRevisionDetails> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
@@ -40,10 +40,10 @@ class GetDocumentRevision(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val current =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val access = identities.access(actor.accountId, company)
+            if (access is Result.Failed) return@run access
+            val identity = (access as Result.Success).value
+            val current = validateCompanySessionActor(actor, identity, clock.instant(), security)
             if (current is Result.Failed) return@run current
             val live = (current as Result.Success).value
 
@@ -63,20 +63,32 @@ class GetDocumentRevision(
                     )
             val profile = profiles.findForEmployee(company, document.employmentId)
             if (profile is Result.Failed) return@run profile
-            if (
-                !canReadDocument(
-                    live,
-                    document.classification,
-                    (profile as Result.Success).value?.profile?.accountId,
-                )
-            )
+            val ownerAccountId = (profile as Result.Success).value?.profile?.accountId
+            if (!canReadDocument(live, document.classification, ownerAccountId))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "document_access_denied"))
             val jobId = revision.validationJobId
-            if (revision.status == DocumentRevisionStatus.VALIDATING && jobId != null)
-                jobs.find(company, jobId).map {
-                    projectDocumentRevision(revision, it, clock.instant())
-                }
-            else Result.Success(projectDocumentRevision(revision, null, clock.instant()))
+            val job =
+                if (revision.status in ACTIVE_DOCUMENT_STATUSES && jobId != null)
+                    jobs.find(company, jobId)
+                else Result.Success(null)
+            if (job is Result.Failed) return@run job
+            val currentJob = (job as Result.Success).value
+            val now = clock.instant()
+            val assurance = validateCompanySessionActor(actor, identity, now, security)
+            if (assurance is Result.Failed) return@run assurance
+            Result.Success(
+                DocumentRevisionDetails(
+                    projectDocumentRevision(revision, currentJob, now),
+                    documentRevisionActions(
+                        live,
+                        document.classification,
+                        ownerAccountId,
+                        revision,
+                        currentJob?.status,
+                        now,
+                    ),
+                )
+            )
         }
     }
 }

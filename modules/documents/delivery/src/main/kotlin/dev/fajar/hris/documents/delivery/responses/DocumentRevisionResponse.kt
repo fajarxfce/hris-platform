@@ -1,7 +1,10 @@
 package dev.fajar.hris.documents.delivery.responses
 
 import dev.fajar.hris.documents.domain.entities.DocumentRevision
+import dev.fajar.hris.documents.domain.entities.DocumentRevisionDetails
 import dev.fajar.hris.documents.domain.policies.DOCUMENT_CHUNK_BYTES
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
 import java.util.UUID
 
@@ -25,6 +28,12 @@ data class DocumentRevisionResponse(
     val validationAttempts: Int,
     val failureCode: String?,
     val validatedAt: Instant?,
+    @get:ArraySchema(
+        schema = Schema(allowableValues = ["VALIDATE", "CANCEL_UPLOAD"]),
+        maxItems = 2,
+        uniqueItems = true,
+    )
+    val availableActions: List<String> = emptyList(),
 )
 
 fun DocumentRevision.toResponse() =
@@ -49,3 +58,6 @@ fun DocumentRevision.toResponse() =
         failureCode,
         validatedAt,
     )
+
+fun DocumentRevisionDetails.toResponse(): DocumentRevisionResponse =
+    revision.toResponse().copy(availableActions = availableActions.map { it.name })

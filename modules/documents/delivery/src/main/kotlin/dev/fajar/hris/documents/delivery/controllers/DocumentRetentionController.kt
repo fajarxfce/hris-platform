@@ -17,6 +17,7 @@ class DocumentRetentionController(
     private val policyHistory: GetDocumentRetentionPolicyHistory,
     private val change: ChangeDocumentRetention,
     private val retire: RetireDocumentRevision,
+    private val retirementReview: GetDocumentRetirementReview,
     private val get: GetDocumentRetention,
     private val history: GetDocumentRetentionHistory,
 ) {
@@ -143,6 +144,10 @@ class DocumentRetentionController(
             )
             .response()
             .toResponse()
+
+    @GetMapping("/revisions/{revisionId}/retirement")
+    fun retirementReview(actor: Actor, @PathVariable revisionId: UUID) =
+        retirementReview.execute(actor, revisionId).response().toResponse()
 
     @PostMapping("/revisions/{revisionId}/retire")
     fun retire(

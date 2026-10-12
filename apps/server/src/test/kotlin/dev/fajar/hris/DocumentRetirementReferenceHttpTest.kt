@@ -121,6 +121,13 @@ class DocumentRetirementReferenceHttpTest : ExpenseSubmissionApiFixture() {
                 barrier.release.countDown()
                 accountProbe.current.set(null)
             }
+            val review = get(f.admin, "$path/revisions/$receipt/retirement")
+            assertEquals(200, review.statusCode(), review.body())
+            assertEquals(
+                if (first == "reference") "document_evidence_referenced"
+                else "document_revision_not_ready",
+                json.readTree(review.body())["blockingReason"].asString(),
+            )
             if (first == "reference") {
                 assertEquals(
                     200,

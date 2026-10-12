@@ -1808,3 +1808,18 @@ cancelled it, a lost archive response replayed its original receipt, a subsequen
 policy change preserved the old snapshot, hold survived restore, rearchiving
 selected the new policy, and revocation removed access. These dashboard changes
 required no new backend or mobile build. Accepted-content retirement is next.
+
+## Document retirement review
+
+The API now exposes a retention-only revision review with server-time eligibility,
+observed revision and retention versions, publication status, and a stable blocker.
+It does not acquire content or private profiles and does not reserve the decision.
+The retirement command rechecks recent assurance after reference and manifest
+reads; expired proofs cannot authorize its subsequent writes.
+
+Formatting, architecture, all 18 document domain tests, nine data tests, 47 selected
+API cases and all 38 worker tests passed. Seventeen new review/assurance cases cover
+independent grants, scope, frozen archive policies, competing holds, publication,
+revocation, pending-read cancellation and proof expiry. Existing reference and
+retirement regressions and the generated API contract also passed. API and worker
+JARs were built. Dashboard retirement controls remain the next increment.

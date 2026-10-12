@@ -655,6 +655,28 @@ class DocumentsConfiguration {
         )
 
     @Bean
+    fun getDocumentRetirementReview(
+        retention: DocumentRetentionRepository,
+        documents: DocumentRepository,
+        references: DocumentReferenceRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetDocumentRetirementReview(
+            retention,
+            documents,
+            references,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun retireDocumentRevision(
         retention: DocumentRetentionRepository,
         documents: DocumentRepository,

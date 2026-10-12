@@ -157,6 +157,14 @@ Archive requires explicit cancellation of every unfinished upload or validation,
 
 ## Accepted revision retirement
 
+`GET /revisions/{revisionId}/retirement` provides an independently authorized
+retention review. It returns revision identity, number, version, status, publication
+state, the current retention snapshot, server review time, and a stable nullable
+`blockingReason`. It does not return file names, private-profile data, content
+hashes or bytes, and it does not grant ordinary document access. A null blocker
+means eligible at that server instant. Review does not reserve eligibility; a
+later hold, reference, restore or retirement can invalidate the observed versions.
+
 `POST /revisions/{revisionId}/retire` takes `expectedRevisionVersion`, `expectedRetentionVersion`, `reason`, and an idempotency key. It requires `documents.retention` and recent authentication/MFA. The revision must be `READY`, its document archived under an elapsed finite policy, its legal hold clear, and its business reference registry empty. Indefinite policies never produce an automatic delete instruction. Historical expense references remain protected even after a receipt is removed from a later draft; leave evidence remains protected after withdrawal or cancellation.
 
 One command retires one revision of at most 100 parts / 100 MiB, with no object reads or deletes inside the transaction. It preserves upload metadata and accepted inspection proof, appends immutable retirement evidence and a `RETIRE` lifecycle change, advances both versions, and queues every accepted object for cleanup after a five-minute grace period. Retiring the currently published revision clears `currentRevisionId`; an older retained revision is not selected automatically. Retiring an older revision leaves a newer publication unchanged. Database constraints reject commits missing lifecycle evidence, a required cleanup registration, or publication removal.

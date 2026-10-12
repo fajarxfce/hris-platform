@@ -109,7 +109,11 @@ class RetireDocumentRevision(
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
             val referenced = references.referenced(company, setOf(revision.id))
             if (referenced is Result.Failed) return@run referenced
+            val loaded = documents.chunks(company, revision.id)
+            if (loaded is Result.Failed) return@run loaded
             val now = clock.instant()
+            val assurance = validateDocumentRetentionAccess(checked.value, now, security)
+            if (assurance is Result.Failed) return@run assurance
             val planned =
                 retireDocumentState(
                     state,
@@ -119,8 +123,6 @@ class RetireDocumentRevision(
                 )
             if (planned is Result.Failed) return@run planned
             val next = (planned as Result.Success).value
-            val loaded = documents.chunks(company, revision.id)
-            if (loaded is Result.Failed) return@run loaded
             val chunks = (loaded as Result.Success).value
             val manifest = documentContentParts(revision, chunks)
             if (manifest is Result.Failed) return@run manifest

@@ -152,6 +152,13 @@ access. Validation/inventory admission retains the guarded identity snapshot and
 checks its proof again after the job queue wait, including the stricter recent
 authentication requirement for inventory. Expired upload admission creates no job.
 
+Retirement review uses the shared document guard before access guards and reads
+only the metadata needed for its independent retention projection. It checks
+session assurance again after the revision, retention and business-reference
+reads. Its pure eligibility policy also serves the command; review never persists
+the proposed transition or reads storage. Retirement rechecks recent assurance
+after reference and manifest acquisition before writing its immutable evidence.
+
 Announcement edits acquire the announcement guard, then audience-group and organization guards, before company/membership/account access guards. Group edits acquire their group guard before people and access guards. The bounded member list is stored in one immutable revision with database validation of its company references; lists select summary columns without materializing those arrays. A revision head and its immutable snapshot are linked by a deferred foreign key and commit with the operation receipt, audit, and outbox event.
 
 

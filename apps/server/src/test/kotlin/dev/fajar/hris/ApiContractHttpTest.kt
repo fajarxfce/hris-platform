@@ -34,6 +34,34 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun retirementReviewExposesDecisionMetadataWithoutContentAccess() {
+        val api = contract()
+        val operation =
+            api["paths"][
+                "/api/v1/companies/{companyId}/documents/revisions/{revisionId}/retirement"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        assertFalse(
+            operation.path("parameters").any { it.path("name").asString() == "Idempotency-Key" }
+        )
+        val properties =
+            api["components"]["schemas"]["DocumentRetirementReviewResponse"]["properties"]
+        assertEquals(
+            setOf(
+                "revisionId",
+                "revisionNumber",
+                "revisionVersion",
+                "status",
+                "published",
+                "retention",
+                "reviewedAt",
+                "blockingReason",
+            ),
+            properties.properties().map { it.key }.toSet(),
+        )
+        assertEquals(64, properties["blockingReason"]["maxLength"].asInt())
+    }
+
+    @Test
     fun selfDocumentDiscoveryDocumentsBoundedOwnedReferencesAndPublishedEvidence() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/documents/me"

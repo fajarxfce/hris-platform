@@ -1739,3 +1739,18 @@ published it through the actual inspection worker. Its authenticated download
 matched every byte and SHA-256. A replacement resumed after page departure and
 file reselection; cancellation retained the original published revision. Retention
 administration remains outstanding.
+
+## Dashboard retention policy contracts
+
+The Documents feature now has separate retention-policy use cases and a data
+adapter for current definitions, ascending version history, and versioned saves.
+The `documents.retention` grant is required independently of content access.
+Unconfigured and indefinite policies remain distinct; no statutory duration is
+assumed. Bounded response mapping rejects inconsistent identity, classification,
+pagination, and receipts. Concurrent head/history reads require another review
+if a newer history entry appears.
+
+Architecture, formatting, TypeScript and the dashboard unit suite passed, including
+23 new retention-boundary cases for scope, immutable projections, duration/version
+limits, history races, MFA rejection, and late cancellation. This increment
+provides the contracts; the retention dashboard remains subsequent work.

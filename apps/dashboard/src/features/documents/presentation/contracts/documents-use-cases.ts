@@ -9,8 +9,10 @@ import type { ReviewDocumentUpload } from "../../domain/usecases/review-document
 import type { SelectDocumentUploadFile } from "../../domain/usecases/select-document-upload-file";
 import type { UploadDocumentFile } from "../../domain/usecases/upload-document-file";
 import type { ValidateDocumentRevision } from "../../domain/usecases/validate-document-revision";
+import type { DocumentRetentionUseCases } from "./document-retention-use-cases";
 
 export type DocumentsUseCases = Readonly<{
+  retention: DocumentRetentionUseCases;
   reviewUpload: Pick<ReviewDocumentUpload, "execute">;
   selectUploadFile: Pick<SelectDocumentUploadFile, "execute">;
   releaseUploadFile: Pick<ReleaseDocumentUploadFile, "execute">;

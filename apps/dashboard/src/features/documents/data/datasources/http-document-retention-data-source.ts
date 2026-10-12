@@ -1,0 +1,50 @@
+import type { HttpClient } from "../../../../core/data/http/http-client";
+import {
+  type DocumentRetentionPolicyChangeDto,
+  documentRetentionPoliciesDto,
+  documentRetentionPolicyPageDto,
+  documentRetentionReceiptDto,
+} from "../models/document-retention-dto";
+import type { DocumentRetentionDataSource } from "./document-retention-data-source";
+
+export class HttpDocumentRetentionDataSource implements DocumentRetentionDataSource {
+  constructor(private readonly http: HttpClient) {}
+  async policies(company: string, signal: AbortSignal) {
+    return documentRetentionPoliciesDto.parse(
+      await this.http.request(
+        { path: `/api/v1/companies/${company}/documents/retention-policies` },
+        signal,
+      ),
+    );
+  }
+  async policyHistory(company: string, id: string, after: string | null, signal: AbortSignal) {
+    const query = new URLSearchParams({ limit: "20" });
+    if (after !== null) query.set("after", after);
+    return documentRetentionPolicyPageDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/documents/retention-policies/${id}/history?${query}`,
+        },
+        signal,
+      ),
+    );
+  }
+  async savePolicy(
+    company: string,
+    operation: string,
+    input: DocumentRetentionPolicyChangeDto,
+    signal: AbortSignal,
+  ) {
+    return documentRetentionReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/documents/retention-policies`,
+          method: "POST",
+          operationId: operation,
+          body: input,
+        },
+        signal,
+      ),
+    );
+  }
+}

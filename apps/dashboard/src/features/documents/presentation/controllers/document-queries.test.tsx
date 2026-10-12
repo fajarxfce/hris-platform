@@ -58,6 +58,12 @@ function setup() {
     locale: "en",
     nextIdentifier: () => documentId(80),
     documents: {
+      retention: {
+        loadPolicies: unused,
+        loadPolicy: unused,
+        reviewPolicy: unused,
+        savePolicy: unused,
+      },
       reviewUpload: unused,
       selectUploadFile: unused,
       releaseUploadFile: { execute: vi.fn() },

@@ -193,3 +193,11 @@ for current CSRF. It admits only the upload offset/checksum headers, preserves t
 operation ID, and clears its owned copy on every outcome. JSON and binary bodies
 cannot be mixed. Resume, retry, publication and file eligibility remain feature
 use-case policy; infrastructure performs no hidden retry or source selection.
+
+Document upload use cases review current company/resource scope, verify selected
+file identity, and coordinate the document and file-input repositories. Prepared
+commands contain named immutable document, revision, start and part references.
+Delivery reads current committed progress, advances at most 100 parts, and clears
+each acquired buffer after its HTTP operation. It never retries automatically or
+publishes content. A reserved part uses the current operator's server-issued
+continuation; replacing page ownership requires reselecting identical content.

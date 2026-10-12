@@ -7,8 +7,27 @@ import type {
   DocumentRevisionPageDto,
   DocumentValidationAttemptDto,
 } from "../models/document-dto";
+import type {
+  DocumentUploadReceiptDto,
+  DocumentUploadStartDto,
+} from "../models/document-upload-dto";
 
 export interface DocumentDataSource {
+  startUpload(
+    company: string,
+    operation: string,
+    body: DocumentUploadStartDto,
+    signal: AbortSignal,
+  ): Promise<DocumentUploadReceiptDto>;
+  uploadChunk(
+    company: string,
+    id: string,
+    operation: string,
+    offset: number,
+    bytes: ArrayBuffer,
+    sha256: string,
+    signal: AbortSignal,
+  ): Promise<DocumentUploadReceiptDto>;
   validate(
     company: string,
     id: string,

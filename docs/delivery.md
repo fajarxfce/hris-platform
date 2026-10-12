@@ -1699,3 +1699,18 @@ expiry and interrupted resource ownership. Dashboard TypeScript and 71 document
 tests passed; its mapper binds continuation metadata to the current part, freezes
 it, and safely ignores unsupported future capabilities. These contracts support
 the separate upload-authoring interface.
+
+## Dashboard document upload contracts
+
+The document feature now provides administrative creation, replacement and resume
+use cases over the bounded file-input and HTTP contracts. Preparation preserves
+document identity and observed versions; resume requires the selected content's
+size and SHA-256 to match. Explicit retries recover metadata receipts and current
+server offsets, including reserved part operations after page replacement.
+Acquired part buffers are cleared on success, failure and late cancellation.
+
+The 18 new boundary scenarios passed, including interrupted metadata/part
+responses, immutable replacement identity, reserved operation recovery, invalid
+selection, cancelled acquisition and transport, and loss of upload eligibility.
+Architecture and TypeScript checks passed. The dashboard authoring controls and
+their live storage/worker acceptance are delivered separately.

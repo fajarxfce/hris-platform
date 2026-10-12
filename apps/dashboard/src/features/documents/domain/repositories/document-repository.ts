@@ -9,9 +9,22 @@ import type {
 } from "../entities/document-employee";
 import type { DocumentRevision, DocumentRevisionPage } from "../entities/document-revision";
 import type { DocumentRevisionChange } from "../entities/document-revision-action";
+import type { DocumentUploadChunk, DocumentUploadStart } from "../entities/document-upload";
 import type { DocumentValidationAttempt } from "../entities/document-validation-attempt";
 
 export interface DocumentRepository {
+  startUpload(
+    company: CompanyId,
+    operation: OperationId,
+    input: DocumentUploadStart,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
+  uploadChunk(
+    company: CompanyId,
+    operation: OperationId,
+    part: DocumentUploadChunk,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
   validate(
     company: CompanyId,
     operation: OperationId,

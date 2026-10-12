@@ -13,10 +13,57 @@ import {
   type DocumentMutationDto,
   documentMutationReceiptDto,
 } from "../models/document-mutation-dto";
+import {
+  type DocumentUploadStartDto,
+  documentUploadReceiptDto,
+} from "../models/document-upload-dto";
 import type { DocumentDataSource } from "./document-data-source";
 
 export class HttpDocumentDataSource implements DocumentDataSource {
   constructor(private readonly http: HttpClient) {}
+  async startUpload(
+    company: string,
+    operation: string,
+    body: DocumentUploadStartDto,
+    signal: AbortSignal,
+  ) {
+    return documentUploadReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/documents/uploads`,
+          method: "POST",
+          operationId: operation,
+          body,
+        },
+        signal,
+      ),
+    );
+  }
+  async uploadChunk(
+    company: string,
+    id: string,
+    operation: string,
+    offset: number,
+    bytes: ArrayBuffer,
+    sha256: string,
+    signal: AbortSignal,
+  ) {
+    return documentUploadReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/documents/revisions/${id}/chunks`,
+          method: "POST",
+          operationId: operation,
+          timeoutMilliseconds: 60_000,
+          binaryBody: {
+            bytes,
+            headers: { "Upload-Offset": String(offset), "Upload-Checksum-Sha256": sha256 },
+          },
+        },
+        signal,
+      ),
+    );
+  }
   async validate(
     company: string,
     id: string,

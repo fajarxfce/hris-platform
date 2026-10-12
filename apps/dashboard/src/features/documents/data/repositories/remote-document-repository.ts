@@ -5,11 +5,15 @@ import type { CompanyId, OperationId } from "../../../../core/domain/identifiers
 import type { DocumentEmployeeSearch } from "../../domain/entities/document-employee";
 import type { DocumentRevision } from "../../domain/entities/document-revision";
 import type { DocumentRevisionChange } from "../../domain/entities/document-revision-action";
+import type {
+  DocumentUploadChunk,
+  DocumentUploadStart,
+} from "../../domain/entities/document-upload";
 import type { DocumentRepository } from "../../domain/repositories/document-repository";
 import type { DocumentDataSource } from "../datasources/document-data-source";
 import { toDocumentEmployees } from "../mappers/document-employee-mapper";
 import { toDocument, toDocumentPage } from "../mappers/document-mapper";
-import { toDocumentMutation } from "../mappers/document-mutation-mapper";
+import { toDocumentMutation, toDocumentReceipt } from "../mappers/document-mutation-mapper";
 import {
   toDocumentAttempts,
   toDocumentRevision,
@@ -18,6 +22,42 @@ import {
 
 export class RemoteDocumentRepository implements DocumentRepository {
   constructor(private readonly source: DocumentDataSource) {}
+  startUpload(
+    company: CompanyId,
+    operation: OperationId,
+    input: DocumentUploadStart,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toDocumentReceipt(
+        await this.source.startUpload(company, operation, { ...input }, signal),
+        input.revisionId,
+        0,
+      ),
+    );
+  }
+  uploadChunk(
+    company: CompanyId,
+    operation: OperationId,
+    part: DocumentUploadChunk,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toDocumentReceipt(
+        await this.source.uploadChunk(
+          company,
+          part.revisionId,
+          operation,
+          part.offset,
+          part.bytes,
+          part.sha256,
+          signal,
+        ),
+        part.revisionId,
+        part.version + 1,
+      ),
+    );
+  }
   validate(
     company: CompanyId,
     operation: OperationId,

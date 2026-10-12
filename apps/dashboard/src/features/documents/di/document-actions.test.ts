@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { documentFileInput } from "../../../../tests/fixtures/document-file-input";
 import {
   documentCompanyId,
   documentHeaderId,
@@ -53,7 +54,11 @@ describe("document command boundaries", () => {
       },
     };
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(raw);
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     const reviewed = await feature.reviewAction.execute(
       access,
       documentHeaderId,
@@ -94,7 +99,11 @@ describe("document command boundaries", () => {
     const request = vi
       .fn<HttpClient["request"]>()
       .mockResolvedValue({ ...uploading(), availableActions: ["FUTURE_ACTION", "CANCEL_UPLOAD"] });
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     expect(
       await feature.reviewAction.execute(
         access,
@@ -116,7 +125,11 @@ describe("document command boundaries", () => {
   });
   it("requires read and management authority before acquiring a review", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     for (const permissions of [
       [],
       ["documents.read", "people.profile.read"],
@@ -147,7 +160,11 @@ describe("document command boundaries", () => {
   it("requires the current server capability and exact parent, including for self-upload grants", async () => {
     const raw = uploading();
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(raw);
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     const scope = {
       ...access,
       permissions: ["documents.read", "people.profile.read", "documents.self.upload"],
@@ -192,7 +209,11 @@ describe("document command boundaries", () => {
   it("does not infer actions when an older API omits them and rejects duplicate capabilities", async () => {
     const { availableActions: _, ...raw } = uploading();
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(raw);
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     expect(
       await feature.reviewAction.execute(
         access,
@@ -220,7 +241,11 @@ describe("document command boundaries", () => {
       const revision = snapshot();
       const raw = { id: revision.id, version: revision.version + 1 };
       const request = vi.fn<HttpClient["request"]>().mockResolvedValue(raw);
-      const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+      const feature = createDocumentsFeature(
+        { request },
+        { downloadBinary: vi.fn() },
+        documentFileInput(),
+      );
       const pending = signal();
       const result = await feature[action].execute(
         access,
@@ -254,7 +279,11 @@ describe("document command boundaries", () => {
       availableActions: ["CANCEL_UPLOAD" as const],
     };
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(raw);
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     const result = await feature.reviewAction.execute(
       access,
       documentHeaderId,
@@ -276,7 +305,11 @@ describe("document command boundaries", () => {
 
   it("rejects wrong scope, malformed commands and unavailable actions before transport", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     const revision = snapshot();
     for (const current of [
       { ...revision, companyId: documentId(2) as CompanyId },
@@ -307,6 +340,7 @@ describe("document command boundaries", () => {
     const feature = createDocumentsFeature(
       { request: vi.fn().mockResolvedValue(raw) },
       { downloadBinary: vi.fn() },
+      documentFileInput(),
     );
     expect(
       await feature.cancelUpload.execute(access, operation, snapshot(), "Reason", signal()),
@@ -317,7 +351,11 @@ describe("document command boundaries", () => {
     const request = vi
       .fn<HttpClient["request"]>()
       .mockRejectedValue(new HttpResponseError(409, { code: "stale_version", detail: "PRIVATE" }));
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     expect(
       await feature.validate.execute(access, operation, snapshot(), "Reason", signal()),
     ).toEqual({ ok: false, failure: { code: "stale_version", fields: {}, parameters: {} } });

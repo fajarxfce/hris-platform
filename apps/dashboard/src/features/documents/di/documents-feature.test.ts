@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { documentFileInput } from "../../../../tests/fixtures/document-file-input";
 import {
   documentBytes,
   documentCompanyId,
@@ -45,7 +46,11 @@ function pendingResponse() {
 describe("document read and download boundaries", () => {
   it("requires both read grants and validated routes before transport", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     for (const permissions of [
       [],
       ["documents.read"],
@@ -91,7 +96,11 @@ describe("document read and download boundaries", () => {
     const raw = documentEmployeeDirectory();
     raw.query = "North";
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(raw);
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     const result = await feature.loadEmployees.execute(
       access,
       { query: " North ", after: null },
@@ -157,6 +166,7 @@ describe("document read and download boundaries", () => {
     const feature = createDocumentsFeature(
       { request: vi.fn().mockResolvedValue(raw) },
       { downloadBinary: vi.fn() },
+      documentFileInput(),
     );
     expect(await feature.loadEmployees.execute(access, search, signal())).toMatchObject(invalid);
   });
@@ -166,7 +176,11 @@ describe("document read and download boundaries", () => {
       .fn<HttpClient["request"]>()
       .mockResolvedValueOnce(documentEmployeeDirectory())
       .mockResolvedValueOnce({ items: [documentHeader()], nextCursor: null });
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     expect(
       await feature.loadFolder.execute(access, documentEmployeeId.toUpperCase(), null, signal()),
     ).toMatchObject({
@@ -191,7 +205,11 @@ describe("document read and download boundaries", () => {
 
   it("rejects a different employee, repeated headers and nonprogressing document cursors", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     for (const page of [
       { items: [{ ...documentHeader(), employmentId: documentId(12) }], nextCursor: null },
       { items: [documentHeader(), documentHeader()], nextCursor: null },
@@ -230,7 +248,11 @@ describe("document read and download boundaries", () => {
       .fn<HttpClient["request"]>()
       .mockResolvedValueOnce(header)
       .mockResolvedValueOnce({ items: [replacing, documentRevision()], nextCursor: null });
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     const result = await feature.loadReview.execute(access, documentHeaderId, null, signal());
     expect(result).toMatchObject({
       ok: true,
@@ -308,7 +330,11 @@ describe("document read and download boundaries", () => {
     const raw = documentRevision();
     mutate(raw);
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(raw);
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     const result = await feature.loadRevision.execute(
       access,
       documentHeaderId,
@@ -337,7 +363,11 @@ describe("document read and download boundaries", () => {
       .fn<HttpClient["request"]>()
       .mockResolvedValueOnce(documentRevision())
       .mockResolvedValueOnce([attempt]);
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     const result = await feature.loadRevision.execute(
       access,
       documentHeaderId,
@@ -357,7 +387,11 @@ describe("document read and download boundaries", () => {
     const request = vi
       .fn<HttpClient["request"]>()
       .mockRejectedValue(new HttpResponseError(403, { code: "mfa_required", detail: "PRIVATE" }));
-    const feature = createDocumentsFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
     expect(await feature.loadReview.execute(access, documentHeaderId, null, signal())).toEqual({
       ok: false,
       failure: { code: "mfa_required", fields: {}, parameters: {} },
@@ -391,7 +425,7 @@ describe("document read and download boundaries", () => {
         mediaType: revision.mediaType,
         etag: `"${revision.id}-${revision.sha256}"`,
       });
-    const feature = createDocumentsFeature({ request }, { downloadBinary });
+    const feature = createDocumentsFeature({ request }, { downloadBinary }, documentFileInput());
     expect(
       await feature.download.execute(access, documentHeaderId, documentRevisionId, signal()),
     ).toEqual({ ok: true, value: undefined });
@@ -416,7 +450,7 @@ describe("document read and download boundaries", () => {
       .fn<HttpClient["request"]>()
       .mockResolvedValue({ ...documentRevision(), status });
     const downloadBinary = vi.fn();
-    const feature = createDocumentsFeature({ request }, { downloadBinary });
+    const feature = createDocumentsFeature({ request }, { downloadBinary }, documentFileInput());
     expect(
       await feature.download.execute(access, documentHeaderId, documentRevisionId, signal()),
     ).toMatchObject({ ok: false, failure: { code: "document_not_ready" } });
@@ -430,7 +464,7 @@ describe("document read and download boundaries", () => {
       .mockResolvedValueOnce(documentRevision())
       .mockRejectedValueOnce(new HttpResponseError(403, { code: "document_access_denied" }));
     const downloadBinary = vi.fn();
-    const feature = createDocumentsFeature({ request }, { downloadBinary });
+    const feature = createDocumentsFeature({ request }, { downloadBinary }, documentFileInput());
     expect(
       await feature.download.execute(access, documentHeaderId, documentRevisionId, signal()),
     ).toMatchObject({ ok: false, failure: { code: "document_access_denied" } });
@@ -464,7 +498,7 @@ describe("document read and download boundaries", () => {
           return held.promise;
         });
       const downloadBinary = vi.fn();
-      const feature = createDocumentsFeature({ request }, { downloadBinary });
+      const feature = createDocumentsFeature({ request }, { downloadBinary }, documentFileInput());
       const pending = new AbortController();
       const result = feature.download.execute(
         access,
@@ -506,6 +540,7 @@ describe("document read and download boundaries", () => {
     const feature = createDocumentsFeature(
       { request },
       { downloadBinary: vi.fn().mockResolvedValue(failure) },
+      documentFileInput(),
     );
     expect(
       await feature.download.execute(access, documentHeaderId, documentRevisionId, signal()),

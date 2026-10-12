@@ -12,7 +12,9 @@ export function documentRetentionPeriod(days: number | null, locale: Locale): st
   const text = documentRetentionMessages(locale);
   return days === null
     ? text.indefinite
-    : `${new Intl.NumberFormat(locale).format(days)} ${text.days}`;
+    : new Intl.NumberFormat(locale, { style: "unit", unit: "day", unitDisplay: "long" }).format(
+        days,
+      );
 }
 export function documentRetentionPolicyRows(
   policies: readonly DocumentRetentionPolicy[],

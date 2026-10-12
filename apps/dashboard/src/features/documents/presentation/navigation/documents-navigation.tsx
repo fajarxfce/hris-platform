@@ -6,7 +6,7 @@ import { canBrowseDocuments } from "../../domain/policies/document-read-policy";
 import { canManageDocumentRetention } from "../../domain/policies/document-retention-policy";
 import { documentMessages } from "../i18n/document-messages";
 import { documentRetentionMessages } from "../i18n/document-retention-messages";
-import { documentRetentionPoliciesPath } from "../models/document-retention-route";
+import { documentRetentionRootPath } from "../models/document-retention-route";
 import { documentsPath } from "../models/document-route";
 
 export function documentsNavigation(
@@ -31,7 +31,7 @@ export function documentRetentionNavigation(
   return canManageDocumentRetention(access?.permissions ?? [])
     ? [
         {
-          to: documentRetentionPoliciesPath,
+          to: documentRetentionRootPath,
           label: documentRetentionMessages(locale).title,
           icon: <Archive20Regular />,
         },

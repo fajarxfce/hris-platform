@@ -14,7 +14,6 @@ const en = {
   retention: "Retention period",
   notConfigured: "Not configured",
   indefinite: "Indefinite",
-  days: "days",
   daysLabel: "Retention days",
   daysHint: "Leave blank for indefinite retention, or enter 1–36,500 days. One day is 24 hours.",
   policyHint: "Applies when a document is archived. Existing archives keep their recorded policy.",
@@ -47,7 +46,6 @@ const id: typeof en = {
   retention: "Masa simpan",
   notConfigured: "Belum diatur",
   indefinite: "Tanpa batas waktu",
-  days: "hari",
   daysLabel: "Masa simpan dalam hari",
   daysHint: "Kosongkan untuk tanpa batas waktu, atau isi 1–36.500 hari. Satu hari adalah 24 jam.",
   policyHint:

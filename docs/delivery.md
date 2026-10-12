@@ -1788,3 +1788,23 @@ The 29 new boundary cases cover nullable initial versions, indefinite retention,
 inconsistent snapshots, head/history races, ineligible transitions, separate
 permissions, receipt binding, MFA failures and cancelled late results. Lifecycle
 UI controls remain the next increment.
+
+## Dashboard archive and legal hold
+
+The retention workspace now provides document-reference lookup, current status,
+paginated lifecycle history and immutable change details. Independent operators
+can archive, restore, place a hold and release it without acquiring file content
+or employee profiles. Forms own fresh reviews, immutable receipt recovery and
+cancelled/late work. Document details link to the same workspace when permitted.
+Administration routes share a prefix; prior policy bookmarks preserve scope when
+redirected. English and Indonesian durations use locale-aware unit formatting.
+
+Architecture, formatting, TypeScript and all 1,041 unit tests passed, including
+fourteen command-owner cases. All 48 document browser scenarios passed, including
+nine lifecycle scenarios and legacy-route recovery. Desktop and narrow dark
+history views were inspected. Both isolated API/database retention scenarios
+passed: an unfinished upload prevented archive, an independent administrator
+cancelled it, a lost archive response replayed its original receipt, a subsequent
+policy change preserved the old snapshot, hold survived restore, rearchiving
+selected the new policy, and revocation removed access. These dashboard changes
+required no new backend or mobile build. Accepted-content retirement is next.

@@ -2,6 +2,34 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_document_retention_change: [
+    "Review the selected document and provide a reason of up to 1,000 characters without line breaks.",
+    "Periksa dokumen yang dipilih dan isi alasan maksimal 1.000 karakter tanpa baris baru.",
+  ],
+  document_retention_action_unavailable: [
+    "This retention action is no longer available. Reload the document's retention status.",
+    "Tindakan retensi ini sudah tidak tersedia. Muat ulang status retensi dokumen.",
+  ],
+  document_retention_state_changed: [
+    "Document retention changed during this review. Refresh to view its current status and history.",
+    "Retensi dokumen berubah saat ditinjau. Muat ulang untuk melihat status dan riwayat terbaru.",
+  ],
+  document_already_archived: [
+    "This document is already archived. Reload its retention status.",
+    "Dokumen sudah diarsipkan. Muat ulang status retensinya.",
+  ],
+  document_not_archived: [
+    "This document is not archived. Reload its retention status.",
+    "Dokumen belum diarsipkan. Muat ulang status retensinya.",
+  ],
+  document_already_held: [
+    "This document already has a legal hold. Reload its retention status.",
+    "Dokumen sudah memiliki legal hold. Muat ulang status retensinya.",
+  ],
+  document_not_held: [
+    "This document has no legal hold. Reload its retention status.",
+    "Dokumen tidak memiliki legal hold. Muat ulang status retensinya.",
+  ],
   invalid_document_retention_policy: [
     "Use 1–36,500 retention days or leave the field blank. Provide a reason of up to 1,000 characters without line breaks.",
     "Isi 1–36.500 hari atau kosongkan masa simpan. Masukkan alasan maksimal 1.000 karakter tanpa baris baru.",
@@ -59,8 +87,8 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Isi judul maksimal 160 karakter, pilih kategori, dan masukkan alasan maksimal 1.000 karakter.",
   ],
   document_upload_active: [
-    "Another revision is still being processed. Complete or cancel it before uploading a replacement.",
-    "Revisi lain masih diproses. Selesaikan atau batalkan sebelum meng-upload penggantinya.",
+    "Another revision is still being processed. Complete or cancel it before continuing.",
+    "Revisi lain masih diproses. Selesaikan atau batalkan sebelum melanjutkan.",
   ],
   document_upload_capacity: [
     "The upload limit has been reached. Complete or cancel an unfinished upload first.",

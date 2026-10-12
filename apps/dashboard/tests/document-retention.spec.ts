@@ -4,7 +4,7 @@ import { installDocumentRetentionApi } from "./document-retention-api";
 import { retentionPolicyId } from "./fixtures/document-retention";
 import { companyIds } from "./identity-api";
 
-const policiesPath = "/documents/retention-policies",
+const policiesPath = "/documents/retention/policies",
   policyPath = `${policiesPath}/personal`;
 test("retention-only access has its own navigation and does not acquire document contents", async ({
   page,
@@ -34,6 +34,17 @@ test("retention-only access has its own navigation and does not acquire document
   expect(api.reads.every((url) => url.pathname.includes("/documents/retention-policies"))).toBe(
     true,
   );
+  expect(api.identity.unhandled).toHaveLength(0);
+});
+
+test("legacy policy links retain company scope and resolve to the current administration route", async ({
+  page,
+}) => {
+  const api = await installDocumentRetentionApi(page);
+  await page.goto(`/documents/retention-policies/personal/edit?company=${companyIds[0]}`);
+  await expect(page).toHaveURL(`${policyPath}/edit?company=${companyIds[0]}`);
+  await expect(page.getByLabel("Retention days", { exact: true })).toHaveValue("365");
+  expect(api.reads).toHaveLength(1);
   expect(api.identity.unhandled).toHaveLength(0);
 });
 

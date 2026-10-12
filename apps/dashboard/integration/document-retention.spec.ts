@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
 import { createAdminCompany } from "./fixtures/admin-company";
-import { authenticatorCode } from "./fixtures/authenticator";
+import { signInAndEnrollAuthenticator } from "./fixtures/sign-in-and-enroll-authenticator";
 
 test("independent retention administration recovers committed saves and rejects concurrent or cross-company review", async ({
   page,
@@ -35,24 +35,7 @@ test("independent retention administration recovers committed saves and rejects 
   const operatorContext = await browser.newContext({ baseURL });
   try {
     const operatorPage = await operatorContext.newPage();
-    await operatorPage.goto("/");
-    await operatorPage
-      .getByLabel("Email", { exact: true })
-      .fill("browser-retention-operator@example.invalid");
-    await operatorPage
-      .getByLabel("Password", { exact: true })
-      .fill("Browser-fixture-password-123!");
-    await operatorPage.getByRole("button", { name: "Sign in", exact: true }).click();
-    await operatorPage
-      .getByRole("button", { name: "Set up an authenticator", exact: true })
-      .click();
-    const key = operatorPage.locator(".app-enrollment-key code");
-    await expect(key).toBeVisible();
-    await operatorPage
-      .getByLabel("Authenticator code", { exact: true })
-      .fill(authenticatorCode((await key.textContent()) ?? ""));
-    await operatorPage.getByRole("button", { name: "Verify", exact: true }).click();
-    await operatorPage.getByRole("button", { name: "I have saved the codes", exact: true }).click();
+    await signInAndEnrollAuthenticator(operatorPage, "browser-retention-operator@example.invalid");
     await operatorPage
       .getByRole("navigation")
       .getByRole("link", { name: "Document retention", exact: true })
@@ -180,7 +163,7 @@ test("independent retention administration recovers committed saves and rejects 
     await operatorPage
       .getByRole("combobox", { name: "Company", exact: true })
       .selectOption(otherCompany);
-    await expect(operatorPage).toHaveURL(`/documents/retention-policies?company=${otherCompany}`);
+    await expect(operatorPage).toHaveURL(`/documents/retention/policies?company=${otherCompany}`);
     await expect(
       operatorPage
         .getByRole("table", { name: "Policies", exact: true })

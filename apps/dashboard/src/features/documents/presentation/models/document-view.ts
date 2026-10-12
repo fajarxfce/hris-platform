@@ -37,6 +37,7 @@ export function documentProperties(document: Document, locale: Locale, timezone:
       timeStyle: "short",
     });
   return [
+    { label: text.documentId, value: document.id },
     { label: text.classification, value: text[document.classification] },
     { label: text.created, value: `${date.format(new Date(document.createdAt))} (${timezone})` },
     { label: text.revisions, value: String(document.revisionCount) },

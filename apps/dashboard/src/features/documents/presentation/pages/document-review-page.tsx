@@ -5,6 +5,7 @@ import { AppResourceTable } from "../../../../core/presentation/components/app-r
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { DocumentReview } from "../../domain/entities/document-review";
 import { documentMessages } from "../i18n/document-messages";
+import { documentRetentionLifecycleMessages } from "../i18n/document-retention-lifecycle-messages";
 import { documentUploadMessages } from "../i18n/document-upload-messages";
 import type { DocumentReadState } from "../models/document-read-state";
 import type { documentProperties, documentRevisionRows } from "../models/document-view";
@@ -19,6 +20,7 @@ export function DocumentReviewPage(props: {
   companyName: string;
   backTo: string;
   uploadTo: string | null;
+  retentionTo: string | null;
   publishedTo: string | null;
   firstPage: boolean;
   onFirst: () => void;
@@ -35,9 +37,16 @@ export function DocumentReviewPage(props: {
       locale={props.locale}
       back={{ to: props.backTo, label: text.backFolder }}
       actions={
-        props.uploadTo && (
-          <Link to={props.uploadTo}>{documentUploadMessages(props.locale).replacement}</Link>
-        )
+        <>
+          {props.uploadTo && (
+            <Link to={props.uploadTo}>{documentUploadMessages(props.locale).replacement}</Link>
+          )}
+          {props.retentionTo && (
+            <Link to={props.retentionTo}>
+              {documentRetentionLifecycleMessages(props.locale).title}
+            </Link>
+          )}
+        </>
       }
     >
       {state.data && (

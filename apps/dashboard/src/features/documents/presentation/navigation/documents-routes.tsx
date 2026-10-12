@@ -2,16 +2,19 @@ import { Navigate, Route, Routes, useLocation, useSearchParams } from "react-rou
 import { DocumentActionScreen } from "../bindings/document-action-screen";
 import { DocumentEmployeesScreen } from "../bindings/document-employees-screen";
 import { DocumentFolderScreen } from "../bindings/document-folder-screen";
+import { DocumentRetentionChangeScreen } from "../bindings/document-retention-change-screen";
 import { DocumentRetentionEditorScreen } from "../bindings/document-retention-editor-screen";
 import { DocumentRetentionPoliciesScreen } from "../bindings/document-retention-policies-screen";
 import { DocumentRetentionPolicyScreen } from "../bindings/document-retention-policy-screen";
+import { DocumentRetentionScreen } from "../bindings/document-retention-screen";
 import { DocumentReviewScreen } from "../bindings/document-review-screen";
 import { DocumentRevisionScreen } from "../bindings/document-revision-screen";
 import { DocumentUploadScreen } from "../bindings/document-upload-screen";
 import type { DocumentsScreenProps } from "../contracts/documents-screen-props";
 import {
   documentRetentionPoliciesPath,
-  isDocumentRetentionPolicyPath,
+  isDocumentRetentionPath,
+  isLegacyDocumentRetentionPath,
 } from "../models/document-retention-route";
 import { documentHref } from "../models/document-route";
 
@@ -29,7 +32,7 @@ export function DocumentsRoutes(props: DocumentsScreenProps) {
           parameters.has("company")
             ? documentHref(
                 props.access.companyId,
-                isDocumentRetentionPolicyPath(location.pathname)
+                isDocumentRetentionPath(location.pathname)
                   ? documentRetentionPoliciesPath
                   : undefined,
               )
@@ -38,17 +41,50 @@ export function DocumentsRoutes(props: DocumentsScreenProps) {
       />
     );
   }
+  if (isLegacyDocumentRetentionPath(location.pathname)) {
+    return (
+      <Navigate
+        replace
+        to={`${location.pathname.replace("/documents/retention-policies", documentRetentionPoliciesPath)}${location.search}`}
+      />
+    );
+  }
   return (
     <Routes>
       <Route index element={<DocumentEmployeesScreen {...props} />} />
-      <Route path="retention-policies" element={<DocumentRetentionPoliciesScreen {...props} />} />
       <Route
-        path="retention-policies/:classification"
+        path="retention"
+        element={
+          <DocumentRetentionPoliciesScreen
+            key={`${props.accountId}:${props.access.companyId}`}
+            {...props}
+          />
+        }
+      />
+      <Route
+        path="retention/policies"
+        element={
+          <DocumentRetentionPoliciesScreen
+            key={`${props.accountId}:${props.access.companyId}`}
+            {...props}
+          />
+        }
+      />
+      <Route
+        path="retention/policies/:classification"
         element={<DocumentRetentionPolicyScreen {...props} />}
       />
       <Route
-        path="retention-policies/:classification/edit"
+        path="retention/policies/:classification/edit"
         element={<DocumentRetentionEditorScreen {...props} />}
+      />
+      <Route
+        path="retention/documents/:documentId"
+        element={<DocumentRetentionScreen {...props} />}
+      />
+      <Route
+        path="retention/documents/:documentId/:intent"
+        element={<DocumentRetentionChangeScreen {...props} />}
       />
       <Route
         path="employees/:employeeId/upload"
@@ -72,7 +108,20 @@ export function DocumentsRoutes(props: DocumentsScreenProps) {
         element={<DocumentRevisionScreen {...props} />}
       />
       <Route path=":documentId" element={<DocumentReviewScreen {...props} />} />
-      <Route path="*" element={<Navigate to={documentHref(props.access.companyId)} replace />} />
+      <Route
+        path="*"
+        element={
+          <Navigate
+            to={documentHref(
+              props.access.companyId,
+              isDocumentRetentionPath(location.pathname)
+                ? documentRetentionPoliciesPath
+                : undefined,
+            )}
+            replace
+          />
+        }
+      />
     </Routes>
   );
 }

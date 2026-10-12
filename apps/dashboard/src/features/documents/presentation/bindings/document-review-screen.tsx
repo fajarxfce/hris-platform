@@ -1,9 +1,11 @@
 import { useMemo } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
+import { canManageDocumentRetention } from "../../domain/policies/document-retention-policy";
 import { canCreateCompanyDocument } from "../../domain/policies/document-upload-policy";
 import type { DocumentsScreenProps } from "../contracts/documents-screen-props";
 import { useDocumentReview } from "../controllers/use-document-reads";
+import { documentRetentionPath } from "../models/document-retention-route";
 import {
   documentFolderPath,
   documentHref,
@@ -37,6 +39,11 @@ export function DocumentReviewScreen(props: DocumentsScreenProps) {
       {...props}
       {...view}
       state={state}
+      retentionTo={
+        state.data && canManageDocumentRetention(props.access.permissions)
+          ? documentHref(props.access.companyId, documentRetentionPath(documentId))
+          : null
+      }
       uploadTo={
         state.data &&
         state.data.document.revisionCount < 100 &&

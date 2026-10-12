@@ -76,6 +76,15 @@ export function useDocumentRetentionPolicies(props: DocumentsScreenProps) {
     props.documents.retention.loadPolicies.execute(props.access, signal),
   );
 }
+export function useDocumentRetention(
+  props: DocumentsScreenProps,
+  documentId: string,
+  after: string | null,
+) {
+  return useDocumentRead(props, ["retention", documentId, after], (signal) =>
+    props.documents.retention.load.execute(props.access, documentId, after, signal),
+  );
+}
 export function useDocumentRetentionPolicy(
   props: DocumentsScreenProps,
   classification: string,

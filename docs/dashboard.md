@@ -546,13 +546,13 @@ that local reference; an unfinished server revision remains in history. Resume
 requires selecting a file with identical content. Browser file references and
 commands are not persisted as an offline draft. Company replacement cancels the
 old owner; equivalent workspace suspension pauses delivery without replaying it.
-Document archive, legal-hold, and content-retirement controls remain separate delivery work.
+Content-retirement controls remain separate delivery work.
 
 ### Retention policies
 
 **Administration → Document retention** provides the three classifications,
 current definitions, and ascending revision history in pages of twenty.
-The route is `/documents/retention-policies`; a company change drops the previous
+The route is `/documents/retention/policies`; a company change drops the previous
 classification and returns to that company's catalog. Access requires the separate
 `documents.retention` grant. It does not acquire employee folders or file content.
 
@@ -565,3 +565,22 @@ Saves retain one immutable operation and reviewed version until acknowledged.
 Response loss stays recoverable through MFA or a later rejection; definite
 conflicts require a fresh review. Leaving a pending form uses workspace departure
 protection. Scope replacement cancels its request and rejects late results.
+
+### Document archive and legal hold
+
+The retention catalog also accepts a document reference. Document details expose
+that reference and a retention link for authorized operators. The lifecycle routes
+stay under `/documents/retention/documents/{id}`; old policy bookmarks redirect
+to the current administration routes without losing company scope.
+
+Retention status and bounded history do not acquire document contents or employee
+profiles. A selected change opens its immutable resulting state in a detail panel.
+The separate retention version protects archive, restore, hold and release
+commands. Each action acquires a fresh review and requires a reason.
+
+Archiving records the current policy and requires unfinished uploads to be
+cancelled separately. Policy changes preserve existing archive snapshots. Restore
+allows new uploads while retaining a legal hold; explicitly archiving again adopts
+the current policy. Hold/release keeps archive metadata intact. These operations
+do not retire accepted content. Lost responses, MFA recovery, departure protection
+and current-scope checks follow the same command ownership as policy editing.

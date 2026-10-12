@@ -7,6 +7,7 @@ import { DocumentRetentionEditorScreen } from "../bindings/document-retention-ed
 import { DocumentRetentionPoliciesScreen } from "../bindings/document-retention-policies-screen";
 import { DocumentRetentionPolicyScreen } from "../bindings/document-retention-policy-screen";
 import { DocumentRetentionScreen } from "../bindings/document-retention-screen";
+import { DocumentRetirementScreen } from "../bindings/document-retirement-screen";
 import { DocumentReviewScreen } from "../bindings/document-review-screen";
 import { DocumentRevisionScreen } from "../bindings/document-revision-screen";
 import { DocumentUploadScreen } from "../bindings/document-upload-screen";
@@ -85,6 +86,10 @@ export function DocumentsRoutes(props: DocumentsScreenProps) {
       <Route
         path="retention/documents/:documentId/:intent"
         element={<DocumentRetentionChangeScreen {...props} />}
+      />
+      <Route
+        path="retention/documents/:documentId/revisions/:revisionId"
+        element={<DocumentRetirementScreen {...props} />}
       />
       <Route
         path="employees/:employeeId/upload"

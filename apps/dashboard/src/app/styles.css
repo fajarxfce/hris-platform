@@ -595,6 +595,14 @@ a {
   margin: 0;
 }
 
+.app-document-retirement .app-editor-form {
+  gap: 20px;
+}
+:where(.app-document-retirement) .app-editor-form h2,
+:where(.app-document-retirement) .app-editor-form p {
+  margin: 0;
+}
+
 .app-document-upload .app-report-content {
   max-width: 760px;
   gap: 20px;

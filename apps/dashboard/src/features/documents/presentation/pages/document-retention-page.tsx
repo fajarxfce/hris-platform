@@ -1,11 +1,15 @@
 import { Text } from "@fluentui/react-components";
 import { Link } from "react-router-dom";
+import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppDetailsPanel } from "../../../../core/presentation/components/app-details-panel";
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
+import { AppTextField } from "../../../../core/presentation/components/app-text-field";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { DocumentRetentionReview } from "../../domain/entities/document-retention";
+import type { useDocumentRetirementLookup } from "../controllers/use-document-retirement-lookup";
 import { documentRetentionLifecycleMessages } from "../i18n/document-retention-lifecycle-messages";
+import { documentRetirementMessages } from "../i18n/document-retirement-messages";
 import type { DocumentReadState } from "../models/document-read-state";
 import type {
   documentRetentionChangeProperties,
@@ -21,6 +25,7 @@ export function DocumentRetentionPage(props: {
   rows: ReturnType<typeof documentRetentionHistoryRows>;
   change: ReturnType<typeof documentRetentionChangeProperties> | null;
   actions: readonly { to: string; label: string }[];
+  retirementLookup: ReturnType<typeof useDocumentRetirementLookup>;
   locale: Locale;
   companyName: string;
   backTo: string;
@@ -32,6 +37,7 @@ export function DocumentRetentionPage(props: {
   onCloseChange: () => void;
 }) {
   const text = documentRetentionLifecycleMessages(props.locale),
+    retirement = documentRetirementMessages(props.locale),
     { state } = props;
   return (
     <>
@@ -55,6 +61,23 @@ export function DocumentRetentionPage(props: {
         {state.data && (
           <>
             <AppPropertyList title={text.overview} items={props.properties} />
+            <section className="app-resource-panel" aria-label={retirement.lookup}>
+              <h2>{retirement.lookup}</h2>
+              <form
+                className="app-resource-filters"
+                onSubmit={props.retirementLookup.submit}
+                noValidate
+              >
+                <AppTextField
+                  label={retirement.reference}
+                  hint={retirement.referenceHint}
+                  {...props.retirementLookup.revisionId}
+                  maxLength={36}
+                  error={props.retirementLookup.invalid ? retirement.invalidReference : undefined}
+                />
+                <AppButton type="submit">{retirement.review}</AppButton>
+              </form>
+            </section>
             {props.rows.length === 0 ? (
               <Text role="status">{text.noHistory}</Text>
             ) : (

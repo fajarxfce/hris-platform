@@ -2,6 +2,34 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_document_retirement: [
+    "Review the selected revision and provide a reason of up to 1,000 characters without line breaks.",
+    "Periksa revisi yang dipilih dan isi alasan maksimal 1.000 karakter tanpa baris baru.",
+  ],
+  document_retirement_unavailable: [
+    "This revision cannot be retired. Reload its retention review.",
+    "Revisi belum dapat dihentikan. Muat ulang tinjauan retensinya.",
+  ],
+  document_revision_not_ready: [
+    "Only an accepted revision can be retired. Review its processing status.",
+    "Hanya revisi yang telah diterima yang dapat dihentikan. Periksa status pemrosesannya.",
+  ],
+  document_legal_hold: [
+    "An active legal hold protects this document from retirement.",
+    "Legal hold yang aktif melindungi dokumen dari penghentian.",
+  ],
+  document_retention_indefinite: [
+    "This archive has an indefinite retention period.",
+    "Arsip ini memiliki masa simpan tanpa batas waktu.",
+  ],
+  document_retention_pending: [
+    "The archive's retention period has not ended.",
+    "Masa simpan arsip belum berakhir.",
+  ],
+  document_evidence_referenced: [
+    "A business record references this revision. Its content must be retained.",
+    "Revisi digunakan sebagai bukti dalam catatan bisnis. Kontennya harus tetap disimpan.",
+  ],
   invalid_document_retention_change: [
     "Review the selected document and provide a reason of up to 1,000 characters without line breaks.",
     "Periksa dokumen yang dipilih dan isi alasan maksimal 1.000 karakter tanpa baris baru.",

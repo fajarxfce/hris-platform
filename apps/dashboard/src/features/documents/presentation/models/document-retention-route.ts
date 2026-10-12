@@ -10,6 +10,8 @@ export const isLegacyDocumentRetentionPath = (path: string): boolean =>
   path.startsWith(`${documentsPath}/retention-policies/`);
 export const documentRetentionPath = (documentId: string): string =>
   `${documentRetentionRootPath}/documents/${encodeURIComponent(documentId)}`;
+export const documentRetirementPath = (documentId: string, revisionId: string): string =>
+  `${documentRetentionPath(documentId)}/revisions/${encodeURIComponent(revisionId)}`;
 export const documentRetentionChangePath = (
   documentId: string,
   intent: DocumentRetentionIntent,

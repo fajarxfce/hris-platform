@@ -40,7 +40,8 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000019', 'browser-retention-admin@example.invalid', 'Browser Retention Admin'),
   ('a0000000-0000-4000-8000-000000000020', 'browser-retention-operator@example.invalid', 'Browser Retention Operator'),
   ('a0000000-0000-4000-8000-000000000021', 'browser-document-lifecycle-admin@example.invalid', 'Browser Document Lifecycle Admin'),
-  ('a0000000-0000-4000-8000-000000000022', 'browser-document-lifecycle-operator@example.invalid', 'Browser Document Lifecycle Operator')
+  ('a0000000-0000-4000-8000-000000000022', 'browser-document-lifecycle-operator@example.invalid', 'Browser Document Lifecycle Operator'),
+  ('a0000000-0000-4000-8000-000000000023', 'browser-retirement-operator@example.invalid', 'Browser Retirement Operator')
 ) AS fixture(id, email, name)
 WHERE bootstrap.email = 'browser-admin@example.invalid'
 ON CONFLICT DO NOTHING;

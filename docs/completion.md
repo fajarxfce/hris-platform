@@ -63,6 +63,16 @@ recovery, company availability, MFA enrollment/verification and recovery-code lo
 and device-session revocation. External providers and the employee workflows below
 retain their own acceptance work.
 
+Administrative Documents now covers employee folders, document/revision history,
+new and replacement uploads, resumable browser delivery, authorized downloads,
+validation/retry, explicit cancellation, retention-policy configuration,
+archive/restore, legal hold/release, and accepted-content retirement. Independent
+operators and immutable lifecycle history were verified against the API/database.
+Upload and validation acceptance used private storage and the development worker;
+retirement browser acceptance used pre-existing fictional archive metadata in an
+owned disposable database. Its historical and current revisions, lost-response
+replay and competing hold were exercised without modifying development records.
+
 ## Remaining delivery sequence
 
 | Area | Remaining end-to-end work |
@@ -72,7 +82,6 @@ retain their own acceptance work.
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
 | Workforce | Dashboard company-wide exception queues, correction history, overtime and closing; bulk/reset and late corrections; mobile overtime requests and physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections, and mobile work calendars plus online/offline capture are implemented and verified against the real API. |
 | Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry. Mobile balances, filtered history, request details, submission with published document evidence, and durable withdrawal/cancellation flows are implemented and verified against the development API. |
-| Documents | Dashboard content-retirement controls. Retention-policy configuration, archive/restore, legal hold/release and immutable history are implemented and verified with independent operators against the API. Administrative employee folders, document/revision history, new/replacement uploads, resumable browser delivery, authorized downloads, validation/retry and explicit upload cancellation are implemented and verified against private storage and the development worker. Mobile encrypted import, resumable upload/download, published-document browsing and authenticated Save copy are implemented. |
 | Expenses | Dashboard policies, claims, review, payment/reconciliation and corrections; mobile claims, receipts, submission and payment progress |
 | Payroll | Dashboard policies, compensation, inputs, calculation, review, finalization, payslips, payments and amendments; mobile finalized payslips and downloads |
 | Communications | Mobile push hints and navigation. Dashboard audience groups, drafts, bounded named audience selection, publication review, preview, scheduling, cancellation/recovery and archival, and the mobile inbox with durable read/acknowledgement commands are implemented. |

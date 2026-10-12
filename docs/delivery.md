@@ -1836,3 +1836,39 @@ Twenty-eight new boundary cases cover independent access, contradictory metadata
 unknown blockers, immutable snapshots, receipt binding, original-command replay,
 safe failures and late cancellation. These are contracts; the retirement controls
 and their browser/API acceptance remain subsequent work.
+
+## Dashboard accepted-content retirement
+
+The retention workspace now provides revision lookup, a separate server-derived
+review, and explicit retirement confirmation. It displays the observed versions,
+publication status and archive snapshot; blockers disable submission. The command
+owner retains the original operation, review and reason through unknown outcomes,
+MFA recovery and later rejection. Company departure cancels ownership and discards
+late results. Ordinary revision details expose the link only with the independent
+retention grant. Both languages and themes use the existing Fluent components.
+
+Architecture, formatting, TypeScript and all 1,082 dashboard unit tests passed,
+including thirteen new command-owner cases. All 61 document browser scenarios
+passed. Narrow light/dark review and history views were inspected; a scoped form
+spacing adjustment was checked with the narrow-layout scenario again.
+
+All three isolated API/database retention scenarios passed. The new positive
+scenario uses a pre-existing fictional archive seeded by the disposable database
+owner, with constraints and triggers enabled. It verifies historical retirement
+without clearing a newer publication, recovery of one committed result, a hold
+inserted after review, original-receipt replay during that hold, fresh confirmation
+after release, current publication removal and immutable history. This browser
+scenario exercises real retirement transactions and cleanup registration; it does
+not exercise upload, scanning or physical object deletion. Those retain their
+separate backend/storage validation records.
+
+All 17 isolated API/browser scenarios and the separate worker/browser scenario
+passed with the shared fixture. Upload acceptance captures and disposes the real
+API response before forwarding it to Chromium, avoiding a test failure when the
+browser has already released its failed upload stream. The narrow-layout check
+also passed after the final spacing change.
+
+The development API and worker were updated with guarded retirement review while
+preserving the private document services and WireGuard overlay. API requests on
+loopback and WireGuard and the dashboard on WireGuard returned HTTP 200. These
+dashboard changes required no new mobile build.

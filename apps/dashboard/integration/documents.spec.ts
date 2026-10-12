@@ -56,6 +56,17 @@ test("real browser upload, reserved part review and cancellation remain company-
     buffer: Buffer.from(bytes),
   });
   await expect(page.getByRole("button", { name: "Ganti file", exact: true })).toBeEnabled();
+  const parts: { status: number; body: unknown }[] = [];
+  await page.route(`**${base}/documents/revisions/*/chunks`, async (route) => {
+    // Capture the real server response before Chromium releases the failed upload stream.
+    const response = await route.fetch();
+    try {
+      parts.push({ status: response.status(), body: await response.json() });
+      await route.fulfill({ response });
+    } finally {
+      await response.dispose();
+    }
+  });
   const metadataResponse = page.waitForResponse(
     (response) =>
       response.request().method() === "POST" &&
@@ -87,7 +98,9 @@ test("real browser upload, reserved part review and cancellation remain company-
   const part = await partResponse;
   // This isolated API has no object storage. Reservation and its recovery metadata are real.
   expect(part.status()).toBe(503);
-  expect(await part.json()).toMatchObject({ code: "object_storage_not_configured" });
+  expect(parts).toEqual([
+    { status: 503, body: expect.objectContaining({ code: "object_storage_not_configured" }) },
+  ]);
   await expect(page.getByRole("status")).toContainText("Upload terhenti.");
   const reserved = await context.request.get(`${base}/documents/revisions/${revision}`);
   expect(await reserved.json()).toMatchObject({

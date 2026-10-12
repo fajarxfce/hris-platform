@@ -546,7 +546,6 @@ that local reference; an unfinished server revision remains in history. Resume
 requires selecting a file with identical content. Browser file references and
 commands are not persisted as an offline draft. Company replacement cancels the
 old owner; equivalent workspace suspension pauses delivery without replaying it.
-Content-retirement controls remain separate delivery work.
 
 ### Retention policies
 
@@ -584,3 +583,20 @@ allows new uploads while retaining a legal hold; explicitly archiving again adop
 the current policy. Hold/release keeps archive metadata intact. These operations
 do not retire accepted content. Lost responses, MFA recovery, departure protection
 and current-scope checks follow the same command ownership as policy editing.
+
+### Content retirement
+
+Retention details accept a revision reference, and ordinary revision details offer
+the review link only with the independent retention grant. The route stays under
+`/documents/retention/documents/{documentId}/revisions/{revisionId}`. It reads
+revision identity/status, publication and retention metadata without acquiring a
+file or employee profile. The server supplies the review time and current blocker.
+
+Eligible revisions require a reason and explicit confirmation. The page states
+that access is removed permanently and file deletion is scheduled, while metadata
+and history remain. A blocked review has no confirmation control. A new hold or
+version change requires another review; a previously uncertain command keeps its
+original operation, two versions and reason through retry and MFA recovery.
+Scope replacement aborts its owner and cannot publish late results into the next
+company. Retirement history opens the original revision reference and archive
+snapshot in the existing detail panel.

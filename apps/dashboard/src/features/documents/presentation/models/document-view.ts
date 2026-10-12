@@ -75,6 +75,7 @@ export function documentRevisionView(
   return {
     title: `${text.revision} ${revision.number}`,
     properties: [
+      { label: text.revisionId, value: revision.id },
       { label: text.fileName, value: revision.fileName },
       { label: text.status, value: text[revision.status] },
       { label: text.mediaType, value: revision.mediaType },

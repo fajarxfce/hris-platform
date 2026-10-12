@@ -6,10 +6,13 @@ import {
   documentRevisionIntents,
 } from "../../domain/entities/document-revision-action";
 import { canPerformDocumentAction } from "../../domain/policies/document-action-policy";
+import { canManageDocumentRetention } from "../../domain/policies/document-retention-policy";
 import { canResumeDocument } from "../../domain/policies/document-upload-policy";
 import { documentActionMessages } from "../i18n/document-action-messages";
 import { documentMessages } from "../i18n/document-messages";
+import { documentRetirementMessages } from "../i18n/document-retirement-messages";
 import { documentUploadMessages } from "../i18n/document-upload-messages";
+import { documentRetirementPath } from "./document-retention-route";
 import { documentActionPath, documentHref, documentRevisionPath } from "./document-route";
 import { documentSize } from "./document-view";
 
@@ -40,6 +43,11 @@ export function documentActionLinks(
         `${documentRevisionPath(revision.documentId, revision.id)}/upload`,
       ),
       label: documentUploadMessages(locale).resume,
+    });
+  if (access.companyId === revision.companyId && canManageDocumentRetention(access.permissions))
+    links.push({
+      to: documentHref(access.companyId, documentRetirementPath(revision.documentId, revision.id)),
+      label: documentRetirementMessages(locale).review,
     });
   return links;
 }

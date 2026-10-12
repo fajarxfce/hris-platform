@@ -67,9 +67,37 @@ export class FetchHttpClient implements HttpClient {
     const timeout = request.timeoutMilliseconds ?? this.deadlineMilliseconds;
     if (!Number.isInteger(timeout) || timeout < 1 || timeout > 60_000)
       throw new RangeError("Invalid request deadline");
-    const body = request.body === undefined ? undefined : JSON.stringify(request.body);
-    if (body !== undefined && new TextEncoder().encode(body).byteLength > maximumBytes)
+    const method = request.method ?? "GET";
+    const upload = request.binaryBody;
+    const uploadHeaders =
+      upload &&
+      Object.freeze({
+        "Upload-Offset": upload.headers["Upload-Offset"],
+        "Upload-Checksum-Sha256": upload.headers["Upload-Checksum-Sha256"],
+      });
+    if (
+      upload &&
+      (request.body !== undefined ||
+        !["POST", "PUT", "PATCH"].includes(method) ||
+        !(upload.bytes instanceof ArrayBuffer) ||
+        Object.keys(upload.headers).length !== 2 ||
+        Object.keys(upload.headers).some(
+          (name) => name !== "Upload-Offset" && name !== "Upload-Checksum-Sha256",
+        ) ||
+        typeof uploadHeaders?.["Upload-Offset"] !== "string" ||
+        typeof uploadHeaders?.["Upload-Checksum-Sha256"] !== "string" ||
+        !/^(0|[1-9][0-9]{0,9})$/u.test(uploadHeaders?.["Upload-Offset"] ?? "") ||
+        !/^[a-f0-9]{64}$/u.test(uploadHeaders?.["Upload-Checksum-Sha256"] ?? ""))
+    )
+      throw new TypeError("Invalid binary request");
+    if (upload && (upload.bytes.byteLength < 1 || upload.bytes.byteLength > maximumBytes))
       throw new RequestBodyTooLargeError();
+    const json = request.body === undefined ? undefined : JSON.stringify(request.body);
+    if (json !== undefined && new TextEncoder().encode(json).byteLength > maximumBytes)
+      throw new RequestBodyTooLargeError();
+    // Snapshot a bounded body before waiting for CSRF. The caller retains ownership of its part.
+    const binary = upload?.bytes.slice(0);
+    const body = binary ?? json;
     const controller = new AbortController();
     const onAbort = () => controller.abort(signal.reason);
     signal.addEventListener("abort", onAbort, { once: true });
@@ -78,7 +106,6 @@ export class FetchHttpClient implements HttpClient {
       timeout,
     );
     try {
-      const method = request.method ?? "GET";
       const headers = new Headers({
         Accept: "application/json",
         "X-HRIS-Client-Platform": "WEB",
@@ -107,7 +134,11 @@ export class FetchHttpClient implements HttpClient {
         headers.set(csrf.headerName, csrf.token);
       }
       if (body !== undefined) {
-        headers.set("Content-Type", "application/json");
+        headers.set("Content-Type", upload ? "application/octet-stream" : "application/json");
+      }
+      if (uploadHeaders) {
+        headers.set("Upload-Offset", uploadHeaders["Upload-Offset"]);
+        headers.set("Upload-Checksum-Sha256", uploadHeaders["Upload-Checksum-Sha256"]);
       }
       if (request.operationId) headers.set("Idempotency-Key", request.operationId);
       if (request.response) headers.set("Accept", request.response.mediaType);
@@ -120,6 +151,7 @@ export class FetchHttpClient implements HttpClient {
         request.response,
       );
     } finally {
+      if (binary) new Uint8Array(binary).fill(0);
       clearTimeout(deadline);
       signal.removeEventListener("abort", onAbort);
     }
@@ -129,7 +161,7 @@ export class FetchHttpClient implements HttpClient {
     path: string,
     method: string,
     headers: Headers,
-    body: string | undefined,
+    body: string | ArrayBuffer | undefined,
     signal: AbortSignal,
     representation?: HttpRequest["response"],
   ): Promise<unknown> {

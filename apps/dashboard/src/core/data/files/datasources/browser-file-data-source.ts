@@ -1,6 +1,7 @@
 import { FileEncodingError, FileSizeLimitError } from "../file-errors";
 import type { BinaryFileDownloadDto } from "../models/binary-file-dto";
 import type { TextFileDownloadDto, TextFileDto } from "../models/text-file-dto";
+import { selectBrowserFile } from "../select-browser-file";
 import type { FileDataSource } from "./file-data-source";
 
 export class BrowserFileDataSource implements FileDataSource {
@@ -19,43 +20,7 @@ export class BrowserFileDataSource implements FileDataSource {
   }
 
   select(accept: string, signal: AbortSignal): Promise<File | null> {
-    signal.throwIfAborted();
-    const input = this.document.createElement("input");
-    input.type = "file";
-    input.accept = accept;
-    input.multiple = false;
-    input.hidden = true;
-    return new Promise((resolve, reject) => {
-      const clean = () => {
-        input.removeEventListener("change", selected);
-        input.removeEventListener("cancel", cancelled);
-        signal.removeEventListener("abort", aborted);
-        input.remove();
-      };
-      const selected = () => {
-        const file = input.files?.item(0) ?? null;
-        clean();
-        resolve(file);
-      };
-      const cancelled = () => {
-        clean();
-        resolve(null);
-      };
-      const aborted = () => {
-        clean();
-        reject(signal.reason);
-      };
-      input.addEventListener("change", selected, { once: true });
-      input.addEventListener("cancel", cancelled, { once: true });
-      signal.addEventListener("abort", aborted, { once: true });
-      try {
-        this.document.body.append(input);
-        input.click();
-      } catch (error) {
-        clean();
-        reject(error);
-      }
-    });
+    return selectBrowserFile(this.document, accept, signal);
   }
 
   readText(file: File, maximumBytes: number, signal: AbortSignal): Promise<TextFileDto> {

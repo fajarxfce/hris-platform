@@ -179,3 +179,17 @@ Inbox push capture stores only source identities in the publication transaction.
 
 
 Browser file acquisition belongs to the core file datasource. It selects raw browser files, performs bounded UTF-8 reads, and dispatches bounded text downloads; it does not choose import policy. The file repository coordinates selection/read operations and maps raw failures through `safeFileCall`. Native picker cancellation returns a successful null, while caller cancellation aborts owned reads and propagates. Feature use cases own file eligibility and any subsequent API command. The cookie HTTP transport supports bounded CSV representations without bypassing deadlines, redirect restrictions, problem JSON, or current CSRF acquisition. Oversized encoded JSON is rejected before any network request.
+
+Binary input uses a separate file-input repository contract. Its datasource owns
+at most four browser file handles and one active read per handle. Domain values
+contain opaque references and metadata; feature owners release them on departure.
+SHA-256 uses bounded asynchronous 64-KiB reads, a finite whole-file deadline and
+the pinned hash implementation. Individual upload reads cannot exceed one MiB.
+Cancellation releases readers, listeners and timers; failed acquisition clears
+borrowed buffers before returning a domain failure.
+
+The cookie transport snapshots at most one MiB for a binary request before waiting
+for current CSRF. It admits only the upload offset/checksum headers, preserves the
+operation ID, and clears its owned copy on every outcome. JSON and binary bodies
+cannot be mixed. Resume, retry, publication and file eligibility remain feature
+use-case policy; infrastructure performs no hidden retry or source selection.

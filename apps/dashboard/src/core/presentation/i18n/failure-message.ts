@@ -2,6 +2,14 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  file_capacity_exceeded: [
+    "Close another upload before selecting a new file.",
+    "Tutup upload lain sebelum memilih file baru.",
+  ],
+  file_in_use: [
+    "A file read is already running. Wait for it to finish.",
+    "Pembacaan file masih berjalan. Tunggu hingga selesai.",
+  ],
   document_action_unavailable: [
     "This action is no longer available. Reload to check the revision.",
     "Tindakan ini sudah tidak tersedia. Muat ulang untuk memeriksa revisi.",

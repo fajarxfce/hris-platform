@@ -1664,3 +1664,22 @@ then closed an incomplete replacement while preserving the published revision.
 Desktop and narrow layouts were inspected in both themes. Browser upload authoring
 and retention administration remain separate increments; no new mobile build was
 required for these dashboard controls.
+
+## Bounded dashboard file input
+
+The dashboard now has an owned binary file-input contract and browser adapter.
+Opaque references keep SDK objects and file contents out of presentation. File
+hashing reads at most 64 KiB at a time; part reads and HTTP upload bodies are bounded
+to one MiB. Every retained file has explicit release and cancellation ownership.
+The existing native picker is shared with CSV intake without peer-datasource calls.
+
+Cookie transport retains current CSRF, same-origin credentials, restricted headers,
+finite deadlines and stable operation IDs for binary commands. It snapshots the
+part before authentication waits and clears that copy afterward. Repositories clear
+buffers or release newly acquired file handles on mapping failure or late cancellation.
+
+Architecture, formatting, TypeScript and all 933 dashboard unit tests passed,
+including 64 file/HTTP boundary cases. Twenty-six existing CSV-intake and document
+browser scenarios passed against production output. The new input adapters still
+need their document-authoring UI and API acceptance; these checks do not establish
+whole-workflow upload performance.

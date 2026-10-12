@@ -18,6 +18,10 @@ export async function safeFileCall<T>(
       return failed("file_read_timeout");
     if (error instanceof FileSizeLimitError) return failed("file_size_limit");
     if (error instanceof FileEncodingError) return failed("file_encoding_invalid");
+    if (error instanceof DOMException && error.name === "QuotaExceededError")
+      return failed("file_capacity_exceeded");
+    if (error instanceof DOMException && error.name === "InvalidStateError")
+      return failed("file_in_use");
     if (error instanceof DOMException && ["NotAllowedError", "SecurityError"].includes(error.name))
       return failed("file_access_denied");
     return failed("file_unavailable");

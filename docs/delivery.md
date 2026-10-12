@@ -1547,3 +1547,27 @@ The integration exposed a foreground scheduler dependency cycle. Its correction
 and generated-DI regression also landed in Compose Fluent Starter, which passed
 its own root checks, sync Chromium suite and Android dev build. Authenticated mobile
 downloads and administrative document workflows retain their own delivery work.
+
+## Mobile document download and export
+
+[HRIS Mobile](https://github.com/fajarxfce/hris-mobile/commit/e991035) now lists owned
+published revisions with employment and category filters. Downloads use fresh
+content authorization, exact ranges, encrypted progress and whole-file checksum
+verification. Pause and explicit resume retain committed bytes; reopening a partial
+copy does not silently start transport. Imported and downloaded files have separate
+detail routes.
+
+Save copy uses the platform destination dialog, then rechecks company and resource
+access before reading plaintext. Bounded writes, final authorization, finite
+deadlines and owned cleanup cover cancellation and late results. Known denial
+remains gated through a failed retry. Generic output adapters and their regressions
+were also ported to Compose Fluent Starter.
+
+Mobile root checks passed with 739 desktop/JVM tests, plus 83 document, two
+localization and five app Chromium tests. Android dev and production Web builds
+passed. API 35 acceptance downloaded a 607-byte PDF from the real development API,
+cancelled and reopened the native save dialog, saved an identical SHA-256 copy,
+and restored the encrypted completion after process restart. Screens were inspected.
+The current phone ADB connection timed out, so this update was validated on the
+emulator and has not yet been installed on the phone. Administrative document
+workflows remain separate delivery work.

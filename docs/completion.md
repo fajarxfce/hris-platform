@@ -51,7 +51,11 @@ and withdrawal. [Document uploads](https://github.com/fajarxfce/hris-mobile/comm
 now add encrypted local file import, employee-confirmed metadata, resumable delivery,
 server inspection status and explicit retry/cancellation. API 35 acceptance uploaded
 a PDF through the real API and restored its completion after process restart.
-Authenticated mobile download remains separate delivery work.
+The [published document browser](https://github.com/fajarxfce/hris-mobile/commit/e991035)
+adds employment/category filters, authenticated resumable downloads and native
+Save copy. API 35 acceptance verified a PDF against its original SHA-256, picker
+cancellation and encrypted completion after process restart. Resource access is
+rechecked after destination selection and before export completion.
 Automated UI/API checks and the Android dev build passed. Android 16 device checks
 covered password sign-in, company isolation, profiles, inbox reading, offline
 content, offline process restoration with company isolation, queued acknowledgement
@@ -68,7 +72,7 @@ retain their own acceptance work.
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
 | Workforce | Dashboard company-wide exception queues, correction history, overtime and closing; bulk/reset and late corrections; mobile overtime requests and physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections, and mobile work calendars plus online/offline capture are implemented and verified against the real API. |
 | Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry. Mobile balances, filtered history, request details, submission with published document evidence, and durable withdrawal/cancellation flows are implemented and verified against the development API. |
-| Documents | Dashboard document/upload/processing/retention workflows; mobile authenticated download and published-document browsing. Encrypted local import, resumable upload and owned evidence acquisition are implemented. |
+| Documents | Dashboard document/upload/processing/retention workflows. Mobile encrypted import, resumable upload/download, published-document browsing and authenticated Save copy are implemented. |
 | Expenses | Dashboard policies, claims, review, payment/reconciliation and corrections; mobile claims, receipts, submission and payment progress |
 | Payroll | Dashboard policies, compensation, inputs, calculation, review, finalization, payslips, payments and amendments; mobile finalized payslips and downloads |
 | Communications | Mobile push hints and navigation. Dashboard audience groups, drafts, bounded named audience selection, publication review, preview, scheduling, cancellation/recovery and archival, and the mobile inbox with durable read/acknowledgement commands are implemented. |

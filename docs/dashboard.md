@@ -79,8 +79,17 @@ timezone, including overnight intervals, and preserve original capture evidence.
 Editors retain one immutable command during an uncertain outcome. MFA renewal
 does not send it again; explicit retry uses the original operation and payload.
 Definite conflicts require a protected reload. Account/company changes abort the
-owner and suppress late results. Correction-history browsing, company-wide
-exception queues, overtime and period closing remain separate screens.
+owner and suppress late results. Company-wide exception queues, overtime and
+period closing remain separate screens.
+
+Each day links to `/workforce/attendance/{employeeId}/days/{workDate}/history`.
+The page keeps one descending page of at most 50 immutable corrections, including
+explicit absences, original reasons, recording accounts and company-local times.
+Its detail panel reads the selected page without another profile request. Date
+filters survive the return to attendance; page cursors cannot cross company scope.
+Refresh and route replacement remove the prior projection and cancel pending reads.
+MFA recovery does not automatically reacquire history. Locale/theme changes only
+reformat the authorized page, and unmount discards its query cache.
 
 ## Implemented foundation
 

@@ -5,6 +5,7 @@ import { canCorrectAttendance, canReviewAttendance } from "../../domain/policies
 import type { WorkforceScreenProps } from "../contracts/workforce-screen-props";
 import { useEmployeeAttendance } from "../controllers/use-employee-attendance";
 import {
+  attendanceCorrectionHistoryPath,
   attendanceDayPath,
   attendancePath,
   employeeAttendancePath,
@@ -62,6 +63,11 @@ function AttendanceDayBinding(
       correctionTo={
         canCorrectAttendance(props.access.permissions) && day?.pendingCount === 0
           ? `${base}/correction?${props.pinned}`
+          : null
+      }
+      historyTo={
+        day
+          ? `${attendanceCorrectionHistoryPath(props.employeeId, props.date)}?${props.pinned}`
           : null
       }
       onReview={

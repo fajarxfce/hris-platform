@@ -8,6 +8,7 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useEmployeeAttendance } from "../controllers/use-employee-attendance";
+import { attendanceHistoryMessages } from "../i18n/attendance-history-messages";
 import { attendanceMessages } from "../i18n/attendance-messages";
 import type { attendanceDayView } from "../models/attendance-view";
 
@@ -19,6 +20,7 @@ export function AttendanceDayPage(props: {
   date: string;
   backTo: string;
   correctionTo: string | null;
+  historyTo: string | null;
   onReview: ((id: string) => void) | null;
 }) {
   const { state, view, locale } = props,
@@ -46,7 +48,14 @@ export function AttendanceDayPage(props: {
             <AppMetricCard label={text.pending} value={view.pending} />
           </div>
           {view.correction && <AppPropertyList title={text.correction} items={view.correction} />}
-          {props.correctionTo && <Link to={props.correctionTo}>{text.correct}</Link>}
+          {(props.correctionTo || props.historyTo) && (
+            <div className="app-form-actions">
+              {props.correctionTo && <Link to={props.correctionTo}>{text.correct}</Link>}
+              {props.historyTo && (
+                <Link to={props.historyTo}>{attendanceHistoryMessages(locale).title}</Link>
+              )}
+            </div>
+          )}
           {view.entries.length === 0 && <Text role="status">{text.noEvents}</Text>}
           {view.entries.map((entry) => (
             <section key={entry.id} aria-label={`${entry.kind} / ${entry.status}`}>

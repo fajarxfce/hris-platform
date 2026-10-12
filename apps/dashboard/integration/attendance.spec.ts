@@ -1,6 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
-import type { AttendanceDayDto } from "../src/features/workforce/data/models/attendance-dto";
+import type {
+  AttendanceCorrectionDto,
+  AttendanceDayDto,
+} from "../src/features/workforce/data/models/attendance-dto";
 import { authenticatorCode } from "./fixtures/authenticator";
 
 test("offline evidence requires independent review, replays one decision, and preserves raw punches through a competing correction", async ({
@@ -167,6 +170,7 @@ test("offline evidence requires independent review, replays one decision, and pr
       lost = true;
       const response = await route.fetch();
       expect(response.status()).toBe(200);
+      await response.dispose();
       return route.abort("failed");
     }
     return route.continue();
@@ -243,6 +247,35 @@ test("offline evidence requires independent review, replays one decision, and pr
   expect(corrected[0]?.entries.map((entry) => entry.capturedAt)).toContain(clockIn);
   const history = (await (
     await context.request.get(`${employeeBase}/attendance/corrections?workDate=${workDate}`)
-  ).json()) as { items: unknown[] };
+  ).json()) as { items: AttendanceCorrectionDto[] };
   expect(history.items).toHaveLength(2);
+  const latest = history.items[0],
+    original = history.items[1];
+  if (!latest || !original) throw new Error("Missing committed corrections");
+  await page.getByRole("link", { name: "View attendance", exact: true }).click();
+  await page.getByRole("link", { name: "Correction history", exact: true }).click();
+  await expect(
+    page.getByRole("region", { name: "Employee and work date", exact: true }),
+  ).toContainText("Attendance Fixture Employee");
+  const table = page.getByRole("table", { name: "Corrections", exact: true });
+  await expect(table.getByRole("row")).toHaveCount(3);
+  await page.getByRole("button", { name: "View correction: 0", exact: true }).click();
+  const details = page.getByRole("dialog", { name: "Correction details", exact: true });
+  await expect(details).toContainText(original.id);
+  await expect(details).toContainText("Competing verified absence");
+  await expect(details.getByText("Absence", { exact: true })).toBeVisible();
+  await details.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "View correction: 1", exact: true }).click();
+  await expect(details).toContainText(latest.id);
+  await expect(details).toContainText(latest.actorId);
+  await expect(details).toContainText("Final independent correction");
+  await page.screenshot({
+    path: "../../.work/dashboard-attendance-history-real.png",
+    fullPage: true,
+    animations: "disabled",
+  });
+  await details.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("link", { name: "Back to attendance day", exact: true }).click();
+  await expect(page.getByText("435", { exact: true })).toBeVisible();
+  await expect(page.getByText("Final independent correction", { exact: true })).toBeVisible();
 });

@@ -1886,3 +1886,22 @@ Architecture, formatting, TypeScript and all 1,110 dashboard unit tests passed.
 The 28 new boundary cases include empty/terminal pages, malformed and nonprogressing
 responses, reference mismatches, private error suppression and cancellation before
 and between reads. History browsing remains the next presentation increment.
+
+## Dashboard attendance correction history
+
+Attendance days now link to a bounded history table and immutable correction
+details. Company timezone, explicit absence, original reasons, revision references
+and recording actors are retained. The table preserves date filters across paging
+and return navigation. Its query owner discards pages on scope replacement or
+unmount, hides stale rows during refresh, and leaves MFA recovery explicit. Refresh
+shares the page header; the detail panel uses the existing Fluent focus lifecycle.
+
+All 1,118 dashboard unit tests passed with architecture, formatting and TypeScript
+checks, including eight additional read-lifetime cases. All 14 attendance browser
+scenarios passed, including nine history cases for pagination, immutable details,
+invalid cursors, scope cancellation, MFA, localization and narrow layouts. The
+updated API/browser scenario passed against PostgreSQL: two competing corrections
+remained separately readable and the final overnight total and raw punches stayed
+intact. An initial run was interrupted to correct the test's save-link locator;
+the corrected run passed. Narrow light/dark and real-API desktop views were inspected.
+No backend or mobile build changed for this dashboard increment.

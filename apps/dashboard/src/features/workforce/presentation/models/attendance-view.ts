@@ -105,8 +105,8 @@ export function attendanceCorrectionView(
       value: new Intl.NumberFormat(locale).format(correction.breakMinutes),
     },
     { label: text.reason, value: correction.reason },
-    { label: text.reviewer, value: correction.actorId },
-    { label: text.reviewedAt, value: date.format(new Date(correction.recordedAt)) },
+    { label: text.recordedBy, value: correction.actorId },
+    { label: text.recordedAt, value: date.format(new Date(correction.recordedAt)) },
   ];
 }
 export function attendanceDayView(day: AttendanceDay, locale: Locale, timezone: string) {

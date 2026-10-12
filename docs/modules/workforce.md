@@ -91,8 +91,10 @@ independent review, and versioned corrections in the company timezone. Unknown
 outcomes retain their original request through verification and explicit retry.
 The real API/browser scenario covers offline clock-in/out verification, overnight
 totals, lost responses, a competing correction and preservation of raw evidence.
-Company-wide exception queues and correction-history browsing remain subsequent
-dashboard work.
+Each day also provides bounded correction-history browsing with immutable details,
+original reasons and recording actors. The interface distinguishes corrected
+absence from working time and preserves the original attendance evidence. Company-wide
+exception queues remain subsequent dashboard work.
 
 Overtime requests, actual-time submission, independent staged review, withdrawal, and closed-period snapshots are implemented. Late payroll adjustments, roster reset/bulk editing, and lifecycle cleanup remain planned. Accepted attendance totals are factual inputs; they are not a finalized payroll result.
 

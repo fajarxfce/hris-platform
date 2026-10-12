@@ -546,4 +546,22 @@ that local reference; an unfinished server revision remains in history. Resume
 requires selecting a file with identical content. Browser file references and
 commands are not persisted as an offline draft. Company replacement cancels the
 old owner; equivalent workspace suspension pauses delivery without replaying it.
-Retention administration remains separate delivery work.
+Document archive, legal-hold, and content-retirement controls remain separate delivery work.
+
+### Retention policies
+
+**Administration → Document retention** provides the three classifications,
+current definitions, and ascending revision history in pages of twenty.
+The route is `/documents/retention-policies`; a company change drops the previous
+classification and returns to that company's catalog. Access requires the separate
+`documents.retention` grant. It does not acquire employee folders or file content.
+
+An unconfigured policy is distinct from an explicitly indefinite policy. Editors
+accept a reason and either an elapsed-day duration or a blank duration for
+indefinite retention. Existing archives keep their recorded policy. No statutory
+duration is preselected.
+
+Saves retain one immutable operation and reviewed version until acknowledged.
+Response loss stays recoverable through MFA or a later rejection; definite
+conflicts require a fresh review. Leaving a pending form uses workspace departure
+protection. Scope replacement cancels its request and rejects late results.

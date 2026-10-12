@@ -70,3 +70,18 @@ export function useDocumentRevision(
     props.documents.loadRevision.execute(props.access, document, revision, signal),
   );
 }
+
+export function useDocumentRetentionPolicies(props: DocumentsScreenProps) {
+  return useDocumentRead(props, ["retention-policies"], (signal) =>
+    props.documents.retention.loadPolicies.execute(props.access, signal),
+  );
+}
+export function useDocumentRetentionPolicy(
+  props: DocumentsScreenProps,
+  classification: string,
+  after: string | null,
+) {
+  return useDocumentRead(props, ["retention-policy", classification, after], (signal) =>
+    props.documents.retention.loadPolicy.execute(props.access, classification, after, signal),
+  );
+}

@@ -16,6 +16,9 @@ export const validRetentionClassification = (
   retentionClassifications.includes(value as DocumentRetentionPolicySelection["classification"]);
 export const validRetentionCursor = (after: string | null): boolean =>
   after === null || /^(0|[1-9]\d{0,3})$/u.test(after);
+export const canReviseDocumentRetentionPolicy = (
+  selection: DocumentRetentionPolicySelection,
+): boolean => selection.policy === null || selection.policy.version < 9999;
 
 export function prepareDocumentRetentionPolicy(
   access: CompanyAccess,
@@ -48,7 +51,7 @@ export function prepareDocumentRetentionPolicy(
       current.version < 0)
   )
     return failed("invalid_document_retention_policy");
-  if (current !== null && current.version >= 9999)
+  if (!canReviseDocumentRetentionPolicy(selection))
     return failed("document_retention_history_limit");
   return success(
     Object.freeze({

@@ -2,10 +2,17 @@ import { Navigate, Route, Routes, useLocation, useSearchParams } from "react-rou
 import { DocumentActionScreen } from "../bindings/document-action-screen";
 import { DocumentEmployeesScreen } from "../bindings/document-employees-screen";
 import { DocumentFolderScreen } from "../bindings/document-folder-screen";
+import { DocumentRetentionEditorScreen } from "../bindings/document-retention-editor-screen";
+import { DocumentRetentionPoliciesScreen } from "../bindings/document-retention-policies-screen";
+import { DocumentRetentionPolicyScreen } from "../bindings/document-retention-policy-screen";
 import { DocumentReviewScreen } from "../bindings/document-review-screen";
 import { DocumentRevisionScreen } from "../bindings/document-revision-screen";
 import { DocumentUploadScreen } from "../bindings/document-upload-screen";
 import type { DocumentsScreenProps } from "../contracts/documents-screen-props";
+import {
+  documentRetentionPoliciesPath,
+  isDocumentRetentionPolicyPath,
+} from "../models/document-retention-route";
 import { documentHref } from "../models/document-route";
 
 export function DocumentsRoutes(props: DocumentsScreenProps) {
@@ -20,7 +27,12 @@ export function DocumentsRoutes(props: DocumentsScreenProps) {
         replace
         to={
           parameters.has("company")
-            ? documentHref(props.access.companyId)
+            ? documentHref(
+                props.access.companyId,
+                isDocumentRetentionPolicyPath(location.pathname)
+                  ? documentRetentionPoliciesPath
+                  : undefined,
+              )
             : `${location.pathname}?${scoped}`
         }
       />
@@ -29,6 +41,15 @@ export function DocumentsRoutes(props: DocumentsScreenProps) {
   return (
     <Routes>
       <Route index element={<DocumentEmployeesScreen {...props} />} />
+      <Route path="retention-policies" element={<DocumentRetentionPoliciesScreen {...props} />} />
+      <Route
+        path="retention-policies/:classification"
+        element={<DocumentRetentionPolicyScreen {...props} />}
+      />
+      <Route
+        path="retention-policies/:classification/edit"
+        element={<DocumentRetentionEditorScreen {...props} />}
+      />
       <Route
         path="employees/:employeeId/upload"
         element={<DocumentUploadScreen {...props} kind="new" />}

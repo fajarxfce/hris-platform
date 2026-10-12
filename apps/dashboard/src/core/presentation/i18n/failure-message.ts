@@ -2,6 +2,30 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_document_retention_policy: [
+    "Use 1–36,500 retention days or leave the field blank. Provide a reason of up to 1,000 characters without line breaks.",
+    "Isi 1–36.500 hari atau kosongkan masa simpan. Masukkan alasan maksimal 1.000 karakter tanpa baris baru.",
+  ],
+  document_retention_policy_not_found: [
+    "This retention policy is unavailable. Return to the policy list.",
+    "Kebijakan retensi tidak tersedia. Kembali ke daftar kebijakan.",
+  ],
+  document_retention_policy_exists: [
+    "This classification already has a policy. Reload to review its current version.",
+    "Klasifikasi ini sudah memiliki kebijakan. Muat ulang untuk memeriksa versi terbarunya.",
+  ],
+  document_retention_classification_immutable: [
+    "The policy classification cannot be changed. Reload the selected policy.",
+    "Klasifikasi kebijakan tidak dapat diubah. Muat ulang kebijakan yang dipilih.",
+  ],
+  document_retention_history_limit: [
+    "The retention history limit has been reached. Contact an administrator.",
+    "Batas riwayat retensi tercapai. Hubungi administrator.",
+  ],
+  document_retention_review_changed: [
+    "The policy changed during this review. Refresh to view the current policy and history.",
+    "Kebijakan berubah saat ditinjau. Muat ulang untuk melihat kebijakan dan riwayat terbaru.",
+  ],
   object_storage_not_configured: [
     "Document storage has not been configured. Contact an administrator.",
     "Penyimpanan dokumen belum dikonfigurasi. Hubungi administrator.",

@@ -4,7 +4,10 @@ import { type Locale, messages } from "../../core/presentation/i18n/messages";
 import { administrationNavigation } from "../../features/administration/presentation/navigation/administration-navigation";
 import { approvalsNavigation } from "../../features/approvals/presentation/navigation/approvals-navigation";
 import { communicationsNavigation } from "../../features/communications/presentation/navigation/communications-navigation";
-import { documentsNavigation } from "../../features/documents/presentation/navigation/documents-navigation";
+import {
+  documentRetentionNavigation,
+  documentsNavigation,
+} from "../../features/documents/presentation/navigation/documents-navigation";
 import type { CompanyAccess } from "../../features/identity/domain/entities/session";
 import { identityNavigation } from "../../features/identity/presentation/navigation/identity-navigation";
 import { jobsNavigation } from "../../features/jobs/presentation/navigation/jobs-navigation";
@@ -55,6 +58,7 @@ export function portalNavigation(
         ...reportingNavigation(access, locale),
         ...identityNavigation(access, locale),
         ...administrationNavigation(access, locale),
+        ...documentRetentionNavigation(access, locale),
         ...jobsNavigation(access, locale),
       ],
     },

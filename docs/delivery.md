@@ -1754,3 +1754,22 @@ Architecture, formatting, TypeScript and the dashboard unit suite passed, includ
 23 new retention-boundary cases for scope, immutable projections, duration/version
 limits, history races, MFA rejection, and late cancellation. This increment
 provides the contracts; the retention dashboard remains subsequent work.
+
+## Dashboard retention policies
+
+Administration now provides retention classifications, current policy details,
+bounded immutable history, and versioned configuration. The independent retention
+grant does not provide content access. Unknown outcomes retain the original
+command through MFA and later rejection; definite conflicts require another
+review. Changing companies drops old policy references and cancels owned work.
+English/Indonesian layouts were inspected in desktop light and narrow dark modes.
+
+Architecture, formatting, TypeScript and all 998 unit tests passed, including
+twelve new editor-lifecycle cases. All 38 document browser scenarios passed.
+The initial narrow-screen test used an incorrect theme-button accessible name;
+the corrected test passed without a product change. The isolated API/database
+scenario passed with separate administrator/operator accounts: independent grants,
+lost committed responses, exact replay, concurrent-version conflicts, finite and
+indefinite revisions, cross-company denial, and revoked retention access. The
+development dashboard serves this interface; no backend or mobile build changed.
+Archive, legal-hold and content-retirement controls remain subsequent work.

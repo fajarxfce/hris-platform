@@ -1823,3 +1823,16 @@ independent grants, scope, frozen archive policies, competing holds, publication
 revocation, pending-read cancellation and proof expiry. Existing reference and
 retirement regressions and the generated API contract also passed. API and worker
 JARs were built. Dashboard retirement controls remain the next increment.
+
+## Dashboard retirement contracts
+
+Documents now maps the independent retirement review into immutable company and
+resource-bound metadata. The command carries both observed versions, its original
+operation ID and reason without acquiring a replacement review. Current and future
+bounded blocker codes prevent submission; eligibility uses the server review time.
+
+Architecture, formatting, TypeScript and all 1,069 dashboard unit tests passed.
+Twenty-eight new boundary cases cover independent access, contradictory metadata,
+unknown blockers, immutable snapshots, receipt binding, original-command replay,
+safe failures and late cancellation. These are contracts; the retirement controls
+and their browser/API acceptance remain subsequent work.

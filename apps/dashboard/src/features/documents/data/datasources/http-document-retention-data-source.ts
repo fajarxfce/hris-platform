@@ -10,10 +10,45 @@ import {
   documentRetentionDto,
   documentRetentionHistoryDto,
 } from "../models/document-retention-state-dto";
+import {
+  type DocumentRetirementCommandDto,
+  documentRetirementReceiptDto,
+  documentRetirementReviewDto,
+} from "../models/document-retirement-dto";
 import type { DocumentRetentionDataSource } from "./document-retention-data-source";
 
 export class HttpDocumentRetentionDataSource implements DocumentRetentionDataSource {
   constructor(private readonly http: HttpClient) {}
+  async retirement(company: string, revisionId: string, signal: AbortSignal) {
+    return documentRetirementReviewDto.parse(
+      await this.http.request(
+        { path: `/api/v1/companies/${company}/documents/revisions/${revisionId}/retirement` },
+        signal,
+      ),
+    );
+  }
+  async retire(
+    company: string,
+    operation: string,
+    input: DocumentRetirementCommandDto,
+    signal: AbortSignal,
+  ) {
+    return documentRetirementReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/documents/revisions/${input.revisionId}/retire`,
+          method: "POST",
+          operationId: operation,
+          body: {
+            expectedRevisionVersion: input.expectedRevisionVersion,
+            expectedRetentionVersion: input.expectedRetentionVersion,
+            reason: input.reason,
+          },
+        },
+        signal,
+      ),
+    );
+  }
   async state(company: string, documentId: string, signal: AbortSignal) {
     return documentRetentionDto.parse(
       await this.http.request(

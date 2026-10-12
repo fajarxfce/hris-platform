@@ -11,8 +11,24 @@ import type {
   DocumentRetentionPolicyChange,
   DocumentRetentionPolicyPage,
 } from "../entities/document-retention-policy";
+import type {
+  DocumentRetirementCommand,
+  DocumentRetirementReview,
+} from "../entities/document-retirement";
 
 export interface DocumentRetentionRepository {
+  retirement(
+    company: CompanyId,
+    documentId: string,
+    revisionId: string,
+    signal: AbortSignal,
+  ): Promise<Result<DocumentRetirementReview>>;
+  retire(
+    company: CompanyId,
+    operation: OperationId,
+    input: DocumentRetirementCommand,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
   state(
     company: CompanyId,
     documentId: string,

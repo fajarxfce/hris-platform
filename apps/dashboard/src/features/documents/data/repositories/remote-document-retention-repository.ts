@@ -5,6 +5,7 @@ import type {
   DocumentRetentionPolicy,
   DocumentRetentionPolicyChange,
 } from "../../domain/entities/document-retention-policy";
+import type { DocumentRetirementCommand } from "../../domain/entities/document-retirement";
 import type { DocumentRetentionRepository } from "../../domain/repositories/document-retention-repository";
 import type { DocumentRetentionDataSource } from "../datasources/document-retention-data-source";
 import {
@@ -17,9 +18,46 @@ import {
   toDocumentRetentionChangeReceipt,
   toDocumentRetentionHistory,
 } from "../mappers/document-retention-state-mapper";
+import {
+  toDocumentRetirementReceipt,
+  toDocumentRetirementReview,
+} from "../mappers/document-retirement-mapper";
 
 export class RemoteDocumentRetentionRepository implements DocumentRetentionRepository {
   constructor(private readonly source: DocumentRetentionDataSource) {}
+  retirement(company: CompanyId, documentId: string, revisionId: string, signal: AbortSignal) {
+    return safeHttpCall(signal, async () =>
+      toDocumentRetirementReview(
+        await this.source.retirement(company, revisionId, signal),
+        company,
+        documentId,
+        revisionId,
+      ),
+    );
+  }
+  retire(
+    company: CompanyId,
+    operation: OperationId,
+    input: DocumentRetirementCommand,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toDocumentRetirementReceipt(
+        await this.source.retire(
+          company,
+          operation,
+          {
+            revisionId: input.revisionId,
+            expectedRevisionVersion: input.expectedRevisionVersion,
+            expectedRetentionVersion: input.expectedRetentionVersion,
+            reason: input.reason,
+          },
+          signal,
+        ),
+        input,
+      ),
+    );
+  }
   state(company: CompanyId, documentId: string, signal: AbortSignal) {
     return safeHttpCall(signal, async () =>
       toDocumentRetention(

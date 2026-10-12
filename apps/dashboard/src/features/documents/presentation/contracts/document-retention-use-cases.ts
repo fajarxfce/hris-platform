@@ -2,11 +2,15 @@ import type { ChangeDocumentRetention } from "../../domain/usecases/change-docum
 import type { LoadDocumentRetention } from "../../domain/usecases/load-document-retention";
 import type { LoadDocumentRetentionPolicies } from "../../domain/usecases/load-document-retention-policies";
 import type { LoadDocumentRetentionPolicy } from "../../domain/usecases/load-document-retention-policy";
+import type { RetireDocumentRevision } from "../../domain/usecases/retire-document-revision";
 import type { ReviewDocumentRetentionChange } from "../../domain/usecases/review-document-retention-change";
 import type { ReviewDocumentRetentionPolicy } from "../../domain/usecases/review-document-retention-policy";
+import type { ReviewDocumentRetirement } from "../../domain/usecases/review-document-retirement";
 import type { SaveDocumentRetentionPolicy } from "../../domain/usecases/save-document-retention-policy";
 
 export type DocumentRetentionUseCases = Readonly<{
+  reviewRetirement: Pick<ReviewDocumentRetirement, "execute">;
+  retireRevision: Pick<RetireDocumentRevision, "execute">;
   load: Pick<LoadDocumentRetention, "execute">;
   reviewChange: Pick<ReviewDocumentRetentionChange, "execute">;
   change: Pick<ChangeDocumentRetention, "execute">;

@@ -9,8 +9,24 @@ import type {
   DocumentRetentionDto,
   DocumentRetentionHistoryDto,
 } from "../models/document-retention-state-dto";
+import type {
+  DocumentRetirementCommandDto,
+  DocumentRetirementReceiptDto,
+  DocumentRetirementReviewDto,
+} from "../models/document-retirement-dto";
 
 export interface DocumentRetentionDataSource {
+  retirement(
+    company: string,
+    revisionId: string,
+    signal: AbortSignal,
+  ): Promise<DocumentRetirementReviewDto>;
+  retire(
+    company: string,
+    operation: string,
+    input: DocumentRetirementCommandDto,
+    signal: AbortSignal,
+  ): Promise<DocumentRetirementReceiptDto>;
   state(company: string, documentId: string, signal: AbortSignal): Promise<DocumentRetentionDto>;
   history(
     company: string,

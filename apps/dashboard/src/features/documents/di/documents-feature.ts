@@ -16,9 +16,11 @@ import { LoadDocumentReview } from "../domain/usecases/load-document-review";
 import { LoadDocumentRevision } from "../domain/usecases/load-document-revision";
 import { LoadEmployeeDocuments } from "../domain/usecases/load-employee-documents";
 import { ReleaseDocumentUploadFile } from "../domain/usecases/release-document-upload-file";
+import { RetireDocumentRevision } from "../domain/usecases/retire-document-revision";
 import { ReviewDocumentAction } from "../domain/usecases/review-document-action";
 import { ReviewDocumentRetentionChange } from "../domain/usecases/review-document-retention-change";
 import { ReviewDocumentRetentionPolicy } from "../domain/usecases/review-document-retention-policy";
+import { ReviewDocumentRetirement } from "../domain/usecases/review-document-retirement";
 import { ReviewDocumentUpload } from "../domain/usecases/review-document-upload";
 import { SaveDocumentRetentionPolicy } from "../domain/usecases/save-document-retention-policy";
 import { SelectDocumentUploadFile } from "../domain/usecases/select-document-upload-file";
@@ -36,6 +38,8 @@ export function createDocumentsFeature(
   );
   return {
     retention: {
+      reviewRetirement: new ReviewDocumentRetirement(retention),
+      retireRevision: new RetireDocumentRevision(retention),
       load: new LoadDocumentRetention(retention),
       reviewChange: new ReviewDocumentRetentionChange(retention),
       change: new ChangeDocumentRetention(retention),

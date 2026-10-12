@@ -59,6 +59,9 @@ function setup() {
     nextIdentifier: () => documentId(80),
     documents: {
       retention: {
+        load: unused,
+        reviewChange: unused,
+        change: unused,
         loadPolicies: unused,
         loadPolicy: unused,
         reviewPolicy: unused,

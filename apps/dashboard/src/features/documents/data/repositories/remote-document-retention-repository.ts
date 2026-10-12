@@ -1,5 +1,6 @@
 import { safeHttpCall } from "../../../../core/data/http/safe-http-call";
 import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
+import type { DocumentRetentionCommand } from "../../domain/entities/document-retention";
 import type {
   DocumentRetentionPolicy,
   DocumentRetentionPolicyChange,
@@ -11,9 +12,46 @@ import {
   toDocumentRetentionPolicyHistory,
   toDocumentRetentionReceipt,
 } from "../mappers/document-retention-mapper";
+import {
+  toDocumentRetention,
+  toDocumentRetentionChangeReceipt,
+  toDocumentRetentionHistory,
+} from "../mappers/document-retention-state-mapper";
 
 export class RemoteDocumentRetentionRepository implements DocumentRetentionRepository {
   constructor(private readonly source: DocumentRetentionDataSource) {}
+  state(company: CompanyId, documentId: string, signal: AbortSignal) {
+    return safeHttpCall(signal, async () =>
+      toDocumentRetention(
+        await this.source.state(company, documentId, signal),
+        company,
+        documentId,
+      ),
+    );
+  }
+  history(company: CompanyId, documentId: string, after: string | null, signal: AbortSignal) {
+    return safeHttpCall(signal, async () =>
+      toDocumentRetentionHistory(
+        await this.source.history(company, documentId, after, signal),
+        company,
+        documentId,
+        after,
+      ),
+    );
+  }
+  change(
+    company: CompanyId,
+    operation: OperationId,
+    input: DocumentRetentionCommand,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toDocumentRetentionChangeReceipt(
+        await this.source.change(company, operation, { ...input }, signal),
+        input,
+      ),
+    );
+  }
   policies(company: CompanyId, signal: AbortSignal) {
     return safeHttpCall(signal, async () =>
       toDocumentRetentionPolicies(await this.source.policies(company, signal), company),

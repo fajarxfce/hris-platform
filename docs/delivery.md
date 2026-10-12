@@ -1773,3 +1773,18 @@ lost committed responses, exact replay, concurrent-version conflicts, finite and
 indefinite revisions, cross-company denial, and revoked retention access. The
 development dashboard serves this interface; no backend or mobile build changed.
 Archive, legal-hold and content-retirement controls remain subsequent work.
+
+## Dashboard document lifecycle contracts
+
+Documents now exposes retention-state review, bounded lifecycle history, and
+versioned archive, restore, hold, and release use cases. These use the independent
+retention grant and do not acquire employee or content projections. Mapping
+preserves immutable archive snapshots and checks duration/eligibility consistency,
+history identity and ordering, and the exact command receipt. The API still owns
+unfinished-upload checks, policy selection, and current authorization.
+
+Architecture, formatting, TypeScript and all 1,027 dashboard unit tests passed.
+The 29 new boundary cases cover nullable initial versions, indefinite retention,
+inconsistent snapshots, head/history races, ineligible transitions, separate
+permissions, receipt binding, MFA failures and cancelled late results. Lifecycle
+UI controls remain the next increment.

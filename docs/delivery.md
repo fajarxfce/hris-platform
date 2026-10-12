@@ -2224,3 +2224,16 @@ self access without directory authority. The initial runs corrected test-only
 assumptions about the existing failure text and company-roster progress count.
 No additional backend build, migration, mobile APK or release was needed for the
 presentation change.
+
+## Job assurance after acquisition
+
+Job detail/list reads and cancellation now recheck current session assurance after
+acquiring data or recording the cancellation journal. A late failure rolls back the
+flag, version, cleanup eligibility, audit and outbox. Repeated acknowledgement
+retains the same assurance requirement without adding another mutation.
+
+Architecture, Kotlin formatting, two Jobs domain tests, 19 selected API/database
+tests and all 38 worker tests passed. Six new cases exercise proof expiry after
+acquisition, rollback, explicit recovery and cancellation, including reuse of the
+same executor thread after its interrupted transaction releases its guards.
+Both application JARs built. No endpoint contract or migration changed.

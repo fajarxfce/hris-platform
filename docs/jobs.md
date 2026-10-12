@@ -9,6 +9,11 @@ Jobs track durable work submitted by business endpoints. There is no public endp
 
 An active member can read their own jobs. `jobs.read` grants company-wide visibility. `jobs.manage` permits cancellation of another actor's job; it does not implicitly grant read access. Current company, membership, account, credentials, and MFA are checked after pending guards. Available actions use the intersection of the request's original and current permissions and remain hints, not authorization tokens.
 
+Assurance is checked again after acquisition and before returning private data or
+completing cancellation. A proof that expires during an operation cannot release
+the result or leave a partially committed cancellation. After renewing verification,
+the client can explicitly read or request cancellation again.
+
 The response contains job ID/type, status, progress, attempts, cancellation state, a safe failure code, timestamps, version, and available actions. Request values, checkpoints, credentials, and exception text are excluded. Clients translate kind/status/failure codes; unknown job kinds can use their stable identifier, and unknown failures use a generic localized message.
 
 Lists default to 50 and permit at most 200 rows. A continuation uses both `beforeAt` and `beforeId`, copied exactly from `nextCreatedAt` and `nextId`. Results descend by creation timestamp and ID. Preserve timestamp microseconds; rounding to milliseconds can skip jobs. Null continuation fields indicate exhaustion. Each page is a live SQL snapshot. This endpoint is an operational view, not the commit-ordered mobile change feed.

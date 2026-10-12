@@ -36,12 +36,12 @@ class RequestJobCancellation(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val access =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
-            if (access is Result.Failed) return@run access
-            val current = (access as Result.Success).value
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
+            if (checked is Result.Failed) return@run checked
+            val current = (checked as Result.Success).value
             if (
                 job == null ||
                     (job.request.actorId != actor.accountId &&
@@ -49,7 +49,8 @@ class RequestJobCancellation(
             )
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "job_not_found"))
             if (job.cancellationRequested)
-                return@run Result.Success(JobDetails(job, availableJobActions(current, job)))
+                return@run validateCompanySessionActor(actor, access, clock.instant(), security)
+                    .map { live -> JobDetails(job, availableJobActions(live, job)) }
             if (job.status !in setOf(JobStatus.QUEUED, JobStatus.RUNNING))
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "job_already_finished"))
             if (job.version != expectedVersion)
@@ -60,7 +61,10 @@ class RequestJobCancellation(
                 else
                     journal
                         .record(actor, ChangeRecord("job", id, "jobs.cancellation_requested"))
-                        .map { JobDetails(changed, availableJobActions(current, changed)) }
+                        .flatMap {
+                            validateCompanySessionActor(actor, access, clock.instant(), security)
+                        }
+                        .map { live -> JobDetails(changed, availableJobActions(live, changed)) }
             }
         }
     }

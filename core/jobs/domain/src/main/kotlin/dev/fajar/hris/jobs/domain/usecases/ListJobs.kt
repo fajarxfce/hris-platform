@@ -40,12 +40,12 @@ class ListJobs(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val access =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
-            if (access is Result.Failed) return@run access
-            val current = (access as Result.Success).value
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
+            if (checked is Result.Failed) return@run checked
+            val current = (checked as Result.Success).value
             jobs
                 .list(
                     company,
@@ -54,12 +54,15 @@ class ListJobs(
                     beforeAt,
                     beforeId,
                 )
-                .map { page ->
-                    JobDetailsPage(
-                        page.items.map { JobDetails(it, availableJobActions(current, it)) },
-                        page.nextCreatedAt,
-                        page.nextId,
-                    )
+                .flatMap { page ->
+                    validateCompanySessionActor(actor, access, clock.instant(), security).map { live
+                        ->
+                        JobDetailsPage(
+                            page.items.map { JobDetails(it, availableJobActions(live, it)) },
+                            page.nextCreatedAt,
+                            page.nextId,
+                        )
+                    }
                 }
         }
     }

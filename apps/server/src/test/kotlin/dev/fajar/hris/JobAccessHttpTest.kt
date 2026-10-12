@@ -11,19 +11,23 @@ import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import java.net.http.HttpClient
 import java.net.http.HttpResponse
 import java.util.UUID
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 
-@Import(AccountLockProbeConfiguration::class)
+@Import(AccountLockProbeConfiguration::class, JobAssuranceProbeConfiguration::class)
 class JobAccessHttpTest : PeopleApiFixture() {
     @Autowired private lateinit var jobs: JobRepository
     @Autowired private lateinit var transactions: TransactionRunner
     @Autowired private lateinit var probe: AccountLockProbe
+    @Autowired private lateinit var assuranceProbe: JobAssuranceProbe
     @Autowired private lateinit var identities: IdentityRepository
     @Autowired private lateinit var members: MembershipRepository
     @Autowired private lateinit var companies: CompanyRepository
@@ -44,6 +48,7 @@ class JobAccessHttpTest : PeopleApiFixture() {
     @AfterEach
     fun clearProbe() {
         probe.current.getAndSet(null)?.release?.countDown()
+        assuranceProbe.current.getAndSet(null)?.release?.countDown()
     }
 
     private fun member(company: UUID, permissions: Set<String>): Member {
@@ -399,4 +404,140 @@ class JobAccessHttpTest : PeopleApiFixture() {
             }
         }
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["get", "list", "cancel"])
+    fun expiryAfterAcquisitionCannotReleaseJobsOrCommitCancellation(operation: String) {
+        val f = fixture()
+        val actor = assuredActor(f)
+        val before = storedJob(f)
+        val barrier = JobAssuranceProbe.Barrier(f.company, operation)
+        assuranceProbe.current.set(barrier)
+        Executors.newSingleThreadExecutor().use { pool ->
+            val pending = pool.submit<Result<*>> { invokeAssured(f, actor, operation) }
+            try {
+                assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                clock.set(clock.instant().plusSeconds(2))
+                barrier.release.countDown()
+                assertEquals(
+                    "mfa_required",
+                    (pending.get(10, TimeUnit.SECONDS) as Result.Failed).failure.code,
+                )
+            } finally {
+                barrier.release.countDown()
+                assuranceProbe.current.set(null)
+            }
+        }
+        assertEquals(before, storedJob(f))
+        val renewed = actor.copy(mfaVerifiedAt = clock.instant())
+        val accepted = invokeAssured(f, renewed, operation)
+        assertTrue(accepted is Result.Success, accepted.toString())
+        val committed = storedJob(f)
+        assertEquals(
+            "mfa_required",
+            (invokeAssured(f, actor, operation) as Result.Failed).failure.code,
+        )
+        assertEquals(committed, storedJob(f))
+        assertEquals(accepted, invokeAssured(f, renewed, operation))
+        assertEquals(committed, storedJob(f))
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["get", "list", "cancel"])
+    fun cancellationDuringAcquisitionRollsBackAndReleasesTheThreadAndGuards(operation: String) {
+        val f = fixture()
+        val actor = assuredActor(f).copy(mfaVerifiedAt = clock.instant())
+        val before = storedJob(f)
+        val barrier = JobAssuranceProbe.Barrier(f.company, operation)
+        val finished = CountDownLatch(1)
+        assuranceProbe.current.set(barrier)
+        Executors.newSingleThreadExecutor().use { pool ->
+            val pending =
+                pool.submit<Result<*>> {
+                    try {
+                        invokeAssured(f, actor, operation)
+                    } finally {
+                        finished.countDown()
+                    }
+                }
+            try {
+                assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                assertTrue(pending.cancel(true))
+                assertTrue(finished.await(5, TimeUnit.SECONDS))
+            } finally {
+                barrier.release.countDown()
+                assuranceProbe.current.set(null)
+            }
+            assertEquals(before, storedJob(f))
+            val retry = pool.submit<Result<*>> { invokeAssured(f, actor, operation) }
+            assertTrue(retry.get(10, TimeUnit.SECONDS) is Result.Success)
+        }
+    }
+
+    private fun assuredActor(f: Fixture): Actor {
+        database()
+            .update(
+                "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
+                f.operator.id,
+            )
+        return Actor(
+            f.operator.id,
+            f.company,
+            setOf("jobs.read", "jobs.manage"),
+            clock.instant(),
+            UUID.randomUUID(),
+            mfaVerifiedAt =
+                clock.instant().minus(IdentitySecurityPolicy().maximumMfaAge).plusSeconds(1),
+            credentialVersion = 0,
+        )
+    }
+
+    private fun invokeAssured(f: Fixture, actor: Actor, operation: String): Result<*> {
+        val security = IdentitySecurityPolicy()
+        return when (operation) {
+            "get" ->
+                GetJob(jobs, transactions, companies, members, identities, security, clock)
+                    .execute(actor, f.job)
+            "list" ->
+                ListJobs(jobs, transactions, companies, members, identities, security, clock)
+                    .execute(actor, 50, null, null)
+            "cancel" ->
+                RequestJobCancellation(
+                        jobs,
+                        transactions,
+                        journal,
+                        companies,
+                        members,
+                        identities,
+                        security,
+                        clock,
+                    )
+                    .execute(actor, f.job, 0)
+            else -> error("Unknown job fixture operation")
+        }
+    }
+
+    private fun storedJob(f: Fixture): Map<String, Any?> =
+        mapOf(
+            "job" to
+                database()
+                    .queryForMap(
+                        "select cancellation_requested,version,available_at,status from background_jobs where id=?",
+                        f.job,
+                    ),
+            "audit" to
+                database()
+                    .queryForObject(
+                        "select count(*) from audit_entries where company_id=?",
+                        Int::class.java,
+                        f.company,
+                    ),
+            "outbox" to
+                database()
+                    .queryForObject(
+                        "select count(*) from outbox_events where company_id=?",
+                        Int::class.java,
+                        f.company,
+                    ),
+        )
 }

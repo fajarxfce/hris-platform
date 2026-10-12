@@ -147,6 +147,11 @@ Spring Batch provides persistent checkpoints for payroll/import/export. An outbo
 
 Interactive job reads and cancellation use the pure company-session policy to intersect original/live authority and check current MFA after waiting. Their domain details contain the resulting available actions; delivery only serializes them and cannot restore a permission from the originally resolved actor. This interactive policy is separate from background execution authority.
 
+Job operations retain the guarded access snapshot and check assurance again after
+data acquisition or cancellation journaling. Expiry before the final result rolls
+back cancellation state, eligibility, version and journal together. An already
+requested cancellation also requires current assurance; it adds no new mutation.
+
 Optional job schedules are immutable UTC instants persisted separately from retry availability. Feature use cases decide scheduling policy and supply the request; datasources only persist it. The first cancellation advances eligibility to the use case's current instant so the worker can release feature resources. Repeated cancellation never advances a subsequent cleanup retry. PostgreSQL prevents reversing cancellation or moving an uncancelled job ahead of its original schedule. Application restart requires no in-memory timer reconstruction.
 
 ## API and clients

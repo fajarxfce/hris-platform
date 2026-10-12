@@ -32,20 +32,22 @@ class GetJob(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val access =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
-            if (access is Result.Failed) return@run access
-            val current = (access as Result.Success).value
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
+            if (checked is Result.Failed) return@run checked
             jobs.find(company, id).flatMap { job ->
-                if (
-                    job == null ||
-                        (job.request.actorId != actor.accountId &&
-                            "jobs.read" !in current.permissions)
-                )
-                    Result.Failed(Failure(FailureKind.NOT_FOUND, "job_not_found"))
-                else Result.Success(JobDetails(job, availableJobActions(current, job)))
+                validateCompanySessionActor(actor, access, clock.instant(), security).flatMap {
+                    current ->
+                    if (
+                        job == null ||
+                            (job.request.actorId != actor.accountId &&
+                                "jobs.read" !in current.permissions)
+                    )
+                        Result.Failed(Failure(FailureKind.NOT_FOUND, "job_not_found"))
+                    else Result.Success(JobDetails(job, availableJobActions(current, job)))
+                }
             }
         }
     }

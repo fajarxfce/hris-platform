@@ -608,6 +608,27 @@ a {
   padding-top: 16px;
   border-top: 1px solid var(--colorNeutralStroke2);
 }
+
+.app-overtime-plan {
+  max-width: 960px;
+}
+.app-overtime-employee {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+}
+.app-overtime-plan .app-editor-form {
+  gap: 20px;
+}
+.app-overtime-plan p {
+  margin: 0;
+}
+.app-overtime-plan .app-form-actions {
+  padding-top: 16px;
+  border-top: 1px solid var(--colorNeutralStroke2);
+}
 :where(.app-document-retirement) .app-editor-form h2,
 :where(.app-document-retirement) .app-editor-form p {
   margin: 0;

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { expect, type Page, test } from "@playwright/test";
 import type { OvertimeDetailsDto } from "../src/features/workforce/data/models/overtime-details-dto";
+import type { OvertimePlanDto } from "../src/features/workforce/data/models/overtime-plan-dto";
 import { createAdminCompany } from "./fixtures/admin-company";
 import { createOvertimeScenario } from "./fixtures/overtime-scenario";
 import { signInAndEnrollAuthenticator } from "./fixtures/sign-in-and-enroll-authenticator";
@@ -21,7 +22,7 @@ async function loseFirstReceipt(page: Page, resource: string, id: string, versio
   return { commands, stop: () => page.unroute(pattern) };
 }
 
-test("overtime actions recover real receipts, preserve original evidence and enforce independent access", async ({
+test("overtime planning and actions recover real receipts, preserve original evidence and enforce independent access", async ({
   page,
   context,
   browser,
@@ -35,14 +36,81 @@ test("overtime actions recover real receipts, preserve original evidence and enf
     "BROWSER_OVERTIME",
     "Browser Overtime",
   );
-  const scenario = await createOvertimeScenario(context, company);
+  const preparation = await createOvertimeScenario(context, company);
   await page.getByRole("combobox", { name: "Bahasa", exact: true }).selectOption("en");
-  const query = `company=${company}&from=${scenario.workDate}&until=${scenario.workDate}`;
+  const query = `company=${company}&from=${preparation.workDate}&until=${preparation.workDate}`;
   await page.goto(`/workforce/overtime?${query}`);
-  const directory = page.getByRole("table", { name: "Overtime requests", exact: true });
-  await expect(directory).toContainText("Overtime Fixture Employee");
-  await expect(directory).toContainText("Planned");
-  await directory.getByRole("button").click();
+  await page.getByRole("button", { name: "New overtime request", exact: true }).click();
+  await page.getByLabel("Work date", { exact: true }).fill(preparation.workDate);
+  await page.getByRole("button", { name: "Select employee", exact: true }).click();
+  const picker = page.getByRole("dialog", { name: "Select employee", exact: true });
+  await picker
+    .getByRole("button", { name: "Select: Overtime Fixture Employee · OVERTIME-001", exact: true })
+    .click();
+  await expect(page.getByRole("region", { name: "Work schedule", exact: true })).toContainText(
+    "Day off",
+  );
+  await page.getByLabel("Start", { exact: true }).fill(`${preparation.workDate}T08:00`);
+  await page.getByLabel("End", { exact: true }).fill(`${preparation.workDate}T11:00`);
+  await page.getByLabel("Reason", { exact: true }).fill("Inventory count on the original day off");
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({
+    path: "../../.work/dashboard-overtime-plan-real-api.png",
+    fullPage: true,
+    animations: "disabled",
+  });
+  const planningCommands: { operation: string; body: OvertimePlanDto }[] = [];
+  const planPattern = `**${preparation.planPath}`;
+  await page.route(planPattern, async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    const operation = route.request().headers()["idempotency-key"] ?? "",
+      body = route.request().postDataJSON() as OvertimePlanDto;
+    planningCommands.push({ operation, body });
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toEqual({ id: body.id, version: 0 });
+    if (planningCommands.length === 1) {
+      // The committed request retains its original calendar, including on lost-response recovery.
+      const changed = await context.request.put(
+        `${preparation.base}/workforce/holidays/${preparation.holiday}`,
+        {
+          headers: preparation.headers(),
+          data: {
+            workDate: preparation.workDate,
+            name: "Inventory holiday",
+            expectedVersion: 0,
+            active: false,
+            reason: "Later calendar change",
+          },
+        },
+      );
+      expect(changed.status()).toBe(200);
+      return route.abort("failed");
+    }
+    return route.fulfill({ response });
+  });
+  await page.getByRole("button", { name: "Create request", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("The result could not be confirmed");
+  await page.getByRole("button", { name: "Retry this request", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Overtime request created.");
+  await page.unroute(planPattern);
+  expect(planningCommands).toHaveLength(2);
+  expect(planningCommands[1]).toEqual(planningCommands[0]);
+  const originalPlan = planningCommands[0];
+  if (!originalPlan) throw new Error("Missing planned request");
+  expect(originalPlan.body.planningRevision).toMatch(/^[0-9a-f]{64}$/u);
+  const scenario = {
+    ...preparation,
+    id: originalPlan.body.id,
+    plan: originalPlan.body,
+    planKey: originalPlan.operation,
+    plannedReceipt: { id: originalPlan.body.id, version: 0 },
+    overtimePath: `${preparation.planPath}/${originalPlan.body.id}`,
+  };
+  await page.getByRole("link", { name: "View request", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Overview", exact: true })).toContainText(
+    "Planned",
+  );
   await page.getByRole("link", { name: "Submit actual time", exact: true }).click();
   await page.getByLabel("Actual start", { exact: true }).fill(`${scenario.workDate}T08:15`);
   await page.getByLabel("Actual end", { exact: true }).fill(`${scenario.workDate}T10:45`);
@@ -145,6 +213,12 @@ test("overtime actions recover real receipts, preserve original evidence and enf
       animations: "disabled",
     });
 
+    const latestReview = await context.request.get(
+      `${scenario.planPath}/planning/employees/${scenario.employee}?workDate=${scenario.workDate}`,
+    );
+    expect(latestReview.status()).toBe(200);
+    const currentPlanningRevision = ((await latestReview.json()) as { revision: string }).revision;
+    expect(currentPlanningRevision).not.toBe(scenario.plan.planningRevision);
     for (const outcome of ["planned-withdrawal", "pending-withdrawal", "rejection"] as const) {
       const id = randomUUID(),
         resource = `${scenario.planPath}/${id}`;
@@ -155,7 +229,13 @@ test("overtime actions recover real receipts, preserve original evidence and enf
       };
       const planned = await context.request.post(scenario.planPath, {
         headers: scenario.headers(),
-        data: { ...scenario.plan, id, requested, reason: "Evening stock review" },
+        data: {
+          ...scenario.plan,
+          id,
+          requested,
+          planningRevision: currentPlanningRevision,
+          reason: "Evening stock review",
+        },
       });
       expect(planned.status()).toBe(200);
       await page.goto(`/workforce/overtime/${id}?${query}`);

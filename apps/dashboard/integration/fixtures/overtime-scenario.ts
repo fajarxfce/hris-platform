@@ -1,12 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { type BrowserContext, expect } from "@playwright/test";
 import { companyDate } from "../../src/core/presentation/dates/company-date";
-import type { OvertimeDetailsDto } from "../../src/features/workforce/data/models/overtime-details-dto";
 
 export const overtimeReviewer = "a0000000-0000-4000-8000-000000000025";
 export const overtimeEmployee = "a0000000-0000-4000-8000-000000000026";
 
-/** Prepares a real plan and later calendar change; actual time and decisions are entered through the UI. */
+/** Prepares employment, calendar and approval policy; the request is created through the UI. */
 export async function createOvertimeScenario(context: BrowserContext, company: string) {
   const csrf = (await (await context.request.get("/api/v1/auth/csrf")).json()) as {
     headerName: string;
@@ -16,8 +15,7 @@ export async function createOvertimeScenario(context: BrowserContext, company: s
   const base = `/api/v1/companies/${company}`,
     employee = randomUUID(),
     shift = randomUUID(),
-    holiday = randomUUID(),
-    id = randomUUID();
+    holiday = randomUUID();
   for (const [account, permissions] of [
     [overtimeReviewer, ["company.read", "overtime.approve", "approvals.read"]],
     [overtimeEmployee, ["overtime.self.manage"]],
@@ -107,48 +105,7 @@ export async function createOvertimeScenario(context: BrowserContext, company: s
       })
     ).status(),
   ).toBe(200);
-  const overtimePath = `${base}/workforce/overtime/${id}`,
-    planPath = `${base}/workforce/overtime`;
-  const planKey = randomUUID(),
-    plan = {
-      id,
-      employeeId: employee,
-      expectedEmploymentVersion: 0,
-      workDate,
-      requested: {
-        startsAt: `${workDate}T01:00:00Z`,
-        endsAt: `${workDate}T04:00:00Z`,
-        breakMinutes: 0,
-      },
-      reason: "Inventory count on the original day off",
-    };
-  const planned = await context.request.post(planPath, {
-    headers: { ...headers(), "Idempotency-Key": planKey },
-    data: plan,
-  });
-  expect(planned.status()).toBe(200);
-  const plannedReceipt: unknown = await planned.json();
-  const before = await context.request.get(overtimePath);
-  expect(before.status()).toBe(200);
-  expect(((await before.json()) as OvertimeDetailsDto).request.schedule).toMatchObject({
-    kind: "OFF",
-    origin: "HOLIDAY",
-    holidayId: holiday,
-  });
-  expect(
-    (
-      await context.request.put(`${base}/workforce/holidays/${holiday}`, {
-        headers: headers(),
-        data: {
-          workDate,
-          name: "Inventory holiday",
-          expectedVersion: 0,
-          active: false,
-          reason: "Later calendar change",
-        },
-      })
-    ).status(),
-  ).toBe(200);
+  const planPath = `${base}/workforce/overtime`;
   const actual = {
     expectedVersion: 0,
     actual: {
@@ -162,14 +119,9 @@ export async function createOvertimeScenario(context: BrowserContext, company: s
     base,
     employee,
     workDate,
-    id,
     holiday,
     planPath,
-    overtimePath,
     headers,
-    plan,
-    planKey,
     actual,
-    plannedReceipt,
   };
 }

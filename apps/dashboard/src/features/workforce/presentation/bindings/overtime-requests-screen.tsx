@@ -66,6 +66,10 @@ function OvertimeRequestsBinding(
       locale={props.locale}
       companyName={props.companyName}
       firstPage={props.search.after === null}
+      canCreate={props.access.permissions.includes("overtime.manage")}
+      onCreate={() =>
+        navigate(`${overtimePath}/new?${overtimeParameters(props.access.companyId, props.search)}`)
+      }
       onFirst={() => props.onSearch({ ...props.search, after: null })}
       onNext={() => {
         if (state.page?.nextCursor)

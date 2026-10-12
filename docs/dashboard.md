@@ -649,4 +649,23 @@ hidden through pending or failed recovery. Company replacement and disposal abor
 owned work and ignore late results. Unsaved and unresolved actions participate in
 the workspace navigation guard. These commands remain in browser memory.
 
-Creation of new plans and monthly closing remain separate dashboard work.
+## Overtime planning
+
+`/workforce/overtime/new` requires `overtime.manage` and preserves the directory's
+company and filters. A bounded employee panel uses the selected work date and
+minimal name/number references, without acquiring personal profiles. Selecting an
+employee acquires their current calendar review. Changing date clears the employee
+and cancels any older review; changing company replaces the entire form owner.
+
+The page separates the work schedule from requested start/end time, breaks and
+reason. Times use the reviewed company timezone. Confirmation pins employee and
+employment version, calendar revision, new request ID, operation and entered time.
+An unknown result retains that exact command through MFA and later conflicts.
+A definite changed-calendar rejection requires explicit review before another
+confirmation. Denied data stays hidden through pending or failed recovery.
+
+Selection and time controls are read-only during submission or receipt recovery.
+Drafts participate in the shared navigation guard, and successful creation links
+to the resulting request. Browser commands remain in memory. The employee panel
+uses compact reference columns within the shared resource table; larger directory
+tables retain their default minimum width. Monthly closing remains subsequent work.

@@ -10,6 +10,7 @@ import { HolidayEditorScreen } from "../bindings/holiday-editor-screen";
 import { HolidayScreen } from "../bindings/holiday-screen";
 import { HolidaysScreen } from "../bindings/holidays-screen";
 import { OvertimeActionScreen } from "../bindings/overtime-action-screen";
+import { OvertimePlanScreen } from "../bindings/overtime-plan-screen";
 import { OvertimeRequestScreen } from "../bindings/overtime-request-screen";
 import { OvertimeRequestsScreen } from "../bindings/overtime-requests-screen";
 import { RosterDayScreen } from "../bindings/roster-day-screen";
@@ -25,6 +26,7 @@ export function WorkforceRoutes(props: WorkforceScreenProps) {
   return (
     <Routes>
       <Route path="overtime" element={<OvertimeRequestsScreen {...props} />} />
+      <Route path="overtime/new" element={<OvertimePlanScreen {...props} />} />
       <Route path="overtime/:overtimeId" element={<OvertimeRequestScreen {...props} />} />
       <Route path="overtime/:overtimeId/:intent" element={<OvertimeActionScreen {...props} />} />
       <Route path="attendance" element={<AttendanceDirectoryScreen {...props} />} />

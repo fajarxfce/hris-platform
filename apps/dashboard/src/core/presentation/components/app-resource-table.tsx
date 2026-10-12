@@ -14,18 +14,23 @@ export function AppResourceTable({
   columns,
   rows,
   action,
+  minWidth,
 }: {
   title: string;
   columns: readonly Readonly<{ id: string; label: string; numeric?: boolean }>[];
   rows: readonly Readonly<{ id: string; actionLabel?: string; cells: readonly string[] }>[];
   action?: Readonly<{ label: string; onOpen: (id: string) => void; disabled?: boolean }>;
+  minWidth?: number;
 }) {
   const restoreFocus = useRestoreFocusTarget();
   return (
     <section className="app-resource-panel" aria-label={title}>
       <h2>{title}</h2>
       <div className="app-table-scroll">
-        <Table aria-label={title} style={{ minWidth: columns.length * 160 + (action ? 120 : 0) }}>
+        <Table
+          aria-label={title}
+          style={{ minWidth: minWidth ?? columns.length * 160 + (action ? 120 : 0) }}
+        >
           <TableHeader>
             <TableRow>
               {columns.map((column) => (

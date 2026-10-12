@@ -1,5 +1,5 @@
 import { Text } from "@fluentui/react-components";
-import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Add20Regular, ArrowClockwise20Regular } from "@fluentui/react-icons";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -13,6 +13,7 @@ import { overtimeStatuses } from "../../domain/entities/overtime-request";
 import type { useOvertimeFilters } from "../controllers/use-overtime-filters";
 import type { useOvertimeRequests } from "../controllers/use-overtime-requests";
 import { overtimeMessages } from "../i18n/overtime-messages";
+import { overtimePlanningMessages } from "../i18n/overtime-planning-messages";
 import type { overtimeRows } from "../models/overtime-view";
 
 export function OvertimeRequestsPage(props: {
@@ -22,6 +23,8 @@ export function OvertimeRequestsPage(props: {
   locale: Locale;
   companyName: string;
   firstPage: boolean;
+  canCreate: boolean;
+  onCreate: () => void;
   onFirst: () => void;
   onNext: () => void;
   onOpen: (id: string) => void;
@@ -34,14 +37,21 @@ export function OvertimeRequestsPage(props: {
         title={text.title}
         context={props.companyName}
         actions={
-          <AppButton
-            icon={<ArrowClockwise20Regular />}
-            appearance="subtle"
-            disabled={state.loading}
-            onClick={state.refresh}
-          >
-            {messages(locale).refresh}
-          </AppButton>
+          <>
+            {props.canCreate && (
+              <AppButton appearance="primary" icon={<Add20Regular />} onClick={props.onCreate}>
+                {overtimePlanningMessages(locale).title}
+              </AppButton>
+            )}
+            <AppButton
+              icon={<ArrowClockwise20Regular />}
+              appearance="subtle"
+              disabled={state.loading}
+              onClick={state.refresh}
+            >
+              {messages(locale).refresh}
+            </AppButton>
+          </>
         }
       />
       <form onSubmit={filters.apply} noValidate>

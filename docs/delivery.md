@@ -2123,3 +2123,26 @@ Development API and worker images were rebuilt from validated JARs and restarted
 with the document-services and WireGuard overlays. Database, Garage and ClamAV
 remained healthy; API readiness was UP and the VPN dashboard returned HTTP 200.
 No migration or mobile APK changed. Dashboard planning presentation remains next.
+
+## Dashboard overtime planning
+
+Added the scoped employee picker and reviewed-calendar form for new requests.
+Confirmation retains the exact employment, calendar revision, time interval and
+operation through an uncertain response. Date/company replacement cancels stale
+reads, denied details remain hidden, and drafts participate in navigation guards.
+The compact picker fits both desktop panels and narrow layouts.
+
+Architecture, Biome, TypeScript and all 1,340 dashboard unit tests passed,
+including 17 new controller/time-input cases. The nine new planning browser
+scenarios and 29 existing overtime scenarios passed across the combined run and
+a focused rerun. Two focused browser cases and static checks also passed after
+the final picker-width adjustment. English light, Indonesian dark and narrow
+layouts were inspected.
+
+The real API/PostgreSQL scenario now creates its first plan through the dashboard.
+A deliberately lost committed response recovered the original receipt after the
+calendar changed. Actual time, independent approval, rejection and withdrawal
+also passed, including lost-response recovery, maker exclusion, employee-owned
+reads and foreign-company rejection. The scenario cleaned up its disposable
+database. No additional backend deployment or mobile APK was needed. Monthly
+attendance closing is the next workforce dashboard increment.

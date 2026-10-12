@@ -1,0 +1,9 @@
+# Optional development access through the VPS's private WireGuard address.
+# Keep compose.yml's loopback publication for the dashboard and local tooling.
+services:
+  api:
+    ports:
+      - target: 8080
+        published: "8088"
+        host_ip: 10.77.77.1
+        protocol: tcp

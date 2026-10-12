@@ -25,6 +25,35 @@ are then available on that interface; the database and direct API remain on
 loopback. Local HTTP development uses `HRIS_SECURE_COOKIES=false` in the ignored
 environment file. Deployed environments retain secure cookies and HTTPS.
 
+For HRIS Mobile on this VPS, include `compose.wireguard.yml` to publish the API
+on `10.77.77.1:8088` as well as loopback. The phone then needs WireGuard but no
+ADB forwarding. With the document services enabled, start/update the API using:
+
+```sh
+docker compose -f compose.yml -f compose.documents.yml -f compose.wireguard.yml up -d api
+```
+
+Keep that overlay in subsequent deployments. For this local stack, the ignored
+`.env` may set `COMPOSE_FILE=compose.yml:compose.documents.yml:compose.wireguard.yml`
+so ordinary Compose commands use the same configuration. A different VPS must
+set `host_ip` to its own private VPN address. Do not publish this HTTP development
+port on a public interface. PostgreSQL, Garage and ClamAV remain private; staging
+and production clients require the deployed HTTPS origin.
+
+If WireGuard's firewall drops forwarding to Docker, allow only the original
+private API destination and its established replies before those drop rules.
+Docker translates the destination before the forwarding hook, so match conntrack's
+original destination. The VPS stores these rules in `/etc/wireguard/wg0.nft`:
+
+```nft
+iifname "wg0" ip saddr 10.77.77.0/24 meta l4proto tcp ct original ip daddr 10.77.77.1 ct original proto-dst 8088 counter accept
+oifname "wg0" ip daddr 10.77.77.0/24 meta l4proto tcp ct state established,related ct original ip daddr 10.77.77.1 ct original proto-dst 8088 counter accept
+```
+
+Keep existing isolation rules and validate a firewall transaction with `nft --check`
+before applying it. Do not flush Docker or WireGuard rules. A health check from the
+VPS alone does not validate the phone's route; check from the VPN client too.
+
 Private HTTP origins do not expose `crypto.randomUUID()` in every browser. The
 dashboard uses `crypto.getRandomValues()` for RFC 9562 version-4 operation IDs when
 that API is unavailable. Both paths require browser-provided secure randomness;

@@ -1515,3 +1515,20 @@ was reversed and its policy retired; document and request audit history remain.
 Light/dark appearance and 200% text were inspected. The phone was unavailable;
 no physical-phone interaction is claimed. File acquisition, scoped transfer and
 the dashboard document workflows remain separate delivery work.
+
+## Private VPN development API
+
+The optional `compose.wireguard.yml` overlay publishes the API on
+`10.77.77.1:8088` alongside its existing loopback port. Compose validation confirmed
+both specific bindings and retained the private document storage/scanner settings.
+The running API was recreated with the document and VPN overlays; PostgreSQL,
+Garage, signature updates and ClamAV remained healthy. API health returned HTTP 200
+on both interfaces, and the dashboard returned HTTP 200.
+
+The VPS WireGuard firewall initially rejected forwarding into Docker. Two narrow
+conntrack rules now admit only the original private API destination/port and its
+established replies. The transaction passed `nft --check` before application and
+was persisted in the existing WireGuard firewall configuration. Other isolation
+rules were retained. An HTTP health request from the phone over WireGuard returned
+200. HRIS Mobile separately verified sign-in, company selection and process
+restoration on the emulator without ADB reverse; phone installation was install-only.

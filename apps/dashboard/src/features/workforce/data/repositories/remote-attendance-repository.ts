@@ -6,10 +6,28 @@ import type { AttendanceReviewChange } from "../../domain/entities/attendance-re
 import type { CalendarRange } from "../../domain/entities/calendar-range";
 import type { AttendanceRepository } from "../../domain/repositories/attendance-repository";
 import type { AttendanceDataSource } from "../datasources/attendance-data-source";
+import { toAttendanceCorrectionPage } from "../mappers/attendance-correction-page-mapper";
 import { toAttendanceReceipt, toEmployeeAttendance } from "../mappers/attendance-mapper";
 
 export class RemoteAttendanceRepository implements AttendanceRepository {
   constructor(private readonly source: AttendanceDataSource) {}
+  corrections(
+    company: CompanyId,
+    employee: EmployeeId,
+    workDate: string,
+    after: string | null,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toAttendanceCorrectionPage(
+        await this.source.corrections(company, employee, workDate, after, signal),
+        company,
+        employee,
+        workDate,
+        after,
+      ),
+    );
+  }
   days(company: CompanyId, employee: EmployeeId, range: CalendarRange, signal: AbortSignal) {
     return safeHttpCall(signal, async () =>
       toEmployeeAttendance(

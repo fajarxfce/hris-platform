@@ -9,6 +9,7 @@ import { RemoteHolidayRepository } from "../data/repositories/remote-holiday-rep
 import { RemoteShiftRepository } from "../data/repositories/remote-shift-repository";
 import { AssignWeeklySchedule } from "../domain/usecases/assign-weekly-schedule";
 import { CorrectAttendance } from "../domain/usecases/correct-attendance";
+import { LoadAttendanceCorrectionHistory } from "../domain/usecases/load-attendance-correction-history";
 import { LoadCalendarReview } from "../domain/usecases/load-calendar-review";
 import { LoadEmployeeAttendance } from "../domain/usecases/load-employee-attendance";
 import { LoadHoliday } from "../domain/usecases/load-holiday";
@@ -27,6 +28,7 @@ export function createWorkforceFeature(http: HttpClient) {
   const shifts = new RemoteShiftRepository(new HttpShiftDataSource(http));
   const holidays = new RemoteHolidayRepository(new HttpHolidayDataSource(http));
   return {
+    loadAttendanceCorrectionHistory: new LoadAttendanceCorrectionHistory(attendance, calendars),
     loadEmployeeAttendance: new LoadEmployeeAttendance(attendance, calendars),
     reviewAttendance: new ReviewAttendance(attendance),
     correctAttendance: new CorrectAttendance(attendance),

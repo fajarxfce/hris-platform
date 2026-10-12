@@ -41,6 +41,7 @@ export function toAttendanceEntry(dto: AttendanceEntryDto, date: string): Attend
 export function toAttendanceCorrection(dto: AttendanceCorrectionDto): AttendanceCorrection {
   if (
     utcInstantMicroseconds(dto.recordedAt) === null ||
+    dto.reason.trim().length === 0 ||
     (dto.clockIn === null) !== (dto.clockOut === null)
   )
     throw new InvalidHttpResponseError();

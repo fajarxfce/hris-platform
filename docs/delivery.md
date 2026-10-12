@@ -1872,3 +1872,17 @@ The development API and worker were updated with guarded retirement review while
 preserving the private document services and WireGuard overlay. API requests on
 loopback and WireGuard and the dashboard on WireGuard returned HTTP 200. These
 dashboard changes required no new mobile build.
+
+## Dashboard attendance correction history contracts
+
+Workforce now exposes a correction-history use case over the existing API. It
+coordinates the bounded employee reference and history repositories, validates
+the employee/date/cursor before acquisition, and returns an immutable company and
+date-bound page. Mapping checks exclusive descending revisions, distinct IDs,
+correction intervals, bounded page size and cursor progress. Cancellation and
+existing access/MFA failures retain their classifications.
+
+Architecture, formatting, TypeScript and all 1,110 dashboard unit tests passed.
+The 28 new boundary cases include empty/terminal pages, malformed and nonprogressing
+responses, reference mismatches, private error suppression and cancellation before
+and between reads. History browsing remains the next presentation increment.

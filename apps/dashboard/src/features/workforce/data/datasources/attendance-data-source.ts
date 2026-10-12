@@ -7,6 +7,13 @@ import type {
 import type { CalendarRangeDto } from "../models/calendar-dto";
 
 export interface AttendanceDataSource {
+  corrections(
+    company: string,
+    employee: string,
+    workDate: string,
+    after: string | null,
+    signal: AbortSignal,
+  ): Promise<AttendanceCorrectionPageDto>;
   days(
     company: string,
     employee: string,
@@ -28,3 +35,5 @@ export interface AttendanceDataSource {
     signal: AbortSignal,
   ): Promise<AttendanceReceiptDto>;
 }
+
+import type { AttendanceCorrectionPageDto } from "../models/attendance-correction-page-dto";

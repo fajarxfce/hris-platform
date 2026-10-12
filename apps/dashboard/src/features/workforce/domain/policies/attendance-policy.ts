@@ -15,6 +15,9 @@ export const canReviewAttendance = (permissions: readonly string[]): boolean =>
 export const canCorrectAttendance = (permissions: readonly string[]): boolean =>
   canReadAttendance(permissions) && permissions.includes("attendance.correct");
 
+export const isAttendanceCorrectionCursor = (value: string): boolean =>
+  /^(0|[1-9][0-9]{0,15})$/u.test(value) && Number.isSafeInteger(Number(value));
+
 export function parseAttendanceRange(range: CalendarRange): Result<CalendarRange> {
   if (!isCalendarDate(range.from) || !isCalendarDate(range.until))
     return failed("invalid_attendance_range");

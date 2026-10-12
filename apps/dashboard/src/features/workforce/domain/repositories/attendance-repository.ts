@@ -3,11 +3,19 @@ import type { MutationReceipt } from "../../../../core/domain/mutation-receipt";
 import type { Result } from "../../../../core/domain/result";
 import type { EmployeeId } from "../../../people/domain/entities/employee";
 import type { AttendanceCorrectionChange } from "../entities/attendance-correction-change";
+import type { AttendanceCorrectionPage } from "../entities/attendance-correction-page";
 import type { AttendanceReviewChange } from "../entities/attendance-review-change";
 import type { CalendarRange } from "../entities/calendar-range";
 import type { EmployeeAttendance } from "../entities/employee-attendance";
 
 export interface AttendanceRepository {
+  corrections(
+    company: CompanyId,
+    employee: EmployeeId,
+    workDate: string,
+    after: string | null,
+    signal: AbortSignal,
+  ): Promise<Result<AttendanceCorrectionPage>>;
   days(
     company: CompanyId,
     employee: EmployeeId,

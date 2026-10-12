@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes, useLocation, useSearchParams } from "react-router-dom";
+import { DocumentActionScreen } from "../bindings/document-action-screen";
 import { DocumentEmployeesScreen } from "../bindings/document-employees-screen";
 import { DocumentFolderScreen } from "../bindings/document-folder-screen";
 import { DocumentReviewScreen } from "../bindings/document-review-screen";
@@ -28,6 +29,10 @@ export function DocumentsRoutes(props: DocumentsScreenProps) {
     <Routes>
       <Route index element={<DocumentEmployeesScreen {...props} />} />
       <Route path="employees/:employeeId" element={<DocumentFolderScreen {...props} />} />
+      <Route
+        path=":documentId/revisions/:revisionId/:intent"
+        element={<DocumentActionScreen {...props} />}
+      />
       <Route
         path=":documentId/revisions/:revisionId"
         element={<DocumentRevisionScreen {...props} />}

@@ -9,10 +9,52 @@ import {
   documentRevisionPageDto,
   documentValidationAttemptsDto,
 } from "../models/document-dto";
+import {
+  type DocumentMutationDto,
+  documentMutationReceiptDto,
+} from "../models/document-mutation-dto";
 import type { DocumentDataSource } from "./document-data-source";
 
 export class HttpDocumentDataSource implements DocumentDataSource {
   constructor(private readonly http: HttpClient) {}
+  async validate(
+    company: string,
+    id: string,
+    operation: string,
+    body: DocumentMutationDto,
+    signal: AbortSignal,
+  ) {
+    return documentMutationReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/documents/revisions/${id}/validate`,
+          method: "POST",
+          operationId: operation,
+          body,
+        },
+        signal,
+      ),
+    );
+  }
+  async cancelUpload(
+    company: string,
+    id: string,
+    operation: string,
+    body: DocumentMutationDto,
+    signal: AbortSignal,
+  ) {
+    return documentMutationReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/documents/revisions/${id}/cancel`,
+          method: "POST",
+          operationId: operation,
+          body,
+        },
+        signal,
+      ),
+    );
+  }
   async employees(
     company: string,
     search: string,

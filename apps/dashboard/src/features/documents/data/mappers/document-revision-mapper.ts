@@ -13,6 +13,7 @@ import type {
 
 export function toDocumentRevision(raw: DocumentRevisionDto, company: CompanyId): DocumentRevision {
   if (
+    new Set(raw.availableActions).size !== raw.availableActions.length ||
     raw.uploadedBytes > raw.size ||
     (raw.uploadedBytes !== raw.size && raw.uploadedBytes % raw.chunkSize !== 0) ||
     (raw.status === "READY" && (raw.uploadedBytes !== raw.size || raw.validatedAt === null))
@@ -34,6 +35,7 @@ export function toDocumentRevision(raw: DocumentRevisionDto, company: CompanyId)
     documentId: raw.documentId.toLowerCase(),
     createdBy: raw.createdBy.toLowerCase(),
     validationJobId: raw.validationJobId?.toLowerCase() ?? null,
+    availableActions: Object.freeze([...raw.availableActions]),
   });
 }
 export function toDocumentRevisions(

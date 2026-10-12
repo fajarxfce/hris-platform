@@ -1,4 +1,5 @@
 import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { DocumentRevisionIntent } from "../../domain/entities/document-revision-action";
 
 export const documentsPath = "/documents";
 export const documentFolderPath = (employee: string): string =>
@@ -6,6 +7,11 @@ export const documentFolderPath = (employee: string): string =>
 export const documentPath = (id: string): string => `${documentsPath}/${encodeURIComponent(id)}`;
 export const documentRevisionPath = (document: string, revision: string): string =>
   `${documentPath(document)}/revisions/${encodeURIComponent(revision)}`;
+export const documentActionPath = (
+  document: string,
+  revision: string,
+  intent: DocumentRevisionIntent,
+): string => `${documentRevisionPath(document, revision)}/${intent}`;
 
 export function documentParameters(
   company: CompanyId,

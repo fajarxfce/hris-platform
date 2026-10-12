@@ -79,6 +79,10 @@ export const documentRevisionDto = z.object({
     .regex(/^[a-z][a-z0-9_.]{0,119}$/u)
     .nullable(),
   validatedAt: instant.nullable(),
+  availableActions: z
+    .array(z.enum(["VALIDATE", "CANCEL_UPLOAD"]))
+    .max(2)
+    .default([]),
 });
 export const documentRevisionPageDto = z.object({
   items: z.array(documentRevisionDto).max(20),

@@ -2,6 +2,42 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  document_action_unavailable: [
+    "This action is no longer available. Reload to check the revision.",
+    "Tindakan ini sudah tidak tersedia. Muat ulang untuk memeriksa revisi.",
+  ],
+  invalid_document_validation: [
+    "Enter a reason of up to 1,000 characters and review the selected revision.",
+    "Isi alasan maksimal 1.000 karakter dan periksa revisi yang dipilih.",
+  ],
+  invalid_document_cancellation: [
+    "Enter a reason of up to 1,000 characters and review the selected upload.",
+    "Isi alasan maksimal 1.000 karakter dan periksa upload yang dipilih.",
+  ],
+  document_upload_closed: [
+    "This upload is closed. Reload to check its current status.",
+    "Upload sudah ditutup. Muat ulang untuk memeriksa status terbaru.",
+  ],
+  document_upload_incomplete: [
+    "The file has not finished uploading.",
+    "File belum selesai di-upload.",
+  ],
+  document_validation_active: [
+    "Validation is already in progress.",
+    "Validasi sedang berlangsung.",
+  ],
+  document_validation_attempts_exhausted: [
+    "The validation attempt limit has been reached. Cancel this upload before replacing it.",
+    "Batas percobaan validasi tercapai. Batalkan upload ini sebelum menggantinya.",
+  ],
+  document_content_expired: [
+    "The upload deadline has passed. Cancel this upload before replacing it.",
+    "Batas waktu upload telah lewat. Batalkan upload ini sebelum menggantinya.",
+  ],
+  document_archived: [
+    "This document is archived and cannot receive new content.",
+    "Dokumen sudah diarsipkan dan tidak dapat menerima konten baru.",
+  ],
   document_not_found: [
     "This document is unavailable in the current company.",
     "Dokumen tidak tersedia di perusahaan ini.",

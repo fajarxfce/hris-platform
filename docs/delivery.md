@@ -1641,3 +1641,26 @@ composition did not change. Coverage includes current/original grants, incomplet
 content, active validation, the eight-attempt limit, publication, expired upload
 cancellation, MFA expiry during the job read, interruption and guard release.
 The added response field preserves the existing flat metadata contract.
+
+## Dashboard document processing
+
+Document revision details now link to fresh validation and cancellation reviews.
+Current server capabilities and local management grants control availability.
+Confirmation uses the reviewed version and one immutable operation; an uncertain
+receipt stays pinned through explicit retry, MFA recovery and later rejection.
+Definite conflicts require a new review. Workspace departure owns cancellation,
+and known access loss hides the review through pending or failed recovery.
+
+Architecture, formatting, TypeScript and all 913 dashboard unit tests passed,
+including 69 document cases. Twenty document browser scenarios passed against
+production output. The real API/database browser scenario cancelled an upload,
+discarded its first committed response and recovered the original receipt through
+the UI with the same operation and payload. Foreign-company reads remained denied.
+
+Development acceptance uploaded a 605-byte PDF as test setup, requested validation
+through the dashboard and observed actual worker publication. The authenticated
+browser download matched the original bytes and SHA-256. Dashboard cancellation
+then closed an incomplete replacement while preserving the published revision.
+Desktop and narrow layouts were inspected in both themes. Browser upload authoring
+and retention administration remain separate increments; no new mobile build was
+required for these dashboard controls.

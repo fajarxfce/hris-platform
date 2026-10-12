@@ -1,13 +1,15 @@
 import { InvalidHttpResponseError } from "../../../../core/data/http/http-response-error";
 import { safeHttpCall } from "../../../../core/data/http/safe-http-call";
 import { binaryFilePartBytes } from "../../../../core/domain/files/binary-file";
-import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
 import type { DocumentEmployeeSearch } from "../../domain/entities/document-employee";
 import type { DocumentRevision } from "../../domain/entities/document-revision";
+import type { DocumentRevisionChange } from "../../domain/entities/document-revision-action";
 import type { DocumentRepository } from "../../domain/repositories/document-repository";
 import type { DocumentDataSource } from "../datasources/document-data-source";
 import { toDocumentEmployees } from "../mappers/document-employee-mapper";
 import { toDocument, toDocumentPage } from "../mappers/document-mapper";
+import { toDocumentMutation } from "../mappers/document-mutation-mapper";
 import {
   toDocumentAttempts,
   toDocumentRevision,
@@ -16,6 +18,44 @@ import {
 
 export class RemoteDocumentRepository implements DocumentRepository {
   constructor(private readonly source: DocumentDataSource) {}
+  validate(
+    company: CompanyId,
+    operation: OperationId,
+    change: DocumentRevisionChange,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toDocumentMutation(
+        await this.source.validate(
+          company,
+          change.id,
+          operation,
+          { expectedVersion: change.version, reason: change.reason },
+          signal,
+        ),
+        change,
+      ),
+    );
+  }
+  cancelUpload(
+    company: CompanyId,
+    operation: OperationId,
+    change: DocumentRevisionChange,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toDocumentMutation(
+        await this.source.cancelUpload(
+          company,
+          change.id,
+          operation,
+          { expectedVersion: change.version, reason: change.reason },
+          signal,
+        ),
+        change,
+      ),
+    );
+  }
   employees(
     company: CompanyId,
     search: DocumentEmployeeSearch,

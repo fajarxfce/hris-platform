@@ -10,4 +10,5 @@ export type DocumentsScreenProps = Readonly<{
   companyName: string;
   timezone: string;
   locale: Locale;
+  nextIdentifier: () => string;
 }>;

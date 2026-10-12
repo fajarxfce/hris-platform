@@ -65,5 +65,6 @@ export function documentRevision(): DocumentRevisionDto {
     validationAttempts: 1,
     failureCode: null,
     validatedAt: "2026-10-01T00:01:00Z",
+    availableActions: [],
   };
 }

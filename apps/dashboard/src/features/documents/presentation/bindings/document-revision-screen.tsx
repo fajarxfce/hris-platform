@@ -7,6 +7,7 @@ import type { DocumentsScreenProps } from "../contracts/documents-screen-props";
 import { DocumentDownloadController } from "../controllers/document-download-controller";
 import { useDocumentRevision } from "../controllers/use-document-reads";
 import { documentMessages } from "../i18n/document-messages";
+import { documentActionLinks } from "../models/document-action-view";
 import { documentHref, documentPath } from "../models/document-route";
 import { documentRevisionView } from "../models/document-view";
 import { DocumentRevisionContent } from "../pages/document-revision-content";
@@ -58,6 +59,10 @@ function DocumentRevisionBinding(props: DocumentsScreenProps & { review: Documen
     () => documentRevisionView(props.review, props.locale, props.timezone),
     [props.review, props.locale, props.timezone],
   );
+  const actions = useMemo(
+    () => documentActionLinks(props.access, props.review.revision, props.locale),
+    [props.access, props.review.revision, props.locale],
+  );
   useWorkspaceRevalidation(state.failure);
   return (
     <DocumentRevisionContent
@@ -65,6 +70,7 @@ function DocumentRevisionBinding(props: DocumentsScreenProps & { review: Documen
       state={state}
       locale={props.locale}
       ready={props.review.revision.status === "READY"}
+      actions={actions}
       onDownload={() => void controller.start()}
       onCancel={controller.cancel}
     />

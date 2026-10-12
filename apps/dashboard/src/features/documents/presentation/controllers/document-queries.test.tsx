@@ -56,12 +56,16 @@ function setup() {
     companyName: "Company",
     timezone: "Asia/Jakarta",
     locale: "en",
+    nextIdentifier: () => documentId(80),
     documents: {
       loadEmployees: load,
       loadFolder: unused,
       loadReview: unused,
       loadRevision: unused,
       download: unused,
+      reviewAction: unused,
+      validate: unused,
+      cancelUpload: unused,
     },
   };
   return { data, load, scope };

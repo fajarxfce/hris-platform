@@ -1,4 +1,5 @@
 import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { DocumentRevisionAction } from "./document-revision-action";
 
 export type DocumentRevision = Readonly<{
   id: string;
@@ -28,6 +29,7 @@ export type DocumentRevision = Readonly<{
   validationAttempts: number;
   failureCode: string | null;
   validatedAt: string | null;
+  availableActions: readonly DocumentRevisionAction[];
 }>;
 export type DocumentRevisionPage = Readonly<{
   items: readonly DocumentRevision[];

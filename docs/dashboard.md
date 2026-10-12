@@ -517,5 +517,16 @@ or availability rejection hides the detail until a successful metadata refresh;
 MFA verification never repeats the download automatically. Browser handoff reports
 that a download started, not that the user saved it.
 
-Upload authoring, processing actions and retention administration remain separate
-workflows.
+Revision details expose validation, retry and upload cancellation only when the
+current API capability and management scope permit them. Each confirmation route
+acquires a fresh review. Cancellation remains available for an expired upload that
+has not yet been closed; completed content cannot be revalidated arbitrarily.
+
+The controller retains one immutable operation, observed version and reason until
+the outcome is acknowledged. An uncertain response permits only an explicit replay
+of that command, including after MFA recovery or a later rejection. Definite version
+conflicts require a new review. Departure protection covers edits and pending or
+unconfirmed commands; replacing the workspace cancels obsolete work. Known access
+loss hides metadata until a successful authorized review.
+
+Upload authoring and retention administration remain separate workflows.

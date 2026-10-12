@@ -9,6 +9,20 @@ import type {
 } from "../models/document-dto";
 
 export interface DocumentDataSource {
+  validate(
+    company: string,
+    id: string,
+    operation: string,
+    body: DocumentMutationDto,
+    signal: AbortSignal,
+  ): Promise<DocumentMutationReceiptDto>;
+  cancelUpload(
+    company: string,
+    id: string,
+    operation: string,
+    body: DocumentMutationDto,
+    signal: AbortSignal,
+  ): Promise<DocumentMutationReceiptDto>;
   employees(
     company: string,
     query: string,
@@ -41,3 +55,8 @@ export interface DocumentDataSource {
     signal: AbortSignal,
   ): Promise<BinaryResponseDto>;
 }
+
+import type {
+  DocumentMutationDto,
+  DocumentMutationReceiptDto,
+} from "../models/document-mutation-dto";

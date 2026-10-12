@@ -72,13 +72,35 @@ test("real document employee discovery, upload metadata and cancellation remain 
   await expect(page.getByText("record.pdf", { exact: true })).toBeVisible();
   await expect(page.getByText("Mengunggah", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Download", exact: true })).toHaveCount(0);
-  const cancelled = await context.request.post(`${base}/documents/revisions/${revision}/cancel`, {
-    headers: headers(),
-    data: { expectedVersion: 0, reason: "Finish browser metadata acceptance" },
+  await expect(page.getByRole("link", { name: "Validasi file", exact: true })).toHaveCount(0);
+  const commands: { operation: string; body: unknown }[] = [];
+  await page.route(`**${base}/documents/revisions/${revision}/cancel`, async (route) => {
+    commands.push({
+      operation: route.request().headers()["idempotency-key"] ?? "",
+      body: route.request().postDataJSON(),
+    });
+    if (commands.length === 1) {
+      const response = await route.fetch();
+      expect(response.status()).toBe(200);
+      await response.dispose();
+      await route.abort("failed");
+    } else await route.continue();
   });
-  expect(cancelled.status()).toBe(200);
-  await page.getByRole("button", { name: "Muat ulang", exact: true }).click();
+  await page.getByRole("link", { name: "Batalkan upload", exact: true }).click();
+  await page.getByLabel("Alasan", { exact: true }).fill("Finish browser metadata acceptance");
+  await page.getByRole("button", { name: "Konfirmasi", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Respons belum terkonfirmasi.");
+  await page.getByRole("button", { name: "Ulangi permintaan", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Upload dibatalkan.");
+  expect(commands).toHaveLength(2);
+  expect(commands[0]).toEqual(commands[1]);
+  expect(commands[0]?.body).toEqual({
+    expectedVersion: 0,
+    reason: "Finish browser metadata acceptance",
+  });
+  await page.getByRole("link", { name: "Lihat revisi", exact: true }).click();
   await expect(page.getByText("Dibatalkan", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Batalkan upload", exact: true })).toHaveCount(0);
   const otherCompany = await context.request.post("/api/v1/companies", {
     headers: headers(),
     data: {

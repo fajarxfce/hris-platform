@@ -1,5 +1,6 @@
 import type { BinaryFileContent } from "../../../../core/domain/files/binary-file";
-import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
+import type { MutationReceipt } from "../../../../core/domain/mutation-receipt";
 import type { Result } from "../../../../core/domain/result";
 import type { Document, DocumentPage } from "../entities/document";
 import type {
@@ -7,9 +8,22 @@ import type {
   DocumentEmployeeSearch,
 } from "../entities/document-employee";
 import type { DocumentRevision, DocumentRevisionPage } from "../entities/document-revision";
+import type { DocumentRevisionChange } from "../entities/document-revision-action";
 import type { DocumentValidationAttempt } from "../entities/document-validation-attempt";
 
 export interface DocumentRepository {
+  validate(
+    company: CompanyId,
+    operation: OperationId,
+    change: DocumentRevisionChange,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
+  cancelUpload(
+    company: CompanyId,
+    operation: OperationId,
+    change: DocumentRevisionChange,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
   employees(
     company: CompanyId,
     search: DocumentEmployeeSearch,

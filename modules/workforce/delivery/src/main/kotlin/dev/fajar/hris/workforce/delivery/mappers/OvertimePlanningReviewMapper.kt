@@ -10,4 +10,5 @@ fun OvertimePlanningReview.toResponse(): OvertimePlanningReviewResponse =
         companyDate,
         timezone,
         schedule.toResponse(),
+        revision,
     )

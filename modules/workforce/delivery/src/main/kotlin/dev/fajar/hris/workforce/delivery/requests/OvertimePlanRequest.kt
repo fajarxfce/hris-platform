@@ -10,4 +10,5 @@ data class OvertimePlanRequest(
     val workDate: LocalDate,
     val requested: OvertimeIntervalRequest,
     val reason: String,
+    val planningRevision: String? = null,
 )

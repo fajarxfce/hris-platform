@@ -37,11 +37,16 @@ class PlanOvertimeRequest(
         workDate: LocalDate,
         requested: OvertimeInterval,
         reason: String,
+        planningRevision: String? = null,
     ): Result<MutationReceipt> {
         if (actor.permissions.none { it in setOf("overtime.manage", "overtime.self.manage") })
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
         val valid = validateOvertimePlan(workDate, requested, reason, expectedEmploymentVersion)
         if (valid is Result.Failed) return valid
+        if (planningRevision != null && !Regex("[0-9a-f]{64}").matches(planningRevision))
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_overtime_planning_revision")
+            )
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
@@ -58,7 +63,7 @@ class PlanOvertimeRequest(
                     requested.endsAt.toString(),
                     requested.breakMinutes.toString(),
                     reason,
-                ),
+                ) + (planningRevision?.let { listOf("planning", it) } ?: emptyList()),
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
@@ -135,6 +140,18 @@ class PlanOvertimeRequest(
                     .flatMap(::resolveCalendar)
             if (calendar is Result.Failed) return@run calendar
             val day = (calendar as Result.Success).value.days.single()
+            if (
+                planningRevision != null &&
+                    planningRevision !=
+                        overtimePlanningRevision(
+                            company,
+                            employeeId,
+                            employee.version,
+                            settings.timezone,
+                            day,
+                        )
+            )
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "overtime_planning_changed"))
             val time = validateOvertimeSchedule(workDate, settings.timezone, requested, day)
             if (time is Result.Failed) return@run time
             val request =

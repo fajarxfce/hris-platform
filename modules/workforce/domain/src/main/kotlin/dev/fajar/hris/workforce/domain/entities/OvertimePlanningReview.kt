@@ -8,4 +8,5 @@ data class OvertimePlanningReview(
     val companyDate: LocalDate,
     val timezone: String,
     val schedule: ScheduledDay,
+    val revision: String,
 )

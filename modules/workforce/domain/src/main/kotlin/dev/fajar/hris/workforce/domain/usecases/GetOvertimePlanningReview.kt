@@ -110,6 +110,13 @@ class GetOvertimePlanningReview(
                     today,
                     configured.timezone,
                     day,
+                    overtimePlanningRevision(
+                        company,
+                        employeeId,
+                        employee.version,
+                        configured.timezone,
+                        day,
+                    ),
                 )
             }
         }

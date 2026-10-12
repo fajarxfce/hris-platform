@@ -71,6 +71,12 @@ contracts. Review only reads an existing period; it never creates one or reserve
 eligibility. Assurance is rechecked after acquisition, and the plan command
 independently authorizes and validates its write under its mutation guards.
 
+The overtime planning content revision is a pure domain precondition, derived from
+scope, employment version, company timezone and immutable calendar references.
+The command compares it after acquiring the schedule guard and resolving current
+facts. Original receipts precede that comparison; the optional precondition is
+included in operation identity only when supplied, preserving older receipts.
+
 Company attendance exceptions use one bounded SQL projection under shared people,
 company, membership and account guards. They do not acquire employee/day locks:
 evidence, reviews and correction heads come from the same statement snapshot,

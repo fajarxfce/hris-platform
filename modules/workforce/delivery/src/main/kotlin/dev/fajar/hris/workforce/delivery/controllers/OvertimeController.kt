@@ -37,6 +37,7 @@ class OvertimeController(
                 body.workDate,
                 body.requested.toInterval(),
                 body.reason,
+                body.planningRevision,
             )
             .response()
             .toResponse()

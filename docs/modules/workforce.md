@@ -191,3 +191,11 @@ Individual review creates no business records, receipts or period rows. It rejec
 missing schedules, inactive employment and an observed processing/closed month.
 The plan command independently rechecks current scope, employment, schedule,
 period availability and capacity when saving; review does not reserve eligibility.
+
+The review's `revision` binds company, employee, observed employment version,
+timezone and resolved calendar facts. New clients send it as `planningRevision`
+when creating the request. A changed review returns `overtime_planning_changed`
+without consuming the operation. The original receipt is recovered before
+comparing today's calendar, and changing or removing a sent revision cannot reuse
+that receipt key. The field remains optional for existing clients; their operation
+identity is unchanged. This content revision grants no permission or reservation.

@@ -2087,3 +2087,19 @@ expired MFA after acquisition, concurrent readers and cancellation cleanup. One
 domain case verifies the shared inclusive planning-date limits. OpenAPI generation
 includes both endpoints. This increment has not changed the development runtime
 or mobile APK; dashboard planning remains in progress.
+
+## Overtime reviewed-calendar precondition
+
+Planning review now returns a content revision over company, employment version,
+timezone and resolved calendar references. Clients may pin it in `planningRevision`;
+a changed calendar rejects the new plan without consuming its operation. Original
+receipt recovery precedes comparison with current facts. Supplied revisions bind
+the operation payload, while omitted revisions preserve existing client receipts.
+
+Architecture, Kotlin formatting and both application builds passed. The 39
+workforce domain, 67 selected API/contract and 38 worker cases passed across the
+main check and a focused rerun of the three new HTTP cases. Coverage includes
+changed calendars, complete rejection rollback, fresh-review recovery, exact
+receipt replay, malformed revisions and foreign-company review references. Two
+new pure policy cases verify stable content and changes to scope, employment,
+timezone, schedule origin, holiday and shift evidence. No migration is required.

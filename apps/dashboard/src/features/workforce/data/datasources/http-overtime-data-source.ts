@@ -1,10 +1,71 @@
 import type { HttpClient } from "../../../../core/data/http/http-client";
+import type { OvertimeActualDto } from "../models/overtime-actual-dto";
+import type { OvertimeDecisionDto } from "../models/overtime-decision-dto";
 import { overtimeDetailsDto } from "../models/overtime-details-dto";
+import { overtimeReceiptDto } from "../models/overtime-receipt-dto";
 import { type OvertimeSearchDto, overtimePageDto } from "../models/overtime-request-dto";
+import type { OvertimeWithdrawalDto } from "../models/overtime-withdrawal-dto";
 import type { OvertimeDataSource } from "./overtime-data-source";
 
 export class HttpOvertimeDataSource implements OvertimeDataSource {
   constructor(private readonly http: HttpClient) {}
+  async submitActual(
+    company: string,
+    id: string,
+    operation: string,
+    body: OvertimeActualDto,
+    signal: AbortSignal,
+  ) {
+    return overtimeReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/workforce/overtime/${id}/actual`,
+          method: "POST",
+          operationId: operation,
+          body,
+        },
+        signal,
+      ),
+    );
+  }
+  async decide(
+    company: string,
+    id: string,
+    operation: string,
+    body: OvertimeDecisionDto,
+    signal: AbortSignal,
+  ) {
+    return overtimeReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/workforce/overtime/${id}/decisions`,
+          method: "POST",
+          operationId: operation,
+          body,
+        },
+        signal,
+      ),
+    );
+  }
+  async withdraw(
+    company: string,
+    id: string,
+    operation: string,
+    body: OvertimeWithdrawalDto,
+    signal: AbortSignal,
+  ) {
+    return overtimeReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/workforce/overtime/${id}/withdraw`,
+          method: "POST",
+          operationId: operation,
+          body,
+        },
+        signal,
+      ),
+    );
+  }
   async list(company: string, search: OvertimeSearchDto, signal: AbortSignal) {
     const query = new URLSearchParams({ from: search.from, until: search.until, limit: "50" });
     if (search.employeeId !== null) query.set("employeeId", search.employeeId);

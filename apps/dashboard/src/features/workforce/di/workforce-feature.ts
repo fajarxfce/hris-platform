@@ -11,6 +11,7 @@ import { RemoteOvertimeRepository } from "../data/repositories/remote-overtime-r
 import { RemoteShiftRepository } from "../data/repositories/remote-shift-repository";
 import { AssignWeeklySchedule } from "../domain/usecases/assign-weekly-schedule";
 import { CorrectAttendance } from "../domain/usecases/correct-attendance";
+import { DecideOvertimeRequest } from "../domain/usecases/decide-overtime-request";
 import { LoadAttendanceCorrectionHistory } from "../domain/usecases/load-attendance-correction-history";
 import { LoadAttendanceExceptions } from "../domain/usecases/load-attendance-exceptions";
 import { LoadCalendarReview } from "../domain/usecases/load-calendar-review";
@@ -23,9 +24,12 @@ import { LoadShift } from "../domain/usecases/load-shift";
 import { LoadShifts } from "../domain/usecases/load-shifts";
 import { LoadWorkforceEmployees } from "../domain/usecases/load-workforce-employees";
 import { ReviewAttendance } from "../domain/usecases/review-attendance";
+import { ReviewOvertimeAction } from "../domain/usecases/review-overtime-action";
 import { SaveHoliday } from "../domain/usecases/save-holiday";
 import { SaveShift } from "../domain/usecases/save-shift";
 import { SetRosterDay } from "../domain/usecases/set-roster-day";
+import { SubmitOvertimeActual } from "../domain/usecases/submit-overtime-actual";
+import { WithdrawOvertimeRequest } from "../domain/usecases/withdraw-overtime-request";
 
 export function createWorkforceFeature(http: HttpClient) {
   const attendance = new RemoteAttendanceRepository(new HttpAttendanceDataSource(http));
@@ -34,6 +38,10 @@ export function createWorkforceFeature(http: HttpClient) {
   const holidays = new RemoteHolidayRepository(new HttpHolidayDataSource(http));
   const overtime = new RemoteOvertimeRepository(new HttpOvertimeDataSource(http));
   return {
+    reviewOvertimeAction: new ReviewOvertimeAction(overtime),
+    submitOvertimeActual: new SubmitOvertimeActual(overtime),
+    decideOvertimeRequest: new DecideOvertimeRequest(overtime),
+    withdrawOvertimeRequest: new WithdrawOvertimeRequest(overtime),
     loadOvertimeRequests: new LoadOvertimeRequests(overtime),
     loadOvertimeRequest: new LoadOvertimeRequest(overtime),
     loadAttendanceExceptions: new LoadAttendanceExceptions(attendance),

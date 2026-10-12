@@ -2021,3 +2021,22 @@ The integration used its own disposable database and fictional accounts. The
 development VPN dashboard and API returned HTTP 200; no backend migration or
 runtime deployment was required. Overtime authoring/review forms and closing remain
 separate dashboard work.
+
+## Dashboard overtime action contracts
+
+Dedicated domain use cases now review available actions, submit actual time,
+decide a pending request and withdraw an unfinished request. Pure policies validate
+whole-minute intervals, requested bounds, breaks and reasons. The API remains
+authoritative for current ownership, reviewer independence, period locks and
+completed work. Repositories map explicit DTOs and verify the returned request ID
+and exact next revision inside the shared HTTP failure boundary.
+
+A captured action snapshot can recover its original receipt without first reading
+a newer request. Definite rejection and denied-read classifications are separate
+from uncertain delivery, so a later failure cannot implicitly release an earlier
+unconfirmed command. Presentation forms remain the next increment.
+
+Architecture, formatting, TypeScript and all 1,272 dashboard unit tests passed.
+The 36 added contract cases exercise validation before I/O, immutable input,
+receipt mismatches, safe MFA errors, cancellation and late results/failures. No
+backend runtime or mobile build changed.

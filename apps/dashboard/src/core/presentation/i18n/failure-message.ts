@@ -996,6 +996,42 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "The overtime request was not found or is no longer accessible.",
     "Pengajuan lembur tidak ditemukan atau tidak dapat diakses.",
   ],
+  overtime_action_unavailable: [
+    "This action is no longer available. Refresh the request.",
+    "Tindakan ini tidak lagi tersedia. Muat ulang pengajuan.",
+  ],
+  invalid_overtime_actual: [
+    "Check the actual time and enter a reason.",
+    "Periksa waktu aktual dan masukkan alasan.",
+  ],
+  invalid_overtime_interval: [
+    "Check the start, end and break. Use whole minutes within a 12-hour interval.",
+    "Periksa waktu mulai, selesai, dan istirahat. Gunakan menit penuh dalam rentang maksimal 12 jam.",
+  ],
+  overtime_outside_requested_window: [
+    "Actual time must fit within the requested interval and duration.",
+    "Waktu aktual harus berada dalam rentang dan durasi yang diajukan.",
+  ],
+  overtime_not_ended: [
+    "Actual time can be submitted after the work has ended.",
+    "Waktu aktual dapat diajukan setelah pekerjaan selesai.",
+  ],
+  invalid_overtime_decision: [
+    "Check the review decision and reason.",
+    "Periksa keputusan dan alasan peninjauan.",
+  ],
+  invalid_overtime_withdrawal: [
+    "Enter a reason for withdrawing this request.",
+    "Masukkan alasan penarikan pengajuan.",
+  ],
+  overtime_not_planned: [
+    "Actual time has already been submitted or the request has ended. Refresh the request.",
+    "Waktu aktual sudah diajukan atau pengajuan telah selesai. Muat ulang pengajuan.",
+  ],
+  overtime_not_pending: [
+    "This request is no longer pending. Refresh its status.",
+    "Pengajuan ini tidak lagi menunggu keputusan. Muat ulang statusnya.",
+  ],
   employee_not_found: [
     "The employee was not found for this date or is no longer accessible.",
     "Karyawan tidak ditemukan untuk tanggal ini atau tidak dapat diakses.",

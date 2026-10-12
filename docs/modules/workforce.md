@@ -168,4 +168,7 @@ from a request and uses the request's timezone for time records. Assigned review
 can open a source request from Approvals without gaining company-wide directory
 access. Refresh hides the previous private result until acquisition succeeds;
 changing account/company or leaving the route cancels its request. Authoring and
-review forms remain the next dashboard increment.
+review forms remain the next dashboard increment. Their domain/data contracts
+already support fresh action review, bounded actual-time submission, independent
+decisions and withdrawal. Receipt recovery retains the observed version and
+operation without acquiring a newer request first.

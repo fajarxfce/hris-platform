@@ -1,5 +1,6 @@
 import type { AssignWeeklySchedule } from "../../domain/usecases/assign-weekly-schedule";
 import type { CorrectAttendance } from "../../domain/usecases/correct-attendance";
+import type { DecideOvertimeRequest } from "../../domain/usecases/decide-overtime-request";
 import type { LoadAttendanceCorrectionHistory } from "../../domain/usecases/load-attendance-correction-history";
 import type { LoadAttendanceExceptions } from "../../domain/usecases/load-attendance-exceptions";
 import type { LoadCalendarReview } from "../../domain/usecases/load-calendar-review";
@@ -12,11 +13,18 @@ import type { LoadShift } from "../../domain/usecases/load-shift";
 import type { LoadShifts } from "../../domain/usecases/load-shifts";
 import type { LoadWorkforceEmployees } from "../../domain/usecases/load-workforce-employees";
 import type { ReviewAttendance } from "../../domain/usecases/review-attendance";
+import type { ReviewOvertimeAction } from "../../domain/usecases/review-overtime-action";
 import type { SaveHoliday } from "../../domain/usecases/save-holiday";
 import type { SaveShift } from "../../domain/usecases/save-shift";
 import type { SetRosterDay } from "../../domain/usecases/set-roster-day";
+import type { SubmitOvertimeActual } from "../../domain/usecases/submit-overtime-actual";
+import type { WithdrawOvertimeRequest } from "../../domain/usecases/withdraw-overtime-request";
 
 export type WorkforceUseCases = Readonly<{
+  reviewOvertimeAction: Pick<ReviewOvertimeAction, "execute">;
+  submitOvertimeActual: Pick<SubmitOvertimeActual, "execute">;
+  decideOvertimeRequest: Pick<DecideOvertimeRequest, "execute">;
+  withdrawOvertimeRequest: Pick<WithdrawOvertimeRequest, "execute">;
   loadOvertimeRequests: Pick<LoadOvertimeRequests, "execute">;
   loadOvertimeRequest: Pick<LoadOvertimeRequest, "execute">;
   loadAttendanceExceptions: Pick<LoadAttendanceExceptions, "execute">;

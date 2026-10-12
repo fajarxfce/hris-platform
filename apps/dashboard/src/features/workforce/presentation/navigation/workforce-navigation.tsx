@@ -3,6 +3,7 @@ import {
   CalendarStar20Regular,
   CalendarWorkWeek20Regular,
   Clock20Regular,
+  Timer20Regular,
   Warning20Regular,
 } from "@fluentui/react-icons";
 import type { AppNavigationItem } from "../../../../core/presentation/components/app-portal-shell";
@@ -11,13 +12,16 @@ import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import { canReadAttendance } from "../../domain/policies/attendance-policy";
 import { canReadCalendars } from "../../domain/policies/calendar-policy";
 import { canReadHolidays } from "../../domain/policies/holiday-policy";
+import { canBrowseCompanyOvertime } from "../../domain/policies/overtime-read-policy";
 import { canReadShifts } from "../../domain/policies/shift-policy";
 import { attendanceExceptionMessages } from "../i18n/attendance-exception-messages";
 import { attendanceMessages } from "../i18n/attendance-messages";
 import { calendarMessages } from "../i18n/calendar-messages";
 import { holidayMessages } from "../i18n/holiday-messages";
+import { overtimeMessages } from "../i18n/overtime-messages";
 import { shiftMessages } from "../i18n/shift-messages";
 import { attendanceExceptionsPath } from "../models/attendance-exception-route";
+import { overtimePath } from "../models/overtime-route";
 
 export function workforceNavigation(
   access: CompanyAccess | null,
@@ -25,6 +29,15 @@ export function workforceNavigation(
 ): readonly AppNavigationItem[] {
   const permissions = access?.permissions ?? [];
   return [
+    ...(canBrowseCompanyOvertime(permissions)
+      ? [
+          {
+            to: overtimePath,
+            label: overtimeMessages(locale).title,
+            icon: <Timer20Regular />,
+          },
+        ]
+      : []),
     ...(canReadAttendance(permissions)
       ? [
           {

@@ -9,6 +9,8 @@ import { EmployeeCalendarScreen } from "../bindings/employee-calendar-screen";
 import { HolidayEditorScreen } from "../bindings/holiday-editor-screen";
 import { HolidayScreen } from "../bindings/holiday-screen";
 import { HolidaysScreen } from "../bindings/holidays-screen";
+import { OvertimeRequestScreen } from "../bindings/overtime-request-screen";
+import { OvertimeRequestsScreen } from "../bindings/overtime-requests-screen";
 import { RosterDayScreen } from "../bindings/roster-day-screen";
 import { ShiftEditorScreen } from "../bindings/shift-editor-screen";
 import { ShiftScreen } from "../bindings/shift-screen";
@@ -21,6 +23,8 @@ import { shiftParameters, shiftsPath } from "../models/shift-route";
 export function WorkforceRoutes(props: WorkforceScreenProps) {
   return (
     <Routes>
+      <Route path="overtime" element={<OvertimeRequestsScreen {...props} />} />
+      <Route path="overtime/:overtimeId" element={<OvertimeRequestScreen {...props} />} />
       <Route path="attendance" element={<AttendanceDirectoryScreen {...props} />} />
       <Route path="attendance/exceptions" element={<AttendanceExceptionsScreen {...props} />} />
       <Route path="attendance/:employeeId" element={<EmployeeAttendanceScreen {...props} />} />

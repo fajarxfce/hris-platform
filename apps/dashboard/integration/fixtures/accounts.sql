@@ -41,7 +41,10 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000020', 'browser-retention-operator@example.invalid', 'Browser Retention Operator'),
   ('a0000000-0000-4000-8000-000000000021', 'browser-document-lifecycle-admin@example.invalid', 'Browser Document Lifecycle Admin'),
   ('a0000000-0000-4000-8000-000000000022', 'browser-document-lifecycle-operator@example.invalid', 'Browser Document Lifecycle Operator'),
-  ('a0000000-0000-4000-8000-000000000023', 'browser-retirement-operator@example.invalid', 'Browser Retirement Operator')
+  ('a0000000-0000-4000-8000-000000000023', 'browser-retirement-operator@example.invalid', 'Browser Retirement Operator'),
+  ('a0000000-0000-4000-8000-000000000024', 'browser-overtime-admin@example.invalid', 'Browser Overtime Admin'),
+  ('a0000000-0000-4000-8000-000000000025', 'browser-overtime-reviewer@example.invalid', 'Browser Overtime Reviewer'),
+  ('a0000000-0000-4000-8000-000000000026', 'browser-overtime-employee@example.invalid', 'Browser Overtime Employee')
 ) AS fixture(id, email, name)
 WHERE bootstrap.email = 'browser-admin@example.invalid'
 ON CONFLICT DO NOTHING;
@@ -63,7 +66,8 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000017'),
   ('a0000000-0000-4000-8000-000000000018'),
   ('a0000000-0000-4000-8000-000000000019'),
-  ('a0000000-0000-4000-8000-000000000021')
+  ('a0000000-0000-4000-8000-000000000021'),
+  ('a0000000-0000-4000-8000-000000000024')
 ) AS fixture(account_id)
 WHERE platform_permissions.account_id = (SELECT id FROM accounts WHERE email = 'browser-admin@example.invalid')
 ON CONFLICT DO NOTHING;

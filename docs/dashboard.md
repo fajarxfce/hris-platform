@@ -621,3 +621,18 @@ original operation, two versions and reason through retry and MFA recovery.
 Scope replacement aborts its owner and cannot publish late results into the next
 company. Retirement history opens the original revision reference and archive
 snapshot in the existing detail panel.
+
+## Overtime review
+
+The overtime directory defaults to the current company month and supports bounded
+date/status filters and explicit paging. Request details keep requested, actual
+and approved time distinct, show the original schedule, and open immutable change
+details without repeating the request. Displayed times use the request's timezone.
+Returning preserves directory filters and the page cursor.
+
+Account/company/grant changes replace query ownership. Refresh and failed reads
+remove the previous private result; MFA verification alone cannot restore it.
+Assigned reviewers reach their source request through Approvals and return there
+without a company directory grant. All reads still authorize independently on the
+server. Creation, actual-time submission, review and withdrawal forms remain the
+next increment.

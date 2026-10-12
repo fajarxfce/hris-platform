@@ -161,3 +161,11 @@ requested, actual and approved time separately. Directories use bounded date,
 employee and status filters with exclusive UUID cursors; history uses descending
 revisions. The client validates structural consistency while the API retains
 current company, employee, reviewer and delegation authorization.
+
+The dashboard now provides overtime directories, request details, original schedule
+evidence and paged change history. It retains date/status filters when returning
+from a request and uses the request's timezone for time records. Assigned reviewers
+can open a source request from Approvals without gaining company-wide directory
+access. Refresh hides the previous private result until acquisition succeeds;
+changing account/company or leaving the route cancels its request. Authoring and
+review forms remain the next dashboard increment.

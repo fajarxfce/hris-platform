@@ -1997,3 +1997,27 @@ input, limited directory grants, MFA errors and late cancellation/failure. The
 validated API and worker were deployed with the document and WireGuard overlays
 preserved; the VPN API and dashboard returned HTTP 200. Dashboard overtime pages
 remain the next increment; no mobile APK changed.
+
+## Dashboard overtime directories and request review
+
+Overtime now has date/status-filtered directories, company-pinned detail navigation,
+requested/actual/approved time, original work-calendar evidence and paged history.
+Change panels retain keyboard focus without reacquiring the request. Assigned
+approvers can follow their source request without company-wide overtime access.
+Scope replacement cancels obsolete requests; refresh hides private data until a
+fresh result succeeds, including after MFA verification.
+
+Architecture, formatting, TypeScript and all 1,236 dashboard unit tests passed.
+Fifteen overtime browser scenarios and eleven existing navigation/approval browser
+scenarios passed, covering paging, filters, timezone boundaries, cancellation,
+malformed responses, MFA recovery and contained English/Indonesian light/dark
+layouts. The real API/PostgreSQL browser scenario also passed: a later calendar
+change preserved the original overtime schedule, maker approval was rejected, an
+independent reviewer saw the assigned request without directory access, and
+original plan/submission/decision receipts replayed without extra history. Native
+employee reads and foreign-company rejection were verified in that scenario.
+
+The integration used its own disposable database and fictional accounts. The
+development VPN dashboard and API returned HTTP 200; no backend migration or
+runtime deployment was required. Overtime authoring/review forms and closing remain
+separate dashboard work.

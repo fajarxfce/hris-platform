@@ -4,6 +4,15 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.workforce.domain.entities.*
 import java.time.*
 
+fun validateOvertimeWorkDate(workDate: LocalDate, today: LocalDate): Result<Unit> =
+    if (
+        workDate.year !in 2000..2100 ||
+            workDate < today.minusDays(31) ||
+            workDate > today.plusDays(90)
+    )
+        Result.Failed(Failure(FailureKind.VALIDATION, "overtime_date_out_of_range"))
+    else Result.Success(Unit)
+
 fun validateOvertimeInterval(value: OvertimeInterval, field: String = "interval"): Result<Unit> {
     if (
         value.startsAt.nano != 0 ||

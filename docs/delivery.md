@@ -2069,3 +2069,21 @@ employee reads and foreign-company rejection.
 The scenario used an owned disposable database. The development VPN dashboard and
 API returned HTTP 200; no backend deployment or mobile APK changed. New-plan
 authoring and monthly closing remain separate dashboard work.
+
+## Overtime planning preparation
+
+Added bounded employee discovery and an individual planning review with the
+observed employment version, effective schedule and server-derived company date
+and timezone. Administrative overtime grants do not grant private-profile or
+general work-calendar access. Employee self-service may review only its current
+employment. Shared guards preserve scope and session assurance through pending
+reads; review creates no request, receipt or period row.
+
+Architecture and Kotlin formatting checks passed, along with 37 workforce domain,
+64 selected API/contract and 38 worker tests. Both application JARs built. Ten new
+HTTP/assurance cases cover discovery pagination, minimal output, ownership,
+company-local date limits, missing schedules, period availability, revocation,
+expired MFA after acquisition, concurrent readers and cancellation cleanup. One
+domain case verifies the shared inclusive planning-date limits. OpenAPI generation
+includes both endpoints. This increment has not changed the development runtime
+or mobile APK; dashboard planning remains in progress.

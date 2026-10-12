@@ -63,6 +63,14 @@ check rolls back business state, history, approval effects and the operation
 receipt together. Detail readers share the employee and approval guards while
 mutations retain exclusive ownership; cancellation releases transaction resources.
 
+Overtime planning discovery acquires shared people and access guards. Its separate
+review acquires the shared schedule guard before people and access guards, then
+returns the minimal employment reference and resolved day. Use cases own date,
+employment, current scope and period-availability policy through existing repository
+contracts. Review only reads an existing period; it never creates one or reserves
+eligibility. Assurance is rechecked after acquisition, and the plan command
+independently authorizes and validates its write under its mutation guards.
+
 Company attendance exceptions use one bounded SQL projection under shared people,
 company, membership and account guards. They do not acquire employee/day locks:
 evidence, reviews and correction heads come from the same statement snapshot,

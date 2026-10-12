@@ -174,3 +174,20 @@ retains the observed version and operation without acquiring a newer request;
 an ambiguous result cannot become editable after a later rejection. Access and MFA
 failures hide private details during recovery. New-plan authoring and closing
 remain the next dashboard work.
+
+Planning preparation uses `GET /workforce/overtime/planning/employees` with a
+work date, optional name/number query and bounded cursor. It requires
+`overtime.manage` and returns up to 50 display references with observed employment
+versions. Discovery validates the date range and current access; it does not
+guarantee that every result has an eligible schedule or employment status.
+
+`GET /workforce/overtime/planning/employees/{employeeId}` returns the employee,
+requested work date, server-derived company date/timezone and effective schedule.
+Current employees may review their own reference with `overtime.self.manage`.
+Both endpoints apply the plan's preceding-31/following-90-day range and current
+session assurance after their shared guards.
+
+Individual review creates no business records, receipts or period rows. It rejects
+missing schedules, inactive employment and an observed processing/closed month.
+The plan command independently rechecks current scope, employment, schedule,
+period availability and capacity when saving; review does not reserve eligibility.

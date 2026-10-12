@@ -106,10 +106,8 @@ class PlanOvertimeRequest(
             }
             val mutable = requireMutablePeriod((periodResult as Result.Success).value)
             if (mutable is Result.Failed) return@run mutable
-            if (workDate < today.minusDays(31) || workDate > today.plusDays(90))
-                return@run Result.Failed(
-                    Failure(FailureKind.VALIDATION, "overtime_date_out_of_range")
-                )
+            val date = validateOvertimeWorkDate(workDate, today)
+            if (date is Result.Failed) return@run date
             val employeeResult = people.find(company, employeeId, workDate)
             if (employeeResult is Result.Failed) return@run employeeResult
             val employee =

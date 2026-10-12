@@ -9,6 +9,24 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class OvertimePolicyTest {
+    @Test
+    fun planningDateBoundsAreSharedByDiscoveryReviewAndCommand() {
+        val today = LocalDate.parse("2026-10-01")
+        for (date in listOf(today.minusDays(31), today, today.plusDays(90))) assertTrue(
+            validateOvertimeWorkDate(date, today) is Result.Success
+        )
+        for (date in
+            listOf(
+                today.minusDays(32),
+                today.plusDays(91),
+                LocalDate.of(1999, 12, 31),
+                LocalDate.of(2101, 1, 1),
+            )) assertEquals(
+            "overtime_date_out_of_range",
+            (validateOvertimeWorkDate(date, today) as Result.Failed).failure.code,
+        )
+    }
+
     private val date = LocalDate.parse("2026-09-01")
     private val holiday = ScheduledDay.Off(date, CalendarOrigin.HOLIDAY, 0, UUID.randomUUID())
     private val window =

@@ -31,8 +31,8 @@ abstract class OvertimeApiFixture : WorkPeriodApiFixture() {
         accountProbe.current.getAndSet(null)?.release?.countDown()
     }
 
-    protected fun overtimeFixture(): Fixture {
-        val f = fixture()
+    protected fun overtimeFixture(email: String = "admin@example.test"): Fixture {
+        val f = fixture(email)
         database()
             .update(
                 "insert into membership_permissions(company_id,account_id,permission) values(?,?,'overtime.self.manage')",

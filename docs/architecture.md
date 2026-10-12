@@ -56,6 +56,13 @@ Attendance capture, capture windows, verification, corrections, daily reads and
 correction history apply the same interactive assurance policy after their guards.
 An original receipt retains its data but still requires current session assurance.
 
+Overtime reads and commands apply the identity session policy after their resource
+and access guards. They check current assurance again before releasing private
+results or completing a transaction, including receipt replay. A late failed
+check rolls back business state, history, approval effects and the operation
+receipt together. Detail readers share the employee and approval guards while
+mutations retain exclusive ownership; cancellation releases transaction resources.
+
 Company attendance exceptions use one bounded SQL projection under shared people,
 company, membership and account guards. They do not acquire employee/day locks:
 evidence, reviews and correction heads come from the same statement snapshot,

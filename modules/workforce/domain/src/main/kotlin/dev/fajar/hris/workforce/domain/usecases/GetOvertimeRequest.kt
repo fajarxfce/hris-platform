@@ -4,7 +4,8 @@ import dev.fajar.hris.approvals.domain.entities.*
 import dev.fajar.hris.approvals.domain.policies.*
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -24,11 +25,14 @@ class GetOvertimeRequest(
     private val transactions: TransactionRunner,
     private val clock: Clock,
     private val approvals: ApprovalRepository,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(actor: Actor, id: UUID, after: Long?, limit: Int): Result<OvertimeRequestDetails> {
         if ((after ?: 0) < 0 || limit !in 1..200)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_page"))
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         return transactions.run(actor) {
             val original = overtime.find(company, id)
             if (original is Result.Failed) return@run original
@@ -41,7 +45,7 @@ class GetOvertimeRequest(
             if (lock is Result.Failed) return@run lock
             val peopleLock = people.lockReportingLines(company, shared = true)
             if (peopleLock is Result.Failed) return@run peopleLock
-            val approvalLock = approvals.lock(company)
+            val approvalLock = approvals.lock(company, shared = true)
             if (approvalLock is Result.Failed) return@run approvalLock
             val found = overtime.find(company, id)
             if (found is Result.Failed) return@run found
@@ -69,10 +73,10 @@ class GetOvertimeRequest(
                 val accountLock = identities.lockAccount(accountId, shared = true)
                 if (accountLock is Result.Failed) return@run accountLock
             }
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val now = clock.instant()
@@ -116,8 +120,10 @@ class GetOvertimeRequest(
                     current?.person?.accountId,
                     now,
                 )
-            overtime.history(company, id, after, limit).map {
-                OvertimeRequestDetails(request, approval, it, actions)
+            overtime.history(company, id, after, limit).flatMap { history ->
+                validateCompanySessionActor(actor, access, clock.instant(), security).map {
+                    OvertimeRequestDetails(request, approval, history, actions)
+                }
             }
         }
     }

@@ -4,7 +4,8 @@ import dev.fajar.hris.approvals.domain.entities.*
 import dev.fajar.hris.approvals.domain.policies.*
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -27,6 +28,7 @@ class SubmitOvertimeActual(
     private val transactions: TransactionRunner,
     private val clock: Clock,
     private val approvals: ApprovalRepository,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -42,7 +44,9 @@ class SubmitOvertimeActual(
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_overtime_actual"))
         val valid = validateOvertimeInterval(actual, "actual")
         if (valid is Result.Failed) return valid
-        val company = requireNotNull(actor.companyId)
+        val company =
+            actor.companyId
+                ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         val key =
             OperationKey(
                 "overtime.submit_actual",
@@ -82,10 +86,10 @@ class SubmitOvertimeActual(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId, shared = true)
             if (accountLock is Result.Failed) return@run accountLock
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             if (live.permissions.none { it in setOf("overtime.manage", "overtime.self.manage") })
@@ -104,8 +108,9 @@ class SubmitOvertimeActual(
                 return@run Result.Failed(
                     Failure(FailureKind.NOT_FOUND, "overtime_request_not_found")
                 )
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run validateCompanySessionActor(actor, access, clock.instant(), security)
+                    .map { receipt }
             }
             val found = overtime.find(company, id)
             if (found is Result.Failed) return@run found
@@ -199,6 +204,9 @@ class SubmitOvertimeActual(
                             ),
                         )
                         .flatMap { operations.record(actor, key, receipt) }
+                        .flatMap {
+                            validateCompanySessionActor(actor, access, clock.instant(), security)
+                        }
                         .map { receipt }
                 }
         }

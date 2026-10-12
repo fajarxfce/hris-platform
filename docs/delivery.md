@@ -1963,3 +1963,20 @@ The original lost-response and competing-correction checks continued to pass.
 Desktop and narrow light/dark views were inspected; desktop action visibility is
 also asserted against the actual API fixture. This dashboard increment needed no
 new mobile APK.
+
+## Overtime session assurance
+
+Overtime reads and commands now apply the existing identity session policy after
+their resource/access guards and before completing the operation. Original
+receipts retain their outcome but require current assurance. Expiry before commit
+rolls back the request, immutable history, approval effects, audit/outbox, mobile
+invalidation and receipt together. Detail readers share employee and approval
+guards while writers retain exclusive ownership.
+
+Architecture and formatting checks, both application JAR builds, 36 Workforce
+domain tests, 37 overtime API tests and 38 worker tests passed. Fifteen new cases
+cover missing company scope, MFA expiry during account acquisition, read-result
+acquisition and transaction completion, original-key recovery, cancellation and
+concurrent detail readers. Existing access, delegation, overlapping windows,
+period closing, immutable history and replay checks also passed. No API response
+shape, database migration or mobile APK changed in this increment.

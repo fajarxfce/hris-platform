@@ -145,6 +145,13 @@ Active windows cannot overlap for the same employee, including across adjacent w
 
 Every mutation rechecks live company membership and credentials without expanding the permissions resolved when the request began. Business state, immutable change history, approval consequences, audit/outbox, mobile invalidation, and command receipt commit together. Database constraints reject incomplete history and mismatched approval/business state. Retries return the original receipt only while the caller remains authorized.
 
+Interactive reads and commands require current session assurance after acquiring
+their guards and before returning data or completing the transaction. Expired MFA
+cannot authorize an original receipt or partially commit a command. Independent
+detail readers share the employee and approval guards across current state and
+history; writers continue to acquire exclusive ownership. Cancellation unwinds
+the transaction without retaining a reader's locks.
+
 Monthly closing holds the same month gate as overtime mutations and refuses unresolved plans/reviews. Closed employee snapshots include each approved request ID, version, actual interval, approved minutes, and original schedule. New plans and actual-time changes cannot enter a processing/closed month. These are verified time facts; statutory wage rates and payable eligibility belong to payroll.
 
 Employee-owned requests are registered as `OVERTIME_REQUESTS` in the [mobile change feed](../synchronization.md). Approver access is specific to assigned/delegated requests; it does not grant a directory export.

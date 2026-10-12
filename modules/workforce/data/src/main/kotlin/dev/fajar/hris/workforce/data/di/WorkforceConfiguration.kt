@@ -615,6 +615,7 @@ class WorkforceConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         schedules: ScheduleRepository,
+        security: IdentitySecurityPolicy,
     ) =
         PlanOvertimeRequest(
             overtime,
@@ -628,6 +629,7 @@ class WorkforceConfiguration {
             transactions,
             clock,
             schedules,
+            security,
         )
 
     @Bean
@@ -643,6 +645,7 @@ class WorkforceConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         approvals: ApprovalRepository,
+        security: IdentitySecurityPolicy,
     ) =
         SubmitOvertimeActual(
             overtime,
@@ -656,6 +659,7 @@ class WorkforceConfiguration {
             transactions,
             clock,
             approvals,
+            security,
         )
 
     @Bean
@@ -671,6 +675,7 @@ class WorkforceConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         approvals: ApprovalRepository,
+        security: IdentitySecurityPolicy,
     ) =
         WithdrawOvertimeRequest(
             overtime,
@@ -684,6 +689,7 @@ class WorkforceConfiguration {
             transactions,
             clock,
             approvals,
+            security,
         )
 
     @Bean
@@ -699,6 +705,7 @@ class WorkforceConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         approvals: ApprovalRepository,
+        security: IdentitySecurityPolicy,
     ) =
         DecideOvertimeRequest(
             overtime,
@@ -712,6 +719,7 @@ class WorkforceConfiguration {
             transactions,
             clock,
             approvals,
+            security,
         )
 
     @Bean
@@ -725,6 +733,7 @@ class WorkforceConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         approvals: ApprovalRepository,
+        security: IdentitySecurityPolicy,
     ) =
         GetOvertimeRequest(
             overtime,
@@ -736,6 +745,7 @@ class WorkforceConfiguration {
             transactions,
             clock,
             approvals,
+            security,
         )
 
     @Bean
@@ -747,5 +757,16 @@ class WorkforceConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = ListOvertimeRequests(overtime, people, companies, members, identities, transactions, clock)
+        security: IdentitySecurityPolicy,
+    ) =
+        ListOvertimeRequests(
+            overtime,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 }

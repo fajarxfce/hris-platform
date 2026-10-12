@@ -5,6 +5,7 @@ import dev.fajar.hris.core.http.*
 import dev.fajar.hris.payroll.delivery.mappers.*
 import dev.fajar.hris.payroll.delivery.pdf.*
 import dev.fajar.hris.payroll.delivery.responses.*
+import dev.fajar.hris.payroll.domain.entities.PayrollPayslipReadScope
 import dev.fajar.hris.payroll.domain.usecases.*
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -31,25 +32,31 @@ class PayrollPayslipController(
         @RequestParam(required = false) employeeId: UUID?,
         @RequestParam(required = false) after: String?,
         @RequestParam(defaultValue = "50") limit: Int,
+        @RequestParam(defaultValue = "AUTHORIZED") scope: PayrollPayslipReadScope,
     ): Page<PayrollPayslipSummaryResponse> =
-        list.execute(actor, from, until, employeeId, after, limit).response().let {
+        list.execute(actor, from, until, employeeId, after, limit, scope).response().let {
             Page(it.items.map { item -> item.toResponse() }, it.nextCursor)
         }
 
     @GetMapping("/{id}")
-    fun get(actor: Actor, @PathVariable id: UUID): PayrollPayslipResponse =
-        get.execute(actor, id).response().toResponse()
+    fun get(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestParam(defaultValue = "AUTHORIZED") scope: PayrollPayslipReadScope,
+    ): PayrollPayslipResponse = get.execute(actor, id, scope).response().toResponse()
 
     @GetMapping("/{id}/pdf", produces = ["application/pdf"])
     fun pdf(
         actor: Actor,
         @PathVariable id: UUID,
         @RequestParam(defaultValue = "ID") language: PayrollDocumentLanguage,
+        @RequestParam(defaultValue = "AUTHORIZED") scope: PayrollPayslipReadScope,
         request: HttpServletRequest,
         response: HttpServletResponse,
     ) {
-        val payslip = get.execute(actor, id).response()
+        val payslip = get.execute(actor, id, scope).response()
         val bytes = pdf.write(payslip, language)
+        get.execute(actor, id, scope).response()
         val digest = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes))
         writeBinaryDownloadResponse(
             request,
@@ -63,13 +70,16 @@ class PayrollPayslipController(
             downloads,
             PAYSLIP_PDF_MAXIMUM_BYTES,
         ) { offset, length ->
-            get.execute(actor, id).map {
+            get.execute(actor, id, scope).map {
                 bytes.copyOfRange(offset.toInt(), offset.toInt() + length)
             }
         }
     }
 
     @GetMapping("/{id}/payments")
-    fun payments(actor: Actor, @PathVariable id: UUID): PayrollPaymentProgressResponse =
-        payments.execute(actor, id).response().toResponse()
+    fun payments(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestParam(defaultValue = "AUTHORIZED") scope: PayrollPayslipReadScope,
+    ): PayrollPaymentProgressResponse = payments.execute(actor, id, scope).response().toResponse()
 }

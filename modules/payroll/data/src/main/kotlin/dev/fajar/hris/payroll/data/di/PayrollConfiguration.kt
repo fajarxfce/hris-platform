@@ -959,7 +959,19 @@ class PayrollConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetPayrollPayslip(assessments, people, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollPayslip(
+            assessments,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun listPayrollPayslips(
@@ -970,6 +982,7 @@ class PayrollConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         ListPayrollPayslips(
             assessments,
@@ -979,6 +992,7 @@ class PayrollConfiguration {
             identities,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -1233,5 +1247,17 @@ class PayrollConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetPayrollPayslipPayments(payments, people, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollPayslipPayments(
+            payments,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 }

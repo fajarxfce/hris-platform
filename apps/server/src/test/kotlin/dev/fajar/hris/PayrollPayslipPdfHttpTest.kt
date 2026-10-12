@@ -159,7 +159,7 @@ class PayrollPayslipPdfHttpTest : PayrollFinalizationApiFixture() {
         val f = approved()
         val p = f.calculation.people.payroll
         val id = published(f)
-        val path = "/api/v1/companies/${p.company}/payroll/payslips/$id/pdf"
+        val path = "/api/v1/companies/${p.company}/payroll/payslips/$id/pdf?scope=SELF"
         val exchanged =
             command(
                 p.owner.client,
@@ -187,6 +187,84 @@ class PayrollPayslipPdfHttpTest : PayrollFinalizationApiFixture() {
             404,
             "payroll_payslip_not_found",
         )
+    }
+
+    @Test
+    fun selfScopeAlsoProtectsPdfMetadataAndConditionalRequestsFromFinanceReaders() {
+        val f = approved()
+        val p = f.calculation.people.payroll
+        val id = published(f)
+        val path = "/api/v1/companies/${p.company}/payroll/payslips/$id/pdf"
+        val own = download(p.owner.client, "$path?scope=SELF&language=EN")
+        assertEquals(200, own.statusCode())
+        val etag = own.headers().firstValue("ETag").orElseThrow()
+        assertArrayEquals(own.body(), download(p.operator.client, "$path?language=EN").body())
+        for (headers in
+            listOf(
+                emptyMap(),
+                mapOf("If-None-Match" to "*"),
+                mapOf("If-None-Match" to etag),
+                mapOf("Range" to "bytes=0-31", "If-Range" to etag),
+            )) {
+            val rejected =
+                download(p.operator.client, "$path?scope=SELF&language=EN", headers = headers)
+            failure(rejected, 404, "payroll_payslip_not_found")
+            assertTrue(rejected.headers().firstValue("ETag").isEmpty)
+        }
+        val hidden = download(p.operator.client, "$path?scope=SELF", method = "HEAD")
+        assertEquals(404, hidden.statusCode())
+        assertTrue(hidden.headers().firstValue("ETag").isEmpty)
+        assertEquals(0, hidden.body().size)
+        val partial =
+            download(
+                p.owner.client,
+                "$path?scope=SELF&language=EN",
+                headers = mapOf("Range" to "bytes=0-31", "If-Range" to etag),
+            )
+        assertEquals(206, partial.statusCode())
+        assertArrayEquals(own.body().copyOfRange(0, 32), partial.body())
+        assertEquals(
+            304,
+            download(
+                    p.owner.client,
+                    "$path?scope=SELF&language=EN",
+                    headers = mapOf("If-None-Match" to etag),
+                )
+                .statusCode(),
+        )
+        failure(download(p.owner.client, "$path?scope=unsupported"), 400, "invalid_request")
+    }
+
+    @Test
+    fun revocationAfterRenderingStillProtectsConditionalMetadata() {
+        val f = approved()
+        val p = f.calculation.people.payroll
+        val id = published(f)
+        val path = "/api/v1/companies/${p.company}/payroll/payslips/$id/pdf?scope=SELF"
+        val barrier = AccountLockProbe.Barrier(p.owner.account, occurrence = 2)
+        accountProbe.current.set(barrier)
+        Executors.newSingleThreadExecutor().use { pool ->
+            val pending =
+                pool.submit<HttpResponse<ByteArray>> {
+                    download(p.owner.client, path, headers = mapOf("If-None-Match" to "*"))
+                }
+            try {
+                assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                database()
+                    .update(
+                        "update company_memberships set active=false where company_id=? and account_id=?",
+                        p.company,
+                        p.owner.account,
+                    )
+                barrier.release.countDown()
+                val response = pending.get(10, TimeUnit.SECONDS)
+                failure(response, 403, "company_access_denied")
+                assertTrue(response.headers().firstValue("ETag").isEmpty)
+            } finally {
+                barrier.release.countDown()
+                accountProbe.current.set(null)
+            }
+        }
     }
 
     @Test

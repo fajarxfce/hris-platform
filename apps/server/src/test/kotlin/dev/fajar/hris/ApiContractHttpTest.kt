@@ -654,6 +654,23 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun payslipReadScopesAreExplicitAndPreserveTheAuthorizedDefault() {
+        val paths = contract()["paths"]
+        for (suffix in listOf("", "/{id}", "/{id}/payments", "/{id}/pdf")) {
+            val operation = paths["/api/v1/companies/{companyId}/payroll/payslips$suffix"]["get"]
+            val scope = operation["parameters"].single { it["name"].asString() == "scope" }
+            assertEquals("query", scope["in"].asString())
+            assertFalse(scope["required"].asBoolean())
+            assertEquals("AUTHORIZED", scope["schema"]["default"].asString())
+            assertEquals(
+                setOf("AUTHORIZED", "SELF"),
+                scope["schema"]["enum"].iterator().asSequence().map { it.asString() }.toSet(),
+            )
+            assertTrue(operation["x-hris-company-admission"].asBoolean())
+        }
+    }
+
+    @Test
     fun documentationRequiresACurrentAuthenticatedAccount() {
         val browser = client()
         assertEquals(401, get(browser, "/api/v1/openapi").statusCode())

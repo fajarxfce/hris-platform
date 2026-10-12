@@ -2313,3 +2313,18 @@ where 271 desktop tests, five Chromium tests, Android dev assembly and applicati
 Web compilation passed. After notice, the validated mobile APK was installed on
 the authorized Android 16 phone with install-only delivery. No backend code,
 migration, runtime deployment, release or physical-device UI interaction was required.
+
+## Employee payslip scope and session assurance
+
+Payslip list, detail, payment-progress and PDF endpoints now accept explicit `SELF`
+scope. It narrows company-wide finance grants to owned employments; the default
+`AUTHORIZED` behavior remains compatible with existing clients. Current assurance
+is checked after resource/access guards and after acquisition. PDF delivery also
+reauthorizes after rendering before HEAD/304 metadata and before content reads.
+
+The affected 57 API tests, 38 worker tests, 56 payroll domain tests and five PDF
+delivery tests passed. Thirteen new cases cover explicit self scope, conditional
+PDF ownership, revocation after rendering, post-guard/post-read MFA expiry,
+interruption recovery and the generated API contract. Format and architecture
+checks passed; both application JARs built. No migration changed. Native payslip
+pages and file export remain the next integration step.

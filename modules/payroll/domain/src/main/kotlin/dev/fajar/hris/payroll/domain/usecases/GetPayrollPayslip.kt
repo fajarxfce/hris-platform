@@ -1,13 +1,16 @@
 package dev.fajar.hris.payroll.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.payroll.domain.entities.PayrollPayslip
+import dev.fajar.hris.payroll.domain.entities.PayrollPayslipReadScope
 import dev.fajar.hris.payroll.domain.policies.canReadPayrollPayslips
 import dev.fajar.hris.payroll.domain.repositories.PayrollAssessmentRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
+import java.time.Clock
 import java.util.UUID
 
 class GetPayrollPayslip(
@@ -17,8 +20,14 @@ class GetPayrollPayslip(
     private val members: MembershipRepository,
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
+    private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
-    fun execute(actor: Actor, id: UUID): Result<PayrollPayslip> {
+    fun execute(
+        actor: Actor,
+        id: UUID,
+        scope: PayrollPayslipReadScope = PayrollPayslipReadScope.AUTHORIZED,
+    ): Result<PayrollPayslip> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
@@ -33,16 +42,20 @@ class GetPayrollPayslip(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val accessed = identities.access(actor.accountId, company)
+            if (accessed is Result.Failed) return@run accessed
+            val access = (accessed as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val current = (checked as Result.Success).value
             if (!canReadPayrollPayslips(current))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
             val allowedEmployees =
-                if ("payroll.read" in current.permissions) null
+                if (
+                    scope == PayrollPayslipReadScope.AUTHORIZED &&
+                        "payroll.read" in current.permissions
+                )
+                    null
                 else {
                     val owned = people.employeeIdsForAccount(company, actor.accountId, 201)
                     if (owned is Result.Failed) return@run owned
@@ -57,10 +70,12 @@ class GetPayrollPayslip(
                         )
                     ids.toSet()
                 }
-            assessments.payslip(company, id, allowedEmployees).flatMap {
-                if (it == null)
-                    Result.Failed(Failure(FailureKind.NOT_FOUND, "payroll_payslip_not_found"))
-                else Result.Success(it)
+            assessments.payslip(company, id, allowedEmployees).flatMap { payslip ->
+                validateCompanySessionActor(actor, access, clock.instant(), security).flatMap {
+                    if (payslip == null)
+                        Result.Failed(Failure(FailureKind.NOT_FOUND, "payroll_payslip_not_found"))
+                    else Result.Success(payslip)
+                }
             }
         }
     }

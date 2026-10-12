@@ -11,6 +11,10 @@ Finalized, published payroll assessments provide the immutable payslip. Draft, c
 
 Cookie and native bearer authentication are supported. PDF clients should accept both `application/pdf` and `application/problem+json`, then inspect status and content type before saving bytes. Error codes and parameters remain unlocalized; the selected document language changes only PDF labels and number formatting.
 
+All four endpoints accept `scope=AUTHORIZED|SELF`, defaulting to `AUTHORIZED` for existing clients. `AUTHORIZED` follows the reader's current company/self grants. Employee-facing screens should send `scope=SELF`: it always limits results to the account's own employments, even when the account also has company-wide finance access. Scope never grants a missing permission. An unbound self reader receives an empty list or `payroll_payslip_not_found` for detail, payment progress and PDF; an explicit foreign `employeeId` filter returns `access_denied`. Keep scope unchanged when following a page cursor.
+
+Interactive reads check current credentials, intersected permissions and MFA after acquiring their guards and again after data acquisition. PDF rendering happens outside the transaction; access is rechecked afterward before returning metadata, including HEAD/304 responses, and before releasing content bytes.
+
 The attachment name contains the assessment ID and language, without employee names. Responses set `Content-Length`, a SHA-256 ETag, `private, no-store`, and `nosniff`. The shared download transport supports one byte range, `If-Range`, authorized `If-None-Match`/304 responses, and HEAD metadata. Unsupported ranges return 416. Conditional requests recheck current access; a cached ETag is not authorization. PDF generation is eager and bounded, including when negotiating metadata. The JSON summary collections remain the lightweight [mobile synchronization](synchronization.md) contract. Sensitive offline copies need the account/company partition and access-expiry policy in the [mobile API](mobile-api.md).
 
 ## Representation

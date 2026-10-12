@@ -91,6 +91,12 @@ The command compares it after acquiring the schedule guard and resolving current
 facts. Original receipts precede that comparison; the optional precondition is
 included in operation identity only when supplied, preserving older receipts.
 
+Payslip list, detail and payment-progress reads revalidate current session assurance
+after their guards and again after acquisition. Explicit `SELF` scope narrows
+company-wide finance grants to owned employments without granting new authority.
+PDF rendering runs outside database transactions; the delivery adapter reauthorizes
+after rendering before conditional metadata and again before content is released.
+
 Company attendance exceptions use one bounded SQL projection under shared people,
 company, membership and account guards. They do not acquire employee/day locks:
 evidence, reviews and correction heads come from the same statement snapshot,

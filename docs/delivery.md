@@ -1409,3 +1409,21 @@ failed-precondition rollback and recovery, competing confirmations, replay after
 withdrawal and policy replacement, pending source guards and interruption cleanup.
 No new DI graph or database schema was introduced. Mobile command persistence and
 the creation interface remain their own integration work.
+
+## Employee leave submission in mobile
+
+[HRIS Mobile 7aa9bcd](https://github.com/fajarxfce/hris-mobile/commit/7aa9bcd)
+connects effective leave types, controlled dates and daily portions, a multiline
+reason, server calculation review and encrypted durable confirmation. Retry keeps
+the original request/operation IDs and reviewed facts. Uncertain delivery cannot
+be discarded, and confirmed delivery opens the canonical request after reconciliation.
+The form blocks types requiring document evidence until that integration is available.
+
+Root checks passed with 592 JVM/UI tests, 42 Leave presentation Chromium tests,
+two localization Chromium tests and Android/production Web builds. API 35 emulator
+acceptance excluded Saturday from a three-date selection, reserved the expected
+days, restored a confirmed input after process restart with the API blocked, and
+delivered it after reconnection. Withdrawal returned the available balance to its
+baseline. Dark mode and 200% text were inspected. The validated APK was installed
+on the connected phone using install-only. This does not claim physical-phone UI
+interaction, iOS acceptance or runtime performance measurements.

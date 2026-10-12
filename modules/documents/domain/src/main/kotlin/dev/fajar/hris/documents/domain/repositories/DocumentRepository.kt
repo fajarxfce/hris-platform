@@ -30,6 +30,14 @@ interface DocumentRepository {
         limit: Int,
     ): Result<Page<DocumentRevision>>
 
+    fun published(
+        companyId: UUID,
+        employmentId: UUID,
+        classification: DocumentClassification,
+        after: UUID?,
+        limit: Int,
+    ): Result<Page<DocumentEvidence>>
+
     fun create(actor: Actor, document: Document): Result<Unit>
 
     fun addRevision(

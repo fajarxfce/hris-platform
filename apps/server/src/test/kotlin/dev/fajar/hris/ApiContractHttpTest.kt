@@ -34,6 +34,66 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun selfDocumentDiscoveryDocumentsBoundedOwnedReferencesAndPublishedEvidence() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/documents/me"
+        for (path in listOf("$base/employments", "$base/evidence")) {
+            val operation = api["paths"][path]["get"]
+            assertTrue(operation["x-hris-company-admission"].asBoolean())
+            val parameters = operation["parameters"].associateBy { it["name"].asString() }
+            assertEquals(50, parameters.getValue("limit")["schema"]["maximum"].asInt())
+            assertEquals(1, parameters.getValue("limit")["schema"]["minimum"].asInt())
+            assertEquals(20, parameters.getValue("limit")["schema"]["default"].asInt())
+            assertEquals("integer", parameters.getValue("limit")["schema"]["type"].asString())
+            assertFalse(parameters.containsKey("Idempotency-Key"))
+            if (path.endsWith("/employments")) {
+                assertEquals(32, parameters.getValue("after")["schema"]["maxLength"].asInt())
+            } else {
+                assertTrue(parameters.getValue("employmentId")["required"].asBoolean())
+                assertEquals(
+                    "PERSONAL",
+                    parameters.getValue("classification")["schema"]["default"].asString(),
+                )
+                assertEquals(
+                    setOf("PERSONAL", "RECEIPT"),
+                    parameters
+                        .getValue("classification")["schema"]["enum"]
+                        .iterator()
+                        .asSequence()
+                        .map { it.asString() }
+                        .toSet(),
+                )
+            }
+        }
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("id", "employeeNumber", "status", "version"),
+            schemas["DocumentEmploymentResponse"]["properties"].properties().map { it.key }.toSet(),
+        )
+        assertEquals(
+            setOf("accountId", "companyId", "employmentId", "classification", "documents"),
+            schemas["SelfDocumentEvidenceResponse"]["properties"]
+                .properties()
+                .map { it.key }
+                .toSet(),
+        )
+        assertEquals(
+            setOf(
+                "documentId",
+                "revisionId",
+                "revisionNumber",
+                "title",
+                "fileName",
+                "mediaType",
+                "size",
+                "sha256",
+                "validatedAt",
+            ),
+            schemas["DocumentEvidenceResponse"]["properties"].properties().map { it.key }.toSet(),
+        )
+    }
+
+    @Test
     fun selfLeavePreparationDocumentsItsBoundedReadWithoutAnIdempotencyRequirement() {
         val api = contract()
         val operation =

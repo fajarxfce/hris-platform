@@ -48,6 +48,48 @@ class DocumentsConfiguration {
     fun documents(source: DocumentDataSource): DocumentRepository = StoredDocumentRepository(source)
 
     @Bean
+    fun listSelfDocumentEmployments(
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListSelfDocumentEmployments(
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun listSelfDocumentEvidence(
+        documents: DocumentRepository,
+        profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListSelfDocumentEvidence(
+            documents,
+            profiles,
+            people,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun startDocumentUpload(
         documents: DocumentRepository,
         retention: DocumentRetentionRepository,

@@ -1,6 +1,7 @@
 package dev.fajar.hris.documents.data.datasources
 
 import dev.fajar.hris.documents.data.models.DocumentCapacityData
+import dev.fajar.hris.documents.data.models.PublishedDocumentData
 import dev.fajar.hris.schema.Tables.*
 import dev.fajar.hris.schema.tables.records.*
 import java.util.UUID
@@ -90,6 +91,31 @@ class PostgresDocumentDataSource(private val sql: DSLContext) : DocumentDataSour
     override fun insertDocument(row: DocumentsRecord) {
         sql.insertInto(DOCUMENTS).set(row).execute()
     }
+
+    override fun published(
+        companyId: UUID,
+        employmentId: UUID,
+        classification: String,
+        after: UUID?,
+        limit: Int,
+    ): List<PublishedDocumentData> =
+        sql.select(DOCUMENTS.asterisk(), DOCUMENT_REVISIONS.asterisk())
+            .from(DOCUMENTS)
+            .join(DOCUMENT_REVISIONS)
+            .on(
+                DOCUMENT_REVISIONS.COMPANY_ID.eq(DOCUMENTS.COMPANY_ID),
+                DOCUMENT_REVISIONS.DOCUMENT_ID.eq(DOCUMENTS.ID),
+                DOCUMENT_REVISIONS.ID.eq(DOCUMENTS.CURRENT_REVISION_ID),
+            )
+            .where(
+                DOCUMENTS.COMPANY_ID.eq(companyId),
+                DOCUMENTS.EMPLOYMENT_ID.eq(employmentId),
+                DOCUMENTS.CLASSIFICATION.eq(classification),
+                after?.let { DOCUMENTS.ID.gt(it) } ?: DSL.noCondition(),
+            )
+            .orderBy(DOCUMENTS.ID)
+            .limit(limit)
+            .fetch { PublishedDocumentData(it.into(DOCUMENTS), it.into(DOCUMENT_REVISIONS)) }
 
     override fun incrementRevision(companyId: UUID, id: UUID, version: Long) =
         sql.update(DOCUMENTS)

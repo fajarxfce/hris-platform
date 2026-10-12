@@ -1,6 +1,7 @@
 package dev.fajar.hris.documents.data.datasources
 
 import dev.fajar.hris.documents.data.models.DocumentCapacityData
+import dev.fajar.hris.documents.data.models.PublishedDocumentData
 import dev.fajar.hris.schema.tables.records.*
 import java.util.UUID
 
@@ -31,6 +32,14 @@ interface DocumentDataSource {
     ): List<DocumentRevisionsRecord>
 
     fun insertDocument(row: DocumentsRecord)
+
+    fun published(
+        companyId: UUID,
+        employmentId: UUID,
+        classification: String,
+        after: UUID?,
+        limit: Int,
+    ): List<PublishedDocumentData>
 
     fun incrementRevision(companyId: UUID, id: UUID, version: Long): DocumentsRecord?
 

@@ -1478,3 +1478,23 @@ appeared. Its trace contained 465 development module requests. After the change,
 all 409 browser scenarios, 13 real API scenarios and the real worker publication
 scenario passed locally. Configuration formatting also passed. This is validation
 of the production artifact and does not establish a runtime performance claim.
+
+## Owned document evidence discovery
+
+Documents now provides independent self-service employment discovery and a bounded
+catalog of published evidence. Responses retain account/company/employment scope
+and expose accepted revision metadata without object keys or storage I/O. A pending
+replacement keeps the earlier published revision available. Current authority and
+MFA are checked after access guards; administrative grants do not expand self access.
+
+Formatting, architecture checks, 13 document domain tests, nine data tests, 19 new
+self-service API cases, API contract/download/retirement regressions and all 38
+worker tests passed. API and worker JARs were rebuilt and deployed. The private
+Garage, signature updater and ClamAV services are healthy; the scanner reports
+ClamAV 1.5.4 with signature database 28150 dated October 11, 2026. A fictional
+employee uploaded a valid PDF through the development API. The real worker accepted
+it, its owner discovered it through the new catalog, and an authorized byte-range
+download matched the original content. The same self route rejected an account
+with only administrative grants. Probe sessions were closed and credentials remain
+in ignored development configuration. This does not complete the mobile file queue
+or establish production signature monitoring, backup recovery or load capacity.

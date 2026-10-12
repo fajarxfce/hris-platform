@@ -74,6 +74,20 @@ class StoredDocumentRepository(private val source: DocumentDataSource) : Documen
         source.insertDocument(document.toDocumentRow(requireNotNull(actor.companyId)))
     }
 
+    override fun published(
+        companyId: UUID,
+        employmentId: UUID,
+        classification: DocumentClassification,
+        after: UUID?,
+        limit: Int,
+    ) = safeDatabaseCall {
+        require(limit in 1..50)
+        val rows = source.published(companyId, employmentId, classification.name, after, limit + 1)
+        require(rows.size <= limit + 1)
+        val mapped = rows.take(limit).map { it.toEvidence(companyId, employmentId, classification) }
+        Page(mapped, if (rows.size > limit) mapped.last().documentId.toString() else null)
+    }
+
     override fun addRevision(
         actor: Actor,
         revision: DocumentRevision,

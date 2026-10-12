@@ -31,6 +31,28 @@ waiting, before receipt replay, and again after content storage I/O. A late resp
 cannot release bytes or publish upload progress using an expired proof. Background
 validation resolves its execution authority separately from interactive MFA age.
 
+## Self-service evidence catalog
+
+`GET /me/employments` returns the account's own employment references with the
+company date/time zone. It requires `documents.self.read` and Documents admission,
+independently of People or Leave module availability. Pages default to 20 and allow
+at most 50 references; `after` is the preceding employee number, at most 32 characters.
+
+`GET /me/evidence?employmentId=...&classification=PERSONAL` lists only the current
+published revision for each owned document. `RECEIPT` is also supported; `HR_ONLY`
+is rejected. The response identifies the account, company, employment and selected
+classification, then provides bounded metadata pages with a document-ID cursor.
+Unvalidated replacement uploads do not replace accepted evidence in the catalog.
+An unpublished document has no entry, and a foreign or missing employment returns
+the same not-found result. Broad administrative grants alone do not authorize these
+self-service endpoints.
+
+Both reads preserve original/live authority and check current session MFA after
+waiting for access guards. The catalog acquires one bounded metadata query and
+performs no object-storage reads. It neither reserves a revision nor authorizes a
+later download or business attachment; those operations recheck their own scope,
+availability and observed facts.
+
 ## Content inspection adapter
 
 The content inspection adapter combines private storage chunks, Apache Tika 4.1 type detection, and ClamAV's INSTREAM protocol. It reports observed size, whole-file SHA-256, media type, scanner version, and verdict. The domain workflow decides whether that evidence permits publication. A clean scanner response alone does not establish a matching document type or digest.

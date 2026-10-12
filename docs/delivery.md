@@ -1588,3 +1588,17 @@ also passed for owner-only catalogs and original-grant handling, together with a
 cases cover scoped fields, literal search, bounded pagination, exact lookup,
 revocation while pending, expired MFA, interrupted ownership and independent module
 admission. Dashboard consumption remains the next increment.
+
+## Dashboard document read contracts
+
+The dashboard Documents feature now has separate employee, document, revision and
+validation-history contracts. Use cases own current read grants and exact resource
+selection; the repository maps transport values inside the HTTP failure boundary.
+Scope mismatches, duplicate entries, nonprogressing cursors, malformed revisions
+and unsupported content metadata are rejected before reaching presentation.
+
+Download re-reads the selected revision before requesting authenticated content.
+The existing bounded binary transport and browser file handoff are reused; acquired
+buffers are cleared after handoff, mapping failure or late cancellation. File bytes
+do not enter presentation state or a query cache. The 33 feature boundary tests
+passed alongside dashboard architecture, formatting and TypeScript checks.

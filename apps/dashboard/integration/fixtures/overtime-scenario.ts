@@ -6,7 +6,7 @@ import type { OvertimeDetailsDto } from "../../src/features/workforce/data/model
 export const overtimeReviewer = "a0000000-0000-4000-8000-000000000025";
 export const overtimeEmployee = "a0000000-0000-4000-8000-000000000026";
 
-/** Creates real, company-owned evidence; the browser separately exercises its authorized presentation. */
+/** Prepares a real plan and later calendar change; actual time and decisions are entered through the UI. */
 export async function createOvertimeScenario(context: BrowserContext, company: string) {
   const csrf = (await (await context.request.get("/api/v1/auth/csrf")).json()) as {
     headerName: string;
@@ -149,32 +149,15 @@ export async function createOvertimeScenario(context: BrowserContext, company: s
       })
     ).status(),
   ).toBe(200);
-  const actualKey = randomUUID(),
-    actual = {
-      expectedVersion: 0,
-      actual: {
-        startsAt: `${workDate}T01:15:00Z`,
-        endsAt: `${workDate}T03:45:00Z`,
-        breakMinutes: 15,
-      },
-      reason: "Inventory completed",
-    };
-  const submitted = await context.request.post(`${overtimePath}/actual`, {
-    headers: { ...headers(), "Idempotency-Key": actualKey },
-    data: actual,
-  });
-  expect(submitted.status()).toBe(200);
-  const submittedReceipt: unknown = await submitted.json();
-  const pending = await context.request.get(overtimePath);
-  expect(pending.status()).toBe(200);
-  const details = (await pending.json()) as OvertimeDetailsDto;
-  expect(details.request).toMatchObject({
-    status: "PENDING",
-    approvedMinutes: 0,
-    requested: { workedMinutes: 180 },
-    actual: { workedMinutes: 135 },
-    schedule: { kind: "OFF", origin: "HOLIDAY", holidayId: holiday },
-  });
+  const actual = {
+    expectedVersion: 0,
+    actual: {
+      startsAt: `${workDate}T01:15:00Z`,
+      endsAt: `${workDate}T03:45:00Z`,
+      breakMinutes: 15,
+    },
+    reason: "Inventory completed",
+  };
   return {
     base,
     employee,
@@ -187,8 +170,6 @@ export async function createOvertimeScenario(context: BrowserContext, company: s
     plan,
     planKey,
     actual,
-    actualKey,
     plannedReceipt,
-    submittedReceipt,
   };
 }

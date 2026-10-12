@@ -167,8 +167,10 @@ evidence and paged change history. It retains date/status filters when returning
 from a request and uses the request's timezone for time records. Assigned reviewers
 can open a source request from Approvals without gaining company-wide directory
 access. Refresh hides the previous private result until acquisition succeeds;
-changing account/company or leaving the route cancels its request. Authoring and
-review forms remain the next dashboard increment. Their domain/data contracts
-already support fresh action review, bounded actual-time submission, independent
-decisions and withdrawal. Receipt recovery retains the observed version and
-operation without acquiring a newer request first.
+changing account/company or leaving the route cancels its request. Actual-time,
+approval, rejection and withdrawal forms acquire their own current action review.
+Input uses the request's timezone and domain interval policy. Receipt recovery
+retains the observed version and operation without acquiring a newer request;
+an ambiguous result cannot become editable after a later rejection. Access and MFA
+failures hide private details during recovery. New-plan authoring and closing
+remain the next dashboard work.

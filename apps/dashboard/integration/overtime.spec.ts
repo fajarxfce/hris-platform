@@ -1,16 +1,33 @@
 import { randomUUID } from "node:crypto";
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 import type { OvertimeDetailsDto } from "../src/features/workforce/data/models/overtime-details-dto";
 import { createAdminCompany } from "./fixtures/admin-company";
 import { createOvertimeScenario } from "./fixtures/overtime-scenario";
 import { signInAndEnrollAuthenticator } from "./fixtures/sign-in-and-enroll-authenticator";
 
-test("overtime review preserves original calendar evidence and independent request access through the real API", async ({
+async function loseFirstReceipt(page: Page, resource: string, id: string, version: number) {
+  const commands: { operation: string; body: unknown }[] = [];
+  const pattern = `**${resource}`;
+  await page.route(pattern, async (route) => {
+    const operation = route.request().headers()["idempotency-key"] ?? "";
+    expect(operation).toMatch(/^[a-f0-9-]{36}$/u);
+    commands.push({ operation, body: route.request().postDataJSON() });
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toEqual({ id, version });
+    if (commands.length === 1) return route.abort("failed");
+    return route.fulfill({ response });
+  });
+  return { commands, stop: () => page.unroute(pattern) };
+}
+
+test("overtime actions recover real receipts, preserve original evidence and enforce independent access", async ({
   page,
   context,
   browser,
   request,
 }) => {
+  test.setTimeout(150_000);
   const { company } = await createAdminCompany(
     page,
     context,
@@ -24,8 +41,36 @@ test("overtime review preserves original calendar evidence and independent reque
   await page.goto(`/workforce/overtime?${query}`);
   const directory = page.getByRole("table", { name: "Overtime requests", exact: true });
   await expect(directory).toContainText("Overtime Fixture Employee");
-  await expect(directory).toContainText("Pending review");
+  await expect(directory).toContainText("Planned");
   await directory.getByRole("button").click();
+  await page.getByRole("link", { name: "Submit actual time", exact: true }).click();
+  await page.getByLabel("Actual start", { exact: true }).fill(`${scenario.workDate}T08:15`);
+  await page.getByLabel("Actual end", { exact: true }).fill(`${scenario.workDate}T10:45`);
+  await page.getByLabel("Break (min)", { exact: true }).fill("15");
+  await page.getByLabel("Reason", { exact: true }).fill("Inventory completed");
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({
+    path: "../../.work/dashboard-overtime-actual-real-api.png",
+    fullPage: true,
+    animations: "disabled",
+  });
+  const actualDelivery = await loseFirstReceipt(
+    page,
+    `${scenario.overtimePath}/actual`,
+    scenario.id,
+    1,
+  );
+  await page.getByRole("button", { name: "Submit actual time", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("The result could not be confirmed");
+  await page.getByRole("button", { name: "Retry original action", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Actual time submitted for review.");
+  expect(actualDelivery.commands).toHaveLength(2);
+  expect(actualDelivery.commands[1]).toEqual(actualDelivery.commands[0]);
+  expect(actualDelivery.commands[0]?.body).toEqual(scenario.actual);
+  const actualKey = actualDelivery.commands[0]?.operation;
+  if (!actualKey) throw new Error("Missing actual operation");
+  await actualDelivery.stop();
+  await page.getByRole("link", { name: "View current request", exact: true }).click();
   const overview = page.getByRole("region", { name: "Overview", exact: true });
   await expect(overview).toContainText("Overtime Fixture Employee");
   await expect(page.getByRole("region", { name: "Original schedule", exact: true })).toContainText(
@@ -44,6 +89,7 @@ test("overtime review preserves original calendar evidence and independent reque
   });
   expect(selfApproval.status()).toBe(403);
   expect(await selfApproval.json()).toMatchObject({ code: "self_approval_denied" });
+  await expect(page.getByRole("link", { name: "Approve overtime", exact: true })).toHaveCount(0);
 
   const reviewer = await browser.newContext({ baseURL: new URL(page.url()).origin });
   try {
@@ -71,25 +117,22 @@ test("overtime review preserves original calendar evidence and independent reque
         )
       ).status(),
     ).toBe(403);
-    const csrf = (await (await reviewer.request.get("/api/v1/auth/csrf")).json()) as {
-      headerName: string;
-      token: string;
-    };
-    const headers = { [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() };
-    const decision = { expectedVersion: 1, decision: "APPROVE", reason: "Independently verified" };
-    const accepted = await reviewer.request.post(`${scenario.overtimePath}/decisions`, {
-      headers,
-      data: decision,
-    });
-    expect(accepted.status()).toBe(200);
-    const receipt: unknown = await accepted.json();
-    const replay = await reviewer.request.post(`${scenario.overtimePath}/decisions`, {
-      headers,
-      data: decision,
-    });
-    expect(replay.status()).toBe(200);
-    expect(await replay.json()).toEqual(receipt);
-    await review.getByRole("button", { name: "Refresh", exact: true }).click();
+    await review.getByRole("link", { name: "Approve overtime", exact: true }).click();
+    await review.getByLabel("Reason", { exact: true }).fill("Independently verified");
+    const decisionDelivery = await loseFirstReceipt(
+      review,
+      `${scenario.overtimePath}/decisions`,
+      scenario.id,
+      2,
+    );
+    await review.getByRole("button", { name: "Approve overtime", exact: true }).click();
+    await expect(review.getByRole("status")).toContainText("The result could not be confirmed");
+    await review.getByRole("button", { name: "Retry original action", exact: true }).click();
+    await expect(review.getByRole("status")).toContainText("Approval recorded.");
+    expect(decisionDelivery.commands).toHaveLength(2);
+    expect(decisionDelivery.commands[1]).toEqual(decisionDelivery.commands[0]);
+    await decisionDelivery.stop();
+    await review.getByRole("link", { name: "View current request", exact: true }).click();
     await expect(review.getByRole("region", { name: "Overview", exact: true })).toContainText(
       "Approved",
     );
@@ -101,6 +144,70 @@ test("overtime review preserves original calendar evidence and independent reque
       fullPage: true,
       animations: "disabled",
     });
+
+    for (const outcome of ["planned-withdrawal", "pending-withdrawal", "rejection"] as const) {
+      const id = randomUUID(),
+        resource = `${scenario.planPath}/${id}`;
+      const requested = {
+        startsAt: `${scenario.workDate}T11:00:00Z`,
+        endsAt: `${scenario.workDate}T13:00:00Z`,
+        breakMinutes: 0,
+      };
+      const planned = await context.request.post(scenario.planPath, {
+        headers: scenario.headers(),
+        data: { ...scenario.plan, id, requested, reason: "Evening stock review" },
+      });
+      expect(planned.status()).toBe(200);
+      await page.goto(`/workforce/overtime/${id}?${query}`);
+      if (outcome !== "planned-withdrawal") {
+        await page.getByRole("link", { name: "Submit actual time", exact: true }).click();
+        await page.getByLabel("Reason", { exact: true }).fill("Evening review completed");
+        await page.getByRole("button", { name: "Submit actual time", exact: true }).click();
+        await expect(page.getByRole("status")).toContainText("Actual time submitted for review.");
+        await page.getByRole("link", { name: "View current request", exact: true }).click();
+      }
+      if (outcome === "rejection") {
+        await review.goto(`/workforce/overtime/${id}?${query}`);
+        await review.getByRole("link", { name: "Reject overtime", exact: true }).click();
+        await review
+          .getByLabel("Reason", { exact: true })
+          .fill("Reported work could not be verified");
+        await review.getByRole("button", { name: "Reject overtime", exact: true }).click();
+        await expect(review.getByRole("status")).toContainText("Request rejected.");
+      } else {
+        await page.getByRole("link", { name: "Withdraw overtime", exact: true }).click();
+        await page.getByLabel("Reason", { exact: true }).fill("Work no longer required");
+        const delivery =
+          outcome === "pending-withdrawal"
+            ? await loseFirstReceipt(page, `${resource}/withdraw`, id, 2)
+            : null;
+        await page.getByRole("button", { name: "Withdraw overtime", exact: true }).click();
+        if (delivery) {
+          await expect(page.getByRole("status")).toContainText("The result could not be confirmed");
+          await page.getByRole("button", { name: "Retry original action", exact: true }).click();
+        }
+        await expect(page.getByRole("status")).toContainText("Request withdrawn.");
+        if (delivery) {
+          expect(delivery.commands).toHaveLength(2);
+          expect(delivery.commands[1]).toEqual(delivery.commands[0]);
+          await delivery.stop();
+        }
+      }
+      const changed = (await (await context.request.get(resource)).json()) as OvertimeDetailsDto;
+      expect(changed.request).toMatchObject({
+        status: outcome === "rejection" ? "REJECTED" : "WITHDRAWN",
+        approvedMinutes: 0,
+        version: outcome === "planned-withdrawal" ? 1 : 2,
+      });
+      expect(changed.approval?.status ?? null).toBe(
+        outcome === "rejection"
+          ? "REJECTED"
+          : outcome === "pending-withdrawal"
+            ? "CANCELLED"
+            : null,
+      );
+      expect(changed.history.items).toHaveLength(outcome === "planned-withdrawal" ? 2 : 3);
+    }
   } finally {
     await reviewer.close();
   }
@@ -121,9 +228,9 @@ test("overtime review preserves original calendar evidence and independent reque
     [scenario.planPath, scenario.planKey, scenario.plan, scenario.plannedReceipt],
     [
       `${scenario.overtimePath}/actual`,
-      scenario.actualKey,
+      actualKey,
       scenario.actual,
-      scenario.submittedReceipt,
+      { id: scenario.id, version: 1 },
     ],
   ] as const) {
     const replay = await context.request.post(path, {
@@ -166,7 +273,7 @@ test("overtime review preserves original calendar evidence and independent reque
       await context.request.get(`/api/v1/companies/${otherId}/workforce/overtime/${scenario.id}`)
     ).status(),
   ).toBe(404);
-  await page.getByRole("button", { name: "Refresh", exact: true }).click();
+  await page.goto(`/workforce/overtime/${scenario.id}?${query}`);
   await expect(overview).toContainText("Approved");
   await expect(
     page.getByRole("table", { name: "History", exact: true }).getByRole("row"),

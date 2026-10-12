@@ -6,6 +6,7 @@ import { canBrowseCompanyOvertime } from "../../domain/policies/overtime-read-po
 import type { WorkforceScreenProps } from "../contracts/workforce-screen-props";
 import { useOvertimeRequest } from "../controllers/use-overtime-request";
 import { overtimeMessages } from "../i18n/overtime-messages";
+import { overtimeActionLinks } from "../models/overtime-action-view";
 import {
   overtimeParameters,
   overtimePath,
@@ -65,6 +66,7 @@ function OvertimeRequestBinding(props: WorkforceScreenProps & { id: string; back
       view={view}
       companyName={props.companyName}
       locale={props.locale}
+      actions={overtimeActionLinks(state.details, props.access, props.backQuery, props.locale)}
       backTo={
         directory
           ? `${overtimePath}?${props.backQuery}`

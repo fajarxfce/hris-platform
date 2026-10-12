@@ -2,6 +2,7 @@ import { Text } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
 import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
+import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppDetailsPanel } from "../../../../core/presentation/components/app-details-panel";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
 import { AppLoading } from "../../../../core/presentation/components/app-loading";
@@ -10,7 +11,9 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useOvertimeRequest } from "../controllers/use-overtime-request";
+import { overtimeActionMessages } from "../i18n/overtime-action-messages";
 import { overtimeMessages } from "../i18n/overtime-messages";
+import type { overtimeActionLinks } from "../models/overtime-action-view";
 import type { overtimeDetailsView } from "../models/overtime-view";
 
 export function OvertimeRequestPage(props: {
@@ -18,6 +21,7 @@ export function OvertimeRequestPage(props: {
   view: ReturnType<typeof overtimeDetailsView> | null;
   companyName: string;
   locale: Locale;
+  actions: ReturnType<typeof overtimeActionLinks>;
   backTo: string;
   backLabel: string;
   approvalTo: string | null;
@@ -50,6 +54,15 @@ export function OvertimeRequestPage(props: {
           }
         />
         <AppFailure failure={state.failure} locale={locale} />
+        {props.actions.length > 0 && (
+          <AppCommandBar label={overtimeActionMessages(locale).actions}>
+            {props.actions.map((action) => (
+              <Link key={action.intent} to={action.to}>
+                {action.label}
+              </Link>
+            ))}
+          </AppCommandBar>
+        )}
         {state.loading && <AppLoading label={messages(locale).loading} />}
         {view && (
           <div className="app-report-content">

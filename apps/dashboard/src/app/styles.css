@@ -598,6 +598,16 @@ a {
 .app-document-retirement .app-editor-form {
   gap: 20px;
 }
+.app-overtime-action .app-editor-form {
+  gap: 20px;
+}
+:where(.app-overtime-action) .app-editor-form p {
+  margin: 0;
+}
+.app-overtime-action .app-form-actions {
+  padding-top: 16px;
+  border-top: 1px solid var(--colorNeutralStroke2);
+}
 :where(.app-document-retirement) .app-editor-form h2,
 :where(.app-document-retirement) .app-editor-form p {
   margin: 0;

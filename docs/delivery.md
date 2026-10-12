@@ -2040,3 +2040,32 @@ Architecture, formatting, TypeScript and all 1,272 dashboard unit tests passed.
 The 36 added contract cases exercise validation before I/O, immutable input,
 receipt mismatches, safe MFA errors, cancellation and late results/failures. No
 backend runtime or mobile build changed.
+
+## Dashboard overtime actual time and decisions
+
+The request command bar now opens dedicated actual-time, approval, rejection and
+withdrawal reviews. Time fields use the original request's timezone and validate
+whole minutes through the domain. Separate presentation handlers own each action;
+current server capabilities and grants determine availability. Approval records a
+stage without implying that the entire request is approved.
+
+One immutable command survives an unknown outcome, explicit retry, MFA renewal and
+later conflict replies. Definite first conflicts require a new review. Private
+details remain hidden after denied reads through pending or failed retries.
+Navigation protects drafts and unresolved commands; changing company or disposing
+the controller aborts acquisition and suppresses late results. Browser commands
+remain in memory and do not claim durable offline recovery.
+
+Architecture, formatting, TypeScript and all 1,291 dashboard unit tests passed,
+including 19 new presentation/clock-input cases. Fourteen action browser scenarios
+and the fifteen existing overtime read scenarios passed. English light and
+Indonesian dark narrow layouts were inspected. The real API/PostgreSQL scenario
+submitted actual work, approved independently, rejected, and withdrew both planned
+and pending requests. Deliberately lost actual/decision/withdrawal responses
+recovered their original receipts without duplicate history. It also verified
+original calendar preservation, maker exclusion, assigned-reviewer access, native
+employee reads and foreign-company rejection.
+
+The scenario used an owned disposable database. The development VPN dashboard and
+API returned HTTP 200; no backend deployment or mobile APK changed. New-plan
+authoring and monthly closing remain separate dashboard work.

@@ -634,5 +634,19 @@ Account/company/grant changes replace query ownership. Refresh and failed reads
 remove the previous private result; MFA verification alone cannot restore it.
 Assigned reviewers reach their source request through Approvals and return there
 without a company directory grant. All reads still authorize independently on the
-server. Creation, actual-time submission, review and withdrawal forms remain the
-next increment.
+server.
+
+Request actions open separate current reviews for actual-time submission,
+approval, rejection and withdrawal. Time fields use the request's zone, preserve
+unchanged stored instants and reject newly entered ambiguous clock changes.
+Approval acknowledges the current stage without claiming final approval.
+
+Each action captures the observed version, immutable input and one operation ID.
+Unconfirmed delivery retains that command through explicit retries, renewed MFA
+and later conflicts; retry never acquires a newer request first. A definite first
+conflict requires protected re-review. Denied reads clear private details and stay
+hidden through pending or failed recovery. Company replacement and disposal abort
+owned work and ignore late results. Unsaved and unresolved actions participate in
+the workspace navigation guard. These commands remain in browser memory.
+
+Creation of new plans and monthly closing remain separate dashboard work.

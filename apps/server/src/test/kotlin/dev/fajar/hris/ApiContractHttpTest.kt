@@ -712,6 +712,73 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun administrativeExpenseDraftingHasBoundedCompanyAdmittedMetadataRoutes() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/expenses/drafting/employees"
+        for (suffix in
+            listOf("", "/{employmentId}/receipts", "/{employmentId}/references")) assertTrue(
+            api["paths"][base + suffix]["get"]["x-hris-company-admission"].asBoolean()
+        )
+        val directory =
+            api["paths"][base]["get"]["parameters"].associateBy { it["name"].asString() }
+        assertEquals(50, directory.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals(120, directory.getValue("query")["schema"]["maxLength"].asInt())
+        assertEquals(32, directory.getValue("after")["schema"]["maxLength"].asInt())
+        val receipts =
+            api["paths"]["$base/{employmentId}/receipts"]["get"]["parameters"].associateBy {
+                it["name"].asString()
+            }
+        assertEquals(50, receipts.getValue("limit")["schema"]["maximum"].asInt())
+        val references =
+            api["paths"]["$base/{employmentId}/references"]["get"]["parameters"].associateBy {
+                it["name"].asString()
+            }
+        for ((name, maximum) in
+            listOf("categoryIds" to 20, "costCenterIds" to 20, "receiptRevisionIds" to 60)) {
+            assertEquals(maximum, references.getValue(name)["schema"]["maxItems"].asInt())
+            assertTrue(references.getValue(name)["schema"]["uniqueItems"].asBoolean())
+        }
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("companyDate", "timezone", "employees"),
+            schemas["ExpenseDraftDirectoryResponse"]["properties"]
+                .properties()
+                .map { it.key }
+                .toSet(),
+        )
+        assertEquals(
+            setOf("id", "employeeNumber", "legalName", "status", "version"),
+            schemas["ExpenseDraftEmployeeResponse"]["properties"]
+                .properties()
+                .map { it.key }
+                .toSet(),
+        )
+        assertEquals(
+            setOf(
+                "documentId",
+                "revisionId",
+                "revisionNumber",
+                "title",
+                "fileName",
+                "mediaType",
+                "size",
+                "validatedAt",
+            ),
+            schemas["ExpenseDraftReceiptOptionResponse"]["properties"]
+                .properties()
+                .map { it.key }
+                .toSet(),
+        )
+        assertEquals(
+            setOf("employmentId", "categories", "costCenters", "receipts"),
+            schemas["ExpenseDraftReferencesResponse"]["properties"]
+                .properties()
+                .map { it.key }
+                .toSet(),
+        )
+    }
+
+    @Test
     fun selfExpenseDiscoveryHasItsOwnMinimalCompanyAdmittedContract() {
         val api = contract()
         val operation = api["paths"]["/api/v1/companies/{companyId}/expenses/me/employments"]["get"]

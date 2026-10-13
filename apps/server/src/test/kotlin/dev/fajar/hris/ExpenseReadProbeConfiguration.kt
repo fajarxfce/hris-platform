@@ -1,5 +1,6 @@
 package dev.fajar.hris
 
+import dev.fajar.hris.documents.domain.entities.DocumentClassification
 import dev.fajar.hris.documents.domain.repositories.DocumentRepository
 import dev.fajar.hris.expenses.domain.entities.ExpenseClaimStatus
 import dev.fajar.hris.expenses.domain.repositories.*
@@ -165,6 +166,17 @@ class ExpenseReadProbeConfiguration {
         probe: ExpenseReadProbe,
     ): DocumentRepository =
         object : DocumentRepository by delegate {
+            override fun published(
+                companyId: UUID,
+                employmentId: UUID,
+                classification: DocumentClassification,
+                after: UUID?,
+                limit: Int,
+            ) =
+                delegate.published(companyId, employmentId, classification, after, limit).also {
+                    probe.afterRead(companyId, "draft-receipts")
+                }
+
             override fun revision(companyId: UUID, id: UUID) =
                 delegate.revision(companyId, id).also {
                     probe.afterRead(companyId, "receipt-metadata")

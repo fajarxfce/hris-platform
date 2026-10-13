@@ -16,7 +16,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.UUID
 
-class GetSelfExpenseDraftReferences(
+class GetExpenseDraftReferences(
     private val policies: ExpensePolicyRepository,
     private val people: PeopleRepository,
     private val units: OrganizationRepository,
@@ -32,11 +32,16 @@ class GetSelfExpenseDraftReferences(
         actor: Actor,
         employmentId: UUID,
         query: ExpenseDraftReferenceQuery,
-    ): Result<SelfExpenseDraftReferences> {
+        scope: ExpenseClaimReadScope = ExpenseClaimReadScope.SELF,
+    ): Result<ExpenseDraftReferences> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
-        if (actor.permissions.none { it in setOf("expenses.self.manage", "expenses.manage") })
+        val editingPermissions =
+            if (scope == ExpenseClaimReadScope.SELF)
+                setOf("expenses.self.manage", "expenses.manage")
+            else setOf("expenses.manage")
+        if (actor.permissions.none { it in editingPermissions })
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
         if (
             query.categoryIds.size > 20 ||
@@ -65,7 +70,7 @@ class GetSelfExpenseDraftReferences(
             val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
-            if (live.permissions.none { it in setOf("expenses.self.manage", "expenses.manage") })
+            if (live.permissions.none { it in editingPermissions })
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
             val foundCompany = companies.find(company)
             if (foundCompany is Result.Failed) return@run foundCompany
@@ -76,9 +81,14 @@ class GetSelfExpenseDraftReferences(
             val foundEmployee = people.find(company, employmentId, today)
             if (foundEmployee is Result.Failed) return@run foundEmployee
             val employee = (foundEmployee as Result.Success).value
-            if (employee == null || employee.person.accountId != live.accountId)
+            if (
+                employee == null ||
+                    (scope == ExpenseClaimReadScope.SELF &&
+                        employee.person.accountId != live.accountId)
+            )
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
             val acquired = acquireReferences(company, employmentId, query)
+            if (acquired is Result.Failed) return@run acquired
             val publication = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (publication is Result.Failed) publication else acquired
         }
@@ -88,7 +98,7 @@ class GetSelfExpenseDraftReferences(
         company: UUID,
         employmentId: UUID,
         query: ExpenseDraftReferenceQuery,
-    ): Result<SelfExpenseDraftReferences> {
+    ): Result<ExpenseDraftReferences> {
         val categories = mutableListOf<ExpenseDraftLabelReference>()
         for (id in query.categoryIds.sortedBy(UUID::toString)) {
             val response = policies.find(company, id)
@@ -144,7 +154,7 @@ class GetSelfExpenseDraftReferences(
                     )
         }
         return Result.Success(
-            SelfExpenseDraftReferences(
+            ExpenseDraftReferences(
                 employmentId,
                 categories.toList(),
                 costCenters.toList(),

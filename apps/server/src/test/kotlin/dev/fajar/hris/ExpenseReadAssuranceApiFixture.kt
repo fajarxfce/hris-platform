@@ -38,8 +38,31 @@ abstract class ExpenseReadAssuranceApiFixture : ExpenseReviewApiFixture() {
     @Autowired protected lateinit var readProbe: ExpenseReadProbe
     protected val security = IdentitySecurityPolicy()
 
+    protected fun draftEmployeeReader() =
+        ListExpenseDraftEmployees(
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    protected fun draftReceiptReader() =
+        ListExpenseDraftReceipts(
+            documents,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
     protected fun draftReferenceReader() =
-        GetSelfExpenseDraftReferences(
+        GetExpenseDraftReferences(
             policies,
             people,
             units,

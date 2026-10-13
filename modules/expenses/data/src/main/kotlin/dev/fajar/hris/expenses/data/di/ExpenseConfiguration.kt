@@ -22,7 +22,49 @@ import org.springframework.context.annotation.Configuration
 @Configuration(proxyBeanMethods = false)
 class ExpenseConfiguration {
     @Bean
-    fun getSelfExpenseDraftReferences(
+    fun listExpenseDraftEmployees(
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListExpenseDraftEmployees(
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun listExpenseDraftReceipts(
+        documents: DocumentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListExpenseDraftReceipts(
+            documents,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun getExpenseDraftReferences(
         policies: ExpensePolicyRepository,
         people: PeopleRepository,
         units: OrganizationRepository,
@@ -34,7 +76,7 @@ class ExpenseConfiguration {
         security: IdentitySecurityPolicy,
         clock: Clock,
     ) =
-        GetSelfExpenseDraftReferences(
+        GetExpenseDraftReferences(
             policies,
             people,
             units,

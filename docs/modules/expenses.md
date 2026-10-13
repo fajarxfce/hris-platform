@@ -12,8 +12,9 @@ The [claim dashboard](../dashboard.md#expense-claims) implements bounded directo
 coherent current claim/history review, immutable submission evidence, payment
 progress and scoped receipt downloads. Independent reviewers can approve, reject
 or return submitted evidence with both observed versions and operation recovery.
-Approval source links use submission IDs; draft authoring and finance commands
-remain separate delivery increments.
+Approval source links use submission IDs. Finance preparation, release,
+cancellation/replacement and reconciliation are implemented separately; dashboard
+draft authoring remains a subsequent delivery increment.
 
 Acceptance: category limits, company attachment access, concurrent submission, payment replay, failed/partial batch reconciliation, and immutable paid records.
 
@@ -100,6 +101,25 @@ Limits are 1,000 open claims (`DRAFT`, `PENDING`, or `RETURNED`) per company, fi
 Commands recheck live account, membership, and credential state before replay. Their permissions are limited to the intersection with the original request, so a grant made while a command waits cannot expand its authority.
 
 ## Draft reference lookup
+
+Administrative drafting uses `/expenses/drafting/employees`, requiring
+`expenses.manage` independently of People browsing. Search is bounded to 120
+characters and pages to fifty entries (twenty by default). The response includes
+the company date/timezone and employee ID, number, name, status and observed
+version. Selection reserves neither employee eligibility nor submission policy.
+
+`/{employmentId}/receipts` lists only published, accepted `RECEIPT` revisions for
+that company employment. Its bounded metadata page excludes digests, storage keys,
+inspection details and file bytes. `/{employmentId}/references` resolves at most
+20 category, 20 cost-center and 60 receipt identifiers using the same minimal
+reference projection as the employee editor. Missing or inaccessible references
+retain their requested ID with null metadata. Every administrative route requires
+the original and current `expenses.manage` grant; it grants no document-content
+or personal-profile endpoint access.
+
+These reads keep ordered resource/access guards and check session assurance
+after waiting and after acquisition. Employee discovery uses the current company
+date, and receipt discovery holds the document guard against concurrent retirement.
 
 `GET /expenses/me/employments/{employmentId}/draft-references` resolves the names
 used by the employee editor. Optional UUID sets accept at most 20 `categoryIds`,

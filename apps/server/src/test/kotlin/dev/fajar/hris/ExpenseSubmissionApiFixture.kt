@@ -12,6 +12,7 @@ abstract class ExpenseSubmissionApiFixture : ExpenseApiFixture() {
     protected fun readyReceipt(
         f: ExpenseFixture,
         bytes: ByteArray = pdf + "\n%${UUID.randomUUID()}".toByteArray(),
+        classification: String = "RECEIPT",
     ): UUID {
         val admin =
             database()
@@ -34,7 +35,7 @@ abstract class ExpenseSubmissionApiFixture : ExpenseApiFixture() {
             )
         val id = UUID.randomUUID()
         val started =
-            start(docs, uploadInput(docs, bytes, revision = id, classification = "RECEIPT"))
+            start(docs, uploadInput(docs, bytes, revision = id, classification = classification))
         assertEquals(200, started.statusCode(), started.body())
         for (offset in bytes.indices step 1048576) {
             val uploaded =

@@ -2,10 +2,11 @@ package dev.fajar.hris.expenses.delivery.controllers
 
 import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.core.http.response
-import dev.fajar.hris.expenses.delivery.mappers.toResponse
+import dev.fajar.hris.expenses.delivery.mappers.toSelfResponse
 import dev.fajar.hris.expenses.delivery.responses.SelfExpenseDraftReferencesResponse
+import dev.fajar.hris.expenses.domain.entities.ExpenseClaimReadScope
 import dev.fajar.hris.expenses.domain.entities.ExpenseDraftReferenceQuery
-import dev.fajar.hris.expenses.domain.usecases.GetSelfExpenseDraftReferences
+import dev.fajar.hris.expenses.domain.usecases.GetExpenseDraftReferences
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping(
     "/api/v1/companies/{companyId}/expenses/me/employments/{employmentId}/draft-references"
 )
-class SelfExpenseDraftReferencesController(private val references: GetSelfExpenseDraftReferences) {
+class SelfExpenseDraftReferencesController(private val references: GetExpenseDraftReferences) {
     @GetMapping
     fun get(
         actor: Actor,
@@ -61,7 +62,8 @@ class SelfExpenseDraftReferencesController(private val references: GetSelfExpens
                     costCenterIds.orEmpty(),
                     receiptRevisionIds.orEmpty(),
                 ),
+                ExpenseClaimReadScope.SELF,
             )
             .response()
-            .toResponse()
+            .toSelfResponse()
 }

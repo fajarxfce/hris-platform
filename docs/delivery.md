@@ -2844,3 +2844,28 @@ item IDs with one history entry. Independent release and reconciliation also
 recovered from dropped responses, retaining exact account/amount/CSV evidence,
 partial/final results, foreign-company denial and finance-revocation behavior.
 No bank transfer, phone installation or release was performed.
+
+## Administrative expense draft discovery
+
+Expense management now has separate company-admitted employee, published receipt
+and selected-reference reads for administrative drafting. Pages are bounded to
+fifty entries, and reference sets retain their 20/20/60 limits. Responses include
+only fields required for selection and labels; receipt bytes, digests, storage
+keys and inspection details are excluded. Other expense grants do not authorize
+administrative drafting.
+
+Reference acquisition is shared by one domain use case with an explicit scope.
+The existing `/me` route always requests SELF, preserving its ownership checks and
+wire schema even for administrators. Administrative reads require original and
+current `expenses.manage`. Ordered shared guards retain scope during acquisition;
+the receipt page also guards against concurrent document mutation. Cancellation
+releases ownership, and final session assurance prevents publication after expiry.
+
+Ninety-seven selected API/PostgreSQL tests passed, including 24 contract tests,
+16 new discovery/assurance cases, eight existing self-reference cases and 49
+existing expense read-assurance cases. They cover minimal payloads, pagination,
+search limits, foreign employment/company references, unpublished and other-kind
+receipts, original/live grants, MFA expiry after waits and interrupted cleanup.
+The expense domain tests, architecture, formatting and API JAR build passed.
+The worker graph is unchanged. Dashboard draft authoring follows this increment;
+no mobile or phone update was made.

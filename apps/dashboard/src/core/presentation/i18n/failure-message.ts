@@ -2,6 +2,43 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_expense_payment_batch: [
+    "Review the title, note and selected claims before preparing the batch.",
+    "Periksa judul, catatan, dan klaim yang dipilih sebelum menyiapkan batch.",
+  ],
+  invalid_expense_payment_destination: [
+    "Enter a valid bank code, account number and account name.",
+    "Isi kode bank, nomor rekening, dan nama rekening yang valid.",
+  ],
+  expense_payment_preparation_unavailable: [
+    "This claim cannot be prepared by the current operator. Refresh the payable claims.",
+    "Klaim tidak dapat disiapkan oleh operator saat ini. Muat ulang klaim siap bayar.",
+  ],
+  expense_payment_selection_limit: [
+    "A batch can contain up to 100 claims.",
+    "Satu batch dapat berisi maksimal 100 klaim.",
+  ],
+  expense_payment_duplicate_claim: ["This claim is already selected.", "Klaim sudah dipilih."],
+  expense_payment_requires_approved_claims: [
+    "A selected claim is no longer payable. Refresh the payable claims and review your selection.",
+    "Klaim yang dipilih tidak lagi siap bayar. Muat ulang klaim siap bayar dan periksa pilihan.",
+  ],
+  expense_payment_batch_exists: [
+    "This batch already exists. Return to the payment list and review its details.",
+    "Batch sudah ada. Kembali ke daftar pembayaran dan periksa detailnya.",
+  ],
+  expense_payment_capacity: [
+    "The company payment batch limit has been reached. Resolve outstanding batches before preparing another.",
+    "Batas batch pembayaran perusahaan telah tercapai. Selesaikan batch tertunda sebelum menyiapkan batch lain.",
+  ],
+  expense_claim_payment_reserved: [
+    "A selected claim is reserved by another batch. Remove it and review the remaining instructions.",
+    "Klaim yang dipilih sudah digunakan batch lain. Hapus klaim tersebut dan periksa instruksi lainnya.",
+  ],
+  expense_payment_attempt_limit: [
+    "A selected claim has reached its payment attempt limit. Contact finance before preparing another batch.",
+    "Klaim yang dipilih mencapai batas percobaan pembayaran. Hubungi finance sebelum menyiapkan batch lain.",
+  ],
   expense_reconciliation_unavailable: [
     "Reconciliation is unavailable. Return to the batch details.",
     "Rekonsiliasi tidak tersedia. Kembali ke detail batch.",

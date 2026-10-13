@@ -1,5 +1,5 @@
 import { Text } from "@fluentui/react-components";
-import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Add20Regular, ArrowClockwise20Regular } from "@fluentui/react-icons";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -13,12 +13,15 @@ import { expensePaymentBatchStatuses } from "../../domain/entities/expense-payme
 import type { useExpensePaymentFilters } from "../controllers/use-expense-payment-filters";
 import type { useExpensePayments } from "../controllers/use-expense-payments";
 import { expensePaymentMessages } from "../i18n/expense-payment-messages";
+import { expensePreparationMessages } from "../i18n/expense-preparation-messages";
 import type { expensePaymentRows } from "../models/expense-payment-view";
 export function ExpensePaymentsPage(props: {
   state: ReturnType<typeof useExpensePayments>;
   filters: ReturnType<typeof useExpensePaymentFilters>;
   rows: ReturnType<typeof expensePaymentRows>;
   companyName: string;
+  canPrepare: boolean;
+  onPrepare: () => void;
   locale: Locale;
   firstPage: boolean;
   onFirst: () => void;
@@ -33,14 +36,21 @@ export function ExpensePaymentsPage(props: {
         title={text.title}
         context={props.companyName}
         actions={
-          <AppButton
-            appearance="subtle"
-            icon={<ArrowClockwise20Regular />}
-            onClick={state.refresh}
-            disabled={state.loading}
-          >
-            {messages(locale).refresh}
-          </AppButton>
+          <div className="app-form-actions">
+            {props.canPrepare && (
+              <AppButton appearance="primary" icon={<Add20Regular />} onClick={props.onPrepare}>
+                {expensePreparationMessages(locale).title}
+              </AppButton>
+            )}
+            <AppButton
+              appearance="subtle"
+              icon={<ArrowClockwise20Regular />}
+              onClick={state.refresh}
+              disabled={state.loading}
+            >
+              {messages(locale).refresh}
+            </AppButton>
+          </div>
         }
       />
       <form onSubmit={filters.submit} noValidate>

@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 import { companyDateTimeInput } from "../src/core/presentation/dates/company-date-time";
 import type { ExpensePaymentReviewDto } from "../src/features/expenses/data/models/expense-payment-dto";
+import type { ExpensePaymentPreparationDto } from "../src/features/expenses/data/models/expense-payment-preparation-dto";
 import type { ExpenseReconciliationDto } from "../src/features/expenses/data/models/expense-reconciliation-dto";
 import { createAdminCompany } from "./fixtures/admin-company";
 import {
@@ -12,7 +13,7 @@ import {
   prepareExpensePaymentClaims,
 } from "./fixtures/expense-payment-scenario";
 
-test("real finance review releases and reconciles payments with original-command recovery and current scope", async ({
+test("real finance prepares, releases and reconciles payments with original-command recovery and current scope", async ({
   page,
   context,
   browser,
@@ -55,8 +56,7 @@ test("real finance review releases and reconciles payments with original-command
       );
       expect(approved.status()).toBe(200);
     }
-    const makerCsrf = await paymentSession(makerPage, "maker"),
-      id = randomUUID();
+    const makerCsrf = await paymentSession(makerPage, "maker");
     await paymentSession(finance, "checker");
     const cancelledId = randomUUID();
     const replacement = await maker.request.put(`${base}/expenses/payments/${cancelledId}`, {
@@ -87,24 +87,94 @@ test("real finance review releases and reconciles payments with original-command
     ).json()) as ExpensePaymentReviewDto;
     expect(cancelled.batch).toMatchObject({ status: "CANCELLED", version: 1 });
     expect(cancelled.history.items).toHaveLength(2);
-    const prepared = await maker.request.put(`${base}/expenses/payments/${id}`, {
-      headers: paymentHeaders(makerCsrf),
-      data: {
-        title: "October reimbursements",
-        items: items.map((item) => ({
-          id: item.id,
-          submissionId: item.submissionId,
-          destination: item.destination,
-        })),
-        reason: "Bank destinations verified",
-      },
+    const preparationWrites: {
+      id: string;
+      operation: string;
+      body: ExpensePaymentPreparationDto;
+    }[] = [];
+    await makerPage.route(`**${base}/expenses/payments/*`, async (route) => {
+      if (route.request().method() !== "PUT") return route.fallback();
+      const id = new URL(route.request().url()).pathname.split("/").at(-1);
+      if (!id) throw new Error("Preparation batch ID is required");
+      preparationWrites.push({
+        id,
+        operation: route.request().headers()["idempotency-key"] ?? "",
+        body: route.request().postDataJSON() as ExpensePaymentPreparationDto,
+      });
+      const response = await route.fetch();
+      expect(response.status()).toBe(200);
+      expect(await response.json()).toMatchObject({ id, version: 0 });
+      if (preparationWrites.length === 1) return route.abort("failed");
+      return route.fulfill({ response });
     });
-    expect(prepared.status()).toBe(200);
+    const directory = `/expenses/payments?company=${company}&from=${today}&until=${today}`;
+    await makerPage.goto(directory);
+    await makerPage.getByRole("button", { name: "Prepare payment batch", exact: true }).click();
+    await makerPage.getByLabel("Batch title", { exact: true }).fill("October reimbursements");
+    await makerPage
+      .getByLabel("Preparation note", { exact: true })
+      .fill("Bank destinations verified");
+    await makerPage.getByRole("button", { name: "Add claims", exact: true }).click();
+    const picker = makerPage.getByRole("dialog", { name: "Select approved claims", exact: true });
+    for (const [index, item] of items.entries())
+      await picker
+        .getByRole("button", {
+          name: `Add claim: Customer visit ${index + 1} · ${item.name}`,
+          exact: true,
+        })
+        .click();
+    await picker.getByRole("button", { name: "Done", exact: true }).click();
+    for (const [index, item] of items.entries()) {
+      await makerPage
+        .getByRole("button", {
+          name: `Edit bank details: Customer visit ${index + 1} · ${item.name}`,
+          exact: true,
+        })
+        .click();
+      const panel = makerPage.getByRole("dialog", { name: "Bank details", exact: true });
+      await panel.getByLabel("Bank code", { exact: true }).fill(item.destination.bankCode);
+      await panel
+        .getByLabel("Account number", { exact: true })
+        .fill(item.destination.accountNumber);
+      await panel.getByLabel("Account name", { exact: true }).fill(item.destination.accountName);
+      await panel.getByRole("button", { name: "Save bank details", exact: true }).click();
+    }
+    await makerPage.getByRole("button", { name: "Review instructions", exact: true }).click();
+    await makerPage
+      .getByRole("heading", { name: "Review payment batch", exact: true })
+      .scrollIntoViewIfNeeded();
+    await makerPage.screenshot({
+      path: "../../.work/dashboard-expense-preparation-real.png",
+      fullPage: true,
+      animations: "disabled",
+    });
+    await makerPage.getByRole("button", { name: "Create batch", exact: true }).click();
+    await makerPage
+      .getByRole("button", { name: "Retry original preparation", exact: true })
+      .click();
+    await expect(makerPage.getByRole("status")).toContainText("Payment batch prepared.");
+    expect(preparationWrites).toHaveLength(2);
+    expect(preparationWrites[1]).toEqual(preparationWrites[0]);
+    const id = preparationWrites[0]?.id;
+    if (!id) throw new Error("Prepared batch receipt is required");
     const makerReview = (await (
       await maker.request.get(`${base}/expenses/payments/${id}/review`)
     ).json()) as ExpensePaymentReviewDto;
     expect(makerReview.availableActions).toEqual(["CANCEL"]);
-    const directory = `/expenses/payments?company=${company}&from=${today}&until=${today}`;
+    expect(makerReview.batch).toMatchObject({
+      status: "PREPARED",
+      version: 0,
+      totalAmount: "425001.00",
+    });
+    expect(makerReview.history.items).toHaveLength(1);
+    for (const item of items) {
+      const preparedItem = makerReview.batch.items.find(
+        (entry) => entry.submissionId === item.submissionId,
+      );
+      if (!preparedItem) throw new Error("Prepared instruction is required");
+      expect(preparedItem.destination).toEqual(item.destination);
+      item.id = preparedItem.id;
+    }
     await finance.goto(directory);
     await expect(
       finance.getByRole("table", { name: "Expense payments", exact: true }),

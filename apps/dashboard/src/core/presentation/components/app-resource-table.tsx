@@ -18,7 +18,12 @@ export function AppResourceTable({
 }: {
   title: string;
   columns: readonly Readonly<{ id: string; label: string; numeric?: boolean }>[];
-  rows: readonly Readonly<{ id: string; actionLabel?: string; cells: readonly string[] }>[];
+  rows: readonly Readonly<{
+    id: string;
+    actionLabel?: string;
+    actionDisabled?: boolean;
+    cells: readonly string[];
+  }>[];
   action?: Readonly<{ label: string; onOpen: (id: string) => void; disabled?: boolean }>;
   minWidth?: number;
 }) {
@@ -60,7 +65,7 @@ export function AppResourceTable({
                   <TableCell className="app-table-action">
                     <AppButton
                       {...restoreFocus}
-                      disabled={action.disabled ?? false}
+                      disabled={action.disabled === true || row.actionDisabled === true}
                       appearance="subtle"
                       aria-label={`${action.label}: ${row.actionLabel ?? row.id}`}
                       onClick={() => action.onOpen(row.id)}

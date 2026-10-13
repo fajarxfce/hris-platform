@@ -3,6 +3,7 @@ import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { ExpensePaymentSearchInput } from "../../domain/entities/expense-payment-search";
+import { canReadExpensePayments } from "../../domain/policies/expense-payment-read-policy";
 import type { ExpenseScreenProps } from "../contracts/expense-screen-props";
 import { useExpensePaymentFilters } from "../controllers/use-expense-payment-filters";
 import { useExpensePayments } from "../controllers/use-expense-payments";
@@ -62,6 +63,12 @@ function ExpensePaymentsBinding(
       rows={rows}
       locale={props.locale}
       companyName={props.companyName}
+      canPrepare={canReadExpensePayments(props.access.permissions)}
+      onPrepare={() =>
+        navigate(
+          `/expenses/payments/new?${expensePaymentParameters(props.access.companyId, props.search)}`,
+        )
+      }
       firstPage={props.search.after === null}
       onFirst={() => props.onSearch({ ...props.search, after: null })}
       onNext={() => {

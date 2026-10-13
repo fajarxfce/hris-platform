@@ -49,8 +49,38 @@ command for explicit retry, including after MFA recovery or a later rejection.
 A definite version conflict requires protected reload before a new decision.
 Access loss clears evidence without guessing the outcome of a pending write.
 Form input and retry state belong to the current browser editor; leaving a dirty,
-pending or unconfirmed editor requires a navigation decision. Draft authoring and
-finance commands remain subsequent workflows.
+pending or unconfirmed editor requires a navigation decision. Draft authoring
+remains a subsequent workflow.
+
+## Expense payments
+
+`/expenses/payments` requires `expenses.pay` and provides bounded
+company-date/status filters. A batch's tabs share one coherent review of its
+instructions, results and history. Complete bank details open in a side panel;
+the directory and ordinary instruction table retain masked account numbers.
+CSV download, release, cancellation and reconciliation use current server action
+availability and independently authorized endpoints.
+
+`/expenses/payments/new` selects approved claims through a dated, twenty-row
+picker. Selections persist across pages, with a maximum of 100. Unavailable
+operator actions and already selected claims cannot be added. Each payment has
+its own bank-details panel. Account numbers remain strings, including leading
+zeroes; no profile or reusable bank-account record is changed.
+
+The operator reviews every complete destination and amount before creation.
+Confirmation freezes the title, note, submission references, bank instructions,
+batch/item IDs and one operation ID. Unknown outcomes retain that same command
+through verification and later rejected retries. Definite initial rejection
+permits explicit correction and another review; denied access hides bank data.
+Selection and bank input share the page's navigation protection. Discovery and
+submission stop on disposal, and obsolete results cannot enter another company.
+Drafts and retry commands remain in browser memory for the editor lifecycle.
+
+Release and cancellation review the current batch version and require a reason.
+Reconciliation stages confirmed item results before one versioned submission;
+unentered items remain pending. Failure requires explicit confirmation that no
+funds were transferred. A prepared batch can be cancelled and replaced to correct
+its instructions; a released or successful payment cannot be silently rewritten.
 
 ## Expense policies
 

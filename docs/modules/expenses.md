@@ -257,6 +257,17 @@ the date/cursor page and does not disclose those internal actor IDs. It is a
 display hint; preparation still rechecks current independence, reservations and
 capacity when the command executes.
 
+The dashboard preparation page retains selected claims across twenty-row payable
+pages and limits each batch to 100. A bank-details panel edits only its selected
+payment; a separate review displays every complete destination and amount before
+confirmation. Title, note, submission references and all generated identifiers
+are frozen together for explicit retry after an unknown result. MFA renewal or a
+later rejection cannot replace that command. Definite initial failures permit
+correction and another review. Current access rejection removes bank data, and
+scope replacement cancels owned discovery and submission. Form and panel share
+one navigation guard; local edits do not reacquire claims. Browser draft/retry
+state is retained only during the editor lifecycle.
+
 Preparation reserves each claim. A database unique constraint prevents a claim from appearing in another prepared/pending/successful instruction, even under competing requests. Original makers, the frozen beneficiary, and the currently linked beneficiary cannot prepare, release, or reconcile their own claims. Payment instructions preserve their original destinations, amounts, and evidence. A correction requires cancellation of the prepared batch and a new batch.
 
 `POST /expenses/payments/{id}/release` requires an expected batch version, reason, idempotency key, and an operator different from the preparer. It changes the batch to `RELEASED` and its items to `PENDING`. `POST .../{id}/cancel` is limited to `PREPARED` and releases its reservations. A released batch cannot be cancelled because a bank instruction may already be in progress. There are at most 100 open and 10,000 total batches per company, and twenty preparation attempts per claim.

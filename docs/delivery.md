@@ -2814,3 +2814,33 @@ the API JAR build passed. Dashboard preparation is the next delivery increment.
 The development API image was rebuilt and updated using the existing document
 and WireGuard Compose overrides. API readiness and the development dashboard both
 returned HTTP 200 on their private WireGuard addresses.
+
+## Expense payment preparation
+
+Finance can select approved claims across dated twenty-row pages, complete each
+payment's bank destination in a side panel and review all instructions before
+creating a batch. Current server availability prevents selecting an ineligible
+claim. The client retains leading zeroes, validates destinations and limits the
+selection to 100; the API independently enforces authority and reservations.
+
+Confirmation freezes one operation, batch/item identifiers and all instructions.
+Lost responses retain the original command through MFA and later rejected retries.
+Known initial rejection permits explicit correction and review. A denied refresh
+or write removes bank data; disposal and company replacement abort owned work and
+ignore late results. Form and bank panel share one navigation owner. Browser
+selection and retry input remain in memory during the editor lifecycle.
+
+Architecture, formatting, TypeScript, the production build and 1,708 dashboard
+unit/component tests passed. The 44 new boundary/lifecycle tests passed again
+after the final presentation adjustment. Thirty-nine Chromium scenarios passed,
+including ten preparation cases and all existing payment read, transition and
+reconciliation scenarios. Review columns, the claim picker and narrow dark bank
+entry were inspected; nominal amounts remain visible in the desktop review.
+
+Real API/PostgreSQL acceptance passed with separate MFA-enrolled operators.
+After cancelling an initial batch, the maker prepared replacement instructions
+through the dashboard. A dropped committed response replayed the same batch and
+item IDs with one history entry. Independent release and reconciliation also
+recovered from dropped responses, retaining exact account/amount/CSV evidence,
+partial/final results, foreign-company denial and finance-revocation behavior.
+No bank transfer, phone installation or release was performed.

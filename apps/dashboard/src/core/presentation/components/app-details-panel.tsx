@@ -17,12 +17,14 @@ export function AppDetailsPanel({
   closeLabel,
   onClose,
   children,
+  width = 480,
 }: {
   open: boolean;
   title: string;
   closeLabel: string;
   onClose: () => void;
   children: ReactNode;
+  width?: number;
 }) {
   const restoreFocus = useRestoreFocusSource();
   const restoreClose = useRestoreFocusTarget();
@@ -33,7 +35,7 @@ export function AppDetailsPanel({
       open={open && visible}
       position="end"
       size="medium"
-      style={{ width: "480px", maxWidth: "100%" }}
+      style={{ width, maxWidth: "100%" }}
       onOpenChange={(_event, data) => {
         if (!data.open) onClose();
       }}

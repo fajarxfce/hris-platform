@@ -1,10 +1,12 @@
 import type { HttpClient } from "../../../../core/data/http/http-client";
+import { expensePayablePageDto } from "../models/expense-payable-dto";
 import {
   expensePaymentPageDto,
   expensePaymentReviewDto,
   expensePaymentWorksheetDto,
   expensePaymentWorksheetMaximumBytes,
 } from "../models/expense-payment-dto";
+import type { ExpensePaymentPreparationDto } from "../models/expense-payment-preparation-dto";
 import {
   type ExpensePaymentTransitionDto,
   expensePaymentTransitionReceiptDto,
@@ -13,6 +15,41 @@ import type { ExpenseReconciliationDto } from "../models/expense-reconciliation-
 import type { ExpensePaymentDataSource } from "./expense-payment-data-source";
 export class HttpExpensePaymentDataSource implements ExpensePaymentDataSource {
   constructor(private readonly http: HttpClient) {}
+  async payables(
+    company: string,
+    from: string,
+    until: string,
+    after: string | null,
+    signal: AbortSignal,
+  ) {
+    const query = new URLSearchParams({ from, until, limit: "20" });
+    if (after !== null) query.set("after", after);
+    return expensePayablePageDto.parse(
+      await this.http.request(
+        { path: `/api/v1/companies/${company}/expenses/payments/payables?${query}` },
+        signal,
+      ),
+    );
+  }
+  async prepare(
+    company: string,
+    id: string,
+    operation: string,
+    command: ExpensePaymentPreparationDto,
+    signal: AbortSignal,
+  ) {
+    return expensePaymentTransitionReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/expenses/payments/${id}`,
+          method: "PUT",
+          operationId: operation,
+          body: command,
+        },
+        signal,
+      ),
+    );
+  }
   async reconcile(
     company: string,
     id: string,

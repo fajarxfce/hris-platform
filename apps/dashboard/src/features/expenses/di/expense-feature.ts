@@ -11,11 +11,13 @@ import { DownloadExpensePayment } from "../domain/usecases/download-expense-paym
 import { DownloadExpenseReceipt } from "../domain/usecases/download-expense-receipt";
 import { LoadExpenseClaim } from "../domain/usecases/load-expense-claim";
 import { LoadExpenseClaims } from "../domain/usecases/load-expense-claims";
+import { LoadExpensePayables } from "../domain/usecases/load-expense-payables";
 import { LoadExpensePayment } from "../domain/usecases/load-expense-payment";
 import { LoadExpensePayments } from "../domain/usecases/load-expense-payments";
 import { LoadExpensePolicies } from "../domain/usecases/load-expense-policies";
 import { LoadExpensePolicy } from "../domain/usecases/load-expense-policy";
 import { LoadExpenseSubmission } from "../domain/usecases/load-expense-submission";
+import { PrepareExpensePayment } from "../domain/usecases/prepare-expense-payment";
 import { ReconcileExpensePayment } from "../domain/usecases/reconcile-expense-payment";
 import { ReviewExpenseDecision } from "../domain/usecases/review-expense-decision";
 import { ReviewExpensePaymentTransition } from "../domain/usecases/review-expense-payment-transition";
@@ -32,6 +34,8 @@ export function createExpenseFeature(
   const claims = new RemoteExpenseClaimRepository(new HttpExpenseClaimDataSource(http));
   const payments = new RemoteExpensePaymentRepository(new HttpExpensePaymentDataSource(http));
   return {
+    loadPayables: new LoadExpensePayables(payments),
+    preparePayment: new PrepareExpensePayment(payments),
     reviewReconciliation: new ReviewExpenseReconciliation(payments),
     reconcilePayment: new ReconcileExpensePayment(payments),
     reviewPaymentTransition: new ReviewExpensePaymentTransition(payments),

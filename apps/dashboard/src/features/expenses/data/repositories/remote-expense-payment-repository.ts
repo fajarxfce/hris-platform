@@ -1,16 +1,55 @@
 import { InvalidHttpResponseError } from "../../../../core/data/http/http-response-error";
 import { safeHttpCall } from "../../../../core/data/http/safe-http-call";
 import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
+import type { ExpensePayableSearch } from "../../domain/entities/expense-payable-search";
 import type { ExpensePaymentBatchId } from "../../domain/entities/expense-payment-batch";
+import type { ExpensePaymentPreparationCommand } from "../../domain/entities/expense-payment-preparation-command";
 import type { ExpensePaymentSearch } from "../../domain/entities/expense-payment-search";
 import type { ExpensePaymentTransitionCommand } from "../../domain/entities/expense-payment-transition-command";
 import type { ExpenseReconciliationCommand } from "../../domain/entities/expense-reconciliation-command";
 import type { ExpensePaymentRepository } from "../../domain/repositories/expense-payment-repository";
 import type { ExpensePaymentDataSource } from "../datasources/expense-payment-data-source";
+import { toExpensePayablePage } from "../mappers/expense-payable-mapper";
 import { toExpensePaymentPage } from "../mappers/expense-payment-mapper";
 import { toExpensePaymentReview } from "../mappers/expense-payment-review-mapper";
 export class RemoteExpensePaymentRepository implements ExpensePaymentRepository {
   constructor(private readonly source: ExpensePaymentDataSource) {}
+  payables(company: CompanyId, search: ExpensePayableSearch, signal: AbortSignal) {
+    return safeHttpCall(signal, async () =>
+      toExpensePayablePage(
+        await this.source.payables(company, search.from, search.until, search.after, signal),
+        company,
+        search,
+      ),
+    );
+  }
+  prepare(
+    company: CompanyId,
+    operation: OperationId,
+    command: ExpensePaymentPreparationCommand,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () => {
+      const receipt = await this.source.prepare(
+        company,
+        command.id,
+        operation,
+        {
+          title: command.title,
+          reason: command.reason,
+          items: command.items.map((item) => ({
+            id: item.id,
+            submissionId: item.submissionId,
+            destination: { ...item.destination },
+          })),
+        },
+        signal,
+      );
+      if (receipt.id.toLowerCase() !== command.id || receipt.version !== 0)
+        throw new InvalidHttpResponseError();
+      return Object.freeze({ id: receipt.id.toLowerCase(), version: receipt.version });
+    });
+  }
   reconcile(
     company: CompanyId,
     operation: OperationId,

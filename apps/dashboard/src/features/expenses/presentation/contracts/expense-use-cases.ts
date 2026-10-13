@@ -3,11 +3,13 @@ import type { DownloadExpensePayment } from "../../domain/usecases/download-expe
 import type { DownloadExpenseReceipt } from "../../domain/usecases/download-expense-receipt";
 import type { LoadExpenseClaim } from "../../domain/usecases/load-expense-claim";
 import type { LoadExpenseClaims } from "../../domain/usecases/load-expense-claims";
+import type { LoadExpensePayables } from "../../domain/usecases/load-expense-payables";
 import type { LoadExpensePayment } from "../../domain/usecases/load-expense-payment";
 import type { LoadExpensePayments } from "../../domain/usecases/load-expense-payments";
 import type { LoadExpensePolicies } from "../../domain/usecases/load-expense-policies";
 import type { LoadExpensePolicy } from "../../domain/usecases/load-expense-policy";
 import type { LoadExpenseSubmission } from "../../domain/usecases/load-expense-submission";
+import type { PrepareExpensePayment } from "../../domain/usecases/prepare-expense-payment";
 import type { ReconcileExpensePayment } from "../../domain/usecases/reconcile-expense-payment";
 import type { ReviewExpenseDecision } from "../../domain/usecases/review-expense-decision";
 import type { ReviewExpensePaymentTransition } from "../../domain/usecases/review-expense-payment-transition";
@@ -15,6 +17,8 @@ import type { ReviewExpenseReconciliation } from "../../domain/usecases/review-e
 import type { SaveExpensePolicy } from "../../domain/usecases/save-expense-policy";
 import type { TransitionExpensePayment } from "../../domain/usecases/transition-expense-payment";
 export type ExpenseUseCases = Readonly<{
+  loadPayables: Pick<LoadExpensePayables, "execute">;
+  preparePayment: Pick<PrepareExpensePayment, "execute">;
   reviewReconciliation: Pick<ReviewExpenseReconciliation, "execute">;
   reconcilePayment: Pick<ReconcileExpensePayment, "execute">;
   reviewPaymentTransition: Pick<ReviewExpensePaymentTransition, "execute">;

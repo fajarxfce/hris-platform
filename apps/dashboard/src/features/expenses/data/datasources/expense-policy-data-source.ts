@@ -6,6 +6,12 @@ import type {
 } from "../models/expense-policy-dto";
 
 export interface ExpensePolicyDataSource {
+  categories(
+    company: string,
+    asOf: string,
+    after: string | null,
+    signal: AbortSignal,
+  ): Promise<ExpenseCategoryPageDto>;
   save(
     company: string,
     id: string,

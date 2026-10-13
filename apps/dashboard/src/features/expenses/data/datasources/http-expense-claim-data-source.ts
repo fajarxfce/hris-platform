@@ -1,7 +1,9 @@
 import { binaryResponseDto } from "../../../../core/data/http/binary-response-dto";
 import type { HttpClient } from "../../../../core/data/http/http-client";
 import { expenseClaimPageDto, expenseClaimReviewDto } from "../models/expense-claim-dto";
-import { type ExpenseDecisionDto, expenseDecisionReceiptDto } from "../models/expense-decision-dto";
+import { expenseClaimReceiptDto } from "../models/expense-claim-receipt-dto";
+import type { ExpenseDecisionDto } from "../models/expense-decision-dto";
+import type { ExpenseDraftChangeDto } from "../models/expense-draft-change-dto";
 import {
   type ExpenseReceiptMetadataDto,
   expenseSubmissionDto,
@@ -9,6 +11,25 @@ import {
 import type { ExpenseClaimDataSource } from "./expense-claim-data-source";
 export class HttpExpenseClaimDataSource implements ExpenseClaimDataSource {
   constructor(private readonly http: HttpClient) {}
+  async saveDraft(
+    company: string,
+    id: string,
+    operation: string,
+    change: ExpenseDraftChangeDto,
+    signal: AbortSignal,
+  ) {
+    return expenseClaimReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/expenses/claims/${id}/draft`,
+          method: "PUT",
+          operationId: operation,
+          body: change,
+        },
+        signal,
+      ),
+    );
+  }
   async decide(
     company: string,
     id: string,
@@ -16,7 +37,7 @@ export class HttpExpenseClaimDataSource implements ExpenseClaimDataSource {
     change: ExpenseDecisionDto,
     signal: AbortSignal,
   ) {
-    return expenseDecisionReceiptDto.parse(
+    return expenseClaimReceiptDto.parse(
       await this.http.request(
         {
           path: `/api/v1/companies/${company}/expenses/submissions/${id}/decisions`,

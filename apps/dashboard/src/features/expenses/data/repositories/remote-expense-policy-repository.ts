@@ -5,10 +5,21 @@ import type { ExpensePolicyChange } from "../../domain/entities/expense-policy-c
 import type { ExpensePolicyId } from "../../domain/entities/expense-policy-definition";
 import type { ExpensePolicyRepository } from "../../domain/repositories/expense-policy-repository";
 import type { ExpensePolicyDataSource } from "../datasources/expense-policy-data-source";
+import { toExpenseCategoryPage } from "../mappers/expense-category-mapper";
 import { toExpensePolicyPage, toExpensePolicyReview } from "../mappers/expense-policy-mapper";
 
 export class RemoteExpensePolicyRepository implements ExpensePolicyRepository {
   constructor(private readonly source: ExpensePolicyDataSource) {}
+  categories(company: CompanyId, asOf: string, after: string | null, signal: AbortSignal) {
+    return safeHttpCall(signal, async () =>
+      toExpenseCategoryPage(
+        await this.source.categories(company, asOf, after, signal),
+        company,
+        asOf,
+        after,
+      ),
+    );
+  }
   save(
     company: CompanyId,
     operation: OperationId,

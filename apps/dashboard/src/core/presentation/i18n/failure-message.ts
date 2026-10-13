@@ -2,6 +2,50 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_expense_draft: [
+    "Review the claim title, items and change note.",
+    "Periksa judul klaim, item, dan catatan perubahan.",
+  ],
+  invalid_expense_line: [
+    "Check the item date, category, amount, description and receipts.",
+    "Periksa tanggal, kategori, jumlah, deskripsi, dan receipt item.",
+  ],
+  duplicate_expense_line: [
+    "Each expense item must be distinct.",
+    "Setiap item expense harus berbeda.",
+  ],
+  expense_claim_amount_limit: [
+    "The claim total exceeds the supported amount.",
+    "Total klaim melebihi batas jumlah yang didukung.",
+  ],
+  expense_access_denied: [
+    "You no longer have access to this expense claim.",
+    "Anda tidak lagi memiliki akses ke klaim expense ini.",
+  ],
+  expense_identity_immutable: [
+    "The employee on an existing claim cannot be changed.",
+    "Karyawan pada klaim yang sudah dibuat tidak dapat diubah.",
+  ],
+  expense_not_editable: [
+    "This claim can no longer be edited. Reload its details.",
+    "Klaim ini tidak dapat diedit lagi. Muat ulang detailnya.",
+  ],
+  expense_draft_revision_limit: [
+    "This claim has reached its draft revision limit.",
+    "Klaim ini mencapai batas revisi draft.",
+  ],
+  expense_draft_capacity: [
+    "Resolve outstanding drafts before creating another claim.",
+    "Selesaikan draft tertunda sebelum membuat klaim lain.",
+  ],
+  expense_category_unavailable: [
+    "A selected category is unavailable. Review the expense items.",
+    "Kategori yang dipilih tidak tersedia. Periksa item expense.",
+  ],
+  expense_cost_center_unavailable: [
+    "A selected cost center is unavailable. Review the expense items.",
+    "Cost center yang dipilih tidak tersedia. Periksa item expense.",
+  ],
   invalid_expense_payment_batch: [
     "Review the title, note and selected claims before preparing the batch.",
     "Periksa judul, catatan, dan klaim yang dipilih sebelum menyiapkan batch.",
@@ -128,8 +172,8 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Bukti tidak tersedia. Muat ulang pengajuan untuk memeriksa akses terbaru.",
   ],
   expense_receipt_unavailable: [
-    "This receipt cannot be downloaded. Reload the submission.",
-    "Bukti belum dapat diunduh. Muat ulang pengajuan.",
+    "This receipt is unavailable. Review the selected evidence.",
+    "Receipt tidak tersedia. Periksa bukti yang dipilih.",
   ],
   invalid_expense_policy: [
     "Review the category requirements and amount limits.",

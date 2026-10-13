@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { expect, type Page, test } from "@playwright/test";
 import { companyDate } from "../src/core/presentation/dates/company-date";
+import type { ExpenseDraftChangeDto } from "../src/features/expenses/data/models/expense-draft-change-dto";
 import { createAdminCompany } from "./fixtures/admin-company";
 import { authenticatorCode } from "./fixtures/authenticator";
 
@@ -21,7 +22,7 @@ async function reviewerSession(page: Page) {
   await page.getByRole("button", { name: "I have saved the codes", exact: true }).click();
 }
 
-test("real expense review preserves submitted evidence, replays a lost decision and supports correction and rejection", async ({
+test("real expense authoring and review replay lost saves and decisions, preserve evidence, and support returned-claim correction", async ({
   page,
   context,
   browser,
@@ -39,8 +40,6 @@ test("real expense review preserves submitted evidence, replays a lost decision 
   const base = `/api/v1/companies/${company}`,
     employee = randomUUID(),
     category = randomUUID(),
-    claim = randomUUID(),
-    line = randomUUID(),
     submission = randomUUID();
   const reviewer = "a0000000-0000-4000-8000-000000000031";
   const headers = () => ({ [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() });
@@ -100,28 +99,67 @@ test("real expense review preserves submitted evidence, replays a lost decision 
     },
   });
   expect(template.status()).toBe(200);
-  const draft = {
-    employmentId: employee,
-    title: "Customer visit",
-    description: "Transport to customer office",
-    lines: [
-      {
-        id: line,
-        categoryId: category,
-        occurredOn: today,
-        amount: "150000.75",
-        description: "Return train ticket",
-        costCenterId: null,
-        receiptRevisionIds: [],
-      },
-    ],
-    reason: "Expense details confirmed",
-  };
-  const saved = await context.request.put(`${base}/expenses/claims/${claim}/draft`, {
-    headers: headers(),
-    data: { ...draft, expectedVersion: null },
+  const creationWrites: { id: string; operation: string; body: ExpenseDraftChangeDto }[] = [];
+  const draftRoute = `**${base}/expenses/claims/*/draft`;
+  await page.route(draftRoute, async (route) => {
+    const claimId = new URL(route.request().url()).pathname.split("/").at(-2);
+    if (!claimId) throw new Error("Creation requires a claim ID");
+    creationWrites.push({
+      id: claimId,
+      operation: route.request().headers()["idempotency-key"] ?? "",
+      body: route.request().postDataJSON() as ExpenseDraftChangeDto,
+    });
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toMatchObject({ id: claimId, version: 0 });
+    if (creationWrites.length === 1) return route.abort("failed");
+    return route.fulfill({ response });
   });
-  expect(saved.status()).toBe(200);
+  await page.goto(`/expenses/claims/new?company=${company}&from=${today}&until=${today}`);
+  await page.getByRole("button", { name: "Select: Expense Fixture Employee", exact: true }).click();
+  await page.getByLabel("Claim title", { exact: true }).fill("Customer visit");
+  await page.getByLabel("Description", { exact: true }).fill("Transport to customer office");
+  await page.getByLabel("Change note", { exact: true }).fill("Expense details confirmed");
+  await page.getByRole("button", { name: "Add item", exact: true }).click();
+  const itemEditor = page.getByRole("dialog", { name: "Item details", exact: true });
+  await itemEditor.getByLabel("Expense date", { exact: true }).fill(today);
+  await itemEditor.getByRole("button", { name: "Select category", exact: true }).click();
+  await itemEditor.getByRole("button", { name: "Select: Business travel", exact: true }).click();
+  await itemEditor.getByLabel("Amount (IDR)", { exact: true }).fill("150000.75");
+  await itemEditor.getByLabel("Item description", { exact: true }).fill("Return train ticket");
+  await itemEditor.getByRole("button", { name: "Add receipt", exact: true }).click();
+  await expect(itemEditor.getByText("No matching records.", { exact: true })).toBeVisible();
+  await itemEditor.getByRole("button", { name: "Back to item", exact: true }).click();
+  await itemEditor.getByRole("button", { name: "Apply item", exact: true }).click();
+  await page
+    .getByRole("heading", { name: "New expense claim", exact: true })
+    .scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: "../../.work/dashboard-expense-draft-real.png",
+    fullPage: true,
+    animations: "disabled",
+  });
+  await page.getByRole("button", { name: "Save draft", exact: true }).click();
+  await page.getByRole("button", { name: "Retry original save", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Draft saved.");
+  await page.unroute(draftRoute);
+  const createdDraft = creationWrites[0];
+  if (!createdDraft) throw new Error("Draft creation was not captured");
+  const claim = createdDraft.id,
+    draft = createdDraft.body;
+  expect(creationWrites).toHaveLength(2);
+  expect(creationWrites[1]).toEqual(createdDraft);
+  expect(draft).toMatchObject({
+    employmentId: employee,
+    expectedVersion: null,
+    lines: [{ categoryId: category, amount: "150000.75" }],
+  });
+  expect(
+    await (await context.request.get(`${base}/expenses/claims/${claim}/review`)).json(),
+  ).toMatchObject({
+    claim: { version: 0 },
+    history: { items: [{ version: 0, kind: "DRAFT_SAVED" }] },
+  });
   const revised = await context.request.put(`${base}/expenses/claims/${claim}/draft`, {
     headers: headers(),
     data: { ...draft, title: "Customer visit reimbursement", expectedVersion: 0 },
@@ -313,14 +351,39 @@ test("real expense review preserves submitted evidence, replays a lost decision 
       approval: { version: 1, status: "REJECTED" },
       reviews: [{ decision: "RETURN", reason: "Correct the item description" }],
     });
+    await page.goto(
+      `/expenses/claims/${correctedClaim}/edit?company=${company}&from=${today}&until=${today}`,
+    );
+    await expect(
+      page.getByText("This claim was returned. Save your corrections before submitting again.", {
+        exact: true,
+      }),
+    ).toBeVisible();
+    await page.getByLabel("Description", { exact: true }).fill("Updated item description");
+    await page.getByRole("button", { name: "Edit item: Return train ticket", exact: true }).click();
+    const correctionEditor = page.getByRole("dialog", { name: "Item details", exact: true });
+    await expect(correctionEditor).toContainText("Revised travel policy");
+    await correctionEditor
+      .getByLabel("Item description", { exact: true })
+      .fill("Updated train ticket evidence");
+    await correctionEditor.getByRole("button", { name: "Apply item", exact: true }).click();
+    await page.getByLabel("Change note", { exact: true }).fill("Corrected reviewer findings");
+    await page.getByRole("button", { name: "Save draft", exact: true }).click();
+    await expect(page.getByRole("status")).toContainText("Draft saved.");
     expect(
-      (
-        await context.request.put(`${base}/expenses/claims/${correctedClaim}/draft`, {
-          headers: headers(),
-          data: { ...correctionDraft, description: "Updated item description", expectedVersion: 2 },
-        })
-      ).status(),
-    ).toBe(200);
+      await (await context.request.get(`${base}/expenses/claims/${correctedClaim}/review`)).json(),
+    ).toMatchObject({
+      claim: {
+        version: 3,
+        draftRevision: 1,
+        status: "DRAFT",
+        draft: {
+          lines: [
+            { id: correctionDraft.lines[0]?.id, description: "Updated train ticket evidence" },
+          ],
+        },
+      },
+    });
     expect(
       (
         await context.request.post(`${base}/expenses/claims/${correctedClaim}/submit`, {

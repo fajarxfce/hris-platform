@@ -5,6 +5,7 @@ import type { CompanyId, OperationId } from "../../../../core/domain/identifiers
 import type { ExpenseClaimId } from "../../domain/entities/expense-claim";
 import type { ExpenseClaimSearch } from "../../domain/entities/expense-claim-search";
 import type { ExpenseDecisionCommand } from "../../domain/entities/expense-decision-command";
+import type { ExpenseDraftChange } from "../../domain/entities/expense-draft-change";
 import type { ExpenseReceipt } from "../../domain/entities/expense-receipt";
 import type { ExpenseSubmissionId } from "../../domain/entities/expense-submission-summary";
 import type { ExpenseClaimRepository } from "../../domain/repositories/expense-claim-repository";
@@ -14,6 +15,38 @@ import { toExpenseClaimReview } from "../mappers/expense-claim-review-mapper";
 import { toExpenseSubmission } from "../mappers/expense-submission-mapper";
 export class RemoteExpenseClaimRepository implements ExpenseClaimRepository {
   constructor(private readonly source: ExpenseClaimDataSource) {}
+  saveDraft(
+    company: CompanyId,
+    operation: OperationId,
+    change: ExpenseDraftChange,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () => {
+      const receipt = await this.source.saveDraft(
+        company,
+        change.id,
+        operation,
+        {
+          employmentId: change.employmentId,
+          expectedVersion: change.expectedVersion,
+          title: change.title,
+          description: change.description,
+          reason: change.reason,
+          lines: change.lines.map((line) => ({
+            ...line,
+            receiptRevisionIds: [...line.receiptRevisionIds],
+          })),
+        },
+        signal,
+      );
+      if (
+        receipt.id.toLowerCase() !== change.id ||
+        receipt.version !== (change.expectedVersion ?? -1) + 1
+      )
+        throw new InvalidHttpResponseError();
+      return Object.freeze({ id: receipt.id.toLowerCase(), version: receipt.version });
+    });
+  }
   decide(
     company: CompanyId,
     operation: OperationId,

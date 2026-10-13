@@ -12,6 +12,7 @@ import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useExpenseClaim } from "../controllers/use-expense-claim";
 import { expenseClaimMessages } from "../i18n/expense-claim-messages";
+import { expenseDraftMessages } from "../i18n/expense-draft-messages";
 import { type ExpenseClaimTab, expenseClaimTabs } from "../models/expense-claim-route";
 import type { expenseClaimView } from "../models/expense-claim-view";
 export function ExpenseClaimPage(props: {
@@ -20,6 +21,7 @@ export function ExpenseClaimPage(props: {
   locale: Locale;
   companyName: string;
   backTo: string;
+  editTo: string | null;
   tab: ExpenseClaimTab;
   firstHistory: boolean;
   onTab: (tab: string) => void;
@@ -39,6 +41,7 @@ export function ExpenseClaimPage(props: {
           actions={
             <>
               <Link to={props.backTo}>{text.title}</Link>
+              {props.editTo && <Link to={props.editTo}>{expenseDraftMessages(locale).edit}</Link>}
               <AppButton
                 appearance="subtle"
                 icon={<ArrowClockwise20Regular />}

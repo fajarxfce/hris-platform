@@ -1,5 +1,5 @@
 import { Text } from "@fluentui/react-components";
-import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Add20Regular, ArrowClockwise20Regular } from "@fluentui/react-icons";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -13,6 +13,7 @@ import { expenseClaimStatuses } from "../../domain/entities/expense-claim";
 import type { useExpenseClaimFilters } from "../controllers/use-expense-claim-filters";
 import type { useExpenseClaims } from "../controllers/use-expense-claims";
 import { expenseClaimMessages } from "../i18n/expense-claim-messages";
+import { expenseDraftMessages } from "../i18n/expense-draft-messages";
 import type { expenseClaimRows } from "../models/expense-claim-view";
 export function ExpenseClaimsPage(props: {
   state: ReturnType<typeof useExpenseClaims>;
@@ -24,6 +25,7 @@ export function ExpenseClaimsPage(props: {
   onFirst: () => void;
   onNext: () => void;
   onOpen: (id: string) => void;
+  onCreate: (() => void) | null;
 }) {
   const { state, filters, locale } = props,
     text = expenseClaimMessages(locale);
@@ -33,14 +35,21 @@ export function ExpenseClaimsPage(props: {
         title={text.title}
         context={props.companyName}
         actions={
-          <AppButton
-            appearance="subtle"
-            icon={<ArrowClockwise20Regular />}
-            onClick={state.refresh}
-            disabled={state.loading}
-          >
-            {messages(locale).refresh}
-          </AppButton>
+          <>
+            {props.onCreate && (
+              <AppButton icon={<Add20Regular />} onClick={props.onCreate}>
+                {expenseDraftMessages(locale).create}
+              </AppButton>
+            )}
+            <AppButton
+              appearance="subtle"
+              icon={<ArrowClockwise20Regular />}
+              onClick={state.refresh}
+              disabled={state.loading}
+            >
+              {messages(locale).refresh}
+            </AppButton>
+          </>
         }
       />
       <form onSubmit={filters.submit} noValidate>

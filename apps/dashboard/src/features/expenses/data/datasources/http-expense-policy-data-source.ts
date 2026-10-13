@@ -9,6 +9,16 @@ import type { ExpensePolicyDataSource } from "./expense-policy-data-source";
 
 export class HttpExpensePolicyDataSource implements ExpensePolicyDataSource {
   constructor(private readonly http: HttpClient) {}
+  async categories(company: string, asOf: string, after: string | null, signal: AbortSignal) {
+    const query = new URLSearchParams({ asOf, limit: "20" });
+    if (after !== null) query.set("after", after);
+    return expenseCategoryPageDto.parse(
+      await this.http.request(
+        { path: `/api/v1/companies/${company}/expenses/categories?${query}` },
+        signal,
+      ),
+    );
+  }
   async save(
     company: string,
     id: string,

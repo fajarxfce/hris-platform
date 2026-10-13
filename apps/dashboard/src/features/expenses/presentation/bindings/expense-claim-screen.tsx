@@ -2,6 +2,10 @@ import { useMemo } from "react";
 import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
+import {
+  canEditExpenseDraft,
+  canManageExpenseDrafts,
+} from "../../domain/policies/expense-draft-policy";
 import type { ExpenseScreenProps } from "../contracts/expense-screen-props";
 import { useExpenseClaim } from "../controllers/use-expense-claim";
 import {
@@ -70,6 +74,13 @@ function ExpenseClaimBinding(props: ExpenseScreenProps & { id: string; directory
       locale={props.locale}
       companyName={props.companyName}
       backTo={`/expenses/claims?${props.directory}`}
+      editTo={
+        state.review &&
+        canManageExpenseDrafts(props.access.permissions) &&
+        canEditExpenseDraft(state.review.claim)
+          ? `${expenseClaimPath(state.review.claim.id)}/edit?${props.directory}`
+          : null
+      }
       tab={tab}
       firstHistory={after === null}
       onTab={(value) => {

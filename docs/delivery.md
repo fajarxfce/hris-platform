@@ -2869,3 +2869,40 @@ receipts, original/live grants, MFA expiry after waits and interrupted cleanup.
 The expense domain tests, architecture, formatting and API JAR build passed.
 The worker graph is unchanged. Dashboard draft authoring follows this increment;
 no mobile or phone update was made.
+
+## Dashboard expense draft authoring
+
+Expense managers can create drafts for a selected company employee, edit current
+drafts and correct returned claims. The editor keeps claim fields, the item table
+and item entry separate. Employee search is explicit; employee, dated-category,
+cost-center and published-receipt selectors request twenty entries per page.
+Drafts support twenty items, three receipts per item and exact decimal amounts.
+An empty draft can be saved before its items are ready for submission.
+
+Editing retains the reviewed claim version, employee identity and original item
+and receipt IDs. Archived or unavailable references remain visible for correction.
+Category selection uses the expense date's effective revision rather than requiring
+the latest policy head. Labels are retained only for the selected items. Browser
+input belongs to the editor lifecycle; one navigation owner protects both the
+claim form and an uncommitted item panel.
+
+Saving freezes one operation and payload. A lost response retains that original
+command across MFA and later rejection; a definite version conflict requires an
+explicit protected reload. Access failures withdraw visible evidence. Scoped
+queries and controllers cancel obsolete work and ignore late completion after
+disposal or account/company changes.
+
+Real API/PostgreSQL acceptance created a draft through the dashboard, selected an
+employee and dated category, and checked the empty published-receipt list. A
+deliberately dropped committed save replayed as one claim and one history entry.
+The existing independent approval scenario also corrected a returned claim
+through the editor, retained its item IDs and preserved earlier submitted
+evidence. Lost decision replay, foreign-company denial and subsequent rejection
+continued to pass. Light and narrow dark layouts were inspected, including
+language changes with retained input.
+
+The final dashboard check passed: architecture, formatting, TypeScript and 1,760
+unit/component tests, including 52 new boundary and lifecycle cases. Thirty
+Chromium scenarios passed across draft authoring, claim reads and review decisions.
+The production build and real API/PostgreSQL scenario passed. Existing CSS
+specificity and bundle-size advisories remain.

@@ -3,6 +3,7 @@ import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { ExpenseClaimSearchInput } from "../../domain/entities/expense-claim-search";
+import { canManageExpenseDrafts } from "../../domain/policies/expense-draft-policy";
 import type { ExpenseScreenProps } from "../contracts/expense-screen-props";
 import { useExpenseClaimFilters } from "../controllers/use-expense-claim-filters";
 import { useExpenseClaims } from "../controllers/use-expense-claims";
@@ -62,6 +63,14 @@ function ExpenseClaimsBinding(
       rows={rows}
       locale={props.locale}
       companyName={props.companyName}
+      onCreate={
+        canManageExpenseDrafts(props.access.permissions)
+          ? () =>
+              navigate(
+                `/expenses/claims/new?${expenseClaimParameters(props.access.companyId, props.search)}`,
+              )
+          : null
+      }
       firstPage={props.search.after === null}
       onFirst={() => props.onSearch({ ...props.search, after: null })}
       onNext={() => {

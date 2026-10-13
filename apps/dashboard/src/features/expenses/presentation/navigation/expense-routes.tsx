@@ -7,6 +7,7 @@ import { canReadExpensePayments } from "../../domain/policies/expense-payment-re
 import { ExpenseClaimScreen } from "../bindings/expense-claim-screen";
 import { ExpenseClaimsScreen } from "../bindings/expense-claims-screen";
 import { ExpenseDecisionScreen } from "../bindings/expense-decision-screen";
+import { ExpenseDraftEditorScreen } from "../bindings/expense-draft-editor-screen";
 import { ExpensePaymentScreen } from "../bindings/expense-payment-screen";
 import { ExpensePaymentTransitionScreen } from "../bindings/expense-payment-transition-screen";
 import { ExpensePaymentsScreen } from "../bindings/expense-payments-screen";
@@ -41,6 +42,11 @@ export function ExpenseRoutes(props: {
         element={<ExpensePaymentTransitionScreen {...props} />}
       />
       <Route path="claims" element={<ExpenseClaimsScreen {...props} />} />
+      <Route path="claims/new" element={<ExpenseDraftEditorScreen {...props} creating={true} />} />
+      <Route
+        path="claims/:claimId/edit"
+        element={<ExpenseDraftEditorScreen {...props} creating={false} />}
+      />
       <Route path="claims/:claimId" element={<ExpenseClaimScreen {...props} />} />
       <Route path="submissions/:submissionId" element={<ExpenseSubmissionScreen {...props} />} />
       <Route

@@ -8,6 +8,7 @@ import { ExpenseClaimScreen } from "../bindings/expense-claim-screen";
 import { ExpenseClaimsScreen } from "../bindings/expense-claims-screen";
 import { ExpenseDecisionScreen } from "../bindings/expense-decision-screen";
 import { ExpensePaymentScreen } from "../bindings/expense-payment-screen";
+import { ExpensePaymentTransitionScreen } from "../bindings/expense-payment-transition-screen";
 import { ExpensePaymentsScreen } from "../bindings/expense-payments-screen";
 import { ExpensePoliciesScreen } from "../bindings/expense-policies-screen";
 import { ExpensePolicyEditorScreen } from "../bindings/expense-policy-editor-screen";
@@ -28,6 +29,10 @@ export function ExpenseRoutes(props: {
     <Routes>
       <Route path="payments" element={<ExpensePaymentsScreen {...props} />} />
       <Route path="payments/:batchId" element={<ExpensePaymentScreen {...props} />} />
+      <Route
+        path="payments/:batchId/:intent"
+        element={<ExpensePaymentTransitionScreen {...props} />}
+      />
       <Route path="claims" element={<ExpenseClaimsScreen {...props} />} />
       <Route path="claims/:claimId" element={<ExpenseClaimScreen {...props} />} />
       <Route path="submissions/:submissionId" element={<ExpenseSubmissionScreen {...props} />} />

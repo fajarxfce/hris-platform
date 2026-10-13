@@ -56,6 +56,35 @@ test("real finance review exports confirmed instructions and shows partial and f
     const makerCsrf = await paymentSession(makerPage, "maker"),
       checkerCsrf = await paymentSession(finance, "checker"),
       id = randomUUID();
+    const cancelledId = randomUUID();
+    const replacement = await maker.request.put(`${base}/expenses/payments/${cancelledId}`, {
+      headers: paymentHeaders(makerCsrf),
+      data: {
+        title: "Reimbursement instructions to replace",
+        items: items.map((item) => ({
+          id: randomUUID(),
+          submissionId: item.submissionId,
+          destination: item.destination,
+        })),
+        reason: "Initial bank instructions",
+      },
+    });
+    expect(replacement.status()).toBe(200);
+    await makerPage.goto(`/expenses/payments/${cancelledId}?company=${company}`);
+    await expect(makerPage.getByRole("button", { name: "Release batch", exact: true })).toHaveCount(
+      0,
+    );
+    await makerPage.getByRole("button", { name: "Cancel batch", exact: true }).click();
+    await makerPage
+      .getByLabel("Reason", { exact: true })
+      .fill("Replace bank instructions before release");
+    await makerPage.getByRole("button", { name: "Cancel batch", exact: true }).click();
+    await expect(makerPage.getByRole("status")).toContainText("Payment batch updated.");
+    const cancelled = (await (
+      await maker.request.get(`${base}/expenses/payments/${cancelledId}/review`)
+    ).json()) as ExpensePaymentReviewDto;
+    expect(cancelled.batch).toMatchObject({ status: "CANCELLED", version: 1 });
+    expect(cancelled.history.items).toHaveLength(2);
     const prepared = await maker.request.put(`${base}/expenses/payments/${id}`, {
       headers: paymentHeaders(makerCsrf),
       data: {
@@ -85,12 +114,30 @@ test("real finance review exports confirmed instructions and shows partial and f
     await expect(overview).toContainText("Prepared");
     await finance.getByRole("tab", { name: "Bank instructions", exact: true }).click();
     await expect(finance.getByRole("button", { name: "Download CSV", exact: true })).toHaveCount(0);
-    const released = await checker.request.post(`${base}/expenses/payments/${id}/release`, {
-      headers: paymentHeaders(checkerCsrf),
-      data: { expectedVersion: 0, reason: "Independent bank instruction review" },
+    const releaseWrites: { operation: string; body: unknown }[] = [];
+    await finance.route(`**${base}/expenses/payments/${id}/release`, async (route) => {
+      releaseWrites.push({
+        operation: route.request().headers()["idempotency-key"] ?? "",
+        body: route.request().postDataJSON(),
+      });
+      const response = await route.fetch();
+      expect(response.status()).toBe(200);
+      expect(await response.json()).toMatchObject({ id, version: 1 });
+      if (releaseWrites.length === 1) return route.abort("failed");
+      return route.fulfill({ response });
     });
-    expect(released.status()).toBe(200);
-    await finance.getByRole("button", { name: "Refresh", exact: true }).click();
+    await finance.getByRole("button", { name: "Release batch", exact: true }).click();
+    await finance.getByLabel("Reason", { exact: true }).fill("Independent bank instruction review");
+    await finance.getByRole("button", { name: "Release batch", exact: true }).click();
+    await expect(
+      finance.getByRole("button", { name: "Retry original action", exact: true }),
+    ).toBeVisible();
+    await finance.getByRole("button", { name: "Retry original action", exact: true }).click();
+    await expect(finance.getByRole("status")).toContainText("Payment batch updated.");
+    expect(releaseWrites).toHaveLength(2);
+    expect(releaseWrites[1]).toEqual(releaseWrites[0]);
+    await finance.getByRole("link", { name: "Batch details", exact: true }).last().click();
+    await finance.getByRole("tab", { name: "Bank instructions", exact: true }).click();
     const started = finance.waitForEvent("download");
     await finance.getByRole("button", { name: "Download CSV", exact: true }).click();
     const download = await started,

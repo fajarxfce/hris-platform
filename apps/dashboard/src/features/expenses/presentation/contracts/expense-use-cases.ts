@@ -9,9 +9,13 @@ import type { LoadExpensePolicies } from "../../domain/usecases/load-expense-pol
 import type { LoadExpensePolicy } from "../../domain/usecases/load-expense-policy";
 import type { LoadExpenseSubmission } from "../../domain/usecases/load-expense-submission";
 import type { ReviewExpenseDecision } from "../../domain/usecases/review-expense-decision";
+import type { ReviewExpensePaymentTransition } from "../../domain/usecases/review-expense-payment-transition";
 import type { SaveExpensePolicy } from "../../domain/usecases/save-expense-policy";
+import type { TransitionExpensePayment } from "../../domain/usecases/transition-expense-payment";
 
 export type ExpenseUseCases = Readonly<{
+  reviewPaymentTransition: Pick<ReviewExpensePaymentTransition, "execute">;
+  transitionPayment: Pick<TransitionExpensePayment, "execute">;
   loadPayments: Pick<LoadExpensePayments, "execute">;
   loadPayment: Pick<LoadExpensePayment, "execute">;
   downloadPayment: Pick<DownloadExpensePayment, "execute">;

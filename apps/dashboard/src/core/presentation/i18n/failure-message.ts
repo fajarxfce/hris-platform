@@ -2,6 +2,30 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  expense_payment_action_unavailable: [
+    "This action is unavailable. Return to the batch details.",
+    "Tindakan tidak tersedia. Kembali ke detail batch.",
+  ],
+  invalid_expense_payment_action: [
+    "Enter a reason of up to 1,000 characters and review the payment batch.",
+    "Isi alasan maksimal 1.000 karakter dan periksa batch pembayaran.",
+  ],
+  expense_payment_not_prepared: [
+    "This batch is no longer prepared. Reload its details.",
+    "Batch tidak lagi dalam tahap persiapan. Muat ulang detailnya.",
+  ],
+  expense_payment_evidence_unavailable: [
+    "Payment evidence has changed. Reload the batch review.",
+    "Bukti pembayaran telah berubah. Muat ulang tinjauan batch.",
+  ],
+  independent_payment_release_required: [
+    "Another authorized finance operator must release this batch.",
+    "Operator finance lain yang berwenang harus merilis batch ini.",
+  ],
+  independent_expense_payment_required: [
+    "An independent finance operator must handle this payment.",
+    "Pembayaran harus ditangani operator finance yang independen.",
+  ],
   expense_payment_batch_not_found: [
     "This payment batch is unavailable. Return to the payment list.",
     "Batch pembayaran tidak tersedia. Kembali ke daftar pembayaran.",

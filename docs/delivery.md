@@ -2729,3 +2729,34 @@ The development dashboard remains available through WireGuard. No phone update
 was needed for this dashboard increment. The existing bundle-size advisory and
 two unrelated CSS specificity warnings remain. Preparation, release/cancellation
 and reconciliation entry in the dashboard are subsequent work.
+
+## Expense payment release and cancellation
+
+Prepared batches now open a separate release/cancellation review from their
+current server capabilities. Full destinations and amounts are visible before
+confirmation, and both actions require a reason. The client captures one immutable
+versioned command. A lost response preserves its operation and input through
+explicit retries; later MFA, permission or conflict failures cannot turn an unknown
+first outcome into a new command. Known initial conflicts require a fresh review.
+
+Payment inspection stays local to the form. Navigation protection covers dirty
+input, pending writes and unconfirmed results; account/company replacement and
+disposal release owned work. Access or independence rejection removes bank data.
+The ordinary detail reader and worksheet retain their separate ownership.
+
+Dashboard architecture, formatting, TypeScript, production build and all 1,619
+unit/component tests passed, including 28 new boundary/lifecycle cases. Twenty
+Chromium scenarios passed: eight transition workflows and twelve existing payment
+read/download checks. They exercised required input, duplicate presses, local
+inspection, capability denial, explicit conflict recovery, response loss across
+MFA verification and later rejection, company replacement, and language/theme
+retention. Light and 760-pixel dark layouts were inspected; the layout scenario
+was rerun after correcting the screenshot's scroll position.
+
+The real API/PostgreSQL browser scenario passed with separate MFA-enrolled
+operators. The batch maker cancelled an initial batch through the dashboard;
+its claims then entered a replacement batch. An independent operator released
+that batch, its committed response was dropped, and the original operation was
+replayed with one release entry. Existing CSV, partial/final reconciliation,
+foreign-company denial and finance revocation acceptance remained successful.
+No bank transfer or phone installation was performed for this increment.

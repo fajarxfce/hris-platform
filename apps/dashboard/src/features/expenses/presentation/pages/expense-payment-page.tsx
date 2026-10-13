@@ -15,10 +15,14 @@ import { type Locale, messages } from "../../../../core/presentation/i18n/messag
 import type { useExpensePayment } from "../controllers/use-expense-payment";
 import { expensePaymentMessages } from "../i18n/expense-payment-messages";
 import { type ExpensePaymentTab, expensePaymentTabs } from "../models/expense-payment-route";
+import type { ExpensePaymentTransitionIntent } from "../models/expense-payment-transition-intent";
+import type { expensePaymentTransitionActions } from "../models/expense-payment-transition-view";
 import type { expensePaymentView } from "../models/expense-payment-view";
 export function ExpensePaymentPage(props: {
   state: ReturnType<typeof useExpensePayment>;
   view: ReturnType<typeof expensePaymentView> | null;
+  transitions: ReturnType<typeof expensePaymentTransitionActions>;
+  onTransition: (intent: ExpensePaymentTransitionIntent) => void;
   locale: Locale;
   companyName: string;
   backTo: string;
@@ -41,6 +45,15 @@ export function ExpensePaymentPage(props: {
           context={props.companyName}
           actions={
             <>
+              {props.transitions.map((action) => (
+                <AppButton
+                  key={action.intent}
+                  appearance={action.intent === "release" ? "primary" : "subtle"}
+                  onClick={() => props.onTransition(action.intent)}
+                >
+                  {action.label}
+                </AppButton>
+              ))}
               <Link to={props.backTo}>{text.title}</Link>
               <AppButton
                 appearance="subtle"

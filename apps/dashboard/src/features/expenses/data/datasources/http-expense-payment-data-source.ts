@@ -5,9 +5,33 @@ import {
   expensePaymentWorksheetDto,
   expensePaymentWorksheetMaximumBytes,
 } from "../models/expense-payment-dto";
+import {
+  type ExpensePaymentTransitionDto,
+  expensePaymentTransitionReceiptDto,
+} from "../models/expense-payment-transition-dto";
 import type { ExpensePaymentDataSource } from "./expense-payment-data-source";
 export class HttpExpensePaymentDataSource implements ExpensePaymentDataSource {
   constructor(private readonly http: HttpClient) {}
+  async transition(
+    company: string,
+    id: string,
+    operation: string,
+    action: "release" | "cancel",
+    command: ExpensePaymentTransitionDto,
+    signal: AbortSignal,
+  ) {
+    return expensePaymentTransitionReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/expenses/payments/${id}/${action}`,
+          method: "POST",
+          operationId: operation,
+          body: command,
+        },
+        signal,
+      ),
+    );
+  }
   async list(
     company: string,
     from: string,

@@ -220,6 +220,16 @@ twelve-digit limit. This read flow does not grant access to the source claim and
 does not issue bank transfers. Batch authoring and reconciliation commands have
 their own delivery work.
 
+Prepared batch details expose release and cancellation only from the current
+server action projection. Each action opens a fresh review with complete bank
+destinations, amounts and a required reason. The confirmation captures the
+reviewed batch version and one operation ID. Unknown outcomes retain the original
+input and operation for explicit retry, including across account verification or
+a later rejected retry. A definite conflict requires an explicit fresh review.
+Inspection stays local to the form; departure and reload protect unsaved input
+and unconfirmed commands. Disposal aborts owned work and ignores late results.
+These browser commands are retained during the editor lifecycle, not persisted.
+
 `GET /expenses/payments/payables?from=YYYY-MM-DD&until=YYYY-MM-DD` lists approved claims without an unresolved or successful payment reservation. `PUT /expenses/payments/{id}` prepares an immutable batch of one to 100 instructions with stable item IDs, submission IDs, bank codes, account numbers/names, title, reason, and idempotency key. Finance supplies independently verified destinations for this batch; it does not change a person's profile or define a reusable bank-account master. Claim amounts and employee labels come from the approved submission, not the request. All amounts are IDR decimal strings.
 
 Preparation reserves each claim. A database unique constraint prevents a claim from appearing in another prepared/pending/successful instruction, even under competing requests. Original makers, the frozen beneficiary, and the currently linked beneficiary cannot prepare, release, or reconcile their own claims. Payment instructions preserve their original destinations, amounts, and evidence. A correction requires cancellation of the prepared batch and a new batch.

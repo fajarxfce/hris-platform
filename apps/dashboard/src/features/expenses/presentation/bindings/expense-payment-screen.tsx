@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Navigate, useParams, useSearchParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { ExpenseScreenProps } from "../contracts/expense-screen-props";
@@ -11,6 +11,7 @@ import {
   expensePaymentTab,
   expensePaymentTabs,
 } from "../models/expense-payment-route";
+import { expensePaymentTransitionActions } from "../models/expense-payment-transition-view";
 import { expensePaymentView } from "../models/expense-payment-view";
 import { ExpensePaymentPage } from "../pages/expense-payment-page";
 import { ExpensePaymentWorksheet } from "./expense-payment-worksheet";
@@ -41,6 +42,7 @@ export function ExpensePaymentScreen(props: ExpenseScreenProps) {
 }
 function ExpensePaymentBinding(props: ExpenseScreenProps & { id: string; directory: string }) {
   const [parameters, setParameters] = useSearchParams();
+  const navigate = useNavigate();
   const after = parameters.get("historyAfter"),
     tab = expensePaymentTab(parameters.get("view"));
   const selectedItem = tab === "instructions" || tab === "results" ? parameters.get("item") : null;
@@ -66,10 +68,18 @@ function ExpensePaymentBinding(props: ExpenseScreenProps & { id: string; directo
     [state.review, selectedItem, selectedChange, props.locale, props.timezone],
   );
   useWorkspaceRevalidation(state.failure);
+  const transitions = state.review
+    ? expensePaymentTransitionActions(props.access, state.review, props.locale)
+    : [];
   return (
     <ExpensePaymentPage
       state={state}
       view={view}
+      transitions={transitions}
+      onTransition={(intent) => {
+        if (transitions.some((item) => item.intent === intent))
+          navigate(`${expensePaymentPath(props.id)}/${intent}?${parameters}`);
+      }}
       locale={props.locale}
       companyName={props.companyName}
       backTo={`/expenses/payments?${props.directory}`}

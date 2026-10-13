@@ -17,7 +17,9 @@ import { LoadExpensePolicies } from "../domain/usecases/load-expense-policies";
 import { LoadExpensePolicy } from "../domain/usecases/load-expense-policy";
 import { LoadExpenseSubmission } from "../domain/usecases/load-expense-submission";
 import { ReviewExpenseDecision } from "../domain/usecases/review-expense-decision";
+import { ReviewExpensePaymentTransition } from "../domain/usecases/review-expense-payment-transition";
 import { SaveExpensePolicy } from "../domain/usecases/save-expense-policy";
+import { TransitionExpensePayment } from "../domain/usecases/transition-expense-payment";
 import type { ExpenseUseCases } from "../presentation/contracts/expense-use-cases";
 
 export function createExpenseFeature(
@@ -28,6 +30,8 @@ export function createExpenseFeature(
   const claims = new RemoteExpenseClaimRepository(new HttpExpenseClaimDataSource(http));
   const payments = new RemoteExpensePaymentRepository(new HttpExpensePaymentDataSource(http));
   return {
+    reviewPaymentTransition: new ReviewExpensePaymentTransition(payments),
+    transitionPayment: new TransitionExpensePayment(payments),
     loadPayments: new LoadExpensePayments(payments),
     loadPayment: new LoadExpensePayment(payments),
     downloadPayment: new DownloadExpensePayment(payments, files),

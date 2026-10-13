@@ -37,7 +37,7 @@ function fixture() {
   return {
     request,
     downloadBinary,
-    feature: createExpenseFeature({ request }, { downloadBinary }),
+    feature: createExpenseFeature({ request }, { downloadBinary, downloadText: vi.fn() }),
   };
 }
 

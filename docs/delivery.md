@@ -2691,3 +2691,41 @@ ordinary and foreign scope denial, beneficiary exclusions, independent concurren
 readers with a blocked release, access revocation during acquisition, late MFA or
 authentication expiry, failed acquisition and interruption cleanup. The worker
 does not import expense composition. The payment dashboard remains subsequent work.
+
+## Expense payment dashboard reads and worksheets
+
+Finance operators now have filtered batch directories and a coherent detail view
+with bank instructions, reconciliation outcomes and ascending activity. Tab,
+language and theme changes reuse the current review. Each page has explicit
+refresh; an access or export-eligibility rejection hides the observed bank data
+until a fresh review succeeds. Account/company replacement and disposal cancel
+owned acquisition and discard inactive query entries.
+
+The existing file repository saves a bounded CSV response with its original
+leading-zero account values and stable payment references. The UI exposes export
+only while the server permits it. Currency amounts stay decimal, including a
+hundred maximum-sized claims whose batch total exceeds the individual claim limit.
+DTO mapping rejects inconsistent totals, outcomes, history and action metadata.
+Tables mask account numbers, while the selected payment panel shows the complete
+instruction and any confirmed bank outcome.
+
+Dashboard architecture, formatting, TypeScript, production build and all 1,591
+unit/component tests passed. Sixty-three new cases cover boundary validation,
+exact totals, cancellation, disposal, stale responses, explicit retry and bank-data
+removal. Twelve Chromium scenarios passed for filters/paging, tab reuse, worksheet
+bytes, cancellation/retry, changed access/eligibility, company replacement and
+English/Indonesian light/dark layouts. Desktop and 760-pixel screenshots were
+inspected.
+
+The real API/PostgreSQL browser scenario passed with four independent accounts
+and MFA. It prepared and released two approved claims, downloaded the expected
+CSV, recorded a successful transfer and a separately confirmed no-transfer result,
+and verified partial/closed status and four immutable activity entries. A finance
+reader could not read the batch through another company; permission revocation
+removed its displayed data. Ordinary expense administration did not grant finance
+access. The fixture owned its database and did not execute any bank transfer.
+
+The development dashboard remains available through WireGuard. No phone update
+was needed for this dashboard increment. The existing bundle-size advisory and
+two unrelated CSS specificity warnings remain. Preparation, release/cancellation
+and reconciliation entry in the dashboard are subsequent work.

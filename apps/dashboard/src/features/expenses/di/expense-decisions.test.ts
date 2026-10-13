@@ -27,6 +27,7 @@ function fixture() {
       { request },
       {
         downloadBinary: vi.fn().mockResolvedValue(success(undefined)),
+        downloadText: vi.fn(),
       },
     ),
   };

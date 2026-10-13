@@ -2,6 +2,14 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  expense_payment_batch_not_found: [
+    "This payment batch is unavailable. Return to the payment list.",
+    "Batch pembayaran tidak tersedia. Kembali ke daftar pembayaran.",
+  ],
+  expense_payment_instructions_unavailable: [
+    "This worksheet is no longer available. Reload the batch to check its payment results.",
+    "Instruksi pembayaran tidak lagi tersedia. Muat ulang batch untuk memeriksa hasil pembayaran.",
+  ],
   invalid_expense_decision: [
     "Review the decision and enter a reason of up to 1,000 characters.",
     "Periksa keputusan dan isi alasan maksimal 1.000 karakter.",
@@ -19,8 +27,8 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Periksa indikasi duplikat bukti terbaru sebelum menyetujui.",
   ],
   invalid_expense_page: [
-    "Choose valid dates within 366 days and review the claim filters.",
-    "Pilih tanggal dengan rentang maksimal 366 hari dan periksa filter klaim.",
+    "Choose valid dates within 366 days and review the filters.",
+    "Pilih tanggal dengan rentang maksimal 366 hari dan periksa filter.",
   ],
   expense_claim_not_found: [
     "This expense claim is unavailable. Return to the claim list.",

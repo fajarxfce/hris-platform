@@ -49,7 +49,11 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000028', 'browser-closing-employee@example.invalid', 'Browser Closing Employee'),
   ('a0000000-0000-4000-8000-000000000029', 'browser-expense-admin@example.invalid', 'Browser Expense Admin'),
   ('a0000000-0000-4000-8000-000000000030', 'browser-expense-claim-admin@example.invalid', 'Browser Expense Claim Admin'),
-  ('a0000000-0000-4000-8000-000000000031', 'browser-expense-claim-reviewer@example.invalid', 'Browser Expense Claim Reviewer')
+  ('a0000000-0000-4000-8000-000000000031', 'browser-expense-claim-reviewer@example.invalid', 'Browser Expense Claim Reviewer'),
+  ('a0000000-0000-4000-8000-000000000032', 'browser-expense-payment-admin@example.invalid', 'Browser Expense Payment Admin'),
+  ('a0000000-0000-4000-8000-000000000033', 'browser-expense-payment-reviewer@example.invalid', 'Browser Expense Payment Reviewer'),
+  ('a0000000-0000-4000-8000-000000000034', 'browser-expense-payment-maker@example.invalid', 'Browser Expense Payment Maker'),
+  ('a0000000-0000-4000-8000-000000000035', 'browser-expense-payment-checker@example.invalid', 'Browser Expense Payment Checker')
 ) AS fixture(id, email, name)
 WHERE bootstrap.email = 'browser-admin@example.invalid'
 ON CONFLICT DO NOTHING;
@@ -75,7 +79,8 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000024'),
   ('a0000000-0000-4000-8000-000000000027'),
   ('a0000000-0000-4000-8000-000000000029'),
-  ('a0000000-0000-4000-8000-000000000030')
+  ('a0000000-0000-4000-8000-000000000030'),
+  ('a0000000-0000-4000-8000-000000000032')
 ) AS fixture(account_id)
 WHERE platform_permissions.account_id = (SELECT id FROM accounts WHERE email = 'browser-admin@example.invalid')
 ON CONFLICT DO NOTHING;

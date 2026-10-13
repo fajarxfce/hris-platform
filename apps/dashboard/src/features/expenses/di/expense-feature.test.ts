@@ -21,7 +21,10 @@ const change = { ...expensePolicyRecord().current, expectedVersion: 2, reason: "
 describe("expense policy boundary", () => {
   it("rejects readers, malformed identifiers and unbounded cursors before I/O", async () => {
     const request = vi.fn<HttpClient["request"]>(),
-      feature = createExpenseFeature({ request }, { downloadBinary: vi.fn() });
+      feature = createExpenseFeature(
+        { request },
+        { downloadBinary: vi.fn(), downloadText: vi.fn() },
+      );
     for (const permissions of [
       [],
       ["expenses.read"],
@@ -61,7 +64,10 @@ describe("expense policy boundary", () => {
   it("reads bounded saved heads and ascending history without replacing the current terms", async () => {
     const raw = expensePolicyRecord(0, 1, 23),
       request = vi.fn<HttpClient["request"]>();
-    const feature = createExpenseFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createExpenseFeature(
+      { request },
+      { downloadBinary: vi.fn(), downloadText: vi.fn() },
+    );
     request.mockResolvedValueOnce({ items: [raw.current], nextCursor: null });
     expect(
       await feature.loadPolicies.execute(access, { active: "false", after: "EARLIER" }, signal()),
@@ -175,7 +181,7 @@ describe("expense policy boundary", () => {
     mutate(raw);
     const feature = createExpenseFeature(
       { request: vi.fn().mockResolvedValue(raw) },
-      { downloadBinary: vi.fn() },
+      { downloadBinary: vi.fn(), downloadText: vi.fn() },
     );
     expect(await feature.loadPolicy.execute(access, change.id, null, signal())).toMatchObject({
       ok: false,
@@ -187,7 +193,10 @@ describe("expense policy boundary", () => {
     const first = expensePolicyRecord().current,
       second = expensePolicyRecord(0, 2).current;
     const request = vi.fn<HttpClient["request"]>(),
-      feature = createExpenseFeature({ request }, { downloadBinary: vi.fn() });
+      feature = createExpenseFeature(
+        { request },
+        { downloadBinary: vi.fn(), downloadText: vi.fn() },
+      );
     for (const raw of [
       { items: [second, first], nextCursor: null },
       { items: [first, first], nextCursor: null },
@@ -207,7 +216,10 @@ describe("expense policy boundary", () => {
 
   it("keeps exact decimal values through validation, HTTP and localized formatting", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue({ id: change.id, version: 3 });
-    const feature = createExpenseFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createExpenseFeature(
+      { request },
+      { downloadBinary: vi.fn(), downloadText: vi.fn() },
+    );
     const result = await feature.savePolicy.execute(
       access,
       operation,
@@ -242,7 +254,10 @@ describe("expense policy boundary", () => {
     "rejects invalid IDR amount %s before HTTP",
     async (maximumLineAmount) => {
       const request = vi.fn<HttpClient["request"]>(),
-        feature = createExpenseFeature({ request }, { downloadBinary: vi.fn() });
+        feature = createExpenseFeature(
+          { request },
+          { downloadBinary: vi.fn(), downloadText: vi.fn() },
+        );
       expect(
         await feature.savePolicy.execute(
           access,
@@ -267,7 +282,10 @@ describe("expense policy boundary", () => {
       .mockRejectedValueOnce(
         new HttpResponseError(403, { code: "mfa_required", detail: "Private diagnostic" }),
       );
-    const feature = createExpenseFeature({ request }, { downloadBinary: vi.fn() });
+    const feature = createExpenseFeature(
+      { request },
+      { downloadBinary: vi.fn(), downloadText: vi.fn() },
+    );
     expect(await feature.loadPolicies.execute(access, query, signal())).toEqual({
       ok: false,
       failure: { code: "mfa_required", fields: {}, parameters: {} },

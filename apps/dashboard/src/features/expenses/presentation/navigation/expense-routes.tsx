@@ -3,9 +3,12 @@ import type { AccountId } from "../../../../core/domain/identifiers";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import { canBrowseCompanyExpenses } from "../../domain/policies/expense-claim-read-policy";
+import { canReadExpensePayments } from "../../domain/policies/expense-payment-read-policy";
 import { ExpenseClaimScreen } from "../bindings/expense-claim-screen";
 import { ExpenseClaimsScreen } from "../bindings/expense-claims-screen";
 import { ExpenseDecisionScreen } from "../bindings/expense-decision-screen";
+import { ExpensePaymentScreen } from "../bindings/expense-payment-screen";
+import { ExpensePaymentsScreen } from "../bindings/expense-payments-screen";
 import { ExpensePoliciesScreen } from "../bindings/expense-policies-screen";
 import { ExpensePolicyEditorScreen } from "../bindings/expense-policy-editor-screen";
 import { ExpensePolicyScreen } from "../bindings/expense-policy-screen";
@@ -23,6 +26,8 @@ export function ExpenseRoutes(props: {
 }) {
   return (
     <Routes>
+      <Route path="payments" element={<ExpensePaymentsScreen {...props} />} />
+      <Route path="payments/:batchId" element={<ExpensePaymentScreen {...props} />} />
       <Route path="claims" element={<ExpenseClaimsScreen {...props} />} />
       <Route path="claims/:claimId" element={<ExpenseClaimScreen {...props} />} />
       <Route path="submissions/:submissionId" element={<ExpenseSubmissionScreen {...props} />} />
@@ -45,7 +50,7 @@ export function ExpenseRoutes(props: {
         element={
           <Navigate
             replace
-            to={`/expenses/${canBrowseCompanyExpenses(props.access.permissions) ? "claims" : "policies"}?company=${props.access.companyId}`}
+            to={`/expenses/${canBrowseCompanyExpenses(props.access.permissions) ? "claims" : canReadExpensePayments(props.access.permissions) ? "payments" : "policies"}?company=${props.access.companyId}`}
           />
         }
       />

@@ -199,6 +199,27 @@ claims; a batch preparer cannot release the batch. A partial reconciliation remo
 export availability, and closed/cancelled batches expose no actions. These display
 hints do not replace authorization, version or evidence checks on the commands.
 
+The dashboard exposes finance-only batch directories with company-date/status
+filters and twenty-row pages. Detail tabs reuse a single review for the current
+batch, bank instructions, reconciliation outcomes and activity. Opening an item
+reveals its complete account and immutable payment reference; tables show only
+the account's final four digits. Activity has a separate ascending cursor.
+
+CSV acquisition is bounded to 256 KiB and uses the existing browser file port.
+The server's export capability gates the action, and the export endpoint checks
+current finance authority and batch eligibility independently. Cancellation,
+departure and company replacement abort owned work; a late result cannot start a
+download. Authorization or eligibility loss removes the observed review until an
+explicit successful refresh. Changing tabs, language or theme does not refetch
+the batch. Queries are scoped by account/company with no inactive cache retention.
+
+The client validates item counts, exact decimal totals, immutable outcome
+references, history continuity and action/status coherence before publication.
+Batch totals permit fourteen integral digits while individual claims retain their
+twelve-digit limit. This read flow does not grant access to the source claim and
+does not issue bank transfers. Batch authoring and reconciliation commands have
+their own delivery work.
+
 `GET /expenses/payments/payables?from=YYYY-MM-DD&until=YYYY-MM-DD` lists approved claims without an unresolved or successful payment reservation. `PUT /expenses/payments/{id}` prepares an immutable batch of one to 100 instructions with stable item IDs, submission IDs, bank codes, account numbers/names, title, reason, and idempotency key. Finance supplies independently verified destinations for this batch; it does not change a person's profile or define a reusable bank-account master. Claim amounts and employee labels come from the approved submission, not the request. All amounts are IDR decimal strings.
 
 Preparation reserves each claim. A database unique constraint prevents a claim from appearing in another prepared/pending/successful instruction, even under competing requests. Original makers, the frozen beneficiary, and the currently linked beneficiary cannot prepare, release, or reconcile their own claims. Payment instructions preserve their original destinations, amounts, and evidence. A correction requires cancellation of the prepared batch and a new batch.

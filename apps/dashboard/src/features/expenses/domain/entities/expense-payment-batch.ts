@@ -1,0 +1,20 @@
+import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { ExpensePaymentItem } from "./expense-payment-item";
+export type ExpensePaymentBatchId = string & { readonly expensePaymentBatchId: unique symbol };
+export const expensePaymentBatchStatuses = ["PREPARED", "RELEASED", "CLOSED", "CANCELLED"] as const;
+export type ExpensePaymentBatchStatus = (typeof expensePaymentBatchStatuses)[number];
+export type ExpensePaymentBatch = Readonly<{
+  id: ExpensePaymentBatchId;
+  companyId: CompanyId;
+  status: ExpensePaymentBatchStatus;
+  version: number;
+  title: string;
+  totalAmount: string;
+  currency: "IDR";
+  itemCount: number;
+  createdBy: string;
+  createdAt: string;
+  releasedBy: string | null;
+  releasedAt: string | null;
+  items: readonly ExpensePaymentItem[];
+}>;

@@ -8,12 +8,15 @@ import type { LoadExpensePayments } from "../../domain/usecases/load-expense-pay
 import type { LoadExpensePolicies } from "../../domain/usecases/load-expense-policies";
 import type { LoadExpensePolicy } from "../../domain/usecases/load-expense-policy";
 import type { LoadExpenseSubmission } from "../../domain/usecases/load-expense-submission";
+import type { ReconcileExpensePayment } from "../../domain/usecases/reconcile-expense-payment";
 import type { ReviewExpenseDecision } from "../../domain/usecases/review-expense-decision";
 import type { ReviewExpensePaymentTransition } from "../../domain/usecases/review-expense-payment-transition";
+import type { ReviewExpenseReconciliation } from "../../domain/usecases/review-expense-reconciliation";
 import type { SaveExpensePolicy } from "../../domain/usecases/save-expense-policy";
 import type { TransitionExpensePayment } from "../../domain/usecases/transition-expense-payment";
-
 export type ExpenseUseCases = Readonly<{
+  reviewReconciliation: Pick<ReviewExpenseReconciliation, "execute">;
+  reconcilePayment: Pick<ReconcileExpensePayment, "execute">;
   reviewPaymentTransition: Pick<ReviewExpensePaymentTransition, "execute">;
   transitionPayment: Pick<TransitionExpensePayment, "execute">;
   loadPayments: Pick<LoadExpensePayments, "execute">;

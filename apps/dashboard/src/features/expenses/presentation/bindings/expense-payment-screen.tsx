@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
+import { expenseReconciliationSnapshot } from "../../domain/entities/expense-reconciliation-snapshot";
+import { canReconcileExpensePayment } from "../../domain/policies/expense-reconciliation-policy";
 import type { ExpenseScreenProps } from "../contracts/expense-screen-props";
 import { useExpensePayment } from "../controllers/use-expense-payment";
 import {
@@ -71,11 +73,18 @@ function ExpensePaymentBinding(props: ExpenseScreenProps & { id: string; directo
   const transitions = state.review
     ? expensePaymentTransitionActions(props.access, state.review, props.locale)
     : [];
+  const canReconcile =
+    state.review !== null &&
+    canReconcileExpensePayment(props.access, expenseReconciliationSnapshot(state.review));
   return (
     <ExpensePaymentPage
       state={state}
       view={view}
       transitions={transitions}
+      canReconcile={canReconcile}
+      onReconcile={() => {
+        if (canReconcile) navigate(`${expensePaymentPath(props.id)}/reconcile?${parameters}`);
+      }}
       onTransition={(intent) => {
         if (transitions.some((item) => item.intent === intent))
           navigate(`${expensePaymentPath(props.id)}/${intent}?${parameters}`);

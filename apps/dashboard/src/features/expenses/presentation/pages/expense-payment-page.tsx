@@ -14,6 +14,7 @@ import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useExpensePayment } from "../controllers/use-expense-payment";
 import { expensePaymentMessages } from "../i18n/expense-payment-messages";
+import { expenseReconciliationMessages } from "../i18n/expense-reconciliation-messages";
 import { type ExpensePaymentTab, expensePaymentTabs } from "../models/expense-payment-route";
 import type { ExpensePaymentTransitionIntent } from "../models/expense-payment-transition-intent";
 import type { expensePaymentTransitionActions } from "../models/expense-payment-transition-view";
@@ -22,6 +23,8 @@ export function ExpensePaymentPage(props: {
   state: ReturnType<typeof useExpensePayment>;
   view: ReturnType<typeof expensePaymentView> | null;
   transitions: ReturnType<typeof expensePaymentTransitionActions>;
+  canReconcile: boolean;
+  onReconcile: () => void;
   onTransition: (intent: ExpensePaymentTransitionIntent) => void;
   locale: Locale;
   companyName: string;
@@ -45,6 +48,11 @@ export function ExpensePaymentPage(props: {
           context={props.companyName}
           actions={
             <>
+              {props.canReconcile && (
+                <AppButton appearance="primary" onClick={props.onReconcile}>
+                  {expenseReconciliationMessages(locale).action}
+                </AppButton>
+              )}
               {props.transitions.map((action) => (
                 <AppButton
                   key={action.intent}

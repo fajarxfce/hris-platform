@@ -217,8 +217,8 @@ The client validates item counts, exact decimal totals, immutable outcome
 references, history continuity and action/status coherence before publication.
 Batch totals permit fourteen integral digits while individual claims retain their
 twelve-digit limit. This read flow does not grant access to the source claim and
-does not issue bank transfers. Batch authoring and reconciliation commands have
-their own delivery work.
+does not issue bank transfers. Commands independently authorize their current
+resource and observed version.
 
 Prepared batch details expose release and cancellation only from the current
 server action projection. Each action opens a fresh review with complete bank
@@ -229,6 +229,24 @@ a later rejected retry. A definite conflict requires an explicit fresh review.
 Inspection stays local to the form; departure and reload protect unsaved input
 and unconfirmed commands. Disposal aborts owned work and ignores late results.
 These browser commands are retained during the editor lifecycle, not persisted.
+
+Reconciliation opens its own current review. Finance enters confirmed results in
+an item panel, then submits one to 100 outcomes together with a reconciliation
+note. Unentered payments remain pending. Success requires a bank reference;
+failure requires explicit confirmation that no funds were transferred. Entry
+uses the company timezone, rejects invalid or ambiguous local times, and preserves
+an unchanged result's timestamp precision. The API enforces its own upper time
+bound at commit.
+
+Results can be edited or removed locally before submission. The captured command
+freezes its outcomes, batch version, reason and operation ID. Response loss
+retains that original command across verification and later rejected retries.
+A definite initial conflict requires a fresh review and explicit result re-entry;
+input rejection permits correction. Access loss hides bank data, and disposal
+aborts acquisition/delivery and ignores late results. Theme, language and local
+item inspection do not refetch the review. The page owns departure protection for
+its form and item panel. Staged results and retry input remain in memory only for
+the editor lifecycle.
 
 `GET /expenses/payments/payables?from=YYYY-MM-DD&until=YYYY-MM-DD` lists approved claims without an unresolved or successful payment reservation. `PUT /expenses/payments/{id}` prepares an immutable batch of one to 100 instructions with stable item IDs, submission IDs, bank codes, account numbers/names, title, reason, and idempotency key. Finance supplies independently verified destinations for this batch; it does not change a person's profile or define a reusable bank-account master. Claim amounts and employee labels come from the approved submission, not the request. All amounts are IDR decimal strings.
 

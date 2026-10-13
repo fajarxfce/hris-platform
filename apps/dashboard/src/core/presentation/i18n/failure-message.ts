@@ -2,6 +2,30 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  expense_reconciliation_unavailable: [
+    "Reconciliation is unavailable. Return to the batch details.",
+    "Rekonsiliasi tidak tersedia. Kembali ke detail batch.",
+  ],
+  invalid_expense_payment_results: [
+    "Enter between one and 100 distinct payment results.",
+    "Isi satu hingga 100 hasil pembayaran yang berbeda.",
+  ],
+  invalid_expense_payment_result: [
+    "Review the bank result and note. The confirmation time must fall between batch release and now.",
+    "Periksa hasil bank dan catatan. Waktu konfirmasi harus berada antara waktu rilis batch dan saat ini.",
+  ],
+  duplicate_payment_transaction_reference: [
+    "Each successful payment requires a distinct bank transaction reference.",
+    "Setiap pembayaran berhasil memerlukan referensi transaksi bank yang berbeda.",
+  ],
+  expense_payment_not_released: [
+    "This batch is no longer awaiting payment results. Reload its details.",
+    "Batch tidak lagi menunggu hasil pembayaran. Muat ulang detailnya.",
+  ],
+  expense_payment_item_not_pending: [
+    "A selected payment already has a result. Reload the batch review.",
+    "Pembayaran yang dipilih sudah memiliki hasil. Muat ulang tinjauan batch.",
+  ],
   expense_payment_action_unavailable: [
     "This action is unavailable. Return to the batch details.",
     "Tindakan tidak tersedia. Kembali ke detail batch.",

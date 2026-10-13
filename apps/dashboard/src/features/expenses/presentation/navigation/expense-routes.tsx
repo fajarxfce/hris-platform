@@ -13,6 +13,7 @@ import { ExpensePaymentsScreen } from "../bindings/expense-payments-screen";
 import { ExpensePoliciesScreen } from "../bindings/expense-policies-screen";
 import { ExpensePolicyEditorScreen } from "../bindings/expense-policy-editor-screen";
 import { ExpensePolicyScreen } from "../bindings/expense-policy-screen";
+import { ExpenseReconciliationScreen } from "../bindings/expense-reconciliation-screen";
 import { ExpenseSubmissionScreen } from "../bindings/expense-submission-screen";
 import type { ExpenseUseCases } from "../contracts/expense-use-cases";
 
@@ -29,6 +30,10 @@ export function ExpenseRoutes(props: {
     <Routes>
       <Route path="payments" element={<ExpensePaymentsScreen {...props} />} />
       <Route path="payments/:batchId" element={<ExpensePaymentScreen {...props} />} />
+      <Route
+        path="payments/:batchId/reconcile"
+        element={<ExpenseReconciliationScreen {...props} />}
+      />
       <Route
         path="payments/:batchId/:intent"
         element={<ExpensePaymentTransitionScreen {...props} />}

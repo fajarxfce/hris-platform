@@ -1,7 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
+import { companyDateTimeInput } from "../src/core/presentation/dates/company-date-time";
 import type { ExpensePaymentReviewDto } from "../src/features/expenses/data/models/expense-payment-dto";
+import type { ExpenseReconciliationDto } from "../src/features/expenses/data/models/expense-reconciliation-dto";
 import { createAdminCompany } from "./fixtures/admin-company";
 import {
   paymentAccounts,
@@ -10,7 +12,7 @@ import {
   prepareExpensePaymentClaims,
 } from "./fixtures/expense-payment-scenario";
 
-test("real finance review exports confirmed instructions and shows partial and final reconciliation with current scope", async ({
+test("real finance review releases and reconciles payments with original-command recovery and current scope", async ({
   page,
   context,
   browser,
@@ -54,8 +56,8 @@ test("real finance review exports confirmed instructions and shows partial and f
       expect(approved.status()).toBe(200);
     }
     const makerCsrf = await paymentSession(makerPage, "maker"),
-      checkerCsrf = await paymentSession(finance, "checker"),
       id = randomUUID();
+    await paymentSession(finance, "checker");
     const cancelledId = randomUUID();
     const replacement = await maker.request.put(`${base}/expenses/payments/${cancelledId}`, {
       headers: paymentHeaders(makerCsrf),
@@ -163,25 +165,53 @@ test("real finance review exports confirmed instructions and shows partial and f
     await finance.getByRole("button", { name: "Close", exact: true }).click();
     const [first, second] = items;
     if (!first || !second) throw new Error("Two fixture payments are required");
-    const settled = await checker.request.post(`${base}/expenses/payments/${id}/reconcile`, {
-      headers: paymentHeaders(checkerCsrf),
-      data: {
-        expectedVersion: 1,
-        results: [
-          {
-            itemId: first.id,
-            status: "SUCCEEDED",
-            transactionReference: "BROWSER-BANK-001",
-            occurredAt: new Date().toISOString(),
-            reason: "Bank statement confirmed",
-            confirmedNoTransfer: false,
-          },
-        ],
-        reason: "First transfer confirmed",
-      },
+    const reconciliationWrites: { operation: string; body: ExpenseReconciliationDto }[] = [];
+    await finance.route(`**${base}/expenses/payments/${id}/reconcile`, async (route) => {
+      const body = route.request().postDataJSON() as ExpenseReconciliationDto;
+      reconciliationWrites.push({
+        operation: route.request().headers()["idempotency-key"] ?? "",
+        body,
+      });
+      const response = await route.fetch();
+      expect(response.status()).toBe(200);
+      expect(await response.json()).toMatchObject({ id, version: body.expectedVersion + 1 });
+      if (reconciliationWrites.length === 1) return route.abort("failed");
+      return route.fulfill({ response });
     });
-    expect(settled.status()).toBe(200);
-    await finance.getByRole("button", { name: "Refresh", exact: true }).click();
+    await finance.getByRole("button", { name: "Reconcile payments", exact: true }).click();
+    await finance
+      .getByRole("button", { name: "Edit result: Payment Employee 1 · PAY-1", exact: true })
+      .click();
+    const outcomePanel = finance.getByRole("dialog", { name: "Bank result", exact: true });
+    await outcomePanel
+      .getByRole("combobox", { name: "Bank result", exact: true })
+      .selectOption("SUCCEEDED");
+    await outcomePanel
+      .getByLabel("Bank transaction reference", { exact: true })
+      .fill("BROWSER-BANK-001");
+    await outcomePanel
+      .getByLabel("Bank confirmation time (Asia/Jakarta)", { exact: true })
+      .fill(companyDateTimeInput(new Date().toISOString(), "Asia/Jakarta").replace(/:00$/u, ""));
+    await outcomePanel.getByLabel("Result note", { exact: true }).fill("Bank statement confirmed");
+    await outcomePanel.getByRole("button", { name: "Add to reconciliation", exact: true }).click();
+    await expect(outcomePanel).toHaveCount(0);
+    await finance
+      .getByLabel("Reconciliation note", { exact: true })
+      .fill("First transfer confirmed");
+    await finance.getByRole("button", { name: "Submit results", exact: true }).click();
+    await finance
+      .getByRole("button", { name: "Retry original reconciliation", exact: true })
+      .click();
+    await expect(finance.getByRole("status")).toContainText("Payment results recorded.");
+    expect(reconciliationWrites).toHaveLength(2);
+    expect(reconciliationWrites[1]).toEqual(reconciliationWrites[0]);
+    expect(reconciliationWrites[0]?.body.results[0]).toMatchObject({
+      itemId: first.id,
+      status: "SUCCEEDED",
+      transactionReference: "BROWSER-BANK-001",
+      confirmedNoTransfer: false,
+    });
+    await finance.getByRole("link", { name: "Batch details", exact: true }).last().click();
     await expect(finance.getByRole("button", { name: "Download CSV", exact: true })).toHaveCount(0);
     await finance.getByRole("tab", { name: "Overview", exact: true }).click();
     await expect(overview).toContainText("Released");
@@ -193,25 +223,52 @@ test("real finance review exports confirmed instructions and shows partial and f
     await expect(finance.getByRole("table", { name: "Reconciliation", exact: true })).toContainText(
       "BROWSER-BANK-001",
     );
-    const finished = await checker.request.post(`${base}/expenses/payments/${id}/reconcile`, {
-      headers: paymentHeaders(checkerCsrf),
-      data: {
-        expectedVersion: 2,
-        results: [
-          {
-            itemId: second.id,
-            status: "FAILED",
-            transactionReference: null,
-            occurredAt: new Date().toISOString(),
-            reason: "Bank confirmed no funds transferred",
-            confirmedNoTransfer: true,
-          },
-        ],
-        reason: "Remaining bank outcome confirmed",
-      },
+    await finance.getByRole("button", { name: "Reconcile payments", exact: true }).click();
+    await expect(
+      finance.getByRole("button", { name: "Edit result: Payment Employee 1 · PAY-1", exact: true }),
+    ).toHaveCount(0);
+    await finance
+      .getByRole("button", { name: "Edit result: Payment Employee 2 · PAY-2", exact: true })
+      .click();
+    await outcomePanel
+      .getByRole("combobox", { name: "Bank result", exact: true })
+      .selectOption("FAILED");
+    await outcomePanel
+      .getByLabel("Bank confirmation time (Asia/Jakarta)", { exact: true })
+      .fill(companyDateTimeInput(new Date().toISOString(), "Asia/Jakarta").replace(/:00$/u, ""));
+    await outcomePanel
+      .getByLabel("Result note", { exact: true })
+      .fill("Bank confirmed no funds transferred");
+    await outcomePanel.getByRole("checkbox").check();
+    await finance.screenshot({
+      path: "../../.work/dashboard-expense-reconciliation-real-result.png",
+      fullPage: true,
+      animations: "disabled",
     });
-    expect(finished.status()).toBe(200);
-    await finance.getByRole("button", { name: "Refresh", exact: true }).click();
+    await outcomePanel.getByRole("button", { name: "Add to reconciliation", exact: true }).click();
+    await expect(outcomePanel).toHaveCount(0);
+    await finance
+      .getByLabel("Reconciliation note", { exact: true })
+      .fill("Remaining bank outcome confirmed");
+    await finance.getByRole("button", { name: "Submit results", exact: true }).click();
+    await expect(finance.getByRole("status")).toContainText("Payment results recorded.");
+    expect(reconciliationWrites).toHaveLength(3);
+    expect(reconciliationWrites[2]?.body).toMatchObject({
+      expectedVersion: 2,
+      results: [
+        {
+          itemId: second.id,
+          status: "FAILED",
+          transactionReference: null,
+          confirmedNoTransfer: true,
+        },
+      ],
+    });
+    await finance.getByRole("link", { name: "Batch details", exact: true }).last().click();
+    await expect(
+      finance.getByRole("button", { name: "Reconcile payments", exact: true }),
+    ).toHaveCount(0);
+    await finance.getByRole("tab", { name: "Reconciliation", exact: true }).click();
     await expect(
       finance.getByRole("table", { name: "Reconciliation", exact: true }).getByRole("row"),
     ).toHaveCount(3);

@@ -3,7 +3,15 @@ import type {
   ExpensePaymentTransitionDto,
   ExpensePaymentTransitionReceiptDto,
 } from "../models/expense-payment-transition-dto";
+import type { ExpenseReconciliationDto } from "../models/expense-reconciliation-dto";
 export interface ExpensePaymentDataSource {
+  reconcile(
+    company: string,
+    id: string,
+    operation: string,
+    command: ExpenseReconciliationDto,
+    signal: AbortSignal,
+  ): Promise<ExpensePaymentTransitionReceiptDto>;
   transition(
     company: string,
     id: string,

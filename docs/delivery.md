@@ -2760,3 +2760,36 @@ that batch, its committed response was dropped, and the original operation was
 replayed with one release entry. Existing CSV, partial/final reconciliation,
 foreign-company denial and finance revocation acceptance remained successful.
 No bank transfer or phone installation was performed for this increment.
+
+## Expense payment reconciliation entry
+
+Finance can stage confirmed bank results in an item panel and submit them together
+against one reviewed batch version. Payments without a result remain pending.
+Success requires a bank reference; failure requires explicit confirmation that no
+funds were transferred. Company-local time entry rejects invalid/ambiguous values
+and preserves unchanged timestamp precision. The API remains the authority for
+current eligibility, time bounds and transaction-reference uniqueness.
+
+The page owns navigation protection for both the batch note and item panel. Local
+editing does not reacquire data. Confirmation freezes all outcomes and one operation
+ID; response loss retains that command through MFA renewal and subsequent denied
+retries. Initial definite conflicts require review and re-entry, while input
+rejections remain correctable. Access rejection hides bank details. Disposal and
+scope replacement abort requests and discard late results. Browser drafts remain
+in memory for the editor lifecycle.
+
+Dashboard architecture, formatting, TypeScript, production build and 1,664
+unit/component tests passed, including 45 new boundary, lifecycle and time-input
+cases. Nine reconciliation Chromium scenarios passed across the final suite and
+targeted validation rerun; twenty existing payment read/transition scenarios also
+passed. Coverage includes multiple outcomes in one command, required no-transfer
+confirmation, local correction/removal, unsaved panel departure, duplicate presses,
+lost responses across MFA/rejection, scope replacement and language/theme retention.
+Light desktop, 760-pixel dark and real-API result panels were inspected.
+
+The real API/PostgreSQL scenario passed with independent MFA-enrolled operators.
+Release and reconciliation each survived a deliberately dropped committed response
+using their original operation. The first result left another payment pending;
+confirmed no-transfer failure closed the batch. Stored history/results, CSV
+eligibility, foreign-company denial and finance revocation remained correct.
+The fixture owns its database; no bank transfer or phone update occurred.

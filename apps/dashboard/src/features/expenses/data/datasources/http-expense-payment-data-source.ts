@@ -9,9 +9,29 @@ import {
   type ExpensePaymentTransitionDto,
   expensePaymentTransitionReceiptDto,
 } from "../models/expense-payment-transition-dto";
+import type { ExpenseReconciliationDto } from "../models/expense-reconciliation-dto";
 import type { ExpensePaymentDataSource } from "./expense-payment-data-source";
 export class HttpExpensePaymentDataSource implements ExpensePaymentDataSource {
   constructor(private readonly http: HttpClient) {}
+  async reconcile(
+    company: string,
+    id: string,
+    operation: string,
+    command: ExpenseReconciliationDto,
+    signal: AbortSignal,
+  ) {
+    return expensePaymentTransitionReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/expenses/payments/${id}/reconcile`,
+          method: "POST",
+          operationId: operation,
+          body: command,
+        },
+        signal,
+      ),
+    );
+  }
   async transition(
     company: string,
     id: string,

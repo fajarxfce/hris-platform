@@ -3015,3 +3015,28 @@ requires zero requests from editing the filter and an explicit Apply action.
 All eight expense-claim Chromium scenarios passed against the production build,
 together with TypeScript and the focused formatting check. The reproduction uses
 the owned request gate and rendered data, without sleeps or additional retries.
+
+
+## Mobile account-owned Inbox replication
+
+[HRIS Mobile 718e6b5](https://github.com/fajarxfce/hris-mobile/commit/718e6b5)
+separates the active request session from the stable API/account/company owner
+of its Inbox records. Reauthentication retains published facts while the new
+login acquires its own cursor. Permission changes and confirmed scope denials remain
+separate from ordinary freshness or cursor expiry. Atomic records/checkpoint commits,
+staging generations, tombstones and encrypted storage retain their existing owners.
+Room and IndexedDB migrations preserve preceding session projections; their generic
+contract and regressions are also present in [Compose Fluent Starter c199bab](https://github.com/fajarxfce/compose-fluent-starter/commit/c199bab).
+
+Mobile root checks passed with 1,195 JVM/desktop tests and 76 focused Chromium cases;
+starter root checks passed with 279 JVM/desktop and 24 database Chromium cases. Both
+Android dev builds passed. API 35 emulator acceptance retained legacy ciphertext
+through upgrade, reopened Inbox/detail offline, and verified unchanged account data
+under a different session after sign-in before company admission or another feed
+acquisition. The saved Inbox reopened offline after that admission. Network access
+was restored and inspected AndroidRuntime/SQLite logs contained no errors.
+
+After notice, the mobile APK was installed on the authorized Android 16 phone using
+install-only mode. No interaction with that phone's app was performed. Other business
+read projections, complete offline drafts and shared sync-status UI remain in the
+remaining delivery sequence; this is not a claim of complete local-first coverage.

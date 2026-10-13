@@ -20,8 +20,8 @@ age-based read limit. Saved views remain readable after freshness or credential
 expiry; live authorization and operation reviews have separate checks. Foreground
 revalidation retains the same workspace, while confirmed denials keep affected
 reads gated through failed cleanup and retries. The [mobile read and sync model](https://github.com/fajarxfce/hris-mobile/blob/main/docs/local-first.md)
-distinguishes existing snapshots from complete replicas: Inbox and Leave
-request/balance collections consume change feeds and retain account-owned records
+distinguishes existing snapshots from complete replicas: Inbox, Leave and Overtime
+collections consume change feeds and retain account-owned records
 across sign-in, independently of the active request session. A replacement cursor
 stages new data without hiding published facts. Most other features retain their
 last acquired list/detail views, and the
@@ -70,12 +70,15 @@ adds employment/category filters, authenticated resumable downloads and native
 Save copy. API 35 acceptance verified a PDF against its original SHA-256, picker
 cancellation and encrypted completion after process restart. Resource access is
 rechecked after destination selection and before export completion.
-The [mobile overtime view](https://github.com/fajarxfce/hris-mobile/commit/29eed7a)
-adds owned requests with month/status filters, planned and actual time, frozen
-schedule evidence, approval progress and paged activity. API 35 acceptance covered
-overnight dates, encrypted list/detail restoration after process restart offline,
-and explicit recovery. The validated update was installed on the phone with
-install-only delivery. The [native overtime workflows](https://github.com/fajarxfce/hris-mobile/commit/b58caf8)
+The [mobile Overtime replica](https://github.com/fajarxfce/hris-mobile/commit/9420cd2)
+retains full owned requests and acquired activity per record, with local date/status
+queries and an incremental request feed. Cursor replacement preserves published
+facts while its successor is acquired. API 35 acceptance covered legacy offline
+upgrade, real synchronization, independent request details after offline process
+restart, and local filters without rewriting ciphertext. Older activity acquisition
+and same-account reauthentication are covered by automated storage tests. The
+validated update was installed on the phone with install-only delivery.
+The [native overtime workflows](https://github.com/fajarxfce/hris-mobile/commit/b58caf8)
 now add reviewed-calendar planning, actual-time submission and withdrawal. Immutable
 encrypted commands retain original input and operation keys across response loss,
 offline process restoration and explicit replay. API 35 acceptance verified a real

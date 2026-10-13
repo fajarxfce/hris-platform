@@ -3145,3 +3145,40 @@ tests, seven selected HTTP/PostgreSQL tests and 38 worker tests. Both applicatio
 JARs built. The first integration attempt lacked the Docker group; the successful
 run used the documented same-user Docker group without changing socket permissions.
 Mobile replica integration is a separate delivery step.
+
+## Mobile Overtime record synchronization
+
+[HRIS Mobile 9420cd2](https://github.com/fajarxfce/hris-mobile/commit/9420cd2)
+adds account-owned request, summary and acquired-activity records. Local employment,
+date and status queries retain earlier months independently of the last opened
+page. The sync use case hydrates `OVERTIME_REQUESTS` references and commits each
+processed page with its encrypted checkpoint. Bootstrap replacement preserves the
+published generation; bounded older-activity acquisition resumes from stored
+frontiers. Current action authority remains separate from permission to read
+owned local facts. The old overview and request snapshots are read-only migration
+sources until their replacements publish.
+
+Mobile root checks passed with 1,267 desktop tests. The Workforce domain, data and
+presentation Chromium suites passed 179 tests, and Android dev assembly passed.
+New cases cover local queries, independent requests, cursor recovery, versioned
+deletion, account replacement, cancellation, mutex-wait deadlines, retained denials
+through failed cleanup, authenticated indexes and original action-review times.
+
+API 35 acceptance preserved preceding ciphertext through an offline upgrade.
+Reconnection populated two full requests, two summaries and one directory document
+through the real API, with no pending generation. After force-stop and offline
+restart, previously unopened details and an earlier selected request remained
+independently available. Local month/status filters preserved all ciphertext hashes.
+Screenshots were inspected, the crash buffer contained no fatal exception, and
+emulator connectivity was restored. Older-page backfill is covered by automated
+tests because these short device histories needed no additional page.
+
+After notice, the validated APK was installed on the authorized Android 16 phone
+using install-only mode; its application was not opened or driven. The API and
+worker were rebuilt and deployed with their document and WireGuard overlays
+retained, and health checks passed on loopback and the private VPN address. The
+[supporting backend/dashboard CI](https://github.com/fajarxfce/hris-platform/actions/runs/38469415288)
+passed all backend, dashboard and integration jobs. No shared starter foundation
+changed in this feature-specific increment. Attendance,
+Expenses and Payslips replicas, unfinished offline drafts and shared sync-status
+presentation remain in the delivery sequence.

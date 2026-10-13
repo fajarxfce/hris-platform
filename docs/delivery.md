@@ -2328,3 +2328,32 @@ PDF ownership, revocation after rendering, post-guard/post-read MFA expiry,
 interruption recovery and the generated API contract. Format and architecture
 checks passed; both application JARs built. No migration changed. Native payslip
 pages and file export remain the next integration step.
+
+## Native employee payslips
+
+The [mobile payslip workflow](https://github.com/fajarxfce/hris-mobile/commit/46d8b2f)
+adds annual history, published earnings/deductions, employer contributions, payment
+progress and English/Indonesian PDF saving. All financial reads use employee SELF
+scope. Independently encrypted list/detail snapshots have bounded read leases;
+known denials remain gated through pending/failed retries and failed cleanup.
+Typed MVI handlers own acquisition, year changes and export lifetime. Leaving a
+route cancels its work; an Android file dialog's temporary Activity stop preserves
+the explicit save operation.
+
+Mobile root checks passed with 959 desktop tests and eighteen targeted Chromium
+tests. Android dev assembly and the production Web build passed. Assembled UI
+tests cover 200% text, destination selection, cancellation and saving
+across a stopped Activity. API 35 acceptance used a payslip published through the
+normal development policy, calculation, independent review and finalization APIs.
+It verified year filters, exact retained amounts, unset payment status, picker
+cancellation, native PDF saving, both themes, offline list/detail restoration after
+background process death, and explicit recovery. The 11,099-byte PDF matched the
+backend SHA-256. After notice, the validated APK was installed on the authorized
+phone with install-only delivery; its UI was not driven.
+
+The exact decimal value and localized formatting also returned to
+[Compose Fluent Starter](https://github.com/fajarxfce/compose-fluent-starter/commit/95b16df),
+where 276 desktop tests and seven targeted Chromium tests passed. Its complete
+CI, including Apple and Windows, passed. Production Web optimization and emulator
+sessions now run separately on the shared VPS following an observed host memory
+exhaustion; the emulator was restored without clearing application data.

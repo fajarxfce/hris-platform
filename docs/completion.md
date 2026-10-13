@@ -67,6 +67,13 @@ encrypted commands retain original input and operation keys across response loss
 offline process restoration and explicit replay. API 35 acceptance verified a real
 plan, actual time, cancelled approval and distinct versioned history entries; the
 validated APK was installed on the phone without opening it.
+The [native payslip pages](https://github.com/fajarxfce/hris-mobile/commit/46d8b2f)
+now provide annual history, published amounts, payment progress and English/Indonesian
+PDF saving. Every read requests employee SELF scope. API 35 acceptance verified
+year filters, native file-dialog cancellation, the exported PDF's SHA-256,
+encrypted list/detail restoration after background process death offline, and
+explicit online recovery. The validated APK was installed on the phone with
+install-only delivery.
 Automated UI/API checks and the Android dev build passed. Android 16 device checks
 covered password sign-in, company isolation, profiles, inbox reading, offline
 content, offline process restoration with company isolation, queued acknowledgement
@@ -94,7 +101,7 @@ replay and competing hold were exercised without modifying development records.
 | Workforce | Bulk/reset and late corrections; physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections and their history, company-wide exception review queues, overtime planning with reviewed calendars, directories/details/history, actual-time submission, independent review and withdrawal, dashboard monthly closing/recovery with published employee results, and mobile work calendars, overtime planning/actual time/withdrawal with durable recovery, and online/offline capture are implemented and verified against the real API. |
 | Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry. Mobile balances, filtered history, request details, submission with published document evidence, and durable withdrawal/cancellation flows are implemented and verified against the development API. |
 | Expenses | Dashboard policies, claims, review, payment/reconciliation and corrections; mobile claims, receipts, submission and payment progress |
-| Payroll | Dashboard policies, compensation, inputs, calculation, review, finalization, payslips, payments and amendments; mobile finalized payslips and downloads |
+| Payroll | Dashboard policies, compensation, inputs, calculation, review, finalization, payslips, payments and amendments. Native finalized payslips, payment progress, bounded offline views and authorized PDF saving are implemented. |
 | Communications | Mobile push hints and navigation. Dashboard audience groups, drafts, bounded named audience selection, publication review, preview, scheduling, cancellation/recovery and archival, and the mobile inbox with durable read/acknowledgement commands are implemented. |
 | Identity administration | Dashboard platform users, role/membership changes, invitations, provider bindings and sessions; company membership and grant review is implemented |
 | Reporting | Attendance, leave, overtime, expenses and payroll reports, authorized bounded exports and export history |

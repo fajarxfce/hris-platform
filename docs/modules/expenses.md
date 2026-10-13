@@ -131,6 +131,20 @@ Repeated receipt digests within the claim or in another current pending or appro
 
 `GET /expenses/submissions/{submissionId}` returns only that submitted evidence and its approval/current claim status. Current self/team/company scope applies, and an assigned reviewer with live permissions or a valid delegation can read this exact submission. A historical reviewer does not gain access to the current unsubmitted draft or its history. `GET /expenses/claims/{id}/submissions` uses ordinary claim scope and returns summaries with a number cursor, at most twenty per page.
 
+Submission details expose `canReadClaim` separately from `availableActions`.
+`DECIDE` is available only to the current independent approval stage of a pending
+latest submission. Makers, original/current beneficiaries and their delegates are
+excluded. Earlier and later stage assignments may still authorize evidence reads
+without authorizing a decision. Explicit `SELF` reads expose no reviewer action.
+Duplicate signals require review input; they do not hide the decision workflow.
+
+Reads acquire shared actor/delegator account guards in identifier order before
+resolving current grants. A delegation that expires during acquisition cannot
+release evidence unless another ordinary claim scope still permits it. Action
+availability is derived again at result delivery. These observations do not
+reserve a decision: commands independently validate current scope and both
+observed claim/approval versions.
+
 Pending claims cannot be edited or cancelled directly. `POST /expenses/submissions/{id}/withdraw` cancels the current pending/blocked approval and returns the claim to `DRAFT`, preserving all submitted evidence. It requires management scope, an expected claim version, and a reason. A later edit creates a new draft revision; resubmission creates a new submission/approval. There are at most twenty submissions per claim. Withdrawal and draft cancellation remain possible at that limit.
 
 Claim transitions, submission evidence, approval state, action history, audit, and operation receipts commit together. Database insertion fences prohibit adding evidence to a committed submission, and deferred constraints require complete line/receipt snapshots. Competing saves/submissions/withdrawals use the same optimistic claim version and serialization guards. Replays recheck current account, company, membership, credentials, and resource access.

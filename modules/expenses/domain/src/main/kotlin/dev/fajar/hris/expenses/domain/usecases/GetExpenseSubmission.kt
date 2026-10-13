@@ -1,5 +1,7 @@
 package dev.fajar.hris.expenses.domain.usecases
 
+import dev.fajar.hris.approvals.domain.entities.ApprovalKind
+import dev.fajar.hris.approvals.domain.entities.Delegation
 import dev.fajar.hris.approvals.domain.policies.isAssignedApprover
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
@@ -7,6 +9,7 @@ import dev.fajar.hris.expenses.domain.entities.*
 import dev.fajar.hris.expenses.domain.policies.*
 import dev.fajar.hris.expenses.domain.repositories.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.entities.MemberAccount
 import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
@@ -44,14 +47,11 @@ class GetExpenseSubmission(
             if (companyGuard is Result.Failed) return@run companyGuard
             val memberGuard = members.lock(company, shared = true)
             if (memberGuard is Result.Failed) return@run memberGuard
-            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
-            if (accountGuard is Result.Failed) return@run accountGuard
-            val accessed = identities.access(actor.accountId, company)
-            if (accessed is Result.Failed) return@run accessed
-            val access = (accessed as Result.Success).value
-            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
-            if (checked is Result.Failed) return@run checked
-            val live = (checked as Result.Success).value
+            val initialAccess =
+                identities.access(actor.accountId, company).flatMap {
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
+                }
+            if (initialAccess is Result.Failed) return@run initialAccess
             val found = claims.submission(company, id)
             if (found is Result.Failed) return@run found
             val submission =
@@ -73,6 +73,36 @@ class GetExpenseSubmission(
                     ?: return@run Result.Failed(
                         Failure(FailureKind.CONFLICT, "approval_unavailable")
                     )
+            val foundDelegations =
+                if (scope == ExpenseClaimReadScope.AUTHORIZED)
+                    approvals.delegations(company, actor.accountId, clock.instant())
+                else Result.Success(emptyList<Delegation>())
+            if (foundDelegations is Result.Failed) return@run foundDelegations
+            val delegations = (foundDelegations as Result.Success).value
+            if (delegations.size > 200)
+                return@run Result.Failed(
+                    Failure(FailureKind.CONFLICT, "approval_delegation_capacity")
+                )
+            val assigned = approval.stages.flatMap { it.assignees }.toSet()
+            val parties =
+                delegations
+                    .filter {
+                        it.kind == ApprovalKind.EXPENSE &&
+                            it.toAccount == actor.accountId &&
+                            it.fromAccount in assigned
+                    }
+                    .map { it.fromAccount }
+                    .toSet() + actor.accountId
+            for (party in parties.sorted()) {
+                val accountGuard = identities.lockAccount(party, shared = true)
+                if (accountGuard is Result.Failed) return@run accountGuard
+            }
+            val accessed = identities.access(actor.accountId, company)
+            if (accessed is Result.Failed) return@run accessed
+            val access = (accessed as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
+            if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
             val foundCompany = companies.find(company)
             if (foundCompany is Result.Failed) return@run foundCompany
             val settings =
@@ -83,29 +113,24 @@ class GetExpenseSubmission(
             val foundEmployee = people.findAtInstant(company, claim.employmentId, now)
             if (foundEmployee is Result.Failed) return@run foundEmployee
             val employee = (foundEmployee as Result.Success).value
+            val foundGrants =
+                if (scope == ExpenseClaimReadScope.AUTHORIZED)
+                    members.candidates(company, assigned, emptySet(), assigned.size)
+                else Result.Success(emptyList<MemberAccount>())
+            if (foundGrants is Result.Failed) return@run foundGrants
+            val grants = (foundGrants as Result.Success).value
             if (employee == null || !canReadExpenseClaim(live, employee, today, scope)) {
-                if (scope == ExpenseClaimReadScope.SELF)
-                    return@run Result.Failed(
-                        Failure(FailureKind.NOT_FOUND, "expense_submission_not_found")
-                    )
-                val delegated = approvals.delegations(company, actor.accountId, now)
-                if (delegated is Result.Failed) return@run delegated
-                val assigned = approval.stages.flatMap { it.assignees }.toSet()
-                val grants = members.candidates(company, assigned, emptySet(), assigned.size)
-                if (grants is Result.Failed) return@run grants
                 if (
-                    !isAssignedApprover(
-                        live,
-                        approval,
-                        (delegated as Result.Success).value,
-                        (grants as Result.Success).value,
-                        now,
-                    )
+                    scope == ExpenseClaimReadScope.SELF ||
+                        !isAssignedApprover(live, approval, delegations, grants, now)
                 )
                     return@run Result.Failed(
                         Failure(FailureKind.NOT_FOUND, "expense_submission_not_found")
                     )
             }
+            val foundBeneficiary = people.accountForEmployee(company, claim.employmentId)
+            if (foundBeneficiary is Result.Failed) return@run foundBeneficiary
+            val beneficiary = (foundBeneficiary as Result.Success).value
             val foundReviews = claims.reviews(company, id)
             if (foundReviews is Result.Failed) return@run foundReviews
             val hashes = submission.lines.flatMap { it.receipts }.map { it.sha256 }.toSet()
@@ -116,14 +141,51 @@ class GetExpenseSubmission(
                     submission.lines,
                     (foundDuplicates as Result.Success).value,
                 )
-            validateCompanySessionActor(actor, access, clock.instant(), security).map {
-                ExpenseSubmissionDetails(
-                    submission,
-                    claim,
-                    approval,
-                    (foundReviews as Result.Success).value,
-                    duplicates,
+            val deliveredAt = clock.instant()
+            validateCompanySessionActor(actor, access, deliveredAt, security).flatMap { current ->
+                val canReadClaim =
+                    employee != null &&
+                        canReadExpenseClaim(
+                            current,
+                            employee,
+                            deliveredAt.atZone(ZoneId.of(settings.timezone)).toLocalDate(),
+                            scope,
+                        )
+                if (
+                    !canReadClaim &&
+                        (scope == ExpenseClaimReadScope.SELF ||
+                            !isAssignedApprover(
+                                current,
+                                approval,
+                                delegations,
+                                grants,
+                                deliveredAt,
+                            ))
                 )
+                    Result.Failed(Failure(FailureKind.NOT_FOUND, "expense_submission_not_found"))
+                else
+                    Result.Success(
+                        ExpenseSubmissionDetails(
+                            submission,
+                            claim,
+                            approval,
+                            (foundReviews as Result.Success).value,
+                            duplicates,
+                            canReadClaim,
+                            if (scope == ExpenseClaimReadScope.AUTHORIZED)
+                                expenseSubmissionAvailableActions(
+                                    claim,
+                                    submission,
+                                    approval,
+                                    current,
+                                    beneficiary,
+                                    delegations,
+                                    grants,
+                                    deliveredAt,
+                                )
+                            else emptySet(),
+                        )
+                    )
             }
         }
     }

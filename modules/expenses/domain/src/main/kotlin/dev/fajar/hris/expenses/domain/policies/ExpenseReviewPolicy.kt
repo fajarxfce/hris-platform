@@ -32,6 +32,39 @@ fun hasExpenseReviewScope(
         )
 }
 
+fun expenseSubmissionAvailableActions(
+    claim: ExpenseClaim,
+    submission: ExpenseSubmission,
+    approval: ApprovalRequest,
+    actor: Actor,
+    currentBeneficiary: UUID?,
+    delegations: List<Delegation>,
+    members: List<MemberAccount>,
+    at: Instant,
+): Set<ExpenseSubmissionAction> {
+    if (
+        claim.status != ExpenseClaimStatus.PENDING ||
+            claim.latestSubmissionId != submission.id ||
+            delegations.size > 200
+    )
+        return emptySet()
+    val excluded = excludedExpenseReviewers(submission, currentBeneficiary)
+    if (actor.accountId in excluded) return emptySet()
+    val decision =
+        decideApproval(
+            approval,
+            actor,
+            ApprovalDecision.APPROVE,
+            "",
+            delegations.filter { it.fromAccount !in excluded },
+            members,
+            at,
+        )
+    return if (decision is Result.Success && decision.value.decidingFor !in excluded)
+        setOf(ExpenseSubmissionAction.DECIDE)
+    else emptySet()
+}
+
 fun duplicateExpenseReceiptDigests(
     lines: List<ExpenseSubmittedLine>,
     otherClaims: Set<String>,

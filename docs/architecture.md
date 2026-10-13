@@ -121,6 +121,13 @@ current session assurance before returning. Submission-only approval authority
 does not grant access to this draft aggregate; submitted evidence has its own
 scoped endpoint. No object-storage I/O occurs inside the review transaction.
 
+Submission review holds shared actor/delegator account guards in identifier order.
+Its domain policy derives current-stage actions separately from ordinary claim
+read access. Credential/MFA validation follows the ordered guards; delegated read
+scope and action availability are checked again before delivery so elapsed
+delegation validity cannot release stale authority. Commands retain their own
+independent current-scope and observed-version checks.
+
 Company attendance exceptions use one bounded SQL projection under shared people,
 company, membership and account guards. They do not acquire employee/day locks:
 evidence, reviews and correction heads come from the same statement snapshot,

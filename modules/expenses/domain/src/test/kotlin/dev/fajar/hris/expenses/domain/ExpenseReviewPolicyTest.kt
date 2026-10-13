@@ -90,6 +90,217 @@ class ExpenseReviewPolicyTest {
         )
 
     @Test
+    fun availableActionsFollowTheCurrentStageRatherThanHistoricalReadAssignment() {
+        val stages =
+            approval.copy(
+                stages = listOf(ApprovalStage(setOf(reviewer)), ApprovalStage(setOf(delegate)))
+            )
+        assertEquals(
+            setOf(ExpenseSubmissionAction.DECIDE),
+            expenseSubmissionAvailableActions(
+                claim,
+                submission,
+                stages,
+                actor,
+                null,
+                emptyList(),
+                listOf(grant),
+                now,
+            ),
+        )
+        assertTrue(
+            expenseSubmissionAvailableActions(
+                    claim,
+                    submission,
+                    stages,
+                    actor.copy(accountId = delegate),
+                    null,
+                    emptyList(),
+                    listOf(grant),
+                    now,
+                )
+                .isEmpty()
+        )
+        val advanced = stages.copy(currentStep = 1, version = 1)
+        assertTrue(
+            hasExpenseReviewScope(
+                submission,
+                advanced,
+                actor,
+                null,
+                emptyList(),
+                listOf(grant),
+                now,
+            )
+        )
+        assertTrue(
+            expenseSubmissionAvailableActions(
+                    claim,
+                    submission,
+                    advanced,
+                    actor,
+                    null,
+                    emptyList(),
+                    listOf(grant),
+                    now,
+                )
+                .isEmpty()
+        )
+        assertEquals(
+            setOf(ExpenseSubmissionAction.DECIDE),
+            expenseSubmissionAvailableActions(
+                claim,
+                submission,
+                advanced,
+                actor.copy(accountId = delegate),
+                null,
+                emptyList(),
+                listOf(grant),
+                now,
+            ),
+        )
+        for (status in
+            ExpenseClaimStatus.entries.filter { it != ExpenseClaimStatus.PENDING }) assertTrue(
+            expenseSubmissionAvailableActions(
+                    claim.copy(status = status),
+                    submission,
+                    approval,
+                    actor,
+                    null,
+                    emptyList(),
+                    listOf(grant),
+                    now,
+                )
+                .isEmpty()
+        )
+        assertTrue(
+            expenseSubmissionAvailableActions(
+                    claim.copy(latestSubmissionId = UUID.randomUUID()),
+                    submission,
+                    approval,
+                    actor,
+                    null,
+                    emptyList(),
+                    listOf(grant),
+                    now,
+                )
+                .isEmpty()
+        )
+        for (status in listOf(ApprovalStatus.BLOCKED, ApprovalStatus.APPROVED)) assertTrue(
+            expenseSubmissionAvailableActions(
+                    claim,
+                    submission,
+                    approval.copy(status = status),
+                    actor,
+                    null,
+                    emptyList(),
+                    listOf(grant),
+                    now,
+                )
+                .isEmpty()
+        )
+    }
+
+    @Test
+    fun availableActionsExcludeMakersAndBeneficiariesIncludingTheirDelegates() {
+        for ((evidence, beneficiary) in
+            listOf(
+                submission.copy(makerIds = setOf(owner, reviewer)) to null,
+                submission.copy(requesterId = reviewer) to null,
+                submission to reviewer,
+            )) {
+            for (account in listOf(reviewer, delegate)) assertTrue(
+                expenseSubmissionAvailableActions(
+                        claim,
+                        evidence,
+                        approval,
+                        actor.copy(accountId = account),
+                        beneficiary,
+                        listOf(delegation),
+                        listOf(grant),
+                        now,
+                    )
+                    .isEmpty()
+            )
+        }
+    }
+
+    @Test
+    fun delegatedActionsRequireCurrentBoundedAuthority() {
+        val delegated = actor.copy(accountId = delegate)
+        assertEquals(
+            setOf(ExpenseSubmissionAction.DECIDE),
+            expenseSubmissionAvailableActions(
+                claim,
+                submission,
+                approval,
+                delegated,
+                null,
+                listOf(delegation),
+                listOf(grant),
+                now,
+            ),
+        )
+        for (member in
+            listOf(
+                grant.copy(accountActive = false),
+                grant.copy(membershipActive = false),
+                grant.copy(permissions = emptySet()),
+            )) assertTrue(
+            expenseSubmissionAvailableActions(
+                    claim,
+                    submission,
+                    approval,
+                    delegated,
+                    null,
+                    listOf(delegation),
+                    listOf(member),
+                    now,
+                )
+                .isEmpty()
+        )
+        assertTrue(
+            expenseSubmissionAvailableActions(
+                    claim,
+                    submission,
+                    approval,
+                    delegated,
+                    null,
+                    listOf(delegation),
+                    listOf(grant),
+                    delegation.validUntil,
+                )
+                .isEmpty()
+        )
+        assertTrue(
+            expenseSubmissionAvailableActions(
+                    claim,
+                    submission,
+                    approval,
+                    delegated,
+                    null,
+                    List(201) { delegation.copy(id = UUID.randomUUID()) },
+                    listOf(grant),
+                    now,
+                )
+                .isEmpty()
+        )
+        assertTrue(
+            expenseSubmissionAvailableActions(
+                    claim,
+                    submission,
+                    approval,
+                    actor.copy(permissions = setOf("expenses.read")),
+                    null,
+                    emptyList(),
+                    listOf(grant),
+                    now,
+                )
+                .isEmpty()
+        )
+    }
+
+    @Test
     fun previousMakersAndCurrentBeneficiariesCannotReviewDirectlyOrByDelegation() {
         val made = submission.copy(makerIds = setOf(owner, reviewer))
         val direct =

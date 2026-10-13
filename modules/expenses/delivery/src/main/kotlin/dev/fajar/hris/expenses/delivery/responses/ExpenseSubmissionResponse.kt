@@ -27,4 +27,6 @@ data class ExpenseSubmissionResponse(
     val current: Boolean,
     val reviews: List<ExpenseReviewResponse>,
     val duplicateReceiptDigests: Set<String>,
+    val canReadClaim: Boolean,
+    val availableActions: Set<String>,
 )

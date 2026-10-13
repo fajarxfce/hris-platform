@@ -2605,3 +2605,21 @@ interruption followed by recovery on the same executor. Existing independent
 review, duplicate evidence, revocation, concurrent decisions and API contracts
 also passed. This change affects only expense composition in the API; it does not
 modify the worker dependency graph.
+
+## Guarded expense submission actions
+
+Submission details now report ordinary claim-read access separately from current
+decision availability. Only a pending latest submission's independent active stage
+exposes `DECIDE`; maker/beneficiary exclusions, live delegator grants and explicit
+SELF scope remain authoritative in domain. Shared actor/delegator account guards
+are acquired in identifier order. Read scope and time-based action availability
+are rechecked before delivery; a former delegation cannot release private evidence.
+
+Architecture, formatting, fifteen expense domain cases and API assembly passed.
+Six new API/PostgreSQL cases and 103 existing regression cases passed, covering
+current versus historical stages, reassignment, both observed versions, ordinary
+versus delegated reads, expiration during acquisition, and account revocation
+before/during guarded reads. The expiration fixture uses PostgreSQL's persisted
+microsecond boundary. Existing maker/current-beneficiary HTTP scenarios also
+verify absent actions. Command authorization remains independent of this read
+projection; the dashboard decision workflow is the next increment.

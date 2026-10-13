@@ -8,4 +8,6 @@ data class ExpenseSubmissionDetails(
     val approval: ApprovalRequest,
     val reviews: List<ExpenseReview> = emptyList(),
     val duplicateReceiptDigests: Set<String> = emptySet(),
+    val canReadClaim: Boolean = false,
+    val availableActions: Set<ExpenseSubmissionAction> = emptySet(),
 )

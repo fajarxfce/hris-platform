@@ -37,6 +37,8 @@ fun ExpenseSubmissionDetails.toResponse(): ExpenseSubmissionResponse {
         claim.latestSubmissionId == s.id,
         reviews.map { it.toResponse() },
         duplicateReceiptDigests,
+        canReadClaim,
+        availableActions.map { it.name }.toSet(),
     )
 }
 

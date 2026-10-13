@@ -51,6 +51,9 @@ class ExpenseReadProbeConfiguration {
         probe: ExpenseReadProbe,
     ): ExpenseClaimRepository =
         object : ExpenseClaimRepository by delegate {
+            override fun find(companyId: UUID, id: UUID) =
+                delegate.find(companyId, id).also { probe.afterRead(companyId, "claim-head") }
+
             override fun list(
                 companyId: UUID,
                 employmentId: UUID?,

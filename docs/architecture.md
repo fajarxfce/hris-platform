@@ -107,6 +107,15 @@ Expense category-policy saves apply the same session-assurance fence after their
 policy/access guards and before receipt replay or transaction completion. The
 final check participates in the category, revision, journal and receipt transaction.
 
+Expense claim review acquires the shared company expense guard before shared
+people and access guards. Claims, policies and payments use that same aggregate
+guard, so its bounded current-draft/history/submission/payment read cannot mix
+versions across a concurrent mutation. The use case coordinates claim and payment
+repository contracts directly, preserves each acquisition failure, and rechecks
+current session assurance before returning. Submission-only approval authority
+does not grant access to this draft aggregate; submitted evidence has its own
+scoped endpoint. No object-storage I/O occurs inside the review transaction.
+
 Company attendance exceptions use one bounded SQL projection under shared people,
 company, membership and account guards. They do not acquire employee/day locks:
 evidence, reviews and correction heads come from the same statement snapshot,

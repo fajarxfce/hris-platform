@@ -12,6 +12,7 @@ interface ExpenseClaimRepository {
 
     fun review(actor: Actor, claim: ExpenseClaim, review: ExpenseReview): Result<MutationReceipt>
 
+    /** Company expense aggregate guard, also protecting policy and payment evidence. */
     fun lock(companyId: UUID, shared: Boolean = false): Result<Unit>
 
     fun capacity(companyId: UUID, accountId: UUID): Result<ExpenseClaimCapacity>

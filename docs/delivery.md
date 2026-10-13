@@ -2544,3 +2544,20 @@ offset below the sticky header. Browser checks cover both. The production build
 passed with the existing main-bundle size advisory. Development API deployment
 includes the policy-save assurance fix and administrative read endpoints; external
 distribution and production performance are not claimed.
+
+### Coherent expense claim review
+
+Added a bounded claim review endpoint combining the current draft, descending
+action/submission pages and payment progress. Shared aggregate guards keep these
+reads consistent across writes; ordinary claim authority does not expand through
+approval assignment. Payment responses exclude bank destinations and references.
+Resource-dependent cursor validation follows authorization, acquisition failures
+remain failures, and session assurance is rechecked before releasing the result.
+
+Architecture and formatting checks, 79 API/PostgreSQL tests, the twelve expense
+domain tests and the API boot JAR task passed. New checks cover concurrent shared
+readers versus a draft save, descending pagination, assignment-only and foreign
+scope denial, payment projection, revocation, expiry during acquisition and after
+the final read, interruption cleanup and failed aggregate acquisition. Existing
+mobile-compatible endpoints remain available. Dashboard integration is subsequent
+work; no additional physical-device validation is claimed by this endpoint.

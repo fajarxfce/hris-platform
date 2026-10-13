@@ -1,15 +1,30 @@
 package dev.fajar.hris
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.expenses.domain.repositories.ExpensePaymentRepository
 import dev.fajar.hris.storage.domain.repositories.ObjectStorageRepository
+import java.util.UUID
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
+    @Test
+    fun failedPaymentAcquisitionPreservesItsFailureAndDoesNotReturnAPartialReview() {
+        val scene = prepare()
+        val failure = Failure(FailureKind.UNAVAILABLE, "database_unavailable")
+        val failing =
+            object : ExpensePaymentRepository by payments {
+                override fun progress(companyId: UUID, claimId: UUID) = Result.Failed(failure)
+            }
+        val result = invoke(scene, "claim-review", paymentRepository = failing)
+        assertSame(failure, (result as Result.Failed).failure)
+        assertTrue(invoke(scene, "claim-review") is Result.Success)
+    }
 
     @ParameterizedTest
     @ValueSource(strings = ["success", "mfa", "corrupt"])
@@ -56,6 +71,7 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
                 "category-history",
                 "policy-catalog",
                 "policy-review",
+                "claim-review",
                 "directory",
                 "receipt-metadata",
                 "receipt-content",
@@ -102,6 +118,7 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
                 "category-history",
                 "policy-catalog",
                 "policy-review",
+                "claim-review",
                 "directory",
                 "receipt-metadata",
                 "receipt-content",
@@ -116,7 +133,11 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
         val barrier =
             ExpenseReadProbe.Barrier(
                 scene.company,
-                if (action == "policy-review") "category-history" else action,
+                when (action) {
+                    "policy-review" -> "category-history"
+                    "claim-review" -> "payments"
+                    else -> action
+                },
             )
         readProbe.current.set(barrier)
         Executors.newSingleThreadExecutor().use { pool ->
@@ -152,6 +173,7 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
                 "category-history",
                 "policy-catalog",
                 "policy-review",
+                "claim-review",
                 "directory",
                 "receipt-metadata",
                 "receipt-content",
@@ -162,7 +184,11 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
         val barrier =
             ExpenseReadProbe.Barrier(
                 scene.company,
-                if (action == "policy-review") "category-history" else action,
+                when (action) {
+                    "policy-review" -> "category-history"
+                    "claim-review" -> "payments"
+                    else -> action
+                },
             )
         readProbe.current.set(barrier)
         Executors.newFixedThreadPool(2).use { pool ->

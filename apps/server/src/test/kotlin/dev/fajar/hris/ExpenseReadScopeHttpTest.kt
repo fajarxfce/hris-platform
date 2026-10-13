@@ -40,7 +40,7 @@ class ExpenseReadScopeHttpTest : ExpenseReviewApiFixture() {
             404,
             get(f.worker, "${f.path}?$range&scope=SELF&employmentId=${f.manager}").statusCode(),
         )
-        for (suffix in listOf("", "/drafts", "/history", "/submissions", "/payments")) {
+        for (suffix in listOf("", "/drafts", "/history", "/submissions", "/payments", "/review")) {
             val path = "${f.path}/${other.claim}$suffix"
             assertEquals(200, get(f.worker, path).statusCode(), suffix)
             val denied = get(f.worker, "$path?scope=SELF")

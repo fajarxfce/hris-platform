@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Import
 @Import(AccountLockProbeConfiguration::class, ExpenseReadProbeConfiguration::class)
 abstract class ExpenseReadAssuranceApiFixture : ExpenseReviewApiFixture() {
     @Autowired private lateinit var claims: ExpenseClaimRepository
-    @Autowired private lateinit var payments: ExpensePaymentRepository
+    @Autowired protected lateinit var payments: ExpensePaymentRepository
     @Autowired private lateinit var policies: ExpensePolicyRepository
     @Autowired private lateinit var approvals: ApprovalRepository
     @Autowired private lateinit var documents: DocumentRepository
@@ -118,11 +118,25 @@ abstract class ExpenseReadAssuranceApiFixture : ExpenseReviewApiFixture() {
         action: String,
         actor: Actor = scene.actor,
         storage: ObjectStorageRepository = objects,
+        paymentRepository: ExpensePaymentRepository = payments,
     ): Result<*> {
         val f = scene.fixture
         val scope = ExpenseClaimReadScope.SELF
         val today = LocalDate.ofInstant(clock.instant(), ZoneId.of("Asia/Jakarta"))
         return when (action) {
+            "claim-review" ->
+                GetExpenseClaimReview(
+                        claims,
+                        paymentRepository,
+                        people,
+                        companies,
+                        identities,
+                        transactions,
+                        clock,
+                        members,
+                        security,
+                    )
+                    .execute(actor, f.claim, null, 20, null, 20, scope)
             "list" ->
                 ListExpenseClaims(
                         claims,

@@ -68,6 +68,24 @@ References must belong to the same company. Cost centers must have the correct o
 
 `GET /expenses/claims/{id}` returns the current draft. `/drafts` returns immutable draft revisions (maximum twenty per page); `/history` returns versioned actions (maximum 200 per page). `GET /expenses/claims` requires `from` and `until` dates spanning at most 366 days in the company timezone and supports status, employment, and cursor filters. Users without company-wide expense read/manage permission must provide an authorized employment scope. Summary pages default to fifty and allow at most 200 rows.
 
+`GET /expenses/claims/{id}/review` returns the current claim/draft, a descending
+history page, a descending submission-summary page, and bounded payment progress
+in one guarded transaction. `historyAfter` is an exclusive version cursor;
+`historyLimit` defaults to fifty and allows at most 200 records.
+`submissionsAfter` is an exclusive submission-number cursor; `submissionsLimit`
+defaults to twenty and allows at most twenty records. Each page request reads a
+coherent current aggregate; it does not pin an earlier response. Payment progress
+contains status and timestamps, never bank destinations or bank references.
+
+The review uses ordinary current self/team/company claim authority and honors
+explicit `scope=SELF`. Assignment-only reviewers use the immutable submission
+endpoint instead; assignment does not expose the current draft or its history.
+Resource-dependent cursor validation follows authorization. Shared expense and
+access guards keep the draft, actions, submissions and payment evidence consistent
+while allowing independent readers. Current session assurance is checked after
+guard acquisition and again before releasing the aggregate. Receipt bytes are
+not acquired by this transaction.
+
 Every edit appends a complete revision; previous lines, receipts, totals, actors, and reasons remain unchanged. Database constraints prevent appending contents to an already committed draft and verify line counts/totals before commit. Header, revision, evidence references, action history, audit, and idempotency receipt commit together. A lost response can be replayed after fresh authorization without changing the current revision.
 
 Limits are 1,000 open claims (`DRAFT`, `PENDING`, or `RETURNED`) per company, fifty per creating account, and 100 draft revisions per claim. Submission keeps its capacity reservation until a terminal outcome. `POST /expenses/claims/{id}/cancel` requires the expected version and a reason, releases open-claim capacity, and preserves its evidence/history. Cancellation remains available after the revision limit. Competing edits/cancellation cannot both commit the same version. Payment progress remains separate from the approved claim status.

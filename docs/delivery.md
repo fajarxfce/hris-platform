@@ -2427,3 +2427,21 @@ permission intersection, and interrupted executor reuse. Expense domain checks a
 both application JARs passed; the unchanged worker check was up to date. The initial
 fixture was corrected to remove its organization grant and apply active MFA policy.
 No migration or mobile APK changed in this increment.
+
+
+## Native expense draft authoring
+
+The [mobile editor](https://github.com/fajarxfce/hris-mobile/commit/4503540)
+creates and updates employee-owned drafts, resolves dated categories and cost
+centers, and selects inspected personal receipts. Saves use encrypted immutable
+commands and versioned API operations. Conflicting edits retain local input;
+connection recovery reacquires authority without requiring input to be discarded.
+Pending or uncertain delivery cannot become a different request.
+
+Final mobile checks passed with 1,092 desktop tests, 36 presentation Chromium tests
+and Android dev assembly. Initial editor checks also passed 73 expense domain/data
+Chromium tests and production Web compilation. CI validated Linux, Windows and the
+iOS simulator build. API 35 acceptance exercised creation, exact amounts, receipts,
+competing edits, background retention, offline recovery, both themes and 200% text.
+The validated APK was installed on the phone without launching it. Submission,
+cancellation, withdrawal and receipt export are not yet exposed by the native UI.

@@ -94,8 +94,10 @@ class ReconcileExpensePaymentBatch(
                 )
             val independent = validateExpensePaymentIndependence(actor.accountId, evidence)
             if (independent is Result.Failed) return@run independent
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run validateExpensePaymentAccess(live, clock.instant(), security).map {
+                    receipt
+                }
             }
             if (batch.version != version)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
@@ -132,6 +134,7 @@ class ReconcileExpensePaymentBatch(
                             ),
                         )
                     }
+                    .flatMap { validateExpensePaymentAccess(live, clock.instant(), security) }
                     .map { receipt }
             }
         }

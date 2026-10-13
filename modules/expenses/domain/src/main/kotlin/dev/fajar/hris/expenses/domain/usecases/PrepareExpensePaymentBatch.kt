@@ -86,8 +86,10 @@ class PrepareExpensePaymentBatch(
                 )
             val independent = validateExpensePaymentIndependence(actor.accountId, evidence)
             if (independent is Result.Failed) return@run independent
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run validateExpensePaymentAccess(live, clock.instant(), security).map {
+                    receipt
+                }
             }
             val found = payments.find(company, id)
             if (found is Result.Failed) return@run found
@@ -162,6 +164,7 @@ class PrepareExpensePaymentBatch(
                             ),
                         )
                     }
+                    .flatMap { validateExpensePaymentAccess(live, clock.instant(), security) }
                     .map { receipt }
             }
         }

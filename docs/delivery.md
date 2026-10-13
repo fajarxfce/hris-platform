@@ -2656,3 +2656,21 @@ no additional claim reads when switching tabs. No phone update was required for
 this dashboard increment. The existing bundle-size advisory and two unrelated
 CSS specificity warnings remain. Draft authoring and finance administration are
 subsequent expense work.
+
+## Expense payment assurance at completion
+
+Finance reads now verify recent authentication after their final acquisition,
+including bank destinations, reconciliation history and export instructions.
+Preparation, release, cancellation and reconciliation check assurance again before
+returning an original receipt and after the journal write. The same policy covers
+recent MFA and deployments that use recent password authentication. A failed read
+keeps its original error classification; interruption still propagates.
+
+Architecture, formatting, fifteen expense domain tests, the API boot JAR and 54
+API/PostgreSQL cases passed. The 34 new cases cover expiry after acquisition and
+journaling, both new commands and original receipt replay, complete rollback of
+payment/item/reference/history/journal state, and interrupted transactions followed
+by recovery on the same executor. Existing payment bounds, reservations, independent
+operators, concurrent writes, partial reconciliation, access revocation and shared
+read tests passed. This changes only expense domain behavior in the API; the worker
+dependency graph is unaffected.

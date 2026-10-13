@@ -72,8 +72,10 @@ class CancelExpensePaymentBatch(
                     ?: return@run Result.Failed(
                         Failure(FailureKind.NOT_FOUND, "expense_payment_batch_not_found")
                     )
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run validateExpensePaymentAccess(live, clock.instant(), security).map {
+                    receipt
+                }
             }
             if (batch.version != version)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
@@ -103,6 +105,7 @@ class CancelExpensePaymentBatch(
                                 ),
                             )
                         }
+                        .flatMap { validateExpensePaymentAccess(live, clock.instant(), security) }
                         .map { receipt }
                 }
         }

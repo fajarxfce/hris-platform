@@ -57,12 +57,8 @@ class ListExpensePayables(
                     validateCompanyCommandActor(actor, it)
                 }
             if (checked is Result.Failed) return@run checked
-            val recent =
-                validateExpensePaymentAccess(
-                    (checked as Result.Success).value,
-                    clock.instant(),
-                    security,
-                )
+            val live = (checked as Result.Success).value
+            val recent = validateExpensePaymentAccess(live, clock.instant(), security)
             if (recent is Result.Failed) return@run recent
             val found = companies.find(company)
             if (found is Result.Failed) return@run found
@@ -70,13 +66,17 @@ class ListExpensePayables(
                 (found as Result.Success).value
                     ?: return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "company_not_found"))
             val zone = ZoneId.of(settings.timezone)
-            payments.payables(
-                company,
-                from.atStartOfDay(zone).toInstant(),
-                until.plusDays(1).atStartOfDay(zone).toInstant(),
-                after,
-                limit,
-            )
+            payments
+                .payables(
+                    company,
+                    from.atStartOfDay(zone).toInstant(),
+                    until.plusDays(1).atStartOfDay(zone).toInstant(),
+                    after,
+                    limit,
+                )
+                .flatMap { page ->
+                    validateExpensePaymentAccess(live, clock.instant(), security).map { page }
+                }
         }
     }
 }

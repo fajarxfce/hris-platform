@@ -178,6 +178,12 @@ Metadata and each content read revalidate company/account/credential access and 
 
 `expenses.pay` is a protected grant, separate from expense read/manage/approval. Company administrators do not receive it automatically. Payment queries, bank details, exports, and commands require current company/account/membership access and recent authentication (recent MFA when enforced). Commands recheck the original request's permission intersection after acquiring their resource/account guards and before receipt replay.
 
+Reads recheck recent assurance after acquiring the final result. Commands recheck
+before returning an original receipt and after journaling; expiry rolls back the
+batch/item transition, bank-reference reservation, history, audit/outbox and operation
+receipt together. An acquisition failure retains its original classification.
+Renewing authentication permits explicit retry with the original command identity.
+
 `GET /expenses/payments/payables?from=YYYY-MM-DD&until=YYYY-MM-DD` lists approved claims without an unresolved or successful payment reservation. `PUT /expenses/payments/{id}` prepares an immutable batch of one to 100 instructions with stable item IDs, submission IDs, bank codes, account numbers/names, title, reason, and idempotency key. Finance supplies independently verified destinations for this batch; it does not change a person's profile or define a reusable bank-account master. Claim amounts and employee labels come from the approved submission, not the request. All amounts are IDR decimal strings.
 
 Preparation reserves each claim. A database unique constraint prevents a claim from appearing in another prepared/pending/successful instruction, even under competing requests. Original makers, the frozen beneficiary, and the currently linked beneficiary cannot prepare, release, or reconcile their own claims. Payment instructions preserve their original destinations, amounts, and evidence. A correction requires cancellation of the prepared batch and a new batch.

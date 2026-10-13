@@ -3003,3 +3003,15 @@ or scanning. Browser form retention remains in memory.
 
 The dashboard build passed. The current backend artifacts served the integration
 tests; no backend source or mobile application change was required for this slice.
+
+## Expense browser return navigation
+
+The expense-filter scenario now holds the list request made when returning from
+details, verifies the pending view, and waits for the returned rows before counting
+filter requests. Two CI failures had counted the navigation request after that
+baseline, incorrectly attributing it to an unapplied status edit. The test still
+requires zero requests from editing the filter and an explicit Apply action.
+
+All eight expense-claim Chromium scenarios passed against the production build,
+together with TypeScript and the focused formatting check. The reproduction uses
+the owned request gate and rendered data, without sleeps or additional retries.

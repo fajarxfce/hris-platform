@@ -30,8 +30,16 @@ test("claim filters and paging keep the selected company and do not search on ea
   await expect(page.getByRole("region", { name: "Current claim", exact: true })).toContainText(
     "150,000.75",
   );
-  await page.getByRole("link", { name: "Expense claims", exact: true }).last().click();
-  await expect(page).toHaveURL(`${directory}&after=${expenseIdentifier(20)}`);
+  const returningList = api.holdNext("list");
+  try {
+    await page.getByRole("link", { name: "Expense claims", exact: true }).last().click();
+    await expect(page).toHaveURL(`${directory}&after=${expenseIdentifier(20)}`);
+    await returningList.entered;
+    await expect(table).toHaveCount(0);
+  } finally {
+    returningList.release();
+  }
+  await expect(table.getByRole("row")).toHaveCount(4);
   const before = api.reads.length;
   await page.getByRole("combobox", { name: "Status", exact: true }).selectOption("CANCELLED");
   expect(api.reads).toHaveLength(before);

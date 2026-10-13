@@ -5,6 +5,7 @@ import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import { canBrowseCompanyExpenses } from "../../domain/policies/expense-claim-read-policy";
 import { ExpenseClaimScreen } from "../bindings/expense-claim-screen";
 import { ExpenseClaimsScreen } from "../bindings/expense-claims-screen";
+import { ExpenseDecisionScreen } from "../bindings/expense-decision-screen";
 import { ExpensePoliciesScreen } from "../bindings/expense-policies-screen";
 import { ExpensePolicyEditorScreen } from "../bindings/expense-policy-editor-screen";
 import { ExpensePolicyScreen } from "../bindings/expense-policy-screen";
@@ -25,6 +26,10 @@ export function ExpenseRoutes(props: {
       <Route path="claims" element={<ExpenseClaimsScreen {...props} />} />
       <Route path="claims/:claimId" element={<ExpenseClaimScreen {...props} />} />
       <Route path="submissions/:submissionId" element={<ExpenseSubmissionScreen {...props} />} />
+      <Route
+        path="submissions/:submissionId/:intent"
+        element={<ExpenseDecisionScreen {...props} />}
+      />
       <Route path="policies" element={<ExpensePoliciesScreen {...props} />} />
       <Route
         path="policies/new"

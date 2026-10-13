@@ -2623,3 +2623,36 @@ before/during guarded reads. The expiration fixture uses PostgreSQL's persisted
 microsecond boundary. Existing maker/current-beneficiary HTTP scenarios also
 verify absent actions. Command authorization remains independent of this read
 projection; the dashboard decision workflow is the next increment.
+
+## Expense decision dashboard
+
+Assigned reviewers can approve, reject or return an expense submission. The form
+uses the server's current action projection, keeps both observed versions and
+requires reasons for rejection/return. Approval with current duplicate signals
+requires acknowledgement and an explanation. Receipt acquisition has a separate
+owner shared with submission details; inspecting or downloading evidence does not
+navigate away from the form or discard input.
+
+One captured operation survives response loss, MFA recovery and later retry
+rejections during the editor lifecycle. A definite conflict requires an explicit
+fresh review before another command. Access loss removes evidence without treating
+an in-flight write as rejected. Repeated presses, company replacement, disposal and
+late results are covered; input and unconfirmed operations have navigation protection.
+
+Dashboard architecture, formatting, TypeScript, production build and all 1,528
+unit/component tests passed. Nineteen expense browser scenarios passed, including
+capability gating, intermediate approval, all three decisions, duplicate review,
+receipt download and revocation, original-operation recovery, reassignment,
+company replacement and locale/theme retention. Initial assertions were corrected
+to match the existing stage table and the backend's rejected approval attempt for
+a returned claim. The final real API/PostgreSQL browser scenario passed with MFA:
+a committed approval response was dropped and replayed with one recorded review;
+another claim was returned, revised, resubmitted and rejected. Its earlier evidence
+and return review remained immutable.
+
+Desktop light and 760-pixel dark screenshots were inspected. The development
+browser also downloaded the real 698-byte receipt with the expected SHA-256 and
+no additional claim reads when switching tabs. No phone update was required for
+this dashboard increment. The existing bundle-size advisory and two unrelated
+CSS specificity warnings remain. Draft authoring and finance administration are
+subsequent expense work.

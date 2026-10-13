@@ -34,8 +34,23 @@ Receipt download uses the exact submission/revision endpoint and bounded binary
 transport. Only one download can be active. Cancellation, refresh, company change
 and disposal abort its owner and reject late results. Access loss clears the
 evidence; recoverable transport failures retain it for explicit retry. Locale and
-theme changes do not fetch data again. Draft authoring, review decisions and finance
-commands remain separate workflows.
+theme changes do not fetch data again.
+
+Assigned reviewers can approve, reject or return a submission through
+`/expenses/submissions/:submissionId/:intent`. Server-provided decision availability
+is separate from ordinary claim-read authority. The form reviews the submitted
+items and current duplicate signals; item inspection and receipt downloads keep
+the current reason intact. Rejection/return require a reason. Approving current
+duplicate signals also requires explicit acknowledgement and an explanation.
+
+The editor captures the observed claim and approval versions with one operation ID.
+Repeated clicks cannot start another write. A lost response keeps the original
+command for explicit retry, including after MFA recovery or a later rejection.
+A definite version conflict requires protected reload before a new decision.
+Access loss clears evidence without guessing the outcome of a pending write.
+Form input and retry state belong to the current browser editor; leaving a dirty,
+pending or unconfirmed editor requires a navigation decision. Draft authoring and
+finance commands remain subsequent workflows.
 
 ## Expense policies
 

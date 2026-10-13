@@ -1,5 +1,11 @@
 import { MessageBar, MessageBarBody, Text } from "@fluentui/react-components";
-import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import {
+  ArrowClockwise20Regular,
+  ArrowUndo20Regular,
+  Checkmark20Regular,
+  Dismiss20Regular,
+} from "@fluentui/react-icons";
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppDetailsPanel } from "../../../../core/presentation/components/app-details-panel";
@@ -10,8 +16,9 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
-import { ExpenseReceiptList } from "../components/expense-receipt-list";
 import { expenseClaimMessages } from "../i18n/expense-claim-messages";
+import { expenseDecisionMessages } from "../i18n/expense-decision-messages";
+import type { ExpenseDecisionIntent } from "../models/expense-decision-intent";
 import type { ExpenseSubmissionState } from "../models/expense-submission-state";
 import type { expenseSubmissionView } from "../models/expense-submission-view";
 export function ExpenseSubmissionPage(props: {
@@ -27,11 +34,13 @@ export function ExpenseSubmissionPage(props: {
   onTab: (tab: string) => void;
   onLine: (id: string | null) => void;
   onReview: (version: string | null) => void;
-  onDownload: (id: string) => void;
-  onCancelDownload: () => void;
+  receiptContent: ReactNode;
+  canDecide: boolean;
+  onDecision: (intent: ExpenseDecisionIntent) => void;
 }) {
   const { state, view, locale } = props,
-    text = expenseClaimMessages(locale);
+    text = expenseClaimMessages(locale),
+    decisions = expenseDecisionMessages(locale);
   return (
     <>
       <section className="app-expense-submission" aria-busy={state.stage === "loading"}>
@@ -41,6 +50,31 @@ export function ExpenseSubmissionPage(props: {
           actions={
             <>
               <Link to={props.backTo}>{props.backLabel}</Link>
+              {props.canDecide && (
+                <>
+                  <AppButton
+                    appearance="primary"
+                    icon={<Checkmark20Regular />}
+                    onClick={() => props.onDecision("approve")}
+                  >
+                    {decisions.approve}
+                  </AppButton>
+                  <AppButton
+                    appearance="subtle"
+                    icon={<Dismiss20Regular />}
+                    onClick={() => props.onDecision("reject")}
+                  >
+                    {decisions.reject}
+                  </AppButton>
+                  <AppButton
+                    appearance="subtle"
+                    icon={<ArrowUndo20Regular />}
+                    onClick={() => props.onDecision("return")}
+                  >
+                    {decisions.return}
+                  </AppButton>
+                </>
+              )}
               <AppButton
                 appearance="subtle"
                 icon={<ArrowClockwise20Regular />}
@@ -144,13 +178,7 @@ export function ExpenseSubmissionPage(props: {
         {view?.line && (
           <>
             <AppPropertyList title={text.lineDetails} items={view.line.properties} />
-            <ExpenseReceiptList
-              rows={view.line.receipts}
-              state={state.download}
-              locale={locale}
-              onDownload={props.onDownload}
-              onCancel={props.onCancelDownload}
-            />
+            {props.receiptContent}
           </>
         )}
       </AppDetailsPanel>

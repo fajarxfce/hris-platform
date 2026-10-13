@@ -28,6 +28,8 @@ export type ExpenseSubmission = ExpenseSubmissionSummary &
     claimVersion: number;
     claimStatus: ExpenseClaimStatus;
     current: boolean;
+    canReadClaim: boolean;
+    availableActions: readonly "DECIDE"[];
     reviews: readonly ExpenseSubmissionReview[];
     duplicateReceiptDigests: readonly string[];
   }>;

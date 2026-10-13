@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useSyncExternalStore } from "react";
-import { Navigate, useParams, useSearchParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
-import {
-  canBrowseCompanyExpenses,
-  canReadExpenseClaims,
-} from "../../domain/policies/expense-claim-read-policy";
+import { canBrowseCompanyExpenses } from "../../domain/policies/expense-claim-read-policy";
+import { canReviewExpenses } from "../../domain/policies/expense-decision-policy";
 import type { ExpenseScreenProps } from "../contracts/expense-screen-props";
 import { ExpenseSubmissionController } from "../controllers/expense-submission-controller";
 import { expenseClaimMessages } from "../i18n/expense-claim-messages";
@@ -17,6 +15,7 @@ import {
 } from "../models/expense-claim-route";
 import { expenseSubmissionView } from "../models/expense-submission-view";
 import { ExpenseSubmissionPage } from "../pages/expense-submission-page";
+import { ExpenseEvidenceDownloads } from "./expense-evidence-downloads";
 export function ExpenseSubmissionScreen(props: ExpenseScreenProps) {
   const { submissionId = "" } = useParams();
   const [parameters] = useSearchParams();
@@ -44,15 +43,10 @@ export function ExpenseSubmissionScreen(props: ExpenseScreenProps) {
 }
 function ExpenseSubmissionBinding(props: ExpenseScreenProps & { id: string }) {
   const [parameters, setParameters] = useSearchParams();
+  const navigate = useNavigate();
   const controller = useMemo(
-    () =>
-      new ExpenseSubmissionController(
-        props.expense.loadSubmission,
-        props.expense.downloadReceipt,
-        props.access,
-        props.id,
-      ),
-    [props.expense.loadSubmission, props.expense.downloadReceipt, props.access, props.id],
+    () => new ExpenseSubmissionController(props.expense.loadSubmission, props.access, props.id),
+    [props.expense.loadSubmission, props.access, props.id],
   );
   const state = useSyncExternalStore(
     controller.subscribe,
@@ -63,7 +57,7 @@ function ExpenseSubmissionBinding(props: ExpenseScreenProps & { id: string }) {
     controller.activate();
     return controller.deactivate;
   }, [controller]);
-  useWorkspaceRevalidation(state.failure ?? state.download.failure);
+  useWorkspaceRevalidation(state.failure);
   const selectedTab = parameters.get("view"),
     tab = selectedTab === "reviews" || selectedTab === "approval" ? selectedTab : "items";
   const line = tab === "items" ? parameters.get("line") : null,
@@ -80,11 +74,12 @@ function ExpenseSubmissionBinding(props: ExpenseScreenProps & { id: string }) {
     props.access.companyId,
     expenseClaimSearchFromRoute(parameters, props.access.companyId, today),
   );
-  const sourceClaim =
-    state.submission &&
-    (canBrowseCompanyExpenses(props.access.permissions) ||
-      (canReadExpenseClaims(props.access.permissions) &&
-        parameters.get("claim") === state.submission.claimId));
+  const sourceClaim = state.submission?.canReadClaim ?? false;
+  if (sourceClaim && state.submission && !canBrowseCompanyExpenses(props.access.permissions))
+    directory.set("employmentId", state.submission.employmentId);
+  const canDecide =
+    canReviewExpenses(props.access.permissions) &&
+    (state.submission?.availableActions.includes("DECIDE") ?? false);
   const approvalAccess = props.access.permissions.includes("approvals.read");
   const text = expenseClaimMessages(props.locale);
   const claimQuery = new URLSearchParams(directory);
@@ -110,11 +105,30 @@ function ExpenseSubmissionBinding(props: ExpenseScreenProps & { id: string }) {
           : null
       }
       onRefresh={controller.refresh}
-      onDownload={controller.downloadReceipt}
-      onCancelDownload={controller.cancelDownload}
+      canDecide={canDecide}
+      onDecision={(intent) => {
+        if (!canDecide) return;
+        const next = new URLSearchParams(parameters);
+        next.delete("view");
+        next.delete("line");
+        next.delete("review");
+        navigate(`${expenseSubmissionPath(props.id)}/${intent}?${next}`);
+      }}
+      receiptContent={
+        view?.line && state.submission ? (
+          <ExpenseEvidenceDownloads
+            key={line}
+            download={props.expense.downloadReceipt}
+            access={props.access}
+            submission={state.submission}
+            rows={view.line.receipts}
+            locale={props.locale}
+            onUnavailable={controller.revokeEvidence}
+          />
+        ) : null
+      }
       onTab={(value) => {
         if (!["items", "reviews", "approval"].includes(value)) return;
-        controller.cancelDownload();
         const next = new URLSearchParams(parameters);
         next.set("view", value);
         next.delete("line");
@@ -122,7 +136,6 @@ function ExpenseSubmissionBinding(props: ExpenseScreenProps & { id: string }) {
         setParameters(next);
       }}
       onLine={(id) => {
-        controller.cancelDownload();
         const next = new URLSearchParams(parameters);
         next.delete("review");
         if (id === null) next.delete("line");

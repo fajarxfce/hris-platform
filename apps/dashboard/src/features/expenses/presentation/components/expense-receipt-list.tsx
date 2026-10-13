@@ -4,11 +4,12 @@ import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { expenseClaimMessages } from "../i18n/expense-claim-messages";
-import type { ExpenseReceiptDownloadState } from "../models/expense-submission-state";
+import type { ExpenseReceiptDownloadState } from "../models/expense-receipt-state";
 export function ExpenseReceiptList(props: {
   rows: readonly Readonly<{ id: string; name: string; size: string; duplicate: boolean }>[];
   state: ExpenseReceiptDownloadState;
   locale: Locale;
+  disabled?: boolean;
   onDownload: (id: string) => void;
   onCancel: () => void;
 }) {
@@ -30,7 +31,11 @@ export function ExpenseReceiptList(props: {
               <AppButton
                 appearance="subtle"
                 icon={<ArrowDownload20Regular />}
-                disabled={props.state.stage === "downloading"}
+                disabled={
+                  props.disabled ||
+                  props.state.stage === "downloading" ||
+                  props.state.stage === "unavailable"
+                }
                 aria-label={`${text.download}: ${receipt.name}`}
                 onClick={() => props.onDownload(receipt.id)}
               >

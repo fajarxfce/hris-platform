@@ -758,3 +758,14 @@ a {
 .app-expense-submission .app-property-list {
   row-gap: 12px;
 }
+
+.app-expense-decision,
+.app-expense-decision .app-editor-form {
+  gap: 16px;
+}
+.app-expense-decision .app-editor-form > p {
+  margin: 0;
+}
+.app-expense-decision .app-property-list {
+  row-gap: 12px;
+}

@@ -21,7 +21,7 @@ async function reviewerSession(page: Page) {
   await page.getByRole("button", { name: "I have saved the codes", exact: true }).click();
 }
 
-test("real claim review preserves submitted rules, independent reviewer access and current approval progress", async ({
+test("real expense review preserves submitted evidence, replays a lost decision and supports correction and rejection", async ({
   page,
   context,
   browser,
@@ -207,24 +207,47 @@ test("real claim review preserves submitted rules, independent reviewer access a
     expect(
       (await reviewerContext.request.get(`${base}/expenses/claims/${claim}/review`)).status(),
     ).toBe(404);
-    const reviewerCsrf = (await (
-      await reviewerContext.request.get("/api/v1/auth/csrf")
-    ).json()) as { headerName: string; token: string };
-    const decision = await reviewerContext.request.post(
-      `${base}/expenses/submissions/${submission}/decisions`,
-      {
-        headers: { [reviewerCsrf.headerName]: reviewerCsrf.token, "Idempotency-Key": randomUUID() },
-        data: {
-          expectedVersion: 2,
-          expectedApprovalVersion: 0,
-          decision: "APPROVE",
-          reason: "Reviewed submitted evidence",
-          acknowledgeDuplicates: false,
-        },
+    await expect(reviewPage.getByRole("link", { name: "View claim", exact: true })).toHaveCount(0);
+    const writes: { operation: string; body: unknown }[] = [];
+    await reviewPage.route(
+      `**${base}/expenses/submissions/${submission}/decisions`,
+      async (route) => {
+        writes.push({
+          operation: route.request().headers()["idempotency-key"] ?? "",
+          body: route.request().postDataJSON(),
+        });
+        const response = await route.fetch();
+        expect(response.status()).toBe(200);
+        expect(await response.json()).toMatchObject({ id: claim, version: 3 });
+        if (writes.length === 1) return route.abort("failed");
+        return route.fulfill({ response });
       },
     );
-    expect(decision.status()).toBe(200);
-    await reviewPage.getByRole("button", { name: "Refresh", exact: true }).click();
+    await reviewPage.getByRole("button", { name: "Approve", exact: true }).click();
+    await reviewPage.getByLabel("Reason", { exact: true }).fill("Reviewed submitted evidence");
+    await reviewPage.evaluate(() => window.scrollTo(0, 0));
+    await reviewPage.screenshot({
+      path: "../../.work/dashboard-expense-decision-real.png",
+      fullPage: true,
+      animations: "disabled",
+    });
+    await reviewPage.getByRole("button", { name: "Approve expense", exact: true }).click();
+    await expect(
+      reviewPage.getByRole("button", { name: "Retry original operation", exact: true }),
+    ).toBeVisible();
+    await reviewPage.getByRole("button", { name: "Retry original operation", exact: true }).click();
+    await expect(reviewPage.getByRole("status")).toContainText("Decision recorded.");
+    expect(writes).toHaveLength(2);
+    expect(writes[0]?.operation).toMatch(/^[a-f0-9-]{36}$/u);
+    expect(writes[1]).toEqual(writes[0]);
+    expect(writes[0]?.body).toEqual({
+      expectedVersion: 2,
+      expectedApprovalVersion: 0,
+      decision: "APPROVE",
+      reason: "Reviewed submitted evidence",
+      acknowledgeDuplicates: false,
+    });
+    await reviewPage.getByRole("link", { name: "View submission", exact: true }).click();
     await expect(
       reviewPage.getByRole("region", { name: "Expense submission", exact: true }),
     ).toContainText("Approved");
@@ -234,6 +257,110 @@ test("real claim review preserves submitted rules, independent reviewer access a
     ).toHaveCount(2);
     await reviewPage.getByRole("button", { name: "View action: Stage 1", exact: true }).click();
     await expect(reviewPage.getByRole("dialog")).toContainText("Reviewed submitted evidence");
+    await reviewPage.getByRole("button", { name: "Close", exact: true }).click();
+    const approved = await reviewerContext.request.get(
+      `${base}/expenses/submissions/${submission}`,
+    );
+    expect(await approved.json()).toMatchObject({
+      claimVersion: 3,
+      claimStatus: "APPROVED",
+      availableActions: [],
+      approval: { version: 1, status: "APPROVED" },
+      reviews: [{ decision: "APPROVE" }],
+    });
+
+    const correctedClaim = randomUUID(),
+      firstSubmission = randomUUID(),
+      correctedSubmission = randomUUID();
+    const correctionDraft = {
+      ...draft,
+      title: "Receipt correction review",
+      lines: draft.lines.map((item) => ({ ...item, id: randomUUID() })),
+    };
+    expect(
+      (
+        await context.request.put(`${base}/expenses/claims/${correctedClaim}/draft`, {
+          headers: headers(),
+          data: { ...correctionDraft, expectedVersion: null },
+        })
+      ).status(),
+    ).toBe(200);
+    expect(
+      (
+        await context.request.post(`${base}/expenses/claims/${correctedClaim}/submit`, {
+          headers: headers(),
+          data: {
+            submissionId: firstSubmission,
+            expectedVersion: 0,
+            reason: "Submit expense for review",
+          },
+        })
+      ).status(),
+    ).toBe(200);
+    await reviewPage.goto(`/expenses/submissions/${firstSubmission}?company=${company}`);
+    await reviewPage.getByRole("button", { name: "Return for correction", exact: true }).click();
+    await reviewPage.getByLabel("Reason", { exact: true }).fill("Correct the item description");
+    await reviewPage.getByRole("button", { name: "Return expense", exact: true }).click();
+    await expect(reviewPage.getByRole("status")).toContainText("Returned for correction.");
+    const returned = await reviewerContext.request.get(
+      `${base}/expenses/submissions/${firstSubmission}`,
+    );
+    expect(await returned.json()).toMatchObject({
+      current: true,
+      claimVersion: 2,
+      claimStatus: "RETURNED",
+      availableActions: [],
+      approval: { version: 1, status: "REJECTED" },
+      reviews: [{ decision: "RETURN", reason: "Correct the item description" }],
+    });
+    expect(
+      (
+        await context.request.put(`${base}/expenses/claims/${correctedClaim}/draft`, {
+          headers: headers(),
+          data: { ...correctionDraft, description: "Updated item description", expectedVersion: 2 },
+        })
+      ).status(),
+    ).toBe(200);
+    expect(
+      (
+        await context.request.post(`${base}/expenses/claims/${correctedClaim}/submit`, {
+          headers: headers(),
+          data: {
+            submissionId: correctedSubmission,
+            expectedVersion: 3,
+            reason: "Resubmit corrected expense",
+          },
+        })
+      ).status(),
+    ).toBe(200);
+    await reviewPage.goto(`/expenses/submissions/${correctedSubmission}?company=${company}`);
+    await reviewPage.getByRole("button", { name: "Reject", exact: true }).click();
+    await reviewPage.getByLabel("Reason", { exact: true }).fill("Expense is not reimbursable");
+    await reviewPage.getByRole("button", { name: "Reject expense", exact: true }).click();
+    await expect(reviewPage.getByRole("status")).toContainText("Submission rejected.");
+    const rejected = await reviewerContext.request.get(
+      `${base}/expenses/submissions/${correctedSubmission}`,
+    );
+    expect(await rejected.json()).toMatchObject({
+      number: 2,
+      current: true,
+      claimVersion: 5,
+      claimStatus: "REJECTED",
+      availableActions: [],
+      approval: { version: 1, status: "REJECTED" },
+      reviews: [{ decision: "REJECT", reason: "Expense is not reimbursable" }],
+    });
+    const original = await reviewerContext.request.get(
+      `${base}/expenses/submissions/${firstSubmission}`,
+    );
+    expect(await original.json()).toMatchObject({
+      number: 1,
+      current: false,
+      availableActions: [],
+      description: "Transport to customer office",
+      approval: { status: "REJECTED" },
+      reviews: [{ decision: "RETURN" }],
+    });
   } finally {
     await reviewerContext.close();
   }

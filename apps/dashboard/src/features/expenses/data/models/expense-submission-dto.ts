@@ -64,6 +64,8 @@ export const expenseSubmissionDto = expenseSubmissionSummaryDto.omit({ approvalI
   claimVersion: expenseVersionDto,
   claimStatus: z.enum(expenseClaimStatuses),
   current: z.boolean(),
+  canReadClaim: z.boolean(),
+  availableActions: z.array(z.literal("DECIDE")).max(1),
   reviews: z
     .array(
       z.object({

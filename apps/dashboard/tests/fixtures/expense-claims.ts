@@ -149,6 +149,8 @@ export function expenseSubmissionRecord(
     claimVersion: version,
     claimStatus: "PENDING",
     current: true,
+    canReadClaim: true,
+    availableActions: ["DECIDE"],
     reviews: [],
     duplicateReceiptDigests: [],
   };

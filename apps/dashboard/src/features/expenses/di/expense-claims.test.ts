@@ -285,6 +285,7 @@ describe("expense claim boundaries", () => {
     raw.current = true;
     raw.claimStatus = "DRAFT";
     raw.approval.status = "CANCELLED";
+    raw.availableActions = [];
     const withdrawn = await f.feature.loadSubmission.execute(access, raw.id, signal());
     expect(withdrawn).toMatchObject({
       ok: true,

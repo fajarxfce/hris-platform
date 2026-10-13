@@ -1,9 +1,10 @@
 import { InvalidHttpResponseError } from "../../../../core/data/http/http-response-error";
 import { safeHttpCall } from "../../../../core/data/http/safe-http-call";
 import { binaryFilePartBytes } from "../../../../core/domain/files/binary-file";
-import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
 import type { ExpenseClaimId } from "../../domain/entities/expense-claim";
 import type { ExpenseClaimSearch } from "../../domain/entities/expense-claim-search";
+import type { ExpenseDecisionCommand } from "../../domain/entities/expense-decision-command";
 import type { ExpenseReceipt } from "../../domain/entities/expense-receipt";
 import type { ExpenseSubmissionId } from "../../domain/entities/expense-submission-summary";
 import type { ExpenseClaimRepository } from "../../domain/repositories/expense-claim-repository";
@@ -13,6 +14,34 @@ import { toExpenseClaimReview } from "../mappers/expense-claim-review-mapper";
 import { toExpenseSubmission } from "../mappers/expense-submission-mapper";
 export class RemoteExpenseClaimRepository implements ExpenseClaimRepository {
   constructor(private readonly source: ExpenseClaimDataSource) {}
+  decide(
+    company: CompanyId,
+    operation: OperationId,
+    change: ExpenseDecisionCommand,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () => {
+      const receipt = await this.source.decide(
+        company,
+        change.id,
+        operation,
+        {
+          expectedVersion: change.claimVersion,
+          expectedApprovalVersion: change.approvalVersion,
+          decision: change.decision,
+          reason: change.reason,
+          acknowledgeDuplicates: change.acknowledgeDuplicates,
+        },
+        signal,
+      );
+      if (
+        receipt.id.toLowerCase() !== change.claimId.toLowerCase() ||
+        receipt.version !== change.claimVersion + 1
+      )
+        throw new InvalidHttpResponseError();
+      return Object.freeze({ id: receipt.id.toLowerCase(), version: receipt.version });
+    });
+  }
   list(company: CompanyId, search: ExpenseClaimSearch, signal: AbortSignal) {
     return safeHttpCall(signal, async () =>
       toExpenseClaimPage(

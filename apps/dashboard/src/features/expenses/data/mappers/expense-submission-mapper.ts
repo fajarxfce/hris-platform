@@ -82,6 +82,8 @@ export function toExpenseSubmission(
   });
   const hashes = new Set(lines.flatMap((line) => line.receipts).map((receipt) => receipt.sha256));
   if (
+    (raw.availableActions.includes("DECIDE") &&
+      (!raw.current || raw.claimStatus !== "PENDING" || raw.approval.status !== "PENDING")) ||
     new Set(raw.duplicateReceiptDigests).size !== raw.duplicateReceiptDigests.length ||
     raw.duplicateReceiptDigests.some((digest) => !hashes.has(digest))
   )
@@ -105,5 +107,6 @@ export function toExpenseSubmission(
       stages: Object.freeze(stages),
     }),
     duplicateReceiptDigests: Object.freeze([...raw.duplicateReceiptDigests]),
+    availableActions: Object.freeze([...raw.availableActions]),
   });
 }

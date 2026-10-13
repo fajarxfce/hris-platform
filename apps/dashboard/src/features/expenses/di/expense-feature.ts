@@ -4,12 +4,14 @@ import { HttpExpenseClaimDataSource } from "../data/datasources/http-expense-cla
 import { HttpExpensePolicyDataSource } from "../data/datasources/http-expense-policy-data-source";
 import { RemoteExpenseClaimRepository } from "../data/repositories/remote-expense-claim-repository";
 import { RemoteExpensePolicyRepository } from "../data/repositories/remote-expense-policy-repository";
+import { DecideExpenseSubmission } from "../domain/usecases/decide-expense-submission";
 import { DownloadExpenseReceipt } from "../domain/usecases/download-expense-receipt";
 import { LoadExpenseClaim } from "../domain/usecases/load-expense-claim";
 import { LoadExpenseClaims } from "../domain/usecases/load-expense-claims";
 import { LoadExpensePolicies } from "../domain/usecases/load-expense-policies";
 import { LoadExpensePolicy } from "../domain/usecases/load-expense-policy";
 import { LoadExpenseSubmission } from "../domain/usecases/load-expense-submission";
+import { ReviewExpenseDecision } from "../domain/usecases/review-expense-decision";
 import { SaveExpensePolicy } from "../domain/usecases/save-expense-policy";
 import type { ExpenseUseCases } from "../presentation/contracts/expense-use-cases";
 
@@ -20,6 +22,8 @@ export function createExpenseFeature(
   const policies = new RemoteExpensePolicyRepository(new HttpExpensePolicyDataSource(http));
   const claims = new RemoteExpenseClaimRepository(new HttpExpenseClaimDataSource(http));
   return {
+    reviewDecision: new ReviewExpenseDecision(claims),
+    decideSubmission: new DecideExpenseSubmission(claims),
     loadClaims: new LoadExpenseClaims(claims),
     loadClaim: new LoadExpenseClaim(claims),
     loadSubmission: new LoadExpenseSubmission(claims),

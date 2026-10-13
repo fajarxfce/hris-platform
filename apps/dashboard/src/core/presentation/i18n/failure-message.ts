@@ -2,6 +2,22 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_expense_decision: [
+    "Review the decision and enter a reason of up to 1,000 characters.",
+    "Periksa keputusan dan isi alasan maksimal 1.000 karakter.",
+  ],
+  expense_decision_unavailable: [
+    "You cannot decide this submission at its current stage. Return to its details.",
+    "Anda tidak dapat memberi keputusan pada tahap ini. Kembali ke detail pengajuan.",
+  ],
+  expense_submission_not_current: [
+    "This submission is no longer pending. Reload its details.",
+    "Pengajuan ini tidak lagi menunggu keputusan. Muat ulang detailnya.",
+  ],
+  expense_duplicate_acknowledgement_required: [
+    "Review the current duplicate receipt signals before approving.",
+    "Periksa indikasi duplikat bukti terbaru sebelum menyetujui.",
+  ],
   invalid_expense_page: [
     "Choose valid dates within 366 days and review the claim filters.",
     "Pilih tanggal dengan rentang maksimal 366 hari dan periksa filter klaim.",

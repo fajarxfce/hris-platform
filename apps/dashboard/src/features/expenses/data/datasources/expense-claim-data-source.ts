@@ -1,10 +1,18 @@
 import type { BinaryResponseDto } from "../../../../core/data/http/binary-response-dto";
 import type { ExpenseClaimPageDto, ExpenseClaimReviewDto } from "../models/expense-claim-dto";
+import type { ExpenseDecisionDto, ExpenseDecisionReceiptDto } from "../models/expense-decision-dto";
 import type {
   ExpenseReceiptMetadataDto,
   ExpenseSubmissionDto,
 } from "../models/expense-submission-dto";
 export interface ExpenseClaimDataSource {
+  decide(
+    company: string,
+    id: string,
+    operation: string,
+    change: ExpenseDecisionDto,
+    signal: AbortSignal,
+  ): Promise<ExpenseDecisionReceiptDto>;
   list(
     company: string,
     from: string,

@@ -128,6 +128,16 @@ export async function installExpenseClaimsApi(
       index === 0 ? 23 : 2,
     );
     raw.duplicateReceiptDigests = ["a".repeat(64)];
+    raw.canReadClaim = permissions.some((permission) =>
+      ["expenses.read", "expenses.manage", "expenses.team.read", "expenses.self.manage"].includes(
+        permission,
+      ),
+    );
+    raw.availableActions = permissions.some((permission) =>
+      ["expenses.approve", "expenses.team.approve"].includes(permission),
+    )
+      ? ["DECIDE"]
+      : [];
     if (kind === "submission") return route.fulfill({ json: raw });
     const receipt = raw.lines
       .flatMap((line) => line.receipts)

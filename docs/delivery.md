@@ -2394,3 +2394,18 @@ completing the required-receipt fixtures. New cases cover guard/acquisition/jour
 expiry, unchanged receipt replay, rollback and cancellation with executor reuse.
 Both application JARs built. The worker graph is unchanged and its test task was
 up to date. No migration or mobile APK changed in this backend increment.
+
+
+## Expense cost-center discovery
+
+Added a minimal active cost-center directory for expense editing, independently
+of general organization browsing. Name/code search and cursor pages are bounded;
+responses contain only ID, code, name and observed version. Shared structure and
+access guards retain current company, credential, permission and MFA admission
+through acquisition. Selecting a reference reserves no eligibility.
+
+Architecture, formatting, eight new API/ownership/cancellation cases and 22 API
+contract cases passed. Checks include literal wildcard search, inactive/foreign
+record exclusion, module/native-build admission, late proof expiry, removed/new
+grants and executor reuse. Both application JARs built; the unchanged worker check
+was up to date. No migration or mobile APK changed in this increment.

@@ -654,6 +654,23 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun expenseCostCentersExposeOnlyBoundedEditingReferences() {
+        val api = contract()
+        val operation = api["paths"]["/api/v1/companies/{companyId}/expenses/cost-centers"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val parameters = operation["parameters"].associateBy { it["name"].asString() }
+        assertEquals(50, parameters.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals(120, parameters.getValue("query")["schema"]["maxLength"].asInt())
+        assertEquals(44, parameters.getValue("after")["schema"]["maxLength"].asInt())
+        val reference =
+            api["components"]["schemas"]["ExpenseCostCenterSnapshotResponse"]["properties"]
+        assertEquals(
+            setOf("id", "code", "name", "version"),
+            reference.properties().map { it.key }.toSet(),
+        )
+    }
+
+    @Test
     fun selfExpenseDiscoveryHasItsOwnMinimalCompanyAdmittedContract() {
         val api = contract()
         val operation = api["paths"]["/api/v1/companies/{companyId}/expenses/me/employments"]["get"]

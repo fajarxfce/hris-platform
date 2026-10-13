@@ -22,6 +22,14 @@ Each company allows 500 categories and each category 1,000 revisions. Competing 
 
 ## Employee reads
 
+`GET /expenses/cost-centers` provides active cost-center references for claim editing,
+with only ID, code, name and observed version. It requires `expenses.self.manage`
+or `expenses.manage`, independently of general organization browsing. Search is
+bounded to 120 characters; cursor pages default to twenty and allow at most fifty.
+The endpoint applies expense module/native-build admission and rechecks session
+assurance after shared structure/access guards and after acquisition. Selecting a
+reference reserves nothing; submission independently validates and freezes it.
+
 `GET /expenses/me/employments` returns only the signed-in account's employment references, the company date/timezone, and a bounded cursor page (default twenty, maximum fifty). Each reference contains its ID, employee number, status, and observed version. It requires `expenses.self.manage`, `expenses.read`, or `expenses.manage`; People access and the People module are not required. Company module admission and native minimum-build requirements still apply.
 
 Claim lists, details, drafts, history, submission summaries, payment progress, submission details, and receipt downloads accept `scope=SELF`. This always restricts the response to the account's own employment, including when that account also has company-wide or reviewer grants. Self-scoped claim lists require an owned `employmentId`. The default `AUTHORIZED` preserves company, team, and assigned-reviewer access according to each endpoint's existing policy; it does not expose unsubmitted drafts to submission reviewers.

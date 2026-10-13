@@ -164,6 +164,17 @@ class ExpenseConfiguration {
         )
 
     @Bean
+    fun listExpenseCostCenters(
+        units: OrganizationRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListExpenseCostCenters(units, companies, members, identities, transactions, security, clock)
+
+    @Bean
     fun listSelfExpenseEmployments(
         people: PeopleRepository,
         companies: CompanyRepository,

@@ -7,7 +7,8 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.expenses.domain.entities.*
 import dev.fajar.hris.expenses.domain.policies.*
 import dev.fajar.hris.expenses.domain.repositories.ExpenseClaimRepository
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -25,6 +26,7 @@ class ReviewExpenseSubmission(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -111,10 +113,10 @@ class ReviewExpenseSubmission(
                 val locked = identities.lockAccount(party)
                 if (locked is Result.Failed) return@run locked
             }
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             if (live.permissions.none { it in approvalPermissions(ApprovalKind.EXPENSE) })
@@ -140,8 +142,9 @@ class ReviewExpenseSubmission(
                 )
             )
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "not_assigned_approver"))
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run validateCompanySessionActor(actor, access, clock.instant(), security)
+                    .map { receipt }
             }
             if (claim.version != version)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
@@ -204,7 +207,10 @@ class ReviewExpenseSubmission(
                                 ),
                             )
                         }
-                        .map { receipt }
+                        .flatMap {
+                            validateCompanySessionActor(actor, access, clock.instant(), security)
+                                .map { receipt }
+                        }
                 }
         }
     }

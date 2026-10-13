@@ -103,6 +103,11 @@ and before transaction completion. Late expiry rolls back claim state, immutable
 evidence, approval effects, history, audit/outbox and the operation receipt together.
 Original input and observed versions remain unchanged during explicit recovery.
 
+Expense approval, rejection and return also revalidate current session assurance
+after their ordered account guards, before receipt replay and after journaling.
+Expiry before transaction completion rolls back the approval transition, review
+evidence, claim history, audit/outbox and operation receipt together.
+
 Expense category-policy saves apply the same session-assurance fence after their
 policy/access guards and before receipt replay or transaction completion. The
 final check participates in the category, revision, journal and receipt transaction.

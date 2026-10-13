@@ -2589,3 +2589,19 @@ acceptance check, not a new phone installation.
 The existing production bundle-size advisory and two unrelated CSS specificity
 warnings remain. Expense test fixtures no longer use non-null assertions. Draft
 authoring, review commands and payment administration remain subsequent work.
+
+## Expense decision session assurance
+
+Approval, rejection and return now recheck current MFA after ordered account
+guards, before original receipt replay and after journaling. A late expired proof
+rolls back the decision, expense review, claim history, approval transition,
+audit/outbox and operation receipt together. Explicit retry retains both observed
+versions and the original operation.
+
+Architecture, formatting, twelve expense domain cases, the API boot JAR and 71
+API/PostgreSQL cases passed. The 32 command-assurance cases include expiry during
+guard acquisition, expiry before receipt return, expiry after journaling, and
+interruption followed by recovery on the same executor. Existing independent
+review, duplicate evidence, revocation, concurrent decisions and API contracts
+also passed. This change affects only expense composition in the API; it does not
+modify the worker dependency graph.

@@ -147,6 +147,11 @@ An approval with currently duplicated receipt bytes requires explicit acknowledg
 
 Review uses the same company expense/approval guards as submission and withdrawal. It rechecks actor/delegator access, expiry, current beneficiary, and resource scope before a decision or receipt replay. Competing reviewers or withdrawal cannot commit the same claim version. The shared approval decision, expense status, review evidence, history, audit, and idempotency receipt form one transaction. Database constraints require matching review evidence for each review transition and prohibit changing terminal approved/rejected claims. Payment progress is tracked separately from this approved evidence.
 
+Current MFA assurance is checked after the ordered account guards, before returning
+a receipt and after journaling. An expired proof cannot authorize a decision or
+replay. Renewing assurance allows explicit recovery with the original operation
+and observed claim/approval versions.
+
 ## Receipt content
 
 `GET/HEAD /expenses/submissions/{submissionId}/receipts/{revisionId}/content` serves a receipt attached to that exact immutable submission. Current claim owners, current managers with team read permission, company expense readers, and assigned reviewers with current approval access or valid delegation can use it. It does not grant general document/profile access, and an old submission cannot authorize a receipt added to a later draft.

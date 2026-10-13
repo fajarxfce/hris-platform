@@ -478,6 +478,7 @@ class ExpenseConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         ReviewExpenseSubmission(
             claims,
@@ -490,6 +491,7 @@ class ExpenseConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean

@@ -11,7 +11,9 @@ import org.junit.jupiter.params.provider.ValueSource
 
 class ExpenseCommandAssuranceTest : ExpenseCommandAssuranceApiFixture() {
     @ParameterizedTest
-    @ValueSource(strings = ["save", "edit", "cancel", "submit", "withdraw"])
+    @ValueSource(
+        strings = ["save", "edit", "cancel", "submit", "withdraw", "approve", "reject", "return"]
+    )
     fun expiryWhileWaitingCannotMutateOrReplayAnOriginalReceipt(action: String) {
         val scene = prepare(action)
         val actor =
@@ -54,7 +56,9 @@ class ExpenseCommandAssuranceTest : ExpenseCommandAssuranceApiFixture() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["save", "edit", "cancel", "submit", "withdraw"])
+    @ValueSource(
+        strings = ["save", "edit", "cancel", "submit", "withdraw", "approve", "reject", "return"]
+    )
     fun expiryAfterAcquisitionRejectsBothTheMutationAndACompletedReceipt(action: String) {
         val scene = prepare(action)
         for (replay in listOf(false, true)) {
@@ -82,7 +86,9 @@ class ExpenseCommandAssuranceTest : ExpenseCommandAssuranceApiFixture() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["save", "edit", "cancel", "submit", "withdraw"])
+    @ValueSource(
+        strings = ["save", "edit", "cancel", "submit", "withdraw", "approve", "reject", "return"]
+    )
     fun expiryAfterJournalRollsBackEvidenceHistoryApprovalAndOperationTogether(action: String) {
         val scene = prepare(action)
         val actor =
@@ -108,7 +114,9 @@ class ExpenseCommandAssuranceTest : ExpenseCommandAssuranceApiFixture() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["save", "edit", "cancel", "submit", "withdraw"])
+    @ValueSource(
+        strings = ["save", "edit", "cancel", "submit", "withdraw", "approve", "reject", "return"]
+    )
     fun interruptionReleasesGuardsAndTheSameExecutorCanRecoverTheOriginalOperation(action: String) {
         val scene = prepare(action)
         val before = snapshot(scene)

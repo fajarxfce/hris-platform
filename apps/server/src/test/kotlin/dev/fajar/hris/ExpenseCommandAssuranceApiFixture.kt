@@ -4,6 +4,7 @@ import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.documents.domain.repositories.DocumentReferenceRepository
 import dev.fajar.hris.documents.domain.repositories.DocumentRepository
+import dev.fajar.hris.expenses.domain.entities.ExpenseDecision
 import dev.fajar.hris.expenses.domain.entities.ExpenseLine
 import dev.fajar.hris.expenses.domain.entities.SaveExpenseDraftCommand
 import dev.fajar.hris.expenses.domain.repositories.*
@@ -57,13 +58,17 @@ abstract class ExpenseCommandAssuranceApiFixture : ExpenseSubmissionApiFixture()
 
     protected fun prepare(action: String): Scenario {
         val f = expenseFixture()
+        val reviewing = action in setOf("approve", "reject", "return")
         val submission = UUID.randomUUID()
         val receipts =
             when (action) {
                 "save",
                 "edit" -> listOf(expenseReceipt(f))
                 "submit",
-                "withdraw" -> listOf(readyReceipt(f))
+                "withdraw",
+                "approve",
+                "reject",
+                "return" -> listOf(readyReceipt(f))
                 else -> emptyList()
             }
         if (action != "save") {
@@ -74,15 +79,16 @@ abstract class ExpenseCommandAssuranceApiFixture : ExpenseSubmissionApiFixture()
                 )
             assertEquals(200, response.statusCode(), response.body())
         }
-        if (action == "withdraw") {
+        if (action == "withdraw" || reviewing) {
             expenseTemplate(f)
             val response = submitExpense(f, submission)
             assertEquals(200, response.statusCode(), response.body())
         } else if (action == "submit") expenseTemplate(f)
+        val account = if (reviewing) f.managerAccount else f.account
         database()
             .update(
                 "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
-                f.account,
+                account,
             )
         return Scenario(
             f,
@@ -109,9 +115,10 @@ abstract class ExpenseCommandAssuranceApiFixture : ExpenseSubmissionApiFixture()
                 "Retain expense evidence",
             ),
             Actor(
-                f.account,
+                account,
                 f.company,
-                setOf("company.read", "expenses.self.manage"),
+                if (reviewing) setOf("company.read", "expenses.team.approve")
+                else setOf("company.read", "expenses.self.manage"),
                 clock.instant(),
                 UUID.randomUUID(),
                 mfaVerifiedAt = clock.instant(),
@@ -196,6 +203,32 @@ abstract class ExpenseCommandAssuranceApiFixture : ExpenseSubmissionApiFixture()
                         security,
                     )
                     .execute(actor, scene.operation, scene.submission, 1, "Correct expense details")
+            "approve",
+            "reject",
+            "return" ->
+                ReviewExpenseSubmission(
+                        claims,
+                        approvals,
+                        people,
+                        companies,
+                        members,
+                        identities,
+                        operations,
+                        journal,
+                        transactions,
+                        clock,
+                        security,
+                    )
+                    .execute(
+                        actor,
+                        scene.operation,
+                        scene.submission,
+                        1,
+                        0,
+                        ExpenseDecision.valueOf(scene.action.uppercase()),
+                        "Independent expense review",
+                        false,
+                    )
             else -> error("Unknown expense command")
         }
     }
@@ -213,6 +246,7 @@ abstract class ExpenseCommandAssuranceApiFixture : ExpenseSubmissionApiFixture()
                 "expense_submissions",
                 "expense_submitted_lines",
                 "expense_submitted_receipts",
+                "expense_reviews",
                 "approval_requests",
                 "approval_decisions",
                 "operation_receipts",

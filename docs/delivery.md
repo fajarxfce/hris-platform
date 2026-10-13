@@ -2378,3 +2378,19 @@ and explicit recovery. After notice, the validated APK was installed on the
 connected Android 16 phone with install-only delivery. No phone UI, bank transfer,
 release or external message was involved. Native draft authoring, receipt actions
 and submission remain in progress.
+
+
+## Employee expense command assurance
+
+Draft creation/editing, cancellation, submission and withdrawal now recheck current
+session assurance after resource/access waits, before receipt replay and before
+transaction completion. Late expiry rolls back evidence, approval effects, claim
+history, audit/outbox and the operation receipt together. Existing permission
+intersection, observed versions and command identity remain intact.
+
+Architecture and formatting passed. The 122 existing expense API cases passed;
+twenty new transaction/assurance cases and 21 API contract cases passed after
+completing the required-receipt fixtures. New cases cover guard/acquisition/journal
+expiry, unchanged receipt replay, rollback and cancellation with executor reuse.
+Both application JARs built. The worker graph is unchanged and its test task was
+up to date. No migration or mobile APK changed in this backend increment.

@@ -6,7 +6,8 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.expenses.domain.entities.*
 import dev.fajar.hris.expenses.domain.policies.*
 import dev.fajar.hris.expenses.domain.repositories.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -24,6 +25,7 @@ class WithdrawExpenseSubmission(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -58,10 +60,10 @@ class WithdrawExpenseSubmission(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val foundSubmission = claims.submission(company, id)
@@ -86,8 +88,9 @@ class WithdrawExpenseSubmission(
                 return@run Result.Failed(
                     Failure(FailureKind.NOT_FOUND, "expense_submission_not_found")
                 )
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run validateCompanySessionActor(actor, access, clock.instant(), security)
+                    .map { receipt }
             }
             if (claim.version != version)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
@@ -124,6 +127,9 @@ class WithdrawExpenseSubmission(
                                     reason,
                                 ),
                             )
+                        }
+                        .flatMap {
+                            validateCompanySessionActor(actor, access, clock.instant(), security)
                         }
                         .map { receipt }
                 }

@@ -97,6 +97,12 @@ company-wide finance grants to owned employments without granting new authority.
 PDF rendering runs outside database transactions; the delivery adapter reauthorizes
 after rendering before conditional metadata and again before content is released.
 
+Employee expense draft saves, cancellations, submission and withdrawal check
+current session assurance after resource/access guards, before receipt replay,
+and before transaction completion. Late expiry rolls back claim state, immutable
+evidence, approval effects, history, audit/outbox and the operation receipt together.
+Original input and observed versions remain unchanged during explicit recovery.
+
 Company attendance exceptions use one bounded SQL projection under shared people,
 company, membership and account guards. They do not acquire employee/day locks:
 evidence, reviews and correction heads come from the same statement snapshot,

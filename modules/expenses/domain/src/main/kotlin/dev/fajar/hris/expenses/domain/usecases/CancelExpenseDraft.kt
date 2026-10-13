@@ -4,7 +4,8 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.expenses.domain.entities.*
 import dev.fajar.hris.expenses.domain.policies.*
 import dev.fajar.hris.expenses.domain.repositories.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.*
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -21,6 +22,7 @@ class CancelExpenseDraft(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -55,10 +57,10 @@ class CancelExpenseDraft(
             val identityLock = identities.lockAccount(actor.accountId)
             if (identityLock is Result.Failed) return@run identityLock
 
-            val current =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val current = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (current is Result.Failed) return@run current
             val live = (current as Result.Success).value
 
@@ -82,8 +84,9 @@ class CancelExpenseDraft(
             val employee = (foundEmployee as Result.Success).value
             if (employee == null || !canManageExpenseClaim(live, employee))
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "expense_claim_not_found"))
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run validateCompanySessionActor(actor, access, clock.instant(), security)
+                    .map { receipt }
             }
             if (claim.version != version)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
@@ -102,6 +105,9 @@ class CancelExpenseDraft(
                                 reason = reason,
                             ),
                         )
+                    }
+                    .flatMap {
+                        validateCompanySessionActor(actor, access, clock.instant(), security)
                     }
                     .map { receipt }
             }

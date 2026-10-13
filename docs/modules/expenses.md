@@ -30,6 +30,8 @@ Interactive claim and category reads acquire shared resource/access guards in th
 
 ## Claim drafts
 
+Employee draft saves, cancellation, submission and withdrawal revalidate current session assurance after their guards, before returning an existing operation receipt, and before transaction completion. Late expiry rolls back the claim, immutable evidence, approval changes, journal and receipt together. An explicit retry retains its original input and observed version.
+
 `PUT /expenses/claims/{id}/draft` saves a draft with an employment ID, title, description, lines, reason, and expected version (null on create). Every line has a stable UUID, category, transaction date, decimal IDR amount, description, optional cost center, and receipt revision IDs. Drafts allow up to twenty lines and three receipts per line. An empty draft is allowed; policy eligibility, mandatory evidence, and approval routing are checked when the claim is submitted.
 
 References must belong to the same company. Cost centers must have the correct organization-unit kind. Receipt documents must use the `RECEIPT` classification and belong to the claim's employment. A draft can reference an unfinished upload or an archived category while it is being prepared; saving does not make its evidence ready or authorize reimbursement. Claim employment and original author cannot be changed.

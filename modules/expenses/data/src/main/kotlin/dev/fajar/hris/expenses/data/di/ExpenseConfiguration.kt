@@ -118,6 +118,7 @@ class ExpenseConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         SaveExpenseDraft(
             claims,
@@ -133,6 +134,7 @@ class ExpenseConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -146,6 +148,7 @@ class ExpenseConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         CancelExpenseDraft(
             claims,
@@ -157,6 +160,7 @@ class ExpenseConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -282,6 +286,7 @@ class ExpenseConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         SubmitExpenseClaim(
             claims,
@@ -297,6 +302,7 @@ class ExpenseConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -311,6 +317,7 @@ class ExpenseConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         WithdrawExpenseSubmission(
             claims,
@@ -323,6 +330,7 @@ class ExpenseConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean

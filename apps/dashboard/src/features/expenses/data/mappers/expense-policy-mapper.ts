@@ -7,7 +7,7 @@ import type {
 } from "../../domain/entities/expense-policy-definition";
 import type { ExpensePolicyReview } from "../../domain/entities/expense-policy-review";
 import type { ExpensePolicyTerms } from "../../domain/entities/expense-policy-terms";
-import { expenseAmountMinor } from "../../domain/policies/expense-policy-change-policy";
+import { expenseAmountMinor } from "../../domain/policies/expense-amount";
 import type {
   ExpenseCategoryDto,
   ExpenseCategoryPageDto,

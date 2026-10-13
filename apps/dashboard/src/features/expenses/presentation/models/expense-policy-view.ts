@@ -5,19 +5,7 @@ import type { ExpensePolicyRevision } from "../../domain/entities/expense-policy
 import type { ExpensePolicyTerms } from "../../domain/entities/expense-policy-terms";
 import { expensePolicyMessages } from "../i18n/expense-policy-messages";
 
-/** Format validated decimal amounts without converting money to a binary float. */
-export function expenseAmountView(amount: string, locale: Locale): string {
-  const [whole = "0", fraction = ""] = amount.split(".");
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
-    .formatToParts(BigInt(whole))
-    .map((part) => (part.type === "fraction" ? fraction.padEnd(2, "0") : part.value))
-    .join("");
-}
+import { expenseAmountView } from "./expense-amount-view";
 
 export function expensePolicyTermsView(policy: ExpensePolicyTerms, locale: Locale) {
   const text = expensePolicyMessages(locale);

@@ -8,6 +8,11 @@ Payments have stable item references and per-item success/failure status. Paid c
 
 Screens: claims, review, policy setup, payment batches, reconciliation.
 
+The [claim dashboard](../dashboard.md#expense-claims) implements bounded directories,
+coherent current claim/history review, immutable submission evidence, payment
+progress and scoped receipt downloads. Approval source links use submission IDs;
+draft authoring and administrative commands are separate delivery increments.
+
 Acceptance: category limits, company attachment access, concurrent submission, payment replay, failed/partial batch reconciliation, and immutable paid records.
 
 ## Category policies

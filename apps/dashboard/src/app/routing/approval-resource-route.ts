@@ -9,5 +9,9 @@ export function approvalResourceRoute(request: ApprovalRequest): string | null {
     const query = new URLSearchParams({ company: request.companyId });
     return `/workforce/overtime/${encodeURIComponent(request.resourceId)}?${query}`;
   }
+  if (request.kind === "EXPENSE") {
+    const query = new URLSearchParams({ company: request.companyId });
+    return `/expenses/submissions/${encodeURIComponent(request.resourceId)}?${query}`;
+  }
   return null;
 }

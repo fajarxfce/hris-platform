@@ -3,12 +3,7 @@ import { isUuid } from "../../../../core/domain/identifiers";
 import type { Failure } from "../../../../core/domain/result";
 import type { ExpensePolicyChange } from "../entities/expense-policy-change";
 
-/** Exact IDR minor units; bounded input excludes exponents and locale separators. */
-export function expenseAmountMinor(value: string): bigint | null {
-  if (!/^(?:0|[1-9]\d{0,11})(?:\.\d{1,2})?$/u.test(value)) return null;
-  const [whole = "0", fraction = ""] = value.split(".");
-  return BigInt(whole) * 100n + BigInt(fraction.padEnd(2, "0"));
-}
+import { expenseAmountMinor } from "./expense-amount";
 
 export function normalizeExpensePolicyChange(input: ExpensePolicyChange): ExpensePolicyChange {
   return Object.freeze({

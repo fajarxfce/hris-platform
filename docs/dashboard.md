@@ -12,6 +12,31 @@ Primary screens: organization and employee directory; roster and attendance exce
 
 Reference: https://learn.microsoft.com/en-us/azure/azure-portal/azure-portal-overview
 
+## Expense claims
+
+`/expenses/claims` provides a company-scoped directory with creation-date/status
+filters and twenty-row cursor pages. Company browsing requires expense read or
+management authority; team and self readers require a selected employment. Dates
+use the company timezone and an inclusive maximum range of 366 days.
+
+Current claim details keep the draft, descending change history, submissions and
+payment progress in separate tabs backed by one coherent response. Changing tabs
+does not repeat acquisition. History paging and explicit refresh acquire a new
+review. Payment progress excludes bank destinations and transaction references.
+
+`/expenses/submissions/:submissionId` displays immutable submitted amounts,
+category rules, cost-center references and receipt metadata separately from current
+claim/approval status. The approval inbox links to this submitted evidence; an
+assignment does not grant access to a later draft. Item details open in a side
+panel. Historical duplicate flags remain distinct from current duplicate signals.
+
+Receipt download uses the exact submission/revision endpoint and bounded binary
+transport. Only one download can be active. Cancellation, refresh, company change
+and disposal abort its owner and reject late results. Access loss clears the
+evidence; recoverable transport failures retain it for explicit retry. Locale and
+theme changes do not fetch data again. Draft authoring, review decisions and finance
+commands remain separate workflows.
+
 ## Expense policies
 
 `/expenses/policies` provides a bounded directory of current saved category

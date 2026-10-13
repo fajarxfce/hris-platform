@@ -8,7 +8,7 @@ import type { HttpClient } from "../../../core/data/http/http-client";
 import { HttpResponseError } from "../../../core/data/http/http-response-error";
 import type { CompanyId, OperationId } from "../../../core/domain/identifiers";
 import type { ExpensePolicyReviewDto } from "../data/models/expense-policy-dto";
-import { expenseAmountView } from "../presentation/models/expense-policy-view";
+import { expenseAmountView } from "../presentation/models/expense-amount-view";
 import { createExpenseFeature } from "./expense-feature";
 
 const companyId = "10000000-0000-4000-8000-000000000001" as CompanyId;
@@ -21,7 +21,7 @@ const change = { ...expensePolicyRecord().current, expectedVersion: 2, reason: "
 describe("expense policy boundary", () => {
   it("rejects readers, malformed identifiers and unbounded cursors before I/O", async () => {
     const request = vi.fn<HttpClient["request"]>(),
-      feature = createExpenseFeature({ request });
+      feature = createExpenseFeature({ request }, { downloadBinary: vi.fn() });
     for (const permissions of [
       [],
       ["expenses.read"],
@@ -61,7 +61,7 @@ describe("expense policy boundary", () => {
   it("reads bounded saved heads and ascending history without replacing the current terms", async () => {
     const raw = expensePolicyRecord(0, 1, 23),
       request = vi.fn<HttpClient["request"]>();
-    const feature = createExpenseFeature({ request });
+    const feature = createExpenseFeature({ request }, { downloadBinary: vi.fn() });
     request.mockResolvedValueOnce({ items: [raw.current], nextCursor: null });
     expect(
       await feature.loadPolicies.execute(access, { active: "false", after: "EARLIER" }, signal()),
@@ -173,7 +173,10 @@ describe("expense policy boundary", () => {
   ])("rejects a malformed %s", async (_, mutate) => {
     const raw = expensePolicyRecord();
     mutate(raw);
-    const feature = createExpenseFeature({ request: vi.fn().mockResolvedValue(raw) });
+    const feature = createExpenseFeature(
+      { request: vi.fn().mockResolvedValue(raw) },
+      { downloadBinary: vi.fn() },
+    );
     expect(await feature.loadPolicy.execute(access, change.id, null, signal())).toMatchObject({
       ok: false,
       failure: { code: "invalid_response" },
@@ -184,7 +187,7 @@ describe("expense policy boundary", () => {
     const first = expensePolicyRecord().current,
       second = expensePolicyRecord(0, 2).current;
     const request = vi.fn<HttpClient["request"]>(),
-      feature = createExpenseFeature({ request });
+      feature = createExpenseFeature({ request }, { downloadBinary: vi.fn() });
     for (const raw of [
       { items: [second, first], nextCursor: null },
       { items: [first, first], nextCursor: null },
@@ -204,7 +207,7 @@ describe("expense policy boundary", () => {
 
   it("keeps exact decimal values through validation, HTTP and localized formatting", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue({ id: change.id, version: 3 });
-    const feature = createExpenseFeature({ request });
+    const feature = createExpenseFeature({ request }, { downloadBinary: vi.fn() });
     const result = await feature.savePolicy.execute(
       access,
       operation,
@@ -239,7 +242,7 @@ describe("expense policy boundary", () => {
     "rejects invalid IDR amount %s before HTTP",
     async (maximumLineAmount) => {
       const request = vi.fn<HttpClient["request"]>(),
-        feature = createExpenseFeature({ request });
+        feature = createExpenseFeature({ request }, { downloadBinary: vi.fn() });
       expect(
         await feature.savePolicy.execute(
           access,
@@ -264,7 +267,7 @@ describe("expense policy boundary", () => {
       .mockRejectedValueOnce(
         new HttpResponseError(403, { code: "mfa_required", detail: "Private diagnostic" }),
       );
-    const feature = createExpenseFeature({ request });
+    const feature = createExpenseFeature({ request }, { downloadBinary: vi.fn() });
     expect(await feature.loadPolicies.execute(access, query, signal())).toEqual({
       ok: false,
       failure: { code: "mfa_required", fields: {}, parameters: {} },

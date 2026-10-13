@@ -721,3 +721,40 @@ a {
 .app-work-period-action > .app-page-header {
   margin-bottom: 0;
 }
+
+.app-expense-description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.app-expense-receipts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.app-expense-receipts > li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--colorNeutralStroke2);
+}
+.app-expense-receipts > li > div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+
+.app-expense-claim .app-report-content,
+.app-expense-submission .app-report-content {
+  gap: 16px;
+}
+.app-expense-claim .app-report-content > p,
+.app-expense-submission .app-report-content > p {
+  margin: 0;
+}
+.app-expense-submission .app-property-list {
+  row-gap: 12px;
+}

@@ -1,14 +1,29 @@
 import type { HttpClient } from "../../../core/data/http/http-client";
+import type { FileRepository } from "../../../core/domain/files/file-repository";
+import { HttpExpenseClaimDataSource } from "../data/datasources/http-expense-claim-data-source";
 import { HttpExpensePolicyDataSource } from "../data/datasources/http-expense-policy-data-source";
+import { RemoteExpenseClaimRepository } from "../data/repositories/remote-expense-claim-repository";
 import { RemoteExpensePolicyRepository } from "../data/repositories/remote-expense-policy-repository";
+import { DownloadExpenseReceipt } from "../domain/usecases/download-expense-receipt";
+import { LoadExpenseClaim } from "../domain/usecases/load-expense-claim";
+import { LoadExpenseClaims } from "../domain/usecases/load-expense-claims";
 import { LoadExpensePolicies } from "../domain/usecases/load-expense-policies";
 import { LoadExpensePolicy } from "../domain/usecases/load-expense-policy";
+import { LoadExpenseSubmission } from "../domain/usecases/load-expense-submission";
 import { SaveExpensePolicy } from "../domain/usecases/save-expense-policy";
 import type { ExpenseUseCases } from "../presentation/contracts/expense-use-cases";
 
-export function createExpenseFeature(http: HttpClient): ExpenseUseCases {
+export function createExpenseFeature(
+  http: HttpClient,
+  files: Pick<FileRepository, "downloadBinary">,
+): ExpenseUseCases {
   const policies = new RemoteExpensePolicyRepository(new HttpExpensePolicyDataSource(http));
+  const claims = new RemoteExpenseClaimRepository(new HttpExpenseClaimDataSource(http));
   return {
+    loadClaims: new LoadExpenseClaims(claims),
+    loadClaim: new LoadExpenseClaim(claims),
+    loadSubmission: new LoadExpenseSubmission(claims),
+    downloadReceipt: new DownloadExpenseReceipt(claims, files),
     loadPolicies: new LoadExpensePolicies(policies),
     loadPolicy: new LoadExpensePolicy(policies),
     savePolicy: new SaveExpensePolicy(policies),

@@ -2559,5 +2559,33 @@ domain tests and the API boot JAR task passed. New checks cover concurrent share
 readers versus a draft save, descending pagination, assignment-only and foreign
 scope denial, payment projection, revocation, expiry during acquisition and after
 the final read, interruption cleanup and failed aggregate acquisition. Existing
-mobile-compatible endpoints remain available. Dashboard integration is subsequent
-work; no additional physical-device validation is claimed by this endpoint.
+mobile-compatible endpoints remain available. No additional physical-device
+validation is claimed by this endpoint.
+
+## Expense claim dashboard
+
+Implemented company claim directories, current draft/history/submission/payment
+review, immutable submitted evidence and receipt downloads. Approval source links
+resolve submission IDs. Submitted category snapshots remain independent of later
+policy revisions. Exact decimal formatting, bounded pagination, account/company
+scope and cancellation are retained across the feature's layers.
+
+Dashboard architecture, TypeScript, production build and all 1,499 unit/component
+tests passed. Eight mocked Chromium scenarios passed for filtering/pagination,
+tab retention, receipt cancellation/retry, revoked access, company replacement,
+malformed responses and English/Indonesian light/dark layouts. The real
+API/PostgreSQL browser scenario passed with MFA enabled: it verifies submitted
+policy immutability, history, assignment-only review, foreign-company denial and
+updated approval progress after an API decision. It does not claim that a dashboard
+decision command is implemented. Current claim tabs do not trigger another review
+request. Screenshots were inspected at desktop and 760-pixel widths.
+
+The development dashboard also downloaded a published receipt through the real
+WireGuard API and private object storage. Its 698 bytes and SHA-256 matched the
+submitted metadata; switching claim tabs issued no additional review request.
+The temporary browser session was closed after the check. This was a browser
+acceptance check, not a new phone installation.
+
+The existing production bundle-size advisory and two unrelated CSS specificity
+warnings remain. Expense test fixtures no longer use non-null assertions. Draft
+authoring, review commands and payment administration remain subsequent work.

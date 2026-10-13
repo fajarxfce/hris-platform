@@ -2,9 +2,13 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import type { AccountId } from "../../../../core/domain/identifiers";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
+import { canBrowseCompanyExpenses } from "../../domain/policies/expense-claim-read-policy";
+import { ExpenseClaimScreen } from "../bindings/expense-claim-screen";
+import { ExpenseClaimsScreen } from "../bindings/expense-claims-screen";
 import { ExpensePoliciesScreen } from "../bindings/expense-policies-screen";
 import { ExpensePolicyEditorScreen } from "../bindings/expense-policy-editor-screen";
 import { ExpensePolicyScreen } from "../bindings/expense-policy-screen";
+import { ExpenseSubmissionScreen } from "../bindings/expense-submission-screen";
 import type { ExpenseUseCases } from "../contracts/expense-use-cases";
 
 export function ExpenseRoutes(props: {
@@ -18,6 +22,9 @@ export function ExpenseRoutes(props: {
 }) {
   return (
     <Routes>
+      <Route path="claims" element={<ExpenseClaimsScreen {...props} />} />
+      <Route path="claims/:claimId" element={<ExpenseClaimScreen {...props} />} />
+      <Route path="submissions/:submissionId" element={<ExpenseSubmissionScreen {...props} />} />
       <Route path="policies" element={<ExpensePoliciesScreen {...props} />} />
       <Route
         path="policies/new"
@@ -30,7 +37,12 @@ export function ExpenseRoutes(props: {
       <Route path="policies/:policyId" element={<ExpensePolicyScreen {...props} />} />
       <Route
         path="*"
-        element={<Navigate replace to={`/expenses/policies?company=${props.access.companyId}`} />}
+        element={
+          <Navigate
+            replace
+            to={`/expenses/${canBrowseCompanyExpenses(props.access.permissions) ? "claims" : "policies"}?company=${props.access.companyId}`}
+          />
+        }
       />
     </Routes>
   );

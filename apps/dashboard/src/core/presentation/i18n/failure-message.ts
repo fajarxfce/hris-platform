@@ -2,6 +2,26 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_expense_page: [
+    "Choose valid dates within 366 days and review the claim filters.",
+    "Pilih tanggal dengan rentang maksimal 366 hari dan periksa filter klaim.",
+  ],
+  expense_claim_not_found: [
+    "This expense claim is unavailable. Return to the claim list.",
+    "Klaim tidak tersedia. Kembali ke daftar klaim.",
+  ],
+  expense_submission_not_found: [
+    "This submission is unavailable or your access has changed.",
+    "Pengajuan tidak tersedia atau akses Anda telah berubah.",
+  ],
+  expense_receipt_not_found: [
+    "This receipt is unavailable. Reload the submission to check current access.",
+    "Bukti tidak tersedia. Muat ulang pengajuan untuk memeriksa akses terbaru.",
+  ],
+  expense_receipt_unavailable: [
+    "This receipt cannot be downloaded. Reload the submission.",
+    "Bukti belum dapat diunduh. Muat ulang pengajuan.",
+  ],
   invalid_expense_policy: [
     "Review the category requirements and amount limits.",
     "Periksa persyaratan kategori dan batas nominal.",

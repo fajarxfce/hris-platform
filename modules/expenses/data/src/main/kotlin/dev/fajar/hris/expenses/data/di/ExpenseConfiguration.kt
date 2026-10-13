@@ -22,6 +22,32 @@ import org.springframework.context.annotation.Configuration
 @Configuration(proxyBeanMethods = false)
 class ExpenseConfiguration {
     @Bean
+    fun getSelfExpenseDraftReferences(
+        policies: ExpensePolicyRepository,
+        people: PeopleRepository,
+        units: OrganizationRepository,
+        documents: DocumentRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetSelfExpenseDraftReferences(
+            policies,
+            people,
+            units,
+            documents,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun expensePolicySource(sql: DSLContext): ExpensePolicyDataSource =
         PostgresExpensePolicyDataSource(sql)
 

@@ -54,6 +54,26 @@ Limits are 1,000 open claims (`DRAFT`, `PENDING`, or `RETURNED`) per company, fi
 
 Commands recheck live account, membership, and credential state before replay. Their permissions are limited to the intersection with the original request, so a grant made while a command waits cannot expand its authority.
 
+## Draft reference lookup
+
+`GET /expenses/me/employments/{employmentId}/draft-references` resolves the names
+used by the employee editor. Optional UUID sets accept at most 20 `categoryIds`,
+20 `costCenterIds` and 60 `receiptRevisionIds`. Only an account-owned employment
+with expense editing permission is admitted, including for finance administrators.
+This endpoint is independent of general organization/document browsing.
+
+The response contains category/cost-center names and active flags, plus receipt
+filename/type/size/upload status. It never reads file contents or returns storage
+keys, digests, inspection details or another employee's metadata. Missing,
+foreign-company, wrong-kind and inaccessible receipt references contain only the
+requested identifier with null metadata. Archived names remain available so the
+editor can replace them; they do not reserve submission eligibility.
+
+Resource/access guards retain scope through bounded lookup. Current grants,
+credentials and MFA are checked after waiting and again before publication.
+Submission still independently validates active categories/cost centers and ready
+receipts against the transaction date.
+
 ## Submission and withdrawal
 
 `POST /expenses/claims/{id}/submit` requires a client-generated `submissionId`, expected claim version, reason, and idempotency key. It freezes an immutable submission and creates an `EXPENSE` approval whose resource ID is that submission ID. The mutation receipt returns the claim ID/version; the caller's submission ID remains usable after a lost response or a later correction.

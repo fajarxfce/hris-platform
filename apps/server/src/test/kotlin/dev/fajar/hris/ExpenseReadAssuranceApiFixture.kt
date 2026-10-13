@@ -9,6 +9,7 @@ import dev.fajar.hris.expenses.domain.usecases.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.organization.domain.repositories.OrganizationRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.storage.domain.repositories.ObjectStorageRepository
 import java.time.LocalDate
@@ -28,6 +29,7 @@ abstract class ExpenseReadAssuranceApiFixture : ExpenseReviewApiFixture() {
     @Autowired private lateinit var documents: DocumentRepository
     @Autowired private lateinit var people: PeopleRepository
     @Autowired private lateinit var companies: CompanyRepository
+    @Autowired private lateinit var units: OrganizationRepository
     @Autowired private lateinit var members: MembershipRepository
     @Autowired private lateinit var identities: IdentityRepository
     @Autowired private lateinit var transactions: TransactionRunner
@@ -35,6 +37,20 @@ abstract class ExpenseReadAssuranceApiFixture : ExpenseReviewApiFixture() {
     @Autowired protected lateinit var accountProbe: AccountLockProbe
     @Autowired protected lateinit var readProbe: ExpenseReadProbe
     protected val security = IdentitySecurityPolicy()
+
+    protected fun draftReferenceReader() =
+        GetSelfExpenseDraftReferences(
+            policies,
+            people,
+            units,
+            documents,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     protected data class Scenario(
         val fixture: ExpenseFixture,

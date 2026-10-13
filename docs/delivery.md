@@ -2409,3 +2409,21 @@ contract cases passed. Checks include literal wildcard search, inactive/foreign
 record exclusion, module/native-build admission, late proof expiry, removed/new
 grants and executor reuse. Both application JARs built; the unchanged worker check
 was up to date. No migration or mobile APK changed in this increment.
+
+
+## Employee expense draft references
+
+A bounded employee-owned lookup resolves category/cost-center labels and receipt
+revision status for draft editing. It is independent of general organization and
+document browsing. Unavailable, foreign and wrongly classified references retain
+only their requested ID; archived labels remain recognizable. File contents and
+storage diagnostics are never acquired. Submission still validates current policy
+and evidence independently.
+
+Architecture, formatting, eight new API/access/cancellation cases and 23 API
+contract cases passed. Tests cover minimal editing grants, ownership, null metadata,
+archived references, cardinality, MFA expiry after locks and metadata acquisition,
+permission intersection, and interrupted executor reuse. Expense domain checks and
+both application JARs passed; the unchanged worker check was up to date. The initial
+fixture was corrected to remove its organization grant and apply active MFA policy.
+No migration or mobile APK changed in this increment.

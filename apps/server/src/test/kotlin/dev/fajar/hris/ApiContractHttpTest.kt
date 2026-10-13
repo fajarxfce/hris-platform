@@ -671,6 +671,47 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun expenseDraftReferenceLookupBoundsEverySetAndExposesOnlyDisplayMetadata() {
+        val api = contract()
+        val operation =
+            api["paths"][
+                "/api/v1/companies/{companyId}/expenses/me/employments/{employmentId}/draft-references"][
+                "get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val parameters = operation["parameters"].associateBy { it["name"].asString() }
+        for ((name, maximum) in
+            listOf("categoryIds" to 20, "costCenterIds" to 20, "receiptRevisionIds" to 60)) {
+            val parameter = parameters.getValue(name)
+            assertFalse(parameter["required"].asBoolean())
+            assertEquals(maximum, parameter["schema"]["maxItems"].asInt())
+            assertTrue(parameter["schema"]["uniqueItems"].asBoolean())
+            assertEquals("uuid", parameter["schema"]["items"]["format"].asString())
+        }
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("employmentId", "categories", "costCenters", "receipts"),
+            schemas["SelfExpenseDraftReferencesResponse"]["properties"]
+                .properties()
+                .map { it.key }
+                .toSet(),
+        )
+        assertEquals(
+            setOf("id", "code", "name", "active"),
+            schemas["ExpenseDraftLabelReferenceResponse"]["properties"]
+                .properties()
+                .map { it.key }
+                .toSet(),
+        )
+        assertEquals(
+            setOf("revisionId", "documentId", "fileName", "mediaType", "size", "status"),
+            schemas["ExpenseDraftReceiptReferenceResponse"]["properties"]
+                .properties()
+                .map { it.key }
+                .toSet(),
+        )
+    }
+
+    @Test
     fun selfExpenseDiscoveryHasItsOwnMinimalCompanyAdmittedContract() {
         val api = contract()
         val operation = api["paths"]["/api/v1/companies/{companyId}/expenses/me/employments"]["get"]

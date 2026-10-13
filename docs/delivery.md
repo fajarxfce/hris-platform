@@ -3131,3 +3131,17 @@ install-only delivery. Its application was not opened or driven. This increment
 does not change backend behavior or shared starter foundations. Other business
 replicas, unfinished offline drafts and shared synchronization status remain in
 the delivery sequence.
+
+## Overtime replica API preparation
+
+An explicit `OVERTIME_REQUESTS` selection now accepts the existing read grants
+used by the native overtime pages. The effective projection remains limited to
+the account's employments; default feeds and other collection permissions are
+unchanged. HTTP tests verify owned canonical reads, empty results for an unrelated
+reader, and rejection after permission revocation.
+
+Architecture and formatting checks passed, together with 11 synchronization policy
+tests, seven selected HTTP/PostgreSQL tests and 38 worker tests. Both application
+JARs built. The first integration attempt lacked the Docker group; the successful
+run used the documented same-user Docker group without changing socket permissions.
+Mobile replica integration is a separate delivery step.

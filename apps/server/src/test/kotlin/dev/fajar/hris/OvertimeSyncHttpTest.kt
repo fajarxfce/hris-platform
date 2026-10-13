@@ -8,6 +8,49 @@ import org.junit.jupiter.api.Test
 
 class OvertimeSyncHttpTest : OvertimeApiFixture() {
     @Test
+    fun explicitReadOnlyProjectionContainsOwnedRequestsAndStopsAfterRevocation() {
+        val f = overtimeFixture()
+        val id = UUID.randomUUID()
+        overtimeBody(plan(f, id))
+        val worker = mobileSyncTestWorker(postgres.jdbcUrl, database())
+        repeat(4) { assertTrue(worker.maintain.execute() is Result.Success) }
+        database()
+            .update(
+                "update membership_permissions set permission='overtime.read' where company_id=? and account_id=? and permission='overtime.self.manage'",
+                f.company,
+                f.employeeAccount,
+            )
+        val path = "/api/v1/companies/${f.company}/sync"
+        val selection = "collections=OVERTIME_REQUESTS"
+        assertEquals(403, get(f.employeeClient, "$path/bootstrap").statusCode())
+        val bootstrap = overtimeBody(get(f.employeeClient, "$path/bootstrap?$selection"))
+        assertEquals(1, bootstrap["items"].size())
+        assertEquals(id.toString(), bootstrap["items"][0]["id"].asString())
+        assertEquals(200, get(f.employeeClient, "${f.path}/overtime/$id").statusCode())
+        val other = reviewer(f, setOf("company.read", "overtime.read"))
+        assertEquals(
+            0,
+            overtimeBody(get(other.client, "$path/bootstrap?$selection"))["items"].size(),
+        )
+        val cursor = URLEncoder.encode(bootstrap["changesCursor"].asString(), Charsets.UTF_8)
+        assertEquals(
+            0,
+            overtimeBody(get(f.employeeClient, "$path/changes?$selection&cursor=$cursor"))["items"]
+                .size(),
+        )
+        database()
+            .update(
+                "delete from membership_permissions where company_id=? and account_id=? and permission='overtime.read'",
+                f.company,
+                f.employeeAccount,
+            )
+        assertEquals(
+            403,
+            get(f.employeeClient, "$path/changes?$selection&cursor=$cursor").statusCode(),
+        )
+    }
+
+    @Test
     fun ownedOvertimeSnapshotsAndCommittedChangesUseTheMobileSyncPartition() {
         val f = overtimeFixture()
         val id = UUID.randomUUID()

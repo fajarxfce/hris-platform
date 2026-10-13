@@ -27,13 +27,17 @@ fun selectSyncCollections(
                 fields = mapOf("collections" to "required"),
             )
         )
-    // The existing Leave read grant admits own-request reads too. An explicit
-    // selection enables that same owned projection without changing default feeds.
-    val authorized =
-        selfSyncCollections(permissions) +
-            if (requested != null && "leave.read" in permissions)
-                setOf(SyncCollection.LEAVE_REQUESTS, SyncCollection.LEAVE_BALANCES)
-            else emptySet()
+    // Existing read grants also admit owned resources. Explicit selection exposes
+    // that same projection without changing default feeds or exporting team data.
+    val authorized = selfSyncCollections(permissions).toMutableSet()
+    if (requested != null) {
+        if ("leave.read" in permissions) {
+            authorized += SyncCollection.LEAVE_REQUESTS
+            authorized += SyncCollection.LEAVE_BALANCES
+        }
+        if (permissions.any { it in setOf("overtime.read", "overtime.manage", "workforce.read") })
+            authorized += SyncCollection.OVERTIME_REQUESTS
+    }
     val selected = authorized.intersect(requested ?: defaultSyncCollections)
     if (selected.isEmpty())
         return Result.Failed(Failure(FailureKind.FORBIDDEN, "sync_access_denied"))

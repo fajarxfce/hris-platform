@@ -9,7 +9,7 @@ The supported collections are:
 | `EXPENSE_CLAIMS` | `expenses.self.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}` |
 | `LEAVE_REQUESTS` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments or immutable request owner | `/api/v1/companies/{companyId}/leave/requests/{id}` |
 | `LEAVE_BALANCES` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/leave/balances/{id}` |
-| `OVERTIME_REQUESTS` | `overtime.self.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/overtime/{id}` |
+| `OVERTIME_REQUESTS` | `overtime.self.manage`, or explicit selection with `overtime.read`, `overtime.manage` or `workforce.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/overtime/{id}` |
 | `PAYSLIPS` | `payroll.self.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}` |
 | `PAYROLL_PAYMENTS` | `payroll.self.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}/payments` |
 | `INBOX` (explicit selection) | `announcements.read` | Original recipient account only | `/api/v1/companies/{companyId}/inbox/{id}` |
@@ -44,6 +44,12 @@ for their own records, matching the existing self-read endpoints. This does not
 change omitted-selection feeds or grant team/company exports. `leave.team.read`
 alone does not authorize these collections; current membership, ownership, MFA,
 and permission checks still apply to every feed and canonical-resource request.
+
+Overtime readers with `overtime.read`, `overtime.manage` or `workforce.read` may
+explicitly select `OVERTIME_REQUESTS` for their own employment records. Omitted
+selection retains its existing permissions. An approver grant alone cannot
+select this collection, and an administrative read grant never widens its
+account-owned audience.
 
 An empty set returns `422 invalid_sync_collections`; an unknown enum value returns `400 invalid_request`. A known selection with no authorized collection returns `403 sync_access_denied`. Correct unsupported/empty selections instead of retrying them unchanged. Nonselected records are excluded from snapshot, delta, and pending-publication responses.
 

@@ -8,7 +8,7 @@ import java.util.UUID
 interface ExpenseClaimDataSource {
     fun review(company: UUID, id: UUID, version: Long, status: String): Long?
 
-    fun lock(company: UUID)
+    fun lock(company: UUID, shared: Boolean = false)
 
     fun capacity(company: UUID, account: UUID): ExpenseCapacityRow
 

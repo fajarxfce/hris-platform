@@ -20,6 +20,14 @@ Policies define a display name, maximum amount per line and per claim for that c
 
 Each company allows 500 categories and each category 1,000 revisions. Competing definitions/updates use company serialization and optimistic versions. Current account, company, membership, and permission are checked before a mutation or receipt replay. Policy history, version, audit, and operation receipt commit together; no external I/O runs in that transaction. Submission uses these effective policies; payment processing uses the approved immutable evidence.
 
+## Employee reads
+
+`GET /expenses/me/employments` returns only the signed-in account's employment references, the company date/timezone, and a bounded cursor page (default twenty, maximum fifty). Each reference contains its ID, employee number, status, and observed version. It requires `expenses.self.manage`, `expenses.read`, or `expenses.manage`; People access and the People module are not required. Company module admission and native minimum-build requirements still apply.
+
+Claim lists, details, drafts, history, submission summaries, payment progress, submission details, and receipt downloads accept `scope=SELF`. This always restricts the response to the account's own employment, including when that account also has company-wide or reviewer grants. Self-scoped claim lists require an owned `employmentId`. The default `AUTHORIZED` preserves company, team, and assigned-reviewer access according to each endpoint's existing policy; it does not expose unsubmitted drafts to submission reviewers.
+
+Interactive claim and category reads acquire shared resource/access guards in the same order as their writers. They revalidate current company membership, credentials, the original permission intersection, and applicable MFA assurance after waiting and before returning acquired data. Receipt content uses short guarded database transactions before and after object-storage I/O. It verifies the immutable chunk, rechecks access before delivery, and clears the acquired byte buffer on both successful and failed delivery. External storage calls hold no database guards.
+
 ## Claim drafts
 
 `PUT /expenses/claims/{id}/draft` saves a draft with an employment ID, title, description, lines, reason, and expected version (null on create). Every line has a stable UUID, category, transaction date, decimal IDR amount, description, optional cost center, and receipt revision IDs. Drafts allow up to twenty lines and three receipts per line. An empty draft is allowed; policy eligibility, mandatory evidence, and approval routing are checked when the claim is submitted.

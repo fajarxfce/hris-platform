@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface ExpensePolicyDataSource {
-    fun lock(company: UUID)
+    fun lock(company: UUID, shared: Boolean = false)
 
     fun count(company: UUID): Int
 

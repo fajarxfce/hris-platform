@@ -12,7 +12,7 @@ interface ExpenseClaimRepository {
 
     fun review(actor: Actor, claim: ExpenseClaim, review: ExpenseReview): Result<MutationReceipt>
 
-    fun lock(companyId: UUID): Result<Unit>
+    fun lock(companyId: UUID, shared: Boolean = false): Result<Unit>
 
     fun capacity(companyId: UUID, accountId: UUID): Result<ExpenseClaimCapacity>
 

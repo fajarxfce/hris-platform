@@ -6,7 +6,8 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.expenses.domain.entities.*
 import dev.fajar.hris.expenses.domain.policies.*
 import dev.fajar.hris.expenses.domain.repositories.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -22,16 +23,33 @@ class GetExpenseSubmission(
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
-    fun execute(actor: Actor, id: UUID): Result<ExpenseSubmissionDetails> {
+    fun execute(
+        actor: Actor,
+        id: UUID,
+        scope: ExpenseClaimReadScope = ExpenseClaimReadScope.AUTHORIZED,
+    ): Result<ExpenseSubmissionDetails> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         return transactions.run(actor) {
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val resource = claims.lock(company, shared = true)
+            if (resource is Result.Failed) return@run resource
+            val peopleGuard = people.lockReportingLines(company, shared = true)
+            if (peopleGuard is Result.Failed) return@run peopleGuard
+            val approvalGuard = approvals.lock(company, shared = true)
+            if (approvalGuard is Result.Failed) return@run approvalGuard
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
+            val accessed = identities.access(actor.accountId, company)
+            if (accessed is Result.Failed) return@run accessed
+            val access = (accessed as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val found = claims.submission(company, id)
@@ -65,7 +83,11 @@ class GetExpenseSubmission(
             val foundEmployee = people.findAtInstant(company, claim.employmentId, now)
             if (foundEmployee is Result.Failed) return@run foundEmployee
             val employee = (foundEmployee as Result.Success).value
-            if (employee == null || !canReadExpenseClaim(live, employee, today)) {
+            if (employee == null || !canReadExpenseClaim(live, employee, today, scope)) {
+                if (scope == ExpenseClaimReadScope.SELF)
+                    return@run Result.Failed(
+                        Failure(FailureKind.NOT_FOUND, "expense_submission_not_found")
+                    )
                 val delegated = approvals.delegations(company, actor.accountId, now)
                 if (delegated is Result.Failed) return@run delegated
                 val assigned = approval.stages.flatMap { it.assignees }.toSet()
@@ -94,7 +116,7 @@ class GetExpenseSubmission(
                     submission.lines,
                     (foundDuplicates as Result.Success).value,
                 )
-            Result.Success(
+            validateCompanySessionActor(actor, access, clock.instant(), security).map {
                 ExpenseSubmissionDetails(
                     submission,
                     claim,
@@ -102,7 +124,7 @@ class GetExpenseSubmission(
                     (foundReviews as Result.Success).value,
                     duplicates,
                 )
-            )
+            }
         }
     }
 }

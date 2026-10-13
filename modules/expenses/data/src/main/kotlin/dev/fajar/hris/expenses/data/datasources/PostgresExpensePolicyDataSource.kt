@@ -11,9 +11,11 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresExpensePolicyDataSource(private val sql: DSLContext) : ExpensePolicyDataSource {
-    override fun lock(company: UUID) {
-        sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "expenses:$company")
-            .execute()
+    override fun lock(company: UUID, shared: Boolean) {
+        val statement =
+            if (shared) "select pg_advisory_xact_lock_shared(hashtextextended(?,0))"
+            else "select pg_advisory_xact_lock(hashtextextended(?,0))"
+        sql.query(statement, "expenses:$company").execute()
     }
 
     override fun count(company: UUID): Int = sql.fetchCount(C, C.COMPANY_ID.eq(company))

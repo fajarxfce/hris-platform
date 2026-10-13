@@ -4,7 +4,8 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.expenses.domain.entities.*
 import dev.fajar.hris.expenses.domain.policies.*
 import dev.fajar.hris.expenses.domain.repositories.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.*
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -18,6 +19,8 @@ class ListExpenseClaims(
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val members: MembershipRepository,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -27,6 +30,7 @@ class ListExpenseClaims(
         until: LocalDate,
         after: UUID?,
         limit: Int,
+        scope: ExpenseClaimReadScope = ExpenseClaimReadScope.AUTHORIZED,
     ): Result<Page<ExpenseClaimSummary>> {
         val company =
             actor.companyId
@@ -39,10 +43,20 @@ class ListExpenseClaims(
         )
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_page"))
         return transactions.run(actor) {
-            val current =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val resource = claims.lock(company, shared = true)
+            if (resource is Result.Failed) return@run resource
+            val peopleGuard = people.lockReportingLines(company, shared = true)
+            if (peopleGuard is Result.Failed) return@run peopleGuard
+            val companyGuard = companies.lock(company, shared = true)
+            if (companyGuard is Result.Failed) return@run companyGuard
+            val memberGuard = members.lock(company, shared = true)
+            if (memberGuard is Result.Failed) return@run memberGuard
+            val accountGuard = identities.lockAccount(actor.accountId, shared = true)
+            if (accountGuard is Result.Failed) return@run accountGuard
+            val accessed = identities.access(actor.accountId, company)
+            if (accessed is Result.Failed) return@run accessed
+            val access = (accessed as Result.Success).value
+            val current = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (current is Result.Failed) return@run current
             val live = (current as Result.Success).value
 
@@ -54,7 +68,10 @@ class ListExpenseClaims(
             val now = clock.instant()
             val today = now.atZone(ZoneId.of(settings.timezone)).toLocalDate()
 
-            if ("expenses.read" !in live.permissions && "expenses.manage" !in live.permissions) {
+            if (
+                scope == ExpenseClaimReadScope.SELF ||
+                    ("expenses.read" !in live.permissions && "expenses.manage" !in live.permissions)
+            ) {
                 if (employmentId == null)
                     return@run Result.Failed(
                         Failure(FailureKind.FORBIDDEN, "employee_scope_required")
@@ -62,19 +79,23 @@ class ListExpenseClaims(
                 val foundEmployee = people.find(company, employmentId, today)
                 if (foundEmployee is Result.Failed) return@run foundEmployee
                 val employee = (foundEmployee as Result.Success).value
-                if (employee == null || !canReadExpenseClaim(live, employee, today))
+                if (employee == null || !canReadExpenseClaim(live, employee, today, scope))
                     return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
             }
             val zone = ZoneId.of(settings.timezone)
-            claims.list(
-                company,
-                employmentId,
-                status,
-                from.atStartOfDay(zone).toInstant(),
-                until.plusDays(1).atStartOfDay(zone).toInstant(),
-                after,
-                limit,
-            )
+            val acquired =
+                claims.list(
+                    company,
+                    employmentId,
+                    status,
+                    from.atStartOfDay(zone).toInstant(),
+                    until.plusDays(1).atStartOfDay(zone).toInstant(),
+                    after,
+                    limit,
+                )
+            acquired.flatMap { value ->
+                validateCompanySessionActor(actor, access, clock.instant(), security).map { value }
+            }
         }
     }
 }

@@ -1,10 +1,12 @@
 package dev.fajar.hris.expenses.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.expenses.domain.entities.ExpenseClaimReadScope
 import dev.fajar.hris.expenses.domain.entities.ExpensePaymentProgress
 import dev.fajar.hris.expenses.domain.policies.canReadExpenseClaim
 import dev.fajar.hris.expenses.domain.repositories.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
@@ -22,8 +24,13 @@ class GetExpenseClaimPayments(
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
-    fun execute(actor: Actor, id: UUID): Result<List<ExpensePaymentProgress>> {
+    fun execute(
+        actor: Actor,
+        id: UUID,
+        scope: ExpenseClaimReadScope = ExpenseClaimReadScope.AUTHORIZED,
+    ): Result<List<ExpensePaymentProgress>> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
@@ -38,10 +45,10 @@ class GetExpenseClaimPayments(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val accessed = identities.access(actor.accountId, company)
+            if (accessed is Result.Failed) return@run accessed
+            val access = (accessed as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val found = claims.find(company, id)
             if (found is Result.Failed) return@run found
@@ -62,10 +69,12 @@ class GetExpenseClaimPayments(
             val employee = (foundEmployee as Result.Success).value
             if (
                 employee == null ||
-                    !canReadExpenseClaim((checked as Result.Success).value, employee, today)
+                    !canReadExpenseClaim((checked as Result.Success).value, employee, today, scope)
             )
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "expense_claim_not_found"))
-            payments.progress(company, id)
+            payments.progress(company, id).flatMap { value ->
+                validateCompanySessionActor(actor, access, clock.instant(), security).map { value }
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ import dev.fajar.hris.core.http.*
 import dev.fajar.hris.expenses.delivery.mappers.*
 import dev.fajar.hris.expenses.delivery.requests.*
 import dev.fajar.hris.expenses.delivery.responses.*
+import dev.fajar.hris.expenses.domain.entities.ExpenseClaimReadScope
 import dev.fajar.hris.expenses.domain.entities.ExpenseClaimStatus
 import dev.fajar.hris.expenses.domain.usecases.*
 import java.time.LocalDate
@@ -25,8 +26,12 @@ class ExpenseClaimController(
     private val history: GetExpenseClaimHistory,
 ) {
     @GetMapping("/{id}/payments")
-    fun payments(actor: Actor, @PathVariable id: UUID): List<ExpensePaymentProgressResponse> =
-        payments.execute(actor, id).response().map {
+    fun payments(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestParam(defaultValue = "AUTHORIZED") scope: ExpenseClaimReadScope,
+    ): List<ExpensePaymentProgressResponse> =
+        payments.execute(actor, id, scope).response().map {
             ExpensePaymentProgressResponse(
                 it.batchId,
                 it.itemId,
@@ -64,8 +69,9 @@ class ExpenseClaimController(
         @PathVariable id: UUID,
         @RequestParam(required = false) after: Int?,
         @RequestParam(defaultValue = "20") limit: Int,
+        @RequestParam(defaultValue = "AUTHORIZED") scope: ExpenseClaimReadScope,
     ): Page<ExpenseSubmissionSummaryResponse> =
-        submissions.execute(actor, id, after, limit).response().let {
+        submissions.execute(actor, id, after, limit, scope).response().let {
             Page(it.items.map { submission -> submission.toResponse() }, it.nextCursor)
         }
 
@@ -82,8 +88,11 @@ class ExpenseClaimController(
             .toResponse()
 
     @GetMapping("/{id}")
-    fun get(actor: Actor, @PathVariable id: UUID): ExpenseClaimResponse =
-        get.execute(actor, id).response().toResponse()
+    fun get(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestParam(defaultValue = "AUTHORIZED") scope: ExpenseClaimReadScope,
+    ): ExpenseClaimResponse = get.execute(actor, id, scope).response().toResponse()
 
     @GetMapping
     fun list(
@@ -94,8 +103,9 @@ class ExpenseClaimController(
         @RequestParam until: LocalDate,
         @RequestParam(required = false) after: UUID?,
         @RequestParam(defaultValue = "50") limit: Int,
+        @RequestParam(defaultValue = "AUTHORIZED") scope: ExpenseClaimReadScope,
     ): Page<ExpenseClaimSummaryResponse> =
-        list.execute(actor, employmentId, status, from, until, after, limit).response().let {
+        list.execute(actor, employmentId, status, from, until, after, limit, scope).response().let {
             Page(it.items.map { claim -> claim.toResponse() }, it.nextCursor)
         }
 
@@ -105,8 +115,9 @@ class ExpenseClaimController(
         @PathVariable id: UUID,
         @RequestParam(required = false) after: Int?,
         @RequestParam(defaultValue = "20") limit: Int,
+        @RequestParam(defaultValue = "AUTHORIZED") scope: ExpenseClaimReadScope,
     ): Page<ExpenseDraftResponse> =
-        drafts.execute(actor, id, after, limit).response().let {
+        drafts.execute(actor, id, after, limit, scope).response().let {
             Page(it.items.map { draft -> draft.toResponse() }, it.nextCursor)
         }
 
@@ -116,8 +127,9 @@ class ExpenseClaimController(
         @PathVariable id: UUID,
         @RequestParam(required = false) after: Long?,
         @RequestParam(defaultValue = "50") limit: Int,
+        @RequestParam(defaultValue = "AUTHORIZED") scope: ExpenseClaimReadScope,
     ): Page<ExpenseClaimChangeResponse> =
-        history.execute(actor, id, after, limit).response().let {
+        history.execute(actor, id, after, limit, scope).response().let {
             Page(it.items.map { change -> change.toResponse() }, it.nextCursor)
         }
 }

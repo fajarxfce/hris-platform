@@ -654,6 +654,53 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun selfExpenseDiscoveryHasItsOwnMinimalCompanyAdmittedContract() {
+        val api = contract()
+        val operation = api["paths"]["/api/v1/companies/{companyId}/expenses/me/employments"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val parameters = operation["parameters"].associateBy { it["name"].asString() }
+        assertEquals(50, parameters.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals(32, parameters.getValue("after")["schema"]["maxLength"].asInt())
+        val directory = api["components"]["schemas"]["SelfExpenseDirectoryResponse"]["properties"]
+        assertEquals(
+            setOf("accountId", "companyId", "asOf", "timezone", "employments"),
+            directory.properties().map { it.key }.toSet(),
+        )
+        val reference = api["components"]["schemas"]["ExpenseEmploymentResponse"]["properties"]
+        assertEquals(
+            setOf("id", "employeeNumber", "status", "version"),
+            reference.properties().map { it.key }.toSet(),
+        )
+    }
+
+    @Test
+    fun expenseReadScopesAreExplicitAndPreserveTheAuthorizedDefault() {
+        val paths = contract()["paths"]
+        for (suffix in
+            listOf(
+                "/claims",
+                "/claims/{id}",
+                "/claims/{id}/drafts",
+                "/claims/{id}/history",
+                "/claims/{id}/submissions",
+                "/claims/{id}/payments",
+                "/submissions/{id}",
+                "/submissions/{submissionId}/receipts/{revisionId}/content",
+            )) {
+            val operation = paths["/api/v1/companies/{companyId}/expenses$suffix"]["get"]
+            val scope = operation["parameters"].single { it["name"].asString() == "scope" }
+            assertEquals("query", scope["in"].asString())
+            assertFalse(scope["required"].asBoolean())
+            assertEquals("AUTHORIZED", scope["schema"]["default"].asString())
+            assertEquals(
+                setOf("AUTHORIZED", "SELF"),
+                scope["schema"]["enum"].iterator().asSequence().map { it.asString() }.toSet(),
+            )
+            assertTrue(operation["x-hris-company-admission"].asBoolean())
+        }
+    }
+
+    @Test
     fun payslipReadScopesAreExplicitAndPreserveTheAuthorizedDefault() {
         val paths = contract()["paths"]
         for (suffix in listOf("", "/{id}", "/{id}/payments", "/{id}/pdf")) {

@@ -5,6 +5,7 @@ import dev.fajar.hris.core.http.*
 import dev.fajar.hris.expenses.delivery.mappers.*
 import dev.fajar.hris.expenses.delivery.requests.*
 import dev.fajar.hris.expenses.delivery.responses.ExpenseSubmissionResponse
+import dev.fajar.hris.expenses.domain.entities.ExpenseClaimReadScope
 import dev.fajar.hris.expenses.domain.usecases.*
 import java.util.UUID
 import org.springframework.web.bind.annotation.*
@@ -17,8 +18,11 @@ class ExpenseSubmissionController(
     private val review: ReviewExpenseSubmission,
 ) {
     @GetMapping("/{id}")
-    fun get(actor: Actor, @PathVariable id: UUID): ExpenseSubmissionResponse =
-        get.execute(actor, id).response().toResponse()
+    fun get(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestParam(defaultValue = "AUTHORIZED") scope: ExpenseClaimReadScope,
+    ): ExpenseSubmissionResponse = get.execute(actor, id, scope).response().toResponse()
 
     @PostMapping("/{id}/decisions")
     fun review(

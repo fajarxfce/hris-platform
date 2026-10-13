@@ -12,7 +12,9 @@ import java.util.UUID
 
 class StoredExpensePolicyRepository(private val source: ExpensePolicyDataSource) :
     ExpensePolicyRepository {
-    override fun lock(companyId: UUID): Result<Unit> = safeDatabaseCall { source.lock(companyId) }
+    override fun lock(companyId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
+        source.lock(companyId, shared)
+    }
 
     override fun count(companyId: UUID): Result<Int> = safeDatabaseCall { source.count(companyId) }
 

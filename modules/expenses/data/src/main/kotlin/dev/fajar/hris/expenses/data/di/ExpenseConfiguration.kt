@@ -54,14 +54,40 @@ class ExpenseConfiguration {
         policies: ExpensePolicyRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListExpenseCategories(policies, identities, transactions)
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListExpenseCategories(
+            policies,
+            identities,
+            transactions,
+            companies,
+            members,
+            clock,
+            security,
+        )
 
     @Bean
     fun getExpenseCategoryHistory(
         policies: ExpensePolicyRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetExpenseCategoryHistory(policies, identities, transactions)
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetExpenseCategoryHistory(
+            policies,
+            identities,
+            transactions,
+            companies,
+            members,
+            clock,
+            security,
+        )
 
     @Bean
     fun expenseClaimSource(sql: DSLContext): ExpenseClaimDataSource =
@@ -134,6 +160,26 @@ class ExpenseConfiguration {
         )
 
     @Bean
+    fun listSelfExpenseEmployments(
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListSelfExpenseEmployments(
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun getExpenseClaim(
         claims: ExpenseClaimRepository,
         people: PeopleRepository,
@@ -141,7 +187,19 @@ class ExpenseConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetExpenseClaim(claims, people, companies, identities, transactions, clock)
+        members: MembershipRepository,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetExpenseClaim(
+            claims,
+            people,
+            companies,
+            identities,
+            transactions,
+            clock,
+            members,
+            security,
+        )
 
     @Bean
     fun getExpenseDrafts(
@@ -151,7 +209,19 @@ class ExpenseConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetExpenseDrafts(claims, people, companies, identities, transactions, clock)
+        members: MembershipRepository,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetExpenseDrafts(
+            claims,
+            people,
+            companies,
+            identities,
+            transactions,
+            clock,
+            members,
+            security,
+        )
 
     @Bean
     fun getExpenseClaimHistory(
@@ -161,7 +231,19 @@ class ExpenseConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = GetExpenseClaimHistory(claims, people, companies, identities, transactions, clock)
+        members: MembershipRepository,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetExpenseClaimHistory(
+            claims,
+            people,
+            companies,
+            identities,
+            transactions,
+            clock,
+            members,
+            security,
+        )
 
     @Bean
     fun listExpenseClaims(
@@ -171,7 +253,19 @@ class ExpenseConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = ListExpenseClaims(claims, people, companies, identities, transactions, clock)
+        members: MembershipRepository,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListExpenseClaims(
+            claims,
+            people,
+            companies,
+            identities,
+            transactions,
+            clock,
+            members,
+            security,
+        )
 
     @Bean
     fun submitExpenseClaim(
@@ -241,6 +335,7 @@ class ExpenseConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         GetExpenseSubmission(
             claims,
@@ -251,6 +346,7 @@ class ExpenseConfiguration {
             identities,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -261,7 +357,19 @@ class ExpenseConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
-    ) = ListExpenseSubmissions(claims, people, companies, identities, transactions, clock)
+        members: MembershipRepository,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListExpenseSubmissions(
+            claims,
+            people,
+            companies,
+            identities,
+            transactions,
+            clock,
+            members,
+            security,
+        )
 
     @Bean
     fun reviewExpenseSubmission(
@@ -300,6 +408,7 @@ class ExpenseConfiguration {
         members: MembershipRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         GetExpenseReceiptDownload(
             claims,
@@ -311,6 +420,7 @@ class ExpenseConfiguration {
             members,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -325,6 +435,7 @@ class ExpenseConfiguration {
         clock: Clock,
         documents: DocumentRepository,
         storage: ObjectStorageRepository,
+        security: IdentitySecurityPolicy,
     ) =
         ReadExpenseReceiptContent(
             claims,
@@ -337,6 +448,7 @@ class ExpenseConfiguration {
             transactions,
             clock,
             storage,
+            security,
         )
 
     @Bean
@@ -593,6 +705,7 @@ class ExpenseConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         GetExpenseClaimPayments(
             claims,
@@ -603,5 +716,6 @@ class ExpenseConfiguration {
             identities,
             transactions,
             clock,
+            security,
         )
 }

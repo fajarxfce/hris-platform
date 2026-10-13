@@ -178,7 +178,9 @@ class StoredExpenseClaimRepository(
                 }
             }
 
-    override fun lock(companyId: UUID): Result<Unit> = safeDatabaseCall { source.lock(companyId) }
+    override fun lock(companyId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
+        source.lock(companyId, shared)
+    }
 
     override fun capacity(companyId: UUID, accountId: UUID): Result<ExpenseClaimCapacity> =
         safeDatabaseCall {

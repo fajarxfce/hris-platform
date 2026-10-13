@@ -15,14 +15,18 @@ import type { LoadExpensePolicy } from "../../domain/usecases/load-expense-polic
 import type { LoadExpenseSubmission } from "../../domain/usecases/load-expense-submission";
 import type { PrepareExpensePayment } from "../../domain/usecases/prepare-expense-payment";
 import type { ReconcileExpensePayment } from "../../domain/usecases/reconcile-expense-payment";
+import type { ReviewExpenseClaimAction } from "../../domain/usecases/review-expense-claim-action";
 import type { ReviewExpenseDecision } from "../../domain/usecases/review-expense-decision";
 import type { ReviewExpenseDraftEdit } from "../../domain/usecases/review-expense-draft-edit";
 import type { ReviewExpensePaymentTransition } from "../../domain/usecases/review-expense-payment-transition";
 import type { ReviewExpenseReconciliation } from "../../domain/usecases/review-expense-reconciliation";
 import type { SaveExpenseDraft } from "../../domain/usecases/save-expense-draft";
 import type { SaveExpensePolicy } from "../../domain/usecases/save-expense-policy";
+import type { TransitionExpenseClaim } from "../../domain/usecases/transition-expense-claim";
 import type { TransitionExpensePayment } from "../../domain/usecases/transition-expense-payment";
 export type ExpenseUseCases = Readonly<{
+  reviewClaimAction: Pick<ReviewExpenseClaimAction, "execute">;
+  transitionClaim: Pick<TransitionExpenseClaim, "execute">;
   loadDraftEmployees: Pick<LoadExpenseDraftEmployees, "execute">;
   loadDraftReceipts: Pick<LoadExpenseDraftReceipts, "execute">;
   loadCostCenters: Pick<LoadExpenseCostCenters, "execute">;

@@ -1,4 +1,8 @@
 import type { BinaryResponseDto } from "../../../../core/data/http/binary-response-dto";
+import type {
+  ExpenseClaimActionDto,
+  ExpenseClaimSubmissionDto,
+} from "../models/expense-claim-action-dto";
 import type { ExpenseClaimPageDto, ExpenseClaimReviewDto } from "../models/expense-claim-dto";
 import type { ExpenseClaimReceiptDto } from "../models/expense-claim-receipt-dto";
 import type { ExpenseDecisionDto } from "../models/expense-decision-dto";
@@ -8,6 +12,27 @@ import type {
   ExpenseSubmissionDto,
 } from "../models/expense-submission-dto";
 export interface ExpenseClaimDataSource {
+  submit(
+    company: string,
+    id: string,
+    operation: string,
+    input: ExpenseClaimSubmissionDto,
+    signal: AbortSignal,
+  ): Promise<ExpenseClaimReceiptDto>;
+  cancel(
+    company: string,
+    id: string,
+    operation: string,
+    input: ExpenseClaimActionDto,
+    signal: AbortSignal,
+  ): Promise<ExpenseClaimReceiptDto>;
+  withdraw(
+    company: string,
+    submissionId: string,
+    operation: string,
+    input: ExpenseClaimActionDto,
+    signal: AbortSignal,
+  ): Promise<ExpenseClaimReceiptDto>;
   saveDraft(
     company: string,
     id: string,

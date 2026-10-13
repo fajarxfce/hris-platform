@@ -116,6 +116,18 @@ retirement browser acceptance used pre-existing fictional archive metadata in an
 owned disposable database. Its historical and current revisions, lost-response
 replay and competing hold were exercised without modifying development records.
 
+Expense workflows now include backend self-service discovery and strict ownership,
+mobile claim history, bounded offline views, draft authoring, dated categories,
+cost centers, published receipt selection/export, submission, cancellation and
+withdrawal with durable recovery. The dashboard supports policy administration,
+administrative drafts and returned-claim correction, submission/cancellation/
+withdrawal, immutable submitted evidence, authorized receipt downloads and
+independent review. Finance covers payable selection, reviewed bank instructions,
+batch directories/details, CSV worksheets, guarded release/cancellation,
+replacement instructions and reconciliation. Browser commands retain their
+original operation after response loss; the administrative workflows were checked
+against an isolated API/PostgreSQL fixture with independent operators.
+
 ## Remaining delivery sequence
 
 | Area | Remaining end-to-end work |
@@ -125,7 +137,6 @@ replay and competing hold were exercised without modifying development records.
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
 | Workforce | Bulk/reset and late corrections; physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections and their history, company-wide exception review queues, overtime planning with reviewed calendars, directories/details/history, actual-time submission, independent review and withdrawal, dashboard monthly closing/recovery with published employee results, and mobile work calendars, overtime planning/actual time/withdrawal with durable recovery, and online/offline capture are implemented and verified against the real API. |
 | Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry. Mobile balances, filtered history, request details, submission with published document evidence, and durable withdrawal/cancellation flows are implemented and verified against the development API. |
-| Expenses | Backend own-employment discovery and strictly self-scoped reads, mobile claim history/details, approval/payment progress, bounded offline views, draft authoring, published receipt selection/export, submission, cancellation, withdrawal and durable command recovery are implemented. Dashboard policy administration, claim directories/current details/history, administrative draft authoring and returned-claim correction, dated category/cost-center/receipt selection, immutable submitted evidence, receipt downloads, independent review decisions, finance batch directories/details, bank outcomes/activity, authorized CSV worksheets, payable selection and reviewed bank preparation, guarded release/cancellation, replacement instructions and reconciliation entry with original-command recovery are implemented. Remaining: dashboard submission, draft cancellation and withdrawal |
 | Payroll | Dashboard policies, compensation, inputs, calculation, review, finalization, payslips, payments and amendments. Native finalized payslips, payment progress, bounded offline views and authorized PDF saving are implemented. |
 | Communications | Mobile push hints and navigation. Dashboard audience groups, drafts, bounded named audience selection, publication review, preview, scheduling, cancellation/recovery and archival, and the mobile inbox with durable read/acknowledgement commands are implemented. |
 | Identity administration | Dashboard platform users, role/membership changes, invitations, provider bindings and sessions; company membership and grant review is implemented |

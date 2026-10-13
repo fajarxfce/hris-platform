@@ -1,5 +1,9 @@
 import { binaryResponseDto } from "../../../../core/data/http/binary-response-dto";
 import type { HttpClient } from "../../../../core/data/http/http-client";
+import type {
+  ExpenseClaimActionDto,
+  ExpenseClaimSubmissionDto,
+} from "../models/expense-claim-action-dto";
 import { expenseClaimPageDto, expenseClaimReviewDto } from "../models/expense-claim-dto";
 import { expenseClaimReceiptDto } from "../models/expense-claim-receipt-dto";
 import type { ExpenseDecisionDto } from "../models/expense-decision-dto";
@@ -11,6 +15,63 @@ import {
 import type { ExpenseClaimDataSource } from "./expense-claim-data-source";
 export class HttpExpenseClaimDataSource implements ExpenseClaimDataSource {
   constructor(private readonly http: HttpClient) {}
+  async submit(
+    company: string,
+    id: string,
+    operation: string,
+    input: ExpenseClaimSubmissionDto,
+    signal: AbortSignal,
+  ) {
+    return expenseClaimReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/expenses/claims/${id}/submit`,
+          method: "POST",
+          operationId: operation,
+          body: input,
+        },
+        signal,
+      ),
+    );
+  }
+  async cancel(
+    company: string,
+    id: string,
+    operation: string,
+    input: ExpenseClaimActionDto,
+    signal: AbortSignal,
+  ) {
+    return expenseClaimReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/expenses/claims/${id}/cancel`,
+          method: "POST",
+          operationId: operation,
+          body: input,
+        },
+        signal,
+      ),
+    );
+  }
+  async withdraw(
+    company: string,
+    submissionId: string,
+    operation: string,
+    input: ExpenseClaimActionDto,
+    signal: AbortSignal,
+  ) {
+    return expenseClaimReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/expenses/submissions/${submissionId}/withdraw`,
+          method: "POST",
+          operationId: operation,
+          body: input,
+        },
+        signal,
+      ),
+    );
+  }
   async saveDraft(
     company: string,
     id: string,

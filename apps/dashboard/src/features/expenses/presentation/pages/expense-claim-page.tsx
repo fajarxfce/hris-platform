@@ -10,7 +10,9 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import type { ExpenseClaimAction } from "../../domain/entities/expense-claim-action";
 import type { useExpenseClaim } from "../controllers/use-expense-claim";
+import { expenseClaimActionMessages } from "../i18n/expense-claim-action-messages";
 import { expenseClaimMessages } from "../i18n/expense-claim-messages";
 import { expenseDraftMessages } from "../i18n/expense-draft-messages";
 import { type ExpenseClaimTab, expenseClaimTabs } from "../models/expense-claim-route";
@@ -24,6 +26,8 @@ export function ExpenseClaimPage(props: {
   editTo: string | null;
   tab: ExpenseClaimTab;
   firstHistory: boolean;
+  actions: readonly ExpenseClaimAction[];
+  onAction: (action: ExpenseClaimAction) => void;
   onTab: (tab: string) => void;
   onSubmission: (id: string) => void;
   onChange: (version: string | null) => void;
@@ -42,6 +46,11 @@ export function ExpenseClaimPage(props: {
             <>
               <Link to={props.backTo}>{text.title}</Link>
               {props.editTo && <Link to={props.editTo}>{expenseDraftMessages(locale).edit}</Link>}
+              {props.actions.map((action) => (
+                <AppButton key={action} onClick={() => props.onAction(action)}>
+                  {expenseClaimActionMessages(locale)[action]}
+                </AppButton>
+              ))}
               <AppButton
                 appearance="subtle"
                 icon={<ArrowClockwise20Regular />}

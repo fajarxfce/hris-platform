@@ -4,6 +4,7 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import { canBrowseCompanyExpenses } from "../../domain/policies/expense-claim-read-policy";
 import { canReadExpensePayments } from "../../domain/policies/expense-payment-read-policy";
+import { ExpenseClaimActionScreen } from "../bindings/expense-claim-action-screen";
 import { ExpenseClaimScreen } from "../bindings/expense-claim-screen";
 import { ExpenseClaimsScreen } from "../bindings/expense-claims-screen";
 import { ExpenseDecisionScreen } from "../bindings/expense-decision-screen";
@@ -48,6 +49,7 @@ export function ExpenseRoutes(props: {
         element={<ExpenseDraftEditorScreen {...props} creating={false} />}
       />
       <Route path="claims/:claimId" element={<ExpenseClaimScreen {...props} />} />
+      <Route path="claims/:claimId/:intent" element={<ExpenseClaimActionScreen {...props} />} />
       <Route path="submissions/:submissionId" element={<ExpenseSubmissionScreen {...props} />} />
       <Route
         path="submissions/:submissionId/:intent"

@@ -3,6 +3,7 @@ import type { CompanyId, OperationId } from "../../../../core/domain/identifiers
 import type { MutationReceipt } from "../../../../core/domain/mutation-receipt";
 import type { Result } from "../../../../core/domain/result";
 import type { ExpenseClaimId } from "../entities/expense-claim";
+import type { ExpenseClaimActionCommand } from "../entities/expense-claim-action-command";
 import type { ExpenseClaimReview } from "../entities/expense-claim-review";
 import type { ExpenseClaimSearch } from "../entities/expense-claim-search";
 import type { ExpenseClaimPage } from "../entities/expense-claim-summary";
@@ -12,6 +13,12 @@ import type { ExpenseReceipt } from "../entities/expense-receipt";
 import type { ExpenseSubmission } from "../entities/expense-submission";
 import type { ExpenseSubmissionId } from "../entities/expense-submission-summary";
 export interface ExpenseClaimRepository {
+  transition(
+    company: CompanyId,
+    operation: OperationId,
+    command: ExpenseClaimActionCommand,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
   saveDraft(
     company: CompanyId,
     operation: OperationId,

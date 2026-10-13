@@ -25,12 +25,14 @@ import { LoadExpensePolicy } from "../domain/usecases/load-expense-policy";
 import { LoadExpenseSubmission } from "../domain/usecases/load-expense-submission";
 import { PrepareExpensePayment } from "../domain/usecases/prepare-expense-payment";
 import { ReconcileExpensePayment } from "../domain/usecases/reconcile-expense-payment";
+import { ReviewExpenseClaimAction } from "../domain/usecases/review-expense-claim-action";
 import { ReviewExpenseDecision } from "../domain/usecases/review-expense-decision";
 import { ReviewExpenseDraftEdit } from "../domain/usecases/review-expense-draft-edit";
 import { ReviewExpensePaymentTransition } from "../domain/usecases/review-expense-payment-transition";
 import { ReviewExpenseReconciliation } from "../domain/usecases/review-expense-reconciliation";
 import { SaveExpenseDraft } from "../domain/usecases/save-expense-draft";
 import { SaveExpensePolicy } from "../domain/usecases/save-expense-policy";
+import { TransitionExpenseClaim } from "../domain/usecases/transition-expense-claim";
 import { TransitionExpensePayment } from "../domain/usecases/transition-expense-payment";
 import type { ExpenseUseCases } from "../presentation/contracts/expense-use-cases";
 
@@ -43,6 +45,8 @@ export function createExpenseFeature(
   const drafting = new RemoteExpenseDraftingRepository(new HttpExpenseDraftingDataSource(http));
   const payments = new RemoteExpensePaymentRepository(new HttpExpensePaymentDataSource(http));
   return {
+    reviewClaimAction: new ReviewExpenseClaimAction(claims, drafting),
+    transitionClaim: new TransitionExpenseClaim(claims),
     loadDraftEmployees: new LoadExpenseDraftEmployees(drafting),
     loadDraftReceipts: new LoadExpenseDraftReceipts(drafting),
     loadCostCenters: new LoadExpenseCostCenters(drafting),

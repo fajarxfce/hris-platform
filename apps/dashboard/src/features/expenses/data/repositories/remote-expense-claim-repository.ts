@@ -3,6 +3,7 @@ import { safeHttpCall } from "../../../../core/data/http/safe-http-call";
 import { binaryFilePartBytes } from "../../../../core/domain/files/binary-file";
 import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
 import type { ExpenseClaimId } from "../../domain/entities/expense-claim";
+import type { ExpenseClaimActionCommand } from "../../domain/entities/expense-claim-action-command";
 import type { ExpenseClaimSearch } from "../../domain/entities/expense-claim-search";
 import type { ExpenseDecisionCommand } from "../../domain/entities/expense-decision-command";
 import type { ExpenseDraftChange } from "../../domain/entities/expense-draft-change";
@@ -15,6 +16,31 @@ import { toExpenseClaimReview } from "../mappers/expense-claim-review-mapper";
 import { toExpenseSubmission } from "../mappers/expense-submission-mapper";
 export class RemoteExpenseClaimRepository implements ExpenseClaimRepository {
   constructor(private readonly source: ExpenseClaimDataSource) {}
+  transition(
+    company: CompanyId,
+    operation: OperationId,
+    command: ExpenseClaimActionCommand,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () => {
+      const input = { expectedVersion: command.version, reason: command.reason };
+      const receipt =
+        command.action === "SUBMIT"
+          ? await this.source.submit(
+              company,
+              command.claimId,
+              operation,
+              { ...input, submissionId: command.submissionId },
+              signal,
+            )
+          : command.action === "CANCEL"
+            ? await this.source.cancel(company, command.claimId, operation, input, signal)
+            : await this.source.withdraw(company, command.submissionId, operation, input, signal);
+      if (receipt.id.toLowerCase() !== command.claimId || receipt.version !== command.version + 1)
+        throw new InvalidHttpResponseError();
+      return Object.freeze({ id: receipt.id.toLowerCase(), version: receipt.version });
+    });
+  }
   saveDraft(
     company: CompanyId,
     operation: OperationId,

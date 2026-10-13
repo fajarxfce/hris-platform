@@ -2906,3 +2906,34 @@ unit/component tests, including 52 new boundary and lifecycle cases. Thirty
 Chromium scenarios passed across draft authoring, claim reads and review decisions.
 The production build and real API/PostgreSQL scenario passed. Existing CSS
 specificity and bundle-size advisories remain.
+
+## Dashboard expense submission, cancellation and withdrawal
+
+Expense managers can submit a reviewed draft, cancel a draft or returned claim,
+and withdraw the current pending submission. Submission review resolves current
+item labels and receipt metadata; cancellation and withdrawal only acquire the
+claim facts they require. Empty drafts cannot be submitted. The API independently
+validates current policy, receipt eligibility, approval state, scope and version.
+
+Confirmation freezes the reviewed version, reason and one operation ID. Submission
+also retains one new submission ID; withdrawal targets the reviewed current ID.
+Lost responses preserve that exact command through MFA renewal and later rejected
+retries. A definite initial conflict requires an explicit protected reload. Access
+rejection removes visible review data, and disposal or company replacement cancels
+owned work and ignores late completion. One navigation owner protects the reason
+and any unconfirmed command; item inspection is read-only.
+
+Architecture, formatting, TypeScript, the production build and 1,798 dashboard
+unit/component tests passed, including 38 new policy, boundary and lifecycle
+cases. Forty-one distinct Chromium scenarios passed across claim reads, draft
+authoring, review decisions and the eleven new action scenarios. The action suite
+was rerun after correcting its table label. Light desktop and 760-pixel dark
+Indonesian layouts were inspected.
+
+Real API/PostgreSQL acceptance submitted an authored draft through the dashboard
+and replayed a deliberately lost committed response without a duplicate request.
+An independent reviewer approved its immutable evidence. Returned-claim correction
+and resubmission retained the original item IDs and previous evidence. A separate
+claim was submitted, withdrawn and cancelled; lost withdrawal/cancellation
+responses replayed once, preserving four distinct versioned history entries and
+the cancelled approval. No phone update or release was required for this increment.

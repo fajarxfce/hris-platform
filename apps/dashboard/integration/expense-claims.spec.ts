@@ -4,6 +4,7 @@ import { companyDate } from "../src/core/presentation/dates/company-date";
 import type { ExpenseDraftChangeDto } from "../src/features/expenses/data/models/expense-draft-change-dto";
 import { createAdminCompany } from "./fixtures/admin-company";
 import { authenticatorCode } from "./fixtures/authenticator";
+import { confirmExpenseClaimAction } from "./fixtures/expense-claim-action";
 
 async function reviewerSession(page: Page) {
   await page.goto("/");
@@ -22,7 +23,7 @@ async function reviewerSession(page: Page) {
   await page.getByRole("button", { name: "I have saved the codes", exact: true }).click();
 }
 
-test("real expense authoring and review replay lost saves and decisions, preserve evidence, and support returned-claim correction", async ({
+test("real expense authoring and actions replay lost responses, preserve evidence, and support returned-claim correction", async ({
   page,
   context,
   browser,
@@ -39,8 +40,7 @@ test("real expense authoring and review replay lost saves and decisions, preserv
   await page.getByRole("combobox", { name: "Bahasa", exact: true }).selectOption("en");
   const base = `/api/v1/companies/${company}`,
     employee = randomUUID(),
-    category = randomUUID(),
-    submission = randomUUID();
+    category = randomUUID();
   const reviewer = "a0000000-0000-4000-8000-000000000031";
   const headers = () => ({ [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() });
   const today = companyDate("Asia/Jakarta", new Date());
@@ -165,11 +165,15 @@ test("real expense authoring and review replay lost saves and decisions, preserv
     data: { ...draft, title: "Customer visit reimbursement", expectedVersion: 0 },
   });
   expect(revised.status()).toBe(200);
-  const submitted = await context.request.post(`${base}/expenses/claims/${claim}/submit`, {
-    headers: headers(),
-    data: { submissionId: submission, expectedVersion: 1, reason: "Submit travel reimbursement" },
+  const submission = await confirmExpenseClaimAction(page, {
+    company,
+    claimId: claim,
+    action: "submit",
+    expectedVersion: 1,
+    reason: "Submit travel reimbursement",
+    loseResponse: true,
   });
-  expect(submitted.status()).toBe(200);
+  if (!submission) throw new Error("Submission is required for review");
   const revisedPolicy = await context.request.put(`${base}/expenses/categories/${category}`, {
     headers: headers(),
     data: {
@@ -307,9 +311,7 @@ test("real expense authoring and review replay lost saves and decisions, preserv
       reviews: [{ decision: "APPROVE" }],
     });
 
-    const correctedClaim = randomUUID(),
-      firstSubmission = randomUUID(),
-      correctedSubmission = randomUUID();
+    const correctedClaim = randomUUID();
     const correctionDraft = {
       ...draft,
       title: "Receipt correction review",
@@ -323,18 +325,14 @@ test("real expense authoring and review replay lost saves and decisions, preserv
         })
       ).status(),
     ).toBe(200);
-    expect(
-      (
-        await context.request.post(`${base}/expenses/claims/${correctedClaim}/submit`, {
-          headers: headers(),
-          data: {
-            submissionId: firstSubmission,
-            expectedVersion: 0,
-            reason: "Submit expense for review",
-          },
-        })
-      ).status(),
-    ).toBe(200);
+    const firstSubmission = await confirmExpenseClaimAction(page, {
+      company,
+      claimId: correctedClaim,
+      action: "submit",
+      expectedVersion: 0,
+      reason: "Submit expense for review",
+    });
+    if (!firstSubmission) throw new Error("Submission is required for correction review");
     await reviewPage.goto(`/expenses/submissions/${firstSubmission}?company=${company}`);
     await reviewPage.getByRole("button", { name: "Return for correction", exact: true }).click();
     await reviewPage.getByLabel("Reason", { exact: true }).fill("Correct the item description");
@@ -384,18 +382,14 @@ test("real expense authoring and review replay lost saves and decisions, preserv
         },
       },
     });
-    expect(
-      (
-        await context.request.post(`${base}/expenses/claims/${correctedClaim}/submit`, {
-          headers: headers(),
-          data: {
-            submissionId: correctedSubmission,
-            expectedVersion: 3,
-            reason: "Resubmit corrected expense",
-          },
-        })
-      ).status(),
-    ).toBe(200);
+    const correctedSubmission = await confirmExpenseClaimAction(page, {
+      company,
+      claimId: correctedClaim,
+      action: "submit",
+      expectedVersion: 3,
+      reason: "Resubmit corrected expense",
+    });
+    if (!correctedSubmission) throw new Error("Corrected submission is required for review");
     await reviewPage.goto(`/expenses/submissions/${correctedSubmission}?company=${company}`);
     await reviewPage.getByRole("button", { name: "Reject", exact: true }).click();
     await reviewPage.getByLabel("Reason", { exact: true }).fill("Expense is not reimbursable");
@@ -427,6 +421,74 @@ test("real expense authoring and review replay lost saves and decisions, preserv
   } finally {
     await reviewerContext.close();
   }
+  const withdrawnClaim = randomUUID();
+  expect(
+    (
+      await context.request.put(`${base}/expenses/claims/${withdrawnClaim}/draft`, {
+        headers: headers(),
+        data: {
+          ...draft,
+          title: "Withdrawable travel draft",
+          expectedVersion: null,
+          lines: draft.lines.map((item) => ({ ...item, id: randomUUID() })),
+          reason: "Prepare a separate travel claim",
+        },
+      })
+    ).status(),
+  ).toBe(200);
+  const withdrawnSubmission = await confirmExpenseClaimAction(page, {
+    company,
+    claimId: withdrawnClaim,
+    action: "submit",
+    expectedVersion: 0,
+    reason: "Submit travel for approval",
+  });
+  if (!withdrawnSubmission) throw new Error("A current submission is required for withdrawal");
+  await confirmExpenseClaimAction(page, {
+    company,
+    claimId: withdrawnClaim,
+    submissionId: withdrawnSubmission,
+    action: "withdraw",
+    expectedVersion: 1,
+    reason: "Travel was postponed",
+    loseResponse: true,
+  });
+  await confirmExpenseClaimAction(page, {
+    company,
+    claimId: withdrawnClaim,
+    action: "cancel",
+    expectedVersion: 2,
+    reason: "Travel is no longer required",
+    loseResponse: true,
+  });
+  const cancelled = await context.request.get(`${base}/expenses/claims/${withdrawnClaim}/review`);
+  expect(cancelled.status()).toBe(200);
+  const cancelledReview = await cancelled.json();
+  expect(cancelledReview).toMatchObject({
+    claim: {
+      version: 3,
+      status: "CANCELLED",
+      submissionCount: 1,
+      latestSubmissionId: withdrawnSubmission,
+    },
+    history: {
+      items: [
+        { version: 3, kind: "CANCELLED" },
+        { version: 2, kind: "WITHDRAWN" },
+        { version: 1, kind: "SUBMITTED" },
+        { version: 0, kind: "DRAFT_SAVED" },
+      ],
+    },
+  });
+  expect(cancelledReview.history.items).toHaveLength(4);
+  const cancelledApproval = await context.request.get(
+    `${base}/expenses/submissions/${withdrawnSubmission}`,
+  );
+  expect(cancelledApproval.status()).toBe(200);
+  expect(await cancelledApproval.json()).toMatchObject({
+    approval: { status: "CANCELLED" },
+    availableActions: [],
+  });
   await page.goto(detail);
   await page.getByRole("tab", { name: "Payments", exact: true }).click();
   await expect(

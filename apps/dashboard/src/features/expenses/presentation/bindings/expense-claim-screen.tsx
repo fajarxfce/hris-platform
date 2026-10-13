@@ -2,12 +2,15 @@ import { useMemo } from "react";
 import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
+import { expenseClaimActionSnapshot } from "../../domain/entities/expense-claim-action-snapshot";
+import { availableExpenseClaimActions } from "../../domain/policies/expense-claim-action-policy";
 import {
   canEditExpenseDraft,
   canManageExpenseDrafts,
 } from "../../domain/policies/expense-draft-policy";
 import type { ExpenseScreenProps } from "../contracts/expense-screen-props";
 import { useExpenseClaim } from "../controllers/use-expense-claim";
+import { expenseClaimIntentForAction } from "../models/expense-claim-action-intent";
 import {
   expenseClaimParameters,
   expenseClaimPath,
@@ -83,6 +86,26 @@ function ExpenseClaimBinding(props: ExpenseScreenProps & { id: string; directory
       }
       tab={tab}
       firstHistory={after === null}
+      actions={
+        state.review
+          ? availableExpenseClaimActions(
+              props.access,
+              expenseClaimActionSnapshot(state.review.claim),
+            )
+          : []
+      }
+      onAction={(action) => {
+        if (
+          state.review &&
+          availableExpenseClaimActions(
+            props.access,
+            expenseClaimActionSnapshot(state.review.claim),
+          ).includes(action)
+        )
+          navigate(
+            `${expenseClaimPath(state.review.claim.id)}/${expenseClaimIntentForAction[action]}?${props.directory}`,
+          );
+      }}
       onTab={(value) => {
         if (!expenseClaimTabs.some((item) => item === value)) return;
         const next = new URLSearchParams(parameters);

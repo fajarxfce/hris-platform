@@ -2,6 +2,66 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  approval_group_too_large: [
+    "The approval group exceeds the supported size. Ask an administrator to review the policy.",
+    "Grup persetujuan melebihi batas. Minta administrator memeriksa kebijakannya.",
+  ],
+  approval_exclusion_capacity: [
+    "This request has too many contributors for approval. Ask an administrator to review it.",
+    "Kontributor permintaan ini melebihi batas persetujuan. Minta administrator memeriksanya.",
+  ],
+  expense_claim_action_unavailable: [
+    "This action is unavailable for the current claim. Return to its details.",
+    "Tindakan tidak tersedia untuk klaim saat ini. Kembali ke detailnya.",
+  ],
+  invalid_expense_action: [
+    "Review the claim and enter a reason of up to 1,000 characters.",
+    "Periksa klaim dan isi alasan maksimal 1.000 karakter.",
+  ],
+  expense_lines_required: [
+    "Add at least one expense item before submitting.",
+    "Tambahkan minimal satu item expense sebelum mengajukan.",
+  ],
+  expense_transaction_date_invalid: [
+    "Expense dates must be within the past 366 days and cannot be in the future.",
+    "Tanggal expense harus berada dalam 366 hari terakhir dan tidak boleh di masa depan.",
+  ],
+  expense_employment_ineligible: [
+    "The employee is ineligible for a selected expense category or date.",
+    "Karyawan tidak memenuhi ketentuan kategori atau tanggal expense yang dipilih.",
+  ],
+  expense_transaction_expired: [
+    "An expense item exceeds its category's submission period.",
+    "Item expense melewati batas waktu pengajuan kategorinya.",
+  ],
+  expense_line_limit_exceeded: [
+    "An item exceeds its category's amount limit.",
+    "Jumlah item melebihi batas kategori.",
+  ],
+  expense_category_limit_exceeded: [
+    "The claim total for a category exceeds its limit.",
+    "Total klaim untuk suatu kategori melebihi batas.",
+  ],
+  expense_cost_center_required: [
+    "Add the cost center required by the selected expense category.",
+    "Tambahkan cost center yang diwajibkan kategori expense.",
+  ],
+  expense_receipt_required: [
+    "Add the receipt required by the selected expense category.",
+    "Tambahkan receipt yang diwajibkan kategori expense.",
+  ],
+  expense_receipt_not_ready: [
+    "A selected receipt is not ready. Review its validation status before submitting.",
+    "Receipt yang dipilih belum siap. Periksa status validasinya sebelum mengajukan.",
+  ],
+  expense_submission_limit: [
+    "This claim has reached its submission limit.",
+    "Klaim ini mencapai batas pengajuan.",
+  ],
+  expense_approval_requires_split: [
+    "These categories require different approval routes. Separate them into different claims.",
+    "Kategori ini memerlukan alur persetujuan berbeda. Pisahkan ke klaim yang berbeda.",
+  ],
   invalid_expense_draft: [
     "Review the claim title, items and change note.",
     "Periksa judul klaim, item, dan catatan perubahan.",

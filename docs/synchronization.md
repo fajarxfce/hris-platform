@@ -116,13 +116,23 @@ Cursors are encrypted and authenticated, not client-editable offsets. They bind 
 | `401 session_revoked` | Stop requests/outbox and authenticate again. |
 | `403 company_access_denied` / `sync_access_denied` | Stop sync, remove inaccessible cached data, and suspend that partition's queued commands. |
 | `409 sync_scope_changed` | Discard the previous sync partition and re-bootstrap under current access. Revalidate queued intents before replay. |
-| `409 sync_cursor_expired` / `sync_cursor_out_of_range` / `sync_cursor_invalidated` | Discard that cursor and replace the local snapshot through bootstrap. |
+| `409 sync_cursor_expired` / `sync_cursor_out_of_range` / `sync_cursor_invalidated` | Discard that cursor and stage a bootstrap replacement. Keep the owned published view until replacement commits. |
 | `409 sync_bootstrap_limit` | Restart with a sufficient page size or review the collection size; do not loop with the failing token. |
 | `422 invalid_sync_cursor` | Reject a malformed, wrong-account/company, or wrong-phase token; correct the client partition and bootstrap. |
 | `422 invalid_sync_limit` / `sync_scope_limit` | Correct the bounded request or account configuration. |
 | `503 sync_unavailable` | Cursor keys are not configured. Use bounded backoff and report the service configuration issue. |
 
-Use the [localizable problem contract](mobile-api.md#localizable-errors) for messages. Do not decode cursor contents or use a device timestamp as a conflict/version authority. Never log bearer tokens or cursor query values in application, proxy, analytics, or crash reporting. Offline revocation cannot erase data on a disconnected device; enforce the documented local cache expiry and device policy.
+Use the [localizable problem contract](mobile-api.md#localizable-errors) for messages. Do not decode cursor contents or use a device timestamp as a conflict/version authority. Never log bearer tokens or cursor query values in application, proxy, analytics, or crash reporting.
+
+Cursor retention, data freshness, local ownership and live authorization have
+separate lifetimes. Ordinary cursor or credential expiry does not delete owned
+local facts. A confirmed scope/access denial instead gates the affected projection
+while cleanup and reauthorization proceed; a storage failure cannot turn that
+denial into permission to display retained data. Offline clients cannot learn a
+new revocation until they reconnect. Apply explicit account/company isolation,
+device protection and logout/removal policy rather than treating a freshness
+timestamp as proof of access. See the mobile [read and sync model](https://github.com/fajarxfce/hris-mobile/blob/main/docs/local-first.md)
+for current coverage and the remaining collection integrations.
 
 ## Publication and resource ownership
 

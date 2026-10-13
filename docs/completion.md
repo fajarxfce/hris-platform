@@ -15,8 +15,15 @@ secure refresh, device-session management and remote logout, company selection, 
 problems, restrained navigation transitions, self-profile/assignment reads, and an
 encrypted, synchronized employee inbox with durable read/acknowledgement actions are connected in
 [the mobile application](https://github.com/fajarxfce/hris-mobile/commit/bab8734).
-An encrypted company admission also restores the selected workspace offline,
-with bounded session/MFA lifetime and live access revalidation on foreground entry.
+The encrypted company selection restores its owned local workspace without an
+age-based read limit. Saved views remain readable after freshness or credential
+expiry; live authorization and operation reviews have separate checks. Foreground
+revalidation retains the same workspace, while confirmed denials keep affected
+reads gated through failed cleanup and retries. The [mobile read and sync model](https://github.com/fajarxfce/hris-mobile/blob/main/docs/local-first.md)
+distinguishes existing snapshots from complete replicas: Inbox consumes change
+feeds; most other features retain their last acquired list/detail views, and the
+coworker directory remains online. API 35 acceptance reopened Home and monthly
+attendance without connectivity after advancing the emulator clock by 73 hours.
 Company policy controls maintenance, minimum builds and module availability, with
 fresh admission before inbox synchronization and command delivery.
 The [employee work calendar](https://github.com/fajarxfce/hris-mobile/commit/cffb545)
@@ -133,7 +140,7 @@ against an isolated API/PostgreSQL fixture with independent operators.
 | Area | Remaining end-to-end work |
 | --- | --- |
 | Mobile identity | Native OIDC handoff and external-provider acceptance. Android MFA and device-session workflows are validated; iOS physical acceptance remains separate. |
-| Mobile foundation | Additional business replicas and durable commands, background restoration, deep links and push registration. Bounded encrypted company admission, company availability, the employee inbox and HRIS sync client are implemented. |
+| Mobile foundation | Additional business replicas and offline drafts, stable read partitions across sign-in, consistent sync status, deep links and push registration. Owned encrypted company restoration, age-independent stored reads, company availability, Inbox change feeds and staged cursor recovery are implemented; other collections retain the integration work described in the mobile sync model. |
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
 | Workforce | Bulk/reset and late corrections; physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections and their history, company-wide exception review queues, overtime planning with reviewed calendars, directories/details/history, actual-time submission, independent review and withdrawal, dashboard monthly closing/recovery with published employee results, and mobile work calendars, overtime planning/actual time/withdrawal with durable recovery, and online/offline capture are implemented and verified against the real API. |
 | Leave | Dashboard request creation, team calendar, entitlement batches and year closing; scheduled accrual/expiry. Mobile balances, filtered history, request details, submission with published document evidence, and durable withdrawal/cancellation flows are implemented and verified against the development API. |

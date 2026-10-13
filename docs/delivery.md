@@ -2486,3 +2486,18 @@ The bounded response reader and regressions were also ported to
 [Compose Fluent Starter e33d908](https://github.com/fajarxfce/compose-fluent-starter/commit/e33d908).
 Its root checks passed with 278 desktop tests, 36 network Chromium tests and Android
 dev assembly. Administrative expense workflows remain separate work.
+
+## Expense policy session assurance
+
+Category creation and revision now validate current MFA after their resource and
+access guards, before original receipt replay and before transaction completion.
+A late failure rolls back category state, immutable revision, audit, outbox and
+idempotency receipt together. The operation identity and permission intersection
+are unchanged.
+
+Six new regressions passed against PostgreSQL with MFA explicitly enabled. They
+cover create/update expiry during guard waits, expiry after journal insertion,
+renewed replay and interruption followed by recovery on the same executor.
+The existing policy HTTP and expense command/read assurance cases also passed;
+all 38 worker tests, architecture and format checks passed. The new fixture uses
+enabled business policy independently of the HTTP fixture's disabled-MFA setup.

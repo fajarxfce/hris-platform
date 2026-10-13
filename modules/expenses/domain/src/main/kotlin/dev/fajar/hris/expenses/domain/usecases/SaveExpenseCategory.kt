@@ -4,9 +4,11 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.expenses.domain.entities.ExpenseCategory
 import dev.fajar.hris.expenses.domain.policies.*
 import dev.fajar.hris.expenses.domain.repositories.ExpensePolicyRepository
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import java.time.Clock
 import java.util.UUID
 
 class SaveExpenseCategory(
@@ -17,6 +19,8 @@ class SaveExpenseCategory(
     private val operations: OperationRepository,
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
+    private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -64,16 +68,17 @@ class SaveExpenseCategory(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
-            val current =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val accessed = identities.access(actor.accountId, company)
+            if (accessed is Result.Failed) return@run accessed
+            val access = (accessed as Result.Success).value
+            val current = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (current is Result.Failed) return@run current
             val permission =
                 (current as Result.Success).value.requirePermission("expenses.policy.manage")
             if (permission is Result.Failed) return@run permission
             (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+                return@run validateCompanySessionActor(actor, access, clock.instant(), security)
+                    .map { _ -> it }
             }
             val found = policies.find(company, category.id)
             if (found is Result.Failed) return@run found
@@ -110,7 +115,11 @@ class SaveExpenseCategory(
                             ),
                         )
                     }
-                    .map { receipt }
+                    .flatMap {
+                        validateCompanySessionActor(actor, access, clock.instant(), security).map {
+                            receipt
+                        }
+                    }
             }
         }
     }

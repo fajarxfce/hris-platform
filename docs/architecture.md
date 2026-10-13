@@ -103,6 +103,10 @@ and before transaction completion. Late expiry rolls back claim state, immutable
 evidence, approval effects, history, audit/outbox and the operation receipt together.
 Original input and observed versions remain unchanged during explicit recovery.
 
+Expense category-policy saves apply the same session-assurance fence after their
+policy/access guards and before receipt replay or transaction completion. The
+final check participates in the category, revision, journal and receipt transaction.
+
 Company attendance exceptions use one bounded SQL projection under shared people,
 company, membership and account guards. They do not acquire employee/day locks:
 evidence, reviews and correction heads come from the same statement snapshot,

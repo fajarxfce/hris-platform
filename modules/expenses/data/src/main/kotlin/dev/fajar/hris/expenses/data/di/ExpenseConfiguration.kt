@@ -64,6 +64,8 @@ class ExpenseConfiguration {
         operations: OperationRepository,
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         SaveExpenseCategory(
             policies,
@@ -73,6 +75,8 @@ class ExpenseConfiguration {
             operations,
             journal,
             transactions,
+            clock,
+            security,
         )
 
     @Bean

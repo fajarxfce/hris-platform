@@ -20,6 +20,11 @@ Policies define a display name, maximum amount per line and per claim for that c
 
 Each company allows 500 categories and each category 1,000 revisions. Competing definitions/updates use company serialization and optimistic versions. Current account, company, membership, and permission are checked before a mutation or receipt replay. Policy history, version, audit, and operation receipt commit together; no external I/O runs in that transaction. Submission uses these effective policies; payment processing uses the approved immutable evidence.
 
+Policy saves also revalidate current session assurance after waiting for their
+resource/access guards, before returning an original receipt and before transaction
+completion. Expired MFA rolls back the category revision, audit, outbox and receipt
+together. An explicit retry retains its original operation ID and body.
+
 ## Employee reads
 
 `GET /expenses/cost-centers` provides active cost-center references for claim editing,

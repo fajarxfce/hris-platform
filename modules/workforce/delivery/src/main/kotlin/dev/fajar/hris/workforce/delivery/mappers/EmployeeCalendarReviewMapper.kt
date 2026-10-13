@@ -13,11 +13,5 @@ fun EmployeeCalendarReview.toResponse(): EmployeeCalendarReviewResponse =
         from,
         until,
         calendar.toResponse(),
-        assignmentAtStart?.let { assignment ->
-            ScheduleAssignmentResponse(
-                assignment.effectiveFrom,
-                assignment.revision,
-                assignment.days.mapKeys { it.key.name }.mapValues { it.value.toResponse() },
-            )
-        },
+        assignmentAtStart?.toResponse(),
     )

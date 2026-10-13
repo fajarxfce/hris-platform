@@ -4,12 +4,28 @@ import dev.fajar.hris.schema.tables.RosterDays.ROSTER_DAYS as R
 import dev.fajar.hris.schema.tables.RosterRevisions.ROSTER_REVISIONS as H
 import dev.fajar.hris.schema.tables.ScheduleAssignments.SCHEDULE_ASSIGNMENTS as A
 import dev.fajar.hris.schema.tables.ScheduleVersions.SCHEDULE_VERSIONS as V
+import dev.fajar.hris.schema.tables.WorkScheduleSyncHeads.WORK_SCHEDULE_SYNC_HEADS as S
 import dev.fajar.hris.schema.tables.records.*
 import java.time.LocalDate
 import java.util.UUID
 import org.jooq.DSLContext
 
 class PostgresCalendarDataSource(private val sql: DSLContext) : CalendarDataSource {
+    override fun assignment(companyId: UUID, id: UUID): ScheduleAssignmentsRecord? =
+        sql.select(A.asterisk())
+            .from(S)
+            .join(A)
+            .on(
+                A.COMPANY_ID.eq(S.COMPANY_ID)
+                    .and(A.EMPLOYMENT_ID.eq(S.EMPLOYMENT_ID))
+                    .and(A.REVISION.eq(S.REVISION))
+            )
+            .where(S.COMPANY_ID.eq(companyId), S.ID.eq(id))
+            .fetchOneInto(A)
+
+    override fun rosterDay(companyId: UUID, id: UUID): RosterDaysRecord? =
+        sql.selectFrom(R).where(R.COMPANY_ID.eq(companyId), R.ID.eq(id)).fetchOne()
+
     override fun lock(companyId: UUID, shared: Boolean) {
         val function = if (shared) "pg_advisory_xact_lock_shared" else "pg_advisory_xact_lock"
         sql.query("select $function(hashtextextended(?,0))", "calendar:$companyId").execute()

@@ -7,7 +7,7 @@ including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) r
 
 - Repository and product/architecture specification: initialized.
 - Backend foundation: implemented Gradle conventions, PostgreSQL migrations/jOOQ generation, transaction/error boundaries, company RLS, immutable audit/outbox storage, correlation IDs, CI, and local container configuration. Business capabilities and job processing are tracked below.
-- Mobile API: native sessions, atomic command receipts, optimistic versions, and consistent localizable JSON problems are implemented. Owned expense/leave-request/leave-balance/overtime/payslip/payment-progress and account-owned inbox bootstrap/incremental synchronization, explicit client collection selection, encrypted scope-bound cursors, bounded post-commit publication, retention, and worker lifecycle are implemented. Inbox requires explicit selection; the omitted-selection projection remains compatible with earlier clients. Other collections and a mobile client integration remain subsequent work.
+- Mobile API: native sessions, atomic command receipts, optimistic versions, and consistent localizable JSON problems are implemented. Owned expense/leave-request/leave-balance/overtime/payslip/payment-progress account-owned inbox, daily attendance and calendar-source bootstrap/incremental synchronization, explicit client collection selection, encrypted scope-bound cursors, bounded post-commit publication, retention, and worker lifecycle are implemented. Inbox, Attendance and calendar sources require explicit selection; the omitted-selection projection remains compatible with earlier clients. Mobile consumer coverage is tracked in the completion document.
 - API description: generated OpenAPI 3.1, exact registered-route coverage, filter authentication contracts, safe localizable problems, binary negotiation metadata, and CI artifacts are implemented. Runtime documentation is optional and authenticated, with a single canonical locale and bounded cache.
 - Identity: password sign-in, persistent cookie sessions, CSRF/session rotation, bootstrap, current-company permissions, revocation checks, credential-race handling, shared sign-in limits, and bounded password verification implemented. Company member administration is implemented, including versioned grants/revocation and sensitive-grant restrictions. Authenticator MFA, recovery codes, live credential revocation, and recent-authentication gates are implemented. Direct native password sign-in, pending MFA sessions, native authenticator enrollment, access/refresh rotation, reuse detection, session management, and native MFA renewal are implemented. Configured OIDC sign-in and account bindings are implemented. Configurable company role templates, versioned assignment snapshots, and global account activation/permission administration are implemented. Local invitations, one-use password recovery, and durable SMTP delivery are implemented.
 - Organization and people: company setup, organization units with bounded name/code search and coherent parent details, employee onboarding, scoped directories, and effective employment revisions implemented. Restricted profile editing, immutable history, and cancellation of scheduled employment revisions are implemented. Atomic cross-company transfer with source membership revocation is implemented. Versioned lifecycle checklists, task assignment/history, and explicit offboarding with access revocation are implemented. CSV preview/apply jobs, field errors, partial outcomes, cancellation, and explicit recovery are implemented. Independently authorized initial person/account binding and historical account identity are implemented. Scheduled lifecycle execution remains planned.
@@ -3199,3 +3199,24 @@ The new cases cover populated upgrades with an in-flight writer, concurrent
 changes, rollback, exact command replay, original schedules, account/company
 isolation, collection availability, late MFA expiry and interrupted reads.
 Mobile Attendance/calendar replication is not part of this backend increment.
+
+### Calendar source synchronization
+
+Explicit `WORK_SCHEDULES`, `ROSTER_DAYS` and `WORK_HOLIDAYS` collections expose the
+inputs for local employee calendar resolution. Effective-date rules retain stable
+IDs and immutable embedded shifts; roster IDs preserve explicit days off; inactive
+holidays remain versioned records. Shared holiday metadata requires owned
+employment and the calendar read grant. Canonical source readers enforce that
+same scope with shared calendar/access guards and current session assurance.
+The migration preserves existing rules and serializes backfill with old writers.
+
+Architecture/format checks and both application builds passed. Focused runs passed
+171 tests: 17 database, 13 sync domain, 41 workforce domain, 62 server and 38 worker.
+Coverage includes migration rollback and in-flight writes, frozen template changes,
+source versions, exact replay, colleague/company isolation, source availability,
+late MFA expiry, interrupted reads, existing calendar commands and OpenAPI route
+coverage, including preservation of the selected projection when reusing cursors.
+
+The preceding Attendance migration and API/worker are deployed to development;
+health checks passed on loopback and WireGuard with the document overlay retained.
+Calendar source integration in the mobile replica remains in progress.

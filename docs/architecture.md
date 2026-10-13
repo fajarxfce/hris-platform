@@ -63,6 +63,15 @@ and revalidate session assurance before releasing the result. Account ownership
 narrows administrative read permission. Storage triggers maintain the separate
 daily sync version; event and correction command versions remain unchanged.
 
+Owned calendar source reads use the shared calendar guard before people and
+access guards, then recheck live session assurance before releasing their data.
+Repositories map stored assignment snapshots, roster rows and holiday metadata;
+the read use cases enforce account ownership. Schedule heads identify the latest
+immutable assignment per effective date. Roster IDs and company-scoped holiday
+changes share the existing transactional publication pipeline, with a separate
+explicit company audience for holiday metadata. Shared holidays require owned
+employment; they never widen access to another employee's schedule.
+
 Interactive monthly attendance closing, recovery, period lists and published
 snapshot reads use the same post-guard session policy. They recheck assurance
 after acquisition and before returning private results or completing a write.

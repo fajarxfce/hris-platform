@@ -43,7 +43,10 @@ fun requestedSyncModules(request: HttpServletRequest, actor: Actor): Result<Set<
                     SyncCollection.LEAVE_REQUESTS,
                     SyncCollection.LEAVE_BALANCES -> CompanyModule.LEAVE
                     SyncCollection.OVERTIME_REQUESTS,
-                    SyncCollection.ATTENDANCE_DAYS -> CompanyModule.WORKFORCE
+                    SyncCollection.ATTENDANCE_DAYS,
+                    SyncCollection.WORK_SCHEDULES,
+                    SyncCollection.ROSTER_DAYS,
+                    SyncCollection.WORK_HOLIDAYS -> CompanyModule.WORKFORCE
                     SyncCollection.PAYSLIPS,
                     SyncCollection.PAYROLL_PAYMENTS -> CompanyModule.PAYROLL
                     SyncCollection.INBOX -> CompanyModule.COMMUNICATIONS

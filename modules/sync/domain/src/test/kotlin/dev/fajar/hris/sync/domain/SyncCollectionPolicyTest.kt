@@ -8,6 +8,30 @@ import org.junit.jupiter.api.Test
 
 class SyncCollectionPolicyTest {
     @Test
+    fun calendarSourcesAreExplicitAndNeverGrantedByTeamOrCompanyMetadataAccess() {
+        val sources = setOf(WORK_SCHEDULES, ROSTER_DAYS, WORK_HOLIDAYS)
+        for (grant in listOf("attendance.self.record", "workforce.read")) {
+            assertEquals(Result.Success(sources), selectSyncCollections(setOf(grant), sources))
+            assertEquals(
+                "sync_access_denied",
+                (selectSyncCollections(setOf(grant), null) as Result.Failed).failure.code,
+            )
+        }
+        for (grant in
+            listOf(
+                "company.read",
+                "workforce.team.read",
+                "attendance.verify",
+                "overtime.approve",
+            )) {
+            assertEquals(
+                "sync_access_denied",
+                (selectSyncCollections(setOf(grant), sources) as Result.Failed).failure.code,
+            )
+        }
+    }
+
+    @Test
     fun attendanceRequiresExplicitSelectionAndAnOwnedReadGrant() {
         for (grant in listOf("attendance.self.record", "workforce.read")) {
             assertEquals(

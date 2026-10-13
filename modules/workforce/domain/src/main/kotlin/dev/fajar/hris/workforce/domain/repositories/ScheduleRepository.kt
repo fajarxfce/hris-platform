@@ -9,6 +9,10 @@ import java.util.UUID
 interface ScheduleRepository {
     fun lock(companyId: UUID, shared: Boolean = false): Result<Unit>
 
+    fun workSchedule(companyId: UUID, id: UUID): Result<WorkScheduleRecord?>
+
+    fun rosterDay(companyId: UUID, id: UUID): Result<RosterRecord?>
+
     fun findShift(companyId: UUID, id: UUID): Result<ShiftDefinition?>
 
     fun shifts(

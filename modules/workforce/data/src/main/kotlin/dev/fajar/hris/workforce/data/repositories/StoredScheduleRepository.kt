@@ -20,6 +20,19 @@ class StoredScheduleRepository(
     private val holidaySource: HolidayDataSource,
     private val json: ObjectMapper,
 ) : ScheduleRepository {
+    override fun workSchedule(companyId: UUID, id: UUID): Result<WorkScheduleRecord?> =
+        safeDatabaseCall {
+            calendars.assignment(companyId, id)?.let {
+                WorkScheduleRecord(id, requireNotNull(it.employmentId), it.toAssignment(json))
+            }
+        }
+
+    override fun rosterDay(companyId: UUID, id: UUID): Result<RosterRecord?> = safeDatabaseCall {
+        calendars.rosterDay(companyId, id)?.let {
+            RosterRecord(requireNotNull(it.id), requireNotNull(it.employmentId), it.toRoster(json))
+        }
+    }
+
     override fun lock(companyId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
         calendars.lock(companyId, shared)
     }

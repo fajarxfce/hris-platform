@@ -14,6 +14,9 @@ The supported collections are:
 | `PAYROLL_PAYMENTS` | `payroll.self.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}/payments` |
 | `INBOX` (explicit selection) | `announcements.read` | Original recipient account only | `/api/v1/companies/{companyId}/inbox/{id}` |
 | `ATTENDANCE_DAYS` (explicit selection) | `attendance.self.record` or `workforce.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/attendance/days/{id}` |
+| `WORK_SCHEDULES` (explicit selection) | `attendance.self.record` or `workforce.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/me/schedules/{id}` |
+| `ROSTER_DAYS` (explicit selection) | `attendance.self.record` or `workforce.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/me/roster/{id}` |
+| `WORK_HOLIDAYS` (explicit selection) | `attendance.self.record` or `workforce.read` | Company calendar, only while the account owns an employment | `/api/v1/companies/{companyId}/workforce/me/holidays/{id}` |
 
 Balance projections have stable IDs and versions. A year closing can publish several versions of its source balance and a destination update in one transaction; fetching a reference returns the latest committed account. Empty accounts are exposed only after a movement or explicit closing. Adding a collection to the selected projection changes its scope fingerprint and requires bootstrap.
 
@@ -22,7 +25,7 @@ balance directory, so clients can hydrate a balance independently of a previousl
 opened directory page. These descriptive fields come from the current leave type;
 the balance version still identifies financial movements and closing state.
 
-All business-request statuses are included. Request cancellation or withdrawal is an `UPSERT` with a new version. Archiving an announcement withdraws its inbox items and produces `DELETE` references. Team/company administration rights do not grant an employee-wide export. Documents, schedules, approval inboxes, unfinalized payroll, and announcement-management records are not registered sync collections yet. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
+All business-request statuses are included. Request cancellation or withdrawal is an `UPSERT` with a new version. Archiving an announcement withdraws its inbox items and produces `DELETE` references. Team/company administration rights do not grant an employee-wide export. Documents, approval inboxes, unfinalized payroll, and announcement-management records are not registered sync collections yet. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
 
 Attendance days have stable projection IDs and versions independent of individual
 capture and correction revisions. A capture, review or correction advances the
@@ -43,6 +46,28 @@ fall between those steps. Lock acquisition fails after five seconds so an
 occupied deployment fails atomically and can be retried. Historical rows need no fabricated delta: bootstrap discovers
 them. Subsequent changes remain subject to ordinary after-commit publication.
 
+Calendar replication stores source records, independently of the week currently
+displayed. A work-schedule record has one stable ID per employee/effective date
+and points to that date's latest immutable assignment revision. Its version is
+the assignment revision, so gaps between versions are valid. A later effective
+date is another record; changing an earlier date retains its identity. The
+original shift snapshots remain embedded in the weekly pattern. Editing a shift
+template alone does not change previously assigned schedules.
+
+Roster records have stable IDs and their own versions. A null shift means an
+explicit day off; it is not a deleted record. Holidays retain inactive records
+as versioned updates, allowing a local calendar to remove the holiday's effect.
+Their shared company audience requires at least one owned employment and the
+same calendar read grant. It does not expose another employee's rules or roster,
+and `company.read` alone does not authorize this employee projection.
+
+Local calendar resolution uses the latest assignment effective on the selected
+date, then applies an active holiday, then a roster override. The embedded shift
+timezone governs work intervals, overnight shifts and daylight-saving gaps.
+These read inputs do not authorize attendance commands or replace the frozen
+schedule of already captured evidence. Bootstrap retains all effective dates;
+clients bound query/render work separately from stored history.
+
 Payslips reference immutable finalized assessments and have version `0`. Publication captures the entire run's references in one transaction; rollback or cancellation exposes none. The feed carries IDs, never salary amounts or calculation evidence. New collection authorization changes the scope fingerprint, so existing published assessments are discovered through a fresh bootstrap. Company-wide `payroll.read` does not grant employee sync; that projection requires `payroll.self.read`.
 
 Payroll payment references use the assessment ID, but belong to a separate collection and monotonically increasing progress version. Preparation, release, cancellation, and reconciliation capture changes atomically. A retry after a confirmed failure retains earlier attempts and advances the same progress resource. Bank destinations and transaction references are excluded from employee progress and sync. Before the first attempt, the canonical progress resource returns an empty version `0`; no payment reference is needed in bootstrap yet. Adding this collection to an existing selection requires a fresh bootstrap.
@@ -57,7 +82,7 @@ Mobile clients should send an explicit list of collections implemented by that c
 
 Persist the requested selection with the account/company partition and cursor, and send it on every page. Cursors bind the effective selection. Switching to another effective selection, or omitting a selection when the default would include more collections, returns `409 sync_scope_changed`; replace the local partition through bootstrap. Changing order or adding an unauthorized collection does not alter the effective projection. Current permission and ownership changes still invalidate scope independently.
 
-An explicit selection prevents a newly registered server collection from appearing automatically in an older client. A client upgrade that adds support for another collection explicitly changes its selection and replaces the partition. Omitting `collections` selects the original six collections intersected with current permissions. `INBOX` and `ATTENDANCE_DAYS` are excluded from that default even when authorized, preserving existing client projections and cursors. Their clients must select these collections explicitly.
+An explicit selection prevents a newly registered server collection from appearing automatically in an older client. A client upgrade that adds support for another collection explicitly changes its selection and replaces the partition. Omitting `collections` selects the original six collections intersected with current permissions. Inbox, Attendance and the three calendar source collections are excluded from that default even when authorized, preserving existing client projections and cursors. Their clients must select these collections explicitly.
 
 Clients with `leave.read` can explicitly request `LEAVE_REQUESTS,LEAVE_BALANCES`
 for their own records, matching the existing self-read endpoints. This does not

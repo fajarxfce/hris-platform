@@ -10,6 +10,9 @@ import dev.fajar.hris.schema.tables.MobileSyncHeads.MOBILE_SYNC_HEADS as H
 import dev.fajar.hris.schema.tables.OvertimeRequests.OVERTIME_REQUESTS as O
 import dev.fajar.hris.schema.tables.PayrollAssessments.PAYROLL_ASSESSMENTS as P
 import dev.fajar.hris.schema.tables.PayrollPaymentHeads.PAYROLL_PAYMENT_HEADS as S
+import dev.fajar.hris.schema.tables.RosterDays.ROSTER_DAYS as R
+import dev.fajar.hris.schema.tables.WorkHolidays.WORK_HOLIDAYS as W
+import dev.fajar.hris.schema.tables.WorkScheduleSyncHeads.WORK_SCHEDULE_SYNC_HEADS as T
 import dev.fajar.hris.schema.tables.records.*
 import dev.fajar.hris.sync.data.models.*
 import dev.fajar.hris.sync.data.queries.syncAudience
@@ -126,6 +129,42 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                     A.EMPLOYMENT_ID.`in`(selection.employmentIds),
                     DSL.inline("ATTENDANCE_DAYS").`in`(selection.collections),
                 )
+        val schedules =
+            sql.select(
+                    DSL.inline("WORK_SCHEDULES").`as`("collection"),
+                    T.ID.`as`("resource_id"),
+                    T.REVISION.`as`("resource_version"),
+                )
+                .from(T)
+                .where(
+                    T.COMPANY_ID.eq(selection.companyId),
+                    T.EMPLOYMENT_ID.`in`(selection.employmentIds),
+                    DSL.inline("WORK_SCHEDULES").`in`(selection.collections),
+                )
+        val roster =
+            sql.select(
+                    DSL.inline("ROSTER_DAYS").`as`("collection"),
+                    R.ID.`as`("resource_id"),
+                    R.VERSION.`as`("resource_version"),
+                )
+                .from(R)
+                .where(
+                    R.COMPANY_ID.eq(selection.companyId),
+                    R.EMPLOYMENT_ID.`in`(selection.employmentIds),
+                    DSL.inline("ROSTER_DAYS").`in`(selection.collections),
+                )
+        val holidays =
+            sql.select(
+                    DSL.inline("WORK_HOLIDAYS").`as`("collection"),
+                    W.ID.`as`("resource_id"),
+                    W.VERSION.`as`("resource_version"),
+                )
+                .from(W)
+                .where(
+                    W.COMPANY_ID.eq(selection.companyId),
+                    DSL.condition(selection.employmentIds.isNotEmpty()),
+                    DSL.inline("WORK_HOLIDAYS").`in`(selection.collections),
+                )
         val records =
             expenses
                 .unionAll(leaves)
@@ -135,6 +174,9 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                 .unionAll(payments)
                 .unionAll(inbox)
                 .unionAll(attendance)
+                .unionAll(schedules)
+                .unionAll(roster)
+                .unionAll(holidays)
                 .asTable("sync_resources")
         val collection = requireNotNull(records.field("collection", String::class.java))
         val id = requireNotNull(records.field("resource_id", UUID::class.java))

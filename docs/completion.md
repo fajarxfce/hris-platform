@@ -82,7 +82,10 @@ The backend now exposes an explicit `ATTENDANCE_DAYS` change feed and an owned
 canonical daily record. Captures, reviews and corrections advance one projection
 version without rewriting original evidence or correction command versions.
 The upgrade backfills every existing evidence day and serializes with in-flight
-writes. Mobile integration and local calendar derivation are still in progress.
+writes. The three calendar source collections now provide effective weekly rules,
+daily rosters and company holidays, including embedded shift snapshots. Only owned
+employment admits the shared holiday feed; employee-specific sources remain scoped
+to the account. Mobile integration and local calendar derivation are in progress.
 The [native overtime workflows](https://github.com/fajarxfce/hris-mobile/commit/b58caf8)
 now add reviewed-calendar planning, actual-time submission and withdrawal. Immutable
 encrypted commands retain original input and operation keys across response loss,

@@ -52,3 +52,16 @@ fun ScheduledDay.toResponse(): ScheduledDayResponse =
 
 fun WorkHoliday.toResponse(): WorkHolidayResponse =
     WorkHolidayResponse(id, workDate, name, active, version)
+
+fun ScheduleAssignment.toResponse(): ScheduleAssignmentResponse =
+    ScheduleAssignmentResponse(
+        effectiveFrom,
+        revision,
+        days.mapKeys { it.key.name }.mapValues { it.value.toResponse() },
+    )
+
+fun WorkScheduleRecord.toResponse(): WorkScheduleRecordResponse =
+    WorkScheduleRecordResponse(id, employeeId, assignment.revision, assignment.toResponse())
+
+fun RosterRecord.toResponse(): RosterRecordResponse =
+    RosterRecordResponse(id, employeeId, day.version, day.workDate, day.shift?.toResponse())

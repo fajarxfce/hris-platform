@@ -7,6 +7,10 @@ import java.util.UUID
 interface CalendarDataSource {
     fun lock(companyId: UUID, shared: Boolean)
 
+    fun assignment(companyId: UUID, id: UUID): ScheduleAssignmentsRecord?
+
+    fun rosterDay(companyId: UUID, id: UUID): RosterDaysRecord?
+
     fun scheduleVersion(companyId: UUID, employeeId: UUID): Long?
 
     fun insertScheduleVersion(companyId: UUID, employeeId: UUID)

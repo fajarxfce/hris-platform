@@ -29,6 +29,72 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class WorkforceConfiguration {
     @Bean
+    fun ownedWorkSchedule(
+        schedules: ScheduleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetOwnedWorkSchedule(
+            schedules,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun ownedRosterDay(
+        schedules: ScheduleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetOwnedRosterDay(
+            schedules,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun ownedWorkHoliday(
+        schedules: ScheduleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetOwnedWorkHoliday(
+            schedules,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun overtimePlanningEmployees(
         people: PeopleRepository,
         companies: CompanyRepository,

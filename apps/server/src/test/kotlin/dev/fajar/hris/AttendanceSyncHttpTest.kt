@@ -21,10 +21,15 @@ class AttendanceSyncHttpTest : WorkforceAccessApiFixture() {
         val root = "/api/v1/companies/${f.company}"
         val initial = body(get(f.employeeClient, "$root/sync/bootstrap?collections=$selection"))
         assertEquals(
-            listOf("ATTENDANCE_DAYS"),
-            initial["collections"].iterator().asSequence().map { it.asString() }.toList(),
+            setOf("ATTENDANCE_DAYS", "WORK_SCHEDULES", "ROSTER_DAYS", "WORK_HOLIDAYS"),
+            initial["collections"].iterator().asSequence().map { it.asString() }.toSet(),
         )
-        val id = initial["items"][0]["id"].asString()
+        val id =
+            initial["items"]
+                .iterator()
+                .asSequence()
+                .first { it["collection"].asString() == "ATTENDANCE_DAYS" }["id"]
+                .asString()
         for ((version, disabled) in listOf(null to listOf("WORKFORCE"), 0L to emptyList())) {
             body(
                 command(
@@ -48,7 +53,7 @@ class AttendanceSyncHttpTest : WorkforceAccessApiFixture() {
             for (path in
                 listOf(
                     syncPath(f, "bootstrap"),
-                    syncPath(f, "changes") +
+                    "$root/sync/changes?collections=$selection" +
                         "&cursor=" +
                         encoded(initial["changesCursor"].asString()),
                     "${f.path}/attendance/days/$id",

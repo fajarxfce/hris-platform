@@ -3065,3 +3065,12 @@ the real Room 9-to-10 upgrade preserved encrypted Inbox records and displayed th
 after an offline cold start. Connectivity was restored. The validated mobile APK
 was installed on the authorized phone after notice using install-only mode;
 the app was not opened. Leave integration with these local queries remains pending.
+
+## Payment browser return navigation
+
+The expense-payment filter scenario now waits for the returned directory rows
+before counting requests. CI had counted the pending navigation request as a
+filter edit. The test holds that request explicitly, verifies the pending view,
+and still requires an explicit Apply action before edited filters request data.
+All 12 payment Chromium scenarios passed against the production build, together
+with TypeScript and the focused formatting check. No application behavior changed.

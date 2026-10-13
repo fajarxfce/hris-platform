@@ -22,8 +22,16 @@ test("finance directory filters, paging and return preserve explicit search", as
   await expect(page.getByRole("region", { name: "Payment batch", exact: true })).toContainText(
     "450,002.25",
   );
-  await page.getByRole("link", { name: "Expense payments", exact: true }).last().click();
-  await expect(page).toHaveURL(`${directory}&after=${expenseIdentifier(80020)}`);
+  const returningList = api.holdNext("list");
+  try {
+    await page.getByRole("link", { name: "Expense payments", exact: true }).last().click();
+    await expect(page).toHaveURL(`${directory}&after=${expenseIdentifier(80020)}`);
+    await returningList.entered;
+    await expect(table).toHaveCount(0);
+  } finally {
+    returningList.release();
+  }
+  await expect(table.getByRole("row")).toHaveCount(4);
   const before = api.reads.length;
   await page.getByRole("combobox", { name: "Status", exact: true }).selectOption("CANCELLED");
   expect(api.reads).toHaveLength(before);

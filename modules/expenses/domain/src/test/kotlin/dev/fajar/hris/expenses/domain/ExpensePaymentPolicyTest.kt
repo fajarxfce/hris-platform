@@ -58,6 +58,30 @@ class ExpensePaymentPolicyTest {
         )
 
     @Test
+    fun payablePreparationHintsExcludeEveryMakerAndBothBeneficiaryIdentities() {
+        val independent = setOf(ExpensePayableAvailableAction.PREPARE)
+        assertEquals(independent, expensePayableAvailableActions(actor, payable))
+        for (excluded in
+            payable.makerIds +
+                setOf(
+                    requireNotNull(payable.requesterId),
+                    requireNotNull(payable.currentAccountId),
+                )) {
+            assertEquals(
+                emptySet<ExpensePayableAvailableAction>(),
+                expensePayableAvailableActions(excluded, payable),
+            )
+        }
+        assertEquals(
+            independent,
+            expensePayableAvailableActions(
+                actor,
+                payable.copy(requesterId = null, currentAccountId = null),
+            ),
+        )
+    }
+
+    @Test
     fun preparationExposesReleaseOnlyToAnIndependentOperatorOtherThanThePreparer() {
         val prepared =
             batch.copy(

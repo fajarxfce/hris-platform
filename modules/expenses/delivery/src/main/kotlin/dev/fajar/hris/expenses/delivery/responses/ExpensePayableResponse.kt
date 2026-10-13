@@ -13,4 +13,5 @@ data class ExpensePayableResponse(
     val amount: String,
     val currency: String,
     val approvedAt: Instant,
+    val availableActions: Set<String>,
 )

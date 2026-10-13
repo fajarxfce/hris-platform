@@ -34,17 +34,18 @@ fun ExpensePaymentResultRequest.toResult() =
         confirmedNoTransfer,
     )
 
-fun ExpensePayable.toResponse() =
+fun ExpensePayableReview.toResponse() =
     ExpensePayableResponse(
-        claimId,
-        submissionId,
-        employmentId,
-        employeeNumber,
-        employeeName,
-        title,
-        amount.toPlainString(),
+        payable.claimId,
+        payable.submissionId,
+        payable.employmentId,
+        payable.employeeNumber,
+        payable.employeeName,
+        payable.title,
+        payable.amount.toPlainString(),
         "IDR",
-        approvedAt,
+        payable.approvedAt,
+        availableActions.map { it.name }.toSet(),
     )
 
 fun ExpensePaymentBatch.toResponse() =

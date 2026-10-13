@@ -2793,3 +2793,24 @@ using their original operation. The first result left another payment pending;
 confirmed no-transfer failure closed the batch. Stored history/results, CSV
 eligibility, foreign-company denial and finance revocation remained correct.
 The fixture owns its database; no bank transfer or phone update occurred.
+
+## Payable preparation availability
+
+Finance payable rows now include a domain-derived `availableActions` projection.
+An independent operator receives `PREPARE`; historical makers and either the
+submitted or currently linked beneficiary receive no preparation action. The
+shared resource/access guards and final assurance check cover that projection.
+Internal actor evidence remains private, and row/cursor pagination is unchanged.
+The preparation command still rechecks authority, independence and reservations.
+
+Twenty expense domain tests passed. Eighty distinct API/PostgreSQL tests passed
+across the selected run and the focused read rerun, including 23 API contract
+tests. The new cases cover independent versus beneficiary hints, unchanged
+pagination, private actor fields and a real account-link change that withdraws
+both the hint and command permission. Existing shared-read, revocation, expiry,
+replay and competing payment checks remain covered. Architecture, formatting and
+the API JAR build passed. Dashboard preparation is the next delivery increment.
+
+The development API image was rebuilt and updated using the existing document
+and WireGuard Compose overrides. API readiness and the development dashboard both
+returned HTTP 200 on their private WireGuard addresses.

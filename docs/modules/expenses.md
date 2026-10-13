@@ -250,6 +250,13 @@ the editor lifecycle.
 
 `GET /expenses/payments/payables?from=YYYY-MM-DD&until=YYYY-MM-DD` lists approved claims without an unresolved or successful payment reservation. `PUT /expenses/payments/{id}` prepares an immutable batch of one to 100 instructions with stable item IDs, submission IDs, bank codes, account numbers/names, title, reason, and idempotency key. Finance supplies independently verified destinations for this batch; it does not change a person's profile or define a reusable bank-account master. Claim amounts and employee labels come from the approved submission, not the request. All amounts are IDR decimal strings.
 
+Payable rows include `availableActions`: `PREPARE` for an independent operator,
+otherwise an empty set. This guarded read projection covers every historical
+maker and both the submitted and current beneficiary identities. It preserves
+the date/cursor page and does not disclose those internal actor IDs. It is a
+display hint; preparation still rechecks current independence, reservations and
+capacity when the command executes.
+
 Preparation reserves each claim. A database unique constraint prevents a claim from appearing in another prepared/pending/successful instruction, even under competing requests. Original makers, the frozen beneficiary, and the currently linked beneficiary cannot prepare, release, or reconcile their own claims. Payment instructions preserve their original destinations, amounts, and evidence. A correction requires cancellation of the prepared batch and a new batch.
 
 `POST /expenses/payments/{id}/release` requires an expected batch version, reason, idempotency key, and an operator different from the preparer. It changes the batch to `RELEASED` and its items to `PENDING`. `POST .../{id}/cancel` is limited to `PREPARED` and releases its reservations. A released batch cannot be cancelled because a bank instruction may already be in progress. There are at most 100 open and 10,000 total batches per company, and twenty preparation attempts per claim.

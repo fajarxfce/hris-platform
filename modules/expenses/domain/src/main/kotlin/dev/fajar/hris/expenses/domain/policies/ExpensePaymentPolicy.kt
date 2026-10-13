@@ -60,6 +60,15 @@ fun validateExpensePaymentIndependence(
     else Result.Success(Unit)
 
 /** Read projection only; each command independently rechecks current authority and evidence. */
+fun expensePayableAvailableActions(
+    actorId: UUID,
+    payable: ExpensePayable,
+): Set<ExpensePayableAvailableAction> =
+    if (validateExpensePaymentIndependence(actorId, listOf(payable)) is Result.Success)
+        setOf(ExpensePayableAvailableAction.PREPARE)
+    else emptySet()
+
+/** Read projection only; each command independently rechecks current authority and evidence. */
 fun expensePaymentAvailableActions(
     actorId: UUID,
     batch: ExpensePaymentBatch,

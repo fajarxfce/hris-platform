@@ -28,7 +28,7 @@ class ListExpensePayables(
         until: LocalDate,
         after: UUID?,
         limit: Int,
-    ): Result<Page<ExpensePayable>> {
+    ): Result<Page<ExpensePayableReview>> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
@@ -75,7 +75,16 @@ class ListExpensePayables(
                     limit,
                 )
                 .flatMap { page ->
-                    validateExpensePaymentAccess(live, clock.instant(), security).map { page }
+                    val reviewed =
+                        page.items.map { payable ->
+                            ExpensePayableReview(
+                                payable,
+                                expensePayableAvailableActions(live.accountId, payable),
+                            )
+                        }
+                    validateExpensePaymentAccess(live, clock.instant(), security).map {
+                        Page(reviewed, page.nextCursor)
+                    }
                 }
         }
     }

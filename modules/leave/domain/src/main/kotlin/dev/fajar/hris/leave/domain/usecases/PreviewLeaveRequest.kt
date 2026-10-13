@@ -16,7 +16,7 @@ import dev.fajar.hris.workforce.domain.repositories.ScheduleRepository
 import java.time.*
 import java.util.UUID
 
-class PreviewSelfLeaveRequest(
+class PreviewLeaveRequest(
     private val requests: LeaveRequestRepository,
     private val ledger: LeaveLedgerRepository,
     private val policies: LeavePolicyRepository,
@@ -35,9 +35,12 @@ class PreviewSelfLeaveRequest(
         employeeId: UUID,
         typeId: UUID,
         days: List<RequestedLeaveDay>,
+        scope: LeavePreparationScope = LeavePreparationScope.SELF,
     ): Result<LeaveRequestPreview> {
-        if ("leave.self.manage" !in actor.permissions)
-            return Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
+        val permission =
+            if (scope == LeavePreparationScope.SELF) "leave.self.manage" else "leave.manage"
+        val admitted = actor.requirePermission(permission)
+        if (admitted is Result.Failed) return admitted
         val valid = validateLeaveDateSelection(days)
         if (valid is Result.Failed) return valid
         val company =
@@ -62,13 +65,14 @@ class PreviewSelfLeaveRequest(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
-            if ("leave.self.manage" !in (checked as Result.Success).value.permissions)
-                return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
+            val permissionAfterWait =
+                (checked as Result.Success).value.requirePermission(permission)
+            if (permissionAfterWait is Result.Failed) return@run permissionAfterWait
 
             val now = clock.instant()
             val settings =
@@ -81,13 +85,25 @@ class PreviewSelfLeaveRequest(
                             )
                 }
             val today = now.atZone(ZoneId.of(settings.timezone)).toLocalDate()
-            val current =
-                when (val result = people.find(company, employeeId, today)) {
+            val employee =
+                when (val result = people.find(company, employeeId, until)) {
                     is Result.Failed -> return@run result
                     is Result.Success -> result.value
                 }
-            if (current?.person?.accountId != actor.accountId || !current.terms.isWorkingOn(today))
+            if (employee == null)
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
+            if (scope == LeavePreparationScope.SELF) {
+                val current =
+                    when (val result = people.find(company, employeeId, today)) {
+                        is Result.Failed -> return@run result
+                        is Result.Success -> result.value
+                    }
+                if (
+                    current?.person?.accountId != actor.accountId ||
+                        !current.terms.isWorkingOn(today)
+                )
+                    return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
+            }
             val frozen =
                 cutoffs.frozenMonths(
                     company,
@@ -140,7 +156,7 @@ class PreviewSelfLeaveRequest(
                 balances += LeavePreviewBalance(value, movement.reservedDelta)
             }
             val included = charged.map { it.workDate }.toSet()
-            Result.Success(
+            val result =
                 LeaveRequestPreview(
                     employeeId,
                     now,
@@ -159,7 +175,7 @@ class PreviewSelfLeaveRequest(
                         balances,
                     ),
                 )
-            )
+            validateCompanySessionActor(actor, access, clock.instant(), security).map { result }
         }
     }
 }

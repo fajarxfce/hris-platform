@@ -2937,3 +2937,37 @@ and resubmission retained the original item IDs and previous evidence. A separat
 claim was submitted, withdrawn and cancelled; lost withdrawal/cancellation
 responses replayed once, preserving four distinct versioned history entries and
 the cancelled approval. No phone update or release was required for this increment.
+
+## Administrative leave request preparation
+
+Leave management now has bounded employee discovery, published personal-evidence
+selection and administrative request preview. These capabilities require original
+and current `leave.manage`; they expose only the metadata needed for request entry.
+People, Workforce and Documents screen availability does not control Leave's
+admission. Evidence selection grants no unsubmitted file-content access.
+
+Administrative and employee previews share the domain preparation use case and
+submission policies. The `/me` route retains explicit account ownership. An
+administrative preview may evaluate eligible historical employment even after it
+has ended. Dates, schedules, applicable policy, overlap, cutoffs and annual balance
+versions determine the reviewed content revision. Preview makes no reservation;
+submission independently validates that revision and retains original receipt
+recovery after later changes.
+
+Eighty-three distinct API/PostgreSQL tests passed across the selected run and
+focused HTTP rerun, including 25 contract tests and twenty new preparation/contract
+cases. They cover minimal payloads, bounded pages, company and employee isolation,
+document classification/publication, current and original grants, expiry during
+guard acquisition and after data acquisition, interrupted cleanup, unchanged
+employee-route scope, historical dates, stale preview and committed replay.
+The rerun corrected the upload fixture's clock and an assertion against a field
+intentionally absent from public mutation receipts.
+
+Twenty Leave domain tests, all 38 worker tests, architecture, formatting and the
+API JAR build passed. Worker validation includes the shared Leave DI changes.
+Dashboard request authoring follows this API increment; no mobile update or
+release was made.
+
+The development API image was rebuilt and restarted with the existing Documents
+and WireGuard Compose overrides. API and dashboard checks returned HTTP 200 at
+their private WireGuard addresses.

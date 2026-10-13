@@ -158,6 +158,12 @@ ownership. Its use case reuses pure submission policies and returns current fact
 without reserving a balance or constructing an approval. The employee route never
 broadens ownership through an administrative grant.
 
+Administrative leave preparation uses that same domain use case with an explicit
+scope and `leave.manage`. Minimal employee and published-evidence discovery also
+belong to Leave use cases coordinating People and Documents repository contracts;
+they do not grant general profile or file access. Shared resource/access guards
+retain scope, and all three reads recheck session assurance after acquisition.
+
 Interactive leave balance, ledger, and entitlement reads revalidate current session assurance after resource and access guards. Independent adjustments, entitlement posting, and year closing use the same post-acquisition check before mutation or original receipt replay. A proof that expires while waiting cannot authorize the later result; cancellation unwinds the transaction and releases its guards.
 
 The employee balance directory and ledger acquire a shared employee-ledger guard, then the shared policy, people, and access guards. The directory datasource returns a bounded account/type projection in one query. Its repository maps rows and pagination inside the database failure boundary; the use case owns current employee scope and assurance. Minimal labels do not expose administrative policy revision reasons or require unrelated people-administration grants.

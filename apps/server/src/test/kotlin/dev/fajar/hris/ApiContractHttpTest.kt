@@ -148,14 +148,16 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
-    fun selfLeavePreparationDocumentsItsBoundedReadWithoutAnIdempotencyRequirement() {
+    fun leavePreparationDocumentsItsBoundedReadsWithoutAnIdempotencyRequirement() {
         val api = contract()
-        val operation =
-            api["paths"]["/api/v1/companies/{companyId}/leave/me/requests/preview"]["post"]
-        assertTrue(operation["x-hris-company-admission"].asBoolean())
-        assertFalse(
-            operation.path("parameters").any { it.path("name").asString() == "Idempotency-Key" }
-        )
+        for (scope in listOf("requests", "me/requests")) {
+            val operation =
+                api["paths"]["/api/v1/companies/{companyId}/leave/$scope/preview"]["post"]
+            assertTrue(operation["x-hris-company-admission"].asBoolean())
+            assertFalse(
+                operation.path("parameters").any { it.path("name").asString() == "Idempotency-Key" }
+            )
+        }
         val days = api["components"]["schemas"]["LeavePreviewRequest"]["properties"]["days"]
         assertEquals(1, days["minItems"].asInt())
         assertEquals(366, days["maxItems"].asInt())
@@ -164,6 +166,54 @@ class ApiContractHttpTest : PeopleApiFixture() {
         assertTrue(response.has("balances"))
         assertTrue(response.has("evaluatedAt"))
         assertFalse(response.has("approval"))
+    }
+
+    @Test
+    fun administrativeLeavePreparationHasBoundedCompanyMetadataRoutes() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/leave/preparation/employees"
+        for (suffix in listOf("", "/{employeeId}/evidence")) {
+            val operation = api["paths"][base + suffix]["get"]
+            assertTrue(operation["x-hris-company-admission"].asBoolean())
+            val parameters =
+                operation["parameters"].iterator().asSequence().associateBy {
+                    it["name"].asString()
+                }
+            assertEquals(1, parameters.getValue("limit")["schema"]["minimum"].asInt())
+            assertEquals(50, parameters.getValue("limit")["schema"]["maximum"].asInt())
+            if (suffix.isEmpty()) {
+                assertEquals(120, parameters.getValue("query")["schema"]["maxLength"].asInt())
+                assertEquals(32, parameters.getValue("after")["schema"]["maxLength"].asInt())
+            }
+        }
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("companyDate", "timezone", "employees"),
+            schemas["LeavePreparationDirectoryResponse"]["properties"]
+                .properties()
+                .map { it.key }
+                .toSet(),
+        )
+        assertEquals(
+            setOf("id", "employeeNumber", "legalName", "status", "version"),
+            schemas["LeavePreparationEmployeeResponse"]["properties"]
+                .properties()
+                .map { it.key }
+                .toSet(),
+        )
+        assertEquals(
+            setOf(
+                "documentId",
+                "revisionId",
+                "revisionNumber",
+                "title",
+                "fileName",
+                "mediaType",
+                "size",
+                "validatedAt",
+            ),
+            schemas["LeaveEvidenceOptionResponse"]["properties"].properties().map { it.key }.toSet(),
+        )
     }
 
     @Test

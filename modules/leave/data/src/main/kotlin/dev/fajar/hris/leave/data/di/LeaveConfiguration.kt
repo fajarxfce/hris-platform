@@ -26,7 +26,49 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class LeaveConfiguration {
     @Bean
-    fun previewSelfLeaveRequest(
+    fun listLeavePreparationEmployees(
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListLeavePreparationEmployees(
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun listLeavePreparationEvidence(
+        documents: DocumentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListLeavePreparationEvidence(
+            documents,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun previewLeaveRequest(
         requests: LeaveRequestRepository,
         ledger: LeaveLedgerRepository,
         policies: LeavePolicyRepository,
@@ -40,7 +82,7 @@ class LeaveConfiguration {
         cutoffs: PayrollCutoffRepository,
         security: IdentitySecurityPolicy,
     ) =
-        PreviewSelfLeaveRequest(
+        PreviewLeaveRequest(
             requests,
             ledger,
             policies,

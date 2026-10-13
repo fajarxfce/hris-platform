@@ -67,7 +67,7 @@ class LeaveRequestAssuranceTest : ApprovalApiFixture() {
                 security,
             )
         val preview =
-            PreviewSelfLeaveRequest(
+            PreviewLeaveRequest(
                 requests,
                 ledger,
                 policies,
@@ -133,7 +133,7 @@ class LeaveRequestAssuranceTest : ApprovalApiFixture() {
         val f = leaveFixture()
         pending(f)
         val preview =
-            PreviewSelfLeaveRequest(
+            PreviewLeaveRequest(
                 requests,
                 ledger,
                 policies,

@@ -6,10 +6,11 @@ import dev.fajar.hris.leave.delivery.mappers.toResponse
 import dev.fajar.hris.leave.delivery.requests.LeavePreviewRequest
 import dev.fajar.hris.leave.delivery.responses.LeaveRequestPreviewResponse
 import dev.fajar.hris.leave.delivery.responses.LeaveRequestResponse
+import dev.fajar.hris.leave.domain.entities.LeavePreparationScope
 import dev.fajar.hris.leave.domain.entities.LeaveRequestReadScope
 import dev.fajar.hris.leave.domain.entities.RequestedLeaveDay
 import dev.fajar.hris.leave.domain.usecases.GetLeaveRequest
-import dev.fajar.hris.leave.domain.usecases.PreviewSelfLeaveRequest
+import dev.fajar.hris.leave.domain.usecases.PreviewLeaveRequest
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 import java.util.UUID
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/companies/{companyId}/leave/me/requests")
 class SelfLeaveRequestController(
     private val details: GetLeaveRequest,
-    private val preview: PreviewSelfLeaveRequest,
+    private val preview: PreviewLeaveRequest,
 ) {
     @PostMapping("/preview")
     fun preview(actor: Actor, @RequestBody body: LeavePreviewRequest): LeaveRequestPreviewResponse =
@@ -29,6 +30,7 @@ class SelfLeaveRequestController(
                 body.employeeId,
                 body.typeId,
                 body.days.map { RequestedLeaveDay(it.workDate, it.portion) },
+                LeavePreparationScope.SELF,
             )
             .response()
             .toResponse()

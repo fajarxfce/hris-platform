@@ -19,7 +19,21 @@ class LeaveRequestController(
     private val cancel: RequestLeaveCancellation,
     private val details: GetLeaveRequest,
     private val list: ListLeaveRequests,
+    private val preview: PreviewLeaveRequest,
 ) {
+    @PostMapping("/preview")
+    fun preview(actor: Actor, @RequestBody body: LeavePreviewRequest): LeaveRequestPreviewResponse =
+        preview
+            .execute(
+                actor,
+                body.employeeId,
+                body.typeId,
+                body.days.map { RequestedLeaveDay(it.workDate, it.portion) },
+                LeavePreparationScope.ADMINISTRATIVE,
+            )
+            .response()
+            .toResponse()
+
     @PostMapping
     fun submit(
         actor: Actor,

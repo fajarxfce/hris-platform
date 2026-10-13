@@ -94,6 +94,37 @@ Payroll cutoffs are integrated into request submission, decisions, withdrawal, a
 
 Automatic scheduling and carry-bucket expiry dates remain subsequent work. Current expiry occurs at explicit year closing; no expiry date or statutory entitlement is invented by a default policy.
 
+## Administrative request preparation
+
+`GET /leave/preparation/employees` supplies minimal company employee references
+for request entry. It requires current `leave.manage`, supports explicit search
+of at most 120 characters and pages by employee number with a maximum of fifty
+rows. The response includes the company-local date and timezone. It does not
+grant access to general People profiles.
+
+`GET /leave/preparation/employees/{employeeId}/evidence` pages the selected
+employee's current published `PERSONAL` revisions. It returns selection metadata
+without file contents, hashes, storage keys or inspection details. Other document
+classifications and employees are excluded. This capability does not authorize
+unsubmitted document downloads or personal-document administration.
+
+`POST /leave/requests/preview` evaluates an administrative date selection with
+`leave.manage`. It shares the domain preparation use case and pure submission
+policies with `/leave/me/requests/preview`. The employee route explicitly selects
+SELF and remains account-owned even if the caller also has administrative grants.
+Administrative preview can review applicable historical employment; it does not
+require the employee to be working today. Submission rechecks eligibility, scope,
+evidence, approval routing and the reviewed content revision before recording a
+request. Preview creates no reservation or business receipt.
+
+Discovery takes shared people, document (for evidence), company, membership and
+account guards. Preview retains its ledger/schedule/cutoff/policy/people/access
+ordering. Original and current permissions must both authorize acquisition;
+session assurance is checked again before returning acquired results. Cancellation
+releases transaction-owned guards. These routes use Leave company admission and
+remain available when unrelated People, Workforce or Documents screens are
+disabled. Browser request authoring follows this API capability.
+
 ## Employee application discovery
 
 `GET /api/v1/companies/{companyId}/leave/me/employments` returns the signed-in

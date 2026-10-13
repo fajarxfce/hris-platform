@@ -42,6 +42,113 @@ class ExpensePaymentPolicyTest {
             now.minusSeconds(60),
             listOf(item),
         )
+    private val payable =
+        ExpensePayable(
+            item.claimId,
+            item.submissionId,
+            item.employmentId,
+            item.employeeNumber,
+            item.employeeName,
+            "Travel",
+            item.amount,
+            now,
+            setOf(UUID.randomUUID()),
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+        )
+
+    @Test
+    fun preparationExposesReleaseOnlyToAnIndependentOperatorOtherThanThePreparer() {
+        val prepared =
+            batch.copy(
+                status = ExpensePaymentBatchStatus.PREPARED,
+                items = listOf(item.copy(status = ExpensePaymentItemStatus.PREPARED)),
+            )
+        assertEquals(
+            setOf(ExpensePaymentAvailableAction.CANCEL),
+            expensePaymentAvailableActions(actor, prepared, listOf(payable)),
+        )
+        assertEquals(
+            setOf(ExpensePaymentAvailableAction.RELEASE, ExpensePaymentAvailableAction.CANCEL),
+            expensePaymentAvailableActions(UUID.randomUUID(), prepared, listOf(payable)),
+        )
+    }
+
+    @Test
+    fun makersAndBeneficiariesCanReadReleasedInstructionsButCannotReconcileThem() {
+        for (excluded in
+            payable.makerIds +
+                setOf(
+                    requireNotNull(payable.requesterId),
+                    requireNotNull(payable.currentAccountId),
+                )) {
+            assertEquals(
+                setOf(ExpensePaymentAvailableAction.EXPORT),
+                expensePaymentAvailableActions(excluded, batch, listOf(payable)),
+            )
+            assertEquals(
+                setOf(ExpensePaymentAvailableAction.CANCEL),
+                expensePaymentAvailableActions(
+                    excluded,
+                    batch.copy(status = ExpensePaymentBatchStatus.PREPARED),
+                    listOf(payable),
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun partialReconciliationRemovesExportAndTerminalBatchesHaveNoCommands() {
+        val second =
+            item.copy(
+                id = UUID.randomUUID(),
+                claimId = UUID.randomUUID(),
+                submissionId = UUID.randomUUID(),
+            )
+        val candidates =
+            listOf(
+                payable,
+                payable.copy(claimId = second.claimId, submissionId = second.submissionId),
+            )
+        val allPending = batch.copy(itemCount = 2, items = listOf(item, second))
+        assertEquals(
+            setOf(ExpensePaymentAvailableAction.RECONCILE, ExpensePaymentAvailableAction.EXPORT),
+            expensePaymentAvailableActions(actor, allPending, candidates),
+        )
+        val partial =
+            allPending.copy(
+                items = listOf(item.copy(status = ExpensePaymentItemStatus.SUCCEEDED), second)
+            )
+        assertEquals(
+            setOf(ExpensePaymentAvailableAction.RECONCILE),
+            expensePaymentAvailableActions(actor, partial, candidates),
+        )
+        for (status in
+            listOf(
+                ExpensePaymentBatchStatus.CLOSED,
+                ExpensePaymentBatchStatus.CANCELLED,
+            )) assertEquals(
+            emptySet<ExpensePaymentAvailableAction>(),
+            expensePaymentAvailableActions(actor, partial.copy(status = status), candidates),
+        )
+    }
+
+    @Test
+    fun missingOrMismatchedEvidenceCannotExposeMoneyMovingCommands() {
+        val prepared =
+            batch.copy(status = ExpensePaymentBatchStatus.PREPARED, createdBy = UUID.randomUUID())
+        for (candidates in
+            listOf(emptyList(), listOf(payable.copy(submissionId = UUID.randomUUID())))) {
+            assertEquals(
+                setOf(ExpensePaymentAvailableAction.CANCEL),
+                expensePaymentAvailableActions(actor, prepared, candidates),
+            )
+            assertEquals(
+                setOf(ExpensePaymentAvailableAction.EXPORT),
+                expensePaymentAvailableActions(actor, batch, candidates),
+            )
+        }
+    }
 
     @Test
     fun instructionsBoundBankFieldsCountsAndStableIdentifiers() {

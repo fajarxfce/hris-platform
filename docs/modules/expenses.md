@@ -184,6 +184,21 @@ batch/item transition, bank-reference reservation, history, audit/outbox and ope
 receipt together. An acquisition failure retains its original classification.
 Renewing authentication permits explicit retry with the original command identity.
 
+`GET /expenses/payments/{id}/review` returns the batch and its immutable instructions,
+an ascending history page, reconciliation records and current `availableActions`
+under one shared aggregate/access guard. History uses `historyAfter` and
+`historyLimit` (default 50, maximum 200); a cursor beyond the current batch version
+is rejected after resource authorization. Reconciliation evidence is bounded by
+the batch's one hundred instructions. Paging rereads the current coherent batch;
+it does not retain a historical transaction snapshot across requests.
+
+Action availability distinguishes preparation cancellation, independent release,
+independent reconciliation, and export before the first reconciled item. Original
+makers and both beneficiary identities cannot release or reconcile their own
+claims; a batch preparer cannot release the batch. A partial reconciliation removes
+export availability, and closed/cancelled batches expose no actions. These display
+hints do not replace authorization, version or evidence checks on the commands.
+
 `GET /expenses/payments/payables?from=YYYY-MM-DD&until=YYYY-MM-DD` lists approved claims without an unresolved or successful payment reservation. `PUT /expenses/payments/{id}` prepares an immutable batch of one to 100 instructions with stable item IDs, submission IDs, bank codes, account numbers/names, title, reason, and idempotency key. Finance supplies independently verified destinations for this batch; it does not change a person's profile or define a reusable bank-account master. Claim amounts and employee labels come from the approved submission, not the request. All amounts are IDR decimal strings.
 
 Preparation reserves each claim. A database unique constraint prevents a claim from appearing in another prepared/pending/successful instruction, even under competing requests. Original makers, the frozen beneficiary, and the currently linked beneficiary cannot prepare, release, or reconcile their own claims. Payment instructions preserve their original destinations, amounts, and evidence. A correction requires cancellation of the prepared batch and a new batch.

@@ -705,6 +705,28 @@ class ExpenseConfiguration {
         )
 
     @Bean
+    fun getExpensePaymentReview(
+        payments: ExpensePaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetExpensePaymentReview(
+            payments,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun getExpensePaymentBatch(
         payments: ExpensePaymentRepository,
         people: PeopleRepository,

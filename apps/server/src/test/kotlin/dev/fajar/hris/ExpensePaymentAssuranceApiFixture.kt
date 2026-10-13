@@ -109,6 +109,18 @@ abstract class ExpensePaymentAssuranceApiFixture : ExpensePaymentApiFixture() {
     protected fun readPayment(scene: PaymentScenario, actor: Actor = scene.actor): Result<*> {
         val today = LocalDate.now(clock)
         return when (scene.action) {
+            "review" ->
+                GetExpensePaymentReview(
+                        payments,
+                        people,
+                        companies,
+                        members,
+                        identities,
+                        transactions,
+                        scene.security,
+                        clock,
+                    )
+                    .execute(actor, scene.batch, null, 20)
             "batch" ->
                 GetExpensePaymentBatch(
                         payments,

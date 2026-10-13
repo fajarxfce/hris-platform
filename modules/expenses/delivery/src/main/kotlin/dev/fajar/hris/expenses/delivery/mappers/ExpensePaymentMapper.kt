@@ -1,8 +1,17 @@
 package dev.fajar.hris.expenses.delivery.mappers
 
+import dev.fajar.hris.core.domain.Page
 import dev.fajar.hris.expenses.delivery.requests.*
 import dev.fajar.hris.expenses.delivery.responses.*
 import dev.fajar.hris.expenses.domain.entities.*
+
+fun ExpensePaymentReview.toResponse() =
+    ExpensePaymentReviewResponse(
+        batch.toResponse(),
+        Page(history.items.map { it.toResponse() }, history.nextCursor),
+        results.map { it.toResponse() },
+        availableActions.map { it.name }.toSet(),
+    )
 
 fun ExpensePaymentInstructionRequest.toInstruction() =
     ExpensePaymentInstruction(

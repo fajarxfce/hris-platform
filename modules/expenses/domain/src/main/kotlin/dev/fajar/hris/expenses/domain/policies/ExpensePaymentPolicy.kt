@@ -59,6 +59,38 @@ fun validateExpensePaymentIndependence(
         Result.Failed(Failure(FailureKind.FORBIDDEN, "independent_expense_payment_required"))
     else Result.Success(Unit)
 
+/** Read projection only; each command independently rechecks current authority and evidence. */
+fun expensePaymentAvailableActions(
+    actorId: UUID,
+    batch: ExpensePaymentBatch,
+    candidates: List<ExpensePayable>,
+): Set<ExpensePaymentAvailableAction> {
+    val completeEvidence =
+        candidates.size == batch.itemCount &&
+            candidates.map { it.submissionId }.toSet() ==
+                batch.items.map { it.submissionId }.toSet()
+    val independent =
+        completeEvidence &&
+            validateExpensePaymentIndependence(actorId, candidates) is Result.Success
+    return buildSet {
+        when (batch.status) {
+            ExpensePaymentBatchStatus.PREPARED -> {
+                if (independent && batch.createdBy != actorId)
+                    add(ExpensePaymentAvailableAction.RELEASE)
+                add(ExpensePaymentAvailableAction.CANCEL)
+            }
+            ExpensePaymentBatchStatus.RELEASED -> {
+                val pending = batch.items.count { it.status == ExpensePaymentItemStatus.PENDING }
+                if (independent && pending > 0) add(ExpensePaymentAvailableAction.RECONCILE)
+                if (pending > 0 && pending == batch.itemCount)
+                    add(ExpensePaymentAvailableAction.EXPORT)
+            }
+            ExpensePaymentBatchStatus.CLOSED,
+            ExpensePaymentBatchStatus.CANCELLED -> Unit
+        }
+    }
+}
+
 fun validateExpensePaymentResults(
     batch: ExpensePaymentBatch,
     results: List<ExpensePaymentResult>,

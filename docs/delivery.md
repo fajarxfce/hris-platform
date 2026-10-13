@@ -2674,3 +2674,20 @@ by recovery on the same executor. Existing payment bounds, reservations, indepen
 operators, concurrent writes, partial reconciliation, access revocation and shared
 read tests passed. This changes only expense domain behavior in the API; the worker
 dependency graph is unaffected.
+
+## Coherent expense payment review
+
+Added a finance-only batch review that acquires instructions, bounded ascending
+history, reconciliation records and action availability under one shared aggregate
+and access guard. The projection distinguishes cancellation, independent release,
+independent reconciliation and export before any item is reconciled. Commands
+retain their own authorization and version checks. History paging returns a new
+coherent current batch without mixing separate endpoint versions.
+
+Architecture, formatting, nineteen expense domain tests and API assembly passed.
+Sixty-four payment API/PostgreSQL cases and twenty-three API contract cases passed.
+Ten new cases cover partial/complete settlement, cursor bounds after authorization,
+ordinary and foreign scope denial, beneficiary exclusions, independent concurrent
+readers with a blocked release, access revocation during acquisition, late MFA or
+authentication expiry, failed acquisition and interruption cleanup. The worker
+does not import expense composition. The payment dashboard remains subsequent work.

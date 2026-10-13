@@ -40,6 +40,9 @@ class LeaveBalanceSyncHttpTest : LeaveAccountingApiFixture() {
                     )
                 )
             assertEquals(item["version"].asLong(), canonical["version"].asLong())
+            assertEquals("ANNUAL", canonical["typeCode"].asString())
+            assertEquals("Annual leave", canonical["typeName"].asString())
+            assertEquals(f.employee.toString(), canonical["employeeId"].asString())
         }
         assertEquals(
             403,

@@ -19,8 +19,18 @@ class PostgresLeaveLedgerDataSource(private val sql: DSLContext) : LeaveLedgerDa
         sql.query(statement, "leave:$company:$employee").execute()
     }
 
-    override fun account(company: UUID, id: UUID): LeaveAccountsRecord? =
-        sql.selectFrom(A).where(A.COMPANY_ID.eq(company)).and(A.ID.eq(id)).fetchOne()
+    override fun account(company: UUID, id: UUID): LeaveBalanceSummaryRow? {
+        val name = DSL.field("{0}->>'name'", String::class.java, R.DETAILS)
+        return sql.select(A.fields().toList() + listOf(T.CODE, name))
+            .from(A)
+            .join(T)
+            .on(T.COMPANY_ID.eq(A.COMPANY_ID).and(T.ID.eq(A.TYPE_ID)))
+            .join(R)
+            .on(R.COMPANY_ID.eq(T.COMPANY_ID).and(R.TYPE_ID.eq(T.ID)).and(R.REVISION.eq(T.VERSION)))
+            .where(A.COMPANY_ID.eq(company))
+            .and(A.ID.eq(id))
+            .fetchOne { LeaveBalanceSummaryRow(it.into(A), it[T.CODE], it[name]) }
+    }
 
     override fun balance(
         company: UUID,

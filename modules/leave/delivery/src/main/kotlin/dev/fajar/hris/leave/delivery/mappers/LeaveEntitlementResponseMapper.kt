@@ -14,6 +14,8 @@ fun LeaveAccount.toResponse(): LeaveAccountResponse =
         balance.consumedHalfDays.toLeaveDays(),
         balance.version,
         balance.closed,
+        typeCode,
+        typeName,
     )
 
 fun LeaveAccrualPosting.toResponse(): LeaveAccrualPostingResponse =

@@ -7,4 +7,6 @@ data class LeaveAccount(
     val employeeId: UUID,
     val typeId: UUID,
     val balance: LeaveBalance,
+    val typeCode: String,
+    val typeName: String,
 )

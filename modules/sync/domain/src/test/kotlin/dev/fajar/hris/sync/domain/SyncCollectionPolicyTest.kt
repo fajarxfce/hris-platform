@@ -8,6 +8,30 @@ import org.junit.jupiter.api.Test
 
 class SyncCollectionPolicyTest {
     @Test
+    fun readOnlyLeaveRequiresExplicitSelectionAndCannotAddOtherCollections() {
+        val permissions = setOf("leave.read", "payroll.read")
+        assertEquals(
+            "sync_access_denied",
+            (selectSyncCollections(permissions, null) as Result.Failed).failure.code,
+        )
+        assertEquals(
+            Result.Success(setOf(LEAVE_REQUESTS, LEAVE_BALANCES)),
+            selectSyncCollections(permissions, setOf(LEAVE_REQUESTS, LEAVE_BALANCES, PAYSLIPS)),
+        )
+        assertEquals(
+            Result.Success(setOf(LEAVE_REQUESTS)),
+            selectSyncCollections(permissions, setOf(LEAVE_REQUESTS)),
+        )
+        assertEquals(
+            "sync_access_denied",
+            (selectSyncCollections(setOf("leave.team.read"), setOf(LEAVE_REQUESTS))
+                    as Result.Failed)
+                .failure
+                .code,
+        )
+    }
+
+    @Test
     fun explicitClientSelectionDoesNotAutomaticallyGrowWithServerCollections() {
         val permissions = setOf("expenses.self.manage", "payroll.self.read")
         assertEquals(

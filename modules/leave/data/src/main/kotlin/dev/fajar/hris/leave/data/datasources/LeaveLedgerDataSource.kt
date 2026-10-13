@@ -8,7 +8,7 @@ import java.util.UUID
 interface LeaveLedgerDataSource {
     fun lock(company: UUID, employee: UUID, shared: Boolean)
 
-    fun account(company: UUID, id: UUID): LeaveAccountsRecord?
+    fun account(company: UUID, id: UUID): LeaveBalanceSummaryRow?
 
     fun balance(company: UUID, employee: UUID, type: UUID, year: Int): LeaveAccountsRecord?
 

@@ -3040,3 +3040,28 @@ After notice, the mobile APK was installed on the authorized Android 16 phone us
 install-only mode. No interaction with that phone's app was performed. Other business
 read projections, complete offline drafts and shared sync-status UI remain in the
 remaining delivery sequence; this is not a claim of complete local-first coverage.
+
+## Leave replica API preparation
+
+Canonical leave balances now carry their type code and name for independent
+hydration. Explicit Leave collection selection also admits the existing
+`leave.read` grant while retaining account-owned scope. Default feeds and team-only
+grants keep their preceding behavior. Tests exercise owned request/balance reads,
+colleague isolation, permission revocation, and existing MFA boundaries.
+
+Architecture and formatting checks passed, along with 20 Leave domain tests,
+10 synchronization policy tests, 29 selected HTTP/PostgreSQL tests, and 38 worker
+tests. Both application JARs built. A stale generated test delegate after the
+datasource return-type change required cleaning the server output; the unchanged
+authorization tests passed after recompilation. This was a focused backend run,
+not the complete server suite.
+
+[HRIS Mobile f76694f](https://github.com/fajarxfce/hris-mobile/commit/f76694f)
+and [Compose Fluent Starter d94c7f3](https://github.com/fajarxfce/compose-fluent-starter/commit/d94c7f3)
+provide atomic indexed replica queries and keyed filter tokens. Root checks and
+Android dev builds passed in both repositories, with 1,199 and 283 JVM/desktop
+tests respectively and 41 focused Chromium cases in each. On the API 35 emulator,
+the real Room 9-to-10 upgrade preserved encrypted Inbox records and displayed them
+after an offline cold start. Connectivity was restored. The validated mobile APK
+was installed on the authorized phone after notice using install-only mode;
+the app was not opened. Leave integration with these local queries remains pending.

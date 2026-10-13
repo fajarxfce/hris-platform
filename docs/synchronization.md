@@ -7,14 +7,19 @@ The supported collections are:
 | Collection | Required permission | Audience | Canonical resource |
 | --- | --- | --- | --- |
 | `EXPENSE_CLAIMS` | `expenses.self.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}` |
-| `LEAVE_REQUESTS` | `leave.self.manage` | Current account's employments or immutable request owner | `/api/v1/companies/{companyId}/leave/requests/{id}` |
-| `LEAVE_BALANCES` | `leave.self.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/leave/balances/{id}` |
+| `LEAVE_REQUESTS` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments or immutable request owner | `/api/v1/companies/{companyId}/leave/requests/{id}` |
+| `LEAVE_BALANCES` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/leave/balances/{id}` |
 | `OVERTIME_REQUESTS` | `overtime.self.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/overtime/{id}` |
 | `PAYSLIPS` | `payroll.self.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}` |
 | `PAYROLL_PAYMENTS` | `payroll.self.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}/payments` |
 | `INBOX` (explicit selection) | `announcements.read` | Original recipient account only | `/api/v1/companies/{companyId}/inbox/{id}` |
 
 Balance projections have stable IDs and versions. A year closing can publish several versions of its source balance and a destination update in one transaction; fetching a reference returns the latest committed account. Empty accounts are exposed only after a movement or explicit closing. Adding a collection to the selected projection changes its scope fingerprint and requires bootstrap.
+
+The canonical balance response includes `typeCode` and `typeName`, matching the
+balance directory, so clients can hydrate a balance independently of a previously
+opened directory page. These descriptive fields come from the current leave type;
+the balance version still identifies financial movements and closing state.
 
 All business-request statuses are included. Request cancellation or withdrawal is an `UPSERT` with a new version. Archiving an announcement withdraws its inbox items and produces `DELETE` references. Team/company administration rights do not grant an employee-wide export. Documents, attendance, schedules, approval inboxes, unfinalized payroll, and announcement-management records are not registered sync collections yet. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
 
@@ -33,6 +38,12 @@ Mobile clients should send an explicit list of collections implemented by that c
 Persist the requested selection with the account/company partition and cursor, and send it on every page. Cursors bind the effective selection. Switching to another effective selection, or omitting a selection when the default would include more collections, returns `409 sync_scope_changed`; replace the local partition through bootstrap. Changing order or adding an unauthorized collection does not alter the effective projection. Current permission and ownership changes still invalidate scope independently.
 
 An explicit selection prevents a newly registered server collection from appearing automatically in an older client. A client upgrade that adds support for another collection explicitly changes its selection and replaces the partition. Omitting `collections` selects the original six collections intersected with current permissions. `INBOX` is excluded from that default even when authorized, preserving existing client projections and cursors. An inbox client must request `collections=INBOX` or explicitly include it alongside its other supported collections.
+
+Clients with `leave.read` can explicitly request `LEAVE_REQUESTS,LEAVE_BALANCES`
+for their own records, matching the existing self-read endpoints. This does not
+change omitted-selection feeds or grant team/company exports. `leave.team.read`
+alone does not authorize these collections; current membership, ownership, MFA,
+and permission checks still apply to every feed and canonical-resource request.
 
 An empty set returns `422 invalid_sync_collections`; an unknown enum value returns `400 invalid_request`. A known selection with no authorized collection returns `403 sync_access_denied`. Correct unsupported/empty selections instead of retrying them unchanged. Nonselected records are excluded from snapshot, delta, and pending-publication responses.
 

@@ -1,5 +1,6 @@
 package dev.fajar.hris.leave.data.mappers
 
+import dev.fajar.hris.leave.data.models.LeaveBalanceSummaryRow
 import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.schema.tables.records.LeaveAccountsRecord
 
@@ -14,5 +15,12 @@ fun LeaveAccountsRecord.toBalance(): LeaveBalance =
         id,
     )
 
-fun LeaveAccountsRecord.toAccount(): LeaveAccount =
-    LeaveAccount(id, employmentId, typeId, toBalance())
+fun LeaveBalanceSummaryRow.toAccount(): LeaveAccount =
+    LeaveAccount(
+        account.id,
+        account.employmentId,
+        account.typeId,
+        account.toBalance(),
+        typeCode,
+        typeName,
+    )

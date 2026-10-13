@@ -13,4 +13,6 @@ data class LeaveAccountResponse(
     val consumedDays: String,
     val version: Long,
     val closed: Boolean,
+    val typeCode: String,
+    val typeName: String,
 )

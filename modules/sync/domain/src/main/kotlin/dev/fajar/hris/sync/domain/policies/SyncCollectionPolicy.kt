@@ -27,7 +27,13 @@ fun selectSyncCollections(
                 fields = mapOf("collections" to "required"),
             )
         )
-    val authorized = selfSyncCollections(permissions)
+    // The existing Leave read grant admits own-request reads too. An explicit
+    // selection enables that same owned projection without changing default feeds.
+    val authorized =
+        selfSyncCollections(permissions) +
+            if (requested != null && "leave.read" in permissions)
+                setOf(SyncCollection.LEAVE_REQUESTS, SyncCollection.LEAVE_BALANCES)
+            else emptySet()
     val selected = authorized.intersect(requested ?: defaultSyncCollections)
     if (selected.isEmpty())
         return Result.Failed(Failure(FailureKind.FORBIDDEN, "sync_access_denied"))

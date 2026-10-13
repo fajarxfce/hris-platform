@@ -11,6 +11,62 @@ import tools.jackson.databind.JsonNode
 
 @TestPropertySource(properties = [MOBILE_SYNC_TEST_KEYS])
 class MobileLeaveSyncHttpTest : LeaveApiFixture() {
+    @Test
+    fun explicitReadOnlyLeaveProjectionRemainsOwnedAndRevocationStopsItsCursor() {
+        val f = leaveFixture()
+        configureWorkAndApprovals(f)
+        body(adjust(f, "2"))
+        val id = UUID.randomUUID()
+        body(submit(f, id, listOf("2026-10-05" to "FULL")))
+        publish()
+        database()
+            .update(
+                "update membership_permissions set permission='leave.read' where company_id=? and account_id=? and permission='leave.self.manage'",
+                f.company,
+                f.account,
+            )
+        val path = "/api/v1/companies/${f.company}/sync"
+        val selection = "collections=LEAVE_REQUESTS,LEAVE_BALANCES"
+        assertEquals(403, get(f.worker, "$path/bootstrap").statusCode())
+        val snapshot = body(get(f.worker, "$path/bootstrap?$selection"))
+        val refs = snapshot["items"].iterator().asSequence().toList()
+        assertEquals(2, refs.size)
+        assertEquals(
+            id.toString(),
+            refs.single { it["collection"].asString() == "LEAVE_REQUESTS" }["id"].asString(),
+        )
+        val accountId =
+            refs.single { it["collection"].asString() == "LEAVE_BALANCES" }["id"].asString()
+        assertEquals(
+            f.employee.toString(),
+            body(get(f.worker, "/api/v1/companies/${f.company}/leave/balances/$accountId"))[
+                    "employeeId"]
+                .asString(),
+        )
+
+        // An HR read grant does not export a colleague's requests or balances through sync.
+        assertEquals(403, get(f.supervisor, "$path/bootstrap?$selection").statusCode())
+        database()
+            .update(
+                "insert into membership_permissions(company_id,account_id,permission) values(?,?,'leave.read')",
+                f.company,
+                f.managerAccount,
+            )
+        assertEquals(0, body(get(f.supervisor, "$path/bootstrap?$selection"))["items"].size())
+        val cursor = URLEncoder.encode(snapshot["changesCursor"].asString(), Charsets.UTF_8)
+        assertEquals(
+            0,
+            body(get(f.worker, "$path/changes?$selection&cursor=$cursor"))["items"].size(),
+        )
+        database()
+            .update(
+                "delete from membership_permissions where company_id=? and account_id=? and permission='leave.read'",
+                f.company,
+                f.account,
+            )
+        assertEquals(403, get(f.worker, "$path/changes?$selection&cursor=$cursor").statusCode())
+    }
+
     private fun body(response: HttpResponse<String>): JsonNode {
         assertEquals(200, response.statusCode(), response.body())
         return json.readTree(response.body())

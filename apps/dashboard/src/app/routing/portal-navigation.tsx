@@ -8,6 +8,7 @@ import {
   documentRetentionNavigation,
   documentsNavigation,
 } from "../../features/documents/presentation/navigation/documents-navigation";
+import { expenseNavigation } from "../../features/expenses/presentation/navigation/expense-navigation";
 import type { CompanyAccess } from "../../features/identity/domain/entities/session";
 import { identityNavigation } from "../../features/identity/presentation/navigation/identity-navigation";
 import { jobsNavigation } from "../../features/jobs/presentation/navigation/jobs-navigation";
@@ -44,7 +45,11 @@ export function portalNavigation(
     {
       id: "requests",
       label: text.navigationRequests,
-      items: [...leaveNavigation(access, locale), ...approvalsNavigation(access, locale)],
+      items: [
+        ...leaveNavigation(access, locale),
+        ...expenseNavigation(access, locale),
+        ...approvalsNavigation(access, locale),
+      ],
     },
     {
       id: "communications",

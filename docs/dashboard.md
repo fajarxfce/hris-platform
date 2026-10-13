@@ -12,6 +12,26 @@ Primary screens: organization and employee directory; roster and attendance exce
 
 Reference: https://learn.microsoft.com/en-us/azure/azure-portal/azure-portal-overview
 
+## Expense policies
+
+`/expenses/policies` provides a bounded directory of current saved category
+definitions, including future and inactive revisions. Status filters and code
+cursors remain scoped to the selected company. Detail keeps the latest definition
+separate from ascending immutable history; selecting a revision reads the acquired
+page and moves keyboard focus below the sticky header.
+
+Policy administration requires `expenses.policy.manage`. Creation and editing
+include exact decimal IDR limits, transaction age, eligible contracts, receipt and
+cost-center requirements, effective date and a reason. Codes remain immutable.
+An inactive revision takes effect on its stated date; saving a policy does not
+rewrite submitted claims or change effective-date selection.
+
+The editor retains one operation and observed version after response loss. Retry
+uses the same payload, including after a later rejection. A definite conflict
+requires protected reload of the current head. Account/company replacement aborts
+the owner and discards obsolete results. Drafts are held only in browser memory;
+locale and theme changes do not reacquire data or reset input.
+
 ## Shift templates
 
 The Workforce route owns a bounded shift directory, current details, and create/edit

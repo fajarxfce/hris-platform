@@ -595,6 +595,25 @@ a {
   margin: 0;
 }
 
+.app-expense-policy-editor .app-editor-form {
+  gap: 16px;
+}
+.app-expense-policy-editor .app-editor-form :is(h2, p) {
+  margin: 0;
+}
+.app-expense-policy-editor .app-editor-form h2 {
+  font-size: 18px;
+  padding-top: 8px;
+}
+.app-expense-policy-revision {
+  scroll-margin-top: 64px;
+}
+@media (max-width: 800px) {
+  .app-expense-policy-revision {
+    scroll-margin-top: 112px;
+  }
+}
+
 .app-document-retirement .app-editor-form {
   gap: 20px;
 }

@@ -12,6 +12,7 @@ import { createAdministrationFeature } from "../features/administration/di/admin
 import { createApprovalsFeature } from "../features/approvals/di/approvals-feature";
 import { createCommunicationsFeature } from "../features/communications/di/communications-feature";
 import { createDocumentsFeature } from "../features/documents/di/documents-feature";
+import { createExpenseFeature } from "../features/expenses/di/expense-feature";
 import { createIdentityFeature } from "../features/identity/di/identity-feature";
 import { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
 import { createJobsFeature } from "../features/jobs/di/jobs-feature";
@@ -39,6 +40,7 @@ const jobs = createJobsFeature(http);
 const files = createBrowserFiles();
 const documents = createDocumentsFeature(http, files, createBrowserFileInput(document));
 const leave = createLeaveFeature(http, files);
+const expense = createExpenseFeature(http);
 const organization = createOrganizationFeature(http);
 const workforce = createWorkforceFeature(http);
 const people = createPeopleFeature(http, files);
@@ -67,6 +69,7 @@ const router = createBrowserRouter([
           documents={documents}
           jobs={jobs}
           leave={leave}
+          expense={expense}
           organization={organization}
           workforce={workforce}
           people={people}

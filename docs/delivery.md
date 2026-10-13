@@ -2519,3 +2519,28 @@ before result delivery. Twelve expense domain tests, architecture and formatting
 passed; both bootJars built. The initial new tests required corrections for
 Jackson array iteration and an error response's echoed request path. Dashboard
 interaction is a separate increment.
+
+## Expense policy dashboard
+
+Added the administrative category directory, saved-definition details, ascending
+revision history and create/edit forms. Future and inactive policies remain
+visible without changing effective-date selection for claims. Limits retain exact
+decimal IDR values; policy codes and observed versions are protected. An uncertain
+save keeps one operation and payload through explicit recovery. Definite conflicts
+require a protected reload, and company replacement cancels obsolete reads.
+
+Dashboard architecture, formatting, TypeScript and 1,444 unit tests passed, including
+41 expense boundary/controller cases. Nine Chromium scenarios passed for filters,
+history, exact amounts, validation, uncertain recovery, conflicts, company
+replacement, access denial and retained input in Indonesian dark/narrow layout.
+The real API/PostgreSQL scenario created a policy, scheduled an inactive revision,
+dropped its committed response and recovered the same receipt. History contains
+one new revision, the old effective policy remains available for today's claims,
+and foreign-company review is rejected. Both API guards and the dashboard workflow
+run with MFA in their production paths.
+
+Visual inspection led to narrower desktop tables and an explicit revision-focus
+offset below the sticky header. Browser checks cover both. The production build
+passed with the existing main-bundle size advisory. Development API deployment
+includes the policy-save assurance fix and administrative read endpoints; external
+distribution and production performance are not claimed.

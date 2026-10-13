@@ -8,6 +8,7 @@ import type { AdministrationUseCases } from "../../features/administration/prese
 import type { ApprovalsUseCases } from "../../features/approvals/presentation/contracts/approvals-use-cases";
 import type { CommunicationsUseCases } from "../../features/communications/presentation/contracts/communications-use-cases";
 import type { DocumentsUseCases } from "../../features/documents/presentation/contracts/documents-use-cases";
+import type { ExpenseUseCases } from "../../features/expenses/presentation/contracts/expense-use-cases";
 import type {
   CompanyAccess,
   CompanyMembership,
@@ -311,6 +312,12 @@ const DocumentsRoutes = lazy(() =>
   })),
 );
 
+const ExpenseRoutes = lazy(() =>
+  import("../../features/expenses/presentation/navigation/expense-routes").then((module) => ({
+    default: module.ExpenseRoutes,
+  })),
+);
+
 export function PortalRoutes({
   clientBuild,
   accountId,
@@ -325,6 +332,7 @@ export function PortalRoutes({
   documents,
   jobs,
   leave,
+  expense,
   organization,
   workforce,
   people,
@@ -345,6 +353,7 @@ export function PortalRoutes({
   documents: DocumentsUseCases;
   jobs: JobsUseCases;
   leave: LeaveUseCases;
+  expense: ExpenseUseCases;
   organization: OrganizationUseCases;
   workforce: WorkforceUseCases;
   people: PeopleUseCases;
@@ -355,6 +364,22 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/expenses/*"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ExpenseRoutes
+              accountId={accountId}
+              access={access}
+              expense={expense}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/documents/*"
         element={

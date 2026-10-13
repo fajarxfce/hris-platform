@@ -2,6 +2,30 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_expense_policy: [
+    "Review the category requirements and amount limits.",
+    "Periksa persyaratan kategori dan batas nominal.",
+  ],
+  invalid_expense_category: [
+    "Review the category requirements and amount limits.",
+    "Periksa persyaratan kategori dan batas nominal.",
+  ],
+  expense_category_not_found: [
+    "This expense category is unavailable. Return to the policy list.",
+    "Kategori biaya tidak tersedia. Kembali ke daftar kebijakan.",
+  ],
+  expense_category_code_immutable: [
+    "The category code cannot be changed. Reload the current policy.",
+    "Kode kategori tidak dapat diubah. Muat ulang kebijakan terbaru.",
+  ],
+  expense_category_limit: [
+    "This company has reached its limit of 500 expense categories.",
+    "Perusahaan telah mencapai batas 500 kategori biaya.",
+  ],
+  expense_policy_revision_limit: [
+    "This category has reached its revision limit. Contact an administrator.",
+    "Kategori telah mencapai batas revisi. Hubungi administrator.",
+  ],
   invalid_document_retirement: [
     "Review the selected revision and provide a reason of up to 1,000 characters without line breaks.",
     "Periksa revisi yang dipilih dan isi alasan maksimal 1.000 karakter tanpa baris baru.",

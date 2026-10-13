@@ -35,6 +35,11 @@ resource/access guards, before returning an original receipt and before transact
 completion. Expired MFA rolls back the category revision, audit, outbox and receipt
 together. An explicit retry retains its original operation ID and body.
 
+The [administrative dashboard](../dashboard.md#expense-policies) provides category
+creation, versioned editing, status filters and revision review. Amount entry and
+display preserve decimal IDR precision. An uncertain browser save retains its
+original payload for explicit retry; changing company cancels its request owner.
+
 ## Employee reads
 
 `GET /expenses/cost-centers` provides active cost-center references for claim editing,

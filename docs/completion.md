@@ -44,13 +44,15 @@ and its durable queue. Employees has search and department filtering, and Inbox
 shows the full account-owned unread total. API 35 checks covered encrypted monthly
 offline restoration and explicit queued capture replay; the validated update was
 installed on the phone without interacting with its UI.
-The [mobile Leave replica](https://github.com/fajarxfce/hris-mobile/commit/5de87f0)
-stores balances and request summaries per record, with indexed local employment,
-year and status queries. API 35 acceptance covered offline upgrade from the
-preceding overview, change-feed acquisition, process restoration and offline
-filters. Protected reads stay gated across pending and failed retries; the
-validated update was installed on the phone without opening it. Full request
-details/activity still use their preceding last-view snapshot.
+The [mobile Leave replica](https://github.com/fajarxfce/hris-mobile/commit/24d0d99)
+stores balances, full requests and acquired activity pages per record, with indexed
+local employment, year and status queries. Older activity acquisition resumes from
+a stored per-request cursor without renewing action-review authority. API 35
+acceptance covered offline upgrade, change-feed acquisition, local filters and
+independent request details after process restart without connectivity. Protected
+reads stay gated across pending and failed retries; the validated update was
+installed on the phone without opening it. Older-page backfill and legacy detail
+compatibility are exercised by automated SQLite and IndexedDB tests.
 The [request creation flow](https://github.com/fajarxfce/hris-mobile/commit/7aa9bcd)
 adds effective leave types, date/portion selection, server-reviewed calculations
 and durable submission. API 35 checks covered excluded dates, balance reservations,

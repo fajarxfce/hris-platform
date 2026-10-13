@@ -3100,3 +3100,34 @@ passed all backend, dashboard and integration jobs for the supporting source cha
 Full Leave detail/activity replication, other collection migrations and unfinished
 offline drafts remain in the delivery sequence; this does not complete local-first
 coverage for the whole application.
+
+## Mobile Leave details and activity
+
+[HRIS Mobile 24d0d99](https://github.com/fajarxfce/hris-mobile/commit/24d0d99)
+extends the account-owned replica to complete request details and activity pages.
+Each request retains its own summary, header, dates and history, independently of
+the last opened page. The existing sync task backfills older activity with bounded
+work and atomic cursor publication. Cached history navigation uses local queries;
+fresh acquisitions share the worker's execution owner. Stale writes, deleted
+parents and replaced generations cannot reintroduce obsolete details. Activity
+acquisition does not extend a previous action-review deadline.
+
+Mobile root checks passed with 1,242 JVM/desktop tests, and the three Leave
+Chromium suites passed 178 tests. Android dev assembly passed. Migration tests
+cover old-format compatibility, interrupted staging and authoritative absence;
+SQLite and IndexedDB exercise independent requests, dense records, late writes,
+cancellation, cursor progress and resource cleanup.
+
+API 35 acceptance retained the old overview and summary ciphertext during an
+offline upgrade. The real API then populated five complete requests across 23
+published documents, with no pending generation. Two previously unopened details
+displayed their reasons, dates and activity after force-stop and offline restart;
+the first remained readable after visiting the second and another restart. The
+inspected crash buffer contained no fatal exception. Network access was restored
+and emulator data retained.
+
+After notice, the validated dev APK was installed on the Android 16 phone with
+install-only delivery. Its application was not opened or driven. This increment
+does not change backend behavior or shared starter foundations. Other business
+replicas, unfinished offline drafts and shared synchronization status remain in
+the delivery sequence.

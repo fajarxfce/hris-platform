@@ -22,7 +22,12 @@ class AttendanceController(
     private val review: ReviewAttendance,
     private val attendance: GetEmployeeAttendance,
     private val exceptions: ListAttendanceExceptions,
+    private val day: GetAttendanceDay,
 ) {
+    @GetMapping("/attendance/days/{id}")
+    fun day(actor: Actor, @PathVariable id: UUID): AttendanceRecordResponse =
+        day.execute(actor, id).response().toResponse()
+
     @GetMapping("/attendance/exceptions")
     fun exceptions(
         actor: Actor,

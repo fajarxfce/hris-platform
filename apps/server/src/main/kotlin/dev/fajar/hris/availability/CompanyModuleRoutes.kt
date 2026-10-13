@@ -24,10 +24,11 @@ val companyModulePackages: Map<String, CompanyModule> =
 
 fun requestedSyncModules(request: HttpServletRequest, actor: Actor): Result<Set<CompanyModule>> {
     val values = request.getParameterValues("collections")
-    if (values != null && (values.size > 7 || values.sumOf { it.length } > 200))
+    val maximumCollections = SyncCollection.entries.size
+    if (values != null && (values.size > maximumCollections || values.sumOf { it.length } > 200))
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_sync_collections"))
     val tokens = values?.flatMap { it.split(',').map(String::trim) }?.filter { it.isNotEmpty() }
-    if (tokens != null && tokens.size > 7)
+    if (tokens != null && tokens.size > maximumCollections)
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_sync_collections"))
     if (tokens?.any { name -> SyncCollection.entries.none { it.name == name } } == true)
         throw org.springframework.web.server.ResponseStatusException(
@@ -41,7 +42,8 @@ fun requestedSyncModules(request: HttpServletRequest, actor: Actor): Result<Set<
                     SyncCollection.EXPENSE_CLAIMS -> CompanyModule.EXPENSES
                     SyncCollection.LEAVE_REQUESTS,
                     SyncCollection.LEAVE_BALANCES -> CompanyModule.LEAVE
-                    SyncCollection.OVERTIME_REQUESTS -> CompanyModule.WORKFORCE
+                    SyncCollection.OVERTIME_REQUESTS,
+                    SyncCollection.ATTENDANCE_DAYS -> CompanyModule.WORKFORCE
                     SyncCollection.PAYSLIPS,
                     SyncCollection.PAYROLL_PAYMENTS -> CompanyModule.PAYROLL
                     SyncCollection.INBOX -> CompanyModule.COMMUNICATIONS

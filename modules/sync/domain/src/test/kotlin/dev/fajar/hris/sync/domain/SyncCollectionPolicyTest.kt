@@ -8,6 +8,33 @@ import org.junit.jupiter.api.Test
 
 class SyncCollectionPolicyTest {
     @Test
+    fun attendanceRequiresExplicitSelectionAndAnOwnedReadGrant() {
+        for (grant in listOf("attendance.self.record", "workforce.read")) {
+            assertEquals(
+                Result.Success(setOf(ATTENDANCE_DAYS)),
+                selectSyncCollections(setOf(grant), setOf(ATTENDANCE_DAYS)),
+            )
+            assertEquals(
+                "sync_access_denied",
+                (selectSyncCollections(setOf(grant), null) as Result.Failed).failure.code,
+            )
+        }
+        for (grant in
+            listOf("workforce.team.read", "attendance.verify", "attendance.team.verify")) {
+            assertEquals(
+                "sync_access_denied",
+                (selectSyncCollections(setOf(grant), setOf(ATTENDANCE_DAYS)) as Result.Failed)
+                    .failure
+                    .code,
+            )
+        }
+        assertEquals(
+            Result.Success(setOf(LEAVE_REQUESTS, LEAVE_BALANCES)),
+            selectSyncCollections(setOf("attendance.self.record", "leave.self.manage"), null),
+        )
+    }
+
+    @Test
     fun overtimeReadGrantsRequireExplicitSelectionAndKeepTheOwnedProjection() {
         for (grant in listOf("overtime.read", "overtime.manage", "workforce.read")) {
             val permissions = setOf(grant, "payroll.read")

@@ -3,6 +3,7 @@ package dev.fajar.hris.workforce.data.datasources
 import dev.fajar.hris.schema.tables.AttendanceCaptureWindows.ATTENDANCE_CAPTURE_WINDOWS as W
 import dev.fajar.hris.schema.tables.AttendanceEvents.ATTENDANCE_EVENTS as E
 import dev.fajar.hris.schema.tables.AttendanceReviews.ATTENDANCE_REVIEWS as R
+import dev.fajar.hris.schema.tables.AttendanceSyncHeads.ATTENDANCE_SYNC_HEADS as H
 import dev.fajar.hris.schema.tables.records.*
 import dev.fajar.hris.workforce.data.models.AttendanceExceptionRow
 import dev.fajar.hris.workforce.data.models.AttendanceRow
@@ -12,6 +13,9 @@ import java.util.UUID
 import org.jooq.DSLContext
 
 class PostgresAttendanceDataSource(private val sql: DSLContext) : AttendanceDataSource {
+    override fun dayHead(company: UUID, id: UUID): AttendanceSyncHeadsRecord? =
+        sql.selectFrom(H).where(H.COMPANY_ID.eq(company), H.ID.eq(id)).fetchOne()
+
     override fun exceptions(
         company: UUID,
         from: LocalDate,

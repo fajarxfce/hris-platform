@@ -37,6 +37,7 @@ fun selectSyncCollections(
         }
         if (permissions.any { it in setOf("overtime.read", "overtime.manage", "workforce.read") })
             authorized += SyncCollection.OVERTIME_REQUESTS
+        if ("workforce.read" in permissions) authorized += SyncCollection.ATTENDANCE_DAYS
     }
     val selected = authorized.intersect(requested ?: defaultSyncCollections)
     if (selected.isEmpty())

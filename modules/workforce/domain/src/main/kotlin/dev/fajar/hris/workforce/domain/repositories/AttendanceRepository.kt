@@ -7,6 +7,8 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface AttendanceRepository {
+    fun dayHead(companyId: UUID, id: UUID): Result<AttendanceDayHead?>
+
     fun exceptions(
         companyId: UUID,
         from: LocalDate,

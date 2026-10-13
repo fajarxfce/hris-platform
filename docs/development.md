@@ -4,7 +4,7 @@ Requires JDK 21, Docker, and Python 3. Gradle Wrapper pins the build tool. The d
 
 ## Backend checks
 
-Run ./gradlew check :apps:server:bootJar :apps:worker:bootJar. Query generation launches a temporary PostgreSQL container, applies all migrations, generates jOOQ types, and removes only its own container. Tests use Testcontainers against PostgreSQL. Test infrastructure never connects to the development database.
+Run ./gradlew check :apps:server:bootJar :apps:worker:bootJar. Query generation launches a temporary PostgreSQL container, applies each migration in its own transaction to match Flyway, generates jOOQ types, and removes only its own container. Tests use Testcontainers against PostgreSQL. Test infrastructure never connects to the development database.
 
 If Docker requires a group available through sudo, run the build as the same user with that group, for example sudo -n -u fajar -g docker ./gradlew check --no-daemon. Do not change Docker socket permissions. A previously running Gradle daemon may retain its old groups, hence --no-daemon.
 

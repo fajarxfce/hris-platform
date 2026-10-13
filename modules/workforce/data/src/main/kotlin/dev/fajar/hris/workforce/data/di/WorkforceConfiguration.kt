@@ -436,6 +436,30 @@ class WorkforceConfiguration {
         )
 
     @Bean
+    fun attendanceDay(
+        attendance: AttendanceRepository,
+        corrections: AttendanceCorrectionRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetAttendanceDay(
+            attendance,
+            corrections,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun employeeAttendance(
         attendance: AttendanceRepository,
         corrections: AttendanceCorrectionRepository,

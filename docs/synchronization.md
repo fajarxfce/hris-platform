@@ -13,6 +13,7 @@ The supported collections are:
 | `PAYSLIPS` | `payroll.self.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}` |
 | `PAYROLL_PAYMENTS` | `payroll.self.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}/payments` |
 | `INBOX` (explicit selection) | `announcements.read` | Original recipient account only | `/api/v1/companies/{companyId}/inbox/{id}` |
+| `ATTENDANCE_DAYS` (explicit selection) | `attendance.self.record` or `workforce.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/attendance/days/{id}` |
 
 Balance projections have stable IDs and versions. A year closing can publish several versions of its source balance and a destination update in one transaction; fetching a reference returns the latest committed account. Empty accounts are exposed only after a movement or explicit closing. Adding a collection to the selected projection changes its scope fingerprint and requires bootstrap.
 
@@ -21,7 +22,26 @@ balance directory, so clients can hydrate a balance independently of a previousl
 opened directory page. These descriptive fields come from the current leave type;
 the balance version still identifies financial movements and closing state.
 
-All business-request statuses are included. Request cancellation or withdrawal is an `UPSERT` with a new version. Archiving an announcement withdraws its inbox items and produces `DELETE` references. Team/company administration rights do not grant an employee-wide export. Documents, attendance, schedules, approval inboxes, unfinalized payroll, and announcement-management records are not registered sync collections yet. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
+All business-request statuses are included. Request cancellation or withdrawal is an `UPSERT` with a new version. Archiving an announcement withdraws its inbox items and produces `DELETE` references. Team/company administration rights do not grant an employee-wide export. Documents, schedules, approval inboxes, unfinalized payroll, and announcement-management records are not registered sync collections yet. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
+
+Attendance days have stable projection IDs and versions independent of individual
+capture and correction revisions. A capture, review or correction advances the
+same employee/date record and captures its invalidation in that business
+transaction. Bootstrap includes every day with captured or corrected evidence;
+it does not impose a recent-history cutoff. The canonical response contains the
+employee ID, projection version and the current daily summary with original
+capture schedules, review outcomes and the latest correction. It holds the
+shared day and current access guards while acquiring that coherent result.
+
+Empty dates have no attendance record. Scheduled days, holidays and absence
+metrics still require the calendar projection; this collection does not invent
+an absence or copy the latest schedule over captured evidence. The migration
+preserves existing evidence and correction command versions while assigning
+projection IDs. It waits for in-flight writers before backfilling, and retains
+the schema guards until change capture is installed; a concurrent commit cannot
+fall between those steps. Lock acquisition fails after five seconds so an
+occupied deployment fails atomically and can be retried. Historical rows need no fabricated delta: bootstrap discovers
+them. Subsequent changes remain subject to ordinary after-commit publication.
 
 Payslips reference immutable finalized assessments and have version `0`. Publication captures the entire run's references in one transaction; rollback or cancellation exposes none. The feed carries IDs, never salary amounts or calculation evidence. New collection authorization changes the scope fingerprint, so existing published assessments are discovered through a fresh bootstrap. Company-wide `payroll.read` does not grant employee sync; that projection requires `payroll.self.read`.
 
@@ -37,7 +57,7 @@ Mobile clients should send an explicit list of collections implemented by that c
 
 Persist the requested selection with the account/company partition and cursor, and send it on every page. Cursors bind the effective selection. Switching to another effective selection, or omitting a selection when the default would include more collections, returns `409 sync_scope_changed`; replace the local partition through bootstrap. Changing order or adding an unauthorized collection does not alter the effective projection. Current permission and ownership changes still invalidate scope independently.
 
-An explicit selection prevents a newly registered server collection from appearing automatically in an older client. A client upgrade that adds support for another collection explicitly changes its selection and replaces the partition. Omitting `collections` selects the original six collections intersected with current permissions. `INBOX` is excluded from that default even when authorized, preserving existing client projections and cursors. An inbox client must request `collections=INBOX` or explicitly include it alongside its other supported collections.
+An explicit selection prevents a newly registered server collection from appearing automatically in an older client. A client upgrade that adds support for another collection explicitly changes its selection and replaces the partition. Omitting `collections` selects the original six collections intersected with current permissions. `INBOX` and `ATTENDANCE_DAYS` are excluded from that default even when authorized, preserving existing client projections and cursors. Their clients must select these collections explicitly.
 
 Clients with `leave.read` can explicitly request `LEAVE_REQUESTS,LEAVE_BALANCES`
 for their own records, matching the existing self-read endpoints. This does not
@@ -50,6 +70,11 @@ explicitly select `OVERTIME_REQUESTS` for their own employment records. Omitted
 selection retains its existing permissions. An approver grant alone cannot
 select this collection, and an administrative read grant never widens its
 account-owned audience.
+
+Attendance selection also retains account ownership when `workforce.read` allows
+broader administrative reads elsewhere. Its canonical endpoint has the same
+owner-only scope. Team read/review grants alone do not authorize this collection;
+administrative attendance review continues to use its existing endpoints.
 
 An empty set returns `422 invalid_sync_collections`; an unknown enum value returns `400 invalid_request`. A known selection with no authorized collection returns `403 sync_access_denied`. Correct unsupported/empty selections instead of retrying them unchanged. Nonselected records are excluded from snapshot, delta, and pending-publication responses.
 

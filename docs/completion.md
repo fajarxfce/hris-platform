@@ -78,6 +78,11 @@ upgrade, real synchronization, independent request details after offline process
 restart, and local filters without rewriting ciphertext. Older activity acquisition
 and same-account reauthentication are covered by automated storage tests. The
 validated update was installed on the phone with install-only delivery.
+The backend now exposes an explicit `ATTENDANCE_DAYS` change feed and an owned
+canonical daily record. Captures, reviews and corrections advance one projection
+version without rewriting original evidence or correction command versions.
+The upgrade backfills every existing evidence day and serializes with in-flight
+writes. Mobile integration and local calendar derivation are still in progress.
 The [native overtime workflows](https://github.com/fajarxfce/hris-mobile/commit/b58caf8)
 now add reviewed-calendar planning, actual-time submission and withdrawal. Immutable
 encrypted commands retain original input and operation keys across response loss,

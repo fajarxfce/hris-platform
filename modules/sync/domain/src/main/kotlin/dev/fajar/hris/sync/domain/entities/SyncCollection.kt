@@ -8,4 +8,5 @@ enum class SyncCollection {
     PAYSLIPS,
     PAYROLL_PAYMENTS,
     INBOX,
+    ATTENDANCE_DAYS,
 }

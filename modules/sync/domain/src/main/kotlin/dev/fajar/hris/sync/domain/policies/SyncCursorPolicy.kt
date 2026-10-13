@@ -17,6 +17,7 @@ fun selfSyncCollections(permissions: Set<String>): Set<SyncCollection> = buildSe
     }
     if ("overtime.self.manage" in permissions) add(SyncCollection.OVERTIME_REQUESTS)
     if ("announcements.read" in permissions) add(SyncCollection.INBOX)
+    if ("attendance.self.record" in permissions) add(SyncCollection.ATTENDANCE_DAYS)
 }
 
 fun validateSyncCursor(

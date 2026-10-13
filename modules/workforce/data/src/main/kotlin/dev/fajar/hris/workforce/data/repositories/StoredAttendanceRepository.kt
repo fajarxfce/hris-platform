@@ -16,6 +16,10 @@ class StoredAttendanceRepository(
     private val source: AttendanceDataSource,
     private val json: ObjectMapper,
 ) : AttendanceRepository {
+    override fun dayHead(companyId: UUID, id: UUID): Result<AttendanceDayHead?> = safeDatabaseCall {
+        source.dayHead(companyId, id)?.toHead()
+    }
+
     override fun exceptions(
         companyId: UUID,
         from: LocalDate,

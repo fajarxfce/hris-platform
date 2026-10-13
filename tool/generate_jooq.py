@@ -29,7 +29,8 @@ try:
     else:
         raise RuntimeError("Temporary PostgreSQL did not start")
     for migration in sorted(Path(migration_dir).glob("V*__*.sql"), key=lambda p: int(p.name.split("__")[0][1:])):
-        run("exec", "-i", container, "psql", "-U", "postgres", "-d", "hris", "-v", "ON_ERROR_STOP=1",
+        # Match Flyway's per-migration transaction, including SET LOCAL and schema guards.
+        run("exec", "-i", container, "psql", "-U", "postgres", "-d", "hris", "-v", "ON_ERROR_STOP=1", "--single-transaction", "-f", "-",
             input=migration.read_bytes(), stdout=subprocess.DEVNULL)
     binding = run("port", container, "5432", capture_output=True, text=True).stdout.strip()
     port = binding.rsplit(":", 1)[1]

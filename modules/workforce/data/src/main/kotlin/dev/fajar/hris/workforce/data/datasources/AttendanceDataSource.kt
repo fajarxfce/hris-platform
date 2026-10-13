@@ -8,6 +8,8 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 interface AttendanceDataSource {
+    fun dayHead(company: UUID, id: UUID): AttendanceSyncHeadsRecord?
+
     fun exceptions(
         company: UUID,
         from: LocalDate,

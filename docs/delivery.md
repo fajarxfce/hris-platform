@@ -3182,3 +3182,20 @@ passed all backend, dashboard and integration jobs. No shared starter foundation
 changed in this feature-specific increment. Attendance,
 Expenses and Payslips replicas, unfinished offline drafts and shared sync-status
 presentation remain in the delivery sequence.
+
+### Attendance change-feed foundation
+
+`ATTENDANCE_DAYS` exposes account-owned, versioned daily evidence through explicit
+collection selection and a canonical day endpoint. Capture, review and correction
+write the invalidation in their business transaction; existing correction command
+versions remain independent. Bootstrap has no recent-history cutoff. The upgrade
+retains original evidence, waits for preceding writers before backfill, and keeps
+the same schema guards through trigger installation. Query generation now applies
+each SQL migration transactionally, matching Flyway.
+
+Architecture and format checks, both application JARs and 116 focused tests passed:
+16 database, 12 sync domain, 41 workforce domain, 9 server and 38 worker tests.
+The new cases cover populated upgrades with an in-flight writer, concurrent
+changes, rollback, exact command replay, original schedules, account/company
+isolation, collection availability, late MFA expiry and interrupted reads.
+Mobile Attendance/calendar replication is not part of this backend increment.

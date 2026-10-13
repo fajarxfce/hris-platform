@@ -3,6 +3,9 @@ package dev.fajar.hris.workforce.delivery.mappers
 import dev.fajar.hris.workforce.delivery.responses.*
 import dev.fajar.hris.workforce.domain.entities.*
 
+fun AttendanceRecord.toResponse(): AttendanceRecordResponse =
+    AttendanceRecordResponse(id, employeeId, version, day.toResponse())
+
 fun AttendanceException.toResponse(): AttendanceExceptionResponse =
     AttendanceExceptionResponse(
         employeeId,

@@ -56,6 +56,13 @@ Attendance capture, capture windows, verification, corrections, daily reads and
 correction history apply the same interactive assurance policy after their guards.
 An original receipt retains its data but still requires current session assurance.
 
+Canonical mobile attendance days acquire the shared day guard before people,
+company, membership and account guards. They reread the projection head after
+waiting, combine captured evidence with the latest correction under that guard,
+and revalidate session assurance before releasing the result. Account ownership
+narrows administrative read permission. Storage triggers maintain the separate
+daily sync version; event and correction command versions remain unchanged.
+
 Interactive monthly attendance closing, recovery, period lists and published
 snapshot reads use the same post-guard session policy. They recheck assurance
 after acquisition and before returning private results or completing a write.

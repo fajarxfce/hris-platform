@@ -2445,3 +2445,23 @@ iOS simulator build. API 35 acceptance exercised creation, exact amounts, receip
 competing edits, background retention, offline recovery, both themes and 200% text.
 The validated APK was installed on the phone without launching it. Submission,
 cancellation, withdrawal and receipt export are not yet exposed by the native UI.
+
+## Native expense actions
+
+The [mobile action pages](https://github.com/fajarxfce/hris-mobile/commit/1388947)
+submit claims, withdraw pending submissions and cancel drafts. Confirmation keeps
+the reviewed claim version. Retained commands prevent competing actions and keep
+the original reason and operation during recovery. Back cancels reads and delivery
+before route disposal; an uncertain result remains stored.
+
+Final checks passed with 1,108 desktop tests, 49 presentation Chromium tests and
+Android dev assembly. The policy integration also passed 52 domain Chromium tests
+and production Web compilation. API 35 acceptance retained a pending submission
+through offline process restart, replayed it once, withdrew its approval and
+cancelled the draft through detail recovery. API reads verified the original reason,
+one submission and one history entry per version. Normal/dark appearance and 200%
+text were inspected, and emulator transport/display settings were restored.
+
+The validated APK was installed on the authorized phone with install-only delivery.
+No phone UI interaction or runtime performance measurement is claimed. Native
+receipt export and the administrative expense pages remain separate increments.

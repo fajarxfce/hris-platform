@@ -2357,3 +2357,24 @@ where 276 desktop tests and seven targeted Chromium tests passed. Its complete
 CI, including Apple and Windows, passed. Production Web optimization and emulator
 sessions now run separately on the shared VPS following an observed host memory
 exhaustion; the emulator was restored without clearing application data.
+
+
+## Native employee expense reads
+
+The [expense read foundation](https://github.com/fajarxfce/hris-mobile/commit/c963e5b)
+and [pages](https://github.com/fajarxfce/hris-mobile/commit/a213e1a) add owned employment
+discovery, month/status filters, current claim details, frozen receipt metadata,
+approval activity and separate payment progress. Composite acquisition checks the
+claim version before publication. Independently encrypted list/detail snapshots
+use bounded authenticated chunks and atomic generation checks. Known access/MFA
+failures remain gated after failed cleanup and during failed recovery.
+
+Mobile root checks passed with 1,004 desktop tests and 36 targeted Chromium tests.
+Android dev assembly and production Web compilation passed. API 35 acceptance used
+two claims created through the normal development API and independent approval. It
+verified filters, draft/approved states, unpaid approval, activity, both themes,
+200% text, encrypted list/detail restoration after background process death offline,
+and explicit recovery. After notice, the validated APK was installed on the
+connected Android 16 phone with install-only delivery. No phone UI, bank transfer,
+release or external message was involved. Native draft authoring, receipt actions
+and submission remain in progress.

@@ -3064,7 +3064,7 @@ tests respectively and 41 focused Chromium cases in each. On the API 35 emulator
 the real Room 9-to-10 upgrade preserved encrypted Inbox records and displayed them
 after an offline cold start. Connectivity was restored. The validated mobile APK
 was installed on the authorized phone after notice using install-only mode;
-the app was not opened. Leave integration with these local queries remains pending.
+the app was not opened. Leave's subsequent integration is recorded below.
 
 ## Payment browser return navigation
 
@@ -3074,3 +3074,29 @@ filter edit. The test holds that request explicitly, verifies the pending view,
 and still requires an explicit Apply action before edited filters request data.
 All 12 payment Chromium scenarios passed against the production build, together
 with TypeScript and the focused formatting check. No application behavior changed.
+
+## Mobile Leave record synchronization
+
+[HRIS Mobile 5de87f0](https://github.com/fajarxfce/hris-mobile/commit/5de87f0)
+consumes `LEAVE_REQUESTS` and `LEAVE_BALANCES` with stable account/company ownership.
+Its use case acquires canonical records, checks current admission and commits
+encrypted records with their checkpoint. Indexed year/status queries operate
+locally. A replacement bootstrap keeps the published generation readable;
+confirmed scope loss remains distinct from a stale cursor or unavailable network.
+The former overview is an upgrade fallback until a complete replica publishes.
+
+Mobile root checks passed with 1,225 JVM/desktop tests, including assembled flows
+and resource disposal. The three Leave Chromium suites passed 161 tests and the
+Android dev APK built. API 35 acceptance retained the old overview offline during
+upgrade, acquired five requests and two balances through the real API, and reopened
+the published records after offline process restart. Local year/status queries
+preserved the encrypted records. After notice, the validated APK was installed on
+the Android 16 phone using install-only mode without opening its UI.
+
+The supporting API and worker were rebuilt and deployed with the document and
+WireGuard overlays retained. Health checks passed on loopback and the private VPN
+address. [Backend/dashboard CI](https://github.com/fajarxfce/hris-platform/actions/runs/38447477674)
+passed all backend, dashboard and integration jobs for the supporting source changes.
+Full Leave detail/activity replication, other collection migrations and unfinished
+offline drafts remain in the delivery sequence; this does not complete local-first
+coverage for the whole application.

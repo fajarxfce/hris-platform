@@ -2971,3 +2971,35 @@ release was made.
 The development API image was rebuilt and restarted with the existing Documents
 and WireGuard Compose overrides. API and dashboard checks returned HTTP 200 at
 their private WireGuard addresses.
+
+## Dashboard leave request creation
+
+Leave management can prepare an administrative request with scoped employee and
+published-evidence selectors, dated policy selection, full/partial boundary days,
+and a required reason. The review renders the server's charged days, excluded
+dates and annual balance projection. Changing the selection cancels its previous
+preview; confirmation carries that preview revision with an immutable company,
+input and operation ID. A definitive conflict requires another review. Unknown
+outcomes retain the original command through MFA renewal and subsequent conflicts.
+
+Architecture, formatting, TypeScript and all 1,834 dashboard unit/controller tests
+passed. These include twenty preparation/submission contract cases and sixteen
+new controller/date-selection cases. Ten production-build Chromium scenarios
+passed, covering employee pagination/search, required evidence, partial/off days,
+cancelled previews, MFA and lost-response recovery, read-only access, company
+replacement, explicit recovery from offline discovery, and Indonesian dark/narrow
+layout. Desktop and narrow screenshots were inspected; the review avoids repeated
+table headings and unnecessary panel padding.
+
+Two browser scenarios against isolated API/PostgreSQL instances passed: the
+existing staged decision/cancellation flow and the new administrative creation
+flow. The latter changes a balance after preview, confirms rejection without a
+reservation, reviews the new balance, discards a committed HTTP response and
+replays the original command. It verifies one request/history entry, exactly 0.5
+reserved days, the immutable overnight schedule, and foreign-company rejection.
+Published-evidence selection is covered by the browser transport fixture and the
+existing backend preparation/attachment tests; these runs do not exercise upload
+or scanning. Browser form retention remains in memory.
+
+The dashboard build passed. The current backend artifacts served the integration
+tests; no backend source or mobile application change was required for this slice.

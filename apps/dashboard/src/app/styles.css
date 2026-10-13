@@ -436,6 +436,105 @@ a {
   padding: 0 4px;
   font-weight: 600;
 }
+.app-leave-creation .app-command-bar-panel {
+  padding: 10px 0;
+  border-width: 1px 0;
+  background: transparent;
+}
+.app-leave-creation-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(320px, 440px);
+  align-items: start;
+  gap: 32px;
+  max-width: 1200px;
+}
+.app-leave-creation-layout .app-editor-form {
+  margin-top: 0;
+}
+.app-leave-creation-layout .app-editor-section {
+  padding: 0;
+  border: 0;
+}
+.app-leave-creation-layout legend {
+  padding: 0 0 16px;
+}
+.app-leave-creation-layout p {
+  margin: 0;
+}
+.app-leave-reference {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 36px;
+}
+.app-leave-creation-review {
+  min-width: 0;
+  display: grid;
+  gap: 16px;
+  padding-left: 24px;
+  border-left: 1px solid var(--colorNeutralStroke2);
+}
+.app-leave-creation-review :is(h2, h3) {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+.app-leave-creation-review h3 {
+  font-size: 14px;
+}
+.app-leave-creation-review .app-resource-panel {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+:where(.app-leave-creation-review) .app-resource-panel h2 {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.app-leave-total {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.app-leave-total dd {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+.app-leave-review-days {
+  max-height: 28rem;
+  overflow: auto;
+}
+.app-leave-selected-documents {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.app-leave-selected-documents li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.app-leave-document-label {
+  display: grid;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1100px) {
+  .app-leave-creation-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .app-leave-creation-review {
+    padding: 24px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--colorNeutralStroke2);
+  }
+}
 .app-form-actions {
   display: flex;
   flex-wrap: wrap;

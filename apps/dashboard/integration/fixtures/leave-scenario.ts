@@ -6,9 +6,9 @@ export async function createLeaveScenario(
   context: BrowserContext,
   company: string,
   reviewer: string,
-  stages = 1,
-  cancellation = false,
+  options: Readonly<{ stages?: number; cancellation?: boolean; submit?: boolean }> = {},
 ) {
+  const { stages = 1, cancellation = false, submit = true } = options;
   const csrf = (await (await context.request.get("/api/v1/auth/csrf")).json()) as {
     headerName: string;
     token: string;
@@ -101,17 +101,19 @@ export async function createLeaveScenario(
     },
   });
   expect(template.status()).toBe(200);
-  const submitted = await context.request.post(`${base}/leave/requests`, {
-    headers: headers(),
-    data: {
-      id: request,
-      employeeId: employee,
-      typeId: type,
-      days: [{ workDate: date, portion: "FIRST_HALF" }],
-      reason: "Browser personal leave",
-    },
-  });
-  expect(submitted.status()).toBe(200);
+  if (submit) {
+    const submitted = await context.request.post(`${base}/leave/requests`, {
+      headers: headers(),
+      data: {
+        id: request,
+        employeeId: employee,
+        typeId: type,
+        days: [{ workDate: date, portion: "FIRST_HALF" }],
+        reason: "Browser personal leave",
+      },
+    });
+    expect(submitted.status()).toBe(200);
+  }
   if (cancellation) {
     const template = await context.request.put(`${base}/approvals/templates/${randomUUID()}`, {
       headers: headers(),

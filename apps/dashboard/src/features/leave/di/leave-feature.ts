@@ -2,9 +2,11 @@ import type { HttpClient } from "../../../core/data/http/http-client";
 import type { FileRepository } from "../../../core/domain/files/file-repository";
 import { HttpLeaveBalanceDataSource } from "../data/datasources/http-leave-balance-data-source";
 import { HttpLeavePolicyDataSource } from "../data/datasources/http-leave-policy-data-source";
+import { HttpLeavePreparationDataSource } from "../data/datasources/http-leave-preparation-data-source";
 import { HttpLeaveRequestDataSource } from "../data/datasources/http-leave-request-data-source";
 import { RemoteLeaveBalanceRepository } from "../data/repositories/remote-leave-balance-repository";
 import { RemoteLeavePolicyRepository } from "../data/repositories/remote-leave-policy-repository";
+import { RemoteLeavePreparationRepository } from "../data/repositories/remote-leave-preparation-repository";
 import { RemoteLeaveRequestRepository } from "../data/repositories/remote-leave-request-repository";
 import { AdjustLeaveBalance } from "../domain/usecases/adjust-leave-balance";
 import { DecideLeaveRequest } from "../domain/usecases/decide-leave-request";
@@ -14,12 +16,17 @@ import { LoadLeaveAdjustmentCatalog } from "../domain/usecases/load-leave-adjust
 import { LoadLeaveLedger } from "../domain/usecases/load-leave-ledger";
 import { LoadLeavePolicies } from "../domain/usecases/load-leave-policies";
 import { LoadLeavePolicy } from "../domain/usecases/load-leave-policy";
+import { LoadLeavePreparationEmployees } from "../domain/usecases/load-leave-preparation-employees";
+import { LoadLeavePreparationEvidence } from "../domain/usecases/load-leave-preparation-evidence";
 import { LoadLeaveRequest } from "../domain/usecases/load-leave-request";
+import { LoadLeaveRequestTypes } from "../domain/usecases/load-leave-request-types";
 import { LoadLeaveRequests } from "../domain/usecases/load-leave-requests";
+import { PreviewLeaveRequest } from "../domain/usecases/preview-leave-request";
 import { RequestLeaveCancellation } from "../domain/usecases/request-leave-cancellation";
 import { ReviewLeaveAction } from "../domain/usecases/review-leave-action";
 import { ReviewLeaveBalanceAdjustment } from "../domain/usecases/review-leave-balance-adjustment";
 import { SaveLeavePolicy } from "../domain/usecases/save-leave-policy";
+import { SubmitLeaveRequest } from "../domain/usecases/submit-leave-request";
 import { WithdrawLeaveRequest } from "../domain/usecases/withdraw-leave-request";
 
 export function createLeaveFeature(
@@ -29,7 +36,15 @@ export function createLeaveFeature(
   const requests = new RemoteLeaveRequestRepository(new HttpLeaveRequestDataSource(http));
   const policies = new RemoteLeavePolicyRepository(new HttpLeavePolicyDataSource(http));
   const balances = new RemoteLeaveBalanceRepository(new HttpLeaveBalanceDataSource(http));
+  const preparation = new RemoteLeavePreparationRepository(
+    new HttpLeavePreparationDataSource(http),
+  );
   return {
+    loadPreparationEmployees: new LoadLeavePreparationEmployees(preparation),
+    loadPreparationEvidence: new LoadLeavePreparationEvidence(preparation),
+    loadRequestTypes: new LoadLeaveRequestTypes(preparation),
+    previewRequest: new PreviewLeaveRequest(preparation),
+    submitRequest: new SubmitLeaveRequest(requests),
     adjustBalance: new AdjustLeaveBalance(balances),
     reviewBalanceAdjustment: new ReviewLeaveBalanceAdjustment(balances),
     loadAdjustmentCatalog: new LoadLeaveAdjustmentCatalog(balances, policies),

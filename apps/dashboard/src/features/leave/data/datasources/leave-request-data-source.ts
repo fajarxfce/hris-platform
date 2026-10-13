@@ -6,9 +6,16 @@ import type {
   LeaveRequestDecisionDto,
 } from "../models/leave-request-change-dto";
 import type { LeaveRequestDetailsDto } from "../models/leave-request-details-dto";
+import type { LeaveRequestSubmissionDto } from "../models/leave-request-submission-dto";
 import type { LeaveRequestPageDto } from "../models/leave-request-summary-dto";
 
 export interface LeaveRequestDataSource {
+  submit(
+    company: string,
+    operation: string,
+    body: LeaveRequestSubmissionDto,
+    signal: AbortSignal,
+  ): Promise<LeaveReceiptDto>;
   downloadAttachment(
     company: string,
     request: string,

@@ -496,6 +496,32 @@ The independent approval API scenario exercises templates, delegations, and reas
 
 Response mapping rejects repeated dates, inconsistent quantities, invalid intervals, duplicate assignments, non-progressing pages, and history newer than the current request. Controllers clear snapshots while reloading, abort obsolete work, and reject late results after disposal or company replacement. Locale/theme changes update presentation without repeating the request. Submitted evidence can be downloaded from details and action reviews.
 
+## Leave request creation
+
+`/leave/requests/new` requires `leave.manage` and opens from the request directory.
+Employee discovery supports explicit search and twenty-item pages without general
+People access. Effective leave types are selected for the starting date. The form
+accepts a bounded date range, full or partial first/last days, a reason, and up to
+three published personal documents belonging to the selected employee. Intermediate
+dates are requested as full days; the server identifies nonworking dates.
+
+The review shows server-calculated working days, excluded dates and annual balances.
+It creates no reservation. Response mapping verifies the employee/type, selected
+date partition, schedule intervals, exact half-day quantities and balance totals.
+Changing dates, portions, employee or type cancels the previous preview. Submission
+retains the reviewed content revision, company, immutable input and operation ID.
+A definitive conflict requires another review. An ambiguous result retains the
+original command through explicit retries, MFA renewal and subsequent conflicts.
+
+The command bar reports submission separately from approval and links to the saved
+request. Scoped drawers restore focus; changing employee clears selected evidence.
+Company/account replacement and disposal cancel pending work and suppress late
+results. Access denials remove private form details while an uncertain command
+remains recoverable by its existing owner. Locale/theme changes retain the form;
+the shared departure guard protects drafts and pending or unconfirmed submissions.
+This dashboard retention is in memory and does not provide offline draft recovery
+after a browser restart.
+
 ## Binary downloads
 
 Binary file acquisition uses the authenticated HTTP transport, including current client-admission headers, private cache behavior, cancellation, and explicit deadlines of at most sixty seconds. The transport validates the expected media type, ETag, and exact byte count, retaining at most 100 MiB in 64 KiB blocks. Stream reads, empty responses, and retained block counts are bounded. Native downloads own one short-lived object URL and release their anchor, timer, and abort listener after dispatch or failure. This primitive reports browser handoff, not completion of an operating-system save; feature controllers own the acquisition lifetime.

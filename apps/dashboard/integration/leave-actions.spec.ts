@@ -59,7 +59,10 @@ test("real API leave decisions recover receipts and preserve staged reservations
     },
   });
   expect(grant.status()).toBe(200);
-  const scenario = await createLeaveScenario(context, company, reviewer, 2, true);
+  const scenario = await createLeaveScenario(context, company, reviewer, {
+    stages: 2,
+    cancellation: true,
+  });
   const detail = `/leave/requests/${scenario.request}?company=${company}`;
   const resource = `${scenario.base}/leave/requests/${scenario.request}`;
   const balancePath = `${scenario.base}/leave/employees/${scenario.employee}/balances/${scenario.type}/${scenario.date.slice(0, 4)}`;

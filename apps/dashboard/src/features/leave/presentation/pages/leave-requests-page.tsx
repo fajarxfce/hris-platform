@@ -1,4 +1,6 @@
 import { Text } from "@fluentui/react-components";
+import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
 import { AppLoading } from "../../../../core/presentation/components/app-loading";
@@ -8,6 +10,7 @@ import { AppSelect } from "../../../../core/presentation/components/app-select";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { leaveStatuses } from "../../domain/entities/leave-request";
 import type { useLeaveFilters } from "../controllers/use-leave-filters";
+import { leaveCreationMessages } from "../i18n/leave-creation-messages";
 import { leaveMessages } from "../i18n/leave-messages";
 import type { leaveRequestsView } from "../models/leave-request-view";
 import type { LeaveRequestsState } from "../models/leave-requests-state";
@@ -23,6 +26,7 @@ export function LeaveRequestsPage({
   onFirst,
   onNext,
   onOpen,
+  createTo,
 }: {
   state: LeaveRequestsState;
   rows: ReturnType<typeof leaveRequestsView>;
@@ -34,6 +38,7 @@ export function LeaveRequestsPage({
   onFirst: () => void;
   onNext: () => void;
   onOpen: (id: string) => void;
+  createTo: string | null;
 }) {
   const text = leaveMessages(locale);
   return (
@@ -42,9 +47,17 @@ export function LeaveRequestsPage({
         title={text.requests}
         context={companyName}
         actions={
-          <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
-            {messages(locale).refresh}
-          </AppButton>
+          <>
+            {createTo && <Link to={createTo}>{leaveCreationMessages(locale).create}</Link>}
+            <AppButton
+              appearance="subtle"
+              icon={<ArrowClockwise20Regular />}
+              disabled={state.stage === "loading"}
+              onClick={onRefresh}
+            >
+              {messages(locale).refresh}
+            </AppButton>
+          </>
         }
       />
       <AppFailure failure={state.failure} locale={locale} />

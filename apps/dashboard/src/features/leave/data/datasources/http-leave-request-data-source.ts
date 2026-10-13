@@ -7,11 +7,30 @@ import type {
   LeaveRequestDecisionDto,
 } from "../models/leave-request-change-dto";
 import { leaveRequestDetailsDto } from "../models/leave-request-details-dto";
+import type { LeaveRequestSubmissionDto } from "../models/leave-request-submission-dto";
 import { leaveRequestPageDto } from "../models/leave-request-summary-dto";
 import type { LeaveRequestDataSource } from "./leave-request-data-source";
 
 export class HttpLeaveRequestDataSource implements LeaveRequestDataSource {
   constructor(private readonly http: HttpClient) {}
+  async submit(
+    company: string,
+    operation: string,
+    body: LeaveRequestSubmissionDto,
+    signal: AbortSignal,
+  ) {
+    return leaveReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/leave/requests`,
+          method: "POST",
+          operationId: operation,
+          body,
+        },
+        signal,
+      ),
+    );
+  }
   async downloadAttachment(
     company: string,
     request: string,

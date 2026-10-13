@@ -6,15 +6,25 @@ import type { LoadLeaveAdjustmentCatalog } from "../../domain/usecases/load-leav
 import type { LoadLeaveLedger } from "../../domain/usecases/load-leave-ledger";
 import type { LoadLeavePolicies } from "../../domain/usecases/load-leave-policies";
 import type { LoadLeavePolicy } from "../../domain/usecases/load-leave-policy";
+import type { LoadLeavePreparationEmployees } from "../../domain/usecases/load-leave-preparation-employees";
+import type { LoadLeavePreparationEvidence } from "../../domain/usecases/load-leave-preparation-evidence";
 import type { LoadLeaveRequest } from "../../domain/usecases/load-leave-request";
+import type { LoadLeaveRequestTypes } from "../../domain/usecases/load-leave-request-types";
 import type { LoadLeaveRequests } from "../../domain/usecases/load-leave-requests";
+import type { PreviewLeaveRequest } from "../../domain/usecases/preview-leave-request";
 import type { RequestLeaveCancellation } from "../../domain/usecases/request-leave-cancellation";
 import type { ReviewLeaveAction } from "../../domain/usecases/review-leave-action";
 import type { ReviewLeaveBalanceAdjustment } from "../../domain/usecases/review-leave-balance-adjustment";
 import type { SaveLeavePolicy } from "../../domain/usecases/save-leave-policy";
+import type { SubmitLeaveRequest } from "../../domain/usecases/submit-leave-request";
 import type { WithdrawLeaveRequest } from "../../domain/usecases/withdraw-leave-request";
 
 export type LeaveUseCases = Readonly<{
+  loadPreparationEmployees: Pick<LoadLeavePreparationEmployees, "execute">;
+  loadPreparationEvidence: Pick<LoadLeavePreparationEvidence, "execute">;
+  loadRequestTypes: Pick<LoadLeaveRequestTypes, "execute">;
+  previewRequest: Pick<PreviewLeaveRequest, "execute">;
+  submitRequest: Pick<SubmitLeaveRequest, "execute">;
   adjustBalance: Pick<AdjustLeaveBalance, "execute">;
   reviewBalanceAdjustment: Pick<ReviewLeaveBalanceAdjustment, "execute">;
   loadAdjustmentCatalog: Pick<LoadLeaveAdjustmentCatalog, "execute">;

@@ -5,6 +5,7 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { LeaveRequestQuery } from "../../domain/entities/leave-request";
+import { canPrepareLeave } from "../../domain/policies/leave-preparation-policy";
 import type { LeaveUseCases } from "../contracts/leave-use-cases";
 import { LeaveRequestsController } from "../controllers/leave-requests-controller";
 import { useLeaveFilters } from "../controllers/use-leave-filters";
@@ -85,6 +86,11 @@ function LeaveRequestsBinding({
         if (state.page?.nextCursor) onQuery({ ...query, after: state.page.nextCursor });
       }}
       onOpen={onOpen}
+      createTo={
+        canPrepareLeave(access.permissions)
+          ? `/leave/requests/new?${leaveParameters(access.companyId, query)}`
+          : null
+      }
     />
   );
 }

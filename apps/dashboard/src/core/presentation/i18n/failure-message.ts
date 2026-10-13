@@ -694,8 +694,8 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Saldo berubah. Muat ulang review sebelum mencatat penyesuaian ini.",
   ],
   insufficient_leave_balance: [
-    "This adjustment would exceed the balance limits. Check the amount.",
-    "Penyesuaian ini melewati batas saldo. Periksa jumlahnya.",
+    "The available leave balance is insufficient for this action.",
+    "Saldo cuti yang tersedia tidak mencukupi untuk tindakan ini.",
   ],
   leave_balance_limit: ["The balance limit has been reached.", "Batas saldo telah tercapai."],
   self_adjustment_denied: [
@@ -703,8 +703,72 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Saldo Anda harus disesuaikan oleh administrator lain.",
   ],
   leave_type_unavailable: [
-    "This leave type is unavailable for the selected year.",
-    "Jenis cuti tidak tersedia untuk tahun yang dipilih.",
+    "This leave type is unavailable for the selected dates.",
+    "Jenis cuti tidak tersedia untuk tanggal yang dipilih.",
+  ],
+  invalid_leave_selection: [
+    "Check the employee, leave type and selected dates.",
+    "Periksa karyawan, jenis cuti, dan tanggal yang dipilih.",
+  ],
+  invalid_leave_submission: [
+    "Enter a reason of up to 1,000 characters and review the request.",
+    "Isi alasan maksimal 1.000 karakter dan review pengajuan.",
+  ],
+  invalid_leave_request: [
+    "Check the selected leave dates and day lengths.",
+    "Periksa tanggal cuti dan bagian hari yang dipilih.",
+  ],
+  invalid_leave_preview: [
+    "Review the request again before submitting.",
+    "Review kembali pengajuan sebelum mengirim.",
+  ],
+  leave_preview_changed: [
+    "The schedule, policy or balance changed. Review the request again.",
+    "Jadwal, kebijakan, atau saldo berubah. Review kembali pengajuan.",
+  ],
+  invalid_leave_attachments: [
+    "Choose up to three different documents belonging to this employee.",
+    "Pilih maksimal tiga dokumen berbeda milik karyawan ini.",
+  ],
+  leave_attachment_required: [
+    "This leave type requires a supporting document.",
+    "Jenis cuti ini memerlukan dokumen pendukung.",
+  ],
+  no_leave_working_days: [
+    "No working days are included in the selected dates.",
+    "Tidak ada hari kerja dalam tanggal yang dipilih.",
+  ],
+  leave_range_too_large: [
+    "Choose a leave range of up to 366 days.",
+    "Pilih rentang cuti maksimal 366 hari.",
+  ],
+  partial_leave_unavailable: [
+    "This leave type requires full days.",
+    "Jenis cuti ini memerlukan hari penuh.",
+  ],
+  leave_schedule_missing: [
+    "The employee needs a work schedule for these dates.",
+    "Karyawan memerlukan jadwal kerja pada tanggal tersebut.",
+  ],
+  leave_employee_ineligible: [
+    "The employee is not eligible for this leave type on the selected dates.",
+    "Karyawan belum memenuhi syarat jenis cuti ini pada tanggal yang dipilih.",
+  ],
+  leave_duration_too_short: [
+    "The selected shift is too short for this day length.",
+    "Shift yang dipilih terlalu singkat untuk bagian hari tersebut.",
+  ],
+  leave_overlap: [
+    "These dates overlap an existing leave request. Check the request history.",
+    "Tanggal ini bertumpang tindih dengan pengajuan cuti lain. Periksa riwayat pengajuan.",
+  ],
+  leave_request_limit: [
+    "The request exceeds this leave type's day limit.",
+    "Pengajuan melewati batas hari jenis cuti ini.",
+  ],
+  leave_ledger_conflict: [
+    "The leave balance changed. Review the request again.",
+    "Saldo cuti berubah. Review kembali pengajuan.",
   ],
   leave_type_not_found: [
     "This leave policy is no longer available.",

@@ -10,8 +10,15 @@ import type {
 } from "../entities/leave-request";
 import type { LeaveRequestChange, LeaveRequestDecision } from "../entities/leave-request-action";
 import type { LeaveRequestDetails } from "../entities/leave-request-details";
+import type { LeaveRequestSubmission } from "../entities/leave-request-submission";
 
 export interface LeaveRequestRepository {
+  submit(
+    company: CompanyId,
+    operation: OperationId,
+    command: LeaveRequestSubmission,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
   downloadAttachment(
     company: CompanyId,
     request: LeaveRequestId,

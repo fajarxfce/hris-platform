@@ -8,14 +8,29 @@ import type {
   LeaveRequestChange,
   LeaveRequestDecision,
 } from "../../domain/entities/leave-request-action";
+import type { LeaveRequestSubmission } from "../../domain/entities/leave-request-submission";
 import type { LeaveRequestRepository } from "../../domain/repositories/leave-request-repository";
 import type { LeaveRequestDataSource } from "../datasources/leave-request-data-source";
 import { toLeaveReceipt } from "../mappers/leave-receipt-mapper";
 import { toLeaveRequestDetails } from "../mappers/leave-request-details-mapper";
 import { toLeaveRequestPage } from "../mappers/leave-request-mapper";
+import { toLeaveSubmissionDto, toLeaveSubmissionReceipt } from "../mappers/leave-submission-mapper";
 
 export class RemoteLeaveRequestRepository implements LeaveRequestRepository {
   constructor(private readonly source: LeaveRequestDataSource) {}
+  submit(
+    company: CompanyId,
+    operation: OperationId,
+    command: LeaveRequestSubmission,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toLeaveSubmissionReceipt(
+        await this.source.submit(company, operation, toLeaveSubmissionDto(command), signal),
+        command,
+      ),
+    );
+  }
   downloadAttachment(
     company: CompanyId,
     request: LeaveRequestId,

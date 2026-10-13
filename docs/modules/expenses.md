@@ -18,6 +18,16 @@ Policies define a display name, maximum amount per line and per claim for that c
 
 `GET /expenses/categories?asOf=YYYY-MM-DD` selects the latest effective revision for each category. Responses distinguish the current optimistic `version` from the selected `appliedRevision`. Backdated corrections do not supersede a later effective revision. Authorized expense users can read applicable policy; `GET /expenses/categories/{id}/history` requires policy administration and returns immutable revisions, actors, reasons, and timestamps. Both lists use bounded cursor pagination (default 50, maximum 200).
 
+Administrative `GET /expenses/policies` returns each latest saved definition,
+including future and inactive heads, ordered by immutable code. It supports an
+optional active filter and code cursor. `GET /expenses/policies/{id}` returns the
+current saved head with a bounded history page (`historyAfter`, `historyLimit`).
+History remains ordered by ascending revision; its cursor does not select a
+different current head. Both endpoints require `expenses.policy.manage` and
+hold shared policy/access guards while acquiring the response. They revalidate
+credentials, current grants and session assurance after waiting and before
+delivery. A review cannot combine a pre-save head with post-save history.
+
 Each company allows 500 categories and each category 1,000 revisions. Competing definitions/updates use company serialization and optimistic versions. Current account, company, membership, and permission are checked before a mutation or receipt replay. Policy history, version, audit, and operation receipt commit together; no external I/O runs in that transaction. Submission uses these effective policies; payment processing uses the approved immutable evidence.
 
 Policy saves also revalidate current session assurance after waiting for their

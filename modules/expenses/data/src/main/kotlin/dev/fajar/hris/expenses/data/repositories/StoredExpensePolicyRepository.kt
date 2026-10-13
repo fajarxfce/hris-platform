@@ -101,4 +101,17 @@ class StoredExpensePolicyRepository(private val source: ExpensePolicyDataSource)
                     MutationReceipt(category.id, version)
                 }
             }
+
+    override fun catalog(
+        companyId: UUID,
+        active: Boolean?,
+        after: String?,
+        limit: Int,
+    ): Result<Page<ExpenseCategory>> = safeDatabaseCall {
+        val rows = source.catalog(companyId, active, after, limit + 1)
+        Page(
+            rows.take(limit).map { it.toCategory() },
+            if (rows.size > limit) rows[limit - 1].code else null,
+        )
+    }
 }

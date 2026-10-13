@@ -28,6 +28,13 @@ interface ExpensePolicyRepository {
         limit: Int,
     ): Result<Page<ExpenseCategoryRevision>>
 
+    fun catalog(
+        companyId: UUID,
+        active: Boolean?,
+        after: String?,
+        limit: Int,
+    ): Result<Page<ExpenseCategory>>
+
     fun save(
         actor: Actor,
         category: ExpenseCategory,

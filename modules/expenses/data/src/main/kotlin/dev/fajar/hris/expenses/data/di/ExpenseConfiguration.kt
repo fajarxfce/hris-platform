@@ -124,6 +124,28 @@ class ExpenseConfiguration {
         PostgresExpenseClaimDataSource(sql)
 
     @Bean
+    fun listExpensePolicies(
+        policies: ExpensePolicyRepository,
+        identities: IdentityRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = ListExpensePolicies(policies, identities, companies, members, transactions, clock, security)
+
+    @Bean
+    fun getExpensePolicy(
+        policies: ExpensePolicyRepository,
+        identities: IdentityRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = GetExpensePolicy(policies, identities, companies, members, transactions, clock, security)
+
+    @Bean
     fun expenseSubmissionSource(sql: DSLContext): ExpenseSubmissionDataSource =
         PostgresExpenseSubmissionDataSource(sql)
 

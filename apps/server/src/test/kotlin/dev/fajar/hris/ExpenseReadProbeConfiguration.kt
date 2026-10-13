@@ -114,6 +114,14 @@ class ExpenseReadProbeConfiguration {
         probe: ExpenseReadProbe,
     ): ExpensePolicyRepository =
         object : ExpensePolicyRepository by delegate {
+            override fun find(companyId: UUID, id: UUID) =
+                delegate.find(companyId, id).also { probe.afterRead(companyId, "policy-head") }
+
+            override fun catalog(companyId: UUID, active: Boolean?, after: String?, limit: Int) =
+                delegate.catalog(companyId, active, after, limit).also {
+                    probe.afterRead(companyId, "policy-catalog")
+                }
+
             override fun list(companyId: UUID, asOf: LocalDate, after: String?, limit: Int) =
                 delegate.list(companyId, asOf, after, limit).also {
                     probe.afterRead(companyId, "categories")

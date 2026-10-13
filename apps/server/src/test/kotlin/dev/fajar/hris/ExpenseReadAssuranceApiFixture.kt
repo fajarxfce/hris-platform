@@ -231,6 +231,28 @@ abstract class ExpenseReadAssuranceApiFixture : ExpenseReviewApiFixture() {
                         security,
                     )
                     .execute(actor, f.category, null, 20)
+            "policy-catalog" ->
+                ListExpensePolicies(
+                        policies,
+                        identities,
+                        companies,
+                        members,
+                        transactions,
+                        clock,
+                        security,
+                    )
+                    .execute(actor, null, null, 20)
+            "policy-review" ->
+                GetExpensePolicy(
+                        policies,
+                        identities,
+                        companies,
+                        members,
+                        transactions,
+                        clock,
+                        security,
+                    )
+                    .execute(actor, f.category, null, 20)
             "directory" ->
                 ListSelfExpenseEmployments(
                         people,

@@ -68,6 +68,21 @@ class PostgresExpensePolicyDataSource(private val sql: DSLContext) : ExpensePoli
             .limit(limit)
             .fetch { it.toExpenseCategoryRow() }
 
+    override fun catalog(
+        company: UUID,
+        active: Boolean?,
+        after: String?,
+        limit: Int,
+    ): List<ExpenseCategoryRow> =
+        selectExpenseCategories(sql)
+            .where(C.COMPANY_ID.eq(company))
+            .and(R.REVISION.eq(C.VERSION))
+            .and(active?.let { R.ACTIVE.eq(it) } ?: DSL.noCondition())
+            .and(after?.let { C.CODE.gt(it) } ?: DSL.noCondition())
+            .orderBy(C.CODE)
+            .limit(limit)
+            .fetch { it.toExpenseCategoryRow() }
+
     override fun insert(row: ExpenseCategoriesRecord) {
         sql.insertInto(C).set(row).execute()
     }

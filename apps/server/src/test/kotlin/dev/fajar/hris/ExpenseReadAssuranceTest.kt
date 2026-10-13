@@ -54,6 +54,8 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
                 "submission",
                 "categories",
                 "category-history",
+                "policy-catalog",
+                "policy-review",
                 "directory",
                 "receipt-metadata",
                 "receipt-content",
@@ -98,6 +100,8 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
                 "submission",
                 "categories",
                 "category-history",
+                "policy-catalog",
+                "policy-review",
                 "directory",
                 "receipt-metadata",
                 "receipt-content",
@@ -109,7 +113,11 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
             scene.actor.copy(
                 mfaVerifiedAt = clock.instant().minus(security.maximumMfaAge).plusSeconds(1)
             )
-        val barrier = ExpenseReadProbe.Barrier(scene.company, action)
+        val barrier =
+            ExpenseReadProbe.Barrier(
+                scene.company,
+                if (action == "policy-review") "category-history" else action,
+            )
         readProbe.current.set(barrier)
         Executors.newSingleThreadExecutor().use { pool ->
             val pending = pool.submit<Result<*>> { invoke(scene, action, actor) }
@@ -142,6 +150,8 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
                 "submission",
                 "categories",
                 "category-history",
+                "policy-catalog",
+                "policy-review",
                 "directory",
                 "receipt-metadata",
                 "receipt-content",
@@ -149,7 +159,11 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
     )
     fun interruptedReadReleasesItsGuardsAndTheNextReadSucceeds(action: String) {
         val scene = prepare()
-        val barrier = ExpenseReadProbe.Barrier(scene.company, action)
+        val barrier =
+            ExpenseReadProbe.Barrier(
+                scene.company,
+                if (action == "policy-review") "category-history" else action,
+            )
         readProbe.current.set(barrier)
         Executors.newFixedThreadPool(2).use { pool ->
             val pending = pool.submit<Result<*>> { invoke(scene, action) }

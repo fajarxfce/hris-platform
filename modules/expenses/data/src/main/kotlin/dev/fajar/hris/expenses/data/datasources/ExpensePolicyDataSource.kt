@@ -16,6 +16,13 @@ interface ExpensePolicyDataSource {
 
     fun list(company: UUID, asOf: LocalDate, after: String?, limit: Int): List<ExpenseCategoryRow>
 
+    fun catalog(
+        company: UUID,
+        active: Boolean?,
+        after: String?,
+        limit: Int,
+    ): List<ExpenseCategoryRow>
+
     fun history(company: UUID, id: UUID, after: Long?, limit: Int): List<ExpenseCategoryRow>
 
     fun insert(row: ExpenseCategoriesRecord)

@@ -2501,3 +2501,21 @@ renewed replay and interruption followed by recovery on the same executor.
 The existing policy HTTP and expense command/read assurance cases also passed;
 all 38 worker tests, architecture and format checks passed. The new fixture uses
 enabled business policy independently of the HTTP fixture's disabled-MFA setup.
+
+## Administrative expense policy reads
+
+Added a bounded administrative catalog and coherent policy review. The catalog
+includes future and inactive saved heads, supports status filtering and advances
+by immutable code. Detail returns the latest saved definition with ascending
+immutable revision history. Shared resource/access guards keep head and history
+consistent across competing saves; current grants and MFA are revalidated after
+waiting and before delivery. Effective policy selection for claims is unchanged.
+
+Across focused runs, 86 API/PostgreSQL cases passed, including 23 OpenAPI contract
+checks, five administrative read scenarios and six added read-assurance cases.
+The suite covers current/foreign scope, revocation during access acquisition,
+concurrent readers, head/history consistency, interrupted recovery and MFA expiry
+before result delivery. Twelve expense domain tests, architecture and formatting
+passed; both bootJars built. The initial new tests required corrections for
+Jackson array iteration and an error response's echoed request path. Dashboard
+interaction is a separate increment.

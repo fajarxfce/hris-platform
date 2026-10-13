@@ -2465,3 +2465,24 @@ text were inspected, and emulator transport/display settings were restored.
 The validated APK was installed on the authorized phone with install-only delivery.
 No phone UI interaction or runtime performance measurement is claimed. Native
 receipt export and the administrative expense pages remain separate increments.
+
+## Native expense receipt export
+
+[HRIS Mobile 0c880a6](https://github.com/fajarxfce/hris-mobile/commit/0c880a6)
+adds receipt saving from claim detail. The use case owns fresh SELF authorization,
+picker/transfer deadlines and output lifetime. The data adapter validates immutable
+metadata, sequential ranges and the final SHA-256 without retaining a read-ahead
+queue. Stopping for the native save dialog retains the export; Back and disposal
+cancel it. Access failures stay gated through failed refresh and cleanup.
+
+Root checks and focused regressions passed with 1,145 desktop tests in the final
+suite, 157 expense Chromium tests, 36 network Chromium tests, Android dev assembly
+and production Web compilation. API 35 acceptance saved a published PDF with the
+server's exact hash, cancelled and retried the picker, and verified both themes,
+200% text and return from Settings. The validated APK was installed on the phone
+without launching its UI.
+
+The bounded response reader and regressions were also ported to
+[Compose Fluent Starter e33d908](https://github.com/fajarxfce/compose-fluent-starter/commit/e33d908).
+Its root checks passed with 278 desktop tests, 36 network Chromium tests and Android
+dev assembly. Administrative expense workflows remain separate work.

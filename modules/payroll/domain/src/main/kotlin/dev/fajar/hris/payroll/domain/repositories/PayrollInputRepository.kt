@@ -6,6 +6,17 @@ import java.time.YearMonth
 import java.util.UUID
 
 interface PayrollInputRepository {
+    fun employee(company: UUID, employee: UUID): Result<PayrollEmployee?>
+
+    fun employees(
+        company: UUID,
+        month: YearMonth,
+        query: String,
+        status: PayrollInputEmployeeStatus?,
+        after: String?,
+        limit: Int,
+    ): Result<Page<PayrollInputEmployee>>
+
     fun find(company: UUID, employee: UUID, month: YearMonth): Result<PayrollInput?>
 
     fun revision(

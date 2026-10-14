@@ -104,6 +104,14 @@ read grants remain independent. Period detail acquires shared payroll, People an
 access guards before reading current participant labels and input heads. Session
 assurance is checked again after reads and through period command completion.
 
+Input review reuses that raw employee projection through its own repository.
+Its monthly discovery combines employee references with nullable input heads in
+one bounded SQL query. The review use case acquires shared payroll, work-period,
+People and access guards, then coordinates input/source/cutoff repositories.
+Domain policy derives action hints from current source versions and maker/checker
+rules. Legacy input reads retain the same post-acquisition session check; input
+commands preserve recent assurance through replay and transaction completion.
+
 Monthly closing overview projects the period and minimal job progress in one SQL
 snapshot under shared access guards. It neither creates period rows nor holds
 resource locks that exclude the worker. The use case chooses available actions

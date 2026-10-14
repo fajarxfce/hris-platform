@@ -1,8 +1,12 @@
 package dev.fajar.hris.payroll.data.datasources
 
+import dev.fajar.hris.payroll.data.models.PayrollEmployeeRow
+import dev.fajar.hris.payroll.data.models.PayrollInputEmployeeRow
 import dev.fajar.hris.payroll.data.models.PayrollInputSummaryRow
+import dev.fajar.hris.schema.tables.Employments.EMPLOYMENTS as E
 import dev.fajar.hris.schema.tables.PayrollInputRevisions.PAYROLL_INPUT_REVISIONS as R
 import dev.fajar.hris.schema.tables.PayrollInputs.PAYROLL_INPUTS as I
+import dev.fajar.hris.schema.tables.Persons.PERSONS as P
 import dev.fajar.hris.schema.tables.records.*
 import java.time.LocalDate
 import java.util.UUID
@@ -10,6 +14,56 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresPayrollInputDataSource(private val sql: DSLContext) : PayrollInputDataSource {
+    override fun employees(
+        company: UUID,
+        month: LocalDate,
+        query: String,
+        status: String?,
+        after: String?,
+        limit: Int,
+    ): List<PayrollInputEmployeeRow> =
+        sql.select(E.ID, E.EMPLOYEE_NUMBER, P.LEGAL_NAME, E.VERSION, I.VERSION, R.STATUS)
+            .from(E)
+            .join(P)
+            .on(P.ID.eq(E.PERSON_ID))
+            .leftJoin(I)
+            .on(
+                I.COMPANY_ID.eq(E.COMPANY_ID)
+                    .and(I.EMPLOYMENT_ID.eq(E.ID))
+                    .and(I.EARNINGS_MONTH.eq(month))
+            )
+            .leftJoin(R)
+            .on(
+                R.COMPANY_ID.eq(I.COMPANY_ID).and(R.INPUT_ID.eq(I.ID)).and(R.REVISION.eq(I.VERSION))
+            )
+            .where(E.COMPANY_ID.eq(company))
+            .and(
+                E.EMPLOYEE_NUMBER.containsIgnoreCase(query)
+                    .or(P.LEGAL_NAME.containsIgnoreCase(query))
+            )
+            .and(after?.let { E.EMPLOYEE_NUMBER.gt(it) } ?: DSL.noCondition())
+            .and(
+                when (status) {
+                    null -> DSL.noCondition()
+                    "UNPREPARED" -> I.ID.isNull
+                    else -> R.STATUS.eq(status)
+                }
+            )
+            .orderBy(E.EMPLOYEE_NUMBER)
+            .limit(limit)
+            .fetch {
+                PayrollInputEmployeeRow(
+                    PayrollEmployeeRow(
+                        requireNotNull(it.value1()),
+                        requireNotNull(it.value2()),
+                        requireNotNull(it.value3()),
+                        requireNotNull(it.value4()),
+                    ),
+                    it.value5(),
+                    it.value6(),
+                )
+            }
+
     override fun find(
         company: UUID,
         employee: UUID,

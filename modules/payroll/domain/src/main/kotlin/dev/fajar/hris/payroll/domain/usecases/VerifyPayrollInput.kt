@@ -74,13 +74,9 @@ class VerifyPayrollInput(
                     validateCompanyCommandActor(actor, it)
                 }
             if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
             val permission =
-                requirePayrollMutation(
-                    (checked as Result.Success).value,
-                    "payroll.review",
-                    clock.instant(),
-                    security,
-                )
+                requirePayrollMutation(live, "payroll.review", clock.instant(), security)
             if (permission is Result.Failed) return@run permission
             val beneficiary = people.accountForEmployee(company, employee)
             if (beneficiary is Result.Failed) return@run beneficiary
@@ -101,8 +97,9 @@ class VerifyPayrollInput(
                 return@run Result.Failed(
                     Failure(FailureKind.FORBIDDEN, "payroll_input_author_cannot_verify")
                 )
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run requirePayrollMutation(live, "payroll.review", clock.instant(), security)
+                    .map { receipt }
             }
             val frozen = cutoffs.frozenMonths(company, employee, setOf(month))
             if (frozen is Result.Failed) return@run frozen
@@ -158,7 +155,10 @@ class VerifyPayrollInput(
                         ),
                     )
                     .flatMap { operations.record(actor, key, receipt) }
-                    .map { receipt }
+                    .flatMap {
+                        requirePayrollMutation(live, "payroll.review", clock.instant(), security)
+                            .map { receipt }
+                    }
             }
         }
     }

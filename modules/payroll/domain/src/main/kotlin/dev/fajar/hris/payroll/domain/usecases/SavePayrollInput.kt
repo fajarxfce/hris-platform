@@ -87,13 +87,9 @@ class SavePayrollInput(
                     validateCompanyCommandActor(actor, it)
                 }
             if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
             val permission =
-                requirePayrollMutation(
-                    (checked as Result.Success).value,
-                    "payroll.calculate",
-                    clock.instant(),
-                    security,
-                )
+                requirePayrollMutation(live, "payroll.calculate", clock.instant(), security)
             if (permission is Result.Failed) return@run permission
             val beneficiary = people.accountForEmployee(company, employee)
             if (beneficiary is Result.Failed) return@run beneficiary
@@ -101,8 +97,14 @@ class SavePayrollInput(
                 return@run Result.Failed(
                     Failure(FailureKind.FORBIDDEN, "self_payroll_input_change_denied")
                 )
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run requirePayrollMutation(
+                        live,
+                        "payroll.calculate",
+                        clock.instant(),
+                        security,
+                    )
+                    .map { receipt }
             }
             val frozen = cutoffs.frozenMonths(company, employee, setOf(month))
             if (frozen is Result.Failed) return@run frozen
@@ -170,7 +172,10 @@ class SavePayrollInput(
                         ),
                     )
                     .flatMap { operations.record(actor, key, receipt) }
-                    .map { receipt }
+                    .flatMap {
+                        requirePayrollMutation(live, "payroll.calculate", clock.instant(), security)
+                            .map { receipt }
+                    }
             }
         }
     }

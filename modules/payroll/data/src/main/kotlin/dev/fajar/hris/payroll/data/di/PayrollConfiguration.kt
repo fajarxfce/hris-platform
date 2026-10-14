@@ -410,8 +410,11 @@ class PayrollConfiguration {
     ): PayrollPeriodRepository = StoredPayrollPeriodRepository(source, employees)
 
     @Bean
-    fun payrollInputs(source: PayrollInputDataSource, json: ObjectMapper): PayrollInputRepository =
-        StoredPayrollInputRepository(source, json)
+    fun payrollInputs(
+        source: PayrollInputDataSource,
+        json: ObjectMapper,
+        employees: PayrollEmployeeDataSource,
+    ): PayrollInputRepository = StoredPayrollInputRepository(source, json, employees)
 
     @Bean
     fun payrollWorkSources(source: PayrollWorkSourceDataSource): PayrollWorkSourceRepository =
@@ -604,6 +607,58 @@ class PayrollConfiguration {
         )
 
     @Bean
+    fun getPayrollInputReview(
+        inputs: PayrollInputRepository,
+        sources: PayrollWorkSourceRepository,
+        policies: PayrollPolicyRepository,
+        cutoffs: PayrollCutoffRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollInputReview(
+            inputs,
+            sources,
+            policies,
+            cutoffs,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun listPayrollInputEmployees(
+        inputs: PayrollInputRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListPayrollInputEmployees(
+            inputs,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun getPayrollInput(
         inputs: PayrollInputRepository,
         policies: PayrollPolicyRepository,
@@ -611,7 +666,19 @@ class PayrollConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetPayrollInput(inputs, policies, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollInput(
+            inputs,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun getPayrollInputHistory(
@@ -621,7 +688,19 @@ class PayrollConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetPayrollInputHistory(inputs, policies, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollInputHistory(
+            inputs,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun listPayrollInputs(
@@ -631,7 +710,19 @@ class PayrollConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListPayrollInputs(inputs, policies, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListPayrollInputs(
+            inputs,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun getPayrollWorkSource(
@@ -641,7 +732,19 @@ class PayrollConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetPayrollWorkSource(sources, policies, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollWorkSource(
+            sources,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun payrollRunSource(sql: DSLContext): PayrollRunDataSource = PostgresPayrollRunDataSource(sql)

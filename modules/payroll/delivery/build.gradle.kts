@@ -2,6 +2,7 @@ plugins { id("hris.spring") }
 
 dependencies {
     implementation(libs.pdfbox)
+    implementation(libs.swagger.annotations)
     implementation(projects.modules.approvals.domain)
     implementation(projects.modules.payroll.domain)
     implementation(projects.modules.people.domain)

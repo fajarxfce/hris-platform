@@ -34,6 +34,54 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun payrollInputReviewDocumentsCurrentSourcesIndependentActionsAndBoundedDiscovery() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/payroll"
+        val lookup = api["paths"]["$base/inputs/employees"]["get"]
+        val review = api["paths"]["$base/employees/{employeeId}/inputs/{month}/review"]["get"]
+        assertTrue(lookup["x-hris-company-admission"].asBoolean())
+        assertTrue(review["x-hris-company-admission"].asBoolean())
+        val parameters = lookup["parameters"].associateBy { it["name"].asString() }
+        assertTrue(parameters.getValue("month")["required"].asBoolean())
+        assertEquals(50, parameters.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals(32, parameters.getValue("after")["schema"]["maxLength"].asInt())
+        assertEquals(120, parameters.getValue("query")["schema"]["maxLength"].asInt())
+        assertEquals(
+            setOf("UNPREPARED", "DRAFT", "VERIFIED"),
+            parameters
+                .getValue("status")["schema"]["enum"]
+                .iterator()
+                .asSequence()
+                .map { it.asString() }
+                .toSet(),
+        )
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf(
+                "id",
+                "employeeNumber",
+                "name",
+                "employmentVersion",
+                "inputVersion",
+                "inputStatus",
+            ),
+            schemas["PayrollInputEmployeeResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf(
+                "earningsMonth",
+                "employee",
+                "source",
+                "current",
+                "history",
+                "frozen",
+                "availableActions",
+            ),
+            schemas["PayrollInputReviewResponse"]["properties"].propertyNames().toSet(),
+        )
+    }
+
+    @Test
     fun payrollPeriodReferencesRemainMinimalAndCompanyAdmitted() {
         val api = contract()
         val lookup = api["paths"]["/api/v1/companies/{companyId}/payroll/periods/employees"]["get"]

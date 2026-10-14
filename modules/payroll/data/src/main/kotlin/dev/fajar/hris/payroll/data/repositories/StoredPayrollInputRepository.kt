@@ -2,6 +2,7 @@ package dev.fajar.hris.payroll.data.repositories
 
 import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.payroll.data.datasources.PayrollEmployeeDataSource
 import dev.fajar.hris.payroll.data.datasources.PayrollInputDataSource
 import dev.fajar.hris.payroll.data.mappers.*
 import dev.fajar.hris.payroll.domain.entities.*
@@ -15,7 +16,35 @@ import tools.jackson.databind.ObjectMapper
 class StoredPayrollInputRepository(
     private val source: PayrollInputDataSource,
     private val json: ObjectMapper,
+    private val employees: PayrollEmployeeDataSource,
 ) : PayrollInputRepository {
+    override fun employee(company: UUID, employee: UUID): Result<PayrollEmployee?> =
+        safeDatabaseCall {
+            employees.employee(company, employee)?.toPayrollEmployee()
+        }
+
+    override fun employees(
+        company: UUID,
+        month: YearMonth,
+        query: String,
+        status: PayrollInputEmployeeStatus?,
+        after: String?,
+        limit: Int,
+    ): Result<Page<PayrollInputEmployee>> = safeDatabaseCall {
+        val rows = source.employees(company, month.atDay(1), query, status?.name, after, limit + 1)
+        Page(
+            rows.take(limit).map { row ->
+                require((row.inputVersion == null) == (row.inputStatus == null))
+                PayrollInputEmployee(
+                    row.employee.toPayrollEmployee(),
+                    row.inputVersion,
+                    row.inputStatus?.let(PayrollInputStatus::valueOf),
+                )
+            },
+            if (rows.size > limit) rows[limit - 1].employee.employeeNumber else null,
+        )
+    }
+
     override fun find(company: UUID, employee: UUID, month: YearMonth): Result<PayrollInput?> =
         safeDatabaseCall {
             source.find(company, employee, month.atDay(1))?.toInput(json)

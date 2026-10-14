@@ -48,6 +48,30 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Monthly payroll input review
+
+Monthly employee discovery includes unprepared, draft and verified input heads
+with bounded name/number search and independent payroll access. One guarded
+review combines the employment version, closed attendance source, current input,
+bounded immutable history and calculation cutoff. It returns preparation and
+verification actions from current permissions, source versions and maker/checker
+policy without acquiring private profiles or reserving command eligibility.
+
+Input reads recheck session assurance after acquisition. Saves and verification
+retain recent assurance through receipt replay and transaction completion; late
+expiry rolls back input revisions, journal and operation receipts together.
+Shared payroll, source, People and access guards prevent a concurrent revision
+from mixing the current head with another history snapshot.
+
+Across focused runs, all 107 selected API/PostgreSQL/contract cases passed,
+including 34 new review and assurance cases. All 56 payroll domain tests, 62 worker
+tests, architecture and formatting checks, and both application JAR builds passed.
+Coverage includes bounded discovery, independent reviewers, frozen inputs,
+concurrent readers/writers, original/live grant intersection, expiry during waits
+and acquisition, cancellation, original receipts and late rollback. The OpenAPI
+test also verifies the new routes, minimal projections and query limits.
+Dashboard consumption and development deployment remain subsequent work.
+
 ### Payroll period dashboard
 
 The dashboard now provides month/status-filtered periods, bounded employee

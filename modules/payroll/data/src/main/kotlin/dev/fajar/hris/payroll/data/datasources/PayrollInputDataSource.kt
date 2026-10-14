@@ -1,11 +1,21 @@
 package dev.fajar.hris.payroll.data.datasources
 
+import dev.fajar.hris.payroll.data.models.PayrollInputEmployeeRow
 import dev.fajar.hris.payroll.data.models.PayrollInputSummaryRow
 import dev.fajar.hris.schema.tables.records.*
 import java.time.LocalDate
 import java.util.UUID
 
 interface PayrollInputDataSource {
+    fun employees(
+        company: UUID,
+        month: LocalDate,
+        query: String,
+        status: String?,
+        after: String?,
+        limit: Int,
+    ): List<PayrollInputEmployeeRow>
+
     fun find(company: UUID, employee: UUID, month: LocalDate): PayrollInputRevisionsRecord?
 
     fun revision(

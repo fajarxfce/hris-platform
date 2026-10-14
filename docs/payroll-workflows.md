@@ -42,6 +42,20 @@ Empty earning, deduction, or resolution lists must be submitted explicitly. Miss
 
 Every input retains at most 1,000 immutable revisions. Header, revision, audit/outbox, and receipt share the transaction; the database rejects missing history, changed verification terms, or an invalid workforce reference. A lost response can be retried with the same key and original payload. Authority and independence are still checked before replay.
 
+Monthly employee discovery includes missing input heads and supports literal name,
+employee-number and preparation-status filters. It reads only minimal references
+and current input metadata in one bounded query. Input review holds shared payroll,
+work-period, People and access guards before combining the current employment,
+source reference, input, history and cutoff. Missing or unclosed sources remain
+visible without advertising preparation. Historical authors and the current
+beneficiary cannot verify; a changed employment or source removes verification
+until the input is prepared again. Commands retain independent validation.
+
+All interactive input readers revalidate session assurance after waiting and
+acquisition. Preparation and verification also recheck recent assurance after
+beneficiary/author reads and through journal/receipt completion. Late expiry rolls
+back the input head, immutable revision, journal and receipt together.
+
 ## Durable calculation
 
 Start from a `DRAFT` period with a closed workforce month, effective payroll policy, observed period/workforce/policy versions, reviewed `incomeDueDate`, reference, and reason. Starting requires `payroll.calculate`, recent authentication/MFA, and an idempotency key. The due date must fall in the earnings month for this ordinary monthly workflow. The run's tax month is that month; a later planned transfer does not postpone income already due. Former-employee or other-month liabilities need a separate assessment/amendment workflow.

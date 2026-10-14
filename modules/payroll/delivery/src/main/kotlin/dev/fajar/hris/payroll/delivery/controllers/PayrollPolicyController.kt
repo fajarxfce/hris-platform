@@ -17,6 +17,7 @@ class PayrollPolicyController(
     private val get: GetPayrollPolicy,
     private val history: GetPayrollPolicyHistory,
     private val rules: ListPayrollIncomeTaxRules,
+    private val review: GetPayrollPolicyReview,
 ) {
     @PutMapping("/policy")
     fun save(
@@ -41,6 +42,25 @@ class PayrollPolicyController(
     ): Page<PayrollPolicyRevisionResponse> =
         history.execute(actor, after, limit).response().let {
             Page(it.items.map { revision -> revision.toResponse() }, it.nextCursor)
+        }
+
+    @GetMapping("/policy/review")
+    fun review(
+        actor: Actor,
+        @RequestParam asOf: YearMonth,
+        @RequestParam(required = false) historyAfter: Long?,
+        @RequestParam(defaultValue = "50") historyLimit: Int,
+    ): PayrollPolicyReviewResponse =
+        review.execute(actor, asOf, historyAfter, historyLimit).response().let {
+            PayrollPolicyReviewResponse(
+                it.asOf,
+                it.current?.toResponse(),
+                it.effective?.toResponse(),
+                Page(
+                    it.history.items.map { revision -> revision.toResponse() },
+                    it.history.nextCursor,
+                ),
+            )
         }
 
     @GetMapping("/income-tax-rules")

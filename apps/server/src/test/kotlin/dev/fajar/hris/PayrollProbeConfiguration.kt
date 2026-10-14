@@ -2,7 +2,10 @@ package dev.fajar.hris
 
 import dev.fajar.hris.core.database.datasources.*
 import dev.fajar.hris.payroll.data.datasources.*
+import dev.fajar.hris.payroll.data.models.PayrollPolicyRow
 import dev.fajar.hris.schema.tables.records.*
+import java.time.LocalDate
+import java.util.UUID
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
@@ -12,11 +15,15 @@ class PayrollProbe {
     @Volatile var omitPolicyRevision = false
     @Volatile var omitCompensationRevision = false
     @Volatile var beforeJournal: ((JournalRow) -> Unit)? = null
+    @Volatile var afterPolicyRead: ((String, UUID) -> Unit)? = null
+    @Volatile var beforePolicyLock: ((UUID, Boolean) -> Unit)? = null
 
     fun clear() {
         omitPolicyRevision = false
         omitCompensationRevision = false
         beforeJournal = null
+        afterPolicyRead = null
+        beforePolicyLock = null
     }
 }
 
@@ -31,6 +38,24 @@ class PayrollProbeConfiguration {
         probe: PayrollProbe,
     ): PayrollPolicyDataSource =
         object : PayrollPolicyDataSource by source {
+            override fun lock(company: UUID, shared: Boolean) {
+                probe.beforePolicyLock?.invoke(company, shared)
+                source.lock(company, shared)
+            }
+
+            override fun current(company: UUID): PayrollPolicyRow? =
+                source.current(company).also { probe.afterPolicyRead?.invoke("current", company) }
+
+            override fun effective(company: UUID, month: LocalDate): PayrollPolicyRow? =
+                source.effective(company, month).also {
+                    probe.afterPolicyRead?.invoke("effective", company)
+                }
+
+            override fun history(company: UUID, after: Long?, limit: Int): List<PayrollPolicyRow> =
+                source.history(company, after, limit).also {
+                    probe.afterPolicyRead?.invoke("history", company)
+                }
+
             override fun append(row: PayrollPolicyRevisionsRecord) {
                 if (!probe.omitPolicyRevision) source.append(row)
             }

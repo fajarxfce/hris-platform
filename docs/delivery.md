@@ -48,6 +48,26 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Coherent payroll policy review
+
+Policy administration now exposes the current configuration, the policy applying
+to a requested month and one bounded ascending history page in a single guarded
+read. An unconfigured company returns an empty review; an uncovered month keeps
+the latest configuration visible without treating it as effective. Read authority
+remains separate from policy-management permission and employee payslip access.
+
+Policy and tax-rule reads recheck current session assurance after access waits.
+Acquired policy results receive another check before delivery. Saves also retain
+recent authentication and MFA through journal/receipt completion; a late failure
+rolls back all writes and allows the original operation to be retried.
+
+Validation: 56 selected API/PostgreSQL/contract tests, all 62 worker tests and 56
+payroll domain tests passed, along with formatting, architecture checks and both
+application JAR builds. The 22 new policy tests exercise coherent concurrent
+reads/writes, null and dated configurations, page bounds, company isolation,
+original/live permission intersection, expired assurance, cancellation, receipt
+replay and transaction rollback. The dashboard consumer remains in progress.
+
 Backend foundation: Gradle check and bootJar passed; six PostgreSQL integration tests passed, covering pooled company isolation, denied writes, typed/raw SQL failure mapping, failed-result rollback, cancellation rollback, and immutable audit records. Compose configuration and actionlint passed. No business module, deployment, or performance benchmark is claimed by these checks.
 
 Identity password/session slice: full Gradle check and bootJar passed. Four domain tests and four HTTP/PostgreSQL tests passed alongside the six database tests (14 total). HTTP tests verify persisted sessions, session/CSRF rotation, logout, company isolation, and membership revocation. No MFA, OIDC, or native-token validation is claimed yet.

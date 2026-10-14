@@ -34,6 +34,23 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun payrollPolicyReviewKeepsConfigurationAndDatedSelectionSeparate() {
+        val api = contract()
+        val operation = api["paths"]["/api/v1/companies/{companyId}/payroll/policy/review"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val parameters = operation["parameters"].associateBy { it["name"].asString() }
+        assertTrue(parameters.getValue("asOf")["required"].asBoolean())
+        assertTrue(
+            parameters.keys.containsAll(setOf("companyId", "asOf", "historyAfter", "historyLimit"))
+        )
+        val properties = api["components"]["schemas"]["PayrollPolicyReviewResponse"]["properties"]
+        assertEquals(
+            setOf("asOf", "current", "effective", "history"),
+            properties.properties().map { it.key }.toSet(),
+        )
+    }
+
+    @Test
     fun attendanceExceptionsHaveABoundedCompanyAdmittedMetadataContract() {
         val api = contract()
         val operation =

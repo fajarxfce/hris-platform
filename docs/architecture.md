@@ -78,6 +78,15 @@ after acquisition and before returning private results or completing a write.
 A late failure rolls back period/job changes, targets, journal and receipt together.
 Background closing retains its separate initiating-credential and lease authority.
 
+Payroll policy review holds the shared company payroll guard before company,
+membership and account guards. Current configuration, the selected month's
+effective policy and bounded revision history remain coherent under concurrent
+edits. Interactive policy and tax-rule reads revalidate current session assurance
+after waits; acquired policy results are checked again before delivery. Policy
+saves retain their recent-authentication and MFA requirements through receipt
+replay and transaction completion, rolling back the revision, journal and receipt
+together when assurance expires during acquisition or journaling.
+
 Monthly closing overview projects the period and minimal job progress in one SQL
 snapshot under shared access guards. It neither creates period rows nor holds
 resource locks that exclude the worker. The use case chooses available actions

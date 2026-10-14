@@ -49,6 +49,20 @@ Mutations require recent authentication and recent MFA when enforcement is enabl
 
 Policy and compensation revisions, operation receipts, audit, and outbox entries commit atomically. Optimistic versions reject competing edits. Database constraints require every header version to have its immutable revision. History and pagination retain company RLS. Failed validation or a rolled-back transaction does not consume the operation ID.
 
+`GET /companies/{companyId}/payroll/policy/review?asOf=YYYY-MM` under `/api/v1`
+returns the latest saved configuration, the effective policy for that month and
+one coherent history page. Either configuration may be null: an unconfigured
+company has an empty history, and an uncovered month retains the saved policy
+without claiming that it applies. `historyAfter` accepts revision numbers from
+the previous page; `historyLimit` defaults to 50 and is bounded to 200. Review
+does not reserve a policy version. Saves still require the current head's
+`expectedVersion`, independently of the selected month's `appliedRevision`.
+
+Policy, policy-history and income-tax-rule reads revalidate current session
+assurance after waiting for guards. Policy review also checks it after acquiring
+all results. Policy commands recheck recent authentication/MFA before transaction
+completion, so a late expiry cannot commit a new revision or consume its operation.
+
 Configuration, period/input preparation, and the pure calculation library are implemented. Durable calculation runs, approval, finalization, payslips, payments, amendments, and measured performance are subsequent implementation steps.
 
 ## Earnings and pay basis

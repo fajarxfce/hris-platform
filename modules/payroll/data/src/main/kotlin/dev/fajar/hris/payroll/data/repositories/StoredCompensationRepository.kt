@@ -16,6 +16,24 @@ class StoredCompensationRepository(
     private val source: CompensationDataSource,
     private val json: ObjectMapper,
 ) : CompensationRepository {
+    override fun employee(companyId: UUID, employeeId: UUID): Result<CompensationEmployee?> =
+        safeDatabaseCall {
+            source.employee(companyId, employeeId)?.toCompensationEmployee()
+        }
+
+    override fun employees(
+        companyId: UUID,
+        query: String,
+        after: String?,
+        limit: Int,
+    ): Result<Page<CompensationEmployee>> = safeDatabaseCall {
+        val rows = source.employees(companyId, query, after, limit + 1)
+        Page(
+            rows.take(limit).map { it.toCompensationEmployee() },
+            if (rows.size > limit) rows[limit - 1].employeeNumber else null,
+        )
+    }
+
     override fun revision(
         companyId: UUID,
         employeeId: UUID,

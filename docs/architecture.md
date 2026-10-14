@@ -87,6 +87,16 @@ saves retain their recent-authentication and MFA requirements through receipt
 replay and transaction completion, rolling back the revision, journal and receipt
 together when assurance expires during acquisition or journaling.
 
+Compensation review takes the shared payroll guard before people and access
+guards. A minimal employment reference includes its independent command version;
+current salary, the selected month's salary and history share the same read.
+Payroll owns the read projection of employment identifiers and labels, while
+People retains all writes. Lookup never returns private person fields or requires
+unrelated People administration grants. Compensation reads revalidate assurance
+after acquisition; salary saves also retain recent assurance through journaling
+and receipt completion. The bound beneficiary cannot change or replay their own
+compensation, and the review exposes that capability without disclosing account IDs.
+
 Monthly closing overview projects the period and minimal job progress in one SQL
 snapshot under shared access guards. It neither creates period rows nor holds
 resource locks that exclude the worker. The use case chooses available actions

@@ -1,8 +1,11 @@
 package dev.fajar.hris.payroll.data.datasources
 
+import dev.fajar.hris.payroll.data.models.CompensationEmployeeRow
 import dev.fajar.hris.payroll.data.models.CompensationRow
 import dev.fajar.hris.schema.tables.EmployeeCompensationRevisions.EMPLOYEE_COMPENSATION_REVISIONS as R
 import dev.fajar.hris.schema.tables.EmployeeCompensations.EMPLOYEE_COMPENSATIONS as C
+import dev.fajar.hris.schema.tables.Employments.EMPLOYMENTS as E
+import dev.fajar.hris.schema.tables.Persons.PERSONS as P
 import dev.fajar.hris.schema.tables.records.*
 import java.time.LocalDate
 import java.util.UUID
@@ -10,6 +13,48 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresCompensationDataSource(private val sql: DSLContext) : CompensationDataSource {
+    override fun employee(company: UUID, employee: UUID): CompensationEmployeeRow? =
+        sql.select(E.ID, E.EMPLOYEE_NUMBER, P.LEGAL_NAME, E.VERSION)
+            .from(E)
+            .join(P)
+            .on(P.ID.eq(E.PERSON_ID))
+            .where(E.COMPANY_ID.eq(company), E.ID.eq(employee))
+            .fetchOne {
+                CompensationEmployeeRow(
+                    requireNotNull(it.value1()),
+                    requireNotNull(it.value2()),
+                    requireNotNull(it.value3()),
+                    requireNotNull(it.value4()),
+                )
+            }
+
+    override fun employees(
+        company: UUID,
+        query: String,
+        after: String?,
+        limit: Int,
+    ): List<CompensationEmployeeRow> =
+        sql.select(E.ID, E.EMPLOYEE_NUMBER, P.LEGAL_NAME, E.VERSION)
+            .from(E)
+            .join(P)
+            .on(P.ID.eq(E.PERSON_ID))
+            .where(E.COMPANY_ID.eq(company))
+            .and(
+                E.EMPLOYEE_NUMBER.containsIgnoreCase(query)
+                    .or(P.LEGAL_NAME.containsIgnoreCase(query))
+            )
+            .and(after?.let { E.EMPLOYEE_NUMBER.gt(it) } ?: DSL.noCondition())
+            .orderBy(E.EMPLOYEE_NUMBER)
+            .limit(limit)
+            .fetch {
+                CompensationEmployeeRow(
+                    requireNotNull(it.value1()),
+                    requireNotNull(it.value2()),
+                    requireNotNull(it.value3()),
+                    requireNotNull(it.value4()),
+                )
+            }
+
     override fun revision(company: UUID, employee: UUID, revision: Long): CompensationRow? =
         sql.select(C.VERSION, *R.fields())
             .from(C)

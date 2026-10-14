@@ -34,6 +34,32 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun compensationReviewAndEmployeeLookupKeepPrivateProfilesOutOfTheirContract() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/payroll"
+        val review = api["paths"]["$base/employees/{employeeId}/compensation/review"]["get"]
+        val lookup = api["paths"]["$base/compensation-employees"]["get"]
+        assertTrue(review["x-hris-company-admission"].asBoolean())
+        assertTrue(lookup["x-hris-company-admission"].asBoolean())
+        val parameters = review["parameters"].associateBy { it["name"].asString() }
+        assertTrue(parameters.getValue("asOf")["required"].asBoolean())
+        assertTrue(
+            parameters.keys.containsAll(
+                setOf("companyId", "employeeId", "asOf", "historyAfter", "historyLimit")
+            )
+        )
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("asOf", "employee", "current", "effective", "history", "canChange"),
+            schemas["CompensationReviewResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("id", "employeeNumber", "name", "employmentVersion"),
+            schemas["CompensationEmployeeResponse"]["properties"].propertyNames().toSet(),
+        )
+    }
+
+    @Test
     fun payrollPolicyReviewKeepsConfigurationAndDatedSelectionSeparate() {
         val api = contract()
         val operation = api["paths"]["/api/v1/companies/{companyId}/payroll/policy/review"]["get"]

@@ -2,6 +2,8 @@ package dev.fajar.hris
 
 import dev.fajar.hris.core.database.datasources.*
 import dev.fajar.hris.payroll.data.datasources.*
+import dev.fajar.hris.payroll.data.models.CompensationEmployeeRow
+import dev.fajar.hris.payroll.data.models.CompensationRow
 import dev.fajar.hris.payroll.data.models.PayrollPolicyRow
 import dev.fajar.hris.schema.tables.records.*
 import java.time.LocalDate
@@ -17,6 +19,7 @@ class PayrollProbe {
     @Volatile var beforeJournal: ((JournalRow) -> Unit)? = null
     @Volatile var afterPolicyRead: ((String, UUID) -> Unit)? = null
     @Volatile var beforePolicyLock: ((UUID, Boolean) -> Unit)? = null
+    @Volatile var afterCompensationRead: ((String, UUID) -> Unit)? = null
 
     fun clear() {
         omitPolicyRevision = false
@@ -24,6 +27,7 @@ class PayrollProbe {
         beforeJournal = null
         afterPolicyRead = null
         beforePolicyLock = null
+        afterCompensationRead = null
     }
 }
 
@@ -68,6 +72,55 @@ class PayrollProbeConfiguration {
         probe: PayrollProbe,
     ): CompensationDataSource =
         object : CompensationDataSource by source {
+            override fun employee(company: UUID, employee: UUID): CompensationEmployeeRow? =
+                source.employee(company, employee).also {
+                    probe.afterCompensationRead?.invoke("employee", company)
+                }
+
+            override fun employees(
+                company: UUID,
+                query: String,
+                after: String?,
+                limit: Int,
+            ): List<CompensationEmployeeRow> =
+                source.employees(company, query, after, limit).also {
+                    probe.afterCompensationRead?.invoke("employees", company)
+                }
+
+            override fun current(company: UUID, employee: UUID): CompensationRow? =
+                source.current(company, employee).also {
+                    probe.afterCompensationRead?.invoke("current", company)
+                }
+
+            override fun effective(
+                company: UUID,
+                employee: UUID,
+                month: LocalDate,
+            ): CompensationRow? =
+                source.effective(company, employee, month).also {
+                    probe.afterCompensationRead?.invoke("effective", company)
+                }
+
+            override fun history(
+                company: UUID,
+                employee: UUID,
+                after: Long?,
+                limit: Int,
+            ): List<CompensationRow> =
+                source.history(company, employee, after, limit).also {
+                    probe.afterCompensationRead?.invoke("history", company)
+                }
+
+            override fun list(
+                company: UUID,
+                month: LocalDate,
+                after: UUID?,
+                limit: Int,
+            ): List<CompensationRow> =
+                source.list(company, month, after, limit).also {
+                    probe.afterCompensationRead?.invoke("list", company)
+                }
+
             override fun append(row: EmployeeCompensationRevisionsRecord) {
                 if (!probe.omitCompensationRevision) source.append(row)
             }

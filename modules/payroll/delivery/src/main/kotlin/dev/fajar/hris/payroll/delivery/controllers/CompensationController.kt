@@ -17,7 +17,30 @@ class CompensationController(
     private val get: GetEmployeeCompensation,
     private val history: GetCompensationHistory,
     private val list: ListEmployeeCompensations,
+    private val review: GetCompensationReview,
+    private val employees: ListCompensationEmployees,
 ) {
+    @GetMapping("/compensation-employees")
+    fun employees(
+        actor: Actor,
+        @RequestParam(defaultValue = "") query: String,
+        @RequestParam(required = false) after: String?,
+        @RequestParam(defaultValue = "20") limit: Int,
+    ): Page<CompensationEmployeeResponse> =
+        employees.execute(actor, query, after, limit).response().let {
+            Page(it.items.map { employee -> employee.toResponse() }, it.nextCursor)
+        }
+
+    @GetMapping("/employees/{employeeId}/compensation/review")
+    fun review(
+        actor: Actor,
+        @PathVariable employeeId: UUID,
+        @RequestParam asOf: YearMonth,
+        @RequestParam(required = false) historyAfter: Long?,
+        @RequestParam(defaultValue = "50") historyLimit: Int,
+    ): CompensationReviewResponse =
+        review.execute(actor, employeeId, asOf, historyAfter, historyLimit).response().toResponse()
+
     @PutMapping("/employees/{employeeId}/compensation")
     fun save(
         actor: Actor,

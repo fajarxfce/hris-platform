@@ -65,6 +65,18 @@ completion, so a late expiry cannot commit a new revision or consume its operati
 
 Configuration, period/input preparation, and the pure calculation library are implemented. Durable calculation runs, approval, finalization, payslips, payments, amendments, and measured performance are subsequent implementation steps.
 
+Salary administration uses `GET /companies/{companyId}/payroll/compensation-employees`
+under `/api/v1` for a minimal, bounded employee lookup, including unconfigured and
+future employment. Search is literal and pages are ordered by employee number.
+`GET /companies/{companyId}/payroll/employees/{employeeId}/compensation/review?asOf=YYYY-MM`
+returns that employment's current command version, latest saved compensation,
+effective compensation and ascending history together. `historyAfter` and
+`historyLimit` use the same bounds as policy review. An earlier month with no
+effective salary retains the saved configuration and history. `canChange`
+reflects the caller's current compensation grant and independence; the save
+command still rechecks employment versions, dates and frozen payroll periods.
+Both reads accept only `payroll.read` or `payroll.compensation.manage`.
+
 ## Earnings and pay basis
 
 Compensation may retain a reviewed `payBasis`. It selects immutable overtime/THR rule IDs and chooses calendar/scheduled units for proration, a standard five/six-day workweek, the six-day week's shortest weekday, explicit overtime eligibility or a referenced exemption, regular nonfixed wage, a service-month convention, and whole-rupiah earning rounding. Missing settings remain missing in older revisions; they do not silently select a payroll convention. The same independent compensation permission, live access guards, observed versions, immutable history, and operation fingerprint protect these settings.

@@ -1,7 +1,8 @@
 package dev.fajar.hris.payroll.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.payroll.domain.entities.*
@@ -17,6 +18,8 @@ class GetEmployeeCompensation(
     private val members: MembershipRepository,
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
+    private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(actor: Actor, employeeId: UUID, month: YearMonth): Result<EmployeeCompensation> {
         val company =
@@ -34,10 +37,10 @@ class GetEmployeeCompensation(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId, shared = true)
             if (accountLock is Result.Failed) return@run accountLock
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val found = identities.access(actor.accountId, company)
+            if (found is Result.Failed) return@run found
+            val access = (found as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
 
@@ -46,7 +49,10 @@ class GetEmployeeCompensation(
             compensations.effective(company, employeeId, month).flatMap { value ->
                 if (value == null)
                     Result.Failed(Failure(FailureKind.NOT_FOUND, "compensation_not_found"))
-                else Result.Success(value)
+                else
+                    validateCompanySessionActor(actor, access, clock.instant(), security).map {
+                        value
+                    }
             }
         }
     }

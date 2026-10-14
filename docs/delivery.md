@@ -48,6 +48,29 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Compensation review and employee lookup
+
+Salary administration now exposes a minimal employee lookup and one coherent
+monthly review. The lookup includes unconfigured and future employments; it
+returns identifiers, names and the current employment version without acquiring
+private profile fields. Review separates that employment version, the latest
+salary revision, the selected month's salary and bounded ascending history.
+Selecting a month before salary starts retains saved configuration and history.
+
+Payroll and People guards keep the review coherent with competing salary and
+employment changes. Current read grants and MFA are rechecked after acquisition.
+Salary mutations retain recent assurance through journal/receipt completion;
+late expiry rolls the transaction back. Both the capability hint and the command
+enforce independence from the currently bound beneficiary, including replay.
+
+Validation passed 66 selected API/PostgreSQL/contract tests across focused runs,
+all 62 worker tests and 56 payroll domain tests. The 31 new cases cover bounded
+literal lookup, minimal output, company and permission isolation, dated/empty
+review, independent command versions, competing reads/writes, changed beneficiary
+binding, expired assurance, revoked credentials, interruption, original replay
+and rollback. Formatting, architecture checks and API/worker JAR builds passed.
+Dashboard consumption and a new development deployment remain subsequent work.
+
 ### Coherent payroll policy review
 
 Policy administration now exposes the current configuration, the policy applying
@@ -3584,4 +3607,7 @@ test-only corrections. Android dev assembly and the production Web build passed.
 API 35 emulator acceptance verified the live profile, cold offline restoration,
 another restart after a 73-hour clock advance, and failed-refresh retention. The
 emulator clock and network were restored. Phone installation remains pending
-because `10.77.77.3:5555` did not respond. This acceptance used the dedicated emulator. Native Apple/Windows build results remain separate CI validation.
+because `10.77.77.3:5555` did not respond. This acceptance used the dedicated emulator.
+The subsequent [mobile CI run](https://github.com/fajarxfce/hris-mobile/actions/runs/38568275914)
+passed Android/Web verification, Windows compilation and the iOS simulator build
+after the Expense UI fixture waited for acquisition before its offline refresh.

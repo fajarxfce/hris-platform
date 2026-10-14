@@ -45,6 +45,8 @@ class PayrollConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         GetCompensationHistory(
             policies,
@@ -53,6 +55,8 @@ class PayrollConfiguration {
             members,
             identities,
             transactions,
+            clock,
+            security,
         )
 
     @Bean
@@ -63,6 +67,8 @@ class PayrollConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         GetEmployeeCompensation(
             policies,
@@ -71,6 +77,8 @@ class PayrollConfiguration {
             members,
             identities,
             transactions,
+            clock,
+            security,
         )
 
     @Bean
@@ -132,6 +140,8 @@ class PayrollConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         ListEmployeeCompensations(
             policies,
@@ -140,6 +150,54 @@ class PayrollConfiguration {
             members,
             identities,
             transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun getCompensationReview(
+        policies: PayrollPolicyRepository,
+        compensations: CompensationRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetCompensationReview(
+            policies,
+            compensations,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun listCompensationEmployees(
+        compensations: CompensationRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListCompensationEmployees(
+            compensations,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
         )
 
     @Bean

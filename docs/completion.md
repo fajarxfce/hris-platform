@@ -20,12 +20,11 @@ age-based read limit. Saved views remain readable after freshness or credential
 expiry; live authorization and operation reviews have separate checks. Foreground
 revalidation retains the same workspace, while confirmed denials keep affected
 reads gated through failed cleanup and retries. The [mobile read and sync model](https://github.com/fajarxfce/hris-mobile/blob/main/docs/local-first.md)
-distinguishes existing snapshots from complete replicas: Inbox, Leave, Overtime, Workforce and Payroll
+distinguishes existing snapshots from complete replicas: Inbox, Leave, Overtime, Workforce, Payroll and Expenses
 collections consume change feeds and retain account-owned records
 across sign-in, independently of the active request session. A replacement cursor
-stages new data without hiding published facts. Expenses retains its
-last acquired list/detail views, and the
-coworker directory remains online. API 35 acceptance reopened Home and monthly
+stages new data without hiding published facts. The coworker directory remains
+online. API 35 acceptance reopened Home and monthly
 attendance without connectivity after advancing the emulator clock by 73 hours.
 Company policy controls maintenance, minimum builds and module availability, with
 fresh admission before inbox synchronization and command delivery.
@@ -141,7 +140,17 @@ The [Expense record endpoint](modules/expenses.md#employee-reads) supplies a
 coherent claim/submission/approval and activity page for local replication.
 Approval reassignment publishes a new invalidation even at the same claim version;
 payment progress retains its separate collection. Backend tests and read-only dev
-checks passed. Full mobile Expense storage and synchronization remain outstanding.
+checks passed. The [mobile Expense replica](https://github.com/fajarxfce/hris-mobile/commit/d9ae9935fd533dffdf331452473fb69e59a638c3)
+now retains complete claims, indexed summaries, independently versioned payments
+and acquired activity. Month/status/page selections query local records, and
+bounded synchronization commits changed data and cursor atomically. Confirmed
+read denials remain authoritative until admitted synchronization succeeds.
+Mobile root checks passed with 1,344 JVM/desktop tests, 184 expense tests in Chromium,
+Android dev assembly and production Web compilation. API 35 acceptance cold-started
+offline after a 73-hour clock advance: four claims, local filters, two claim details,
+approval and activity remained readable with unchanged encrypted payloads.
+Clock/network restoration and explicit refresh succeeded; the emulator crash buffer
+was empty. The validated APK was delivered to the phone with install-only.
 Automated UI/API checks and the Android dev build passed. Android 16 device checks
 covered password sign-in, company isolation, profiles, inbox reading, offline
 content, offline process restoration with company isolation, queued acknowledgement
@@ -160,7 +169,7 @@ owned disposable database. Its historical and current revisions, lost-response
 replay and competing hold were exercised without modifying development records.
 
 Expense workflows now include backend self-service discovery and strict ownership,
-mobile claim history, bounded offline views, draft authoring, dated categories,
+mobile claim history, account-owned local records, draft authoring, dated categories,
 cost centers, published receipt selection/export, submission, cancellation and
 withdrawal with durable recovery. The dashboard supports policy administration,
 administrative drafts and returned-claim correction, submission/cancellation/
@@ -176,7 +185,7 @@ against an isolated API/PostgreSQL fixture with independent operators.
 | Area | Remaining end-to-end work |
 | --- | --- |
 | Mobile identity | Native OIDC handoff and external-provider acceptance. Android MFA and device-session workflows are validated; iOS physical acceptance remains separate. |
-| Mobile foundation | Expense replica and offline drafts, stable ownership for the remaining read projections, consistent sync status, deep links and push registration. Owned encrypted company restoration, age-independent stored reads and account-owned Inbox/Leave/Overtime/Workforce/Payroll records are implemented; the mobile sync model records each remaining collection. |
+| Mobile foundation | Offline drafts, stable ownership for the remaining read projections, consistent sync status, deep links and push registration. Owned encrypted company restoration, age-independent stored reads and account-owned Inbox/Leave/Overtime/Workforce/Payroll/Expense records are implemented; the mobile sync model records each remaining collection. |
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
 | Workforce | Bulk/reset and late corrections; physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections and their history, company-wide exception review queues, overtime planning with reviewed calendars, directories/details/history, actual-time submission, independent review and withdrawal, dashboard monthly closing/recovery with published employee results, and mobile work calendars, overtime planning/actual time/withdrawal with durable recovery, and online/offline capture are implemented and verified against the real API. |
 | Leave | Team calendar, entitlement batches and year closing; scheduled accrual/expiry. Dashboard request creation includes scoped employee/evidence selection, server calculation, preview conflicts and original-command recovery, verified against an isolated API/PostgreSQL instance. Mobile balances, filtered history, request details, submission with published document evidence, and durable withdrawal/cancellation flows are implemented and verified against the development API. |

@@ -11,10 +11,12 @@ class PayrollPeriodProbe {
     @Volatile var omitTransition = false
     @Volatile var omitMembers = false
     @Volatile var omitPeriodChange = false
+    @Volatile var afterRead: ((String, java.util.UUID) -> Unit)? = null
     @Volatile var omitInputRevision = false
     @Volatile var beforeInputAppend: ((PayrollInputRevisionsRecord) -> Unit)? = null
 
     fun clear() {
+        afterRead = null
         omitTransition = false
         omitMembers = false
         omitPeriodChange = false
@@ -34,6 +36,28 @@ class PayrollPeriodProbeConfiguration {
         probe: PayrollPeriodProbe,
     ): PayrollPeriodDataSource =
         object : PayrollPeriodDataSource by source {
+            override fun list(
+                company: java.util.UUID,
+                from: java.time.LocalDate,
+                until: java.time.LocalDate,
+                status: String?,
+                after: java.util.UUID?,
+                limit: Int,
+            ): List<PayrollPeriodsRecord> =
+                source.list(company, from, until, status, after, limit).also {
+                    probe.afterRead?.invoke("list", company)
+                }
+
+            override fun history(
+                company: java.util.UUID,
+                id: java.util.UUID,
+                after: Long?,
+                limit: Int,
+            ): List<PayrollPeriodChangesRecord> =
+                source.history(company, id, after, limit).also {
+                    probe.afterRead?.invoke("detail", company)
+                }
+
             override fun transition(
                 company: java.util.UUID,
                 id: java.util.UUID,

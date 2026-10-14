@@ -97,6 +97,13 @@ after acquisition; salary saves also retain recent assurance through journaling
 and receipt completion. The bound beneficiary cannot change or replay their own
 compensation, and the review exposes that capability without disclosing account IDs.
 
+Payroll compensation and period repositories share a raw, minimal employee
+projection datasource. Neither repository calls another repository or datasource
+through a peer. Period discovery has its own use-case authorization; compensation
+read grants remain independent. Period detail acquires shared payroll, People and
+access guards before reading current participant labels and input heads. Session
+assurance is checked again after reads and through period command completion.
+
 Monthly closing overview projects the period and minimal job progress in one SQL
 snapshot under shared access guards. It neither creates period rows nor holds
 resource locks that exclude the worker. The use case chooses available actions

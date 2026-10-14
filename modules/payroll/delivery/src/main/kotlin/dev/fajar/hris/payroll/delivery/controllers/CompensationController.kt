@@ -26,7 +26,7 @@ class CompensationController(
         @RequestParam(defaultValue = "") query: String,
         @RequestParam(required = false) after: String?,
         @RequestParam(defaultValue = "20") limit: Int,
-    ): Page<CompensationEmployeeResponse> =
+    ): Page<PayrollEmployeeResponse> =
         employees.execute(actor, query, after, limit).response().let {
             Page(it.items.map { employee -> employee.toResponse() }, it.nextCursor)
         }

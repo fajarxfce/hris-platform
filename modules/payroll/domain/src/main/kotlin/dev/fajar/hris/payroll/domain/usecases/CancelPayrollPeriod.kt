@@ -59,13 +59,9 @@ class CancelPayrollPeriod(
                     validateCompanyCommandActor(actor, it)
                 }
             if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
             val permission =
-                requirePayrollMutation(
-                    (checked as Result.Success).value,
-                    "payroll.calculate",
-                    clock.instant(),
-                    security,
-                )
+                requirePayrollMutation(live, "payroll.calculate", clock.instant(), security)
             if (permission is Result.Failed) return@run permission
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
@@ -98,7 +94,10 @@ class CancelPayrollPeriod(
                         ),
                     )
                     .flatMap { operations.record(actor, key, receipt) }
-                    .map { receipt }
+                    .flatMap {
+                        requirePayrollMutation(live, "payroll.calculate", clock.instant(), security)
+                            .map { receipt }
+                    }
             }
         }
     }

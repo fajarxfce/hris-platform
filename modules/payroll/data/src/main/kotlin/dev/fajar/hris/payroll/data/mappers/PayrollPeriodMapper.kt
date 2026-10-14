@@ -30,4 +30,10 @@ fun PayrollPeriodChangesRecord.toChange() =
     )
 
 fun PayrollPeriodMemberRow.toMember() =
-    PayrollPeriodMember(employeeId, inputVersion, inputStatus?.let(PayrollInputStatus::valueOf))
+    PayrollPeriodMember(
+        employeeId,
+        employeeNumber,
+        name,
+        inputVersion,
+        inputStatus?.let(PayrollInputStatus::valueOf),
+    )

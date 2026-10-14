@@ -2,8 +2,10 @@ package dev.fajar.hris.payroll.domain.entities
 
 import java.util.UUID
 
-/** Minimal employment reference for salary administration, independent of effective salary. */
-data class CompensationEmployee(
+/**
+ * Minimal current employment reference for payroll administration; excludes private profile fields.
+ */
+data class PayrollEmployee(
     val id: UUID,
     val employeeNumber: String,
     val name: String,

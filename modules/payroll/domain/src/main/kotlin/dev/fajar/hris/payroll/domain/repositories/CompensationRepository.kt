@@ -6,14 +6,14 @@ import java.time.YearMonth
 import java.util.UUID
 
 interface CompensationRepository {
-    fun employee(companyId: UUID, employeeId: UUID): Result<CompensationEmployee?>
+    fun employee(companyId: UUID, employeeId: UUID): Result<PayrollEmployee?>
 
     fun employees(
         companyId: UUID,
         query: String,
         after: String?,
         limit: Int,
-    ): Result<Page<CompensationEmployee>>
+    ): Result<Page<PayrollEmployee>>
 
     fun revision(companyId: UUID, employeeId: UUID, revision: Long): Result<EmployeeCompensation?>
 

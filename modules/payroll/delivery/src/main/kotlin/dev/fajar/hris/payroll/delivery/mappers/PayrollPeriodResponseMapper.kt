@@ -23,7 +23,7 @@ fun PayrollPeriodChange.toResponse() =
     PayrollPeriodChangeResponse(version, status.name, actorId, recordedAt, reason, runId)
 
 fun PayrollPeriodMember.toResponse() =
-    PayrollPeriodMemberResponse(employeeId, inputVersion, inputStatus?.name)
+    PayrollPeriodMemberResponse(employeeId, employeeNumber, name, inputVersion, inputStatus?.name)
 
 fun PayrollPeriodDetails.toResponse() =
     PayrollPeriodDetailsResponse(

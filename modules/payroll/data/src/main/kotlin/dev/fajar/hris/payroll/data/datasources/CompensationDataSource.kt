@@ -1,21 +1,11 @@
 package dev.fajar.hris.payroll.data.datasources
 
-import dev.fajar.hris.payroll.data.models.CompensationEmployeeRow
 import dev.fajar.hris.payroll.data.models.CompensationRow
 import dev.fajar.hris.schema.tables.records.*
 import java.time.LocalDate
 import java.util.UUID
 
 interface CompensationDataSource {
-    fun employee(company: UUID, employee: UUID): CompensationEmployeeRow?
-
-    fun employees(
-        company: UUID,
-        query: String,
-        after: String?,
-        limit: Int,
-    ): List<CompensationEmployeeRow>
-
     fun revision(company: UUID, employee: UUID, revision: Long): CompensationRow?
 
     fun current(company: UUID, employee: UUID): CompensationRow?

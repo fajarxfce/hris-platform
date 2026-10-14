@@ -48,6 +48,28 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Payroll period preparation reads
+
+Period discovery now has its own payroll-authorized employee lookup. It includes
+future and unconfigured employments and returns only names, employee numbers,
+identifiers and current employment versions. Compensation and period repositories
+share the raw reference datasource; their application permissions remain separate.
+Existing period rosters include current display labels through one bounded query.
+
+Period details hold shared payroll, People and access guards in that order.
+Lists, details and candidate lookup recheck assurance after acquiring results.
+Create/cancel commands retain recent assurance through journal and receipt
+completion, including original receipt replay. Late expiry rolls the transaction
+back without leaving roster, changes, audit or receipt fragments.
+
+Across focused runs, all 97 selected API/PostgreSQL/contract cases passed, including
+19 new period cases. All 62 worker tests, architecture and formatting checks, and
+both application JAR builds passed. The new cases cover minimal bounded discovery,
+independent permissions, company isolation, original/live grant intersection,
+MFA expiry during waits and acquisition, cancellation, replay and late rollback.
+General fixture MFA is disabled; assurance tests explicitly use the production
+MFA policy. Dashboard consumption and development deployment remain separate.
+
 ### Compensation review and employee lookup
 
 Salary administration now exposes a minimal employee lookup and one coherent

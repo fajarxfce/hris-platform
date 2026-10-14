@@ -2,6 +2,7 @@ package dev.fajar.hris.payroll.data.repositories
 
 import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.payroll.data.datasources.PayrollEmployeeDataSource
 import dev.fajar.hris.payroll.data.datasources.PayrollPeriodDataSource
 import dev.fajar.hris.payroll.data.mappers.*
 import dev.fajar.hris.payroll.domain.entities.*
@@ -10,8 +11,23 @@ import dev.fajar.hris.schema.tables.records.*
 import java.time.*
 import java.util.UUID
 
-class StoredPayrollPeriodRepository(private val source: PayrollPeriodDataSource) :
-    PayrollPeriodRepository {
+class StoredPayrollPeriodRepository(
+    private val source: PayrollPeriodDataSource,
+    private val employees: PayrollEmployeeDataSource,
+) : PayrollPeriodRepository {
+    override fun employees(
+        company: UUID,
+        query: String,
+        after: String?,
+        limit: Int,
+    ): Result<Page<PayrollEmployee>> = safeDatabaseCall {
+        val rows = employees.employees(company, query, after, limit + 1)
+        Page(
+            rows.take(limit).map { it.toPayrollEmployee() },
+            if (rows.size > limit) rows[limit - 1].employeeNumber else null,
+        )
+    }
+
     override fun transition(
         company: UUID,
         period: PayrollPeriod,

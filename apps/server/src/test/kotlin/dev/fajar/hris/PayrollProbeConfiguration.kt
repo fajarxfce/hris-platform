@@ -2,8 +2,8 @@ package dev.fajar.hris
 
 import dev.fajar.hris.core.database.datasources.*
 import dev.fajar.hris.payroll.data.datasources.*
-import dev.fajar.hris.payroll.data.models.CompensationEmployeeRow
 import dev.fajar.hris.payroll.data.models.CompensationRow
+import dev.fajar.hris.payroll.data.models.PayrollEmployeeRow
 import dev.fajar.hris.payroll.data.models.PayrollPolicyRow
 import dev.fajar.hris.schema.tables.records.*
 import java.time.LocalDate
@@ -67,12 +67,12 @@ class PayrollProbeConfiguration {
 
     @Bean
     @Primary
-    fun probedCompensationSource(
-        @Qualifier("compensationSource") source: CompensationDataSource,
+    fun probedPayrollEmployeeSource(
+        @Qualifier("payrollEmployeeSource") source: PayrollEmployeeDataSource,
         probe: PayrollProbe,
-    ): CompensationDataSource =
-        object : CompensationDataSource by source {
-            override fun employee(company: UUID, employee: UUID): CompensationEmployeeRow? =
+    ): PayrollEmployeeDataSource =
+        object : PayrollEmployeeDataSource by source {
+            override fun employee(company: UUID, employee: UUID): PayrollEmployeeRow? =
                 source.employee(company, employee).also {
                     probe.afterCompensationRead?.invoke("employee", company)
                 }
@@ -82,11 +82,19 @@ class PayrollProbeConfiguration {
                 query: String,
                 after: String?,
                 limit: Int,
-            ): List<CompensationEmployeeRow> =
+            ): List<PayrollEmployeeRow> =
                 source.employees(company, query, after, limit).also {
                     probe.afterCompensationRead?.invoke("employees", company)
                 }
+        }
 
+    @Bean
+    @Primary
+    fun probedCompensationSource(
+        @Qualifier("compensationSource") source: CompensationDataSource,
+        probe: PayrollProbe,
+    ): CompensationDataSource =
+        object : CompensationDataSource by source {
             override fun current(company: UUID, employee: UUID): CompensationRow? =
                 source.current(company, employee).also {
                     probe.afterCompensationRead?.invoke("current", company)

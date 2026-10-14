@@ -12,6 +12,17 @@ Period creation and cancellation require `payroll.calculate`, recent authenticat
 
 The header, complete participant set, initial change, audit/outbox, and operation receipt commit together. Participant insertion is bound to the header's database transaction; a later insert cannot extend the roster. The deferred completeness check counts the roster once per creation, rather than once per participant. Listing uses finite UUID pages, including current input status for each participant.
 
+Participant discovery searches current payroll employment references in bounded
+name/number pages. It includes future and unconfigured employments; calculation
+still validates effective employment and salary independently. Existing period
+rosters include current name/number labels without acquiring private profiles.
+The roster IDs and payment metadata remain immutable.
+
+Period detail holds shared payroll, People and access guards in that order.
+Lists, detail and candidate discovery recheck session assurance after acquisition;
+new commands and original receipt recovery require current recent assurance.
+Expiry during journal/receipt completion rolls the complete command back.
+
 ## Monthly inputs
 
 A prepared input references the exact closed workforce snapshot for its company, employment, and earnings month. The command carries the observed workforce and employment versions. Missing, unfinished, foreign, or changed source evidence blocks preparation. Payroll reads a scoped projection of the workforce reference; it does not edit factual workforce records or depend on their implementation module.

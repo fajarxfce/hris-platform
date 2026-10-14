@@ -18,7 +18,19 @@ class PayrollPeriodController(
     private val cancel: CancelPayrollPeriod,
     private val get: GetPayrollPeriod,
     private val list: ListPayrollPeriods,
+    private val employees: ListPayrollPeriodEmployees,
 ) {
+    @GetMapping("/employees")
+    fun employees(
+        actor: Actor,
+        @RequestParam(defaultValue = "") query: String,
+        @RequestParam(required = false) after: String?,
+        @RequestParam(defaultValue = "50") limit: Int,
+    ): Page<PayrollEmployeeResponse> =
+        employees.execute(actor, query, after, limit).response().let {
+            Page(it.items.map { row -> row.toResponse() }, it.nextCursor)
+        }
+
     @PostMapping
     fun create(
         actor: Actor,

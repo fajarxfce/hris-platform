@@ -3,6 +3,7 @@ package dev.fajar.hris.payroll.data.repositories
 import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.payroll.data.datasources.CompensationDataSource
+import dev.fajar.hris.payroll.data.datasources.PayrollEmployeeDataSource
 import dev.fajar.hris.payroll.data.mappers.*
 import dev.fajar.hris.payroll.domain.entities.*
 import dev.fajar.hris.payroll.domain.repositories.CompensationRepository
@@ -14,11 +15,12 @@ import tools.jackson.databind.ObjectMapper
 
 class StoredCompensationRepository(
     private val source: CompensationDataSource,
+    private val employees: PayrollEmployeeDataSource,
     private val json: ObjectMapper,
 ) : CompensationRepository {
-    override fun employee(companyId: UUID, employeeId: UUID): Result<CompensationEmployee?> =
+    override fun employee(companyId: UUID, employeeId: UUID): Result<PayrollEmployee?> =
         safeDatabaseCall {
-            source.employee(companyId, employeeId)?.toCompensationEmployee()
+            employees.employee(companyId, employeeId)?.toPayrollEmployee()
         }
 
     override fun employees(
@@ -26,10 +28,10 @@ class StoredCompensationRepository(
         query: String,
         after: String?,
         limit: Int,
-    ): Result<Page<CompensationEmployee>> = safeDatabaseCall {
-        val rows = source.employees(companyId, query, after, limit + 1)
+    ): Result<Page<PayrollEmployee>> = safeDatabaseCall {
+        val rows = employees.employees(companyId, query, after, limit + 1)
         Page(
-            rows.take(limit).map { it.toCompensationEmployee() },
+            rows.take(limit).map { it.toPayrollEmployee() },
             if (rows.size > limit) rows[limit - 1].employeeNumber else null,
         )
     }

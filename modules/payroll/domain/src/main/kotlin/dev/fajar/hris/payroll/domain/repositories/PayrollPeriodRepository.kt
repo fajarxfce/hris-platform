@@ -6,6 +6,13 @@ import java.time.*
 import java.util.UUID
 
 interface PayrollPeriodRepository {
+    fun employees(
+        company: UUID,
+        query: String,
+        after: String?,
+        limit: Int,
+    ): Result<Page<PayrollEmployee>>
+
     fun transition(
         company: UUID,
         period: PayrollPeriod,

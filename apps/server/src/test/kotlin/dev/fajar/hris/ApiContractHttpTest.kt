@@ -34,6 +34,18 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun payrollPeriodReferencesRemainMinimalAndCompanyAdmitted() {
+        val api = contract()
+        val lookup = api["paths"]["/api/v1/companies/{companyId}/payroll/periods/employees"]["get"]
+        assertTrue(lookup["x-hris-company-admission"].asBoolean())
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("employeeId", "employeeNumber", "name", "inputVersion", "inputStatus"),
+            schemas["PayrollPeriodMemberResponse"]["properties"].propertyNames().toSet(),
+        )
+    }
+
+    @Test
     fun compensationReviewAndEmployeeLookupKeepPrivateProfilesOutOfTheirContract() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/payroll"
@@ -55,7 +67,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
         )
         assertEquals(
             setOf("id", "employeeNumber", "name", "employmentVersion"),
-            schemas["CompensationEmployeeResponse"]["properties"].propertyNames().toSet(),
+            schemas["PayrollEmployeeResponse"]["properties"].propertyNames().toSet(),
         )
     }
 

@@ -1,22 +1,27 @@
 package dev.fajar.hris.payroll.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.payroll.domain.entities.*
 import dev.fajar.hris.payroll.domain.policies.*
 import dev.fajar.hris.payroll.domain.repositories.*
+import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import java.time.*
 import java.util.UUID
 
 class GetPayrollPeriod(
     private val periods: PayrollPeriodRepository,
     private val policies: PayrollPolicyRepository,
+    private val people: PeopleRepository,
     private val companies: CompanyRepository,
     private val members: MembershipRepository,
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
+    private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -40,16 +45,18 @@ class GetPayrollPeriod(
         return transactions.run(actor) {
             val policyLock = policies.lock(company, shared = true)
             if (policyLock is Result.Failed) return@run policyLock
+            val peopleLock = people.lockReportingLines(company, shared = true)
+            if (peopleLock is Result.Failed) return@run peopleLock
             val companyLock = companies.lock(company, shared = true)
             if (companyLock is Result.Failed) return@run companyLock
             val memberLock = members.lock(company, shared = true)
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId, shared = true)
             if (accountLock is Result.Failed) return@run accountLock
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val foundAccess = identities.access(actor.accountId, company)
+            if (foundAccess is Result.Failed) return@run foundAccess
+            val access = (foundAccess as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             if (!canReadPayrollInput((checked as Result.Success).value))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
@@ -60,10 +67,14 @@ class GetPayrollPeriod(
                     ?: return@run Result.Failed(
                         Failure(FailureKind.NOT_FOUND, "payroll_period_not_found")
                     )
+            if (historyAfter != null && historyAfter > period.version)
+                return@run Result.Failed(Failure(FailureKind.VALIDATION, "invalid_page"))
             val roster = periods.members(company, id, after, limit)
             if (roster is Result.Failed) return@run roster
-            periods.history(company, id, historyAfter, historyLimit).map {
-                PayrollPeriodDetails(period, (roster as Result.Success).value, it)
+            periods.history(company, id, historyAfter, historyLimit).flatMap { history ->
+                validateCompanySessionActor(actor, access, clock.instant(), security).map {
+                    PayrollPeriodDetails(period, (roster as Result.Success).value, history)
+                }
             }
         }
     }

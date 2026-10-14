@@ -1,8 +1,8 @@
-package dev.fajar.hris.payroll.data.models
+package dev.fajar.hris.payroll.delivery.responses
 
 import java.util.UUID
 
-data class CompensationEmployeeRow(
+data class PayrollEmployeeResponse(
     val id: UUID,
     val employeeNumber: String,
     val name: String,

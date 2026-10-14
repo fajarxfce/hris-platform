@@ -5,7 +5,7 @@ import java.time.YearMonth
 
 data class CompensationReview(
     val asOf: YearMonth,
-    val employee: CompensationEmployee,
+    val employee: PayrollEmployee,
     val current: EmployeeCompensation?,
     val effective: EmployeeCompensation?,
     val history: Page<CompensationRevision>,

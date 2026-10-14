@@ -5,7 +5,7 @@ import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
-import dev.fajar.hris.payroll.domain.entities.CompensationEmployee
+import dev.fajar.hris.payroll.domain.entities.PayrollEmployee
 import dev.fajar.hris.payroll.domain.policies.canReadCompensation
 import dev.fajar.hris.payroll.domain.repositories.CompensationRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -26,7 +26,7 @@ class ListCompensationEmployees(
         query: String,
         after: String?,
         limit: Int,
-    ): Result<Page<CompensationEmployee>> {
+    ): Result<Page<PayrollEmployee>> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))

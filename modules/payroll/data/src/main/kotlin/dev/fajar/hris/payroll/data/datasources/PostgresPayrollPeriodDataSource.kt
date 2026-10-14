@@ -1,11 +1,13 @@
 package dev.fajar.hris.payroll.data.datasources
 
 import dev.fajar.hris.payroll.data.models.PayrollPeriodMemberRow
+import dev.fajar.hris.schema.tables.Employments.EMPLOYMENTS as E
 import dev.fajar.hris.schema.tables.PayrollInputRevisions.PAYROLL_INPUT_REVISIONS as R
 import dev.fajar.hris.schema.tables.PayrollInputs.PAYROLL_INPUTS as I
 import dev.fajar.hris.schema.tables.PayrollPeriodChanges.PAYROLL_PERIOD_CHANGES as C
 import dev.fajar.hris.schema.tables.PayrollPeriodMembers.PAYROLL_PERIOD_MEMBERS as M
 import dev.fajar.hris.schema.tables.PayrollPeriods.PAYROLL_PERIODS as P
+import dev.fajar.hris.schema.tables.Persons.PERSONS as PERSON
 import dev.fajar.hris.schema.tables.records.*
 import java.time.LocalDate
 import java.util.UUID
@@ -78,8 +80,12 @@ class PostgresPayrollPeriodDataSource(private val sql: DSLContext) : PayrollPeri
         after: UUID?,
         limit: Int,
     ): List<PayrollPeriodMemberRow> =
-        sql.select(M.EMPLOYMENT_ID, I.VERSION, R.STATUS)
+        sql.select(M.EMPLOYMENT_ID, E.EMPLOYEE_NUMBER, PERSON.LEGAL_NAME, I.VERSION, R.STATUS)
             .from(M)
+            .join(E)
+            .on(E.COMPANY_ID.eq(M.COMPANY_ID).and(E.ID.eq(M.EMPLOYMENT_ID)))
+            .join(PERSON)
+            .on(PERSON.ID.eq(E.PERSON_ID))
             .join(P)
             .on(P.COMPANY_ID.eq(M.COMPANY_ID).and(P.ID.eq(M.PERIOD_ID)))
             .leftJoin(I)
@@ -102,6 +108,8 @@ class PostgresPayrollPeriodDataSource(private val sql: DSLContext) : PayrollPeri
             .fetch {
                 PayrollPeriodMemberRow(
                     it.get(M.EMPLOYMENT_ID)!!,
+                    requireNotNull(it.get(E.EMPLOYEE_NUMBER)),
+                    requireNotNull(it.get(PERSON.LEGAL_NAME)),
                     it.get(I.VERSION),
                     it.get(R.STATUS),
                 )

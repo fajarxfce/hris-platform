@@ -33,8 +33,9 @@ class PayrollPayslipController(
         @RequestParam(required = false) after: String?,
         @RequestParam(defaultValue = "50") limit: Int,
         @RequestParam(defaultValue = "AUTHORIZED") scope: PayrollPayslipReadScope,
+        @RequestParam(defaultValue = "") query: String,
     ): Page<PayrollPayslipSummaryResponse> =
-        list.execute(actor, from, until, employeeId, after, limit, scope).response().let {
+        list.execute(actor, from, until, employeeId, after, limit, scope, query).response().let {
             Page(it.items.map { item -> item.toResponse() }, it.nextCursor)
         }
 

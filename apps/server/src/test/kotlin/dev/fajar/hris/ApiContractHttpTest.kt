@@ -1156,6 +1156,13 @@ class ApiContractHttpTest : PeopleApiFixture() {
     @Test
     fun payslipReadScopesAreExplicitAndPreserveTheAuthorizedDefault() {
         val paths = contract()["paths"]
+        val search =
+            paths["/api/v1/companies/{companyId}/payroll/payslips"]["get"]["parameters"].single {
+                it["name"].asString() == "query"
+            }
+        assertEquals("query", search["in"].asString())
+        assertFalse(search["required"].asBoolean())
+        assertEquals("string", search["schema"]["type"].asString())
         for (suffix in listOf("", "/{id}", "/{id}/payments", "/{id}/pdf")) {
             val operation = paths["/api/v1/companies/{companyId}/payroll/payslips$suffix"]["get"]
             val scope = operation["parameters"].single { it["name"].asString() == "scope" }

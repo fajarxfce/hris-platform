@@ -4,12 +4,20 @@ Finalized, published payroll assessments provide the immutable payslip. Draft, c
 
 ## API
 
-- `GET /api/v1/companies/{companyId}/payroll/payslips` returns lightweight newest-first pages. Optional month filters are bounded; `limit` is at most 200.
+- `GET /api/v1/companies/{companyId}/payroll/payslips` returns lightweight newest-first pages. Optional month filters are bounded; `limit` is at most 200. Optional `query` searches the retained employee name or number.
 - `GET .../payslips/{id}` returns the retained calculation and issuer/employee labels.
 - `GET .../payslips/{id}/pdf?language=ID` downloads an Indonesian PDF. Use `language=EN` for English; the default is `ID`. Other values return a structured HTTP 400 problem.
 - `GET .../payslips/{id}/payments` returns payment progress independently of the original payslip. A published payslip is not proof of bank settlement.
 
 Cookie and native bearer authentication are supported. PDF clients should accept both `application/pdf` and `application/problem+json`, then inspect status and content type before saving bytes. Error codes and parameters remain unlocalized; the selected document language changes only PDF labels and number formatting.
+
+Employee search is a case-insensitive literal substring, trimmed and limited to
+120 characters without control characters. `%`, `_` and backslashes are ordinary
+characters, not wildcards. Search uses the labels captured for each published
+payslip; a later profile edit does not change its search result. Filtering precedes
+pagination and does not acquire full calculation JSON. Keep the query, month range,
+employee and read scope fixed when following `nextCursor`; changing filters starts
+from the first page. An omitted or blank query retains the unfiltered contract.
 
 All four endpoints accept `scope=AUTHORIZED|SELF`, defaulting to `AUTHORIZED` for existing clients. `AUTHORIZED` follows the reader's current company/self grants. Employee-facing screens should send `scope=SELF`: it always limits results to the account's own employments, even when the account also has company-wide finance access. Scope never grants a missing permission. An unbound self reader receives an empty list or `payroll_payslip_not_found` for detail, payment progress and PDF; an explicit foreign `employeeId` filter returns `access_denied`. Keep scope unchanged when following a page cursor.
 

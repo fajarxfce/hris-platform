@@ -14,7 +14,7 @@ class PayrollPayslipReadAssuranceTest : PayrollPayslipAssuranceApiFixture() {
     @Autowired private lateinit var readProbe: PayrollPayslipReadProbe
 
     @ParameterizedTest
-    @ValueSource(strings = ["list", "details", "payments"])
+    @ValueSource(strings = ["list", "search", "details", "payments"])
     fun expiryDuringAccessAcquisitionCannotAuthorizeAPayslipRead(action: String) {
         val scene = prepare()
         val actor =
@@ -42,7 +42,7 @@ class PayrollPayslipReadAssuranceTest : PayrollPayslipAssuranceApiFixture() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["list", "details", "payments"])
+    @ValueSource(strings = ["list", "search", "details", "payments"])
     fun expiryAfterDataAcquisitionCannotReleasePrivateResults(action: String) {
         val scene = prepare()
         val actor =
@@ -70,7 +70,7 @@ class PayrollPayslipReadAssuranceTest : PayrollPayslipAssuranceApiFixture() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["list", "details", "payments"])
+    @ValueSource(strings = ["list", "search", "details", "payments"])
     fun interruptedReadReleasesItsGuardsAndTheNextReadSucceeds(action: String) {
         val scene = prepare()
         val barrier = PayrollPayslipReadProbe.Barrier(scene.company, action)

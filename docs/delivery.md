@@ -48,6 +48,20 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Payslip employee search
+
+The existing payslip directory accepts a bounded, literal name/number search over
+the employee labels retained at publication. Filtering precedes pagination;
+profile changes do not rewrite historical labels. Company and explicit self
+scope retain the same live-access and session-assurance checks.
+
+All 62 selected API/PostgreSQL/contract tests, 61 payroll domain tests, five PDF
+delivery tests and 62 worker tests passed. Coverage includes multi-month pagination,
+literal wildcard characters, retained names after profile changes, unpublished
+output exclusion, company/self isolation, cancellation and expiry after acquisition.
+Architecture, formatting and both application JAR builds passed. Dashboard
+consumption and deployment remain pending for this increment.
+
 ### Opening tax-history dashboard
 
 Year/status-filtered employee discovery, explicit opening declarations, immutable

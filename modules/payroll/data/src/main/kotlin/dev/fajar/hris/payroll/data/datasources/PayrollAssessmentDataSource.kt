@@ -18,5 +18,6 @@ interface PayrollAssessmentDataSource {
         beforeMonth: LocalDate?,
         afterId: UUID?,
         limit: Int,
+        query: String,
     ): List<PayrollPayslipSummaryRow>
 }

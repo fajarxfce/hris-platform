@@ -35,6 +35,7 @@ class StoredPayrollAssessmentRepository(
         allowedEmployees: Set<UUID>?,
         after: PayrollPayslipCursor?,
         limit: Int,
+        query: String,
     ): Result<Page<PayrollPayslipSummary>> = safeDatabaseCall {
         val rows =
             source.payslips(
@@ -46,6 +47,7 @@ class StoredPayrollAssessmentRepository(
                 after?.month?.atDay(1),
                 after?.id,
                 limit + 1,
+                query,
             )
         val items = rows.take(limit).map { it.toPayslipSummary() }
         Page(items, if (rows.size > limit) "${items.last().taxMonth}:${items.last().id}" else null)

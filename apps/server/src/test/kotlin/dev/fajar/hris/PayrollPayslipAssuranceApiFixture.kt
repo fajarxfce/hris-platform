@@ -46,7 +46,8 @@ abstract class PayrollPayslipAssuranceApiFixture : PayrollFinalizationApiFixture
 
     protected fun invoke(scene: Scenario, action: String, actor: Actor = scene.actor): Result<*> =
         when (action) {
-            "list" ->
+            "list",
+            "search" ->
                 ListPayrollPayslips(
                         assessments,
                         people,
@@ -65,6 +66,7 @@ abstract class PayrollPayslipAssuranceApiFixture : PayrollFinalizationApiFixture
                         null,
                         50,
                         PayrollPayslipReadScope.SELF,
+                        query = if (action == "search") "Example" else "",
                     )
             "details" ->
                 GetPayrollPayslip(

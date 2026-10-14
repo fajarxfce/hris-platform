@@ -18,5 +18,6 @@ interface PayrollAssessmentRepository {
         allowedEmployees: Set<UUID>?,
         after: PayrollPayslipCursor?,
         limit: Int,
+        query: String,
     ): Result<Page<PayrollPayslipSummary>>
 }

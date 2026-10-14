@@ -61,10 +61,20 @@ class PayrollPayslipReadProbeConfiguration {
                 allowedEmployees: Set<UUID>?,
                 after: PayrollPayslipCursor?,
                 limit: Int,
+                query: String,
             ) =
                 delegate
-                    .payslips(company, from, until, employeeId, allowedEmployees, after, limit)
-                    .also { probe.afterRead(company, "list") }
+                    .payslips(
+                        company,
+                        from,
+                        until,
+                        employeeId,
+                        allowedEmployees,
+                        after,
+                        limit,
+                        query,
+                    )
+                    .also { probe.afterRead(company, if (query.isEmpty()) "list" else "search") }
         }
 
     @Bean

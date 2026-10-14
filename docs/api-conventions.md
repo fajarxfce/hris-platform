@@ -265,14 +265,14 @@ Run targets additionally expose nullable `previousAssessmentId`. Subsequent same
 
 Employee payslips:
 
-- `GET /companies/{companyId}/payroll/payslips`: optional `from`/`until` (`YYYY-MM`, inclusive, maximum 36 months), optional `employeeId`, opaque list `after`, and `limit` (default 50, maximum 200). Defaults to the latest twelve company-local months. Returns a `Page` of summaries, ordered tax month descending then ID. Pass `nextCursor` back unchanged as `after`, keeping filters fixed.
+- `GET /companies/{companyId}/payroll/payslips`: optional `from`/`until` (`YYYY-MM`, inclusive, maximum 36 months), optional `employeeId` and `query`, opaque list `after`, and `limit` (default 50, maximum 200). Defaults to the latest twelve company-local months. The trimmed query is a case-insensitive literal search of the retained employee name/number, limited to 120 characters without controls. Returns a `Page` of summaries, ordered tax month descending then ID. Pass `nextCursor` back unchanged as `after`, keeping filters fixed.
 - `GET /companies/{companyId}/payroll/payslips/{id}`: immutable `summary`, retained `companyCode`/`companyName`, and `calculation` breakdown. No unapproved calculation or internal input/review evidence is exposed.
 
 Summaries contain `id`, `employeeId`, `employeeNumber`, `employeeName`, `taxMonth`, `plannedPaymentDate`, `currency`, decimal-string `taxableGross`/`withheld`/`takeHome`, `publishedAt`, and `version: 0`. A planned payment date does not indicate settlement. Both responses use `Cache-Control: no-store`; the mobile application owns its protected offline cache. Company-wide reads require `payroll.read`; `payroll.self.read` restricts reads to the current account's employments. Generic administration and calculation/review/finalization permissions do not grant payslip reads.
 
 List, detail, payment-progress and PDF endpoints accept `scope=AUTHORIZED|SELF`, with default `AUTHORIZED`. `SELF` narrows either read grant to owned employments, including finance accounts. Employee clients should set it explicitly; keep it fixed with the other page filters. Unsupported scope values return HTTP 400. Current session assurance is checked after guards and acquisition; PDF metadata and content require authorization after rendering as well. See the [PDF contract](payroll-payslips.md).
 
-Stable codes include `payroll_payslip_not_found` (404), `invalid_page`, `invalid_payroll_payslip_range` (`maximumMonths: "36"`), and `payroll_scope_limit` (`maximumEmployments: "200"`, all 422). Standard live-access and credential failures remain unchanged. Mobile `PAYSLIPS` sync references use the same ID/version and the detail endpoint as their canonical resource. See [payslip semantics](payroll-workflows.md#payslips).
+Stable codes include `payroll_payslip_not_found` (404), `invalid_page`, `invalid_payroll_payslip_range` (`maximumMonths: "36"`), `invalid_payroll_payslip_search` (`query: "invalid"`, `maximumLength: "120"`), and `payroll_scope_limit` (`maximumEmployments: "200"`, all 422). Standard live-access and credential failures remain unchanged. Mobile `PAYSLIPS` sync references use the same ID/version and the detail endpoint as their canonical resource. See [payslip semantics](payroll-workflows.md#payslips).
 
 ## Announcement authoring
 

@@ -83,6 +83,7 @@ class PostgresPayrollAssessmentDataSource(private val sql: DSLContext) :
         beforeMonth: LocalDate?,
         afterId: UUID?,
         limit: Int,
+        query: String,
     ): List<PayrollPayslipSummaryRow> =
         sql.fetch(
                 """
@@ -91,6 +92,12 @@ class PostgresPayrollAssessmentDataSource(private val sql: DSLContext) :
                     AND (?::uuid IS NULL OR a.employment_id=?::uuid)
                     AND (?::uuid[] IS NULL OR a.employment_id=ANY(?::uuid[]))
                     AND (?::date IS NULL OR a.tax_month<?::date OR (a.tax_month=?::date AND a.id>?::uuid))
+                    AND (?='' OR EXISTS (
+                      SELECT 1 FROM payroll_run_targets searched
+                      WHERE searched.company_id=a.company_id AND searched.run_id=a.run_id AND searched.ordinal=a.ordinal
+                        AND (position(lower(?) in lower(searched.employee_name))>0
+                          OR position(lower(?) in lower(searched.employee_number))>0)
+                    ))
                   ORDER BY a.tax_month DESC,a.id LIMIT ?
                 )
                 SELECT a.id,a.employment_id,a.tax_month,a.published_at,t.employee_number,t.employee_name,r.planned_payment_date,
@@ -115,6 +122,9 @@ class PostgresPayrollAssessmentDataSource(private val sql: DSLContext) :
                 beforeMonth,
                 beforeMonth,
                 afterId,
+                query,
+                query,
+                query,
                 limit,
             )
             .map { it.toPayslipSummaryRow() }

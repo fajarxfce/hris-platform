@@ -3217,6 +3217,38 @@ source versions, exact replay, colleague/company isolation, source availability,
 late MFA expiry, interrupted reads, existing calendar commands and OpenAPI route
 coverage, including preservation of the selected projection when reusing cursors.
 
-The preceding Attendance migration and API/worker are deployed to development;
+The Attendance and calendar migrations and API/worker are deployed to development;
 health checks passed on loopback and WireGuard with the document overlay retained.
-Calendar source integration in the mobile replica remains in progress.
+The [backend/dashboard CI](https://github.com/fajarxfce/hris-platform/actions/runs/38488264506)
+passed all backend, dashboard and integration jobs. Existing overtime transaction
+assertions now distinguish their own changes from the synchronized holiday fixture;
+rollback still verifies that the complete feed is unchanged.
+
+### Workforce records on mobile
+
+The [mobile replica](https://github.com/fajarxfce/hris-mobile/commit/d57f496) retains
+attendance days, effective schedules, roster overrides and holidays with stable
+account/company ownership. Local date queries use authenticated indexes, and
+record/cursor commits publish together. Confirmed read denials survive failed
+cleanup and persisted restrictions survive process restart; only an admitted
+acquisition begun after the latest denial can reopen those records.
+
+Mobile root checks passed with 1,295 desktop/UI tests, Android dev assembly and
+production Web distribution. Workforce replica coverage also passed 123 domain
+and 40 data Chromium tests. The real API populated three attendance days, one
+weekly assignment, one roster override and the directory. The fixture had no
+holiday; automated tests cover holiday precedence and changes.
+
+API 35 acceptance reopened Home, history and the calendar offline after force-stop.
+Local month/week filters retained previous records. Advancing the emulator clock
+73 hours retained the company and historical facts without rewriting their
+encrypted payloads. Restored time and connectivity allowed a successful refresh;
+screenshots were inspected and the crash buffer contained no fatal exception.
+[Action-review feedback](https://github.com/fajarxfce/hris-mobile/commit/90d376b)
+no longer describes stored data as expired.
+
+After notice, the validated APK was installed on the authorized Android 16 phone
+at 07:51:38 WIB on 2026-10-14, with install-only delivery. The package update time
+and matching installed-artifact hash were verified. No starter foundation changed
+in this HRIS-specific increment. Expense/Payslip replicas, unfinished offline
+drafts and shared sync-status presentation remain in the delivery sequence.

@@ -20,19 +20,24 @@ age-based read limit. Saved views remain readable after freshness or credential
 expiry; live authorization and operation reviews have separate checks. Foreground
 revalidation retains the same workspace, while confirmed denials keep affected
 reads gated through failed cleanup and retries. The [mobile read and sync model](https://github.com/fajarxfce/hris-mobile/blob/main/docs/local-first.md)
-distinguishes existing snapshots from complete replicas: Inbox, Leave and Overtime
+distinguishes existing snapshots from complete replicas: Inbox, Leave, Overtime and Workforce
 collections consume change feeds and retain account-owned records
 across sign-in, independently of the active request session. A replacement cursor
-stages new data without hiding published facts. Most other features retain their
+stages new data without hiding published facts. Expenses and Payslips retain their
 last acquired list/detail views, and the
 coworker directory remains online. API 35 acceptance reopened Home and monthly
 attendance without connectivity after advancing the emulator clock by 73 hours.
 Company policy controls maintenance, minimum builds and module availability, with
 fresh admission before inbox synchronization and command delivery.
-The [employee work calendar](https://github.com/fajarxfce/hris-mobile/commit/cffb545)
-now shows weekly shifts, roster overrides and days off, with a bounded encrypted
-offline snapshot independent of People availability. API 24/API 35 emulator checks
-covered week navigation, overnight work, company isolation and offline restoration.
+The [employee calendar and attendance replica](https://github.com/fajarxfce/hris-mobile/commit/d57f496)
+retains encrypted attendance days, effective weekly assignments, roster overrides
+and holidays independently of the displayed month/week. Local queries resolve
+schedule precedence and overnight work without replacing previously acquired dates.
+API 35 acceptance covered process restart offline, month/week navigation and a
+73-hour clock advance with unchanged stored records. Shared persisted read denials
+remain gated until a subsequent admitted acquisition succeeds. The
+[action feedback cleanup](https://github.com/fajarxfce/hris-mobile/commit/90d376b)
+also separates operation review from the lifetime of readable local data.
 Employee [attendance capture](https://github.com/fajarxfce/hris-mobile/commit/a871170)
 now retains encrypted clock-in/out commands before submission, restores offline
 captures after process restart and reuses original evidence on retry. API 35
@@ -158,7 +163,7 @@ against an isolated API/PostgreSQL fixture with independent operators.
 | Area | Remaining end-to-end work |
 | --- | --- |
 | Mobile identity | Native OIDC handoff and external-provider acceptance. Android MFA and device-session workflows are validated; iOS physical acceptance remains separate. |
-| Mobile foundation | Additional business replicas and offline drafts, stable ownership for the remaining read projections, consistent sync status, deep links and push registration. Owned encrypted company restoration, age-independent stored reads, company availability, account-owned Inbox records across sign-in, change feeds and staged cursor recovery are implemented; other collections retain the integration work described in the mobile sync model. |
+| Mobile foundation | Expense/Payslip replicas and offline drafts, stable ownership for the remaining read projections, consistent sync status, deep links and push registration. Owned encrypted company restoration, age-independent stored reads and account-owned Inbox/Leave/Overtime/Workforce records are implemented; the mobile sync model records each remaining collection. |
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
 | Workforce | Bulk/reset and late corrections; physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections and their history, company-wide exception review queues, overtime planning with reviewed calendars, directories/details/history, actual-time submission, independent review and withdrawal, dashboard monthly closing/recovery with published employee results, and mobile work calendars, overtime planning/actual time/withdrawal with durable recovery, and online/offline capture are implemented and verified against the real API. |
 | Leave | Team calendar, entitlement batches and year closing; scheduled accrual/expiry. Dashboard request creation includes scoped employee/evidence selection, server calculation, preview conflicts and original-command recovery, verified against an isolated API/PostgreSQL instance. Mobile balances, filtered history, request details, submission with published document evidence, and durable withdrawal/cancellation flows are implemented and verified against the development API. |

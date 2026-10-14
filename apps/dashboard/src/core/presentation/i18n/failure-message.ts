@@ -10,6 +10,34 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "The combined amount exceeds IDR 50,000,000,000.",
     "Total nominal melebihi IDR 50.000.000.000.",
   ],
+  payroll_tax_opening_action_unavailable: [
+    "This opening action is unavailable. Reload its current review.",
+    "Tindakan riwayat awal tidak tersedia. Muat ulang peninjauannya.",
+  ],
+  payroll_tax_opening_not_found: [
+    "The opening history was not found.",
+    "Riwayat pajak awal tidak ditemukan.",
+  ],
+  payroll_tax_opening_future: [
+    "History may only include completed months.",
+    "Riwayat hanya boleh mencakup bulan yang sudah selesai.",
+  ],
+  payroll_tax_opening_already_verified: [
+    "This opening has already been verified. Reload its current revision.",
+    "Riwayat awal telah diverifikasi. Muat ulang revisi saat ini.",
+  ],
+  payroll_tax_opening_author_cannot_verify: [
+    "An opening preparer cannot verify its history.",
+    "Penyusun riwayat awal tidak dapat memverifikasinya.",
+  ],
+  payroll_tax_opening_revision_limit: [
+    "This opening has reached its revision limit.",
+    "Riwayat awal ini telah mencapai batas revisi.",
+  ],
+  invalid_payroll_tax_opening: [
+    "Review the opening history values.",
+    "Periksa nilai pada riwayat pajak awal.",
+  ],
   payroll_input_action_unavailable: [
     "This action is unavailable. Return to the input to review its source and status.",
     "Tindakan tidak tersedia. Kembali ke input untuk memeriksa sumber dan statusnya.",
@@ -1087,8 +1115,8 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Periksa detail offboarding dan masukkan alasan maksimal 1.000 karakter.",
   ],
   stale_employment_version: [
-    "This employment has changed. Reload the review before completing offboarding.",
-    "Employment sudah berubah. Muat ulang tinjauan sebelum menyelesaikan offboarding.",
+    "This employment has changed. Reload the review before continuing.",
+    "Employment sudah berubah. Muat ulang tinjauan sebelum melanjutkan.",
   ],
   offboarding_terms_changed: [
     "The last working date does not match the employment terms. Review the employment and case dates.",

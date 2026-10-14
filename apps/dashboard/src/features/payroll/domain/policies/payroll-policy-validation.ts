@@ -6,12 +6,15 @@ export const isPayrollMonth = (month: string): boolean =>
 export const isPolicyCursor = (after: string | null): boolean =>
   after === null || /^(?:0|[1-9]\d{0,2})$/u.test(after);
 
-/** Exact minor units with the same monthly amount bound as the API. */
-export function payrollAmountMinor(value: string): bigint | null {
-  if (!/^(?:0|[1-9]\d{0,10})(?:\.\d{1,2})?$/u.test(value)) return null;
+/** Exact minor units, bounded to the API monthly limit unless a caller selects another ceiling. */
+export function payrollAmountMinor(
+  value: string,
+  maximum: bigint = 5_000_000_000_000n,
+): bigint | null {
+  if (!/^(?:0|[1-9]\d{0,11})(?:\.\d{1,2})?$/u.test(value)) return null;
   const [whole = "0", fraction = ""] = value.split(".");
   const minor = BigInt(whole) * 100n + BigInt(fraction.padEnd(2, "0"));
-  return minor <= 5_000_000_000_000n ? minor : null;
+  return minor <= maximum ? minor : null;
 }
 
 export function normalizePayrollPolicy(input: PayrollPolicyChange): PayrollPolicyChange {

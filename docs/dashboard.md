@@ -210,6 +210,34 @@ private evidence. Locale/theme changes retain form values, and draft departure i
 protected. Editor state remains in browser memory. Tables scroll within their
 panels on narrow screens.
 
+## Opening tax history
+
+`/payroll/tax-openings` discovers employees by name, number and opening status for
+an explicit tax year. Its 50-row pages include unprepared employees without
+acquiring private profiles. Reads require `payroll.read`, `payroll.calculate` or
+`payroll.review`, independently of company administration.
+
+`/payroll/tax-openings/:employeeId` separates the current opening and 20-entry
+immutable history pages. Tabs reuse the acquired review; inspecting a revision
+loads its retained terms in a side panel. Changing the year, account or company
+cancels obsolete work and discards the prior scope's selection.
+
+The editor requires explicit residency, PTKP, completed-through month, employment
+months, annual totals and a review reference. Missing history is distinct from a
+confirmed zero declaration. IDR amounts retain decimal precision and annual
+limits. The server enforces completed months using the company timezone.
+
+Preparation requires `payroll.calculate` and the observed employment and opening
+versions. Verification requires `payroll.review` and the exact reviewed revision.
+Current beneficiaries and all historical preparers cannot verify; a tax year
+already fixed for calculation cannot be changed. Server-derived action hints do
+not replace command authorization.
+
+Definite conflicts require protected reload. Lost responses retain the original
+operation and payload through subsequent rejected retries. Confirmed access loss
+clears private data. Locale/theme changes preserve form values; pending, dirty and
+unconfirmed commands protect departure. Drafts remain in browser memory.
+
 ## Shift templates
 
 The Workforce route owns a bounded shift directory, current details, and create/edit

@@ -1,6 +1,7 @@
 import {
   Calendar20Regular,
   ClipboardTaskListLtr20Regular,
+  DocumentTable20Regular,
   MoneySettings20Regular,
   PersonMoney20Regular,
 } from "@fluentui/react-icons";
@@ -11,15 +12,26 @@ import { canReadCompensation } from "../../domain/policies/compensation-access-p
 import { canReadPayrollPolicy } from "../../domain/policies/payroll-access-policy";
 import { canReadPayrollInputs } from "../../domain/policies/payroll-input-access-policy";
 import { canReadPayrollPeriods } from "../../domain/policies/payroll-period-policy";
+import { canReadTaxOpenings } from "../../domain/policies/tax-opening-access-policy";
 import { compensationMessages } from "../i18n/compensation-messages";
 import { payrollInputMessages } from "../i18n/payroll-input-messages";
 import { payrollPeriodMessages } from "../i18n/payroll-period-messages";
 import { payrollPolicyMessages } from "../i18n/payroll-policy-messages";
+import { taxOpeningMessages } from "../i18n/tax-opening-messages";
 
 export function payrollNavigation(
   access: CompanyAccess | null,
   locale: Locale,
 ): readonly AppNavigationItem[] {
+  const openings: readonly AppNavigationItem[] = canReadTaxOpenings(access?.permissions ?? [])
+    ? [
+        {
+          to: "/payroll/tax-openings",
+          label: taxOpeningMessages(locale).title,
+          icon: <DocumentTable20Regular />,
+        },
+      ]
+    : [];
   const inputs: readonly AppNavigationItem[] = canReadPayrollInputs(access?.permissions ?? [])
     ? [
         {
@@ -51,6 +63,7 @@ export function payrollNavigation(
     ? [
         ...periods,
         ...inputs,
+        ...openings,
         ...policies,
         {
           to: "/payroll/compensation",
@@ -58,5 +71,5 @@ export function payrollNavigation(
           icon: <PersonMoney20Regular />,
         },
       ]
-    : [...periods, ...inputs, ...policies];
+    : [...periods, ...inputs, ...openings, ...policies];
 }

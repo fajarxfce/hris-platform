@@ -74,7 +74,7 @@ A stopped job can be resumed by its original author with current assurance, obse
 
 To correct input, first stop a running job, then abandon its run with observed run and period versions. A completed calculation can also be abandoned after any pending or approved review has been explicitly withdrawn. Abandonment preserves evidence, reopens the period as `DRAFT`, and releases its source cutoffs. Start a new run to reassess corrected input; resume does not rewind an existing result. A period retains at most twenty runs. Changes to its immutable roster/payment metadata still require cancelling and replacing the draft.
 
-The first tax-history source is an independently verified opening through the preceding month. Subsequent same-year months use the exact previously finalized assessment, retaining the original opening. Payments and amendments remain subsequent work; a frozen opening is never overwritten to simulate a monthly continuation.
+The first tax-history source is an independently verified opening through the preceding month. Subsequent same-year months use the exact previously finalized assessment, retaining the original opening. The payment workflow is separate from this tax-history continuity; a frozen opening is never overwritten to simulate a monthly continuation.
 
 ## Source cutoffs
 
@@ -93,7 +93,9 @@ period discovery, employee selection, explicit creation review, participant/hist
 tabs and versioned draft cancellation. Selection survives employee search and
 pagination. Browser commands retain their original payload after an unknown
 outcome; an acknowledged receipt is followed by a fresh current-period read.
-Monthly input, calculation and publication screens remain subsequent work.
+The [monthly input](dashboard.md#monthly-payroll-inputs) and
+[opening tax-history](dashboard.md#opening-tax-history) workflows provide independent
+preparation and verification. Calculation and publication screens remain subsequent work.
 
 Scope local caches by account and company; add earnings month and revision to input keys. Keep unsent changes separate from a verified server revision. After `stale_version`, `stale_employment_version`, or `stale_workforce_version`, fetch the current resource before deciding whether to resubmit. An existing operation receipt is historical confirmation, not the latest resource state. Stop obsolete requests when navigating or switching accounts/companies. Clients translate stable error and field codes, including per-employee outcome parameters. Persist the run ID after the start receipt and restore progress after reconnecting; poll only while the screen owns the observation. A queued command with a lost response must reuse its original key. The employee sync feed publishes only finalized payslip references; draft and processing results remain available through these explicitly authorized endpoints.
 

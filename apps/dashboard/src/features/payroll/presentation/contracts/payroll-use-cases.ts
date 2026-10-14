@@ -4,6 +4,7 @@ import type { ListCompensationEmployees } from "../../domain/usecases/list-compe
 import type { ListPayrollInputEmployees } from "../../domain/usecases/list-payroll-input-employees";
 import type { ListPayrollPeriodEmployees } from "../../domain/usecases/list-payroll-period-employees";
 import type { ListPayrollPeriods } from "../../domain/usecases/list-payroll-periods";
+import type { ListTaxOpeningEmployees } from "../../domain/usecases/list-tax-opening-employees";
 import type { LoadCompensationEditor } from "../../domain/usecases/load-compensation-editor";
 import type { LoadCompensationReview } from "../../domain/usecases/load-compensation-review";
 import type { LoadPayrollInputReview } from "../../domain/usecases/load-payroll-input-review";
@@ -11,15 +12,27 @@ import type { LoadPayrollInputRevision } from "../../domain/usecases/load-payrol
 import type { LoadPayrollPeriod } from "../../domain/usecases/load-payroll-period";
 import type { LoadPayrollPolicy } from "../../domain/usecases/load-payroll-policy";
 import type { LoadPayrollPolicyEditor } from "../../domain/usecases/load-payroll-policy-editor";
+import type { LoadTaxOpeningReview } from "../../domain/usecases/load-tax-opening-review";
+import type { LoadTaxOpeningRevision } from "../../domain/usecases/load-tax-opening-revision";
 import type { ReviewPayrollInputAction } from "../../domain/usecases/review-payroll-input-action";
 import type { ReviewPayrollPeriodCancellation } from "../../domain/usecases/review-payroll-period-cancellation";
 import type { ReviewPayrollPeriodCreation } from "../../domain/usecases/review-payroll-period-creation";
+import type { ReviewTaxOpeningAction } from "../../domain/usecases/review-tax-opening-action";
 import type { SaveCompensation } from "../../domain/usecases/save-compensation";
 import type { SavePayrollInput } from "../../domain/usecases/save-payroll-input";
 import type { SavePayrollPolicy } from "../../domain/usecases/save-payroll-policy";
+import type { SaveTaxOpening } from "../../domain/usecases/save-tax-opening";
 import type { VerifyPayrollInput } from "../../domain/usecases/verify-payroll-input";
+import type { VerifyTaxOpening } from "../../domain/usecases/verify-tax-opening";
 
 export type PayrollUseCases = Readonly<{
+  listTaxOpeningEmployees: Pick<ListTaxOpeningEmployees, "execute">;
+  loadTaxOpeningReview: Pick<LoadTaxOpeningReview, "execute">;
+  loadTaxOpeningRevision: Pick<LoadTaxOpeningRevision, "execute">;
+  reviewTaxOpeningAction: Pick<ReviewTaxOpeningAction, "execute">;
+  saveTaxOpening: Pick<SaveTaxOpening, "execute">;
+  verifyTaxOpening: Pick<VerifyTaxOpening, "execute">;
+
   listPayrollInputEmployees: Pick<ListPayrollInputEmployees, "execute">;
   loadInputReview: Pick<LoadPayrollInputReview, "execute">;
   loadInputRevision: Pick<LoadPayrollInputRevision, "execute">;

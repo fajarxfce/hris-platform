@@ -13,11 +13,22 @@ import { PayrollPeriodScreen } from "../bindings/payroll-period-screen";
 import { PayrollPeriodsScreen } from "../bindings/payroll-periods-screen";
 import { PayrollPolicyEditorScreen } from "../bindings/payroll-policy-editor-screen";
 import { PayrollPolicyScreen } from "../bindings/payroll-policy-screen";
+import { TaxOpeningEditorScreen } from "../bindings/tax-opening-editor-screen";
+import { TaxOpeningEmployeesScreen } from "../bindings/tax-opening-employees-screen";
+import { TaxOpeningScreen } from "../bindings/tax-opening-screen";
+import { TaxOpeningVerificationScreen } from "../bindings/tax-opening-verification-screen";
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 
 export function PayrollRoutes(props: PayrollScreenProps) {
   return (
     <Routes>
+      <Route path="tax-openings" element={<TaxOpeningEmployeesScreen {...props} />} />
+      <Route path="tax-openings/:employeeId" element={<TaxOpeningScreen {...props} />} />
+      <Route path="tax-openings/:employeeId/edit" element={<TaxOpeningEditorScreen {...props} />} />
+      <Route
+        path="tax-openings/:employeeId/verify"
+        element={<TaxOpeningVerificationScreen {...props} />}
+      />
       <Route path="inputs" element={<PayrollInputEmployeesScreen {...props} />} />
       <Route path="inputs/:employeeId" element={<PayrollInputScreen {...props} />} />
       <Route path="inputs/:employeeId/edit" element={<PayrollInputEditorScreen {...props} />} />

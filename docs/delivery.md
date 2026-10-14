@@ -3403,3 +3403,23 @@ while preserving the original backfill evidence and company-isolation checks.
 Targeted validation passed all 10 HTTP/PostgreSQL tests across both historical
 expense-payment migrations and the directory-record contract, together with
 formatting and architecture checks.
+
+### Mobile company directory replica
+
+[HRIS Mobile 1dd38355](https://github.com/fajarxfce/hris-mobile/commit/1dd38355)
+consumes the company-directory feed and canonical public-field records. Its
+account/company/audience-owned encrypted store commits records and cursors
+atomically, preserves published data during bootstrap replacement, and retains
+versioned withdrawal. Local search covers all acquired records; department and
+page selections do not issue HTTP requests. Read admission survives failed
+cleanup, pending writes and reauthentication independently of ordinary age.
+
+Validation passed 1,397 desktop/JVM tests, 59 Chromium tests, Android dev assembly
+and the production Web build. A 5,000-record JVM fixture measured 90 ms for
+reading/decrypting its snapshot and 7 ms for a query reaching the final record;
+these are local JVM measurements. API 35 emulator acceptance verified the live
+directory, cold offline restoration, offline search and department selection,
+and another offline restart after advancing the clock by 73 hours. Network and
+clock settings were restored. The phone received the validated APK with
+install-only delivery; its installed SHA-256 matched
+`7ede3e69924e5b1cfc24415aa99d6c53fbc196d48a28b58096ba357aedc6cd6e`.

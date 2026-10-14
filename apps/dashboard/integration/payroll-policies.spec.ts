@@ -20,7 +20,7 @@ test("real payroll policy administration preserves dated rules, independent acce
   const headers = () => ({ [csrf.headerName]: csrf.token, "Idempotency-Key": randomUUID() });
   const other = await context.request.post("/api/v1/companies", {
     headers: headers(),
-    data: { code: "PAY_OTHER", name: "Other Payroll Company", timezone: "Asia/Jakarta" },
+    data: { code: "PAY_POLICY_OTHER", name: "Other Payroll Company", timezone: "Asia/Jakarta" },
   });
   expect(other.status()).toBe(200);
   const otherCompany = ((await other.json()) as { id: string }).id;

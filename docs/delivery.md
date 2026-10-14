@@ -100,6 +100,13 @@ receipt recovery after a lost committed response, coherent current/effective
 history, a newly bound beneficiary's rejected replay, and revoked read access.
 It created only fictional records in the disposable test database.
 
+The complete API/PostgreSQL browser suite passed all 24 scenarios. Running the
+suite together exposed a shared company-code collision between the expense
+payment and payroll policy fixtures; the policy fixture now has its own code.
+The earlier CI run passed the backend and all four dashboard shards, but failed
+that integration fixture. The full local rerun verifies the correction alongside
+compensation and the other administrative workflows.
+
 Development API and worker images were updated with migration V72 retained and
 the document-storage and WireGuard overlays preserved. Local and VPN readiness,
 the dashboard and its proxied API returned HTTP 200; both application containers

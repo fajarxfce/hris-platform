@@ -1,6 +1,7 @@
 package dev.fajar.hris.sync.domain.policies
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.people.domain.policies.canReadSelfProfile
 import dev.fajar.hris.sync.domain.entities.SyncCollection
 
 // Preserve the established projection for clients that omit collection selection.
@@ -31,6 +32,7 @@ fun selectSyncCollections(
     // that same projection without changing default feeds or exporting team data.
     val authorized = selfSyncCollections(permissions).toMutableSet()
     if (requested != null) {
+        if (canReadSelfProfile(permissions)) authorized += SyncCollection.SELF_PROFILES
         if ("documents.self.read" in permissions) authorized += SyncCollection.DOCUMENT_EVIDENCE
         if (permissions.any { it in setOf("people.directory.read", "people.read") })
             authorized += SyncCollection.DIRECTORY_EMPLOYEES

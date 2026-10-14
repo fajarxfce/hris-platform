@@ -179,6 +179,15 @@ Android emulator acceptance covered cold offline restoration, local search and
 filters, and another restart after a 73-hour clock advance. The validated APK
 was installed on the phone without launching its UI. Private profiles remain online.
 
+The backend now provides [owned private-profile snapshots](synchronization.md#owned-private-profiles)
+through an explicit `SELF_PROFILES` feed and canonical record. Employment, private
+person fields and assignment references publish coherently with their own sync
+version. The worker captures cross-company person dependencies, schedules effective
+changes, and retains unchanged data independently of its age. Current ownership,
+grants, MFA and People availability remain separate read gates. Backend migration,
+API/worker, cancellation, concurrency and malformed-payload checks passed. The
+mobile private-profile replica and offline acceptance remain in progress.
+
 The published-document catalog now has an explicit `DOCUMENT_EVIDENCE` change feed
 and a canonical metadata endpoint. Both require current self-document authority
 and owned employment; private HR files and unfinished first uploads are excluded.

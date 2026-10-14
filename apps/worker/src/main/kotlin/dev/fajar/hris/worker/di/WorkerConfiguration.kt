@@ -184,6 +184,30 @@ class WorkerConfiguration {
     ) = dev.fajar.hris.worker.sync.CompanyDirectoryWorker(refresh, timer)
 
     @Bean
+    fun selfProfileProjectionTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 1
+            setThreadNamePrefix("hris-self-profile-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(15)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = ["hris.worker.enabled"],
+        havingValue = "true",
+        matchIfMissing = true,
+    )
+    fun selfProfileProjectionWorker(
+        refresh: RefreshSelfProfiles,
+        @org.springframework.beans.factory.annotation.Qualifier("selfProfileProjectionTimers")
+        timer: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+    ) = dev.fajar.hris.worker.sync.SelfProfileWorker(refresh, timer)
+
+    @Bean
     fun mobileSyncTimers() =
         org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
             poolSize = 1

@@ -18,6 +18,46 @@ import org.springframework.context.annotation.Configuration
 @Configuration(proxyBeanMethods = false)
 class PeopleConfiguration {
     @Bean
+    fun selfProfileProjectionSource(sql: DSLContext): SelfProfileProjectionDataSource =
+        PostgresSelfProfileProjectionDataSource(sql)
+
+    @Bean
+    fun selfProfileProjection(
+        source: SelfProfileProjectionDataSource,
+        json: tools.jackson.databind.ObjectMapper,
+    ): SelfProfileProjectionRepository = StoredSelfProfileProjectionRepository(source, json)
+
+    @Bean
+    fun refreshSelfProfiles(
+        profiles: SelfProfileProjectionRepository,
+        companies: CompanyRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = RefreshSelfProfiles(profiles, companies, transactions, clock)
+
+    @Bean
+    fun getSelfProfileRecord(
+        profiles: SelfProfileProjectionRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetSelfProfileRecord(
+            profiles,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun directoryProjectionSource(sql: DSLContext): DirectoryProjectionDataSource =
         PostgresDirectoryProjectionDataSource(sql)
 

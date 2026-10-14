@@ -327,3 +327,12 @@ acquisition and queue serialization preserve an invalidation from a concurrent
 source writer. Public records, tombstones, due scheduling and raw sync events
 commit atomically. The canonical reader keeps live account/company/MFA checks
 independent of the worker's projection authority and revision lifetime.
+
+People also owns a separate private self-profile projection. One raw SQL snapshot
+combines employment, its owner's person fields and minimal assignment references;
+domain policy derives manager availability and the next effective transition.
+Its aggregate sync revision is independent of employment and person command
+versions. Repositories validate stored payload ownership and map malformed data
+inside the database failure boundary. The canonical use case holds shared people
+and access guards and checks current ownership and session assurance after waits.
+An administrator's broader grants do not widen this account-owned projection.

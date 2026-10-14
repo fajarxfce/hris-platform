@@ -10,6 +10,7 @@ The supported collections are:
 | `EXPENSE_PAYMENTS` (explicit selection) | `expenses.self.manage`, `expenses.read` or `expenses.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}/payment-progress?scope=SELF` |
 | `DIRECTORY_EMPLOYEES` (explicit selection) | `people.directory.read` or `people.read` | Public coworkers in the selected company; no personal employment linkage required | `/api/v1/companies/{companyId}/employees/directory/{id}` |
 | `DOCUMENT_EVIDENCE` (explicit selection) | `documents.self.read` | Current account's employments; published personal documents and receipts only | `/api/v1/companies/{companyId}/documents/me/evidence/{id}` |
+| `SELF_PROFILES` (explicit selection) | `people.self.read`, or both `people.read` and `people.profile.read` | Current account's employments only, including for administrative readers | `/api/v1/companies/{companyId}/employees/me/profiles/{id}` |
 | `LEAVE_REQUESTS` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments or immutable request owner | `/api/v1/companies/{companyId}/leave/requests/{id}` |
 | `LEAVE_BALANCES` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/leave/balances/{id}` |
 | `OVERTIME_REQUESTS` | `overtime.self.manage`, or explicit selection with `overtime.read`, `overtime.manage` or `workforce.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/overtime/{id}` |
@@ -316,3 +317,31 @@ canonical projection is eventually consistent with source changes while its
 worker runs. A stopped projection worker is observable as pending work; neither
 an API read nor the mobile client secretly executes worker policy. The mobile
 application retains its separate integration and offline acceptance work.
+
+## Owned private profiles
+
+`SELF_PROFILES` has separate permission, record and queue ownership from the public
+coworker directory. Its canonical response combines employment details, minimal
+assignment/manager references and the account's private person profile. The
+record's `version` covers that complete snapshot; employment and person versions
+remain independent command versions. `employment.asOf` records the company date
+used to produce the snapshot. A date change alone does not advance its version or
+expire its contents. Ended employments remain visible to their owner while access
+is retained; future employments wait for their effective revision.
+
+One SQL statement acquires current source facts. Source writes enqueue dependent
+employment identities, including shared-person edits, manager display/availability
+changes, assigned unit labels and company timezone changes. A restricted non-login
+trigger role can identify cross-company dependencies without reading private
+profile fields. The worker uses the same bounded, cancellable queue ownership as
+the directory worker, but has a separate timer and profile records. Projection,
+next effective transition and raw change capture commit atomically. Pending owned
+queue rows contribute to `pendingPublication`.
+
+Canonical reads check current account ownership under shared people and access
+guards, then recheck live session assurance after acquisition. Missing, withdrawn,
+foreign and unowned profiles return `404 self_profile_not_found`; an administrative
+read grant never turns this route into a coworker-profile export. Company People
+availability gates both the canonical route and explicit feed. Omitted collection
+selection remains unchanged. These backend contracts do not establish mobile
+offline coverage until its consumer and acceptance checks are completed.

@@ -15,6 +15,8 @@ import dev.fajar.hris.schema.tables.OvertimeRequests.OVERTIME_REQUESTS as O
 import dev.fajar.hris.schema.tables.PayrollAssessments.PAYROLL_ASSESSMENTS as P
 import dev.fajar.hris.schema.tables.PayrollPaymentHeads.PAYROLL_PAYMENT_HEADS as S
 import dev.fajar.hris.schema.tables.RosterDays.ROSTER_DAYS as R
+import dev.fajar.hris.schema.tables.SelfProfileRecords.SELF_PROFILE_RECORDS as SP
+import dev.fajar.hris.schema.tables.SelfProfileRefreshQueue.SELF_PROFILE_REFRESH_QUEUE as SQ
 import dev.fajar.hris.schema.tables.WorkHolidays.WORK_HOLIDAYS as W
 import dev.fajar.hris.schema.tables.WorkScheduleSyncHeads.WORK_SCHEDULE_SYNC_HEADS as T
 import dev.fajar.hris.schema.tables.records.*
@@ -207,6 +209,20 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                     DC.CURRENT_REVISION_ID.isNotNull,
                     DSL.inline("DOCUMENT_EVIDENCE").`in`(selection.collections),
                 )
+        val profiles =
+            sql.select(
+                    DSL.inline("SELF_PROFILES").`as`("collection"),
+                    SP.ID.`as`("resource_id"),
+                    SP.VERSION.`as`("resource_version"),
+                )
+                .from(SP)
+                .where(
+                    SP.COMPANY_ID.eq(selection.companyId),
+                    SP.ID.`in`(selection.employmentIds),
+                    SP.ACCOUNT_ID.eq(selection.accountId),
+                    SP.PAYLOAD.isNotNull,
+                    DSL.inline("SELF_PROFILES").`in`(selection.collections),
+                )
         val records =
             expenses
                 .unionAll(expensePayments)
@@ -222,6 +238,7 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                 .unionAll(holidays)
                 .unionAll(directory)
                 .unionAll(documents)
+                .unionAll(profiles)
                 .asTable("sync_resources")
         val collection = requireNotNull(records.field("collection", String::class.java))
         val id = requireNotNull(records.field("resource_id", UUID::class.java))
@@ -269,6 +286,18 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                                     Q.COMPANY_ID.eq(selection.companyId),
                                     Q.REFRESH_AT.le(now.atOffset(java.time.ZoneOffset.UTC)),
                                     DSL.inline("DIRECTORY_EMPLOYEES").`in`(selection.collections),
+                                )
+                        )
+                    )
+                    .or(
+                        DSL.exists(
+                            DSL.selectOne()
+                                .from(SQ)
+                                .where(
+                                    SQ.COMPANY_ID.eq(selection.companyId),
+                                    SQ.EMPLOYMENT_ID.`in`(selection.employmentIds),
+                                    SQ.REFRESH_AT.le(now.atOffset(java.time.ZoneOffset.UTC)),
+                                    DSL.inline("SELF_PROFILES").`in`(selection.collections),
                                 )
                         )
                     )

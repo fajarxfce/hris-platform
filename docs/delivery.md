@@ -3479,3 +3479,25 @@ crash buffer was empty. The APK SHA-256 is
 `7b1fb049efa7dacd9947118c261481d184af8802d04361afa2a595558b51c9e2`.
 Phone installation remains pending because its ADB connection became unavailable;
 the phone was not launched or used for this acceptance.
+
+### Owned private-profile change feed
+
+People now publishes a coherent, account-owned employment/private-profile snapshot
+through `SELF_PROFILES` and a canonical read. The sync revision covers private
+person fields, employment terms, assignment labels and minimal manager references.
+It remains distinct from the original employment and person command versions.
+The worker schedules effective transitions and captures shared-person, manager,
+unit and timezone changes. Ordinary date changes do not rewrite identical records
+or expire their contents. Current ownership, grants, credentials, MFA and People
+availability remain independent read gates; administrative grants never widen
+this route to coworkers.
+
+Validation passed 194 targeted tests across focused runs: 56 HTTP/contract tests,
+all 62 worker tests, 45 People/Sync domain tests, 14 People data tests and 17 database
+tests. New coverage includes private/public scope separation, coherent versions,
+cross-company dependencies, effective/cancelled revisions, timezone changes,
+competing workers, late invalidation, cancellation rollback, shutdown, bounded
+batches, malformed payloads and account mismatches. Read tests pause acquisition
+to verify live credential/grant revocation and MFA expiry. Migration/jOOQ generation,
+architecture checks and both application JAR builds passed. Mobile integration
+and physical-device acceptance are not included in this backend validation.

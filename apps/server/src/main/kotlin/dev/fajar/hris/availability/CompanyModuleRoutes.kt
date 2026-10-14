@@ -55,7 +55,8 @@ fun requestedSyncModules(request: HttpServletRequest, actor: Actor): Result<Set<
                     SyncCollection.PAYSLIPS,
                     SyncCollection.PAYROLL_PAYMENTS -> CompanyModule.PAYROLL
                     SyncCollection.INBOX -> CompanyModule.COMMUNICATIONS
-                    SyncCollection.DIRECTORY_EMPLOYEES -> CompanyModule.PEOPLE
+                    SyncCollection.DIRECTORY_EMPLOYEES,
+                    SyncCollection.SELF_PROFILES -> CompanyModule.PEOPLE
                     SyncCollection.DOCUMENT_EVIDENCE -> CompanyModule.DOCUMENTS
                 }
             }

@@ -10,6 +10,22 @@ Screens: company/employee directories, organization structure, employee tabs, im
 
 Acceptance: concurrent employee number uniqueness, effective-dated history, company-reference constraints, safe import replay, and historical payroll unchanged.
 
+## Owned profile synchronization
+
+`GET /api/v1/companies/{companyId}/employees/me/profiles/{id}` returns one published
+employment/private-profile snapshot for the current account. It includes current
+assignment labels and the manager's minimal display reference, without the
+manager's private profile or account ID. Self-read authority, or both ordinary
+and private-profile read grants, is required; all cases remain owner-only.
+
+The explicit `SELF_PROFILES` change feed uses a separate record version. A People
+worker publishes source changes and scheduled effective transitions; the read
+endpoint does not execute that worker. Data age does not remove a published
+snapshot. Current credentials, company membership, grants and MFA are checked
+independently before private data is released. See
+[synchronization](../synchronization.md#owned-private-profiles) for bounds, source
+capture, version ownership and cancellation.
+
 ## Implementation status
 
 Company creation, reads, and versioned updates are implemented. Creation grants only the documented company administrator permissions. Idempotency receipts, membership, audit, and outbox records commit together; replay returns the original mutation outcome. Company codes are normalized to uppercase and timezones must be recognized IANA identifiers.

@@ -35,6 +35,10 @@ fun selectSyncCollections(
             authorized += SyncCollection.LEAVE_REQUESTS
             authorized += SyncCollection.LEAVE_BALANCES
         }
+        if ("payroll.read" in permissions) {
+            authorized += SyncCollection.PAYSLIPS
+            authorized += SyncCollection.PAYROLL_PAYMENTS
+        }
         if (permissions.any { it in setOf("overtime.read", "overtime.manage", "workforce.read") })
             authorized += SyncCollection.OVERTIME_REQUESTS
         if ("workforce.read" in permissions) authorized += SyncCollection.ATTENDANCE_DAYS

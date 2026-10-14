@@ -10,8 +10,8 @@ The supported collections are:
 | `LEAVE_REQUESTS` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments or immutable request owner | `/api/v1/companies/{companyId}/leave/requests/{id}` |
 | `LEAVE_BALANCES` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/leave/balances/{id}` |
 | `OVERTIME_REQUESTS` | `overtime.self.manage`, or explicit selection with `overtime.read`, `overtime.manage` or `workforce.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/overtime/{id}` |
-| `PAYSLIPS` | `payroll.self.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}` |
-| `PAYROLL_PAYMENTS` | `payroll.self.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}/payments` |
+| `PAYSLIPS` | `payroll.self.read`, or explicit selection with `payroll.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}` |
+| `PAYROLL_PAYMENTS` | `payroll.self.read`, or explicit selection with `payroll.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/payroll/payslips/{id}/payments` |
 | `INBOX` (explicit selection) | `announcements.read` | Original recipient account only | `/api/v1/companies/{companyId}/inbox/{id}` |
 | `ATTENDANCE_DAYS` (explicit selection) | `attendance.self.record` or `workforce.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/attendance/days/{id}` |
 | `WORK_SCHEDULES` (explicit selection) | `attendance.self.record` or `workforce.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/me/schedules/{id}` |
@@ -68,7 +68,7 @@ These read inputs do not authorize attendance commands or replace the frozen
 schedule of already captured evidence. Bootstrap retains all effective dates;
 clients bound query/render work separately from stored history.
 
-Payslips reference immutable finalized assessments and have version `0`. Publication captures the entire run's references in one transaction; rollback or cancellation exposes none. The feed carries IDs, never salary amounts or calculation evidence. New collection authorization changes the scope fingerprint, so existing published assessments are discovered through a fresh bootstrap. Company-wide `payroll.read` does not grant employee sync; that projection requires `payroll.self.read`.
+Payslips reference immutable finalized assessments and have version `0`. Publication captures the entire run's references in one transaction; rollback or cancellation exposes none. The feed carries IDs, never salary amounts or calculation evidence. New collection authorization changes the scope fingerprint, so existing published assessments are discovered through a fresh bootstrap. Explicit selection also admits `payroll.read` for the account's own employments, matching canonical `scope=SELF` reads. Omitted selection still requires `payroll.self.read`; neither mode exposes a colleague's pay through administrative authority.
 
 Payroll payment references use the assessment ID, but belong to a separate collection and monotonically increasing progress version. Preparation, release, cancellation, and reconciliation capture changes atomically. A retry after a confirmed failure retains earlier attempts and advances the same progress resource. Bank destinations and transaction references are excluded from employee progress and sync. Before the first attempt, the canonical progress resource returns an empty version `0`; no payment reference is needed in bootstrap yet. Adding this collection to an existing selection requires a fresh bootstrap.
 

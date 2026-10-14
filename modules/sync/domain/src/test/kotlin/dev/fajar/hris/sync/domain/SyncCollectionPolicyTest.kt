@@ -8,6 +8,26 @@ import org.junit.jupiter.api.Test
 
 class SyncCollectionPolicyTest {
     @Test
+    fun payrollReadersSelectOwnedResourcesWithoutChangingTheDefaultProjection() {
+        val collections = setOf(PAYSLIPS, PAYROLL_PAYMENTS)
+        for (grant in listOf("payroll.self.read", "payroll.read")) {
+            assertEquals(
+                Result.Success(collections),
+                selectSyncCollections(setOf(grant), collections),
+            )
+        }
+        val permissions = setOf("payroll.read", "expenses.self.manage")
+        assertEquals(
+            Result.Success(setOf(EXPENSE_CLAIMS)),
+            selectSyncCollections(permissions, null),
+        )
+        assertEquals(
+            Result.Success(collections + EXPENSE_CLAIMS),
+            selectSyncCollections(permissions, collections + EXPENSE_CLAIMS),
+        )
+    }
+
+    @Test
     fun calendarSourcesAreExplicitAndNeverGrantedByTeamOrCompanyMetadataAccess() {
         val sources = setOf(WORK_SCHEDULES, ROSTER_DAYS, WORK_HOLIDAYS)
         for (grant in listOf("attendance.self.record", "workforce.read")) {
@@ -67,7 +87,7 @@ class SyncCollectionPolicyTest {
                 (selectSyncCollections(permissions, null) as Result.Failed).failure.code,
             )
             assertEquals(
-                Result.Success(setOf(OVERTIME_REQUESTS)),
+                Result.Success(setOf(OVERTIME_REQUESTS, PAYSLIPS)),
                 selectSyncCollections(permissions, setOf(OVERTIME_REQUESTS, PAYSLIPS)),
             )
         }
@@ -81,14 +101,14 @@ class SyncCollectionPolicyTest {
     }
 
     @Test
-    fun readOnlyLeaveRequiresExplicitSelectionAndCannotAddOtherCollections() {
+    fun readOnlyLeaveAndPayrollRequireExplicitSelection() {
         val permissions = setOf("leave.read", "payroll.read")
         assertEquals(
             "sync_access_denied",
             (selectSyncCollections(permissions, null) as Result.Failed).failure.code,
         )
         assertEquals(
-            Result.Success(setOf(LEAVE_REQUESTS, LEAVE_BALANCES)),
+            Result.Success(setOf(LEAVE_REQUESTS, LEAVE_BALANCES, PAYSLIPS)),
             selectSyncCollections(permissions, setOf(LEAVE_REQUESTS, LEAVE_BALANCES, PAYSLIPS)),
         )
         assertEquals(
@@ -123,7 +143,8 @@ class SyncCollectionPolicyTest {
             Result.Success(setOf(EXPENSE_CLAIMS)),
             selectSyncCollections(setOf("expenses.self.manage"), setOf(EXPENSE_CLAIMS, PAYSLIPS)),
         )
-        for (permissions in listOf(setOf("payroll.read"), setOf("expenses.self.manage"))) {
+        for (permissions in
+            listOf(setOf("payroll.pay"), setOf("payroll.approve"), setOf("expenses.self.manage"))) {
             val failed = selectSyncCollections(permissions, setOf(PAYSLIPS)) as Result.Failed
             assertEquals("sync_access_denied", failed.failure.code)
         }

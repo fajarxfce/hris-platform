@@ -2,6 +2,7 @@ package dev.fajar.hris.payroll.domain.policies
 
 import dev.fajar.hris.approvals.domain.entities.*
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.jobs.domain.entities.JobStatus
 import dev.fajar.hris.payroll.domain.entities.*
 
 fun requireApprovedPayroll(
@@ -42,3 +43,15 @@ fun requirePayrollPublicationSources(readiness: PayrollPublicationReadiness): Re
 
 fun canReadPayrollFinalization(actor: Actor): Boolean =
     canReadPayrollInput(actor) || "payroll.finalize" in actor.permissions
+
+fun nextPayrollFinalizationAttempt(
+    previous: PayrollFinalization?,
+    status: JobStatus?,
+): Result<Int> =
+    when {
+        previous != null && status !in setOf(JobStatus.FAILED, JobStatus.CANCELLED) ->
+            Result.Failed(Failure(FailureKind.CONFLICT, "payroll_finalization_active"))
+        (previous?.number ?: 0) >= 8 ->
+            Result.Failed(Failure(FailureKind.CONFLICT, "payroll_finalization_capacity"))
+        else -> Result.Success((previous?.number ?: 0) + 1)
+    }

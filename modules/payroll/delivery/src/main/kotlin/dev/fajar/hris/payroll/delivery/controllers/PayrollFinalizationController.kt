@@ -5,7 +5,9 @@ import dev.fajar.hris.core.http.*
 import dev.fajar.hris.payroll.delivery.mappers.*
 import dev.fajar.hris.payroll.delivery.requests.PayrollFinalizationRequest
 import dev.fajar.hris.payroll.delivery.responses.*
+import dev.fajar.hris.payroll.domain.entities.PayrollRunStatus
 import dev.fajar.hris.payroll.domain.usecases.*
+import java.time.YearMonth
 import java.util.UUID
 import org.springframework.web.bind.annotation.*
 
@@ -15,7 +17,29 @@ class PayrollFinalizationController(
     private val start: StartPayrollFinalization,
     private val get: GetPayrollFinalization,
     private val list: ListPayrollFinalizations,
+    private val preparation: GetPayrollFinalizationPreparation,
+    private val runs: ListPayrollPublicationRuns,
 ) {
+    @GetMapping("/publication-runs")
+    fun runs(
+        actor: Actor,
+        @RequestParam from: YearMonth,
+        @RequestParam until: YearMonth,
+        @RequestParam(required = false) status: PayrollRunStatus?,
+        @RequestParam(required = false) after: UUID?,
+        @RequestParam(defaultValue = "50") limit: Int,
+    ): Page<PayrollRunResponse> =
+        runs.execute(actor, from, until, status, after, limit).response().let {
+            Page(it.items.map { row -> row.toResponse() }, it.nextCursor)
+        }
+
+    @GetMapping("/runs/{runId}/finalization-preparation")
+    fun preparation(
+        actor: Actor,
+        @PathVariable runId: UUID,
+    ): PayrollFinalizationPreparationResponse =
+        preparation.execute(actor, runId).response().toResponse()
+
     @PostMapping("/runs/{runId}/finalizations")
     fun start(
         actor: Actor,

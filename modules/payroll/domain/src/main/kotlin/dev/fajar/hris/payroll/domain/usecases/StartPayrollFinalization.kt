@@ -123,22 +123,15 @@ class StartPayrollFinalization(
             val last = finalizations.latest(company, runId)
             if (last is Result.Failed) return@run last
             val previous = (last as Result.Success).value
-            if (previous != null) {
-                val lastJob = jobs.find(company, previous.jobId)
-                if (lastJob is Result.Failed) return@run lastJob
-                if (
-                    (lastJob as Result.Success).value?.status !in
-                        setOf(JobStatus.FAILED, JobStatus.CANCELLED)
+            val previousJob = previous?.let { jobs.find(company, it.jobId) }
+            if (previousJob is Result.Failed) return@run previousJob
+            val next =
+                nextPayrollFinalizationAttempt(
+                    previous,
+                    (previousJob as? Result.Success)?.value?.status,
                 )
-                    return@run Result.Failed(
-                        Failure(FailureKind.CONFLICT, "payroll_finalization_active")
-                    )
-            }
-            val number = (previous?.number ?: 0) + 1
-            if (number > 8)
-                return@run Result.Failed(
-                    Failure(FailureKind.CONFLICT, "payroll_finalization_capacity")
-                )
+            if (next is Result.Failed) return@run next
+            val number = (next as Result.Success).value
             val readiness =
                 finalizations.readiness(company, runId).flatMap(::requirePayrollPublicationSources)
             if (readiness is Result.Failed) return@run readiness
@@ -153,6 +146,9 @@ class StartPayrollFinalization(
             val issuer =
                 (companyResult as Result.Success).value
                     ?: return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "company_not_found"))
+            val admission =
+                requirePayrollMutation(live, "payroll.finalize", clock.instant(), security)
+            if (admission is Result.Failed) return@run admission
             val now = clock.instant()
             val job =
                 JobRequest(
@@ -204,7 +200,13 @@ class StartPayrollFinalization(
                         ),
                     )
                 }
+                .flatMap {
+                    requirePayrollMutation(live, "payroll.finalize", clock.instant(), security)
+                }
                 .flatMap { operations.record(actor, key, receipt) }
+                .flatMap {
+                    requirePayrollMutation(live, "payroll.finalize", clock.instant(), security)
+                }
                 .map { receipt }
         }
     }

@@ -11,6 +11,29 @@ import java.util.UUID
 
 class StoredPayrollFinalizationRepository(private val source: PayrollFinalizationDataSource) :
     PayrollFinalizationRepository {
+    override fun publicationRuns(
+        company: UUID,
+        from: YearMonth,
+        until: YearMonth,
+        status: PayrollRunStatus?,
+        after: UUID?,
+        limit: Int,
+    ): Result<Page<PayrollRun>> = safeDatabaseCall {
+        val rows =
+            source.publicationRuns(
+                company,
+                from.atDay(1),
+                until.atDay(1),
+                status?.name,
+                after,
+                limit + 1,
+            )
+        Page(
+            rows.take(limit).map { it.toRun() },
+            if (rows.size > limit) rows[limit - 1].id.toString() else null,
+        )
+    }
+
     override fun find(company: UUID, id: UUID): Result<PayrollFinalization?> = safeDatabaseCall {
         source.find(company, id)?.toFinalization()
     }

@@ -174,6 +174,16 @@ company-wide finance grants to owned employments without granting new authority.
 PDF rendering runs outside database transactions; the delivery adapter reauthorizes
 after rendering before conditional metadata and again before content is released.
 
+Payroll finalization discovery has an independent, bounded run-header projection;
+the finalization grant does not widen input, employee or payslip read grants.
+Preparation holds shared payroll, people, approval and access guards while reviewing
+approved references and publication readiness. Job status is read without a job
+lock, retaining the worker's job-before-payroll acquisition order. Preparation is
+advisory and performs no writes. The command revalidates sources and observed
+versions under its own guards. Finalization reads check session assurance after
+acquisition; admission retains recent assurance after queue waits and through the
+job, finalization, journal and operation-receipt transaction.
+
 Employee expense draft saves, cancellations, submission and withdrawal check
 current session assurance after resource/access guards, before receipt replay,
 and before transaction completion. Late expiry rolls back claim state, immutable

@@ -34,6 +34,34 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun finalizationPreparationAndDirectoryKeepApprovalVersionsAndProgressSeparate() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/payroll"
+        for (path in
+            listOf("/publication-runs", "/runs/{runId}/finalization-preparation")) assertTrue(
+            api["paths"][base + path]["get"]["x-hris-company-admission"].asBoolean()
+        )
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf(
+                "run",
+                "totals",
+                "latestReview",
+                "approvalVersion",
+                "latestFinalization",
+                "latestJobStatus",
+                "blockingIssues",
+                "availableActions",
+            ),
+            schemas["PayrollFinalizationPreparationResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("finalization", "job", "run", "totals"),
+            schemas["PayrollFinalizationDetailsResponse"]["properties"].propertyNames().toSet(),
+        )
+    }
+
+    @Test
     fun payrollReviewPreparationAndActionsKeepVersionsAndAccountLabelsExplicit() {
         val api = contract()
         val path = "/api/v1/companies/{companyId}/payroll/runs/{runId}/review-preparation"

@@ -154,6 +154,27 @@ Mobile clients retain both observed versions with a pending command. A lost resp
 
 `payroll.finalize` starts an explicit publication job for an unchanged, approved run. The command carries an idempotency key, a client-generated finalization ID, review ID, observed run/review/approval versions, and reason. Current company membership, credentials, recent authentication, and configured MFA are checked before both a new command and its original receipt replay. The existing aggregate maker/checker review remains mandatory; a finalizer may be a payroll beneficiary whose personal sources were independently reviewed.
 
+`GET /payroll/publication-runs?from=YYYY-MM&until=YYYY-MM` discovers completed
+calculations and finalized runs under the independent finalization read scope.
+It accepts an optional `CALCULATED`/`FINALIZED` status, an ascending run-ID cursor
+and a limit of 1–200. The inclusive earnings-month range is at most 36 months.
+This live directory contains run headers, without employee calculation payloads;
+retain the same filters when following `nextCursor`.
+
+`GET /payroll/runs/{runId}/finalization-preparation` returns the current run,
+aggregate totals, latest review and its approval version, latest publication
+attempt/status, and current blocking issues/actions. It creates no records and
+reserves neither approval nor job capacity. Current source readiness is checked
+under shared payroll, people, approval and access guards. A finalizer can review
+publication without receiving unrelated input-editing or employee-read grants.
+The command independently checks the reviewed versions, sources and queue.
+
+Finalization detail includes the current run and the captured review totals
+alongside its separate publication job. An older cancelled/failed attempt remains
+readable if a later attempt finalizes the run. Readers check current session
+assurance after waits and acquisition. Start retains recent assurance after queue
+admission and through journal/receipt completion; late expiry rolls back all writes.
+
 Each request retains its actor, approved references, reason, job ID, and company code/name at submission. Later company renaming does not rewrite the published issuer labels. A run permits eight explicit finalization attempts. A queued/running attempt must be cancelled through the job API and reach a terminal outcome before retry or review withdrawal. A failed attempt does not undo review or silently recalculate sources. Start also respects the bounded company job queue.
 
 The worker locks its lease before the company payroll, people, approval, and access guards. It rechecks current authority, credential version, authentication age, exact approved versions, and employment heads. A changed employment revision requires explicit withdrawal and recalculation, including a later effective revision. One person cannot receive two original assessments for the same company/tax month through different employment IDs. A positive THR result retains its holiday kind/year, with a company/person/year/kind uniqueness constraint.

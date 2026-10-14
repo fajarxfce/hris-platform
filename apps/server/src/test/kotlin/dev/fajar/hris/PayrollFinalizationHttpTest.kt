@@ -126,6 +126,15 @@ class PayrollFinalizationHttpTest : PayrollFinalizationApiFixture() {
         }
         assertEquals(0, count(f.calculation.people.payroll.company, "payroll_assessments"))
         payrollError(startFinalization(f), 409, "payroll_finalization_capacity")
+        val preparation =
+            payrollBody(
+                get(f.finalizer.client, runPath(f.calculation, f.run) + "/finalization-preparation")
+            )
+        assertEquals(
+            "payroll_finalization_capacity",
+            preparation["blockingIssues"][0]["code"].asString(),
+        )
+        assertEquals(0, preparation["availableActions"].size())
         val first =
             payrollBody(
                 get(f.finalizer.client, runPath(f.calculation, f.run) + "/finalizations?limit=3")

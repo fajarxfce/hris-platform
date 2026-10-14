@@ -2,10 +2,21 @@ package dev.fajar.hris.payroll.data.datasources
 
 import dev.fajar.hris.payroll.data.models.PayrollPublicationReadinessRow
 import dev.fajar.hris.schema.tables.records.PayrollFinalizationsRecord
+import dev.fajar.hris.schema.tables.records.PayrollRunsRecord
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 
 interface PayrollFinalizationDataSource {
+    fun publicationRuns(
+        company: UUID,
+        from: LocalDate,
+        until: LocalDate,
+        status: String?,
+        after: UUID?,
+        limit: Int,
+    ): List<PayrollRunsRecord>
+
     fun find(company: UUID, id: UUID): PayrollFinalizationsRecord?
 
     fun forJob(company: UUID, job: UUID): PayrollFinalizationsRecord?

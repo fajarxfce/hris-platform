@@ -3914,3 +3914,30 @@ WireGuard overlays retained. Loopback API, VPN API and dashboard probes returned
 HTTP 200.
 Finalization, payslip publication and finance payment dashboard workflows remain
 subsequent work. No mobile or physical-device validation is claimed for this slice.
+
+
+### Finalization discovery and preparation
+
+Payroll finalizers now have a bounded directory of completed calculations and
+finalized runs without receiving unrelated input, employee or payslip read grants.
+Preparation returns aggregate totals, current approved references and versions,
+the latest attempt/status and explicit blockers. Historical attempt details retain
+their own publication progress alongside the current run and captured review totals.
+No review creates records or reserves approval, source readiness or queue capacity.
+
+Shared resource/access guards preserve coherent preparation without reversing the
+worker's job-before-payroll lock order. Reads revalidate session assurance after
+waits and acquisition. Start retains recent assurance after queue admission and
+through journaling and receipt completion; a late failure rolls everything back.
+Explicit retries still carry the original command and observed versions.
+
+Architecture and formatting checks, both application JAR builds and 201 selected
+tests passed: 78 API/PostgreSQL/contract tests, 61 payroll domain tests and all 62
+worker tests. Coverage includes independent finalizer scope, bounded directories,
+shared concurrent readers, cancelled and published attempts, missing/withdrawn
+approval, source failure classification, original/live grants, late MFA expiry,
+receipt rollback and interruption cleanup. One new test used an unknown run status
+while expecting a domain validation error. Its input was corrected, a separate
+unknown-enum assertion added, and all five preparation HTTP tests passed again.
+Dashboard finalization screens remain the next increment. These changes have not
+yet been deployed; no mobile or physical-device validation is claimed.

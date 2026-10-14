@@ -34,4 +34,20 @@ fun PayrollFinalizationDetails.toResponse() =
             job.cancellationRequested,
             job.failureCode,
         ),
+        run.toResponse(),
+        totals.toResponse(),
+    )
+
+fun PayrollFinalizationPreparation.toResponse() =
+    PayrollFinalizationPreparationResponse(
+        run.toResponse(),
+        totals.toResponse(),
+        latestReview?.toResponse(),
+        approvalVersion,
+        latestFinalization?.toResponse(),
+        latestJobStatus?.name,
+        blockingIssues.map {
+            PayrollRunFailureResponse(it.kind.name, it.code, it.fields, it.parameters)
+        },
+        availableActions.map { it.name }.sorted(),
     )

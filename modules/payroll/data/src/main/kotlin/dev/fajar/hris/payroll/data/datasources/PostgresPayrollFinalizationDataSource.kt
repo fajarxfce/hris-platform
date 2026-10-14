@@ -2,7 +2,10 @@ package dev.fajar.hris.payroll.data.datasources
 
 import dev.fajar.hris.payroll.data.models.PayrollPublicationReadinessRow
 import dev.fajar.hris.schema.tables.PayrollFinalizations.PAYROLL_FINALIZATIONS as F
+import dev.fajar.hris.schema.tables.PayrollRuns.PAYROLL_RUNS as R
 import dev.fajar.hris.schema.tables.records.PayrollFinalizationsRecord
+import dev.fajar.hris.schema.tables.records.PayrollRunsRecord
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.UUID
 import org.jooq.DSLContext
@@ -10,6 +13,26 @@ import org.jooq.impl.DSL
 
 class PostgresPayrollFinalizationDataSource(private val sql: DSLContext) :
     PayrollFinalizationDataSource {
+    override fun publicationRuns(
+        company: UUID,
+        from: LocalDate,
+        until: LocalDate,
+        status: String?,
+        after: UUID?,
+        limit: Int,
+    ): List<PayrollRunsRecord> =
+        sql.selectFrom(R)
+            .where(
+                R.COMPANY_ID.eq(company),
+                R.EARNINGS_MONTH.between(from, until),
+                R.STATUS.`in`("CALCULATED", "FINALIZED"),
+                status?.let { R.STATUS.eq(it) } ?: DSL.noCondition(),
+                after?.let { R.ID.gt(it) } ?: DSL.noCondition(),
+            )
+            .orderBy(R.ID)
+            .limit(limit)
+            .fetch()
+
     override fun find(company: UUID, id: UUID): PayrollFinalizationsRecord? =
         sql.selectFrom(F).where(F.COMPANY_ID.eq(company), F.ID.eq(id)).fetchOne()
 

@@ -1,7 +1,8 @@
 package dev.fajar.hris.payroll.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
@@ -20,6 +21,10 @@ class GetPayrollFinalization(
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val jobs: JobRepository,
+    private val runs: PayrollRunRepository,
+    private val reviews: PayrollReviewRepository,
+    private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(actor: Actor, id: UUID): Result<PayrollFinalizationDetails> {
         val company =
@@ -36,10 +41,10 @@ class GetPayrollFinalization(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val foundAccess = identities.access(actor.accountId, company)
+            if (foundAccess is Result.Failed) return@run foundAccess
+            val access = (foundAccess as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             if (!canReadPayrollFinalization((checked as Result.Success).value))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
@@ -50,10 +55,31 @@ class GetPayrollFinalization(
                     ?: return@run Result.Failed(
                         Failure(FailureKind.NOT_FOUND, "payroll_finalization_not_found")
                     )
-            jobs.find(company, finalization.jobId).flatMap { job ->
-                if (job == null)
-                    Result.Failed(Failure(FailureKind.CONFLICT, "payroll_finalization_obsolete"))
-                else Result.Success(PayrollFinalizationDetails(finalization, job))
+            val jobResult = jobs.find(company, finalization.jobId)
+            if (jobResult is Result.Failed) return@run jobResult
+            val job = (jobResult as Result.Success).value
+            if (
+                job == null ||
+                    job.request.companyId != company ||
+                    job.request.kind != JobKind.PAYROLL_FINALIZE ||
+                    job.request.values["finalizationId"] != id.toString() ||
+                    job.request.values["runId"] != finalization.runId.toString()
+            )
+                return@run Result.Failed(
+                    Failure(FailureKind.CONFLICT, "payroll_finalization_obsolete")
+                )
+            val runResult = runs.find(company, finalization.runId)
+            if (runResult is Result.Failed) return@run runResult
+            val reviewResult = reviews.find(company, finalization.reviewId)
+            if (reviewResult is Result.Failed) return@run reviewResult
+            val run = (runResult as Result.Success).value
+            val review = (reviewResult as Result.Success).value
+            if (run == null || review == null || review.runId != run.id)
+                return@run Result.Failed(
+                    Failure(FailureKind.CONFLICT, "payroll_finalization_obsolete")
+                )
+            validateCompanySessionActor(actor, access, clock.instant(), security).map {
+                PayrollFinalizationDetails(finalization, job, run, review.totals)
             }
         }
     }

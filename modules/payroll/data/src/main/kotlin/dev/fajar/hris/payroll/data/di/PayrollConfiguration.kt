@@ -1377,6 +1377,10 @@ class PayrollConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         jobs: JobRepository,
+        runs: PayrollRunRepository,
+        reviews: PayrollReviewRepository,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         GetPayrollFinalization(
             finalizations,
@@ -1386,6 +1390,10 @@ class PayrollConfiguration {
             identities,
             transactions,
             jobs,
+            runs,
+            reviews,
+            clock,
+            security,
         )
 
     @Bean
@@ -1397,6 +1405,8 @@ class PayrollConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         runs: PayrollRunRepository,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         ListPayrollFinalizations(
             finalizations,
@@ -1406,6 +1416,62 @@ class PayrollConfiguration {
             identities,
             transactions,
             runs,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun getPayrollFinalizationPreparation(
+        finalizations: PayrollFinalizationRepository,
+        runs: PayrollRunRepository,
+        reviews: PayrollReviewRepository,
+        policies: PayrollPolicyRepository,
+        approvals: ApprovalRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollFinalizationPreparation(
+            finalizations,
+            runs,
+            reviews,
+            policies,
+            approvals,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun listPayrollPublicationRuns(
+        finalizations: PayrollFinalizationRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListPayrollPublicationRuns(
+            finalizations,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
         )
 
     @Bean

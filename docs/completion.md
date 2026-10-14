@@ -20,7 +20,7 @@ age-based read limit. Saved views remain readable after freshness or credential
 expiry; live authorization and operation reviews have separate checks. Foreground
 revalidation retains the same workspace, while confirmed denials keep affected
 reads gated through failed cleanup and retries. The [mobile read and sync model](https://github.com/fajarxfce/hris-mobile/blob/main/docs/local-first.md)
-distinguishes existing snapshots from complete replicas: Inbox, Leave, Overtime, Workforce, Payroll, Expenses, published Documents and the coworker directory
+distinguishes existing snapshots from complete replicas: Inbox, Leave, Overtime, Workforce, Payroll, Expenses, published Documents, the coworker directory and private profile
 collections consume change feeds and retain account-owned records
 across sign-in, independently of the active request session. A replacement cursor
 stages new data without hiding published facts. The coworker directory also supports
@@ -177,7 +177,8 @@ replacement snapshot remains staged until publication catches up. Confirmed
 read denials remain separate from ordinary data, credential and cursor age.
 Android emulator acceptance covered cold offline restoration, local search and
 filters, and another restart after a 73-hour clock advance. The validated APK
-was installed on the phone without launching its UI. Private profiles remain online.
+was installed on the phone without launching its UI. Private-profile synchronization
+is described separately below.
 
 The backend now provides [owned private-profile snapshots](synchronization.md#owned-private-profiles)
 through an explicit `SELF_PROFILES` feed and canonical record. Employment, private
@@ -186,7 +187,12 @@ version. The worker captures cross-company person dependencies, schedules effect
 changes, and retains unchanged data independently of its age. Current ownership,
 grants, MFA and People availability remain separate read gates. Backend migration,
 API/worker, cancellation, concurrency and malformed-payload checks passed. The
-mobile private-profile replica and offline acceptance remain in progress.
+[mobile private-profile replica](https://github.com/fajarxfce/hris-mobile/commit/70c0661e9890caa84f5ebf8485a4c5934f2eb241)
+now stores coherent owned snapshots with an independent content key and atomic
+cursor publication. Employment selection queries local records. Confirmed read
+denials remain gated through failed cleanup and pending/offline retries. API 35
+acceptance verified cold offline profile restoration and another offline restart
+after a 73-hour clock advance. The phone installation is pending ADB availability.
 
 The published-document catalog now has an explicit `DOCUMENT_EVIDENCE` change feed
 and a canonical metadata endpoint. Both require current self-document authority

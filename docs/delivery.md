@@ -3501,3 +3501,36 @@ batches, malformed payloads and account mismatches. Read tests pause acquisition
 to verify live credential/grant revocation and MFA expiry. Migration/jOOQ generation,
 architecture checks and both application JAR builds passed. Mobile integration
 and physical-device acceptance are not included in this backend validation.
+
+### Mobile private-profile replica
+
+Migration V72 and the new API/worker images were applied to development with the
+private document and WireGuard overlays retained. Readiness returned HTTP 200.
+An authenticated bootstrap, canonical read and change-feed probe verified the
+owned employment, coherent fields and independent command versions. Backend,
+dashboard and full dashboard integration CI passed for
+[08affa50](https://github.com/fajarxfce/hris-platform/actions/runs/38556866977).
+
+The [mobile implementation](https://github.com/fajarxfce/hris-mobile/commit/70c0661e9890caa84f5ebf8485a4c5934f2eb241)
+adds an account/company/audience-owned encrypted profile replica. Initial and
+replacement generations publish after feed catch-up; records and cursor commit
+atomically. Explicit `SELF_PROFILES` acquisition uses bounded pages and concurrent
+canonical reads, with a shared UI/worker execution guard. Local employment
+selection performs no HTTP. Independent sync revisions preserve the original
+employment/person command versions. Ordinary data and credential age do not
+withdraw owned facts. A durable denial and a failed-write buffer retain confirmed
+restrictions until a subsequent admitted acquisition succeeds.
+
+Validation passed the root architecture, formatting and analysis checks,
+1,475 desktop/JVM tests and 86 Chromium People tests. New cases cover scope and
+private/public grants, coherent DTO validation, versioned withdrawal, pending
+publication, cursor replacement, cancellation and late results, encrypted storage
+restart, failed denial persistence, local selection and completed storage-flow
+recovery. Two existing UI scenarios exposed acquisition/render synchronization
+races in their setup; focused checks and the full root suite passed after those
+test-only corrections. Android dev assembly and the production Web build passed.
+
+API 35 emulator acceptance verified the live profile, cold offline restoration,
+another restart after a 73-hour clock advance, and failed-refresh retention. The
+emulator clock and network were restored. Phone installation remains pending
+because `10.77.77.3:5555` did not respond. This acceptance used the dedicated emulator. Native Apple/Windows build results remain separate CI validation.

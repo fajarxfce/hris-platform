@@ -868,3 +868,14 @@ a {
 .app-expense-decision .app-property-list {
   row-gap: 12px;
 }
+
+.app-payroll-policy-editor .app-editor-form {
+  gap: 16px;
+}
+.app-payroll-policy-editor .app-editor-form :is(h2, p) {
+  margin: 0;
+}
+.app-payroll-policy-editor .app-editor-form h2 {
+  font-size: 18px;
+  padding-top: 8px;
+}

@@ -102,6 +102,28 @@ requires protected reload of the current head. Account/company replacement abort
 the owner and discards obsolete results. Drafts are held only in browser memory;
 locale and theme changes do not reacquire data or reset input.
 
+## Payroll policies
+
+`/payroll/policy` shows the policy applying to a selected month, the latest saved
+configuration and bounded ascending history. An uncovered month retains the
+configuration and history. Revision inspection uses the acquired page; it does
+not change the head used for editing. Read access accepts `payroll.read`,
+`payroll.policy.manage` or `payroll.compensation.manage`. Company administration
+and employee payslip access do not grant payroll administration.
+
+The separate editor requires `payroll.policy.manage` and saves a reason with the
+observed current version. Effective periods stay within one calendar year. Tax
+rule IDs come from the backend catalog; exact decimal IDR contribution bases,
+rounding and review references remain explicit. Initial setup does not invent
+statutory caps. A future revision does not replace an earlier month's policy.
+
+The controller owns cancellation and freezes one command after submission.
+Response loss retains the original payload and operation for retry, including
+after a later rejection. A definite version conflict requires protected reload;
+confirmed access loss removes acquired policy data. The form keeps unsaved values
+through locale/theme changes and protects route/company changes. Draft input is
+held in browser memory, not persistent offline storage.
+
 ## Shift templates
 
 The Workforce route owns a bounded shift directory, current details, and create/edit

@@ -66,7 +66,38 @@ payroll domain tests passed, along with formatting, architecture checks and both
 application JAR builds. The 22 new policy tests exercise coherent concurrent
 reads/writes, null and dated configurations, page bounds, company isolation,
 original/live permission intersection, expired assurance, cancellation, receipt
-replay and transaction rollback. The dashboard consumer remains in progress.
+replay and transaction rollback.
+
+### Payroll policy dashboard
+
+The dashboard now separates monthly effective policy, latest saved configuration
+and revision history. Revision inspection uses acquired data; editing always
+observes the current head. Initial setup leaves contribution bases blank and
+requires explicit decimal amounts, an effective period and review references.
+Payroll read and policy-management grants stay independent from ordinary company
+administration and employee payslip access.
+
+The editor retains its draft through theme and locale changes, protects departure
+and freezes the operation/payload when saving. Response loss and subsequent
+rejected retries preserve the original command. A definite conflict requires
+review of the current version. Company replacement cancels outstanding work and
+confirmed access revocation clears acquired configuration/history.
+
+Validation passed dashboard architecture, formatting and TypeScript checks,
+1,859 unit tests including 25 new payroll cases, and the production build. Nine
+Chromium scenarios covered dated history, empty and uncovered months, exact
+decimal inputs, validation, conflicts, response loss, scope replacement,
+read-only access and locale/theme retention. A real API/PostgreSQL browser
+scenario verified independent grants, two dated revisions, original receipt
+recovery after a deliberately lost committed response, immutable history and
+revocation. Its database and accounts were isolated from development. Desktop
+and narrow dark screenshots were inspected. Existing CSS specificity warnings
+and the main-bundle size advisory remain; they did not fail validation.
+
+The checked API and worker images were deployed with the document services and
+WireGuard bindings preserved. Both API readiness addresses, the VPN dashboard
+and its authentication proxy returned HTTP 200. This increment does not change
+the mobile APK.
 
 Backend foundation: Gradle check and bootJar passed; six PostgreSQL integration tests passed, covering pooled company isolation, denied writes, typed/raw SQL failure mapping, failed-result rollback, cancellation rollback, and immutable audit records. Compose configuration and actionlint passed. No business module, deployment, or performance benchmark is claimed by these checks.
 

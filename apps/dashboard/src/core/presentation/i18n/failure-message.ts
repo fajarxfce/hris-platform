@@ -2,6 +2,26 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_payroll_policy: [
+    "Review the policy dates, contribution bases and references.",
+    "Periksa periode kebijakan, dasar iuran, dan referensinya.",
+  ],
+  invalid_payroll_month: [
+    "Select a payroll month from 2024 through 2100.",
+    "Pilih bulan payroll antara tahun 2024 dan 2100.",
+  ],
+  payroll_policy_not_found: [
+    "No payroll policy has been configured for this period.",
+    "Kebijakan payroll belum diatur untuk periode ini.",
+  ],
+  payroll_policy_not_effective: [
+    "The saved policy does not cover this month.",
+    "Kebijakan tersimpan tidak berlaku pada bulan ini.",
+  ],
+  payroll_policy_revision_limit: [
+    "The policy has reached its revision limit.",
+    "Kebijakan mencapai batas revisi.",
+  ],
   approval_group_too_large: [
     "The approval group exceeds the supported size. Ask an administrator to review the policy.",
     "Grup persetujuan melebihi batas. Minta administrator memeriksa kebijakannya.",

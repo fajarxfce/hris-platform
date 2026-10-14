@@ -15,6 +15,7 @@ import { jobsNavigation } from "../../features/jobs/presentation/navigation/jobs
 import { leaveNavigation } from "../../features/leave/presentation/navigation/leave-navigation";
 import { lifecycleNavigation } from "../../features/lifecycle/presentation/navigation/lifecycle-navigation";
 import { organizationNavigation } from "../../features/organization/presentation/navigation/organization-navigation";
+import { payrollNavigation } from "../../features/payroll/presentation/navigation/payroll-navigation";
 import { peopleNavigation } from "../../features/people/presentation/navigation/people-navigation";
 import { reportingNavigation } from "../../features/reporting/presentation/navigation/reporting-navigation";
 import { workforceNavigation } from "../../features/workforce/presentation/navigation/workforce-navigation";
@@ -51,6 +52,7 @@ export function portalNavigation(
         ...approvalsNavigation(access, locale),
       ],
     },
+    { id: "payroll", label: text.navigationPayroll, items: payrollNavigation(access, locale) },
     {
       id: "communications",
       label: text.navigationCommunications,

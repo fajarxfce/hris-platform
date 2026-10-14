@@ -9,6 +9,7 @@ import type { JobsUseCases } from "../features/jobs/presentation/contracts/jobs-
 import type { LeaveUseCases } from "../features/leave/presentation/contracts/leave-use-cases";
 import type { LifecycleUseCases } from "../features/lifecycle/presentation/contracts/lifecycle-use-cases";
 import type { OrganizationUseCases } from "../features/organization/presentation/contracts/organization-use-cases";
+import type { PayrollUseCases } from "../features/payroll/presentation/contracts/payroll-use-cases";
 import type { PeopleUseCases } from "../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../features/reporting/presentation/contracts/reporting-use-cases";
 
@@ -24,6 +25,7 @@ export type ApplicationDependencies = Readonly<{
   communications: CommunicationsUseCases;
   documents: DocumentsUseCases;
   expense: ExpenseUseCases;
+  payroll: PayrollUseCases;
   jobs: JobsUseCases;
   leave: LeaveUseCases;
   organization: OrganizationUseCases;

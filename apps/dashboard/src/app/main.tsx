@@ -19,6 +19,7 @@ import { createJobsFeature } from "../features/jobs/di/jobs-feature";
 import { createLeaveFeature } from "../features/leave/di/leave-feature";
 import { createLifecycleFeature } from "../features/lifecycle/di/lifecycle-feature";
 import { createOrganizationFeature } from "../features/organization/di/organization-feature";
+import { createPayrollFeature } from "../features/payroll/di/payroll-feature";
 import { createPeopleFeature } from "../features/people/di/people-feature";
 import { createReportingFeature } from "../features/reporting/di/reporting-feature";
 import { createWorkforceFeature } from "../features/workforce/di/workforce-feature";
@@ -41,6 +42,7 @@ const files = createBrowserFiles();
 const documents = createDocumentsFeature(http, files, createBrowserFileInput(document));
 const leave = createLeaveFeature(http, files);
 const expense = createExpenseFeature(http, files);
+const payroll = createPayrollFeature(http);
 const organization = createOrganizationFeature(http);
 const workforce = createWorkforceFeature(http);
 const people = createPeopleFeature(http, files);
@@ -70,6 +72,7 @@ const router = createBrowserRouter([
           jobs={jobs}
           leave={leave}
           expense={expense}
+          payroll={payroll}
           organization={organization}
           workforce={workforce}
           people={people}

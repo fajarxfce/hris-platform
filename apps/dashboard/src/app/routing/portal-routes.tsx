@@ -19,6 +19,7 @@ import type { LeaveUseCases } from "../../features/leave/presentation/contracts/
 import type { LifecycleUseCases } from "../../features/lifecycle/presentation/contracts/lifecycle-use-cases";
 import type { OrganizationUseCases } from "../../features/organization/presentation/contracts/organization-use-cases";
 import { OverviewPage } from "../../features/overview/presentation/pages/overview-page";
+import type { PayrollUseCases } from "../../features/payroll/presentation/contracts/payroll-use-cases";
 import type { PeopleUseCases } from "../../features/people/presentation/contracts/people-use-cases";
 import type { ReportingUseCases } from "../../features/reporting/presentation/contracts/reporting-use-cases";
 import type { WorkforceUseCases } from "../../features/workforce/presentation/contracts/workforce-use-cases";
@@ -323,6 +324,12 @@ const ExpenseRoutes = lazy(() =>
   })),
 );
 
+const PayrollRoutes = lazy(() =>
+  import("../../features/payroll/presentation/navigation/payroll-routes").then((module) => ({
+    default: module.PayrollRoutes,
+  })),
+);
+
 export function PortalRoutes({
   clientBuild,
   accountId,
@@ -338,6 +345,7 @@ export function PortalRoutes({
   jobs,
   leave,
   expense,
+  payroll,
   organization,
   workforce,
   people,
@@ -359,6 +367,7 @@ export function PortalRoutes({
   jobs: JobsUseCases;
   leave: LeaveUseCases;
   expense: ExpenseUseCases;
+  payroll: PayrollUseCases;
   organization: OrganizationUseCases;
   workforce: WorkforceUseCases;
   people: PeopleUseCases;
@@ -369,6 +378,22 @@ export function PortalRoutes({
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>
+      <Route
+        path="/payroll/*"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <PayrollRoutes
+              accountId={accountId}
+              access={access}
+              payroll={payroll}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
       <Route
         path="/expenses/*"
         element={

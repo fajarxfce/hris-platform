@@ -117,6 +117,18 @@ class PostgresDocumentDataSource(private val sql: DSLContext) : DocumentDataSour
             .limit(limit)
             .fetch { PublishedDocumentData(it.into(DOCUMENTS), it.into(DOCUMENT_REVISIONS)) }
 
+    override fun publishedRecord(companyId: UUID, id: UUID): PublishedDocumentData? =
+        sql.select(DOCUMENTS.asterisk(), DOCUMENT_REVISIONS.asterisk())
+            .from(DOCUMENTS)
+            .join(DOCUMENT_REVISIONS)
+            .on(
+                DOCUMENT_REVISIONS.COMPANY_ID.eq(DOCUMENTS.COMPANY_ID),
+                DOCUMENT_REVISIONS.DOCUMENT_ID.eq(DOCUMENTS.ID),
+                DOCUMENT_REVISIONS.ID.eq(DOCUMENTS.CURRENT_REVISION_ID),
+            )
+            .where(DOCUMENTS.COMPANY_ID.eq(companyId), DOCUMENTS.ID.eq(id))
+            .fetchOne { PublishedDocumentData(it.into(DOCUMENTS), it.into(DOCUMENT_REVISIONS)) }
+
     override fun incrementRevision(companyId: UUID, id: UUID, version: Long) =
         sql.update(DOCUMENTS)
             .set(DOCUMENTS.VERSION, version + 1)

@@ -25,7 +25,11 @@ val companyModulePackages: Map<String, CompanyModule> =
 fun requestedSyncModules(request: HttpServletRequest, actor: Actor): Result<Set<CompanyModule>> {
     val values = request.getParameterValues("collections")
     val maximumCollections = SyncCollection.entries.size
-    if (values != null && (values.size > maximumCollections || values.sumOf { it.length } > 200))
+    val maximumLength = SyncCollection.entries.sumOf { it.name.length + 1 }
+    if (
+        values != null &&
+            (values.size > maximumCollections || values.sumOf { it.length } > maximumLength)
+    )
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_sync_collections"))
     val tokens = values?.flatMap { it.split(',').map(String::trim) }?.filter { it.isNotEmpty() }
     if (tokens != null && tokens.size > maximumCollections)
@@ -52,6 +56,7 @@ fun requestedSyncModules(request: HttpServletRequest, actor: Actor): Result<Set<
                     SyncCollection.PAYROLL_PAYMENTS -> CompanyModule.PAYROLL
                     SyncCollection.INBOX -> CompanyModule.COMMUNICATIONS
                     SyncCollection.DIRECTORY_EMPLOYEES -> CompanyModule.PEOPLE
+                    SyncCollection.DOCUMENT_EVIDENCE -> CompanyModule.DOCUMENTS
                 }
             }
             .toSet()

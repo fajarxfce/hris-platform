@@ -91,6 +91,15 @@ class ApiContractHttpTest : PeopleApiFixture() {
     fun selfDocumentDiscoveryDocumentsBoundedOwnedReferencesAndPublishedEvidence() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/documents/me"
+        val record = api["paths"]["$base/evidence/{documentId}"]["get"]
+        assertTrue(record["x-hris-company-admission"].asBoolean())
+        assertEquals(
+            setOf("id", "version", "employmentId", "classification", "evidence"),
+            api["components"]["schemas"]["DocumentCatalogRecordResponse"]["properties"]
+                .properties()
+                .map { it.key }
+                .toSet(),
+        )
         for (path in listOf("$base/employments", "$base/evidence")) {
             val operation = api["paths"][path]["get"]
             assertTrue(operation["x-hris-company-admission"].asBoolean())

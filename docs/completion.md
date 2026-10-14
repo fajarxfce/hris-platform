@@ -179,6 +179,14 @@ Android emulator acceptance covered cold offline restoration, local search and
 filters, and another restart after a 73-hour clock advance. The validated APK
 was installed on the phone without launching its UI. Private profiles remain online.
 
+The published-document catalog now has an explicit `DOCUMENT_EVIDENCE` change feed
+and a canonical metadata endpoint. Both require current self-document authority
+and owned employment; private HR files and unfinished first uploads are excluded.
+Replacement uploads retain the accepted revision until publication, while
+retirement emits a versioned withdrawal. API, worker, database and domain checks
+passed. Mobile catalog replication and offline acceptance remain in progress;
+file downloads and business attachment review retain independent authorization.
+
 Administrative Documents now covers employee folders, document/revision history,
 new and replacement uploads, resumable browser delivery, authorized downloads,
 validation/retry, explicit cancellation, retention-policy configuration,

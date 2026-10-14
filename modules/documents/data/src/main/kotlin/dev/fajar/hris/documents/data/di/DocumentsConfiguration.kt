@@ -101,6 +101,28 @@ class DocumentsConfiguration {
         )
 
     @Bean
+    fun getSelfDocumentRecord(
+        documents: DocumentRepository,
+        profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetSelfDocumentRecord(
+            documents,
+            profiles,
+            people,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun startDocumentUpload(
         documents: DocumentRepository,
         retention: DocumentRetentionRepository,

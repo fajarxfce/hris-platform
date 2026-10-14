@@ -8,6 +8,31 @@ import org.junit.jupiter.api.Test
 
 class SyncCollectionPolicyTest {
     @Test
+    fun documentEvidenceRequiresExplicitSelfAccessWithoutWideningAdministrativeGrants() {
+        val requested = setOf(DOCUMENT_EVIDENCE)
+        assertEquals(
+            Result.Success(requested),
+            selectSyncCollections(setOf("documents.self.read"), requested),
+        )
+        assertEquals(
+            Result.Success(setOf(EXPENSE_CLAIMS)),
+            selectSyncCollections(setOf("documents.self.read", "expenses.self.manage"), null),
+        )
+        for (grant in
+            listOf(
+                "documents.read",
+                "documents.manage",
+                "documents.self.upload",
+                "people.profile.read",
+            )) {
+            assertEquals(
+                "sync_access_denied",
+                (selectSyncCollections(setOf(grant), requested) as Result.Failed).failure.code,
+            )
+        }
+    }
+
+    @Test
     fun coworkerDirectoryIsExplicitAndDoesNotGrantPrivateEmploymentCollections() {
         for (grant in listOf("people.directory.read", "people.read")) {
             assertEquals(

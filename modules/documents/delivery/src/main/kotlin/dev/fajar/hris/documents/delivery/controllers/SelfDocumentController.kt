@@ -4,6 +4,7 @@ import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.core.http.response
 import dev.fajar.hris.documents.delivery.responses.*
 import dev.fajar.hris.documents.domain.entities.DocumentClassification
+import dev.fajar.hris.documents.domain.usecases.GetSelfDocumentRecord
 import dev.fajar.hris.documents.domain.usecases.ListSelfDocumentEmployments
 import dev.fajar.hris.documents.domain.usecases.ListSelfDocumentEvidence
 import io.swagger.v3.oas.annotations.Parameter
@@ -16,7 +17,12 @@ import org.springframework.web.bind.annotation.*
 class SelfDocumentController(
     private val employments: ListSelfDocumentEmployments,
     private val evidence: ListSelfDocumentEvidence,
+    private val record: GetSelfDocumentRecord,
 ) {
+    @GetMapping("/evidence/{documentId}")
+    fun record(actor: Actor, @PathVariable documentId: UUID): DocumentCatalogRecordResponse =
+        record.execute(actor, documentId).response().toResponse()
+
     @GetMapping("/employments")
     fun employments(
         actor: Actor,

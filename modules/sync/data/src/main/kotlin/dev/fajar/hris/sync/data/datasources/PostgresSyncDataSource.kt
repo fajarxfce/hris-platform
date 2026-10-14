@@ -3,6 +3,7 @@ package dev.fajar.hris.sync.data.datasources
 import dev.fajar.hris.schema.tables.AttendanceSyncHeads.ATTENDANCE_SYNC_HEADS as A
 import dev.fajar.hris.schema.tables.DirectoryEmployeeRecords.DIRECTORY_EMPLOYEE_RECORDS as D
 import dev.fajar.hris.schema.tables.DirectoryRefreshQueue.DIRECTORY_REFRESH_QUEUE as Q
+import dev.fajar.hris.schema.tables.Documents.DOCUMENTS as DC
 import dev.fajar.hris.schema.tables.ExpenseClaims.EXPENSE_CLAIMS as E
 import dev.fajar.hris.schema.tables.ExpensePaymentHeads.EXPENSE_PAYMENT_HEADS as EP
 import dev.fajar.hris.schema.tables.InboxItems.INBOX_ITEMS as I
@@ -192,6 +193,20 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                     D.NAME.isNotNull,
                     DSL.inline("DIRECTORY_EMPLOYEES").`in`(selection.collections),
                 )
+        val documents =
+            sql.select(
+                    DSL.inline("DOCUMENT_EVIDENCE").`as`("collection"),
+                    DC.ID.`as`("resource_id"),
+                    DC.VERSION.`as`("resource_version"),
+                )
+                .from(DC)
+                .where(
+                    DC.COMPANY_ID.eq(selection.companyId),
+                    DC.EMPLOYMENT_ID.`in`(selection.employmentIds),
+                    DC.CLASSIFICATION.ne("HR_ONLY"),
+                    DC.CURRENT_REVISION_ID.isNotNull,
+                    DSL.inline("DOCUMENT_EVIDENCE").`in`(selection.collections),
+                )
         val records =
             expenses
                 .unionAll(expensePayments)
@@ -206,6 +221,7 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                 .unionAll(roster)
                 .unionAll(holidays)
                 .unionAll(directory)
+                .unionAll(documents)
                 .asTable("sync_resources")
         val collection = requireNotNull(records.field("collection", String::class.java))
         val id = requireNotNull(records.field("resource_id", UUID::class.java))

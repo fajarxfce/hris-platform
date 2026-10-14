@@ -82,6 +82,16 @@ performs no object-storage reads. It neither reserves a revision nor authorizes 
 later download or business attachment; those operations recheck their own scope,
 availability and observed facts.
 
+The explicit `DOCUMENT_EVIDENCE` sync collection supplies account-owned published
+metadata across both supported classifications and all owned employments.
+`GET /me/evidence/{documentId}` returns `id`, the document header's `version`,
+`employmentId`, `classification` and the same `evidence` metadata as the catalog.
+Missing, foreign, unpublished and HR-only records return
+`document_evidence_not_found`. Shared people/document/access guards retain a
+coherent publication; current session assurance is checked again after acquisition.
+Upload progress, retention policy, physical keys and content are excluded.
+See [synchronization](../synchronization.md) for replacement and withdrawal behavior.
+
 ## Content inspection adapter
 
 The content inspection adapter combines private storage chunks, Apache Tika 4.1 type detection, and ClamAV's INSTREAM protocol. It reports observed size, whole-file SHA-256, media type, scanner version, and verdict. The domain workflow decides whether that evidence permits publication. A clean scanner response alone does not establish a matching document type or digest.

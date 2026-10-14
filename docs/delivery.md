@@ -3423,3 +3423,23 @@ and another offline restart after advancing the clock by 73 hours. Network and
 clock settings were restored. The phone received the validated APK with
 install-only delivery; its installed SHA-256 matched
 `7ede3e69924e5b1cfc24415aa99d6c53fbc196d48a28b58096ba357aedc6cd6e`.
+
+### Published document catalog change feed
+
+Documents now exposes a canonical published record and the explicitly selected
+`DOCUMENT_EVIDENCE` collection. Header versions identify metadata revisions;
+accepted content remains visible during a replacement upload, and retirement
+produces a versioned deletion. Both entry points require self-document authority
+and owned employment. They exclude private HR documents and unpublished first
+uploads, preserve omitted-selection compatibility, and do not read file storage.
+The source mutation and pending synchronization reference share their transaction.
+
+Validation passed formatting and architecture checks, 17 database tests, 44
+Documents/sync domain and data tests, 90 API/PostgreSQL tests and all 49 worker
+tests across focused runs. Coverage includes published/replacement/retired records,
+foreign account and company access, original/live permission intersection,
+credential revocation, late MFA expiry, pending cancellation, rollback, explicit
+collection scope and default-client compatibility. API and worker JAR builds
+passed. Initial runs corrected test fixture iteration, command versions and a
+rollback setup; all affected tests subsequently passed. Development deployment
+and mobile replica acceptance are the next integration steps.

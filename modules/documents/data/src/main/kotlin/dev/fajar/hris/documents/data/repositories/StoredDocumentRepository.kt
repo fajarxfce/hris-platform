@@ -88,6 +88,10 @@ class StoredDocumentRepository(private val source: DocumentDataSource) : Documen
         Page(mapped, if (rows.size > limit) mapped.last().documentId.toString() else null)
     }
 
+    override fun publishedRecord(companyId: UUID, id: UUID) = safeDatabaseCall {
+        source.publishedRecord(companyId, id)?.toCatalogRecord(companyId, id)
+    }
+
     override fun addRevision(
         actor: Actor,
         revision: DocumentRevision,

@@ -9,6 +9,7 @@ The supported collections are:
 | `EXPENSE_CLAIMS` | `expenses.self.manage`, or explicit selection with `expenses.read` / `expenses.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}/record?scope=SELF` |
 | `EXPENSE_PAYMENTS` (explicit selection) | `expenses.self.manage`, `expenses.read` or `expenses.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}/payment-progress?scope=SELF` |
 | `DIRECTORY_EMPLOYEES` (explicit selection) | `people.directory.read` or `people.read` | Public coworkers in the selected company; no personal employment linkage required | `/api/v1/companies/{companyId}/employees/directory/{id}` |
+| `DOCUMENT_EVIDENCE` (explicit selection) | `documents.self.read` | Current account's employments; published personal documents and receipts only | `/api/v1/companies/{companyId}/documents/me/evidence/{id}` |
 | `LEAVE_REQUESTS` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments or immutable request owner | `/api/v1/companies/{companyId}/leave/requests/{id}` |
 | `LEAVE_BALANCES` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/leave/balances/{id}` |
 | `OVERTIME_REQUESTS` | `overtime.self.manage`, or explicit selection with `overtime.read`, `overtime.manage` or `workforce.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/overtime/{id}` |
@@ -27,7 +28,23 @@ balance directory, so clients can hydrate a balance independently of a previousl
 opened directory page. These descriptive fields come from the current leave type;
 the balance version still identifies financial movements and closing state.
 
-All business-request statuses are included. Request cancellation or withdrawal is an `UPSERT` with a new version. Archiving an announcement withdraws its inbox items and produces `DELETE` references. Team/company administration rights do not grant an employee-wide export of private business records. The separately selected coworker directory has its own minimal public fields and directory authority. Documents, approval inboxes, unfinalized payroll, and announcement-management records are not registered sync collections yet. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
+All business-request statuses are included. Request cancellation or withdrawal is an `UPSERT` with a new version. Archiving an announcement withdraws its inbox items and produces `DELETE` references. Team/company administration rights do not grant an employee-wide export of private business records. The separately selected coworker directory has its own minimal public fields and directory authority. Document processing/history, approval inboxes, unfinalized payroll, and announcement-management records are not registered sync collections. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
+
+Document evidence uses the document ID and current header version. Only published
+`PERSONAL` and `RECEIPT` metadata appears; `HR_ONLY` and unfinished first uploads
+are excluded. A replacement upload advances the header version but retains its
+previous accepted revision until publication. Retiring the current revision
+clears publication and emits a versioned `DELETE`; ordinary archive retains
+readable evidence. Header changes and pending references share their transaction.
+Bootstrap directly discovers existing publications, without fabricated historical
+deltas. Migration holds preceding header writers until capture is installed.
+
+The canonical record carries employment, classification and immutable revision
+metadata. Its owner-only read holds shared people/document/access guards, then
+rechecks MFA after acquisition. Administrative document/profile grants do not
+substitute for the self read grant. Neither a sync reference nor stored metadata
+authorizes file acquisition, export or a business attachment. Those operations
+recheck current scope and revision availability independently.
 
 Attendance days have stable projection IDs and versions independent of individual
 capture and correction revisions. A capture, review or correction advances the

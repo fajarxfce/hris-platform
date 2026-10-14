@@ -4,6 +4,18 @@ import dev.fajar.hris.documents.data.models.PublishedDocumentData
 import dev.fajar.hris.documents.domain.entities.*
 import java.util.UUID
 
+fun PublishedDocumentData.toCatalogRecord(companyId: UUID, id: UUID): DocumentCatalogRecord {
+    val header = document.toDocument()
+    require(header.id == id)
+    return DocumentCatalogRecord(
+        header.id,
+        header.version,
+        header.employmentId,
+        header.classification,
+        toEvidence(companyId, header.employmentId, header.classification),
+    )
+}
+
 fun PublishedDocumentData.toEvidence(
     companyId: UUID,
     employmentId: UUID,

@@ -41,6 +41,8 @@ interface DocumentDataSource {
         limit: Int,
     ): List<PublishedDocumentData>
 
+    fun publishedRecord(companyId: UUID, id: UUID): PublishedDocumentData?
+
     fun incrementRevision(companyId: UUID, id: UUID, version: Long): DocumentsRecord?
 
     fun insertRevision(row: DocumentRevisionsRecord)

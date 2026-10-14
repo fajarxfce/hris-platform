@@ -3829,3 +3829,30 @@ cleanup and receipt rollback. Initial test-only issues in JSON iteration and a
 required policy query parameter were corrected and their affected suite passed.
 Architecture/format checks and both application JAR builds passed. Dashboard
 calculation screens are the next part of this increment.
+
+### Dashboard calculation and recovery
+
+Payroll periods now open calculation preparation and retained run history. Start
+captures the reviewed source versions, income due date, reference and reason.
+Run detail separates bounded employee results, attempts and source references;
+one employee's structured calculation/evidence is acquired only when opened.
+Read-only grants do not expose mutation controls or require policy administration.
+
+Visible progress owns one request/timer with thirty automatic updates. Hidden
+documents, terminal jobs, failures and disposal stop observation. Temporary
+transport failure can retain authorized results; access/assurance loss clears
+them. Resume keeps completed outcomes; abandon preserves evidence and reopens
+the period for correction. Unknown delivery retains the exact original command
+through explicit retries and later conflicts. Money remains decimal, including
+negative withholding refunds below one rupiah.
+
+Architecture, formatting, TypeScript and 2,049 frontend tests passed. Sixteen
+Chromium scenarios cover calculation and period navigation, bounded pagination,
+independent employee reads, recovery, company replacement, grant restrictions,
+language/theme changes and narrow layouts. An isolated API/PostgreSQL/worker
+scenario verified a lost start response, one retained failed-source run, explicit
+abandonment, corrected independently verified sources, a successful second run,
+unchanged historical results and withdrawal after permission revocation. Initial
+test-only assumptions about error wording and decimal string scale were corrected.
+Desktop output and light/dark narrow screenshots were inspected. Aggregate review,
+publication and payment dashboard workflows remain subsequent work.

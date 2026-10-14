@@ -4,6 +4,7 @@ import { useWorkspaceRevalidation } from "../../../../core/presentation/session/
 import { canPreparePayrollPeriod } from "../../domain/policies/payroll-period-policy";
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 import { PayrollPeriodController } from "../controllers/payroll-period-controller";
+import { payrollCalculationsPath } from "../models/payroll-calculation-route";
 import { payrollPeriodDetailsParameters } from "../models/payroll-period-route";
 import { payrollPeriodDetailsView } from "../models/payroll-period-view";
 import { PayrollPeriodPage } from "../pages/payroll-period-page";
@@ -84,6 +85,7 @@ function PayrollPeriodBinding(
       onCancel={() =>
         navigate(`/payroll/periods/${encodeURIComponent(id)}/cancel?company=${access.companyId}`)
       }
+      calculationTo={state.details ? payrollCalculationsPath(access.companyId, id) : null}
       onRefresh={controller.refresh}
       onTab={(tab) => {
         if (tab === "participants" || tab === "history")

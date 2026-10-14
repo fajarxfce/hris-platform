@@ -2,6 +2,107 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_payroll_run: [
+    "Review the income due date, reference and reason.",
+    "Periksa tanggal penghasilan terutang, referensi, dan alasan.",
+  ],
+  invalid_payroll_run_action: [
+    "Review the current run and enter a reason.",
+    "Periksa proses saat ini dan isi alasan.",
+  ],
+  payroll_calculation_action_unavailable: [
+    "This action is unavailable. Return to the run to review its current status.",
+    "Tindakan tidak tersedia. Kembali ke proses untuk memeriksa status saat ini.",
+  ],
+  payroll_run_not_found: [
+    "The calculation run was not found.",
+    "Proses perhitungan tidak ditemukan.",
+  ],
+  payroll_run_result_not_found: [
+    "This employee result is unavailable. Return to the run.",
+    "Hasil karyawan tidak tersedia. Kembali ke proses perhitungan.",
+  ],
+  payroll_run_limit: [
+    "This period has reached its limit of twenty calculation runs.",
+    "Periode ini mencapai batas dua puluh proses perhitungan.",
+  ],
+  payroll_run_attempt_limit: [
+    "This run has reached its recovery limit. Review whether it should be abandoned.",
+    "Proses ini mencapai batas pemulihan. Tinjau apakah proses perlu dibatalkan.",
+  ],
+  payroll_run_author_required: [
+    "Only the original preparer can resume this run.",
+    "Hanya penyusun awal yang dapat melanjutkan proses ini.",
+  ],
+  payroll_run_not_resumable: [
+    "This run cannot be resumed. Reload its current status.",
+    "Proses tidak dapat dilanjutkan. Muat ulang status saat ini.",
+  ],
+  payroll_job_not_stopped: [
+    "The current job must stop before this action.",
+    "Job saat ini harus berhenti sebelum tindakan ini dilakukan.",
+  ],
+  payroll_run_job_obsolete: [
+    "The active run or job changed. Reload its current status.",
+    "Proses atau job aktif berubah. Muat ulang status saat ini.",
+  ],
+  payroll_run_already_abandoned: [
+    "This run has already been abandoned.",
+    "Proses ini telah dibatalkan.",
+  ],
+  payroll_review_withdrawal_required: [
+    "Withdraw the pending or approved review before abandoning this run.",
+    "Tarik tinjauan yang menunggu atau telah disetujui sebelum membatalkan proses.",
+  ],
+  payroll_tax_month_review_required: [
+    "The income due date must fall in the earnings month.",
+    "Tanggal penghasilan terutang harus berada dalam bulan penghasilan.",
+  ],
+  payroll_timezone_review_required: [
+    "The closed attendance timezone differs from the payroll period. Review the sources.",
+    "Zona waktu attendance yang ditutup berbeda dari periode payroll. Periksa sumbernya.",
+  ],
+  payroll_leave_decision_pending: [
+    "A selected employee has a pending leave decision for this month.",
+    "Ada keputusan cuti yang belum selesai untuk karyawan terpilih pada bulan ini.",
+  ],
+  payroll_compensation_required: [
+    "Prepare effective compensation before recalculating this employee.",
+    "Siapkan kompensasi yang berlaku sebelum menghitung ulang karyawan ini.",
+  ],
+  payroll_input_required: [
+    "Prepare this employee’s monthly payroll input.",
+    "Siapkan input payroll bulanan karyawan ini.",
+  ],
+  payroll_input_verification_required: [
+    "An independent reviewer must verify the monthly input.",
+    "Reviewer independen harus memverifikasi input bulanan.",
+  ],
+  payroll_tax_opening_required: [
+    "Prepare verified opening tax history for this employee.",
+    "Siapkan riwayat pajak awal terverifikasi untuk karyawan ini.",
+  ],
+  payroll_tax_opening_verification_required: [
+    "An independent reviewer must verify the opening tax history.",
+    "Reviewer independen harus memverifikasi riwayat pajak awal.",
+  ],
+  payroll_target_missing: [
+    "A retained employee reference is unavailable. Ask an administrator to investigate.",
+    "Referensi karyawan tersimpan tidak tersedia. Hubungi administrator untuk pemeriksaan.",
+  ],
+  payroll_policy_snapshot_missing: [
+    "The retained payroll policy is unavailable. Ask an administrator to investigate.",
+    "Kebijakan payroll tersimpan tidak tersedia. Hubungi administrator untuk pemeriksaan.",
+  ],
+  payroll_compensation_snapshot_missing: [
+    "The retained compensation revision is unavailable. Ask an administrator to investigate.",
+    "Revisi kompensasi tersimpan tidak tersedia. Hubungi administrator untuk pemeriksaan.",
+  ],
+  payroll_pay_basis_required: [
+    "Configure the employee’s proration, overtime and holiday allowance basis.",
+    "Atur dasar prorata, lembur, dan THR karyawan.",
+  ],
+
   invalid_payroll_input: [
     "Review the monthly input fields and references.",
     "Periksa isian input bulanan dan referensinya.",
@@ -64,8 +165,8 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Input telah mencapai batas revisi.",
   ],
   payroll_workforce_not_closed: [
-    "Attendance must be closed before preparing or verifying payroll inputs.",
-    "Attendance harus ditutup sebelum menyiapkan atau memverifikasi input payroll.",
+    "Attendance must be closed before preparing payroll inputs or starting a calculation.",
+    "Attendance harus ditutup sebelum menyiapkan input payroll atau memulai perhitungan.",
   ],
   payroll_workforce_employee_missing: [
     "This employee is absent from the closed attendance source.",
@@ -982,8 +1083,8 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Karyawan tidak lagi tersedia di perusahaan ini. Periksa pilihan karyawan.",
   ],
   payroll_period_not_draft: [
-    "Only a draft payroll period can be cancelled.",
-    "Hanya periode payroll berstatus draft yang dapat dibatalkan.",
+    "This action requires a draft payroll period.",
+    "Tindakan ini memerlukan periode payroll berstatus Draft.",
   ],
   payroll_period_revision_limit: [
     "This period has reached its revision limit.",

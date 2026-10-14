@@ -3,6 +3,8 @@ import { canReadPayrollPeriods } from "../../domain/policies/payroll-period-poli
 import { CompensationEditorScreen } from "../bindings/compensation-editor-screen";
 import { CompensationEmployeesScreen } from "../bindings/compensation-employees-screen";
 import { CompensationScreen } from "../bindings/compensation-screen";
+import { PayrollCalculationStartScreen } from "../bindings/payroll-calculation-start-screen";
+import { PayrollCalculationsScreen } from "../bindings/payroll-calculations-screen";
 import { PayrollInputEditorScreen } from "../bindings/payroll-input-editor-screen";
 import { PayrollInputEmployeesScreen } from "../bindings/payroll-input-employees-screen";
 import { PayrollInputScreen } from "../bindings/payroll-input-screen";
@@ -13,6 +15,9 @@ import { PayrollPeriodScreen } from "../bindings/payroll-period-screen";
 import { PayrollPeriodsScreen } from "../bindings/payroll-periods-screen";
 import { PayrollPolicyEditorScreen } from "../bindings/payroll-policy-editor-screen";
 import { PayrollPolicyScreen } from "../bindings/payroll-policy-screen";
+import { PayrollRunEmployeeScreen } from "../bindings/payroll-run-employee-screen";
+import { PayrollRunRecoveryScreen } from "../bindings/payroll-run-recovery-screen";
+import { PayrollRunScreen } from "../bindings/payroll-run-screen";
 import { TaxOpeningEditorScreen } from "../bindings/tax-opening-editor-screen";
 import { TaxOpeningEmployeesScreen } from "../bindings/tax-opening-employees-screen";
 import { TaxOpeningScreen } from "../bindings/tax-opening-screen";
@@ -22,6 +27,27 @@ import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 export function PayrollRoutes(props: PayrollScreenProps) {
   return (
     <Routes>
+      <Route
+        path="periods/:periodId/calculations"
+        element={<PayrollCalculationsScreen {...props} />}
+      />
+      <Route
+        path="periods/:periodId/calculate"
+        element={<PayrollCalculationStartScreen {...props} />}
+      />
+      <Route path="runs/:runId" element={<PayrollRunScreen {...props} />} />
+      <Route
+        path="runs/:runId/employees/:employeeId"
+        element={<PayrollRunEmployeeScreen {...props} />}
+      />
+      <Route
+        path="runs/:runId/resume"
+        element={<PayrollRunRecoveryScreen {...props} action="resume" />}
+      />
+      <Route
+        path="runs/:runId/abandon"
+        element={<PayrollRunRecoveryScreen {...props} action="abandon" />}
+      />
       <Route path="tax-openings" element={<TaxOpeningEmployeesScreen {...props} />} />
       <Route path="tax-openings/:employeeId" element={<TaxOpeningScreen {...props} />} />
       <Route path="tax-openings/:employeeId/edit" element={<TaxOpeningEditorScreen {...props} />} />

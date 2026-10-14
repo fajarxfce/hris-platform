@@ -238,6 +238,56 @@ operation and payload through subsequent rejected retries. Confirmed access loss
 clears private data. Locale/theme changes preserve form values; pending, dirty and
 unconfirmed commands protect departure. Drafts remain in browser memory.
 
+## Payroll calculations
+
+`/payroll/periods/:periodId/calculations` shows the current preparation review and
+up to twenty retained runs. The review contains closed attendance and effective
+policy references without acquiring employee profiles or requiring policy
+administration. Reads accept `payroll.read`, `payroll.calculate` or
+`payroll.review`; calculation commands require `payroll.calculate`.
+
+`/payroll/periods/:periodId/calculate` reviews the period and its source versions,
+then requires an income due date within the earnings month, review reference and
+reason. Missing prerequisites remain explicit. Confirmation captures those
+versions with one run ID and operation ID; reading the page does not reserve a
+job or change the source records.
+
+`/payroll/runs/:runId` separates employee results, job attempts and source
+references. Results use pages of fifty summaries. Tabs reuse the acquired
+snapshot; opening an employee fetches only that employee's retained evidence and
+calculation. Returning preserves the result-page cursor. Failed employees retain
+their failure code and nullable amounts, even when the job has processed the
+entire roster. A completed calculation does not establish payment.
+
+One visible run owns one request and at most thirty automatic progress reads,
+four seconds apart after completion. Reads do not overlap. Hidden documents,
+disposal, errors and terminal jobs stop observation; exhaustion offers explicit
+Refresh. Temporary connection failure can retain the current authorized results.
+Access denial or lost assurance clears them. Account/company replacement aborts
+pending work and discards the previous scope; theme and language changes do not
+recreate the controller.
+
+Employee detail uses structured earning, contribution, overtime, THR, tax and
+source sections. Decimal IDR amounts retain precision, including refunds smaller
+than one rupiah. Missing evidence remains absent rather than becoming a zero
+calculation. The source tab displays retained attendance and leave facts without
+performing new payroll calculations in the browser.
+
+Resume and abandon have separate reason/review pages. Resume captures the run
+version; abandon captures both run and period versions. Only the original maker
+can resume a stopped attempt; completed results remain intact. Correcting sources requires a stopped job and
+explicit abandonment, which reopens the period without deleting its history.
+Active aggregate reviews must first be withdrawn; finalized runs cannot be
+abandoned. Job inspection/cancellation uses the independently authorized Jobs
+screen. Current server action hints determine the available recovery links.
+
+Unknown command outcomes retain the original operation and payload across
+explicit retries, including after later conflicts. A definite changed-state
+rejection requires review before creating a new command. Pending forms and
+unconfirmed results use the workspace departure guard. Browser command retention
+is in memory. Aggregate review, finalization and finance payment screens remain
+subsequent work.
+
 ## Shift templates
 
 The Workforce route owns a bounded shift directory, current details, and create/edit

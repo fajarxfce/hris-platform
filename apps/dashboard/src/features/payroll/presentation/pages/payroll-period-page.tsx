@@ -9,6 +9,7 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { payrollCalculationMessages } from "../i18n/payroll-calculation-messages";
 import { payrollPeriodMessages } from "../i18n/payroll-period-messages";
 import type { PayrollPeriodState } from "../models/payroll-period-state";
 import type { payrollPeriodDetailsView } from "../models/payroll-period-view";
@@ -20,6 +21,7 @@ export function PayrollPeriodPage(props: {
   backTo: string;
   tab: string;
   canCancel: boolean;
+  calculationTo: string | null;
   firstPage: boolean;
   hasNext: boolean;
   onRefresh: () => void;
@@ -48,6 +50,9 @@ export function PayrollPeriodPage(props: {
         >
           {messages(locale).refresh}
         </AppButton>
+        {props.calculationTo && (
+          <Link to={props.calculationTo}>{payrollCalculationMessages(locale).calculations}</Link>
+        )}
         {props.canCancel && (
           <AppButton appearance="subtle" icon={<Dismiss20Regular />} onClick={props.onCancel}>
             {text.cancel}

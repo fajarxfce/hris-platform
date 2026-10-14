@@ -101,7 +101,7 @@ test("cancellation conflict requires protected reload and cannot cancel a change
   await page.getByRole("button", { name: "Reload review", exact: true }).click();
   await page.getByRole("dialog").getByRole("button", { name: "Leave page", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText(
-    "Only a draft payroll period can be cancelled.",
+    "This action requires a draft payroll period.",
   );
   await expect(page.getByRole("button", { name: "Cancel draft", exact: true })).toHaveCount(0);
   expect(api.writes).toHaveLength(1);

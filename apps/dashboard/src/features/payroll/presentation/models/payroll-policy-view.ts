@@ -6,13 +6,14 @@ import { payrollPolicyMessages } from "../i18n/payroll-policy-messages";
 
 export function payrollAmountView(amount: string, locale: Locale): string {
   const [whole = "0", fraction = ""] = amount.split(".");
+  const integer = BigInt(whole);
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "IDR",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })
-    .formatToParts(BigInt(whole))
+    .formatToParts(amount.startsWith("-") && integer === 0n ? -0 : integer)
     .map((part) => (part.type === "fraction" ? fraction.padEnd(2, "0") : part.value))
     .join("");
 }

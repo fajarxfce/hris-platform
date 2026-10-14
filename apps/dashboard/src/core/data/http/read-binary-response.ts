@@ -13,15 +13,26 @@ export async function readBinaryResponse(
 ): Promise<BinaryResponseDto> {
   const declared = response.headers.get("Content-Length");
   const mediaType = response.headers.get("Content-Type")?.split(";", 1)[0]?.trim().toLowerCase();
+  const etag = response.headers.get("ETag");
+  const generated = "maximumBytes" in expected;
+  const byteLength = generated ? Number(declared) : expected.byteLength;
   if (
     response.status !== 200 ||
     !response.body ||
-    !Number.isSafeInteger(expected.byteLength) ||
-    expected.byteLength < 1 ||
-    expected.byteLength > maximumBinaryFileBytes ||
-    (declared !== null && (!/^\d+$/u.test(declared) || Number(declared) !== expected.byteLength)) ||
+    !Number.isSafeInteger(byteLength) ||
+    byteLength < 1 ||
+    byteLength > maximumBinaryFileBytes ||
+    (generated &&
+      (!Number.isSafeInteger(expected.maximumBytes) ||
+        expected.maximumBytes < 1 ||
+        expected.maximumBytes > maximumBinaryFileBytes ||
+        byteLength > expected.maximumBytes ||
+        declared === null ||
+        !/^"[\x21\x23-\x7e]{1,510}"$/u.test(etag ?? ""))) ||
+    (declared !== null && (!/^\d+$/u.test(declared) || Number(declared) !== byteLength)) ||
     mediaType !== expected.mediaType ||
-    response.headers.get("ETag") !== expected.etag
+    etag === null ||
+    (!generated && etag !== expected.etag)
   ) {
     await response.body?.cancel();
     signal.throwIfAborted();
@@ -34,6 +45,7 @@ export async function readBinaryResponse(
   let bytes = 0;
   let emptyChunks = 0;
   let complete = false;
+  let transferred = false;
   let cancelled: Promise<void> | undefined;
   const onAbort = () => {
     // A stream already rejected by fetch may also reject cancellation; preserve the caller's abort.
@@ -47,20 +59,20 @@ export async function readBinaryResponse(
       signal.throwIfAborted();
       if (chunk.done) {
         complete = true;
-        if (bytes !== expected.byteLength) throw new InvalidHttpResponseError();
-        return { parts, byteLength: bytes, mediaType: expected.mediaType, etag: expected.etag };
+        if (bytes !== byteLength) throw new InvalidHttpResponseError();
+        transferred = true;
+        return { parts, byteLength: bytes, mediaType: expected.mediaType, etag };
       }
       if (chunk.value.byteLength === 0) {
         if (++emptyChunks > 16) throw new InvalidHttpResponseError();
         continue;
       }
       emptyChunks = 0;
-      if (bytes + chunk.value.byteLength > expected.byteLength)
-        throw new InvalidHttpResponseError();
+      if (bytes + chunk.value.byteLength > byteLength) throw new InvalidHttpResponseError();
       let offset = 0;
       while (offset < chunk.value.byteLength) {
         if (!block || blockOffset === block.byteLength) {
-          block = new Uint8Array(Math.min(binaryFilePartBytes, expected.byteLength - bytes));
+          block = new Uint8Array(Math.min(binaryFilePartBytes, byteLength - bytes));
           parts.push(block.buffer);
           blockOffset = 0;
         }
@@ -73,6 +85,7 @@ export async function readBinaryResponse(
     }
     throw new InvalidHttpResponseError();
   } finally {
+    if (!transferred) for (const part of parts) new Uint8Array(part).fill(0);
     signal.removeEventListener("abort", onAbort);
     try {
       if (cancelled) await cancelled;

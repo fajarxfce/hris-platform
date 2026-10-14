@@ -1,8 +1,10 @@
 import type { HttpClient } from "../../../core/data/http/http-client";
+import type { FileRepository } from "../../../core/domain/files/file-repository";
 import { HttpCompensationDataSource } from "../data/datasources/http-compensation-data-source";
 import { HttpPayrollCalculationDataSource } from "../data/datasources/http-payroll-calculation-data-source";
 import { HttpPayrollFinalizationDataSource } from "../data/datasources/http-payroll-finalization-data-source";
 import { HttpPayrollInputDataSource } from "../data/datasources/http-payroll-input-data-source";
+import { HttpPayrollPayslipDataSource } from "../data/datasources/http-payroll-payslip-data-source";
 import { HttpPayrollPeriodDataSource } from "../data/datasources/http-payroll-period-data-source";
 import { HttpPayrollPolicyDataSource } from "../data/datasources/http-payroll-policy-data-source";
 import { HttpPayrollReviewDataSource } from "../data/datasources/http-payroll-review-data-source";
@@ -11,6 +13,7 @@ import { RemoteCompensationRepository } from "../data/repositories/remote-compen
 import { RemotePayrollCalculationRepository } from "../data/repositories/remote-payroll-calculation-repository";
 import { RemotePayrollFinalizationRepository } from "../data/repositories/remote-payroll-finalization-repository";
 import { RemotePayrollInputRepository } from "../data/repositories/remote-payroll-input-repository";
+import { RemotePayrollPayslipRepository } from "../data/repositories/remote-payroll-payslip-repository";
 import { RemotePayrollPeriodRepository } from "../data/repositories/remote-payroll-period-repository";
 import { RemotePayrollPolicyRepository } from "../data/repositories/remote-payroll-policy-repository";
 import { RemotePayrollReviewRepository } from "../data/repositories/remote-payroll-review-repository";
@@ -19,8 +22,10 @@ import { AbandonPayrollCalculation } from "../domain/usecases/abandon-payroll-ca
 import { CancelPayrollPeriod } from "../domain/usecases/cancel-payroll-period";
 import { CreatePayrollPeriod } from "../domain/usecases/create-payroll-period";
 import { DecidePayrollReview } from "../domain/usecases/decide-payroll-review";
+import { DownloadPayrollPayslip } from "../domain/usecases/download-payroll-payslip";
 import { ListCompensationEmployees } from "../domain/usecases/list-compensation-employees";
 import { ListPayrollInputEmployees } from "../domain/usecases/list-payroll-input-employees";
+import { ListPayrollPayslips } from "../domain/usecases/list-payroll-payslips";
 import { ListPayrollPeriodEmployees } from "../domain/usecases/list-payroll-period-employees";
 import { ListPayrollPeriods } from "../domain/usecases/list-payroll-periods";
 import { ListPayrollPublicationRuns } from "../domain/usecases/list-payroll-publication-runs";
@@ -32,6 +37,8 @@ import { LoadPayrollFinalization } from "../domain/usecases/load-payroll-finaliz
 import { LoadPayrollFinalizations } from "../domain/usecases/load-payroll-finalizations";
 import { LoadPayrollInputReview } from "../domain/usecases/load-payroll-input-review";
 import { LoadPayrollInputRevision } from "../domain/usecases/load-payroll-input-revision";
+import { LoadPayrollPayslip } from "../domain/usecases/load-payroll-payslip";
+import { LoadPayrollPayslipPayments } from "../domain/usecases/load-payroll-payslip-payments";
 import { LoadPayrollPeriod } from "../domain/usecases/load-payroll-period";
 import { LoadPayrollPolicy } from "../domain/usecases/load-payroll-policy";
 import { LoadPayrollPolicyEditor } from "../domain/usecases/load-payroll-policy-editor";
@@ -63,7 +70,11 @@ import { VerifyTaxOpening } from "../domain/usecases/verify-tax-opening";
 import { WithdrawPayrollReview } from "../domain/usecases/withdraw-payroll-review";
 import type { PayrollUseCases } from "../presentation/contracts/payroll-use-cases";
 
-export function createPayrollFeature(http: HttpClient): PayrollUseCases {
+export function createPayrollFeature(
+  http: HttpClient,
+  files: Pick<FileRepository, "downloadBinary">,
+): PayrollUseCases {
+  const payslips = new RemotePayrollPayslipRepository(new HttpPayrollPayslipDataSource(http));
   const policies = new RemotePayrollPolicyRepository(new HttpPayrollPolicyDataSource(http));
   const compensations = new RemoteCompensationRepository(new HttpCompensationDataSource(http));
   const periods = new RemotePayrollPeriodRepository(new HttpPayrollPeriodDataSource(http));
@@ -77,6 +88,10 @@ export function createPayrollFeature(http: HttpClient): PayrollUseCases {
     new HttpPayrollFinalizationDataSource(http),
   );
   return Object.freeze({
+    listPayslips: new ListPayrollPayslips(payslips),
+    loadPayslip: new LoadPayrollPayslip(payslips),
+    loadPayslipPayments: new LoadPayrollPayslipPayments(payslips),
+    downloadPayslip: new DownloadPayrollPayslip(payslips, files),
     listPublicationRuns: new ListPayrollPublicationRuns(finalizations),
     loadFinalizations: new LoadPayrollFinalizations(finalizations),
     loadFinalization: new LoadPayrollFinalization(finalizations),

@@ -1,5 +1,9 @@
 # Payslips
 
+The [dashboard workflow](dashboard.md#published-payslips) provides the directory,
+retained calculation detail, independently refreshed payment history and explicit
+Indonesian/English PDF downloads.
+
 Finalized, published payroll assessments provide the immutable payslip. Draft, calculated, or approved runs are not employee payslips. JSON and PDF share the same current company, credential, and employee/finance authorization. Company administration alone does not grant payroll access.
 
 ## API

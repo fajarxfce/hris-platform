@@ -3,6 +3,7 @@ import type { CompanyId } from "../../../../core/domain/identifiers";
 import type { PayrollRunEmployee } from "../../domain/entities/payroll-run-employee";
 import type { PayrollRunEmployeeDto } from "../models/payroll-calculation-dto";
 import { toPayrollRunItem } from "./payroll-calculation-mapper";
+import { toPayrollCalculationOutput } from "./payroll-calculation-output-mapper";
 export function payrollCalculationMinor(value: string): bigint {
   const negative = value.startsWith("-"),
     [whole = "0", fraction = ""] = value.replace(/^-/, "").split(".");
@@ -60,33 +61,6 @@ export function toPayrollRunEmployee(
         ),
       })
     : null;
-  const calculation = output
-    ? Object.freeze({
-        ...output,
-        units: Object.freeze({
-          ...output.units,
-          employedDates: Object.freeze([...output.units.employedDates]),
-        }),
-        earnings: Object.freeze(output.earnings.map((line) => Object.freeze({ ...line }))),
-        overtime: Object.freeze(
-          output.overtime.map((day) =>
-            Object.freeze({
-              ...day,
-              calculation: Object.freeze({
-                ...day.calculation,
-                segments: Object.freeze(
-                  day.calculation.segments.map((segment) => Object.freeze({ ...segment })),
-                ),
-              }),
-            }),
-          ),
-        ),
-        holiday: output.holiday ? Object.freeze({ ...output.holiday }) : null,
-        contributions: Object.freeze(
-          output.contributions.map((line) => Object.freeze({ ...line })),
-        ),
-        tax: Object.freeze({ ...output.tax }),
-      })
-    : null;
+  const calculation = output ? toPayrollCalculationOutput(output) : null;
   return Object.freeze({ companyId: company, runId, item, evidence, calculation });
 }

@@ -49,7 +49,9 @@ export class FetchHttpClient implements HttpClient {
     }
     const representation = request.response;
     const budget =
-      representation?.type === "binary" ? representation.byteLength : representation?.maximumBytes;
+      representation && "byteLength" in representation
+        ? representation.byteLength
+        : representation?.maximumBytes;
     if (
       budget !== undefined &&
       (!Number.isSafeInteger(budget) ||
@@ -59,8 +61,8 @@ export class FetchHttpClient implements HttpClient {
       throw new RangeError("Invalid response budget");
     if (
       representation?.type === "binary" &&
-      (representation.etag.length < 1 ||
-        representation.etag.length > 512 ||
+      (("etag" in representation &&
+        (representation.etag.length < 1 || representation.etag.length > 512)) ||
         !/^[a-z0-9!#$&^_.+-]+\/[a-z0-9!#$&^_.+-]+$/u.test(representation.mediaType))
     )
       throw new TypeError("Invalid binary representation");
@@ -177,9 +179,16 @@ export class FetchHttpClient implements HttpClient {
     });
     let value: unknown;
     if (!response.ok || !representation) value = await readJsonResponse(response, maximumBytes);
-    else if (representation.type === "binary")
-      value = await readBinaryResponse(response, representation, signal);
-    else
+    else if (representation.type === "binary") {
+      const content = await readBinaryResponse(response, representation, signal);
+      try {
+        signal.throwIfAborted();
+        return content;
+      } catch (error) {
+        for (const part of content.parts) new Uint8Array(part).fill(0);
+        throw error;
+      }
+    } else
       value = await readTextResponse(response, representation.maximumBytes, [
         representation.mediaType,
       ]);

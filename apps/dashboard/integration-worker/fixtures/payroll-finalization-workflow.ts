@@ -7,7 +7,9 @@ import {
   payrollFinalizationDetailsDto,
   payrollFinalizationPreparationDto,
 } from "../../src/features/payroll/data/models/payroll-finalization-dto";
+import { payrollPayslipPageDto } from "../../src/features/payroll/data/models/payroll-payslip-dto";
 import { payrollReviewPreparationDto } from "../../src/features/payroll/data/models/payroll-review-dto";
+import { exercisePayrollPayslip } from "./payroll-payslip-workflow";
 
 /** Publish a fresh, independently approved run through the real worker and review its retained output. */
 export async function exercisePayrollFinalization(input: {
@@ -237,13 +239,7 @@ export async function exercisePayrollFinalization(input: {
       `${base}/payroll/payslips?from=${month}&until=${month}&employeeId=${employee}`,
     );
     expect(payslips.status()).toBe(200);
-    const summaries = (await payslips.json()).items as {
-      id: string;
-      employeeId: string;
-      taxableGross: string;
-      withheld: string;
-      takeHome: string;
-    }[];
+    const summaries = payrollPayslipPageDto.parse(await payslips.json()).items;
     expect(summaries).toHaveLength(1);
     const summary = summaries[0];
     if (!summary) throw new Error("Published payslip required");
@@ -261,6 +257,7 @@ export async function exercisePayrollFinalization(input: {
     expect((await publisher.request.get(`${base}/payroll/payslips/${summary.id}`)).status()).toBe(
       403,
     );
+    await exercisePayrollPayslip({ reader: second, admin, company, month, summary, headers });
     const revoked = await admin.request.put(`${base}/members/${finalizerId}`, {
       headers: headers(),
       data: {

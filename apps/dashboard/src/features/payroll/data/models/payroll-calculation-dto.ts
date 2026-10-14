@@ -240,6 +240,7 @@ export type PayrollRunDto = z.infer<typeof payrollRunDto>;
 export type PayrollRunsDto = z.infer<typeof payrollRunsDto>;
 export type PayrollRunItemDto = z.infer<typeof payrollRunItemDto>;
 export type PayrollRunDetailsDto = z.infer<typeof payrollRunDetailsDto>;
+export type PayrollCalculationOutputDto = z.infer<typeof payrollCalculationOutputDto>;
 export type PayrollRunEmployeeDto = z.infer<typeof payrollRunEmployeeDto>;
 export type PayrollCalculationReceiptDto = z.infer<typeof payrollCalculationReceiptDto>;
 export type PayrollCalculationStartDto = Readonly<{

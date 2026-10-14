@@ -12,6 +12,7 @@ import { type Locale, messages } from "../../../../core/presentation/i18n/messag
 import { payrollCalculationMessages } from "../i18n/payroll-calculation-messages";
 import type { PayrollRunEmployeeState } from "../models/payroll-calculation-state";
 import type { payrollRunEmployeeView } from "../models/payroll-run-employee-view";
+import { PayrollCalculationOutputSection } from "./payroll-calculation-output-section";
 export function PayrollRunEmployeePage(props: {
   state: PayrollRunEmployeeState;
   view: ReturnType<typeof payrollRunEmployeeView> | null;
@@ -65,48 +66,7 @@ export function PayrollRunEmployeePage(props: {
               aria-labelledby={`payroll-employee-result-tab-${props.tab}`}
             >
               {props.tab === "calculation" && (
-                <>
-                  {view.groups.map((group) => (
-                    <AppPropertyList key={group.title} title={group.title} items={group.items} />
-                  ))}
-                  {view.earnings.length > 0 && (
-                    <AppResourceTable
-                      title={text.earnings}
-                      columns={[
-                        { id: "type", label: text.kind },
-                        { id: "code", label: text.code },
-                        { id: "name", label: text.name },
-                        { id: "amount", label: text.amount, numeric: true },
-                        { id: "taxable", label: text.taxable },
-                      ]}
-                      rows={view.earnings}
-                    />
-                  )}
-                  {view.contributions.length > 0 && (
-                    <AppResourceTable
-                      title={text.contributions}
-                      columns={[
-                        { id: "program", label: text.program },
-                        { id: "base", label: text.base, numeric: true },
-                        { id: "employee", label: text.employeeAmount, numeric: true },
-                        { id: "employer", label: text.employerAmount, numeric: true },
-                      ]}
-                      rows={view.contributions}
-                    />
-                  )}
-                  {view.overtime.length > 0 && (
-                    <AppResourceTable
-                      title={text.overtime}
-                      columns={[
-                        { id: "date", label: text.date },
-                        { id: "type", label: text.dayKind },
-                        { id: "wage", label: text.hourlyWage, numeric: true },
-                        { id: "amount", label: text.amount, numeric: true },
-                      ]}
-                      rows={view.overtime}
-                    />
-                  )}
-                </>
+                <PayrollCalculationOutputSection view={view} locale={locale} />
               )}
               {props.tab === "sources" && (
                 <>

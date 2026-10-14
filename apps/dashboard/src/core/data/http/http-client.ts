@@ -10,7 +10,8 @@ export type HttpRequest = Readonly<{
   timeoutMilliseconds?: number;
   response?:
     | Readonly<{ type: "text"; mediaType: "text/csv"; maximumBytes: number }>
-    | Readonly<{ type: "binary"; mediaType: string; byteLength: number; etag: string }>;
+    | Readonly<{ type: "binary"; mediaType: string; byteLength: number; etag: string }>
+    | Readonly<{ type: "binary"; mediaType: string; maximumBytes: number }>;
 }>;
 
 export interface HttpClient {

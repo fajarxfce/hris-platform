@@ -2,6 +2,38 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_payroll_payslip_search: [
+    "Enter up to 120 characters without control characters.",
+    "Masukkan maksimal 120 karakter tanpa karakter kontrol.",
+  ],
+  payroll_payslip_not_found: [
+    "This payslip is unavailable for your current access.",
+    "Payslip tidak tersedia untuk akses Anda saat ini.",
+  ],
+  payroll_scope_limit: [
+    "The account has too many linked employments. Contact your administrator.",
+    "Akun terhubung ke terlalu banyak data kepegawaian. Hubungi administrator.",
+  ],
+  payroll_pdf_text_unsupported: [
+    "The PDF font does not support some document text. The payslip remains available on this page.",
+    "Font PDF tidak mendukung sebagian teks dokumen. Payslip tetap tersedia di halaman ini.",
+  ],
+  payroll_pdf_capacity: [
+    "PDF generation is busy. Try downloading again shortly.",
+    "Pembuatan PDF sedang penuh. Coba download kembali sebentar lagi.",
+  ],
+  payroll_pdf_generation_limit: [
+    "The payslip exceeds the PDF generation limit. Contact your administrator.",
+    "Payslip melebihi batas pembuatan PDF. Hubungi administrator.",
+  ],
+  payroll_pdf_generation_timeout: [
+    "PDF generation timed out. Try downloading again.",
+    "Pembuatan PDF melewati batas waktu. Coba download kembali.",
+  ],
+  invalid_document_language: [
+    "Select a supported PDF language.",
+    "Pilih bahasa PDF yang didukung.",
+  ],
   invalid_payroll_finalization: [
     "Review the approved payroll versions and reason.",
     "Periksa versi payroll yang disetujui dan alasan.",

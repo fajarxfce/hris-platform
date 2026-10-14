@@ -2,8 +2,10 @@ import type { AbandonPayrollCalculation } from "../../domain/usecases/abandon-pa
 import type { CancelPayrollPeriod } from "../../domain/usecases/cancel-payroll-period";
 import type { CreatePayrollPeriod } from "../../domain/usecases/create-payroll-period";
 import type { DecidePayrollReview } from "../../domain/usecases/decide-payroll-review";
+import type { DownloadPayrollPayslip } from "../../domain/usecases/download-payroll-payslip";
 import type { ListCompensationEmployees } from "../../domain/usecases/list-compensation-employees";
 import type { ListPayrollInputEmployees } from "../../domain/usecases/list-payroll-input-employees";
+import type { ListPayrollPayslips } from "../../domain/usecases/list-payroll-payslips";
 import type { ListPayrollPeriodEmployees } from "../../domain/usecases/list-payroll-period-employees";
 import type { ListPayrollPeriods } from "../../domain/usecases/list-payroll-periods";
 import type { ListPayrollPublicationRuns } from "../../domain/usecases/list-payroll-publication-runs";
@@ -15,6 +17,8 @@ import type { LoadPayrollFinalization } from "../../domain/usecases/load-payroll
 import type { LoadPayrollFinalizations } from "../../domain/usecases/load-payroll-finalizations";
 import type { LoadPayrollInputReview } from "../../domain/usecases/load-payroll-input-review";
 import type { LoadPayrollInputRevision } from "../../domain/usecases/load-payroll-input-revision";
+import type { LoadPayrollPayslip } from "../../domain/usecases/load-payroll-payslip";
+import type { LoadPayrollPayslipPayments } from "../../domain/usecases/load-payroll-payslip-payments";
 import type { LoadPayrollPeriod } from "../../domain/usecases/load-payroll-period";
 import type { LoadPayrollPolicy } from "../../domain/usecases/load-payroll-policy";
 import type { LoadPayrollPolicyEditor } from "../../domain/usecases/load-payroll-policy-editor";
@@ -46,6 +50,10 @@ import type { VerifyTaxOpening } from "../../domain/usecases/verify-tax-opening"
 import type { WithdrawPayrollReview } from "../../domain/usecases/withdraw-payroll-review";
 
 export type PayrollUseCases = Readonly<{
+  listPayslips: Pick<ListPayrollPayslips, "execute">;
+  loadPayslip: Pick<LoadPayrollPayslip, "execute">;
+  loadPayslipPayments: Pick<LoadPayrollPayslipPayments, "execute">;
+  downloadPayslip: Pick<DownloadPayrollPayslip, "execute">;
   listPublicationRuns: Pick<ListPayrollPublicationRuns, "execute">;
   loadFinalizations: Pick<LoadPayrollFinalizations, "execute">;
   loadFinalization: Pick<LoadPayrollFinalization, "execute">;

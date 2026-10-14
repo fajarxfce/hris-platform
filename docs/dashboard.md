@@ -352,6 +352,32 @@ job ownership or `jobs.read`. Published payslips and bank settlement remain dist
 Finalized payroll corrections require an amendment rather than editing its
 immutable result.
 
+## Published payslips
+
+`/payroll/payslips` provides fifty retained summaries per page, a month range of up
+to thirty-six months, and submitted employee name/number search. Search uses the
+labels frozen at publication. Changing filters resets the cursor; returning from
+detail retains the directory filters. Company replacement clears the old search.
+`payroll.read` permits company-wide reads. `payroll.self.read` readers use explicit
+`SELF` scope, and finance readers may narrow to their own employments. Calculation,
+review, finalization and generic administrative grants do not grant payslip access.
+
+`/payroll/payslips/:payslipId` displays retained earnings, tax, deductions, insurance
+contributions, overtime and holiday output. Amounts remain decimal strings through
+mapping and formatting. Payment history is a separately versioned projection with
+up to twenty attempts. Its refresh does not reacquire the immutable calculation;
+the planned payment date is not a settlement confirmation. Tabs, locale and theme
+changes retain the current read owner.
+
+PDF downloads select Indonesian or English explicitly. A single GET acquires the
+generated file using its declared length and strong entity tag, with a one-MiB
+limit and the normal finite HTTP deadline. Mapping verifies the SHA-256 digest;
+file handoff belongs to the file repository. Partial, failed and handed-off
+buffers are cleared, and browser object URLs are released. Downloads require an
+explicit action and never retry automatically. Read/PDF failures are localized;
+confirmed access or assurance loss clears private detail and cancels other work.
+Account/company replacement and disposal reject late results.
+
 ## Shift templates
 
 The Workforce route owns a bounded shift directory, current details, and create/edit

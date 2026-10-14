@@ -5,6 +5,7 @@ import {
   DocumentTable20Regular,
   MoneySettings20Regular,
   PersonMoney20Regular,
+  Receipt20Regular,
 } from "@fluentui/react-icons";
 import type { AppNavigationItem } from "../../../../core/presentation/components/app-portal-shell";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
@@ -13,11 +14,13 @@ import { canReadCompensation } from "../../domain/policies/compensation-access-p
 import { canReadPayrollPolicy } from "../../domain/policies/payroll-access-policy";
 import { canReadPayrollFinalizations } from "../../domain/policies/payroll-finalization-policy";
 import { canReadPayrollInputs } from "../../domain/policies/payroll-input-access-policy";
+import { canReadPayrollPayslips } from "../../domain/policies/payroll-payslip-policy";
 import { canReadPayrollPeriods } from "../../domain/policies/payroll-period-policy";
 import { canReadTaxOpenings } from "../../domain/policies/tax-opening-access-policy";
 import { compensationMessages } from "../i18n/compensation-messages";
 import { payrollFinalizationMessages } from "../i18n/payroll-finalization-messages";
 import { payrollInputMessages } from "../i18n/payroll-input-messages";
+import { payrollPayslipMessages } from "../i18n/payroll-payslip-messages";
 import { payrollPeriodMessages } from "../i18n/payroll-period-messages";
 import { payrollPolicyMessages } from "../i18n/payroll-policy-messages";
 import { taxOpeningMessages } from "../i18n/tax-opening-messages";
@@ -26,6 +29,15 @@ export function payrollNavigation(
   access: CompanyAccess | null,
   locale: Locale,
 ): readonly AppNavigationItem[] {
+  const payslips: readonly AppNavigationItem[] = canReadPayrollPayslips(access?.permissions ?? [])
+    ? [
+        {
+          to: "/payroll/payslips",
+          label: payrollPayslipMessages(locale).title,
+          icon: <Receipt20Regular />,
+        },
+      ]
+    : [];
   const publications: readonly AppNavigationItem[] = canReadPayrollFinalizations(
     access?.permissions ?? [],
   )
@@ -77,6 +89,7 @@ export function payrollNavigation(
     ? [
         ...periods,
         ...publications,
+        ...payslips,
         ...inputs,
         ...openings,
         ...policies,
@@ -86,5 +99,5 @@ export function payrollNavigation(
           icon: <PersonMoney20Regular />,
         },
       ]
-    : [...periods, ...publications, ...inputs, ...openings, ...policies];
+    : [...periods, ...publications, ...payslips, ...inputs, ...openings, ...policies];
 }

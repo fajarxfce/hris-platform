@@ -154,6 +154,9 @@ class ExpensePaymentSyncMigrationHttpTest : ExpensePaymentApiFixture() {
                     Int::class.java,
                 ),
         )
+        // Backfill assertions above deliberately exercise V68. Runtime endpoints
+        // below must see all subsequent migrations used by the current application.
+        Flyway.configure().dataSource(source).load().migrate()
         val progress = get(f.worker, "${f.path}/${f.claim}/payment-progress")
         assertEquals(200, progress.statusCode(), progress.body())
         assertEquals(4L, json.readTree(progress.body())["version"].asLong())

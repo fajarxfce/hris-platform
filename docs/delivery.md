@@ -3392,3 +3392,14 @@ fixture probe read the explicit bootstrap/change feed and canonical record; its
 single eligible coworker matched the live directory and publication was caught up.
 The probe performed no business mutation. Mobile replica wiring and offline
 acceptance remain the next integration step.
+
+### Historical migration runtime coverage
+
+The historical expense-payment migration fixture keeps its V68 backfill and
+concurrent-writer assertions, then applies subsequent migrations before exercising
+the current runtime API. This supplies the current sync query's directory tables
+while preserving the original backfill evidence and company-isolation checks.
+
+Targeted validation passed all 10 HTTP/PostgreSQL tests across both historical
+expense-payment migrations and the directory-record contract, together with
+formatting and architecture checks.

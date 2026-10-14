@@ -21,10 +21,10 @@ test("sign-in uses current CSRF, accessible password control, company scope and 
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
   await expect(page.getByLabel("Password", { exact: true })).toHaveValue("");
-  expect(api.commands.map((command) => command.path)).toEqual([
-    "/api/v1/auth/login",
-    "/api/v1/auth/logout",
-  ]);
+  // Local sign-out clears private content before its CSRF and logout requests complete.
+  await expect
+    .poll(() => api.commands.map((command) => command.path))
+    .toEqual(["/api/v1/auth/login", "/api/v1/auth/logout"]);
   expect(api.commands[0]?.csrf).not.toBe(api.commands[1]?.csrf);
   expect(api.unhandled).toEqual([]);
 });

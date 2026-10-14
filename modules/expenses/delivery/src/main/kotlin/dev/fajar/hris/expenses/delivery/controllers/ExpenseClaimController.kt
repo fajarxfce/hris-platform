@@ -31,16 +31,14 @@ class ExpenseClaimController(
         @PathVariable id: UUID,
         @RequestParam(defaultValue = "AUTHORIZED") scope: ExpenseClaimReadScope,
     ): List<ExpensePaymentProgressResponse> =
-        payments.execute(actor, id, scope).response().map {
-            ExpensePaymentProgressResponse(
-                it.batchId,
-                it.itemId,
-                it.status.name,
-                it.createdAt,
-                it.releasedAt,
-                it.settledAt,
-            )
-        }
+        payments.execute(actor, id, scope).response().attempts.map { it.toResponse() }
+
+    @GetMapping("/{id}/payment-progress")
+    fun paymentProgress(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestParam(defaultValue = "SELF") scope: ExpenseClaimReadScope,
+    ): ExpenseClaimPaymentsResponse = payments.execute(actor, id, scope).response().toResponse()
 
     @PutMapping("/{id}/draft")
     fun save(

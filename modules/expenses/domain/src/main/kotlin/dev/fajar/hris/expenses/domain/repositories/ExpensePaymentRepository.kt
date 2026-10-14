@@ -6,7 +6,7 @@ import java.time.Instant
 import java.util.UUID
 
 interface ExpensePaymentRepository {
-    fun progress(companyId: UUID, claimId: UUID): Result<List<ExpensePaymentProgress>>
+    fun progress(companyId: UUID, claimId: UUID): Result<ExpenseClaimPayments>
 
     /** The same company expense aggregate guard used by claims and policies. */
     fun lock(companyId: UUID, shared: Boolean = false): Result<Unit>

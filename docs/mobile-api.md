@@ -49,7 +49,13 @@ Use bearer sessions for native requests and keep refresh credentials in platform
 
 Namespace local data by backend origin, account, company, and client schema. Encrypt sensitive local data according to the device policy. Cancel obsolete requests before switching partitions, and reject late results whose account/company/session generation no longer matches. A 403 `company_access_denied` requires removing that company's cached data and stopping its outbox. Other denied resources must be removed when their access is lost. Logout clears credentials and account caches; never replay an old account's commands after another login.
 
-Revalidate membership and permissions on reconnect and foreground entry. Offline clients cannot learn that access was revoked while disconnected; define a finite offline access period for sensitive content. Server authorization is rechecked independently of what the device has cached.
+Revalidate membership and permissions on reconnect and foreground entry. Restore
+owned local records independently of credential age and data freshness; ordinary
+age must not close a stored read projection. Keep confirmed access denials gated
+through pending or failed revalidation, even when local cleanup fails. An offline
+client cannot discover a new server-side revocation until it reconnects. Live
+requests, command preparation and exports require their separate authorization;
+stored facts do not extend that authority.
 
 ## Transport conventions
 

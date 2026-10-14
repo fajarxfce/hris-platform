@@ -60,7 +60,10 @@ class MobileSyncCollectionHttpTest : MobileSyncApiFixture() {
         error(get(f.worker, "$path/bootstrap?collections=PAYSLIPS"), 403, "sync_access_denied")
         error(get(f.worker, "$path/bootstrap?collections="), 422, "invalid_sync_collections")
         error(get(f.worker, "$path/bootstrap?collections=UNKNOWN"), 400, "invalid_request")
-        error(get(f.admin, "$path/bootstrap?collections=EXPENSE_CLAIMS"), 403, "sync_access_denied")
+        // Explicit read grants still project only the current account's employments.
+        val owned = body(get(f.admin, "$path/bootstrap?collections=EXPENSE_CLAIMS"))
+        assertEquals(0, owned["items"].size())
+        error(get(f.admin, "$path/bootstrap"), 403, "sync_access_denied")
     }
 
     @Test

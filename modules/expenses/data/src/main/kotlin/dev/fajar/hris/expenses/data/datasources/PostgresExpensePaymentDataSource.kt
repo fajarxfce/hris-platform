@@ -4,6 +4,7 @@ import dev.fajar.hris.expenses.data.models.*
 import dev.fajar.hris.schema.tables.ExpensePayableCandidates.EXPENSE_PAYABLE_CANDIDATES as C
 import dev.fajar.hris.schema.tables.ExpensePaymentActions.EXPENSE_PAYMENT_ACTIONS as A
 import dev.fajar.hris.schema.tables.ExpensePaymentBatches.EXPENSE_PAYMENT_BATCHES as B
+import dev.fajar.hris.schema.tables.ExpensePaymentHeads.EXPENSE_PAYMENT_HEADS as H
 import dev.fajar.hris.schema.tables.ExpensePaymentItems.EXPENSE_PAYMENT_ITEMS as I
 import dev.fajar.hris.schema.tables.ExpensePaymentResults.EXPENSE_PAYMENT_RESULTS as R
 import dev.fajar.hris.schema.tables.records.*
@@ -13,6 +14,12 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresExpensePaymentDataSource(private val sql: DSLContext) : ExpensePaymentDataSource {
+    override fun progressVersion(company: UUID, claim: UUID): Long? =
+        sql.select(H.VERSION)
+            .from(H)
+            .where(H.COMPANY_ID.eq(company), H.CLAIM_ID.eq(claim))
+            .fetchOne(H.VERSION)
+
     override fun progress(company: UUID, claim: UUID): List<ExpensePaymentProgressRow> =
         sql.select(B.ID, I.ID, I.STATUS, B.CREATED_AT, B.RELEASED_AT, I.OCCURRED_AT)
             .from(I)
@@ -21,7 +28,7 @@ class PostgresExpensePaymentDataSource(private val sql: DSLContext) : ExpensePay
             .where(I.COMPANY_ID.eq(company))
             .and(I.CLAIM_ID.eq(claim))
             .orderBy(B.CREATED_AT.desc(), I.ID.desc())
-            .limit(20)
+            .limit(21)
             .fetch {
                 ExpensePaymentProgressRow(
                     requireNotNull(it[B.ID]),

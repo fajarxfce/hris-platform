@@ -12,18 +12,24 @@ import java.util.UUID
 
 class StoredExpensePaymentRepository(private val source: ExpensePaymentDataSource) :
     ExpensePaymentRepository {
-    override fun progress(companyId: UUID, claimId: UUID): Result<List<ExpensePaymentProgress>> =
+    override fun progress(companyId: UUID, claimId: UUID): Result<ExpenseClaimPayments> =
         safeDatabaseCall {
-            source.progress(companyId, claimId).map {
-                ExpensePaymentProgress(
-                    it.batchId,
-                    it.itemId,
-                    ExpensePaymentItemStatus.valueOf(it.status),
-                    it.createdAt.toInstant(),
-                    it.releasedAt?.toInstant(),
-                    it.settledAt?.toInstant(),
-                )
-            }
+            val version = source.progressVersion(companyId, claimId) ?: 0L
+            val attempts =
+                source.progress(companyId, claimId).map {
+                    ExpensePaymentProgress(
+                        it.batchId,
+                        it.itemId,
+                        ExpensePaymentItemStatus.valueOf(it.status),
+                        it.createdAt.toInstant(),
+                        it.releasedAt?.toInstant(),
+                        it.settledAt?.toInstant(),
+                    )
+                }
+            require(
+                version in 0L..60L && attempts.size <= 20 && (version == 0L) == attempts.isEmpty()
+            )
+            ExpenseClaimPayments(claimId, version, attempts)
         }
 
     override fun lock(companyId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {

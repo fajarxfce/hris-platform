@@ -39,7 +39,8 @@ fun requestedSyncModules(request: HttpServletRequest, actor: Actor): Result<Set<
         collections
             .map { collection ->
                 when (collection) {
-                    SyncCollection.EXPENSE_CLAIMS -> CompanyModule.EXPENSES
+                    SyncCollection.EXPENSE_CLAIMS,
+                    SyncCollection.EXPENSE_PAYMENTS -> CompanyModule.EXPENSES
                     SyncCollection.LEAVE_REQUESTS,
                     SyncCollection.LEAVE_BALANCES -> CompanyModule.LEAVE
                     SyncCollection.OVERTIME_REQUESTS,

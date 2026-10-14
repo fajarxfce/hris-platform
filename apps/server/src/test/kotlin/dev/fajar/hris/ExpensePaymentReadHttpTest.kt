@@ -7,6 +7,8 @@ import java.util.UUID
 import java.util.concurrent.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 
@@ -260,8 +262,9 @@ class ExpensePaymentReadHttpTest : ExpensePaymentApiFixture() {
         }
     }
 
-    @Test
-    fun employeeProgressRechecksPermissionAndCredentialsWithoutBankDetails() {
+    @ParameterizedTest
+    @ValueSource(strings = ["payments", "payment-progress"])
+    fun employeeProgressRechecksPermissionAndCredentialsWithoutBankDetails(resource: String) {
         val f = expenseFixture()
         expenseTemplate(f)
         val maker = payer(f)
@@ -271,7 +274,7 @@ class ExpensePaymentReadHttpTest : ExpensePaymentApiFixture() {
             preparePayment(f, maker, batch, listOf(paymentInstruction(approvedExpense(f))))
                 .statusCode(),
         )
-        val path = "${f.path}/${f.claim}/payments"
+        val path = "${f.path}/${f.claim}/$resource"
         val before = get(f.worker, path)
         assertEquals(200, before.statusCode(), before.body())
         assertFalse(before.body().contains("accountNumber"))

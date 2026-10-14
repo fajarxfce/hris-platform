@@ -3286,3 +3286,22 @@ After notice, the validated APK was installed on the authorized Android 16 phone
 at 09:15:08 WIB on 2026-10-14 with install-only delivery. The update timestamp and
 installed-artifact hash were verified without opening the app. Expense records,
 unfinished offline drafts and shared sync-status presentation remain outstanding.
+
+### Expense payment synchronization
+
+Employee payment progress now has its own monotonic version and explicit
+`EXPENSE_PAYMENTS` collection. Preparation, release, cancellation and confirmed
+settlement capture references in the business transaction without revising the
+approved claim. The canonical response defaults to SELF; the preceding payments
+list and omitted-collection defaults retain their contracts. Finance read/manage
+grants still select only employments owned by the current account.
+
+Seventeen database, fifteen sync domain and five cursor/data tests passed.
+Focused HTTP runs verified payment transitions, replay, failed-audit rollback,
+competing commands, OpenAPI bounds, explicit/default collection compatibility,
+and account/company isolation. The migration test held an existing payment writer
+during upgrade, then checked unchanged evidence, backfilled versions, bootstrap
+discovery, RLS and subsequent capture. Fifty-six protected-read tests passed,
+including permission/credential revocation while both progress routes waited and
+late assurance failure classification. Architecture/format checks and both API
+and worker builds passed. Mobile Expense replication remains a separate delivery.

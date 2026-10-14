@@ -105,7 +105,7 @@ class GetExpenseClaimReview(
                     ExpenseClaimDetails(claim, draft),
                     (history as Result.Success).value,
                     (submissions as Result.Success).value,
-                    (progress as Result.Success).value,
+                    (progress as Result.Success).value.attempts,
                 )
             }
         }

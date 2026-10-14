@@ -2,6 +2,7 @@ package dev.fajar.hris.sync.data.datasources
 
 import dev.fajar.hris.schema.tables.AttendanceSyncHeads.ATTENDANCE_SYNC_HEADS as A
 import dev.fajar.hris.schema.tables.ExpenseClaims.EXPENSE_CLAIMS as E
+import dev.fajar.hris.schema.tables.ExpensePaymentHeads.EXPENSE_PAYMENT_HEADS as EP
 import dev.fajar.hris.schema.tables.InboxItems.INBOX_ITEMS as I
 import dev.fajar.hris.schema.tables.LeaveAccounts.LEAVE_ACCOUNTS as B
 import dev.fajar.hris.schema.tables.LeaveRequests.LEAVE_REQUESTS as L
@@ -41,6 +42,18 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                     E.COMPANY_ID.eq(selection.companyId),
                     E.EMPLOYMENT_ID.`in`(selection.employmentIds),
                     DSL.inline("EXPENSE_CLAIMS").`in`(selection.collections),
+                )
+        val expensePayments =
+            sql.select(
+                    DSL.inline("EXPENSE_PAYMENTS").`as`("collection"),
+                    EP.CLAIM_ID.`as`("resource_id"),
+                    EP.VERSION.`as`("resource_version"),
+                )
+                .from(EP)
+                .where(
+                    EP.COMPANY_ID.eq(selection.companyId),
+                    EP.EMPLOYMENT_ID.`in`(selection.employmentIds),
+                    DSL.inline("EXPENSE_PAYMENTS").`in`(selection.collections),
                 )
         val leaves =
             sql.select(
@@ -167,6 +180,7 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                 )
         val records =
             expenses
+                .unionAll(expensePayments)
                 .unionAll(leaves)
                 .unionAll(overtime)
                 .unionAll(balances)

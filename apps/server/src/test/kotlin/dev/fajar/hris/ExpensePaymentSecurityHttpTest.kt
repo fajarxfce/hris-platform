@@ -54,6 +54,25 @@ class ExpensePaymentSecurityHttpTest : ExpensePaymentApiFixture() {
                 ),
         )
         assertEquals(
+            1L,
+            database()
+                .queryForObject(
+                    "select version from expense_payment_heads where company_id=? and claim_id=?",
+                    Long::class.java,
+                    f.company,
+                    f.claim,
+                ),
+        )
+        assertEquals(
+            1,
+            database()
+                .queryForObject(
+                    "select count(*) from mobile_sync_changes where company_id=? and collection='EXPENSE_PAYMENTS'",
+                    Int::class.java,
+                    f.company,
+                ),
+        )
+        assertEquals(
             1,
             database()
                 .queryForObject(
@@ -373,6 +392,15 @@ class ExpensePaymentSecurityHttpTest : ExpensePaymentApiFixture() {
                     else -> reconcilePayment(f, maker, batch, 1, result, key)
                 }
             }
+            val progressPath = "${f.path}/${f.claim}/payment-progress"
+            val beforeProgress = get(f.worker, progressPath)
+            assertEquals(200, beforeProgress.statusCode(), beforeProgress.body())
+            val beforeChanges =
+                database()
+                    .queryForList(
+                        "select resource_id,resource_version from mobile_sync_changes where company_id=? and collection='EXPENSE_PAYMENTS' order by resource_version",
+                        f.company,
+                    )
             database()
                 .execute(
                     """create function fail_expense_payment_audit() returns trigger language plpgsql as ${'$'}${'$'} begin if new.resource_id='$batch'::uuid and new.action='expenses.payment_$action' then raise exception 'Fixture failure' using errcode='23514';end if;return new;end ${'$'}${'$'}"""
@@ -384,6 +412,15 @@ class ExpensePaymentSecurityHttpTest : ExpensePaymentApiFixture() {
             try {
                 val failed = command()
                 assertEquals(409, failed.statusCode(), failed.body())
+                assertEquals(beforeProgress.body(), get(f.worker, progressPath).body())
+                assertEquals(
+                    beforeChanges,
+                    database()
+                        .queryForList(
+                            "select resource_id,resource_version from mobile_sync_changes where company_id=? and collection='EXPENSE_PAYMENTS' order by resource_version",
+                            f.company,
+                        ),
+                )
                 assertEquals(
                     0,
                     database()

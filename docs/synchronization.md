@@ -6,7 +6,8 @@ The supported collections are:
 
 | Collection | Required permission | Audience | Canonical resource |
 | --- | --- | --- | --- |
-| `EXPENSE_CLAIMS` | `expenses.self.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}` |
+| `EXPENSE_CLAIMS` | `expenses.self.manage`, or explicit selection with `expenses.read` / `expenses.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}?scope=SELF` |
+| `EXPENSE_PAYMENTS` (explicit selection) | `expenses.self.manage`, `expenses.read` or `expenses.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}/payment-progress?scope=SELF` |
 | `LEAVE_REQUESTS` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments or immutable request owner | `/api/v1/companies/{companyId}/leave/requests/{id}` |
 | `LEAVE_BALANCES` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/leave/balances/{id}` |
 | `OVERTIME_REQUESTS` | `overtime.self.manage`, or explicit selection with `overtime.read`, `overtime.manage` or `workforce.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/overtime/{id}` |
@@ -72,6 +73,19 @@ Payslips reference immutable finalized assessments and have version `0`. Publica
 
 Payroll payment references use the assessment ID, but belong to a separate collection and monotonically increasing progress version. Preparation, release, cancellation, and reconciliation capture changes atomically. A retry after a confirmed failure retains earlier attempts and advances the same progress resource. Bank destinations and transaction references are excluded from employee progress and sync. Before the first attempt, the canonical progress resource returns an empty version `0`; no payment reference is needed in bootstrap yet. Adding this collection to an existing selection requires a fresh bootstrap.
 
+Expense payments follow the same separate-version contract, using the claim ID.
+The canonical response contains `claimId`, `version` and up to twenty `attempts`.
+Each preparation or instruction transition advances the progress version once;
+receipt replay does not. Claim and approved submission versions remain unchanged.
+An empty progress resource has version `0` and requires no bootstrap reference.
+Existing attempts are backfilled under a schema guard that waits for preceding
+writers and stays held until capture is installed. Their evidence is unchanged;
+bootstrap discovers them without fabricated historical changes. Payment rows,
+projection heads and pending references roll back together after a failed command.
+Explicit finance read grants still select only the account's own employments.
+The original `/payments` endpoint retains its list response and `AUTHORIZED`
+default. The new `/payment-progress` response defaults to `SELF`.
+
 Recipient inbox references contain no message text. Publication, read, acknowledgement, and archival capture the corresponding account-owned invalidation in the same transaction as the business change. Failed publication leaves neither inbox nor pending references. An archived item produces `DELETE`, and the canonical endpoint immediately returns `inbox_item_not_found`; physical deletion of its retained record is unnecessary.
 
 An employment ID never grants inbox synchronization. Changing audience groups affects future publication; previously delivered mail stays with its original recipient, subject to current company/read access. New group members do not acquire historic inbox. Existing inbox items are discovered by the first explicit bootstrap. Revocation and scope changes still require replacing the affected local partition.
@@ -82,7 +96,7 @@ Mobile clients should send an explicit list of collections implemented by that c
 
 Persist the requested selection with the account/company partition and cursor, and send it on every page. Cursors bind the effective selection. Switching to another effective selection, or omitting a selection when the default would include more collections, returns `409 sync_scope_changed`; replace the local partition through bootstrap. Changing order or adding an unauthorized collection does not alter the effective projection. Current permission and ownership changes still invalidate scope independently.
 
-An explicit selection prevents a newly registered server collection from appearing automatically in an older client. A client upgrade that adds support for another collection explicitly changes its selection and replaces the partition. Omitting `collections` selects the original six collections intersected with current permissions. Inbox, Attendance and the three calendar source collections are excluded from that default even when authorized, preserving existing client projections and cursors. Their clients must select these collections explicitly.
+An explicit selection prevents a newly registered server collection from appearing automatically in an older client. A client upgrade that adds support for another collection explicitly changes its selection and replaces the partition. Omitting `collections` selects the original six collections intersected with current permissions. Inbox, Attendance, the three calendar source collections and Expense payments are excluded from that default even when authorized, preserving existing client projections and cursors. Their clients must select these collections explicitly.
 
 Clients with `leave.read` can explicitly request `LEAVE_REQUESTS,LEAVE_BALANCES`
 for their own records, matching the existing self-read endpoints. This does not

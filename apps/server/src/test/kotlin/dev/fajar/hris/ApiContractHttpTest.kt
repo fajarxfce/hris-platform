@@ -849,6 +849,25 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun expensePaymentProgressDefaultsToOwnedReadsWithABoundedVersionedResponse() {
+        val api = contract()
+        val operation =
+            api["paths"]["/api/v1/companies/{companyId}/expenses/claims/{id}/payment-progress"][
+                "get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val scope = operation["parameters"].single { it["name"].asString() == "scope" }
+        assertEquals("SELF", scope["schema"]["default"].asString())
+        val progress = api["components"]["schemas"]["ExpenseClaimPaymentsResponse"]["properties"]
+        assertEquals(
+            setOf("claimId", "version", "attempts"),
+            progress.properties().map { it.key }.toSet(),
+        )
+        assertEquals(0, progress["version"]["minimum"].asInt())
+        assertEquals(60, progress["version"]["maximum"].asInt())
+        assertEquals(20, progress["attempts"]["maxItems"].asInt())
+    }
+
+    @Test
     fun expenseReadScopesAreExplicitAndPreserveTheAuthorizedDefault() {
         val paths = contract()["paths"]
         for (suffix in

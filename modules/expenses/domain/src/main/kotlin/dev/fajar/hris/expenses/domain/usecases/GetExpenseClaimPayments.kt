@@ -1,8 +1,8 @@
 package dev.fajar.hris.expenses.domain.usecases
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.expenses.domain.entities.ExpenseClaimPayments
 import dev.fajar.hris.expenses.domain.entities.ExpenseClaimReadScope
-import dev.fajar.hris.expenses.domain.entities.ExpensePaymentProgress
 import dev.fajar.hris.expenses.domain.policies.canReadExpenseClaim
 import dev.fajar.hris.expenses.domain.repositories.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
@@ -30,7 +30,7 @@ class GetExpenseClaimPayments(
         actor: Actor,
         id: UUID,
         scope: ExpenseClaimReadScope = ExpenseClaimReadScope.AUTHORIZED,
-    ): Result<List<ExpensePaymentProgress>> {
+    ): Result<ExpenseClaimPayments> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))

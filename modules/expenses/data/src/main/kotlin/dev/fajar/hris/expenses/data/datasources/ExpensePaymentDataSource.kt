@@ -6,6 +6,8 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 interface ExpensePaymentDataSource {
+    fun progressVersion(company: UUID, claim: UUID): Long?
+
     fun progress(company: UUID, claim: UUID): List<ExpensePaymentProgressRow>
 
     fun lock(company: UUID, shared: Boolean = false)

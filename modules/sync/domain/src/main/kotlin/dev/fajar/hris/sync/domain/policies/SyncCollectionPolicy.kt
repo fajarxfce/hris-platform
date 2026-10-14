@@ -31,6 +31,14 @@ fun selectSyncCollections(
     // that same projection without changing default feeds or exporting team data.
     val authorized = selfSyncCollections(permissions).toMutableSet()
     if (requested != null) {
+        if (
+            permissions.any {
+                it in setOf("expenses.self.manage", "expenses.read", "expenses.manage")
+            }
+        ) {
+            authorized += SyncCollection.EXPENSE_CLAIMS
+            authorized += SyncCollection.EXPENSE_PAYMENTS
+        }
         if ("leave.read" in permissions) {
             authorized += SyncCollection.LEAVE_REQUESTS
             authorized += SyncCollection.LEAVE_BALANCES

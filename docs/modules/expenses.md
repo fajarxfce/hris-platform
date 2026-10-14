@@ -301,3 +301,14 @@ Batch transitions, item results, immutable action/evidence history, audit, and o
 `GET /expenses/payments`, `/{id}`, `/{id}/history`, and `/{id}/results` provide finance views. List ranges span at most 366 company-local days, with default/max page sizes of 50/200; each batch contains at most 100 items/results. `GET /expenses/claims/{id}/payments` exposes at most twenty status/timestamp records through ordinary current self/team/company claim scope, without bank destinations or bank transaction references. Approved claim evidence remains unchanged as payment progresses.
 
 Payment reads and employee progress hold shared expense, people, company, membership, and account guards for their bounded transaction. They revalidate the original/live permission intersection after acquiring the guards; finance reads also recheck recent authentication. Revocation cannot race between the access check and acquisition of payment evidence. Independent readers can proceed together, while resource/access mutations serialize against them.
+
+`GET /expenses/claims/{id}/payment-progress?scope=SELF` returns `claimId`, a
+monotonic `version`, and the same bounded employee-safe `attempts`. Its default
+scope is `SELF`; explicit `AUTHORIZED` uses the existing claim read policy.
+Before the first attempt it returns version `0` with an empty list. Preparation,
+release, cancellation and reconciliation advance a separate claim payment head
+and capture `EXPENSE_PAYMENTS` in the business transaction. Replays and rollbacks
+do not create another version. The original `/payments` list contract remains
+available. Mobile clients explicitly select this collection alongside
+`EXPENSE_CLAIMS`; current read/manage grants never widen its account-owned audience.
+See [synchronization](../synchronization.md).

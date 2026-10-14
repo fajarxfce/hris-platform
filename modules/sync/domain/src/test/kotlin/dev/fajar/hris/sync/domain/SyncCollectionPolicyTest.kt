@@ -8,6 +8,40 @@ import org.junit.jupiter.api.Test
 
 class SyncCollectionPolicyTest {
     @Test
+    fun expenseReadersSelectOwnedClaimsAndPaymentsWithoutChangingDefaultFeeds() {
+        val collections = setOf(EXPENSE_CLAIMS, EXPENSE_PAYMENTS)
+        for (grant in listOf("expenses.self.manage", "expenses.read", "expenses.manage")) {
+            assertEquals(
+                Result.Success(collections),
+                selectSyncCollections(setOf(grant), collections),
+            )
+        }
+        assertEquals(
+            Result.Success(setOf(EXPENSE_CLAIMS)),
+            selectSyncCollections(setOf("expenses.self.manage"), null),
+        )
+        for (grant in
+            listOf(
+                "expenses.read",
+                "expenses.manage",
+                "expenses.pay",
+                "expenses.approve",
+                "expenses.team.read",
+            )) {
+            assertEquals(
+                "sync_access_denied",
+                (selectSyncCollections(setOf(grant), null) as Result.Failed).failure.code,
+            )
+        }
+        for (grant in listOf("expenses.pay", "expenses.approve", "expenses.team.read")) {
+            assertEquals(
+                "sync_access_denied",
+                (selectSyncCollections(setOf(grant), collections) as Result.Failed).failure.code,
+            )
+        }
+    }
+
+    @Test
     fun payrollReadersSelectOwnedResourcesWithoutChangingTheDefaultProjection() {
         val collections = setOf(PAYSLIPS, PAYROLL_PAYMENTS)
         for (grant in listOf("payroll.self.read", "payroll.read")) {

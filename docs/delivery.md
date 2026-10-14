@@ -3326,3 +3326,36 @@ HTTP response passed. Read-only checks of an existing approved and draft fixture
 matched their preceding claim, submission and history endpoints and confirmed
 that older history pages retain the current head. No business record was changed.
 The complete mobile Expense replica and its device acceptance remain outstanding.
+
+### Local Expense drafts on mobile
+
+The [mobile editor](https://github.com/fajarxfce/hris-mobile/commit/a4216f79bd2b43e9c00efb80548b5d34552a6b2a)
+now retains encrypted working copies for unsubmitted claim fields, completed
+lines and an unfinished item. Local ownership and confirmed read denials govern
+observation; action-review deadlines do not expire stored input. Coalesced writes
+use revision checks and recover the same mutation after an uncertain storage
+acknowledgement. New claims retain their original ID through server delivery.
+Explicit reload preserves the reviewed server version, and confirmed cleanup
+removes only matching input. Catalog discovery and server Save still require
+current online admission.
+
+Mobile root checks passed with 1,369 JVM/desktop tests, Android dev assembly and
+production Web distribution. Expense also passed 208 Chromium tests, with four
+additional localization tests. SQLite/IndexedDB, concurrent writes, key creation,
+late scope changes, failed cleanup, cancellation, disposal, lost acknowledgements
+and interrupted version reload are covered. Layout checks include 200% text.
+
+API 35 acceptance created input offline and restored its title, description and
+raw `12,` amount after force-stop and a 73-hour clock advance. Local editing and
+item completion remained available. An offline server Save kept input without
+creating a claim; reconnecting created one claim. Editing that claim survived
+another offline process restart while confirmed facts stayed unchanged. Explicit
+Save advanced its original ID and line to the next version with the same exact
+amount. Matching working copies were removed after acknowledgement. The emulator's
+clock/network settings were restored and no HRIS crash was recorded.
+
+After notice, the validated APK was installed on the authorized phone at
+14:29:54 WIB on 2026-10-14 with install-only delivery. The package update time
+and installed-artifact hash matched the validated APK. This increment changes
+HRIS-specific expense behavior; the remaining mobile foundations and other
+offline editors stay in the completion sequence.

@@ -151,6 +151,14 @@ offline after a 73-hour clock advance: four claims, local filters, two claim det
 approval and activity remained readable with unchanged encrypted payloads.
 Clock/network restoration and explicit refresh succeeded; the emulator crash buffer
 was empty. The validated APK was delivered to the phone with install-only.
+The [mobile Expense working copies](https://github.com/fajarxfce/hris-mobile/commit/a4216f79bd2b43e9c00efb80548b5d34552a6b2a)
+retain unsubmitted draft fields and unfinished items separately from confirmed
+claims and immutable delivery commands. Local autosave uses encrypted storage,
+revision checks and recoverable acknowledgements; live server review remains
+separate. API 35 acceptance restored incomplete input after an offline process
+restart and a 73-hour clock advance, then created and edited exactly one claim
+with stable claim/line IDs. The validated APK was installed on the phone with
+install-only delivery. Other workflows retain their own offline-draft work.
 Automated UI/API checks and the Android dev build passed. Android 16 device checks
 covered password sign-in, company isolation, profiles, inbox reading, offline
 content, offline process restoration with company isolation, queued acknowledgement
@@ -169,7 +177,7 @@ owned disposable database. Its historical and current revisions, lost-response
 replay and competing hold were exercised without modifying development records.
 
 Expense workflows now include backend self-service discovery and strict ownership,
-mobile claim history, account-owned local records, draft authoring, dated categories,
+mobile claim history, account-owned local records, durable local draft authoring, dated categories,
 cost centers, published receipt selection/export, submission, cancellation and
 withdrawal with durable recovery. The dashboard supports policy administration,
 administrative drafts and returned-claim correction, submission/cancellation/
@@ -185,7 +193,7 @@ against an isolated API/PostgreSQL fixture with independent operators.
 | Area | Remaining end-to-end work |
 | --- | --- |
 | Mobile identity | Native OIDC handoff and external-provider acceptance. Android MFA and device-session workflows are validated; iOS physical acceptance remains separate. |
-| Mobile foundation | Offline drafts, stable ownership for the remaining read projections, consistent sync status, deep links and push registration. Owned encrypted company restoration, age-independent stored reads and account-owned Inbox/Leave/Overtime/Workforce/Payroll/Expense records are implemented; the mobile sync model records each remaining collection. |
+| Mobile foundation | Offline drafts for the remaining workflows, stable ownership for the remaining read projections, consistent sync status, deep links and push registration. Expense working copies, owned encrypted company restoration, age-independent stored reads and account-owned Inbox/Leave/Overtime/Workforce/Payroll/Expense records are implemented; the mobile sync model records each remaining collection. |
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
 | Workforce | Bulk/reset and late corrections; physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections and their history, company-wide exception review queues, overtime planning with reviewed calendars, directories/details/history, actual-time submission, independent review and withdrawal, dashboard monthly closing/recovery with published employee results, and mobile work calendars, overtime planning/actual time/withdrawal with durable recovery, and online/offline capture are implemented and verified against the real API. |
 | Leave | Team calendar, entitlement batches and year closing; scheduled accrual/expiry. Dashboard request creation includes scoped employee/evidence selection, server calculation, preview conflicts and original-command recovery, verified against an isolated API/PostgreSQL instance. Mobile balances, filtered history, request details, submission with published document evidence, and durable withdrawal/cancellation flows are implemented and verified against the development API. |

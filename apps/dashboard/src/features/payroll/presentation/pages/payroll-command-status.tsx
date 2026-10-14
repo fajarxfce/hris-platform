@@ -5,11 +5,12 @@ import { AppFailure } from "../../../../core/presentation/components/app-failure
 import { AppLoading } from "../../../../core/presentation/components/app-loading";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { payrollReviewMessages } from "../i18n/payroll-review-messages";
-import type { PayrollReviewCommandState } from "../models/payroll-review-command-state";
-export function PayrollReviewCommandStatus(props: {
-  state: PayrollReviewCommandState<unknown>;
+import type { PayrollCommandState } from "../models/payroll-command-state";
+export function PayrollCommandStatus(props: {
+  state: PayrollCommandState<unknown>;
   locale: Locale;
   successMessage: string;
+  successLabel: string;
   successTo: string | null;
   onRetry: () => void;
   onReload: () => void;
@@ -25,7 +26,7 @@ export function PayrollReviewCommandStatus(props: {
         <MessageBar intent="success" role="status">
           <MessageBarBody>
             {props.successMessage}{" "}
-            {props.successTo && <Link to={props.successTo}>{text.openReview}</Link>}
+            {props.successTo && <Link to={props.successTo}>{props.successLabel}</Link>}
           </MessageBarBody>
         </MessageBar>
       )}

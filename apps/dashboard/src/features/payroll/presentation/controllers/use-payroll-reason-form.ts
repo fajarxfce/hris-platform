@@ -1,9 +1,9 @@
 import { useController, useForm } from "react-hook-form";
 import { useNavigationProtection } from "../../../../core/presentation/navigation/use-navigation-protection";
-import type { PayrollReviewCommandState } from "../models/payroll-review-command-state";
-export function usePayrollReviewReasonForm(
+import type { PayrollCommandState } from "../models/payroll-command-state";
+export function usePayrollReasonForm(
   controller: Readonly<{ save: (reason: string) => Promise<void>; refresh: () => Promise<void> }>,
-  state: PayrollReviewCommandState<unknown>,
+  state: PayrollCommandState<unknown>,
   required = true,
 ) {
   const form = useForm({ defaultValues: { reason: "" } }),

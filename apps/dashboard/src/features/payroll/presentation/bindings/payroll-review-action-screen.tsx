@@ -4,11 +4,11 @@ import { useWorkspaceRevalidation } from "../../../../core/presentation/session/
 import type { PayrollReviewAction } from "../../domain/entities/payroll-review-command";
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 import { PayrollReviewActionController } from "../controllers/payroll-review-action-controller";
-import { usePayrollReviewReasonForm } from "../controllers/use-payroll-review-reason-form";
+import { usePayrollReasonForm } from "../controllers/use-payroll-reason-form";
 import { payrollReviewMessages } from "../i18n/payroll-review-messages";
 import { payrollReviewActionPath, payrollReviewPath } from "../models/payroll-review-route";
 import { payrollReviewView } from "../models/payroll-review-view";
-import { PayrollReviewCommandPage } from "../pages/payroll-review-command-page";
+import { PayrollCommandPage } from "../pages/payroll-command-page";
 export function PayrollReviewActionScreen(
   props: PayrollScreenProps & { action: PayrollReviewAction },
 ) {
@@ -49,7 +49,7 @@ function PayrollReviewActionBinding(
     return controller.deactivate;
   }, [controller]);
   useWorkspaceRevalidation(state.failure);
-  const form = usePayrollReviewReasonForm(controller, state, action !== "APPROVE"),
+  const form = usePayrollReasonForm(controller, state, action !== "APPROVE"),
     text = payrollReviewMessages(locale),
     properties = useMemo(() => {
       if (!state.review) return [];
@@ -58,7 +58,7 @@ function PayrollReviewActionBinding(
     }, [state.review, locale]);
   const backTo = payrollReviewPath(access.companyId, id);
   return (
-    <PayrollReviewCommandPage
+    <PayrollCommandPage
       state={state}
       form={form}
       title={text[action]}
@@ -74,6 +74,7 @@ function PayrollReviewActionBinding(
       backLabel={text.openReview}
       successTo={backTo}
       successMessage={action === "WITHDRAW" ? text.withdrawnMessage : text.decidedMessage}
+      successLabel={text.openReview}
       onRetry={controller.retry}
     />
   );

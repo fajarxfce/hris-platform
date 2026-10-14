@@ -1,6 +1,7 @@
 import type { HttpClient } from "../../../core/data/http/http-client";
 import { HttpCompensationDataSource } from "../data/datasources/http-compensation-data-source";
 import { HttpPayrollCalculationDataSource } from "../data/datasources/http-payroll-calculation-data-source";
+import { HttpPayrollFinalizationDataSource } from "../data/datasources/http-payroll-finalization-data-source";
 import { HttpPayrollInputDataSource } from "../data/datasources/http-payroll-input-data-source";
 import { HttpPayrollPeriodDataSource } from "../data/datasources/http-payroll-period-data-source";
 import { HttpPayrollPolicyDataSource } from "../data/datasources/http-payroll-policy-data-source";
@@ -8,6 +9,7 @@ import { HttpPayrollReviewDataSource } from "../data/datasources/http-payroll-re
 import { HttpTaxOpeningDataSource } from "../data/datasources/http-tax-opening-data-source";
 import { RemoteCompensationRepository } from "../data/repositories/remote-compensation-repository";
 import { RemotePayrollCalculationRepository } from "../data/repositories/remote-payroll-calculation-repository";
+import { RemotePayrollFinalizationRepository } from "../data/repositories/remote-payroll-finalization-repository";
 import { RemotePayrollInputRepository } from "../data/repositories/remote-payroll-input-repository";
 import { RemotePayrollPeriodRepository } from "../data/repositories/remote-payroll-period-repository";
 import { RemotePayrollPolicyRepository } from "../data/repositories/remote-payroll-policy-repository";
@@ -21,10 +23,13 @@ import { ListCompensationEmployees } from "../domain/usecases/list-compensation-
 import { ListPayrollInputEmployees } from "../domain/usecases/list-payroll-input-employees";
 import { ListPayrollPeriodEmployees } from "../domain/usecases/list-payroll-period-employees";
 import { ListPayrollPeriods } from "../domain/usecases/list-payroll-periods";
+import { ListPayrollPublicationRuns } from "../domain/usecases/list-payroll-publication-runs";
 import { ListTaxOpeningEmployees } from "../domain/usecases/list-tax-opening-employees";
 import { LoadCompensationEditor } from "../domain/usecases/load-compensation-editor";
 import { LoadCompensationReview } from "../domain/usecases/load-compensation-review";
 import { LoadPayrollCalculations } from "../domain/usecases/load-payroll-calculations";
+import { LoadPayrollFinalization } from "../domain/usecases/load-payroll-finalization";
+import { LoadPayrollFinalizations } from "../domain/usecases/load-payroll-finalizations";
 import { LoadPayrollInputReview } from "../domain/usecases/load-payroll-input-review";
 import { LoadPayrollInputRevision } from "../domain/usecases/load-payroll-input-revision";
 import { LoadPayrollPeriod } from "../domain/usecases/load-payroll-period";
@@ -40,6 +45,7 @@ import { LoadTaxOpeningReview } from "../domain/usecases/load-tax-opening-review
 import { LoadTaxOpeningRevision } from "../domain/usecases/load-tax-opening-revision";
 import { ResumePayrollCalculation } from "../domain/usecases/resume-payroll-calculation";
 import { ReviewPayrollCalculation } from "../domain/usecases/review-payroll-calculation";
+import { ReviewPayrollFinalization } from "../domain/usecases/review-payroll-finalization";
 import { ReviewPayrollInputAction } from "../domain/usecases/review-payroll-input-action";
 import { ReviewPayrollPeriodCancellation } from "../domain/usecases/review-payroll-period-cancellation";
 import { ReviewPayrollPeriodCreation } from "../domain/usecases/review-payroll-period-creation";
@@ -50,6 +56,7 @@ import { SavePayrollInput } from "../domain/usecases/save-payroll-input";
 import { SavePayrollPolicy } from "../domain/usecases/save-payroll-policy";
 import { SaveTaxOpening } from "../domain/usecases/save-tax-opening";
 import { StartPayrollCalculation } from "../domain/usecases/start-payroll-calculation";
+import { StartPayrollFinalization } from "../domain/usecases/start-payroll-finalization";
 import { SubmitPayrollReview } from "../domain/usecases/submit-payroll-review";
 import { VerifyPayrollInput } from "../domain/usecases/verify-payroll-input";
 import { VerifyTaxOpening } from "../domain/usecases/verify-tax-opening";
@@ -66,7 +73,16 @@ export function createPayrollFeature(http: HttpClient): PayrollUseCases {
     new HttpPayrollCalculationDataSource(http),
   );
   const reviews = new RemotePayrollReviewRepository(new HttpPayrollReviewDataSource(http));
+  const finalizations = new RemotePayrollFinalizationRepository(
+    new HttpPayrollFinalizationDataSource(http),
+  );
   return Object.freeze({
+    listPublicationRuns: new ListPayrollPublicationRuns(finalizations),
+    loadFinalizations: new LoadPayrollFinalizations(finalizations),
+    loadFinalization: new LoadPayrollFinalization(finalizations),
+    reviewFinalization: new ReviewPayrollFinalization(finalizations),
+    startFinalization: new StartPayrollFinalization(finalizations),
+
     loadReviews: new LoadPayrollReviews(reviews),
     loadReview: new LoadPayrollReview(reviews),
     loadReviewSubmission: new LoadPayrollReviewSubmission(reviews),

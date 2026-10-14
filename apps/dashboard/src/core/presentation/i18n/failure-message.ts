@@ -2,6 +2,48 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_payroll_finalization: [
+    "Review the approved payroll versions and reason.",
+    "Periksa versi payroll yang disetujui dan alasan.",
+  ],
+  payroll_finalization_not_found: ["The publication was not found.", "Publikasi tidak ditemukan."],
+  payroll_finalization_obsolete: [
+    "The publication references are unavailable. Reload its current status.",
+    "Referensi publikasi tidak tersedia. Muat ulang status saat ini.",
+  ],
+  payroll_finalization_action_unavailable: [
+    "Publication is unavailable. Review the current payroll status.",
+    "Publikasi tidak tersedia. Periksa status payroll saat ini.",
+  ],
+  payroll_already_finalized: [
+    "This payroll has already been finalized.",
+    "Payroll ini sudah difinalisasi.",
+  ],
+  payroll_successful_calculation_required: [
+    "Complete a successful calculation before finalizing payroll.",
+    "Selesaikan perhitungan yang berhasil sebelum finalisasi payroll.",
+  ],
+  payroll_approved_review_required: [
+    "An approved review of the current calculation is required.",
+    "Diperlukan tinjauan yang disetujui untuk perhitungan saat ini.",
+  ],
+  payroll_finalization_capacity: [
+    "This run has reached its limit of eight publication attempts.",
+    "Proses ini telah mencapai batas delapan percobaan publikasi.",
+  ],
+  payroll_person_duplicated: [
+    "Payroll contains a duplicate person for this tax month. Review the employee references.",
+    "Payroll memuat orang yang sama lebih dari sekali pada bulan pajak ini. Periksa referensi karyawan.",
+  ],
+  payroll_holiday_already_assessed: [
+    "This holiday allowance has already been assessed. Withdraw the review and recalculate.",
+    "THR ini sudah diperhitungkan. Tarik tinjauan lalu hitung ulang.",
+  ],
+  payroll_tax_history_changed: [
+    "Tax history changed. Withdraw the review and recalculate.",
+    "Riwayat pajak berubah. Tarik tinjauan lalu hitung ulang.",
+  ],
+
   invalid_payroll_review: [
     "Review the payroll versions and reason.",
     "Periksa versi payroll dan alasan.",
@@ -47,8 +89,8 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Perhitungan berubah. Kembali ke tinjauan saat ini.",
   ],
   payroll_finalization_active: [
-    "Finalization is in progress. This review cannot be withdrawn.",
-    "Finalisasi sedang berjalan. Tinjauan ini tidak dapat ditarik.",
+    "A publication is queued or running. Wait for it to finish or cancel its job.",
+    "Publikasi sedang dalam antrean atau berjalan. Tunggu hingga selesai atau batalkan job-nya.",
   ],
 
   invalid_payroll_run: [

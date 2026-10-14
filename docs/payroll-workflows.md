@@ -113,8 +113,10 @@ preparation and verification. The [calculation workflow](dashboard.md#payroll-ca
 provides source review, versioned start/recovery, bounded progress and employee
 results, retained evidence and run history. The [aggregate review
 workflow](dashboard.md#payroll-aggregate-review) supports submission, independent
-staged decisions, withdrawal and retained history. Publication screens remain
-subsequent work.
+staged decisions, withdrawal and retained history. The [finalization
+workflow](dashboard.md#payroll-finalization) provides bounded run discovery,
+publication review, original-command recovery and retained attempt progress.
+Payslip and finance payment dashboard screens remain subsequent work.
 
 Scope local caches by account and company; add earnings month and revision to input keys. Keep unsent changes separate from a verified server revision. After `stale_version`, `stale_employment_version`, or `stale_workforce_version`, fetch the current resource before deciding whether to resubmit. An existing operation receipt is historical confirmation, not the latest resource state. Stop obsolete requests when navigating or switching accounts/companies. Clients translate stable error and field codes, including per-employee outcome parameters. Persist the run ID after the start receipt and restore progress after reconnecting; poll only while the screen owns the observation. A queued command with a lost response must reuse its original key. The employee sync feed publishes only finalized payslip references; draft and processing results remain available through these explicitly authorized endpoints.
 

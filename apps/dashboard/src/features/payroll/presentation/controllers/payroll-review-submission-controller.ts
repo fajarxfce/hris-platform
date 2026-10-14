@@ -12,14 +12,14 @@ import {
 } from "../../domain/policies/payroll-review-policy";
 import type { PayrollUseCases } from "../contracts/payroll-use-cases";
 import {
-  initialPayrollReviewCommandState,
-  type PayrollReviewCommandState,
-} from "../models/payroll-review-command-state";
+  initialPayrollCommandState,
+  type PayrollCommandState,
+} from "../models/payroll-command-state";
 
-type State = PayrollReviewCommandState<PayrollReviewPreparation>;
+type State = PayrollCommandState<PayrollReviewPreparation>;
 type Submission = Readonly<{ operation: OperationId; input: PayrollReviewSubmission }>;
 export class PayrollReviewSubmissionController {
-  #state = initialPayrollReviewCommandState<PayrollReviewPreparation>();
+  #state = initialPayrollCommandState<PayrollReviewPreparation>();
   #active = false;
   #pending: AbortController | null = null;
   #submission: Submission | null = null;
@@ -45,14 +45,14 @@ export class PayrollReviewSubmissionController {
     this.#pending?.abort();
     this.#pending = null;
     this.#submission = null;
-    this.publish(initialPayrollReviewCommandState<PayrollReviewPreparation>());
+    this.publish(initialPayrollCommandState<PayrollReviewPreparation>());
   };
   refresh = async (): Promise<void> => {
     if (!this.#active || this.#submission) return;
     this.#pending?.abort();
     const pending = new AbortController();
     this.#pending = pending;
-    this.publish(initialPayrollReviewCommandState<PayrollReviewPreparation>());
+    this.publish(initialPayrollCommandState<PayrollReviewPreparation>());
     try {
       const result = await this.actions.loadReviewSubmission.execute(
         this.access,
@@ -132,7 +132,7 @@ export class PayrollReviewSubmissionController {
       if (result.ok) {
         this.#submission = null;
         this.publish({
-          ...initialPayrollReviewCommandState<PayrollReviewPreparation>(),
+          ...initialPayrollCommandState<PayrollReviewPreparation>(),
           stage: "saved",
           receipt: result.value,
         });

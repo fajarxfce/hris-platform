@@ -3,7 +3,7 @@ import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 import { PayrollReviewSubmissionController } from "../controllers/payroll-review-submission-controller";
-import { usePayrollReviewReasonForm } from "../controllers/use-payroll-review-reason-form";
+import { usePayrollReasonForm } from "../controllers/use-payroll-reason-form";
 import { payrollReviewMessages } from "../i18n/payroll-review-messages";
 import {
   payrollReviewPath,
@@ -11,7 +11,7 @@ import {
   payrollReviewsPath,
 } from "../models/payroll-review-route";
 import { payrollReviewPreparationView } from "../models/payroll-review-view";
-import { PayrollReviewCommandPage } from "../pages/payroll-review-command-page";
+import { PayrollCommandPage } from "../pages/payroll-command-page";
 export function PayrollReviewSubmissionScreen(props: PayrollScreenProps) {
   const { runId = "" } = useParams(),
     [params] = useSearchParams();
@@ -43,14 +43,14 @@ function PayrollReviewSubmissionBinding(props: PayrollScreenProps & { id: string
     return controller.deactivate;
   }, [controller]);
   useWorkspaceRevalidation(state.failure);
-  const form = usePayrollReviewReasonForm(controller, state),
+  const form = usePayrollReasonForm(controller, state),
     text = payrollReviewMessages(locale),
     properties = useMemo(
       () => (state.review ? payrollReviewPreparationView(state.review, locale) : []),
       [state.review, locale],
     );
   return (
-    <PayrollReviewCommandPage
+    <PayrollCommandPage
       state={state}
       form={form}
       title={text.submission}
@@ -66,6 +66,7 @@ function PayrollReviewSubmissionBinding(props: PayrollScreenProps & { id: string
       backLabel={text.back}
       successTo={state.receipt ? payrollReviewPath(access.companyId, state.receipt.id) : null}
       successMessage={text.submittedMessage}
+      successLabel={text.openReview}
       onRetry={controller.retry}
     />
   );

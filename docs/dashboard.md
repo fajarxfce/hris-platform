@@ -285,7 +285,7 @@ Unknown command outcomes retain the original operation and payload across
 explicit retries, including after later conflicts. A definite changed-state
 rejection requires review before creating a new command. Pending forms and
 unconfirmed results use the workspace departure guard. Browser command retention
-is in memory. Finalization and finance payment screens remain subsequent work.
+is in memory. Payslip and finance payment screens remain subsequent work.
 
 ## Payroll aggregate review
 
@@ -316,6 +316,41 @@ outcomes retain the original operation and body through explicit retries and lat
 MFA/conflict responses. Definite version conflicts require a fresh review before
 another command. Reasons and pending commands remain only in mounted memory;
 locale and theme changes do not restart acquisition or discard the input.
+
+## Payroll finalization
+
+`/payroll/publications` lists fifty completed calculations or finalized runs per
+page, with earnings-month and status filters covering up to 36 months. Reads
+accept `payroll.read`, `payroll.calculate`, `payroll.review` or `payroll.finalize`.
+Finalization authority does not grant employee-result, input, approval-review or
+payslip access. Related links respect those separate capabilities.
+
+`/payroll/runs/:runId/finalizations` shows current preparation, reviewed totals,
+blocking issues and up to eight retained publication attempts. The separate
+`/payroll/runs/:runId/finalize` review requires `payroll.finalize` and a reason.
+Confirmation captures the approved review ID, observed run/review/approval
+versions, new finalization ID and one operation ID. Preparation creates no
+records and does not reserve source readiness or queue capacity.
+
+An uncertain response keeps that original command through explicit retry, renewed
+MFA and later conflicts, including after the worker has finalized the run. A
+definite first conflict requires another review before a new command. Drafts and
+unconfirmed commands use the existing workspace departure guard and remain in
+browser memory. Company/account replacement cancels owned work and clears private
+context; locale and theme changes retain the current form and observation.
+
+`/payroll/finalizations/:finalizationId` shows its own job outcome, captured issuer,
+reason, publication time and retained totals. A cancelled attempt stays cancelled
+when a later attempt publishes the same run. One visible detail owns one request
+and at most thirty delayed progress reads, four seconds apart. Observation stops
+on terminal state, error, disposal or a hidden document. Transport failure may
+retain authorized context; lost access or assurance clears it. Exhaustion offers
+explicit Refresh. Publication success is announced to assistive technology.
+
+Job inspection and cancellation use the existing Jobs workflow; the link requires
+job ownership or `jobs.read`. Published payslips and bank settlement remain distinct.
+Finalized payroll corrections require an amendment rather than editing its
+immutable result.
 
 ## Shift templates
 

@@ -6,13 +6,13 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { AppTextArea } from "../../../../core/presentation/components/app-text-area";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
-import type { usePayrollReviewReasonForm } from "../controllers/use-payroll-review-reason-form";
+import type { usePayrollReasonForm } from "../controllers/use-payroll-reason-form";
 import { payrollReviewMessages } from "../i18n/payroll-review-messages";
-import type { PayrollReviewCommandState } from "../models/payroll-review-command-state";
-import { PayrollReviewCommandStatus } from "./payroll-review-command-status";
-export function PayrollReviewCommandPage(props: {
-  state: PayrollReviewCommandState<unknown>;
-  form: ReturnType<typeof usePayrollReviewReasonForm>;
+import type { PayrollCommandState } from "../models/payroll-command-state";
+import { PayrollCommandStatus } from "./payroll-command-status";
+export function PayrollCommandPage(props: {
+  state: PayrollCommandState<unknown>;
+  form: ReturnType<typeof usePayrollReasonForm>;
   title: string;
   note: string;
   label: string;
@@ -26,6 +26,7 @@ export function PayrollReviewCommandPage(props: {
   backLabel: string;
   successTo: string | null;
   successMessage: string;
+  successLabel: string;
   onRetry: () => void;
 }) {
   const { state, form, locale } = props,
@@ -40,10 +41,11 @@ export function PayrollReviewCommandPage(props: {
         context={props.companyName}
         actions={<Link to={props.backTo}>{props.backLabel}</Link>}
       />
-      <PayrollReviewCommandStatus
+      <PayrollCommandStatus
         state={state}
         locale={locale}
         successMessage={props.successMessage}
+        successLabel={props.successLabel}
         successTo={props.successTo}
         onRetry={props.onRetry}
         onReload={form.reload}

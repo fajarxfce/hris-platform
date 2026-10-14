@@ -10,14 +10,16 @@ import {
 import type { PayrollInputReviewDto } from "../src/features/payroll/data/models/payroll-input-dto";
 import type { WorkPeriodOverviewDto } from "../src/features/workforce/data/models/work-period-overview-dto";
 import { compensationTerms } from "../tests/fixtures/compensations";
+import { exercisePayrollFinalization } from "./fixtures/payroll-finalization-workflow";
 import { exercisePayrollReview } from "./fixtures/payroll-review-workflow";
 
-test("calculation and aggregate review retain worker evidence and recover independent versioned commands", async ({
+test("calculation, independent review and publication retain worker evidence and recover original commands", async ({
   page,
   context,
   browser,
   baseURL,
 }) => {
+  test.setTimeout(180_000);
   const { company, csrf } = await createAdminCompany(
     page,
     context,
@@ -95,7 +97,8 @@ test("calculation and aggregate review retain worker evidence and recover indepe
     .toBe("CLOSED");
   if (!baseURL) throw new Error("Integration base URL required");
   const preparer = await browser.newContext({ baseURL }),
-    reviewer = await browser.newContext({ baseURL });
+    reviewer = await browser.newContext({ baseURL }),
+    finalReviewer = await browser.newContext({ baseURL });
   try {
     const editor = await preparer.newPage(),
       checker = await reviewer.newPage();
@@ -337,9 +340,8 @@ test("calculation and aggregate review retain worker evidence and recover indepe
     expect(historical.run.status).toBe("ABANDONED");
     expect(historical.results).toEqual(failed.results);
     expect((await (await preparer.request.get(runs)).json()).items).toHaveLength(2);
-    await exercisePayrollReview({
-      browser,
-      baseURL,
+    const second = await exercisePayrollReview({
+      finalReviewer,
       admin: context,
       preparer,
       reviewer,
@@ -349,6 +351,23 @@ test("calculation and aggregate review retain worker evidence and recover indepe
       run: secondRun,
       month,
       firstReviewer: reviewerId,
+      headers: adminHeaders,
+    });
+    await exercisePayrollFinalization({
+      browser,
+      baseURL,
+      admin: context,
+      preparer,
+      finalReviewer,
+      editor,
+      checker,
+      second,
+      company,
+      rejectedRun: secondRun,
+      period,
+      employee,
+      month,
+      incomeDueDate: lastDate,
       headers: adminHeaders,
     });
     await checker.goto(`/payroll/runs/${secondRun}?company=${company}`);
@@ -374,5 +393,6 @@ test("calculation and aggregate review retain worker evidence and recover indepe
   } finally {
     await preparer.close();
     await reviewer.close();
+    await finalReviewer.close();
   }
 });

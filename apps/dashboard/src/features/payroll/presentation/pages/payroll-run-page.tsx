@@ -12,6 +12,7 @@ import { AppResourceTable } from "../../../../core/presentation/components/app-r
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { payrollCalculationMessages } from "../i18n/payroll-calculation-messages";
+import { payrollFinalizationMessages } from "../i18n/payroll-finalization-messages";
 import { payrollReviewMessages } from "../i18n/payroll-review-messages";
 import type { PayrollRunState } from "../models/payroll-calculation-state";
 import type { payrollRunView } from "../models/payroll-calculation-view";
@@ -21,6 +22,7 @@ export function PayrollRunPage(props: {
   locale: Locale;
   companyName: string;
   backTo: string | null;
+  finalizationsTo: string | null;
   jobTo: string | null;
   reviewsTo: string | null;
   resumeTo: string | null;
@@ -53,6 +55,9 @@ export function PayrollRunPage(props: {
         </AppButton>
         {props.reviewsTo && (
           <Link to={props.reviewsTo}>{payrollReviewMessages(locale).reviews}</Link>
+        )}
+        {props.finalizationsTo && (
+          <Link to={props.finalizationsTo}>{payrollFinalizationMessages(locale).title}</Link>
         )}
         {props.jobTo && <Link to={props.jobTo}>{text.job}</Link>}
         {props.resumeTo && <Link to={props.resumeTo}>{text.resume}</Link>}

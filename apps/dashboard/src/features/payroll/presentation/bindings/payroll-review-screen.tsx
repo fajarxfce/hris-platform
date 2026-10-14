@@ -4,6 +4,7 @@ import { useWorkspaceRevalidation } from "../../../../core/presentation/session/
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 import { PayrollReviewController } from "../controllers/payroll-review-controller";
 import { payrollRunPath } from "../models/payroll-calculation-route";
+import { payrollFinalizationsPath } from "../models/payroll-finalization-route";
 import {
   payrollReviewActionPath,
   payrollReviewPath,
@@ -68,6 +69,9 @@ function PayrollReviewBinding(
       locale={locale}
       companyName={props.companyName}
       backTo={state.data ? payrollReviewsPath(access.companyId, state.data.run.id) : null}
+      finalizationsTo={
+        state.data ? payrollFinalizationsPath(access.companyId, state.data.run.id) : null
+      }
       runTo={state.data ? payrollRunPath(access.companyId, state.data.run.id) : null}
       actionLinks={
         state.data?.availableActions.map((action) => ({

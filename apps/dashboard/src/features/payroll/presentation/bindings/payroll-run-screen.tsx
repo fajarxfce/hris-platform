@@ -10,6 +10,7 @@ import {
   payrollRunPath,
 } from "../models/payroll-calculation-route";
 import { payrollRunView } from "../models/payroll-calculation-view";
+import { payrollFinalizationsPath } from "../models/payroll-finalization-route";
 import { payrollReviewsPath } from "../models/payroll-review-route";
 import { PayrollRunPage } from "../pages/payroll-run-page";
 export function PayrollRunScreen(props: PayrollScreenProps) {
@@ -83,6 +84,7 @@ function PayrollRunBinding(
           ? `/administration/jobs?${new URLSearchParams({ company: access.companyId, job: state.details.job.jobId })}`
           : null
       }
+      finalizationsTo={state.details ? payrollFinalizationsPath(access.companyId, id) : null}
       reviewsTo={state.details ? payrollReviewsPath(access.companyId, id) : null}
       resumeTo={
         canAct && state.details?.availableActions.includes("RESUME")

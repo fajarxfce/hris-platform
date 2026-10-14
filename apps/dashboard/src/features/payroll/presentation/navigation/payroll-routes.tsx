@@ -1,10 +1,14 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { canReadPayrollFinalizations } from "../../domain/policies/payroll-finalization-policy";
 import { canReadPayrollPeriods } from "../../domain/policies/payroll-period-policy";
 import { CompensationEditorScreen } from "../bindings/compensation-editor-screen";
 import { CompensationEmployeesScreen } from "../bindings/compensation-employees-screen";
 import { CompensationScreen } from "../bindings/compensation-screen";
 import { PayrollCalculationStartScreen } from "../bindings/payroll-calculation-start-screen";
 import { PayrollCalculationsScreen } from "../bindings/payroll-calculations-screen";
+import { PayrollFinalizationScreen } from "../bindings/payroll-finalization-screen";
+import { PayrollFinalizationStartScreen } from "../bindings/payroll-finalization-start-screen";
+import { PayrollFinalizationsScreen } from "../bindings/payroll-finalizations-screen";
 import { PayrollInputEditorScreen } from "../bindings/payroll-input-editor-screen";
 import { PayrollInputEmployeesScreen } from "../bindings/payroll-input-employees-screen";
 import { PayrollInputScreen } from "../bindings/payroll-input-screen";
@@ -15,6 +19,7 @@ import { PayrollPeriodScreen } from "../bindings/payroll-period-screen";
 import { PayrollPeriodsScreen } from "../bindings/payroll-periods-screen";
 import { PayrollPolicyEditorScreen } from "../bindings/payroll-policy-editor-screen";
 import { PayrollPolicyScreen } from "../bindings/payroll-policy-screen";
+import { PayrollPublicationsScreen } from "../bindings/payroll-publications-screen";
 import { PayrollReviewActionScreen } from "../bindings/payroll-review-action-screen";
 import { PayrollReviewScreen } from "../bindings/payroll-review-screen";
 import { PayrollReviewSubmissionScreen } from "../bindings/payroll-review-submission-screen";
@@ -31,6 +36,13 @@ import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 export function PayrollRoutes(props: PayrollScreenProps) {
   return (
     <Routes>
+      <Route path="publications" element={<PayrollPublicationsScreen {...props} />} />
+      <Route path="runs/:runId/finalizations" element={<PayrollFinalizationsScreen {...props} />} />
+      <Route path="runs/:runId/finalize" element={<PayrollFinalizationStartScreen {...props} />} />
+      <Route
+        path="finalizations/:finalizationId"
+        element={<PayrollFinalizationScreen {...props} />}
+      />
       <Route path="runs/:runId/reviews" element={<PayrollReviewsScreen {...props} />} />
       <Route
         path="runs/:runId/reviews/new"
@@ -103,7 +115,7 @@ export function PayrollRoutes(props: PayrollScreenProps) {
         path="*"
         element={
           <Navigate
-            to={`/payroll/${canReadPayrollPeriods(props.access.permissions) ? "periods" : "policy"}?company=${props.access.companyId}`}
+            to={`/payroll/${canReadPayrollPeriods(props.access.permissions) ? "periods" : canReadPayrollFinalizations(props.access.permissions) ? "publications" : "policy"}?company=${props.access.companyId}`}
             replace
           />
         }

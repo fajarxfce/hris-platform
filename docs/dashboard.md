@@ -285,8 +285,37 @@ Unknown command outcomes retain the original operation and payload across
 explicit retries, including after later conflicts. A definite changed-state
 rejection requires review before creating a new command. Pending forms and
 unconfirmed results use the workspace departure guard. Browser command retention
-is in memory. Aggregate review, finalization and finance payment screens remain
-subsequent work.
+is in memory. Finalization and finance payment screens remain subsequent work.
+
+## Payroll aggregate review
+
+`/payroll/runs/:runId/reviews` acquires review preparation and up to eight retained
+review rounds. Totals include only successful employee results; incomplete or
+failed calculations cannot be submitted. The separate submission page captures
+the reviewed run version, a new review ID, reason and one operation ID. Routing
+is resolved by the current approval policy when that command is admitted.
+
+`/payroll/reviews/:reviewId` displays retained totals, current assignment stages
+and immutable decision history. Parent links appear only after the owning run or
+period is known; loading does not redirect to an unrelated directory. Tabs reuse
+the acquired detail. Current company
+names label the captured account IDs without acquiring private profiles. The
+calculation link opens the original employee results; the shared Approvals screen
+links back to this payroll workflow for a decision.
+
+Submission and withdrawal require `payroll.calculate`; assigned/delegated
+`payroll.review` accounts approve or reject a stage. Server action hints preserve
+maker exclusions, stage eligibility and active finalization restrictions. Decision
+pages capture both review and approval versions, because reassignment can change
+only the latter. Approving an intermediate stage records a decision without
+claiming final approval. Rejection requires a new calculation; withdrawal keeps
+history and permits a new bounded review round.
+
+Owned requests are cancelled on departure or account/company replacement. Unknown
+outcomes retain the original operation and body through explicit retries and later
+MFA/conflict responses. Definite version conflicts require a fresh review before
+another command. Reasons and pending commands remain only in mounted memory;
+locale and theme changes do not restart acquisition or discard the input.
 
 ## Shift templates
 

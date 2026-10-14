@@ -70,7 +70,8 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000049', 'browser-tax-opening-reviewer@example.invalid', 'Browser Tax Opening Reviewer'),
   ('a0000000-0000-4000-8000-000000000050', 'browser-calculation-admin@example.invalid', 'Browser Calculation Admin'),
   ('a0000000-0000-4000-8000-000000000051', 'browser-calculation-preparer@example.invalid', 'Browser Calculation Preparer'),
-  ('a0000000-0000-4000-8000-000000000052', 'browser-calculation-reviewer@example.invalid', 'Browser Calculation Reviewer')
+  ('a0000000-0000-4000-8000-000000000052', 'browser-calculation-reviewer@example.invalid', 'Browser Calculation Reviewer'),
+  ('a0000000-0000-4000-8000-000000000053', 'browser-payroll-final-reviewer@example.invalid', 'Browser Payroll Final Reviewer')
 ) AS fixture(id, email, name)
 WHERE bootstrap.email = 'browser-admin@example.invalid'
 ON CONFLICT DO NOTHING;

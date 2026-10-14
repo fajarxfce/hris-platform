@@ -2,6 +2,55 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_payroll_review: [
+    "Review the payroll versions and reason.",
+    "Periksa versi payroll dan alasan.",
+  ],
+  payroll_review_not_found: [
+    "The payroll review was not found.",
+    "Tinjauan payroll tidak ditemukan.",
+  ],
+  payroll_review_action_unavailable: [
+    "This action is unavailable. Return to the review for its current status.",
+    "Tindakan tidak tersedia. Kembali ke tinjauan untuk memeriksa status saat ini.",
+  ],
+  payroll_calculation_required: [
+    "Complete a successful calculation before submitting it for review.",
+    "Selesaikan perhitungan yang berhasil sebelum mengajukan tinjauan.",
+  ],
+  payroll_calculation_has_failures: [
+    "Resolve the failed employee results and recalculate before submitting.",
+    "Perbaiki hasil karyawan yang gagal lalu hitung ulang sebelum mengajukan.",
+  ],
+  payroll_review_active: [
+    "This run already has a pending or approved review.",
+    "Proses ini sudah memiliki tinjauan yang menunggu atau disetujui.",
+  ],
+  payroll_recalculation_required: [
+    "This run was rejected. Start a new calculation before submitting another review.",
+    "Proses ini ditolak. Mulai perhitungan baru sebelum mengajukan tinjauan lain.",
+  ],
+  payroll_review_capacity: [
+    "This run has reached its limit of eight review rounds.",
+    "Proses ini telah mencapai batas delapan pengajuan tinjauan.",
+  ],
+  payroll_review_not_pending: [
+    "This review is no longer awaiting a decision. Reload its current status.",
+    "Tinjauan tidak lagi menunggu keputusan. Muat ulang status saat ini.",
+  ],
+  payroll_review_not_active: [
+    "This review is no longer active. Reload its current status.",
+    "Tinjauan tidak lagi aktif. Muat ulang status saat ini.",
+  ],
+  payroll_review_not_current: [
+    "The calculation changed. Return to its current review.",
+    "Perhitungan berubah. Kembali ke tinjauan saat ini.",
+  ],
+  payroll_finalization_active: [
+    "Finalization is in progress. This review cannot be withdrawn.",
+    "Finalisasi sedang berjalan. Tinjauan ini tidak dapat ditarik.",
+  ],
+
   invalid_payroll_run: [
     "Review the income due date, reference and reason.",
     "Periksa tanggal penghasilan terutang, referensi, dan alasan.",

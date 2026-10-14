@@ -143,7 +143,7 @@ test("real period preparation recovers original commands and rechecks competing 
       .getByRole("button", { name: "Leave page", exact: true })
       .click();
     await expect(editor.getByRole("alert")).toContainText(
-      "Only a draft payroll period can be cancelled.",
+      "This action requires a draft payroll period.",
     );
     const replay = await operator.request.post(endpoint, {
       headers: {

@@ -3877,3 +3877,40 @@ Coverage includes staged and delegated eligibility, minimal name projection,
 blocked/reassigned/rejected reviews, concurrent shared readers, late MFA and
 delegation expiry, original receipt recovery and interruption cleanup. Dashboard
 review screens and browser acceptance are the next part of this increment.
+
+### Dashboard aggregate payroll review
+
+Calculation runs now link to retained review totals and bounded review history.
+Submission, independent staged approval/rejection and withdrawal have separate
+review forms. The shared Approvals screen opens the payroll source. Current
+minimal names label the captured assignments and decision actors; full employee
+profiles and calculation payloads are acquired only through their existing views.
+
+Commands retain the observed run or review/approval versions and the exact original
+operation after an uncertain response. Reassignment conflicts require explicit
+review; later conflicts cannot replace an unresolved command. Account/company
+replacement cancels pending acquisition, access loss clears financial context and
+tab/language/theme changes do not refetch the current detail.
+
+Architecture, formatting, TypeScript and 2,089 frontend tests passed. Eighteen
+Chromium scenarios cover calculation/review navigation, signed decimal totals,
+version conflicts, lost responses, reason validation, read-only and blocked states,
+company replacement, revoked access and narrow light/dark layouts. An isolated
+API/PostgreSQL/worker scenario calculated actual retained sources, recovered lost
+submission and decision responses, completed two independent approval stages,
+withdrew the approved review, resubmitted and rejected it, and verified the original
+history and totals. It also exercised the shared approval source link and retained
+calculation access regressions. A repeat run exposed parent links pointing to a
+fallback directory before detail acquisition completed. Both calculation and review
+links now wait for their actual parent, with pending-read browser regressions.
+Screenshots were inspected after the final correction.
+
+The preceding calculation CI passed backend checks and all four browser shards;
+one real-API period test still expected earlier error wording. That assertion was
+updated and the affected API/PostgreSQL scenario passed. Initial review fixture
+checks also corrected an action-only recent-authentication assumption and unused
+imports. API and worker updates were deployed with the private-document and
+WireGuard overlays retained. Loopback API, VPN API and dashboard probes returned
+HTTP 200.
+Finalization, payslip publication and finance payment dashboard workflows remain
+subsequent work. No mobile or physical-device validation is claimed for this slice.

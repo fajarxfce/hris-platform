@@ -13,5 +13,9 @@ export function approvalResourceRoute(request: ApprovalRequest): string | null {
     const query = new URLSearchParams({ company: request.companyId });
     return `/expenses/submissions/${encodeURIComponent(request.resourceId)}?${query}`;
   }
+  if (request.kind === "PAYROLL") {
+    const query = new URLSearchParams({ company: request.companyId });
+    return `/payroll/reviews/${encodeURIComponent(request.resourceId)}?${query}`;
+  }
   return null;
 }

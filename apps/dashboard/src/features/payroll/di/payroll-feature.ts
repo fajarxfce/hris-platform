@@ -4,16 +4,19 @@ import { HttpPayrollCalculationDataSource } from "../data/datasources/http-payro
 import { HttpPayrollInputDataSource } from "../data/datasources/http-payroll-input-data-source";
 import { HttpPayrollPeriodDataSource } from "../data/datasources/http-payroll-period-data-source";
 import { HttpPayrollPolicyDataSource } from "../data/datasources/http-payroll-policy-data-source";
+import { HttpPayrollReviewDataSource } from "../data/datasources/http-payroll-review-data-source";
 import { HttpTaxOpeningDataSource } from "../data/datasources/http-tax-opening-data-source";
 import { RemoteCompensationRepository } from "../data/repositories/remote-compensation-repository";
 import { RemotePayrollCalculationRepository } from "../data/repositories/remote-payroll-calculation-repository";
 import { RemotePayrollInputRepository } from "../data/repositories/remote-payroll-input-repository";
 import { RemotePayrollPeriodRepository } from "../data/repositories/remote-payroll-period-repository";
 import { RemotePayrollPolicyRepository } from "../data/repositories/remote-payroll-policy-repository";
+import { RemotePayrollReviewRepository } from "../data/repositories/remote-payroll-review-repository";
 import { RemoteTaxOpeningRepository } from "../data/repositories/remote-tax-opening-repository";
 import { AbandonPayrollCalculation } from "../domain/usecases/abandon-payroll-calculation";
 import { CancelPayrollPeriod } from "../domain/usecases/cancel-payroll-period";
 import { CreatePayrollPeriod } from "../domain/usecases/create-payroll-period";
+import { DecidePayrollReview } from "../domain/usecases/decide-payroll-review";
 import { ListCompensationEmployees } from "../domain/usecases/list-compensation-employees";
 import { ListPayrollInputEmployees } from "../domain/usecases/list-payroll-input-employees";
 import { ListPayrollPeriodEmployees } from "../domain/usecases/list-payroll-period-employees";
@@ -27,6 +30,10 @@ import { LoadPayrollInputRevision } from "../domain/usecases/load-payroll-input-
 import { LoadPayrollPeriod } from "../domain/usecases/load-payroll-period";
 import { LoadPayrollPolicy } from "../domain/usecases/load-payroll-policy";
 import { LoadPayrollPolicyEditor } from "../domain/usecases/load-payroll-policy-editor";
+import { LoadPayrollReview } from "../domain/usecases/load-payroll-review";
+import { LoadPayrollReviewAction } from "../domain/usecases/load-payroll-review-action";
+import { LoadPayrollReviewSubmission } from "../domain/usecases/load-payroll-review-submission";
+import { LoadPayrollReviews } from "../domain/usecases/load-payroll-reviews";
 import { LoadPayrollRun } from "../domain/usecases/load-payroll-run";
 import { LoadPayrollRunEmployee } from "../domain/usecases/load-payroll-run-employee";
 import { LoadTaxOpeningReview } from "../domain/usecases/load-tax-opening-review";
@@ -43,8 +50,10 @@ import { SavePayrollInput } from "../domain/usecases/save-payroll-input";
 import { SavePayrollPolicy } from "../domain/usecases/save-payroll-policy";
 import { SaveTaxOpening } from "../domain/usecases/save-tax-opening";
 import { StartPayrollCalculation } from "../domain/usecases/start-payroll-calculation";
+import { SubmitPayrollReview } from "../domain/usecases/submit-payroll-review";
 import { VerifyPayrollInput } from "../domain/usecases/verify-payroll-input";
 import { VerifyTaxOpening } from "../domain/usecases/verify-tax-opening";
+import { WithdrawPayrollReview } from "../domain/usecases/withdraw-payroll-review";
 import type { PayrollUseCases } from "../presentation/contracts/payroll-use-cases";
 
 export function createPayrollFeature(http: HttpClient): PayrollUseCases {
@@ -56,7 +65,16 @@ export function createPayrollFeature(http: HttpClient): PayrollUseCases {
   const calculations = new RemotePayrollCalculationRepository(
     new HttpPayrollCalculationDataSource(http),
   );
+  const reviews = new RemotePayrollReviewRepository(new HttpPayrollReviewDataSource(http));
   return Object.freeze({
+    loadReviews: new LoadPayrollReviews(reviews),
+    loadReview: new LoadPayrollReview(reviews),
+    loadReviewSubmission: new LoadPayrollReviewSubmission(reviews),
+    loadReviewAction: new LoadPayrollReviewAction(reviews),
+    submitReview: new SubmitPayrollReview(reviews),
+    decideReview: new DecidePayrollReview(reviews),
+    withdrawReview: new WithdrawPayrollReview(reviews),
+
     loadCalculations: new LoadPayrollCalculations(calculations),
     reviewCalculation: new ReviewPayrollCalculation(calculations),
     loadRun: new LoadPayrollRun(calculations),

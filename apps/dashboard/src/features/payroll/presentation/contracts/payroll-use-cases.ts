@@ -1,6 +1,7 @@
 import type { AbandonPayrollCalculation } from "../../domain/usecases/abandon-payroll-calculation";
 import type { CancelPayrollPeriod } from "../../domain/usecases/cancel-payroll-period";
 import type { CreatePayrollPeriod } from "../../domain/usecases/create-payroll-period";
+import type { DecidePayrollReview } from "../../domain/usecases/decide-payroll-review";
 import type { ListCompensationEmployees } from "../../domain/usecases/list-compensation-employees";
 import type { ListPayrollInputEmployees } from "../../domain/usecases/list-payroll-input-employees";
 import type { ListPayrollPeriodEmployees } from "../../domain/usecases/list-payroll-period-employees";
@@ -14,6 +15,10 @@ import type { LoadPayrollInputRevision } from "../../domain/usecases/load-payrol
 import type { LoadPayrollPeriod } from "../../domain/usecases/load-payroll-period";
 import type { LoadPayrollPolicy } from "../../domain/usecases/load-payroll-policy";
 import type { LoadPayrollPolicyEditor } from "../../domain/usecases/load-payroll-policy-editor";
+import type { LoadPayrollReview } from "../../domain/usecases/load-payroll-review";
+import type { LoadPayrollReviewAction } from "../../domain/usecases/load-payroll-review-action";
+import type { LoadPayrollReviewSubmission } from "../../domain/usecases/load-payroll-review-submission";
+import type { LoadPayrollReviews } from "../../domain/usecases/load-payroll-reviews";
 import type { LoadPayrollRun } from "../../domain/usecases/load-payroll-run";
 import type { LoadPayrollRunEmployee } from "../../domain/usecases/load-payroll-run-employee";
 import type { LoadTaxOpeningReview } from "../../domain/usecases/load-tax-opening-review";
@@ -30,10 +35,20 @@ import type { SavePayrollInput } from "../../domain/usecases/save-payroll-input"
 import type { SavePayrollPolicy } from "../../domain/usecases/save-payroll-policy";
 import type { SaveTaxOpening } from "../../domain/usecases/save-tax-opening";
 import type { StartPayrollCalculation } from "../../domain/usecases/start-payroll-calculation";
+import type { SubmitPayrollReview } from "../../domain/usecases/submit-payroll-review";
 import type { VerifyPayrollInput } from "../../domain/usecases/verify-payroll-input";
 import type { VerifyTaxOpening } from "../../domain/usecases/verify-tax-opening";
+import type { WithdrawPayrollReview } from "../../domain/usecases/withdraw-payroll-review";
 
 export type PayrollUseCases = Readonly<{
+  loadReviews: Pick<LoadPayrollReviews, "execute">;
+  loadReview: Pick<LoadPayrollReview, "execute">;
+  loadReviewSubmission: Pick<LoadPayrollReviewSubmission, "execute">;
+  loadReviewAction: Pick<LoadPayrollReviewAction, "execute">;
+  submitReview: Pick<SubmitPayrollReview, "execute">;
+  decideReview: Pick<DecidePayrollReview, "execute">;
+  withdrawReview: Pick<WithdrawPayrollReview, "execute">;
+
   loadCalculations: Pick<LoadPayrollCalculations, "execute">;
   reviewCalculation: Pick<ReviewPayrollCalculation, "execute">;
   loadRun: Pick<LoadPayrollRun, "execute">;

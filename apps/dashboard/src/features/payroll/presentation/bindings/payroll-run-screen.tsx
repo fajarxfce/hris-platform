@@ -10,6 +10,7 @@ import {
   payrollRunPath,
 } from "../models/payroll-calculation-route";
 import { payrollRunView } from "../models/payroll-calculation-view";
+import { payrollReviewsPath } from "../models/payroll-review-route";
 import { PayrollRunPage } from "../pages/payroll-run-page";
 export function PayrollRunScreen(props: PayrollScreenProps) {
   const { runId = "" } = useParams(),
@@ -75,15 +76,14 @@ function PayrollRunBinding(
       locale={locale}
       companyName={props.companyName}
       backTo={
-        state.details
-          ? payrollCalculationsPath(access.companyId, state.details.run.periodId)
-          : `/payroll/periods?company=${access.companyId}`
+        state.details ? payrollCalculationsPath(access.companyId, state.details.run.periodId) : null
       }
       jobTo={
         canAct && canViewJob && state.details
           ? `/administration/jobs?${new URLSearchParams({ company: access.companyId, job: state.details.job.jobId })}`
           : null
       }
+      reviewsTo={state.details ? payrollReviewsPath(access.companyId, id) : null}
       resumeTo={
         canAct && state.details?.availableActions.includes("RESUME")
           ? `/payroll/runs/${encodeURIComponent(id)}/resume?company=${access.companyId}`

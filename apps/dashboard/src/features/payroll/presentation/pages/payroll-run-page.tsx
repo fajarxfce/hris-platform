@@ -12,6 +12,7 @@ import { AppResourceTable } from "../../../../core/presentation/components/app-r
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { payrollCalculationMessages } from "../i18n/payroll-calculation-messages";
+import { payrollReviewMessages } from "../i18n/payroll-review-messages";
 import type { PayrollRunState } from "../models/payroll-calculation-state";
 import type { payrollRunView } from "../models/payroll-calculation-view";
 export function PayrollRunPage(props: {
@@ -19,8 +20,9 @@ export function PayrollRunPage(props: {
   view: ReturnType<typeof payrollRunView> | null;
   locale: Locale;
   companyName: string;
-  backTo: string;
+  backTo: string | null;
   jobTo: string | null;
+  reviewsTo: string | null;
   resumeTo: string | null;
   abandonTo: string | null;
   tab: string;
@@ -38,7 +40,7 @@ export function PayrollRunPage(props: {
       <AppPageHeader
         title={state.details ? `${text.run} ${state.details.run.number}` : text.run}
         context={props.companyName}
-        actions={<Link to={props.backTo}>{text.calculations}</Link>}
+        actions={props.backTo && <Link to={props.backTo}>{text.calculations}</Link>}
       />
       <AppCommandBar label={text.run}>
         <AppButton
@@ -49,6 +51,9 @@ export function PayrollRunPage(props: {
         >
           {messages(locale).refresh}
         </AppButton>
+        {props.reviewsTo && (
+          <Link to={props.reviewsTo}>{payrollReviewMessages(locale).reviews}</Link>
+        )}
         {props.jobTo && <Link to={props.jobTo}>{text.job}</Link>}
         {props.resumeTo && <Link to={props.resumeTo}>{text.resume}</Link>}
         {props.abandonTo && <Link to={props.abandonTo}>{text.abandon}</Link>}

@@ -15,6 +15,10 @@ import { PayrollPeriodScreen } from "../bindings/payroll-period-screen";
 import { PayrollPeriodsScreen } from "../bindings/payroll-periods-screen";
 import { PayrollPolicyEditorScreen } from "../bindings/payroll-policy-editor-screen";
 import { PayrollPolicyScreen } from "../bindings/payroll-policy-screen";
+import { PayrollReviewActionScreen } from "../bindings/payroll-review-action-screen";
+import { PayrollReviewScreen } from "../bindings/payroll-review-screen";
+import { PayrollReviewSubmissionScreen } from "../bindings/payroll-review-submission-screen";
+import { PayrollReviewsScreen } from "../bindings/payroll-reviews-screen";
 import { PayrollRunEmployeeScreen } from "../bindings/payroll-run-employee-screen";
 import { PayrollRunRecoveryScreen } from "../bindings/payroll-run-recovery-screen";
 import { PayrollRunScreen } from "../bindings/payroll-run-screen";
@@ -27,6 +31,24 @@ import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 export function PayrollRoutes(props: PayrollScreenProps) {
   return (
     <Routes>
+      <Route path="runs/:runId/reviews" element={<PayrollReviewsScreen {...props} />} />
+      <Route
+        path="runs/:runId/reviews/new"
+        element={<PayrollReviewSubmissionScreen {...props} />}
+      />
+      <Route path="reviews/:reviewId" element={<PayrollReviewScreen {...props} />} />
+      <Route
+        path="reviews/:reviewId/approve"
+        element={<PayrollReviewActionScreen {...props} action="APPROVE" />}
+      />
+      <Route
+        path="reviews/:reviewId/reject"
+        element={<PayrollReviewActionScreen {...props} action="REJECT" />}
+      />
+      <Route
+        path="reviews/:reviewId/withdraw"
+        element={<PayrollReviewActionScreen {...props} action="WITHDRAW" />}
+      />
       <Route
         path="periods/:periodId/calculations"
         element={<PayrollCalculationsScreen {...props} />}

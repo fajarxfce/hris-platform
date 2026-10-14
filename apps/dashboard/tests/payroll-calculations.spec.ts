@@ -219,3 +219,20 @@ test("a denied progress refresh withdraws results and layout remains bounded in 
   await expect(page.getByRole("link", { name: "Abandon run", exact: true })).toHaveCount(0);
   expect(await page.content()).not.toContain("PRIVATE TECHNICAL DIAGNOSTIC");
 });
+
+test("calculation navigation waits for the run's period during initial acquisition", async ({
+  page,
+}) => {
+  const api = await installPayrollCalculationsApi(page),
+    held = api.holdNext();
+  await page.goto(run);
+  await held.entered.promise;
+  try {
+    await expect(page.getByRole("link", { name: "Calculations", exact: true })).toHaveCount(0);
+  } finally {
+    held.released.resolve();
+  }
+  await page.getByRole("link", { name: "Calculations", exact: true }).click();
+  await expect(page).toHaveURL(overview);
+  await expect(page.getByRole("table", { name: "Run history", exact: true })).toBeVisible();
+});

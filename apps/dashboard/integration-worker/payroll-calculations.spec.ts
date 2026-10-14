@@ -10,8 +10,9 @@ import {
 import type { PayrollInputReviewDto } from "../src/features/payroll/data/models/payroll-input-dto";
 import type { WorkPeriodOverviewDto } from "../src/features/workforce/data/models/work-period-overview-dto";
 import { compensationTerms } from "../tests/fixtures/compensations";
+import { exercisePayrollReview } from "./fixtures/payroll-review-workflow";
 
-test("calculation retains failed evidence, recovers a lost response and calculates verified sources with the real worker", async ({
+test("calculation and aggregate review retain worker evidence and recover independent versioned commands", async ({
   page,
   context,
   browser,
@@ -336,6 +337,20 @@ test("calculation retains failed evidence, recovers a lost response and calculat
     expect(historical.run.status).toBe("ABANDONED");
     expect(historical.results).toEqual(failed.results);
     expect((await (await preparer.request.get(runs)).json()).items).toHaveLength(2);
+    await exercisePayrollReview({
+      browser,
+      baseURL,
+      admin: context,
+      preparer,
+      reviewer,
+      editor,
+      checker,
+      company,
+      run: secondRun,
+      month,
+      firstReviewer: reviewerId,
+      headers: adminHeaders,
+    });
     await checker.goto(`/payroll/runs/${secondRun}?company=${company}`);
     await expect(
       checker.getByRole("table", { name: "Employee results", exact: true }),

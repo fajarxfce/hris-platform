@@ -4,6 +4,7 @@ import { HttpCompensationDataSource } from "../data/datasources/http-compensatio
 import { HttpPayrollCalculationDataSource } from "../data/datasources/http-payroll-calculation-data-source";
 import { HttpPayrollFinalizationDataSource } from "../data/datasources/http-payroll-finalization-data-source";
 import { HttpPayrollInputDataSource } from "../data/datasources/http-payroll-input-data-source";
+import { HttpPayrollPaymentDataSource } from "../data/datasources/http-payroll-payment-data-source";
 import { HttpPayrollPayslipDataSource } from "../data/datasources/http-payroll-payslip-data-source";
 import { HttpPayrollPeriodDataSource } from "../data/datasources/http-payroll-period-data-source";
 import { HttpPayrollPolicyDataSource } from "../data/datasources/http-payroll-policy-data-source";
@@ -13,6 +14,7 @@ import { RemoteCompensationRepository } from "../data/repositories/remote-compen
 import { RemotePayrollCalculationRepository } from "../data/repositories/remote-payroll-calculation-repository";
 import { RemotePayrollFinalizationRepository } from "../data/repositories/remote-payroll-finalization-repository";
 import { RemotePayrollInputRepository } from "../data/repositories/remote-payroll-input-repository";
+import { RemotePayrollPaymentRepository } from "../data/repositories/remote-payroll-payment-repository";
 import { RemotePayrollPayslipRepository } from "../data/repositories/remote-payroll-payslip-repository";
 import { RemotePayrollPeriodRepository } from "../data/repositories/remote-payroll-period-repository";
 import { RemotePayrollPolicyRepository } from "../data/repositories/remote-payroll-policy-repository";
@@ -22,6 +24,7 @@ import { AbandonPayrollCalculation } from "../domain/usecases/abandon-payroll-ca
 import { CancelPayrollPeriod } from "../domain/usecases/cancel-payroll-period";
 import { CreatePayrollPeriod } from "../domain/usecases/create-payroll-period";
 import { DecidePayrollReview } from "../domain/usecases/decide-payroll-review";
+import { DownloadPayrollPayment } from "../domain/usecases/download-payroll-payment";
 import { DownloadPayrollPayslip } from "../domain/usecases/download-payroll-payslip";
 import { ListCompensationEmployees } from "../domain/usecases/list-compensation-employees";
 import { ListPayrollInputEmployees } from "../domain/usecases/list-payroll-input-employees";
@@ -37,6 +40,9 @@ import { LoadPayrollFinalization } from "../domain/usecases/load-payroll-finaliz
 import { LoadPayrollFinalizations } from "../domain/usecases/load-payroll-finalizations";
 import { LoadPayrollInputReview } from "../domain/usecases/load-payroll-input-review";
 import { LoadPayrollInputRevision } from "../domain/usecases/load-payroll-input-revision";
+import { LoadPayrollPayables } from "../domain/usecases/load-payroll-payables";
+import { LoadPayrollPayment } from "../domain/usecases/load-payroll-payment";
+import { LoadPayrollPayments } from "../domain/usecases/load-payroll-payments";
 import { LoadPayrollPayslip } from "../domain/usecases/load-payroll-payslip";
 import { LoadPayrollPayslipPayments } from "../domain/usecases/load-payroll-payslip-payments";
 import { LoadPayrollPeriod } from "../domain/usecases/load-payroll-period";
@@ -50,10 +56,14 @@ import { LoadPayrollRun } from "../domain/usecases/load-payroll-run";
 import { LoadPayrollRunEmployee } from "../domain/usecases/load-payroll-run-employee";
 import { LoadTaxOpeningReview } from "../domain/usecases/load-tax-opening-review";
 import { LoadTaxOpeningRevision } from "../domain/usecases/load-tax-opening-revision";
+import { PreparePayrollPayment } from "../domain/usecases/prepare-payroll-payment";
+import { ReconcilePayrollPayment } from "../domain/usecases/reconcile-payroll-payment";
 import { ResumePayrollCalculation } from "../domain/usecases/resume-payroll-calculation";
 import { ReviewPayrollCalculation } from "../domain/usecases/review-payroll-calculation";
 import { ReviewPayrollFinalization } from "../domain/usecases/review-payroll-finalization";
 import { ReviewPayrollInputAction } from "../domain/usecases/review-payroll-input-action";
+import { ReviewPayrollPaymentReconciliation } from "../domain/usecases/review-payroll-payment-reconciliation";
+import { ReviewPayrollPaymentTransition } from "../domain/usecases/review-payroll-payment-transition";
 import { ReviewPayrollPeriodCancellation } from "../domain/usecases/review-payroll-period-cancellation";
 import { ReviewPayrollPeriodCreation } from "../domain/usecases/review-payroll-period-creation";
 import { ReviewPayrollRunRecovery } from "../domain/usecases/review-payroll-run-recovery";
@@ -65,6 +75,7 @@ import { SaveTaxOpening } from "../domain/usecases/save-tax-opening";
 import { StartPayrollCalculation } from "../domain/usecases/start-payroll-calculation";
 import { StartPayrollFinalization } from "../domain/usecases/start-payroll-finalization";
 import { SubmitPayrollReview } from "../domain/usecases/submit-payroll-review";
+import { TransitionPayrollPayment } from "../domain/usecases/transition-payroll-payment";
 import { VerifyPayrollInput } from "../domain/usecases/verify-payroll-input";
 import { VerifyTaxOpening } from "../domain/usecases/verify-tax-opening";
 import { WithdrawPayrollReview } from "../domain/usecases/withdraw-payroll-review";
@@ -72,8 +83,9 @@ import type { PayrollUseCases } from "../presentation/contracts/payroll-use-case
 
 export function createPayrollFeature(
   http: HttpClient,
-  files: Pick<FileRepository, "downloadBinary">,
+  files: Pick<FileRepository, "downloadBinary" | "downloadText">,
 ): PayrollUseCases {
+  const payments = new RemotePayrollPaymentRepository(new HttpPayrollPaymentDataSource(http));
   const payslips = new RemotePayrollPayslipRepository(new HttpPayrollPayslipDataSource(http));
   const policies = new RemotePayrollPolicyRepository(new HttpPayrollPolicyDataSource(http));
   const compensations = new RemoteCompensationRepository(new HttpCompensationDataSource(http));
@@ -88,6 +100,16 @@ export function createPayrollFeature(
     new HttpPayrollFinalizationDataSource(http),
   );
   return Object.freeze({
+    loadPayments: new LoadPayrollPayments(payments),
+    loadPayment: new LoadPayrollPayment(payments),
+    loadPayables: new LoadPayrollPayables(payments),
+    preparePayment: new PreparePayrollPayment(payments),
+    downloadPayment: new DownloadPayrollPayment(payments, files),
+    reviewPaymentTransition: new ReviewPayrollPaymentTransition(payments),
+    transitionPayment: new TransitionPayrollPayment(payments),
+    reviewReconciliation: new ReviewPayrollPaymentReconciliation(payments),
+    reconcilePayment: new ReconcilePayrollPayment(payments),
+
     listPayslips: new ListPayrollPayslips(payslips),
     loadPayslip: new LoadPayrollPayslip(payslips),
     loadPayslipPayments: new LoadPayrollPayslipPayments(payslips),

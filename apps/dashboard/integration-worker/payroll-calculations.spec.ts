@@ -13,7 +13,7 @@ import { compensationTerms } from "../tests/fixtures/compensations";
 import { exercisePayrollFinalization } from "./fixtures/payroll-finalization-workflow";
 import { exercisePayrollReview } from "./fixtures/payroll-review-workflow";
 
-test("calculation, independent review and publication retain worker evidence and recover original commands", async ({
+test("calculation, publication and payment retain independently reviewed evidence and recover original commands", async ({
   page,
   context,
   browser,

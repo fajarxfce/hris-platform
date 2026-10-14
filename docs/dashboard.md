@@ -285,7 +285,8 @@ Unknown command outcomes retain the original operation and payload across
 explicit retries, including after later conflicts. A definite changed-state
 rejection requires review before creating a new command. Pending forms and
 unconfirmed results use the workspace departure guard. Browser command retention
-is in memory. Payslip and finance payment screens remain subsequent work.
+is in memory. Published payslips and finance payments have separate scoped
+workflows described below.
 
 ## Payroll aggregate review
 
@@ -377,6 +378,41 @@ buffers are cleared, and browser object URLs are released. Downloads require an
 explicit action and never retry automatically. Read/PDF failures are localized;
 confirmed access or assurance loss clears private detail and cancels other work.
 Account/company replacement and disposal reject late results.
+
+## Payroll payments
+
+`/payroll/payments` provides a finance directory filtered by company-local
+creation dates and status, with twenty batches per page and a maximum 366-day
+range. `payroll.pay` and current recent authentication are required. Calculation,
+publication, payslip and expense grants do not provide payroll finance access.
+Detail tabs share one coherent batch review; activity has its own ascending
+cursor. Amounts remain exact decimal strings. Bank-result mapping preserves
+PostgreSQL timestamp precision when validating retained evidence.
+
+Preparation selects up to one hundred distinct finalized payslips through bounded
+publication-date discovery. Employee labels, tax months, planned dates and amounts
+come from retained assessments. Finance enters bank destinations, reviews the
+complete instructions, and submits one immutable batch. Account numbers remain
+strings, including leading zeros. The command cannot replace salary amounts.
+Cancellation retains a prepared batch's history and permits replacement
+instructions. Release requires a different account from its preparer; the server
+rechecks current authority, evidence and observed versions.
+
+Reconciliation stages confirmed outcomes for pending instructions. A successful
+payment requires a bank reference; a failed payment requires explicit confirmation
+that no funds were transferred. Confirmation time uses the company timezone.
+Unentered or uncertain results stay pending, and the batch closes only when every
+item has a confirmed outcome. The CSV worksheet is bounded to 256 KiB and is
+available only while all released instructions remain pending. Downloading it
+does not initiate or confirm a transfer.
+
+Preparation, release, cancellation and reconciliation retain their original
+operation, identifiers, payload and observed versions after an uncertain response.
+Verification never resubmits a business command. A definite first conflict needs
+an explicit fresh review; a later rejection cannot replace an already uncertain
+command. Input and command retention are in memory. Company/account replacement
+cancels pending work and discards its owner. Confirmed access loss removes bank
+details. Tabs, theme and language changes retain the current owner.
 
 ## Shift templates
 

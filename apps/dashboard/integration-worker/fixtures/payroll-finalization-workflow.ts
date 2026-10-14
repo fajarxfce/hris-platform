@@ -9,6 +9,7 @@ import {
 } from "../../src/features/payroll/data/models/payroll-finalization-dto";
 import { payrollPayslipPageDto } from "../../src/features/payroll/data/models/payroll-payslip-dto";
 import { payrollReviewPreparationDto } from "../../src/features/payroll/data/models/payroll-review-dto";
+import { exercisePayrollPayments } from "./payroll-payment-workflow";
 import { exercisePayrollPayslip } from "./payroll-payslip-workflow";
 
 /** Publish a fresh, independently approved run through the real worker and review its retained output. */
@@ -271,6 +272,15 @@ export async function exercisePayrollFinalization(input: {
     await page.getByRole("button", { name: "Refresh", exact: true }).click();
     await expect(page.getByRole("alert")).toBeVisible();
     await expect(page.getByRole("region", { name: "Reviewed totals", exact: true })).toHaveCount(0);
+    await exercisePayrollPayments({
+      maker: second,
+      checker: page,
+      admin,
+      company,
+      month,
+      summary,
+      headers,
+    });
   } finally {
     await publisher.close();
   }

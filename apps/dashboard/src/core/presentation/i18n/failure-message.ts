@@ -448,6 +448,94 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "A selected cost center is unavailable. Review the expense items.",
     "Cost center yang dipilih tidak tersedia. Periksa item expense.",
   ],
+  invalid_payroll_payment_batch: [
+    "Review the title, note and selected payslips before preparing the batch.",
+    "Periksa judul, catatan, dan slip gaji yang dipilih sebelum menyiapkan batch.",
+  ],
+  invalid_payroll_payment_destination: [
+    "Enter a valid bank code, account number and account name.",
+    "Isi kode bank, nomor rekening, dan nama rekening yang valid.",
+  ],
+  payroll_payment_preparation_unavailable: [
+    "This payslip cannot be prepared by the current operator. Refresh the payable payslips.",
+    "Slip gaji tidak dapat disiapkan oleh operator saat ini. Muat ulang slip gaji siap bayar.",
+  ],
+  payroll_payment_selection_limit: [
+    "A batch can contain up to 100 payslips.",
+    "Satu batch dapat berisi maksimal 100 slip gaji.",
+  ],
+  payroll_payment_duplicate_assessment: [
+    "This payslip is already selected.",
+    "Slip gaji sudah dipilih.",
+  ],
+  payroll_assessment_not_payable: [
+    "A selected payslip is no longer payable. Refresh the payable payslips and review your selection.",
+    "Slip gaji yang dipilih tidak lagi siap bayar. Muat ulang slip gaji siap bayar dan periksa pilihan.",
+  ],
+  payroll_payment_batch_exists: [
+    "This batch already exists. Return to the payment list and review its details.",
+    "Batch sudah ada. Kembali ke daftar pembayaran dan periksa detailnya.",
+  ],
+  payroll_payment_capacity: [
+    "The company payment batch limit has been reached. Resolve outstanding batches before preparing another.",
+    "Batas batch pembayaran perusahaan telah tercapai. Selesaikan batch tertunda sebelum menyiapkan batch lain.",
+  ],
+  payroll_assessment_payment_reserved: [
+    "A selected payslip is reserved by another batch. Remove it and review the remaining instructions.",
+    "Slip gaji yang dipilih sudah digunakan batch lain. Hapus slip gaji tersebut dan periksa instruksi lainnya.",
+  ],
+  payroll_payment_attempt_limit: [
+    "A selected payslip has reached its payment attempt limit. Contact finance before preparing another batch.",
+    "Slip gaji yang dipilih mencapai batas percobaan pembayaran. Hubungi finance sebelum menyiapkan batch lain.",
+  ],
+  payroll_reconciliation_unavailable: [
+    "Reconciliation is unavailable. Return to the batch details.",
+    "Rekonsiliasi tidak tersedia. Kembali ke detail batch.",
+  ],
+  invalid_payroll_payment_results: [
+    "Enter between one and 100 distinct payment results.",
+    "Isi satu hingga 100 hasil pembayaran yang berbeda.",
+  ],
+  invalid_payroll_payment_result: [
+    "Review the bank result and note. The confirmation time must fall between batch release and now.",
+    "Periksa hasil bank dan catatan. Waktu konfirmasi harus berada antara waktu rilis batch dan saat ini.",
+  ],
+  payroll_payment_not_released: [
+    "This batch is no longer awaiting payment results. Reload its details.",
+    "Batch tidak lagi menunggu hasil pembayaran. Muat ulang detailnya.",
+  ],
+  payroll_payment_item_not_pending: [
+    "A selected payment already has a result. Reload the batch review.",
+    "Pembayaran yang dipilih sudah memiliki hasil. Muat ulang tinjauan batch.",
+  ],
+  payroll_payment_action_unavailable: [
+    "This action is unavailable. Return to the batch details.",
+    "Tindakan tidak tersedia. Kembali ke detail batch.",
+  ],
+  invalid_payroll_payment_action: [
+    "Enter a reason of up to 1,000 characters and review the payment batch.",
+    "Isi alasan maksimal 1.000 karakter dan periksa batch pembayaran.",
+  ],
+  payroll_payment_not_prepared: [
+    "This batch is no longer prepared. Reload its details.",
+    "Batch tidak lagi dalam tahap persiapan. Muat ulang detailnya.",
+  ],
+  payroll_payment_evidence_unavailable: [
+    "Payment evidence has changed. Reload the batch review.",
+    "Bukti pembayaran telah berubah. Muat ulang tinjauan batch.",
+  ],
+  payroll_payment_batch_not_found: [
+    "This payment batch is unavailable. Return to the payment list.",
+    "Batch pembayaran tidak tersedia. Kembali ke daftar pembayaran.",
+  ],
+  payroll_payment_instructions_unavailable: [
+    "This worksheet is no longer available. Reload the batch to check its payment results.",
+    "Instruksi pembayaran tidak lagi tersedia. Muat ulang batch untuk memeriksa hasil pembayaran.",
+  ],
+  invalid_payroll_payment_page: [
+    "Select a valid date range of up to 366 days.",
+    "Pilih rentang tanggal yang valid, maksimal 366 hari.",
+  ],
   invalid_expense_payment_batch: [
     "Review the title, note and selected claims before preparing the batch.",
     "Periksa judul, catatan, dan klaim yang dipilih sebelum menyiapkan batch.",

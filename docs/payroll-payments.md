@@ -29,6 +29,14 @@ Confirmed transaction references share a company-scoped registry with expense re
 
 `GET /{id}/review` combines the current batch, ascending history, reconciliation results and `availableActions` under one shared payment guard. Optional `historyAfter` and `historyLimit` (default 50, maximum 200) page only the history; the returned batch and results belong to the same guarded review. A cursor ahead of the current batch version is rejected after resource authorization. `RELEASE` requires a different account from the preparer and retained assessment evidence; `CANCEL` applies to prepared batches; `RECONCILE` requires pending items and retained evidence; `EXPORT` applies only before any released item is resolved. Hints do not reserve eligibility or replace each command's current permission, evidence and version checks.
 
+## Dashboard
+
+The [dashboard finance workflow](dashboard.md#payroll-payments) covers payable
+selection, bank review, independent release, cancellation, CSV download and
+reconciliation. Preparation and result panels retain unsaved input while the
+current workspace remains mounted. Lost responses require an explicit retry of
+the original command; they do not authorize another bank transfer.
+
 ## Employee progress and synchronization
 
 `GET /api/v1/companies/{companyId}/payroll/payslips/{assessmentId}/payments` exposes a separate progress object with `assessmentId`, `version`, and up to twenty attempts. An attempt contains batch/item IDs, status, creation/release/resolution timestamps. It omits bank destinations, transaction references, reasons, and other employees. Access follows `payroll.self.read` ownership or explicit company-wide `payroll.read`.

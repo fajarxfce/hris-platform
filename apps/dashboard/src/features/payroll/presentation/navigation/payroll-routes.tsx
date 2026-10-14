@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { canReadPayrollFinalizations } from "../../domain/policies/payroll-finalization-policy";
+import { canReadPayrollPayments } from "../../domain/policies/payroll-payment-read-policy";
 import { canReadPayrollPayslips } from "../../domain/policies/payroll-payslip-policy";
 import { canReadPayrollPeriods } from "../../domain/policies/payroll-period-policy";
 import { CompensationEditorScreen } from "../bindings/compensation-editor-screen";
@@ -14,6 +15,11 @@ import { PayrollInputEditorScreen } from "../bindings/payroll-input-editor-scree
 import { PayrollInputEmployeesScreen } from "../bindings/payroll-input-employees-screen";
 import { PayrollInputScreen } from "../bindings/payroll-input-screen";
 import { PayrollInputVerificationScreen } from "../bindings/payroll-input-verification-screen";
+import { PayrollPaymentPreparationScreen } from "../bindings/payroll-payment-preparation-screen";
+import { PayrollPaymentReconciliationScreen } from "../bindings/payroll-payment-reconciliation-screen";
+import { PayrollPaymentScreen } from "../bindings/payroll-payment-screen";
+import { PayrollPaymentTransitionScreen } from "../bindings/payroll-payment-transition-screen";
+import { PayrollPaymentsScreen } from "../bindings/payroll-payments-screen";
 import { PayrollPayslipScreen } from "../bindings/payroll-payslip-screen";
 import { PayrollPayslipsScreen } from "../bindings/payroll-payslips-screen";
 import { PayrollPeriodCancellationScreen } from "../bindings/payroll-period-cancellation-screen";
@@ -39,6 +45,18 @@ import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 export function PayrollRoutes(props: PayrollScreenProps) {
   return (
     <Routes>
+      <Route path="payments" element={<PayrollPaymentsScreen {...props} />} />
+      <Route path="payments/new" element={<PayrollPaymentPreparationScreen {...props} />} />
+      <Route path="payments/:batchId" element={<PayrollPaymentScreen {...props} />} />
+      <Route
+        path="payments/:batchId/reconcile"
+        element={<PayrollPaymentReconciliationScreen {...props} />}
+      />
+      <Route
+        path="payments/:batchId/:intent"
+        element={<PayrollPaymentTransitionScreen {...props} />}
+      />
+
       <Route path="payslips" element={<PayrollPayslipsScreen {...props} />} />
       <Route path="payslips/:payslipId" element={<PayrollPayslipScreen {...props} />} />
       <Route path="publications" element={<PayrollPublicationsScreen {...props} />} />
@@ -120,7 +138,7 @@ export function PayrollRoutes(props: PayrollScreenProps) {
         path="*"
         element={
           <Navigate
-            to={`/payroll/${canReadPayrollPeriods(props.access.permissions) ? "periods" : canReadPayrollFinalizations(props.access.permissions) ? "publications" : canReadPayrollPayslips(props.access.permissions) ? "payslips" : "policy"}?company=${props.access.companyId}`}
+            to={`/payroll/${canReadPayrollPeriods(props.access.permissions) ? "periods" : canReadPayrollFinalizations(props.access.permissions) ? "publications" : canReadPayrollPayslips(props.access.permissions) ? "payslips" : canReadPayrollPayments(props.access.permissions) ? "payments" : "policy"}?company=${props.access.companyId}`}
             replace
           />
         }

@@ -2,6 +2,7 @@ import type { AbandonPayrollCalculation } from "../../domain/usecases/abandon-pa
 import type { CancelPayrollPeriod } from "../../domain/usecases/cancel-payroll-period";
 import type { CreatePayrollPeriod } from "../../domain/usecases/create-payroll-period";
 import type { DecidePayrollReview } from "../../domain/usecases/decide-payroll-review";
+import type { DownloadPayrollPayment } from "../../domain/usecases/download-payroll-payment";
 import type { DownloadPayrollPayslip } from "../../domain/usecases/download-payroll-payslip";
 import type { ListCompensationEmployees } from "../../domain/usecases/list-compensation-employees";
 import type { ListPayrollInputEmployees } from "../../domain/usecases/list-payroll-input-employees";
@@ -17,6 +18,9 @@ import type { LoadPayrollFinalization } from "../../domain/usecases/load-payroll
 import type { LoadPayrollFinalizations } from "../../domain/usecases/load-payroll-finalizations";
 import type { LoadPayrollInputReview } from "../../domain/usecases/load-payroll-input-review";
 import type { LoadPayrollInputRevision } from "../../domain/usecases/load-payroll-input-revision";
+import type { LoadPayrollPayables } from "../../domain/usecases/load-payroll-payables";
+import type { LoadPayrollPayment } from "../../domain/usecases/load-payroll-payment";
+import type { LoadPayrollPayments } from "../../domain/usecases/load-payroll-payments";
 import type { LoadPayrollPayslip } from "../../domain/usecases/load-payroll-payslip";
 import type { LoadPayrollPayslipPayments } from "../../domain/usecases/load-payroll-payslip-payments";
 import type { LoadPayrollPeriod } from "../../domain/usecases/load-payroll-period";
@@ -30,10 +34,14 @@ import type { LoadPayrollRun } from "../../domain/usecases/load-payroll-run";
 import type { LoadPayrollRunEmployee } from "../../domain/usecases/load-payroll-run-employee";
 import type { LoadTaxOpeningReview } from "../../domain/usecases/load-tax-opening-review";
 import type { LoadTaxOpeningRevision } from "../../domain/usecases/load-tax-opening-revision";
+import type { PreparePayrollPayment } from "../../domain/usecases/prepare-payroll-payment";
+import type { ReconcilePayrollPayment } from "../../domain/usecases/reconcile-payroll-payment";
 import type { ResumePayrollCalculation } from "../../domain/usecases/resume-payroll-calculation";
 import type { ReviewPayrollCalculation } from "../../domain/usecases/review-payroll-calculation";
 import type { ReviewPayrollFinalization } from "../../domain/usecases/review-payroll-finalization";
 import type { ReviewPayrollInputAction } from "../../domain/usecases/review-payroll-input-action";
+import type { ReviewPayrollPaymentReconciliation } from "../../domain/usecases/review-payroll-payment-reconciliation";
+import type { ReviewPayrollPaymentTransition } from "../../domain/usecases/review-payroll-payment-transition";
 import type { ReviewPayrollPeriodCancellation } from "../../domain/usecases/review-payroll-period-cancellation";
 import type { ReviewPayrollPeriodCreation } from "../../domain/usecases/review-payroll-period-creation";
 import type { ReviewPayrollRunRecovery } from "../../domain/usecases/review-payroll-run-recovery";
@@ -45,11 +53,22 @@ import type { SaveTaxOpening } from "../../domain/usecases/save-tax-opening";
 import type { StartPayrollCalculation } from "../../domain/usecases/start-payroll-calculation";
 import type { StartPayrollFinalization } from "../../domain/usecases/start-payroll-finalization";
 import type { SubmitPayrollReview } from "../../domain/usecases/submit-payroll-review";
+import type { TransitionPayrollPayment } from "../../domain/usecases/transition-payroll-payment";
 import type { VerifyPayrollInput } from "../../domain/usecases/verify-payroll-input";
 import type { VerifyTaxOpening } from "../../domain/usecases/verify-tax-opening";
 import type { WithdrawPayrollReview } from "../../domain/usecases/withdraw-payroll-review";
 
 export type PayrollUseCases = Readonly<{
+  loadPayments: Pick<LoadPayrollPayments, "execute">;
+  loadPayment: Pick<LoadPayrollPayment, "execute">;
+  loadPayables: Pick<LoadPayrollPayables, "execute">;
+  preparePayment: Pick<PreparePayrollPayment, "execute">;
+  downloadPayment: Pick<DownloadPayrollPayment, "execute">;
+  reviewPaymentTransition: Pick<ReviewPayrollPaymentTransition, "execute">;
+  transitionPayment: Pick<TransitionPayrollPayment, "execute">;
+  reviewReconciliation: Pick<ReviewPayrollPaymentReconciliation, "execute">;
+  reconcilePayment: Pick<ReconcilePayrollPayment, "execute">;
+
   listPayslips: Pick<ListPayrollPayslips, "execute">;
   loadPayslip: Pick<LoadPayrollPayslip, "execute">;
   loadPayslipPayments: Pick<LoadPayrollPayslipPayments, "execute">;

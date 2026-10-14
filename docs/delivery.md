@@ -48,6 +48,37 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Dashboard payroll payments
+
+Finance can select finalized payslips, review bank destinations, prepare batches,
+independently release instructions, cancel prepared batches, download CSV worksheets
+and reconcile confirmed bank outcomes. Direct salary amounts remain immutable.
+Payment tables distinguish employees and tax months. Separate review, history and
+result panels retain their current owner across tab, theme and language changes.
+Access withdrawal removes private bank details; scope disposal rejects late work.
+Unknown delivery retains one original command through verification and later
+rejection, without silent resubmission or replacement identifiers.
+
+Architecture, formatting, TypeScript and all 2,373 unit tests passed, including
+184 new policy, mapping, transport and controller cases. Three precision cases
+cover inclusive microsecond boundaries and reject outcomes before release or
+after their recorded evidence. All 39 payment browser scenarios passed; the
+twelve read/layout cases passed again after reducing unnecessary table width.
+Light desktop, dark narrow and real released/reconciled screenshots were reviewed.
+The two existing CSS-specificity warnings and bundle-size advisory remain.
+
+The expanded isolated API/PostgreSQL/worker scenario passed calculation, staged
+review, publication, payslip/PDF reads and finance payment in one minute. It
+recovered lost preparation, release and reconciliation responses with the original
+commands, retained exactly one attempt and three payment-history entries,
+preserved leading account-number zeros in CSV, and kept export separate from
+settlement. Revoked finance access removed bank details while independently
+authorized payslip progress exposed only the paid attempt. The first fixture
+attempt omitted navigation to the bank-instructions tab before download; that
+step and its visibility assertion were corrected before the successful full run.
+Only fictional fixture records were used. No bank transfer or mobile/device
+validation was performed for this dashboard increment.
+
 ### Guarded payroll payment review
 
 Finance can acquire current bank instructions, bounded ascending activity,

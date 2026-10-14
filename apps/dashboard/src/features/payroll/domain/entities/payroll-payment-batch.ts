@@ -1,0 +1,20 @@
+import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { PayrollPaymentItem } from "./payroll-payment-item";
+export type PayrollPaymentBatchId = string & { readonly payrollPaymentBatchId: unique symbol };
+export const payrollPaymentBatchStatuses = ["PREPARED", "RELEASED", "CLOSED", "CANCELLED"] as const;
+export type PayrollPaymentBatchStatus = (typeof payrollPaymentBatchStatuses)[number];
+export type PayrollPaymentBatch = Readonly<{
+  id: PayrollPaymentBatchId;
+  companyId: CompanyId;
+  status: PayrollPaymentBatchStatus;
+  version: number;
+  title: string;
+  totalAmount: string;
+  currency: "IDR";
+  itemCount: number;
+  createdBy: string;
+  createdAt: string;
+  releasedBy: string | null;
+  releasedAt: string | null;
+  items: readonly PayrollPaymentItem[];
+}>;

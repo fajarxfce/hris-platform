@@ -3252,3 +3252,37 @@ at 07:51:38 WIB on 2026-10-14, with install-only delivery. The package update ti
 and matching installed-artifact hash were verified. No starter foundation changed
 in this HRIS-specific increment. Expense/Payslip replicas, unfinished offline
 drafts and shared sync-status presentation remain in the delivery sequence.
+
+### Payslip records on mobile
+
+The [mobile replica](https://github.com/fajarxfce/hris-mobile/commit/5d5ac0d) retains
+full payslips, indexed annual summaries and separately versioned payment progress.
+Local year/page/detail queries do not acquire another list or replace earlier
+facts. Two explicit change-feed collections drive bounded acquisition, versioned
+deletion and atomic record/cursor publication. Ordinary cursor expiry stages a
+replacement without hiding published data. Confirmed denials remain gated through
+failed cleanup and retries, including denials from PDF export.
+
+The [explicit payroll sync policy](https://github.com/fajarxfce/hris-platform/commit/1fa3c79)
+admits both self-service and finance read grants to the account-owned projection.
+The default omitted-collection selection is unchanged. Fourteen sync domain and
+fourteen HTTP tests passed, along with architecture/format checks and both
+application builds. The API and worker were deployed; loopback and WireGuard
+health checks passed. All jobs in the
+[backend/dashboard CI](https://github.com/fajarxfce/hris-platform/actions/runs/38494640210)
+passed for that implementation.
+
+Mobile root checks passed with 1,320 desktop/JVM/UI tests, Android dev assembly
+and production Web distribution. Payroll also passed 73 Chromium tests covering
+domain, IndexedDB and presentation behavior. API 35 acceptance acquired one owned
+September payslip and verified offline startup, year navigation and full details
+after force-stop. A 73-hour clock advance preserved the same encrypted facts;
+restored time and connectivity allowed successful synchronization. Screenshots
+were inspected, the crash buffer contained no fatal exception, and the emulator
+was stopped with its data retained. Multi-record paging and legacy migration are
+covered by automated storage/UI tests rather than the single-slip API fixture.
+
+After notice, the validated APK was installed on the authorized Android 16 phone
+at 09:15:08 WIB on 2026-10-14 with install-only delivery. The update timestamp and
+installed-artifact hash were verified without opening the app. Expense records,
+unfinished offline drafts and shared sync-status presentation remain outstanding.

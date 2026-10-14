@@ -10,6 +10,12 @@ If Docker requires a group available through sudo, run the build as the same use
 
 Run ./gradlew format to format handwritten Kotlin. Architecture checks run with check. No generated Java/Kotlin is committed.
 
+Hosted CI bounds the complete Gradle step to 55 minutes within a 60-minute job.
+The [14 October backend check](https://github.com/fajarxfce/hris-platform/actions/runs/38579418741)
+passed in 44 minutes 18 seconds, leaving 42 seconds under its former 45-minute
+step budget. The additional margin covers runner variance and the growing suite;
+individual test, query and transaction deadlines remain unchanged.
+
 ## Local runtime
 
 Copy .env.example to .env and generate distinct secrets. Run docker compose up --build -d after building both application jars. PostgreSQL and API bind localhost only. A migration container owns schema changes; runtime receives only hris_app credentials without superuser/BYPASSRLS. For private Garage/ClamAV services, follow [document service configuration](storage.md#private-document-services) and include `compose.documents.yml`. TLS deployment is configured separately.

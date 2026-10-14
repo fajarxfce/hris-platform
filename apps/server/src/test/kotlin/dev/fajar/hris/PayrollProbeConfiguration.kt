@@ -17,6 +17,7 @@ class PayrollProbe {
     @Volatile var omitPolicyRevision = false
     @Volatile var omitCompensationRevision = false
     @Volatile var beforeJournal: ((JournalRow) -> Unit)? = null
+    @Volatile var afterJournal: ((JournalRow) -> Unit)? = null
     @Volatile var afterPolicyRead: ((String, UUID) -> Unit)? = null
     @Volatile var beforePolicyLock: ((UUID, Boolean) -> Unit)? = null
     @Volatile var afterCompensationRead: ((String, UUID) -> Unit)? = null
@@ -25,6 +26,7 @@ class PayrollProbe {
         omitPolicyRevision = false
         omitCompensationRevision = false
         beforeJournal = null
+        afterJournal = null
         afterPolicyRead = null
         beforePolicyLock = null
         afterCompensationRead = null
@@ -144,6 +146,7 @@ class PayrollProbeConfiguration {
             override fun append(row: JournalRow) {
                 probe.beforeJournal?.invoke(row)
                 source.append(row)
+                probe.afterJournal?.invoke(row)
             }
         }
 }

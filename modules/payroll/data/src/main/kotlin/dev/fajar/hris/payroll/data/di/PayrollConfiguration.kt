@@ -1537,6 +1537,28 @@ class PayrollConfiguration {
         StoredPayrollPaymentRepository(source)
 
     @Bean
+    fun getPayrollPaymentReview(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetPayrollPaymentReview(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
     fun getPayrollPaymentBatch(
         payments: PayrollPaymentRepository,
         people: PeopleRepository,

@@ -2,7 +2,7 @@
 
 Finance prepares payment batches from immutable finalized payroll assessments. The backend copies each employee's retained labels, tax month, planned payment date, and positive take-home amount; a request cannot replace those amounts. A zero take-home assessment has no payable transfer.
 
-All finance endpoints require `payroll.pay` and current recent authentication/MFA. They revalidate original/live permissions and credentials under payment, people, company, membership, and account guards. Payroll administration, calculation, or finalization does not imply payment access. A preparer may be a payroll beneficiary, because salary inputs and finalization are independently reviewed; a different account must release the batch.
+All finance endpoints require `payroll.pay` and current recent authentication/MFA. They revalidate original/live permissions, credentials and session assurance under payment, people, company, membership, and account guards. Reads repeat that check after acquisition; commands retain recent assurance through original receipt recovery and transaction completion. Expiry rolls back payment, item, reference, progress, journal and receipt changes together. Payroll administration, calculation, or finalization does not imply payment access. A preparer may be a payroll beneficiary, because salary inputs and finalization are independently reviewed; a different account must release the batch.
 
 ## Commands
 
@@ -26,6 +26,8 @@ Confirmed transaction references share a company-scoped registry with expense re
 `GET /payables` lists unreserved positive assessments below the attempt limit. `GET /` lists batches, optionally filtered by status. Both accept `from`, `until`, `after`, and `limit`. Dates describe company-local publication/creation days, with a maximum 366-day range and default/maximum pages of 50/200. Follow the returned cursor; it is not a synchronization position.
 
 `GET /{batchId}`, `/history`, and `/results` expose authorized finance detail and immutable evidence. `GET /{batchId}/export` returns a deterministic CSV worksheet only while the batch is released and every item is pending. It retains stable item references, escapes spreadsheet formulas and CSV content, and preserves leading account-number zeros. Repeated downloads do not create a payment or settlement record. Bank-specific formats and direct bank submission are separate integrations.
+
+`GET /{id}/review` combines the current batch, ascending history, reconciliation results and `availableActions` under one shared payment guard. Optional `historyAfter` and `historyLimit` (default 50, maximum 200) page only the history; the returned batch and results belong to the same guarded review. A cursor ahead of the current batch version is rejected after resource authorization. `RELEASE` requires a different account from the preparer and retained assessment evidence; `CANCEL` applies to prepared batches; `RECONCILE` requires pending items and retained evidence; `EXPORT` applies only before any released item is resolved. Hints do not reserve eligibility or replace each command's current permission, evidence and version checks.
 
 ## Employee progress and synchronization
 

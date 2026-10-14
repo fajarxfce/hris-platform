@@ -2,7 +2,6 @@ package dev.fajar.hris.payroll.domain.usecases
 
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.payroll.domain.entities.*
@@ -57,14 +56,11 @@ class ReleasePayrollPaymentBatch(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId, shared = true)
             if (accountLock is Result.Failed) return@run accountLock
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val acquired = identities.access(actor.accountId, company)
+            if (acquired is Result.Failed) return@run acquired
+            val liveAccess = (acquired as Result.Success).value
+            val checked = validatePayrollPaymentActor(actor, liveAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
-            val live = (checked as Result.Success).value
-            val recent = validatePayrollPaymentAccess(live, clock.instant(), security)
-            if (recent is Result.Failed) return@run recent
             val found = payments.find(company, id)
             if (found is Result.Failed) return@run found
             val batch =
@@ -84,6 +80,9 @@ class ReleasePayrollPaymentBatch(
                 return@run Result.Failed(
                     Failure(FailureKind.FORBIDDEN, "independent_payment_release_required")
                 )
+            val completion =
+                validatePayrollPaymentActor(actor, liveAccess, clock.instant(), security)
+            if (completion is Result.Failed) return@run completion
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
@@ -115,7 +114,15 @@ class ReleasePayrollPaymentBatch(
                                 ),
                             )
                         }
-                        .map { receipt }
+                        .flatMap {
+                            validatePayrollPaymentActor(
+                                    actor,
+                                    liveAccess,
+                                    clock.instant(),
+                                    security,
+                                )
+                                .map { receipt }
+                        }
                 }
         }
     }

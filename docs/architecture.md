@@ -284,6 +284,16 @@ requested cancellation also requires current assurance; it adds no new mutation.
 
 Optional job schedules are immutable UTC instants persisted separately from retry availability. Feature use cases decide scheduling policy and supply the request; datasources only persist it. The first cancellation advances eligibility to the use case's current instant so the worker can release feature resources. Repeated cancellation never advances a subsequent cleanup retry. PostgreSQL prevents reversing cancellation or moving an uncancelled job ahead of its original schedule. Application restart requires no in-memory timer reconstruction.
 
+Payroll finance payment review holds the shared payment guard before People and
+access guards. Batch instructions, ascending history, confirmed outcomes and pure
+action hints remain coherent while concurrent payment writers wait. Interactive
+payment reads repeat current session and recent-assurance validation after their
+last acquisition. Preparation, release, cancellation and reconciliation check
+again before original receipt replay and after journaling; a late failure rolls
+back business state, bank references, mobile progress and the operation receipt.
+The review use case coordinates repository contracts, without calling a command
+use case or reserving a payment.
+
 ## API and clients
 
 Company client policy uses a separate admission transaction after actor resolution and before a business handler. Its use case acquires policy/company/member/account guards and evaluates current availability; accepted requests and durable jobs retain their own transaction/execution ownership. The application maps feature adapters and effective sync selections to capability keys. Client policy never adds authorization or modifies a cursor projection. Configuration revisions, receipts, audit, and events are atomic, and settings recovery remains independently authorized during maintenance.

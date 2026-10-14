@@ -48,6 +48,32 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Guarded payroll payment review
+
+Finance can acquire current bank instructions, bounded ascending activity,
+confirmed reconciliation records and available actions through one shared payment
+review. Concurrent readers share that guard; release and reconciliation wait for
+the complete snapshot. Hints preserve payroll's independent-release policy and do
+not reserve eligibility or replace command checks.
+
+Every finance payment read rechecks current session and recent assurance after
+acquisition. Preparation, release, cancellation and reconciliation repeat that
+check before original receipt recovery and after journaling. Late expiry rolls
+back batch/items, bank references, progress heads, history, journal and receipts.
+Existing acquisition failures retain their classification; interruption propagates.
+
+Architecture, formatting, both application JARs, 64 payroll domain tests, 95
+selected API/PostgreSQL/contract tests and all 62 worker tests passed (221 tests,
+no failures, errors or skips). The new cases include 34 assurance probes, nine
+coherent-review HTTP/concurrency cases, three action-policy tests and one API
+contract case. They cover password/MFA expiry during acquisition and journaling,
+original receipt recovery, complete rollback, independent readers with a waiting
+writer, partial/final reconciliation, finance/foreign scope denial, live revocation,
+cursor bounds, preserved failures and cancellation followed by executor reuse.
+No bank transfer or device validation was performed. Dashboard payment entry is
+subsequent work; the finance endpoint is not an employee payment projection.
+
+
 ### Published payslip dashboard
 
 The dashboard provides a month-filtered payslip directory with retained employee

@@ -41,6 +41,7 @@ class PayrollPaymentAccessHttpTest : PayrollPaymentApiFixture() {
                 "/$id",
                 "/$id/history",
                 "/$id/results",
+                "/$id/review",
                 "/$id/export",
             )) {
             val reader = payrollMember(f.payroll.company, setOf("company.read", "payroll.pay"))

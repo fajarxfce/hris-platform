@@ -34,6 +34,30 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun payrollPaymentReviewKeepsBankInstructionsHistoryResultsAndActionHintsTogether() {
+        val api = contract()
+        val operation =
+            api["paths"]["/api/v1/companies/{companyId}/payroll/payments/{id}/review"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val limit = operation["parameters"].single { it["name"].asString() == "historyLimit" }
+        assertEquals(50, limit["schema"]["default"].asInt())
+        assertFalse(limit["required"].asBoolean())
+        val review = api["components"]["schemas"]["PayrollPaymentReviewResponse"]["properties"]
+        assertEquals(
+            setOf("batch", "history", "results", "availableActions"),
+            review.propertyNames().toSet(),
+        )
+        assertEquals(
+            "#/components/schemas/PayrollPaymentBatchResponse",
+            review["batch"]["\$ref"].asString(),
+        )
+        assertEquals(
+            "#/components/schemas/PayrollPaymentReconciliationResponse",
+            review["results"]["items"]["\$ref"].asString(),
+        )
+    }
+
+    @Test
     fun finalizationPreparationAndDirectoryKeepApprovalVersionsAndProgressSeparate() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/payroll"

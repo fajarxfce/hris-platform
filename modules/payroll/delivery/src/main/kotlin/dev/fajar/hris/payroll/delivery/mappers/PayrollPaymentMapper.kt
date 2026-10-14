@@ -1,8 +1,17 @@
 package dev.fajar.hris.payroll.delivery.mappers
 
+import dev.fajar.hris.core.domain.Page
 import dev.fajar.hris.payroll.delivery.requests.*
 import dev.fajar.hris.payroll.delivery.responses.*
 import dev.fajar.hris.payroll.domain.entities.*
+
+fun PayrollPaymentReview.toResponse() =
+    PayrollPaymentReviewResponse(
+        batch.toResponse(),
+        Page(history.items.map { it.toResponse() }, history.nextCursor),
+        results.map { it.toResponse() },
+        availableActions.map { it.name }.toSet(),
+    )
 
 fun PayrollPaymentInstructionRequest.toInstruction() =
     PayrollPaymentInstruction(

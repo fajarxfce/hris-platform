@@ -1,11 +1,48 @@
 package dev.fajar.hris.payroll.domain.policies
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.AccountAccess
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.requireRecentAuthentication
 import dev.fajar.hris.identity.domain.policies.requireRecentMfa
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.payroll.domain.entities.*
 import java.time.Instant
+import java.util.UUID
+
+fun validatePayrollPaymentActor(
+    actor: Actor,
+    access: AccountAccess?,
+    now: Instant,
+    security: IdentitySecurityPolicy,
+): Result<Actor> =
+    validateCompanySessionActor(actor, access, now, security).flatMap { current ->
+        validatePayrollPaymentAccess(current, now, security).map { current }
+    }
+
+fun payrollPaymentAvailableActions(
+    accountId: UUID,
+    batch: PayrollPaymentBatch,
+    candidates: List<PayrollPayable>,
+): Set<PayrollPaymentAvailableAction> = buildSet {
+    val evidence = candidates.map { it.assessmentId }.toSet()
+    val complete =
+        evidence.size == batch.itemCount && evidence == batch.items.map { it.assessmentId }.toSet()
+    when (batch.status) {
+        PayrollPaymentBatchStatus.PREPARED -> {
+            if (complete && batch.createdBy != accountId) add(PayrollPaymentAvailableAction.RELEASE)
+            add(PayrollPaymentAvailableAction.CANCEL)
+        }
+        PayrollPaymentBatchStatus.RELEASED -> {
+            if (complete && batch.items.any { it.status == PayrollPaymentItemStatus.PENDING })
+                add(PayrollPaymentAvailableAction.RECONCILE)
+            if (batch.items.all { it.status == PayrollPaymentItemStatus.PENDING })
+                add(PayrollPaymentAvailableAction.EXPORT)
+        }
+        PayrollPaymentBatchStatus.CANCELLED,
+        PayrollPaymentBatchStatus.CLOSED -> Unit
+    }
+}
 
 fun validatePayrollPaymentAccess(
     actor: Actor,

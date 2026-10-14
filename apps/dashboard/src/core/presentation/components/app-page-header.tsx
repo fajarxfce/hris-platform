@@ -1,14 +1,16 @@
-import { Text, Title2 } from "@fluentui/react-components";
-import type { ReactNode } from "react";
+import { Text, typographyStyles } from "@fluentui/react-components";
+import type { ReactNode, Ref } from "react";
 
 export function AppPageHeader({
   title,
   context,
   actions,
+  headingRef,
 }: {
   title: string;
   context?: string;
   actions?: ReactNode;
+  headingRef?: Ref<HTMLHeadingElement>;
 }) {
   return (
     <header className="app-page-header">
@@ -18,7 +20,9 @@ export function AppPageHeader({
             {context}
           </Text>
         )}
-        <Title2 as="h1">{title}</Title2>
+        <h1 style={typographyStyles.title2} ref={headingRef} tabIndex={headingRef ? -1 : undefined}>
+          {title}
+        </h1>
       </div>
       {actions && <div className="app-command-bar">{actions}</div>}
     </header>

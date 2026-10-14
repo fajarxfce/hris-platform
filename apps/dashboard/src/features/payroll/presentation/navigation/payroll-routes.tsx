@@ -1,7 +1,12 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { canReadPayrollPeriods } from "../../domain/policies/payroll-period-policy";
 import { CompensationEditorScreen } from "../bindings/compensation-editor-screen";
 import { CompensationEmployeesScreen } from "../bindings/compensation-employees-screen";
 import { CompensationScreen } from "../bindings/compensation-screen";
+import { PayrollPeriodCancellationScreen } from "../bindings/payroll-period-cancellation-screen";
+import { PayrollPeriodCreationScreen } from "../bindings/payroll-period-creation-screen";
+import { PayrollPeriodScreen } from "../bindings/payroll-period-screen";
+import { PayrollPeriodsScreen } from "../bindings/payroll-periods-screen";
 import { PayrollPolicyEditorScreen } from "../bindings/payroll-policy-editor-screen";
 import { PayrollPolicyScreen } from "../bindings/payroll-policy-screen";
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
@@ -9,6 +14,13 @@ import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 export function PayrollRoutes(props: PayrollScreenProps) {
   return (
     <Routes>
+      <Route path="periods" element={<PayrollPeriodsScreen {...props} />} />
+      <Route path="periods/new" element={<PayrollPeriodCreationScreen {...props} />} />
+      <Route path="periods/:periodId" element={<PayrollPeriodScreen {...props} />} />
+      <Route
+        path="periods/:periodId/cancel"
+        element={<PayrollPeriodCancellationScreen {...props} />}
+      />
       <Route path="policy" element={<PayrollPolicyScreen {...props} />} />
       <Route path="policy/edit" element={<PayrollPolicyEditorScreen {...props} />} />
       <Route path="compensation" element={<CompensationEmployeesScreen {...props} />} />
@@ -19,7 +31,12 @@ export function PayrollRoutes(props: PayrollScreenProps) {
       />
       <Route
         path="*"
-        element={<Navigate to={`/payroll/policy?company=${props.access.companyId}`} replace />}
+        element={
+          <Navigate
+            to={`/payroll/${canReadPayrollPeriods(props.access.permissions) ? "periods" : "policy"}?company=${props.access.companyId}`}
+            replace
+          />
+        }
       />
     </Routes>
   );

@@ -70,6 +70,13 @@ Worker lock order is job lease, payroll guard/run, then people/company/membershi
 
 Input and history lists return metadata summaries, without the earning/deduction/resolution payload. Fetch the current detail or an exact historical revision when opened. Period details paginate participants and changes separately. Run details expose progress, attempts, and paginated result summaries; fetch full facts/calculation for one employee when opened. Default/max page sizes are 50/200.
 
+The [dashboard period workflow](dashboard.md#payroll-periods) provides bounded
+period discovery, employee selection, explicit creation review, participant/history
+tabs and versioned draft cancellation. Selection survives employee search and
+pagination. Browser commands retain their original payload after an unknown
+outcome; an acknowledged receipt is followed by a fresh current-period read.
+Monthly input, calculation and publication screens remain subsequent work.
+
 Scope local caches by account and company; add earnings month and revision to input keys. Keep unsent changes separate from a verified server revision. After `stale_version`, `stale_employment_version`, or `stale_workforce_version`, fetch the current resource before deciding whether to resubmit. An existing operation receipt is historical confirmation, not the latest resource state. Stop obsolete requests when navigating or switching accounts/companies. Clients translate stable error and field codes, including per-employee outcome parameters. Persist the run ID after the start receipt and restore progress after reconnecting; poll only while the screen owns the observation. A queued command with a lost response must reuse its original key. The employee sync feed publishes only finalized payslip references; draft and processing results remain available through these explicitly authorized endpoints.
 
 API paths and request fields are listed in [API conventions](api-conventions.md). Tax, overtime, proration, THR, and opening-history policies are documented in [payroll rules](payroll-rules.md).

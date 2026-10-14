@@ -7,7 +7,7 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { AppTextField } from "../../../../core/presentation/components/app-text-field";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
-import type { useCompensationSearch } from "../controllers/use-compensation-search";
+import type { usePayrollEmployeeSearch } from "../controllers/use-payroll-employee-search";
 import { compensationMessages } from "../i18n/compensation-messages";
 import type { CompensationEmployeesState } from "../models/compensation-employees-state";
 export function CompensationEmployeesPage({
@@ -22,7 +22,7 @@ export function CompensationEmployeesPage({
   onNext,
 }: {
   state: CompensationEmployeesState;
-  filter: ReturnType<typeof useCompensationSearch>;
+  filter: ReturnType<typeof usePayrollEmployeeSearch>;
   locale: Locale;
   companyName: string;
   firstPage: boolean;

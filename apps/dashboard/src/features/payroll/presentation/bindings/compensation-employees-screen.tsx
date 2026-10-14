@@ -4,7 +4,7 @@ import { companyDate } from "../../../../core/presentation/dates/company-date";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 import { CompensationEmployeesController } from "../controllers/compensation-employees-controller";
-import { useCompensationSearch } from "../controllers/use-compensation-search";
+import { usePayrollEmployeeSearch } from "../controllers/use-payroll-employee-search";
 import {
   compensationEmployeeParameters,
   compensationEmployeeQuery,
@@ -63,7 +63,7 @@ function CompensationEmployeesBinding({
     return controller.deactivate;
   }, [controller]);
   useWorkspaceRevalidation(state.failure);
-  const filter = useCompensationSearch(query, (query) => onQuery(query, null));
+  const filter = usePayrollEmployeeSearch(query, (query) => onQuery(query, null));
   return (
     <CompensationEmployeesPage
       state={state}

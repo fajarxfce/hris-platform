@@ -883,6 +883,38 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "You are no longer assigned to this approval stage. Reload the request.",
     "Anda tidak lagi ditugaskan pada tahap ini. Muat ulang permintaan.",
   ],
+  invalid_payroll_period: [
+    "Review the period, planned payment date, employee selection and reason.",
+    "Periksa periode, rencana tanggal pembayaran, pilihan karyawan, dan alasan.",
+  ],
+  payroll_period_not_found: [
+    "This payroll period is unavailable.",
+    "Periode payroll tidak tersedia.",
+  ],
+  payroll_period_exists: [
+    "This period identifier is already in use. Review the saved period.",
+    "ID periode sudah digunakan. Periksa periode yang tersimpan.",
+  ],
+  payroll_period_active: [
+    "An active payroll period already exists for this month.",
+    "Periode payroll aktif sudah ada untuk bulan ini.",
+  ],
+  payroll_period_attempt_limit: [
+    "This month has reached its draft limit.",
+    "Batas draft untuk bulan ini sudah tercapai.",
+  ],
+  payroll_period_employee_unavailable: [
+    "An employee is no longer available in this company. Review the selection.",
+    "Karyawan tidak lagi tersedia di perusahaan ini. Periksa pilihan karyawan.",
+  ],
+  payroll_period_not_draft: [
+    "Only a draft payroll period can be cancelled.",
+    "Hanya periode payroll berstatus draft yang dapat dibatalkan.",
+  ],
+  payroll_period_revision_limit: [
+    "This period has reached its revision limit.",
+    "Batas revisi periode sudah tercapai.",
+  ],
   payroll_period_frozen: [
     "This change is blocked by a frozen payroll period.",
     "Perubahan terhalang periode payroll yang telah dikunci.",

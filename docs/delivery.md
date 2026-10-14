@@ -48,6 +48,38 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Payroll period dashboard
+
+The dashboard now provides month/status-filtered periods, bounded employee
+selection, explicit creation review, participant/history tabs and versioned draft
+cancellation. Selection spans name/number lookup pages without acquiring private
+profiles. Readers use independent payroll grants; preparation requires calculation
+authority. Creation pins the selected IDs and payment metadata in one command.
+
+Response loss retains the original operation, payload and observed version through
+later rejected retries. Definite cancellation conflicts require protected reload.
+Company/account replacement cancels owned requests and removes obsolete selection;
+confirmed access loss clears private evidence. Locale/theme changes retain draft
+input, and tabs reuse the acquired detail. Drafts are held in browser memory.
+
+Validation passed dashboard architecture, formatting and TypeScript checks,
+1,929 unit tests, eight Chromium scenarios and the production build. The complete
+25-scenario API/PostgreSQL browser suite passed with isolated accounts and data.
+Period acceptance covered a committed response deliberately dropped before delivery,
+exact retry, a competing cancellation, replacement drafts, immutable history,
+independent preparation/review grants and revoked access. Visual review exposed
+missing focus on the creation review; its regression failed before the fix and
+passed afterward on desktop and a narrow viewport. The period API scenario was
+rerun successfully after that presentation change. Light and narrow dark screenshots
+were inspected. The two existing CSS specificity warnings and bundle-size advisory
+remain.
+
+Both checked application images were rebuilt and deployed with the document
+services and WireGuard bindings retained. API readiness on loopback and the VPN
+address, the VPN dashboard and its authentication proxy returned HTTP 200 from
+the VPS. API and worker remained running with zero restarts. The image context
+now includes both JARs explicitly. This increment does not change the mobile APK.
+
 ### Payroll period preparation reads
 
 Period discovery now has its own payroll-authorized employee lookup. It includes
@@ -68,7 +100,7 @@ both application JAR builds passed. The new cases cover minimal bounded discover
 independent permissions, company isolation, original/live grant intersection,
 MFA expiry during waits and acquisition, cancellation, replay and late rollback.
 General fixture MFA is disabled; assurance tests explicitly use the production
-MFA policy. Dashboard consumption and development deployment remain separate.
+MFA policy. Dashboard consumption and development deployment are recorded above.
 
 ### Compensation review and employee lookup
 

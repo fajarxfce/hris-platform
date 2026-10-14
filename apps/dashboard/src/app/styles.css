@@ -233,6 +233,28 @@ a {
 .app-table-scroll {
   overflow-x: auto;
 }
+.app-selection-scroll,
+.app-payroll-selection .app-table-scroll {
+  max-height: 28rem;
+  overflow: auto;
+}
+.app-selection-scroll th,
+.app-payroll-selection th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--colorNeutralBackground1);
+}
+.app-payroll-period-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 640px) {
+  .app-payroll-period-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .app-table-number {
   text-align: end;
   font-variant-numeric: tabular-nums;

@@ -153,6 +153,33 @@ or replay their own salary. The API remains authoritative for current authority,
 verification dates and frozen payroll periods. Forms retain input across theme
 and locale changes and protect departure. Drafts are held in browser memory.
 
+## Payroll periods
+
+`/payroll/periods` lists 20 periods per page with month and status filters, bounded
+to 36 months. Period reads accept `payroll.read`, `payroll.calculate` or
+`payroll.review`; unrelated administration grants do not admit payroll data.
+
+`/payroll/periods/new` requires `payroll.calculate`. Preparation selects an earnings
+month, planned payment date, reason and 1–5,000 employees. The minimal employee
+lookup includes future and unconfigured employments without acquiring private
+profiles. Its 50-row pages retain selection across searches; the selected roster
+is also paged. A separate review presents the exact selection before submission
+and moves focus to its visible heading without animation.
+Creation freezes the roster and payment metadata. Changing them requires cancelling
+the draft and preparing a replacement; calculation eligibility is checked later.
+
+`/payroll/periods/:periodId` separates the period properties, 50-row participant
+pages and 20-entry history pages. Tabs reuse the acquired detail. Participant
+names and input heads reflect the current read; retained employee IDs define the
+immutable roster. `/payroll/periods/:periodId/cancel` reviews the current draft and
+submits its observed version with a reason.
+
+Response loss retains the original command and operation through later rejected
+retries. Definite cancellation conflicts require protected reload. Company/account
+replacement cancels outstanding work and drops obsolete selection; confirmed access
+loss removes acquired private data. Forms retain values through locale/theme
+changes and protect departure. Draft input remains in browser memory.
+
 ## Shift templates
 
 The Workforce route owns a bounded shift directory, current details, and create/edit

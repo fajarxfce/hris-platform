@@ -20,6 +20,64 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class PayrollConfiguration {
     @Bean
+    fun payrollAmendmentSource(sql: DSLContext): PayrollAmendmentSourceDataSource =
+        PostgresPayrollAmendmentSourceDataSource(sql)
+
+    @Bean
+    fun payrollAmendmentSources(
+        source: PayrollAmendmentSourceDataSource,
+        json: ObjectMapper,
+    ): PayrollAmendmentSourceRepository = StoredPayrollAmendmentSourceRepository(source, json)
+
+    @Bean
+    fun getPayrollAmendmentPreparation(
+        policies: PayrollPolicyRepository,
+        sources: PayrollAmendmentSourceRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollAmendmentPreparation(
+            policies,
+            sources,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun previewPayrollAmendment(
+        policies: PayrollPolicyRepository,
+        sources: PayrollAmendmentSourceRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        PreviewPayrollAmendment(
+            policies,
+            sources,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun payrollPolicySource(sql: DSLContext): PayrollPolicyDataSource =
         PostgresPayrollPolicyDataSource(sql)
 

@@ -34,6 +34,40 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun amendmentPreparationAndPreviewExposeObservedVersionsAndServerCalculatedDifferences() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/payroll/payslips/{id}"
+        assertTrue(
+            api["paths"][base + "/amendment-preparation"]["get"]["x-hris-company-admission"]
+                .asBoolean()
+        )
+        val preview = api["paths"][base + "/amendment-preview"]["post"]
+        assertTrue(preview["x-hris-company-admission"].asBoolean())
+        assertFalse(
+            preview.path("parameters").any { it.path("name").asString() == "Idempotency-Key" }
+        )
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("sourceVersions", "corrections"),
+            schemas["PayrollAmendmentPreviewRequest"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("assessmentId", "compensation", "input"),
+            schemas["PayrollAmendmentRemunerationRequest"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("firstAssessmentId", "sourceVersions", "calculations", "difference"),
+            schemas["PayrollAmendmentPreviewResponse"]["properties"].propertyNames().toSet(),
+        )
+        val difference = schemas["PayrollAmendmentDifferenceResponse"]["properties"]
+        assertEquals(
+            setOf("taxableGross", "withheld", "takeHome", "employeeDeductions", "employerCost"),
+            difference.propertyNames().toSet(),
+        )
+        assertEquals("string", difference["takeHome"]["type"].asString())
+    }
+
+    @Test
     fun payrollPaymentReviewKeepsBankInstructionsHistoryResultsAndActionHintsTogether() {
         val api = contract()
         val operation =

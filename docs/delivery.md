@@ -48,6 +48,31 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Payroll amendment preparation
+
+Company-scoped preparation and preview acquire retained published-year sources,
+accept explicit remuneration proposals and recalculate the affected monthly
+suffix with the existing rule engine. Complete source versions include earlier
+tax-continuity evidence. Newly published months require a new review. The explicit
+amendment grant does not broaden default roles; beneficiaries cannot prepare
+their own corrections. Guards and post-acquisition checks retain current access
+and applicable authentication assurance.
+
+Architecture and formatting passed. Validation covered 83 payroll domain tests,
+17 identity domain tests and all 62 worker tests, including the shared DI graph.
+All 74 selected HTTP/PostgreSQL and API contract cases passed across the validation
+runs, including 23 amendment cases. The 19 new domain cases cover chronological
+tax reconciliation, signed differences, retained source ownership, complete-year
+preconditions, bounded proposals and cancellation. API checks exercise concurrent
+publication with shared readers, source corruption, technical failure mapping,
+withdrawn grants, late authentication expiry and executor/transaction reuse.
+Existing finalization, tax-continuity and payslip scenarios also passed.
+
+Preview preserves original calculations and creates no draft, job, approval,
+payment or command receipt. Persisted amendments, independent review, revised
+publication, settlement differences and dashboard/mobile delivery remain tracked
+in [payroll amendments](payroll-amendments.md).
+
 ### Dashboard payroll payments
 
 Finance can select finalized payslips, review bank destinations, prepare batches,

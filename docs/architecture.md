@@ -184,6 +184,17 @@ versions under its own guards. Finalization reads check session assurance after
 acquisition; admission retains recent assurance after queue waits and through the
 job, finalization, journal and operation-receipt transaction.
 
+Amendment preparation and preview acquire shared payroll, People and access
+guards in that order. A bounded payroll-owned projection reads the complete
+published person/year with historical opening and calculation evidence; its
+datasource performs only SQL acquisition. Repository mapping checks scope and
+stored consistency inside the database error boundary. The use cases own
+amendment authority, beneficiary exclusions and complete-year preconditions.
+Pure policies assemble proposed payroll remuneration and reuse monthly tax rules
+in chronological order. Preview cannot replace verified source ownership and
+creates no persistent draft, approval or payment. Session checks follow waits
+and acquisition; preview retains recent authentication through calculation.
+
 Employee expense draft saves, cancellations, submission and withdrawal check
 current session assurance after resource/access guards, before receipt replay,
 and before transaction completion. Late expiry rolls back claim state, immutable

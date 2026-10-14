@@ -71,21 +71,23 @@ class ResumePayrollCalculation(
                     validateCompanyCommandActor(actor, it)
                 }
             if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
             val permission =
-                requirePayrollMutation(
-                    (checked as Result.Success).value,
-                    "payroll.calculate",
-                    clock.instant(),
-                    security,
-                )
+                requirePayrollMutation(live, "payroll.calculate", clock.instant(), security)
             if (permission is Result.Failed) return@run permission
 
             if (run != null && run.actorId != actor.accountId)
                 return@run Result.Failed(
                     Failure(FailureKind.FORBIDDEN, "payroll_run_author_required")
                 )
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run requirePayrollMutation(
+                        live,
+                        "payroll.calculate",
+                        clock.instant(),
+                        security,
+                    )
+                    .map { receipt }
             }
             if (run == null)
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "payroll_run_not_found"))
@@ -155,6 +157,14 @@ class ResumePayrollCalculation(
                             ),
                         )
                         .flatMap { operations.record(actor, key, receipt) }
+                        .flatMap {
+                            requirePayrollMutation(
+                                live,
+                                "payroll.calculate",
+                                clock.instant(),
+                                security,
+                            )
+                        }
                         .map { receipt }
                 }
         }

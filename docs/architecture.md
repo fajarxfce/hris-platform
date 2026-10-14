@@ -120,6 +120,14 @@ Interactive opening reads revalidate session assurance after acquisition; comman
 retain recent assurance through original receipt recovery and transaction completion.
 Missing opening evidence remains distinct from an explicit zero declaration.
 
+Calculation preparation holds shared payroll, work-period, People and access
+guards. Its read combines period state with minimal closed-work and effective-policy
+references; it does not reserve queue capacity or acquire full employee facts.
+Run reads expose current period versions and recovery hints under the payroll
+guard. Interactive reads recheck session assurance after acquisition, and start,
+resume and abandon retain recent assurance through receipt replay and transaction
+completion. Finalized runs cannot be abandoned.
+
 Monthly closing overview projects the period and minimal job progress in one SQL
 snapshot under shared access guards. It neither creates period rows nor holds
 resource locks that exclude the worker. The use case chooses available actions

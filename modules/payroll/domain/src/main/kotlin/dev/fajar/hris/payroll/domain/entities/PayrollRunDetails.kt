@@ -9,4 +9,6 @@ data class PayrollRunDetails(
     val attempts: List<PayrollRunAttempt>,
     val job: BackgroundJob,
     val results: Page<PayrollRunItem>,
+    val period: PayrollPeriod,
+    val availableActions: Set<PayrollCalculationAction>,
 )

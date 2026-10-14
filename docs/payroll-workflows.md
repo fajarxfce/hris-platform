@@ -62,6 +62,13 @@ verification with explicit recovery of unknown command outcomes.
 
 ## Durable calculation
 
+`GET /payroll/periods/{id}/calculation-review` returns the period, nullable closed
+work source, minimal effective-policy references, run count and blocking issues.
+It uses calculation/review read authority without requiring policy administration
+or private People access. `START` is an availability hint; the command independently
+rechecks source versions, roster completeness, current grants and queue capacity.
+Reading preparation creates no work period, run or job.
+
 Start from a `DRAFT` period with a closed workforce month, effective payroll policy, observed period/workforce/policy versions, reviewed `incomeDueDate`, reference, and reason. Starting requires `payroll.calculate`, recent authentication/MFA, and an idempotency key. The due date must fall in the earnings month for this ordinary monthly workflow. The run's tax month is that month; a later planned transfer does not postpone income already due. Former-employee or other-month liabilities need a separate assessment/amendment workflow.
 
 Start retains the workforce job/version, policy revision, timezone, and at most 5,000 lightweight employee references: employment version, display labels, effective compensation revision, monthly input revision, and opening-history revision. Missing financial sources remain explicit null references and become per-employee readiness errors. A pending leave or cancellation decision on any selected actual leave date blocks start. The complete target set, first attempt, queued job, period transition, audit/outbox, and receipt commit together.
@@ -71,6 +78,13 @@ The worker processes one employee per transaction. It verifies the lease, curren
 Each committed employee advances exactly one indexed checkpoint. The final metadata step changes the run and period to `CALCULATED` and completes the job atomically. `SUCCEEDED` on the job means the roster was processed; the run's failed count still matters. No payslip or payment is published by calculation. Snapshots are acquired one employee at a time; the worker does not retain 5,000 complete payloads. Stored facts/output are bounded to 256/128 KiB per employee.
 
 A stopped job can be resumed by its original author with current assurance, observed run version, reason, and a new idempotency key. Resume creates another job attempt for the remaining employees and metadata step, preserving every prior outcome, including failures. Each run permits eight explicit attempts. If process retries exhaust before feature cleanup, the run may still say `PROCESSING` while the job is terminal; that terminal job is eligible for explicit recovery. A replaced or expired lease cannot commit late results.
+
+Run details include the current period and explicit `CANCEL_JOB`, `RESUME` and
+`ABANDON` action hints. Cancellation retains the shared job ownership/version
+contract. Resume and abandonment require independently reviewed original commands;
+their handlers recheck current eligibility. Interactive reads revalidate MFA after
+waiting and acquisition. Expiry during a command rolls back the run, period, job,
+journal and receipt together. Receipt recovery also requires current assurance.
 
 To correct input, first stop a running job, then abandon its run with observed run and period versions. A completed calculation can also be abandoned after any pending or approved review has been explicitly withdrawn. Abandonment preserves evidence, reopens the period as `DRAFT`, and releases its source cutoffs. Start a new run to reassess corrected input; resume does not rewind an existing result. A period retains at most twenty runs. Changes to its immutable roster/payment metadata still require cancelling and replacing the draft.
 

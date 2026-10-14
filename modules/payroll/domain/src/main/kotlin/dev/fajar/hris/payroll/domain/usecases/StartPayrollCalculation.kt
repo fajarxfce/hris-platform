@@ -98,17 +98,19 @@ class StartPayrollCalculation(
                     validateCompanyCommandActor(actor, it)
                 }
             if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
 
             val permitted =
-                requirePayrollMutation(
-                    (checked as Result.Success).value,
-                    "payroll.calculate",
-                    clock.instant(),
-                    security,
-                )
+                requirePayrollMutation(live, "payroll.calculate", clock.instant(), security)
             if (permitted is Result.Failed) return@run permitted
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run requirePayrollMutation(
+                        live,
+                        "payroll.calculate",
+                        clock.instant(),
+                        security,
+                    )
+                    .map { receipt }
             }
             if (period == null)
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "payroll_period_not_found"))
@@ -238,6 +240,9 @@ class StartPayrollCalculation(
                     )
                 }
                 .flatMap { operations.record(actor, key, receipt) }
+                .flatMap {
+                    requirePayrollMutation(live, "payroll.calculate", clock.instant(), security)
+                }
                 .map { receipt }
         }
     }

@@ -1,7 +1,9 @@
 package dev.fajar.hris
 
 import dev.fajar.hris.payroll.data.datasources.*
+import dev.fajar.hris.payroll.data.models.*
 import dev.fajar.hris.schema.tables.records.*
+import java.time.LocalDate
 import java.util.UUID
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.TestConfiguration
@@ -18,6 +20,7 @@ class PayrollRunProbe {
     @Volatile var targetSnapshot: ((List<PayrollRunTargetsRecord>) -> Unit)? = null
     @Volatile var snapshot: ((String?) -> String?)? = null
     @Volatile var afterCutoffLock: ((UUID) -> Unit)? = null
+    @Volatile var afterRead: ((String, UUID) -> Unit)? = null
 
     fun clear() {
         invalidTarget = false
@@ -29,6 +32,7 @@ class PayrollRunProbe {
         targetSnapshot = null
         snapshot = null
         afterCutoffLock = null
+        afterRead = null
     }
 }
 
@@ -56,6 +60,31 @@ class PayrollRunProbeConfiguration {
         probe: PayrollRunProbe,
     ): PayrollRunDataSource =
         object : PayrollRunDataSource by source {
+            override fun list(
+                company: UUID,
+                period: UUID,
+                after: Int?,
+                limit: Int,
+            ): List<PayrollRunsRecord> =
+                source.list(company, period, after, limit).also {
+                    probe.afterRead?.invoke("list", company)
+                }
+
+            override fun results(
+                company: UUID,
+                run: UUID,
+                after: Int?,
+                limit: Int,
+            ): List<PayrollRunItemRow> =
+                source.results(company, run, after, limit).also {
+                    probe.afterRead?.invoke("detail", company)
+                }
+
+            override fun result(company: UUID, run: UUID, employee: UUID): PayrollRunResultRow? =
+                source.result(company, run, employee).also {
+                    probe.afterRead?.invoke("employee", company)
+                }
+
             override fun insertTargets(rows: List<PayrollRunTargetsRecord>) {
                 probe.targetSnapshot?.invoke(rows)
                 if (probe.invalidTarget) rows.first().employmentVersion += 1
@@ -85,6 +114,11 @@ class PayrollRunProbeConfiguration {
         probe: PayrollRunProbe,
     ): PayrollCalculationSourceDataSource =
         object : PayrollCalculationSourceDataSource by source {
+            override fun pendingLeave(company: UUID, period: UUID, month: LocalDate): Boolean =
+                source.pendingLeave(company, period, month).also {
+                    probe.afterRead?.invoke("review", company)
+                }
+
             override fun workSnapshot(company: UUID, job: UUID, employee: UUID): String? {
                 val raw = source.workSnapshot(company, job, employee)
                 return probe.snapshot?.invoke(raw) ?: raw

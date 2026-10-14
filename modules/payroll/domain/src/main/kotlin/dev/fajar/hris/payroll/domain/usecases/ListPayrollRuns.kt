@@ -1,7 +1,8 @@
 package dev.fajar.hris.payroll.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
@@ -19,6 +20,8 @@ class ListPayrollRuns(
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val periods: PayrollPeriodRepository,
+    private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(actor: Actor, periodId: UUID, after: Int?, limit: Int): Result<Page<PayrollRun>> {
         val company =
@@ -38,10 +41,10 @@ class ListPayrollRuns(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId, shared = true)
             if (accountLock is Result.Failed) return@run accountLock
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val foundAccess = identities.access(actor.accountId, company)
+            if (foundAccess is Result.Failed) return@run foundAccess
+            val access = (foundAccess as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             if (!canReadPayrollInput((checked as Result.Success).value))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
@@ -50,7 +53,9 @@ class ListPayrollRuns(
             if (period is Result.Failed) return@run period
             if ((period as Result.Success).value == null)
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "payroll_period_not_found"))
-            runs.list(company, periodId, after, limit)
+            runs.list(company, periodId, after, limit).flatMap { page ->
+                validateCompanySessionActor(actor, access, clock.instant(), security).map { page }
+            }
         }
     }
 }

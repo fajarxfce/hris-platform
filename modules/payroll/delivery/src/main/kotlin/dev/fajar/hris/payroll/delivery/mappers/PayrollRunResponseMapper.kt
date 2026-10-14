@@ -88,4 +88,6 @@ fun PayrollRunDetails.toResponse() =
             job.failureCode,
         ),
         Page(results.items.map { it.toResponse() }, results.nextCursor),
+        period.toResponse(),
+        availableActions.map { it.name },
     )

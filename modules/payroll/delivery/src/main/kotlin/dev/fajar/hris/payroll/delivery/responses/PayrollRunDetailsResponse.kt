@@ -8,4 +8,6 @@ data class PayrollRunDetailsResponse(
     val attempts: List<PayrollRunAttemptResponse>,
     val job: PayrollRunProgressResponse,
     val results: Page<PayrollRunItemResponse>,
+    val period: PayrollPeriodResponse,
+    val availableActions: List<String>,
 )

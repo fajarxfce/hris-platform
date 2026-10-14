@@ -80,17 +80,19 @@ class AbandonPayrollCalculation(
                     validateCompanyCommandActor(actor, it)
                 }
             if (checked is Result.Failed) return@run checked
+            val live = (checked as Result.Success).value
             val permission =
-                requirePayrollMutation(
-                    (checked as Result.Success).value,
-                    "payroll.calculate",
-                    clock.instant(),
-                    security,
-                )
+                requirePayrollMutation(live, "payroll.calculate", clock.instant(), security)
             if (permission is Result.Failed) return@run permission
 
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run requirePayrollMutation(
+                        live,
+                        "payroll.calculate",
+                        clock.instant(),
+                        security,
+                    )
+                    .map { receipt }
             }
             if (run == null)
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "payroll_run_not_found"))
@@ -100,6 +102,8 @@ class AbandonPayrollCalculation(
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "payroll_run_already_abandoned")
                 )
+            if (run.status == PayrollRunStatus.FINALIZED)
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "payroll_period_frozen"))
             val reviewResult = reviews.latest(company, run.id)
             if (reviewResult is Result.Failed) return@run reviewResult
             if (
@@ -145,6 +149,9 @@ class AbandonPayrollCalculation(
                         )
                     }
                     .flatMap { operations.record(actor, key, receipt) }
+                    .flatMap {
+                        requirePayrollMutation(live, "payroll.calculate", clock.instant(), security)
+                    }
                     .map { receipt }
             }
         }

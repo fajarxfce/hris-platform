@@ -56,6 +56,16 @@ class PayrollFinalizationHttpTest : PayrollFinalizationApiFixture() {
         assertEquals(receipt, payrollBody(startFinalization(f, body, key)))
         payrollError(startFinalization(f), 409, "payroll_already_finalized")
         payrollError(withdrawReview(c, f.review, 1, 1), 409, "payroll_review_not_current")
+        payrollError(
+            abandonRun(c, f.run, version = 2, periodVersion = 3),
+            409,
+            "payroll_period_frozen",
+        )
+        assertEquals(
+            0,
+            payrollBody(get(c.people.preparer.client, runPath(c, f.run)))["availableActions"].size(),
+        )
+        assertEquals(after["results"], runView(c, f.run)["results"])
         val late = stepFinalization(f, lease)
         assertEquals(Result.Failed(Failure(FailureKind.CONFLICT, "job_lease_lost")), late)
     }

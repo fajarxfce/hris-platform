@@ -3806,3 +3806,26 @@ because `10.77.77.3:5555` did not respond. This acceptance used the dedicated em
 The subsequent [mobile CI run](https://github.com/fajarxfce/hris-mobile/actions/runs/38568275914)
 passed Android/Web verification, Windows compilation and the iOS simulator build
 after the Expense UI fixture waited for acquisition before its offline refresh.
+
+### Calculation preparation and recovery contracts
+
+Payroll now exposes a scoped preparation review with current period, closed-work
+and effective-policy references, explicit missing evidence and bounded run counts.
+Run details include the current period and recovery hints. Neither read acquires
+the entire employee roster or creates preparation records. Calculation, review
+and policy administration grants remain independent.
+
+Interactive reads revalidate session assurance after waiting and acquisition.
+Start, resume and abandon retain recent assurance through journaling, receipt
+recording and original-command recovery. A late failure rolls back the run,
+period, job, journal and receipt together. Finalized runs explicitly reject
+abandonment before any transition.
+
+Validation passed 91 selected API/PostgreSQL/contract tests across focused runs,
+61 payroll domain tests and all 62 worker tests. New coverage includes coherent
+concurrent start/review, original/live permission intersection, foreign-company
+IDs, limited policy disclosure, bounded recovery, late MFA expiry, interruption
+cleanup and receipt rollback. Initial test-only issues in JSON iteration and a
+required policy query parameter were corrected and their affected suite passed.
+Architecture/format checks and both application JAR builds passed. Dashboard
+calculation screens are the next part of this increment.

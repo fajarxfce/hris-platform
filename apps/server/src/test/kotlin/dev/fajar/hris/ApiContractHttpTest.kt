@@ -34,6 +34,35 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun calculationPreparationAndRunRecoveryKeepSourceReferencesExplicit() {
+        val api = contract()
+        val path = "/api/v1/companies/{companyId}/payroll/periods/{periodId}/calculation-review"
+        assertTrue(api["paths"][path]["get"]["x-hris-company-admission"].asBoolean())
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("period", "source", "policy", "runCount", "blockingIssues", "availableActions"),
+            schemas["PayrollCalculationReviewResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf(
+                "version",
+                "appliedRevision",
+                "effectiveFrom",
+                "effectiveUntil",
+                "incomeTaxRuleId",
+                "insuranceRuleId",
+            ),
+            schemas["PayrollCalculationPolicyResponse"]["properties"].propertyNames().toSet(),
+        )
+        val details = schemas["PayrollRunDetailsResponse"]["properties"]
+        assertTrue(details.has("period"))
+        assertTrue(details.has("availableActions"))
+        val item = schemas["PayrollRunItemResponse"]["properties"]
+        assertFalse(item.has("facts"))
+        assertFalse(item.has("calculation"))
+    }
+
+    @Test
     fun taxOpeningReviewExposesBoundedReferencesAndExplicitRevisionSelection() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/payroll"

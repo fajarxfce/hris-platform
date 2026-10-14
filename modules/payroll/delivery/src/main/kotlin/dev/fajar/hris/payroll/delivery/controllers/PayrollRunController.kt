@@ -19,7 +19,12 @@ class PayrollRunController(
     private val get: GetPayrollRun,
     private val employee: GetPayrollRunEmployee,
     private val list: ListPayrollRuns,
+    private val review: GetPayrollCalculationReview,
 ) {
+    @GetMapping("/periods/{periodId}/calculation-review")
+    fun review(actor: Actor, @PathVariable periodId: UUID): PayrollCalculationReviewResponse =
+        review.execute(actor, periodId).response().toResponse()
+
     @PostMapping("/periods/{periodId}/runs")
     fun start(
         actor: Actor,

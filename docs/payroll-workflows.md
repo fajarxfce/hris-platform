@@ -121,6 +121,12 @@ API paths and request fields are listed in [API conventions](api-conventions.md)
 
 ## Run review
 
+`GET /payroll/runs/{id}/review-preparation` returns current run state, retained
+summary totals, the latest review and submission eligibility. Totals count only
+successful results; an incomplete/failed run remains blocked. Reading preparation
+does not select or reserve approval routing, which is resolved under the command's
+current approval guard at submission.
+
 Only a fully calculated run with no failed employees can be submitted. Review retains the exact run version, participant count, taxable gross, withholding, and take-home totals. Total take-home selects the effective `PAYROLL` approval template on the submission date in the run's recorded timezone. Named and permission-based assignments are supported. A company payroll aggregate has no individual manager to resolve; manager assignment is rejected.
 
 Submission and withdrawal require `payroll.calculate`; an assigned or currently delegated `payroll.review` account decides each stage. Every mutation requires current recent authentication/MFA, live company access, an idempotency key, and observed versions. Review versions and shared approval versions are separate: reassignment advances the approval version without editing the frozen payroll snapshot. Reads require `payroll.read`, `payroll.calculate`, or `payroll.review`.
@@ -130,6 +136,14 @@ The calculation maker and submission author cannot approve directly or through d
 A missing assignee blocks the shared approval until administrative reassignment. Rejection retains the decision and requires a new calculation; identical rejected results cannot be submitted to another reviewer. Pending or approved reviews may be explicitly withdrawn before finalization. Withdrawal cancels the approval and preserves its decisions. Only then can the run be abandoned to release source cutoffs. A withdrawn snapshot may be submitted again, with at most eight review rounds per run.
 
 Review, approval transition, immutable change evidence, audit/outbox, and receipt share a transaction. The database rejects changed totals, missing history, unmatched decisions, or abandonment with an active review. Submission aggregates summary amount columns; it does not load every employee's complete JSON snapshot. Review reads return at most ten change records, and submission history uses bounded pages.
+
+Review detail includes current run state, finalization activity and current action
+hints, including stage and delegation eligibility. Minimal account display labels
+cover the captured assignments and history actors; historical account IDs remain
+unchanged. Readers share payroll/approval guards and revalidate session assurance
+after acquisition. Commands keep recent assurance through the journal and receipt;
+a delegation expiring during decision storage rolls back the approval, review,
+history and receipt together.
 
 Mobile clients retain both observed versions with a pending command. A lost response can replay the original operation after current access checks. `stale_version` or `approval_changed` requires fetching the latest review before constructing a new action. A finalized/paid state is never inferred from a completed calculation or approved review.
 

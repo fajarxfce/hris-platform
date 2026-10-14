@@ -3856,3 +3856,24 @@ unchanged historical results and withdrawal after permission revocation. Initial
 test-only assumptions about error wording and decimal string scale were corrected.
 Desktop output and light/dark narrow screenshots were inspected. Aggregate review,
 publication and payment dashboard workflows remain subsequent work.
+
+### Aggregate review preparation and action contracts
+
+Payroll exposes a read-only review preparation with retained calculation totals,
+the latest review and current submission eligibility. Review detail includes the
+current run, minimal participant names, approval stages/history and independent
+decision/withdrawal hints. Approval routing is resolved by the submission command;
+the preparation read does not reserve or select a routing template.
+
+Reads preserve shared guards and revalidate session assurance after waits and
+acquisition. Submission, decisions and withdrawal retain recent authentication
+through journaling, receipt recording and original-command recovery. Delegation
+expiry during a decision rolls back its review, approval, history and receipt.
+Historical results remain readable after withdrawal or abandonment.
+
+Architecture/format checks, both application JAR builds and 222 tests passed:
+99 API/PostgreSQL/contract tests, 61 payroll domain tests and all 62 worker tests.
+Coverage includes staged and delegated eligibility, minimal name projection,
+blocked/reassigned/rejected reviews, concurrent shared readers, late MFA and
+delegation expiry, original receipt recovery and interruption cleanup. Dashboard
+review screens and browser acceptance are the next part of this increment.

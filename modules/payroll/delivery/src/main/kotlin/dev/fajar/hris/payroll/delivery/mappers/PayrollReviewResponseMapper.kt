@@ -56,4 +56,19 @@ fun PayrollReviewDetails.toResponse() =
             approval.excludedAccountIds,
         ),
         changes.map { it.toResponse() },
+        run.toResponse(),
+        accounts.map { PayrollReviewAccountResponse(it.id, it.displayName) },
+        finalizationActive,
+        availableActions.map { it.name },
+    )
+
+fun PayrollReviewPreparation.toResponse() =
+    PayrollReviewPreparationResponse(
+        run.toResponse(),
+        totals.toResponse(),
+        latestReview?.toResponse(),
+        blockingIssues.map {
+            PayrollRunFailureResponse(it.kind.name, it.code, it.fields, it.parameters)
+        },
+        availableActions.map { it.name },
     )

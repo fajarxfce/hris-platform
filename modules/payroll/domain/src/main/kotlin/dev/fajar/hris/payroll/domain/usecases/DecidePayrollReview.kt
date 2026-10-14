@@ -113,10 +113,26 @@ class DecidePayrollReview(
             if (foundMembers is Result.Failed) return@run foundMembers
             val grants = (foundMembers as Result.Success).value
             val now = clock.instant()
-            if (!isAssignedApprover(live, approval, delegations, grants, now))
-                return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "not_assigned_approver"))
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            val authority =
+                requirePayrollReviewDecisionActor(
+                    live,
+                    approval,
+                    delegations,
+                    grants,
+                    now,
+                    security,
+                )
+            if (authority is Result.Failed) return@run authority
+            (replay as Result.Success).value?.let { receipt ->
+                return@run requirePayrollReviewDecisionActor(
+                        live,
+                        approval,
+                        delegations,
+                        grants,
+                        clock.instant(),
+                        security,
+                    )
+                    .map { receipt }
             }
             if (review.version != expectedVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
@@ -149,6 +165,16 @@ class DecidePayrollReview(
                     reason,
                     now,
                 )
+            val current =
+                requirePayrollReviewDecisionActor(
+                    live,
+                    approval,
+                    delegations,
+                    grants,
+                    clock.instant(),
+                    security,
+                )
+            if (current is Result.Failed) return@run current
             approvals
                 .decide(
                     actor,
@@ -176,8 +202,28 @@ class DecidePayrollReview(
                                 reason,
                             ),
                         )
+                        .flatMap {
+                            requirePayrollReviewDecisionActor(
+                                live,
+                                approval,
+                                delegations,
+                                grants,
+                                clock.instant(),
+                                security,
+                            )
+                        }
                         .flatMap { operations.record(actor, key, receipt) }
-                        .map { receipt }
+                        .flatMap {
+                            requirePayrollReviewDecisionActor(
+                                    live,
+                                    approval,
+                                    delegations,
+                                    grants,
+                                    clock.instant(),
+                                    security,
+                                )
+                                .map { receipt }
+                        }
                 }
         }
     }

@@ -71,8 +71,14 @@ class SubmitPayrollReview(
             val access =
                 requirePayrollMutation(live, "payroll.calculate", clock.instant(), security)
             if (access is Result.Failed) return@run access
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run requirePayrollMutation(
+                        live,
+                        "payroll.calculate",
+                        clock.instant(),
+                        security,
+                    )
+                    .map { receipt }
             }
             val found = runs.find(company, runId)
             if (found is Result.Failed) return@run found
@@ -142,6 +148,9 @@ class SubmitPayrollReview(
                     PayrollReviewStatus.PENDING,
                     0,
                 )
+            val current =
+                requirePayrollMutation(live, "payroll.calculate", clock.instant(), security)
+            if (current is Result.Failed) return@run current
             approvals
                 .create(company, approval)
                 .flatMap { reviews.create(company, review) }
@@ -160,8 +169,24 @@ class SubmitPayrollReview(
                                 reason,
                             ),
                         )
+                        .flatMap {
+                            requirePayrollMutation(
+                                live,
+                                "payroll.calculate",
+                                clock.instant(),
+                                security,
+                            )
+                        }
                         .flatMap { operations.record(actor, key, receipt) }
-                        .map { receipt }
+                        .flatMap {
+                            requirePayrollMutation(
+                                    live,
+                                    "payroll.calculate",
+                                    clock.instant(),
+                                    security,
+                                )
+                                .map { receipt }
+                        }
                 }
         }
     }

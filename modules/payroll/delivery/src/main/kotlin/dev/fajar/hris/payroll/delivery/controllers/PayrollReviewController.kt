@@ -17,7 +17,12 @@ class PayrollReviewController(
     private val withdraw: WithdrawPayrollReview,
     private val get: GetPayrollReview,
     private val list: ListPayrollReviews,
+    private val preparation: GetPayrollReviewPreparation,
 ) {
+    @GetMapping("/runs/{runId}/review-preparation")
+    fun preparation(actor: Actor, @PathVariable runId: UUID): PayrollReviewPreparationResponse =
+        preparation.execute(actor, runId).response().toResponse()
+
     @PostMapping("/runs/{runId}/reviews")
     fun submit(
         actor: Actor,

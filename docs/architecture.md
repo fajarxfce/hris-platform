@@ -128,6 +128,17 @@ guard. Interactive reads recheck session assurance after acquisition, and start,
 resume and abandon retain recent assurance through receipt replay and transaction
 completion. Finalized runs cannot be abandoned.
 
+Aggregate payroll review preparation reads retained summary totals and current
+run/review heads under shared payroll and access guards. It does not acquire full
+employee calculation payloads or create an approval snapshot. Detail readers
+also hold the shared approval guard and lock actor/delegator accounts in identifier
+order. Stage eligibility uses the same pure approval policy as decisions; current
+company account labels are projected separately from immutable actor IDs without
+returning account email or grants. The bounded party set never becomes a directory
+search. Reads revalidate session assurance after acquisition. Submission, decisions
+and withdrawal retain recent assurance through journal and receipt completion;
+delegated decisions also recheck delegation validity before committing.
+
 Monthly closing overview projects the period and minimal job progress in one SQL
 snapshot under shared access guards. It neither creates period rows nor holds
 resource locks that exclude the worker. The use case chooses available actions

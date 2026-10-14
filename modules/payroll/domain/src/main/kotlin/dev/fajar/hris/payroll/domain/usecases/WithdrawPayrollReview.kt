@@ -85,8 +85,14 @@ class WithdrawPayrollReview(
             val access =
                 requirePayrollMutation(live, "payroll.calculate", clock.instant(), security)
             if (access is Result.Failed) return@run access
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run requirePayrollMutation(
+                        live,
+                        "payroll.calculate",
+                        clock.instant(),
+                        security,
+                    )
+                    .map { receipt }
             }
             val found = reviews.find(company, id)
             if (found is Result.Failed) return@run found
@@ -129,6 +135,9 @@ class WithdrawPayrollReview(
                     )
             if (approval.version != expectedApprovalVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "approval_changed"))
+            val current =
+                requirePayrollMutation(live, "payroll.calculate", clock.instant(), security)
+            if (current is Result.Failed) return@run current
             approvals
                 .cancel(company, approval.id, approval.version)
                 .flatMap { cancelled ->
@@ -160,8 +169,24 @@ class WithdrawPayrollReview(
                                 reason,
                             ),
                         )
+                        .flatMap {
+                            requirePayrollMutation(
+                                live,
+                                "payroll.calculate",
+                                clock.instant(),
+                                security,
+                            )
+                        }
                         .flatMap { operations.record(actor, key, receipt) }
-                        .map { receipt }
+                        .flatMap {
+                            requirePayrollMutation(
+                                    live,
+                                    "payroll.calculate",
+                                    clock.instant(),
+                                    security,
+                                )
+                                .map { receipt }
+                        }
                 }
         }
     }

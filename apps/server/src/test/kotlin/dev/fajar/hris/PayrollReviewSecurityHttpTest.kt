@@ -109,7 +109,12 @@ class PayrollReviewSecurityHttpTest : PayrollReviewApiFixture() {
             "access_denied",
         )
         payrollError(get(f.people.payroll.admin, reviewsPath(f) + "/$id"), 403, "access_denied")
-        for (suffix in listOf(reviewsPath(f) + "/$id", runPath(f, run) + "/reviews")) {
+        for (suffix in
+            listOf(
+                reviewsPath(f) + "/$id",
+                runPath(f, run) + "/reviews",
+                runPath(f, run) + "/review-preparation",
+            )) {
             val reader =
                 payrollMember(f.people.payroll.company, setOf("company.read", "payroll.calculate"))
             val barrier = AccountLockProbe.Barrier(reader.account)
@@ -190,12 +195,44 @@ class PayrollReviewSecurityHttpTest : PayrollReviewApiFixture() {
             403,
             "not_assigned_approver",
         )
+        assertEquals(0, reviewView(f, id, delegate)["availableActions"].size())
         database()
             .update(
                 "insert into membership_permissions(company_id,account_id,permission) values(?,?,'payroll.review')",
                 f.people.payroll.company,
                 f.people.reviewer.account,
             )
+        assertEquals(
+            setOf("APPROVE", "REJECT"),
+            reviewView(f, id, delegate)["availableActions"]
+                .asSequence()
+                .map { it.asString() }
+                .toSet(),
+        )
+        val before =
+            listOf(
+                    "approval_decisions",
+                    "payroll_review_changes",
+                    "operation_receipts",
+                    "audit_entries",
+                    "outbox_events",
+                )
+                .associateWith { count(f.people.payroll.company, it) }
+        val at = clock.instant()
+        payrollProbe.beforeJournal = { row ->
+            if (row.action == "payroll.review_decided") clock.set(expires)
+        }
+        try {
+            payrollError(
+                decideReview(f, id, member = delegate, key = key),
+                403,
+                "not_assigned_approver",
+            )
+            assertEquals(before, before.keys.associateWith { count(f.people.payroll.company, it) })
+        } finally {
+            payrollProbe.clear()
+            clock.set(at)
+        }
         payrollBody(decideReview(f, id, member = delegate, key = key))
         payrollBody(decideReview(f, id, member = delegate, key = key))
         try {

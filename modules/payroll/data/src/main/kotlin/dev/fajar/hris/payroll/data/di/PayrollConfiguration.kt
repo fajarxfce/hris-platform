@@ -1210,7 +1210,26 @@ class PayrollConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetPayrollReview(reviews, policies, approvals, companies, members, identities, transactions)
+        runs: PayrollRunRepository,
+        finalizations: PayrollFinalizationRepository,
+        jobs: JobRepository,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollReview(
+            reviews,
+            policies,
+            approvals,
+            companies,
+            members,
+            identities,
+            transactions,
+            runs,
+            finalizations,
+            jobs,
+            clock,
+            security,
+        )
 
     @Bean
     fun listPayrollReviews(
@@ -1221,7 +1240,44 @@ class PayrollConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListPayrollReviews(reviews, runs, policies, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListPayrollReviews(
+            reviews,
+            runs,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun getPayrollReviewPreparation(
+        reviews: PayrollReviewRepository,
+        runs: PayrollRunRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollReviewPreparation(
+            reviews,
+            runs,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
 
     @Bean
     fun payrollFinalizationSource(sql: DSLContext): PayrollFinalizationDataSource =

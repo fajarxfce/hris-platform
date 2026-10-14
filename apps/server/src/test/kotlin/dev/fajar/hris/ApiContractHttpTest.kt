@@ -34,6 +34,34 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun payrollReviewPreparationAndActionsKeepVersionsAndAccountLabelsExplicit() {
+        val api = contract()
+        val path = "/api/v1/companies/{companyId}/payroll/runs/{runId}/review-preparation"
+        assertTrue(api["paths"][path]["get"]["x-hris-company-admission"].asBoolean())
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("run", "totals", "latestReview", "blockingIssues", "availableActions"),
+            schemas["PayrollReviewPreparationResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf(
+                "review",
+                "approval",
+                "changes",
+                "run",
+                "accounts",
+                "finalizationActive",
+                "availableActions",
+            ),
+            schemas["PayrollReviewDetailsResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("id", "displayName"),
+            schemas["PayrollReviewAccountResponse"]["properties"].propertyNames().toSet(),
+        )
+    }
+
+    @Test
     fun calculationPreparationAndRunRecoveryKeepSourceReferencesExplicit() {
         val api = contract()
         val path = "/api/v1/companies/{companyId}/payroll/periods/{periodId}/calculation-review"

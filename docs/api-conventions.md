@@ -235,9 +235,10 @@ An outcome failure is an unlocalized `{kind, code, fields, parameters}` object. 
 
 Payroll review:
 
+- `GET /companies/{companyId}/payroll/runs/{runId}/review-preparation`: current `run`, retained summary `totals`, nullable `latestReview`, `blockingIssues` and `availableActions` (`SUBMIT`). It performs no reservation or write. Totals count successful employees; failed/incomplete calculations cannot be submitted. Approval routing is resolved from current policy when the command is submitted.
 - `POST /companies/{companyId}/payroll/runs/{runId}/reviews`: `{id, expectedRunVersion, reason}`; requires `payroll.calculate` and a complete successful calculation.
 - `GET /companies/{companyId}/payroll/runs/{runId}/reviews`: `after` review number and `limit` (default 50, maximum 200); at most eight rounds exist for one run.
-- `GET /companies/{companyId}/payroll/reviews/{id}`: frozen `review`, current `approval`, and at most ten immutable `changes`. Totals contain decimal-string `taxableGross`, `withheld`, and `takeHome`, plus `employeeCount` and `currency: "IDR"`.
+- `GET /companies/{companyId}/payroll/reviews/{id}`: frozen `review`, current `approval` and `run`, at most ten immutable `changes`, scoped account display references, `finalizationActive` and current `availableActions` (`APPROVE`, `REJECT`, `WITHDRAW`). Account references contain only `id` and `displayName`; they describe current company members rather than rewriting historical actor IDs. Totals contain decimal-string `taxableGross`, `withheld`, and `takeHome`, plus `employeeCount` and `currency: "IDR"`.
 - `POST /companies/{companyId}/payroll/reviews/{id}/decisions`: `{expectedVersion, expectedApprovalVersion, decision: "APPROVE"|"REJECT", reason}`; requires an assigned/delegated `payroll.review` account. Rejection requires a reason.
 - `POST /companies/{companyId}/payroll/reviews/{id}/withdraw`: `{expectedVersion, expectedApprovalVersion, reason}`; requires `payroll.calculate` and a pending/approved review. Withdrawal cancels the shared approval and retains prior decisions.
 

@@ -4,4 +4,8 @@
 !apps/server/build/
 !apps/server/build/libs/
 !apps/server/build/libs/apps-server.jar
+!apps/worker/
+!apps/worker/build/
+!apps/worker/build/libs/
+!apps/worker/build/libs/apps-worker.jar
 !Dockerfile

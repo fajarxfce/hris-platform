@@ -14,6 +14,11 @@ Run ./gradlew format to format handwritten Kotlin. Architecture checks run with 
 
 Copy .env.example to .env and generate distinct secrets. Run docker compose up --build -d after building both application jars. PostgreSQL and API bind localhost only. A migration container owns schema changes; runtime receives only hris_app credentials without superuser/BYPASSRLS. For private Garage/ClamAV services, follow [document service configuration](storage.md#private-document-services) and include `compose.documents.yml`. TLS deployment is configured separately.
 
+The image build context admits the API and worker JARs explicitly through
+`.dockerignore`; source files and environment secrets remain excluded. Build both
+artifacts before `docker compose build api worker`. The worker selects its own
+artifact through the Dockerfile's `APP_JAR` argument.
+
 For a dashboard on a private WireGuard interface, run from `apps/dashboard`:
 
 ```sh

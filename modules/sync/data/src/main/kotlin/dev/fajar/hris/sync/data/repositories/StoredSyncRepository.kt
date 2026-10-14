@@ -43,9 +43,10 @@ class StoredSyncRepository(private val source: SyncDataSource) : SyncRepository 
         }
     }
 
-    override fun pending(scope: SyncScope): Result<Boolean> = safeDatabaseCall {
-        source.pending(scope.toSelection())
-    }
+    override fun pending(scope: SyncScope, now: java.time.Instant): Result<Boolean> =
+        safeDatabaseCall {
+            source.pending(scope.toSelection(), now)
+        }
 
     override fun publish(limit: Int): Result<Int> = safeDatabaseCall { source.publish(limit) }
 

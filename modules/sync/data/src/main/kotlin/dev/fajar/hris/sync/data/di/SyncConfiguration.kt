@@ -1,6 +1,7 @@
 package dev.fajar.hris.sync.data.di
 
 import dev.fajar.hris.core.domain.TransactionRunner
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -46,6 +47,7 @@ class SyncConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         GetMobileSyncBootstrap(
             sync,
@@ -56,6 +58,7 @@ class SyncConfiguration {
             identities,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -68,6 +71,7 @@ class SyncConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         GetMobileSyncChanges(
             sync,
@@ -78,6 +82,7 @@ class SyncConfiguration {
             identities,
             transactions,
             clock,
+            security,
         )
 
     @Bean

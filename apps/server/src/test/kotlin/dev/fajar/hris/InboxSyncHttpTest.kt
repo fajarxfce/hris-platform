@@ -219,7 +219,10 @@ class InboxSyncHttpTest : AnnouncementPublicationApiFixture() {
             Result.Success(emptyList<SyncResource>()),
             transactions.run(actor) { sync.snapshot(scope, null, 100) },
         )
-        assertEquals(Result.Success(false), transactions.run(actor) { sync.pending(scope) })
+        assertEquals(
+            Result.Success(false),
+            transactions.run(actor) { sync.pending(scope, clock.instant()) },
+        )
         publishChanges()
         assertEquals(
             Result.Success(emptyList<SyncChange>()),

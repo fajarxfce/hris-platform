@@ -316,3 +316,14 @@ Delivery reads current committed progress, advances at most 100 parts, and clear
 each acquired buffer after its HTTP operation. It never retries automatically or
 publishes content. A reserved part uses the current operator's server-issued
 continuation; replacing page ownership requires reselecting identical content.
+
+
+People owns a public coworker projection for mobile synchronization. Its worker
+use case selects company-local eligibility and the next effective transition;
+repositories acquire raw candidates, map the minimal fields, and store resulting
+records. Source triggers only capture raw identities. A company timezone guard
+precedes bounded queue row locks; no source lock is acquired afterward. MVCC
+acquisition and queue serialization preserve an invalidation from a concurrent
+source writer. Public records, tombstones, due scheduling and raw sync events
+commit atomically. The canonical reader keeps live account/company/MFA checks
+independent of the worker's projection authority and revision lifetime.

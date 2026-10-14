@@ -3359,3 +3359,36 @@ After notice, the validated APK was installed on the authorized phone at
 and installed-artifact hash matched the validated APK. This increment changes
 HRIS-specific expense behavior; the remaining mobile foundations and other
 offline editors stay in the completion sequence.
+
+
+### Company directory change feed
+
+People now owns versioned company-directory records and the explicitly selected
+`DIRECTORY_EMPLOYEES` collection. Canonical reads contain only name, employee
+number, assignment labels and their identifiers. Directory authority does not
+require a personal employment or grant private-profile/business access. Existing
+omitted collection selections and the interactive directory retain their behavior.
+
+A bounded worker derives current eligibility in the company timezone and schedules
+the next effective transition. Source transactions capture raw invalidations;
+public changes, tombstones, next due instants and raw sync events commit together.
+Unchanged content keeps its version. Each pass divides at most 200 records among
+up to four companies, and competing workers skip locked rows. Cross-company name
+capture uses a separate non-login, non-bypass role with only identity-column and
+queue privileges. API and worker logins do not inherit it.
+
+Validation passed architecture/format checks, 17 database tests, 32 People/sync
+domain tests and five sync codec tests. Directory, collection/access, profile,
+transfer and OpenAPI regression suites were exercised; the final runtime run
+passed 22 API tests and all 49 worker tests. Coverage includes late MFA expiry,
+revoked credentials/grants, private-field exclusion, effective starts and inclusive
+ends, cancellation of a future revision, timezone changes, concurrent workers,
+source writes waiting on projection completion, rollback during shutdown and
+restricted database-role privileges. API and worker JAR builds passed.
+
+Development migrated to V70 and both application roles were updated while keeping
+the private WireGuard API binding. Health returned HTTP 200. An authenticated
+fixture probe read the explicit bootstrap/change feed and canonical record; its
+single eligible coworker matched the live directory and publication was caught up.
+The probe performed no business mutation. Mobile replica wiring and offline
+acceptance remain the next integration step.

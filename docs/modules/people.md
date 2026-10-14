@@ -189,3 +189,14 @@ assigned to eligible current coworkers. Results are ordered by name/ID, use lite
 search of at most 120 characters, and are bounded to 1–50 entries. `hasMore` tells
 the client to narrow its search; this endpoint does not expose an organization
 tree or require organization administration access.
+
+
+### Public coworker synchronization
+
+The explicitly selected `DIRECTORY_EMPLOYEES` feed and
+`GET /api/v1/companies/{companyId}/employees/directory/{id}` expose versioned public
+coworker records. People owns a bounded projection worker for effective dates,
+name/assignment changes and removals; private profile fields are excluded. See
+[synchronization](../synchronization.md#coworker-directory-projection) for worker
+ownership, publication and client replacement behavior. The live directory API
+and scheduled onboarding/offboarding execution remain separate capabilities.

@@ -160,6 +160,30 @@ class WorkerConfiguration {
     ): JobTask = DocumentInventoryTask(resolve, advance, abort)
 
     @Bean
+    fun directoryProjectionTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 1
+            setThreadNamePrefix("hris-directory-projection-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(15)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = ["hris.worker.enabled"],
+        havingValue = "true",
+        matchIfMissing = true,
+    )
+    fun directoryProjectionWorker(
+        refresh: RefreshCompanyDirectory,
+        @org.springframework.beans.factory.annotation.Qualifier("directoryProjectionTimers")
+        timer: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+    ) = dev.fajar.hris.worker.sync.CompanyDirectoryWorker(refresh, timer)
+
+    @Bean
     fun mobileSyncTimers() =
         org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
             poolSize = 1

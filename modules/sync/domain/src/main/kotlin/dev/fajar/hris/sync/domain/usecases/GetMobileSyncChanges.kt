@@ -1,7 +1,8 @@
 package dev.fajar.hris.sync.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -20,6 +21,7 @@ class GetMobileSyncChanges(
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -56,7 +58,7 @@ class GetMobileSyncChanges(
             val access = identities.access(actor.accountId, companyId)
             if (access is Result.Failed) return@run access
             val identity = (access as Result.Success).value
-            val checked = validateCompanyCommandActor(actor, identity)
+            val checked = validateCompanySessionActor(actor, identity, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val current = (checked as Result.Success).value
             val selection = selectSyncCollections(current.permissions, requested)
@@ -76,7 +78,10 @@ class GetMobileSyncChanges(
                     ?: return@run Result.Failed(
                         Failure(FailureKind.FORBIDDEN, "company_access_denied")
                     )
-            val owned = people.employeeIdsForAccount(companyId, actor.accountId, 201)
+            val owned =
+                if (collections.any { it != SyncCollection.DIRECTORY_EMPLOYEES })
+                    people.employeeIdsForAccount(companyId, actor.accountId, 201)
+                else Result.Success(emptyList<java.util.UUID>())
             if (owned is Result.Failed) return@run owned
             val employmentIds = (owned as Result.Success).value
             if (employmentIds.size > 200)
@@ -121,7 +126,7 @@ class GetMobileSyncChanges(
             val rows = (loaded as Result.Success).value
             val items = rows.take(limit)
             val more = rows.size > limit
-            val pending = sync.pending(scope)
+            val pending = sync.pending(scope, clock.instant())
             if (pending is Result.Failed) return@run pending
             val timely = validateSyncCursorTime(cursor, clock.instant())
             if (timely is Result.Failed) return@run timely
@@ -135,13 +140,18 @@ class GetMobileSyncChanges(
                         issuedAt = now,
                         expiresAt = now.plusSeconds(604800),
                     )
-            cursors.encode(next).map { encoded ->
-                SyncChangePage(
-                    items,
-                    encoded,
-                    more,
-                    (pending as Result.Success).value,
-                    clock.instant(),
+            cursors.encode(next).flatMap { encoded ->
+                val assurance =
+                    validateCompanySessionActor(actor, identity, clock.instant(), security)
+                if (assurance is Result.Failed) return@flatMap assurance
+                Result.Success(
+                    SyncChangePage(
+                        items,
+                        encoded,
+                        more,
+                        (pending as Result.Success).value,
+                        clock.instant(),
+                    )
                 )
             }
         }

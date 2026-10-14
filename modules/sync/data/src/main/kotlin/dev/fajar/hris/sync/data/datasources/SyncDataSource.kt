@@ -22,7 +22,7 @@ interface SyncDataSource {
         limit: Int,
     ): List<MobileSyncChangesRecord>
 
-    fun pending(selection: SyncSelection): Boolean
+    fun pending(selection: SyncSelection, now: java.time.Instant): Boolean
 
     fun publish(limit: Int): Int
 

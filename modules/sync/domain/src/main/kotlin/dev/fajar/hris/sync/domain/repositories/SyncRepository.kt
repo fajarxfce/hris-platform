@@ -14,7 +14,7 @@ interface SyncRepository {
 
     fun changes(scope: SyncScope, after: Long, upper: Long, limit: Int): Result<List<SyncChange>>
 
-    fun pending(scope: SyncScope): Result<Boolean>
+    fun pending(scope: SyncScope, now: java.time.Instant): Result<Boolean>
 
     fun publish(limit: Int): Result<Int>
 

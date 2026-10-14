@@ -8,6 +8,7 @@ The supported collections are:
 | --- | --- | --- | --- |
 | `EXPENSE_CLAIMS` | `expenses.self.manage`, or explicit selection with `expenses.read` / `expenses.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}/record?scope=SELF` |
 | `EXPENSE_PAYMENTS` (explicit selection) | `expenses.self.manage`, `expenses.read` or `expenses.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}/payment-progress?scope=SELF` |
+| `DIRECTORY_EMPLOYEES` (explicit selection) | `people.directory.read` or `people.read` | Public coworkers in the selected company; no personal employment linkage required | `/api/v1/companies/{companyId}/employees/directory/{id}` |
 | `LEAVE_REQUESTS` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments or immutable request owner | `/api/v1/companies/{companyId}/leave/requests/{id}` |
 | `LEAVE_BALANCES` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/leave/balances/{id}` |
 | `OVERTIME_REQUESTS` | `overtime.self.manage`, or explicit selection with `overtime.read`, `overtime.manage` or `workforce.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/workforce/overtime/{id}` |
@@ -26,7 +27,7 @@ balance directory, so clients can hydrate a balance independently of a previousl
 opened directory page. These descriptive fields come from the current leave type;
 the balance version still identifies financial movements and closing state.
 
-All business-request statuses are included. Request cancellation or withdrawal is an `UPSERT` with a new version. Archiving an announcement withdraws its inbox items and produces `DELETE` references. Team/company administration rights do not grant an employee-wide export. Documents, approval inboxes, unfinalized payroll, and announcement-management records are not registered sync collections yet. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
+All business-request statuses are included. Request cancellation or withdrawal is an `UPSERT` with a new version. Archiving an announcement withdraws its inbox items and produces `DELETE` references. Team/company administration rights do not grant an employee-wide export of private business records. The separately selected coworker directory has its own minimal public fields and directory authority. Documents, approval inboxes, unfinalized payroll, and announcement-management records are not registered sync collections yet. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
 
 Attendance days have stable projection IDs and versions independent of individual
 capture and correction revisions. A capture, review or correction advances the
@@ -242,3 +243,59 @@ The worker assigns per-company sequence positions only to committed changes. A t
 A pass publishes at most 200 records, then prunes at most 500 eligible records in a separate transaction. A competing maintenance pass exits without waiting for the publication guard. Pruning advances a retained-history floor; clients behind that floor reset explicitly. API readers hold the head's shared row guard only for one bounded page, so pruning cannot invalidate an already checked page mid-transaction. The timer has one owned thread and one periodic task, with no task allocated per event. Existing SQL/lock timeouts and interruption boundaries apply.
 
 These limits bound individual work and memory; they are not throughput guarantees. Measure backlog age, publication capacity, query latency, and retention on the target deployment before expanding registered collections or declaring performance targets met.
+
+## Coworker directory projection
+
+`DIRECTORY_EMPLOYEES` is an explicit public company collection. It does not change
+omitted collection selections or grant access to private profiles, salaries,
+attendance, or another employee's requests. Its canonical response contains only
+`id`, `version`, `employeeNumber`, `name`, `positionId`, `position`, `departmentId`
+and `department`. Unknown, foreign and withdrawn records return the same scoped
+`404 directory_employee_not_found` outcome. Every canonical read and sync page
+rechecks current credentials, membership, grants and MFA after waiting; assurance
+is checked again before releasing the result, including cursor encoding.
+
+The People worker derives these records from current employment and assignment
+facts using the company-local date. Only active/probation employments between
+their inclusive start/end dates are published. A future employee's identity is
+not published before becoming eligible. The worker schedules the next effective
+revision, start, or end boundary; elapsed days do not require a business write to
+produce the corresponding change. Cancelled revisions are excluded. A timezone
+change requeues the company. Eligibility belongs to the domain policy, separately
+from raw SQL acquisition and invalidation capture.
+
+Source transactions enqueue raw employment identities when employment history,
+a cancellation, a public name or an assigned unit label changes. A person-name
+trigger also captures linked employments after transfers across companies; its
+restricted trigger function returns no data and never acquires private profile
+fields. Its dedicated non-login, non-bypass role can read only employment IDs,
+company IDs and person links, and write the raw refresh queue. API and worker
+logins do not inherit that role; the function does not run as the migrator.
+Other profile edits do not invalidate this public projection. Existing
+employments are queued under migration guards before subsequent writers proceed.
+
+Each fixed-delay worker pass visits at most four companies and divides its
+200-record budget among the selected companies. A single busy company can use
+the whole batch. Competing workers skip locked rows. Projection writes,
+next due instants and raw sync references share one transaction. A source write
+waiting on that queue row marks it due after the worker commits, so completion
+cannot erase a later invalidation. Source guards are never acquired after queue
+rows. Company timezone is guarded; source acquisition uses one MVCC statement.
+Cancellation rolls back the entire company batch, and shutdown cancels the owned
+timer. These limits bound work, not a measured throughput guarantee.
+
+Identical public fields retain their version and emit no change. A removal clears
+the public fields and advances the same record into a tombstone; a later return
+advances that identity again. Records retain their own revision, independently of
+employment, person or organization command versions. The ordinary after-commit
+publisher assigns sync positions. Due projection rows contribute to
+`pendingPublication`, including during first acquisition. A client completing a
+bootstrap must drain its changes and wait for pending publication within its
+finite sync budget before publishing a complete replacement. An unfinished
+replacement never hides the previously published owned local directory.
+
+The existing interactive directory remains a live, date-derived API. The new
+canonical projection is eventually consistent with source changes while its
+worker runs. A stopped projection worker is observable as pending work; neither
+an API read nor the mobile client secretly executes worker policy. The mobile
+application retains its separate integration and offline acceptance work.

@@ -8,6 +8,28 @@ import org.junit.jupiter.api.Test
 
 class SyncCollectionPolicyTest {
     @Test
+    fun coworkerDirectoryIsExplicitAndDoesNotGrantPrivateEmploymentCollections() {
+        for (grant in listOf("people.directory.read", "people.read")) {
+            assertEquals(
+                Result.Success(setOf(DIRECTORY_EMPLOYEES)),
+                selectSyncCollections(setOf(grant), setOf(DIRECTORY_EMPLOYEES, PAYSLIPS)),
+            )
+            assertEquals(
+                "sync_access_denied",
+                (selectSyncCollections(setOf(grant), null) as Result.Failed).failure.code,
+            )
+        }
+        for (grant in listOf("company.read", "people.self.read", "people.manage", "payroll.read")) {
+            assertEquals(
+                "sync_access_denied",
+                (selectSyncCollections(setOf(grant), setOf(DIRECTORY_EMPLOYEES)) as Result.Failed)
+                    .failure
+                    .code,
+            )
+        }
+    }
+
+    @Test
     fun expenseReadersSelectOwnedClaimsAndPaymentsWithoutChangingDefaultFeeds() {
         val collections = setOf(EXPENSE_CLAIMS, EXPENSE_PAYMENTS)
         for (grant in listOf("expenses.self.manage", "expenses.read", "expenses.manage")) {

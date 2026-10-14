@@ -1,6 +1,8 @@
 package dev.fajar.hris.sync.data.datasources
 
 import dev.fajar.hris.schema.tables.AttendanceSyncHeads.ATTENDANCE_SYNC_HEADS as A
+import dev.fajar.hris.schema.tables.DirectoryEmployeeRecords.DIRECTORY_EMPLOYEE_RECORDS as D
+import dev.fajar.hris.schema.tables.DirectoryRefreshQueue.DIRECTORY_REFRESH_QUEUE as Q
 import dev.fajar.hris.schema.tables.ExpenseClaims.EXPENSE_CLAIMS as E
 import dev.fajar.hris.schema.tables.ExpensePaymentHeads.EXPENSE_PAYMENT_HEADS as EP
 import dev.fajar.hris.schema.tables.InboxItems.INBOX_ITEMS as I
@@ -178,6 +180,18 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                     DSL.condition(selection.employmentIds.isNotEmpty()),
                     DSL.inline("WORK_HOLIDAYS").`in`(selection.collections),
                 )
+        val directory =
+            sql.select(
+                    DSL.inline("DIRECTORY_EMPLOYEES").`as`("collection"),
+                    D.ID.`as`("resource_id"),
+                    D.VERSION.`as`("resource_version"),
+                )
+                .from(D)
+                .where(
+                    D.COMPANY_ID.eq(selection.companyId),
+                    D.NAME.isNotNull,
+                    DSL.inline("DIRECTORY_EMPLOYEES").`in`(selection.collections),
+                )
         val records =
             expenses
                 .unionAll(expensePayments)
@@ -191,6 +205,7 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                 .unionAll(schedules)
                 .unionAll(roster)
                 .unionAll(holidays)
+                .unionAll(directory)
                 .asTable("sync_resources")
         val collection = requireNotNull(records.field("collection", String::class.java))
         val id = requireNotNull(records.field("resource_id", UUID::class.java))
@@ -224,8 +239,25 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
             .limit(limit)
             .fetch()
 
-    override fun pending(selection: SyncSelection): Boolean =
-        sql.fetchExists(sql.selectOne().from(C).where(syncAudience(selection), C.SEQUENCE.isNull))
+    override fun pending(selection: SyncSelection, now: java.time.Instant): Boolean =
+        sql.fetchValue(
+            DSL.select(
+                DSL.exists(
+                        DSL.selectOne().from(C).where(syncAudience(selection), C.SEQUENCE.isNull)
+                    )
+                    .or(
+                        DSL.exists(
+                            DSL.selectOne()
+                                .from(Q)
+                                .where(
+                                    Q.COMPANY_ID.eq(selection.companyId),
+                                    Q.REFRESH_AT.le(now.atOffset(java.time.ZoneOffset.UTC)),
+                                    DSL.inline("DIRECTORY_EMPLOYEES").`in`(selection.collections),
+                                )
+                        )
+                    )
+            )
+        ) == true
 
     override fun publish(limit: Int): Int =
         requireNotNull(

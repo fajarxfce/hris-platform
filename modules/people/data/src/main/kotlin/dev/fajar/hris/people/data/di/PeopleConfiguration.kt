@@ -18,6 +18,33 @@ import org.springframework.context.annotation.Configuration
 @Configuration(proxyBeanMethods = false)
 class PeopleConfiguration {
     @Bean
+    fun directoryProjectionSource(sql: DSLContext): DirectoryProjectionDataSource =
+        PostgresDirectoryProjectionDataSource(sql)
+
+    @Bean
+    fun directoryProjection(source: DirectoryProjectionDataSource): DirectoryProjectionRepository =
+        StoredDirectoryProjectionRepository(source)
+
+    @Bean
+    fun refreshCompanyDirectory(
+        directory: DirectoryProjectionRepository,
+        companies: CompanyRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = RefreshCompanyDirectory(directory, companies, transactions, clock)
+
+    @Bean
+    fun getDirectoryRecord(
+        directory: DirectoryProjectionRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetDirectoryRecord(directory, companies, members, identities, transactions, security, clock)
+
+    @Bean
     fun bindPersonAccount(
         profiles: PersonProfileRepository,
         people: PeopleRepository,

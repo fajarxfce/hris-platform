@@ -13,6 +13,7 @@ fun syncAudience(selection: SyncSelection): Condition =
             C.COLLECTION.ne("INBOX")
                 .and(C.EMPLOYMENT_ID.`in`(selection.employmentIds))
                 .or(C.OWNER_ACCOUNT_ID.eq(selection.accountId))
+                .or(C.COLLECTION.eq("DIRECTORY_EMPLOYEES"))
                 .or(
                     C.COLLECTION.eq("WORK_HOLIDAYS")
                         .and(DSL.condition(selection.employmentIds.isNotEmpty()))

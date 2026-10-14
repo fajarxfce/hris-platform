@@ -23,7 +23,7 @@ reads gated through failed cleanup and retries. The [mobile read and sync model]
 distinguishes existing snapshots from complete replicas: Inbox, Leave, Overtime, Workforce, Payroll and Expenses
 collections consume change feeds and retain account-owned records
 across sign-in, independently of the active request session. A replacement cursor
-stages new data without hiding published facts. The coworker directory remains
+stages new data without hiding published facts. The coworker directory in the mobile app remains
 online. API 35 acceptance reopened Home and monthly
 attendance without connectivity after advancing the emulator clock by 73 hours.
 Company policy controls maintenance, minimum builds and module availability, with
@@ -166,6 +166,13 @@ recovery, company availability, MFA enrollment/verification and recovery-code lo
 and device-session revocation. External providers and the employee workflows below
 retain their own acceptance work.
 
+The backend [coworker directory projection](synchronization.md#coworker-directory-projection)
+now provides a company-scoped change feed and canonical public-field records.
+A bounded worker handles effective dates, name/assignment changes and tombstones;
+private profiles and lifecycle commands remain separate. Migration, API/worker
+checks and a scoped development API probe passed. The mobile directory still
+needs its encrypted record store, local queries and synchronization integration.
+
 Administrative Documents now covers employee folders, document/revision history,
 new and replacement uploads, resumable browser delivery, authorized downloads,
 validation/retry, explicit cancellation, retention-policy configuration,
@@ -193,7 +200,7 @@ against an isolated API/PostgreSQL fixture with independent operators.
 | Area | Remaining end-to-end work |
 | --- | --- |
 | Mobile identity | Native OIDC handoff and external-provider acceptance. Android MFA and device-session workflows are validated; iOS physical acceptance remains separate. |
-| Mobile foundation | Offline drafts for the remaining workflows, stable ownership for the remaining read projections, consistent sync status, deep links and push registration. Expense working copies, owned encrypted company restoration, age-independent stored reads and account-owned Inbox/Leave/Overtime/Workforce/Payroll/Expense records are implemented; the mobile sync model records each remaining collection. |
+| Mobile foundation | Offline drafts for the remaining workflows, coworker directory replication, stable ownership for the remaining read projections, consistent sync status, deep links and push registration. Expense working copies, owned encrypted company restoration, age-independent stored reads and account-owned Inbox/Leave/Overtime/Workforce/Payroll/Expense records are implemented; the mobile sync model records each remaining collection. |
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
 | Workforce | Bulk/reset and late corrections; physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections and their history, company-wide exception review queues, overtime planning with reviewed calendars, directories/details/history, actual-time submission, independent review and withdrawal, dashboard monthly closing/recovery with published employee results, and mobile work calendars, overtime planning/actual time/withdrawal with durable recovery, and online/offline capture are implemented and verified against the real API. |
 | Leave | Team calendar, entitlement batches and year closing; scheduled accrual/expiry. Dashboard request creation includes scoped employee/evidence selection, server calculation, preview conflicts and original-command recovery, verified against an isolated API/PostgreSQL instance. Mobile balances, filtered history, request details, submission with published document evidence, and durable withdrawal/cancellation flows are implemented and verified against the development API. |

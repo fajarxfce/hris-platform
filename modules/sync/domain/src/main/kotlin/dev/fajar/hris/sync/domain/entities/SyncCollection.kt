@@ -13,4 +13,5 @@ enum class SyncCollection {
     ROSTER_DAYS,
     WORK_HOLIDAYS,
     EXPENSE_PAYMENTS,
+    DIRECTORY_EMPLOYEES,
 }

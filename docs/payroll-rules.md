@@ -95,7 +95,15 @@ An employment's first payroll year can start with explicit opening evidence, inc
 
 `payroll.calculate` prepares the draft; `payroll.review` verifies it. Both require current company access and recent authentication/MFA. The current beneficiary cannot prepare or verify their own opening. Any account that prepared a historical revision is excluded from verification, even if another preparer edited it afterward. `payroll.read`, `payroll.calculate`, or `payroll.review` permits company-scoped reads; payroll policy management and employee self-service do not confer this access.
 
-A replacement always creates a draft revision and requires independent verification again. Verification preserves the exact submitted terms. Header, immutable revision, audit/outbox, and operation receipt commit together; the database rejects an incomplete or rewritten revision. Commands use observed opening/employment versions and idempotency keys. A replay returns its original receipt while current scope and independence remain valid. An opening retains at most 1,000 revisions; lists/history use bounded pages. Importing these facts does not calculate or finalize payroll. Run capture and finalized-period history consumption are the next integration step.
+A replacement always creates a draft revision and requires independent verification again. Verification preserves the exact submitted terms. Header, immutable revision, audit/outbox, and operation receipt commit together; the database rejects an incomplete or rewritten revision. Commands use observed opening/employment versions and idempotency keys. A replay returns its original receipt while current scope and independence remain valid. An opening retains at most 1,000 revisions; lists/history use bounded pages. Importing these facts does not calculate or finalize payroll. The [calculation workflow](payroll-workflows.md#finalized-tax-continuity) captures reviewed opening evidence and retains its lineage through finalized assessments.
+
+Year-specific employee discovery includes missing openings. One guarded review
+combines the current employee reference, nullable opening, bounded history and
+calculation cutoff. Historical detail is selected by an explicit revision. Current
+beneficiaries, historical preparers and frozen years restrict the available actions;
+the hints do not reserve command eligibility. Session assurance is checked again
+after acquisition, and late command expiry rolls back the revision, journal and
+receipt together.
 
 Period draft and monthly input preparation are described in [payroll workflows](payroll-workflows.md).
 

@@ -1,12 +1,14 @@
 package dev.fajar.hris.payroll.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.payroll.domain.entities.*
 import dev.fajar.hris.payroll.domain.policies.*
 import dev.fajar.hris.payroll.domain.repositories.*
+import java.time.*
 import java.util.UUID
 
 class ListPayrollTaxOpenings(
@@ -16,6 +18,8 @@ class ListPayrollTaxOpenings(
     private val members: MembershipRepository,
     private val identities: IdentityRepository,
     private val transactions: TransactionRunner,
+    private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -40,14 +44,16 @@ class ListPayrollTaxOpenings(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId, shared = true)
             if (accountLock is Result.Failed) return@run accountLock
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val accessResult = identities.access(actor.accountId, company)
+            if (accessResult is Result.Failed) return@run accessResult
+            val access = (accessResult as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             if (!canReadPayrollTaxOpening((checked as Result.Success).value))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
-            openings.list(company, year, status, after, limit)
+            openings.list(company, year, status, after, limit).flatMap { page ->
+                validateCompanySessionActor(actor, access, clock.instant(), security).map { page }
+            }
         }
     }
 }

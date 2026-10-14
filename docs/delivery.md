@@ -48,6 +48,28 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Opening tax-history review and discovery
+
+Year-specific employee discovery now includes unprepared opening history and
+minimal employment references. A guarded review combines the current employee,
+nullable opening, bounded immutable history, historical preparers and calculation
+cutoffs. Independent action hints remain separate from command authorization.
+Historical detail supports an explicit revision; missing history never becomes an
+implicit zero declaration. Legacy readers also retain post-acquisition assurance,
+and saves/verification recheck recent assurance through replay and completion.
+
+All 73 selected API/PostgreSQL/contract tests passed, including 32 new review,
+assurance and contract cases. The 56 payroll domain tests, 62 worker tests,
+architecture/format checks and both application JAR builds passed. Coverage
+includes coherent concurrent reads/writes, bounded discovery, private-profile
+exclusion, original/live grant intersection, historical-maker exclusions,
+calculation cutoffs, cancellation, expiry after acquisition and receipt replay,
+and late transaction rollback. A regression test caught a removed completed-month
+guard during implementation; the unchanged company-local date rule was restored
+and the complete selected suite passed afterward.
+
+Dashboard consumption and development deployment remain subsequent work.
+
 ### Monthly payroll input dashboard
 
 The dashboard provides month/status-filtered employee discovery, coherent

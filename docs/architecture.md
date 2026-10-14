@@ -112,6 +112,14 @@ Domain policy derives action hints from current source versions and maker/checke
 rules. Legacy input reads retain the same post-acquisition session check; input
 commands preserve recent assurance through replay and transaction completion.
 
+Opening tax-history discovery uses the shared minimal employee datasource and a
+year-specific head projection without acquiring private profiles. Its review use
+case holds shared payroll, People and access guards while combining employment,
+current opening, bounded history, historical authors and calculation cutoffs.
+Interactive opening reads revalidate session assurance after acquisition; commands
+retain recent assurance through original receipt recovery and transaction completion.
+Missing opening evidence remains distinct from an explicit zero declaration.
+
 Monthly closing overview projects the period and minimal job progress in one SQL
 snapshot under shared access guards. It neither creates period rows nor holds
 resource locks that exclude the worker. The use case chooses available actions

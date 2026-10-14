@@ -66,13 +66,8 @@ class VerifyPayrollTaxOpening(
                     validateCompanyCommandActor(actor, it)
                 }
             if (checked is Result.Failed) return@run checked
-            val allowed =
-                requirePayrollMutation(
-                    (checked as Result.Success).value,
-                    "payroll.review",
-                    clock.instant(),
-                    security,
-                )
+            val live = (checked as Result.Success).value
+            val allowed = requirePayrollMutation(live, "payroll.review", clock.instant(), security)
             if (allowed is Result.Failed) return@run allowed
             val beneficiary = people.accountForEmployee(company, employee)
             if (beneficiary is Result.Failed) return@run beneficiary
@@ -93,8 +88,9 @@ class VerifyPayrollTaxOpening(
                 return@run Result.Failed(
                     Failure(FailureKind.FORBIDDEN, "payroll_tax_opening_author_cannot_verify")
                 )
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run requirePayrollMutation(live, "payroll.review", clock.instant(), security)
+                    .map { receipt }
             }
             val frozen =
                 cutoffs.frozenMonths(
@@ -137,7 +133,10 @@ class VerifyPayrollTaxOpening(
                         ),
                     )
                     .flatMap { operations.record(actor, key, receipt) }
-                    .map { receipt }
+                    .flatMap {
+                        requirePayrollMutation(live, "payroll.review", clock.instant(), security)
+                            .map { receipt }
+                    }
             }
         }
     }

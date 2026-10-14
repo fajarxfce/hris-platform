@@ -2,6 +2,7 @@ package dev.fajar.hris.payroll.data.repositories
 
 import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.payroll.data.datasources.PayrollEmployeeDataSource
 import dev.fajar.hris.payroll.data.datasources.PayrollTaxOpeningDataSource
 import dev.fajar.hris.payroll.data.mappers.*
 import dev.fajar.hris.payroll.domain.entities.*
@@ -15,7 +16,35 @@ import tools.jackson.databind.ObjectMapper
 class StoredPayrollTaxOpeningRepository(
     private val source: PayrollTaxOpeningDataSource,
     private val json: ObjectMapper,
+    private val employees: PayrollEmployeeDataSource,
 ) : PayrollTaxOpeningRepository {
+    override fun employee(company: UUID, employee: UUID): Result<PayrollEmployee?> =
+        safeDatabaseCall {
+            employees.employee(company, employee)?.toPayrollEmployee()
+        }
+
+    override fun employees(
+        company: UUID,
+        year: Int,
+        query: String,
+        status: PayrollTaxOpeningEmployeeStatus?,
+        after: String?,
+        limit: Int,
+    ): Result<Page<PayrollTaxOpeningEmployee>> = safeDatabaseCall {
+        val rows = source.employees(company, year, query, status?.name, after, limit + 1)
+        Page(
+            rows.take(limit).map { row ->
+                require((row.openingVersion == null) == (row.openingStatus == null))
+                PayrollTaxOpeningEmployee(
+                    row.employee.toPayrollEmployee(),
+                    row.openingVersion,
+                    row.openingStatus?.let(PayrollTaxOpeningStatus::valueOf),
+                )
+            },
+            if (rows.size > limit) rows[limit - 1].employee.employeeNumber else null,
+        )
+    }
+
     override fun revision(
         company: UUID,
         employee: UUID,

@@ -34,6 +34,41 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun taxOpeningReviewExposesBoundedReferencesAndExplicitRevisionSelection() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/payroll"
+        val lookup = api["paths"]["$base/tax-openings/employees"]["get"]
+        val review = api["paths"]["$base/employees/{employeeId}/tax-openings/{year}/review"]["get"]
+        val detail = api["paths"]["$base/employees/{employeeId}/tax-openings/{year}"]["get"]
+        assertTrue(lookup["x-hris-company-admission"].asBoolean())
+        assertTrue(review["x-hris-company-admission"].asBoolean())
+        val parameters = lookup["parameters"].associateBy { it["name"].asString() }
+        assertTrue(parameters.getValue("year")["required"].asBoolean())
+        assertEquals(50, parameters.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals(32, parameters.getValue("after")["schema"]["maxLength"].asInt())
+        assertEquals(120, parameters.getValue("query")["schema"]["maxLength"].asInt())
+        val revision = detail["parameters"].first { it["name"].asString() == "revision" }
+        assertEquals(999, revision["schema"]["maximum"].asInt())
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf(
+                "id",
+                "employeeNumber",
+                "name",
+                "employmentVersion",
+                "openingVersion",
+                "openingStatus",
+            ),
+            schemas["PayrollTaxOpeningEmployeeResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("year", "employee", "current", "history", "frozen", "availableActions"),
+            schemas["PayrollTaxOpeningReviewResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertFalse(schemas["PayrollTaxOpeningSummaryResponse"]["properties"].has("terms"))
+    }
+
+    @Test
     fun payrollInputReviewDocumentsCurrentSourcesIndependentActionsAndBoundedDiscovery() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/payroll"

@@ -1,10 +1,20 @@
 package dev.fajar.hris.payroll.data.datasources
 
+import dev.fajar.hris.payroll.data.models.PayrollTaxOpeningEmployeeRow
 import dev.fajar.hris.payroll.data.models.PayrollTaxOpeningRow
 import dev.fajar.hris.schema.tables.records.*
 import java.util.UUID
 
 interface PayrollTaxOpeningDataSource {
+    fun employees(
+        company: UUID,
+        year: Int,
+        query: String,
+        status: String?,
+        after: String?,
+        limit: Int,
+    ): List<PayrollTaxOpeningEmployeeRow>
+
     fun revision(company: UUID, employee: UUID, year: Int, revision: Long): PayrollTaxOpeningRow?
 
     fun find(company: UUID, employee: UUID, year: Int): PayrollTaxOpeningRow?

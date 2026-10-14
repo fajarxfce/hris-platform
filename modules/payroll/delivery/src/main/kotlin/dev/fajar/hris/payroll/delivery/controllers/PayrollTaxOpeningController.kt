@@ -5,8 +5,11 @@ import dev.fajar.hris.core.http.*
 import dev.fajar.hris.payroll.delivery.mappers.*
 import dev.fajar.hris.payroll.delivery.requests.*
 import dev.fajar.hris.payroll.delivery.responses.*
+import dev.fajar.hris.payroll.domain.entities.PayrollTaxOpeningEmployeeStatus
 import dev.fajar.hris.payroll.domain.entities.PayrollTaxOpeningStatus
 import dev.fajar.hris.payroll.domain.usecases.*
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Schema
 import java.util.UUID
 import org.springframework.web.bind.annotation.*
 
@@ -18,7 +21,40 @@ class PayrollTaxOpeningController(
     private val get: GetPayrollTaxOpening,
     private val history: GetPayrollTaxOpeningHistory,
     private val list: ListPayrollTaxOpenings,
+    private val review: GetPayrollTaxOpeningReview,
+    private val employees: ListPayrollTaxOpeningEmployees,
 ) {
+    @GetMapping("/tax-openings/employees")
+    fun employees(
+        actor: Actor,
+        @RequestParam year: Int,
+        @Parameter(schema = Schema(maxLength = 120)) @RequestParam(defaultValue = "") query: String,
+        @RequestParam(required = false) status: PayrollTaxOpeningEmployeeStatus?,
+        @Parameter(schema = Schema(minLength = 1, maxLength = 32))
+        @RequestParam(required = false)
+        after: String?,
+        @Parameter(schema = Schema(minimum = "1", maximum = "50"))
+        @RequestParam(defaultValue = "50")
+        limit: Int,
+    ): Page<PayrollTaxOpeningEmployeeResponse> =
+        employees.execute(actor, year, query, status, after, limit).response().let {
+            Page(it.items.map { row -> row.toResponse() }, it.nextCursor)
+        }
+
+    @GetMapping("/employees/{employeeId}/tax-openings/{year}/review")
+    fun review(
+        actor: Actor,
+        @PathVariable employeeId: UUID,
+        @PathVariable year: Int,
+        @Parameter(schema = Schema(minimum = "0", maximum = "999"))
+        @RequestParam(required = false)
+        historyAfter: Long?,
+        @Parameter(schema = Schema(minimum = "1", maximum = "200"))
+        @RequestParam(defaultValue = "50")
+        historyLimit: Int,
+    ): PayrollTaxOpeningReviewResponse =
+        review.execute(actor, employeeId, year, historyAfter, historyLimit).response().toResponse()
+
     @PutMapping("/employees/{employeeId}/tax-openings/{year}")
     fun save(
         actor: Actor,
@@ -59,7 +95,11 @@ class PayrollTaxOpeningController(
         actor: Actor,
         @PathVariable employeeId: UUID,
         @PathVariable year: Int,
-    ): PayrollTaxOpeningResponse = get.execute(actor, employeeId, year).response().toResponse()
+        @Parameter(schema = Schema(minimum = "0", maximum = "999"))
+        @RequestParam(required = false)
+        revision: Long?,
+    ): PayrollTaxOpeningResponse =
+        get.execute(actor, employeeId, year, revision).response().toResponse()
 
     @GetMapping("/employees/{employeeId}/tax-openings/{year}/history")
     fun history(

@@ -1,8 +1,10 @@
 package dev.fajar.hris.payroll.data.datasources
 
-import dev.fajar.hris.payroll.data.models.PayrollTaxOpeningRow
+import dev.fajar.hris.payroll.data.models.*
+import dev.fajar.hris.schema.tables.Employments.EMPLOYMENTS as E
 import dev.fajar.hris.schema.tables.PayrollTaxOpeningRevisions.PAYROLL_TAX_OPENING_REVISIONS as R
 import dev.fajar.hris.schema.tables.PayrollTaxOpenings.PAYROLL_TAX_OPENINGS as H
+import dev.fajar.hris.schema.tables.Persons.PERSONS as P
 import dev.fajar.hris.schema.tables.records.*
 import java.util.UUID
 import org.jooq.DSLContext
@@ -10,6 +12,56 @@ import org.jooq.impl.DSL
 
 class PostgresPayrollTaxOpeningDataSource(private val sql: DSLContext) :
     PayrollTaxOpeningDataSource {
+    override fun employees(
+        company: UUID,
+        year: Int,
+        query: String,
+        status: String?,
+        after: String?,
+        limit: Int,
+    ): List<PayrollTaxOpeningEmployeeRow> =
+        sql.select(E.ID, E.EMPLOYEE_NUMBER, P.LEGAL_NAME, E.VERSION, H.VERSION, R.STATUS)
+            .from(E)
+            .join(P)
+            .on(P.ID.eq(E.PERSON_ID))
+            .leftJoin(H)
+            .on(
+                H.COMPANY_ID.eq(E.COMPANY_ID).and(H.EMPLOYMENT_ID.eq(E.ID)).and(H.TAX_YEAR.eq(year))
+            )
+            .leftJoin(R)
+            .on(
+                R.COMPANY_ID.eq(H.COMPANY_ID)
+                    .and(R.OPENING_ID.eq(H.ID))
+                    .and(R.REVISION.eq(H.VERSION))
+            )
+            .where(E.COMPANY_ID.eq(company))
+            .and(
+                E.EMPLOYEE_NUMBER.containsIgnoreCase(query)
+                    .or(P.LEGAL_NAME.containsIgnoreCase(query))
+            )
+            .and(after?.let { E.EMPLOYEE_NUMBER.gt(it) } ?: DSL.noCondition())
+            .and(
+                when (status) {
+                    null -> DSL.noCondition()
+                    "UNPREPARED" -> H.ID.isNull
+                    else -> R.STATUS.eq(status)
+                }
+            )
+            .orderBy(E.EMPLOYEE_NUMBER)
+            .limit(limit)
+            .fetch {
+                PayrollTaxOpeningEmployeeRow(
+                    PayrollEmployeeRow(
+                        requireNotNull(it.value1()),
+                        requireNotNull(it.value2()),
+                        requireNotNull(it.value3()),
+                        requireNotNull(it.value4()),
+                    ),
+                    it.value5(),
+                    it.value6(),
+                )
+            }
+
     override fun revision(
         company: UUID,
         employee: UUID,

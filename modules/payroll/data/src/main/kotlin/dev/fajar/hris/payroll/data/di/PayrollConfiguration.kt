@@ -20,6 +20,224 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class PayrollConfiguration {
     @Bean
+    fun payrollAmendmentDraftSource(sql: DSLContext): PayrollAmendmentDataSource =
+        PostgresPayrollAmendmentDataSource(sql)
+
+    @Bean
+    fun payrollAmendments(
+        source: PayrollAmendmentDataSource,
+        json: ObjectMapper,
+    ): PayrollAmendmentRepository = StoredPayrollAmendmentRepository(source, json)
+
+    @Bean
+    fun savePayrollAmendment(
+        amendments: PayrollAmendmentRepository,
+        sources: PayrollAmendmentSourceRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        SavePayrollAmendment(
+            amendments,
+            sources,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun calculatePayrollAmendment(
+        amendments: PayrollAmendmentRepository,
+        sources: PayrollAmendmentSourceRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        CalculatePayrollAmendment(
+            amendments,
+            sources,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun cancelPayrollAmendment(
+        amendments: PayrollAmendmentRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        CancelPayrollAmendment(
+            amendments,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun getPayrollAmendment(
+        amendments: PayrollAmendmentRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollAmendment(
+            amendments,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun getPayrollAmendmentHistory(
+        amendments: PayrollAmendmentRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollAmendmentHistory(
+            amendments,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun getPayrollAmendmentRevision(
+        amendments: PayrollAmendmentRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollAmendmentRevision(
+            amendments,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun getPayrollAmendmentCalculation(
+        amendments: PayrollAmendmentRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollAmendmentCalculation(
+            amendments,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun listPayrollAmendments(
+        amendments: PayrollAmendmentRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListPayrollAmendments(
+            amendments,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun payrollAmendmentSource(sql: DSLContext): PayrollAmendmentSourceDataSource =
         PostgresPayrollAmendmentSourceDataSource(sql)
 

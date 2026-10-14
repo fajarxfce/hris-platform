@@ -68,6 +68,62 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun retainedAmendmentDraftsExposeBoundedMetadataAndVersionedIdempotentCommands() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/payroll/amendments"
+        for ((path, method) in
+            listOf(
+                base to "get",
+                "$base/{id}" to "get",
+                "$base/{id}/history" to "get",
+                "$base/{id}/revisions/{version}" to "get",
+                "$base/{id}/calculations/{calculationId}" to "get",
+                "$base/{id}" to "put",
+                "$base/{id}/calculate" to "post",
+                "$base/{id}/cancel" to "post",
+            )) {
+            val operation = api["paths"][path][method]
+            assertTrue(operation["x-hris-company-admission"].asBoolean(), "$method $path")
+            if (method != "get")
+                assertTrue(
+                    operation["parameters"].any {
+                        it["name"].asString() == "Idempotency-Key" && it["required"].asBoolean()
+                    }
+                )
+        }
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf(
+                "firstAssessmentId",
+                "expectedVersion",
+                "sourceVersions",
+                "corrections",
+                "reason",
+            ),
+            schemas["SavePayrollAmendmentRequest"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("expectedVersion", "reason"),
+            schemas["PayrollAmendmentCommandRequest"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("amendment", "history", "latestCalculation", "availableActions"),
+            schemas["PayrollAmendmentDetailsResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("summary", "preview"),
+            schemas["PayrollAmendmentCalculationAttemptResponse"]["properties"]
+                .propertyNames()
+                .toSet(),
+        )
+        assertFalse(schemas["PayrollAmendmentSummaryResponse"]["properties"].has("terms"))
+        assertFalse(schemas["PayrollAmendmentSummaryResponse"]["properties"].has("calculation"))
+        val limit =
+            api["paths"][base]["get"]["parameters"].single { it["name"].asString() == "limit" }
+        assertEquals(100, limit["schema"]["maximum"].asInt())
+    }
+
+    @Test
     fun payrollPaymentReviewKeepsBankInstructionsHistoryResultsAndActionHintsTogether() {
         val api = contract()
         val operation =

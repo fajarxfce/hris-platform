@@ -195,6 +195,19 @@ in chronological order. Preview cannot replace verified source ownership and
 creates no persistent draft, approval or payment. Session checks follow waits
 and acquisition; preview retains recent authentication through calculation.
 
+Saved amendments acquire the operation receipt guard before exclusive payroll,
+shared People and access guards. Use cases select and validate reviewed source
+versions, retain pure calculation outcomes, and coordinate the immutable revision,
+calculation evidence, journal and receipt transaction. Repositories map raw stored
+snapshots within the database boundary; metadata queries do not deserialize entire
+proposals or results. A read filter explicitly excludes the requesting beneficiary.
+Current authority and assurance are checked after waits and before returning data
+or committing a command, including receipt replay. SQL constraints protect the
+revision sequence, original identity, complete chronological result set and exact
+signed differences. Failed rule evaluation is retained; interruption and technical
+failure roll back. Private drafts do not advance employee synchronization or
+change published payroll and payment evidence.
+
 Employee expense draft saves, cancellations, submission and withdrawal check
 current session assurance after resource/access guards, before receipt replay,
 and before transaction completion. Late expiry rolls back claim state, immutable

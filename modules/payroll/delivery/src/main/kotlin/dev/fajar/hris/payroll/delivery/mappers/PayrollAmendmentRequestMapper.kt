@@ -8,3 +8,9 @@ fun PayrollAmendmentSourceReferenceRequest.toReference() =
 
 fun PayrollAmendmentRemunerationRequest.toRemuneration() =
     PayrollAmendmentRemuneration(assessmentId, compensation?.toTerms(), input?.toTerms())
+
+fun SavePayrollAmendmentRequest.toTerms() =
+    PayrollAmendmentTerms(
+        sourceVersions.map { it.toReference() },
+        corrections.map { it.toRemuneration() },
+    )

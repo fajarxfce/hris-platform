@@ -43,6 +43,58 @@ failures remain sanitized domain failures.
 These endpoints create no approval, job, payment, operation receipt or published
 revision. They do not provide the draft, approval or settlement workflows below.
 
+## Saved drafts and calculation attempts
+
+The draft API retains reviewed proposals separately from published payroll:
+
+| Method | Path below `/api/v1/companies/{companyId}/payroll` | Result |
+| --- | --- | --- |
+| GET | `/amendments?year=2026` | Current draft summaries, filtered by employee, status and literal name/number search |
+| PUT | `/amendments/{id}` | Create or revise a proposal with an observed version and review reason |
+| GET | `/amendments/{id}` | Current proposal, first history page, latest calculation summary and available actions |
+| GET | `/amendments/{id}/history` | Paged immutable revision summaries |
+| GET | `/amendments/{id}/revisions/{version}` | One retained proposal revision |
+| POST | `/amendments/{id}/calculate` | Retain a calculation attempt against the selected draft revision |
+| GET | `/amendments/{id}/calculations/{calculationId}` | One retained attempt and its monthly results |
+| POST | `/amendments/{id}/cancel` | Cancel an unpublished draft while retaining its evidence |
+
+Commands require `Idempotency-Key`, `expectedVersion` and `reason`. Creation uses
+a client-generated amendment UUID and a null version; editing retains its first
+assessment and beneficiary. The save body also includes `firstAssessmentId`,
+`sourceVersions` and `corrections` in the preparation format. Calculate and cancel
+accept only the observed version and reason. A command receipt identifies the
+amendment and committed revision. Reusing an operation with changed input is
+rejected; an exact retry returns the original receipt after current authorization
+and beneficiary checks, even after another edit, cancellation or published month.
+
+Successful calculation changes `DRAFT` to `CALCULATED`. Editing returns it to
+`DRAFT`, retaining earlier attempts and results. A completed rule failure retains
+a `FAILED` attempt and `CALCULATION_FAILED` revision, with stable failure codes,
+fields and parameters; the command still returns its committed receipt. The draft
+remains editable. Technical acquisition or storage failure and interruption roll
+back the command instead of becoming a rule result. `CANCELLED` is terminal.
+
+Saving and calculating recheck the complete observed year. An additional published
+month requires explicitly reviewing and saving updated references. Historical
+reads and cancellation do not require replacing an old proposal's source versions.
+There are at most 32 calculation attempts and 1,000 revisions per amendment; the
+last revision is reserved for cancellation. A calculation covers at most twelve
+months. List/history pages contain metadata, accept limits from one to 100 and
+use stable keyset cursors. The full proposal and calculation payloads have
+separate detail reads.
+
+Read and command guards retain current company membership, credentials and MFA.
+Commands also require recent authentication and MFA after waits, on replay and
+through the final write. Beneficiaries cannot read or prepare their private
+amendment drafts; their entries are excluded from the administrative list. Original
+employee statements remain available through the existing payslip permission.
+
+Immutable revisions, complete calculation results, audit/outbox and operation
+receipts commit together. Database constraints reject missing outcome records,
+partial suffixes, changed source ownership and inconsistent differences. These
+private drafts create no approval, publication, bank instruction or employee-sync
+revision. Those capabilities are the subsequent stages below.
+
 ## Calculation and evidence
 
 An amendment belongs to one company and person in one tax year. It starts at an
@@ -102,7 +154,7 @@ immutable. A confirmed recovery needs its own scoped evidence and receipt.
 ## Delivery sequence
 
 1. Guarded preparation and deterministic recalculation from retained sources: implemented.
-2. Versioned drafts, retained calculations and independent approval.
+2. Versioned drafts and retained calculations: implemented. Independent approval remains.
 3. Atomic revised assessment publication, ordinary tax-continuity integration,
    payment balances and confirmed recoveries.
 4. Dashboard workflows, amended employee statements/PDFs and mobile incremental
@@ -110,4 +162,4 @@ immutable. A confirmed recovery needs its own scoped evidence and receipt.
 
 Each stage requires isolation, competing-change, lost-response, assurance-expiry,
 cancellation and cleanup tests where applicable. The feature is not complete at
-the preparation or preview stage.
+the preparation, preview or saved-draft stage.

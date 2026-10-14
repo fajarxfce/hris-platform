@@ -1,0 +1,21 @@
+import type { FixedEarning } from "./fixed-earning";
+import type { PayrollPayBasis } from "./payroll-pay-basis";
+import type { PayrollTaxRegistration } from "./payroll-tax-registration";
+export const taxTreatments = ["GROSS", "NET", "GROSS_UP"] as const;
+export const insurancePrograms = ["HEALTH", "OLD_AGE", "PENSION", "ACCIDENT", "DEATH"] as const;
+export const accidentRisks = ["VERY_LOW", "LOW", "MEDIUM", "HIGH", "VERY_HIGH"] as const;
+export type CompensationTerms = Readonly<{
+  basicSalary: string;
+  fixedEarnings: readonly FixedEarning[];
+  treatment: (typeof taxTreatments)[number];
+  tax: PayrollTaxRegistration;
+  insuranceWage: string;
+  insurancePrograms: readonly (typeof insurancePrograms)[number][];
+  insuranceExemptionReason: string | null;
+  accidentRisk: (typeof accidentRisks)[number];
+  additionalHealthDependents: number;
+  additionalRetirementContribution: string;
+  qualifiedDonation: string;
+  otherNetDeduction: string;
+  payBasis: PayrollPayBasis | null;
+}>;

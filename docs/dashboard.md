@@ -124,6 +124,35 @@ confirmed access loss removes acquired policy data. The form keeps unsaved value
 through locale/theme changes and protects route/company changes. Draft input is
 held in browser memory, not persistent offline storage.
 
+## Employee compensation
+
+`/payroll/compensation` provides bounded employee discovery by name or number,
+including employments without configured salary and future employments. It uses
+only payroll read or compensation-management authority and never acquires a
+private person profile. Selected company, search and continuation belong to the
+route; employee details discard their resource selection when company changes.
+
+`/payroll/compensation/:employeeId` separates the selected month's compensation,
+the latest saved revision and bounded immutable history. A month before salary
+starts retains current configuration and history. Inspection opens already
+acquired evidence in a detail panel. The current employment command version is
+independent of salary revisions and is not inferred from an effective snapshot.
+
+The separate editor requires `payroll.compensation.manage` and the server's
+current independent-change capability. It covers decimal IDR earnings, up to 20
+fixed allowances, verified tax registration, BPJS participation and exemptions,
+recurring deductions, and optional reviewed proration/overtime/THR conventions.
+Initial setup leaves salary, residency, PTKP and occupational risk unspecified.
+An absent calculation basis remains absent unless explicitly configured.
+
+Saving pins both employment and compensation versions with the reason and one
+operation ID. Definite version conflicts require protected reload. Response loss
+retains the immutable nested command through later rejected retries. A confirmed
+scope loss clears private review data; a newly linked beneficiary cannot mutate
+or replay their own salary. The API remains authoritative for current authority,
+verification dates and frozen payroll periods. Forms retain input across theme
+and locale changes and protect departure. Drafts are held in browser memory.
+
 ## Shift templates
 
 The Workforce route owns a bounded shift directory, current details, and create/edit

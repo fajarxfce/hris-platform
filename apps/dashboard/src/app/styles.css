@@ -879,3 +879,47 @@ a {
   font-size: 18px;
   padding-top: 8px;
 }
+
+.app-compensation-section {
+  display: grid;
+  gap: 20px;
+}
+.app-compensation-section :is(p, h3) {
+  margin: 0;
+}
+.app-compensation-earning {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 16px 0;
+  border: 0;
+  border-top: 1px solid var(--colorNeutralStroke2);
+}
+.app-compensation-earning > .fui-Button {
+  justify-self: start;
+}
+.app-compensation-programs {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.app-compensation-programs legend {
+  margin-bottom: 8px;
+}
+.app-compensation-property-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: 20px;
+}
+.app-compensation-properties .app-resource-panel {
+  min-width: 0;
+}
+.app-resource-identity {
+  margin: 0 24px 16px;
+  color: var(--colorNeutralForeground2);
+}

@@ -2,6 +2,30 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_compensation: [
+    "Review the compensation fields and verification references.",
+    "Periksa isian kompensasi dan referensi verifikasinya.",
+  ],
+  invalid_compensation_amount: [
+    "Total earnings exceed the supported amount, or deductions exceed earnings.",
+    "Total penghasilan melebihi batas, atau potongan melebihi penghasilan.",
+  ],
+  invalid_payroll_pay_basis: [
+    "Review the proration, overtime and THR calculation basis.",
+    "Periksa dasar perhitungan prorata, lembur, dan THR.",
+  ],
+  compensation_change_unavailable: [
+    "Compensation cannot be changed with this account. Return to its details.",
+    "Kompensasi tidak dapat diubah dengan akun ini. Kembali ke detailnya.",
+  ],
+  self_compensation_change_denied: [
+    "Your compensation must be changed by another authorized operator.",
+    "Kompensasi Anda harus diubah oleh operator lain yang berwenang.",
+  ],
+  compensation_revision_limit: [
+    "This compensation has reached its revision limit.",
+    "Kompensasi ini mencapai batas revisi.",
+  ],
   invalid_payroll_policy: [
     "Review the policy dates, contribution bases and references.",
     "Periksa periode kebijakan, dasar iuran, dan referensinya.",

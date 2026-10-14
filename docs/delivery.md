@@ -3441,5 +3441,41 @@ foreign account and company access, original/live permission intersection,
 credential revocation, late MFA expiry, pending cancellation, rollback, explicit
 collection scope and default-client compatibility. API and worker JAR builds
 passed. Initial runs corrected test fixture iteration, command versions and a
-rollback setup; all affected tests subsequently passed. Development deployment
-and mobile replica acceptance are the next integration steps.
+rollback setup; all affected tests subsequently passed. The complete backend,
+dashboard and integration CI also passed for this implementation.
+
+The development API and worker now run with V71, preserving document storage,
+inspection services and the WireGuard bindings. Readiness returned HTTP 200. A
+read-only fixture probe verified six owned published records through the explicit
+feed and canonical endpoint; their IDs matched the interactive catalog and the
+feed had no pending publication. No business records were changed by the probe.
+
+### Mobile published document replica
+
+[HRIS Mobile f06d8eae](https://github.com/fajarxfce/hris-mobile/commit/f06d8eae)
+consumes published metadata through the explicit change feed. Encrypted records,
+employment references and the processed cursor commit together. Employment,
+category and page selections query local indexes; a replacement bootstrap keeps
+published facts readable until it catches up. Account/company/audience ownership
+survives reauthentication, independently of data and credential age. Confirmed
+read denials retain a separate durable gate and a buffer for failed persistence.
+Content preparation and business evidence review keep their own live admission.
+
+Validation passed root checks with 1,432 desktop/JVM/UI tests, 115 Documents tests
+in Chromium, Android dev assembly and production Web compilation. Regression
+coverage includes versioned withdrawals, staged replacement, bounded hydration,
+cancellation, stale scope, failed denial cleanup, concurrent admission and local
+selection. SQLite and IndexedDB tests exercise indexed encrypted storage. UI
+tests also verify that explicit refresh reopens an observation whose storage
+source terminated after an I/O failure.
+
+API 35 emulator acceptance read all six live published records, restored the
+catalog after a cold offline start, opened a previously unvisited category
+offline and retained selection across route return. Another offline restart
+after a 73-hour clock advance kept both categories readable. Clock and network
+settings were restored, file preparation succeeded online, and the native save
+dialog produced a 605-byte fixture PDF matching its server SHA-256. The emulator
+crash buffer was empty. The APK SHA-256 is
+`7b1fb049efa7dacd9947118c261481d184af8802d04361afa2a595558b51c9e2`.
+Phone installation remains pending because its ADB connection became unavailable;
+the phone was not launched or used for this acceptance.

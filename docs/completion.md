@@ -20,7 +20,7 @@ age-based read limit. Saved views remain readable after freshness or credential
 expiry; live authorization and operation reviews have separate checks. Foreground
 revalidation retains the same workspace, while confirmed denials keep affected
 reads gated through failed cleanup and retries. The [mobile read and sync model](https://github.com/fajarxfce/hris-mobile/blob/main/docs/local-first.md)
-distinguishes existing snapshots from complete replicas: Inbox, Leave, Overtime, Workforce, Payroll, Expenses and the coworker directory
+distinguishes existing snapshots from complete replicas: Inbox, Leave, Overtime, Workforce, Payroll, Expenses, published Documents and the coworker directory
 collections consume change feeds and retain account-owned records
 across sign-in, independently of the active request session. A replacement cursor
 stages new data without hiding published facts. The coworker directory also supports
@@ -184,8 +184,15 @@ and a canonical metadata endpoint. Both require current self-document authority
 and owned employment; private HR files and unfinished first uploads are excluded.
 Replacement uploads retain the accepted revision until publication, while
 retirement emits a versioned withdrawal. API, worker, database and domain checks
-passed. Mobile catalog replication and offline acceptance remain in progress;
-file downloads and business attachment review retain independent authorization.
+passed. The [mobile catalog replica](https://github.com/fajarxfce/hris-mobile/commit/f06d8eae)
+now retains account/company/audience-owned encrypted records, with local
+employment, category and page selection. Published facts remain readable during
+cursor replacement and after ordinary data or credential expiry. Confirmed read
+denials reopen only after admitted acquisition. API 35 acceptance covered cold
+offline restoration, a previously unopened category, retained route selection and
+another restart after a 73-hour clock advance. File preparation and native export
+also passed after reconnecting; the exported digest matched the server. File
+downloads and business attachment review retain independent authorization.
 
 Administrative Documents now covers employee folders, document/revision history,
 new and replacement uploads, resumable browser delivery, authorized downloads,
@@ -214,7 +221,7 @@ against an isolated API/PostgreSQL fixture with independent operators.
 | Area | Remaining end-to-end work |
 | --- | --- |
 | Mobile identity | Native OIDC handoff and external-provider acceptance. Android MFA and device-session workflows are validated; iOS physical acceptance remains separate. |
-| Mobile foundation | Offline drafts for the remaining workflows, stable ownership for the remaining read projections, consistent sync status, deep links and push registration. Expense working copies, owned encrypted company restoration, age-independent stored reads and account-owned Inbox/Leave/Overtime/Workforce/Payroll/Expense/Directory records are implemented; the mobile sync model records each remaining collection. |
+| Mobile foundation | Offline drafts for the remaining workflows, stable ownership for the remaining read projections, consistent sync status, deep links and push registration. Expense working copies, owned encrypted company restoration, age-independent stored reads and account-owned Inbox/Leave/Overtime/Workforce/Payroll/Expense/Directory/Document catalog records are implemented; the mobile sync model records each remaining collection. |
 | People | Scheduled lifecycle execution. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
 | Workforce | Bulk/reset and late corrections; physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections and their history, company-wide exception review queues, overtime planning with reviewed calendars, directories/details/history, actual-time submission, independent review and withdrawal, dashboard monthly closing/recovery with published employee results, and mobile work calendars, overtime planning/actual time/withdrawal with durable recovery, and online/offline capture are implemented and verified against the real API. |
 | Leave | Team calendar, entitlement batches and year closing; scheduled accrual/expiry. Dashboard request creation includes scoped employee/evidence selection, server calculation, preview conflicts and original-command recovery, verified against an isolated API/PostgreSQL instance. Mobile balances, filtered history, request details, submission with published document evidence, and durable withdrawal/cancellation flows are implemented and verified against the development API. |

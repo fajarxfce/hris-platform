@@ -50,7 +50,7 @@ class OvertimeWorkflowHttpTest : OvertimeApiFixture() {
         assertEquals(submitted, overtimeBody(actual(f, id, actualKey)))
         assertEquals(completed, overtimeBody(decide(f, id, 2, key = key, by = next)))
         assertEquals(2, rows(f, "approval_decisions"))
-        assertEquals(4, rows(f, "mobile_sync_changes"))
+        assertEquals(4, overtimeSyncRows(f))
         assertCode(
             plan(f, id, plannedKey, changes = mapOf("reason" to "Changed payload")),
             409,

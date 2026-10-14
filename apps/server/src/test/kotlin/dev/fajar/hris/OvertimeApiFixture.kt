@@ -223,6 +223,14 @@ abstract class OvertimeApiFixture : WorkPeriodApiFixture() {
         assertEquals(code, json.readTree(response.body())["code"].asString())
     }
 
+    protected fun overtimeSyncRows(f: Fixture): Int =
+        database()
+            .queryForObject(
+                "select count(*) from mobile_sync_changes where company_id=? and collection='OVERTIME_REQUESTS'",
+                Int::class.java,
+                f.company,
+            )!!
+
     protected fun rows(f: Fixture, table: String): Int {
         require(
             table in

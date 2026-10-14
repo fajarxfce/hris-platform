@@ -223,6 +223,7 @@ class OvertimeAccessHttpTest : OvertimeApiFixture() {
         val id = UUID.randomUUID()
         val key = UUID.randomUUID()
         val receipts = rows(f, "operation_receipts")
+        val syncChanges = rows(f, "mobile_sync_changes")
         overtimeProbe.beforeJournal = {
             if (it.action == "overtime.planned") {
                 Thread.currentThread().interrupt()
@@ -253,7 +254,8 @@ class OvertimeAccessHttpTest : OvertimeApiFixture() {
         }
         assertEquals(0, rows(f, "overtime_requests"))
         assertEquals(0, rows(f, "overtime_changes"))
-        assertEquals(0, rows(f, "mobile_sync_changes"))
+        assertEquals(syncChanges, rows(f, "mobile_sync_changes"))
+        assertEquals(0, overtimeSyncRows(f))
         assertEquals(receipts, rows(f, "operation_receipts"))
         overtimeProbe.clear()
         val retried =

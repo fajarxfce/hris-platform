@@ -111,7 +111,7 @@ class OvertimeTransactionHttpTest : OvertimeApiFixture() {
         assertTrue(view["request"]["status"].asString() in setOf("APPROVED", "WITHDRAWN"))
         assertEquals(2, view["request"]["version"].asLong())
         assertEquals(3, rows(f, "overtime_changes"))
-        assertEquals(3, rows(f, "mobile_sync_changes"))
+        assertEquals(3, overtimeSyncRows(f))
     }
 
     @Test

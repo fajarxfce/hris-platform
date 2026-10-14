@@ -62,6 +62,23 @@ reference reserves nothing; submission independently validates and freezes it.
 
 Claim lists, details, drafts, history, submission summaries, payment progress, submission details, and receipt downloads accept `scope=SELF`. This always restricts the response to the account's own employment, including when that account also has company-wide or reviewer grants. Self-scoped claim lists require an owned `employmentId`. The default `AUTHORIZED` preserves company, team, and assigned-reviewer access according to each endpoint's existing policy; it does not expose unsubmitted drafts to submission reviewers.
 
+The canonical `GET /expenses/claims/{id}/record` instead defaults to `SELF`.
+It acquires the current claim/draft, latest immutable submission with current
+approval and reviews, and one descending history page in a single guarded
+transaction. `historyLimit` defaults to twenty and accepts 1–20; `historyAfter`
+selects actions below that exclusive version without changing the current head.
+The response omits live action authority and duplicate-receipt review hints.
+It accepts explicit `AUTHORIZED` for ordinary claim readers, but an assignment
+alone cannot reveal the current draft/history. Missing and inaccessible claims
+both return `expense_claim_not_found`, before resource-relative cursor validation.
+
+Approval reassignment captures an owned `EXPENSE_CLAIMS` invalidation in its
+transaction without changing the claim command version. Consumers must hydrate
+that invalidation even at an equal claim version and use the approval's embedded
+version when displaying current assignment. [Synchronization](../synchronization.md)
+defines cursor publication and client upgrade behavior. Payment progress stays
+in its separate versioned collection and never refreshes claim review authority.
+
 Interactive claim and category reads acquire shared resource/access guards in the same order as their writers. They revalidate current company membership, credentials, the original permission intersection, and applicable MFA assurance after waiting and before returning acquired data. Receipt content uses short guarded database transactions before and after object-storage I/O. It verifies the immutable chunk, rechecks access before delivery, and clears the acquired byte buffer on both successful and failed delivery. External storage calls hold no database guards.
 
 ## Claim drafts

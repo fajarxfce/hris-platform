@@ -8,6 +8,8 @@ import dev.fajar.hris.expenses.delivery.responses.*
 import dev.fajar.hris.expenses.domain.entities.ExpenseClaimReadScope
 import dev.fajar.hris.expenses.domain.entities.ExpenseClaimStatus
 import dev.fajar.hris.expenses.domain.usecases.*
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDate
 import java.util.UUID
 import org.springframework.web.bind.annotation.*
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/v1/companies/{companyId}/expenses/claims")
 class ExpenseClaimController(
+    private val record: GetExpenseClaimRecord,
     private val payments: GetExpenseClaimPayments,
     private val save: SaveExpenseDraft,
     private val submit: SubmitExpenseClaim,
@@ -25,6 +28,18 @@ class ExpenseClaimController(
     private val drafts: GetExpenseDrafts,
     private val history: GetExpenseClaimHistory,
 ) {
+    @GetMapping("/{id}/record")
+    fun record(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestParam(required = false) historyAfter: Long?,
+        @Parameter(schema = Schema(minimum = "1", maximum = "20"))
+        @RequestParam(defaultValue = "20")
+        historyLimit: Int,
+        @RequestParam(defaultValue = "SELF") scope: ExpenseClaimReadScope,
+    ): ExpenseClaimRecordResponse =
+        record.execute(actor, id, historyAfter, historyLimit, scope).response().toResponse()
+
     @GetMapping("/{id}/payments")
     fun payments(
         actor: Actor,

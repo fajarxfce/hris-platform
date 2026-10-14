@@ -3305,3 +3305,24 @@ discovery, RLS and subsequent capture. Fifty-six protected-read tests passed,
 including permission/credential revocation while both progress routes waited and
 late assurance failure classification. Architecture/format checks and both API
 and worker builds passed. Mobile Expense replication remains a separate delivery.
+
+### Canonical Expense records
+
+`GET /expenses/claims/{id}/record` now provides a coherent current claim/draft,
+latest submission, approval and bounded activity page. It defaults to SELF and
+excludes live review affordances. Approval reassignment captures an owned claim
+invalidation without changing the claim command version; clients must process
+newly published equal-version references as well as version increases.
+
+Seventeen database tests, thirty-eight worker tests and 111 focused API tests
+passed across the validation runs. These cover concurrent claim saves and approval
+reassignment, shared readers, rollback of captured invalidations, default/self
+scope, assignment-only exclusions, history pagination, current access revocation,
+late MFA expiry, interruption cleanup and OpenAPI bounds. Architecture and format
+checks passed, and both application JARs were built.
+
+The API and worker were deployed. Health through WireGuard and the dashboard's
+HTTP response passed. Read-only checks of an existing approved and draft fixture
+matched their preceding claim, submission and history endpoints and confirmed
+that older history pages retain the current head. No business record was changed.
+The complete mobile Expense replica and its device acceptance remain outstanding.

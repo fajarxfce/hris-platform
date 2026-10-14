@@ -1,6 +1,7 @@
 package dev.fajar.hris
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.expenses.domain.repositories.ExpenseClaimRepository
 import dev.fajar.hris.expenses.domain.repositories.ExpensePaymentRepository
 import dev.fajar.hris.storage.domain.repositories.ObjectStorageRepository
 import java.util.UUID
@@ -13,6 +14,21 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
+    @Test
+    fun failedHistoryDoesNotPublishTheAcquiredClaimOrSubmission() {
+        val scene = prepare()
+        val failure = Failure(FailureKind.UNAVAILABLE, "database_unavailable")
+        val failing =
+            object : ExpenseClaimRepository by claims {
+                override fun history(companyId: UUID, id: UUID, after: Long?, limit: Int) =
+                    Result.Failed(failure)
+            }
+        val result = invoke(scene, "record", claimRepository = failing)
+        assertSame(failure, (result as Result.Failed).failure)
+        assertTrue(acquireReadGuardsExclusively(scene) is Result.Success)
+        assertTrue(invoke(scene, "record") is Result.Success)
+    }
+
     @Test
     fun failedPaymentAcquisitionPreservesItsFailureAndDoesNotReturnAPartialReview() {
         val scene = prepare()
@@ -72,6 +88,7 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
                 "policy-catalog",
                 "policy-review",
                 "claim-review",
+                "record",
                 "directory",
                 "receipt-metadata",
                 "receipt-content",
@@ -119,6 +136,7 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
                 "policy-catalog",
                 "policy-review",
                 "claim-review",
+                "record",
                 "directory",
                 "receipt-metadata",
                 "receipt-content",
@@ -136,6 +154,7 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
                 when (action) {
                     "policy-review" -> "category-history"
                     "claim-review" -> "payments"
+                    "record" -> "history"
                     else -> action
                 },
             )
@@ -174,6 +193,7 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
                 "policy-catalog",
                 "policy-review",
                 "claim-review",
+                "record",
                 "directory",
                 "receipt-metadata",
                 "receipt-content",
@@ -187,6 +207,7 @@ class ExpenseReadAssuranceTest : ExpenseReadAssuranceApiFixture() {
                 when (action) {
                     "policy-review" -> "category-history"
                     "claim-review" -> "payments"
+                    "record" -> "history"
                     else -> action
                 },
             )

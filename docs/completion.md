@@ -137,6 +137,11 @@ SELF expense authority independently of document-catalog permissions, bounded
 sequential reads and a final digest check. API 35 acceptance verified picker
 cancellation/retry, saved bytes against the server hash, large text, dark appearance
 and return from Settings. The validated APK was delivered with install-only.
+The [Expense record endpoint](modules/expenses.md#employee-reads) supplies a
+coherent claim/submission/approval and activity page for local replication.
+Approval reassignment publishes a new invalidation even at the same claim version;
+payment progress retains its separate collection. Backend tests and read-only dev
+checks passed. Full mobile Expense storage and synchronization remain outstanding.
 Automated UI/API checks and the Android dev build passed. Android 16 device checks
 covered password sign-in, company isolation, profiles, inbox reading, offline
 content, offline process restoration with company isolation, queued acknowledgement

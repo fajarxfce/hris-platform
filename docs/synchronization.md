@@ -6,7 +6,7 @@ The supported collections are:
 
 | Collection | Required permission | Audience | Canonical resource |
 | --- | --- | --- | --- |
-| `EXPENSE_CLAIMS` | `expenses.self.manage`, or explicit selection with `expenses.read` / `expenses.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}?scope=SELF` |
+| `EXPENSE_CLAIMS` | `expenses.self.manage`, or explicit selection with `expenses.read` / `expenses.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}/record?scope=SELF` |
 | `EXPENSE_PAYMENTS` (explicit selection) | `expenses.self.manage`, `expenses.read` or `expenses.manage` | Current account's employments in the company | `/api/v1/companies/{companyId}/expenses/claims/{id}/payment-progress?scope=SELF` |
 | `LEAVE_REQUESTS` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments or immutable request owner | `/api/v1/companies/{companyId}/leave/requests/{id}` |
 | `LEAVE_BALANCES` | `leave.self.manage`, or explicit selection with `leave.read` | Current account's employments in the company | `/api/v1/companies/{companyId}/leave/balances/{id}` |
@@ -85,6 +85,24 @@ projection heads and pending references roll back together after a failed comman
 Explicit finance read grants still select only the account's own employments.
 The original `/payments` endpoint retains its list response and `AUTHORIZED`
 default. The new `/payment-progress` response defaults to `SELF`.
+
+The canonical Expense record combines the current claim/draft, its latest
+submission with current approval and reviews, and a descending activity page.
+`historyAfter` is an exclusive claim-version cursor; `historyLimit` defaults to
+twenty and accepts 1–20. Older history pages retain the current claim and submission.
+Shared claim, people, approval and access guards keep each response coherent.
+The response excludes live review actions and cross-claim duplicate-receipt hints;
+commands and interactive review retain their own current authorization.
+
+The reference version remains the claim command version. Reassigning its latest
+approval publishes another `EXPENSE_CLAIMS` invalidation at that same version;
+the embedded approval has its own version. Consume every newly published UPSERT,
+even when its claim version matches the stored record. Coalesce repeated IDs
+within a pending page, acquire the current record and commit it with the cursor.
+Do not deduplicate later feed pages solely by resource ID/version. The original
+claim endpoint remains available to clients that only need the draft. Clients
+upgrading their local shape to include submission/approval facts must bootstrap
+that new local projection so unchanged existing claims also acquire those fields.
 
 Recipient inbox references contain no message text. Publication, read, acknowledgement, and archival capture the corresponding account-owned invalidation in the same transaction as the business change. Failed publication leaves neither inbox nor pending references. An archived item produces `DELETE`, and the canonical endpoint immediately returns `inbox_item_not_found`; physical deletion of its retained record is unnecessary.
 
@@ -182,7 +200,7 @@ Call `GET /api/v1/companies/{companyId}/sync/changes?cursor=<opaque-cursor>&limi
 
 Persist each page's references in a local inbox and advance its cursor in the same local transaction. Resolve that inbox through bounded canonical fetches. Never advance a cursor while discarding unprocessed references. Replaying a cursor may repeat changes; applying a reference must be idempotent. A canonical fetch can return a version newer than the feed reference. Keep that newer version and reject older results that arrive later.
 
-`UPSERT` invalidates the cached resource and schedules a current authorized fetch. `DELETE` removes the resource, including when its version equals the last known version. Process per-resource changes in feed order. Retain the last applied reference version in local sync metadata and cancel obsolete hydration when removing a resource, so a response started before deletion cannot recreate it. Tombstones retain raw identity and owner scope so a deleted database row need not exist for filtering. The current business APIs preserve request history and do not introduce physical-delete commands through sync.
+`UPSERT` invalidates the cached resource and schedules a current authorized fetch, including when its version equals the last known version. Publication order, rather than a version increase alone, identifies new invalidations. `DELETE` removes the resource, including at an equal version. Process per-resource changes in feed order. Retain the last applied reference version in local sync metadata and cancel obsolete hydration when removing a resource, so a response started before deletion cannot recreate it. Tombstones retain raw identity and owner scope so a deleted database row need not exist for filtering. The current business APIs preserve request history and do not introduce physical-delete commands through sync.
 
 When `hasMore` is true, follow the cursor to finish the captured publication range. New publications are handled in a later range, so a busy company cannot extend one page chain forever. When caught up, wait at least `pollAfterSeconds` before polling. `pendingPublication` indicates authorized source changes still awaiting the worker; it does not authorize a tight loop. Resume promptly on a completed local command, foreground entry, and reconnect, while retaining finite request/retry budgets and cancellation ownership.
 

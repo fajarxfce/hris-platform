@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Import
 
 @Import(AccountLockProbeConfiguration::class, ExpenseReadProbeConfiguration::class)
 abstract class ExpenseReadAssuranceApiFixture : ExpenseReviewApiFixture() {
-    @Autowired private lateinit var claims: ExpenseClaimRepository
+    @Autowired protected lateinit var claims: ExpenseClaimRepository
     @Autowired protected lateinit var payments: ExpensePaymentRepository
     @Autowired private lateinit var policies: ExpensePolicyRepository
     @Autowired private lateinit var approvals: ApprovalRepository
@@ -142,11 +142,25 @@ abstract class ExpenseReadAssuranceApiFixture : ExpenseReviewApiFixture() {
         actor: Actor = scene.actor,
         storage: ObjectStorageRepository = objects,
         paymentRepository: ExpensePaymentRepository = payments,
+        claimRepository: ExpenseClaimRepository = claims,
     ): Result<*> {
         val f = scene.fixture
         val scope = ExpenseClaimReadScope.SELF
         val today = LocalDate.ofInstant(clock.instant(), ZoneId.of("Asia/Jakarta"))
         return when (action) {
+            "record" ->
+                GetExpenseClaimRecord(
+                        claimRepository,
+                        approvals,
+                        people,
+                        companies,
+                        members,
+                        identities,
+                        transactions,
+                        clock,
+                        security,
+                    )
+                    .execute(actor, f.claim, null, 20, scope)
             "claim-review" ->
                 GetExpenseClaimReview(
                         claims,

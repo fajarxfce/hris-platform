@@ -849,6 +849,33 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun expenseRecordsDefaultToSelfAndExcludeLiveReviewAffordances() {
+        val api = contract()
+        val operation =
+            api["paths"]["/api/v1/companies/{companyId}/expenses/claims/{id}/record"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val parameters =
+            operation["parameters"].iterator().asSequence().associateBy { it["name"].asString() }
+        assertEquals("SELF", parameters.getValue("scope")["schema"]["default"].asString())
+        assertEquals(1, parameters.getValue("historyLimit")["schema"]["minimum"].asInt())
+        assertEquals(20, parameters.getValue("historyLimit")["schema"]["maximum"].asInt())
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("claim", "submission", "history"),
+            schemas["ExpenseClaimRecordResponse"]["properties"].properties().map { it.key }.toSet(),
+        )
+        val submitted = schemas["ExpenseSubmissionRecordResponse"]["properties"]
+        for (name in
+            listOf("duplicateReceiptDigests", "canReadClaim", "availableActions")) assertFalse(
+            submitted.has(name)
+        )
+        for (name in
+            listOf("lines", "approval", "reviews", "claimVersion", "claimStatus")) assertTrue(
+            submitted.has(name)
+        )
+    }
+
+    @Test
     fun expensePaymentProgressDefaultsToOwnedReadsWithABoundedVersionedResponse() {
         val api = contract()
         val operation =

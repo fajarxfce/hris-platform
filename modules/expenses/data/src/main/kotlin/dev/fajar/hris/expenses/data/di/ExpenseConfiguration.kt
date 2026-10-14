@@ -289,6 +289,30 @@ class ExpenseConfiguration {
         )
 
     @Bean
+    fun getExpenseClaimRecord(
+        claims: ExpenseClaimRepository,
+        approvals: ApprovalRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetExpenseClaimRecord(
+            claims,
+            approvals,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun getExpenseClaimReview(
         claims: ExpenseClaimRepository,
         payments: ExpensePaymentRepository,

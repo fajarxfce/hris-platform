@@ -56,6 +56,10 @@ acquisition. Preparation and verification also recheck recent assurance after
 beneficiary/author reads and through journal/receipt completion. Late expiry rolls
 back the input head, immutable revision, journal and receipt together.
 
+The [dashboard workflow](dashboard.md#monthly-payroll-inputs) provides bounded
+employee discovery, complete term editing, current/revision review and independent
+verification with explicit recovery of unknown command outcomes.
+
 ## Durable calculation
 
 Start from a `DRAFT` period with a closed workforce month, effective payroll policy, observed period/workforce/policy versions, reviewed `incomeDueDate`, reference, and reason. Starting requires `payroll.calculate`, recent authentication/MFA, and an idempotency key. The due date must fall in the earnings month for this ordinary monthly workflow. The run's tax month is that month; a later planned transfer does not postpone income already due. Former-employee or other-month liabilities need a separate assessment/amendment workflow.

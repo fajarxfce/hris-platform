@@ -2,6 +2,52 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_payroll_input: [
+    "Review the monthly input fields and references.",
+    "Periksa isian input bulanan dan referensinya.",
+  ],
+  payroll_amount_limit: [
+    "The combined amount exceeds IDR 50,000,000,000.",
+    "Total nominal melebihi IDR 50.000.000.000.",
+  ],
+  payroll_input_action_unavailable: [
+    "This action is unavailable. Return to the input to review its source and status.",
+    "Tindakan tidak tersedia. Kembali ke input untuk memeriksa sumber dan statusnya.",
+  ],
+  payroll_input_not_found: ["The monthly input was not found.", "Input bulanan tidak ditemukan."],
+  self_payroll_input_change_denied: [
+    "Your input must be prepared by another authorized operator.",
+    "Input Anda harus disiapkan operator lain yang berwenang.",
+  ],
+  self_payroll_input_review_denied: [
+    "Your input must be verified by another authorized reviewer.",
+    "Input Anda harus diverifikasi reviewer lain yang berwenang.",
+  ],
+  payroll_input_author_cannot_verify: [
+    "An independent reviewer must verify this input.",
+    "Input harus diverifikasi reviewer yang tidak menyiapkannya.",
+  ],
+  payroll_input_already_verified: [
+    "This input has already been verified. Reload its current status.",
+    "Input sudah diverifikasi. Muat ulang statusnya.",
+  ],
+  payroll_input_revision_limit: [
+    "This input has reached its revision limit.",
+    "Input telah mencapai batas revisi.",
+  ],
+  payroll_workforce_not_closed: [
+    "Attendance must be closed before preparing or verifying payroll inputs.",
+    "Attendance harus ditutup sebelum menyiapkan atau memverifikasi input payroll.",
+  ],
+  payroll_workforce_employee_missing: [
+    "This employee is absent from the closed attendance source.",
+    "Karyawan tidak tercakup dalam sumber attendance yang ditutup.",
+  ],
+  stale_workforce_version: [
+    "The attendance source has changed. Reload the review.",
+    "Sumber attendance berubah. Muat ulang tinjauan.",
+  ],
+
   invalid_compensation: [
     "Review the compensation fields and verification references.",
     "Periksa isian kompensasi dan referensi verifikasinya.",

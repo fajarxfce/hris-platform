@@ -3,6 +3,10 @@ import { canReadPayrollPeriods } from "../../domain/policies/payroll-period-poli
 import { CompensationEditorScreen } from "../bindings/compensation-editor-screen";
 import { CompensationEmployeesScreen } from "../bindings/compensation-employees-screen";
 import { CompensationScreen } from "../bindings/compensation-screen";
+import { PayrollInputEditorScreen } from "../bindings/payroll-input-editor-screen";
+import { PayrollInputEmployeesScreen } from "../bindings/payroll-input-employees-screen";
+import { PayrollInputScreen } from "../bindings/payroll-input-screen";
+import { PayrollInputVerificationScreen } from "../bindings/payroll-input-verification-screen";
 import { PayrollPeriodCancellationScreen } from "../bindings/payroll-period-cancellation-screen";
 import { PayrollPeriodCreationScreen } from "../bindings/payroll-period-creation-screen";
 import { PayrollPeriodScreen } from "../bindings/payroll-period-screen";
@@ -14,6 +18,13 @@ import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 export function PayrollRoutes(props: PayrollScreenProps) {
   return (
     <Routes>
+      <Route path="inputs" element={<PayrollInputEmployeesScreen {...props} />} />
+      <Route path="inputs/:employeeId" element={<PayrollInputScreen {...props} />} />
+      <Route path="inputs/:employeeId/edit" element={<PayrollInputEditorScreen {...props} />} />
+      <Route
+        path="inputs/:employeeId/verify"
+        element={<PayrollInputVerificationScreen {...props} />}
+      />
       <Route path="periods" element={<PayrollPeriodsScreen {...props} />} />
       <Route path="periods/new" element={<PayrollPeriodCreationScreen {...props} />} />
       <Route path="periods/:periodId" element={<PayrollPeriodScreen {...props} />} />

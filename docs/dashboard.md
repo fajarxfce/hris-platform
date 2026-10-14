@@ -180,6 +180,36 @@ replacement cancels outstanding work and drops obsolete selection; confirmed acc
 loss removes acquired private data. Forms retain values through locale/theme
 changes and protect departure. Draft input remains in browser memory.
 
+## Monthly payroll inputs
+
+`/payroll/inputs` discovers employees by name, number and input status for a selected
+earnings month. The 50-row pages include unprepared inputs without acquiring
+private profiles. Reads require `payroll.read`, `payroll.calculate` or
+`payroll.review`; unrelated administration grants do not admit payroll data.
+
+`/payroll/inputs/:employeeId` combines the current employment and attendance source,
+input terms and 20-entry immutable history pages. Overview/history tabs reuse the
+acquired review. A side panel loads an explicitly selected historical revision.
+Closing it, refreshing or replacing the account/company cancels obsolete reads.
+
+The separate editor supports variable earnings, net deductions, explicit taxable
+non-cash income, a reviewed scheduled-month denominator, half-day resolutions and
+dated holiday allowance evidence. Amounts remain exact IDR decimal strings. New
+inputs require explicit values; the form does not invent missing attendance or
+statutory declarations. Saving requires `payroll.calculate` and pins the observed
+employment, closed attendance and input versions with one reason and operation ID.
+
+The verification page shows the exact revision and submits its observed version
+with `payroll.review`. Current beneficiaries and all historical preparers are
+excluded. Missing or changed sources and frozen inputs remove unavailable actions;
+the API independently revalidates eligibility at command time.
+
+A lost response retains the original immutable command through later rejected
+retries. Definite conflicts require protected reload. Confirmed access loss removes
+private evidence. Locale/theme changes retain form values, and draft departure is
+protected. Editor state remains in browser memory. Tables scroll within their
+panels on narrow screens.
+
 ## Shift templates
 
 The Workforce route owns a bounded shift directory, current details, and create/edit

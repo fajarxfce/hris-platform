@@ -2,6 +2,79 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_offboarding_schedule: [
+    "Check the reviewed schedule and provide a reason.",
+    "Periksa jadwal yang ditinjau dan isi alasannya.",
+  ],
+  offboarding_schedule_changed: [
+    "The case, employment or company timezone changed. Reload and review before scheduling.",
+    "Proses, employment, atau zona waktu perusahaan berubah. Muat ulang dan tinjau sebelum menjadwalkan.",
+  ],
+  offboarding_identity_changed: [
+    "The employee account changed. Review the current employment before continuing.",
+    "Akun karyawan berubah. Periksa employment saat ini sebelum melanjutkan.",
+  ],
+  offboarding_schedule_active: [
+    "This case already has an active schedule. Review its status first.",
+    "Proses ini sudah memiliki jadwal aktif. Periksa statusnya terlebih dahulu.",
+  ],
+  offboarding_schedule_not_future: [
+    "The scheduling boundary has passed. Review manual offboarding completion.",
+    "Batas penjadwalan sudah lewat. Tinjau penyelesaian offboarding manual.",
+  ],
+  offboarding_schedule_too_far: [
+    "The last working date must be within the next 365 days.",
+    "Hari kerja terakhir harus berada dalam 365 hari ke depan.",
+  ],
+  offboarding_schedule_limit: [
+    "This case has reached its limit of eight scheduled attempts.",
+    "Proses ini sudah mencapai batas delapan percobaan terjadwal.",
+  ],
+  offboarding_schedule_finished: [
+    "This schedule has finished. Reload its current status.",
+    "Jadwal ini sudah selesai. Muat ulang statusnya.",
+  ],
+  offboarding_schedule_obsolete: [
+    "This authorization no longer matches the current process. Reload its status.",
+    "Otorisasi ini tidak sesuai lagi dengan proses saat ini. Muat ulang statusnya.",
+  ],
+  offboarding_schedule_not_found: [
+    "This schedule is unavailable for your current access.",
+    "Jadwal ini tidak tersedia untuk akses Anda saat ini.",
+  ],
+  offboarding_job_not_stopped: [
+    "The worker has not stopped. Request cancellation or wait for completion.",
+    "Worker belum berhenti. Ajukan pembatalan atau tunggu hingga selesai.",
+  ],
+  offboarding_job_result_invalid: [
+    "The stopped job requires investigation before recovery. Contact an administrator.",
+    "Hasil job perlu diperiksa sebelum dipulihkan. Hubungi administrator.",
+  ],
+  offboarding_revision_limit: [
+    "This case or employment has reached its revision limit. Contact an administrator.",
+    "Proses atau employment telah mencapai batas revisi. Hubungi administrator.",
+  ],
+  offboarding_schedule_review_required: [
+    "The execution window ended. Review the case for manual completion.",
+    "Batas waktu eksekusi sudah lewat. Tinjau proses untuk penyelesaian manual.",
+  ],
+  offboarding_schedule_not_due: [
+    "The scheduled execution time has not been reached.",
+    "Waktu eksekusi terjadwal belum tiba.",
+  ],
+  offboarding_execution_failed: [
+    "Scheduled execution stopped. Review the case and job status.",
+    "Eksekusi terjadwal berhenti. Periksa proses dan status job.",
+  ],
+  offboarding_progress_invalid: [
+    "Execution progress is inconsistent. Contact an administrator.",
+    "Progres eksekusi tidak konsisten. Hubungi administrator.",
+  ],
+  offboarding_execution_date_changed: [
+    "The company date changed during execution. Review the current job status.",
+    "Tanggal perusahaan berubah saat eksekusi. Periksa status job saat ini.",
+  ],
+
   invalid_payroll_amendment_publication: [
     "Check the approved amendment, observed versions and publication reason.",
     "Periksa koreksi yang disetujui, versi yang ditinjau, dan alasan publikasi.",

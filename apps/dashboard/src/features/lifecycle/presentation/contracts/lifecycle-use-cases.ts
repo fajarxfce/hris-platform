@@ -1,5 +1,6 @@
 import type { AssignLifecycleTask } from "../../domain/usecases/assign-lifecycle-task";
 import type { CancelLifecycleCase } from "../../domain/usecases/cancel-lifecycle-case";
+import type { CancelOffboardingSchedule } from "../../domain/usecases/cancel-offboarding-schedule";
 import type { ChangeLifecycleTask } from "../../domain/usecases/change-lifecycle-task";
 import type { CompleteOffboarding } from "../../domain/usecases/complete-offboarding";
 import type { CompleteOnboarding } from "../../domain/usecases/complete-onboarding";
@@ -11,10 +12,22 @@ import type { LoadLifecycleHistory } from "../../domain/usecases/load-lifecycle-
 import type { LoadLifecycleTemplate } from "../../domain/usecases/load-lifecycle-template";
 import type { LoadLifecycleTemplates } from "../../domain/usecases/load-lifecycle-templates";
 import type { LoadOffboardingReview } from "../../domain/usecases/load-offboarding-review";
+import type { LoadOffboardingSchedule } from "../../domain/usecases/load-offboarding-schedule";
+import type { LoadOffboardingScheduleReview } from "../../domain/usecases/load-offboarding-schedule-review";
+import type { LoadOffboardingSchedules } from "../../domain/usecases/load-offboarding-schedules";
+import type { RecoverOffboardingSchedule } from "../../domain/usecases/recover-offboarding-schedule";
 import type { SaveLifecycleTemplate } from "../../domain/usecases/save-lifecycle-template";
+import type { ScheduleOffboarding } from "../../domain/usecases/schedule-offboarding";
 import type { StartLifecycleCase } from "../../domain/usecases/start-lifecycle-case";
 
 export type LifecycleUseCases = Readonly<{
+  loadOffboardingScheduleReview: Pick<LoadOffboardingScheduleReview, "execute">;
+  loadOffboardingSchedules: Pick<LoadOffboardingSchedules, "execute">;
+  loadOffboardingSchedule: Pick<LoadOffboardingSchedule, "execute">;
+  scheduleOffboarding: Pick<ScheduleOffboarding, "execute">;
+  cancelOffboardingSchedule: Pick<CancelOffboardingSchedule, "execute">;
+  recoverOffboardingSchedule: Pick<RecoverOffboardingSchedule, "execute">;
+
   loadOffboardingReview: Pick<LoadOffboardingReview, "execute">;
   completeOffboarding: Pick<CompleteOffboarding, "execute">;
   cancelCase: Pick<CancelLifecycleCase, "execute">;

@@ -5,7 +5,10 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import { lifecycleCaseActions } from "../../domain/policies/lifecycle-case-change-policy";
-import { canReviewOffboardingCase } from "../../domain/policies/offboarding-policy";
+import {
+  canReadOffboardingReview,
+  canReviewOffboardingCase,
+} from "../../domain/policies/offboarding-policy";
 import type { LifecycleUseCases } from "../contracts/lifecycle-use-cases";
 import { LifecycleCaseController } from "../controllers/lifecycle-case-controller";
 import { lifecycleCaseParameters, lifecycleCaseSearch } from "../models/lifecycle-case-route";
@@ -49,6 +52,7 @@ export function LifecycleCaseScreen(props: Props) {
       id={caseId}
       backTo={backTo}
       offboardingTo={`/people/lifecycle/cases/${encodeURIComponent(caseId)}/offboarding?${base}`}
+      schedulesTo={`/people/lifecycle/cases/${encodeURIComponent(caseId)}/offboarding-schedules?${base}`}
       tab={tab}
       historyAfter={after}
       onTab={(next) => {
@@ -71,6 +75,7 @@ function LifecycleCaseBinding(
     id: string;
     backTo: string;
     offboardingTo: string;
+    schedulesTo: string;
     tab: string;
     historyAfter: string | null;
     onTab: (tab: string) => void;
@@ -123,6 +128,11 @@ function LifecycleCaseBinding(
         canCompleteOnboarding={actions.completeOnboarding}
         onCancel={controller.openCancellation}
         onCompleteOnboarding={controller.openOnboardingCompletion}
+        schedulesTo={
+          state.case?.kind === "OFFBOARDING" && canReadOffboardingReview(props.access.permissions)
+            ? props.schedulesTo
+            : null
+        }
         offboardingTo={
           state.case && canReviewOffboardingCase(props.access, state.case)
             ? props.offboardingTo

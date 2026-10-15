@@ -72,7 +72,9 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000051', 'browser-calculation-preparer@example.invalid', 'Browser Calculation Preparer'),
   ('a0000000-0000-4000-8000-000000000052', 'browser-calculation-reviewer@example.invalid', 'Browser Calculation Reviewer'),
   ('a0000000-0000-4000-8000-000000000053', 'browser-payroll-final-reviewer@example.invalid', 'Browser Payroll Final Reviewer'),
-  ('a0000000-0000-4000-8000-000000000054', 'browser-payroll-finalizer@example.invalid', 'Browser Payroll Finalizer')
+  ('a0000000-0000-4000-8000-000000000054', 'browser-payroll-finalizer@example.invalid', 'Browser Payroll Finalizer'),
+  ('a0000000-0000-4000-8000-000000000055', 'browser-offboarding-admin@example.invalid', 'Browser Offboarding Admin'),
+  ('a0000000-0000-4000-8000-000000000056', 'browser-offboarding-employee@example.invalid', 'Browser Offboarding Employee')
 ) AS fixture(id, email, name)
 WHERE bootstrap.email = 'browser-admin@example.invalid'
 ON CONFLICT DO NOTHING;
@@ -106,7 +108,8 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000042'),
   ('a0000000-0000-4000-8000-000000000044'),
   ('a0000000-0000-4000-8000-000000000047'),
-  ('a0000000-0000-4000-8000-000000000050')
+  ('a0000000-0000-4000-8000-000000000050'),
+  ('a0000000-0000-4000-8000-000000000055')
 ) AS fixture(account_id)
 WHERE platform_permissions.account_id = (SELECT id FROM accounts WHERE email = 'browser-admin@example.invalid')
 ON CONFLICT DO NOTHING;

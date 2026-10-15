@@ -10,7 +10,7 @@ including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) r
 - Mobile API: native sessions, atomic command receipts, optimistic versions, and consistent localizable JSON problems are implemented. Owned expense/leave-request/leave-balance/overtime/payslip/payment-progress account-owned inbox, daily attendance and calendar-source bootstrap/incremental synchronization, explicit client collection selection, encrypted scope-bound cursors, bounded post-commit publication, retention, and worker lifecycle are implemented. Inbox, Attendance and calendar sources require explicit selection; the omitted-selection projection remains compatible with earlier clients. Mobile consumer coverage is tracked in the completion document.
 - API description: generated OpenAPI 3.1, exact registered-route coverage, filter authentication contracts, safe localizable problems, binary negotiation metadata, and CI artifacts are implemented. Runtime documentation is optional and authenticated, with a single canonical locale and bounded cache.
 - Identity: password sign-in, persistent cookie sessions, CSRF/session rotation, bootstrap, current-company permissions, revocation checks, credential-race handling, shared sign-in limits, and bounded password verification implemented. Company member administration is implemented, including versioned grants/revocation and sensitive-grant restrictions. Authenticator MFA, recovery codes, live credential revocation, and recent-authentication gates are implemented. Direct native password sign-in, pending MFA sessions, native authenticator enrollment, access/refresh rotation, reuse detection, session management, and native MFA renewal are implemented. Configured OIDC sign-in and account bindings are implemented. Configurable company role templates, versioned assignment snapshots, and global account activation/permission administration are implemented. Local invitations, one-use password recovery, and durable SMTP delivery are implemented.
-- Organization and people: company setup, organization units with bounded name/code search and coherent parent details, employee onboarding, scoped directories, and effective employment revisions implemented. Restricted profile editing, immutable history, and cancellation of scheduled employment revisions are implemented. Atomic cross-company transfer with source membership revocation is implemented. Versioned lifecycle checklists, task assignment/history, and explicit offboarding with access revocation are implemented. CSV preview/apply jobs, field errors, partial outcomes, cancellation, and explicit recovery are implemented. Independently authorized initial person/account binding and historical account identity are implemented. Reviewed scheduled offboarding is implemented in the backend and worker. Its dashboard workflow and scheduled onboarding remain planned.
+- Organization and people: company setup, organization units with bounded name/code search and coherent parent details, employee onboarding, scoped directories, and effective employment revisions implemented. Restricted profile editing, immutable history, and cancellation of scheduled employment revisions are implemented. Atomic cross-company transfer with source membership revocation is implemented. Versioned lifecycle checklists, task assignment/history, and explicit offboarding with access revocation are implemented. CSV preview/apply jobs, field errors, partial outcomes, cancellation, and explicit recovery are implemented. Independently authorized initial person/account binding and historical account identity are implemented. Reviewed scheduled offboarding is implemented in the backend, worker and dashboard, including cancellation, retained attempts and terminal-job recovery. Scheduled onboarding remains planned.
 - Approvals: effective templates, immutable snapshots, assignment/delegation, inbox, optimistic decision storage, and pure transitions implemented. Bounded policy/delegation administration, live-access revalidation, and serialization of revocation/reassignment with decisions are implemented. Leave submission, staged decisions, withdrawal, and cancellation apply atomic business consequences. Expense submission, staged decisions, return-for-correction, and withdrawal are integrated. Overtime and payroll review also use the shared boundary, including retained maker exclusions.
 - Workforce: versioned shifts, weekly schedules, roster overrides, holidays, and scoped calendar reads implemented. Attendance capture and independent verification are implemented. Versioned HR corrections are implemented. Durable monthly factual closing and explicit recovery are implemented. Planned/actual overtime, independent staged review, withdrawal, immutable evidence, closing gates/snapshots, and employee synchronization are implemented. Late adjustments and bulk/reset workflows remain planned.
 - Leave: effective policies, independent balance adjustments, immutable scoped ledger, snapshotted requests, staged approval, withdrawal, and cancellation implemented. Required/optional validated attachments, immutable business references, and scoped content downloads are implemented. Versioned ledger projections, independent monthly/annual entitlement posting, immutable evidence, explicit year closing with bounded carryover/expiry, closed-year guards, and owned balance sync are implemented. Durable company accrual/year-closing batches, per-employee outcomes, cancellation, and bounded recovery are implemented. Payroll cutoff integration is implemented; automatic scheduling remains planned.
@@ -47,6 +47,51 @@ Performance targets on a 4-vCPU/16-GiB reference deployment: interactive API p95
 Commits are atomic and include relevant tests/docs. No co-author trailers. Push increments; releases and production deployment require explicit instructions. Documentation and demo data must not contain secrets or real employee data.
 
 ## Observed validation
+
+### Dashboard scheduled offboarding
+
+The lifecycle case now opens its retained schedule history, authorization review,
+current detail and explicit cancellation/recovery forms. The reviewed company
+timezone and departure date determine the execution window. Closed cases retain
+history. Form content emphasizes business dates; retained technical references
+remain expandable on the detail page.
+
+Commands capture their original ID, operation, versions, basis and required reason.
+An unconfirmed response remains recoverable through later MFA or conflicts without
+replacing its payload. Cancellation navigates by schedule ID while validating the
+original job receipt. Confirmed scope denial clears private review/form data;
+company replacement and disposal reject late responses. Future schedules load on
+demand; active observation has one request, one timer and thirty finite updates,
+with suspension while hidden and explicit refresh to resume.
+
+The full dashboard check passed with 2,955 tests across 253 files, strict
+TypeScript, architecture and Biome validation. The 47 new boundary/controller
+regressions exercise scope checks, immutable mapping, original receipts, pending
+writes, late results, disposal and finite observation. All 39 selected Chromium
+scenarios passed across the initial run and a targeted rerun: the rerun corrected
+the test's assumption that the existing theme toggle was a dropdown. Narrow dark
+Indonesian layouts and a real-data desktop view were inspected.
+
+The isolated API/PostgreSQL/worker browser acceptance passed. It authorized a
+future departure and recovered a dropped admission response, rejected competing
+manual case cancellation, then recovered a dropped cancellation response after
+the real worker had closed the attempt. Employment remained active, the case
+remained open, and exactly one retained schedule remained. The first acceptance
+run reached those outcomes but omitted the required `asOf` date from its final
+employee verification; that test request was corrected before rerunning.
+
+This browser scenario exercises real future cancellation cleanup, not a simulated
+due date. Due execution, transactional effects and terminal-job recovery retain
+the previously recorded API/worker tests. Two existing CSS specificity warnings
+and the existing Vite chunk-size advisory remain.
+
+Development was upgraded to migration 79 with the validated API and worker JARs.
+Both running artifact hashes match the recorded build inputs. Readiness returned
+UP on loopback and the private WireGuard address, the dashboard returned HTTP 200,
+and the schedule table retains forced company RLS. Garage/ClamAV stayed healthy.
+The existing phone APK remains valid, but another bounded ADB connection attempt
+timed out; no phone installation or device UI interaction occurred.
+
 
 ### Dashboard independent amendment review
 

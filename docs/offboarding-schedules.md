@@ -90,6 +90,34 @@ case/employment/job evidence and company-scoped references. The bounded list rea
 schedule and job metadata in one SQL snapshot without acquiring job locks under
 People/access guards.
 
-The dashboard scheduling workflow is a separate delivery increment. General job
-monitoring already recognizes this job kind. See [lifecycle behavior](modules/people.md#lifecycle-checklists)
-and [job execution](jobs.md).
+## Dashboard
+
+Open **People → Lifecycle cases → Offboarding schedules** from an offboarding
+case. Closed cases retain this history. An open case without an unclosed attempt
+can open **Schedule offboarding**. The review shows the employee, last working
+date, company date, timezone and server-derived execution window. Resolve every
+reported blocker, then provide a reason to authorize the reviewed basis. Creating
+or completing the checklist still does not schedule execution automatically.
+
+A schedule detail separates its retained authorization from the current job.
+**Cancel schedule** requests cancellation using both observed versions.
+**Close stopped attempt** is available only when the job has stopped but its
+schedule header still needs recovery. Neither action starts another attempt.
+References and versions remain available in an expandable detail section;
+ordinary review forms focus on the departure and execution dates.
+
+Each command retains its original operation, schedule ID and exact payload after
+an unconfirmed response. Retrying after MFA or a later conflict cannot silently
+replace it. Cancellation receipts identify the job, but navigation keeps the
+original schedule ID. Revoked access clears private review and entered text.
+Explicit navigation protects pending commands and unsaved reasons; scope changes
+abort obsolete reads and ignore late results.
+
+Future schedules load on demand. Once eligible or awaiting cancellation cleanup,
+a visible detail can perform up to thirty progress reads, four seconds apart.
+Hidden tabs, failed reads, terminal jobs and disposal stop observation. Refresh
+explicitly renews the observation budget. This UI limit does not control worker
+execution or expire retained schedule data.
+
+See [lifecycle behavior](modules/people.md#lifecycle-checklists) and
+[job execution](jobs.md).

@@ -13,6 +13,7 @@ import { type Locale, messages } from "../../../../core/presentation/i18n/messag
 import { lifecycleCaseActionMessages } from "../i18n/lifecycle-case-action-messages";
 import { lifecycleCaseMessages } from "../i18n/lifecycle-case-messages";
 import { offboardingMessages } from "../i18n/offboarding-messages";
+import { offboardingScheduleMessages } from "../i18n/offboarding-schedule-messages";
 import type { LifecycleCaseState } from "../models/lifecycle-case-state";
 import type { lifecycleCaseView } from "../models/lifecycle-case-view";
 
@@ -33,6 +34,7 @@ export function LifecycleCasePage({
   onCancel,
   onCompleteOnboarding,
   offboardingTo,
+  schedulesTo,
 }: {
   state: LifecycleCaseState;
   view: ReturnType<typeof lifecycleCaseView> | null;
@@ -50,6 +52,7 @@ export function LifecycleCasePage({
   onCancel: () => void;
   onCompleteOnboarding: () => void;
   offboardingTo: string | null;
+  schedulesTo: string | null;
 }) {
   const text = lifecycleCaseMessages(locale);
   const actions = lifecycleCaseActionMessages(locale);
@@ -62,6 +65,11 @@ export function LifecycleCasePage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
+            {schedulesTo && (
+              <Link {...restore} to={schedulesTo}>
+                {offboardingScheduleMessages(locale).title}
+              </Link>
+            )}
             {tab === "overview" && offboardingTo && (
               <Link {...restore} to={offboardingTo}>
                 {offboardingMessages(locale).review}

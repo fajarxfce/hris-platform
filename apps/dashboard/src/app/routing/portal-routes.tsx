@@ -181,6 +181,26 @@ const LifecycleCaseScreen = lazy(() =>
     default: module.LifecycleCaseScreen,
   })),
 );
+const OffboardingSchedulesScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/offboarding-schedules-screen").then(
+    (module) => ({ default: module.OffboardingSchedulesScreen }),
+  ),
+);
+const OffboardingScheduleStartScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/offboarding-schedule-start-screen").then(
+    (module) => ({ default: module.OffboardingScheduleStartScreen }),
+  ),
+);
+const OffboardingScheduleScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/offboarding-schedule-screen").then(
+    (module) => ({ default: module.OffboardingScheduleScreen }),
+  ),
+);
+const OffboardingScheduleChangeScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/offboarding-schedule-change-screen").then(
+    (module) => ({ default: module.OffboardingScheduleChangeScreen }),
+  ),
+);
 const OffboardingScreen = lazy(() =>
   import("../../features/lifecycle/presentation/bindings/offboarding-screen").then((module) => ({
     default: module.OffboardingScreen,
@@ -985,6 +1005,83 @@ export function PortalRoutes({
               timezone={company.timezone}
               locale={locale}
               nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/lifecycle/cases/:caseId/offboarding-schedules"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <OffboardingSchedulesScreen
+              accountId={accountId}
+              access={access}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/lifecycle/cases/:caseId/offboarding-schedules/new"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <OffboardingScheduleStartScreen
+              accountId={accountId}
+              access={access}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/lifecycle/cases/:caseId/offboarding-schedules/:scheduleId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <OffboardingScheduleScreen
+              accountId={accountId}
+              access={access}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/lifecycle/cases/:caseId/offboarding-schedules/:scheduleId/cancel"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <OffboardingScheduleChangeScreen
+              accountId={accountId}
+              access={access}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+              action="cancel"
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/lifecycle/cases/:caseId/offboarding-schedules/:scheduleId/recover"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <OffboardingScheduleChangeScreen
+              accountId={accountId}
+              access={access}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+              action="recover"
             />
           </Suspense>
         }

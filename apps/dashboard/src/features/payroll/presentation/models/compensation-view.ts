@@ -1,17 +1,22 @@
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { CompensationReview } from "../../domain/entities/compensation-review";
 import type { CompensationRevision } from "../../domain/entities/compensation-revision";
+import type { CompensationTerms } from "../../domain/entities/compensation-terms";
 import type { EmployeeCompensation } from "../../domain/entities/employee-compensation";
 import { compensationMessages } from "../i18n/compensation-messages";
 import { payrollAmountView } from "./payroll-policy-view";
 export function compensationView(value: EmployeeCompensation, locale: Locale) {
+  return {
+    title: `${compensationMessages(locale).revision} ${value.appliedRevision}`,
+    effectiveFrom: value.effectiveFrom,
+    ...compensationTermsView(value.terms, locale),
+  };
+}
+export function compensationTermsView(t: CompensationTerms, locale: Locale) {
   const text = compensationMessages(locale),
-    t = value.terms,
     b = t.payBasis;
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" });
   return {
-    title: `${text.revision} ${value.appliedRevision}`,
-    effectiveFrom: value.effectiveFrom,
     groups: [
       {
         title: text.earnings,

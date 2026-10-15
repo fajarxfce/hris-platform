@@ -976,3 +976,24 @@ a {
     margin-block-end: 12px;
   }
 }
+
+.app-amendment-disclosure {
+  margin-block: 12px;
+  border-block-end: 1px solid var(--colorNeutralStroke2);
+}
+.app-amendment-disclosure > summary {
+  padding: 12px 4px;
+  cursor: pointer;
+  color: var(--colorNeutralForeground1);
+  font-weight: 600;
+}
+.app-amendment-disclosure > summary:focus-visible {
+  outline: 2px solid var(--colorBrandStroke1);
+  outline-offset: 2px;
+}
+.app-amendment-evidence {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  padding-block: 12px;
+}

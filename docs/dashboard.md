@@ -459,6 +459,30 @@ Confirmed access loss clears private evidence; disposal cancels pending work and
 rejects late results. Draft and command retention are in memory. Theme and language
 changes retain the form, and narrow layouts stack the review panels.
 
+## Payroll amendments
+
+`/payroll/amendments` provides annual, status and literal employee name/number
+filters with bounded keyset pages. Authors, independent reviewers and publishers
+can inspect this directory through their dedicated amendment grants, without
+ordinary payslip or compensation read authority. Company and search context stay
+attached to detail and return navigation.
+
+The detail page separates overview, proposal, retained calculation and revision
+history. Historical proposals use an explicit revision in the URL; invalid or
+missing revisions cannot silently open the current proposal. A calculation keeps
+its original draft version and provides a link to that basis, including after a
+later edit. Proposed compensation and monthly inputs reuse the existing term
+views. Monthly comparison and full original/recalculated evidence retain exact
+decimal values and signed differences.
+
+Tabs, comparison selection, theme and language changes reuse acquired data.
+Refresh, revision and history-page changes cancel obsolete acquisition; company
+or account replacement disposes the owner. Failed private reads clear their
+dependent evidence, and internal diagnostics never appear in product messages.
+History pages are bounded by the aggregate version observed for that acquisition.
+These pages inspect saved amendments; authoring, review decisions and publication
+commands remain separate delivery work.
+
 ## Shift templates
 
 The Workforce route owns a bounded shift directory, current details, and create/edit

@@ -2,6 +2,18 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  payroll_amendment_not_found: [
+    "This amendment or revision is unavailable for your current access.",
+    "Koreksi atau revisi ini tidak tersedia untuk akses Anda saat ini.",
+  ],
+  payroll_amendment_calculation_not_found: [
+    "This retained calculation is unavailable.",
+    "Hasil perhitungan tersimpan ini tidak tersedia.",
+  ],
+  payroll_amendment_self_preparation_forbidden: [
+    "An independent operator must review amendments to your payroll.",
+    "Operator independen harus meninjau koreksi payroll Anda.",
+  ],
   invalid_payroll_payslip_search: [
     "Enter up to 120 characters without control characters.",
     "Masukkan maksimal 120 karakter tanpa karakter kontrol.",

@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { canReadPayrollAmendments } from "../../domain/policies/payroll-amendment-access-policy";
 import { canReadPayrollFinalizations } from "../../domain/policies/payroll-finalization-policy";
 import { canReadPayrollPayments } from "../../domain/policies/payroll-payment-read-policy";
 import { canReadPayrollPayslips } from "../../domain/policies/payroll-payslip-policy";
@@ -6,6 +7,8 @@ import { canReadPayrollPeriods } from "../../domain/policies/payroll-period-poli
 import { CompensationEditorScreen } from "../bindings/compensation-editor-screen";
 import { CompensationEmployeesScreen } from "../bindings/compensation-employees-screen";
 import { CompensationScreen } from "../bindings/compensation-screen";
+import { PayrollAmendmentScreen } from "../bindings/payroll-amendment-screen";
+import { PayrollAmendmentsScreen } from "../bindings/payroll-amendments-screen";
 import { PayrollCalculationStartScreen } from "../bindings/payroll-calculation-start-screen";
 import { PayrollCalculationsScreen } from "../bindings/payroll-calculations-screen";
 import { PayrollFinalizationScreen } from "../bindings/payroll-finalization-screen";
@@ -46,6 +49,8 @@ import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 export function PayrollRoutes(props: PayrollScreenProps) {
   return (
     <Routes>
+      <Route path="amendments" element={<PayrollAmendmentsScreen {...props} />} />
+      <Route path="amendments/:amendmentId" element={<PayrollAmendmentScreen {...props} />} />
       <Route path="payments" element={<PayrollPaymentsScreen {...props} />} />
       <Route path="payments/new" element={<PayrollPaymentPreparationScreen {...props} />} />
       <Route path="payments/:batchId" element={<PayrollPaymentScreen {...props} />} />
@@ -147,7 +152,7 @@ export function PayrollRoutes(props: PayrollScreenProps) {
         path="*"
         element={
           <Navigate
-            to={`/payroll/${canReadPayrollPeriods(props.access.permissions) ? "periods" : canReadPayrollFinalizations(props.access.permissions) ? "publications" : canReadPayrollPayslips(props.access.permissions) ? "payslips" : canReadPayrollPayments(props.access.permissions) ? "payments" : "policy"}?company=${props.access.companyId}`}
+            to={`/payroll/${canReadPayrollPeriods(props.access.permissions) ? "periods" : canReadPayrollFinalizations(props.access.permissions) ? "publications" : canReadPayrollPayslips(props.access.permissions) ? "payslips" : canReadPayrollPayments(props.access.permissions) ? "payments" : canReadPayrollAmendments(props.access.permissions) ? "amendments" : "policy"}?company=${props.access.companyId}`}
             replace
           />
         }

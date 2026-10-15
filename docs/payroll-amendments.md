@@ -259,6 +259,20 @@ immutable. A confirmed recovery needs its own scoped evidence and receipt. The i
 entitlement, confirmed transfers/returns and observed payment version separately
 from immutable individual instructions.
 
+## Dashboard inspection
+
+The amendment directory supports year, status and literal employee search with
+bounded pages. Dedicated author, reviewer and publisher grants admit private
+inspection independently of ordinary payroll reads. Details provide separate
+overview, proposal, calculation and history tabs, including explicit retained
+proposal revisions and the original basis of each retained calculation.
+
+Monthly comparison preserves signed decimal differences and full original and
+recalculated evidence. A later edit does not relabel an older calculation as the
+current proposal. Revision navigation cancels obsolete reads; tab, language and
+theme changes retain the acquired snapshot. Failed dependent reads clear private
+content. These views do not save, approve or publish an amendment.
+
 ## Delivery sequence
 
 1. Guarded preparation and deterministic recalculation from retained sources: implemented.
@@ -272,8 +286,9 @@ from immutable individual instructions.
    partial/full returns, competing balances and original-command recovery.
    Native current-revision payslips,
    independent balances, compatible offline acquisition and revision-pinned PDF
-   export are implemented and validated on the emulator. Amendment
-   authoring/review/publication and native retained-revision
+   export are implemented and validated on the emulator. The amendment directory,
+   retained proposals, calculations and revision history are implemented in the
+   dashboard. Amendment authoring, review decisions, publication and native retained-revision
    navigation remain. The current/retained statements and sync contracts are
    available in the API. The revised APK awaits phone connectivity.
 

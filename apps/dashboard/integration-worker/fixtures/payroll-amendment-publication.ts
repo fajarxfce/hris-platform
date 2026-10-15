@@ -3,6 +3,7 @@ import { type BrowserContext, expect } from "@playwright/test";
 import { z } from "zod";
 import { payrollCalculationMinor } from "../../src/features/payroll/data/mappers/payroll-run-employee-mapper";
 import { compensationTermsDto } from "../../src/features/payroll/data/models/compensation-dto";
+import { exercisePayrollAmendmentRead } from "./payroll-amendment-read";
 
 /** Create the prerequisite through authorized commands and the actual publication worker. */
 export async function publishNegativePayrollAmendment(input: {
@@ -113,6 +114,7 @@ export async function publishNegativePayrollAmendment(input: {
     .parse(await calculatedResponse.json());
   expect(retained.amendment.summary).toMatchObject({ version: 1, status: "CALCULATED" });
   expect(payrollCalculationMinor(retained.latestCalculation.difference.takeHome) < 0n).toBe(true);
+  await exercisePayrollAmendmentRead({ author, company, amendment, month });
   const template = await admin.request.put(`${base}/approvals/templates/${randomUUID()}`, {
     headers: adminHeaders(),
     data: {

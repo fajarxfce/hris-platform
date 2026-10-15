@@ -1,4 +1,5 @@
 import { InvalidHttpResponseError } from "../../../../core/data/http/http-response-error";
+import { isCalendarDate } from "../../../../core/domain/calendar-date";
 import type { CompanyId } from "../../../../core/domain/identifiers";
 import type { CompensationChange } from "../../domain/entities/compensation-change";
 import type { CompensationEmployee } from "../../domain/entities/compensation-employee";
@@ -6,6 +7,7 @@ import type {
   CompensationEmployees,
   CompensationReview,
 } from "../../domain/entities/compensation-review";
+import type { CompensationTerms } from "../../domain/entities/compensation-terms";
 import type { EmployeeCompensation } from "../../domain/entities/employee-compensation";
 import { validateCompensation } from "../../domain/policies/compensation-validation";
 import type { CompensationChangeDto } from "../models/compensation-change-dto";
@@ -13,6 +15,7 @@ import type {
   CompensationEmployeeDto,
   CompensationEmployeesDto,
   CompensationReviewDto,
+  CompensationTermsDto,
   EmployeeCompensationDto,
 } from "../models/compensation-dto";
 export const toCompensationEmployee = (raw: CompensationEmployeeDto): CompensationEmployee =>
@@ -37,15 +40,7 @@ export function toEmployeeCompensation(
     ...value,
     companyId: company,
     employeeId: raw.employeeId.toLowerCase(),
-    terms: Object.freeze({
-      ...raw.terms,
-      fixedEarnings: Object.freeze(
-        raw.terms.fixedEarnings.map((line) => Object.freeze({ ...line })),
-      ),
-      tax: Object.freeze({ ...raw.terms.tax }),
-      insurancePrograms: Object.freeze([...raw.terms.insurancePrograms].sort()),
-      payBasis: raw.terms.payBasis ? Object.freeze({ ...raw.terms.payBasis }) : null,
-    }),
+    terms: toCompensationTerms(raw.terms),
   });
 }
 export function toCompensationEmployees(
@@ -184,4 +179,20 @@ export function toCompensationChangeDto(input: CompensationChange): Compensation
         : null,
     },
   };
+}
+
+export function toCompensationTerms(raw: CompensationTermsDto): CompensationTerms {
+  if (
+    [raw.tax.verifiedOn, raw.tax.subjectiveFrom, raw.tax.subjectiveUntil].some(
+      (date) => date !== null && !isCalendarDate(date),
+    )
+  )
+    throw new InvalidHttpResponseError();
+  return Object.freeze({
+    ...raw,
+    fixedEarnings: Object.freeze(raw.fixedEarnings.map((line) => Object.freeze({ ...line }))),
+    tax: Object.freeze({ ...raw.tax }),
+    insurancePrograms: Object.freeze([...raw.insurancePrograms].sort()),
+    payBasis: raw.payBasis ? Object.freeze({ ...raw.payBasis }) : null,
+  });
 }

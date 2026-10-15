@@ -1,12 +1,12 @@
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { PayrollInput } from "../../domain/entities/payroll-input";
 import type { PayrollInputReview } from "../../domain/entities/payroll-input-review";
+import type { PayrollInputTerms } from "../../domain/entities/payroll-input-terms";
 import { payrollInputMessages } from "../i18n/payroll-input-messages";
 import { payrollAmountView } from "./payroll-policy-view";
 export function payrollInputView(input: PayrollInput, locale: Locale, timezone: string) {
   const text = payrollInputMessages(locale),
-    t = input.terms,
-    h = t.holidayAllowance;
+    t = input.terms;
   return {
     title: `${text.revision} ${input.version}`,
     properties: [
@@ -30,6 +30,13 @@ export function payrollInputView(input: PayrollInput, locale: Locale, timezone: 
       },
       { label: text.reason, value: input.reason },
     ],
+    ...payrollInputTermsView(t, locale),
+  };
+}
+export function payrollInputTermsView(t: PayrollInputTerms, locale: Locale) {
+  const text = payrollInputMessages(locale),
+    h = t.holidayAllowance;
+  return {
     earnings: t.earnings.map((line) => ({
       id: line.code,
       cells: [

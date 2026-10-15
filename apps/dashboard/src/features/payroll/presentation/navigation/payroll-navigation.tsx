@@ -2,6 +2,7 @@ import {
   Calendar20Regular,
   ClipboardTaskListLtr20Regular,
   DocumentCheckmark20Regular,
+  DocumentEdit20Regular,
   DocumentTable20Regular,
   MoneySettings20Regular,
   Payment20Regular,
@@ -13,6 +14,7 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import { canReadCompensation } from "../../domain/policies/compensation-access-policy";
 import { canReadPayrollPolicy } from "../../domain/policies/payroll-access-policy";
+import { canReadPayrollAmendments } from "../../domain/policies/payroll-amendment-access-policy";
 import { canReadPayrollFinalizations } from "../../domain/policies/payroll-finalization-policy";
 import { canReadPayrollInputs } from "../../domain/policies/payroll-input-access-policy";
 import { canReadPayrollPayments } from "../../domain/policies/payroll-payment-read-policy";
@@ -20,6 +22,7 @@ import { canReadPayrollPayslips } from "../../domain/policies/payroll-payslip-po
 import { canReadPayrollPeriods } from "../../domain/policies/payroll-period-policy";
 import { canReadTaxOpenings } from "../../domain/policies/tax-opening-access-policy";
 import { compensationMessages } from "../i18n/compensation-messages";
+import { payrollAmendmentMessages } from "../i18n/payroll-amendment-messages";
 import { payrollFinalizationMessages } from "../i18n/payroll-finalization-messages";
 import { payrollInputMessages } from "../i18n/payroll-input-messages";
 import { payrollPaymentMessages } from "../i18n/payroll-payment-messages";
@@ -32,6 +35,17 @@ export function payrollNavigation(
   access: CompanyAccess | null,
   locale: Locale,
 ): readonly AppNavigationItem[] {
+  const amendments: readonly AppNavigationItem[] = canReadPayrollAmendments(
+    access?.permissions ?? [],
+  )
+    ? [
+        {
+          to: "/payroll/amendments",
+          label: payrollAmendmentMessages(locale).title,
+          icon: <DocumentEdit20Regular />,
+        },
+      ]
+    : [];
   const payments: readonly AppNavigationItem[] = canReadPayrollPayments(access?.permissions ?? [])
     ? [
         {
@@ -103,6 +117,7 @@ export function payrollNavigation(
         ...publications,
         ...payslips,
         ...payments,
+        ...amendments,
         ...inputs,
         ...openings,
         ...policies,
@@ -112,5 +127,14 @@ export function payrollNavigation(
           icon: <PersonMoney20Regular />,
         },
       ]
-    : [...periods, ...publications, ...payslips, ...payments, ...inputs, ...openings, ...policies];
+    : [
+        ...periods,
+        ...publications,
+        ...payslips,
+        ...payments,
+        ...amendments,
+        ...inputs,
+        ...openings,
+        ...policies,
+      ];
 }

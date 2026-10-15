@@ -6,6 +6,7 @@ import type { DecidePayrollReview } from "../../domain/usecases/decide-payroll-r
 import type { DownloadPayrollPayment } from "../../domain/usecases/download-payroll-payment";
 import type { DownloadPayrollPayslip } from "../../domain/usecases/download-payroll-payslip";
 import type { ListCompensationEmployees } from "../../domain/usecases/list-compensation-employees";
+import type { ListPayrollAmendments } from "../../domain/usecases/list-payroll-amendments";
 import type { ListPayrollInputEmployees } from "../../domain/usecases/list-payroll-input-employees";
 import type { ListPayrollPayslips } from "../../domain/usecases/list-payroll-payslips";
 import type { ListPayrollPeriodEmployees } from "../../domain/usecases/list-payroll-period-employees";
@@ -14,6 +15,7 @@ import type { ListPayrollPublicationRuns } from "../../domain/usecases/list-payr
 import type { ListTaxOpeningEmployees } from "../../domain/usecases/list-tax-opening-employees";
 import type { LoadCompensationEditor } from "../../domain/usecases/load-compensation-editor";
 import type { LoadCompensationReview } from "../../domain/usecases/load-compensation-review";
+import type { LoadPayrollAmendment } from "../../domain/usecases/load-payroll-amendment";
 import type { LoadPayrollCalculations } from "../../domain/usecases/load-payroll-calculations";
 import type { LoadPayrollFinalization } from "../../domain/usecases/load-payroll-finalization";
 import type { LoadPayrollFinalizations } from "../../domain/usecases/load-payroll-finalizations";
@@ -61,6 +63,8 @@ import type { VerifyTaxOpening } from "../../domain/usecases/verify-tax-opening"
 import type { WithdrawPayrollReview } from "../../domain/usecases/withdraw-payroll-review";
 
 export type PayrollUseCases = Readonly<{
+  listAmendments: Pick<ListPayrollAmendments, "execute">;
+  loadAmendment: Pick<LoadPayrollAmendment, "execute">;
   reviewPaymentRecovery: Pick<ReviewPayrollPaymentRecovery, "execute">;
   confirmPaymentRecovery: Pick<ConfirmPayrollPaymentRecovery, "execute">;
   loadPayments: Pick<LoadPayrollPayments, "execute">;

@@ -2,7 +2,7 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { payrollInputMessages } from "../i18n/payroll-input-messages";
-import type { payrollInputView } from "../models/payroll-input-view";
+import type { payrollInputTermsView, payrollInputView } from "../models/payroll-input-view";
 export function PayrollInputProperties({
   view,
   locale,
@@ -10,10 +10,24 @@ export function PayrollInputProperties({
   view: ReturnType<typeof payrollInputView>;
   locale: Locale;
 }) {
-  const text = payrollInputMessages(locale);
   return (
     <div className="app-compensation-properties">
       <AppPropertyList title={view.title} items={view.properties} />
+      <PayrollInputTermsProperties view={view} locale={locale} />
+    </div>
+  );
+}
+
+export function PayrollInputTermsProperties({
+  view,
+  locale,
+}: {
+  view: ReturnType<typeof payrollInputTermsView>;
+  locale: Locale;
+}) {
+  const text = payrollInputMessages(locale);
+  return (
+    <>
       {view.earnings.length ? (
         <AppResourceTable
           title={text.earnings}
@@ -60,6 +74,6 @@ export function PayrollInputProperties({
       ) : (
         <p className="app-muted">{text.noHoliday}</p>
       )}
-    </div>
+    </>
   );
 }

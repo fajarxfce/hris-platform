@@ -10,6 +10,14 @@ Use cases may depend on repository contracts from other modules. Datasources nev
 
 Workforce owns schedules and factual attendance; leave owns absence decisions. Reporting and payroll combine those facts. Identity uses stable company/person identifiers without depending on their implementation. These directions prevent cycles. Payroll owns scoped read projections for immutable workforce evidence. Its datasources read raw records; repositories map them into payroll domain references. The originating module retains write ownership. This permits payroll to consume factual snapshots without importing another module’s data implementation or moving permission/period policy into a datasource.
 
+Leave calendar readers take the shared People guard before company, membership
+and account guards. The use cases select current direct-report or company scope
+and own date/access policy. A Leave-owned raw projection reads active allocations
+and submitted request labels in one SQL snapshot; it does not load private
+profiles or coordinate another datasource. Repository acquisition and mapping
+share the database failure boundary. Month summaries and day pages are separate
+live reads. Both revalidate session assurance after acquisition.
+
 ## Runtime
 
 JDK 21, Spring Boot 4.1, Kotlin 2.3, Spring MVC, PostgreSQL 18, Flyway, and jOOQ. Gradle conventions own toolchain and quality configuration; the version catalog owns versions. jOOQ is generated from migrations against PostgreSQL. OpenAPI is reviewed and validated in CI.

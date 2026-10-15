@@ -26,6 +26,58 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class LeaveConfiguration {
     @Bean
+    fun leaveCalendarSource(sql: DSLContext): LeaveCalendarDataSource =
+        PostgresLeaveCalendarDataSource(sql)
+
+    @Bean
+    fun leaveCalendar(source: LeaveCalendarDataSource): LeaveCalendarRepository =
+        StoredLeaveCalendarRepository(source)
+
+    @Bean
+    fun getLeaveCalendar(
+        calendar: LeaveCalendarRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetLeaveCalendar(
+            calendar,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun listLeaveCalendarEntries(
+        calendar: LeaveCalendarRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListLeaveCalendarEntries(
+            calendar,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun listLeavePreparationEmployees(
         people: PeopleRepository,
         companies: CompanyRepository,

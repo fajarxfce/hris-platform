@@ -199,3 +199,35 @@ after acquisition. Admission and resume recheck it after queue waits and through
 journal/receipt completion. A late failure rolls back the job, batch, targets,
 attempt, audit and receipt together. Background workers retain their separate
 credential, permission and lease checks. See the [API contracts](../api-conventions.md).
+
+
+## Team and company calendar
+
+`GET /leave/calendar?scope=TEAM|COMPANY&month=YYYY-MM` returns at most one
+summary per charged work date. Omitting the month selects the current month in
+the company's timezone. `GET /leave/calendar/entries?scope=...&date=YYYY-MM-DD`
+returns a selected date's requests, with a stable request-ID cursor and at most
+200 entries (20 by default). Calendar dates are limited to 1900–2200.
+
+Company scope requires `leave.read`. Team scope restricts that permission or
+`leave.team.read` to current direct reports whose employment has not ended.
+Current reporting lines determine access even when viewing an earlier month.
+Self-service and approval permissions alone do not grant a team calendar. Leave
+admission is independent of People and Workforce screen availability.
+
+Counts come from occupied dates, not the interval between a request's first and
+last dates. Pending and approved requests remain visible, including pending
+cancellation until its approval releases occupancy. Rejected and withdrawn
+requests do not occupy the calendar. Two half-day requests for one employee count
+as two requests and one employee. Portions refer to the submitted shift, including
+its overnight work date. Entries retain submitted employee/type labels and omit
+reasons, account IDs, attachment metadata and profile fields.
+
+Each aggregate uses one bounded SQL snapshot, with a date index on allocations.
+Month summaries and paged entries are independent current reads; they are not a
+frozen snapshot across requests. A withdrawn cursor anchor does not prevent
+forward pagination. Readers hold shared People and access guards, then recheck
+original/current permissions, credentials and MFA. Assurance is checked again
+after acquisition. Cancellation releases the transaction and all guards.
+
+The API is implemented; dashboard delivery and acceptance are in progress.

@@ -1,0 +1,6 @@
+package dev.fajar.hris.leave.domain.entities
+
+enum class LeaveCalendarScope {
+    COMPANY,
+    TEAM,
+}

@@ -4766,3 +4766,33 @@ application contexts started. Readiness passed on loopback and WireGuard, and
 the dashboard returned HTTP 200 at `10.77.77.1:5173`. The private document
 services and VPN bindings were preserved. No mobile artifact changed in this
 increment, and no phone installation or UI interaction was performed.
+
+
+## Leave calendar API
+
+Leave now exposes company/direct-report monthly occupancy and separately paginated
+request entries for a selected work date. Counts use active stored allocations;
+two half-day requests count as one employee, cancellation under review retains
+occupancy, and withdrawn/rejected requests disappear. Submitted labels and portions
+remain independent of later policy changes. Reasons, account IDs, evidence and
+private profiles are excluded. Current reporting lines control team access even
+for historical months. Leave admission does not require People or Workforce screens.
+
+The two read use cases own date/scope policy and shared People/access guards.
+Acquisition and DTO mapping share the repository database boundary. Each SQL query
+has its own coherent snapshot and finite output, with a new allocation date index
+in V81. Readers recheck original/current grants, credentials and MFA after waiting,
+and assurance again after acquisition. Cancellation releases all transaction guards.
+
+Validation: architecture, formatting, query generation, 23 Leave domain tests,
+68 worker tests, and both application JAR builds passed. The affected API/contract
+set had 67 passing scenarios and one new test failure: Jackson 3.1's node-level
+`map` shadowed Kotlin's iterable mapping. That test now explicitly iterates the
+array and passed its focused rerun, bringing the affected scenarios to 68.
+Tests cover cross-company scope, current-team changes during admission, expired
+assurance after waits and reads, credential/grant revocation, cancellation cleanup,
+private response fields, partial/overnight dates, cancellation outcomes, and a
+cursor whose original request was withdrawn. Mapping failures stay sanitized.
+
+Dashboard delivery and real browser acceptance follow this backend increment.
+The existing development runtime has not yet been migrated to V81 by this change.

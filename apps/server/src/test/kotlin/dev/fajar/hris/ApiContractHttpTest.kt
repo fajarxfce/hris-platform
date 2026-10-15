@@ -34,6 +34,46 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun leaveCalendarExposesBoundedDateViewsWithoutRequestReasonsOrAccountIds() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/leave/calendar"
+        for (path in listOf(base, "$base/entries")) {
+            val operation = api["paths"][path]["get"]
+            assertTrue(operation["x-hris-company-admission"].asBoolean())
+            assertFalse(
+                operation.path("parameters").any { it.path("name").asString() == "Idempotency-Key" }
+            )
+            assertTrue(
+                operation["parameters"]
+                    .single { it["name"].asString() == "scope" }["required"]
+                    .asBoolean()
+            )
+        }
+        val limit =
+            api["paths"]["$base/entries"]["get"]["parameters"]
+                .single { it["name"].asString() == "limit" }["schema"]
+        assertEquals(200, limit["maximum"].asInt())
+        val fields =
+            api["components"]["schemas"]["LeaveCalendarEntryResponse"]["properties"]
+                .propertyNames()
+                .toSet()
+        assertEquals(
+            setOf(
+                "requestId",
+                "employeeId",
+                "employeeNumber",
+                "employeeName",
+                "typeCode",
+                "typeName",
+                "portion",
+                "status",
+                "version",
+            ),
+            fields,
+        )
+    }
+
+    @Test
     fun scheduledOnboardingReviewsSelectedDatesAndKeepsQueueAuthorityPrivate() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/employees/{employmentId}/onboarding-schedules"

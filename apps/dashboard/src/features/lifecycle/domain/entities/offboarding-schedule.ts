@@ -1,7 +1,7 @@
 import type { AccountId, CompanyId } from "../../../../core/domain/identifiers";
-import type { JobId, JobStatus } from "../../../jobs/domain/entities/background-job";
 import type { EmployeeId } from "../../../people/domain/entities/employee";
 import type { LifecycleCaseId } from "./lifecycle-case";
+import type { LifecycleScheduleJob } from "./lifecycle-schedule-job";
 
 export type OffboardingScheduleId = string & { readonly offboardingScheduleId: unique symbol };
 export type OffboardingScheduleAction = "cancel" | "recover";
@@ -25,15 +25,6 @@ export type OffboardingSchedule = Readonly<{
   reason: string;
   finishedAt: string | null;
   failureCode: string | null;
-  job: Readonly<{
-    id: JobId;
-    status: JobStatus;
-    version: number;
-    attempts: number;
-    cancellationRequested: boolean;
-    completedItems: number;
-    failureCode: string | null;
-    finishedAt: string | null;
-  }>;
+  job: LifecycleScheduleJob;
   actions: readonly OffboardingScheduleAction[];
 }>;

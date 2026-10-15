@@ -13,16 +13,25 @@ export function LifecycleAssigneePickerPage({
   locale,
   onSelect,
   onClose,
+  onClear,
 }: {
   picker: ReturnType<typeof useLifecycleAssigneePicker>;
   locale: Locale;
   onSelect: (id: string) => void;
   onClose: () => void;
+  onClear?: (() => void) | undefined;
 }) {
   const text = lifecycleCaseMessages(locale);
   return (
     <AppDetailsPanel open title={text.chooseMember} closeLabel={text.close} onClose={onClose}>
       <div className="app-report-content" aria-busy={picker.loading}>
+        {onClear && (
+          <div>
+            <AppButton appearance="subtle" onClick={onClear}>
+              {text.removeAssignee}
+            </AppButton>
+          </div>
+        )}
         <form className="app-form" onSubmit={picker.apply} noValidate>
           <AppTextField label={text.searchMember} {...picker.query} maxLength={120} />
           <AppButton type="submit" appearance="primary">

@@ -855,6 +855,34 @@ The template picker opens on demand and retains one page of at most 20 definitio
 
 Starting pins a new case ID, operation ID, employee, template version, date, and reason. A definite template conflict permits an explicit new selection while preserving other fields. An ambiguous result retains the original command through verification and later rejection until its receipt is recovered or the operator explicitly leaves. Double submission, navigation protection, and disposal use the existing workspace ownership rules. The repository accepts only the matching initial version-zero receipt. Acknowledgement provides a separate **Open case** action; it does not silently refetch or create another case. Starting offboarding creates a checklist; it does not complete termination or revoke access.
 
+## Scheduled onboarding
+
+`/people/employees/{id}/onboarding-schedules` lists up to eight retained attempts.
+Employee details expose this link only with People read and lifecycle read/manage
+permissions. The employee directory's company, effective date and search context
+are retained. Future employees are selected using their first working date.
+
+`/new` first acquires the employment, then offers an active onboarding template
+and preparation date. Explicit review obtains the server's employment/template
+versions, execution window and blockers. A bounded company member picker assigns
+or removes a responsible person per task. Selecting the task opens that picker,
+including at narrow widths. The reviewed selection, copied assignee IDs, reason,
+and separate operation/schedule/case identities are fixed before submission.
+
+`/{scheduleId}` shows retained business dates, checklist, status and minimal job
+progress. References are expandable. A successful initiation links to the open
+case; task completion remains independent. `/{scheduleId}/cancel` and `/recover`
+review current capability and job versions before an explicit command. An
+uncertain result retains the exact original request through MFA and later
+conflicts; no refresh or selection change silently replaces it. Denied access
+clears private view/form state, and disposal rejects late results.
+
+A visible detail observes only due or cancelling active jobs, with one request
+and thirty delayed updates at most. Hidden, failed, terminal and disposed views
+stop observation; future schedules load on demand. Account/company owners remain
+independent of locale and theme changes. See [scheduled onboarding](onboarding-schedules.md)
+for server authorization, transaction semantics and validation limits.
+
 ## Cancelling cases and completing onboarding
 
 The case overview exposes **Cancel case** to lifecycle managers who can read the company case. An open onboarding case also exposes **Complete onboarding** once every required task is done and every optional task is done or waived. The review panel retains the employee, frozen template, target date, and case version, and requires a reason. Task and case editors are mutually exclusive; refresh cannot replace the reviewed snapshot while either panel is open. Current requirements, permissions, and versions remain authoritative on the API.

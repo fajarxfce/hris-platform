@@ -4659,3 +4659,51 @@ acceptance remain the next increment. No development migration or deployment was
 performed in this slice. The previously validated mobile APK still matches all 45
 recorded source hashes; another bounded ADB connection attempt timed out, so phone
 delivery remains pending.
+
+
+### Scheduled onboarding and dashboard delivery
+
+HR can now schedule onboarding preparation from employee details. The review
+captures a future company-local preparation date, the employment's first working
+day, immutable template revision and bounded task assignees. A distinct
+`PEOPLE_ONBOARD_START` worker creates an open case with pending tasks. Employment,
+account activation, grants and task completion retain their explicit workflows.
+Current authority, reviewed sources and the worker lease are rechecked; a manually
+completed onboarding also blocks repeated initiation. Case/history, authorization,
+job progress and journal commit together or roll back.
+
+The dashboard provides scoped history, two-stage preparation, optional assignment
+selection/removal, retained details and explicit cancellation/recovery. Original
+operation and resource identities survive response loss, MFA and later conflicts.
+Denied access erases private display/input data, and late results cannot restore
+an abandoned scope. One visible detail owns a finite progress budget; future jobs
+are read on demand. Checklist creation remains distinct from task completion.
+
+Backend validation passed fifty People domain, 88 selected API/contract and all
+68 worker cases across the affected final runs, with architecture/format checks
+and both JAR builds. The API test classes were regenerated after a local stale
+Kotlin delegate was identified following the repository-contract addition.
+[Hosted backend/dashboard CI](https://github.com/fajarxfce/hris-platform/actions/runs/38749745855)
+subsequently passed all shards and its dependent integration job.
+
+Development API and worker were drained, migrated through V80 and restarted with
+the private document services and WireGuard bindings preserved. Running artifact
+digests match the validated JARs. Both contexts started, forced schedule RLS was
+verified, and API readiness and the dashboard returned HTTP 200 over WireGuard.
+
+Dashboard checks passed architecture, Biome and strict TypeScript with all 3,025
+unit tests. After final navigation labels and task-action placement were refined,
+the production build and all forty affected browser scenarios passed. These cover
+uncertain commands, renewed MFA, late results, denied scope, assignment removal,
+company replacement and narrow dark EN/ID layouts. Screenshots were inspected.
+The initial onboarding browser fixture used an invalid employment effective date;
+it was corrected without relaxing production response validation. Existing CSS
+specificity and bundle-size advisories remain.
+
+The real API/PostgreSQL/worker browser test passed with a future employee and an
+eligible coordinator. It recovered a committed admission whose response was
+lost, cancelled the future job, waited for worker cleanup, and recovered the
+original cancellation receipt afterward. One attempt remained, employment was
+unchanged and no case was created. The disposable database and both test
+applications were stopped. Due initiation is covered by the backend worker tests;
+this browser acceptance does not claim to have waited for a future start date.

@@ -2,6 +2,86 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_onboarding_schedule: [
+    "Check the preparation date, reviewed checklist and reason.",
+    "Periksa tanggal persiapan, checklist yang ditinjau, dan alasannya.",
+  ],
+  onboarding_access_required: [
+    "Onboarding schedule access is unavailable.",
+    "Akses jadwal onboarding tidak tersedia.",
+  ],
+  onboarding_already_completed: [
+    "This employee has already completed onboarding.",
+    "Karyawan ini sudah menyelesaikan onboarding.",
+  ],
+  onboarding_schedule_changed: [
+    "The employment, template or company timezone changed. Reload and review the schedule.",
+    "Employment, template, atau zona waktu perusahaan berubah. Muat ulang dan tinjau jadwal.",
+  ],
+  onboarding_schedule_active: [
+    "This employee already has an active schedule. Review its status first.",
+    "Karyawan ini sudah memiliki jadwal aktif. Periksa statusnya terlebih dahulu.",
+  ],
+  onboarding_schedule_not_future: [
+    "Choose a future preparation date. Use manual checklist creation for a date that is already due.",
+    "Pilih tanggal persiapan mendatang. Buat checklist secara manual jika tanggalnya sudah tiba.",
+  ],
+  onboarding_schedule_too_far: [
+    "The first working day must be within the next 365 days.",
+    "Hari pertama bekerja harus berada dalam 365 hari ke depan.",
+  ],
+  onboarding_schedule_limit: [
+    "This employee has reached the limit of eight scheduled attempts.",
+    "Karyawan ini sudah mencapai batas delapan percobaan terjadwal.",
+  ],
+  onboarding_schedule_finished: [
+    "This schedule has finished. Reload its current status.",
+    "Jadwal ini sudah selesai. Muat ulang statusnya.",
+  ],
+  onboarding_schedule_obsolete: [
+    "This authorization no longer matches the current process. Reload its status.",
+    "Otorisasi ini tidak sesuai lagi dengan proses saat ini. Muat ulang statusnya.",
+  ],
+  onboarding_schedule_not_found: [
+    "This schedule is unavailable for your current access.",
+    "Jadwal ini tidak tersedia untuk akses Anda saat ini.",
+  ],
+  onboarding_job_not_stopped: [
+    "The job has not stopped. Reload its status before recovery.",
+    "Proses belum berhenti. Muat ulang statusnya sebelum pemulihan.",
+  ],
+  onboarding_job_result_invalid: [
+    "The job result needs administrator review.",
+    "Hasil proses perlu ditinjau administrator.",
+  ],
+  onboarding_progress_invalid: [
+    "The job progress needs administrator review.",
+    "Progres proses perlu ditinjau administrator.",
+  ],
+  onboarding_revision_limit: [
+    "The employment has reached its revision limit. Contact an administrator.",
+    "Employment telah mencapai batas revisi. Hubungi administrator.",
+  ],
+  onboarding_template_unavailable: [
+    "Choose an active onboarding template.",
+    "Pilih template onboarding yang aktif.",
+  ],
+  onboarding_terms_changed: [
+    "The reviewed first working day changed. Reload the employment before scheduling.",
+    "Hari pertama bekerja yang ditinjau berubah. Muat ulang employment sebelum menjadwalkan.",
+  ],
+  onboarding_schedule_review_required: [
+    "The execution window ended. Review the employee for manual checklist creation.",
+    "Batas waktu eksekusi sudah lewat. Tinjau karyawan untuk pembuatan checklist manual.",
+  ],
+  onboarding_schedule_not_due: [
+    "The scheduled preparation time has not been reached.",
+    "Waktu persiapan terjadwal belum tiba.",
+  ],
+  onboarding_execution_failed: [
+    "The scheduled checklist could not be created. Review the job result.",
+    "Checklist terjadwal tidak dapat dibuat. Tinjau hasil prosesnya.",
+  ],
   invalid_offboarding_schedule: [
     "Check the reviewed schedule and provide a reason.",
     "Periksa jadwal yang ditinjau dan isi alasannya.",

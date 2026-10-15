@@ -181,6 +181,26 @@ const LifecycleCaseScreen = lazy(() =>
     default: module.LifecycleCaseScreen,
   })),
 );
+const OnboardingSchedulesScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/onboarding-schedules-screen").then(
+    (module) => ({ default: module.OnboardingSchedulesScreen }),
+  ),
+);
+const OnboardingScheduleStartScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/onboarding-schedule-start-screen").then(
+    (module) => ({ default: module.OnboardingScheduleStartScreen }),
+  ),
+);
+const OnboardingScheduleScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/onboarding-schedule-screen").then(
+    (module) => ({ default: module.OnboardingScheduleScreen }),
+  ),
+);
+const OnboardingScheduleChangeScreen = lazy(() =>
+  import("../../features/lifecycle/presentation/bindings/onboarding-schedule-change-screen").then(
+    (module) => ({ default: module.OnboardingScheduleChangeScreen }),
+  ),
+);
 const OffboardingSchedulesScreen = lazy(() =>
   import("../../features/lifecycle/presentation/bindings/offboarding-schedules-screen").then(
     (module) => ({ default: module.OffboardingSchedulesScreen }),
@@ -959,6 +979,93 @@ export function PortalRoutes({
               timezone={company.timezone}
               locale={locale}
               nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/employees/:employeeId/onboarding-schedules"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <OnboardingSchedulesScreen
+              accountId={accountId}
+              access={access}
+              loadEmployee={people.loadEmployee}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/employees/:employeeId/onboarding-schedules/new"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <OnboardingScheduleStartScreen
+              accountId={accountId}
+              access={access}
+              loadEmployee={people.loadEmployee}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/employees/:employeeId/onboarding-schedules/:scheduleId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <OnboardingScheduleScreen
+              accountId={accountId}
+              access={access}
+              loadEmployee={people.loadEmployee}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/employees/:employeeId/onboarding-schedules/:scheduleId/cancel"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <OnboardingScheduleChangeScreen
+              accountId={accountId}
+              access={access}
+              loadEmployee={people.loadEmployee}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+              action="cancel"
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/people/employees/:employeeId/onboarding-schedules/:scheduleId/recover"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <OnboardingScheduleChangeScreen
+              accountId={accountId}
+              access={access}
+              loadEmployee={people.loadEmployee}
+              lifecycle={lifecycle}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+              action="recover"
             />
           </Suspense>
         }

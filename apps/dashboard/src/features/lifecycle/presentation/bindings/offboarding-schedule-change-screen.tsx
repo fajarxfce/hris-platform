@@ -5,7 +5,7 @@ import type { OffboardingScheduleAction } from "../../domain/entities/offboardin
 import { canChangeOffboardingSchedule } from "../../domain/policies/offboarding-schedule-policy";
 import type { OffboardingScheduleScreenProps } from "../contracts/offboarding-schedule-screen-props";
 import { OffboardingScheduleChangeController } from "../controllers/offboarding-schedule-change-controller";
-import { useOffboardingScheduleForm } from "../controllers/use-offboarding-schedule-form";
+import { useLifecycleScheduleReasonForm } from "../controllers/use-lifecycle-schedule-reason-form";
 import { offboardingScheduleMessages } from "../i18n/offboarding-schedule-messages";
 import { offboardingScheduleRoute } from "../models/offboarding-schedule-route";
 import { offboardingScheduleView } from "../models/offboarding-schedule-view";
@@ -76,7 +76,7 @@ function OffboardingScheduleChangeBinding(props: Props & { caseId: string; id: s
     return controller.deactivate;
   }, [controller]);
   useWorkspaceRevalidation(state.failure);
-  const form = useOffboardingScheduleForm(controller, state),
+  const form = useLifecycleScheduleReasonForm(controller, state),
     view = useMemo(
       () => (state.review ? offboardingScheduleView(state.review, props.locale) : null),
       [state.review, props.locale],

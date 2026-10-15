@@ -9,12 +9,12 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { AppTextArea } from "../../../../core/presentation/components/app-text-area";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
-import type { useOffboardingScheduleForm } from "../controllers/use-offboarding-schedule-form";
+import type { useLifecycleScheduleReasonForm } from "../controllers/use-lifecycle-schedule-reason-form";
 import { offboardingScheduleMessages } from "../i18n/offboarding-schedule-messages";
 import type { OffboardingScheduleCommandState } from "../models/offboarding-schedule-state";
 export function OffboardingScheduleCommandPage(props: {
   state: OffboardingScheduleCommandState<unknown>;
-  form: ReturnType<typeof useOffboardingScheduleForm>;
+  form: ReturnType<typeof useLifecycleScheduleReasonForm>;
   companyName: string;
   locale: Locale;
   title: string;

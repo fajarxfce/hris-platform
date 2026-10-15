@@ -2,7 +2,7 @@ import type { AccountId } from "../../../../core/domain/identifiers";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
-import type { LifecycleTemplate } from "../../domain/entities/lifecycle-template";
+import type { LifecycleKind, LifecycleTemplate } from "../../domain/entities/lifecycle-template";
 import type { LifecycleUseCases } from "../contracts/lifecycle-use-cases";
 import { useLifecycleTemplatePicker } from "../controllers/use-lifecycle-template-picker";
 import { LifecycleTemplatePickerPage } from "../pages/lifecycle-template-picker-page";
@@ -12,10 +12,16 @@ export function LifecycleTemplatePicker(props: {
   access: CompanyAccess;
   load: LifecycleUseCases["loadTemplates"];
   locale: Locale;
+  kind?: LifecycleKind;
   onSelect: (template: LifecycleTemplate) => void;
   onClose: () => void;
 }) {
-  const picker = useLifecycleTemplatePicker(props.accountId, props.access, props.load);
+  const picker = useLifecycleTemplatePicker(
+    props.accountId,
+    props.access,
+    props.load,
+    props.kind ?? null,
+  );
   useWorkspaceRevalidation(picker.failure);
   return (
     <LifecycleTemplatePickerPage

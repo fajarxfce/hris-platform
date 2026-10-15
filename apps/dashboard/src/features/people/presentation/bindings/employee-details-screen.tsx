@@ -6,6 +6,7 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { CompanyAccess, CompanyMembership } from "../../../identity/domain/entities/session";
 import { canBrowseEmployeeLeave } from "../../../leave/domain/policies/leave-read-policy";
 import { canPrepareLifecycleCase } from "../../../lifecycle/domain/policies/lifecycle-case-start-policy";
+import { canReadOnboardingSchedules } from "../../../lifecycle/domain/policies/onboarding-schedule-policy";
 import { canReadEmploymentHistory } from "../../domain/policies/employee-policy";
 import { canManageEmployment } from "../../domain/policies/employment-policy";
 import { canTransferEmployment } from "../../domain/policies/employment-transfer-policy";
@@ -78,6 +79,11 @@ export function EmployeeDetailsScreen(props: Props) {
           ? `/people/employees/${encodeURIComponent(employeeId)}/lifecycle/new?${new URLSearchParams({ company: props.access.companyId, asOf: search.asOf })}`
           : null
       }
+      onboardingSchedulesTo={
+        canReadOnboardingSchedules(props.access.permissions)
+          ? `/people/employees/${encodeURIComponent(employeeId)}/onboarding-schedules?${employeeSearchParameters(search, props.access.companyId)}`
+          : null
+      }
       editEmploymentTo={
         canManageEmployment(props.access.permissions)
           ? `/people/employees/${encodeURIComponent(employeeId)}/employment/edit?${employeeSearchParameters(search, props.access.companyId)}`
@@ -127,6 +133,7 @@ function EmployeeDetailsBinding({
   editEmploymentTo,
   transferTo,
   startLifecycleTo,
+  onboardingSchedulesTo,
   leaveTo,
   balancesTo,
   tab,
@@ -142,6 +149,7 @@ function EmployeeDetailsBinding({
   editEmploymentTo: string | null;
   transferTo: string | null;
   startLifecycleTo: string | null;
+  onboardingSchedulesTo: string | null;
   leaveTo: string | null;
   balancesTo: string | null;
   tab: EmployeeTab;
@@ -177,6 +185,7 @@ function EmployeeDetailsBinding({
       editEmploymentTo={editEmploymentTo}
       transferTo={transferTo}
       startLifecycleTo={startLifecycleTo}
+      onboardingSchedulesTo={onboardingSchedulesTo}
       leaveTo={leaveTo}
       balancesTo={balancesTo}
       tab={tab}

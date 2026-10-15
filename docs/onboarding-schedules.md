@@ -1,12 +1,12 @@
 # Scheduled onboarding
 
-Status: backend and worker implemented. Dashboard controls are the next increment.
+Status: backend, worker and dashboard implemented.
 This workflow prepares an onboarding case at a date chosen by HR. Task completion, account activation, company grants and
 employment changes retain their existing explicit workflows.
 
 ## Reviewed case initiation
 
-The planned resource belongs to an employment:
+The resource belongs to an employment:
 `/api/v1/companies/{companyId}/employees/{employmentId}/onboarding-schedules`.
 
 | Method and suffix | Purpose |
@@ -72,7 +72,50 @@ without creating another case. The distinct schedule, case and job identities
 remain stable through original receipt recovery. All company references, initial
 authorization evidence and terminal outcomes are enforced in storage.
 
-The dashboard will reuse the existing template and assignee pickers, add a dated
-review from employment details, and provide retained schedule details and explicit
-cancel/recover actions. Its controllers will own finite observation, scope changes
-and uncertain command recovery independently of ordinary case/task editing.
+## Dashboard workflow
+
+Employee details link to the independently authorized schedule history. For future
+employees, select their first working date in the employee directory. The nested
+routes preserve that date, company and directory filters. Company replacement
+clears the previous scope before returning to the new directory.
+
+The new-schedule form selects an active onboarding template and preparation date,
+then requests an explicit review. Its first working day comes from the acquired
+employment; the server supplies the authoritative versions, window and blockers.
+The checklist supports bounded member selection and explicit removal of an
+assignee. Existing template revision history owns the retained task definitions.
+Admission creates a schedule, while its later `STARTED` outcome means the open
+checklist was created. It does not mean the employee completed onboarding.
+
+Controllers retain one original command through response loss, renewed MFA and
+later conflicts. Known first conflicts require another deliberate review. Denied
+access clears private form/detail data without replacing an uncertain command.
+Cancellation acknowledges the original job receipt; navigation retains the
+schedule ID. Recovery closes a stopped authorization without scheduling another.
+
+One visible detail owns at most thirty delayed progress reads, four seconds apart,
+while a due or cancelling job remains active. Future schedules are read on demand.
+Hidden views, disposal, errors and terminal outcomes stop observation. An explicit
+refresh can resume it. Task definitions and references remain readable after an
+ordinary transport failure, while current action links are withheld.
+
+## Validation and development
+
+The dashboard passed architecture, formatting and TypeScript checks with all
+3,025 unit tests. Final browser/build verification passed forty lifecycle,
+offboarding and onboarding scenarios, including EN/ID layouts, narrow dark mode,
+assignment selection/removal, revoked access, late results, original-command
+recovery and company replacement. Desktop and narrow screenshots were inspected.
+
+The real API/PostgreSQL/worker browser scenario created a future employee,
+template and eligible coordinator, recovered a deliberately lost admission
+response, then cancelled the future job and recovered that response after worker
+cleanup. It verified one retained attempt, unchanged employment and no created
+case. Due execution and the completed-manual-onboarding guard were validated by
+the backend/worker suites, not by advancing this browser scenario's clock.
+
+Development is migrated to V80 and runs the validated API and worker artifacts.
+Their application contexts started successfully, forced RLS was verified and
+readiness passed through loopback and WireGuard. Private document services and
+the existing database volume were retained. The dashboard is available through
+the existing WireGuard development address.

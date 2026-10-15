@@ -1,10 +1,19 @@
 import { useEffect } from "react";
 import { useController, useForm } from "react-hook-form";
 import { useNavigationProtection } from "../../../../core/presentation/navigation/use-navigation-protection";
-import type { OffboardingScheduleCommandState } from "../models/offboarding-schedule-state";
-export function useOffboardingScheduleForm(
+export function useLifecycleScheduleReasonForm(
   controller: { save: (reason: string) => Promise<void>; refresh: () => Promise<void> },
-  state: OffboardingScheduleCommandState<unknown>,
+  state: Readonly<{
+    stage:
+      | "loading"
+      | "unavailable"
+      | "reviewing"
+      | "saving"
+      | "unconfirmed"
+      | "conflict"
+      | "saved";
+    review: unknown | null;
+  }>,
 ) {
   const form = useForm({ defaultValues: { reason: "" } });
   const reset = form.reset;

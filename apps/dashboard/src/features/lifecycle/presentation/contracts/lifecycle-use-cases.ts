@@ -1,6 +1,7 @@
 import type { AssignLifecycleTask } from "../../domain/usecases/assign-lifecycle-task";
 import type { CancelLifecycleCase } from "../../domain/usecases/cancel-lifecycle-case";
 import type { CancelOffboardingSchedule } from "../../domain/usecases/cancel-offboarding-schedule";
+import type { CancelOnboardingSchedule } from "../../domain/usecases/cancel-onboarding-schedule";
 import type { ChangeLifecycleTask } from "../../domain/usecases/change-lifecycle-task";
 import type { CompleteOffboarding } from "../../domain/usecases/complete-offboarding";
 import type { CompleteOnboarding } from "../../domain/usecases/complete-onboarding";
@@ -15,12 +16,24 @@ import type { LoadOffboardingReview } from "../../domain/usecases/load-offboardi
 import type { LoadOffboardingSchedule } from "../../domain/usecases/load-offboarding-schedule";
 import type { LoadOffboardingScheduleReview } from "../../domain/usecases/load-offboarding-schedule-review";
 import type { LoadOffboardingSchedules } from "../../domain/usecases/load-offboarding-schedules";
+import type { LoadOnboardingSchedule } from "../../domain/usecases/load-onboarding-schedule";
+import type { LoadOnboardingScheduleReview } from "../../domain/usecases/load-onboarding-schedule-review";
+import type { LoadOnboardingSchedules } from "../../domain/usecases/load-onboarding-schedules";
 import type { RecoverOffboardingSchedule } from "../../domain/usecases/recover-offboarding-schedule";
+import type { RecoverOnboardingSchedule } from "../../domain/usecases/recover-onboarding-schedule";
 import type { SaveLifecycleTemplate } from "../../domain/usecases/save-lifecycle-template";
 import type { ScheduleOffboarding } from "../../domain/usecases/schedule-offboarding";
+import type { ScheduleOnboarding } from "../../domain/usecases/schedule-onboarding";
 import type { StartLifecycleCase } from "../../domain/usecases/start-lifecycle-case";
 
 export type LifecycleUseCases = Readonly<{
+  loadOnboardingScheduleReview: Pick<LoadOnboardingScheduleReview, "execute">;
+  loadOnboardingSchedules: Pick<LoadOnboardingSchedules, "execute">;
+  loadOnboardingSchedule: Pick<LoadOnboardingSchedule, "execute">;
+  scheduleOnboarding: Pick<ScheduleOnboarding, "execute">;
+  cancelOnboardingSchedule: Pick<CancelOnboardingSchedule, "execute">;
+  recoverOnboardingSchedule: Pick<RecoverOnboardingSchedule, "execute">;
+
   loadOffboardingScheduleReview: Pick<LoadOffboardingScheduleReview, "execute">;
   loadOffboardingSchedules: Pick<LoadOffboardingSchedules, "execute">;
   loadOffboardingSchedule: Pick<LoadOffboardingSchedule, "execute">;

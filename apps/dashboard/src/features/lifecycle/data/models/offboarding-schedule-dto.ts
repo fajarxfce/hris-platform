@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { lifecycleCaseDto } from "./lifecycle-case-dto";
+import { lifecycleScheduleJobDto } from "./lifecycle-schedule-job-dto";
 
 const version = z.number().int().min(0).max(Number.MAX_SAFE_INTEGER);
 const instant = z.iso.datetime({ offset: true });
@@ -23,16 +24,7 @@ export const offboardingScheduleDto = z.object({
   reason: z.string().min(1).max(1000),
   finishedAt: instant.nullable(),
   failureCode: code.nullable(),
-  job: z.object({
-    id: z.uuid(),
-    status: z.enum(["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCELLED"]),
-    version,
-    attempts: z.number().int().min(0).max(8),
-    cancellationRequested: z.boolean(),
-    completedItems: z.number().int().min(0).max(1),
-    failureCode: code.nullable(),
-    finishedAt: instant.nullable(),
-  }),
+  job: lifecycleScheduleJobDto,
   actions: z.array(z.enum(["cancel", "recover"])).max(1),
 });
 export const offboardingSchedulesDto = z.object({

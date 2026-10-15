@@ -4,7 +4,7 @@ import { useWorkspaceRevalidation } from "../../../../core/presentation/session/
 import { canScheduleOffboarding } from "../../domain/policies/offboarding-schedule-policy";
 import type { OffboardingScheduleScreenProps } from "../contracts/offboarding-schedule-screen-props";
 import { OffboardingScheduleStartController } from "../controllers/offboarding-schedule-start-controller";
-import { useOffboardingScheduleForm } from "../controllers/use-offboarding-schedule-form";
+import { useLifecycleScheduleReasonForm } from "../controllers/use-lifecycle-schedule-reason-form";
 import { offboardingScheduleMessages } from "../i18n/offboarding-schedule-messages";
 import { offboardingScheduleRoute } from "../models/offboarding-schedule-route";
 import { offboardingScheduleReviewView } from "../models/offboarding-schedule-view";
@@ -49,7 +49,7 @@ function OffboardingScheduleStartBinding(
     return controller.deactivate;
   }, [controller]);
   useWorkspaceRevalidation(state.failure);
-  const form = useOffboardingScheduleForm(controller, state),
+  const form = useLifecycleScheduleReasonForm(controller, state),
     view = useMemo(
       () => (state.review ? offboardingScheduleReviewView(state.review, props.locale) : null),
       [state.review, props.locale],

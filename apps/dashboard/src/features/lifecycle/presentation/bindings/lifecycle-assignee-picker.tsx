@@ -15,6 +15,7 @@ export function LifecycleAssigneePicker(props: {
   locale: Locale;
   onSelect: (member: LifecycleAssignee) => void;
   onClose: () => void;
+  onClear?: (() => void) | undefined;
 }) {
   const picker = useLifecycleAssigneePicker(
     props.accountId,
@@ -28,6 +29,7 @@ export function LifecycleAssigneePicker(props: {
       picker={picker}
       locale={props.locale}
       onClose={props.onClose}
+      onClear={props.onClear}
       onSelect={(id) => {
         const member = picker.options.find((item) => item.id === id);
         if (member) props.onSelect(member);

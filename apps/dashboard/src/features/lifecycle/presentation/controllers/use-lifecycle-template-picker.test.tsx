@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { AccountId, CompanyId } from "../../../../core/domain/identifiers";
 import { failed, type Result, success } from "../../../../core/domain/result";
-import type { LifecycleTemplateId } from "../../domain/entities/lifecycle-template";
+import type { LifecycleKind, LifecycleTemplateId } from "../../domain/entities/lifecycle-template";
 import type { LifecycleTemplatePage } from "../../domain/entities/lifecycle-template-page";
 import type { LifecycleUseCases } from "../contracts/lifecycle-use-cases";
 import { useLifecycleTemplatePicker } from "./use-lifecycle-template-picker";
@@ -31,7 +31,7 @@ afterEach(() => {
   cleanup();
   for (const client of clients.splice(0)) client.clear();
 });
-function fixture() {
+function fixture(kind: LifecycleKind | null = null) {
   const client = new QueryClient();
   clients.push(client);
   const execute = vi
@@ -46,6 +46,7 @@ function fixture() {
         activeAccount,
         { companyId: activeCompany, permissions },
         { execute },
+        kind,
       ),
     {
       wrapper,
@@ -128,4 +129,25 @@ describe("lifecycle template picker ownership", () => {
     await waitFor(() => expect(f.result.current.failure?.code).toBe("access_denied"));
     expect(f.result.current.options).toEqual([]);
   });
+});
+
+it("filters an explicit onboarding page without scanning later mixed-kind results", async () => {
+  const f = fixture("ONBOARDING");
+  await waitFor(() => expect(f.result.current.options).toHaveLength(10));
+  f.execute.mockResolvedValueOnce(
+    success({
+      items: page.items.map((item) => ({ ...item, kind: "OFFBOARDING", active: true })),
+      nextCursor: "NEXT_KIND_PAGE",
+    }),
+  );
+  act(() => f.result.current.next());
+  await waitFor(() => expect(f.result.current.nextCursor).toBe("NEXT_KIND_PAGE"));
+  expect(f.result.current.options).toEqual([]);
+  expect(f.execute).toHaveBeenCalledTimes(2);
+  act(() => f.result.current.next());
+  await waitFor(() => expect(f.execute).toHaveBeenCalledTimes(3));
+  expect(f.execute.mock.lastCall?.[1]).toBe("NEXT_KIND_PAGE");
+  expect(f.result.current.options.every((item) => item.active && item.kind === "ONBOARDING")).toBe(
+    true,
+  );
 });

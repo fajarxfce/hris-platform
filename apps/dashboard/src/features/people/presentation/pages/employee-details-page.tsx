@@ -27,6 +27,7 @@ export function EmployeeDetailsPage({
   editEmploymentTo,
   transferTo,
   startLifecycleTo,
+  onboardingSchedulesTo,
   leaveTo,
   balancesTo,
   tab,
@@ -45,6 +46,7 @@ export function EmployeeDetailsPage({
   editEmploymentTo: string | null;
   transferTo: string | null;
   startLifecycleTo: string | null;
+  onboardingSchedulesTo: string | null;
   leaveTo: string | null;
   balancesTo: string | null;
   tab: EmployeeTab;
@@ -68,6 +70,9 @@ export function EmployeeDetailsPage({
             {balancesTo && state.employee && <Link to={balancesTo}>{text.leaveBalances}</Link>}
             {startLifecycleTo && state.employee && (
               <Link to={startLifecycleTo}>{text.startLifecycle}</Link>
+            )}
+            {onboardingSchedulesTo && state.employee && (
+              <Link to={onboardingSchedulesTo}>{text.onboardingSchedules}</Link>
             )}
             {editEmploymentTo && state.employee && (
               <Link to={editEmploymentTo}>{employmentMessages(locale).edit}</Link>

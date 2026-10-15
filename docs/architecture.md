@@ -264,6 +264,14 @@ policy and retains the effective predecessor revision separately from the origin
 run target. Database checks preserve the source facts, exact opening and cumulative
 arithmetic. Existing calculation JSON and original payroll remain immutable.
 
+Amendment discovery uses the same shared payroll, People and access guards, with
+current assurance before and after acquisition. Its datasource selects minimal
+current-revision metadata and retained employee labels, excludes the actor's
+current beneficiary records, and applies bounded annual filtering and keyset
+paging. The repository validates scope, ordering and mapping inside the database
+failure boundary. Discovery neither acquires full calculations nor grants
+payslip read authority; application policy stays in its use case.
+
 Employee expense draft saves, cancellations, submission and withdrawal check
 current session assurance after resource/access guards, before receipt replay,
 and before transaction completion. Late expiry rolls back claim state, immutable

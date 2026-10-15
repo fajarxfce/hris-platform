@@ -20,6 +20,17 @@ class PayrollAmendmentPublicationHttpTest : PayrollAmendmentPublicationApiFixtur
         assertEquals(1, current["summary"]["version"].asLong())
         assertNotEquals(original["summary"]["takeHome"], current["summary"]["takeHome"])
         assertEquals(original, currentPayslip(scene, 0))
+        val candidates =
+            payrollBody(
+                get(
+                    scene.source.maker.client,
+                    "/api/v1/companies/${scene.source.payroll.company}/payroll/amendment-sources?year=2026",
+                )
+            )["items"]
+        assertEquals(1, candidates.size())
+        assertEquals(scene.source.assessment.toString(), candidates[0]["assessmentId"].asString())
+        assertEquals(1, candidates[0]["revision"].asLong())
+        assertEquals(current["summary"]["publishedAt"], candidates[0]["publishedAt"])
         val progress = currentProgress(scene)
         assertEquals(1, progress["version"].asLong())
         assertEquals(1, progress["settlement"]["assessmentRevision"].asLong())

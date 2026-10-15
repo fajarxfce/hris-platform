@@ -1,6 +1,7 @@
 package dev.fajar.hris
 
 import dev.fajar.hris.payroll.domain.usecases.GetPayrollAmendmentPreparation
+import dev.fajar.hris.payroll.domain.usecases.ListPayrollAmendmentSources
 import dev.fajar.hris.payroll.domain.usecases.PreviewPayrollAmendment
 import java.math.BigDecimal
 import java.util.UUID
@@ -13,6 +14,7 @@ import tools.jackson.databind.JsonNode
 abstract class PayrollAmendmentApiFixture : PayrollTaxContinuityApiFixture() {
     @Autowired protected lateinit var amendmentProbe: PayrollAmendmentProbe
     @Autowired protected lateinit var getAmendmentPreparation: GetPayrollAmendmentPreparation
+    @Autowired protected lateinit var listAmendmentSources: ListPayrollAmendmentSources
     @Autowired protected lateinit var previewAmendment: PreviewPayrollAmendment
 
     protected data class AmendmentFixture(

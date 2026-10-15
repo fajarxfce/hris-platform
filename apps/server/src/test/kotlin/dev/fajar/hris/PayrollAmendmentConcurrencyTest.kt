@@ -8,11 +8,15 @@ import java.util.UUID
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicBoolean
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class PayrollAmendmentConcurrencyTest : PayrollAmendmentApiFixture() {
-    @Test
-    fun sharedReviewsRemainCoherentWhileFollowingMonthPublicationWaitsForThePayrollGuard() {
+    @ParameterizedTest
+    @ValueSource(strings = ["preview", "discovery"])
+    fun sharedReviewsRemainCoherentWhileFollowingMonthPublicationWaitsForThePayrollGuard(
+        action: String
+    ) {
         val f = amendmentFixture()
         val second = followingMonth(f.publication.calculation, YearMonth.of(2026, 10))
         val calculation = beginTaxRun(second)
@@ -58,8 +62,10 @@ class PayrollAmendmentConcurrencyTest : PayrollAmendmentApiFixture() {
         }
         Executors.newFixedThreadPool(3).use { pool ->
             val read =
-                pool.submit<Result<PayrollAmendmentPreview>> {
-                    previewAmendment.execute(actor, f.assessment, versions, remuneration)
+                pool.submit<Result<*>> {
+                    if (action == "discovery")
+                        listAmendmentSources.execute(actor, 2026, null, "", null, 50)
+                    else previewAmendment.execute(actor, f.assessment, versions, remuneration)
                 }
             try {
                 assertTrue(entered.await(5, TimeUnit.SECONDS))
@@ -76,7 +82,12 @@ class PayrollAmendmentConcurrencyTest : PayrollAmendmentApiFixture() {
                 release.countDown()
                 val result = read.get(10, TimeUnit.SECONDS)
                 assertTrue(result is Result.Success, result.toString())
-                assertEquals(1, (result as Result.Success).value.calculations.size)
+                val value = (result as Result.Success).value
+                assertEquals(
+                    1,
+                    if (value is Page<*>) value.items.size
+                    else (value as PayrollAmendmentPreview).calculations.size,
+                )
                 val published = write.get(10, TimeUnit.SECONDS)
                 assertTrue(published is Result.Success, published.toString())
             } finally {
@@ -87,6 +98,8 @@ class PayrollAmendmentConcurrencyTest : PayrollAmendmentApiFixture() {
         }
         val changed = getAmendmentPreparation.execute(actor, f.assessment)
         assertEquals(2, (changed as Result.Success).value.sources.size)
+        val candidates = listAmendmentSources.execute(actor, 2026, null, "", null, 50)
+        assertEquals(2, (candidates as Result.Success).value.items.size)
         val stale = previewAmendment.execute(actor, f.assessment, versions, remuneration)
         assertEquals("payroll_amendment_sources_changed", (stale as Result.Failed).failure.code)
     }

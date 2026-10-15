@@ -113,6 +113,22 @@ class ApiContractHttpTest : PeopleApiFixture() {
     @Test
     fun amendmentPreparationAndPreviewExposeObservedVersionsAndServerCalculatedDifferences() {
         val api = contract()
+        val sources = api["paths"]["/api/v1/companies/{companyId}/payroll/amendment-sources"]["get"]
+        assertTrue(sources["x-hris-company-admission"].asBoolean())
+        assertEquals(
+            setOf(
+                "assessmentId",
+                "employeeId",
+                "employeeNumber",
+                "employeeName",
+                "taxMonth",
+                "revision",
+                "publishedAt",
+            ),
+            api["components"]["schemas"]["PayrollAmendmentCandidateResponse"]["properties"]
+                .propertyNames()
+                .toSet(),
+        )
         val base = "/api/v1/companies/{companyId}/payroll/payslips/{id}"
         assertTrue(
             api["paths"][base + "/amendment-preparation"]["get"]["x-hris-company-admission"]

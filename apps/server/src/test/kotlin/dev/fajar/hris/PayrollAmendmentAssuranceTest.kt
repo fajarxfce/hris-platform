@@ -81,6 +81,19 @@ class PayrollAmendmentAssuranceTest : PayrollAmendmentApiFixture() {
                         security,
                     )
                     .execute(actor, scene.fixture.assessment)
+            "discovery" ->
+                ListPayrollAmendmentSources(
+                        policies,
+                        sources,
+                        people,
+                        companies,
+                        members,
+                        identities,
+                        transactions,
+                        clock,
+                        security,
+                    )
+                    .execute(actor, 2026, null, "", null, 50)
             "preview" ->
                 PreviewPayrollAmendment(
                         policies,
@@ -98,7 +111,7 @@ class PayrollAmendmentAssuranceTest : PayrollAmendmentApiFixture() {
         }
 
     @ParameterizedTest
-    @ValueSource(strings = ["preparation", "preview"])
+    @ValueSource(strings = ["preparation", "preview", "discovery"])
     fun proofExpiryDuringAnAccessWaitCannotReleaseAnAmendmentReview(action: String) {
         val scene = scenario()
         val age =
@@ -127,7 +140,7 @@ class PayrollAmendmentAssuranceTest : PayrollAmendmentApiFixture() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["preparation", "preview"])
+    @ValueSource(strings = ["preparation", "preview", "discovery"])
     fun acquiredFactsAndCalculationsStayPrivateWhenAssuranceExpiresBeforeDelivery(action: String) {
         val scene = scenario()
         val age =
@@ -169,7 +182,14 @@ class PayrollAmendmentAssuranceTest : PayrollAmendmentApiFixture() {
     }
 
     @ParameterizedTest
-    @CsvSource("preparation,access", "preview,access", "preparation,sources", "preview,sources")
+    @CsvSource(
+        "preparation,access",
+        "preview,access",
+        "preparation,sources",
+        "preview,sources",
+        "discovery,access",
+        "discovery,sources",
+    )
     fun interruptedPendingWorkReleasesItsGuardsAndTheExecutorThreadRemainsReusable(
         action: String,
         stage: String,
@@ -222,7 +242,7 @@ class PayrollAmendmentAssuranceTest : PayrollAmendmentApiFixture() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["preparation", "preview"])
+    @ValueSource(strings = ["preparation", "preview", "discovery"])
     fun permissionWithdrawnWhileWaitingIsCheckedBeforeAcquiringPrivateFacts(action: String) {
         val scene = scenario()
         val entered = CountDownLatch(1)

@@ -48,6 +48,25 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Payroll amendment source discovery
+
+A bounded, separately authorized source directory now returns published
+employee/month references and their current assessment revisions. It requires
+`payroll.amend`, excludes the current beneficiary and omits calculation amounts
+and private profile data. Annual, employee and literal name/number filters use
+stable assessment-ID pagination. Preparation and preview retain their existing
+URLs and complete-year checks.
+
+The full amendment/API-contract run and the focused discovery rerun cover 208 API
+scenarios, including all six discovery tests and the authorized initial account
+linking flow. Payroll domain/data tests
+(108 and seven), all 62 worker tests, architecture/format checks and both application
+JAR builds passed. Coverage includes independent grants, foreign scope, binding
+changes, current revisions, literal filters, page bounds, malformed rows, safe
+failure mapping, late assurance expiry, cancellation and concurrent publication.
+No schema migration or device interaction was required. Dashboard amendment
+workflows remain in progress.
+
 ### Retained payslip navigation
 
 Dashboard payslips now support explicit retained revisions with previous, next,

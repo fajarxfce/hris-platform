@@ -6,18 +6,27 @@ edits an original run, approval, payslip or payment result.
 
 ## Preparation and preview
 
-The first stage provides two company-scoped endpoints:
+Preparation provides company-scoped discovery and assessment review:
 
 | Method | Path below `/api/v1/companies/{companyId}/payroll` | Result |
 | --- | --- | --- |
+| GET | `/amendment-sources?year=2026` | Published employee/month references with current revisions |
 | GET | `/payslips/{id}/amendment-preparation` | Complete published-year references, retained remuneration and original calculations |
 | POST | `/payslips/{id}/amendment-preview` | Recalculated suffix and signed differences, without writing a draft or publishing an assessment |
 
-Both require explicit `payroll.amend` authority; default company, HR, finance and
+All three require explicit `payroll.amend` authority; default company, HR, finance and
 employee roles do not gain it automatically. A beneficiary cannot prepare their
-own amendment. Preparation checks current credentials and MFA; preview also
+own amendment. Discovery and preparation check current credentials and MFA; preview also
 requires recent authentication and MFA. Checks run after resource/access waits
 and again before private results leave the transaction.
+
+Discovery accepts a year from 2024 through 2100, an optional employee reference,
+literal name/number search of at most 120 characters, an assessment UUID cursor
+and a page limit from one to 100. Results retain publication labels, current
+assessment revision and its publication time. They exclude the current beneficiary
+and omit compensation, calculation amounts and private profile fields. Stable
+assessment-ID ordering and one-row lookahead provide the next cursor. Discovery
+does not reserve a revision; preparation acquires the complete published year.
 
 Send `sourceVersions` containing every `assessmentId` and `revision` returned by
 preparation, plus one to twelve `corrections`. Each correction identifies an
@@ -110,8 +119,9 @@ The review API binds an immutable calculation to a separate approval request:
 Submission requires `payroll.amend`, a client-generated review UUID,
 `expectedVersion`, `calculationId` and `reason`. Decisions require the separate
 `payroll.amend.review` grant. Withdrawal requires `payroll.amend`. Private read
-access accepts either grant while excluding the current beneficiary. Default
-company, HR and finance roles do not gain either amendment grant automatically.
+access accepts either grant or `payroll.amend.publish` while excluding the current
+beneficiary. Default company, HR and finance roles do not gain amendment grants
+automatically.
 
 Decide and withdraw send `expectedVersion` for the amendment,
 `expectedReviewVersion`, `expectedApprovalVersion` and `reason`; decide also sends

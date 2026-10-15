@@ -659,6 +659,30 @@ class PayrollConfiguration {
     ): PayrollAmendmentSourceRepository = StoredPayrollAmendmentSourceRepository(source, json)
 
     @Bean
+    fun listPayrollAmendmentSources(
+        policies: PayrollPolicyRepository,
+        sources: PayrollAmendmentSourceRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListPayrollAmendmentSources(
+            policies,
+            sources,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun getPayrollAmendmentPreparation(
         policies: PayrollPolicyRepository,
         sources: PayrollAmendmentSourceRepository,

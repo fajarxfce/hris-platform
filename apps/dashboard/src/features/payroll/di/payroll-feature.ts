@@ -2,6 +2,7 @@ import type { HttpClient } from "../../../core/data/http/http-client";
 import type { FileRepository } from "../../../core/domain/files/file-repository";
 import { HttpCompensationDataSource } from "../data/datasources/http-compensation-data-source";
 import { HttpPayrollAmendmentDataSource } from "../data/datasources/http-payroll-amendment-data-source";
+import { HttpPayrollAmendmentPublicationDataSource } from "../data/datasources/http-payroll-amendment-publication-data-source";
 import { HttpPayrollAmendmentReviewDataSource } from "../data/datasources/http-payroll-amendment-review-data-source";
 import { HttpPayrollAmendmentSourceDataSource } from "../data/datasources/http-payroll-amendment-source-data-source";
 import { HttpPayrollCalculationDataSource } from "../data/datasources/http-payroll-calculation-data-source";
@@ -15,6 +16,7 @@ import { HttpPayrollPolicyDataSource } from "../data/datasources/http-payroll-po
 import { HttpPayrollReviewDataSource } from "../data/datasources/http-payroll-review-data-source";
 import { HttpTaxOpeningDataSource } from "../data/datasources/http-tax-opening-data-source";
 import { RemoteCompensationRepository } from "../data/repositories/remote-compensation-repository";
+import { RemotePayrollAmendmentPublicationRepository } from "../data/repositories/remote-payroll-amendment-publication-repository";
 import { RemotePayrollAmendmentRepository } from "../data/repositories/remote-payroll-amendment-repository";
 import { RemotePayrollAmendmentReviewRepository } from "../data/repositories/remote-payroll-amendment-review-repository";
 import { RemotePayrollAmendmentSourceRepository } from "../data/repositories/remote-payroll-amendment-source-repository";
@@ -52,6 +54,8 @@ import { LoadCompensationReview } from "../domain/usecases/load-compensation-rev
 import { LoadPayrollAmendment } from "../domain/usecases/load-payroll-amendment";
 import { LoadPayrollAmendmentAction } from "../domain/usecases/load-payroll-amendment-action";
 import { LoadPayrollAmendmentEditor } from "../domain/usecases/load-payroll-amendment-editor";
+import { LoadPayrollAmendmentPublication } from "../domain/usecases/load-payroll-amendment-publication";
+import { LoadPayrollAmendmentPublications } from "../domain/usecases/load-payroll-amendment-publications";
 import { LoadPayrollAmendmentReview } from "../domain/usecases/load-payroll-amendment-review";
 import { LoadPayrollAmendmentReviewAction } from "../domain/usecases/load-payroll-amendment-review-action";
 import { LoadPayrollAmendmentReviewSubmission } from "../domain/usecases/load-payroll-amendment-review-submission";
@@ -80,7 +84,10 @@ import { LoadTaxOpeningRevision } from "../domain/usecases/load-tax-opening-revi
 import { PreparePayrollPayment } from "../domain/usecases/prepare-payroll-payment";
 import { PreviewPayrollAmendment } from "../domain/usecases/preview-payroll-amendment";
 import { ReconcilePayrollPayment } from "../domain/usecases/reconcile-payroll-payment";
+import { RecoverPayrollAmendmentPublication } from "../domain/usecases/recover-payroll-amendment-publication";
 import { ResumePayrollCalculation } from "../domain/usecases/resume-payroll-calculation";
+import { ReviewPayrollAmendmentPublication } from "../domain/usecases/review-payroll-amendment-publication";
+import { ReviewPayrollAmendmentPublicationRecovery } from "../domain/usecases/review-payroll-amendment-publication-recovery";
 import { ReviewPayrollCalculation } from "../domain/usecases/review-payroll-calculation";
 import { ReviewPayrollFinalization } from "../domain/usecases/review-payroll-finalization";
 import { ReviewPayrollInputAction } from "../domain/usecases/review-payroll-input-action";
@@ -96,6 +103,7 @@ import { SavePayrollAmendment } from "../domain/usecases/save-payroll-amendment"
 import { SavePayrollInput } from "../domain/usecases/save-payroll-input";
 import { SavePayrollPolicy } from "../domain/usecases/save-payroll-policy";
 import { SaveTaxOpening } from "../domain/usecases/save-tax-opening";
+import { StartPayrollAmendmentPublication } from "../domain/usecases/start-payroll-amendment-publication";
 import { StartPayrollCalculation } from "../domain/usecases/start-payroll-calculation";
 import { StartPayrollFinalization } from "../domain/usecases/start-payroll-finalization";
 import { SubmitPayrollAmendmentReview } from "../domain/usecases/submit-payroll-amendment-review";
@@ -132,11 +140,29 @@ export function createPayrollFeature(
   const amendmentReviews = new RemotePayrollAmendmentReviewRepository(
     new HttpPayrollAmendmentReviewDataSource(http),
   );
+  const amendmentPublications = new RemotePayrollAmendmentPublicationRepository(
+    new HttpPayrollAmendmentPublicationDataSource(http),
+  );
   const amendmentSources = new RemotePayrollAmendmentSourceRepository(
     new HttpPayrollAmendmentSourceDataSource(http),
   );
   return Object.freeze({
     loadAmendmentReviews: new LoadPayrollAmendmentReviews(amendments, amendmentReviews),
+    loadAmendmentPublications: new LoadPayrollAmendmentPublications(
+      amendments,
+      amendmentPublications,
+    ),
+    loadAmendmentPublication: new LoadPayrollAmendmentPublication(amendmentPublications),
+    reviewAmendmentPublication: new ReviewPayrollAmendmentPublication(
+      amendments,
+      amendmentReviews,
+      amendmentPublications,
+    ),
+    reviewAmendmentPublicationRecovery: new ReviewPayrollAmendmentPublicationRecovery(
+      amendmentPublications,
+    ),
+    startAmendmentPublication: new StartPayrollAmendmentPublication(amendmentPublications),
+    recoverAmendmentPublication: new RecoverPayrollAmendmentPublication(amendmentPublications),
     loadAmendmentReview: new LoadPayrollAmendmentReview(amendmentReviews),
     loadAmendmentReviewSubmission: new LoadPayrollAmendmentReviewSubmission(amendments),
     loadAmendmentReviewAction: new LoadPayrollAmendmentReviewAction(amendmentReviews),

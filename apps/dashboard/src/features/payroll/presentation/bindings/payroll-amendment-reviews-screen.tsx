@@ -3,7 +3,7 @@ import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import { canAuthorPayrollAmendments } from "../../domain/policies/payroll-amendment-authoring-policy";
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
-import { PayrollAmendmentReviewReader } from "../controllers/payroll-amendment-review-reader";
+import { PayrollAmendmentReader } from "../controllers/payroll-amendment-reader";
 import {
   payrollAmendmentReviewPath,
   payrollAmendmentReviewSubmissionPath,
@@ -41,7 +41,7 @@ function PayrollAmendmentReviewsBinding(props: PayrollScreenProps & { id: string
     [parameters] = useSearchParams(),
     navigate = useNavigate(),
     controller = useMemo(
-      () => new PayrollAmendmentReviewReader(payroll.loadAmendmentReviews, access, id),
+      () => new PayrollAmendmentReader(payroll.loadAmendmentReviews, access, id),
       [payroll.loadAmendmentReviews, access, id],
     );
   const state = useSyncExternalStore(

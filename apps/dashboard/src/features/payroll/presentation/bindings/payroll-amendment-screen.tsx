@@ -4,6 +4,7 @@ import { useWorkspaceRevalidation } from "../../../../core/presentation/session/
 import { canAuthorPayrollAmendments } from "../../domain/policies/payroll-amendment-authoring-policy";
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 import { PayrollAmendmentController } from "../controllers/payroll-amendment-controller";
+import { payrollAmendmentPublicationsPath } from "../models/payroll-amendment-publication-route";
 import { payrollAmendmentReviewsPath } from "../models/payroll-amendment-review-route";
 import {
   payrollAmendmentActionPath,
@@ -83,6 +84,9 @@ function PayrollAmendmentBinding(props: PayrollScreenProps & { id: string }) {
       view={view}
       locale={locale}
       companyName={props.companyName}
+      publicationsTo={
+        state.data ? payrollAmendmentPublicationsPath(access.companyId, id, parameters) : null
+      }
       tab={tab}
       backTo={`/payroll/amendments?${back}`}
       reviewsTo={state.data ? payrollAmendmentReviewsPath(access.companyId, id, parameters) : null}

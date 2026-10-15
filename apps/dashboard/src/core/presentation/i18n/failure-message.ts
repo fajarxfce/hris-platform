@@ -2,6 +2,42 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_payroll_amendment_publication: [
+    "Check the approved amendment, observed versions and publication reason.",
+    "Periksa koreksi yang disetujui, versi yang ditinjau, dan alasan publikasi.",
+  ],
+  invalid_job_version: [
+    "Reload worker progress before continuing.",
+    "Muat ulang progres worker sebelum melanjutkan.",
+  ],
+  payroll_amendment_approved_review_required: [
+    "Publication requires an approved current amendment review.",
+    "Publikasi memerlukan peninjauan koreksi terbaru yang sudah disetujui.",
+  ],
+  payroll_amendment_publication_active: [
+    "This amendment already has an active publication. Review its progress.",
+    "Koreksi ini sudah memiliki publikasi aktif. Periksa progresnya.",
+  ],
+  payroll_amendment_publication_limit: [
+    "This amendment has reached its limit of eight publication attempts.",
+    "Koreksi ini sudah mencapai batas delapan percobaan publikasi.",
+  ],
+  payroll_amendment_publication_not_found: [
+    "This amendment publication is unavailable for your current access.",
+    "Publikasi koreksi ini tidak tersedia untuk akses Anda saat ini.",
+  ],
+  payroll_amendment_publication_changed: [
+    "The amendment or publication changed. Reload before continuing.",
+    "Koreksi atau publikasi sudah berubah. Muat ulang sebelum melanjutkan.",
+  ],
+  payroll_amendment_publication_obsolete: [
+    "This attempt no longer matches the approved amendment. Review its current state.",
+    "Percobaan ini tidak lagi sesuai dengan koreksi yang disetujui. Tinjau status terbaru.",
+  ],
+  payroll_amendment_recovery_unavailable: [
+    "Recovery requires the latest pending publication and a stopped worker with no completed items.",
+    "Pemulihan memerlukan publikasi tertunda terbaru dan worker terhenti tanpa item selesai.",
+  ],
   payroll_amendment_review_not_found: [
     "This amendment review is unavailable for your current access.",
     "Review koreksi ini tidak tersedia untuk akses Anda saat ini.",

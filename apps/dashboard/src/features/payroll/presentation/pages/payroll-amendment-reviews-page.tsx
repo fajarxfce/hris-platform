@@ -12,14 +12,14 @@ import type { PayrollAmendmentReviews } from "../../domain/entities/payroll-amen
 import { payrollAmendmentMessages } from "../i18n/payroll-amendment-messages";
 import { payrollAmendmentReviewMessages } from "../i18n/payroll-amendment-review-messages";
 import { payrollReviewMessages } from "../i18n/payroll-review-messages";
-import type { PayrollAmendmentReviewReadState } from "../models/payroll-amendment-review-state";
+import type { PayrollAmendmentReadState } from "../models/payroll-amendment-review-state";
 import type {
   payrollAmendmentReviewPreparationView,
   payrollAmendmentReviewRows,
 } from "../models/payroll-amendment-review-view";
 
 export function PayrollAmendmentReviewsPage(props: {
-  state: PayrollAmendmentReviewReadState<PayrollAmendmentReviews>;
+  state: PayrollAmendmentReadState<PayrollAmendmentReviews>;
   properties: ReturnType<typeof payrollAmendmentReviewPreparationView>;
   rows: ReturnType<typeof payrollAmendmentReviewRows>;
   locale: Locale;

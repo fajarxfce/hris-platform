@@ -8,6 +8,7 @@ import {
   exercisePayrollAmendmentCalculation,
   exercisePayrollAmendmentCancellation,
 } from "./payroll-amendment-commands";
+import { exercisePayrollAmendmentPublication } from "./payroll-amendment-publication-workflow";
 import { exercisePayrollAmendmentRead } from "./payroll-amendment-read";
 import { exercisePayrollAmendmentReviews } from "./payroll-amendment-reviews";
 
@@ -129,41 +130,6 @@ export async function publishNegativePayrollAmendment(input: {
     amendment,
     month,
   });
-  const publication = randomUUID(),
-    started = await publisher.request.put(`${draft}/publications/${publication}`, {
-      headers: headers(publisherToken),
-      data: {
-        expectedVersion: approved.amendmentVersion,
-        reviewId: approved.reviewId,
-        expectedReviewVersion: approved.reviewVersion,
-        expectedApprovalVersion: approved.approvalVersion,
-        calculationId: approved.calculationId,
-        reason: "Publish independently approved correction",
-      },
-    });
-  expect(started.status()).toBe(200);
-  await expect
-    .poll(
-      async () => {
-        const response = await publisher.request.get(`${draft}/publications`);
-        expect(response.status()).toBe(200);
-        const values = z
-          .array(
-            z.object({
-              publication: z.object({
-                id: z.uuid(),
-                status: z.string(),
-                failureCode: z.string().nullable(),
-              }),
-            }),
-          )
-          .parse(await response.json());
-        const result = values.find((value) => value.publication.id === publication)?.publication;
-        expect(result?.failureCode).toBeNull();
-        return result?.status;
-      },
-      { timeout: 30_000, intervals: [250, 500, 1000] },
-    )
-    .toBe("PUBLISHED");
+  await exercisePayrollAmendmentPublication({ publisher, company, amendment, month, approved });
   return { financeVersion, publisherHeaders: () => headers(publisherToken), reviewerToken };
 }

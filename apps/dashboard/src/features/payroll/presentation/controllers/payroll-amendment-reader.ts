@@ -1,13 +1,13 @@
 import type { Result } from "../../../../core/domain/result";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import {
-  initialAmendmentReviewReadState,
-  type PayrollAmendmentReviewReadState,
+  initialAmendmentReadState,
+  type PayrollAmendmentReadState,
 } from "../models/payroll-amendment-review-state";
 
-/** Owns one scoped review read; directory and detail bindings each create their own instance. */
-export class PayrollAmendmentReviewReader<T> {
-  #state = initialAmendmentReviewReadState<T>();
+/** Owns one scoped amendment read; directory and detail bindings each create their own instance. */
+export class PayrollAmendmentReader<T> {
+  #state = initialAmendmentReadState<T>();
   #active = false;
   #pending: AbortController | null = null;
   #listeners = new Set<() => void>();
@@ -18,7 +18,7 @@ export class PayrollAmendmentReviewReader<T> {
     private readonly access: CompanyAccess,
     private readonly id: string,
   ) {}
-  getSnapshot = (): PayrollAmendmentReviewReadState<T> => this.#state;
+  getSnapshot = (): PayrollAmendmentReadState<T> => this.#state;
   subscribe = (listener: () => void): (() => void) => {
     this.#listeners.add(listener);
     return () => this.#listeners.delete(listener);
@@ -32,14 +32,14 @@ export class PayrollAmendmentReviewReader<T> {
     this.#active = false;
     this.#pending?.abort();
     this.#pending = null;
-    this.publish(initialAmendmentReviewReadState<T>());
+    this.publish(initialAmendmentReadState<T>());
   };
   refresh = async (): Promise<void> => {
     if (!this.#active) return;
     this.#pending?.abort();
     const pending = new AbortController();
     this.#pending = pending;
-    this.publish(initialAmendmentReviewReadState<T>());
+    this.publish(initialAmendmentReadState<T>());
     try {
       const result = await this.load.execute(this.access, this.id, pending.signal);
       if (pending.signal.aborted || this.#pending !== pending) return;
@@ -59,7 +59,7 @@ export class PayrollAmendmentReviewReader<T> {
       if (this.#pending === pending) this.#pending = null;
     }
   };
-  private publish(state: PayrollAmendmentReviewReadState<T>): void {
+  private publish(state: PayrollAmendmentReadState<T>): void {
     this.#state = state;
     for (const listener of [...this.#listeners]) listener();
   }

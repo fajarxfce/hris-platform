@@ -12,6 +12,7 @@ import { type Locale, messages } from "../../../../core/presentation/i18n/messag
 import { payrollAmendmentActionMessages } from "../i18n/payroll-amendment-action-messages";
 import { payrollAmendmentEditorMessages } from "../i18n/payroll-amendment-editor-messages";
 import { payrollAmendmentMessages } from "../i18n/payroll-amendment-messages";
+import { payrollAmendmentPublicationMessages } from "../i18n/payroll-amendment-publication-messages";
 import { payrollAmendmentReviewMessages } from "../i18n/payroll-amendment-review-messages";
 import type { PayrollAmendmentState } from "../models/payroll-amendment-state";
 import type { payrollAmendmentInspectionView } from "../models/payroll-amendment-view";
@@ -22,6 +23,7 @@ export function PayrollAmendmentPage(props: {
   view: ReturnType<typeof payrollAmendmentInspectionView> | null;
   locale: Locale;
   companyName: string;
+  publicationsTo: string | null;
   tab: string;
   backTo: string;
   reviewsTo: string | null;
@@ -48,6 +50,9 @@ export function PayrollAmendmentPage(props: {
         actions={<Link to={props.backTo}>{text.back}</Link>}
       />
       <AppCommandBar label={text.details}>
+        {props.publicationsTo && (
+          <Link to={props.publicationsTo}>{payrollAmendmentPublicationMessages(locale).title}</Link>
+        )}
         {props.reviewsTo && (
           <Link to={props.reviewsTo}>{payrollAmendmentReviewMessages(locale).title}</Link>
         )}

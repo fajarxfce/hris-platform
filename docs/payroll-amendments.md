@@ -327,6 +327,49 @@ reload; an unconfirmed command retains its original operation and payload throug
 later MFA, conflicts or denied retries. Scope replacement cancels work and clears
 private context. Theme, language and detail tabs reuse the acquired state.
 
+## Dashboard publication
+
+The amendment and review pages link to a directory of at most eight publication
+attempts. Author, reviewer and publisher grants independently permit private
+inspection; only `payroll.amend.publish` permits admission or recovery. A stopped
+attempt remains visible, with its original basis and worker outcome.
+
+Publication preparation coordinates amendment, review and publication repository
+reads. It requires the same approved amendment/review/calculation versions across
+those responses; a competing change requires explicit reload. The command retains
+that basis, a reason, an operation and a separate new publication ID. The receipt
+identifies the amendment revision, while success navigation uses the publication
+ID. Acknowledging admission does not claim the worker has completed publication.
+
+Detail separates the attempt, captured approved basis and worker progress. Evidence
+links retain the publication's amendment revision and exact calculation; review
+history remains accessible independently. One visible page owns one request and
+one timer, with at most 30 delayed progress reads at four-second intervals. Hidden
+or disposed pages abort pending work and clear the timer. Completion, exhausted
+jobs and read failures stop automatic observation; manual refresh resets the
+budget. Theme and language changes reuse the acquired state.
+
+Recovery requires the server's current action hint, the publisher grant, an
+observed amendment/job version and a reason. It closes a pending attempt whose
+worker stopped without completing any items. It does not queue another attempt.
+The restored amendment must be reviewed before a separate publication command.
+Both commands retain their original payload after response loss, including across
+MFA renewal, later conflicts and denied retries. Current authorization still
+applies to receipt recovery. A definite initial conflict requires a fresh review;
+company/account replacement cancels work and clears private state.
+
+Dashboard validation passed architecture, formatting and TypeScript checks,
+2,906 unit tests and 42 selected Chromium scenarios. Coverage includes independent
+permissions, mixed snapshots, original-command recovery, exhausted-job recovery,
+finite observation, cancellation and narrow layouts. The real isolated
+API/PostgreSQL/worker scenario passed browser publication with a response dropped
+after commit and the original acknowledgement recovered after worker completion;
+retained evidence, payments and confirmed returns also passed. Exhausted-job
+recovery was exercised through the browser transport fixture and domain/controller
+tests, separately from the actual worker publication. Screenshots were inspected.
+No backend schema or mobile binary changed in this dashboard increment. Existing
+CSS specificity and bundle-size advisories remain.
+
 ## Delivery sequence
 
 1. Guarded preparation and deterministic recalculation from retained sources: implemented.
@@ -344,8 +387,10 @@ private context. Theme, language and detail tabs reuse the acquired state.
    retained proposals, calculations and revision history are implemented in the
    dashboard. Source selection, draft creation/editing and preview are implemented.
    Retained calculation/cancellation commands and independent review submission,
-   staged decisions, withdrawal and history are implemented. Publication and
-   native retained-revision navigation remain. The current/retained statements and sync contracts are
+   staged decisions, withdrawal and history are implemented. Publication review,
+   admission, bounded progress, retained attempts and terminal-job recovery are
+   implemented in the dashboard. Native retained-revision navigation remains.
+   The current/retained statements and sync contracts are
    available in the API. The revised APK awaits phone connectivity.
 
 Each stage requires isolation, competing-change, lost-response, assurance-expiry,

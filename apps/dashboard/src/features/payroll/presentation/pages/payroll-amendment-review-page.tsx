@@ -14,16 +14,18 @@ import type {
   PayrollAmendmentReviewDetails,
 } from "../../domain/entities/payroll-amendment-review-details";
 import { payrollAmendmentMessages } from "../i18n/payroll-amendment-messages";
+import { payrollAmendmentPublicationMessages } from "../i18n/payroll-amendment-publication-messages";
 import { payrollAmendmentReviewMessages } from "../i18n/payroll-amendment-review-messages";
 import { payrollReviewMessages } from "../i18n/payroll-review-messages";
-import type { PayrollAmendmentReviewReadState } from "../models/payroll-amendment-review-state";
+import type { PayrollAmendmentReadState } from "../models/payroll-amendment-review-state";
 import type { payrollAmendmentReviewView } from "../models/payroll-amendment-review-view";
 
 export function PayrollAmendmentReviewPage(props: {
-  state: PayrollAmendmentReviewReadState<PayrollAmendmentReviewDetails>;
+  state: PayrollAmendmentReadState<PayrollAmendmentReviewDetails>;
   view: ReturnType<typeof payrollAmendmentReviewView> | null;
   locale: Locale;
   companyName: string;
+  publicationsTo: string | null;
   backTo: string | null;
   proposalTo: string | null;
   basisTo: string | null;
@@ -45,6 +47,9 @@ export function PayrollAmendmentReviewPage(props: {
         actions={props.backTo && <Link to={props.backTo}>{text.back}</Link>}
       />
       <AppCommandBar label={text.review}>
+        {props.publicationsTo && (
+          <Link to={props.publicationsTo}>{payrollAmendmentPublicationMessages(locale).title}</Link>
+        )}
         {props.actionLinks.map((link) => (
           <Link key={link.action} to={link.to}>
             {text[link.action]}

@@ -9,6 +9,10 @@ import { CompensationEmployeesScreen } from "../bindings/compensation-employees-
 import { CompensationScreen } from "../bindings/compensation-screen";
 import { PayrollAmendmentActionScreen } from "../bindings/payroll-amendment-action-screen";
 import { PayrollAmendmentEditorScreen } from "../bindings/payroll-amendment-editor-screen";
+import { PayrollAmendmentPublicationRecoveryScreen } from "../bindings/payroll-amendment-publication-recovery-screen";
+import { PayrollAmendmentPublicationScreen } from "../bindings/payroll-amendment-publication-screen";
+import { PayrollAmendmentPublicationStartScreen } from "../bindings/payroll-amendment-publication-start-screen";
+import { PayrollAmendmentPublicationsScreen } from "../bindings/payroll-amendment-publications-screen";
 import { PayrollAmendmentReviewActionScreen } from "../bindings/payroll-amendment-review-action-screen";
 import { PayrollAmendmentReviewScreen } from "../bindings/payroll-amendment-review-screen";
 import { PayrollAmendmentReviewSubmissionScreen } from "../bindings/payroll-amendment-review-submission-screen";
@@ -67,6 +71,22 @@ export function PayrollRoutes(props: PayrollScreenProps) {
         element={<PayrollAmendmentEditorScreen {...props} mode="edit" />}
       />
       <Route path="amendments/:amendmentId" element={<PayrollAmendmentScreen {...props} />} />
+      <Route
+        path="amendments/:amendmentId/publications"
+        element={<PayrollAmendmentPublicationsScreen {...props} />}
+      />
+      <Route
+        path="amendments/:amendmentId/publish"
+        element={<PayrollAmendmentPublicationStartScreen {...props} />}
+      />
+      <Route
+        path="amendments/:amendmentId/publications/:publicationId"
+        element={<PayrollAmendmentPublicationScreen {...props} />}
+      />
+      <Route
+        path="amendments/:amendmentId/publications/:publicationId/recover"
+        element={<PayrollAmendmentPublicationRecoveryScreen {...props} />}
+      />
       <Route
         path="amendments/:amendmentId/calculate"
         element={<PayrollAmendmentActionScreen {...props} action="CALCULATE" />}

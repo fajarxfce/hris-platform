@@ -13,8 +13,8 @@ import { toPayrollAmendmentDetails } from "../../data/mappers/payroll-amendment-
 import { toPayrollAmendmentReviewDetails } from "../../data/mappers/payroll-amendment-review-mapper";
 import type { PayrollAmendmentReviewDetails } from "../../domain/entities/payroll-amendment-review-details";
 import type { PayrollUseCases } from "../contracts/payroll-use-cases";
+import { PayrollAmendmentReader } from "./payroll-amendment-reader";
 import { PayrollAmendmentReviewActionController } from "./payroll-amendment-review-action-controller";
-import { PayrollAmendmentReviewReader } from "./payroll-amendment-review-reader";
 import { PayrollAmendmentReviewSubmissionController } from "./payroll-amendment-review-submission-controller";
 
 const access: CompanyAccess = {
@@ -285,7 +285,7 @@ describe("scoped amendment review reader", () => {
           .fn<PayrollUseCases["loadAmendmentReview"]["execute"]>()
           .mockResolvedValue(success(f.details)),
       },
-      reader = new PayrollAmendmentReviewReader(load, access, amendmentReviewId());
+      reader = new PayrollAmendmentReader(load, access, amendmentReviewId());
     load.execute.mockReturnValueOnce(waiting.promise);
     reader.activate();
     reader.activate();
@@ -315,7 +315,7 @@ describe("scoped amendment review reader", () => {
           .fn<PayrollUseCases["loadAmendmentReview"]["execute"]>()
           .mockResolvedValue(success(f.details)),
       },
-      reader = new PayrollAmendmentReviewReader(load, access, amendmentReviewId()),
+      reader = new PayrollAmendmentReader(load, access, amendmentReviewId()),
       added = vi.fn();
     const releases: (() => void)[] = [];
     releases.push(

@@ -531,7 +531,22 @@ Uncertain commands retain their exact payload through explicit retry, MFA renewa
 and later conflicts. Initial conflicts require protected reload. Confirmed access
 loss clears private evidence and entered reasons; company/account replacement
 cancels owned work. Tabs, theme and language changes do not reacquire data. These
-forms remain in browser memory. Publication controls are separate delivery work.
+forms remain in browser memory.
+
+`/payroll/amendments/:id/publications` lists retained attempts; `/publish` reviews
+the approved amendment, calculation and approval versions before admission.
+The independent publisher grant permits commands without granting authorship or
+review authority. The admitted publication ID remains distinct from the amendment
+receipt, including after a lost response and worker completion.
+
+`/payroll/amendments/:id/publications/:publicationId` separates the captured basis,
+attempt outcome and worker progress. Historical proposal/calculation links retain
+their exact revision. Progress reads are visible-only, sequential and capped at
+30 updates; errors or terminal jobs stop observation. Manual refresh starts a new
+budget. `/recover` closes an exhausted pending attempt only after its current job
+and amendment versions are reviewed. It does not start another publication.
+The [publication contract](payroll-amendments.md#dashboard-publication) describes
+scope, recovery and original-command handling.
 
 ## Shift templates
 

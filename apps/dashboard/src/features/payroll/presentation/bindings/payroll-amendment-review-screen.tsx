@@ -3,7 +3,8 @@ import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import { canActOnAmendmentReview } from "../../domain/policies/payroll-amendment-review-policy";
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
-import { PayrollAmendmentReviewReader } from "../controllers/payroll-amendment-review-reader";
+import { PayrollAmendmentReader } from "../controllers/payroll-amendment-reader";
+import { payrollAmendmentPublicationsPath } from "../models/payroll-amendment-publication-route";
 import {
   payrollAmendmentReviewActionPath,
   payrollAmendmentReviewPath,
@@ -38,7 +39,7 @@ function PayrollAmendmentReviewBinding(props: PayrollScreenProps & { id: string 
     [parameters, setParameters] = useSearchParams(),
     navigate = useNavigate(),
     controller = useMemo(
-      () => new PayrollAmendmentReviewReader(payroll.loadAmendmentReview, access, id),
+      () => new PayrollAmendmentReader(payroll.loadAmendmentReview, access, id),
       [payroll.loadAmendmentReview, access, id],
     );
   const state = useSyncExternalStore(
@@ -73,6 +74,11 @@ function PayrollAmendmentReviewBinding(props: PayrollScreenProps & { id: string 
       view={view}
       locale={locale}
       companyName={props.companyName}
+      publicationsTo={
+        state.data
+          ? payrollAmendmentPublicationsPath(access.companyId, state.data.amendment.id, parameters)
+          : null
+      }
       backTo={
         state.data
           ? payrollAmendmentReviewsPath(access.companyId, state.data.amendment.id, parameters)

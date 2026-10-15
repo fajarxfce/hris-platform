@@ -1357,3 +1357,26 @@ come from authorized display references; no personal profile is acquired. Query
 ownership includes account, company, grants and the selected period/employee.
 Company replacement clears selections and aborts pending work. Locale and theme
 changes reformat the current observation without acquiring it again.
+
+
+## Leave accrual schedules
+
+`/leave/accrual-schedules` provides company-owned history in pages of 20.
+An authorized operator selects a leave type, first month and 1–12 periods, then
+reviews each effective policy, due time, credit, minimum service and eligible
+contracts. Frequency follows policy. Admission retains the reviewed employee
+selection, policy head, reason and one immutable operation; overdue periods may
+start immediately. See the [schedule contract](leave-accrual-schedules.md).
+
+A definite policy conflict requires another review. An uncertain response keeps
+the original command through MFA and later conflicts; recovery requires explicit
+retry. Verification reacquires a denied review but never submits a command.
+Workspace replacement aborts obsolete acquisition and clears private data. Drafts
+and uncertain commands participate in the existing navigation guard and remain
+in browser memory.
+
+Detail displays the immutable authorization and current progress for at most 12
+periods. Opening a period retains the schedule and its history cursor through
+outcome paging and recovery. Cancellation and resume use the existing job and
+batch workflows; future recovery retains the original due time. Schedule readers
+perform explicit bounded reads, without browser timers for future periods.

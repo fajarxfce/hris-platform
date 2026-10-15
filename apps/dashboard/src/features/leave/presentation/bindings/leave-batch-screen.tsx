@@ -5,6 +5,8 @@ import { useWorkspaceRevalidation } from "../../../../core/presentation/session/
 import { canResumeLeaveBatch } from "../../domain/policies/leave-batch-policy";
 import type { LeaveBatchScreenProps } from "../contracts/leave-batch-screen-props";
 import { LeaveBatchController } from "../controllers/leave-batch-controller";
+import { leaveAccrualScheduleMessages } from "../i18n/leave-accrual-schedule-messages";
+import { leaveBatchMessages } from "../i18n/leave-batch-messages";
 import { leaveBatchRoute } from "../models/leave-batch-route";
 import { leaveBatchView } from "../models/leave-batch-view";
 import { LeaveBatchPage } from "../pages/leave-batch-page";
@@ -60,7 +62,12 @@ function LeaveBatchBinding(props: LeaveBatchScreenProps & { id: string; after: s
       view={view}
       locale={props.locale}
       companyName={props.companyName}
-      backTo={route.listTo}
+      backTo={route.backTo}
+      backLabel={
+        route.schedule
+          ? leaveAccrualScheduleMessages(props.locale).backToDetail
+          : leaveBatchMessages(props.locale).back
+      }
       resumeTo={
         state.stage === "ready" && current && canResumeLeaveBatch(props.access, current)
           ? `${route.path}/${encodeURIComponent(props.id)}/resume?${route.detailQuery}`
@@ -75,10 +82,10 @@ function LeaveBatchBinding(props: LeaveBatchScreenProps & { id: string; after: s
       }
       firstPage={props.after === null}
       onRefresh={controller.refresh}
-      onFirst={() => setParameters(new URLSearchParams(route.query))}
+      onFirst={() => setParameters(new URLSearchParams(route.resultQuery))}
       onNext={() => {
         if (current?.results.nextCursor) {
-          const query = new URLSearchParams(route.query);
+          const query = new URLSearchParams(route.resultQuery);
           query.set("resultAfter", current.results.nextCursor);
           setParameters(query);
         }

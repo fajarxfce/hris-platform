@@ -19,6 +19,7 @@ export function LeaveBatchPage(props: {
   locale: Locale;
   companyName: string;
   backTo: string;
+  backLabel: string;
   resumeTo: string | null;
   jobTo: string | null;
   firstPage: boolean;
@@ -35,7 +36,7 @@ export function LeaveBatchPage(props: {
       <AppPageHeader
         title={text.detail}
         context={props.companyName}
-        actions={<Link to={props.backTo}>{text.back}</Link>}
+        actions={<Link to={props.backTo}>{props.backLabel}</Link>}
       />
       <AppCommandBar label={text.detail}>
         {props.resumeTo && <Link to={props.resumeTo}>{text.resume}</Link>}

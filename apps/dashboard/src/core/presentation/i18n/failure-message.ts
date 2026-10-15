@@ -1535,6 +1535,18 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Check the leave type, period and reason.",
     "Periksa jenis cuti, periode, dan alasan.",
   ],
+  invalid_leave_accrual_schedule: [
+    "Choose a leave type, first period and 1–12 periods, then enter a reason.",
+    "Pilih jenis cuti, periode pertama dan 1–12 periode, lalu isi alasan.",
+  ],
+  leave_accrual_schedule_not_found: [
+    "This accrual schedule is unavailable.",
+    "Jadwal akrual ini tidak tersedia.",
+  ],
+  leave_schedule_frequency_changed: [
+    "The selected periods use different accrual frequencies. Review a shorter period range.",
+    "Periode terpilih memakai frekuensi akrual berbeda. Tinjau rentang periode yang lebih pendek.",
+  ],
   leave_batch_not_found: ["This leave process is unavailable.", "Proses cuti ini tidak tersedia."],
   leave_batch_active: [
     "Another process is active for this leave type and period. Review its progress first.",

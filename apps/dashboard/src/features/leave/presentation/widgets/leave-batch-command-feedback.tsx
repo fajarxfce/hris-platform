@@ -11,6 +11,7 @@ export function LeaveBatchCommandFeedback(props: {
   locale: Locale;
   successTo: string | null;
   successMessage: string;
+  successLabel?: string;
   onRetry: () => void;
 }) {
   const text = leaveBatchMessages(props.locale);
@@ -34,7 +35,7 @@ export function LeaveBatchCommandFeedback(props: {
         <MessageBar intent="success" role="status">
           <MessageBarBody>
             {props.successMessage}{" "}
-            {props.successTo && <Link to={props.successTo}>{text.view}</Link>}
+            {props.successTo && <Link to={props.successTo}>{props.successLabel ?? text.view}</Link>}
           </MessageBarBody>
         </MessageBar>
       )}

@@ -56,6 +56,21 @@ const LeaveCalendarScreen = lazy(() =>
   })),
 );
 
+const LeaveAccrualSchedulesScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-accrual-schedules-screen").then(
+    (module) => ({ default: module.LeaveAccrualSchedulesScreen }),
+  ),
+);
+const LeaveAccrualScheduleScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-accrual-schedule-screen").then(
+    (module) => ({ default: module.LeaveAccrualScheduleScreen }),
+  ),
+);
+const LeaveAccrualScheduleStartScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-accrual-schedule-start-screen").then(
+    (module) => ({ default: module.LeaveAccrualScheduleStartScreen }),
+  ),
+);
 const LeaveBatchesScreen = lazy(() =>
   import("../../features/leave/presentation/bindings/leave-batches-screen").then((module) => ({
     default: module.LeaveBatchesScreen,
@@ -579,6 +594,54 @@ export function PortalRoutes({
               leave={leave}
               companyName={company.name}
               locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/accrual-schedules"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveAccrualSchedulesScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/accrual-schedules/new"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveAccrualScheduleStartScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/accrual-schedules/:scheduleId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveAccrualScheduleScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
             />
           </Suspense>
         }

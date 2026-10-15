@@ -7,6 +7,7 @@ import { AppLoading } from "../../../../core/presentation/components/app-loading
 import { AppPageHeader } from "../../../../core/presentation/components/app-page-header";
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { leaveAccrualScheduleMessages } from "../i18n/leave-accrual-schedule-messages";
 import { leaveBatchMessages } from "../i18n/leave-batch-messages";
 import type { LeaveBatchesState } from "../models/leave-batch-state";
 import type { leaveBatchesView } from "../models/leave-batch-view";
@@ -17,6 +18,7 @@ export function LeaveBatchesPage(props: {
   companyName: string;
   accrualTo: string | null;
   closeTo: string | null;
+  schedulesTo: string;
   firstPage: boolean;
   onRefresh: () => void;
   onOpen: (id: string) => void;
@@ -30,6 +32,7 @@ export function LeaveBatchesPage(props: {
     <section className="app-report-content" aria-busy={state.stage === "loading"}>
       <AppPageHeader title={text.title} context={props.companyName} />
       <AppCommandBar label={text.title}>
+        <Link to={props.schedulesTo}>{leaveAccrualScheduleMessages(locale).title}</Link>
         {props.accrualTo && <Link to={props.accrualTo}>{text.newAccrual}</Link>}
         {props.closeTo && <Link to={props.closeTo}>{text.newYearClose}</Link>}
         <AppButton

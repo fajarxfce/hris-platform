@@ -12,6 +12,7 @@ export const AppTextArea = forwardRef<HTMLTextAreaElement, Props>(function AppTe
 ) {
   return (
     <Field
+      className="app-text-area-field"
       label={label}
       validationState={error ? "error" : "none"}
       validationMessage={error ?? null}

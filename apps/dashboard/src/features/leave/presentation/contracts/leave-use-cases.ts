@@ -2,6 +2,8 @@ import type { AdjustLeaveBalance } from "../../domain/usecases/adjust-leave-bala
 import type { DecideLeaveRequest } from "../../domain/usecases/decide-leave-request";
 import type { DownloadLeaveAttachment } from "../../domain/usecases/download-leave-attachment";
 import type { LoadEmployeeLeaveBalances } from "../../domain/usecases/load-employee-leave-balances";
+import type { LoadLeaveAccrualSchedule } from "../../domain/usecases/load-leave-accrual-schedule";
+import type { LoadLeaveAccrualSchedules } from "../../domain/usecases/load-leave-accrual-schedules";
 import type { LoadLeaveAdjustmentCatalog } from "../../domain/usecases/load-leave-adjustment-catalog";
 import type { LoadLeaveBatch } from "../../domain/usecases/load-leave-batch";
 import type { LoadLeaveBatchTypes } from "../../domain/usecases/load-leave-batch-types";
@@ -19,15 +21,21 @@ import type { LoadLeaveRequests } from "../../domain/usecases/load-leave-request
 import type { PreviewLeaveRequest } from "../../domain/usecases/preview-leave-request";
 import type { RequestLeaveCancellation } from "../../domain/usecases/request-leave-cancellation";
 import type { ResumeLeaveBatch } from "../../domain/usecases/resume-leave-batch";
+import type { ReviewLeaveAccrualSchedule } from "../../domain/usecases/review-leave-accrual-schedule";
 import type { ReviewLeaveAction } from "../../domain/usecases/review-leave-action";
 import type { ReviewLeaveBalanceAdjustment } from "../../domain/usecases/review-leave-balance-adjustment";
 import type { ReviewLeaveBatch } from "../../domain/usecases/review-leave-batch";
 import type { SaveLeavePolicy } from "../../domain/usecases/save-leave-policy";
+import type { ScheduleLeaveAccrual } from "../../domain/usecases/schedule-leave-accrual";
 import type { StartLeaveBatch } from "../../domain/usecases/start-leave-batch";
 import type { SubmitLeaveRequest } from "../../domain/usecases/submit-leave-request";
 import type { WithdrawLeaveRequest } from "../../domain/usecases/withdraw-leave-request";
 
 export type LeaveUseCases = Readonly<{
+  loadAccrualSchedule: Pick<LoadLeaveAccrualSchedule, "execute">;
+  loadAccrualSchedules: Pick<LoadLeaveAccrualSchedules, "execute">;
+  reviewAccrualSchedule: Pick<ReviewLeaveAccrualSchedule, "execute">;
+  scheduleAccrual: Pick<ScheduleLeaveAccrual, "execute">;
   loadCalendar: Pick<LoadLeaveCalendar, "execute">;
   loadCalendarEntries: Pick<LoadLeaveCalendarEntries, "execute">;
   loadBatchTypes: Pick<LoadLeaveBatchTypes, "execute">;

@@ -1,4 +1,4 @@
-import type { CompanyId } from "../../../../core/domain/identifiers";
+import { type CompanyId, isUuid } from "../../../../core/domain/identifiers";
 import type { LeaveBatchKind } from "../../domain/entities/leave-batch";
 /** Company replacement discards resource cursors; result paging retains the originating directory. */
 export function leaveBatchRoute(company: CompanyId, parameters: URLSearchParams, tail = "") {
@@ -9,7 +9,27 @@ export function leaveBatchRoute(company: CompanyId, parameters: URLSearchParams,
   const kind: LeaveBatchKind = selectedKind === "YEAR_CLOSE" ? "YEAR_CLOSE" : "ACCRUAL";
   const query = new URLSearchParams({ company });
   if (after !== null) query.set("after", after);
-  const detailQuery = new URLSearchParams(query);
+  const requestedSchedule = parameters.get("schedule"),
+    requestedScheduleAfter = parameters.get("scheduleAfter");
+  const schedule =
+    !foreignCompany && tail !== "/new" && requestedSchedule && isUuid(requestedSchedule)
+      ? requestedSchedule.toLowerCase()
+      : null;
+  const scheduleAfter =
+    schedule && requestedScheduleAfter && isUuid(requestedScheduleAfter)
+      ? requestedScheduleAfter.toLowerCase()
+      : null;
+  const resultQuery = new URLSearchParams(query),
+    scheduleQuery = new URLSearchParams({ company });
+  if (schedule) {
+    resultQuery.delete("after");
+    resultQuery.set("schedule", schedule);
+    if (scheduleAfter) {
+      resultQuery.set("scheduleAfter", scheduleAfter);
+      scheduleQuery.set("after", scheduleAfter);
+    }
+  }
+  const detailQuery = new URLSearchParams(resultQuery);
   if (resultAfter !== null) detailQuery.set("resultAfter", resultAfter);
   const currentQuery = new URLSearchParams(tail === "/new" ? query : detailQuery);
   if (tail === "/new") currentQuery.set("kind", kind);
@@ -22,6 +42,9 @@ export function leaveBatchRoute(company: CompanyId, parameters: URLSearchParams,
     path,
     query: query.toString(),
     detailQuery: detailQuery.toString(),
+    resultQuery: resultQuery.toString(),
+    schedule,
+    backTo: schedule ? `/leave/accrual-schedules/${schedule}?${scheduleQuery}` : `${path}?${query}`,
     kind,
     after,
     resultAfter,

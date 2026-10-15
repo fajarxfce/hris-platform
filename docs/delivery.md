@@ -4854,3 +4854,41 @@ retained 60,000 targets for 12 periods and 5,000 employees; local admission took
 Dashboard delivery and real browser/worker acceptance remain the next increment.
 The development database remains at V81 until the validated V82 artifacts are
 deployed. No mobile source, APK or phone installation changed in this increment.
+
+
+## Dashboard leave accrual schedules
+
+The dashboard now provides reviewed multi-period admission, company history and
+current period progress. Review shows policy eligibility and due times before
+capturing the employee selection and policy head. Uncertain commands retain one
+operation through MFA and later conflicts; verification reacquires a denied
+review without submitting. Period outcomes and resume preserve a validated link
+back to the originating schedule and history page. Future schedules own no browser
+timers. The shared textarea and editor grid now fit narrow containers when text
+is enlarged.
+
+The final dashboard check passed architecture rules, Biome, TypeScript and all
+3,282 tests. All 27 affected browser scenarios passed. Two initial fixture errors
+were corrected: discovery counting included a prior directory read, and a mock
+recovery job collided with another period. A stronger typography check confirmed
+that changing root rem size did not enlarge Fluent's pixel typography. Doubling
+the actual page text exposed intrinsic textarea overflow; after the shared layout
+fix, the 390-pixel dark Indonesian page stayed within the viewport. Desktop and
+narrow screenshots were inspected. Two existing CSS-specificity advisories and
+the existing bundle-size advisory remain.
+
+The isolated API/PostgreSQL/worker browser scenario passed. Response loss recovered
+one admission and one grant for the eligible employee; a different contract was
+skipped. Future-period cancellation released the process for review, and resume
+retained its original due time while current progress reflected the new job.
+Company replacement discarded the former schedule. Fixture services and the
+disposable database were stopped. No mobile source, APK or phone installation
+changed in this increment.
+
+
+Development deployment applied V82 after validating all 82 migrations, then
+restarted only the API and worker with the tested application artifacts. Running
+JAR digests match the validated builds. Readiness returned HTTP 200 through
+loopback and WireGuard; the dashboard remained available at `10.77.77.1:5173`.
+Database, private document services and their existing containers were retained.
+No phone UI or installation was used for this deployment.

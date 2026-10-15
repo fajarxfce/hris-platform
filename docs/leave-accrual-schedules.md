@@ -88,6 +88,24 @@ A separate maximum-size test passed with 12 periods and 5,000 employees, retaini
 5,854 ms in the local disposable PostgreSQL fixture; this is one measurement,
 not a throughput benchmark. All 28 Leave domain tests and 68 worker tests passed,
 along with architecture, formatting, query generation and both application JAR
-builds. Dashboard review, schedule history and real browser/worker acceptance
-follow this increment. No new mobile client capability is claimed by these
-administrative endpoints.
+builds. The [backend CI run](https://github.com/fajarxfce/hris-platform/actions/runs/38785137161)
+also passed all four backend shards, all dashboard shards and real integration.
+
+The [dashboard](dashboard.md#leave-accrual-schedules) now provides policy review,
+protected admission, bounded history and current per-period progress. It preserves
+one uncertain command through MFA and later conflicts; verification never replays
+the command. Schedule-origin navigation survives period outcomes and recovery.
+
+An isolated API/PostgreSQL/worker browser scenario passed. A lost admission response
+recovered one schedule and one grant for the eligible employee, while the excluded
+contract was skipped. The future period remained unprocessed after cancellation
+and resume, with its original due time and new current job reflected in schedule
+detail. Company replacement removed the former review. The fixture processes and
+database were stopped. No new mobile capability is claimed by these administrative
+endpoints.
+
+Dashboard verification passed architecture, formatting, TypeScript, 3,282 unit and
+component tests, and all 27 affected browser scenarios. Narrow dark Indonesian
+review was checked with actual page text doubled, including the shared textarea
+width correction. Two existing stylesheet advisories and the existing production
+bundle-size advisory remain.

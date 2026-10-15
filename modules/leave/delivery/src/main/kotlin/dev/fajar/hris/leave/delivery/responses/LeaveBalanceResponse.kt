@@ -8,4 +8,5 @@ data class LeaveBalanceResponse(
     val version: Long,
     val closed: Boolean,
     val accountId: java.util.UUID?,
+    val carry: LeaveCarryBalanceResponse?,
 )

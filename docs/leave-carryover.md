@@ -295,9 +295,42 @@ debit matched the employee outcome and left the balance at zero. This validates
 recovery and execution; optional-validity admission remains internal. API/worker
 JAR builds passed. No native or development deployment was performed.
 
+## Balance and sync projection
+
+Balance directories, ledger details, entitlement review and the canonical
+`LEAVE_BALANCES` resource include the same nullable `carry` breakdown. It retains
+the closing ID, awarded/available/reserved/consumed/expired/transferred/deducted
+days, optional business deadline, frozen timezone and independent bucket version.
+Ordinary balances and historical untracked awards have no inferred breakdown.
+
+A single raw query joins the account and its carried bucket. Repository mapping
+checks scope, conservation and the carried subset of each main balance, inside
+the database failure boundary. Domain results are detached from mutable SQL
+records. Interactive balance readers retain current session assurance after their
+last acquisition.
+
+Totals remain committed ledger facts. Passing the deadline alone does not rewrite
+a canonical response or advance its version. Commands exclude expired free credit
+immediately; the durable expiry worker records the matching debit. Its transaction
+already advances the main account and publishes the existing balance invalidation.
+Clients must distinguish business validity from cache retention and keep their
+published offline facts while acquiring newly available metadata.
+
+Validation passed 196 API/PostgreSQL tests, 65 Leave domain tests and all 71 worker
+tests. New cases cover matching projections, stable reads across the deadline,
+exact expiry/sync versions, unlimited carry, retained reservation/consumption,
+foreign scope, mutable-record ownership and cancellation. Post-acquisition MFA
+and cancellation were checked across all four balance read use cases. OpenAPI,
+Kotlin formatting and architecture checks passed.
+
+The additive read API and V83–V85 are deployed to development. Both application
+JAR hashes were verified in their running containers; API health succeeded on
+loopback and the WireGuard interface from the VPS. Existing database/document
+containers were preserved. Optional validity configuration remains hidden.
+
 ## Remaining integration
 
-- Add carried-balance metadata to synchronization, dashboard and employee views,
-  then expose optional validity in policy editing.
-- Validate browser/native behavior against the completed API before enabling
-  optional validity and deploying these migrations.
+- Consume carried-balance metadata in dashboard and employee views, then expose
+  optional validity in policy editing.
+- Deploy the additive read API before upgrading mobile replica metadata. Validate
+  browser/native behavior before enabling optional validity.

@@ -8,4 +8,5 @@ data class LeaveBalance(
     val version: Long = 0,
     val closed: Boolean = false,
     val accountId: java.util.UUID? = null,
+    val carry: LeaveCarryAward? = null,
 )

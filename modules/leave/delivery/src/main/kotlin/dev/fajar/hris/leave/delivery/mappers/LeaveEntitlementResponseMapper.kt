@@ -16,6 +16,7 @@ fun LeaveAccount.toResponse(): LeaveAccountResponse =
         balance.closed,
         typeCode,
         typeName,
+        balance.carry?.toResponse(),
     )
 
 fun LeaveAccrualPosting.toResponse(): LeaveAccrualPostingResponse =

@@ -15,4 +15,5 @@ data class LeaveAccountResponse(
     val closed: Boolean,
     val typeCode: String,
     val typeName: String,
+    val carry: LeaveCarryBalanceResponse?,
 )

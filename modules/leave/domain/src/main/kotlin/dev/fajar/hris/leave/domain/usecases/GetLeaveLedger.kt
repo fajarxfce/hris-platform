@@ -81,42 +81,52 @@ class GetLeaveLedger(
             if ((exists as Result.Success).value == null)
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
             val current = currentResult.value
-            ledger.balance(company, employeeId, typeId, year).flatMap { balance ->
-                val actions =
-                    if (
-                        "leave.manage" in live.permissions &&
-                            ownerResult.value != live.accountId &&
-                            !balance.closed
-                    ) {
-                        val employment =
-                            people.find(company, employeeId, LocalDate.of(year, 12, 31))
-                        if (employment is Result.Failed) return@flatMap employment
-                        val applicable =
-                            policies.effective(company, typeId, LocalDate.of(year, 12, 31))
-                        if (applicable is Result.Failed) return@flatMap applicable
+            ledger
+                .balance(company, employeeId, typeId, year)
+                .flatMap { balance ->
+                    val actions =
                         if (
-                            (employment as Result.Success).value != null &&
-                                (applicable as Result.Success).value != null
+                            "leave.manage" in live.permissions &&
+                                ownerResult.value != live.accountId &&
+                                !balance.closed
+                        ) {
+                            val employment =
+                                people.find(company, employeeId, LocalDate.of(year, 12, 31))
+                            if (employment is Result.Failed) return@flatMap employment
+                            val applicable =
+                                policies.effective(company, typeId, LocalDate.of(year, 12, 31))
+                            if (applicable is Result.Failed) return@flatMap applicable
+                            if (
+                                (employment as Result.Success).value != null &&
+                                    (applicable as Result.Success).value != null
+                            )
+                                setOf(LeaveBalanceAction.ADJUST)
+                            else emptySet()
+                        } else emptySet()
+                    ledger.entries(company, employeeId, typeId, year, after, limit).map {
+                        LeaveLedger(
+                            balance,
+                            it,
+                            LeaveEmployeeReference(
+                                employeeId,
+                                current?.employeeNumber,
+                                current?.person?.legalName,
+                            ),
+                            definition.id,
+                            definition.code,
+                            definition.policy.name,
+                            actions,
                         )
-                            setOf(LeaveBalanceAction.ADJUST)
-                        else emptySet()
-                    } else emptySet()
-                ledger.entries(company, employeeId, typeId, year, after, limit).map {
-                    LeaveLedger(
-                        balance,
-                        it,
-                        LeaveEmployeeReference(
-                            employeeId,
-                            current?.employeeNumber,
-                            current?.person?.legalName,
-                        ),
-                        definition.id,
-                        definition.code,
-                        definition.policy.name,
-                        actions,
-                    )
+                    }
                 }
-            }
+                .flatMap { result ->
+                    identities
+                        .access(actor.accountId, company)
+                        .flatMap {
+                            validateCompanySessionActor(actor, it, clock.instant(), security)
+                        }
+                        .map { result }
+                }
         }
     }
 }

@@ -48,6 +48,24 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Leave carry balance projection
+
+Directory, ledger, entitlement and canonical sync reads now return the same stored
+carry breakdown, original deadline and frozen timezone. Raw account/bucket joins
+are mapped under the database boundary with scope and conservation checks. Reads
+retain current assurance after acquisition; elapsed time does not rewrite ledger
+facts or expire offline records.
+
+Validation passed 196 API/PostgreSQL tests, 65 Leave domain tests and all 71 worker
+tests. Projection consistency, deadline boundaries, exact expiry/sync versions,
+record ownership, foreign scope, post-acquisition MFA and cancellation are covered.
+OpenAPI, Kotlin formatting and architecture checks passed. API/worker JAR builds
+passed, and V83–V85 plus both application roles were deployed to development.
+Running JAR hashes match the builds; loopback and WireGuard API health returned
+200/UP and the dashboard returned 200 from the VPS. Database and document-service
+containers remained unchanged. Client consumption and device validation remain
+pending for this increment.
+
 ### Leave carry dashboard
 
 Company history, retained attempts, employee results and explicit terminal recovery

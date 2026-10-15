@@ -34,6 +34,32 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun carryBalanceFactsHaveOneCompatibleShapeForAccountAndDirectoryReads() {
+        val schemas = contract()["components"]["schemas"]
+        for (name in listOf("LeaveBalanceResponse", "LeaveAccountResponse")) {
+            assertTrue(schemas[name]["properties"].has("carry"), name)
+        }
+        assertEquals(
+            setOf(
+                "closingId",
+                "awardedDays",
+                "availableDays",
+                "reservedDays",
+                "consumedDays",
+                "expiredDays",
+                "transferredDays",
+                "deductedDays",
+                "validThrough",
+                "expiresAt",
+                "timezone",
+                "version",
+            ),
+            schemas["LeaveCarryBalanceResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertFalse(schemas["LeaveAccrualPolicyRequest"]["properties"].has("carryValidityMonths"))
+    }
+
+    @Test
     fun carryExpiryReadsExposeBoundedHistoryAndOnlyExplicitRecovery() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/leave/carry-expiries"

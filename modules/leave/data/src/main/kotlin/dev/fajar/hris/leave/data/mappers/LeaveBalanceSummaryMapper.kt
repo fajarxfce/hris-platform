@@ -4,4 +4,4 @@ import dev.fajar.hris.leave.data.models.LeaveBalanceSummaryRow
 import dev.fajar.hris.leave.domain.entities.LeaveBalanceSummary
 
 fun LeaveBalanceSummaryRow.toSummary(): LeaveBalanceSummary =
-    LeaveBalanceSummary(account.typeId, typeCode, typeName, account.toBalance())
+    LeaveBalanceSummary(account.typeId, typeCode, typeName, account.toBalance(carry))

@@ -29,6 +29,16 @@ balance directory, so clients can hydrate a balance independently of a previousl
 opened directory page. These descriptive fields come from the current leave type;
 the balance version still identifies financial movements and closing state.
 
+The optional `carry` field retains the tracked award, its exact breakdown and
+frozen business deadline. Ordinary and historical untracked awards return null.
+It is part of the existing balance resource, not a new sync collection. Paired
+carry movements already advance the main account and capture its invalidation in
+the same transaction. Passing time does not alter stored totals or fabricate a
+new version; the expiry worker commits that change. Clients adopting this field
+must refresh their replica schema while retaining the last complete owned
+partition. Deploy this additive API before that client upgrade. A credit deadline
+is business policy, never a cache TTL.
+
 All business-request statuses are included. Request cancellation or withdrawal is an `UPSERT` with a new version. Archiving an announcement withdraws its inbox items and produces `DELETE` references. Team/company administration rights do not grant an employee-wide export of private business records. The separately selected coworker directory has its own minimal public fields and directory authority. Document processing/history, approval inboxes, unfinalized payroll, and announcement-management records are not registered sync collections. Fetch those through their existing authorized endpoints; do not infer a change feed from a list cursor.
 
 Document evidence uses the document ID and current header version. Only published

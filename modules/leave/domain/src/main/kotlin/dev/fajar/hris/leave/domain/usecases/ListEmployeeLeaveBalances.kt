@@ -70,17 +70,27 @@ class ListEmployeeLeaveBalances(
             if (exists is Result.Failed) return@run exists
             if ((exists as Result.Success).value == null)
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
-            ledger.list(company, employeeId, year, after, limit).map {
-                EmployeeLeaveBalances(
-                    LeaveEmployeeReference(
-                        employeeId,
-                        current?.employeeNumber,
-                        current?.person?.legalName,
-                    ),
-                    year,
-                    it,
-                )
-            }
+            ledger
+                .list(company, employeeId, year, after, limit)
+                .map {
+                    EmployeeLeaveBalances(
+                        LeaveEmployeeReference(
+                            employeeId,
+                            current?.employeeNumber,
+                            current?.person?.legalName,
+                        ),
+                        year,
+                        it,
+                    )
+                }
+                .flatMap { result ->
+                    identities
+                        .access(actor.accountId, company)
+                        .flatMap {
+                            validateCompanySessionActor(actor, it, clock.instant(), security)
+                        }
+                        .map { result }
+                }
         }
     }
 }

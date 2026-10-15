@@ -16,7 +16,10 @@ class StoredLeaveLedgerRepository(private val source: LeaveLedgerDataSource) :
         }
 
     override fun account(companyId: UUID, id: UUID): Result<LeaveAccount?> = safeDatabaseCall {
-        source.account(companyId, id)?.toAccount()
+        source.account(companyId, id)?.let {
+            require(it.account.companyId == companyId && it.account.id == id)
+            it.toAccount()
+        }
     }
 
     override fun balance(
@@ -26,7 +29,15 @@ class StoredLeaveLedgerRepository(private val source: LeaveLedgerDataSource) :
         year: Int,
     ): Result<LeaveBalance> = safeDatabaseCall {
         val row = source.balance(companyId, employeeId, typeId, year)
-        row?.toBalance() ?: LeaveBalance(year, 0, 0, 0)
+        row?.let {
+            require(
+                it.account.companyId == companyId &&
+                    it.account.employmentId == employeeId &&
+                    it.account.typeId == typeId &&
+                    it.account.balanceYear == year
+            )
+            it.toBalance()
+        } ?: LeaveBalance(year, 0, 0, 0)
     }
 
     override fun list(
@@ -37,6 +48,16 @@ class StoredLeaveLedgerRepository(private val source: LeaveLedgerDataSource) :
         limit: Int,
     ): Result<Page<LeaveBalanceSummary>> = safeDatabaseCall {
         val rows = source.list(companyId, employeeId, year, after, limit + 1)
+        require(
+            rows.size <= limit + 1 &&
+                rows.all {
+                    it.account.companyId == companyId &&
+                        it.account.employmentId == employeeId &&
+                        it.account.balanceYear == year &&
+                        (after == null || it.typeCode > after)
+                }
+        )
+        require(rows.zipWithNext().all { (first, next) -> first.typeCode < next.typeCode })
         Page(
             rows.take(limit).map { it.toSummary() },
             if (rows.size > limit) rows[limit - 1].typeCode else null,

@@ -61,10 +61,20 @@ class GetLeaveAccount(
                 )
             )
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "leave_account_not_found"))
-            ledger.account(company, id).flatMap { value ->
-                value?.let { Result.Success(it) }
-                    ?: Result.Failed(Failure(FailureKind.NOT_FOUND, "leave_account_not_found"))
-            }
+            ledger
+                .account(company, id)
+                .flatMap { value ->
+                    value?.let { Result.Success(it) }
+                        ?: Result.Failed(Failure(FailureKind.NOT_FOUND, "leave_account_not_found"))
+                }
+                .flatMap { result ->
+                    identities
+                        .access(actor.accountId, company)
+                        .flatMap {
+                            validateCompanySessionActor(actor, it, clock.instant(), security)
+                        }
+                        .map { result }
+                }
         }
     }
 }

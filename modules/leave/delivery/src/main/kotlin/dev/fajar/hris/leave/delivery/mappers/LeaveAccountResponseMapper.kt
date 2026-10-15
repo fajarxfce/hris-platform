@@ -19,4 +19,21 @@ fun LeaveBalance.toResponse(): LeaveBalanceResponse =
         version,
         closed,
         accountId,
+        carry?.toResponse(),
+    )
+
+fun LeaveCarryAward.toResponse(): LeaveCarryBalanceResponse =
+    LeaveCarryBalanceResponse(
+        bucket.id,
+        bucket.initialHalfDays.toLeaveDays(),
+        bucket.availableHalfDays.toLeaveDays(),
+        bucket.reservedHalfDays.toLeaveDays(),
+        bucket.consumedHalfDays.toLeaveDays(),
+        bucket.expiredHalfDays.toLeaveDays(),
+        bucket.transferredHalfDays.toLeaveDays(),
+        bucket.deductedHalfDays.toLeaveDays(),
+        bucket.validity?.through,
+        bucket.validity?.expiresAt,
+        timezone,
+        bucket.version,
     )

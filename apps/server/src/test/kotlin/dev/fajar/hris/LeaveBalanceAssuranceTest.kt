@@ -4,6 +4,7 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
+import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.leave.domain.repositories.*
 import dev.fajar.hris.leave.domain.usecases.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
@@ -11,6 +12,7 @@ import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import java.time.Instant
 import java.time.YearMonth
 import java.util.UUID
+import java.util.concurrent.CancellationException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.Assertions.*
@@ -154,6 +156,69 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = ["list", "ledger", "account", "entitlements"])
+    fun assuranceExpiresDuringPrivateReadBeforeDelivery(operation: String) {
+        val f = preparedBalance()
+        val actor = balanceOperator(f, assurance = true)
+        val source = guardedRead(operation) { clock.set(clock.instant().plusSeconds(2)) }
+        assertEquals(
+            "mfa_required",
+            (invocation(f, operation, source)(actor) as Result.Failed).failure.code,
+        )
+        assertTrue(
+            invocation(f, operation)(actor.copy(mfaVerifiedAt = clock.instant())) is Result.Success
+        )
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["list", "ledger", "account", "entitlements"])
+    fun cancellationAfterPrivateReadCannotBecomeASuccess(operation: String) {
+        val f = preparedBalance()
+        val actor = balanceOperator(f, assurance = true).copy(mfaVerifiedAt = clock.instant())
+        val source = guardedRead(operation) { throw CancellationException("fixture cancellation") }
+        assertThrows(CancellationException::class.java) { invocation(f, operation, source)(actor) }
+        assertTrue(invocation(f, operation)(actor) is Result.Success)
+    }
+
+    private fun guardedRead(operation: String, acquired: () -> Unit): LeaveLedgerRepository =
+        object : LeaveLedgerRepository by ledgerRepository {
+            private var accountReads = 0
+
+            override fun account(companyId: UUID, id: UUID): Result<LeaveAccount?> =
+                ledgerRepository.account(companyId, id).also {
+                    if (operation == "account" && ++accountReads == 2) acquired()
+                }
+
+            override fun list(
+                companyId: UUID,
+                employeeId: UUID,
+                year: Int,
+                after: String?,
+                limit: Int,
+            ) =
+                ledgerRepository.list(companyId, employeeId, year, after, limit).also {
+                    if (operation == "list") acquired()
+                }
+
+            override fun entries(
+                companyId: UUID,
+                employeeId: UUID,
+                typeId: UUID,
+                year: Int,
+                after: UUID?,
+                limit: Int,
+            ) =
+                ledgerRepository.entries(companyId, employeeId, typeId, year, after, limit).also {
+                    if (operation == "ledger") acquired()
+                }
+
+            override fun balance(companyId: UUID, employeeId: UUID, typeId: UUID, year: Int) =
+                ledgerRepository.balance(companyId, employeeId, typeId, year).also {
+                    if (operation == "entitlements") acquired()
+                }
+        }
+
     private fun preparedBalance(): LeaveFixture {
         val f = accountingFixture(at = Instant.parse("2027-01-02T03:00:00Z"))
         accountingBody(adjust(f, "2", expectedVersion = 0))
@@ -192,14 +257,18 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
         )
     }
 
-    private fun invocation(f: LeaveFixture, operation: String): (Actor) -> Result<*> {
+    private fun invocation(
+        f: LeaveFixture,
+        operation: String,
+        source: LeaveLedgerRepository = ledgerRepository,
+    ): (Actor) -> Result<*> {
         val key = UUID.randomUUID()
         val id = UUID.randomUUID()
         val security = IdentitySecurityPolicy()
         return when (operation) {
             "list" -> { actor ->
                     ListEmployeeLeaveBalances(
-                            ledgerRepository,
+                            source,
                             policies,
                             people,
                             companies,
@@ -213,7 +282,7 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
                 }
             "ledger" -> { actor ->
                     GetLeaveLedger(
-                            ledgerRepository,
+                            source,
                             policies,
                             people,
                             transactions,
@@ -237,7 +306,7 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
                         )!!
                 { actor ->
                     GetLeaveAccount(
-                            ledgerRepository,
+                            source,
                             people,
                             companies,
                             members,
@@ -251,7 +320,7 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
             }
             "entitlements" -> { actor ->
                     GetLeaveEntitlements(
-                            ledgerRepository,
+                            source,
                             people,
                             companies,
                             members,
@@ -266,7 +335,7 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
                 }
             "adjust" -> { actor ->
                     AdjustLeaveBalance(
-                            ledgerRepository,
+                            source,
                             policies,
                             people,
                             operations,
@@ -283,7 +352,7 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
                 }
             "accrue" -> { actor ->
                     PostEmployeeLeaveAccrual(
-                            ledgerRepository,
+                            source,
                             policies,
                             entitlements,
                             people,
@@ -311,7 +380,7 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
                 }
             "close" -> { actor ->
                     CloseEmployeeLeaveYear(
-                            ledgerRepository,
+                            source,
                             policies,
                             entitlements,
                             people,

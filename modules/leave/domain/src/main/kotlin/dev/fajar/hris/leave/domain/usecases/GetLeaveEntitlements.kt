@@ -77,14 +77,24 @@ class GetLeaveEntitlements(
             if (frequency is Result.Failed) return@run frequency
             val postings = entitlements.postings(company, employeeId, typeId, year)
             if (postings is Result.Failed) return@run postings
-            entitlements.closing(company, employeeId, typeId, year).map {
-                LeaveEntitlements(
-                    (balance as Result.Success).value,
-                    (frequency as Result.Success).value,
-                    (postings as Result.Success).value,
-                    it,
-                )
-            }
+            entitlements
+                .closing(company, employeeId, typeId, year)
+                .map {
+                    LeaveEntitlements(
+                        (balance as Result.Success).value,
+                        (frequency as Result.Success).value,
+                        (postings as Result.Success).value,
+                        it,
+                    )
+                }
+                .flatMap { result ->
+                    identities
+                        .access(actor.accountId, company)
+                        .flatMap {
+                            validateCompanySessionActor(actor, it, clock.instant(), security)
+                        }
+                        .map { result }
+                }
         }
     }
 }

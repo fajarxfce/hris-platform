@@ -457,6 +457,14 @@ finite polling and immutable command input. Hidden reads are cancelled and fence
 an uncertain command keeps its operation ID through verification or conflicts.
 Visibility and company transitions belong to bindings/controllers, not datasources.
 
+Leave balance projections join the main account and carried bucket in one raw
+query. Repositories validate ownership, conservation and the carried subset, then
+return detached domain facts. Directory, ledger, entitlement and canonical sync
+reads share that projection and recheck session assurance after acquisition.
+A business deadline never expires locally retained records or mutates a balance
+version on read. The paired expiry debit already invalidates the main account in
+the existing `LEAVE_BALANCES` collection.
+
 ## API and clients
 
 Company client policy uses a separate admission transaction after actor resolution and before a business handler. Its use case acquires policy/company/member/account guards and evaluates current availability; accepted requests and durable jobs retain their own transaction/execution ownership. The application maps feature adapters and effective sync selections to capability keys. Client policy never adds authorization or modifies a cursor projection. Configuration revisions, receipts, audit, and events are atomic, and settings recovery remains independently authorized during maintenance.

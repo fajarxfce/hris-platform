@@ -1,7 +1,7 @@
 package dev.fajar.hris.leave.data.datasources
 
+import dev.fajar.hris.leave.data.models.LeaveBalanceRow
 import dev.fajar.hris.leave.data.models.LeaveBalanceSummaryRow
-import dev.fajar.hris.schema.tables.records.LeaveAccountsRecord
 import dev.fajar.hris.schema.tables.records.LeaveLedgerRecord
 import java.util.UUID
 
@@ -10,7 +10,7 @@ interface LeaveLedgerDataSource {
 
     fun account(company: UUID, id: UUID): LeaveBalanceSummaryRow?
 
-    fun balance(company: UUID, employee: UUID, type: UUID, year: Int): LeaveAccountsRecord?
+    fun balance(company: UUID, employee: UUID, type: UUID, year: Int): LeaveBalanceRow?
 
     fun list(
         company: UUID,

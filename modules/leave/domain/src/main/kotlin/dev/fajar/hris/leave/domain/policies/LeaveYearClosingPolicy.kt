@@ -55,11 +55,13 @@ fun planLeaveYearClosing(
         if (settlement != null) {
             val applied = applyLeaveCarryMovement(bucket, settlement)
             if (applied is Result.Failed) return applied
-            carried = (applied as Result.Success).value
+            val settled = (applied as Result.Success).value
+            carried = settled
             source =
                 balance.copy(
                     availableHalfDays = balance.availableHalfDays - settlement.halfDays,
                     version = balance.version + 1,
+                    carry = balance.carry?.copy(bucket = settled),
                 )
         }
     }

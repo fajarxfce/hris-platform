@@ -480,8 +480,24 @@ Refresh, revision and history-page changes cancel obsolete acquisition; company
 or account replacement disposes the owner. Failed private reads clear their
 dependent evidence, and internal diagnostics never appear in product messages.
 History pages are bounded by the aggregate version observed for that acquisition.
-These pages inspect saved amendments; authoring, review decisions and publication
-commands remain separate delivery work.
+`/payroll/amendments/new` provides a bounded annual source picker under
+`payroll.amend`. Selecting a published month opens its complete retained year;
+months before the selected first month remain read-only. Existing editable
+proposals use `/payroll/amendments/:id/edit`. A month panel reuses compensation
+and input fields, retaining the published tax registration. The owning page
+protects both applied corrections and unapplied panel input on departure.
+
+Preview is required before saving. Changing a correction invalidates that
+preview; changing the reason does not repeat financial acquisition. New published
+revisions require explicit review before replacing a draft's observed sources.
+A conflict retains input and offers deliberate reload. An unconfirmed save pins
+its proposal ID, operation and complete payload for explicit original-command
+retry, even if a later attempt is rejected. A confirmed save links to its exact
+proposal revision. Forms live in the account/company workspace; this browser
+flow does not provide durable offline drafts.
+
+Retained calculation/cancellation commands, independent review decisions and
+publication controls remain separate delivery work.
 
 ## Shift templates
 

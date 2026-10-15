@@ -8,13 +8,8 @@ import { usePayrollInputForm } from "../controllers/use-payroll-input-form";
 import { payrollInputReviewParameters } from "../models/payroll-input-route";
 import { payrollInputReviewView } from "../models/payroll-input-view";
 import { PayrollInputEditorPage } from "../pages/payroll-input-editor-page";
-import { PayrollInputHolidayFields } from "../pages/payroll-input-holiday-fields";
-import { PayrollInputTermsFields } from "../pages/payroll-input-terms-fields";
-import {
-  PayrollInputDayFields,
-  PayrollInputDeductionFields,
-  PayrollInputEarningFields,
-} from "./payroll-input-line-fields";
+import { PayrollInputTermFields } from "./payroll-input-term-fields";
+
 export function PayrollInputEditorScreen(props: PayrollScreenProps) {
   const [parameters] = useSearchParams(),
     { employeeId = "" } = useParams();
@@ -73,45 +68,7 @@ function PayrollInputEditorBinding(
       backTo={props.backTo}
       onRetry={controller.retrySave}
     >
-      <PayrollInputTermsFields
-        form={form}
-        failure={state.failure}
-        locale={locale}
-        earnings={form.earnings.map((row, index) => (
-          <PayrollInputEarningFields
-            key={row.id}
-            control={form.control}
-            index={index}
-            editable={form.editable}
-            failure={state.failure}
-            locale={locale}
-            onRemove={form.removeEarning}
-          />
-        ))}
-        deductions={form.deductions.map((row, index) => (
-          <PayrollInputDeductionFields
-            key={row.id}
-            control={form.control}
-            index={index}
-            editable={form.editable}
-            failure={state.failure}
-            locale={locale}
-            onRemove={form.removeDeduction}
-          />
-        ))}
-        days={form.days.map((row, index) => (
-          <PayrollInputDayFields
-            key={row.id}
-            control={form.control}
-            index={index}
-            editable={form.editable}
-            failure={state.failure}
-            locale={locale}
-            onRemove={form.removeDay}
-          />
-        ))}
-      />
-      <PayrollInputHolidayFields form={form} failure={state.failure} locale={locale} />
+      <PayrollInputTermFields form={form} failure={state.failure} locale={locale} />
     </PayrollInputEditorPage>
   );
 }

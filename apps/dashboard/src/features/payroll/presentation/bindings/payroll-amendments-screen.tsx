@@ -3,6 +3,7 @@ import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { PayrollAmendmentSearch } from "../../domain/entities/payroll-amendment-search";
+import { canAuthorPayrollAmendments } from "../../domain/policies/payroll-amendment-authoring-policy";
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 import { PayrollAmendmentsController } from "../controllers/payroll-amendments-controller";
 import { usePayrollAmendmentFilter } from "../controllers/use-payroll-amendment-filter";
@@ -73,6 +74,11 @@ function PayrollAmendmentsBinding(
       rows={rows}
       locale={locale}
       companyName={props.companyName}
+      createTo={
+        canAuthorPayrollAmendments(access.permissions)
+          ? `/payroll/amendments/new?${payrollAmendmentParameters(access.companyId, { ...search, status: null, after: null })}`
+          : null
+      }
       first={search.after === null}
       onOpen={(id) => {
         if (state.data?.items.some((row) => row.id === id))

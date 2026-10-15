@@ -43,8 +43,13 @@ export function compensationFormValues(
   context: CompensationEditorContext | null,
   month: string,
 ): CompensationFormValues {
-  const t = context?.current?.terms,
-    b = t?.payBasis;
+  return compensationValuesFromTerms(context?.current?.terms ?? null, month);
+}
+export function compensationValuesFromTerms(
+  t: CompensationTerms | null,
+  month: string,
+): CompensationFormValues {
+  const b = t?.payBasis;
   return {
     effectiveFrom: month,
     reason: "",

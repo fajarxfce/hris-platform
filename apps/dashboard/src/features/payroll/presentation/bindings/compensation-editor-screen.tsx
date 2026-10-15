@@ -9,13 +9,8 @@ import {
   compensationEmployeeParameters,
   compensationReviewParameters,
 } from "../models/compensation-route";
-import { CompensationDeductionFields } from "../pages/compensation-deduction-fields";
-import { CompensationEarningsFields } from "../pages/compensation-earnings-fields";
 import { CompensationEditorPage } from "../pages/compensation-editor-page";
-import { CompensationInsuranceFields } from "../pages/compensation-insurance-fields";
-import { CompensationPayBasisFields } from "../pages/compensation-pay-basis-fields";
-import { CompensationTaxFields } from "../pages/compensation-tax-fields";
-import { FixedEarningFields } from "./fixed-earning-fields";
+import { CompensationTermFields } from "./compensation-term-fields";
 export function CompensationEditorScreen(props: PayrollScreenProps) {
   const [parameters] = useSearchParams(),
     { employeeId = "" } = useParams();
@@ -77,23 +72,7 @@ function CompensationEditorBinding(
       backTo={props.backTo}
       onRetry={controller.retrySave}
     >
-      <CompensationEarningsFields form={form} failure={state.failure} locale={locale}>
-        {form.earnings.map((line, index) => (
-          <FixedEarningFields
-            key={line.id}
-            control={form.control}
-            index={index}
-            editable={form.editable}
-            failure={state.failure}
-            locale={locale}
-            onRemove={form.removeEarning}
-          />
-        ))}
-      </CompensationEarningsFields>
-      <CompensationTaxFields form={form} failure={state.failure} locale={locale} />
-      <CompensationInsuranceFields form={form} failure={state.failure} locale={locale} />
-      <CompensationDeductionFields form={form} failure={state.failure} locale={locale} />
-      <CompensationPayBasisFields form={form} failure={state.failure} locale={locale} />
+      <CompensationTermFields form={form} failure={state.failure} locale={locale} />
     </CompensationEditorPage>
   );
 }

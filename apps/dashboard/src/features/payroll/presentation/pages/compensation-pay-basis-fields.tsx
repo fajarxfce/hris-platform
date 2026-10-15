@@ -13,14 +13,14 @@ import {
   prorationBases,
   serviceMonthConventions,
 } from "../../domain/entities/payroll-pay-basis";
-import type { useCompensationForm } from "../controllers/use-compensation-form";
+import type { useCompensationTermFields } from "../controllers/use-compensation-term-fields";
 import { compensationFieldError, compensationMessages } from "../i18n/compensation-messages";
 export function CompensationPayBasisFields({
   form,
   failure,
   locale,
 }: {
-  form: ReturnType<typeof useCompensationForm>;
+  form: ReturnType<typeof useCompensationTermFields>;
   failure: Failure | null;
   locale: Locale;
 }) {

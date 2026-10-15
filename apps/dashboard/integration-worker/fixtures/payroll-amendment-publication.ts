@@ -3,6 +3,7 @@ import { type BrowserContext, expect } from "@playwright/test";
 import { z } from "zod";
 import { payrollCalculationMinor } from "../../src/features/payroll/data/mappers/payroll-run-employee-mapper";
 import { compensationTermsDto } from "../../src/features/payroll/data/models/compensation-dto";
+import { exercisePayrollAmendmentAuthoring } from "./payroll-amendment-authoring";
 import { exercisePayrollAmendmentRead } from "./payroll-amendment-read";
 
 /** Create the prerequisite through authorized commands and the actual publication worker. */
@@ -74,27 +75,14 @@ export async function publishNegativePayrollAmendment(input: {
   if (!original) throw new Error("Published source required");
   const basic = payrollCalculationMinor(original.compensation.basicSalary) - 100_000_000n;
   expect(basic > 0n).toBe(true);
-  const amendment = randomUUID(),
+  const amendment = await exercisePayrollAmendmentAuthoring({
+      author,
+      company,
+      assessment,
+      month,
+      basicSalary: `${basic / 100n}.${String(basic % 100n).padStart(2, "0")}`,
+    }),
     draft = `${base}/payroll/amendments/${amendment}`;
-  const saved = await author.request.put(draft, {
-    headers: headers(authorToken),
-    data: {
-      firstAssessmentId: assessment,
-      expectedVersion: null,
-      sourceVersions: preparation.sourceVersions,
-      corrections: [
-        {
-          assessmentId: assessment,
-          compensation: {
-            ...original.compensation,
-            basicSalary: `${basic / 100n}.${String(basic % 100n).padStart(2, "0")}`,
-          },
-        },
-      ],
-      reason: "Correct verified monthly remuneration",
-    },
-  });
-  expect(saved.status()).toBe(200);
   const calculated = await author.request.post(`${draft}/calculate`, {
     headers: headers(authorToken),
     data: { expectedVersion: 0, reason: "Calculate corrected retained month" },

@@ -1,4 +1,5 @@
-import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
+import type { MutationReceipt } from "../../../../core/domain/mutation-receipt";
 import type { Result } from "../../../../core/domain/result";
 import type {
   PayrollAmendment,
@@ -6,8 +7,16 @@ import type {
   PayrollAmendmentPage,
 } from "../entities/payroll-amendment";
 import type { PayrollAmendmentCalculation } from "../entities/payroll-amendment-calculation";
+import type { PayrollAmendmentSave } from "../entities/payroll-amendment-preparation";
 import type { PayrollAmendmentSearch } from "../entities/payroll-amendment-search";
 export interface PayrollAmendmentRepository {
+  save(
+    company: CompanyId,
+    id: string,
+    operation: OperationId,
+    input: PayrollAmendmentSave,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
   list(
     company: CompanyId,
     search: PayrollAmendmentSearch,

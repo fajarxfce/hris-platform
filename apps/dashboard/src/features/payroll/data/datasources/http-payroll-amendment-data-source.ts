@@ -7,9 +7,32 @@ import {
   payrollAmendmentHistoryDto,
   payrollAmendmentPageDto,
 } from "../models/payroll-amendment-dto";
+import {
+  type PayrollAmendmentSaveDto,
+  payrollAmendmentReceiptDto,
+} from "../models/payroll-amendment-preparation-dto";
 import type { PayrollAmendmentDataSource } from "./payroll-amendment-data-source";
 export class HttpPayrollAmendmentDataSource implements PayrollAmendmentDataSource {
   constructor(private readonly http: HttpClient) {}
+  async save(
+    company: string,
+    id: string,
+    operation: string,
+    input: PayrollAmendmentSaveDto,
+    signal: AbortSignal,
+  ) {
+    return payrollAmendmentReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/payroll/amendments/${id}`,
+          method: "PUT",
+          operationId: operation,
+          body: input,
+        },
+        signal,
+      ),
+    );
+  }
   async list(company: string, search: PayrollAmendmentSearchDto, signal: AbortSignal) {
     const parameters = new URLSearchParams({
       year: String(search.year),

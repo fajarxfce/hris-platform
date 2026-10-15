@@ -4,7 +4,7 @@ import type { Failure } from "../../../../core/domain/result";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppTextField } from "../../../../core/presentation/components/app-text-field";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
-import type { usePayrollInputForm } from "../controllers/use-payroll-input-form";
+import type { usePayrollInputTermFields } from "../controllers/use-payroll-input-term-fields";
 import { payrollInputFieldError, payrollInputMessages } from "../i18n/payroll-input-messages";
 export function PayrollInputTermsFields({
   form,
@@ -14,7 +14,7 @@ export function PayrollInputTermsFields({
   deductions,
   days,
 }: {
-  form: ReturnType<typeof usePayrollInputForm>;
+  form: ReturnType<typeof usePayrollInputTermFields>;
   failure: Failure | null;
   locale: Locale;
   earnings: ReactNode;

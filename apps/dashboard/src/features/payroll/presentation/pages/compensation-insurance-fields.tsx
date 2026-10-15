@@ -5,14 +5,14 @@ import { AppTextArea } from "../../../../core/presentation/components/app-text-a
 import { AppTextField } from "../../../../core/presentation/components/app-text-field";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { accidentRisks } from "../../domain/entities/compensation-terms";
-import type { useCompensationForm } from "../controllers/use-compensation-form";
+import type { useCompensationTermFields } from "../controllers/use-compensation-term-fields";
 import { compensationFieldError, compensationMessages } from "../i18n/compensation-messages";
 export function CompensationInsuranceFields({
   form,
   failure,
   locale,
 }: {
-  form: ReturnType<typeof useCompensationForm>;
+  form: ReturnType<typeof useCompensationTermFields>;
   failure: Failure | null;
   locale: Locale;
 }) {

@@ -6,7 +6,18 @@ import type {
   PayrollAmendmentPageDto,
   PayrollAmendmentSearchDto,
 } from "../models/payroll-amendment-dto";
+import type {
+  PayrollAmendmentReceiptDto,
+  PayrollAmendmentSaveDto,
+} from "../models/payroll-amendment-preparation-dto";
 export interface PayrollAmendmentDataSource {
+  save(
+    company: string,
+    id: string,
+    operation: string,
+    input: PayrollAmendmentSaveDto,
+    signal: AbortSignal,
+  ): Promise<PayrollAmendmentReceiptDto>;
   list(
     company: string,
     search: PayrollAmendmentSearchDto,

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
+import { canAuthorPayrollAmendments } from "../../domain/policies/payroll-amendment-authoring-policy";
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 import { PayrollAmendmentController } from "../controllers/payroll-amendment-controller";
 import {
@@ -80,6 +81,13 @@ function PayrollAmendmentBinding(props: PayrollScreenProps & { id: string }) {
       backTo={`/payroll/amendments?${back}`}
       latestTo={revision === null ? null : payrollAmendmentPath(access.companyId, id, latest)}
       basisTo={state.data?.calculation ? payrollAmendmentPath(access.companyId, id, basis) : null}
+      editTo={
+        canAuthorPayrollAmendments(access.permissions) &&
+        state.data?.current.availableActions.includes("EDIT") &&
+        state.data.selected.summary.version === state.data.current.amendment.summary.version
+          ? `/payroll/amendments/${encodeURIComponent(id)}/edit?${back}`
+          : null
+      }
       first={after === null}
       onRefresh={controller.refresh}
       onTab={(nextTab) => {

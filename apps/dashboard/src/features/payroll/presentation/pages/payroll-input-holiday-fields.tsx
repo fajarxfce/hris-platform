@@ -7,14 +7,14 @@ import {
   payrollHolidayKinds,
   payrollPriorHolidayPayments,
 } from "../../domain/entities/payroll-input-terms";
-import type { usePayrollInputForm } from "../controllers/use-payroll-input-form";
+import type { usePayrollInputTermFields } from "../controllers/use-payroll-input-term-fields";
 import { payrollInputFieldError, payrollInputMessages } from "../i18n/payroll-input-messages";
 export function PayrollInputHolidayFields({
   form,
   failure,
   locale,
 }: {
-  form: ReturnType<typeof usePayrollInputForm>;
+  form: ReturnType<typeof usePayrollInputTermFields>;
   failure: Failure | null;
   locale: Locale;
 }) {

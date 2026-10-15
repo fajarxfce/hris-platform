@@ -271,7 +271,25 @@ Monthly comparison preserves signed decimal differences and full original and
 recalculated evidence. A later edit does not relabel an older calculation as the
 current proposal. Revision navigation cancels obsolete reads; tab, language and
 theme changes retain the acquired snapshot. Failed dependent reads clear private
-content. These views do not save, approve or publish an amendment.
+content. Inspection does not change a proposal or its review status.
+
+## Dashboard authoring
+
+Authors with `payroll.amend` select a published employee/month through the bounded
+annual source directory. The editor acquires the complete published year and
+keeps earlier months read-only. Monthly compensation and input corrections use
+shared term controls; published tax registration remains fixed. Applying a
+correction clears any previous preview. The author reviews signed differences
+and enters a reason before saving the proposal's observed version.
+
+Editing an older proposal does not silently replace its assessment revisions.
+The editor shows the current and retained references and requires explicit
+acceptance of the current basis before preview. Conflicts preserve entered
+changes until deliberate reload. A lost save response retains the original
+identifier, operation and immutable payload; a subsequent conflict cannot turn
+that uncertain operation into a fresh command. Confirmed saves link to the
+acknowledged proposal revision. One page owner protects navigation for the main
+form and its monthly panel, and company/account replacement disposes the owner.
 
 ## Delivery sequence
 
@@ -288,8 +306,9 @@ content. These views do not save, approve or publish an amendment.
    independent balances, compatible offline acquisition and revision-pinned PDF
    export are implemented and validated on the emulator. The amendment directory,
    retained proposals, calculations and revision history are implemented in the
-   dashboard. Amendment authoring, review decisions, publication and native retained-revision
-   navigation remain. The current/retained statements and sync contracts are
+   dashboard. Source selection, draft creation/editing and preview are implemented.
+   Retained calculation/cancellation commands, review decisions, publication and
+   native retained-revision navigation remain. The current/retained statements and sync contracts are
    available in the API. The revised APK awaits phone connectivity.
 
 Each stage requires isolation, competing-change, lost-response, assurance-expiry,

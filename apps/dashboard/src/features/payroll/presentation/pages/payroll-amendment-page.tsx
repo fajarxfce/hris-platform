@@ -9,6 +9,7 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { payrollAmendmentEditorMessages } from "../i18n/payroll-amendment-editor-messages";
 import { payrollAmendmentMessages } from "../i18n/payroll-amendment-messages";
 import type { PayrollAmendmentState } from "../models/payroll-amendment-state";
 import type { payrollAmendmentInspectionView } from "../models/payroll-amendment-view";
@@ -23,6 +24,7 @@ export function PayrollAmendmentPage(props: {
   backTo: string;
   latestTo: string | null;
   basisTo: string | null;
+  editTo: string | null;
   first: boolean;
   onRefresh: () => void;
   onTab: (tab: string) => void;
@@ -41,6 +43,9 @@ export function PayrollAmendmentPage(props: {
         actions={<Link to={props.backTo}>{text.back}</Link>}
       />
       <AppCommandBar label={text.details}>
+        {props.editTo && (
+          <Link to={props.editTo}>{payrollAmendmentEditorMessages(locale).edit}</Link>
+        )}
         {props.latestTo && <Link to={props.latestTo}>{text.latest}</Link>}
         <AppButton
           appearance="subtle"

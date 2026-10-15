@@ -1,5 +1,7 @@
+import { InvalidHttpResponseError } from "../../../../core/data/http/http-response-error";
 import { safeHttpCall } from "../../../../core/data/http/safe-http-call";
-import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
+import type { PayrollAmendmentSave } from "../../domain/entities/payroll-amendment-preparation";
 import type { PayrollAmendmentSearch } from "../../domain/entities/payroll-amendment-search";
 import type { PayrollAmendmentRepository } from "../../domain/repositories/payroll-amendment-repository";
 import type { PayrollAmendmentDataSource } from "../datasources/payroll-amendment-data-source";
@@ -10,8 +12,34 @@ import {
   toPayrollAmendmentHistory,
   toPayrollAmendmentPage,
 } from "../mappers/payroll-amendment-mapper";
+import { toPayrollAmendmentTermsDto } from "../mappers/payroll-amendment-preparation-mapper";
 export class RemotePayrollAmendmentRepository implements PayrollAmendmentRepository {
   constructor(private readonly source: PayrollAmendmentDataSource) {}
+  save(
+    company: CompanyId,
+    id: string,
+    operation: OperationId,
+    input: PayrollAmendmentSave,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () => {
+      const receipt = await this.source.save(
+        company,
+        id,
+        operation,
+        {
+          ...toPayrollAmendmentTermsDto(input),
+          firstAssessmentId: input.firstAssessmentId,
+          expectedVersion: input.expectedVersion,
+          reason: input.reason,
+        },
+        signal,
+      );
+      if (receipt.id.toLowerCase() !== id || receipt.version !== (input.expectedVersion ?? -1) + 1)
+        throw new InvalidHttpResponseError();
+      return Object.freeze({ id: id, version: receipt.version });
+    });
+  }
   list(company: CompanyId, search: PayrollAmendmentSearch, signal: AbortSignal) {
     return safeHttpCall(signal, async () =>
       toPayrollAmendmentPage(await this.source.list(company, search, signal), company, search),

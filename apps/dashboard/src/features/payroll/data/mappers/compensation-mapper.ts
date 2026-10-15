@@ -129,55 +129,57 @@ export function toCompensationReview(
   });
 }
 export function toCompensationChangeDto(input: CompensationChange): CompensationChangeDto {
-  const t = input.terms,
-    b = t.payBasis;
   return {
     effectiveFrom: input.effectiveFrom,
     expectedVersion: input.expectedVersion,
     expectedEmploymentVersion: input.expectedEmploymentVersion,
     reason: input.reason,
-    terms: {
-      basicSalary: t.basicSalary,
-      fixedEarnings: t.fixedEarnings.map((line) => ({
-        code: line.code,
-        name: line.name,
-        amount: line.amount,
-        taxable: line.taxable,
-      })),
-      treatment: t.treatment,
-      tax: {
-        residency: t.tax.residency,
-        ptkp: t.tax.ptkp,
-        residenceCountry: t.tax.residenceCountry,
-        subjectiveFrom: t.tax.subjectiveFrom,
-        subjectiveUntil: t.tax.subjectiveUntil,
-        verifiedOn: t.tax.verifiedOn,
-        verificationReference: t.tax.verificationReference,
-      },
-      insuranceWage: t.insuranceWage,
-      insurancePrograms: [...t.insurancePrograms],
-      insuranceExemptionReason: t.insuranceExemptionReason,
-      accidentRisk: t.accidentRisk,
-      additionalHealthDependents: t.additionalHealthDependents,
-      additionalRetirementContribution: t.additionalRetirementContribution,
-      qualifiedDonation: t.qualifiedDonation,
-      otherNetDeduction: t.otherNetDeduction,
-      payBasis: b
-        ? {
-            overtimeRuleId: b.overtimeRuleId,
-            holidayAllowanceRuleId: b.holidayAllowanceRuleId,
-            proration: b.proration,
-            workWeek: b.workWeek,
-            shortestWorkDay: b.shortestWorkDay,
-            overtimeEligibility: b.overtimeEligibility,
-            overtimeExemptionReference: b.overtimeExemptionReference,
-            regularNonFixedWage: b.regularNonFixedWage,
-            serviceMonthConvention: b.serviceMonthConvention,
-            rounding: b.rounding,
-            reviewReference: b.reviewReference,
-          }
-        : null,
+    terms: toCompensationTermsDto(input.terms),
+  };
+}
+export function toCompensationTermsDto(t: CompensationTerms): CompensationTermsDto {
+  const b = t.payBasis;
+  return {
+    basicSalary: t.basicSalary,
+    fixedEarnings: t.fixedEarnings.map((line) => ({
+      code: line.code,
+      name: line.name,
+      amount: line.amount,
+      taxable: line.taxable,
+    })),
+    treatment: t.treatment,
+    tax: {
+      residency: t.tax.residency,
+      ptkp: t.tax.ptkp,
+      residenceCountry: t.tax.residenceCountry,
+      subjectiveFrom: t.tax.subjectiveFrom,
+      subjectiveUntil: t.tax.subjectiveUntil,
+      verifiedOn: t.tax.verifiedOn,
+      verificationReference: t.tax.verificationReference,
     },
+    insuranceWage: t.insuranceWage,
+    insurancePrograms: [...t.insurancePrograms],
+    insuranceExemptionReason: t.insuranceExemptionReason,
+    accidentRisk: t.accidentRisk,
+    additionalHealthDependents: t.additionalHealthDependents,
+    additionalRetirementContribution: t.additionalRetirementContribution,
+    qualifiedDonation: t.qualifiedDonation,
+    otherNetDeduction: t.otherNetDeduction,
+    payBasis: b
+      ? {
+          overtimeRuleId: b.overtimeRuleId,
+          holidayAllowanceRuleId: b.holidayAllowanceRuleId,
+          proration: b.proration,
+          workWeek: b.workWeek,
+          shortestWorkDay: b.shortestWorkDay,
+          overtimeEligibility: b.overtimeEligibility,
+          overtimeExemptionReference: b.overtimeExemptionReference,
+          regularNonFixedWage: b.regularNonFixedWage,
+          serviceMonthConvention: b.serviceMonthConvention,
+          rounding: b.rounding,
+          reviewReference: b.reviewReference,
+        }
+      : null,
   };
 }
 

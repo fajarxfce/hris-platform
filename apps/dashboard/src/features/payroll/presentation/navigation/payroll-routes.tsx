@@ -7,7 +7,9 @@ import { canReadPayrollPeriods } from "../../domain/policies/payroll-period-poli
 import { CompensationEditorScreen } from "../bindings/compensation-editor-screen";
 import { CompensationEmployeesScreen } from "../bindings/compensation-employees-screen";
 import { CompensationScreen } from "../bindings/compensation-screen";
+import { PayrollAmendmentEditorScreen } from "../bindings/payroll-amendment-editor-screen";
 import { PayrollAmendmentScreen } from "../bindings/payroll-amendment-screen";
+import { PayrollAmendmentSourcesScreen } from "../bindings/payroll-amendment-sources-screen";
 import { PayrollAmendmentsScreen } from "../bindings/payroll-amendments-screen";
 import { PayrollCalculationStartScreen } from "../bindings/payroll-calculation-start-screen";
 import { PayrollCalculationsScreen } from "../bindings/payroll-calculations-screen";
@@ -50,6 +52,15 @@ export function PayrollRoutes(props: PayrollScreenProps) {
   return (
     <Routes>
       <Route path="amendments" element={<PayrollAmendmentsScreen {...props} />} />
+      <Route path="amendments/new" element={<PayrollAmendmentSourcesScreen {...props} />} />
+      <Route
+        path="amendments/new/:assessmentId"
+        element={<PayrollAmendmentEditorScreen {...props} mode="create" />}
+      />
+      <Route
+        path="amendments/:amendmentId/edit"
+        element={<PayrollAmendmentEditorScreen {...props} mode="edit" />}
+      />
       <Route path="amendments/:amendmentId" element={<PayrollAmendmentScreen {...props} />} />
       <Route path="payments" element={<PayrollPaymentsScreen {...props} />} />
       <Route path="payments/new" element={<PayrollPaymentPreparationScreen {...props} />} />

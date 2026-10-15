@@ -1,6 +1,7 @@
 import { isCalendarDate } from "../../../../core/domain/calendar-date";
 import type { Failure } from "../../../../core/domain/result";
 import type { CompensationChange } from "../entities/compensation-change";
+import type { CompensationTerms } from "../entities/compensation-terms";
 import { accidentRisks, insurancePrograms, taxTreatments } from "../entities/compensation-terms";
 import {
   earningsRounding,
@@ -16,53 +17,52 @@ import { ptkpStatuses, taxResidencies } from "../entities/payroll-tax-registrati
 import { isPayrollMonth, payrollAmountMinor } from "./payroll-policy-validation";
 
 export function normalizeCompensation(input: CompensationChange): CompensationChange {
-  const terms = input.terms,
-    tax = terms.tax,
-    basis = terms.payBasis;
   return Object.freeze({
     ...input,
     effectiveFrom: input.effectiveFrom.trim(),
     reason: input.reason.trim(),
-    terms: Object.freeze({
-      ...terms,
-      basicSalary: terms.basicSalary.trim(),
-      insuranceWage: terms.insuranceWage.trim(),
-      fixedEarnings: Object.freeze(
-        terms.fixedEarnings.slice(0, 21).map((line) =>
-          Object.freeze({
-            ...line,
-            code: line.code.trim().toUpperCase(),
-            name: line.name.trim(),
-            amount: line.amount.trim(),
-          }),
-        ),
+    terms: normalizeCompensationTerms(input.terms),
+  });
+}
+export function normalizeCompensationTerms(terms: CompensationTerms): CompensationTerms {
+  const tax = terms.tax,
+    basis = terms.payBasis;
+  return Object.freeze({
+    ...terms,
+    basicSalary: terms.basicSalary.trim(),
+    insuranceWage: terms.insuranceWage.trim(),
+    fixedEarnings: Object.freeze(
+      terms.fixedEarnings.slice(0, 21).map((line) =>
+        Object.freeze({
+          ...line,
+          code: line.code.trim().toUpperCase(),
+          name: line.name.trim(),
+          amount: line.amount.trim(),
+        }),
       ),
-      tax: Object.freeze({
-        ...tax,
-        residenceCountry: tax.residenceCountry.trim().toUpperCase(),
-        verificationReference: tax.verificationReference.trim(),
-      }),
-      insurancePrograms: Object.freeze(terms.insurancePrograms.slice(0, 6)),
-      insuranceExemptionReason: terms.insuranceExemptionReason?.trim() || null,
-      additionalRetirementContribution: terms.additionalRetirementContribution.trim(),
-      qualifiedDonation: terms.qualifiedDonation.trim(),
-      otherNetDeduction: terms.otherNetDeduction.trim(),
-      payBasis: basis
-        ? Object.freeze({
-            ...basis,
-            regularNonFixedWage: basis.regularNonFixedWage.trim(),
-            reviewReference: basis.reviewReference.trim(),
-            overtimeExemptionReference: basis.overtimeExemptionReference?.trim() || null,
-          })
-        : null,
+    ),
+    tax: Object.freeze({
+      ...tax,
+      residenceCountry: tax.residenceCountry.trim().toUpperCase(),
+      verificationReference: tax.verificationReference.trim(),
     }),
+    insurancePrograms: Object.freeze(terms.insurancePrograms.slice(0, 6)),
+    insuranceExemptionReason: terms.insuranceExemptionReason?.trim() || null,
+    additionalRetirementContribution: terms.additionalRetirementContribution.trim(),
+    qualifiedDonation: terms.qualifiedDonation.trim(),
+    otherNetDeduction: terms.otherNetDeduction.trim(),
+    payBasis: basis
+      ? Object.freeze({
+          ...basis,
+          regularNonFixedWage: basis.regularNonFixedWage.trim(),
+          reviewReference: basis.reviewReference.trim(),
+          overtimeExemptionReference: basis.overtimeExemptionReference?.trim() || null,
+        })
+      : null,
   });
 }
 export function validateCompensation(input: CompensationChange): Failure | null {
-  const fields: Record<string, string> = {},
-    t = input.terms,
-    tax = t.tax,
-    basis = t.payBasis;
+  const fields: Record<string, string> = {};
   if (!isPayrollMonth(input.effectiveFrom)) fields.effectiveFrom = "out_of_range";
   if (!input.reason.trim().length || input.reason.length > 1000) fields.reason = "invalid";
   if (
@@ -74,6 +74,16 @@ export function validateCompensation(input: CompensationChange): Failure | null 
     fields.expectedVersion = "out_of_range";
   if (!Number.isSafeInteger(input.expectedEmploymentVersion) || input.expectedEmploymentVersion < 0)
     fields.expectedEmploymentVersion = "out_of_range";
+  const failure = validateCompensationTerms(input.effectiveFrom, input.terms);
+  return Object.keys(fields).length
+    ? { code: "invalid_compensation", fields: { ...failure?.fields, ...fields }, parameters: {} }
+    : failure;
+}
+export function validateCompensationTerms(month: string, t: CompensationTerms): Failure | null {
+  const fields: Record<string, string> = {},
+    tax = t.tax,
+    basis = t.payBasis;
+  if (!isPayrollMonth(month)) fields.effectiveFrom = "out_of_range";
   const amounts = [
     "basicSalary",
     "insuranceWage",
@@ -111,14 +121,13 @@ export function validateCompensation(input: CompensationChange): Failure | null 
     fields["terms.tax.verificationReference"] = "invalid";
   if (
     tax.subjectiveFrom !== null &&
-    (!isPayrollEvidenceDate(tax.subjectiveFrom) ||
-      tax.subjectiveFrom.slice(0, 7) > input.effectiveFrom)
+    (!isPayrollEvidenceDate(tax.subjectiveFrom) || tax.subjectiveFrom.slice(0, 7) > month)
   )
     fields["terms.tax.subjectiveFrom"] = "invalid";
   if (
     tax.subjectiveUntil !== null &&
     (!isPayrollEvidenceDate(tax.subjectiveUntil) ||
-      tax.subjectiveUntil < `${input.effectiveFrom}-01` ||
+      tax.subjectiveUntil < `${month}-01` ||
       (tax.subjectiveFrom !== null && tax.subjectiveUntil < tax.subjectiveFrom))
   )
     fields["terms.tax.subjectiveUntil"] = "invalid";

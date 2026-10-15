@@ -24,7 +24,12 @@ export function AppResourceTable({
     actionDisabled?: boolean;
     cells: readonly string[];
   }>[];
-  action?: Readonly<{ label: string; onOpen: (id: string) => void; disabled?: boolean }>;
+  action?: Readonly<{
+    label: string;
+    onOpen: (id: string) => void;
+    disabled?: boolean;
+    columnId?: string;
+  }>;
   minWidth?: number;
 }) {
   const restoreFocus = useRestoreFocusTarget();
@@ -34,7 +39,9 @@ export function AppResourceTable({
       <div className="app-table-scroll">
         <Table
           aria-label={title}
-          style={{ minWidth: minWidth ?? columns.length * 160 + (action ? 120 : 0) }}
+          style={{
+            minWidth: minWidth ?? columns.length * 160 + (action && !action.columnId ? 120 : 0),
+          }}
         >
           <TableHeader>
             <TableRow>
@@ -47,7 +54,7 @@ export function AppResourceTable({
                   {column.label}
                 </TableHeaderCell>
               ))}
-              {action && <TableHeaderCell>{action.label}</TableHeaderCell>}
+              {action && !action.columnId && <TableHeaderCell>{action.label}</TableHeaderCell>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -58,10 +65,22 @@ export function AppResourceTable({
                     key={column.id}
                     className={column.numeric ? "app-table-number" : undefined}
                   >
-                    {row.cells[index]}
+                    {action?.columnId === column.id ? (
+                      <AppButton
+                        {...restoreFocus}
+                        disabled={action.disabled === true || row.actionDisabled === true}
+                        appearance="subtle"
+                        aria-label={`${action.label}: ${row.actionLabel ?? row.id}`}
+                        onClick={() => action.onOpen(row.id)}
+                      >
+                        {row.cells[index]}
+                      </AppButton>
+                    ) : (
+                      row.cells[index]
+                    )}
                   </TableCell>
                 ))}
-                {action && (
+                {action && !action.columnId && (
                   <TableCell className="app-table-action">
                     <AppButton
                       {...restoreFocus}

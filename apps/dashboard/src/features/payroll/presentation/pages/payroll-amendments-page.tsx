@@ -1,4 +1,5 @@
 import { ArrowSync20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -10,6 +11,7 @@ import { AppTextField } from "../../../../core/presentation/components/app-text-
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { payrollAmendmentStatuses } from "../../domain/entities/payroll-amendment";
 import type { usePayrollAmendmentFilter } from "../controllers/use-payroll-amendment-filter";
+import { payrollAmendmentEditorMessages } from "../i18n/payroll-amendment-editor-messages";
 import { payrollAmendmentMessages } from "../i18n/payroll-amendment-messages";
 import type { PayrollAmendmentsState } from "../models/payroll-amendment-state";
 import type { payrollAmendmentRows } from "../models/payroll-amendment-view";
@@ -19,6 +21,7 @@ export function PayrollAmendmentsPage(props: {
   rows: ReturnType<typeof payrollAmendmentRows>;
   locale: Locale;
   companyName: string;
+  createTo: string | null;
   first: boolean;
   onOpen: (id: string) => void;
   onRefresh: () => void;
@@ -31,6 +34,9 @@ export function PayrollAmendmentsPage(props: {
     <section aria-busy={state.stage === "loading"}>
       <AppPageHeader title={text.title} context={props.companyName} />
       <AppCommandBar label={text.title}>
+        {props.createTo && (
+          <Link to={props.createTo}>{payrollAmendmentEditorMessages(locale).create}</Link>
+        )}
         <AppButton
           appearance="subtle"
           icon={<ArrowSync20Regular />}

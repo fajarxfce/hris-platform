@@ -4,7 +4,7 @@ import type { Failure } from "../../../../core/domain/result";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppTextField } from "../../../../core/presentation/components/app-text-field";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
-import type { useCompensationForm } from "../controllers/use-compensation-form";
+import type { useCompensationTermFields } from "../controllers/use-compensation-term-fields";
 import { compensationFieldError, compensationMessages } from "../i18n/compensation-messages";
 export function CompensationEarningsFields({
   form,
@@ -12,7 +12,7 @@ export function CompensationEarningsFields({
   locale,
   children,
 }: {
-  form: ReturnType<typeof useCompensationForm>;
+  form: ReturnType<typeof useCompensationTermFields>;
   failure: Failure | null;
   locale: Locale;
   children: ReactNode;

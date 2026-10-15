@@ -2,6 +2,38 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_payroll_amendment: [
+    "Check the proposed changes and amendment reason.",
+    "Periksa perubahan yang diusulkan dan alasan koreksi.",
+  ],
+  invalid_payroll_amendment_corrections: [
+    "Select corrections for the first month and any affected later months.",
+    "Pilih koreksi untuk bulan pertama dan bulan berikutnya yang terdampak.",
+  ],
+  payroll_amendment_sources_changed: [
+    "Published payroll has changed. Reload and review its current revisions.",
+    "Payroll terpublikasi sudah berubah. Muat ulang dan tinjau revisi terbaru.",
+  ],
+  payroll_amendment_tax_evidence_changed: [
+    "Tax registration must match the published payroll.",
+    "Registrasi pajak harus sesuai dengan payroll terpublikasi.",
+  ],
+  payroll_amendment_not_editable: [
+    "This proposal no longer allows the requested change. Reload its current state.",
+    "Proposal ini tidak lagi mengizinkan perubahan tersebut. Muat ulang status terbaru.",
+  ],
+  payroll_amendment_basis_changed: [
+    "The first payroll month cannot be changed for an existing proposal.",
+    "Bulan payroll pertama tidak dapat diubah pada proposal yang sudah ada.",
+  ],
+  payroll_amendment_sources_invalid: [
+    "The published payroll basis cannot be used. Reload it before continuing.",
+    "Dasar payroll terpublikasi tidak dapat digunakan. Muat ulang sebelum melanjutkan.",
+  ],
+  payroll_amendment_revision_limit: [
+    "This amendment has reached its revision limit.",
+    "Koreksi ini sudah mencapai batas revisi.",
+  ],
   payroll_amendment_not_found: [
     "This amendment or revision is unavailable for your current access.",
     "Koreksi atau revisi ini tidak tersedia untuk akses Anda saat ini.",

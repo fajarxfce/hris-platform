@@ -25,8 +25,10 @@ export type PayrollInputFormValues = {
   reason: string;
 };
 export function payrollInputFormValues(review: PayrollInputReview | null): PayrollInputFormValues {
-  const t = review?.current?.terms,
-    h = t?.holidayAllowance;
+  return payrollInputValuesFromTerms(review?.current?.terms ?? null);
+}
+export function payrollInputValuesFromTerms(t: PayrollInputTerms | null): PayrollInputFormValues {
+  const h = t?.holidayAllowance;
   return {
     earnings: t?.earnings.map((line) => ({ ...line })) ?? [],
     deductions: t?.deductions.map((line) => ({ ...line })) ?? [],

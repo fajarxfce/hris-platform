@@ -4,16 +4,18 @@ import { AppTextField } from "../../../../core/presentation/components/app-text-
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { taxTreatments } from "../../domain/entities/compensation-terms";
 import { ptkpStatuses, taxResidencies } from "../../domain/entities/payroll-tax-registration";
-import type { useCompensationForm } from "../controllers/use-compensation-form";
+import type { useCompensationTermFields } from "../controllers/use-compensation-term-fields";
 import { compensationFieldError, compensationMessages } from "../i18n/compensation-messages";
 export function CompensationTaxFields({
   form,
   failure,
   locale,
+  taxReadOnly = false,
 }: {
-  form: ReturnType<typeof useCompensationForm>;
+  form: ReturnType<typeof useCompensationTermFields>;
   failure: Failure | null;
   locale: Locale;
+  taxReadOnly?: boolean;
 }) {
   const text = compensationMessages(locale);
   return (
@@ -38,7 +40,7 @@ export function CompensationTaxFields({
           label={text.residency}
           {...form.residency}
           onChange={(_, data) => form.changeResidency(data.value)}
-          disabled={!form.editable}
+          disabled={!form.editable || taxReadOnly}
           required
           error={compensationFieldError(failure, "terms.tax.residency", locale)}
         >
@@ -52,7 +54,7 @@ export function CompensationTaxFields({
         <AppSelect
           label={text.ptkp}
           {...form.ptkp}
-          disabled={!form.editable}
+          disabled={!form.editable || taxReadOnly}
           required
           error={compensationFieldError(failure, "terms.tax.ptkp", locale)}
         >
@@ -66,7 +68,7 @@ export function CompensationTaxFields({
         <AppTextField
           label={text.residenceCountry}
           {...form.residenceCountry}
-          readOnly={!form.editable}
+          readOnly={!form.editable || taxReadOnly}
           required
           maxLength={2}
           autoCapitalize="characters"
@@ -75,7 +77,7 @@ export function CompensationTaxFields({
         <AppTextField
           label={text.verifiedOn}
           {...form.verifiedOn}
-          readOnly={!form.editable}
+          readOnly={!form.editable || taxReadOnly}
           required
           type="date"
           min="1900-01-01"
@@ -85,7 +87,7 @@ export function CompensationTaxFields({
         <AppTextField
           label={text.verificationReference}
           {...form.verificationReference}
-          readOnly={!form.editable}
+          readOnly={!form.editable || taxReadOnly}
           required
           maxLength={200}
           error={compensationFieldError(failure, "terms.tax.verificationReference", locale)}
@@ -95,7 +97,7 @@ export function CompensationTaxFields({
             <AppTextField
               label={text.subjectiveFrom}
               {...form.subjectiveFrom}
-              readOnly={!form.editable}
+              readOnly={!form.editable || taxReadOnly}
               type="date"
               min="1900-01-01"
               max="2100-12-31"
@@ -104,7 +106,7 @@ export function CompensationTaxFields({
             <AppTextField
               label={text.subjectiveUntil}
               {...form.subjectiveUntil}
-              readOnly={!form.editable}
+              readOnly={!form.editable || taxReadOnly}
               type="date"
               min="1900-01-01"
               max="2100-12-31"

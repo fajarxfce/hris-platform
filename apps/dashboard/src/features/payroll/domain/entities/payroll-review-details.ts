@@ -1,20 +1,11 @@
 import type { PayrollReview, PayrollReviewStatus } from "./payroll-review";
+import type { PayrollReviewAccount, PayrollReviewApproval } from "./payroll-review-approval";
 import type { PayrollReviewAction } from "./payroll-review-command";
 import type { PayrollRun } from "./payroll-run";
 export type PayrollReviewDetails = Readonly<{
   review: PayrollReview;
   run: PayrollRun;
-  approval: Readonly<{
-    id: string;
-    status: "PENDING" | "BLOCKED" | "APPROVED" | "REJECTED" | "CANCELLED";
-    version: number;
-    currentStep: number;
-    templateId: string;
-    templateRevision: number;
-    stages: readonly (readonly string[])[];
-    authorId: string;
-    excludedAccountIds: readonly string[];
-  }>;
+  approval: PayrollReviewApproval;
   changes: readonly Readonly<{
     revision: number;
     action: "SUBMITTED" | "APPROVED" | "REJECTED" | "WITHDRAWN";
@@ -26,7 +17,7 @@ export type PayrollReviewDetails = Readonly<{
     reason: string;
     at: string;
   }>[];
-  accounts: readonly Readonly<{ id: string; displayName: string }>[];
+  accounts: readonly PayrollReviewAccount[];
   finalizationActive: boolean;
   availableActions: readonly PayrollReviewAction[];
 }>;

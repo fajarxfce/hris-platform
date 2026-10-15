@@ -10,6 +10,7 @@ import type {
   PayrollReviewsDto,
 } from "../models/payroll-review-dto";
 import { toPayrollCalculationFailure, toPayrollRun } from "./payroll-calculation-mapper";
+import { toPayrollReviewApproval } from "./payroll-review-approval-mapper";
 export function toPayrollReview(raw: PayrollReviewDto, company: CompanyId): PayrollReview {
   if (raw.totals.employeeCount < 1) throw new InvalidHttpResponseError();
   return Object.freeze({
@@ -70,17 +71,7 @@ export function toPayrollReviewDetails(
 ): PayrollReviewDetails {
   const review = toPayrollReview(raw.review, company),
     run = toPayrollRun(raw.run, company),
-    a = raw.approval;
-  const approval = Object.freeze({
-    ...a,
-    id: a.id.toLowerCase(),
-    templateId: a.templateId.toLowerCase(),
-    authorId: a.authorId.toLowerCase(),
-    stages: Object.freeze(
-      a.stages.map((stage) => Object.freeze(stage.map((value) => value.toLowerCase()))),
-    ),
-    excludedAccountIds: Object.freeze(a.excludedAccountIds.map((value) => value.toLowerCase())),
-  });
+    approval = toPayrollReviewApproval(raw.approval);
   const changes = raw.changes.map((row) =>
       Object.freeze({
         ...row,
@@ -110,9 +101,6 @@ export function toPayrollReviewDetails(
     !approval.excludedAccountIds.includes(run.actorId) ||
     review.status !== expectedStatus ||
     review.totals.employeeCount !== run.totalEmployees ||
-    approval.currentStep >= approval.stages.length ||
-    approval.stages.some((stage) => new Set(stage).size !== stage.length) ||
-    new Set(approval.excludedAccountIds).size !== approval.excludedAccountIds.length ||
     changes.length !== review.version + 1 ||
     changes.some(
       (row, index) =>

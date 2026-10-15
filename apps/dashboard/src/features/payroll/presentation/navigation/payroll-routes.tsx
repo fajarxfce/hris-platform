@@ -9,6 +9,10 @@ import { CompensationEmployeesScreen } from "../bindings/compensation-employees-
 import { CompensationScreen } from "../bindings/compensation-screen";
 import { PayrollAmendmentActionScreen } from "../bindings/payroll-amendment-action-screen";
 import { PayrollAmendmentEditorScreen } from "../bindings/payroll-amendment-editor-screen";
+import { PayrollAmendmentReviewActionScreen } from "../bindings/payroll-amendment-review-action-screen";
+import { PayrollAmendmentReviewScreen } from "../bindings/payroll-amendment-review-screen";
+import { PayrollAmendmentReviewSubmissionScreen } from "../bindings/payroll-amendment-review-submission-screen";
+import { PayrollAmendmentReviewsScreen } from "../bindings/payroll-amendment-reviews-screen";
 import { PayrollAmendmentScreen } from "../bindings/payroll-amendment-screen";
 import { PayrollAmendmentSourcesScreen } from "../bindings/payroll-amendment-sources-screen";
 import { PayrollAmendmentsScreen } from "../bindings/payroll-amendments-screen";
@@ -70,6 +74,30 @@ export function PayrollRoutes(props: PayrollScreenProps) {
       <Route
         path="amendments/:amendmentId/cancel"
         element={<PayrollAmendmentActionScreen {...props} action="CANCEL" />}
+      />
+      <Route
+        path="amendments/:amendmentId/reviews"
+        element={<PayrollAmendmentReviewsScreen {...props} />}
+      />
+      <Route
+        path="amendments/:amendmentId/reviews/new"
+        element={<PayrollAmendmentReviewSubmissionScreen {...props} />}
+      />
+      <Route
+        path="amendment-reviews/:reviewId"
+        element={<PayrollAmendmentReviewScreen {...props} />}
+      />
+      <Route
+        path="amendment-reviews/:reviewId/approve"
+        element={<PayrollAmendmentReviewActionScreen {...props} action="APPROVE" />}
+      />
+      <Route
+        path="amendment-reviews/:reviewId/reject"
+        element={<PayrollAmendmentReviewActionScreen {...props} action="REJECT" />}
+      />
+      <Route
+        path="amendment-reviews/:reviewId/withdraw"
+        element={<PayrollAmendmentReviewActionScreen {...props} action="WITHDRAW" />}
       />
       <Route path="payments" element={<PayrollPaymentsScreen {...props} />} />
       <Route path="payments/new" element={<PayrollPaymentPreparationScreen {...props} />} />

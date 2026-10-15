@@ -506,8 +506,32 @@ access clears private review and form values. Reload protects unsaved input.
 A calculation receipt acknowledges a retained attempt, including a failed rule
 check. Its result link opens the exact committed proposal revision and calculation
 tab. Cancellation retains proposal and calculation history. Historical revisions
-cannot offer commands against a different current version. Independent review
-decisions and publication controls remain separate delivery work.
+cannot offer commands against a different current version.
+
+`/payroll/amendments/:id/reviews` shows at most eight retained review rounds.
+The separate submission page requires `payroll.amend`, a current successful
+calculation and an available submission action. It captures the amendment version,
+calculation, new review ID, reason and original operation. The receipt identifies
+the amendment; successful navigation uses the separately captured review ID.
+
+`/payroll/amendment-reviews/:id` displays retained amounts, current assignment
+stages and immutable decisions. Proposal and calculation links open the submitted
+revision; history links open the amendment revision recorded by each decision.
+Parent links appear after acquisition. Directory reads reject mismatched review
+versions when a submission or decision changes between the two API reads.
+
+Assigned independent reviewers use `payroll.amend.review` to approve or reject;
+authors use `payroll.amend` to withdraw. Separate action pages acquire live hints
+and capture amendment, review and approval versions with a required reason.
+Intermediate approval records a decision without claiming final approval.
+Withdrawal retains the review and allows another eligible submission. Shared
+Approvals navigation opens this workflow through its review resource ID.
+
+Uncertain commands retain their exact payload through explicit retry, MFA renewal
+and later conflicts. Initial conflicts require protected reload. Confirmed access
+loss clears private evidence and entered reasons; company/account replacement
+cancels owned work. Tabs, theme and language changes do not reacquire data. These
+forms remain in browser memory. Publication controls are separate delivery work.
 
 ## Shift templates
 

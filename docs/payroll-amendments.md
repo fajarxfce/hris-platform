@@ -306,6 +306,27 @@ earlier calculations accessible. Historical versions cannot offer commands
 against an unseen current revision. Browser forms remain scoped to the mounted
 account/company workspace rather than providing durable offline commands.
 
+## Dashboard independent review
+
+The proposal's review directory retains up to eight rounds. Submission requires
+the author's current grant, a successful calculation and live action eligibility.
+The form captures its calculation, amendment version, reason, new review ID and
+operation. The amendment receipt acknowledges the command; navigation retains
+the separate review identity.
+
+Review detail separates the overview, approval stages and decision history.
+Amounts belong to the submitted calculation. Evidence links pin the submitted
+proposal revision, and history rows link to their recorded amendment revision.
+Current assignment and action hints remain independent from that retained basis.
+The shared Approvals page links to the same amendment review workflow.
+
+Approve, reject and withdraw acquire a fresh action review and capture all three
+observed versions. Every action requires a reason. The dedicated author/reviewer
+grants and server hints both apply. A definite initial conflict requires protected
+reload; an unconfirmed command retains its original operation and payload through
+later MFA, conflicts or denied retries. Scope replacement cancels work and clears
+private context. Theme, language and detail tabs reuse the acquired state.
+
 ## Delivery sequence
 
 1. Guarded preparation and deterministic recalculation from retained sources: implemented.
@@ -322,7 +343,8 @@ account/company workspace rather than providing durable offline commands.
    export are implemented and validated on the emulator. The amendment directory,
    retained proposals, calculations and revision history are implemented in the
    dashboard. Source selection, draft creation/editing and preview are implemented.
-   Retained calculation/cancellation commands are implemented. Review decisions, publication and
+   Retained calculation/cancellation commands and independent review submission,
+   staged decisions, withdrawal and history are implemented. Publication and
    native retained-revision navigation remain. The current/retained statements and sync contracts are
    available in the API. The revised APK awaits phone connectivity.
 

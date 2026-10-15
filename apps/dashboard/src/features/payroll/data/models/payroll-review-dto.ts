@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { payrollRunDto, payrollRunFailureDto } from "./payroll-calculation-dto";
+import { payrollReviewAccountDto, payrollReviewApprovalDto } from "./payroll-review-approval-dto";
 
 const version = z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
   money = z.string().regex(/^(?:0|[1-9]\d{0,14})(?:\.\d{1,2})?$/u),
@@ -40,17 +41,7 @@ export const payrollReviewPreparationDto = z.object({
 export const payrollReviewDetailsDto = z.object({
   review: payrollReviewDto,
   run: payrollRunDto,
-  approval: z.object({
-    id: z.uuid(),
-    status: z.enum(["PENDING", "BLOCKED", "APPROVED", "REJECTED", "CANCELLED"]),
-    version,
-    currentStep: z.number().int().min(0).max(7),
-    templateId: z.uuid(),
-    templateRevision: version,
-    stages: z.array(z.array(z.uuid()).max(200)).min(1).max(8),
-    authorId: z.uuid(),
-    excludedAccountIds: z.array(z.uuid()).max(200),
-  }),
+  approval: payrollReviewApprovalDto,
   changes: z
     .array(
       z.object({
@@ -67,7 +58,7 @@ export const payrollReviewDetailsDto = z.object({
     )
     .min(1)
     .max(10),
-  accounts: z.array(z.object({ id: z.uuid(), displayName: z.string().min(1).max(200) })).max(2000),
+  accounts: z.array(payrollReviewAccountDto).max(2000),
   finalizationActive: z.boolean(),
   availableActions: z.array(z.enum(["APPROVE", "REJECT", "WITHDRAW"])).max(3),
 });

@@ -4,6 +4,7 @@ import { useWorkspaceRevalidation } from "../../../../core/presentation/session/
 import { canAuthorPayrollAmendments } from "../../domain/policies/payroll-amendment-authoring-policy";
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 import { PayrollAmendmentController } from "../controllers/payroll-amendment-controller";
+import { payrollAmendmentReviewsPath } from "../models/payroll-amendment-review-route";
 import {
   payrollAmendmentActionPath,
   payrollAmendmentPath,
@@ -84,6 +85,7 @@ function PayrollAmendmentBinding(props: PayrollScreenProps & { id: string }) {
       companyName={props.companyName}
       tab={tab}
       backTo={`/payroll/amendments?${back}`}
+      reviewsTo={state.data ? payrollAmendmentReviewsPath(access.companyId, id, parameters) : null}
       latestTo={revision === null ? null : payrollAmendmentPath(access.companyId, id, latest)}
       basisTo={state.data?.calculation ? payrollAmendmentPath(access.companyId, id, basis) : null}
       editTo={

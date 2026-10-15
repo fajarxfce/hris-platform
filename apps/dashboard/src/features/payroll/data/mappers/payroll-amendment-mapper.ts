@@ -19,6 +19,7 @@ import type {
 } from "../models/payroll-amendment-dto";
 import { toCompensationEmployee, toCompensationTerms } from "./compensation-mapper";
 import { toPayrollAmendmentCalculationSummary } from "./payroll-amendment-calculation-mapper";
+import { toPayrollAmendmentReviewSummary } from "./payroll-amendment-review-summary-mapper";
 export function toPayrollAmendmentSummary(
   raw: PayrollAmendmentSummaryDto,
   company: CompanyId,
@@ -151,16 +152,7 @@ export function toPayrollAmendmentDetails(
       ? toPayrollAmendmentCalculationSummary(raw.latestCalculation, id)
       : null,
     review = raw.latestReview,
-    latestReview = review
-      ? Object.freeze({
-          ...review,
-          id: review.id.toLowerCase(),
-          amendmentId: review.amendmentId.toLowerCase(),
-          calculationId: review.calculationId.toLowerCase(),
-          approvalId: review.approvalId.toLowerCase(),
-          submittedBy: review.submittedBy.toLowerCase(),
-        })
-      : null,
+    latestReview = review ? toPayrollAmendmentReviewSummary(review) : null,
     summary = amendment.summary;
   if (
     (latestCalculation?.id ?? null) !== summary.latestCalculationId ||

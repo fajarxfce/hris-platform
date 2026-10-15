@@ -5,6 +5,7 @@ import type { PayrollReviewPreparation } from "../../domain/entities/payroll-rev
 import type { PayrollReviewTotals } from "../../domain/entities/payroll-review-totals";
 import { payrollReviewMessages } from "../i18n/payroll-review-messages";
 import { payrollAmountView } from "./payroll-policy-view";
+import { payrollReviewStagesView } from "./payroll-review-stages-view";
 export function payrollReviewTotalsView(totals: PayrollReviewTotals, locale: Locale) {
   const text = payrollReviewMessages(locale);
   return [
@@ -78,24 +79,7 @@ export function payrollReviewView(details: PayrollReviewDetails, locale: Locale)
       { label: text.reason, value: review.reason },
     ],
     totals: payrollReviewTotalsView(review.totals, locale),
-    stages: approval.stages.map((stage, index) => ({
-      id: String(index),
-      cells: [
-        String(index + 1),
-        stage.map((id) => names.get(id) ?? id).join(", ") || text.none,
-        index < approval.currentStep || approval.status === "APPROVED"
-          ? text.completed
-          : index === approval.currentStep
-            ? approval.status === "PENDING"
-              ? text.waiting
-              : approval.status === "BLOCKED"
-                ? text.unassigned
-                : text.statuses[approval.status]
-            : approval.status === "CANCELLED" || approval.status === "REJECTED"
-              ? text.notReached
-              : text.upcoming,
-      ],
-    })),
+    stages: payrollReviewStagesView(approval, names, locale),
     history: details.changes.map((change) => ({
       id: String(change.revision),
       cells: [

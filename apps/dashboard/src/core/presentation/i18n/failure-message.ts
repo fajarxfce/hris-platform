@@ -2,6 +2,42 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  payroll_amendment_review_not_found: [
+    "This amendment review is unavailable for your current access.",
+    "Review koreksi ini tidak tersedia untuk akses Anda saat ini.",
+  ],
+  payroll_amendment_calculation_required: [
+    "A successful current calculation is required before submitting this amendment.",
+    "Koreksi ini memerlukan perhitungan terbaru yang berhasil sebelum diajukan.",
+  ],
+  payroll_amendment_review_active: [
+    "This amendment already has an active review. Reload its current state.",
+    "Koreksi ini sudah memiliki review aktif. Muat ulang status terbaru.",
+  ],
+  payroll_amendment_recalculation_required: [
+    "Update the proposal and calculate it again before resubmitting.",
+    "Perbarui proposal dan hitung kembali sebelum mengajukan ulang.",
+  ],
+  payroll_amendment_review_limit: [
+    "This amendment has reached its limit of eight reviews.",
+    "Koreksi ini sudah mencapai batas delapan review.",
+  ],
+  payroll_amendment_review_not_pending: [
+    "This review is no longer awaiting a decision. Reload its current state.",
+    "Review ini tidak lagi menunggu keputusan. Muat ulang status terbaru.",
+  ],
+  payroll_amendment_review_not_active: [
+    "This review can no longer be withdrawn. Reload its current state.",
+    "Review ini tidak dapat ditarik lagi. Muat ulang status terbaru.",
+  ],
+  payroll_amendment_review_not_current: [
+    "The amendment review changed. Reload it before continuing.",
+    "Review koreksi sudah berubah. Muat ulang sebelum melanjutkan.",
+  ],
+  payroll_amendment_review_action_unavailable: [
+    "This action is unavailable for the current amendment review.",
+    "Tindakan ini tidak tersedia pada review koreksi saat ini.",
+  ],
   invalid_payroll_amendment: [
     "Check the proposed changes and amendment reason.",
     "Periksa perubahan yang diusulkan dan alasan koreksi.",

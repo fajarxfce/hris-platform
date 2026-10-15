@@ -9,6 +9,7 @@ import {
   exercisePayrollAmendmentCancellation,
 } from "./payroll-amendment-commands";
 import { exercisePayrollAmendmentRead } from "./payroll-amendment-read";
+import { exercisePayrollAmendmentReviews } from "./payroll-amendment-reviews";
 
 /** Create the prerequisite through authorized commands and the actual publication worker. */
 export async function publishNegativePayrollAmendment(input: {
@@ -121,37 +122,22 @@ export async function publishNegativePayrollAmendment(input: {
     },
   });
   expect(template.status()).toBe(200);
-  const review = randomUUID(),
-    calculation = retained.latestCalculation.id;
-  const submitted = await author.request.put(`${draft}/reviews/${review}`, {
-    headers: headers(authorToken),
-    data: {
-      expectedVersion: 1,
-      calculationId: calculation,
-      reason: "Submit the retained correction",
-    },
+  const approved = await exercisePayrollAmendmentReviews({
+    author,
+    reviewer,
+    company,
+    amendment,
+    month,
   });
-  expect(submitted.status()).toBe(200);
-  const approved = await reviewer.request.post(`${draft}/reviews/${review}/decisions`, {
-    headers: headers(reviewerToken),
-    data: {
-      expectedVersion: 2,
-      expectedReviewVersion: 0,
-      expectedApprovalVersion: 0,
-      decision: "APPROVE",
-      reason: "Independent correction review",
-    },
-  });
-  expect(approved.status()).toBe(200);
   const publication = randomUUID(),
     started = await publisher.request.put(`${draft}/publications/${publication}`, {
       headers: headers(publisherToken),
       data: {
-        expectedVersion: 3,
-        reviewId: review,
-        expectedReviewVersion: 1,
-        expectedApprovalVersion: 1,
-        calculationId: calculation,
+        expectedVersion: approved.amendmentVersion,
+        reviewId: approved.reviewId,
+        expectedReviewVersion: approved.reviewVersion,
+        expectedApprovalVersion: approved.approvalVersion,
+        calculationId: approved.calculationId,
         reason: "Publish independently approved correction",
       },
     });

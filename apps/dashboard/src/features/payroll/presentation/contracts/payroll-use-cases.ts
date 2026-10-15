@@ -2,6 +2,7 @@ import type { AbandonPayrollCalculation } from "../../domain/usecases/abandon-pa
 import type { CancelPayrollPeriod } from "../../domain/usecases/cancel-payroll-period";
 import type { ConfirmPayrollPaymentRecovery } from "../../domain/usecases/confirm-payroll-payment-recovery";
 import type { CreatePayrollPeriod } from "../../domain/usecases/create-payroll-period";
+import type { DecidePayrollAmendmentReview } from "../../domain/usecases/decide-payroll-amendment-review";
 import type { DecidePayrollReview } from "../../domain/usecases/decide-payroll-review";
 import type { DownloadPayrollPayment } from "../../domain/usecases/download-payroll-payment";
 import type { DownloadPayrollPayslip } from "../../domain/usecases/download-payroll-payslip";
@@ -18,6 +19,10 @@ import type { LoadCompensationEditor } from "../../domain/usecases/load-compensa
 import type { LoadCompensationReview } from "../../domain/usecases/load-compensation-review";
 import type { LoadPayrollAmendment } from "../../domain/usecases/load-payroll-amendment";
 import type { LoadPayrollAmendmentEditor } from "../../domain/usecases/load-payroll-amendment-editor";
+import type { LoadPayrollAmendmentReview } from "../../domain/usecases/load-payroll-amendment-review";
+import type { LoadPayrollAmendmentReviewAction } from "../../domain/usecases/load-payroll-amendment-review-action";
+import type { LoadPayrollAmendmentReviewSubmission } from "../../domain/usecases/load-payroll-amendment-review-submission";
+import type { LoadPayrollAmendmentReviews } from "../../domain/usecases/load-payroll-amendment-reviews";
 import type { LoadPayrollCalculations } from "../../domain/usecases/load-payroll-calculations";
 import type { LoadPayrollFinalization } from "../../domain/usecases/load-payroll-finalization";
 import type { LoadPayrollFinalizations } from "../../domain/usecases/load-payroll-finalizations";
@@ -60,13 +65,22 @@ import type { SavePayrollPolicy } from "../../domain/usecases/save-payroll-polic
 import type { SaveTaxOpening } from "../../domain/usecases/save-tax-opening";
 import type { StartPayrollCalculation } from "../../domain/usecases/start-payroll-calculation";
 import type { StartPayrollFinalization } from "../../domain/usecases/start-payroll-finalization";
+import type { SubmitPayrollAmendmentReview } from "../../domain/usecases/submit-payroll-amendment-review";
 import type { SubmitPayrollReview } from "../../domain/usecases/submit-payroll-review";
 import type { TransitionPayrollPayment } from "../../domain/usecases/transition-payroll-payment";
 import type { VerifyPayrollInput } from "../../domain/usecases/verify-payroll-input";
 import type { VerifyTaxOpening } from "../../domain/usecases/verify-tax-opening";
+import type { WithdrawPayrollAmendmentReview } from "../../domain/usecases/withdraw-payroll-amendment-review";
 import type { WithdrawPayrollReview } from "../../domain/usecases/withdraw-payroll-review";
 
 export type PayrollUseCases = Readonly<{
+  loadAmendmentReviews: Pick<LoadPayrollAmendmentReviews, "execute">;
+  loadAmendmentReview: Pick<LoadPayrollAmendmentReview, "execute">;
+  loadAmendmentReviewSubmission: Pick<LoadPayrollAmendmentReviewSubmission, "execute">;
+  loadAmendmentReviewAction: Pick<LoadPayrollAmendmentReviewAction, "execute">;
+  submitAmendmentReview: Pick<SubmitPayrollAmendmentReview, "execute">;
+  decideAmendmentReview: Pick<DecidePayrollAmendmentReview, "execute">;
+  withdrawAmendmentReview: Pick<WithdrawPayrollAmendmentReview, "execute">;
   listAmendmentSources: Pick<ListPayrollAmendmentSources, "execute">;
   loadAmendmentEditor: Pick<LoadPayrollAmendmentEditor, "execute">;
   previewAmendment: Pick<PreviewPayrollAmendment, "execute">;

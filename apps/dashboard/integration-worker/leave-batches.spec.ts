@@ -181,7 +181,8 @@ test("reviewed accrual and year closing preserve one posting across response los
   await page.getByRole("button", { name: "Close leave year", exact: true }).click();
   const closingResponse = await posted;
   expect(closingResponse.status()).toBe(200);
-  const closingId = ((await closingResponse.json()) as { id: string }).id;
+  // The client allocates the ID before navigation; the worker read verifies that exact command.
+  const closingId = (closingResponse.request().postDataJSON() as { id: string }).id;
   await expect(page.getByRole("status")).toContainText("Process submitted.");
   await expect
     .poll(

@@ -18,7 +18,7 @@ function gate() {
 }
 export async function installPayrollPayslipsApi(
   page: Page,
-  options: { permissions?: readonly string[]; count?: number } = {},
+  options: { permissions?: readonly string[]; count?: number; currentRevision?: number } = {},
 ) {
   const permissions = options.permissions ?? ["payroll.read"];
   const identity = await installIdentityApi(page, {
@@ -28,9 +28,14 @@ export async function installPayrollPayslipsApi(
     mfaVerified: true,
     permissions,
   });
-  const rows = Array.from({ length: options.count ?? 3 }, (_, i) => payslipSummary(i + 1));
+  let currentRevision = options.currentRevision ?? 0;
+  const rows = Array.from({ length: options.count ?? 3 }, (_, i) =>
+    payslipSummary(i + 1, { version: currentRevision }),
+  );
   const reads: URL[] = [],
     payments = payslipPayments();
+  payments.version = Math.max(payments.version, currentRevision);
+  payments.settlement.assessmentRevision = currentRevision;
   let failure: { action: string; code: string; status: number } | null = null;
   let held: {
     action: string;
@@ -97,6 +102,10 @@ export async function installPayrollPayslipsApi(
     if (!row) return problem("payroll_payslip_not_found", 404);
     const index = rows.indexOf(row) + 1;
     if (action === "payments") return route.fulfill({ json: { ...payments, assessmentId: id } });
+    const selected = url.searchParams.get("revision"),
+      revision = selected === null ? currentRevision : Number(selected);
+    if (!Number.isSafeInteger(revision) || revision < 0 || revision > currentRevision)
+      return problem("payroll_payslip_not_found", 404);
     if (action === "pdf") {
       expect(request.headers().accept).toBe("application/pdf");
       const pdf = payslipPdf();
@@ -109,12 +118,20 @@ export async function installPayrollPayslipsApi(
         },
       });
     }
-    return route.fulfill({ json: payslipDetails(index) });
+    const detail = payslipDetails(index);
+    detail.summary.version = revision;
+    return route.fulfill({ json: detail });
   });
   return {
     identity,
     reads,
     payments,
+    publishRevision(revision: number) {
+      currentRevision = revision;
+      for (const row of rows) row.version = revision;
+      payments.version = Math.max(payments.version + 1, revision);
+      payments.settlement.assessmentRevision = revision;
+    },
     failNext(action: string, code: string, status = 503) {
       failure = { action, code, status };
     },

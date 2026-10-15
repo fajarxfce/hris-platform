@@ -30,10 +30,48 @@ function fixture(raw: unknown) {
   return { http, repo: new RemotePayrollPayslipRepository(new HttpPayrollPayslipDataSource(http)) };
 }
 describe("payslip mapping and acquisition", () => {
+  it.each([null, 0, 2])(
+    "acquires revision %s with explicit scope and exact response matching",
+    async (revision) => {
+      const raw = payslipDetails();
+      raw.summary.version = revision ?? 3;
+      const { repo, http } = fixture(raw);
+      const result = await repo.get(company, payslipId(), "SELF", revision, signal());
+      assert(result.ok);
+      expect(result.value.summary.version).toBe(raw.summary.version);
+      const url = new URL(http.request.mock.calls[0]?.[0].path ?? "", "https://example.invalid");
+      expect(url.searchParams.get("revision")).toBe(revision === null ? null : String(revision));
+      expect(url.searchParams.get("scope")).toBe("SELF");
+      expect(http.request).toHaveBeenCalledOnce();
+    },
+  );
+  it("rejects a substituted assessment revision without another request", async () => {
+    const raw = payslipDetails();
+    raw.summary.version = 3;
+    const { repo, http } = fixture(raw);
+    expect(await repo.get(company, payslipId(), "SELF", 0, signal())).toMatchObject({
+      ok: false,
+      failure: { code: "invalid_response" },
+    });
+    expect(http.request).toHaveBeenCalledOnce();
+  });
+  it("discards a revision acquired after its request is cancelled", async () => {
+    const raw = payslipDetails(),
+      owner = new AbortController(),
+      { repo, http } = fixture(raw);
+    http.request.mockImplementation(async () => {
+      owner.abort();
+      return raw;
+    });
+    await expect(repo.get(company, payslipId(), "SELF", 0, owner.signal)).rejects.toMatchObject({
+      name: "AbortError",
+    });
+    expect(http.request).toHaveBeenCalledOnce();
+  });
   it("keeps exact signed amounts, immutable detail and retained labels without source profiles", async () => {
     const raw = payslipDetails(),
       { repo, http } = fixture(raw);
-    const result = await repo.get(company, payslipId(), "SELF", signal());
+    const result = await repo.get(company, payslipId(), "SELF", null, signal());
     assert(result.ok);
     expect(result.value.summary.withheld).toBe("-0.50");
     expect(Object.isFrozen(result.value.calculation.earnings[0])).toBe(true);
@@ -73,10 +111,12 @@ describe("payslip mapping and acquisition", () => {
   ])("rejects %s without leaking technical details", async (_, corrupt) => {
     const raw = payslipDetails();
     corrupt(raw);
-    expect(await fixture(raw).repo.get(company, payslipId(), "SELF", signal())).toMatchObject({
-      ok: false,
-      failure: { code: "invalid_response" },
-    });
+    expect(await fixture(raw).repo.get(company, payslipId(), "SELF", null, signal())).toMatchObject(
+      {
+        ok: false,
+        failure: { code: "invalid_response" },
+      },
+    );
   });
   it("encodes submitted filters and accepts ordered cursor pages", async () => {
     const items = Array.from({ length: 50 }, (_, i) => payslipSummary(i + 1)),

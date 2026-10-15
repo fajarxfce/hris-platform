@@ -7,6 +7,8 @@ export const canReadPayrollPayslips = (permissions: readonly string[]): boolean 
   permissions.includes("payroll.read") || permissions.includes("payroll.self.read");
 export const validPayrollPayslipScope = (scope: PayrollPayslipScope): boolean =>
   scope === "AUTHORIZED" || scope === "SELF";
+export const validPayrollPayslipRevision = (revision: number): boolean =>
+  Number.isSafeInteger(revision) && revision >= 0;
 export function payrollPayslipSearchFailure(search: PayrollPayslipSearch): Failure | null {
   if (search.query.length > 120 || /\p{Cc}/u.test(search.query))
     return {

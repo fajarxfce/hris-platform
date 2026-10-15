@@ -1,5 +1,6 @@
 import { MessageBar, MessageBarBody } from "@fluentui/react-components";
 import { ArrowDownload20Regular, ArrowSync20Regular } from "@fluentui/react-icons";
+import type { MouseEventHandler } from "react";
 import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
@@ -14,6 +15,7 @@ import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { payrollPaymentRecoveryMessages } from "../i18n/payroll-payment-recovery-messages";
 import { payrollPayslipMessages } from "../i18n/payroll-payslip-messages";
+import type { payrollPayslipRevisionLinks } from "../models/payroll-payslip-route";
 import type { PayrollPayslipState } from "../models/payroll-payslip-state";
 import type {
   payrollPayslipPaymentRows,
@@ -27,6 +29,7 @@ export function PayrollPayslipPage(props: {
   view: ReturnType<typeof payrollPayslipView> | null;
   paymentRows: ReturnType<typeof payrollPayslipPaymentRows>;
   settlement: ReturnType<typeof payrollPayslipSettlementView>;
+  revisionLinks: ReturnType<typeof payrollPayslipRevisionLinks>;
   locale: Locale;
   companyName: string;
   timezone: string;
@@ -34,6 +37,7 @@ export function PayrollPayslipPage(props: {
   returnsTo: string | null;
   tab: string;
   onRefresh: () => void;
+  onLatest: MouseEventHandler<HTMLAnchorElement>;
   onRefreshPayments: () => void;
   onDownload: () => void;
   onLanguage: (language: string) => void;
@@ -57,12 +61,33 @@ export function PayrollPayslipPage(props: {
         >
           {messages(locale).refresh}
         </AppButton>
+        {props.revisionLinks.previousTo && (
+          <Link to={props.revisionLinks.previousTo}>{text.previousRevision}</Link>
+        )}
+        {props.revisionLinks.nextTo && (
+          <Link to={props.revisionLinks.nextTo}>{text.nextRevision}</Link>
+        )}
+        {props.revisionLinks.originalTo && (
+          <Link to={props.revisionLinks.originalTo}>{text.originalRevision}</Link>
+        )}
+        {props.revisionLinks.latestTo && (
+          <Link to={props.revisionLinks.latestTo} onClick={props.onLatest}>
+            {text.latestRevision}
+          </Link>
+        )}
       </AppCommandBar>
       <div className="app-report-content">
         <AppFailure failure={state.failure} locale={locale} />
         {state.stage === "loading" && <AppLoading label={messages(locale).loading} />}
         {view && state.payslip && (
           <>
+            {(props.revisionLinks.retained || props.revisionLinks.newer) && (
+              <MessageBar intent="info">
+                <MessageBarBody>
+                  {props.revisionLinks.newer ? text.newerRevision : text.retainedRevision}
+                </MessageBarBody>
+              </MessageBar>
+            )}
             <div className="app-metric-grid app-payroll-payslip-metrics">
               {view.metrics.map((metric) => (
                 <AppMetricCard key={metric.label} {...metric} />

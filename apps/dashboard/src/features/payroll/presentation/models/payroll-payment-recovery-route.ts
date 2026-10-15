@@ -1,6 +1,10 @@
 import { isUuid } from "../../../../core/domain/identifiers";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
-import { canReadPayrollPayslips } from "../../domain/policies/payroll-payslip-policy";
+import {
+  canReadPayrollPayslips,
+  validPayrollPayslipRevision,
+} from "../../domain/policies/payroll-payslip-policy";
+import { payrollPayslipRevisionFromRoute } from "./payroll-payslip-route";
 
 export function payrollPaymentRecoveryRoute(
   assessment: string,
@@ -25,6 +29,9 @@ export function payrollPaymentRecoveryRoute(
   } else if (input.get("source") === "payslip" && canReadPayrollPayslips(access.permissions)) {
     parameters.set("source", "payslip");
     parameters.set("scope", input.get("scope") === "SELF" ? "SELF" : "AUTHORIZED");
+    const revision = payrollPayslipRevisionFromRoute(input);
+    if (revision !== null && validPayrollPayslipRevision(revision))
+      parameters.set("revision", String(revision));
     const back = new URLSearchParams(parameters);
     back.delete("source");
     back.set("tab", "payments");

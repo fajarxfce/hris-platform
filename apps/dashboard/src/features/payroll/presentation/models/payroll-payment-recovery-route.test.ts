@@ -46,4 +46,14 @@ describe("return review navigation", () => {
     );
     expect(route.backLabel).toBe("backPayslip");
   });
+  it("retains an explicit payslip revision through return review and entry", () => {
+    const route = payrollPaymentRecoveryRoute(
+      assessment,
+      { ...access, permissions: ["payroll.pay", "payroll.self.read"] },
+      new URLSearchParams({ source: "payslip", scope: "SELF", revision: "0" }),
+    );
+    expect(route.backTo).toContain("scope=SELF&revision=0&tab=payments");
+    expect(route.review).toContain("revision=0");
+    expect(route.record).toContain("revision=0");
+  });
 });

@@ -29,11 +29,19 @@ export class HttpPayrollPayslipDataSource implements PayrollPayslipDataSource {
       ),
     );
   }
-  async get(company: string, id: string, scope: PayrollPayslipScopeDto, signal: AbortSignal) {
+  async get(
+    company: string,
+    id: string,
+    scope: PayrollPayslipScopeDto,
+    revision: number | null,
+    signal: AbortSignal,
+  ) {
+    const parameters = new URLSearchParams({ scope });
+    if (revision !== null) parameters.set("revision", String(revision));
     return payrollPayslipDto.parse(
       await this.http.request(
         {
-          path: `/api/v1/companies/${company}/payroll/payslips/${id}?${new URLSearchParams({ scope })}`,
+          path: `/api/v1/companies/${company}/payroll/payslips/${id}?${parameters}`,
         },
         signal,
       ),

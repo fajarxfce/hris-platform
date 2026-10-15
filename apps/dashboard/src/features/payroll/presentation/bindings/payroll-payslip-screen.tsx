@@ -8,6 +8,8 @@ import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 import { PayrollPayslipController } from "../controllers/payroll-payslip-controller";
 import {
   payrollPayslipParameters,
+  payrollPayslipRevisionFromRoute,
+  payrollPayslipRevisionLinks,
   payrollPayslipScopeFromRoute,
   payrollPayslipSearchFromRoute,
 } from "../models/payroll-payslip-route";
@@ -21,29 +23,31 @@ import { PayrollPayslipPage } from "../pages/payroll-payslip-page";
 export function PayrollPayslipScreen(props: PayrollScreenProps) {
   const [parameters] = useSearchParams(),
     { payslipId = "" } = useParams();
-  const scope = payrollPayslipScopeFromRoute(
-    parameters,
-    props.access.permissions.includes("payroll.read"),
-  );
+  const revision = payrollPayslipRevisionFromRoute(parameters),
+    scope = payrollPayslipScopeFromRoute(
+      parameters,
+      props.access.permissions.includes("payroll.read"),
+    );
   if (parameters.get("company") !== props.access.companyId)
     return <Navigate to={`/payroll/payslips?company=${props.access.companyId}`} replace />;
   return (
     <PayrollPayslipBinding
-      key={`${props.accountId}:${props.access.companyId}:${payslipId}:${scope}`}
+      key={`${props.accountId}:${props.access.companyId}:${payslipId}:${scope}:${revision}`}
       {...props}
       id={payslipId.toLowerCase()}
       scope={scope}
+      revision={revision}
     />
   );
 }
 function PayrollPayslipBinding(
-  props: PayrollScreenProps & { id: string; scope: PayrollPayslipScope },
+  props: PayrollScreenProps & { id: string; scope: PayrollPayslipScope; revision: number | null },
 ) {
   const [parameters, setParameters] = useSearchParams();
-  const { payroll, access, id, scope, locale, timezone } = props;
+  const { payroll, access, id, scope, revision, locale, timezone } = props;
   const controller = useMemo(
-    () => new PayrollPayslipController(payroll, access, id, scope),
-    [payroll, access, id, scope],
+    () => new PayrollPayslipController(payroll, access, id, scope, revision),
+    [payroll, access, id, scope, revision],
   );
   const state = useSyncExternalStore(
     controller.subscribe,
@@ -80,9 +84,17 @@ function PayrollPayslipBinding(
       view={view}
       paymentRows={paymentRows}
       settlement={settlement}
+      revisionLinks={payrollPayslipRevisionLinks(parameters, {
+        id,
+        company: access.companyId,
+        scope,
+        requested: revision,
+        viewed: state.payslip?.summary.version ?? null,
+        current: state.payments?.settlement.assessmentRevision ?? null,
+      })}
       returnsTo={
         state.payslip && canReadPayrollPayments(access.permissions)
-          ? `/payroll/payslips/${id}/returns?${new URLSearchParams({ company: access.companyId, source: "payslip", scope })}`
+          ? `/payroll/payslips/${id}/returns?${new URLSearchParams({ company: access.companyId, source: "payslip", scope, ...(revision !== null ? { revision: String(revision) } : {}) })}`
           : null
       }
       locale={locale}
@@ -91,6 +103,19 @@ function PayrollPayslipBinding(
       tab={parameters.get("tab") === "payments" ? "payments" : "calculation"}
       backTo={`/payroll/payslips?${payrollPayslipParameters(access.companyId, backSearch)}`}
       onRefresh={controller.refresh}
+      onLatest={(event) => {
+        if (
+          revision === null &&
+          event.button === 0 &&
+          !event.ctrlKey &&
+          !event.metaKey &&
+          !event.shiftKey &&
+          !event.altKey
+        ) {
+          event.preventDefault();
+          void controller.refresh();
+        }
+      }}
       onRefreshPayments={controller.refreshPayments}
       onDownload={controller.download}
       onLanguage={(language) => {

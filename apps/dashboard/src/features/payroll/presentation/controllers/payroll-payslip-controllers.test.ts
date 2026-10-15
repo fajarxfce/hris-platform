@@ -79,13 +79,37 @@ function actions() {
     },
   };
 }
-function detail() {
+function detail(revision: number | null = null) {
   const api = actions(),
-    controller = new PayrollPayslipController(api, access, payslipId(), "SELF");
+    controller = new PayrollPayslipController(api, access, payslipId(), "SELF", revision);
   owned.add(controller);
   return { api, controller };
 }
 describe("payslip presentation ownership", () => {
+  it("refreshes and exports the selected revision while payments carry a newer assessment", async () => {
+    const { api, controller } = detail(2),
+      raw = payslipDetails(),
+      payments = payslipPayments();
+    raw.summary.version = 2;
+    payments.settlement.assessmentRevision = 3;
+    api.loadPayslip.execute.mockResolvedValue(
+      success(toPayrollPayslip(raw, access.companyId, payslipId())),
+    );
+    api.loadPayslipPayments.execute.mockResolvedValue(
+      success(toPayrollPaymentProgress(payments, access.companyId, payslipId())),
+    );
+    controller.activate();
+    await flush();
+    await controller.refresh();
+    await flush();
+    await controller.download();
+    expect(api.loadPayslip.execute.mock.calls.map((call) => call.slice(0, 4))).toEqual([
+      [access, payslipId(), "SELF", 2],
+      [access, payslipId(), "SELF", 2],
+    ]);
+    expect(api.downloadPayslip.execute.mock.calls[0]?.[3]).toBe(2);
+    expect(controller.getSnapshot().payslip?.summary.version).toBe(2);
+  });
   it("loads each projection once per activation and refreshes payments independently", async () => {
     const { api, controller } = detail();
     controller.activate();
@@ -143,7 +167,7 @@ describe("payslip presentation ownership", () => {
       api.loadPayslip.execute.mockReturnValueOnce(old.promise);
       controller.activate();
       await controller.refresh();
-      expect(api.loadPayslip.execute.mock.calls[0]?.[3].aborted).toBe(true);
+      expect(api.loadPayslip.execute.mock.calls[0]?.[4].aborted).toBe(true);
       if (outcome === "success")
         old.resolve(success(toPayrollPayslip(payslipDetails(2), access.companyId, payslipId(2))));
       else old.reject(new Error("late failure"));

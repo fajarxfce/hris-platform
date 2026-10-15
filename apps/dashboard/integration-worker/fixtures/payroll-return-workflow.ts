@@ -13,6 +13,7 @@ import {
 } from "../../src/features/payroll/data/models/payroll-payslip-dto";
 import { payrollAmountView } from "../../src/features/payroll/presentation/models/payroll-policy-view";
 import { publishNegativePayrollAmendment } from "./payroll-amendment-publication";
+import { exercisePayrollRevisions } from "./payroll-revision-workflow";
 
 /** Exercise real return entry while retaining the original bank and payroll records. */
 export async function exercisePayrollReturns(input: {
@@ -60,6 +61,12 @@ export async function exercisePayrollReturns(input: {
   expect(payrollCalculationMinor(revised.summary.takeHome)).toBe(
     payrollCalculationMinor(before.payments.settlement.entitlement),
   );
+  await exercisePayrollRevisions({
+    reader: publisher,
+    company,
+    original: summary,
+    current: revised.summary,
+  });
 
   const writes: {
       path: string;

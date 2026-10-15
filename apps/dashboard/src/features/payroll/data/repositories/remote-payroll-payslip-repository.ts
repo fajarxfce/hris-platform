@@ -21,9 +21,20 @@ export class RemotePayrollPayslipRepository implements PayrollPayslipRepository 
       toPayrollPayslipPage(await this.source.list(company, search, signal), company, search),
     );
   }
-  get(company: CompanyId, id: string, scope: PayrollPayslipScope, signal: AbortSignal) {
+  get(
+    company: CompanyId,
+    id: string,
+    scope: PayrollPayslipScope,
+    revision: number | null,
+    signal: AbortSignal,
+  ) {
     return safeHttpCall(signal, async () =>
-      toPayrollPayslip(await this.source.get(company, id, scope, signal), company, id),
+      toPayrollPayslip(
+        await this.source.get(company, id, scope, revision, signal),
+        company,
+        id,
+        revision,
+      ),
     );
   }
   payments(company: CompanyId, id: string, scope: PayrollPayslipScope, signal: AbortSignal) {

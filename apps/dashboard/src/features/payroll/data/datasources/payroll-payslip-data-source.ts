@@ -18,6 +18,7 @@ export interface PayrollPayslipDataSource {
     company: string,
     id: string,
     scope: PayrollPayslipScopeDto,
+    revision: number | null,
     signal: AbortSignal,
   ): Promise<PayrollPayslipDto>;
   payments(

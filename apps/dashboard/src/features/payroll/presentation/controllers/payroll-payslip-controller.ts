@@ -26,6 +26,7 @@ export class PayrollPayslipController {
     private readonly access: CompanyAccess,
     private readonly id: string,
     private readonly scope: PayrollPayslipScope,
+    private readonly revision: number | null,
   ) {}
   getSnapshot = (): PayrollPayslipState => this.#state;
   subscribe = (listener: () => void): (() => void) => {
@@ -62,6 +63,7 @@ export class PayrollPayslipController {
         this.access,
         this.id,
         this.scope,
+        this.revision,
         pending.signal,
       );
       if (pending.signal.aborted || this.#detail !== pending) return;

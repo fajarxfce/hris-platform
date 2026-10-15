@@ -5,6 +5,7 @@ import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { PayrollDocumentLanguage, PayrollPayslipScope } from "../entities/payroll-payslip";
 import {
   canReadPayrollPayslips,
+  validPayrollPayslipRevision,
   validPayrollPayslipScope,
 } from "../policies/payroll-payslip-policy";
 import type { PayrollPayslipRepository } from "../repositories/payroll-payslip-repository";
@@ -25,7 +26,7 @@ export class DownloadPayrollPayslip {
     signal.throwIfAborted();
     if (!canReadPayrollPayslips(access.permissions)) return failed("access_denied");
     if (!isUuid(id) || !validPayrollPayslipScope(scope)) return failed("payroll_payslip_not_found");
-    if (!Number.isSafeInteger(revision) || revision < 0) return failed("invalid_payslip_revision");
+    if (!validPayrollPayslipRevision(revision)) return failed("invalid_payslip_revision");
     if (language !== "ID" && language !== "EN") return failed("invalid_document_language");
     const content = await this.payslips.pdf(
       access.companyId,

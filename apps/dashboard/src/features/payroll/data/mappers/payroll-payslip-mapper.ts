@@ -71,9 +71,11 @@ export function toPayrollPayslip(
   raw: PayrollPayslipDto,
   company: CompanyId,
   id: string,
+  revision: number | null = null,
 ): PayrollPayslip {
   if (
     raw.summary.id.toLowerCase() !== id ||
+    (revision !== null && raw.summary.version !== revision) ||
     (["taxableGross", "withheld", "takeHome"] as const).some(
       (key) =>
         payrollCalculationMinor(raw.summary[key]) !==

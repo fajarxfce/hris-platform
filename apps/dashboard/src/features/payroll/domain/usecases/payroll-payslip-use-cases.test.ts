@@ -40,7 +40,7 @@ describe("payslip application policy", () => {
         files = { downloadBinary: vi.fn<FileRepository["downloadBinary"]>() };
       for (const result of await Promise.all([
         new ListPayrollPayslips(repo).execute(actor, search, signal()),
-        new LoadPayrollPayslip(repo).execute(actor, payslipId(), "AUTHORIZED", signal()),
+        new LoadPayrollPayslip(repo).execute(actor, payslipId(), "AUTHORIZED", null, signal()),
         new LoadPayrollPayslipPayments(repo).execute(actor, payslipId(), "AUTHORIZED", signal()),
         new DownloadPayrollPayslip(repo, files).execute(
           actor,
@@ -92,14 +92,14 @@ describe("payslip application policy", () => {
       owner = new AbortController();
     owner.abort();
     await expect(
-      new LoadPayrollPayslip(repo).execute(access, payslipId(), "SELF", owner.signal),
+      new LoadPayrollPayslip(repo).execute(access, payslipId(), "SELF", null, owner.signal),
     ).rejects.toMatchObject({ name: "AbortError" });
     expect(repo.get).not.toHaveBeenCalled();
     const failure = failed("payroll_payslip_not_found");
     repo.get.mockResolvedValue(failure);
-    expect(await new LoadPayrollPayslip(repo).execute(access, payslipId(), "SELF", signal())).toBe(
-      failure,
-    );
+    expect(
+      await new LoadPayrollPayslip(repo).execute(access, payslipId(), "SELF", null, signal()),
+    ).toBe(failure);
   });
   it.each(["saved", "failed", "aborted", "thrown"])(
     "clears owned PDF bytes after a %s handoff",
@@ -180,5 +180,41 @@ it.each([-1, Number.NaN, Number.MAX_SAFE_INTEGER + 1, 0.5])(
     ).toMatchObject({ ok: false, failure: { code: "invalid_payslip_revision" } });
     expect(repo.pdf).not.toHaveBeenCalled();
     expect(files.downloadBinary).not.toHaveBeenCalled();
+  },
+);
+
+it.each([null, 0, 3, Number.MAX_SAFE_INTEGER])(
+  "keeps the explicit read revision %s and self scope at the repository boundary",
+  async (revision) => {
+    const repo = repository(),
+      owner = new AbortController();
+    await new LoadPayrollPayslip(repo).execute(
+      access,
+      payslipId().toUpperCase(),
+      "SELF",
+      revision,
+      owner.signal,
+    );
+    expect(repo.get).toHaveBeenCalledExactlyOnceWith(
+      access.companyId,
+      payslipId(),
+      "SELF",
+      revision,
+      owner.signal,
+    );
+  },
+);
+
+it.each([-1, Number.NaN, Number.POSITIVE_INFINITY, Number.MAX_SAFE_INTEGER + 1, 0.5])(
+  "rejects invalid read revision %s without falling back to current data",
+  async (revision) => {
+    const repo = repository();
+    expect(
+      await new LoadPayrollPayslip(repo).execute(access, payslipId(), "SELF", revision, signal()),
+    ).toMatchObject({
+      ok: false,
+      failure: { code: "invalid_payslip_revision" },
+    });
+    expect(repo.get).not.toHaveBeenCalled();
   },
 );

@@ -20,6 +20,7 @@ export interface PayrollPayslipRepository {
     company: CompanyId,
     id: string,
     scope: PayrollPayslipScope,
+    revision: number | null,
     signal: AbortSignal,
   ): Promise<Result<PayrollPayslip>>;
   payments(

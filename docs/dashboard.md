@@ -374,6 +374,20 @@ does not reacquire the immutable calculation;
 the planned payment date is not a settlement confirmation. Tabs, locale and theme
 changes retain the current read owner.
 
+An optional `revision` selects one retained statement, including revision zero.
+Previous, next, original and latest links preserve company, read scope and
+directory filters; navigation acquires one revision at a time. Next is offered
+only when current payment evidence identifies a later assessment revision.
+The return-review link preserves a selected revision when navigating back.
+Refreshing a retained statement keeps that revision. A newer payment projection
+offers explicit navigation without replacing the open statement.
+
+Malformed, duplicate or unavailable revision selections do not fall back to
+current data. Response mapping requires the requested version. Changing revision
+cancels its previous read, payment acquisition and PDF download; late responses
+cannot restore an earlier owner. Current and retained reads keep the same
+server-side employee/company authorization.
+
 PDF downloads select Indonesian or English explicitly and pin the displayed
 assessment revision throughout acquisition. The filename includes that revision.
 A single GET acquires the

@@ -1,5 +1,6 @@
 import type { CompanyId } from "../../../../core/domain/identifiers";
 import type { PayrollAmendmentStatus } from "../../domain/entities/payroll-amendment";
+import type { PayrollAmendmentDraftAction } from "../../domain/entities/payroll-amendment-command";
 import type {
   PayrollAmendmentSearch,
   PayrollAmendmentSelection,
@@ -54,4 +55,15 @@ export function payrollAmendmentPath(
   const next = new URLSearchParams(parameters);
   next.set("company", company);
   return `/payroll/amendments/${encodeURIComponent(id)}?${next}`;
+}
+export function payrollAmendmentActionPath(
+  company: CompanyId,
+  id: string,
+  action: PayrollAmendmentDraftAction,
+  parameters: URLSearchParams,
+): string {
+  const next = new URLSearchParams(parameters);
+  next.set("company", company);
+  for (const key of ["revision", "historyAfter", "assessment", "tab"]) next.delete(key);
+  return `/payroll/amendments/${encodeURIComponent(id)}/${action.toLowerCase()}?${next}`;
 }

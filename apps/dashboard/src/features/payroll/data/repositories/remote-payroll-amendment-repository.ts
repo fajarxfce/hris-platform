@@ -1,11 +1,12 @@
-import { InvalidHttpResponseError } from "../../../../core/data/http/http-response-error";
 import { safeHttpCall } from "../../../../core/data/http/safe-http-call";
 import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
+import type { PayrollAmendmentCommand } from "../../domain/entities/payroll-amendment-command";
 import type { PayrollAmendmentSave } from "../../domain/entities/payroll-amendment-preparation";
 import type { PayrollAmendmentSearch } from "../../domain/entities/payroll-amendment-search";
 import type { PayrollAmendmentRepository } from "../../domain/repositories/payroll-amendment-repository";
 import type { PayrollAmendmentDataSource } from "../datasources/payroll-amendment-data-source";
 import { toPayrollAmendmentCalculation } from "../mappers/payroll-amendment-calculation-mapper";
+import { toPayrollAmendmentReceipt } from "../mappers/payroll-amendment-command-mapper";
 import {
   toPayrollAmendment,
   toPayrollAmendmentDetails,
@@ -15,6 +16,48 @@ import {
 import { toPayrollAmendmentTermsDto } from "../mappers/payroll-amendment-preparation-mapper";
 export class RemotePayrollAmendmentRepository implements PayrollAmendmentRepository {
   constructor(private readonly source: PayrollAmendmentDataSource) {}
+  calculate(
+    company: CompanyId,
+    id: string,
+    operation: OperationId,
+    input: PayrollAmendmentCommand,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toPayrollAmendmentReceipt(
+        await this.source.calculate(
+          company,
+          id,
+          operation,
+          { expectedVersion: input.expectedVersion, reason: input.reason },
+          signal,
+        ),
+        id,
+        input.expectedVersion,
+      ),
+    );
+  }
+  cancel(
+    company: CompanyId,
+    id: string,
+    operation: OperationId,
+    input: PayrollAmendmentCommand,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toPayrollAmendmentReceipt(
+        await this.source.cancel(
+          company,
+          id,
+          operation,
+          { expectedVersion: input.expectedVersion, reason: input.reason },
+          signal,
+        ),
+        id,
+        input.expectedVersion,
+      ),
+    );
+  }
   save(
     company: CompanyId,
     id: string,
@@ -35,9 +78,7 @@ export class RemotePayrollAmendmentRepository implements PayrollAmendmentReposit
         },
         signal,
       );
-      if (receipt.id.toLowerCase() !== id || receipt.version !== (input.expectedVersion ?? -1) + 1)
-        throw new InvalidHttpResponseError();
-      return Object.freeze({ id: id, version: receipt.version });
+      return toPayrollAmendmentReceipt(receipt, id, input.expectedVersion);
     });
   }
   list(company: CompanyId, search: PayrollAmendmentSearch, signal: AbortSignal) {

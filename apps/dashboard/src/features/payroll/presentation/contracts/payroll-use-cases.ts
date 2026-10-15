@@ -71,6 +71,9 @@ export type PayrollUseCases = Readonly<{
   loadAmendmentEditor: Pick<LoadPayrollAmendmentEditor, "execute">;
   previewAmendment: Pick<PreviewPayrollAmendment, "execute">;
   saveAmendment: Pick<SavePayrollAmendment, "execute">;
+  loadAmendmentAction: Pick<LoadPayrollAmendmentAction, "execute">;
+  calculateAmendment: Pick<CalculatePayrollAmendment, "execute">;
+  cancelAmendment: Pick<CancelPayrollAmendment, "execute">;
   listAmendments: Pick<ListPayrollAmendments, "execute">;
   loadAmendment: Pick<LoadPayrollAmendment, "execute">;
   reviewPaymentRecovery: Pick<ReviewPayrollPaymentRecovery, "execute">;
@@ -142,3 +145,7 @@ export type PayrollUseCases = Readonly<{
   loadCompensationEditor: Pick<LoadCompensationEditor, "execute">;
   saveCompensation: Pick<SaveCompensation, "execute">;
 }>;
+
+import type { CalculatePayrollAmendment } from "../../domain/usecases/calculate-payroll-amendment";
+import type { CancelPayrollAmendment } from "../../domain/usecases/cancel-payroll-amendment";
+import type { LoadPayrollAmendmentAction } from "../../domain/usecases/load-payroll-amendment-action";

@@ -38,6 +38,8 @@ const access: CompanyAccess = {
 function repository() {
   return {
     save: vi.fn<PayrollAmendmentRepository["save"]>(),
+    calculate: vi.fn<PayrollAmendmentRepository["calculate"]>(),
+    cancel: vi.fn<PayrollAmendmentRepository["cancel"]>(),
     list: vi
       .fn<PayrollAmendmentRepository["list"]>()
       .mockResolvedValue(success({ items: [], nextCursor: null })),

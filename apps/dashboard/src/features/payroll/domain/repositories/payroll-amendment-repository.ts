@@ -7,9 +7,24 @@ import type {
   PayrollAmendmentPage,
 } from "../entities/payroll-amendment";
 import type { PayrollAmendmentCalculation } from "../entities/payroll-amendment-calculation";
+import type { PayrollAmendmentCommand } from "../entities/payroll-amendment-command";
 import type { PayrollAmendmentSave } from "../entities/payroll-amendment-preparation";
 import type { PayrollAmendmentSearch } from "../entities/payroll-amendment-search";
 export interface PayrollAmendmentRepository {
+  calculate(
+    company: CompanyId,
+    id: string,
+    operation: OperationId,
+    input: PayrollAmendmentCommand,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
+  cancel(
+    company: CompanyId,
+    id: string,
+    operation: OperationId,
+    input: PayrollAmendmentCommand,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
   save(
     company: CompanyId,
     id: string,

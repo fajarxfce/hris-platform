@@ -55,6 +55,8 @@ function fixture() {
     },
     amendments = {
       list: vi.fn<PayrollAmendmentRepository["list"]>(),
+      calculate: vi.fn<PayrollAmendmentRepository["calculate"]>(),
+      cancel: vi.fn<PayrollAmendmentRepository["cancel"]>(),
       get: vi
         .fn<PayrollAmendmentRepository["get"]>()
         .mockResolvedValue(

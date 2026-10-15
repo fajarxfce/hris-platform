@@ -9,8 +9,8 @@ import type {
 } from "../../domain/entities/payroll-amendment-preparation";
 import {
   amendmentAccessLost,
-  amendmentSaveWasRejected,
-  amendmentSourceConflict,
+  amendmentCommandRejected,
+  amendmentContextChanged,
   normalizeAmendmentTerms,
 } from "../../domain/policies/payroll-amendment-authoring-policy";
 import type { PayrollUseCases } from "../contracts/payroll-use-cases";
@@ -189,7 +189,7 @@ export class PayrollAmendmentEditorController {
       else
         this.publish({
           ...this.#state,
-          stage: amendmentSourceConflict(result.failure) ? "conflict" : "editing",
+          stage: amendmentContextChanged(result.failure) ? "conflict" : "editing",
           failure: result.failure,
         });
     } catch {
@@ -273,16 +273,16 @@ export class PayrollAmendmentEditorController {
       } else {
         const cleared = amendmentAccessLost(result.failure),
           retained = cleared ? initialPayrollAmendmentEditorState : this.#state;
-        if (!wasUnconfirmed && amendmentSaveWasRejected(result.failure)) {
+        if (!wasUnconfirmed && amendmentCommandRejected(result.failure)) {
           this.#submission = null;
           this.publish({
             ...retained,
             stage: cleared
               ? "unavailable"
-              : amendmentSourceConflict(result.failure)
+              : amendmentContextChanged(result.failure)
                 ? "conflict"
                 : "editing",
-            preview: amendmentSourceConflict(result.failure) ? null : retained.preview,
+            preview: amendmentContextChanged(result.failure) ? null : retained.preview,
             operationId: null,
             failure: result.failure,
           });

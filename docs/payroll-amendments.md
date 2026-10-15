@@ -291,6 +291,21 @@ that uncertain operation into a fresh command. Confirmed saves link to the
 acknowledged proposal revision. One page owner protects navigation for the main
 form and its monthly panel, and company/account replacement disposes the owner.
 
+Current proposals also provide separate calculation and cancellation reviews.
+Their `payroll.amend` grant and current action hints are independent of ordinary
+calculation or read authority. A command captures the observed proposal version
+and reason. A lost response retains that immutable command through later MFA,
+conflict or denied retries; it does not reacquire a different proposal before
+checking the original receipt. Definitive conflicts require a protected reload.
+Denied acquisition removes private review and form values.
+
+The calculation confirmation reports a retained attempt, since a rule failure
+also commits reviewable evidence. The result link opens the acknowledged revision
+and its calculation tab. Cancellation opens its own retained revision and keeps
+earlier calculations accessible. Historical versions cannot offer commands
+against an unseen current revision. Browser forms remain scoped to the mounted
+account/company workspace rather than providing durable offline commands.
+
 ## Delivery sequence
 
 1. Guarded preparation and deterministic recalculation from retained sources: implemented.
@@ -307,7 +322,7 @@ form and its monthly panel, and company/account replacement disposes the owner.
    export are implemented and validated on the emulator. The amendment directory,
    retained proposals, calculations and revision history are implemented in the
    dashboard. Source selection, draft creation/editing and preview are implemented.
-   Retained calculation/cancellation commands, review decisions, publication and
+   Retained calculation/cancellation commands are implemented. Review decisions, publication and
    native retained-revision navigation remain. The current/retained statements and sync contracts are
    available in the API. The revised APK awaits phone connectivity.
 

@@ -118,6 +118,15 @@ test("a changed approval requires a new review before allocating another command
     page.getByRole("button", { name: "Retry original command", exact: true }),
   ).toHaveCount(0);
   await page.getByRole("button", { name: "Reload review", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Stay on this page", exact: true })
+    .click();
+  expect(api.writes).toHaveLength(1);
+  await page.getByRole("button", { name: "Reload review", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Leave page", exact: true }).click();
+  await expect(page.getByLabel("Reason", { exact: true })).toHaveValue("");
+  await page.getByLabel("Reason", { exact: true }).fill("Publish the current approval");
   await page.getByRole("button", { name: "Publish payroll", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("Publication requested.");
   expect(api.writes[0]?.body.expectedApprovalVersion).toBe(3);

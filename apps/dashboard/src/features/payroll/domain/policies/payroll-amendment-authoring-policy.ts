@@ -153,26 +153,27 @@ export const amendmentAccessLost = (failure: Failure): boolean =>
     "payroll_amendment_self_preparation_forbidden",
     "authentication_required",
     "unauthenticated",
+    "mfa_required",
+    "mfa_setup_required",
     "session_revoked",
     "company_module_disabled",
     "company_maintenance",
     "client_update_required",
   ].includes(failure.code);
-export const amendmentSourceConflict = (failure: Failure): boolean =>
+export const amendmentContextChanged = (failure: Failure): boolean =>
   [
     "stale_version",
     "payroll_amendment_sources_changed",
     "payroll_amendment_not_editable",
     "payroll_amendment_basis_changed",
     "payroll_amendment_sources_invalid",
+    "payroll_amendment_calculation_limit",
     "payroll_amendment_revision_limit",
   ].includes(failure.code);
-export const amendmentSaveWasRejected = (failure: Failure): boolean =>
+export const amendmentCommandRejected = (failure: Failure): boolean =>
   amendmentAccessLost(failure) ||
-  amendmentSourceConflict(failure) ||
+  amendmentContextChanged(failure) ||
   [
-    "mfa_required",
-    "mfa_setup_required",
     "recent_authentication_required",
     "csrf_invalid",
     "company_required",

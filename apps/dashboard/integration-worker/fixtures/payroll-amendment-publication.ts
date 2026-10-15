@@ -4,6 +4,10 @@ import { z } from "zod";
 import { payrollCalculationMinor } from "../../src/features/payroll/data/mappers/payroll-run-employee-mapper";
 import { compensationTermsDto } from "../../src/features/payroll/data/models/compensation-dto";
 import { exercisePayrollAmendmentAuthoring } from "./payroll-amendment-authoring";
+import {
+  exercisePayrollAmendmentCalculation,
+  exercisePayrollAmendmentCancellation,
+} from "./payroll-amendment-commands";
 import { exercisePayrollAmendmentRead } from "./payroll-amendment-read";
 
 /** Create the prerequisite through authorized commands and the actual publication worker. */
@@ -83,11 +87,7 @@ export async function publishNegativePayrollAmendment(input: {
       basicSalary: `${basic / 100n}.${String(basic % 100n).padStart(2, "0")}`,
     }),
     draft = `${base}/payroll/amendments/${amendment}`;
-  const calculated = await author.request.post(`${draft}/calculate`, {
-    headers: headers(authorToken),
-    data: { expectedVersion: 0, reason: "Calculate corrected retained month" },
-  });
-  expect(calculated.status()).toBe(200);
+  await exercisePayrollAmendmentCalculation({ author, company, amendment, month });
   const calculatedResponse = await author.request.get(draft);
   expect(calculatedResponse.status()).toBe(200);
   const retained = z
@@ -103,6 +103,12 @@ export async function publishNegativePayrollAmendment(input: {
   expect(retained.amendment.summary).toMatchObject({ version: 1, status: "CALCULATED" });
   expect(payrollCalculationMinor(retained.latestCalculation.difference.takeHome) < 0n).toBe(true);
   await exercisePayrollAmendmentRead({ author, company, amendment, month });
+  await exercisePayrollAmendmentCancellation({
+    author,
+    company,
+    amendment,
+    headers: () => headers(authorToken),
+  });
   const template = await admin.request.put(`${base}/approvals/templates/${randomUUID()}`, {
     headers: adminHeaders(),
     data: {

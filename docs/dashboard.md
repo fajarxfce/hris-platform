@@ -496,8 +496,18 @@ retry, even if a later attempt is rejected. A confirmed save links to its exact
 proposal revision. Forms live in the account/company workspace; this browser
 flow does not provide durable offline drafts.
 
-Retained calculation/cancellation commands, independent review decisions and
-publication controls remain separate delivery work.
+Current proposals expose calculation and cancellation reviews under
+`/payroll/amendments/:id/calculate` and `/cancel`, independently authorized by
+`payroll.amend`. Each command captures the reviewed version and required reason.
+It retains its original operation after response loss, without acquiring a new
+version before replay. Initial conflicts require deliberate reload; withdrawn
+access clears private review and form values. Reload protects unsaved input.
+
+A calculation receipt acknowledges a retained attempt, including a failed rule
+check. Its result link opens the exact committed proposal revision and calculation
+tab. Cancellation retains proposal and calculation history. Historical revisions
+cannot offer commands against a different current version. Independent review
+decisions and publication controls remain separate delivery work.
 
 ## Shift templates
 

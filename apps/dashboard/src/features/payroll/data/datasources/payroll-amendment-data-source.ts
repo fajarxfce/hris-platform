@@ -1,4 +1,9 @@
 import type {
+  PayrollAmendmentCommandDto,
+  PayrollAmendmentReceiptDto,
+  PayrollAmendmentSaveDto,
+} from "../models/payroll-amendment-command-dto";
+import type {
   PayrollAmendmentCalculationDto,
   PayrollAmendmentDetailsDto,
   PayrollAmendmentDto,
@@ -6,11 +11,21 @@ import type {
   PayrollAmendmentPageDto,
   PayrollAmendmentSearchDto,
 } from "../models/payroll-amendment-dto";
-import type {
-  PayrollAmendmentReceiptDto,
-  PayrollAmendmentSaveDto,
-} from "../models/payroll-amendment-preparation-dto";
 export interface PayrollAmendmentDataSource {
+  calculate(
+    company: string,
+    id: string,
+    operation: string,
+    input: PayrollAmendmentCommandDto,
+    signal: AbortSignal,
+  ): Promise<PayrollAmendmentReceiptDto>;
+  cancel(
+    company: string,
+    id: string,
+    operation: string,
+    input: PayrollAmendmentCommandDto,
+    signal: AbortSignal,
+  ): Promise<PayrollAmendmentReceiptDto>;
   save(
     company: string,
     id: string,

@@ -1,11 +1,20 @@
 import { expect, type Page } from "@playwright/test";
 import type {
+  PayrollAmendmentCommandDto,
+  PayrollAmendmentSaveDto,
+} from "../src/features/payroll/data/models/payroll-amendment-command-dto";
+import type {
+  PayrollAmendmentCalculationDto,
   PayrollAmendmentDto,
   PayrollAmendmentTermsDto,
 } from "../src/features/payroll/data/models/payroll-amendment-dto";
-import type { PayrollAmendmentSaveDto } from "../src/features/payroll/data/models/payroll-amendment-preparation-dto";
 import { amendmentPreparation, amendmentPreview } from "./fixtures/payroll-amendment-authoring";
-import { amendmentId, amendmentRevision, amendmentSummary } from "./fixtures/payroll-amendments";
+import {
+  amendmentCalculation,
+  amendmentId,
+  amendmentRevision,
+  amendmentSummary,
+} from "./fixtures/payroll-amendments";
 import { calculationCompany, calculationEmployeeId } from "./fixtures/payroll-calculations";
 import { payslipId } from "./fixtures/payroll-payslips";
 import { installIdentityApi } from "./identity-api";
@@ -24,6 +33,7 @@ export async function installPayrollAmendmentAuthoringApi(
     permissions?: string[];
     count?: number;
     publishedRevision?: number;
+    calculationFails?: boolean;
   } = {},
 ) {
   const permissions = options.permissions ?? ["payroll.amend"],
@@ -36,10 +46,11 @@ export async function installPayrollAmendmentAuthoringApi(
     });
   const requests: { action: string; url: URL; input: unknown; operation: string | null }[] = [];
   const drafts = new Map<string, PayrollAmendmentDto[]>([[amendmentId(), [amendmentRevision(0)]]]),
-    receipts = new Map<string, { id: string; version: number; input: string }>();
+    calculations = new Map<string, PayrollAmendmentCalculationDto>(),
+    receipts = new Map<string, { id: string; version: number; input: string; action: string }>();
   let publishedRevision = options.publishedRevision ?? 0,
-    denied = false,
-    loseNextSave = false;
+    denied = false;
+  let loseNextAction: string | null = null;
   let fail: { action: string; code: string; status: number } | null = null;
   let held: {
     action: string;
@@ -77,7 +88,7 @@ export async function installPayrollAmendmentAuthoringApi(
       });
     if (
       denied ||
-      (["sources", "prepare", "preview", "save"].includes(action) &&
+      (["sources", "prepare", "preview", "save", "calculate", "cancel"].includes(action) &&
         !permissions.includes("payroll.amend"))
     )
       return problem("access_denied", 403);
@@ -134,6 +145,7 @@ export async function installPayrollAmendmentAuthoringApi(
       if (original) {
         expect(JSON.stringify(input)).toBe(original.input);
         expect(id).toBe(original.id);
+        expect(action).toBe(original.action);
         return route.fulfill({ json: { id, version: original.version } });
       }
       const revisions = drafts.get(id) ?? [],
@@ -157,9 +169,9 @@ export async function installPayrollAmendmentAuthoringApi(
         }),
       });
       drafts.set(id, revisions);
-      receipts.set(operation ?? "", { id, version, input: JSON.stringify(input) });
-      if (loseNextSave) {
-        loseNextSave = false;
+      receipts.set(operation ?? "", { id, version, input: JSON.stringify(input), action });
+      if (loseNextAction === action) {
+        loseNextAction = null;
         return route.abort("failed");
       }
       return route.fulfill({ json: { id, version } });
@@ -170,7 +182,72 @@ export async function installPayrollAmendmentAuthoringApi(
       });
     const revisions = drafts.get(id ?? ""),
       current = revisions?.at(-1);
-    if (!revisions || !current) return problem("payroll_amendment_not_found", 404);
+    if (!id || !revisions || !current) return problem("payroll_amendment_not_found", 404);
+    if (action === "calculate" || action === "cancel") {
+      const input = body as PayrollAmendmentCommandDto;
+      expect(operation).toBeTruthy();
+      const original = receipts.get(operation ?? "");
+      if (original) {
+        expect({ id, action, input: JSON.stringify(input) }).toEqual({
+          id: original.id,
+          action: original.action,
+          input: original.input,
+        });
+        return route.fulfill({ json: { id, version: original.version } });
+      }
+      if (input.expectedVersion !== current.summary.version) return problem("stale_version", 409);
+      if (
+        action === "calculate"
+          ? current.summary.status !== "DRAFT"
+          : !["DRAFT", "CALCULATED", "REJECTED"].includes(current.summary.status)
+      )
+        return problem("payroll_amendment_not_editable", 409);
+      const version = current.summary.version + 1,
+        summary = { ...current.summary, version, reason: input.reason };
+      summary.recordedAt = new Date(Date.parse(summary.recordedAt) + 1000).toISOString();
+      if (action === "calculate") {
+        const calculated = amendmentCalculation(1, options.calculationFails),
+          number =
+            [...calculations.values()].filter((row) => row.summary.amendmentId === id).length + 1;
+        calculated.summary = {
+          ...calculated.summary,
+          id: amendmentId(200 + calculations.size),
+          amendmentId: id,
+          draftVersion: current.summary.version,
+          number,
+          reason: input.reason,
+          recordedAt: summary.recordedAt,
+        };
+        if (!options.calculationFails) {
+          calculated.preview = amendmentPreview(
+            amendmentPreparation(options.multiple, publishedRevision),
+            current.terms,
+          );
+          calculated.summary.assessmentCount = calculated.preview.calculations.length;
+          calculated.summary.difference = calculated.preview.difference;
+        }
+        calculations.set(calculated.summary.id, calculated);
+        summary.latestCalculationId = calculated.summary.id;
+        summary.action = options.calculationFails ? "CALCULATION_FAILED" : "CALCULATED";
+        summary.status = options.calculationFails ? "DRAFT" : "CALCULATED";
+      } else {
+        summary.action = "CANCELLED";
+        summary.status = "CANCELLED";
+      }
+      revisions.push({ summary, terms: structuredClone(current.terms) });
+      receipts.set(operation ?? "", { id, version, input: JSON.stringify(input), action });
+      if (loseNextAction === action) {
+        loseNextAction = null;
+        return route.abort("failed");
+      }
+      return route.fulfill({ json: { id, version } });
+    }
+    if (action === "calculations") {
+      const calculated = calculations.get(parts[9] ?? "");
+      return calculated?.summary.amendmentId === id
+        ? route.fulfill({ json: calculated })
+        : problem("payroll_amendment_calculation_not_found", 404);
+    }
     if (action === "revisions") {
       const revision = revisions[Number(parts[9])];
       return revision
@@ -191,9 +268,17 @@ export async function installPayrollAmendmentAuthoringApi(
         json: {
           amendment: current,
           history: { items: revisions.map((row) => row.summary), nextCursor: null },
-          latestCalculation: null,
+          latestCalculation: current.summary.latestCalculationId
+            ? (calculations.get(current.summary.latestCalculationId)?.summary ?? null)
+            : null,
           latestReview: null,
-          availableActions: ["EDIT", "CALCULATE", "CANCEL"],
+          availableActions: permissions.includes("payroll.amend")
+            ? current.summary.status === "DRAFT"
+              ? ["EDIT", "CALCULATE", "CANCEL"]
+              : current.summary.status === "CALCULATED"
+                ? ["EDIT", "CANCEL", "SUBMIT"]
+                : []
+            : [],
         },
       });
     throw new Error(`Unhandled amendment fixture action: ${action}`);
@@ -202,6 +287,7 @@ export async function installPayrollAmendmentAuthoringApi(
     identity,
     requests,
     drafts,
+    calculations,
     receipts,
     count(action: string) {
       return requests.filter((request) => request.action === action).length;
@@ -210,7 +296,10 @@ export async function installPayrollAmendmentAuthoringApi(
       publishedRevision = value;
     },
     loseNextSave() {
-      loseNextSave = true;
+      loseNextAction = "save";
+    },
+    loseNextCommand(action: "calculate" | "cancel") {
+      loseNextAction = action;
     },
     failNext(action: string, code: string, status = 503) {
       fail = { action, code, status };

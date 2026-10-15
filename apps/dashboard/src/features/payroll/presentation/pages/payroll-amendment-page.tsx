@@ -9,6 +9,7 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { payrollAmendmentActionMessages } from "../i18n/payroll-amendment-action-messages";
 import { payrollAmendmentEditorMessages } from "../i18n/payroll-amendment-editor-messages";
 import { payrollAmendmentMessages } from "../i18n/payroll-amendment-messages";
 import type { PayrollAmendmentState } from "../models/payroll-amendment-state";
@@ -25,6 +26,8 @@ export function PayrollAmendmentPage(props: {
   latestTo: string | null;
   basisTo: string | null;
   editTo: string | null;
+  calculateTo: string | null;
+  cancelTo: string | null;
   first: boolean;
   onRefresh: () => void;
   onTab: (tab: string) => void;
@@ -45,6 +48,12 @@ export function PayrollAmendmentPage(props: {
       <AppCommandBar label={text.details}>
         {props.editTo && (
           <Link to={props.editTo}>{payrollAmendmentEditorMessages(locale).edit}</Link>
+        )}
+        {props.calculateTo && (
+          <Link to={props.calculateTo}>{payrollAmendmentActionMessages(locale).CALCULATE}</Link>
+        )}
+        {props.cancelTo && (
+          <Link to={props.cancelTo}>{payrollAmendmentActionMessages(locale).CANCEL}</Link>
         )}
         {props.latestTo && <Link to={props.latestTo}>{text.latest}</Link>}
         <AppButton

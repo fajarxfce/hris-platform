@@ -1,5 +1,10 @@
 import type { HttpClient } from "../../../../core/data/http/http-client";
 import {
+  type PayrollAmendmentCommandDto,
+  type PayrollAmendmentSaveDto,
+  payrollAmendmentReceiptDto,
+} from "../models/payroll-amendment-command-dto";
+import {
   type PayrollAmendmentSearchDto,
   payrollAmendmentCalculationDto,
   payrollAmendmentDetailsDto,
@@ -7,13 +12,47 @@ import {
   payrollAmendmentHistoryDto,
   payrollAmendmentPageDto,
 } from "../models/payroll-amendment-dto";
-import {
-  type PayrollAmendmentSaveDto,
-  payrollAmendmentReceiptDto,
-} from "../models/payroll-amendment-preparation-dto";
 import type { PayrollAmendmentDataSource } from "./payroll-amendment-data-source";
 export class HttpPayrollAmendmentDataSource implements PayrollAmendmentDataSource {
   constructor(private readonly http: HttpClient) {}
+  async calculate(
+    company: string,
+    id: string,
+    operation: string,
+    input: PayrollAmendmentCommandDto,
+    signal: AbortSignal,
+  ) {
+    return payrollAmendmentReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/payroll/amendments/${id}/calculate`,
+          method: "POST",
+          operationId: operation,
+          body: input,
+        },
+        signal,
+      ),
+    );
+  }
+  async cancel(
+    company: string,
+    id: string,
+    operation: string,
+    input: PayrollAmendmentCommandDto,
+    signal: AbortSignal,
+  ) {
+    return payrollAmendmentReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/payroll/amendments/${id}/cancel`,
+          method: "POST",
+          operationId: operation,
+          body: input,
+        },
+        signal,
+      ),
+    );
+  }
   async save(
     company: string,
     id: string,

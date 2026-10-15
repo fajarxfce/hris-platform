@@ -5,6 +5,7 @@ import { canAuthorPayrollAmendments } from "../../domain/policies/payroll-amendm
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 import { PayrollAmendmentController } from "../controllers/payroll-amendment-controller";
 import {
+  payrollAmendmentActionPath,
   payrollAmendmentPath,
   payrollAmendmentSelectionFromRoute,
 } from "../models/payroll-amendment-route";
@@ -71,6 +72,10 @@ function PayrollAmendmentBinding(props: PayrollScreenProps & { id: string }) {
     basis.set("tab", "proposal");
     basis.delete("assessment");
   }
+  const canChange =
+    canAuthorPayrollAmendments(access.permissions) &&
+    state.data !== null &&
+    state.data.selected.summary.version === state.data.current.amendment.summary.version;
   return (
     <PayrollAmendmentPage
       state={state}
@@ -82,10 +87,18 @@ function PayrollAmendmentBinding(props: PayrollScreenProps & { id: string }) {
       latestTo={revision === null ? null : payrollAmendmentPath(access.companyId, id, latest)}
       basisTo={state.data?.calculation ? payrollAmendmentPath(access.companyId, id, basis) : null}
       editTo={
-        canAuthorPayrollAmendments(access.permissions) &&
-        state.data?.current.availableActions.includes("EDIT") &&
-        state.data.selected.summary.version === state.data.current.amendment.summary.version
+        canChange && state.data?.current.availableActions.includes("EDIT")
           ? `/payroll/amendments/${encodeURIComponent(id)}/edit?${back}`
+          : null
+      }
+      calculateTo={
+        canChange && state.data?.current.availableActions.includes("CALCULATE")
+          ? payrollAmendmentActionPath(access.companyId, id, "CALCULATE", parameters)
+          : null
+      }
+      cancelTo={
+        canChange && state.data?.current.availableActions.includes("CANCEL")
+          ? payrollAmendmentActionPath(access.companyId, id, "CANCEL", parameters)
           : null
       }
       first={after === null}

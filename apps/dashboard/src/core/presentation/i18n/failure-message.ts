@@ -34,6 +34,10 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "This amendment has reached its revision limit.",
     "Koreksi ini sudah mencapai batas revisi.",
   ],
+  payroll_amendment_calculation_limit: [
+    "This proposal has reached its calculation attempt limit. It can still be cancelled.",
+    "Proposal ini sudah mencapai batas percobaan perhitungan. Proposal masih dapat dibatalkan.",
+  ],
   payroll_amendment_not_found: [
     "This amendment or revision is unavailable for your current access.",
     "Koreksi atau revisi ini tidak tersedia untuk akses Anda saat ini.",

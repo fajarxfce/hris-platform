@@ -27,6 +27,8 @@ import { RemotePayrollPolicyRepository } from "../data/repositories/remote-payro
 import { RemotePayrollReviewRepository } from "../data/repositories/remote-payroll-review-repository";
 import { RemoteTaxOpeningRepository } from "../data/repositories/remote-tax-opening-repository";
 import { AbandonPayrollCalculation } from "../domain/usecases/abandon-payroll-calculation";
+import { CalculatePayrollAmendment } from "../domain/usecases/calculate-payroll-amendment";
+import { CancelPayrollAmendment } from "../domain/usecases/cancel-payroll-amendment";
 import { CancelPayrollPeriod } from "../domain/usecases/cancel-payroll-period";
 import { ConfirmPayrollPaymentRecovery } from "../domain/usecases/confirm-payroll-payment-recovery";
 import { CreatePayrollPeriod } from "../domain/usecases/create-payroll-period";
@@ -45,6 +47,7 @@ import { ListTaxOpeningEmployees } from "../domain/usecases/list-tax-opening-emp
 import { LoadCompensationEditor } from "../domain/usecases/load-compensation-editor";
 import { LoadCompensationReview } from "../domain/usecases/load-compensation-review";
 import { LoadPayrollAmendment } from "../domain/usecases/load-payroll-amendment";
+import { LoadPayrollAmendmentAction } from "../domain/usecases/load-payroll-amendment-action";
 import { LoadPayrollAmendmentEditor } from "../domain/usecases/load-payroll-amendment-editor";
 import { LoadPayrollCalculations } from "../domain/usecases/load-payroll-calculations";
 import { LoadPayrollFinalization } from "../domain/usecases/load-payroll-finalization";
@@ -125,6 +128,9 @@ export function createPayrollFeature(
     loadAmendmentEditor: new LoadPayrollAmendmentEditor(amendments, amendmentSources),
     previewAmendment: new PreviewPayrollAmendment(amendmentSources),
     saveAmendment: new SavePayrollAmendment(amendments),
+    loadAmendmentAction: new LoadPayrollAmendmentAction(amendments),
+    calculateAmendment: new CalculatePayrollAmendment(amendments),
+    cancelAmendment: new CancelPayrollAmendment(amendments),
     listAmendments: new ListPayrollAmendments(amendments),
     loadAmendment: new LoadPayrollAmendment(amendments),
     reviewPaymentRecovery: new ReviewPayrollPaymentRecovery(recoveries),

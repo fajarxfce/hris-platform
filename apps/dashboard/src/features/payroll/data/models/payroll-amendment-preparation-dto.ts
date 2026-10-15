@@ -1,10 +1,6 @@
 import { z } from "zod";
 import { compensationEmployeeDto, compensationTermsDto } from "./compensation-dto";
-import {
-  payrollAmendmentSourceDto,
-  payrollAmendmentSummaryDto,
-  type payrollAmendmentTermsDto,
-} from "./payroll-amendment-dto";
+import { payrollAmendmentSourceDto, payrollAmendmentSummaryDto } from "./payroll-amendment-dto";
 import { payrollCalculationOutputDto } from "./payroll-calculation-dto";
 import { payrollInputTermsDto } from "./payroll-input-dto";
 export const payrollAmendmentCandidatesDto = z.object({
@@ -48,13 +44,3 @@ export type PayrollAmendmentSourceSearchDto = Readonly<{
   employeeId: string | null;
   after: string | null;
 }>;
-export type PayrollAmendmentSaveDto = z.infer<typeof payrollAmendmentTermsDto> & {
-  firstAssessmentId: string;
-  expectedVersion: number | null;
-  reason: string;
-};
-export const payrollAmendmentReceiptDto = z.object({
-  id: z.uuid(),
-  version: z.number().int().min(0).max(999),
-});
-export type PayrollAmendmentReceiptDto = z.infer<typeof payrollAmendmentReceiptDto>;

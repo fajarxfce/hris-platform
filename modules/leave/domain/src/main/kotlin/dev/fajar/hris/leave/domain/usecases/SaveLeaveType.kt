@@ -62,6 +62,9 @@ class SaveLeaveType(
                             it.halfDaysPerPeriod.toString(),
                             it.carryLimitHalfDays.toString(),
                         )
+                    } ?: emptyList()) +
+                    (type.policy.accrual?.carryValidityMonths?.let {
+                        listOf("carryValidityMonths", it.toString())
                     } ?: emptyList()),
             )
         val company = requireNotNull(actor.companyId)

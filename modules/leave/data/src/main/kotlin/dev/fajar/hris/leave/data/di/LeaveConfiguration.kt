@@ -26,6 +26,13 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class LeaveConfiguration {
     @Bean
+    fun leaveCarrySource(sql: DSLContext): LeaveCarryDataSource = PostgresLeaveCarryDataSource(sql)
+
+    @Bean
+    fun leaveCarry(source: LeaveCarryDataSource): LeaveCarryRepository =
+        StoredLeaveCarryRepository(source)
+
+    @Bean
     fun leaveAccrualScheduleSource(sql: DSLContext): LeaveAccrualScheduleDataSource =
         PostgresLeaveAccrualScheduleDataSource(sql)
 

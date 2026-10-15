@@ -20,6 +20,7 @@ fun LeaveLedgerRecord.toEntry(): LeaveLedgerEntry =
         actorId,
         recordedAt.toInstant(),
         reason,
+        carryExpiryId,
     )
 
 fun LeaveLedgerEntry.toRow(company: UUID): LeaveLedgerRecord =
@@ -38,4 +39,5 @@ fun LeaveLedgerEntry.toRow(company: UUID): LeaveLedgerRecord =
         it.actorId = actorId
         it.recordedAt = recordedAt.atOffset(ZoneOffset.UTC)
         it.reason = reason
+        it.carryExpiryId = carryExpiryId
     }

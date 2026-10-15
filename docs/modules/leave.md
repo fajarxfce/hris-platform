@@ -92,7 +92,7 @@ Batch details include the current job state, counts, attempts, and paginated emp
 
 Payroll cutoffs are integrated into request submission, decisions, withdrawal, and cancellation, including available cancellation actions. Pending decisions on selected actual dates block a payroll start; active/calculated payroll freezes those absence facts until explicit abandonment. See [cutoff and recovery semantics](../payroll-workflows.md#source-cutoffs).
 
-[Finite accrual schedules](../leave-accrual-schedules.md) are implemented and validated in the backend; dashboard delivery follows. Carry-bucket expiry dates remain subsequent work. Current expiry occurs at explicit year closing; no expiry date or statutory entitlement is invented by a default policy.
+[Finite accrual schedules](../leave-accrual-schedules.md) are implemented and validated across the backend, worker and dashboard. The [carry accounting foundation](../leave-carryover.md) is implemented and tested; command, worker and client integration remains. Current public expiry occurs at explicit year closing; no expiry date or statutory entitlement is invented by a default policy.
 
 ## Administrative request preparation
 

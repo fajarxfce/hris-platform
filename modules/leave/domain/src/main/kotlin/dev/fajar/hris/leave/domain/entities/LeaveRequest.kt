@@ -19,4 +19,5 @@ data class LeaveRequest(
     val cancellationApprovalId: UUID?,
     val version: Long,
     val attachments: List<LeaveAttachment> = emptyList(),
+    val carryAllocationCount: Int = 0,
 )

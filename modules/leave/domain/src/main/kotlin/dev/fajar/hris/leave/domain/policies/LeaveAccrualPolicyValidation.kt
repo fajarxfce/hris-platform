@@ -24,6 +24,11 @@ fun validateLeaveAccrualPolicy(
             (!partialDaysAllowed && accrual.carryLimitHalfDays % 2 != 0)
     )
         fields["accrual.carryLimitDays"] = "out_of_range"
+    if (
+        accrual.carryValidityMonths != null &&
+            (accrual.carryValidityMonths !in 1..12 || accrual.carryLimitHalfDays == 0)
+    )
+        fields["accrual.carryValidityMonths"] = "out_of_range"
     return if (fields.isEmpty()) Result.Success(Unit)
     else
         Result.Failed(

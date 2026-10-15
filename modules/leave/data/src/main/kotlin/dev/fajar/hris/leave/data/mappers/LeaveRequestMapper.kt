@@ -63,6 +63,7 @@ fun LeaveRequestsRecord.toRequest(
         cancellationApprovalId,
         version,
         attachments,
+        carryAllocationCount.toInt(),
     )
 
 fun LeaveRequest.toRow(company: UUID, json: ObjectMapper): LeaveRequestsRecord =
@@ -88,6 +89,7 @@ fun LeaveRequest.toRow(company: UUID, json: ObjectMapper): LeaveRequestsRecord =
         it.cancellationApprovalId = cancellationApprovalId
         it.version = version
         it.attachmentCount = attachments.size.toShort()
+        it.carryAllocationCount = carryAllocationCount.toShort()
     }
 
 fun LeaveRequest.toAllocations(company: UUID): List<LeaveAllocationsRecord> =

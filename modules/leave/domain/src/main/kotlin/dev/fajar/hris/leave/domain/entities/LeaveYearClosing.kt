@@ -17,4 +17,6 @@ data class LeaveYearClosing(
     val actorId: UUID,
     val recordedAt: Instant,
     val reason: String,
+    val carryTracking: Boolean = false,
+    val timezone: String? = null,
 )

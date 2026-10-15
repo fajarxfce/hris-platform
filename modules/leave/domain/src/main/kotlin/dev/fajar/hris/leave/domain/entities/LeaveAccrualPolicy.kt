@@ -4,4 +4,5 @@ data class LeaveAccrualPolicy(
     val frequency: LeaveAccrualFrequency,
     val halfDaysPerPeriod: Int,
     val carryLimitHalfDays: Int,
+    val carryValidityMonths: Int? = null,
 )

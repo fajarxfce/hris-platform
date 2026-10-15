@@ -17,4 +17,5 @@ data class LeaveLedgerEntry(
     val actorId: UUID,
     val recordedAt: Instant,
     val reason: String,
+    val carryExpiryId: UUID? = null,
 )

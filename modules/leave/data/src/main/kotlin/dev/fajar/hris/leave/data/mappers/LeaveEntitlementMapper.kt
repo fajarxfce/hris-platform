@@ -61,6 +61,8 @@ fun LeaveYearClosingsRecord.toClosing(json: ObjectMapper): LeaveYearClosing =
         actorId,
         recordedAt.toInstant(),
         reason,
+        carryTracking,
+        companyTimezone,
     )
 
 fun LeaveYearClosing.toRow(company: UUID, json: ObjectMapper): LeaveYearClosingsRecord =
@@ -81,4 +83,6 @@ fun LeaveYearClosing.toRow(company: UUID, json: ObjectMapper): LeaveYearClosings
         it.actorId = actorId
         it.recordedAt = recordedAt.atOffset(ZoneOffset.UTC)
         it.reason = reason
+        it.carryTracking = carryTracking
+        it.companyTimezone = timezone
     }

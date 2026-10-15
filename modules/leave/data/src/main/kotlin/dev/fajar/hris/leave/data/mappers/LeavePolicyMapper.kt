@@ -16,7 +16,12 @@ fun LeavePolicy.toData(): LeavePolicyData =
         maxRequestDays,
         attachmentRequired,
         accrual?.let {
-            LeaveAccrualPolicyData(it.frequency.name, it.halfDaysPerPeriod, it.carryLimitHalfDays)
+            LeaveAccrualPolicyData(
+                it.frequency.name,
+                it.halfDaysPerPeriod,
+                it.carryLimitHalfDays,
+                it.carryValidityMonths,
+            )
         },
     )
 
@@ -34,6 +39,7 @@ fun LeavePolicyData.toPolicy(): LeavePolicy =
                 LeaveAccrualFrequency.valueOf(it.frequency),
                 it.halfDaysPerPeriod,
                 it.carryLimitHalfDays,
+                it.carryValidityMonths,
             )
         },
     )

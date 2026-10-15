@@ -50,6 +50,12 @@ const PersonAccountBindingScreen = lazy(() =>
   ),
 );
 
+const LeaveCalendarScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-calendar-screen").then((module) => ({
+    default: module.LeaveCalendarScreen,
+  })),
+);
+
 const LeaveBatchesScreen = lazy(() =>
   import("../../features/leave/presentation/bindings/leave-batches-screen").then((module) => ({
     default: module.LeaveBatchesScreen,
@@ -557,6 +563,20 @@ export function PortalRoutes({
               accountId={accountId}
               access={access}
               actions={identityAdministration}
+              companyName={company.name}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/calendar"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveCalendarScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
               companyName={company.name}
               locale={locale}
             />

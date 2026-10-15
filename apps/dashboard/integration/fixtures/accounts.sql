@@ -77,7 +77,8 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000056', 'browser-offboarding-employee@example.invalid', 'Browser Offboarding Employee'),
   ('a0000000-0000-4000-8000-000000000057', 'browser-onboarding-admin@example.invalid', 'Browser Onboarding Admin'),
   ('a0000000-0000-4000-8000-000000000058', 'browser-onboarding-coordinator@example.invalid', 'Browser Onboarding Coordinator'),
-  ('a0000000-0000-4000-8000-000000000059', 'browser-leave-batches-admin@example.invalid', 'Browser Leave Batches Admin')
+  ('a0000000-0000-4000-8000-000000000059', 'browser-leave-batches-admin@example.invalid', 'Browser Leave Batches Admin'),
+  ('a0000000-0000-4000-8000-000000000060', 'browser-leave-calendar-admin@example.invalid', 'Browser Leave Calendar Admin')
 ) AS fixture(id, email, name)
 WHERE bootstrap.email = 'browser-admin@example.invalid'
 ON CONFLICT DO NOTHING;
@@ -114,7 +115,8 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000050'),
   ('a0000000-0000-4000-8000-000000000055'),
   ('a0000000-0000-4000-8000-000000000057'),
-  ('a0000000-0000-4000-8000-000000000059')
+  ('a0000000-0000-4000-8000-000000000059'),
+  ('a0000000-0000-4000-8000-000000000060')
 ) AS fixture(account_id)
 WHERE platform_permissions.account_id = (SELECT id FROM accounts WHERE email = 'browser-admin@example.invalid')
 ON CONFLICT DO NOTHING;

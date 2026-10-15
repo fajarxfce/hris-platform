@@ -2,6 +2,15 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_leave_calendar_month: [
+    "Choose a valid month between 1900 and 2200.",
+    "Pilih bulan yang valid antara 1900 dan 2200.",
+  ],
+  invalid_leave_calendar_date: [
+    "Choose a valid date in the displayed month.",
+    "Pilih tanggal yang valid pada bulan yang ditampilkan.",
+  ],
+  invalid_leave_calendar_scope: ["Choose Company or My team.", "Pilih Perusahaan atau Tim saya."],
   invalid_onboarding_schedule: [
     "Check the preparation date, reviewed checklist and reason.",
     "Periksa tanggal persiapan, checklist yang ditinjau, dan alasannya.",

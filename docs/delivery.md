@@ -4796,3 +4796,37 @@ cursor whose original request was withdrawn. Mapping failures stay sanitized.
 
 Dashboard delivery and real browser acceptance follow this backend increment.
 The existing development runtime has not yet been migrated to V81 by this change.
+
+
+## Dashboard leave calendar
+
+The calendar now exposes current company/direct-report scope, a company-local
+month grid and explicit 20-entry date pages. Submitted labels and partial-day
+status remain visible without private request fields. Date changes retain the
+month; request detail, history and action reviews retain a validated return
+selection. Authority failures clear the full view. Hidden workspaces cancel
+acquisition and reload after admission, while obsolete responses are ignored.
+
+The full dashboard check passed architecture rules, Biome, TypeScript and all
+3,199 tests. The first browser run found a missing read recovery after MFA plus
+two test/accessible-label mismatches; these were corrected. All 45 affected
+calendar/request/action/evidence scenarios then passed. After improving responsive
+panel widths, the production build and all 11 calendar browser scenarios passed
+again. Desktop and narrow dark Indonesian screenshots were inspected. The page
+stayed within the viewport at 200% text. Two existing CSS-specificity advisories
+and the existing bundle-size advisory remain.
+
+The isolated API/PostgreSQL browser test passed: two independently submitted
+half-day requests occupied one employee's charged date, request withdrawal through
+the dashboard preserved its calendar return context and updated occupancy, a
+second withdrawal removed the final request, and company replacement discarded
+the former selection. Test services and the disposable database were stopped.
+No mobile sources or artifacts changed in this increment.
+
+
+Development API and worker were restarted with the validated calendar artifacts.
+Flyway applied V81 after validating all earlier migrations. Both running JAR
+digests match the validated builds, readiness passed through loopback and
+WireGuard, and the dashboard returned HTTP 200 at `10.77.77.1:5173`.
+The existing private document services and VPN bindings were retained. No phone
+installation or device UI interaction was performed.

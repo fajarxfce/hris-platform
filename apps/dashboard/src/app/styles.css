@@ -997,3 +997,79 @@ a {
   min-width: 0;
   padding-block: 12px;
 }
+
+.app-leave-calendar-month {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+}
+.app-leave-calendar-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.app-leave-calendar-month-panel,
+.app-leave-calendar-day-panel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.app-leave-calendar-layout .app-leave-calendar-month-panel h2,
+.app-leave-calendar-layout .app-leave-calendar-day-panel h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+.app-leave-calendar-layout .app-leave-calendar-month-panel p,
+.app-leave-calendar-layout .app-leave-calendar-day-panel header p {
+  margin: 0;
+}
+.app-month-calendar {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  background: var(--colorNeutralBackground1);
+}
+.app-month-calendar th {
+  padding-block: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--colorNeutralForeground3);
+  border-block-end: 1px solid var(--colorNeutralStroke2);
+}
+.app-month-calendar td {
+  padding: 2px;
+  vertical-align: top;
+}
+.app-month-calendar .app-month-calendar-date {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 60px;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 2px;
+  border-radius: 2px;
+}
+.app-month-calendar-number {
+  font-weight: 400;
+}
+.app-month-calendar-date[data-today="true"] .app-month-calendar-number {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.app-month-calendar-count {
+  font-size: 11px;
+  line-height: 14px;
+}
+@media (max-width: 1350px) {
+  .app-leave-calendar-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .app-leave-calendar-month-panel {
+    max-width: 540px;
+  }
+}

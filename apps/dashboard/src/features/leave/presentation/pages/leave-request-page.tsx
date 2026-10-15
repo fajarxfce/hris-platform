@@ -21,6 +21,7 @@ export function LeaveRequestPage({
   locale,
   timezone,
   backTo,
+  backLabel,
   firstHistory,
   onRefresh,
   onLatest,
@@ -36,6 +37,7 @@ export function LeaveRequestPage({
   locale: Locale;
   timezone: string;
   backTo: string;
+  backLabel?: string | undefined;
   firstHistory: boolean;
   onRefresh: () => void;
   onLatest: () => void;
@@ -50,7 +52,7 @@ export function LeaveRequestPage({
         context={companyName}
         actions={
           <>
-            <Link to={backTo}>{text.back}</Link>
+            <Link to={backTo}>{backLabel ?? text.back}</Link>
             {balanceLinks.map((link) => (
               <Link key={link.to} to={link.to}>
                 {link.label}

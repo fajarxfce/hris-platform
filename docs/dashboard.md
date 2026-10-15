@@ -1050,6 +1050,36 @@ A definite version conflict disables saving until an explicit new review. Re-rev
 
 Drafts, pending writes, and unconfirmed outcomes use the workspace departure guard. Account/company replacement and disposal abort owned work and suppress late results. Equivalent verification, language, and theme changes retain the form without starting another command. Commands remain in memory; browser cancellation does not reverse a server commit or provide durable offline recovery.
 
+## Leave calendar
+
+`/leave/calendar` shows company or current direct-report occupancy by work date.
+Company readers can choose either scope; team readers start with their own team.
+Approval and self-service grants alone do not expose this screen. The initial
+month and Today use the API's company-local date, independently of the browser's
+clock. Explicit month navigation supports 1900–2200 and retains date-only values.
+
+The month grid counts employees. Selecting a date shows request counts and a
+20-entry page with submitted employee/type labels, portions and status. Two
+half-day requests can therefore represent one employee. Overnight portions belong
+to the submitted work date. Month and date queries are independent live reads;
+Refresh renews both. Date changes and pagination retain the month without polling
+or scanning further pages.
+
+Request detail, history and action reviews retain a validated same-company
+calendar scope, month, date and page. Returning reacquires current occupancy;
+withdrawing a request can remove it. Arbitrary return URLs and incompatible
+company/date/cursor context are discarded. Company replacement clears the former
+selection and cancels pending reads.
+
+The controller owns one month request and one date request. Late responses cannot
+replace a newer selection. A day-read authority failure clears the entire view;
+a transient failure retains the authorized month. Hidden workspaces cancel reads,
+and successful workspace admission reacquires them after account verification.
+Calendar read recovery does not replay commands. Locale/theme changes preserve
+the read and filter draft.
+The shared month grid supports keyboard activation, current-date/selection labels,
+Fluent light/dark tokens and responsive placement above the resource table.
+
 ## Leave entitlement processing
 
 `/leave/batches` lists company accrual and year-closing processes in pages of

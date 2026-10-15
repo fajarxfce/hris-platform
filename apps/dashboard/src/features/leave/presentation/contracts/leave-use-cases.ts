@@ -6,6 +6,8 @@ import type { LoadLeaveAdjustmentCatalog } from "../../domain/usecases/load-leav
 import type { LoadLeaveBatch } from "../../domain/usecases/load-leave-batch";
 import type { LoadLeaveBatchTypes } from "../../domain/usecases/load-leave-batch-types";
 import type { LoadLeaveBatches } from "../../domain/usecases/load-leave-batches";
+import type { LoadLeaveCalendar } from "../../domain/usecases/load-leave-calendar";
+import type { LoadLeaveCalendarEntries } from "../../domain/usecases/load-leave-calendar-entries";
 import type { LoadLeaveLedger } from "../../domain/usecases/load-leave-ledger";
 import type { LoadLeavePolicies } from "../../domain/usecases/load-leave-policies";
 import type { LoadLeavePolicy } from "../../domain/usecases/load-leave-policy";
@@ -26,6 +28,8 @@ import type { SubmitLeaveRequest } from "../../domain/usecases/submit-leave-requ
 import type { WithdrawLeaveRequest } from "../../domain/usecases/withdraw-leave-request";
 
 export type LeaveUseCases = Readonly<{
+  loadCalendar: Pick<LoadLeaveCalendar, "execute">;
+  loadCalendarEntries: Pick<LoadLeaveCalendarEntries, "execute">;
   loadBatchTypes: Pick<LoadLeaveBatchTypes, "execute">;
   reviewBatch: Pick<ReviewLeaveBatch, "execute">;
   loadBatches: Pick<LoadLeaveBatches, "execute">;

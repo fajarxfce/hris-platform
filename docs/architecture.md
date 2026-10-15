@@ -16,7 +16,11 @@ and own date/access policy. A Leave-owned raw projection reads active allocation
 and submitted request labels in one SQL snapshot; it does not load private
 profiles or coordinate another datasource. Repository acquisition and mapping
 share the database failure boundary. Month summaries and day pages are separate
-live reads. Both revalidate session assurance after acquisition.
+live reads. Both revalidate session assurance after acquisition. The dashboard
+calendar controller owns and cancels each read independently; selecting a date
+retains the month. Hidden workspace reads stop and reacquire after admission.
+Presentation owns validated return context, without adding navigation fields to
+the repository query or domain entities.
 
 ## Runtime
 

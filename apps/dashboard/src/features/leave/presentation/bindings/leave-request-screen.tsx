@@ -8,7 +8,9 @@ import { canBrowseEmployeeLeave } from "../../domain/policies/leave-read-policy"
 import type { LeaveUseCases } from "../contracts/leave-use-cases";
 import { LeaveRequestController } from "../controllers/leave-request-controller";
 import { leaveBalanceMessages } from "../i18n/leave-balance-messages";
+import { leaveCalendarMessages } from "../i18n/leave-calendar-messages";
 import { leaveActionLinks } from "../models/leave-action-view";
+import { leaveCalendarOrigin, leaveCalendarParameters } from "../models/leave-calendar-route";
 import { leaveRequestView } from "../models/leave-request-view";
 import { leaveParameters, leaveQuery } from "../models/leave-route";
 import { LeaveRequestPage } from "../pages/leave-request-page";
@@ -28,13 +30,14 @@ export function LeaveRequestScreen(props: Props) {
   const navigate = useNavigate();
   const query = leaveQuery(parameters, props.access.companyId);
   const historyAfter = parameters.get("historyAfter");
-  const canonical = leaveParameters(props.access.companyId, query).toString();
+  const origin = leaveCalendarOrigin(parameters, props.access.companyId);
+  const canonical = leaveParameters(props.access.companyId, query, null, origin).toString();
   if (parameters.has("company") && parameters.get("company") !== props.access.companyId)
     return <Navigate to={`/leave/requests?${canonical}`} replace />;
   if (!parameters.has("company"))
     return (
       <Navigate
-        to={`/leave/requests/${encodeURIComponent(requestId)}?${leaveParameters(props.access.companyId, query, historyAfter)}`}
+        to={`/leave/requests/${encodeURIComponent(requestId)}?${leaveParameters(props.access.companyId, query, historyAfter, origin)}`}
         replace
       />
     );
@@ -44,10 +47,17 @@ export function LeaveRequestScreen(props: Props) {
       {...props}
       id={requestId}
       historyAfter={historyAfter}
-      backTo={`/leave/requests?${canonical}`}
+      backTo={
+        origin
+          ? `/leave/calendar?${leaveCalendarParameters(props.access.companyId, origin.scope, origin.month, origin.date, origin.after)}`
+          : `/leave/requests?${canonical}`
+      }
+      backLabel={origin ? leaveCalendarMessages(props.locale).back : undefined}
       actionPath={`/leave/requests/${encodeURIComponent(requestId)}`}
       actionQuery={canonical}
-      onHistory={(after) => setParameters(leaveParameters(props.access.companyId, query, after))}
+      onHistory={(after) =>
+        setParameters(leaveParameters(props.access.companyId, query, after, origin))
+      }
       onApproval={(id) =>
         navigate(`/approvals/${encodeURIComponent(id)}?company=${props.access.companyId}`)
       }
@@ -63,6 +73,7 @@ function LeaveRequestBinding({
   timezone,
   companyName,
   backTo,
+  backLabel,
   actionPath,
   actionQuery,
   onHistory,
@@ -71,6 +82,7 @@ function LeaveRequestBinding({
   id: string;
   historyAfter: string | null;
   backTo: string;
+  backLabel: string | undefined;
   actionPath: string;
   actionQuery: string;
   onHistory: (after: string | null) => void;
@@ -133,6 +145,7 @@ function LeaveRequestBinding({
       locale={locale}
       timezone={timezone}
       backTo={backTo}
+      backLabel={backLabel}
       firstHistory={historyAfter === null}
       onRefresh={controller.refresh}
       onLatest={() => onHistory(null)}

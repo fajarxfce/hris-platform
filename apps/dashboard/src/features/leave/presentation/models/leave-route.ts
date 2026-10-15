@@ -1,5 +1,6 @@
 import type { CompanyId } from "../../../../core/domain/identifiers";
 import type { LeaveRequestQuery, LeaveStatus } from "../../domain/entities/leave-request";
+import type { LeaveCalendarOrigin } from "./leave-calendar-route";
 
 export function leaveQuery(parameters: URLSearchParams, company: CompanyId): LeaveRequestQuery {
   if (parameters.has("company") && parameters.get("company") !== company)
@@ -14,11 +15,18 @@ export function leaveParameters(
   company: CompanyId,
   query: LeaveRequestQuery,
   historyAfter: string | null = null,
+  calendar: LeaveCalendarOrigin | null = null,
 ): URLSearchParams {
   const parameters = new URLSearchParams({ company });
   if (query.employeeId !== null) parameters.set("employee", query.employeeId);
   if (query.status !== null) parameters.set("status", query.status);
   if (query.after !== null) parameters.set("after", query.after);
   if (historyAfter !== null) parameters.set("historyAfter", historyAfter);
+  if (calendar !== null) {
+    parameters.set("calendarScope", calendar.scope);
+    parameters.set("calendarMonth", calendar.month);
+    parameters.set("calendarDate", calendar.date);
+    if (calendar.after !== null) parameters.set("calendarAfter", calendar.after);
+  }
   return parameters;
 }

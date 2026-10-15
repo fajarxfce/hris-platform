@@ -1,10 +1,10 @@
 # Leave carryover accounting
 
-Status: domain/storage accounting, request transitions, balance adjustments and
-direct/batch year closing are implemented and tested. New public closings create
-tracked awards; absent validity still means no additional expiry. Optional
-validity configuration remains hidden until the expiry worker and client views
-are complete. These changes have not been deployed.
+Status: accounting, request transitions, adjustments, year closing, the durable
+expiry worker and domain recovery are implemented and tested. New public
+closings create tracked awards; absent validity still means no additional expiry.
+Optional validity configuration remains hidden until scoped transport and client
+views are complete. These changes have not been deployed.
 
 ## Contract
 
@@ -121,11 +121,47 @@ receipts and sync invalidations must commit together; failure rolls everything
 back. Late-year closing evaluates carry validity after acquiring the employee
 guard so an expiry worker cannot miss credit created with a stale date.
 
-Automatic expiry will use the existing durable worker, with a bounded cohort for
-a company year-closing batch and a single employee for direct closing. It must
-not create thousands of browser timers or one long transaction for all employees.
-Worker authority, fencing, recovery and current client views remain required
-before exposing the new policy in the dashboard.
+Automatic expiry uses the existing durable worker. One closing batch shares one
+expiry cohort of at most 5,000 employees; a direct positive award has one employee.
+Admission reserves both batch jobs, or the direct expiry job, under the company
+queue guard after resource/access guards. Capacity, journal or assurance failure
+rolls back the entire admission. A closing after the deadline creates no expiry
+job or spendable carried credit.
+
+## Durable expiry and recovery
+
+V85 retains an immutable origin with its original source, employee cohort,
+calendar and UTC deadline. The job owns execution status; the origin holds only
+its current job and recovery version. Attempts are immutable and capped at eight.
+Outcomes form a contiguous employee prefix and retain their exact ledger effect.
+A new expiring award requires its durable origin in the same transaction;
+migration neither reattributes historical credit nor invents historical jobs.
+
+Each worker step verifies its lease, locks the origin and employee ledger, then
+checks the clock after acquisition. Free carried units expire; reserved and
+consumed funding remains intact. A prior settlement records an unchanged outcome.
+A target without an award from this origin records `NO_AWARD`; a parent closing
+resumed after the deadline cannot introduce expired credit for that target.
+Outcome, carry movement, main ledger, sync invalidation and fenced checkpoint
+commit together. A final bounded step closes the job without another debit.
+
+This derived task uses an empty-permission actor tied to its verified lease and
+fixed origin. Revoking the original HR account does not extend awarded credit.
+The task cannot choose another cohort, change validity or grant units. Generic
+job cancellation is unavailable for fixed expiry, including a storage guard.
+Existing interactive and other job authorization rules retain their own checks.
+
+Terminal recovery requires current `leave.year.close` scope, recent assurance,
+an observed version, a reason and an idempotency key. Another authorized HR user
+may recover the fixed obligation. Recovery locks the old job before the origin
+and access/queue guards, retains the completed prefix and original deadline, and
+creates only the remaining work plus finalization. Competing recovery attempts
+cannot become current together. A failed journal, lost lease, cancellation or
+late assurance failure rolls back the affected transaction.
+
+Reads preserve the UTC deadline originally validated at award creation. Updating
+timezone data cannot recalculate an existing award. New award validation still
+checks its calendar and requires agreement with its admitted expiry origin.
 
 ## Observed validation
 
@@ -177,10 +213,32 @@ ledger values, versions, policy evidence and sync records. Query generation,
 Kotlin compilation, formatting and architecture checks passed. No browser,
 native or development deployment was performed for this increment.
 
+The worker increment passed 64 Leave domain tests and all 68 existing worker
+checks. The initial API run passed 101 existing regressions; two new fixture
+errors were corrected (missing approval setup and an assertion against an
+intentionally omitted transport field). The final focused run passed 27 expiry
+API/PostgreSQL cases, three real restricted-worker scenarios, two Jobs domain
+checks and the extended V82-to-V85 migration test. Coverage includes original
+creator revocation, recovery by another HR user, a partially completed parent
+closing, retained reservations, lost or omitted checkpoints, competing recovery,
+RLS, immutable history, late assurance, cancellation and original receipts.
+
+The 5,000-employee admission fixture used two jobs and one expiry origin, measured
+at 512 ms in this run; this measures admission, not full-cohort worker throughput.
+The migration test preserves both tracked and untracked existing awards, ledger,
+account versions and sync facts. Fourteen existing dashboard Jobs tests and the
+changed label's Biome check passed. No browser, native or development deployment
+was performed for this increment.
+
+A final UTC-retention check passed 33 API/storage/mapper cases and the three
+restricted-worker scenarios after changing reads to retain their persisted
+deadline. New awards still reject an instant inconsistent with their current
+calendar. Formatting and architecture checks passed; all 34 local documentation
+link targets were verified.
+
 ## Remaining integration
 
-- Admit and execute bounded expiry work with immutable origin, lease fencing,
-  original due times and explicit terminal-job recovery.
-- Expose validity and progress through scoped transport/sync models, dashboard
-  policy/recovery views and employee balance views; validate browser and native
-  behavior against the completed API.
+- Expose scoped expiry reads/recovery and optional validity through transport,
+  synchronization models, dashboard policy/recovery views and employee balances.
+- Validate browser/native behavior against the completed API before enabling
+  optional validity and deploying these migrations.

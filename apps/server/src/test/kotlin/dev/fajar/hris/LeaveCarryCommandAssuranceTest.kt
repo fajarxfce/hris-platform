@@ -125,6 +125,8 @@ class LeaveCarryCommandAssuranceTest : LeaveCarryStorageFixture() {
                         carryRequests,
                         security,
                         carry,
+                        carryExpiryJobs,
+                        carryExpiries,
                     )
                     .execute(
                         actor,

@@ -93,6 +93,7 @@ const kinds: Readonly<Record<string, readonly [string, string]>> = {
   PAYROLL_AMENDMENT_PUBLISH: ["Payroll amendment publication", "Publikasi koreksi payroll"],
   LEAVE_ACCRUAL: ["Leave accrual", "Penambahan hak cuti"],
   LEAVE_YEAR_CLOSE: ["Leave year closing", "Penutupan tahun cuti"],
+  LEAVE_CARRY_EXPIRY: ["Leave carryover expiry", "Masa berlaku saldo cuti bawaan"],
   DOCUMENT_VALIDATE: ["Document validation", "Validasi dokumen"],
   DOCUMENT_INVENTORY: ["Document inventory", "Inventaris dokumen"],
   EMPLOYEE_IMPORT_PREVIEW: ["Employee import preview", "Preview import karyawan"],

@@ -3,6 +3,8 @@ package dev.fajar.hris
 import dev.fajar.hris.approvals.domain.entities.*
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.jobs.domain.entities.*
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.leave.domain.policies.*
 import dev.fajar.hris.leave.domain.repositories.*
@@ -12,8 +14,10 @@ import java.util.UUID
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired
 
-/** Exercises real storage transactions before the carry command/worker adapters are enabled. */
+/** Seeds retained carry awards for storage, request and expiry integration tests. */
 abstract class LeaveCarryStorageFixture : LeaveAccountingApiFixture() {
+    @Autowired protected lateinit var carryExpiryJobs: JobRepository
+    @Autowired protected lateinit var carryExpiries: LeaveCarryExpiryRepository
     @Autowired protected lateinit var carryRepository: LeaveCarryRepository
     @Autowired protected lateinit var carryLedger: LeaveLedgerRepository
     @Autowired protected lateinit var carryEntitlements: LeaveEntitlementRepository
@@ -97,7 +101,11 @@ abstract class LeaveCarryStorageFixture : LeaveAccountingApiFixture() {
         )
     }
 
-    protected fun storeCarry(prepared: PreparedCarry, includeAward: Boolean = true): Result<Unit> {
+    protected fun storeCarry(
+        prepared: PreparedCarry,
+        includeAward: Boolean = true,
+        includeExpiry: Boolean = true,
+    ): Result<Unit> {
         val (f, closing, award) = prepared
         val entries = buildList {
             if (closing.rollover.carryHalfDays > 0) {
@@ -162,6 +170,55 @@ abstract class LeaveCarryStorageFixture : LeaveAccountingApiFixture() {
                 .flatMap {
                     if (includeAward && award != null) carryRepository.create(f.company, award)
                     else Result.Success(Unit)
+                }
+                .flatMap {
+                    val validity = award?.bucket?.validity
+                    if (!includeExpiry || validity == null) Result.Success(Unit)
+                    else {
+                        val actor = accountingActor(f)
+                        val expiry =
+                            LeaveCarryExpiry(
+                                UUID.randomUUID(),
+                                LeaveCarryExpirySource.Closing(closing.id, f.employee),
+                                f.type,
+                                closing.year + 1,
+                                requireNotNull(closing.timezone),
+                                validity,
+                                closing.actorId,
+                                closing.recordedAt,
+                                closing.reason,
+                                1,
+                                UUID.randomUUID(),
+                            )
+                        val job =
+                            JobRequest(
+                                expiry.jobId,
+                                f.company,
+                                closing.actorId,
+                                JobKind.LEAVE_CARRY_EXPIRY,
+                                UUID.randomUUID(),
+                                mapOf("expiryId" to expiry.id.toString()),
+                                actor.authenticatedAt,
+                                actor.credentialVersion ?: 0,
+                                actor.correlationId,
+                                closing.recordedAt,
+                                2,
+                                scheduledFor = validity.expiresAt,
+                            )
+                        carryExpiryJobs.create(job).flatMap {
+                            carryExpiries.create(
+                                f.company,
+                                expiry,
+                                LeaveCarryExpiryAttempt(
+                                    job.id,
+                                    1,
+                                    0,
+                                    closing.recordedAt,
+                                    closing.reason,
+                                ),
+                            )
+                        }
+                    }
                 }
                 .flatMap { carryLedger.append(f.company, entries) }
                 .flatMap {

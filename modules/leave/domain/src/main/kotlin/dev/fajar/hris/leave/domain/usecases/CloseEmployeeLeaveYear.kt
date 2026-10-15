@@ -4,6 +4,8 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.entities.*
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.leave.domain.policies.*
 import dev.fajar.hris.leave.domain.repositories.*
@@ -27,6 +29,8 @@ class CloseEmployeeLeaveYear(
     private val requests: LeaveRequestRepository,
     private val security: IdentitySecurityPolicy,
     private val carry: LeaveCarryRepository,
+    private val jobs: JobRepository,
+    private val expiries: LeaveCarryExpiryRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -140,6 +144,13 @@ class CloseEmployeeLeaveYear(
             val acquiredCarry = carry.buckets(company, employeeId, typeId, setOf(year))
             if (acquiredCarry is Result.Failed) return@run acquiredCarry
             val bucket = (acquiredCarry as Result.Success).value.singleOrNull()
+            if (type.policy.accrual?.carryValidityMonths != null) {
+                val queueLock = jobs.lockQueue(company)
+                if (queueLock is Result.Failed) return@run queueLock
+                val assured =
+                    validateCompanySessionActor(actor, currentAccess, clock.instant(), security)
+                if (assured is Result.Failed) return@run assured
+            }
             val now = clock.instant()
             val planned =
                 planLeaveYearClosing(
@@ -284,6 +295,45 @@ class CloseEmployeeLeaveYear(
                         settings.timezone,
                         type.policy.accrual?.carryValidityMonths,
                     )
+            val expiry =
+                award?.bucket?.validity?.let {
+                    LeaveCarryExpiry(
+                        UUID.randomUUID(),
+                        LeaveCarryExpirySource.Closing(id, employeeId),
+                        typeId,
+                        year + 1,
+                        settings.timezone,
+                        it,
+                        actor.accountId,
+                        now,
+                        reason,
+                        1,
+                        UUID.randomUUID(),
+                    )
+                }
+            val expiryJob =
+                expiry?.let {
+                    JobRequest(
+                        it.jobId,
+                        company,
+                        actor.accountId,
+                        JobKind.LEAVE_CARRY_EXPIRY,
+                        operationId,
+                        mapOf("expiryId" to it.id.toString()),
+                        actor.authenticatedAt,
+                        actor.credentialVersion ?: 0,
+                        actor.correlationId,
+                        now,
+                        2,
+                        scheduledFor = it.validity.expiresAt,
+                    )
+                }
+            if (expiry != null) {
+                val pending = jobs.pendingCount(company)
+                if (pending is Result.Failed) return@run pending
+                if ((pending as Result.Success).value >= 100)
+                    return@run Result.Failed(Failure(FailureKind.CONFLICT, "job_queue_full"))
+            }
             val sourceMovements = entries.count { it.year == year }
             val receipt = MutationReceipt(id, 0)
             val settled =
@@ -296,6 +346,17 @@ class CloseEmployeeLeaveYear(
                 .flatMap { entitlements.createClosing(company, closing) }
                 .flatMap {
                     if (award == null) Result.Success(Unit) else carry.create(company, award)
+                }
+                .flatMap {
+                    if (expiry == null) Result.Success(Unit)
+                    else
+                        jobs.create(requireNotNull(expiryJob)).flatMap {
+                            expiries.create(
+                                company,
+                                expiry,
+                                LeaveCarryExpiryAttempt(expiry.jobId, 1, 0, now, reason),
+                            )
+                        }
                 }
                 .flatMap { carry.append(company, postings) }
                 .flatMap {

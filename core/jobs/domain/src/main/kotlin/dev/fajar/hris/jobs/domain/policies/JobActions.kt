@@ -5,7 +5,8 @@ import dev.fajar.hris.jobs.domain.entities.*
 
 fun availableJobActions(actor: Actor, job: BackgroundJob): List<String> =
     if (
-        job.status in setOf(JobStatus.QUEUED, JobStatus.RUNNING) &&
+        job.request.kind != JobKind.LEAVE_CARRY_EXPIRY &&
+            job.status in setOf(JobStatus.QUEUED, JobStatus.RUNNING) &&
             !job.cancellationRequested &&
             (job.request.actorId == actor.accountId || "jobs.manage" in actor.permissions)
     )

@@ -26,6 +26,69 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class LeaveConfiguration {
     @Bean
+    fun leaveCarryExpirySource(sql: DSLContext): LeaveCarryExpiryDataSource =
+        PostgresLeaveCarryExpiryDataSource(sql)
+
+    @Bean
+    fun leaveCarryExpiries(source: LeaveCarryExpiryDataSource): LeaveCarryExpiryRepository =
+        StoredLeaveCarryExpiryRepository(source)
+
+    @Bean
+    fun advanceLeaveCarryExpiry(
+        expiries: LeaveCarryExpiryRepository,
+        jobs: JobRepository,
+        carry: LeaveCarryRepository,
+        ledger: LeaveLedgerRepository,
+        entitlements: LeaveEntitlementRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        AdvanceLeaveCarryExpiry(
+            expiries,
+            jobs,
+            carry,
+            ledger,
+            entitlements,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun abortLeaveCarryExpiry(
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+    ) = AbortLeaveCarryExpiry(jobs, journal, transactions)
+
+    @Bean
+    fun resumeLeaveCarryExpiry(
+        expiries: LeaveCarryExpiryRepository,
+        jobs: JobRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ResumeLeaveCarryExpiry(
+            expiries,
+            jobs,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun leaveCarrySource(sql: DSLContext): LeaveCarryDataSource = PostgresLeaveCarryDataSource(sql)
 
     @Bean
@@ -340,6 +403,8 @@ class LeaveConfiguration {
         requests: LeaveRequestRepository,
         security: IdentitySecurityPolicy,
         carry: LeaveCarryRepository,
+        jobs: JobRepository,
+        expiries: LeaveCarryExpiryRepository,
     ) =
         CloseEmployeeLeaveYear(
             ledger,
@@ -356,6 +421,8 @@ class LeaveConfiguration {
             requests,
             security,
             carry,
+            jobs,
+            expiries,
         )
 
     @Bean
@@ -1027,6 +1094,7 @@ class LeaveConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         security: IdentitySecurityPolicy,
+        expiries: LeaveCarryExpiryRepository,
     ) =
         StartLeaveYearCloseBatch(
             batches,
@@ -1041,5 +1109,6 @@ class LeaveConfiguration {
             transactions,
             clock,
             security,
+            expiries,
         )
 }

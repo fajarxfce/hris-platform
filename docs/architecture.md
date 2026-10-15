@@ -434,6 +434,17 @@ back business state, bank references, mobile progress and the operation receipt.
 The review use case coordinates repository contracts, without calling a command
 use case or reserving a payment.
 
+Fixed leave-carry expiry is a derived obligation, documented in
+[carryover accounting](leave-carryover.md#durable-expiry-and-recovery). Its worker
+verifies a lease and immutable origin before taking the employee ledger guard.
+An empty-permission actor supplies company/audit scope for that fixed debit;
+retirement of the original operator does not renew credit. Outcome, movement,
+ledger and checkpoint remain one transaction. Recovery acquires the former job,
+origin, company/member/account guards and finally the queue, and rechecks current
+HR scope/assurance through receipt completion. The new job cannot change the
+cohort or original deadline. Generic cancellation is unavailable for this job
+kind. Other workers keep their own live authorization requirements.
+
 ## API and clients
 
 Company client policy uses a separate admission transaction after actor resolution and before a business handler. Its use case acquires policy/company/member/account guards and evaluates current availability; accepted requests and durable jobs retain their own transaction/execution ownership. The application maps feature adapters and effective sync selections to capability keys. Client policy never adds authorization or modifies a cursor projection. Configuration revisions, receipts, audit, and events are atomic, and settings recovery remains independently authorized during maintenance.

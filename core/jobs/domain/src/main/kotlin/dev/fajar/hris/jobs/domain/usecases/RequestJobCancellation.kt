@@ -48,6 +48,10 @@ class RequestJobCancellation(
                         "jobs.manage" !in current.permissions)
             )
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "job_not_found"))
+            if (job.request.kind == JobKind.LEAVE_CARRY_EXPIRY)
+                return@run Result.Failed(
+                    Failure(FailureKind.CONFLICT, "job_cancellation_unavailable")
+                )
             if (job.cancellationRequested)
                 return@run validateCompanySessionActor(actor, access, clock.instant(), security)
                     .map { live -> JobDetails(job, availableJobActions(live, job)) }

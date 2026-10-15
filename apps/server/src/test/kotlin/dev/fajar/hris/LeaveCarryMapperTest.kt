@@ -83,7 +83,8 @@ class LeaveCarryMapperTest {
                 { it.typeId = UUID.randomUUID() },
                 { it.balanceYear = 2028 },
                 { it.availableHalfDays = 7 },
-                { it.expiresAt = it.expiresAt.plusSeconds(1) },
+                { it.expiresAt = java.time.OffsetDateTime.MAX },
+                { it.validThrough = it.validThrough.minusDays(1) },
                 { it.validThrough = null },
                 { it.validityMonths = null },
             )
@@ -98,6 +99,22 @@ class LeaveCarryMapperTest {
             repository(buckets = { listOf(row(), row()) })
                 .buckets(company, employee, type, setOf(2027)) is Result.Failed
         )
+    }
+
+    @Test
+    fun persistedUtcDeadlineSurvivesDifferentCurrentTimezoneRulesWithoutChangingNewAwardValidation() {
+        val raw = row()
+        raw.expiresAt = raw.expiresAt.plusHours(1)
+        val result =
+            repository(buckets = { listOf(raw) }).buckets(company, employee, type, setOf(2027))
+        assertTrue(result is Result.Success, result.toString())
+        val bucket = (result as Result.Success).value.single()
+        val retained = requireNotNull(bucket.validity)
+        assertEquals(raw.expiresAt.toInstant(), retained.expiresAt)
+        assertEquals(raw.validThrough, retained.through)
+        assertThrows(IllegalArgumentException::class.java) {
+            LeaveCarryAward(bucket, employee, type, "Asia/Jakarta", 3).toCarryRow(company)
+        }
     }
 
     @Test

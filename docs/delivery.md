@@ -4962,3 +4962,32 @@ JAR digests match the validated builds. Readiness returned HTTP 200 through
 loopback and WireGuard; the dashboard remained available at `10.77.77.1:5173`.
 Database, private document services and their existing containers were retained.
 No phone UI or installation was used for this deployment.
+
+## Durable leave carry expiry
+
+The [carry accounting foundation](leave-carryover.md) now includes atomic expiry
+admission, a worker bound to the original award/cohort, and explicit domain
+recovery after terminal failure. Direct closing reserves its expiry job; batch
+closing shares one bounded expiry job for up to 5,000 employees. Fixed deadlines
+survive creator revocation, while recovery requires current HR scope and
+assurance. Each outcome, carry debit, main ledger, synchronization invalidation
+and fenced checkpoint commits together. Reserved funding remains available to its
+original request, with late returns settled by request transitions.
+
+The focused run passed 27 API/PostgreSQL scenarios, three real restricted-worker
+scenarios, two Jobs domain tests and the extended migration test. The preceding
+run passed 64 Leave domain tests, all 68 existing worker tests and 101 existing
+API regressions; two new fixture errors were corrected before the focused run.
+Fourteen dashboard Jobs tests, the label's Biome check, formatting and architecture
+checks passed. One admission fixture processed a 5,000-employee selection in
+512 ms with two jobs; full-cohort execution throughput was not measured.
+
+V85 preserves existing tracked/untracked awards and adds no historical jobs.
+Optional validity remains hidden until scoped API/sync models and dashboard/mobile
+views are complete. V83–V85 have not been deployed, and this increment changed no
+mobile source, APK or phone installation.
+
+The UTC-read follow-up passed 33 API/storage/mapper cases and the three worker
+scenarios. Existing awards retain their persisted instant even when current
+timezone conversion differs; new awards still validate their calendar. Formatting,
+architecture and all 34 local documentation link targets passed.

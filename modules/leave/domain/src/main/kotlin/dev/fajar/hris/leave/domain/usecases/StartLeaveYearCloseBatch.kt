@@ -27,6 +27,7 @@ class StartLeaveYearCloseBatch(
     private val transactions: TransactionRunner,
     private val clock: Clock,
     private val security: IdentitySecurityPolicy,
+    private val expiries: LeaveCarryExpiryRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -92,8 +93,7 @@ class StartLeaveYearCloseBatch(
             val settings =
                 (settingsResult as Result.Success).value
                     ?: return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "company_not_found"))
-            val now = clock.instant()
-            val today = now.atZone(ZoneId.of(settings.timezone)).toLocalDate()
+            val today = clock.instant().atZone(ZoneId.of(settings.timezone)).toLocalDate()
             val typeResult = policies.effective(company, typeId, period.atEndOfMonth())
             if (typeResult is Result.Failed) return@run typeResult
             val type =
@@ -124,12 +124,59 @@ class StartLeaveYearCloseBatch(
                 )
             val queueLock = jobs.lockQueue(company)
             if (queueLock is Result.Failed) return@run queueLock
-            val pending = jobs.pendingCount(company)
-            if (pending is Result.Failed) return@run pending
-            if ((pending as Result.Success).value >= 100)
-                return@run Result.Failed(Failure(FailureKind.CONFLICT, "job_queue_full"))
             val assured = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (assured is Result.Failed) return@run assured
+            val now = clock.instant()
+            val validityResult =
+                leaveCarryValidity(
+                    year + 1,
+                    type.policy.accrual?.carryValidityMonths,
+                    settings.timezone,
+                )
+            if (validityResult is Result.Failed) return@run validityResult
+            val expiry =
+                (validityResult as Result.Success)
+                    .value
+                    ?.takeIf {
+                        now.isBefore(it.expiresAt) &&
+                            (type.policy.accrual?.carryLimitHalfDays ?: 0) > 0
+                    }
+                    ?.let {
+                        LeaveCarryExpiry(
+                            UUID.randomUUID(),
+                            LeaveCarryExpirySource.Batch(id),
+                            typeId,
+                            year + 1,
+                            settings.timezone,
+                            it,
+                            actor.accountId,
+                            now,
+                            reason,
+                            ids.size,
+                            UUID.randomUUID(),
+                        )
+                    }
+            val expiryJob =
+                expiry?.let {
+                    JobRequest(
+                        it.jobId,
+                        company,
+                        actor.accountId,
+                        JobKind.LEAVE_CARRY_EXPIRY,
+                        operationId,
+                        mapOf("expiryId" to it.id.toString()),
+                        actor.authenticatedAt,
+                        actor.credentialVersion ?: 0,
+                        actor.correlationId,
+                        now,
+                        ids.size + 1,
+                        scheduledFor = it.validity.expiresAt,
+                    )
+                }
+            val pending = jobs.pendingCount(company)
+            if (pending is Result.Failed) return@run pending
+            if ((pending as Result.Success).value + (if (expiry == null) 1 else 2) > 100)
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "job_queue_full"))
             val request =
                 JobRequest(
                     UUID.randomUUID(),
@@ -169,6 +216,17 @@ class StartLeaveYearCloseBatch(
             jobs
                 .create(request)
                 .flatMap { batches.create(company, batch, targets, attempt) }
+                .flatMap {
+                    if (expiry == null) Result.Success(Unit)
+                    else
+                        jobs.create(requireNotNull(expiryJob)).flatMap {
+                            expiries.create(
+                                company,
+                                expiry,
+                                LeaveCarryExpiryAttempt(expiry.jobId, 1, 0, now, reason),
+                            )
+                        }
+                }
                 .flatMap {
                     journal.record(
                         actor,

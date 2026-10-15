@@ -29,6 +29,9 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
     @Autowired private lateinit var operations: OperationRepository
     @Autowired private lateinit var journal: ChangeJournalRepository
     @Autowired private lateinit var requests: LeaveRequestRepository
+    @Autowired
+    private lateinit var carryExpiryJobs: dev.fajar.hris.jobs.domain.repositories.JobRepository
+    @Autowired private lateinit var carryExpiries: LeaveCarryExpiryRepository
     @Autowired private lateinit var carry: LeaveCarryRepository
 
     @ParameterizedTest
@@ -322,6 +325,8 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
                             requests,
                             security,
                             carry,
+                            carryExpiryJobs,
+                            carryExpiries,
                         )
                         .execute(
                             actor,

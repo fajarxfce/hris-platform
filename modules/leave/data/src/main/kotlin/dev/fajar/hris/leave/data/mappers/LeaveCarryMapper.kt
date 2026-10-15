@@ -6,6 +6,8 @@ import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.leave.domain.policies.leaveCarryValidity
 import dev.fajar.hris.leave.domain.policies.validateLeaveCarryBucket
 import dev.fajar.hris.schema.tables.records.*
+import java.time.YearMonth
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.UUID
 
@@ -13,8 +15,17 @@ fun LeaveCarryBucketsRecord.toCarryBucket(): LeaveCarryBucket {
     val validity =
         if (validThrough == null && expiresAt == null) null
         else LeaveCarryValidity(requireNotNull(validThrough), requireNotNull(expiresAt).toInstant())
-    val calculated = leaveCarryValidity(balanceYear, validityMonths, companyTimezone)
-    require(calculated is Result.Success && calculated.value == validity)
+    val months = validityMonths
+    require((months == null) == (validity == null))
+    ZoneId.of(companyTimezone)
+    if (months != null) {
+        require(months in 1..12 && balanceYear in 1901..2200)
+        require(
+            requireNotNull(validity).through == YearMonth.of(balanceYear, months).atEndOfMonth()
+        )
+        // UTC was validated when the award was created; later timezone data cannot rewrite it.
+        require(requireNotNull(expiresAt).year in balanceYear..(balanceYear + 1))
+    }
     val bucket =
         LeaveCarryBucket(
             id,

@@ -197,5 +197,114 @@ class LeaveCarryMigrationTest {
         }
         assertEquals(beforeLedger, sql.queryForList(ledgerQuery))
         assertEquals(beforeAccounts, sql.queryForList("select * from leave_accounts order by id"))
+
+        // A pre-existing tracked award is preserved too; V85 does not invent a job or rewrite
+        // history.
+        val trackedType = UUID.randomUUID()
+        val trackedClosing = UUID.randomUUID()
+        sql.update(
+            "insert into leave_types(company_id,id,code) values(?,?,'TRACKED')",
+            company,
+            trackedType,
+        )
+        sql.update(
+            """insert into leave_type_revisions(company_id,type_id,revision,effective_from,details,active,actor_id,reason)
+            values(?,?,0,'2026-01-01',cast(? as jsonb),true,?,'Tracked policy')""",
+            company,
+            trackedType,
+            """{"name":"Tracked leave","paid":true,"allowPartialDays":true,"minServiceMonths":0,"allowedContracts":[],"maxRequestDays":30,"attachmentRequired":false,"accrual":{"frequency":"MANUAL","halfDaysPerPeriod":0,"carryLimitHalfDays":4,"carryValidityMonths":3}}""",
+            actor,
+        )
+        sql.update(
+            """insert into leave_ledger(company_id,id,employment_id,type_id,balance_year,kind,source_id,available_delta,reserved_delta,consumed_delta,actor_id,recorded_at,reason)
+            values(?,?,?,?,2026,'ADJUSTMENT',?,6,0,0,?,'2026-12-31T00:00:00Z','Tracked credit')""",
+            company,
+            UUID.randomUUID(),
+            employee,
+            trackedType,
+            UUID.randomUUID(),
+            actor,
+        )
+        TransactionTemplate(JdbcTransactionManager(source)).executeWithoutResult {
+            sql.update(
+                """insert into leave_year_closings(company_id,id,employment_id,type_id,balance_year,source_version,destination_version,
+                available_half_days,consumed_half_days,carry_half_days,expire_half_days,policy_revision,policy_snapshot,actor_id,recorded_at,reason,carry_tracking,company_timezone)
+                select ?,?,?,?,2026,1,0,6,0,4,2,0,jsonb_build_object('typeId',type_id,'code','TRACKED','revision',0,'policy',details),?,'2027-01-05T00:00:00Z','Tracked closing',true,'Asia/Jakarta'
+                from leave_type_revisions where company_id=? and type_id=? and revision=0""",
+                company,
+                trackedClosing,
+                employee,
+                trackedType,
+                actor,
+                company,
+                trackedType,
+            )
+            sql.update(
+                """insert into leave_carry_buckets(company_id,id,employment_id,type_id,balance_year,initial_half_days,available_half_days,company_timezone,validity_months,valid_through,expires_at)
+                values(?,?,?,?,2027,4,4,'Asia/Jakarta',3,'2027-03-31','2027-03-31T17:00:00Z')""",
+                company,
+                trackedClosing,
+                employee,
+                trackedType,
+            )
+            for ((kind, year, delta) in
+                listOf(
+                    Triple("CARRY_OUT", 2026, -4),
+                    Triple("CARRY_IN", 2027, 4),
+                    Triple("EXPIRE", 2026, -2),
+                )) {
+                sql.update(
+                    """insert into leave_ledger(company_id,id,employment_id,type_id,balance_year,kind,source_id,available_delta,reserved_delta,consumed_delta,actor_id,recorded_at,reason)
+                    values(?,?,?,?,?,?,?,?,0,0,?,'2027-01-05T00:00:00Z','Tracked closing')""",
+                    company,
+                    UUID.randomUUID(),
+                    employee,
+                    trackedType,
+                    year,
+                    kind,
+                    trackedClosing,
+                    delta,
+                    actor,
+                )
+            }
+            sql.update(
+                "update leave_accounts set closing_id=?,version=version+1 where company_id=? and employment_id=? and type_id=? and balance_year=2026",
+                trackedClosing,
+                company,
+                employee,
+                trackedType,
+            )
+        }
+        val trackedTables =
+            listOf(
+                "leave_accounts",
+                "leave_ledger",
+                "leave_year_closings",
+                "leave_carry_buckets",
+                "mobile_sync_changes",
+            )
+        val retained =
+            trackedTables.associateWith { sql.queryForList("select * from $it order by id") }
+        Flyway.configure().dataSource(source).target("85").load().migrate()
+        assertEquals(
+            retained,
+            trackedTables.associateWith { sql.queryForList("select * from $it order by id") },
+        )
+        for (table in
+            listOf(
+                "leave_carry_expiries",
+                "leave_carry_expiry_attempts",
+                "leave_carry_expiry_outcomes",
+            )) {
+            assertEquals(0, sql.queryForObject("select count(*) from $table", Int::class.java))
+            assertEquals(
+                true,
+                sql.queryForObject(
+                    "select relrowsecurity and relforcerowsecurity from pg_class where oid=cast(? as regclass)",
+                    Boolean::class.java,
+                    table,
+                ),
+            )
+        }
     }
 }

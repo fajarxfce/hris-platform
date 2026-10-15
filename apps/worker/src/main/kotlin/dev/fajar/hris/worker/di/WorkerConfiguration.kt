@@ -253,6 +253,12 @@ class WorkerConfiguration {
     ): JobTask = LeaveAccrualTask(resolve, advance, abort)
 
     @Bean
+    fun leaveCarryExpiryTask(
+        advance: AdvanceLeaveCarryExpiry,
+        abort: AbortLeaveCarryExpiry,
+    ): JobTask = LeaveCarryExpiryTask(advance, abort)
+
+    @Bean
     fun leaveYearCloseTask(
         resolve: ResolveActor,
         advance: AdvanceLeaveYearCloseBatch,

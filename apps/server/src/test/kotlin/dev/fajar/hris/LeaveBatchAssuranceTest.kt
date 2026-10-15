@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 
 class LeaveBatchAssuranceTest : LeaveBatchApiFixture() {
+    @Autowired private lateinit var carryExpiries: LeaveCarryExpiryRepository
     @Autowired private lateinit var batches: LeaveBatchRepository
     @Autowired private lateinit var policies: LeavePolicyRepository
     @Autowired private lateinit var people: PeopleRepository
@@ -391,6 +392,7 @@ class LeaveBatchAssuranceTest : LeaveBatchApiFixture() {
                             transactions,
                             clock,
                             security,
+                            carryExpiries,
                         )
                         .execute(actor, operation, id, f.type, 2026, 1, null, "Year closing")
                 }

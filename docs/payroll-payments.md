@@ -59,7 +59,11 @@ result. All finance authorization and assurance checks apply to these endpoints.
 
 The [dashboard finance workflow](dashboard.md#payroll-payments) covers payable
 selection, bank review, independent release, cancellation, CSV download and
-reconciliation. Preparation and result panels retain unsaved input while the
+reconciliation. Its selection and review retain the observed assessment revision,
+payment version and current positive amount through delivery and retry. Payslip
+payment summaries show independently versioned balances and retained transfer
+amounts. Confirmed-return entry remains a separate dashboard workflow.
+Preparation and result panels retain unsaved input while the
 current workspace remains mounted. Lost responses require an explicit retry of
 the original command; they do not authorize another bank transfer.
 

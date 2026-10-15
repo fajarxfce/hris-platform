@@ -76,6 +76,10 @@ export function reviewPayrollPaymentPreparation(
   for (const item of selected) {
     if (
       !isUuid(item.payable.assessmentId) ||
+      !Number.isSafeInteger(item.payable.assessmentRevision) ||
+      item.payable.assessmentRevision < 0 ||
+      !Number.isSafeInteger(item.payable.paymentVersion) ||
+      item.payable.paymentVersion < item.payable.assessmentRevision ||
       (payrollPaymentAmountMinor(item.payable.amount) ?? 0n) <= 0n ||
       item.payable.currency !== "IDR"
     )
@@ -130,6 +134,9 @@ export function preparePayrollPaymentCommand(
       Object.freeze({
         id: itemId.toLowerCase(),
         assessmentId: item.payable.assessmentId.toLowerCase(),
+        assessmentRevision: item.payable.assessmentRevision,
+        paymentVersion: item.payable.paymentVersion,
+        amount: item.payable.amount,
         destination: item.destination,
       }),
     );
@@ -150,6 +157,9 @@ export const payrollPaymentPreparationWasRejected = (failure: Failure): boolean 
     "invalid_payroll_payment_destination",
     "payroll_payment_preparation_unavailable",
     "payroll_assessment_not_payable",
+    "payroll_payment_balance_changed",
+    "payroll_payment_observation_required",
+    "invalid_payroll_payment_observation",
     "payroll_payment_batch_exists",
     "payroll_payment_capacity",
     "payroll_assessment_payment_reserved",

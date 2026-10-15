@@ -82,6 +82,8 @@ test("payment refresh, tabs and locale changes preserve the immutable detail own
   attempt.status = "SUCCEEDED";
   attempt.resolvedAt = "2026-10-02T03:00:00Z";
   api.payments.version++;
+  api.payments.settlement.confirmedPaid = attempt.amount;
+  api.payments.settlement.payable = "0.00";
   await page.getByRole("button", { name: "Refresh payments", exact: true }).click();
   await expect(page.getByRole("table", { name: /Payment history/u })).toContainText("Paid");
   expect(api.count("get")).toBe(1);
@@ -132,12 +134,15 @@ test("PDF generation uses an explicit language, bounded download and a single pe
     await expect(page.getByLabel("PDF language", { exact: true })).toBeDisabled();
     held.release();
     const file = await downloaded;
-    expect(file.suggestedFilename()).toBe(`payslip-${payslipId()}-en.pdf`);
+    expect(file.suggestedFilename()).toBe(`payslip-${payslipId()}-v0-en.pdf`);
     const path = await file.path();
     if (!path) throw new Error("Browser download required");
     expect((await readFile(path)).subarray(0, 5).toString()).toBe("%PDF-");
     await expect(page.getByRole("status")).toContainText("PDF sent to your browser's downloads.");
     expect(api.count("pdf")).toBe(1);
+    expect(
+      api.reads.find((url) => url.pathname.endsWith("/pdf"))?.searchParams.get("revision"),
+    ).toBe("0");
     expect(
       api.reads.find((url) => url.pathname.endsWith("/pdf"))?.searchParams.get("language"),
     ).toBe("EN");
@@ -198,4 +203,44 @@ test("company replacement discards a pending directory response and its search",
   } finally {
     held.release();
   }
+});
+
+test("a revised payment balance keeps its own revision and exports the statement being viewed", async ({
+  page,
+}) => {
+  const api = await installPayrollPayslipsApi(page),
+    attempt = api.payments.attempts[0];
+  if (!attempt) throw new Error("Payment fixture missing");
+  attempt.status = "SUCCEEDED";
+  attempt.resolvedAt = "2026-10-02T03:00:00Z";
+  api.payments.version = 7;
+  api.payments.settlement = {
+    assessmentRevision: 1,
+    entitlement: "11000000.75",
+    confirmedPaid: "10000000.75",
+    confirmedRecovered: "0.00",
+    payable: "1000000.00",
+    recoverable: "0.00",
+    currency: "IDR",
+  };
+  await page.goto(detail);
+  await page.getByRole("tab", { name: "Payment history", exact: true }).click();
+  const overview = page.getByRole("region", { name: "Overview", exact: true });
+  const balance = page.getByRole("region", { name: "Payment summary", exact: true });
+  await expect(
+    overview.locator(".app-property-row").filter({ hasText: "Payslip revision" }).locator("dd"),
+  ).toHaveText("0");
+  await expect(
+    balance.locator(".app-property-row").filter({ hasText: "Payslip revision" }).locator("dd"),
+  ).toHaveText("1");
+  await expect(
+    balance.locator(".app-property-row").filter({ hasText: "Amount due" }).locator("dd"),
+  ).toContainText("1,000,000.00");
+  const downloaded = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download PDF", exact: true }).click();
+  expect((await downloaded).suggestedFilename()).toBe(`payslip-${payslipId()}-v0-id.pdf`);
+  expect(api.reads.find((url) => url.pathname.endsWith("/pdf"))?.searchParams.get("revision")).toBe(
+    "0",
+  );
+  expect(api.count("get")).toBe(1);
 });

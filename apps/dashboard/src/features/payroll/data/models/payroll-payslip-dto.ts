@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { payrollCalculationOutputDto } from "./payroll-calculation-dto";
+import { payrollAmountDto } from "./payroll-payment-dto";
+import { payrollSettlementDto } from "./payroll-settlement-dto";
 
 const month = z.string().regex(/^(?:202[4-9]|20[3-9]\d|2100)-(?:0[1-9]|1[0-2])$/u);
 const money = z.string().regex(/^(?:0|[1-9]\d{0,14})(?:\.\d{1,2})?$/u);
@@ -32,11 +34,14 @@ export const payrollPayslipDto = z.object({
 export const payrollPaymentProgressDto = z.object({
   assessmentId: z.uuid(),
   version: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
+  settlement: payrollSettlementDto,
   attempts: z
     .array(
       z.object({
         batchId: z.uuid(),
         itemId: z.uuid(),
+        amount: payrollAmountDto,
+        assessmentRevision: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
         status: z.enum(["PREPARED", "PENDING", "SUCCEEDED", "FAILED", "CANCELLED"]),
         createdAt: instant,
         releasedAt: instant.nullable(),

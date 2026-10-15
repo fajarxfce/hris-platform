@@ -156,7 +156,7 @@ describe("payroll preparation boundaries", () => {
       addPayrollPaymentSelection(access, hundred, { ...payrollPayable(101), companyId: company }),
     ).toMatchObject({ ok: false, failure: { code: "payroll_payment_selection_limit" } });
   });
-  it("freezes the human review and sends only original IDs and bank instructions", async () => {
+  it("freezes the reviewed balance and sends its observed versions with bank instructions", async () => {
     const f = fixture(),
       current = review(),
       itemIds = [payrollIdentifier(996), payrollIdentifier(997)];
@@ -175,6 +175,9 @@ describe("payroll preparation boundaries", () => {
         items: current.items.map((item, index) => ({
           id: itemIds[index],
           assessmentId: item.payable.assessmentId,
+          assessmentRevision: item.payable.assessmentRevision,
+          paymentVersion: item.payable.paymentVersion,
+          amount: item.payable.amount,
           destination,
         })),
       },
@@ -223,6 +226,9 @@ describe("payroll preparation boundaries", () => {
   it.each([
     "payroll_assessment_payment_reserved",
     "payroll_assessment_not_payable",
+    "payroll_payment_observation_required",
+    "payroll_payment_balance_changed",
+    "invalid_payroll_payment_observation",
     "access_denied",
     "mfa_required",
   ])("preserves the safe %s failure", async (code) => {
@@ -278,4 +284,43 @@ describe("payroll preparation boundaries", () => {
       ),
     ).rejects.toThrow();
   });
+});
+
+it("prepares only the reviewed positive delta with its exact assessment and payment versions", async () => {
+  const f = fixture(),
+    raw = payrollPayablePage(1),
+    row = raw.items[0];
+  assert(row);
+  row.assessmentRevision = 2;
+  row.paymentVersion = 9;
+  row.amount = "175000.25";
+  const items = toPayrollPayablePage(raw, company, search).items.map((payable) => ({
+    payable,
+    destination,
+  }));
+  const checked = reviewPayrollPaymentPreparation(
+    access,
+    items,
+    "Payroll correction",
+    "Reviewed revised entitlement",
+  );
+  assert(checked.ok);
+  row.assessmentRevision = 3;
+  row.paymentVersion = 10;
+  row.amount = "900000.00";
+  f.request.mockResolvedValue({ id, version: 0 });
+  await f.feature.preparePayment.execute(
+    access,
+    operation,
+    id,
+    checked.value,
+    [payrollIdentifier(997)],
+    signal(),
+  );
+  expect(f.request.mock.calls[0]?.[0].body.items[0]).toMatchObject({
+    assessmentRevision: 2,
+    paymentVersion: 9,
+    amount: "175000.25",
+  });
+  expect(f.request).toHaveBeenCalledOnce();
 });

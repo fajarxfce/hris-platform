@@ -32,6 +32,7 @@ export interface PayrollPayslipRepository {
     company: CompanyId,
     id: string,
     scope: PayrollPayslipScope,
+    revision: number,
     language: PayrollDocumentLanguage,
     signal: AbortSignal,
   ): Promise<Result<BinaryFileContent>>;

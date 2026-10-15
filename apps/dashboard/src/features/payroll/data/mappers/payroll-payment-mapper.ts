@@ -22,6 +22,9 @@ export function toPayrollPaymentBatch(
     if (
       (payrollPaymentAmountMinor(item.amount) ?? 0n) <= 0n ||
       item.version !== expectedVersion ||
+      (item.observedPaymentVersion === null
+        ? item.assessmentRevision !== 0
+        : item.observedPaymentVersion < item.assessmentRevision) ||
       item.batchVersion > raw.version ||
       (settled ? item.batchVersion < 2 : item.batchVersion !== expectedVersion) ||
       (item.status === "SUCCEEDED") !== (item.transactionReference !== null) ||

@@ -3,6 +3,8 @@ import type { payrollPaymentStatuses } from "./payroll-payment-status";
 export type PayrollPaymentItem = Readonly<{
   id: string;
   assessmentId: string;
+  assessmentRevision: number;
+  observedPaymentVersion: number | null;
   employmentId: string;
   employeeNumber: string;
   employeeName: string;

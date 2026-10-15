@@ -45,12 +45,23 @@ export function payslipDetails(index = 1): PayrollPayslipDto {
 export function payslipPayments(index = 1): PayrollPaymentProgressDto {
   return {
     assessmentId: payslipId(index),
-    version: 3,
+    version: 5,
+    settlement: {
+      assessmentRevision: 0,
+      entitlement: "10000000.75",
+      confirmedPaid: "0.00",
+      confirmedRecovered: "0.00",
+      payable: "10000000.75",
+      recoverable: "0.00",
+      currency: "IDR",
+    },
     attempts: [
       {
         batchId: "f2000000-0000-4000-8000-000000000002",
         itemId: "f3000000-0000-4000-8000-000000000002",
         status: "PENDING",
+        amount: "10000000.75",
+        assessmentRevision: 0,
         createdAt: "2026-10-02T02:00:00Z",
         releasedAt: "2026-10-02T02:01:00Z",
         resolvedAt: null,
@@ -59,6 +70,8 @@ export function payslipPayments(index = 1): PayrollPaymentProgressDto {
         batchId: "f2000000-0000-4000-8000-000000000001",
         itemId: "f3000000-0000-4000-8000-000000000001",
         status: "FAILED",
+        amount: "10000000.75",
+        assessmentRevision: 0,
         createdAt: "2026-10-02T01:00:00Z",
         releasedAt: "2026-10-02T01:01:00Z",
         resolvedAt: "2026-10-02T01:02:00Z",

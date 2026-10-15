@@ -122,6 +122,7 @@ export function payrollPaymentView(
           { label: text.accountName, value: item.destination.accountName },
           { label: text.paymentReference, value: item.id },
           { label: text.taxMonth, value: item.taxMonth },
+          { label: text.revision, value: String(item.assessmentRevision) },
           { label: text.plannedDate, value: item.plannedPaymentDate },
           { label: text.assessmentId, value: item.assessmentId },
           ...(outcome && reconciliation

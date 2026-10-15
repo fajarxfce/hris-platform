@@ -124,7 +124,7 @@ describe("payslip presentation ownership", () => {
     const pending = controller.download();
     api.loadPayslipPayments.execute.mockResolvedValueOnce(failed("access_denied"));
     await controller.refreshPayments();
-    expect(api.downloadPayslip.execute.mock.calls[0]?.[4].aborted).toBe(true);
+    expect(api.downloadPayslip.execute.mock.calls[0]?.[5].aborted).toBe(true);
     held.resolve(success(undefined));
     await pending;
     expect(controller.getSnapshot()).toMatchObject({
@@ -163,7 +163,7 @@ describe("payslip presentation ownership", () => {
     controller.selectDocumentLanguage("ID");
     await controller.download();
     expect(api.downloadPayslip.execute).toHaveBeenCalledOnce();
-    expect(api.downloadPayslip.execute.mock.calls[0]?.[3]).toBe("EN");
+    expect(api.downloadPayslip.execute.mock.calls[0]?.[4]).toBe("EN");
     held.resolve(failed("payroll_pdf_capacity"));
     await pending;
     expect(controller.getSnapshot()).toMatchObject({
@@ -187,7 +187,7 @@ describe("payslip presentation ownership", () => {
       unsubscribe = controller.subscribe(listener);
     unsubscribe();
     controller.deactivate();
-    expect(api.downloadPayslip.execute.mock.calls[0]?.[4].aborted).toBe(true);
+    expect(api.downloadPayslip.execute.mock.calls[0]?.[5].aborted).toBe(true);
     held.resolve(success(undefined));
     await pending;
     expect(controller.getSnapshot()).toMatchObject({
@@ -217,4 +217,26 @@ describe("payslip presentation ownership", () => {
     await flush();
     expect(controller.getSnapshot().page?.items).toHaveLength(1);
   });
+});
+
+it("pins the visible statement revision when a newer payment projection arrives", async () => {
+  const { api, controller } = detail(),
+    raw = payslipDetails(),
+    payments = payslipPayments();
+  raw.summary.version = 2;
+  payments.version = 8;
+  payments.settlement.assessmentRevision = 3;
+  api.loadPayslip.execute.mockResolvedValueOnce(
+    success(toPayrollPayslip(raw, access.companyId, payslipId())),
+  );
+  api.loadPayslipPayments.execute.mockResolvedValueOnce(
+    success(toPayrollPaymentProgress(payments, access.companyId, payslipId())),
+  );
+  controller.activate();
+  await flush();
+  await controller.download();
+  expect(controller.getSnapshot().payslip?.summary.version).toBe(2);
+  expect(controller.getSnapshot().payments?.settlement.assessmentRevision).toBe(3);
+  expect(api.downloadPayslip.execute.mock.calls[0]?.[3]).toBe(2);
+  expect(api.loadPayslip.execute).toHaveBeenCalledOnce();
 });

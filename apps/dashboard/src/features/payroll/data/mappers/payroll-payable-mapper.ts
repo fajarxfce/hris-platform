@@ -17,6 +17,7 @@ export function toPayrollPayablePage(
     if (
       at === null ||
       id === search.after ||
+      row.assessmentRevision > row.paymentVersion ||
       (payrollPaymentAmountMinor(row.amount) ?? 0n) <= 0n ||
       (previous && (at > previous.at || (at === previous.at && id >= previous.id)))
     )

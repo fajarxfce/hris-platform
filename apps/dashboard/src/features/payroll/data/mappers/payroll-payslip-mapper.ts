@@ -22,6 +22,7 @@ import type {
 } from "../models/payroll-payslip-dto";
 import { toPayrollCalculationOutput } from "./payroll-calculation-output-mapper";
 import { payrollCalculationMinor } from "./payroll-run-employee-mapper";
+import { toPayrollSettlement } from "./payroll-settlement-mapper";
 
 export function toPayrollPayslipSummary(
   raw: PayrollPayslipSummaryDto,
@@ -92,8 +93,19 @@ export function toPayrollPaymentProgress(
   company: CompanyId,
   id: string,
 ): PayrollPaymentProgress {
+  const settlement = toPayrollSettlement(raw.settlement);
+  const paid = raw.attempts
+    .filter((item) => item.status === "SUCCEEDED")
+    .reduce((sum, item) => sum + payrollCalculationMinor(item.amount), 0n);
   if (
     raw.assessmentId.toLowerCase() !== id ||
+    settlement.assessmentRevision > raw.version ||
+    paid !== payrollCalculationMinor(settlement.confirmedPaid) ||
+    raw.attempts.some(
+      (item) =>
+        item.assessmentRevision > settlement.assessmentRevision ||
+        payrollCalculationMinor(item.amount) <= 0n,
+    ) ||
     new Set(raw.attempts.map((item) => item.itemId.toLowerCase())).size !== raw.attempts.length
   )
     throw new InvalidHttpResponseError();
@@ -101,6 +113,7 @@ export function toPayrollPaymentProgress(
     companyId: company,
     assessmentId: id,
     version: raw.version,
+    settlement,
     attempts: Object.freeze(
       raw.attempts.map((attempt) =>
         Object.freeze({

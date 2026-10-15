@@ -105,8 +105,17 @@ export async function installPayrollPaymentPreparationApi(
       const payable = rows.find((row) => row.assessmentId === item.assessmentId),
         baseline = record.batch.items[index];
       if (!payable || !baseline) throw new Error("Selected payable and instruction are required");
+      expect(item.assessmentRevision).toBe(payable.assessmentRevision);
+      expect(item.paymentVersion).toBe(payable.paymentVersion);
+      expect(item.amount).toBe(payable.amount);
       total += payrollPaymentAmountMinor(payable.amount) ?? 0n;
-      return { ...baseline, ...payable, id: item.id, destination: item.destination };
+      return {
+        ...baseline,
+        ...payable,
+        observedPaymentVersion: item.paymentVersion,
+        id: item.id,
+        destination: item.destination,
+      };
     });
     record.batch.totalAmount = `${total / 100n}.${String(total % 100n).padStart(2, "0")}`;
     const entry = record.history.items[0];

@@ -39,6 +39,8 @@ export function payrollPaymentRecord({
         return {
           id: payrollIdentifier(90_000 + index * 100 + offset, company),
           assessmentId: payrollIdentifier(110_000 + index * 100 + offset, company),
+          assessmentRevision: 0,
+          observedPaymentVersion: null,
           employmentId: payrollIdentifier(120_000 + offset, company),
           employeeNumber: `EMP-${String(offset + 1).padStart(3, "0")}`,
           employeeName: `Finance Employee ${offset + 1}`,

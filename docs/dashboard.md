@@ -365,12 +365,18 @@ review, finalization and generic administrative grants do not grant payslip acce
 
 `/payroll/payslips/:payslipId` displays retained earnings, tax, deductions, insurance
 contributions, overtime and holiday output. Amounts remain decimal strings through
-mapping and formatting. Payment history is a separately versioned projection with
-up to twenty attempts. Its refresh does not reacquire the immutable calculation;
+mapping and formatting. The overview identifies its loaded assessment revision.
+Payment history is a separately versioned projection with up to twenty attempts,
+each retaining its amount and assessment revision. Its summary carries its own
+entitlement, confirmed transfers/returns and payable or recoverable balance, so a
+newer payment read cannot silently change the displayed statement. Its refresh
+does not reacquire the immutable calculation;
 the planned payment date is not a settlement confirmation. Tabs, locale and theme
 changes retain the current read owner.
 
-PDF downloads select Indonesian or English explicitly. A single GET acquires the
+PDF downloads select Indonesian or English explicitly and pin the displayed
+assessment revision throughout acquisition. The filename includes that revision.
+A single GET acquires the
 generated file using its declared length and strong entity tag, with a one-MiB
 limit and the normal finite HTTP deadline. Mapping verifies the SHA-256 digest;
 file handoff belongs to the file repository. Partial, failed and handed-off
@@ -390,8 +396,11 @@ cursor. Amounts remain exact decimal strings. Bank-result mapping preserves
 PostgreSQL timestamp precision when validating retained evidence.
 
 Preparation selects up to one hundred distinct finalized payslips through bounded
-publication-date discovery. Employee labels, tax months, planned dates and amounts
-come from retained assessments. Finance enters bank destinations, reviews the
+publication-date discovery. Employee labels, tax months and planned dates come
+from retained assessments. The amount is the current positive payment balance.
+Selection freezes that amount and the observed assessment/payment versions; the
+review displays the payslip revision. A revised assessment cannot silently replace
+those original instructions during retry. Finance enters bank destinations, reviews the
 complete instructions, and submits one immutable batch. Account numbers remain
 strings, including leading zeros. The command cannot replace salary amounts.
 Cancellation retains a prepared batch's history and permits replacement

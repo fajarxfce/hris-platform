@@ -30,6 +30,7 @@ export interface PayrollPayslipDataSource {
     company: string,
     id: string,
     scope: PayrollPayslipScopeDto,
+    revision: number,
     language: PayrollDocumentLanguageDto,
     signal: AbortSignal,
   ): Promise<BinaryResponseDto>;

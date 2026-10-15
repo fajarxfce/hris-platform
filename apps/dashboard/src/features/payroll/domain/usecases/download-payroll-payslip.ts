@@ -18,17 +18,20 @@ export class DownloadPayrollPayslip {
     access: CompanyAccess,
     id: string,
     scope: PayrollPayslipScope,
+    revision: number,
     language: PayrollDocumentLanguage,
     signal: AbortSignal,
   ) {
     signal.throwIfAborted();
     if (!canReadPayrollPayslips(access.permissions)) return failed("access_denied");
     if (!isUuid(id) || !validPayrollPayslipScope(scope)) return failed("payroll_payslip_not_found");
+    if (!Number.isSafeInteger(revision) || revision < 0) return failed("invalid_payslip_revision");
     if (language !== "ID" && language !== "EN") return failed("invalid_document_language");
     const content = await this.payslips.pdf(
       access.companyId,
       id.toLowerCase(),
       scope,
+      revision,
       language,
       signal,
     );
@@ -41,7 +44,7 @@ export class DownloadPayrollPayslip {
       return await this.files.downloadBinary(
         Object.freeze({
           ...content.value,
-          name: `payslip-${id.toLowerCase()}-${language.toLowerCase()}.pdf`,
+          name: `payslip-${id.toLowerCase()}-v${revision}-${language.toLowerCase()}.pdf`,
           mediaType: "application/pdf",
         }),
         signal,

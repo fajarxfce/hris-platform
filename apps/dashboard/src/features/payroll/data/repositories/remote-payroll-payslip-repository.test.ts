@@ -109,7 +109,7 @@ describe("payslip mapping and acquisition", () => {
       { repo } = fixture(raw);
     const result = await repo.payments(company, payslipId(), "AUTHORIZED", signal());
     assert(result.ok);
-    expect(result.value.version).toBe(3);
+    expect(result.value.version).toBe(5);
     expect(result.value.attempts.map((x) => x.status)).toEqual(["PENDING", "FAILED"]);
     assert(raw.attempts[0]);
     raw.attempts[0].status = "SUCCEEDED";
@@ -123,7 +123,7 @@ describe("payslip mapping and acquisition", () => {
   it("requests one bounded localized PDF and checks its digest before transferring owned buffers", async () => {
     const raw = payslipPdf(),
       { repo, http } = fixture(raw);
-    const result = await repo.pdf(company, payslipId(), "SELF", "EN", signal());
+    const result = await repo.pdf(company, payslipId(), "SELF", 0, "EN", signal());
     assert(result.ok);
     expect(result.value.byteLength).toBe(raw.byteLength);
     assert(result.value.parts[0]);
@@ -132,7 +132,7 @@ describe("payslip mapping and acquisition", () => {
     expect(http.request.mock.calls[0]?.[0]).toMatchObject({
       response: { maximumBytes: 1024 * 1024 },
     });
-    expect(http.request.mock.calls[0]?.[0].path).toContain("scope=SELF&language=EN");
+    expect(http.request.mock.calls[0]?.[0].path).toContain("scope=SELF&language=EN&revision=0");
   });
   it.each(["digest", "abort"])("clears acquired bytes after %s failure", async (failure) => {
     const raw = payslipPdf(),
@@ -144,7 +144,7 @@ describe("payslip mapping and acquisition", () => {
         owner.abort();
         return raw;
       });
-    const result = repo.pdf(company, payslipId(), "SELF", "ID", owner.signal);
+    const result = repo.pdf(company, payslipId(), "SELF", 0, "ID", owner.signal);
     if (failure === "abort") await expect(result).rejects.toMatchObject({ name: "AbortError" });
     else expect(await result).toMatchObject({ ok: false, failure: { code: "invalid_response" } });
     expect(new Uint8Array(raw.parts[0]).every((value) => value === 0)).toBe(true);
@@ -158,7 +158,7 @@ describe("payslip mapping and acquisition", () => {
         detail: "PRIVATE",
       }),
     );
-    const result = await repo.pdf(company, payslipId(), "SELF", "ID", signal());
+    const result = await repo.pdf(company, payslipId(), "SELF", 0, "ID", signal());
     expect(result).toMatchObject({
       ok: false,
       failure: { code: "payroll_pdf_capacity", retryAfterSeconds: 2 },

@@ -110,6 +110,7 @@ export function PayrollPaymentPreparationPage(props: {
                 columns={[
                   { id: "taxMonth", label: text.taxMonth },
                   { id: "employee", label: common.employee },
+                  { id: "revision", label: common.revision },
                   { id: "destination", label: text.destination },
                   { id: "amount", label: common.amount, numeric: true },
                 ]}
@@ -134,6 +135,7 @@ export function PayrollPaymentPreparationPage(props: {
               columns={[
                 { id: "taxMonth", label: text.taxMonth },
                 { id: "employee", label: common.employee },
+                { id: "revision", label: common.revision },
                 { id: "bank", label: common.bank },
                 { id: "name", label: common.accountName },
                 { id: "account", label: common.accountNumber },

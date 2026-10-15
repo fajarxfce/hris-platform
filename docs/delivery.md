@@ -4312,3 +4312,33 @@ dashboard and its same-origin API proxy returned HTTP 200 from the VPS. The priv
 document services, database volume and WireGuard bindings were retained.
 Dashboard amendment/return-entry screens and revised mobile delivery remain
 separate work; this backend increment does not complete those client workflows.
+
+
+### Dashboard payment balances and revision-pinned PDFs
+
+Payslip detail now identifies its loaded assessment revision. Payment history
+retains each instruction's amount and revision, while a separate summary displays
+its own entitlement, confirmed transfers/returns and remaining payable or
+recoverable amount. A newer payment projection does not change the loaded payslip
+or derive a balance from another revision. PDF requests and filenames retain the
+revision displayed when download starts.
+
+Finance selection and review now retain the observed assessment revision, payment
+version and positive amount in every instruction. A changed balance requires
+explicit review; an uncertain outcome retains the original payload. Original
+legacy instructions remain readable. Data mapping validates decimal balances,
+confirmed-transfer sums and revision coherence before publishing a result.
+
+Workspace architecture, TypeScript and formatting checks and the production build
+passed, with all 2,398 unit tests. Focused verification covered 550 payroll cases and 48 Chromium
+scenarios, including revised balances, retained PDF versions, frozen review,
+cancellation, revoked access and company replacement. The same formatted source
+passed the real API/PostgreSQL/worker scenario covering calculation, independent
+review, publication, payslips/PDFs, bank preparation, reconciliation and original
+command recovery. Azure layout screenshots were inspected; narrow widths, theme
+and locale changes passed browser checks. Existing CSS specificity and bundle-size
+advisories remain.
+
+This increment supplies balance reads and positive-delta instruction preparation.
+Amendment authoring/review/publication screens, confirmed-return entry,
+retained-revision navigation and revised mobile delivery remain separate work.

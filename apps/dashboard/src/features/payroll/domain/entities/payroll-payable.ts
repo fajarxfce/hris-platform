@@ -2,6 +2,8 @@ import type { CompanyId } from "../../../../core/domain/identifiers";
 export type PayrollPayable = Readonly<{
   companyId: CompanyId;
   assessmentId: string;
+  assessmentRevision: number;
+  paymentVersion: number;
   employmentId: string;
   employeeNumber: string;
   employeeName: string;

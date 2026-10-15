@@ -7,6 +7,9 @@ export type PayrollPaymentPreparationCommand = Readonly<{
   items: readonly Readonly<{
     id: string;
     assessmentId: string;
+    assessmentRevision: number;
+    paymentVersion: number;
+    amount: string;
     destination: PayrollPaymentDestination;
   }>[];
 }>;

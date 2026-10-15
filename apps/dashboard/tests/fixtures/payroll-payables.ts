@@ -7,6 +7,8 @@ import { payrollIdentifier } from "./payroll-payment-identifiers";
 export function payrollPayable(index = 0, company = 0): PayrollPayableDto {
   return {
     assessmentId: payrollIdentifier(190_000 + index, company),
+    assessmentRevision: 0,
+    paymentVersion: 0,
     employmentId: payrollIdentifier(196_000 + index, company),
     employeeNumber: `PAY-${index + 1}`,
     employeeName: `Payable Employee ${index + 1}`,

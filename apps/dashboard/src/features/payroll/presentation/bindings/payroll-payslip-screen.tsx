@@ -10,7 +10,11 @@ import {
   payrollPayslipScopeFromRoute,
   payrollPayslipSearchFromRoute,
 } from "../models/payroll-payslip-route";
-import { payrollPayslipPaymentRows, payrollPayslipView } from "../models/payroll-payslip-view";
+import {
+  payrollPayslipPaymentRows,
+  payrollPayslipSettlementView,
+  payrollPayslipView,
+} from "../models/payroll-payslip-view";
 import { PayrollPayslipPage } from "../pages/payroll-payslip-page";
 
 export function PayrollPayslipScreen(props: PayrollScreenProps) {
@@ -61,6 +65,10 @@ function PayrollPayslipBinding(
     () => (state.payslip ? payrollPayslipView(state.payslip, locale, timezone) : null),
     [state.payslip, locale, timezone],
   );
+  const settlement = useMemo(
+    () => payrollPayslipSettlementView(state.payments, locale),
+    [state.payments, locale],
+  );
   const paymentRows = useMemo(
     () => payrollPayslipPaymentRows(state.payments, locale, timezone),
     [state.payments, locale, timezone],
@@ -70,6 +78,7 @@ function PayrollPayslipBinding(
       state={state}
       view={view}
       paymentRows={paymentRows}
+      settlement={settlement}
       locale={locale}
       timezone={timezone}
       companyName={props.companyName}

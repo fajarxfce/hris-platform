@@ -14,13 +14,18 @@ import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { payrollPayslipMessages } from "../i18n/payroll-payslip-messages";
 import type { PayrollPayslipState } from "../models/payroll-payslip-state";
-import type { payrollPayslipPaymentRows, payrollPayslipView } from "../models/payroll-payslip-view";
+import type {
+  payrollPayslipPaymentRows,
+  payrollPayslipSettlementView,
+  payrollPayslipView,
+} from "../models/payroll-payslip-view";
 import { PayrollCalculationOutputSection } from "./payroll-calculation-output-section";
 
 export function PayrollPayslipPage(props: {
   state: PayrollPayslipState;
   view: ReturnType<typeof payrollPayslipView> | null;
   paymentRows: ReturnType<typeof payrollPayslipPaymentRows>;
+  settlement: ReturnType<typeof payrollPayslipSettlementView>;
   locale: Locale;
   companyName: string;
   timezone: string;
@@ -120,6 +125,9 @@ export function PayrollPayslipPage(props: {
                   <p className="app-muted">{text.paymentNote}</p>
                   <AppFailure failure={state.paymentFailure} locale={locale} />
                   {state.paymentsLoading && <AppLoading label={messages(locale).loading} />}
+                  {!state.paymentsLoading && props.settlement && (
+                    <AppPropertyList title={text.settlement} items={props.settlement} />
+                  )}
                   {!state.paymentsLoading &&
                     state.payments &&
                     (props.paymentRows.length ? (
@@ -128,6 +136,8 @@ export function PayrollPayslipPage(props: {
                         columns={[
                           { id: "attempt", label: text.attempt },
                           { id: "status", label: text.status },
+                          { id: "amount", label: text.amount },
+                          { id: "revision", label: text.revision },
                           { id: "created", label: text.created },
                           { id: "released", label: text.released },
                           { id: "resolved", label: text.resolved },

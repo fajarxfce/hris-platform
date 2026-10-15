@@ -255,9 +255,10 @@ from immutable individual instructions.
 2. Versioned drafts, retained calculations and independent approval: implemented in the API.
 3. Atomic revised assessment publication, ordinary tax-continuity integration,
    payment balances and confirmed recoveries: implemented in the API/worker.
-4. Dashboard amendment/settlement workflows and revised mobile delivery remain.
-   Canonical current/retained statements, revision-pinned PDFs and sync versions
-   are available in the API; client integration and end-to-end acceptance follow.
+4. Dashboard balance summaries, revision-pinned PDFs and observed positive-delta
+   payment instructions are implemented. Amendment authoring/review/publication,
+   confirmed-return entry, retained-revision navigation and revised mobile delivery
+   remain. The current/retained statements and sync contracts are available in the API.
 
 Each stage requires isolation, competing-change, lost-response, assurance-expiry,
 cancellation and cleanup tests where applicable. The feature is not complete at

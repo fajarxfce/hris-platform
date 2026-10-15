@@ -81,6 +81,7 @@ export function PayrollPayablePickerPage(props: {
               columns={[
                 { id: "taxMonth", label: text.taxMonth },
                 { id: "employee", label: common.employee },
+                { id: "revision", label: common.revision },
                 { id: "amount", label: common.amount, numeric: true },
                 { id: "approved", label: text.approved },
                 { id: "availability", label: text.eligibility },

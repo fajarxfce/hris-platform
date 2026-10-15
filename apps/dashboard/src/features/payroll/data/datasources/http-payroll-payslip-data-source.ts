@@ -53,13 +53,14 @@ export class HttpPayrollPayslipDataSource implements PayrollPayslipDataSource {
     company: string,
     id: string,
     scope: PayrollPayslipScopeDto,
+    revision: number,
     language: PayrollDocumentLanguageDto,
     signal: AbortSignal,
   ) {
     return binaryResponseDto.parse(
       await this.http.request(
         {
-          path: `/api/v1/companies/${company}/payroll/payslips/${id}/pdf?${new URLSearchParams({ scope, language })}`,
+          path: `/api/v1/companies/${company}/payroll/payslips/${id}/pdf?${new URLSearchParams({ scope, language, revision: String(revision) })}`,
           response: { type: "binary", mediaType: "application/pdf", maximumBytes: 1024 * 1024 },
         },
         signal,

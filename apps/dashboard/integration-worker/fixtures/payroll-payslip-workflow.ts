@@ -62,7 +62,7 @@ export async function exercisePayrollPayslip(input: {
       await reader.getByRole("button", { name: "Download PDF", exact: true }).click();
       const download = await completed;
       expect(download.suggestedFilename()).toBe(
-        `payslip-${summary.id}-${language.toLowerCase()}.pdf`,
+        `payslip-${summary.id}-v0-${language.toLowerCase()}.pdf`,
       );
       const path = await download.path();
       if (!path) throw new Error("Published PDF download required");

@@ -124,7 +124,8 @@ export class PayrollPayslipController {
     });
   };
   download = async (): Promise<void> => {
-    if (!this.#active || this.#state.stage !== "ready" || this.#download) return;
+    const payslip = this.#state.payslip;
+    if (!this.#active || this.#state.stage !== "ready" || !payslip || this.#download) return;
     const pending = new AbortController();
     this.#download = pending;
     this.publish({ ...this.#state, download: "saving", downloadFailure: null });
@@ -133,6 +134,7 @@ export class PayrollPayslipController {
         this.access,
         this.id,
         this.scope,
+        payslip.summary.version,
         this.#state.documentLanguage,
         pending.signal,
       );

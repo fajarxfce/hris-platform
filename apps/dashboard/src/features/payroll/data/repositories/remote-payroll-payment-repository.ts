@@ -40,6 +40,9 @@ export class RemotePayrollPaymentRepository implements PayrollPaymentRepository 
           items: command.items.map((item) => ({
             id: item.id,
             assessmentId: item.assessmentId,
+            assessmentRevision: item.assessmentRevision,
+            paymentVersion: item.paymentVersion,
+            amount: item.amount,
             destination: { ...item.destination },
           })),
         },

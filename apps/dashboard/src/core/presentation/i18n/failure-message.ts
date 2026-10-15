@@ -6,6 +6,22 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Enter up to 120 characters without control characters.",
     "Masukkan maksimal 120 karakter tanpa karakter kontrol.",
   ],
+  invalid_payslip_revision: [
+    "Select a valid payslip revision.",
+    "Pilih revisi payslip yang valid.",
+  ],
+  payroll_payment_observation_required: [
+    "Review the current payslip revision and payment balance before preparing instructions.",
+    "Periksa revisi payslip dan saldo pembayaran saat ini sebelum menyiapkan instruksi.",
+  ],
+  invalid_payroll_payment_observation: [
+    "Review the selected payslip versions and amounts.",
+    "Periksa versi dan nominal payslip yang dipilih.",
+  ],
+  payroll_payment_balance_changed: [
+    "The payment balance changed. Review the current amount before preparing another instruction.",
+    "Saldo pembayaran berubah. Periksa nominal saat ini sebelum menyiapkan instruksi baru.",
+  ],
   payroll_payslip_not_found: [
     "This payslip is unavailable for your current access.",
     "Payslip tidak tersedia untuk akses Anda saat ini.",

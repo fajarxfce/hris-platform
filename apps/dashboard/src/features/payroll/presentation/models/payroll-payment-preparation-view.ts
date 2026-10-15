@@ -47,6 +47,7 @@ export function payrollPaymentPreparationView(
       cells: [
         payable.taxMonth,
         `${payable.employeeName} · ${payable.employeeNumber}`,
+        String(payable.assessmentRevision),
         destination
           ? `${destination.bankCode} · •••• ${destination.accountNumber.slice(-4)}`
           : text.missingDestination,
@@ -59,6 +60,7 @@ export function payrollPaymentPreparationView(
         cells: [
           payable.taxMonth,
           `${payable.employeeName} · ${payable.employeeNumber}`,
+          String(payable.assessmentRevision),
           destination.bankCode,
           destination.accountName,
           destination.accountNumber,
@@ -75,6 +77,7 @@ export function payrollPaymentPreparationView(
               label: common.employee,
               value: `${selected.payable.employeeName} · ${selected.payable.employeeNumber}`,
             },
+            { label: common.revision, value: String(selected.payable.assessmentRevision) },
             { label: common.amount, value: payrollAmountView(selected.payable.amount, locale) },
           ],
         }
@@ -101,6 +104,7 @@ export function payrollPayableRows(
       cells: [
         payable.taxMonth,
         `${payable.employeeName} · ${payable.employeeNumber}`,
+        String(payable.assessmentRevision),
         payrollAmountView(payable.amount, locale),
         date.format(new Date(payable.publishedAt)),
         selected ? text.selected : available ? text.available : text.unavailable,

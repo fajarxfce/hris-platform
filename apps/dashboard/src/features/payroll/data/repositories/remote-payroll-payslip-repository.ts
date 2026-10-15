@@ -35,13 +35,14 @@ export class RemotePayrollPayslipRepository implements PayrollPayslipRepository 
     company: CompanyId,
     id: string,
     scope: PayrollPayslipScope,
+    revision: number,
     language: PayrollDocumentLanguage,
     signal: AbortSignal,
   ) {
     const acquired: ArrayBuffer[] = [];
     try {
       const result = await safeHttpCall(signal, async () => {
-        const raw = await this.source.pdf(company, id, scope, language, signal);
+        const raw = await this.source.pdf(company, id, scope, revision, language, signal);
         acquired.push(...raw.parts);
         return toPayrollPayslipPdf(raw);
       });

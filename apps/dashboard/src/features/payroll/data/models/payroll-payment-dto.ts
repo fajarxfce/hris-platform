@@ -27,6 +27,8 @@ const batchHeader = z.object({
 export const payrollPaymentItemDto = z.object({
   id: z.uuid(),
   assessmentId: z.uuid(),
+  assessmentRevision: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
+  observedPaymentVersion: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).nullable(),
   employmentId: z.uuid(),
   employeeNumber: z.string().min(1).max(32),
   employeeName: z.string().min(1).max(200),

@@ -39,6 +39,7 @@ export function payrollPayslipView(payslip: PayrollPayslip, locale: Locale, time
       { label: text.employee, value: summary.employeeName },
       { label: text.number, value: summary.employeeNumber },
       { label: text.month, value: month },
+      { label: text.revision, value: String(summary.version) },
       { label: text.planned, value: summary.plannedPaymentDate },
       {
         label: `${text.published} (${timezone})`,
@@ -74,10 +75,32 @@ export function payrollPayslipPaymentRows(
       cells: [
         String(progress.attempts.length - index),
         text.paymentStatuses[attempt.status],
+        payrollAmountView(attempt.amount, locale),
+        String(attempt.assessmentRevision),
         time.format(new Date(attempt.createdAt)),
         attempt.releasedAt === null ? "—" : time.format(new Date(attempt.releasedAt)),
         attempt.resolvedAt === null ? "—" : time.format(new Date(attempt.resolvedAt)),
       ],
     })) ?? []
   );
+}
+
+export function payrollPayslipSettlementView(
+  progress: PayrollPaymentProgress | null,
+  locale: Locale,
+) {
+  if (!progress) return null;
+  const text = payrollPayslipMessages(locale),
+    settlement = progress.settlement;
+  return [
+    { label: text.revision, value: String(settlement.assessmentRevision) },
+    { label: text.entitlement, value: payrollAmountView(settlement.entitlement, locale) },
+    { label: text.confirmedPaid, value: payrollAmountView(settlement.confirmedPaid, locale) },
+    {
+      label: text.confirmedRecovered,
+      value: payrollAmountView(settlement.confirmedRecovered, locale),
+    },
+    { label: text.payable, value: payrollAmountView(settlement.payable, locale) },
+    { label: text.recoverable, value: payrollAmountView(settlement.recoverable, locale) },
+  ];
 }

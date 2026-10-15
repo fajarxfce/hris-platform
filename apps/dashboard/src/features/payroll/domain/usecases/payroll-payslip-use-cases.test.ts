@@ -46,6 +46,7 @@ describe("payslip application policy", () => {
           actor,
           payslipId(),
           "AUTHORIZED",
+          0,
           "ID",
           signal(),
         ),
@@ -111,7 +112,7 @@ describe("payslip application policy", () => {
         downloadBinary: vi
           .fn<FileRepository["downloadBinary"]>()
           .mockImplementation(async (file) => {
-            expect(file.name).toBe(`payslip-${payslipId()}-en.pdf`);
+            expect(file.name).toBe(`payslip-${payslipId()}-v0-en.pdf`);
             assert(file.parts[0]);
             expect(new Uint8Array(file.parts[0])[0]).toBe(37);
             if (outcome === "aborted") {
@@ -126,6 +127,7 @@ describe("payslip application policy", () => {
         access,
         payslipId(),
         "SELF",
+        0,
         "EN",
         owner.signal,
       );
@@ -151,6 +153,7 @@ describe("payslip application policy", () => {
         access,
         payslipId(),
         "SELF",
+        0,
         "ID",
         owner.signal,
       ),
@@ -159,3 +162,23 @@ describe("payslip application policy", () => {
     expect(new Uint8Array(raw.parts[0]).every((value) => value === 0)).toBe(true);
   });
 });
+
+it.each([-1, Number.NaN, Number.MAX_SAFE_INTEGER + 1, 0.5])(
+  "rejects invalid export revision %s before acquisition",
+  async (revision) => {
+    const repo = repository(),
+      files = { downloadBinary: vi.fn<FileRepository["downloadBinary"]>() };
+    expect(
+      await new DownloadPayrollPayslip(repo, files).execute(
+        access,
+        payslipId(),
+        "SELF",
+        revision,
+        "ID",
+        signal(),
+      ),
+    ).toMatchObject({ ok: false, failure: { code: "invalid_payslip_revision" } });
+    expect(repo.pdf).not.toHaveBeenCalled();
+    expect(files.downloadBinary).not.toHaveBeenCalled();
+  },
+);

@@ -1,7 +1,8 @@
 # Leave carryover accounting
 
 Status: accounting, request transitions, adjustments, year closing, the durable
-expiry worker, scoped history and terminal recovery are implemented and tested.
+expiry worker, scoped history and terminal recovery are implemented and tested
+across the API and dashboard.
 New public closings create tracked awards; absent validity still means no
 additional expiry. Optional validity configuration remains hidden until client
 views and synchronization are complete. These changes have not been deployed.
@@ -185,6 +186,20 @@ stale discovery. Scope and session assurance are checked again after acquiring
 private data. Responses include only the current page's minimal employee labels
 and safe job metadata, never worker credentials or lease authority.
 
+## Dashboard
+
+Leave processing links to company carry-expiry history, retained attempts and
+bounded employee results. Each result links to the employee's corresponding
+balance year. The original closing labels and deadline remain visible after
+recovery. Commands require the current server-provided action and HR permission.
+
+The detail controller owns one cancellable read and one timer. It stops work when
+hidden or disposed, does not poll a queued deadline more than two minutes away,
+and limits automatic reads to thirty before an explicit refresh. Confirmed
+access loss clears private data. Company replacement discards the previous
+selection and cursors. Recovery retains the original operation and reason after
+an uncertain response; verification cannot silently submit a command.
+
 ## Observed validation
 
 The foundation passed 45 Leave domain tests, including 17 carry-policy scenarios covering
@@ -266,9 +281,23 @@ late MFA and cancellation. OpenAPI contracts, Kotlin compilation, formatting and
 architecture checks passed. No browser, native or development deployment was
 performed for this increment.
 
+Dashboard validation passed all 526 Leave unit tests, type checking, architecture
+checks and the changed files' formatting checks. Thirty-two browser tests covered
+carry expiry and the shared batch/accrual forms; the narrow Indonesian review was
+also rechecked after resetting screenshot scroll position. Desktop and narrow
+screenshots were inspected. These scenarios used controlled API responses.
+
+An additional browser scenario used an isolated API, PostgreSQL and real worker.
+A fictional pre-existing award and failed initial attempt were seeded with all
+constraints enabled. Public recovery survived a lost successful response and
+returned its original receipt after the worker completed. Exactly one three-day
+debit matched the employee outcome and left the balance at zero. This validates
+recovery and execution; optional-validity admission remains internal. API/worker
+JAR builds passed. No native or development deployment was performed.
+
 ## Remaining integration
 
-- Connect expiry history/recovery to the dashboard, and add optional validity to
-  synchronization models, dashboard policies and employee balance views.
+- Add carried-balance metadata to synchronization, dashboard and employee views,
+  then expose optional validity in policy editing.
 - Validate browser/native behavior against the completed API before enabling
   optional validity and deploying these migrations.

@@ -4,6 +4,7 @@ import { HttpLeaveAccrualScheduleDataSource } from "../data/datasources/http-lea
 import { HttpLeaveBalanceDataSource } from "../data/datasources/http-leave-balance-data-source";
 import { HttpLeaveBatchDataSource } from "../data/datasources/http-leave-batch-data-source";
 import { HttpLeaveCalendarDataSource } from "../data/datasources/http-leave-calendar-data-source";
+import { HttpLeaveCarryExpiryDataSource } from "../data/datasources/http-leave-carry-expiry-data-source";
 import { HttpLeavePolicyDataSource } from "../data/datasources/http-leave-policy-data-source";
 import { HttpLeavePreparationDataSource } from "../data/datasources/http-leave-preparation-data-source";
 import { HttpLeaveRequestDataSource } from "../data/datasources/http-leave-request-data-source";
@@ -11,6 +12,7 @@ import { RemoteLeaveAccrualScheduleRepository } from "../data/repositories/remot
 import { RemoteLeaveBalanceRepository } from "../data/repositories/remote-leave-balance-repository";
 import { RemoteLeaveBatchRepository } from "../data/repositories/remote-leave-batch-repository";
 import { RemoteLeaveCalendarRepository } from "../data/repositories/remote-leave-calendar-repository";
+import { RemoteLeaveCarryExpiryRepository } from "../data/repositories/remote-leave-carry-expiry-repository";
 import { RemoteLeavePolicyRepository } from "../data/repositories/remote-leave-policy-repository";
 import { RemoteLeavePreparationRepository } from "../data/repositories/remote-leave-preparation-repository";
 import { RemoteLeaveRequestRepository } from "../data/repositories/remote-leave-request-repository";
@@ -26,6 +28,8 @@ import { LoadLeaveBatchTypes } from "../domain/usecases/load-leave-batch-types";
 import { LoadLeaveBatches } from "../domain/usecases/load-leave-batches";
 import { LoadLeaveCalendar } from "../domain/usecases/load-leave-calendar";
 import { LoadLeaveCalendarEntries } from "../domain/usecases/load-leave-calendar-entries";
+import { LoadLeaveCarryExpiries } from "../domain/usecases/load-leave-carry-expiries";
+import { LoadLeaveCarryExpiry } from "../domain/usecases/load-leave-carry-expiry";
 import { LoadLeaveLedger } from "../domain/usecases/load-leave-ledger";
 import { LoadLeavePolicies } from "../domain/usecases/load-leave-policies";
 import { LoadLeavePolicy } from "../domain/usecases/load-leave-policy";
@@ -37,6 +41,7 @@ import { LoadLeaveRequests } from "../domain/usecases/load-leave-requests";
 import { PreviewLeaveRequest } from "../domain/usecases/preview-leave-request";
 import { RequestLeaveCancellation } from "../domain/usecases/request-leave-cancellation";
 import { ResumeLeaveBatch } from "../domain/usecases/resume-leave-batch";
+import { ResumeLeaveCarryExpiry } from "../domain/usecases/resume-leave-carry-expiry";
 import { ReviewLeaveAccrualSchedule } from "../domain/usecases/review-leave-accrual-schedule";
 import { ReviewLeaveAction } from "../domain/usecases/review-leave-action";
 import { ReviewLeaveBalanceAdjustment } from "../domain/usecases/review-leave-balance-adjustment";
@@ -51,6 +56,7 @@ export function createLeaveFeature(
   http: HttpClient,
   files: Pick<FileRepository, "downloadBinary">,
 ) {
+  const carry = new RemoteLeaveCarryExpiryRepository(new HttpLeaveCarryExpiryDataSource(http));
   const schedules = new RemoteLeaveAccrualScheduleRepository(
     new HttpLeaveAccrualScheduleDataSource(http),
   );
@@ -63,6 +69,9 @@ export function createLeaveFeature(
     new HttpLeavePreparationDataSource(http),
   );
   return {
+    loadCarryExpiries: new LoadLeaveCarryExpiries(carry),
+    loadCarryExpiry: new LoadLeaveCarryExpiry(carry),
+    resumeCarryExpiry: new ResumeLeaveCarryExpiry(carry),
     loadAccrualSchedule: new LoadLeaveAccrualSchedule(schedules),
     loadAccrualSchedules: new LoadLeaveAccrualSchedules(schedules),
     reviewAccrualSchedule: new ReviewLeaveAccrualSchedule(schedules),

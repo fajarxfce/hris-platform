@@ -1531,6 +1531,34 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Kebijakan cuti ini tidak lagi tersedia.",
   ],
   invalid_leave_policy: ["Check the leave policy fields.", "Periksa isian kebijakan cuti."],
+  invalid_leave_carry_expiry_recovery: [
+    "Enter a reason and review the current expiry process.",
+    "Isi alasan dan tinjau proses kedaluwarsa saat ini.",
+  ],
+  leave_carry_expiry_not_found: [
+    "This carry expiry process is unavailable.",
+    "Proses kedaluwarsa carryover ini tidak tersedia.",
+  ],
+  leave_carry_expiry_changed: [
+    "The process changed. Reload its current details.",
+    "Proses berubah. Muat ulang detail terbarunya.",
+  ],
+  leave_carry_expiry_job_obsolete: [
+    "This job has been replaced. Reload the expiry process.",
+    "Job ini sudah digantikan. Muat ulang proses kedaluwarsa.",
+  ],
+  leave_carry_expiry_not_stopped: [
+    "This process has not stopped. Review its current progress.",
+    "Proses ini belum berhenti. Tinjau progres terbarunya.",
+  ],
+  leave_carry_expiry_attempt_limit: [
+    "This process has reached its limit of eight attempts.",
+    "Proses ini telah mencapai batas delapan percobaan.",
+  ],
+  leave_carry_expiry_checkpoint_inconsistent: [
+    "The recorded progress needs administrator review before this process can continue.",
+    "Progres tercatat perlu diperiksa administrator sebelum proses dilanjutkan.",
+  ],
   invalid_leave_batch: [
     "Check the leave type, period and reason.",
     "Periksa jenis cuti, periode, dan alasan.",

@@ -4,9 +4,17 @@ import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppLoading } from "../../../../core/presentation/components/app-loading";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { leaveBatchMessages } from "../i18n/leave-batch-messages";
-import type { LeaveBatchStartState } from "../models/leave-batch-state";
-export function LeaveBatchCommandFeedback(props: {
-  stage: LeaveBatchStartState["stage"];
+export function LeaveCommandFeedback(props: {
+  stage:
+    | "loading"
+    | "unavailable"
+    | "reviewing"
+    | "saving"
+    | "unconfirmed"
+    | "conflict"
+    | "saved"
+    | "editing"
+    | "preparing";
   operationId: string | null;
   locale: Locale;
   successTo: string | null;

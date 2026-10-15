@@ -1,0 +1,30 @@
+import type { CompanyId } from "../../../../core/domain/identifiers";
+export type LeaveCarryExpiryId = string & { readonly leaveCarryExpiryId: unique symbol };
+export type LeaveCarryExpiryStatus = "QUEUED" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELLED";
+export type LeaveCarryExpiry = Readonly<{
+  id: LeaveCarryExpiryId;
+  companyId: CompanyId;
+  sourceKind: "BATCH" | "CLOSING";
+  sourceId: string;
+  employeeId: string | null;
+  typeId: string;
+  typeCode: string;
+  typeName: string;
+  year: number;
+  timezone: string;
+  validThrough: string;
+  expiresAt: string;
+  actorId: string;
+  createdAt: string;
+  reason: string;
+  totalEmployees: number;
+  jobId: string;
+  version: number;
+  status: LeaveCarryExpiryStatus;
+  completedEmployees: number;
+  failureCode: string | null;
+}>;
+export type LeaveCarryExpiryPage = Readonly<{
+  items: readonly LeaveCarryExpiry[];
+  nextCursor: string | null;
+}>;

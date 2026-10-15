@@ -115,6 +115,8 @@ def main():
             raise RuntimeError("Fixture account setup timed out")
         command(sql, input=(root / "apps/dashboard/integration/fixtures/accounts.sql").read_text())
         command(sql, input=(root / "apps/dashboard/integration/fixtures/retirement-archive.sql").read_text())
+        if with_worker:
+            command(sql, input=(root / "apps/dashboard/integration/fixtures/leave-carry-expiry.sql").read_text())
         deadline = time.monotonic() + 30
         while time.monotonic() < deadline:
             if api.poll() is not None:

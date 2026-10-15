@@ -71,6 +71,21 @@ const LeaveAccrualScheduleStartScreen = lazy(() =>
     (module) => ({ default: module.LeaveAccrualScheduleStartScreen }),
   ),
 );
+const LeaveCarryExpiriesScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-carry-expiries-screen").then(
+    (module) => ({ default: module.LeaveCarryExpiriesScreen }),
+  ),
+);
+const LeaveCarryExpiryScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-carry-expiry-screen").then((module) => ({
+    default: module.LeaveCarryExpiryScreen,
+  })),
+);
+const LeaveCarryExpiryResumeScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-carry-expiry-resume-screen").then(
+    (module) => ({ default: module.LeaveCarryExpiryResumeScreen }),
+  ),
+);
 const LeaveBatchesScreen = lazy(() =>
   import("../../features/leave/presentation/bindings/leave-batches-screen").then((module) => ({
     default: module.LeaveBatchesScreen,
@@ -640,6 +655,51 @@ export function PortalRoutes({
               leave={leave}
               companyName={company.name}
               timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/carry-expiries"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveCarryExpiriesScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/carry-expiries/:expiryId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveCarryExpiryScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/carry-expiries/:expiryId/resume"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveCarryExpiryResumeScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
               locale={locale}
               nextIdentifier={nextIdentifier}
             />

@@ -16,7 +16,7 @@ import { leaveAccrualScheduleMessages } from "../i18n/leave-accrual-schedule-mes
 import { leaveBatchMessages } from "../i18n/leave-batch-messages";
 import type { LeaveAccrualScheduleStartState } from "../models/leave-accrual-schedule-state";
 import type { leaveAccrualScheduleReviewView } from "../models/leave-accrual-schedule-view";
-import { LeaveBatchCommandFeedback } from "../widgets/leave-batch-command-feedback";
+import { LeaveCommandFeedback } from "../widgets/leave-command-feedback";
 export function LeaveAccrualScheduleStartPage(props: {
   state: LeaveAccrualScheduleStartState;
   form: ReturnType<typeof useLeaveAccrualScheduleForm>;
@@ -66,7 +66,7 @@ export function LeaveAccrualScheduleStartPage(props: {
       </AppCommandBar>
       <div className="app-report-content">
         <AppFailure failure={state.failure} locale={locale} />
-        <LeaveBatchCommandFeedback
+        <LeaveCommandFeedback
           stage={state.stage}
           operationId={state.operationId}
           locale={locale}

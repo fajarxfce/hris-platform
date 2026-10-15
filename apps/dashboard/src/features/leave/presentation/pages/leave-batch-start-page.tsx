@@ -15,7 +15,7 @@ import type { useLeaveBatchForm } from "../controllers/use-leave-batch-form";
 import { leaveBatchMessages } from "../i18n/leave-batch-messages";
 import type { LeaveBatchStartState } from "../models/leave-batch-state";
 import type { leaveBatchReviewView } from "../models/leave-batch-view";
-import { LeaveBatchCommandFeedback } from "../widgets/leave-batch-command-feedback";
+import { LeaveCommandFeedback } from "../widgets/leave-command-feedback";
 export function LeaveBatchStartPage(props: {
   state: LeaveBatchStartState;
   form: ReturnType<typeof useLeaveBatchForm>;
@@ -68,7 +68,7 @@ export function LeaveBatchStartPage(props: {
       </AppCommandBar>
       <div className="app-report-content">
         <AppFailure failure={state.failure} locale={locale} />
-        <LeaveBatchCommandFeedback
+        <LeaveCommandFeedback
           stage={state.stage}
           operationId={state.operationId}
           locale={locale}

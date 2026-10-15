@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useController, useForm } from "react-hook-form";
 import { useNavigationProtection } from "../../../../core/presentation/navigation/use-navigation-protection";
-export function useLeaveBatchReasonForm(
+export function useLeaveReasonForm(
   controller: { save: (reason: string) => Promise<void>; refresh: () => Promise<void> },
   state: Readonly<{
     stage:

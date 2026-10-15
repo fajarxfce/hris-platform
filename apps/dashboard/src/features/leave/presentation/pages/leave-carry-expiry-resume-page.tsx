@@ -1,0 +1,81 @@
+import { MessageBar, MessageBarBody } from "@fluentui/react-components";
+import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";
+import { AppButton } from "../../../../core/presentation/components/app-button";
+import { AppFailure } from "../../../../core/presentation/components/app-failure";
+import { AppLoading } from "../../../../core/presentation/components/app-loading";
+import { AppPageHeader } from "../../../../core/presentation/components/app-page-header";
+import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
+import { AppTextArea } from "../../../../core/presentation/components/app-text-area";
+import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import type { useLeaveReasonForm } from "../controllers/use-leave-reason-form";
+import { leaveCarryExpiryMessages } from "../i18n/leave-carry-expiry-messages";
+import type { LeaveCarryExpiryCommandState } from "../models/leave-carry-expiry-state";
+import type { leaveCarryExpiryView } from "../models/leave-carry-expiry-view";
+import { LeaveCommandFeedback } from "../widgets/leave-command-feedback";
+export function LeaveCarryExpiryResumePage(props: {
+  state: LeaveCarryExpiryCommandState;
+  form: ReturnType<typeof useLeaveReasonForm>;
+  view: ReturnType<typeof leaveCarryExpiryView> | null;
+  canSubmit: boolean;
+  locale: Locale;
+  companyName: string;
+  backTo: string;
+  successTo: string | null;
+  onRetry: () => void;
+}) {
+  const { state, form, view, locale } = props,
+    text = leaveCarryExpiryMessages(locale);
+  return (
+    <section
+      className="app-report-content app-record-editor"
+      aria-busy={state.stage === "loading" || state.stage === "saving"}
+    >
+      <AppPageHeader
+        title={text.resume}
+        context={props.companyName}
+        actions={<Link to={props.backTo}>{text.backToDetail}</Link>}
+      />
+      <AppFailure failure={state.failure} locale={locale} />
+      {state.stage === "loading" && <AppLoading label={messages(locale).loading} />}
+      <LeaveCommandFeedback
+        stage={state.stage}
+        operationId={state.operationId}
+        locale={locale}
+        successTo={props.successTo}
+        successMessage={text.resumed}
+        successLabel={text.view}
+        onRetry={props.onRetry}
+      />
+      {["reviewing", "conflict", "unavailable"].includes(state.stage) && (
+        <div>
+          <AppButton appearance="subtle" icon={<ArrowClockwise20Regular />} onClick={form.reload}>
+            {text.reload}
+          </AppButton>
+        </div>
+      )}
+      {view && <AppPropertyList title={text.overview} items={view.properties} />}
+      {state.stage === "reviewing" && !props.canSubmit && (
+        <MessageBar intent="warning" role="status">
+          <MessageBarBody>{text.unavailableAction}</MessageBarBody>
+        </MessageBar>
+      )}
+      {state.stage === "reviewing" && props.canSubmit && (
+        <form
+          className="app-editor-form"
+          aria-label={text.resume}
+          onSubmit={form.submit}
+          noValidate
+        >
+          <p>{text.resumeNote}</p>
+          <AppTextArea label={text.reason} rows={3} maxLength={1000} required {...form.reason} />
+          <div className="app-form-actions">
+            <AppButton appearance="primary" type="submit">
+              {text.resume}
+            </AppButton>
+          </div>
+        </form>
+      )}
+    </section>
+  );
+}

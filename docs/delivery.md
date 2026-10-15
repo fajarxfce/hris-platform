@@ -48,6 +48,23 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Leave carry dashboard
+
+Company history, retained attempts, employee results and explicit terminal recovery
+are implemented. Controllers own visibility, cancellation and finite polling.
+Uncertain responses retain the original command across verification and conflicts;
+company replacement clears obsolete selections. Shared reason/command feedback
+components also continue to serve accrual and year-closing forms.
+
+Validation passed 526 Leave unit tests, type checking, architecture and formatting
+checks, and 32 controlled-API browser tests. A narrow review screenshot was rechecked;
+desktop and narrow layouts were visually inspected. An additional isolated
+API/PostgreSQL/worker browser scenario verified public recovery after a lost success
+response, retained attempts and one matching three-day ledger debit. API/worker
+JAR builds passed. Optional-validity admission remains internal; balance/sync/client
+integration and development deployment are still pending. No native validation
+was performed for this dashboard increment.
+
 ### Leave carry history and recovery
 
 Scoped history and detail retain original policy labels, coherent current-job

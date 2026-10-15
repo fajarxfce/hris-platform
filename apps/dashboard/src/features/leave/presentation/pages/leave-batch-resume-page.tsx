@@ -9,14 +9,14 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { AppTextArea } from "../../../../core/presentation/components/app-text-area";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { LeaveBatchDetails } from "../../domain/entities/leave-batch-details";
-import type { useLeaveBatchReasonForm } from "../controllers/use-leave-batch-reason-form";
+import type { useLeaveReasonForm } from "../controllers/use-leave-reason-form";
 import { leaveBatchMessages } from "../i18n/leave-batch-messages";
 import type { LeaveBatchCommandState } from "../models/leave-batch-state";
 import type { leaveBatchView } from "../models/leave-batch-view";
-import { LeaveBatchCommandFeedback } from "../widgets/leave-batch-command-feedback";
+import { LeaveCommandFeedback } from "../widgets/leave-command-feedback";
 export function LeaveBatchResumePage(props: {
   state: LeaveBatchCommandState<LeaveBatchDetails>;
-  form: ReturnType<typeof useLeaveBatchReasonForm>;
+  form: ReturnType<typeof useLeaveReasonForm>;
   view: ReturnType<typeof leaveBatchView> | null;
   canSubmit: boolean;
   locale: Locale;
@@ -39,7 +39,7 @@ export function LeaveBatchResumePage(props: {
       />
       <AppFailure failure={state.failure} locale={locale} />
       {state.stage === "loading" && <AppLoading label={messages(locale).loading} />}
-      <LeaveBatchCommandFeedback
+      <LeaveCommandFeedback
         stage={state.stage}
         operationId={state.operationId}
         locale={locale}

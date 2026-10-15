@@ -452,6 +452,10 @@ guards; recovery between initial discovery and locking returns a conflict rather
 than combining attempts. Employee references are minimal and limited to the
 requested outcome page. Reads retain current scope and MFA assurance after
 acquisition. Delivery projects safe job fields without lease or credential data.
+The dashboard's separate history/detail/recovery controllers own their requests,
+finite polling and immutable command input. Hidden reads are cancelled and fenced;
+an uncertain command keeps its operation ID through verification or conflicts.
+Visibility and company transitions belong to bindings/controllers, not datasources.
 
 ## API and clients
 

@@ -10,6 +10,8 @@ import type { LoadLeaveBatchTypes } from "../../domain/usecases/load-leave-batch
 import type { LoadLeaveBatches } from "../../domain/usecases/load-leave-batches";
 import type { LoadLeaveCalendar } from "../../domain/usecases/load-leave-calendar";
 import type { LoadLeaveCalendarEntries } from "../../domain/usecases/load-leave-calendar-entries";
+import type { LoadLeaveCarryExpiries } from "../../domain/usecases/load-leave-carry-expiries";
+import type { LoadLeaveCarryExpiry } from "../../domain/usecases/load-leave-carry-expiry";
 import type { LoadLeaveLedger } from "../../domain/usecases/load-leave-ledger";
 import type { LoadLeavePolicies } from "../../domain/usecases/load-leave-policies";
 import type { LoadLeavePolicy } from "../../domain/usecases/load-leave-policy";
@@ -21,6 +23,7 @@ import type { LoadLeaveRequests } from "../../domain/usecases/load-leave-request
 import type { PreviewLeaveRequest } from "../../domain/usecases/preview-leave-request";
 import type { RequestLeaveCancellation } from "../../domain/usecases/request-leave-cancellation";
 import type { ResumeLeaveBatch } from "../../domain/usecases/resume-leave-batch";
+import type { ResumeLeaveCarryExpiry } from "../../domain/usecases/resume-leave-carry-expiry";
 import type { ReviewLeaveAccrualSchedule } from "../../domain/usecases/review-leave-accrual-schedule";
 import type { ReviewLeaveAction } from "../../domain/usecases/review-leave-action";
 import type { ReviewLeaveBalanceAdjustment } from "../../domain/usecases/review-leave-balance-adjustment";
@@ -32,6 +35,9 @@ import type { SubmitLeaveRequest } from "../../domain/usecases/submit-leave-requ
 import type { WithdrawLeaveRequest } from "../../domain/usecases/withdraw-leave-request";
 
 export type LeaveUseCases = Readonly<{
+  loadCarryExpiries: Pick<LoadLeaveCarryExpiries, "execute">;
+  loadCarryExpiry: Pick<LoadLeaveCarryExpiry, "execute">;
+  resumeCarryExpiry: Pick<ResumeLeaveCarryExpiry, "execute">;
   loadAccrualSchedule: Pick<LoadLeaveAccrualSchedule, "execute">;
   loadAccrualSchedules: Pick<LoadLeaveAccrualSchedules, "execute">;
   reviewAccrualSchedule: Pick<ReviewLeaveAccrualSchedule, "execute">;

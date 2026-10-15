@@ -4,7 +4,7 @@ import { useWorkspaceRevalidation } from "../../../../core/presentation/session/
 import { canResumeLeaveBatch } from "../../domain/policies/leave-batch-policy";
 import type { LeaveBatchScreenProps } from "../contracts/leave-batch-screen-props";
 import { LeaveBatchResumeController } from "../controllers/leave-batch-resume-controller";
-import { useLeaveBatchReasonForm } from "../controllers/use-leave-batch-reason-form";
+import { useLeaveReasonForm } from "../controllers/use-leave-reason-form";
 import { leaveBatchRoute } from "../models/leave-batch-route";
 import { leaveBatchView } from "../models/leave-batch-view";
 import { LeaveBatchResumePage } from "../pages/leave-batch-resume-page";
@@ -50,7 +50,7 @@ function LeaveBatchResumeBinding(props: LeaveBatchScreenProps & { id: string }) 
     return controller.deactivate;
   }, [controller]);
   useWorkspaceRevalidation(state.failure);
-  const form = useLeaveBatchReasonForm(controller, state),
+  const form = useLeaveReasonForm(controller, state),
     view = useMemo(
       () => (state.review ? leaveBatchView(state.review, props.locale) : null),
       [state.review, props.locale],

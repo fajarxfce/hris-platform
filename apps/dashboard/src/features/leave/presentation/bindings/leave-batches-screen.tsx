@@ -52,6 +52,7 @@ function LeaveBatchesBinding(props: LeaveBatchScreenProps & { after: string | nu
         canRunLeaveBatch(props.access.permissions, "YEAR_CLOSE") ? route.newYearCloseTo : null
       }
       schedulesTo={`/leave/accrual-schedules?company=${encodeURIComponent(props.access.companyId)}`}
+      carryTo={`/leave/carry-expiries?company=${encodeURIComponent(props.access.companyId)}`}
       firstPage={props.after === null}
       onRefresh={controller.refresh}
       onFirst={() => setParameters({ company: props.access.companyId })}

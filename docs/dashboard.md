@@ -1380,3 +1380,19 @@ periods. Opening a period retains the schedule and its history cursor through
 outcome paging and recovery. Cancellation and resume use the existing job and
 batch workflows; future recovery retains the original due time. Schedule readers
 perform explicit bounded reads, without browser timers for future periods.
+
+## Leave carry expiry
+
+Leave processing opens company carry-expiry history, attempt details and employee
+results. Results link to the matching balance year; original labels and deadlines
+remain retained. Terminal recovery uses current HR scope, the observed version,
+a reason and the original operation ID after response loss. Hidden reads stop;
+active details use bounded polling, while distant scheduled work is not polled.
+Company changes clear the previous selection and cursors. English/Indonesian
+copy and responsive Fluent components reuse the existing portal shell.
+
+Unit and browser tests cover disposal, finite polling, original-command recovery,
+MFA, company replacement and narrow dark-mode review. A real API/PostgreSQL/worker
+scenario verified recovery and one ledger debit after a lost successful response.
+Optional validity configuration and carried-balance presentation remain in the
+[carryover integration](leave-carryover.md#remaining-integration) backlog.

@@ -14,7 +14,15 @@ import org.springframework.web.bind.annotation.*
 class PayrollPaymentRecoveryController(
     private val confirm: ConfirmPayrollPaymentRecovery,
     private val list: ListPayrollPaymentRecoveries,
+    private val review: GetPayrollPaymentRecoveryReview,
 ) {
+    @GetMapping("/review")
+    fun review(
+        actor: Actor,
+        @PathVariable assessmentId: UUID,
+    ): PayrollPaymentRecoveryReviewResponse =
+        review.execute(actor, assessmentId).response().toResponse()
+
     @GetMapping
     fun list(actor: Actor, @PathVariable assessmentId: UUID): List<PayrollPaymentRecoveryResponse> =
         list.execute(actor, assessmentId).response().map { it.toResponse() }

@@ -21,6 +21,28 @@ import tools.jackson.databind.ObjectMapper
 class PayrollConfiguration {
 
     @Bean
+    fun getPayrollPaymentRecoveryReview(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetPayrollPaymentRecoveryReview(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
     fun confirmPayrollPaymentRecovery(
         payments: PayrollPaymentRepository,
         people: PeopleRepository,

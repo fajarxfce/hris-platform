@@ -33,6 +33,16 @@ operation still returns its original receipt before checking current balances.
 
 ## Confirmed recoveries
 
+`GET /api/v1/companies/{companyId}/payroll/payslips/{assessmentId}/recoveries/review`
+combines the current employee/month reference, independently versioned payment
+balance, retained returns and earliest valid confirmation time under one shared
+payment guard. It requires finance authority independently of payslip read grants.
+The response includes `canConfirm` and every applicable blocker: `NOT_OVERPAID`,
+`PENDING_PAYMENT`, `RECOVERY_LIMIT` or `BENEFICIARY`. A beneficiary with finance
+read authority can inspect the evidence but cannot confirm their own return.
+The review creates no reservation or command. Confirmation still rechecks its
+observed revision, payment version, current balance and current beneficiary.
+
 Use `GET /api/v1/companies/{companyId}/payroll/payslips/{assessmentId}/recoveries`
 for at most twenty retained return records. `PUT .../recoveries/{id}` records one
 confirmed incoming bank amount with an `Idempotency-Key`, `assessmentRevision`,

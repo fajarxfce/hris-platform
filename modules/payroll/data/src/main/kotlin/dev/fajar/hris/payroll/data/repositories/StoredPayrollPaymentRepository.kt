@@ -38,18 +38,7 @@ class StoredPayrollPaymentRepository(private val source: PayrollPaymentDataSourc
             PayrollPaymentProgress(
                 head.assessmentId,
                 head.version,
-                source.progress(companyId, assessmentId).map {
-                    PayrollPaymentAttempt(
-                        it.batchId,
-                        it.itemId,
-                        PayrollPaymentItemStatus.valueOf(it.status),
-                        it.createdAt.toInstant(),
-                        it.releasedAt?.toInstant(),
-                        it.resolvedAt?.toInstant(),
-                        it.amount,
-                        it.assessmentRevision,
-                    )
-                },
+                source.progress(companyId, assessmentId).map { it.toAttempt() },
                 PayrollSettlement(
                     head.assessmentRevision,
                     head.entitlement,

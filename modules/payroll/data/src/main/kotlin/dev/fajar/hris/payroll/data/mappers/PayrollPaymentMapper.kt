@@ -1,11 +1,30 @@
 package dev.fajar.hris.payroll.data.mappers
 
+import dev.fajar.hris.payroll.data.models.PayrollPaymentProgressRow
 import dev.fajar.hris.payroll.data.models.PayrollPaymentSummaryRow
 import dev.fajar.hris.payroll.domain.entities.*
 import dev.fajar.hris.schema.tables.records.*
 import java.time.YearMonth
 import java.time.ZoneOffset
 import java.util.UUID
+
+fun PayrollPaymentProgressRow.toAttempt(): PayrollPaymentAttempt {
+    val state = PayrollPaymentItemStatus.valueOf(status)
+    if (state in setOf(PayrollPaymentItemStatus.SUCCEEDED, PayrollPaymentItemStatus.FAILED)) {
+        requireNotNull(releasedAt)
+        requireNotNull(resolvedAt)
+    }
+    return PayrollPaymentAttempt(
+        batchId,
+        itemId,
+        state,
+        createdAt.toInstant(),
+        releasedAt?.toInstant(),
+        resolvedAt?.toInstant(),
+        amount,
+        assessmentRevision,
+    )
+}
 
 fun PayrollPayableCandidatesRecord.toPayable() =
     PayrollPayable(

@@ -256,9 +256,12 @@ from immutable individual instructions.
 3. Atomic revised assessment publication, ordinary tax-continuity integration,
    payment balances and confirmed recoveries: implemented in the API/worker.
 4. Dashboard balance summaries, revision-pinned PDFs and observed positive-delta
-   payment instructions are implemented. Amendment authoring/review/publication,
-   confirmed-return entry, retained-revision navigation and revised mobile delivery
-   remain. The current/retained statements and sync contracts are available in the API.
+   payment instructions are implemented. Native current-revision payslips,
+   independent balances, compatible offline acquisition and revision-pinned PDF
+   export are implemented and validated on the emulator. Amendment
+   authoring/review/publication, confirmed-return entry and retained-revision
+   navigation remain. The current/retained statements and sync contracts are
+   available in the API. The revised APK awaits phone connectivity.
 
 Each stage requires isolation, competing-change, lost-response, assurance-expiry,
 cancellation and cleanup tests where applicable. The feature is not complete at

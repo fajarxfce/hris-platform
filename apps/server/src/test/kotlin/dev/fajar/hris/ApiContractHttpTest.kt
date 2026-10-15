@@ -34,6 +34,37 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun payrollRecoveryReviewCarriesACompleteBalanceAndServerEligibilityWithoutACommand() {
+        val api = contract()
+        val path = "/api/v1/companies/{companyId}/payroll/payslips/{assessmentId}/recoveries/review"
+        val operation = api["paths"][path]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        assertFalse(
+            operation.path("parameters").any { it.path("name").asString() == "Idempotency-Key" }
+        )
+        val fields =
+            api["components"]["schemas"]["PayrollPaymentRecoveryReviewResponse"]["properties"]
+        assertEquals(
+            setOf(
+                "assessmentId",
+                "employmentId",
+                "employeeNumber",
+                "employeeName",
+                "taxMonth",
+                "publishedAt",
+                "payments",
+                "recoveries",
+                "earliestConfirmationAt",
+                "canConfirm",
+                "blockers",
+            ),
+            fields.propertyNames().toSet(),
+        )
+        assertEquals("boolean", fields["canConfirm"]["type"].asString())
+        assertEquals("array", fields["recoveries"]["type"].asString())
+    }
+
+    @Test
     fun amendmentReviewsPinDraftCalculationAndApprovalReferencesWithIndependentReadRoutes() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/payroll"

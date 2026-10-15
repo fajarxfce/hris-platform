@@ -249,6 +249,14 @@ registry; they never become negative instructions. The independently synchronize
 payment projection carries its own entitlement and assessment revision. PDF
 acquisition and post-render authorization retain the selected statement revision.
 
+Finance return review coordinates candidate, payment-progress, beneficiary and
+retained-return reads under the shared payment, People and access guards. A return
+or amended publication cannot interleave those facts; concurrent readers share the
+guard. Domain policy derives advisory blockers and the earliest confirmation time.
+Confirmed bank outcomes require their release/resolution timestamps at the data
+mapping boundary. The review rechecks current assurance after acquisition and
+does not reserve a balance or change original-command recovery.
+
 Amendment acquisition selects the current head through a security-invoker evidence
 view; it never falls back to original results. The repository maps its raw rows
 inside the database failure boundary. Recalculation owns the chronological tax

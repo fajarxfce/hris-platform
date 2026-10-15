@@ -1,4 +1,5 @@
 import { expect, type Page } from "@playwright/test";
+import type { LeaveCarryBalanceDto } from "../src/features/leave/data/models/leave-carry-balance-dto";
 import { leaveEmployeeId } from "./fixtures/leave";
 import { balanceDirectoryPage, balanceLedgerPage } from "./fixtures/leave-balances";
 import { companyIds } from "./identity-api";
@@ -16,6 +17,7 @@ export async function installLeaveBalancesApi(page: Page, permissions = ["leave.
   const reads: URL[] = [];
   let failure: string | null = null;
   let malformed = false;
+  let carry: LeaveCarryBalanceDto | null | undefined;
   let held: {
     kind: "list" | "ledger";
     entered: ReturnType<typeof gate>;
@@ -51,11 +53,13 @@ export async function installLeaveBalancesApi(page: Page, permissions = ["leave.
     const after = url.searchParams.get("after");
     if (type) {
       const raw = balanceLedgerPage(Number(parts[10]), after, type);
+      raw.balance.carry = carry;
       return route.fulfill({
         json: malformed ? { ...raw, balance: { ...raw.balance, year: 1900 } } : raw,
       });
     }
     const raw = balanceDirectoryPage(Number(url.searchParams.get("year")), after);
+    for (const item of raw.balances.items) item.balance.carry = carry;
     return route.fulfill({
       json: malformed ? { ...raw, employee: { ...raw.employee, id: leaveEmployeeId(1) } } : raw,
     });
@@ -64,6 +68,9 @@ export async function installLeaveBalancesApi(page: Page, permissions = ["leave.
     requests,
     identity: requests.identity,
     reads,
+    setCarry: (value: LeaveCarryBalanceDto | null) => {
+      carry = value;
+    },
     failNext: (code: string) => {
       failure = code;
     },

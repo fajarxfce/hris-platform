@@ -1,4 +1,5 @@
 import type { EmployeeLeaveBalancesDto } from "../../src/features/leave/data/models/leave-balance-dto";
+import type { LeaveCarryBalanceDto } from "../../src/features/leave/data/models/leave-carry-balance-dto";
 import type { LeaveLedgerDto } from "../../src/features/leave/data/models/leave-ledger-dto";
 import { leaveEmployeeId, leaveId } from "./leave";
 
@@ -95,5 +96,22 @@ export function balanceLedgerPage(
       items: available.slice(0, 20),
       nextCursor: available.length > 20 ? (available[19]?.id ?? null) : null,
     },
+  };
+}
+
+export function carriedBalance(year = 2026): LeaveCarryBalanceDto {
+  return {
+    closingId: "cf000000-0000-4000-8000-000000000001",
+    awardedDays: "6",
+    availableDays: "2.5",
+    reservedDays: "0.5",
+    consumedDays: "1.5",
+    expiredDays: "0.5",
+    transferredDays: "0.5",
+    deductedDays: "0.5",
+    validThrough: `${year}-03-31`,
+    expiresAt: `${year}-03-31T17:00:00Z`,
+    timezone: "Asia/Jakarta",
+    version: 5,
   };
 }

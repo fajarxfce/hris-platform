@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { leaveEmployeeId, leaveId } from "./fixtures/leave";
-import { balanceEntryId, balanceTypeId } from "./fixtures/leave-balances";
+import { balanceEntryId, balanceTypeId, carriedBalance } from "./fixtures/leave-balances";
 import { companyIds } from "./identity-api";
 import { installLeaveBalancesApi } from "./leave-balances-api";
 
@@ -261,3 +261,56 @@ test("ledger evidence supports Indonesian dark mobile layout without restarting 
     animations: "disabled",
   });
 });
+
+for (const locale of ["en", "id"] as const)
+  test(`carried balance retains its frozen validity and exact values in ${locale}`, async ({
+    page,
+  }) => {
+    if (locale === "id") await page.setViewportSize({ width: 390, height: 844 });
+    const api = await installLeaveBalancesApi(page);
+    api.setCarry(carriedBalance());
+    await page.goto(ledger);
+    await expect(page.getByRole("region", { name: "Carried balance", exact: true })).toBeVisible();
+    const reads = api.reads.length;
+    if (locale === "id") {
+      await page.getByRole("combobox", { name: "Language", exact: true }).selectOption("id");
+      await page.getByRole("button", { name: "Tema", exact: true }).click();
+    }
+    const carry = page.getByRole("region", {
+      name: locale === "en" ? "Carried balance" : "Saldo carryover",
+      exact: true,
+    });
+    await expect(carry).toContainText(locale === "en" ? "2.5" : "2,5");
+    await expect(carry).toContainText(locale === "en" ? "Mar 31, 2026" : "31 Mar 2026");
+    await expect(carry).toContainText("Asia/Jakarta");
+    expect(api.reads).toHaveLength(reads);
+    await page
+      .getByRole("button", {
+        name: locale === "en" ? "Older movements" : "Transaksi sebelumnya",
+        exact: true,
+      })
+      .click();
+    await expect(carry).toContainText(locale === "en" ? "2.5" : "2,5");
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({
+      path: `/tmp/hris-carry-balance-ui/ledger-${locale}.png`,
+      fullPage: true,
+      animations: "disabled",
+    });
+    api.setCarry({ ...carriedBalance(), validThrough: null, expiresAt: null });
+    await page
+      .getByRole("button", { name: locale === "en" ? "Refresh" : "Muat ulang", exact: true })
+      .click();
+    await expect(carry).toContainText(
+      locale === "en" ? "No additional deadline" : "Tanpa batas tambahan",
+    );
+    api.failNext("employee_not_found");
+    await page
+      .getByRole("button", { name: locale === "en" ? "Refresh" : "Muat ulang", exact: true })
+      .click();
+    await expect(page.getByRole("alert")).toBeVisible();
+    await expect(carry).toHaveCount(0);
+  });

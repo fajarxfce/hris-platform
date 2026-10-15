@@ -94,6 +94,18 @@ test("retained carry recovery survives response loss and the real worker debits 
     availableDeltaDays: "-3",
   });
   expect(ledger.balance.availableDays).toBe("0");
+  expect(ledger.balance.carry).toMatchObject({
+    awardedDays: "3",
+    availableDays: "0",
+    reservedDays: "0",
+    consumedDays: "0",
+    expiredDays: "3",
+    transferredDays: "0",
+    deductedDays: "0",
+    validThrough: original.expiry.validThrough,
+    expiresAt: original.expiry.expiresAt,
+    timezone: original.expiry.timezone,
+  });
   await page.getByRole("link", { name: "View expiry", exact: true }).click();
   const results = page.getByRole("table", { name: "Employee results", exact: true });
   await expect(results).toContainText("Carry Fixture Employee");
@@ -108,4 +120,9 @@ test("retained carry recovery survives response loss and the real worker debits 
     .click();
   await expect(page).toHaveURL(new RegExp(`/balances/${type}\\?`, "u"));
   expect(new URL(page.url()).searchParams.get("year")).toBe(String(completed.expiry.year));
+  const carry = page.getByRole("region", { name: "Carried balance", exact: true });
+  await expect(carry).toBeVisible();
+  await expect(carry.getByText("Expired days", { exact: true }).locator("+ dd")).toHaveText("3");
+  await expect(carry.getByText("Available days", { exact: true }).locator("+ dd")).toHaveText("0");
+  await page.screenshot({ path: "/tmp/hris-carry-balance-ui/real-worker.png", fullPage: true });
 });

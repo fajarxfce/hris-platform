@@ -44,7 +44,28 @@ export function leaveLedgerView(ledger: LeaveLedger, locale: Locale, timezone: s
     timeZone: timezone,
   });
   const balance = ledger.balance;
+  const carry = balance.carry;
+  const calendarDate = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" });
   return {
+    carry: carry
+      ? [
+          { label: text.awarded, value: number.format(Number(carry.awardedDays)) },
+          { label: text.available, value: number.format(Number(carry.availableDays)) },
+          { label: text.reserved, value: number.format(Number(carry.reservedDays)) },
+          { label: text.consumed, value: number.format(Number(carry.consumedDays)) },
+          { label: text.expired, value: number.format(Number(carry.expiredDays)) },
+          { label: text.transferred, value: number.format(Number(carry.transferredDays)) },
+          { label: text.deducted, value: number.format(Number(carry.deductedDays)) },
+          {
+            label: text.validThrough,
+            value: carry.validThrough
+              ? calendarDate.format(new Date(`${carry.validThrough}T00:00:00Z`))
+              : text.noDeadline,
+          },
+          { label: text.timezone, value: carry.timezone },
+          { label: text.closing, value: carry.closingId },
+        ]
+      : null,
     properties: [
       { label: text.type, value: `${ledger.typeName} · ${ledger.typeCode}` },
       { label: text.available, value: number.format(Number(balance.availableDays)) },

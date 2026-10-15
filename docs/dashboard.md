@@ -1040,6 +1040,21 @@ Drafts and unresolved saves use the shared departure guard. Company replacement 
 
 Mapping validates employee/type/year identity, half-day decimal bounds, unique accounts/movements, precise timestamp order, and finite cursor progress. Controllers own one read, cancel obsolete work, and clear private values and selection during refresh, access failure, disposal, or company replacement. Verification never silently retries a failed read. Locale/theme updates retain the observation and selection. The directory does not create unused accounts; entitlement posting and year closing remain subsequent dashboard actions.
 
+Tracked carry appears in a separate balance section, including awarded, free,
+reserved, used, expired, transferred and deducted days, the original validity date
+and award timezone. These figures are part of the main account totals. Mapping
+checks conservation and the carried subset, freezes detached values and retains
+the original UTC deadline across timezone database changes. Ordinary or older
+responses without a breakdown remain readable. Calendar dates do not shift when
+the operator uses another timezone. Recorded balances do not guarantee that a
+future request can use expired carried credit; request preview applies that policy.
+
+The increment passed 546 Leave unit tests, type checking, architecture checks,
+changed-file formatting and 14 balance browser scenarios. English desktop and
+Indonesian dark narrow screenshots were inspected. An additional isolated
+API/PostgreSQL/worker browser scenario verified matching expired and available
+figures after the recovered worker's single debit. No native validation is included.
+
 ## Leave balance adjustments
 
 `/leave/employees/:employeeId/balances/adjust` selects a leave type for an explicit year, including types without an existing balance account. Its use case coordinates bounded employee-balance and policy repository reads; the catalog is not an atomic cross-request snapshot. Twenty-type pages retain their cursor and directory context. Opening `/leave/employees/:employeeId/balances/:typeId/adjust` independently reviews the latest balance and server-provided actions. Current management and balance-read scope are required. Missing or unknown action flags never enable adjustment.

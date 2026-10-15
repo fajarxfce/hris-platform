@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { leaveCarryBalanceDto } from "./leave-carry-balance-dto";
 import { leaveVersionDto } from "./leave-value-dto";
 
 export const leaveBalanceQuantityDto = z
@@ -19,6 +20,7 @@ export const leaveBalanceDto = z.object({
   consumedDays: leaveBalanceQuantityDto,
   version: leaveVersionDto,
   closed: z.boolean(),
+  carry: leaveCarryBalanceDto.nullish(),
 });
 export const leaveBalanceSummaryDto = z.object({
   typeId: z.uuid(),

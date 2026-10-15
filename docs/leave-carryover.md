@@ -328,9 +328,18 @@ JAR hashes were verified in their running containers; API health succeeded on
 loopback and the WireGuard interface from the VPS. Existing database/document
 containers were preserved. Optional validity configuration remains hidden.
 
+Dashboard ledger review now displays the tracked breakdown and original calendar
+deadline separately from the account totals. Responses without metadata remain
+compatible. It passed 546 Leave unit tests and fourteen balance browser scenarios,
+including Indonesian dark narrow layout, original UTC retention, conservation,
+access loss and stable figures while paging older ledger movements. The isolated
+API/PostgreSQL/worker scenario also verified the published expired/available
+breakdown in the ledger page after the single debit. Type/build, architecture and
+changed-file formatting checks passed; screenshots were inspected.
+
 ## Remaining integration
 
-- Consume carried-balance metadata in dashboard and employee views, then expose
-  optional validity in policy editing.
-- Deploy the additive read API before upgrading mobile replica metadata. Validate
-  browser/native behavior before enabling optional validity.
+- Consume carried-balance metadata in employee views and upgrade the mobile
+  replica while retaining owned offline records.
+- Validate native behavior before exposing optional validity in policy editing.
+  The additive API is already deployed.

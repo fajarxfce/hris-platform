@@ -75,6 +75,12 @@ export function LeaveLedgerPage({
         {view && (
           <>
             <AppPropertyList title={text.summary} items={view.properties} />
+            {view.carry && (
+              <div>
+                <AppPropertyList title={text.carry} items={view.carry} />
+                <Text className="app-muted">{text.carryHint}</Text>
+              </div>
+            )}
             <Text className="app-muted">{text.labels}</Text>
             {view.entries.length === 0 ? (
               <Text role="status">{text.noEntries}</Text>

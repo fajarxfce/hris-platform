@@ -3,6 +3,7 @@ import type { CompanyId } from "../../../../core/domain/identifiers";
 import type { EmployeeLeaveBalances } from "../../domain/entities/employee-leave-balances";
 import type { LeaveBalance } from "../../domain/entities/leave-balance";
 import type { EmployeeLeaveBalancesDto, LeaveBalanceDto } from "../models/leave-balance-dto";
+import { toLeaveCarryBalance } from "./leave-carry-balance-mapper";
 
 export function toLeaveBalance(raw: LeaveBalanceDto, year: number): LeaveBalance {
   if (
@@ -13,7 +14,11 @@ export function toLeaveBalance(raw: LeaveBalanceDto, year: number): LeaveBalance
         [raw.availableDays, raw.reservedDays, raw.consumedDays].some((value) => value !== "0")))
   )
     throw new InvalidHttpResponseError();
-  return Object.freeze({ ...raw, accountId: raw.accountId?.toLowerCase() ?? null });
+  return Object.freeze({
+    ...raw,
+    accountId: raw.accountId?.toLowerCase() ?? null,
+    carry: raw.carry ? toLeaveCarryBalance(raw.carry, raw) : null,
+  });
 }
 
 export function toEmployeeLeaveBalances(

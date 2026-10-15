@@ -1,3 +1,5 @@
+import type { LeaveCarryBalance } from "./leave-carry-balance";
+
 export type LeaveBalance = Readonly<{
   accountId: string | null;
   year: number;
@@ -6,4 +8,5 @@ export type LeaveBalance = Readonly<{
   consumedDays: string;
   version: number;
   closed: boolean;
+  carry: LeaveCarryBalance | null;
 }>;

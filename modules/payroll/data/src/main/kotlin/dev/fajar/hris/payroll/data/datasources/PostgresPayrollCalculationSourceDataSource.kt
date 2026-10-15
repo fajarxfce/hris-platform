@@ -26,7 +26,8 @@ class PostgresPayrollCalculationSourceDataSource(private val sql: DSLContext) :
                     ) ORDER BY m.employment_id LIMIT 5001
                 )
                 SELECT e.id,e.employee_number,p.legal_name,e.version,c.revision compensation_revision,
-                    i.id input_id,i.version input_revision,o.id opening_id,o.version opening_revision,a.id previous_assessment_id
+                    i.id input_id,i.version input_revision,o.id opening_id,o.version opening_revision,
+                    a.id previous_assessment_id,coalesce(a.revision,0) previous_assessment_revision
                 FROM selected m
                 JOIN LATERAL (
                     SELECT e.id,e.employee_number,e.person_id,e.version FROM employments e
@@ -49,7 +50,8 @@ class PostgresPayrollCalculationSourceDataSource(private val sql: DSLContext) :
                     WHERE o.company_id=? AND o.employment_id=e.id AND o.tax_year=? LIMIT 1
                 ) o ON true
                 LEFT JOIN LATERAL (
-                    SELECT a.id FROM payroll_assessments a
+                    SELECT a.id,h.revision FROM payroll_assessments a
+                    JOIN payroll_assessment_heads h ON h.company_id=a.company_id AND h.assessment_id=a.id
                     WHERE a.company_id=? AND a.person_id=e.person_id AND a.tax_month>=? AND a.tax_month<?
                     ORDER BY a.tax_month DESC LIMIT 1
                 ) a ON true
@@ -83,6 +85,7 @@ class PostgresPayrollCalculationSourceDataSource(private val sql: DSLContext) :
                     r.get("opening_id", UUID::class.java),
                     r.get("opening_revision", Long::class.javaObjectType),
                     r.get("previous_assessment_id", UUID::class.java),
+                    r.get("previous_assessment_revision", Long::class.javaObjectType)!!,
                 )
             }
 

@@ -29,8 +29,8 @@ decimal string in both directions.
 The server acquires retained facts under the shared payroll guard and constructs
 the calculation basis. Clients cannot provide calculated amounts, cumulative tax
 history, work/leave evidence, policy versions or replacement tax registration.
-The original immutable assessment is currently source revision zero; revised
-assessment heads belong to the later publication stage.
+Original immutable assessments retain revision zero in a separate revision ledger.
+Revised publication belongs to the later stage below.
 
 An additional published month or changed source version returns
 `payroll_amendment_sources_changed`. The caller must obtain and review the current
@@ -195,8 +195,10 @@ authentication, observed versions and stable operation IDs.
 Publication advances every affected assessment together. Its transaction includes
 the amendment, revised assessment heads, financial differences, audit/outbox,
 employee synchronization and the fenced publication job. Ordinary calculation and
-finalization must also bind the previous assessment's revision, so an amendment
-cannot silently change the tax history of an already prepared run.
+finalization already bind the previous assessment's ID and revision: calculation
+reads that exact retained history, and finalization checks it against the current
+head. A future amendment cannot silently change the tax history of a prepared run.
+The dashboard shows the retained predecessor revision with its source references.
 
 ## Payment differences
 

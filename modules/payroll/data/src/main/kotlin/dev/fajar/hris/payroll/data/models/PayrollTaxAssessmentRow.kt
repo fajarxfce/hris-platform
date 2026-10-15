@@ -12,4 +12,5 @@ data class PayrollTaxAssessmentRow(
     val registration: String,
     val input: String,
     val calculation: String,
+    val revision: Long,
 )

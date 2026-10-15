@@ -21,12 +21,14 @@ fun derivePayrollTaxHistory(
     )
         return Result.Failed(Failure(FailureKind.CONFLICT, "payroll_tax_history_mismatch"))
     if (target.previousAssessmentId == null) {
-        if (previous != null)
+        if (previous != null || target.previousAssessmentRevision != 0L)
             return Result.Failed(Failure(FailureKind.CONFLICT, "payroll_tax_history_changed"))
         return Result.Success(opening.terms)
     }
     if (previous == null || previous.id != target.previousAssessmentId)
         return Result.Failed(Failure(FailureKind.CONFLICT, "payroll_tax_assessment_missing"))
+    if (previous.revision < 0 || previous.revision != target.previousAssessmentRevision)
+        return Result.Failed(Failure(FailureKind.CONFLICT, "payroll_tax_history_changed"))
     if (previous.month >= month || previous.month.year != month.year)
         return Result.Failed(Failure(FailureKind.CONFLICT, "payroll_tax_history_out_of_order"))
     if (previous.month != month.minusMonths(1))
@@ -61,7 +63,8 @@ fun derivePayrollTaxHistory(
             registration.residency,
             registration.ptkp,
             history,
-            "assessment:${previous.id}",
+            if (previous.revision == 0L) "assessment:${previous.id}"
+            else "assessment:${previous.id}:${previous.revision}",
         )
     return validatePayrollTaxOpening(month.year, terms, "Published tax continuity").map { terms }
 }

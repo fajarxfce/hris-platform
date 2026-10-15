@@ -74,6 +74,13 @@ describe("calculation transport and mapping", () => {
   });
   it.each<[string, (raw: PayrollRunDetailsDto) => void]>([
     [
+      "assessment revision without identity",
+      (raw) => {
+        assert(raw.results.items[0]);
+        raw.results.items[0].target.previousAssessmentRevision = 1;
+      },
+    ],
+    [
       "foreign run",
       (raw) => {
         raw.run.id = calculationPeriod;
@@ -169,6 +176,20 @@ describe("calculation transport and mapping", () => {
       code: "payroll_input_required",
     });
     expect(failure.value.calculation).toBeNull();
+  });
+  it("retains the exact previous assessment revision", async () => {
+    const raw = calculationEmployee();
+    raw.item.target.previousAssessmentId = calculationPeriod;
+    raw.item.target.previousAssessmentRevision = 3;
+    const result = await fixture(raw).repo.employee(
+      company,
+      calculationId,
+      calculationEmployeeId(),
+      signal,
+    );
+    assert(result.ok);
+    expect(result.value.item.target.previousAssessmentId).toBe(calculationPeriod);
+    expect(result.value.item.target.previousAssessmentRevision).toBe(3);
   });
   it("rejects mismatched employee totals and never turns invalid data into a zero result", async () => {
     const raw = calculationEmployee();

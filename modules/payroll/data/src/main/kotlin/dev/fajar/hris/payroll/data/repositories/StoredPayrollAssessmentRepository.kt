@@ -14,10 +14,13 @@ class StoredPayrollAssessmentRepository(
     private val source: PayrollAssessmentDataSource,
     private val json: ObjectMapper,
 ) : PayrollAssessmentRepository {
-    override fun taxHistory(company: UUID, id: UUID): Result<PayrollTaxAssessment?> =
-        safeDatabaseCall {
-            source.taxHistory(company, id)?.toTaxAssessment(json)
-        }
+    override fun taxHistory(
+        company: UUID,
+        id: UUID,
+        revision: Long,
+    ): Result<PayrollTaxAssessment?> = safeDatabaseCall {
+        source.taxHistory(company, id, revision)?.toTaxAssessment(json)
+    }
 
     override fun payslip(
         company: UUID,

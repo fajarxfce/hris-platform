@@ -86,6 +86,7 @@ export const payrollRunItemDto = z.object({
     taxOpeningId: z.uuid().nullable(),
     taxOpeningRevision: revision.nullable(),
     previousAssessmentId: z.uuid().nullable(),
+    previousAssessmentRevision: version,
   }),
   jobId: z.uuid(),
   completedAt: instant,

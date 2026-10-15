@@ -4195,3 +4195,26 @@ services and WireGuard bindings retained. Both processes are running with zero
 restarts. API startup probes on loopback and WireGuard, the dashboard and its
 authentication proxy returned HTTP 200 from the VPS. Existing development
 credentials and MFA were not changed.
+
+### Exact payroll assessment revisions
+
+Ordinary payroll targets now retain both the predecessor assessment ID and its
+published revision. Calculation reads that exact history; publication rejects a
+changed current reference. Original assessments receive revision zero in the same
+transaction, with immutable history and separate current heads. Upgrading existing
+records preserves their facts, results and sync versions. The dashboard displays
+the retained predecessor revision with the calculation's source references.
+
+Validation passed 711 selected backend tests: 531 API/contract cases covering every
+payroll test class, 97 payroll domain cases, three data cases, 18 database cases
+and all 62 worker cases. Coverage includes a populated upgrade waiting for an
+existing writer, company isolation, exact-version reads, rejected raw amendment
+promotion, rollback and 5,000-reference publication. Architecture and formatting
+checks and both application JAR builds passed.
+
+Dashboard checks passed all 2,378 unit tests and nine calculation browser scenarios.
+The existing real API/PostgreSQL/worker scenario also passed calculation recovery,
+independent review, publication, payslip/PDF access, payment and original-command
+recovery. The narrow source-reference layout was inspected. Existing CSS and bundle
+advisories remain. Revised amendment publication and settlement remain subsequent
+work; this increment does not complete those workflows.

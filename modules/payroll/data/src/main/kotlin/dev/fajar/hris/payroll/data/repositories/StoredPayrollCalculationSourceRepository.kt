@@ -49,6 +49,7 @@ class StoredPayrollCalculationSourceRepository(
                 r.taxOpeningId,
                 r.taxOpeningRevision,
                 r.previousAssessmentId,
+                r.previousAssessmentRevision,
             )
         }
     }

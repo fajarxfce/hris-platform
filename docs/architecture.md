@@ -220,6 +220,15 @@ reads, rejection, withdrawal and authorized receipt replay do not replace it.
 Recent assurance and current delegation validity are retained through completion.
 Approval remains separate from revised publication and employee synchronization.
 
+Assessment identities retain an immutable revision ledger and a separate current
+head. Original finalization records revision zero in the same transaction as its
+assessment; backfill does not rewrite retained results or emit new sync events.
+Ordinary calculation targets capture the predecessor's ID and revision. Domain
+continuity and database arithmetic checks use that exact revision, while publication
+readiness compares the current head under the payroll guard. A history read cannot
+substitute a newer revision or fall back to revision zero when one is missing.
+Amendment publication must independently authorize any later assessment revision.
+
 Employee expense draft saves, cancellations, submission and withdrawal check
 current session assurance after resource/access guards, before receipt replay,
 and before transaction completion. Late expiry rolls back claim state, immutable

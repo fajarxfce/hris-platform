@@ -8,19 +8,24 @@ import org.jooq.DSLContext
 
 class PostgresPayrollAssessmentDataSource(private val sql: DSLContext) :
     PayrollAssessmentDataSource {
-    override fun taxHistory(company: UUID, id: UUID): PayrollTaxAssessmentRow? =
+    override fun taxHistory(company: UUID, id: UUID, revision: Long): PayrollTaxAssessmentRow? =
         sql.fetchOne(
                 """
-                SELECT a.id,a.employment_id,a.tax_month,t.tax_opening_id,t.tax_opening_revision,
-                  (o.facts->'compensation'->'tax')::text registration,
-                  (o.calculation->'taxInput')::text tax_input,(o.calculation->'tax')::text tax_result
+                SELECT a.id,a.employment_id,a.tax_month,t.tax_opening_id,t.tax_opening_revision,v.revision,
+                  ((CASE WHEN v.revision=0 THEN o.facts ELSE corrected.facts END)->'compensation'->'tax')::text registration,
+                  ((CASE WHEN v.revision=0 THEN o.calculation ELSE corrected.calculation END)->'taxInput')::text tax_input,
+                  ((CASE WHEN v.revision=0 THEN o.calculation ELSE corrected.calculation END)->'tax')::text tax_result
                 FROM payroll_assessments a
+                  JOIN payroll_assessment_revisions v ON v.company_id=a.company_id AND v.assessment_id=a.id AND v.revision=?
                   JOIN payroll_finalizations f ON f.company_id=a.company_id AND f.id=a.finalization_id AND f.published_at IS NOT NULL
                   JOIN payroll_run_targets t ON t.company_id=a.company_id AND t.run_id=a.run_id AND t.ordinal=a.ordinal
                   JOIN payroll_run_results o ON o.company_id=a.company_id AND o.run_id=a.run_id AND o.ordinal=a.ordinal
+                  LEFT JOIN payroll_amendment_results corrected ON corrected.company_id=v.company_id
+                    AND corrected.calculation_id=v.amendment_calculation_id AND corrected.assessment_id=v.assessment_id
                 WHERE a.company_id=? AND a.id=?
                 """
                     .trimIndent(),
+                revision,
                 company,
                 id,
             )
@@ -34,6 +39,7 @@ class PostgresPayrollAssessmentDataSource(private val sql: DSLContext) :
                     it.get("registration", String::class.java)!!,
                     it.get("tax_input", String::class.java)!!,
                     it.get("tax_result", String::class.java)!!,
+                    it.get("revision", Long::class.javaObjectType)!!,
                 )
             }
 

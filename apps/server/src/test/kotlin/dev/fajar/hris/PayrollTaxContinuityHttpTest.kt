@@ -18,7 +18,7 @@ class PayrollTaxContinuityHttpTest : PayrollTaxContinuityApiFixture() {
     private fun history(f: CalculationFixture, id: UUID): PayrollTaxAssessment {
         val result =
             transactions.run(payrollActor(f.people.payroll, f.people.reviewer)) {
-                assessments.taxHistory(f.people.payroll.company, id)
+                assessments.taxHistory(f.people.payroll.company, id, 0)
             }
         assertTrue(result is Result.Success, result.toString())
         return requireNotNull((result as Result.Success).value)
@@ -45,6 +45,7 @@ class PayrollTaxContinuityHttpTest : PayrollTaxContinuityApiFixture() {
             val current = history(f, id)
             val target = runView(f, published.run)["results"]["items"][0]["target"]
             assertEquals(previous.id.toString(), target["previousAssessmentId"].asString())
+            assertEquals(previous.revision, target["previousAssessmentRevision"].asLong())
             assertEquals(previous.openingId, current.openingId)
             assertEquals(previous.openingRevision, current.openingRevision)
             assertEquals(
@@ -205,7 +206,7 @@ class PayrollTaxContinuityHttpTest : PayrollTaxContinuityApiFixture() {
         val other = calculationFixture()
         val isolated =
             transactions.run(payrollActor(other.people.payroll, other.people.preparer)) {
-                assessments.taxHistory(first.people.payroll.company, id)
+                assessments.taxHistory(first.people.payroll.company, id, 0)
             }
         assertEquals(Result.Success<PayrollTaxAssessment?>(null), isolated)
         assertEquals(id, history(first, id).id)

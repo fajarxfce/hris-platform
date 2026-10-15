@@ -15,4 +15,5 @@ fun PayrollTaxAssessmentRow.toTaxAssessment(json: ObjectMapper) =
         json.readValue(registration, TaxRegistrationData::class.java).toRegistration(),
         json.readValue(input, IncomeTaxInputData::class.java).toDomain(),
         json.readValue(calculation, IncomeTaxCalculationData::class.java).toDomain(),
+        revision,
     )

@@ -11,6 +11,7 @@ export type PayrollRunTarget = Readonly<{
   taxOpeningId: string | null;
   taxOpeningRevision: number | null;
   previousAssessmentId: string | null;
+  previousAssessmentRevision: number;
 }>;
 export type PayrollRunItem = Readonly<{
   target: PayrollRunTarget;

@@ -21,6 +21,10 @@ export function payrollRunEmployeeView(result: PayrollRunEmployee, locale: Local
       value: t.taxOpeningRevision === null ? "—" : String(t.taxOpeningRevision),
     },
     { label: text.previousAssessment, value: t.previousAssessmentId ?? "—" },
+    {
+      label: text.previousAssessmentRevision,
+      value: t.previousAssessmentId === null ? "—" : String(t.previousAssessmentRevision),
+    },
   ];
   const overview = [
     { label: text.name, value: t.employeeName },

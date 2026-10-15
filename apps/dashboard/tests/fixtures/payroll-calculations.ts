@@ -81,6 +81,7 @@ export function calculationItem(index = 1, code: string | null = null): PayrollR
       taxOpeningId: `ec600000-0000-4000-8000-${String(index).padStart(12, "0")}`,
       taxOpeningRevision: 1,
       previousAssessmentId: null,
+      previousAssessmentRevision: 0,
     },
     jobId: calculationJob,
     completedAt: "2026-10-01T00:01:00Z",

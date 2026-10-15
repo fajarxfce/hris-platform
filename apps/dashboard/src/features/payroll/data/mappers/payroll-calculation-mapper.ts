@@ -112,6 +112,7 @@ export function toPayrollRunItem(raw: PayrollRunItemDto): PayrollRunItem {
   if (
     (t.inputId === null) !== (t.inputRevision === null) ||
     (t.taxOpeningId === null) !== (t.taxOpeningRevision === null) ||
+    (t.previousAssessmentId === null && t.previousAssessmentRevision !== 0) ||
     [raw.taxableGross, raw.withheld, raw.takeHome].some(
       (amount) => (amount === null) !== (raw.failure !== null),
     )

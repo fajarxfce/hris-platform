@@ -49,6 +49,7 @@ fun PayrollRunTargetsRecord.toTarget() =
         taxOpeningId,
         taxOpeningRevision,
         previousAssessmentId,
+        previousAssessmentRevision,
     )
 
 fun PayrollRunAttemptsRecord.toAttempt() =
@@ -146,6 +147,7 @@ fun PayrollRunTarget.toRecord(company: UUID, run: PayrollRun) =
         it.taxOpeningId = taxOpeningId
         it.taxOpeningRevision = taxOpeningRevision
         it.previousAssessmentId = previousAssessmentId
+        it.previousAssessmentRevision = previousAssessmentRevision
     }
 
 fun PayrollRunAttempt.toRecord(company: UUID, run: UUID) =

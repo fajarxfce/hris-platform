@@ -191,8 +191,9 @@ class AdvancePayrollCalculation(
                                 )
                             )
                     val previous =
-                        target.previousAssessmentId?.let { assessments.taxHistory(company, it) }
-                            ?: Result.Success(null)
+                        target.previousAssessmentId?.let {
+                            assessments.taxHistory(company, it, target.previousAssessmentRevision)
+                        } ?: Result.Success(null)
                     if (previous is Result.Failed) return@run previous
                     val history =
                         derivePayrollTaxHistory(

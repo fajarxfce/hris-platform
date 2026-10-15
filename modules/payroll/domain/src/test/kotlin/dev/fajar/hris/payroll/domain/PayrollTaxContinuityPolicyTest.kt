@@ -238,6 +238,59 @@ class PayrollTaxContinuityPolicyTest : MonthlyPayrollFixture() {
     }
 
     @Test
+    fun `the same assessment identity cannot silently substitute another revision`() {
+        val base = facts()
+        val opening = opening(base)
+        val previous = assessment(opening, base)
+        for ((expected, actual) in listOf(0L to 1L, 2L to 1L, 1L to -1L)) {
+            val result =
+                derivePayrollTaxHistory(
+                    target(opening, previous.id).copy(previousAssessmentRevision = expected),
+                    base.month.plusMonths(1),
+                    opening,
+                    base.compensation.tax,
+                    previous.copy(revision = actual),
+                )
+            assertEquals(
+                Result.Failed(Failure(FailureKind.CONFLICT, "payroll_tax_history_changed")),
+                result,
+            )
+        }
+        val selected = previous.copy(revision = 2)
+        val result =
+            derivePayrollTaxHistory(
+                target(opening, previous.id).copy(previousAssessmentRevision = 2),
+                base.month.plusMonths(1),
+                opening,
+                base.compensation.tax,
+                selected,
+            )
+        assertTrue(result is Result.Success, result.toString())
+        val history = (result as Result.Success).value
+        assertEquals("assessment:${previous.id}:2", history.reference)
+        money(
+            (previous.input.history.withheld + previous.calculation.withheld).toPlainString(),
+            history.history.withheld,
+        )
+    }
+
+    @Test
+    fun `an opening cannot carry a revision without an assessment`() {
+        val base = facts()
+        val opening = opening(base)
+        assertEquals(
+            Result.Failed(Failure(FailureKind.CONFLICT, "payroll_tax_history_changed")),
+            derivePayrollTaxHistory(
+                target(opening).copy(previousAssessmentRevision = 1),
+                base.month,
+                opening,
+                base.compensation.tax,
+                null,
+            ),
+        )
+    }
+
+    @Test
     fun `a publication rejects a stale captured tax reference and interruption propagates`() {
         assertEquals(
             Result.Failed(Failure(FailureKind.CONFLICT, "payroll_tax_history_changed")),

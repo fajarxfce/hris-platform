@@ -3,9 +3,7 @@ package dev.fajar.hris.payroll.domain.entities
 import java.time.YearMonth
 import java.util.UUID
 
-/**
- * Tax evidence from one immutable published result; it already retains cumulative prior history.
- */
+/** Tax evidence from one immutable published revision; it retains cumulative prior history. */
 data class PayrollTaxAssessment(
     val id: UUID,
     val employeeId: UUID,
@@ -15,4 +13,5 @@ data class PayrollTaxAssessment(
     val registration: TaxRegistration,
     val input: IncomeTaxInput,
     val calculation: IncomeTaxCalculation,
+    val revision: Long = 0,
 )

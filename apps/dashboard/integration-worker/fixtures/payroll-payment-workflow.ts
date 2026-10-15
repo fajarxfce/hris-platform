@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { type BrowserContext, expect, type Page, type Route } from "@playwright/test";
-import { companyDateTimeInput } from "../../src/core/presentation/dates/company-date-time";
+import { bankConfirmationInput } from "../../integration/fixtures/bank-confirmation-input";
 import { payrollCalculationMinor } from "../../src/features/payroll/data/mappers/payroll-run-employee-mapper";
 import { payrollPayablePageDto } from "../../src/features/payroll/data/models/payroll-payable-dto";
 import { payrollPaymentReviewDto } from "../../src/features/payroll/data/models/payroll-payment-dto";
@@ -208,6 +208,7 @@ export async function exercisePayrollPayments(input: {
     });
     expect(released.batch.items[0]?.status).toBe("PENDING");
     expect(released.availableActions).toEqual(["RECONCILE", "EXPORT"]);
+    if (!released.batch.releasedAt) throw new Error("Released payment time is required");
     await checker.screenshot({
       path: "../../.work/dashboard-payroll-payment-real-released.png",
       fullPage: true,
@@ -229,7 +230,7 @@ export async function exercisePayrollPayments(input: {
     await outcome.getByLabel("Bank transaction reference", { exact: true }).fill(reference);
     await outcome
       .getByLabel("Bank confirmation time (Asia/Jakarta)", { exact: true })
-      .fill(companyDateTimeInput(new Date().toISOString(), "Asia/Jakarta").replace(/:00$/u, ""));
+      .fill(await bankConfirmationInput(released.batch.releasedAt, "Asia/Jakarta"));
     await outcome
       .getByLabel("Result note", { exact: true })
       .fill("Confirmed on fixture bank statement");

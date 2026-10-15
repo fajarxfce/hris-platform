@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
-import { companyDateTimeInput } from "../src/core/presentation/dates/company-date-time";
 import type { ExpensePaymentReviewDto } from "../src/features/expenses/data/models/expense-payment-dto";
 import type { ExpensePaymentPreparationDto } from "../src/features/expenses/data/models/expense-payment-preparation-dto";
 import type { ExpenseReconciliationDto } from "../src/features/expenses/data/models/expense-reconciliation-dto";
 import { createAdminCompany } from "./fixtures/admin-company";
+import { bankConfirmationInput } from "./fixtures/bank-confirmation-input";
 import {
   paymentAccounts,
   paymentHeaders,
@@ -235,6 +235,11 @@ test("real finance prepares, releases and reconciles payments with original-comm
     await finance.getByRole("button", { name: "Close", exact: true }).click();
     const [first, second] = items;
     if (!first || !second) throw new Error("Two fixture payments are required");
+    const releasedResponse = await checker.request.get(`${base}/expenses/payments/${id}/review`);
+    expect(releasedResponse.status()).toBe(200);
+    const released = (await releasedResponse.json()) as ExpensePaymentReviewDto;
+    if (!released.batch.releasedAt) throw new Error("Released payment time is required");
+    const confirmation = await bankConfirmationInput(released.batch.releasedAt, "Asia/Jakarta");
     const reconciliationWrites: { operation: string; body: ExpenseReconciliationDto }[] = [];
     await finance.route(`**${base}/expenses/payments/${id}/reconcile`, async (route) => {
       const body = route.request().postDataJSON() as ExpenseReconciliationDto;
@@ -261,7 +266,7 @@ test("real finance prepares, releases and reconciles payments with original-comm
       .fill("BROWSER-BANK-001");
     await outcomePanel
       .getByLabel("Bank confirmation time (Asia/Jakarta)", { exact: true })
-      .fill(companyDateTimeInput(new Date().toISOString(), "Asia/Jakarta").replace(/:00$/u, ""));
+      .fill(confirmation);
     await outcomePanel.getByLabel("Result note", { exact: true }).fill("Bank statement confirmed");
     await outcomePanel.getByRole("button", { name: "Add to reconciliation", exact: true }).click();
     await expect(outcomePanel).toHaveCount(0);
@@ -305,7 +310,7 @@ test("real finance prepares, releases and reconciles payments with original-comm
       .selectOption("FAILED");
     await outcomePanel
       .getByLabel("Bank confirmation time (Asia/Jakarta)", { exact: true })
-      .fill(companyDateTimeInput(new Date().toISOString(), "Asia/Jakarta").replace(/:00$/u, ""));
+      .fill(confirmation);
     await outcomePanel
       .getByLabel("Result note", { exact: true })
       .fill("Bank confirmed no funds transferred");

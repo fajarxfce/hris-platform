@@ -4218,3 +4218,19 @@ independent review, publication, payslip/PDF access, payment and original-comman
 recovery. The narrow source-reference layout was inspected. Existing CSS and bundle
 advisories remain. Revised amendment publication and settlement remain subsequent
 work; this increment does not complete those workflows.
+
+### Bounded backend CI jobs
+
+The previous single backend job reached its 55-minute Gradle limit. API test
+classes now run in four disjoint jobs, each with a 35-minute step budget and the
+complete shared-module and worker checks. Nested class files keep their enclosing
+owner. The first job runs the API contract and publishes the application artifacts;
+integration waits for every backend and dashboard job.
+
+Architecture and formatting checks passed, and 39 contract tests executed
+successfully with the first shard configured. Unsharded discovery found 1,259
+methods and parameterized-test templates across 286 concrete test classes. The
+four shard discoveries matched that complete set without overlap. These dry runs
+verified selection, without executing regression bodies. Workflow checks verified
+unique YAML keys, artifact ownership and integration dependencies. Complete hosted
+execution is tracked by the subsequent CI run.

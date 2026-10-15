@@ -1,4 +1,7 @@
-plugins { id("hris.application") }
+plugins {
+    id("hris.application")
+    id("hris.api-tests")
+}
 
 dependencies {
     implementation(projects.modules.reporting.domain)

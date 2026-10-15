@@ -10,11 +10,21 @@ If Docker requires a group available through sudo, run the build as the same use
 
 Run ./gradlew format to format handwritten Kotlin. Architecture checks run with check. No generated Java/Kotlin is committed.
 
-Hosted CI bounds the complete Gradle step to 55 minutes within a 60-minute job.
-The [14 October backend check](https://github.com/fajarxfce/hris-platform/actions/runs/38579418741)
-passed in 44 minutes 18 seconds, leaving 42 seconds under its former 45-minute
-step budget. The additional margin covers runner variance and the growing suite;
-individual test, query and transaction deadlines remain unchanged.
+Backend CI distributes API test classes across four isolated jobs. Each job still
+runs the complete shared-module and worker checks, with a 35-minute Gradle step
+budget. The API test convention assigns compiled classes by their enclosing class,
+so nested tests stay together. `ApiContractHttpTest` belongs to the first job,
+which also publishes the application JARs and OpenAPI artifact. Integration waits
+for every backend and dashboard job.
+
+Local checks remain unsharded unless both `-PhrisApiTestShard=1` and
+`-PhrisApiTestShards=4` are supplied. The index must be within the configured count,
+from one to sixteen. `:apps:server:test --test-dry-run` can inspect discovery and
+selection without executing test bodies; it is not a successful regression run.
+
+The [15 October backend check](https://github.com/fajarxfce/hris-platform/actions/runs/38665982727)
+reached the previous 55-minute step limit as the API suite grew. Sharding retains
+the full suite and its individual test, query and transaction deadlines.
 
 ## Local runtime
 

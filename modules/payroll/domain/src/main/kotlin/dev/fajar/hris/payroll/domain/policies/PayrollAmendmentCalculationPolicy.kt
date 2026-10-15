@@ -22,7 +22,7 @@ fun recalculatePayrollAmendment(
             } ||
             sources.any {
                 it.revision < 0 ||
-                    it.revision == Long.MAX_VALUE ||
+                    it.revision >= Long.MAX_VALUE - 1 ||
                     it.target.employeeId != it.opening.employeeId ||
                     it.opening.status != PayrollTaxOpeningStatus.VERIFIED ||
                     it.facts.month != it.calculation.taxInput.month
@@ -57,18 +57,42 @@ fun recalculatePayrollAmendment(
                 it.facts.compensation.tax,
                 it.calculation.taxInput,
                 it.calculation.tax,
+                it.revision,
             )
         }
     val calculations = mutableListOf<PayrollAmendmentCalculation>()
     var total = PayrollAmendmentDifference()
-    for (source in affected) {
+    for ((index, source) in affected.withIndex()) {
         if (Thread.currentThread().isInterrupted) throw InterruptedException()
         val basis = proposed[source.assessmentId]?.facts ?: source.facts
         if (basis.month != source.facts.month)
             return Result.Failed(Failure(FailureKind.VALIDATION, "payroll_amendment_month_changed"))
+        val retainedPredecessor = sources.getOrNull(first + index - 1)
+        if (
+            retainedPredecessor != null &&
+                source.target.previousAssessmentId == retainedPredecessor.assessmentId &&
+                source.target.previousAssessmentRevision != retainedPredecessor.revision
+        )
+            return Result.Failed(
+                Failure(
+                    FailureKind.CONFLICT,
+                    "payroll_tax_history_changed",
+                    parameters =
+                        mapOf(
+                            "assessmentId" to source.assessmentId.toString(),
+                            "taxMonth" to basis.month.toString(),
+                        ),
+                )
+            )
+        // The identity remains the retained predecessor. Within the corrected suffix,
+        // its next published revision supplies the new cumulative amounts.
+        val target =
+            if (previous != null && source.target.previousAssessmentId == previous.id)
+                source.target.copy(previousAssessmentRevision = previous.revision)
+            else source.target
         val history =
             derivePayrollTaxHistory(
-                source.target,
+                target,
                 basis.month,
                 source.opening,
                 basis.compensation.tax,
@@ -110,7 +134,7 @@ fun recalculatePayrollAmendment(
         calculations +=
             PayrollAmendmentCalculation(
                 PayrollAmendmentSourceReference(source.assessmentId, source.revision),
-                source.target,
+                target,
                 source.calculation,
                 facts,
                 result,
@@ -134,6 +158,7 @@ fun recalculatePayrollAmendment(
                 basis.compensation.tax,
                 result.taxInput,
                 result.tax,
+                source.revision + 1,
             )
     }
     return Result.Success(

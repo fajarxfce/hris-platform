@@ -229,6 +229,13 @@ readiness compares the current head under the payroll guard. A history read cann
 substitute a newer revision or fall back to revision zero when one is missing.
 Amendment publication must independently authorize any later assessment revision.
 
+Amendment acquisition selects the current head through a security-invoker evidence
+view; it never falls back to original results. The repository maps its raw rows
+inside the database failure boundary. Recalculation owns the chronological tax
+policy and retains the effective predecessor revision separately from the original
+run target. Database checks preserve the source facts, exact opening and cumulative
+arithmetic. Existing calculation JSON and original payroll remain immutable.
+
 Employee expense draft saves, cancellations, submission and withdrawal check
 current session assurance after resource/access guards, before receipt replay,
 and before transaction completion. Late expiry rolls back claim state, immutable

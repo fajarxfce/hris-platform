@@ -13,6 +13,8 @@ fun PayrollAmendmentSourceRow.toAmendmentSource(json: ObjectMapper): PayrollAmen
     require(taxMonth.dayOfMonth == 1 && facts.month == month && calculation.taxInput.month == month)
     require(target.companyId == companyId && opening.revision.companyId == companyId)
     require(opening.employeeId == target.employmentId && opening.year == month.year)
+    require(revision >= 0 && previousAssessmentRevision >= 0)
+    require(target.previousAssessmentId != null || previousAssessmentRevision == 0L)
     require(
         opening.revision.openingId == target.taxOpeningId &&
             opening.revision.revision == target.taxOpeningRevision
@@ -20,9 +22,9 @@ fun PayrollAmendmentSourceRow.toAmendmentSource(json: ObjectMapper): PayrollAmen
     return PayrollAmendmentSource(
         companyId,
         assessmentId,
-        0,
+        revision,
         personId,
-        target.toTarget(),
+        target.toTarget().copy(previousAssessmentRevision = previousAssessmentRevision),
         opening.toOpening(json),
         facts,
         calculation,

@@ -13,4 +13,6 @@ data class PayrollAmendmentSourceRow(
     val opening: PayrollTaxOpeningRow,
     val facts: String,
     val calculation: String,
+    val revision: Long,
+    val previousAssessmentRevision: Long,
 )

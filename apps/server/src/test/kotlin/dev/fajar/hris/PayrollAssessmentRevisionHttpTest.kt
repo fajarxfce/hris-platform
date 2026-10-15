@@ -35,7 +35,24 @@ class PayrollAssessmentRevisionHttpTest : PayrollAmendmentReviewApiFixture() {
                 assessments.taxHistory(f.payroll.company, f.assessment, 0)
             },
         )
-        for (table in listOf("payroll_assessment_heads", "payroll_assessment_revisions")) {
+        for (table in
+            listOf(
+                "payroll_assessment_heads",
+                "payroll_assessment_revisions",
+                "payroll_assessment_evidence",
+            )) {
+            assertEquals(
+                Result.Success(1),
+                transactions.run(actor) {
+                    safeDatabaseCall {
+                        runtimeJdbc.queryForObject(
+                            "select count(*) from $table where company_id=?",
+                            Int::class.java,
+                            f.payroll.company,
+                        )
+                    }
+                },
+            )
             assertEquals(
                 Result.Success(0),
                 transactions.run(payrollActor(other.payroll, other.maker)) {

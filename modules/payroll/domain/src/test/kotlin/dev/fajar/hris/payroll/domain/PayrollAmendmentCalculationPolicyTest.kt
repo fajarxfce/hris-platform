@@ -28,6 +28,15 @@ class PayrollAmendmentCalculationPolicyTest : PayrollAmendmentFixture() {
         money("280000", requireNotNull(original.last().calculation.tax.annualTax))
         money("-2975000", original.last().calculation.tax.withheld)
         assertSame(original.first().calculation, result.calculations.first().original)
+        assertEquals(0, result.calculations.first().target.previousAssessmentRevision)
+        for ((index, entry) in result.calculations.withIndex().drop(1)) {
+            assertEquals(1, entry.target.previousAssessmentRevision)
+            assertEquals(
+                "assessment:${original[index - 1].assessmentId}:1",
+                entry.facts.taxHistory.reference,
+            )
+            assertEquals(0, original[index].target.previousAssessmentRevision)
+        }
     }
 
     @Test
@@ -52,6 +61,83 @@ class PayrollAmendmentCalculationPolicyTest : PayrollAmendmentFixture() {
         money("15500000", result.calculations.first().facts.taxHistory.history.taxableGross)
         money("25000", result.difference.withheld)
         money("475000", result.difference.takeHome)
+        assertEquals(0, result.calculations.first().target.previousAssessmentRevision)
+        assertEquals(
+            "assessment:${original.first().assessmentId}",
+            result.calculations.first().facts.taxHistory.reference,
+        )
+        assertEquals(1, result.calculations[1].target.previousAssessmentRevision)
+    }
+
+    @Test
+    fun `a second amendment uses current retained amounts and preserves the unchanged predecessor revision`() {
+        val original = sources()
+        val first = preview(original, listOf(correction(original.first(), "16500000")))
+        val published =
+            original.zip(first.calculations) { source, result ->
+                source.copy(
+                    revision = 1,
+                    target = result.target,
+                    facts = result.facts,
+                    calculation = result.calculation,
+                )
+            }
+        val second =
+            preview(
+                published,
+                listOf(correction(published[1], "16000000")),
+                published[1].assessmentId,
+            )
+        assertEquals(List(4) { 1L }, second.sourceVersions.map { it.revision })
+        assertEquals(
+            listOf(1L, 2L, 2L),
+            second.calculations.map { it.target.previousAssessmentRevision },
+        )
+        assertEquals(
+            "assessment:${published[0].assessmentId}:1",
+            second.calculations[0].facts.taxHistory.reference,
+        )
+        assertEquals(
+            "assessment:${published[1].assessmentId}:2",
+            second.calculations[1].facts.taxHistory.reference,
+        )
+        assertSame(published[1].calculation, second.calculations[0].original)
+        money("16500000", second.calculations[0].facts.taxHistory.history.taxableGross)
+        money("500000", second.difference.taxableGross)
+        money("25000", second.difference.withheld)
+        money("475000", second.difference.takeHome)
+    }
+
+    @Test
+    fun `recalculation never substitutes a different predecessor or an unobserved revision`() {
+        val original = sources()
+        for ((target, code) in
+            listOf(
+                original[1].target.copy(previousAssessmentId = UUID.randomUUID()) to
+                    "payroll_tax_assessment_missing",
+                original[1].target.copy(previousAssessmentRevision = 4) to
+                    "payroll_tax_history_changed",
+            )) {
+            val changed = original.toMutableList().also { it[1] = it[1].copy(target = target) }
+            val result =
+                recalculatePayrollAmendment(
+                    original.first().assessmentId,
+                    changed,
+                    listOf(correction(original.first(), "16000000")),
+                )
+            assertEquals(code, (result as Result.Failed).failure.code)
+        }
+        val orphan =
+            original.toMutableList().also {
+                it[0] = it[0].copy(target = it[0].target.copy(previousAssessmentRevision = 2))
+            }
+        val result =
+            recalculatePayrollAmendment(
+                original.first().assessmentId,
+                orphan,
+                listOf(correction(original.first(), "16000000")),
+            )
+        assertEquals("payroll_tax_history_changed", (result as Result.Failed).failure.code)
     }
 
     @Test
@@ -147,6 +233,7 @@ class PayrollAmendmentCalculationPolicyTest : PayrollAmendmentFixture() {
                 listOf(first.copy(personId = UUID.randomUUID())) + original.drop(1),
                 listOf(first.copy(revision = -1)) + original.drop(1),
                 listOf(first.copy(revision = Long.MAX_VALUE)) + original.drop(1),
+                listOf(first.copy(revision = Long.MAX_VALUE - 1)) + original.drop(1),
                 listOf(
                     first.copy(opening = first.opening.copy(status = PayrollTaxOpeningStatus.DRAFT))
                 ) + original.drop(1),

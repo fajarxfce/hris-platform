@@ -72,7 +72,7 @@ fun PayrollAmendmentResultRow.toAmendmentCalculation(
     require(facts.month == original.taxInput.month && facts.month == calculated.taxInput.month)
     return PayrollAmendmentCalculation(
         PayrollAmendmentSourceReference(result.assessmentId, result.assessmentRevision),
-        target.toTarget(),
+        target.toTarget().copy(previousAssessmentRevision = result.previousAssessmentRevision),
         original,
         facts,
         calculated,
@@ -170,6 +170,7 @@ fun PayrollAmendmentCalculation.toRecord(
         it.ordinal = ordinal
         it.assessmentId = source.assessmentId
         it.assessmentRevision = source.revision
+        it.previousAssessmentRevision = target.previousAssessmentRevision
         it.facts = JSONB.valueOf(json.writeValueAsString(facts.toSnapshotData()))
         it.original = JSONB.valueOf(json.writeValueAsString(original.toSnapshotData()))
         it.calculation = JSONB.valueOf(json.writeValueAsString(calculation.toSnapshotData()))

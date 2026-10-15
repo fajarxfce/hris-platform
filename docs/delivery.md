@@ -48,6 +48,28 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Amended payroll tax references
+
+Amendment acquisition now reads the current assessment revision through a
+company-scoped evidence view. Recalculation retains unchanged predecessor
+revisions and names the next revision for earlier results in its corrected
+suffix. Further corrections use the current retained amounts; a wrong assessment
+identity or unobserved revision is rejected. Original run targets and calculation
+JSON remain immutable.
+
+Migration V76 stores the effective predecessor revision and validates the exact
+opening, month, registration and cumulative amounts. A forged reference or tax
+history rolls back the calculation, draft revision, journal and receipt together.
+The same operation can then be retried. This prepares revised publication; it does
+not yet authorize promoting an amendment or change employee payment balances.
+
+Architecture and formatting passed. Two complementary runs covered 301 distinct
+tests: 99 payroll domain, three data mapper, 119 API/PostgreSQL, 18 database and
+62 worker cases. Coverage includes repeat corrections, wrong IDs/versions,
+opening/cumulative-history corruption, runtime view isolation, current-source
+mapping, retained review history, concurrency, interruption and rollback.
+No dashboard or mobile source changed in this increment.
+
 ### Independent payroll amendment review
 
 A separate amendment grant and approval kind bind each review to its retained
@@ -4219,6 +4241,13 @@ recovery. The narrow source-reference layout was inspected. Existing CSS and bun
 advisories remain. Revised amendment publication and settlement remain subsequent
 work; this increment does not complete those workflows.
 
+The validated API and worker images were deployed with schema V75 and the private
+document/WireGuard overlays. Existing assessment references matched their new
+revision-zero records and heads; runtime grants were verified. Both applications
+started with zero restarts. Loopback/VPN API and dashboard/proxy probes returned
+HTTP 200 from the VPS. No mobile binary or physical-device validation was part of
+this increment.
+
 ### Bounded backend CI jobs
 
 The previous single backend job reached its 55-minute Gradle limit. API test
@@ -4234,3 +4263,7 @@ four shard discoveries matched that complete set without overlap. These dry runs
 verified selection, without executing regression bodies. Workflow checks verified
 unique YAML keys, artifact ownership and integration dependencies. Complete hosted
 execution is tracked by the subsequent CI run.
+
+The [complete CI run for `9277d97e`](https://github.com/fajarxfce/hris-platform/actions/runs/38673765653)
+passed all four backend shards, all four dashboard shards and the dependent
+API/worker browser integration job.

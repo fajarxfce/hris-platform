@@ -175,6 +175,16 @@ Each result retains its original assessment/version, corrected facts, calculatio
 and signed differences. Cumulative tax history is derived in chronological order,
 including unchanged later remuneration: December reconciliation can change after
 an earlier salary correction. Opening and prior-employer credits are applied once.
+
+The retained target also identifies its effective predecessor revision. An
+unchanged earlier month keeps its current revision; a later corrected month names
+the next revision produced earlier in the same suffix. A second amendment uses the
+current revised facts and amounts. It never silently substitutes a different
+assessment ID or an unobserved base revision. Storage validates the opening,
+predecessor reference and cumulative arithmetic independently of the calculator.
+Previously retained calculations remain readable. A legacy calculation without
+that revised lineage must be explicitly recalculated before publication.
+
 The existing residency, registration, employment-continuity and rule-pack checks
 remain mandatory. A result failure identifies its assessment/month and preserves
 the original failure classification. Cancellation interrupts the bounded sequence.

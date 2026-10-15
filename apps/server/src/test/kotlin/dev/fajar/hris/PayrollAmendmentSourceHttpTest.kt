@@ -9,7 +9,9 @@ import org.springframework.dao.TransientDataAccessResourceException
 
 class PayrollAmendmentSourceHttpTest : PayrollAmendmentApiFixture() {
     @ParameterizedTest
-    @ValueSource(strings = ["malformed", "company", "month", "opening", "bound"])
+    @ValueSource(
+        strings = ["malformed", "company", "month", "opening", "bound", "revision", "predecessor"]
+    )
     fun malformedOrMisScopedStoredSourcesAreMappedInsideTheDatabaseBoundary(kind: String) {
         val f = amendmentFixture()
         val original = amendmentPreparation(f)
@@ -25,6 +27,8 @@ class PayrollAmendmentSourceHttpTest : PayrollAmendmentApiFixture() {
                             it.copy(opening = it.opening.copy(employeeId = UUID.randomUUID()))
                         }
                     "bound" -> List(13) { rows.first() }
+                    "revision" -> rows.map { it.copy(revision = -1) }
+                    "predecessor" -> rows.map { it.copy(previousAssessmentRevision = 1) }
                     else -> error("Unknown corruption")
                 }
         }

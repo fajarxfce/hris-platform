@@ -1,9 +1,10 @@
 package dev.fajar.hris.payroll.data.datasources
 
 import dev.fajar.hris.payroll.data.models.*
+import dev.fajar.hris.schema.tables.PayrollAssessmentEvidence.PAYROLL_ASSESSMENT_EVIDENCE as E
+import dev.fajar.hris.schema.tables.PayrollAssessmentHeads.PAYROLL_ASSESSMENT_HEADS as HEAD
 import dev.fajar.hris.schema.tables.PayrollAssessments.PAYROLL_ASSESSMENTS as A
 import dev.fajar.hris.schema.tables.PayrollFinalizations.PAYROLL_FINALIZATIONS as F
-import dev.fajar.hris.schema.tables.PayrollRunResults.PAYROLL_RUN_RESULTS as R
 import dev.fajar.hris.schema.tables.PayrollRunTargets.PAYROLL_RUN_TARGETS as T
 import dev.fajar.hris.schema.tables.PayrollTaxOpeningRevisions.PAYROLL_TAX_OPENING_REVISIONS as O
 import dev.fajar.hris.schema.tables.PayrollTaxOpenings.PAYROLL_TAX_OPENINGS as H
@@ -33,8 +34,10 @@ class PostgresPayrollAmendmentSourceDataSource(private val sql: DSLContext) :
                 H.EMPLOYMENT_ID,
                 H.TAX_YEAR,
                 *O.fields(),
-                R.FACTS,
-                R.CALCULATION,
+                E.FACTS,
+                E.CALCULATION,
+                E.REVISION,
+                E.PREVIOUS_ASSESSMENT_REVISION,
             )
             .from(selected)
             .join(A)
@@ -56,11 +59,13 @@ class PostgresPayrollAmendmentSourceDataSource(private val sql: DSLContext) :
                     .and(T.RUN_ID.eq(A.RUN_ID))
                     .and(T.ORDINAL.eq(A.ORDINAL))
             )
-            .join(R)
+            .join(HEAD)
+            .on(HEAD.COMPANY_ID.eq(A.COMPANY_ID).and(HEAD.ASSESSMENT_ID.eq(A.ID)))
+            .join(E)
             .on(
-                R.COMPANY_ID.eq(A.COMPANY_ID)
-                    .and(R.RUN_ID.eq(A.RUN_ID))
-                    .and(R.ORDINAL.eq(A.ORDINAL))
+                E.COMPANY_ID.eq(A.COMPANY_ID)
+                    .and(E.ASSESSMENT_ID.eq(A.ID))
+                    .and(E.REVISION.eq(HEAD.REVISION))
             )
             .join(H)
             .on(H.COMPANY_ID.eq(A.COMPANY_ID).and(H.ID.eq(T.TAX_OPENING_ID)))
@@ -85,8 +90,10 @@ class PostgresPayrollAmendmentSourceDataSource(private val sql: DSLContext) :
                         it.get(H.TAX_YEAR)!!,
                         it.into(O),
                     ),
-                    it.get(R.FACTS)!!.data(),
-                    it.get(R.CALCULATION)!!.data(),
+                    it.get(E.FACTS)!!.data(),
+                    it.get(E.CALCULATION)!!.data(),
+                    it.get(E.REVISION)!!,
+                    it.get(E.PREVIOUS_ASSESSMENT_REVISION)!!,
                 )
             }
     }

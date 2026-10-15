@@ -142,6 +142,7 @@ export function payrollPaymentView(
             : []),
         ]
       : null,
+    itemAssessmentId: item?.assessmentId ?? null,
     change: change
       ? [
           { label: text.version, value: number.format(change.version) },

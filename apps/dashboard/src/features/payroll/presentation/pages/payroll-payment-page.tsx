@@ -15,6 +15,7 @@ import { type Locale, messages } from "../../../../core/presentation/i18n/messag
 import type { usePayrollPayment } from "../controllers/use-payroll-payment";
 import { payrollPaymentMessages } from "../i18n/payroll-payment-messages";
 import { payrollPaymentReconciliationMessages } from "../i18n/payroll-payment-reconciliation-messages";
+import { payrollPaymentRecoveryMessages } from "../i18n/payroll-payment-recovery-messages";
 import { type PayrollPaymentTab, payrollPaymentTabs } from "../models/payroll-payment-route";
 import type { PayrollPaymentTransitionIntent } from "../models/payroll-payment-transition-intent";
 import type { payrollPaymentTransitionActions } from "../models/payroll-payment-transition-view";
@@ -24,6 +25,7 @@ export function PayrollPaymentPage(props: {
   view: ReturnType<typeof payrollPaymentView> | null;
   transitions: ReturnType<typeof payrollPaymentTransitionActions>;
   canReconcile: boolean;
+  returnsTo: string | null;
   onReconcile: () => void;
   onTransition: (intent: PayrollPaymentTransitionIntent) => void;
   locale: Locale;
@@ -182,6 +184,9 @@ export function PayrollPaymentPage(props: {
         onClose={() => props.onItem(null)}
       >
         {view?.item && <AppPropertyList title={text.itemDetails} items={view.item} />}
+        {props.returnsTo && (
+          <Link to={props.returnsTo}>{payrollPaymentRecoveryMessages(locale).review}</Link>
+        )}
       </AppDetailsPanel>
       <AppDetailsPanel
         open={view?.change != null}

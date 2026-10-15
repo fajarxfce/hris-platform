@@ -3,6 +3,7 @@ import { Navigate, useParams, useSearchParams } from "react-router-dom";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { PayrollPayslipScope } from "../../domain/entities/payroll-payslip";
+import { canReadPayrollPayments } from "../../domain/policies/payroll-payment-read-policy";
 import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 import { PayrollPayslipController } from "../controllers/payroll-payslip-controller";
 import {
@@ -79,6 +80,11 @@ function PayrollPayslipBinding(
       view={view}
       paymentRows={paymentRows}
       settlement={settlement}
+      returnsTo={
+        state.payslip && canReadPayrollPayments(access.permissions)
+          ? `/payroll/payslips/${id}/returns?${new URLSearchParams({ company: access.companyId, source: "payslip", scope })}`
+          : null
+      }
       locale={locale}
       timezone={timezone}
       companyName={props.companyName}

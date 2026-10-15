@@ -950,6 +950,15 @@ a {
 .app-payroll-payslip-metrics {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
 }
+.app-payroll-return-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: 20px;
+}
+.app-payroll-return-form {
+  max-width: 760px;
+  margin-top: 0;
+}
 .app-payroll-payslip-metrics .app-metric-card p {
   font-size: clamp(18px, 2.4vw, 28px);
   line-height: 1.3;

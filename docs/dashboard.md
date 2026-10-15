@@ -423,6 +423,28 @@ command. Input and command retention are in memory. Company/account replacement
 cancels pending work and discards its owner. Confirmed access loss removes bank
 details. Tabs, theme and language changes retain the current owner.
 
+### Confirmed payroll returns
+
+Payment item details link to `/payroll/payslips/:id/returns`, with current
+entitlement, confirmed transfers/returns, remaining balance and up to twenty
+immutable return records. Finance can inspect this evidence without a payslip
+read grant. An authorized payslip also links to the same review. Company and
+account ownership are retained in the route and request owner.
+
+The `/returns/new` form records a bank-confirmed partial or complete return.
+The review supplies eligibility, observed assessment/payment versions and the
+earliest confirmation instant. Amounts use exact decimals; confirmation input
+uses the company timezone and rejects invalid or ambiguous local times. The API
+rechecks current authority, beneficiary, versions, balance and its own clock.
+
+A definite initial conflict preserves input and requires explicit reload. An
+uncertain outcome freezes the original identifier, operation and evidence through
+later authorization failures or conflicts; only an explicit retry resends it.
+Navigation protection covers input, pending writes and unconfirmed results.
+Confirmed access loss clears private evidence; disposal cancels pending work and
+rejects late results. Draft and command retention are in memory. Theme and language
+changes retain the form, and narrow layouts stack the review panels.
+
 ## Shift templates
 
 The Workforce route owns a bounded shift directory, current details, and create/edit

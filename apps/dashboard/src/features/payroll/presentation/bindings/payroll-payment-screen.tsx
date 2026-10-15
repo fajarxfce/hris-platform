@@ -82,6 +82,15 @@ function PayrollPaymentBinding(props: PayrollScreenProps & { id: string; directo
       view={view}
       transitions={transitions}
       canReconcile={canReconcile}
+      returnsTo={
+        view?.itemAssessmentId
+          ? `/payroll/payslips/${view.itemAssessmentId}/returns?${new URLSearchParams({
+              company: props.access.companyId,
+              batch: props.id,
+              payment: selectedItem ?? "",
+            })}`
+          : null
+      }
       onReconcile={() => {
         if (canReconcile) navigate(`${payrollPaymentPath(props.id)}/reconcile?${parameters}`);
       }}

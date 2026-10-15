@@ -19,8 +19,36 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Periksa versi dan nominal payslip yang dipilih.",
   ],
   payroll_payment_balance_changed: [
-    "The payment balance changed. Review the current amount before preparing another instruction.",
-    "Saldo pembayaran berubah. Periksa nominal saat ini sebelum menyiapkan instruksi baru.",
+    "The payment balance changed. Review the current amount before continuing.",
+    "Saldo pembayaran berubah. Periksa nominal saat ini sebelum melanjutkan.",
+  ],
+  invalid_payroll_payment_recovery: [
+    "Review the return amount, bank reference, confirmation time and note.",
+    "Periksa nominal pengembalian, referensi bank, waktu konfirmasi, dan catatan.",
+  ],
+  payroll_payment_recovery_unavailable: [
+    "Recording a return is unavailable. Reload the current review.",
+    "Pengembalian belum dapat dicatat. Muat ulang tinjauan saat ini.",
+  ],
+  payroll_payment_recovery_exceeds_balance: [
+    "The return exceeds the current balance or predates its publication. Reload the review.",
+    "Pengembalian melebihi saldo saat ini atau mendahului publikasinya. Muat ulang tinjauan.",
+  ],
+  payroll_payment_recovery_limit: [
+    "This payslip has reached the limit of 20 return records.",
+    "Payslip ini telah mencapai batas 20 catatan pengembalian.",
+  ],
+  payroll_payment_recovery_exists: [
+    "This return is already recorded. Review its history.",
+    "Pengembalian ini sudah dicatat. Periksa riwayatnya.",
+  ],
+  payroll_self_recovery_forbidden: [
+    "Another authorized finance operator must record your return.",
+    "Operator finance lain yang berwenang harus mencatat pengembalian Anda.",
+  ],
+  payroll_amendment_payment_pending: [
+    "Resolve prepared or pending payments before continuing.",
+    "Selesaikan pembayaran yang disiapkan atau tertunda sebelum melanjutkan.",
   ],
   payroll_payslip_not_found: [
     "This payslip is unavailable for your current access.",

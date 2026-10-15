@@ -255,11 +255,14 @@ from immutable individual instructions.
 2. Versioned drafts, retained calculations and independent approval: implemented in the API.
 3. Atomic revised assessment publication, ordinary tax-continuity integration,
    payment balances and confirmed recoveries: implemented in the API/worker.
-4. Dashboard balance summaries, revision-pinned PDFs and observed positive-delta
-   payment instructions are implemented. Native current-revision payslips,
+4. Dashboard balance summaries, revision-pinned PDFs, observed positive-delta
+   payment instructions and confirmed-return entry/history are implemented.
+   Real API/PostgreSQL/worker acceptance covers approved negative corrections,
+   partial/full returns, competing balances and original-command recovery.
+   Native current-revision payslips,
    independent balances, compatible offline acquisition and revision-pinned PDF
    export are implemented and validated on the emulator. Amendment
-   authoring/review/publication, confirmed-return entry and retained-revision
+   authoring/review/publication and retained-revision
    navigation remain. The current/retained statements and sync contracts are
    available in the API. The revised APK awaits phone connectivity.
 

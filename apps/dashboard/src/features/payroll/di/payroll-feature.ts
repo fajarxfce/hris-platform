@@ -5,6 +5,7 @@ import { HttpPayrollCalculationDataSource } from "../data/datasources/http-payro
 import { HttpPayrollFinalizationDataSource } from "../data/datasources/http-payroll-finalization-data-source";
 import { HttpPayrollInputDataSource } from "../data/datasources/http-payroll-input-data-source";
 import { HttpPayrollPaymentDataSource } from "../data/datasources/http-payroll-payment-data-source";
+import { HttpPayrollPaymentRecoveryDataSource } from "../data/datasources/http-payroll-payment-recovery-data-source";
 import { HttpPayrollPayslipDataSource } from "../data/datasources/http-payroll-payslip-data-source";
 import { HttpPayrollPeriodDataSource } from "../data/datasources/http-payroll-period-data-source";
 import { HttpPayrollPolicyDataSource } from "../data/datasources/http-payroll-policy-data-source";
@@ -14,6 +15,7 @@ import { RemoteCompensationRepository } from "../data/repositories/remote-compen
 import { RemotePayrollCalculationRepository } from "../data/repositories/remote-payroll-calculation-repository";
 import { RemotePayrollFinalizationRepository } from "../data/repositories/remote-payroll-finalization-repository";
 import { RemotePayrollInputRepository } from "../data/repositories/remote-payroll-input-repository";
+import { RemotePayrollPaymentRecoveryRepository } from "../data/repositories/remote-payroll-payment-recovery-repository";
 import { RemotePayrollPaymentRepository } from "../data/repositories/remote-payroll-payment-repository";
 import { RemotePayrollPayslipRepository } from "../data/repositories/remote-payroll-payslip-repository";
 import { RemotePayrollPeriodRepository } from "../data/repositories/remote-payroll-period-repository";
@@ -22,6 +24,7 @@ import { RemotePayrollReviewRepository } from "../data/repositories/remote-payro
 import { RemoteTaxOpeningRepository } from "../data/repositories/remote-tax-opening-repository";
 import { AbandonPayrollCalculation } from "../domain/usecases/abandon-payroll-calculation";
 import { CancelPayrollPeriod } from "../domain/usecases/cancel-payroll-period";
+import { ConfirmPayrollPaymentRecovery } from "../domain/usecases/confirm-payroll-payment-recovery";
 import { CreatePayrollPeriod } from "../domain/usecases/create-payroll-period";
 import { DecidePayrollReview } from "../domain/usecases/decide-payroll-review";
 import { DownloadPayrollPayment } from "../domain/usecases/download-payroll-payment";
@@ -63,6 +66,7 @@ import { ReviewPayrollCalculation } from "../domain/usecases/review-payroll-calc
 import { ReviewPayrollFinalization } from "../domain/usecases/review-payroll-finalization";
 import { ReviewPayrollInputAction } from "../domain/usecases/review-payroll-input-action";
 import { ReviewPayrollPaymentReconciliation } from "../domain/usecases/review-payroll-payment-reconciliation";
+import { ReviewPayrollPaymentRecovery } from "../domain/usecases/review-payroll-payment-recovery";
 import { ReviewPayrollPaymentTransition } from "../domain/usecases/review-payroll-payment-transition";
 import { ReviewPayrollPeriodCancellation } from "../domain/usecases/review-payroll-period-cancellation";
 import { ReviewPayrollPeriodCreation } from "../domain/usecases/review-payroll-period-creation";
@@ -86,6 +90,9 @@ export function createPayrollFeature(
   files: Pick<FileRepository, "downloadBinary" | "downloadText">,
 ): PayrollUseCases {
   const payments = new RemotePayrollPaymentRepository(new HttpPayrollPaymentDataSource(http));
+  const recoveries = new RemotePayrollPaymentRecoveryRepository(
+    new HttpPayrollPaymentRecoveryDataSource(http),
+  );
   const payslips = new RemotePayrollPayslipRepository(new HttpPayrollPayslipDataSource(http));
   const policies = new RemotePayrollPolicyRepository(new HttpPayrollPolicyDataSource(http));
   const compensations = new RemoteCompensationRepository(new HttpCompensationDataSource(http));
@@ -100,6 +107,8 @@ export function createPayrollFeature(
     new HttpPayrollFinalizationDataSource(http),
   );
   return Object.freeze({
+    reviewPaymentRecovery: new ReviewPayrollPaymentRecovery(recoveries),
+    confirmPaymentRecovery: new ConfirmPayrollPaymentRecovery(recoveries),
     loadPayments: new LoadPayrollPayments(payments),
     loadPayment: new LoadPayrollPayment(payments),
     loadPayables: new LoadPayrollPayables(payments),

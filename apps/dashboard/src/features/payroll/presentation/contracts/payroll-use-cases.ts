@@ -1,5 +1,6 @@
 import type { AbandonPayrollCalculation } from "../../domain/usecases/abandon-payroll-calculation";
 import type { CancelPayrollPeriod } from "../../domain/usecases/cancel-payroll-period";
+import type { ConfirmPayrollPaymentRecovery } from "../../domain/usecases/confirm-payroll-payment-recovery";
 import type { CreatePayrollPeriod } from "../../domain/usecases/create-payroll-period";
 import type { DecidePayrollReview } from "../../domain/usecases/decide-payroll-review";
 import type { DownloadPayrollPayment } from "../../domain/usecases/download-payroll-payment";
@@ -41,6 +42,7 @@ import type { ReviewPayrollCalculation } from "../../domain/usecases/review-payr
 import type { ReviewPayrollFinalization } from "../../domain/usecases/review-payroll-finalization";
 import type { ReviewPayrollInputAction } from "../../domain/usecases/review-payroll-input-action";
 import type { ReviewPayrollPaymentReconciliation } from "../../domain/usecases/review-payroll-payment-reconciliation";
+import type { ReviewPayrollPaymentRecovery } from "../../domain/usecases/review-payroll-payment-recovery";
 import type { ReviewPayrollPaymentTransition } from "../../domain/usecases/review-payroll-payment-transition";
 import type { ReviewPayrollPeriodCancellation } from "../../domain/usecases/review-payroll-period-cancellation";
 import type { ReviewPayrollPeriodCreation } from "../../domain/usecases/review-payroll-period-creation";
@@ -59,6 +61,8 @@ import type { VerifyTaxOpening } from "../../domain/usecases/verify-tax-opening"
 import type { WithdrawPayrollReview } from "../../domain/usecases/withdraw-payroll-review";
 
 export type PayrollUseCases = Readonly<{
+  reviewPaymentRecovery: Pick<ReviewPayrollPaymentRecovery, "execute">;
+  confirmPaymentRecovery: Pick<ConfirmPayrollPaymentRecovery, "execute">;
   loadPayments: Pick<LoadPayrollPayments, "execute">;
   loadPayment: Pick<LoadPayrollPayment, "execute">;
   loadPayables: Pick<LoadPayrollPayables, "execute">;

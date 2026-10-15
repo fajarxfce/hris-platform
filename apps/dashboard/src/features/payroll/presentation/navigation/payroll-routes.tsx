@@ -17,6 +17,7 @@ import { PayrollInputScreen } from "../bindings/payroll-input-screen";
 import { PayrollInputVerificationScreen } from "../bindings/payroll-input-verification-screen";
 import { PayrollPaymentPreparationScreen } from "../bindings/payroll-payment-preparation-screen";
 import { PayrollPaymentReconciliationScreen } from "../bindings/payroll-payment-reconciliation-screen";
+import { PayrollPaymentRecoveryScreen } from "../bindings/payroll-payment-recovery-screen";
 import { PayrollPaymentScreen } from "../bindings/payroll-payment-screen";
 import { PayrollPaymentTransitionScreen } from "../bindings/payroll-payment-transition-screen";
 import { PayrollPaymentsScreen } from "../bindings/payroll-payments-screen";
@@ -59,6 +60,14 @@ export function PayrollRoutes(props: PayrollScreenProps) {
 
       <Route path="payslips" element={<PayrollPayslipsScreen {...props} />} />
       <Route path="payslips/:payslipId" element={<PayrollPayslipScreen {...props} />} />
+      <Route
+        path="payslips/:payslipId/returns"
+        element={<PayrollPaymentRecoveryScreen {...props} />}
+      />
+      <Route
+        path="payslips/:payslipId/returns/new"
+        element={<PayrollPaymentRecoveryScreen {...props} record />}
+      />
       <Route path="publications" element={<PayrollPublicationsScreen {...props} />} />
       <Route path="runs/:runId/finalizations" element={<PayrollFinalizationsScreen {...props} />} />
       <Route path="runs/:runId/finalize" element={<PayrollFinalizationStartScreen {...props} />} />

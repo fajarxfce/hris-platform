@@ -312,6 +312,7 @@ export async function exercisePayrollPayments(input: {
     await maker.getByRole("tab", { name: "Payment history", exact: true }).click();
     await expect(maker.getByRole("table", { name: /^Payment history/u })).toContainText("Paid");
     expect((await maker.request.get(`${batchPath}/review`)).status()).toBe(403);
+    return { batchId };
   } finally {
     await maker.unroute(preparePattern, onPrepare);
     await checker.unroute(commandPattern, onCommand);

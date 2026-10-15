@@ -72,7 +72,13 @@ selection, bank review, independent release, cancellation, CSV download and
 reconciliation. Its selection and review retain the observed assessment revision,
 payment version and current positive amount through delivery and retry. Payslip
 payment summaries show independently versioned balances and retained transfer
-amounts. Confirmed-return entry remains a separate dashboard workflow.
+amounts. Finance can open balance and return history from either a payment item
+or an authorized payslip. The return form requires reviewed versions, a positive
+decimal amount, bank reference, company-local confirmation time and a reason.
+Definite balance conflicts require explicit review; an uncertain response retains
+the exact original return. Partial and complete returns leave the original bank
+instructions and results intact. These screens require `payroll.pay` independently
+of permission to read a full payslip.
 Preparation and result panels retain unsaved input while the
 current workspace remains mounted. Lost responses require an explicit retry of
 the original command; they do not authorize another bank transfer.

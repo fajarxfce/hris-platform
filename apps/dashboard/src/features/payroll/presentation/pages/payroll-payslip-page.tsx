@@ -12,6 +12,7 @@ import { AppResourceTable } from "../../../../core/presentation/components/app-r
 import { AppSelect } from "../../../../core/presentation/components/app-select";
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { payrollPaymentRecoveryMessages } from "../i18n/payroll-payment-recovery-messages";
 import { payrollPayslipMessages } from "../i18n/payroll-payslip-messages";
 import type { PayrollPayslipState } from "../models/payroll-payslip-state";
 import type {
@@ -30,6 +31,7 @@ export function PayrollPayslipPage(props: {
   companyName: string;
   timezone: string;
   backTo: string;
+  returnsTo: string | null;
   tab: string;
   onRefresh: () => void;
   onRefreshPayments: () => void;
@@ -113,6 +115,11 @@ export function PayrollPayslipPage(props: {
               {props.tab === "payments" && (
                 <>
                   <AppCommandBar label={text.payments}>
+                    {props.returnsTo && (
+                      <Link to={props.returnsTo}>
+                        {payrollPaymentRecoveryMessages(locale).review}
+                      </Link>
+                    )}
                     <AppButton
                       appearance="subtle"
                       icon={<ArrowSync20Regular />}

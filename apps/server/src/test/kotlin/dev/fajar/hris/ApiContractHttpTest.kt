@@ -34,6 +34,53 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun leaveAccrualSchedulesExposeFiniteReviewsAndExistingPeriodJobs() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/leave/accrual-schedules"
+        for ((path, method) in
+            listOf(base to "get", base to "post", "$base/review" to "get", "$base/{id}" to "get")) {
+            val operation = api["paths"][path][method]
+            assertTrue(operation["x-hris-company-admission"].asBoolean(), path)
+            assertEquals(
+                method == "post",
+                operation.path("parameters").any { it.path("name").asString() == "Idempotency-Key" },
+            )
+        }
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf(
+                "id",
+                "typeId",
+                "firstPeriod",
+                "periods",
+                "expectedPolicyVersion",
+                "employeeIds",
+                "reason",
+            ),
+            schemas["LeaveAccrualScheduleRequest"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("scheduledFor", "batch", "jobStatus", "completedEmployees"),
+            schemas["LeaveAccrualSchedulePeriodResponse"]["properties"].propertyNames().toSet(),
+        )
+        for (name in
+            listOf(
+                "LeaveAccrualScheduleResponse",
+                "LeaveAccrualScheduleReviewResponse",
+                "LeaveAccrualSchedulePeriodResponse",
+            )) {
+            val properties = schemas[name]["properties"].propertyNames().toSet()
+            assertTrue(
+                properties
+                    .intersect(
+                        setOf("authenticatedAt", "credentialVersion", "leaseToken", "leaseOwner")
+                    )
+                    .isEmpty()
+            )
+        }
+    }
+
+    @Test
     fun leaveCalendarExposesBoundedDateViewsWithoutRequestReasonsOrAccountIds() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/leave/calendar"

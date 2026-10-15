@@ -385,6 +385,14 @@ session assurance after acquisition; admission/resume retain it after queue wait
 and through journaling and receipt completion. Background execution keeps its
 separate initiating-credential and lease authority.
 
+Accrual schedules reuse that batch and queue ownership. The scheduling use case
+coordinates existing repositories to create a finite immutable plan and all
+periods atomically. Datasources persist raw rows; the schedule repository maps
+bounded metadata and current job progress. Domain policies own recurrence and
+company-local due times. Future recovery preserves the original due time, and
+worker execution retains the existing independent authorization and lease checks.
+See [leave accrual schedules](leave-accrual-schedules.md).
+
 The employee balance directory and ledger acquire a shared employee-ledger guard, then the shared policy, people, and access guards. The directory datasource returns a bounded account/type projection in one query. Its repository maps rows and pagination inside the database failure boundary; the use case owns current employee scope and assurance. Minimal labels do not expose administrative policy revision reasons or require unrelated people-administration grants.
 
 Import recovery and cancellation acquire the previous job before the import header, matching worker order. Import reads protect the header and row outcomes with a shared resource guard before access guards. Privileged commands recheck recent authentication after a pending resource or queue acquisition; an earlier check cannot authorize work indefinitely.

@@ -26,6 +26,112 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class LeaveConfiguration {
     @Bean
+    fun leaveAccrualScheduleSource(sql: DSLContext): LeaveAccrualScheduleDataSource =
+        PostgresLeaveAccrualScheduleDataSource(sql)
+
+    @Bean
+    fun leaveAccrualSchedules(
+        source: LeaveAccrualScheduleDataSource,
+        json: ObjectMapper,
+    ): LeaveAccrualScheduleRepository = StoredLeaveAccrualScheduleRepository(source, json)
+
+    @Bean
+    fun reviewLeaveAccrualSchedule(
+        batches: LeaveBatchRepository,
+        policies: LeavePolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ReviewLeaveAccrualSchedule(
+            batches,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun scheduleLeaveAccrual(
+        schedules: LeaveAccrualScheduleRepository,
+        batches: LeaveBatchRepository,
+        policies: LeavePolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ScheduleLeaveAccrual(
+            schedules,
+            batches,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun getLeaveAccrualSchedule(
+        schedules: LeaveAccrualScheduleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetLeaveAccrualSchedule(
+            schedules,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun listLeaveAccrualSchedules(
+        schedules: LeaveAccrualScheduleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListLeaveAccrualSchedules(
+            schedules,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun leaveCalendarSource(sql: DSLContext): LeaveCalendarDataSource =
         PostgresLeaveCalendarDataSource(sql)
 

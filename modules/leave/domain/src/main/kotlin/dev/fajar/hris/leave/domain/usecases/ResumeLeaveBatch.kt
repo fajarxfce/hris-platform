@@ -152,6 +152,7 @@ class ResumeLeaveBatch(
                     actor.correlationId,
                     now,
                     remaining + 1,
+                    scheduledFor = previous.request.scheduledFor?.let { maxOf(it, now) },
                 )
             val attempt =
                 LeaveBatchAttempt(request.id, attempts.size + 1, counts.completed, now, reason)

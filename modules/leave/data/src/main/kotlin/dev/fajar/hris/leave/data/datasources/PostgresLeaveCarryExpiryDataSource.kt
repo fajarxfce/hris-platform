@@ -1,9 +1,13 @@
 package dev.fajar.hris.leave.data.datasources
 
+import dev.fajar.hris.leave.data.models.LeaveCarryExpiryOverviewRow
 import dev.fajar.hris.leave.data.models.LeaveCarryExpiryTargetRow
+import dev.fajar.hris.schema.tables.BackgroundJobs.BACKGROUND_JOBS as J
+import dev.fajar.hris.schema.tables.LeaveBatches.LEAVE_BATCHES as B
 import dev.fajar.hris.schema.tables.LeaveCarryExpiries.LEAVE_CARRY_EXPIRIES as E
 import dev.fajar.hris.schema.tables.LeaveCarryExpiryAttempts.LEAVE_CARRY_EXPIRY_ATTEMPTS as A
 import dev.fajar.hris.schema.tables.LeaveCarryExpiryOutcomes.LEAVE_CARRY_EXPIRY_OUTCOMES as O
+import dev.fajar.hris.schema.tables.LeaveYearClosings.LEAVE_YEAR_CLOSINGS as C
 import dev.fajar.hris.schema.tables.records.*
 import java.util.UUID
 import org.jooq.DSLContext
@@ -27,6 +31,72 @@ class PostgresLeaveCarryExpiryDataSource(private val sql: DSLContext) : LeaveCar
             .orderBy(E.ID)
             .limit(limit)
             .fetch()
+
+    override fun overviews(
+        company: UUID,
+        id: UUID?,
+        after: UUID?,
+        limit: Int,
+    ): List<LeaveCarryExpiryOverviewRow> {
+        val code =
+            DSL.field(
+                    "coalesce({0}->>'code',{1}->>'code')",
+                    String::class.java,
+                    B.POLICY_SNAPSHOT,
+                    C.POLICY_SNAPSHOT,
+                )
+                .`as`("type_code")
+        val name =
+            DSL.field(
+                    "coalesce({0}->'policy'->>'name',{1}->'policy'->>'name')",
+                    String::class.java,
+                    B.POLICY_SNAPSHOT,
+                    C.POLICY_SNAPSHOT,
+                )
+                .`as`("type_name")
+        val completed =
+            DSL.field(
+                    """(select coalesce(max(o.ordinal),0) from leave_carry_expiry_outcomes o
+            where o.company_id={0} and o.expiry_id={1})""",
+                    Int::class.java,
+                    E.COMPANY_ID,
+                    E.ID,
+                )
+                .`as`("completed_employees")
+        val jobId = J.ID.`as`("current_job_id")
+        val jobCompany = J.COMPANY_ID.`as`("job_company_id")
+        val kind = J.KIND.`as`("job_kind")
+        val status = J.STATUS.`as`("job_status")
+        return sql.select(
+                E.fields().toList() +
+                    listOf(code, name, completed, jobId, jobCompany, kind, status, J.FAILURE_CODE)
+            )
+            .from(E)
+            .join(J)
+            .on(J.COMPANY_ID.eq(E.COMPANY_ID), J.ID.eq(E.JOB_ID))
+            .leftJoin(B)
+            .on(B.COMPANY_ID.eq(E.COMPANY_ID), B.ID.eq(E.BATCH_ID))
+            .leftJoin(C)
+            .on(C.COMPANY_ID.eq(E.COMPANY_ID), C.ID.eq(E.CLOSING_ID))
+            .where(E.COMPANY_ID.eq(company))
+            .and(if (id == null) DSL.noCondition() else E.ID.eq(id))
+            .and(if (after == null) DSL.noCondition() else E.ID.gt(after))
+            .orderBy(E.ID)
+            .limit(limit)
+            .fetch {
+                LeaveCarryExpiryOverviewRow(
+                    it.into(E),
+                    requireNotNull(it[jobId]),
+                    requireNotNull(it[jobCompany]),
+                    requireNotNull(it[kind]),
+                    requireNotNull(it[code]),
+                    requireNotNull(it[name]),
+                    requireNotNull(it[status]),
+                    requireNotNull(it[completed]),
+                    it[J.FAILURE_CODE],
+                )
+            }
+    }
 
     override fun insert(row: LeaveCarryExpiriesRecord) {
         sql.executeInsert(row)

@@ -34,6 +34,62 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun carryExpiryReadsExposeBoundedHistoryAndOnlyExplicitRecovery() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/leave/carry-expiries"
+        for ((path, method) in
+            listOf(base to "get", "$base/{id}" to "get", "$base/{id}/resume" to "post")) {
+            val operation = api["paths"][path][method]
+            assertTrue(operation["x-hris-company-admission"].asBoolean(), path)
+            assertEquals(
+                method == "post",
+                operation.path("parameters").any { it.path("name").asString() == "Idempotency-Key" },
+            )
+        }
+        for (path in listOf(base, "$base/{id}")) {
+            val limit =
+                api["paths"][path]["get"]["parameters"]
+                    .single { it["name"].asString() == "limit" }["schema"]
+            assertEquals(1, limit["minimum"].asInt())
+            assertEquals(100, limit["maximum"].asInt())
+        }
+        val after =
+            api["paths"]["$base/{id}"]["get"]["parameters"]
+                .single { it["name"].asString() == "after" }["schema"]
+        assertEquals(5000, after["maximum"].asInt())
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("expectedVersion", "reason"),
+            schemas["LeaveCarryExpiryResumeRequest"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("expiry", "attempts", "job", "results", "employees", "availableActions"),
+            schemas["LeaveCarryExpiryDetailsResponse"]["properties"].propertyNames().toSet(),
+        )
+        val properties =
+            schemas["LeaveCarryExpiryJobResponse"]["properties"].propertyNames().toSet()
+        assertTrue(
+            properties.containsAll(
+                setOf("id", "status", "completedItems", "totalItems", "scheduledFor")
+            )
+        )
+        assertTrue(
+            properties
+                .intersect(
+                    setOf(
+                        "request",
+                        "authenticatedAt",
+                        "credentialVersion",
+                        "leaseToken",
+                        "leaseOwner",
+                        "correlationId",
+                    )
+                )
+                .isEmpty()
+        )
+    }
+
+    @Test
     fun leaveAccrualSchedulesExposeFiniteReviewsAndExistingPeriodJobs() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/leave/accrual-schedules"

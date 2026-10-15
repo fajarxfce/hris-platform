@@ -1,10 +1,10 @@
 # Leave carryover accounting
 
 Status: accounting, request transitions, adjustments, year closing, the durable
-expiry worker and domain recovery are implemented and tested. New public
-closings create tracked awards; absent validity still means no additional expiry.
-Optional validity configuration remains hidden until scoped transport and client
-views are complete. These changes have not been deployed.
+expiry worker, scoped history and terminal recovery are implemented and tested.
+New public closings create tracked awards; absent validity still means no
+additional expiry. Optional validity configuration remains hidden until client
+views and synchronization are complete. These changes have not been deployed.
 
 ## Contract
 
@@ -163,6 +163,28 @@ Reads preserve the UTC deadline originally validated at award creation. Updating
 timezone data cannot recalculate an existing award. New award validation still
 checks its calendar and requires agreement with its admitted expiry origin.
 
+## History and recovery API
+
+All routes are under `/api/v1/companies/{companyId}/leave/carry-expiries`.
+
+| Method | Route | Behavior |
+| --- | --- | --- |
+| GET | `/` | Company-scoped history with an optional UUID `after` cursor |
+| GET | `/{id}` | Current job, retained attempts and one employee-outcome page |
+| POST | `/{id}/resume` | Recover terminal work using `expectedVersion`, `reason` and `Idempotency-Key` |
+
+Reads require current `leave.read`; recovery independently requires
+`leave.year.close`. Read page size defaults to 50 and is bounded to 1–100.
+Detail `after` is an outcome ordinal from 1–5,000. Pages are live scoped reads,
+not a synchronization cursor. Employee progress excludes the finalization step.
+
+Overview labels come from the original closing or batch policy snapshot. A policy
+rename cannot rewrite this history. Detail acquisition locks the current job
+before the origin and People/access guards; concurrent recovery invalidates a
+stale discovery. Scope and session assurance are checked again after acquiring
+private data. Responses include only the current page's minimal employee labels
+and safe job metadata, never worker credentials or lease authority.
+
 ## Observed validation
 
 The foundation passed 45 Leave domain tests, including 17 carry-policy scenarios covering
@@ -236,9 +258,17 @@ deadline. New awards still reject an instant inconsistent with their current
 calendar. Formatting and architecture checks passed; all 34 local documentation
 link targets were verified.
 
+The history/recovery API passed 65 Leave domain tests, 74 API/PostgreSQL cases
+and all 71 worker tests. Coverage includes frozen labels, company/read scope,
+finite paging, minimal employee references, original recovery receipts, retained
+outcomes without another debit, recovery during discovery, revoked credentials,
+late MFA and cancellation. OpenAPI contracts, Kotlin compilation, formatting and
+architecture checks passed. No browser, native or development deployment was
+performed for this increment.
+
 ## Remaining integration
 
-- Expose scoped expiry reads/recovery and optional validity through transport,
-  synchronization models, dashboard policy/recovery views and employee balances.
+- Connect expiry history/recovery to the dashboard, and add optional validity to
+  synchronization models, dashboard policies and employee balance views.
 - Validate browser/native behavior against the completed API before enabling
   optional validity and deploying these migrations.

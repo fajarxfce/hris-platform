@@ -445,6 +445,14 @@ HR scope/assurance through receipt completion. The new job cannot change the
 cohort or original deadline. Generic cancellation is unavailable for this job
 kind. Other workers keep their own live authorization requirements.
 
+Expiry history has separate scoped read use cases. A bounded overview query joins
+immutable source labels, the current job and committed employee progress in one
+SQL snapshot. Detail readers lock the job before the origin, People and access
+guards; recovery between initial discovery and locking returns a conflict rather
+than combining attempts. Employee references are minimal and limited to the
+requested outcome page. Reads retain current scope and MFA assurance after
+acquisition. Delivery projects safe job fields without lease or credential data.
+
 ## API and clients
 
 Company client policy uses a separate admission transaction after actor resolution and before a business handler. Its use case acquires policy/company/member/account guards and evaluates current availability; accepted requests and durable jobs retain their own transaction/execution ownership. The application maps feature adapters and effective sync selections to capability keys. Client policy never adds authorization or modifies a cursor projection. Configuration revisions, receipts, audit, and events are atomic, and settings recovery remains independently authorized during maintenance.

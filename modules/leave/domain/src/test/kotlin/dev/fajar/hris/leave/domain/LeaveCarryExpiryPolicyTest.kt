@@ -86,6 +86,30 @@ class LeaveCarryExpiryPolicyTest {
     private val attempt = LeaveCarryExpiryAttempt(request.id, 1, 0, created, "Year closing")
 
     @Test
+    fun recoveryHintsRequireAuthorityATerminalJobAndRemainingAttempts() {
+        val reader = Actor(actor, company, setOf("leave.read"), created, UUID.randomUUID())
+        val administrator = reader.copy(permissions = setOf("leave.read", "leave.year.close"))
+        for (status in JobStatus.entries) {
+            val overview =
+                LeaveCarryExpiryOverview(expiry, "ANNUAL", "Annual leave", status, 0, null)
+            assertTrue(availableLeaveCarryExpiryActions(reader, overview).isEmpty())
+            assertEquals(
+                if (status in setOf(JobStatus.FAILED, JobStatus.CANCELLED))
+                    setOf(LeaveCarryExpiryAction.RESUME)
+                else emptySet(),
+                availableLeaveCarryExpiryActions(administrator, overview),
+            )
+            assertTrue(
+                availableLeaveCarryExpiryActions(
+                        administrator,
+                        overview.copy(expiry = expiry.copy(version = 7)),
+                    )
+                    .isEmpty()
+            )
+        }
+    }
+
+    @Test
     fun expiryStartsAtItsExactFrozenBoundary() {
         assertEquals(
             "leave_carry_expiry_not_due",

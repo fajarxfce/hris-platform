@@ -89,6 +89,52 @@ class LeaveConfiguration {
         )
 
     @Bean
+    fun listLeaveCarryExpiries(
+        expiries: LeaveCarryExpiryRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ListLeaveCarryExpiries(
+            expiries,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun getLeaveCarryExpiry(
+        expiries: LeaveCarryExpiryRepository,
+        jobs: JobRepository,
+        batches: LeaveBatchRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetLeaveCarryExpiry(
+            expiries,
+            jobs,
+            batches,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun leaveCarrySource(sql: DSLContext): LeaveCarryDataSource = PostgresLeaveCarryDataSource(sql)
 
     @Bean

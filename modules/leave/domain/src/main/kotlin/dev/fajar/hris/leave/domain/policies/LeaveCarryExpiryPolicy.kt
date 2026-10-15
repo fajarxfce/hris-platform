@@ -72,3 +72,15 @@ fun validateLeaveCarryExpiryProgress(
         return Result.Failed(Failure(FailureKind.CONFLICT, "leave_carry_expiry_not_due"))
     return Result.Success(Unit)
 }
+
+fun availableLeaveCarryExpiryActions(
+    actor: Actor,
+    overview: LeaveCarryExpiryOverview,
+): Set<LeaveCarryExpiryAction> =
+    if (
+        "leave.year.close" in actor.permissions &&
+            overview.expiry.version in 0..6 &&
+            overview.status in setOf(JobStatus.FAILED, JobStatus.CANCELLED)
+    )
+        setOf(LeaveCarryExpiryAction.RESUME)
+    else emptySet()

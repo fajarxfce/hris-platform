@@ -11,6 +11,10 @@ interface LeaveCarryExpiryRepository {
 
     fun list(companyId: UUID, after: UUID?, limit: Int): Result<Page<LeaveCarryExpiry>>
 
+    fun overview(companyId: UUID, id: UUID): Result<LeaveCarryExpiryOverview?>
+
+    fun overviews(companyId: UUID, after: UUID?, limit: Int): Result<Page<LeaveCarryExpiryOverview>>
+
     fun create(
         companyId: UUID,
         expiry: LeaveCarryExpiry,

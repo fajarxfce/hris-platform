@@ -1,5 +1,8 @@
 package dev.fajar.hris.leave.data.mappers
 
+import dev.fajar.hris.jobs.domain.entities.JobKind
+import dev.fajar.hris.jobs.domain.entities.JobStatus
+import dev.fajar.hris.leave.data.models.LeaveCarryExpiryOverviewRow
 import dev.fajar.hris.leave.domain.entities.*
 import dev.fajar.hris.schema.tables.records.*
 import java.time.ZoneId
@@ -120,3 +123,27 @@ fun LeaveCarryExpiryOutcome.toRow(company: UUID, expiry: UUID): LeaveCarryExpiry
         it.ledgerId = ledgerId
         it.recordedAt = recordedAt.atOffset(ZoneOffset.UTC)
     }
+
+fun LeaveCarryExpiryOverviewRow.toCarryExpiryOverview(): LeaveCarryExpiryOverview {
+    require(
+        jobCompanyId == expiry.companyId &&
+            jobId == expiry.jobId &&
+            jobKind == JobKind.LEAVE_CARRY_EXPIRY.name
+    )
+    val origin = expiry.toCarryExpiry()
+    val state = JobStatus.valueOf(status)
+    require(
+        typeCode.isNotBlank() &&
+            typeName.isNotBlank() &&
+            completedEmployees in 0..origin.totalEmployees
+    )
+    require(state != JobStatus.SUCCEEDED || completedEmployees == origin.totalEmployees)
+    return LeaveCarryExpiryOverview(
+        origin,
+        typeCode,
+        typeName,
+        state,
+        completedEmployees,
+        failureCode,
+    )
+}

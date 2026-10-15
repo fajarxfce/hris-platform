@@ -1,5 +1,6 @@
 package dev.fajar.hris.leave.data.datasources
 
+import dev.fajar.hris.leave.data.models.LeaveCarryExpiryOverviewRow
 import dev.fajar.hris.leave.data.models.LeaveCarryExpiryTargetRow
 import dev.fajar.hris.schema.tables.records.*
 import java.util.UUID
@@ -10,6 +11,13 @@ interface LeaveCarryExpiryDataSource {
     fun forJob(company: UUID, job: UUID, lock: Boolean): LeaveCarryExpiriesRecord?
 
     fun list(company: UUID, after: UUID?, limit: Int): List<LeaveCarryExpiriesRecord>
+
+    fun overviews(
+        company: UUID,
+        id: UUID?,
+        after: UUID?,
+        limit: Int,
+    ): List<LeaveCarryExpiryOverviewRow>
 
     fun insert(row: LeaveCarryExpiriesRecord)
 

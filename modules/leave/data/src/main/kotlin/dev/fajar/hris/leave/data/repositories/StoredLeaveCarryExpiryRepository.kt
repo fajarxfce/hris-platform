@@ -41,6 +41,34 @@ class StoredLeaveCarryExpiryRepository(private val source: LeaveCarryExpiryDataS
             )
         }
 
+    override fun overview(companyId: UUID, id: UUID): Result<LeaveCarryExpiryOverview?> =
+        safeDatabaseCall {
+            val rows = source.overviews(companyId, id, null, 1)
+            require(rows.size <= 1)
+            rows
+                .singleOrNull()
+                ?.also { require(it.expiry.companyId == companyId && it.expiry.id == id) }
+                ?.toCarryExpiryOverview()
+        }
+
+    override fun overviews(
+        companyId: UUID,
+        after: UUID?,
+        limit: Int,
+    ): Result<Page<LeaveCarryExpiryOverview>> = safeDatabaseCall {
+        require(limit in 1..100)
+        val rows = source.overviews(companyId, null, after, limit + 1)
+        require(
+            rows.size <= limit + 1 &&
+                rows.all { it.expiry.companyId == companyId } &&
+                rows.map { it.expiry.id }.distinct().size == rows.size
+        )
+        Page(
+            java.util.List.copyOf(rows.take(limit).map { it.toCarryExpiryOverview() }),
+            if (rows.size > limit) rows[limit - 1].expiry.id.toString() else null,
+        )
+    }
+
     override fun create(
         companyId: UUID,
         expiry: LeaveCarryExpiry,

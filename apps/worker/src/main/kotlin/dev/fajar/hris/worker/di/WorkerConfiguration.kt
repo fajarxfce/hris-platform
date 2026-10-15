@@ -23,6 +23,13 @@ import org.springframework.transaction.PlatformTransactionManager
 @Configuration(proxyBeanMethods = false)
 class WorkerConfiguration {
     @Bean
+    fun offboardingScheduleTask(
+        resolve: ResolveActor,
+        execute: ExecuteOffboardingSchedule,
+        abort: AbortOffboardingSchedule,
+    ): JobTask = OffboardingScheduleTask(resolve, execute, abort)
+
+    @Bean
     fun workPeriodCloseTask(
         resolve: ResolveActor,
         advance: AdvanceWorkPeriodClose,

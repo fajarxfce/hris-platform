@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Import
 @Import(AccountLockProbeConfiguration::class)
 class LifecycleAssuranceHttpTest : LifecycleApiFixture() {
     @Autowired private lateinit var lifecycle: LifecycleRepository
+    @Autowired private lateinit var schedules: OffboardingScheduleRepository
     @Autowired private lateinit var people: PeopleRepository
     @Autowired private lateinit var companies: CompanyRepository
     @Autowired private lateinit var identities: IdentityRepository
@@ -216,6 +217,7 @@ class LifecycleAssuranceHttpTest : LifecycleApiFixture() {
         val cancel =
             CancelLifecycleCase(
                 lifecycle,
+                schedules,
                 companies,
                 identities,
                 members,
@@ -242,6 +244,7 @@ class LifecycleAssuranceHttpTest : LifecycleApiFixture() {
         val offboarding =
             CompleteOffboarding(
                 lifecycle,
+                schedules,
                 people,
                 companies,
                 identities,

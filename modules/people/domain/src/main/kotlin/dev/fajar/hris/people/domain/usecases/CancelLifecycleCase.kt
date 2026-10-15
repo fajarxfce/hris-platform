@@ -13,6 +13,7 @@ import java.util.UUID
 
 class CancelLifecycleCase(
     private val lifecycle: LifecycleRepository,
+    private val schedules: OffboardingScheduleRepository,
     private val companies: CompanyRepository,
     private val identities: IdentityRepository,
     private val members: MembershipRepository,
@@ -56,10 +57,11 @@ class CancelLifecycleCase(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val currentAccess = identities.access(actor.accountId, company)
+            if (currentAccess is Result.Failed) return@run currentAccess
+            val identityAccess = (currentAccess as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val permission = live.requirePermission("people.lifecycle.manage")
@@ -78,6 +80,14 @@ class CancelLifecycleCase(
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
             if (case.status != LifecycleStatus.OPEN)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "lifecycle_case_not_open"))
+            if (case.kind == LifecycleKind.OFFBOARDING) {
+                val attempts = schedules.forCase(company, id)
+                if (attempts is Result.Failed) return@run attempts
+                if (offboardingExecutionPending((attempts as Result.Success).value))
+                    return@run Result.Failed(
+                        Failure(FailureKind.CONFLICT, "offboarding_cancellation_required")
+                    )
+            }
             val event =
                 LifecycleEvent(
                     case.version + 1,
@@ -101,6 +111,14 @@ class CancelLifecycleCase(
                                 "people.lifecycle_cancelled",
                                 reason = reason,
                             ),
+                        )
+                    }
+                    .flatMap {
+                        validateCompanySessionActor(
+                            actor,
+                            identityAccess,
+                            clock.instant(),
+                            security,
                         )
                     }
                     .map { receipt }

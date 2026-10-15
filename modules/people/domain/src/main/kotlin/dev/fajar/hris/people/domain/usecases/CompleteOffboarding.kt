@@ -8,7 +8,7 @@ import dev.fajar.hris.identity.domain.policies.validateSessionAssurance
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.entities.*
-import dev.fajar.hris.people.domain.policies.validateLifecycleCompletion
+import dev.fajar.hris.people.domain.policies.*
 import dev.fajar.hris.people.domain.repositories.*
 import java.time.Clock
 import java.time.LocalDate
@@ -17,6 +17,7 @@ import java.util.UUID
 
 class CompleteOffboarding(
     private val lifecycle: LifecycleRepository,
+    private val schedules: OffboardingScheduleRepository,
     private val people: PeopleRepository,
     private val companies: CompanyRepository,
     private val identities: IdentityRepository,
@@ -123,6 +124,12 @@ class CompleteOffboarding(
                     reason,
                 )
             if (valid is Result.Failed) return@run valid
+            val attempts = schedules.forCase(company, id)
+            if (attempts is Result.Failed) return@run attempts
+            if (offboardingExecutionPending((attempts as Result.Success).value))
+                return@run Result.Failed(
+                    Failure(FailureKind.CONFLICT, "offboarding_cancellation_required")
+                )
             val otherCases = lifecycle.hasOpenCases(company, case.employmentId, case.id)
             if (otherCases is Result.Failed) return@run otherCases
             if ((otherCases as Result.Success).value)
@@ -276,6 +283,15 @@ class CompleteOffboarding(
                                 ),
                                 reason,
                             ),
+                        )
+                    }
+                    .flatMap {
+                        validateOffboardingSession(
+                            actor,
+                            access,
+                            clock.instant(),
+                            security,
+                            recent = true,
                         )
                     }
                     .map { receipt }

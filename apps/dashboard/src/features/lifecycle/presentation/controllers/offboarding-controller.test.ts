@@ -125,10 +125,16 @@ describe("offboarding request and command ownership", () => {
       .mockResolvedValueOnce(failed("connection_unavailable"))
       .mockResolvedValueOnce(failed("mfa_required"))
       .mockResolvedValueOnce(failed("stale_employment_version"))
-      .mockResolvedValueOnce(failed("lifecycle_case_not_open"));
+      .mockResolvedValueOnce(failed("lifecycle_case_not_open"))
+      .mockResolvedValueOnce(failed("offboarding_cancellation_required"));
     await f.controller.complete("Departure reviewed");
     const captured = f.complete.mock.lastCall;
-    for (const code of ["mfa_required", "stale_employment_version", "lifecycle_case_not_open"]) {
+    for (const code of [
+      "mfa_required",
+      "stale_employment_version",
+      "lifecycle_case_not_open",
+      "offboarding_cancellation_required",
+    ]) {
       await f.controller.retry();
       expect(f.controller.getSnapshot()).toMatchObject({ stage: "unconfirmed", failure: { code } });
       await f.controller.complete("Different payload");
@@ -149,6 +155,7 @@ describe("offboarding request and command ownership", () => {
     "stale_employment_version",
     "scheduled_employment_changes_pending",
     "reporting_reassignment_required",
+    "offboarding_cancellation_required",
   ])("a definite %s rejection requires a fresh review before another command", async (code) => {
     const f = fixture();
     await ready(f);

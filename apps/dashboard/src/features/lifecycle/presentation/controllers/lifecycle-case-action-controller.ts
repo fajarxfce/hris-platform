@@ -105,6 +105,7 @@ export class LifecycleCaseActionController {
             "data_conflict",
             "lifecycle_case_not_found",
             "lifecycle_case_not_open",
+            "offboarding_cancellation_required",
             "required_lifecycle_tasks_pending",
             "lifecycle_tasks_unresolved",
           ].includes(result.failure.code)

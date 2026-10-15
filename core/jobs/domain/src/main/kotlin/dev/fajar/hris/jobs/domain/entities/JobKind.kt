@@ -2,6 +2,7 @@ package dev.fajar.hris.jobs.domain.entities
 
 enum class JobKind {
     ANNOUNCEMENT_PUBLISH,
+    PEOPLE_OFFBOARD,
     WORKFORCE_CLOSE,
     PAYROLL_CALCULATE,
     PAYROLL_FINALIZE,

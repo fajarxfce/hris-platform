@@ -39,3 +39,11 @@ If the response is interrupted or unreadable, the client must not assume rollbac
 `/administration/jobs` displays one page, explicit refresh, URL continuation, and a scoped details panel. A `job` query parameter opens a canonical detail read. Company changes discard the previous company's continuation and selected job. Cancellation uses confirmation and a single in-flight command. An unconfirmed response removes the old details and requires a status read before another command.
 
 The list and detail controllers have separate request lifetimes. Accepted detail observations update a matching visible row without downgrading its version or replacing another company/page. Closing a panel preserves keyboard focus and avoids an unnecessary list request. Each list refresh is an independent live snapshot; cancellation always uses the canonical detail version. There is no polling, growing page cache, or browser worker scheduler. [Dashboard](dashboard.md) describes the shared layout and validation commands.
+
+
+`PEOPLE_OFFBOARD` executes one explicitly reviewed lifecycle authorization after
+its retained company-local boundary. It rechecks current initiating credentials,
+permissions and departure sources; its transaction closes employment, applicable
+company access, case, schedule and job together. Cancellation stops execution and
+terminal-job recovery closes evidence without scheduling a replacement. See
+[scheduled offboarding](offboarding-schedules.md).

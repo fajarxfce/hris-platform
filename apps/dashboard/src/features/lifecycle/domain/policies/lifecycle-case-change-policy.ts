@@ -45,6 +45,7 @@ export const lifecycleCaseChangeWasRejected = (failure: Failure): boolean =>
     "invalid_lifecycle_change",
     "lifecycle_case_not_found",
     "lifecycle_case_not_open",
+    "offboarding_cancellation_required",
     "required_lifecycle_tasks_pending",
     "lifecycle_tasks_unresolved",
     "stale_version",

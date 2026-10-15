@@ -96,10 +96,15 @@ describe("lifecycle case action ownership", () => {
     f.execute
       .mockResolvedValueOnce(failed("connection_unavailable"))
       .mockResolvedValueOnce(failed("mfa_required"))
-      .mockResolvedValueOnce(failed("lifecycle_case_not_open"));
+      .mockResolvedValueOnce(failed("lifecycle_case_not_open"))
+      .mockResolvedValueOnce(failed("offboarding_cancellation_required"));
     await f.controller.save("Checklist cancelled");
     const captured = f.execute.mock.lastCall;
-    for (const code of ["mfa_required", "lifecycle_case_not_open"]) {
+    for (const code of [
+      "mfa_required",
+      "lifecycle_case_not_open",
+      "offboarding_cancellation_required",
+    ]) {
       await f.controller.retry();
       expect(f.controller.getSnapshot()).toMatchObject({ stage: "unconfirmed", failure: { code } });
       await f.controller.save("Changed reason");
@@ -118,6 +123,7 @@ describe("lifecycle case action ownership", () => {
     "required_lifecycle_tasks_pending",
     "lifecycle_tasks_unresolved",
     "lifecycle_case_not_open",
+    "offboarding_cancellation_required",
   ])("requires a new review after a definite %s response", async (code) => {
     const f = fixture("completeOnboarding");
     f.execute.mockResolvedValueOnce(failed(code));

@@ -34,6 +34,54 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun scheduledOffboardingPinsItsReviewedBasisAndKeepsCredentialsOutOfResponses() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/lifecycle/cases/{caseId}/offboarding-schedules"
+        for ((path, method) in
+            listOf(
+                base to "get",
+                "$base/review" to "get",
+                "$base/{id}" to "get",
+                base to "post",
+                "$base/{id}/cancel" to "post",
+                "$base/{id}/recover" to "post",
+            )) {
+            val operation = api["paths"][path][method]
+            assertTrue(operation["x-hris-company-admission"].asBoolean(), path)
+            assertEquals(
+                method == "post",
+                operation.path("parameters").any { it.path("name").asString() == "Idempotency-Key" },
+            )
+        }
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("id", "expectedVersion", "employmentVersion", "basisRevision", "reason"),
+            schemas["OffboardingScheduleRequest"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("expectedVersion", "expectedJobVersion", "reason"),
+            schemas["OffboardingScheduleJobRequest"]["properties"].propertyNames().toSet(),
+        )
+        for (response in
+            listOf(
+                "OffboardingScheduleResponse",
+                "OffboardingScheduleJobResponse",
+                "OffboardingScheduleReviewResponse",
+            )) {
+            val properties = schemas[response]["properties"]
+            for (privateField in
+                listOf(
+                    "employeeAccountId",
+                    "credentialVersion",
+                    "authenticatedAt",
+                    "request",
+                    "birthDate",
+                    "email",
+                )) assertFalse(properties.has(privateField), "$response.$privateField")
+        }
+    }
+
+    @Test
     fun payrollRecoveryReviewCarriesACompleteBalanceAndServerEligibilityWithoutACommand() {
         val api = contract()
         val path = "/api/v1/companies/{companyId}/payroll/payslips/{assessmentId}/recoveries/review"

@@ -144,6 +144,7 @@ export class OffboardingController {
             "required_lifecycle_tasks_pending",
             "lifecycle_tasks_unresolved",
             "offboarding_terms_changed",
+            "offboarding_cancellation_required",
             "other_lifecycle_cases_pending",
             "offboarding_date_not_reached",
             "cannot_complete_own_offboarding",

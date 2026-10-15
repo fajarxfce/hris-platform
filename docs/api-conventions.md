@@ -313,3 +313,13 @@ Stable codes include `invalid_announcement_schedule` (422, `maximumDays: "365"`)
 
 
 `GET /api/v1/companies/{companyId}/announcements/{id}/audience-preview?expectedVersion=0` requires current `announcements.manage` and the observed announcement version. It accepts drafts and queued announcements. The response contains `announcementId`, `version`, `asOfDate` (the company-local date), `evaluatedAt` (UTC), `recipientCount`, and `audienceVersions`; recipient account/employment IDs are not returned. This read has no publication or command side effect. Empty audiences return zero; more than 5,000 recipients returns `announcement_audience_limit`. Other stable errors include `invalid_version`, `stale_version`, `announcement_audience_unavailable`, `announcement_not_found`, and `announcement_preview_unavailable` for published/archived content. Actual publication evaluates eligibility again at execution time.
+
+
+## Scheduled offboarding
+
+The case-owned `/lifecycle/cases/{caseId}/offboarding-schedules` API provides
+review, bounded retained attempts, explicit admission, cancellation and terminal-job
+recovery. Server-derived company dates and an opaque reviewed basis accompany
+observed case/employment versions. Cancellation receipts identify the changed job;
+recovery receipts identify the schedule. All commands retain idempotency and recent
+assurance through completion. See [request contracts and timing](offboarding-schedules.md).

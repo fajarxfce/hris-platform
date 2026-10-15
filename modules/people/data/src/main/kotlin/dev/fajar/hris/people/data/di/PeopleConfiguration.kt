@@ -18,6 +18,215 @@ import org.springframework.context.annotation.Configuration
 @Configuration(proxyBeanMethods = false)
 class PeopleConfiguration {
     @Bean
+    fun offboardingScheduleSource(sql: DSLContext): OffboardingScheduleDataSource =
+        PostgresOffboardingScheduleDataSource(sql)
+
+    @Bean
+    fun offboardingSchedules(source: OffboardingScheduleDataSource): OffboardingScheduleRepository =
+        StoredOffboardingScheduleRepository(source)
+
+    @Bean
+    fun getOffboardingScheduleReview(
+        schedules: OffboardingScheduleRepository,
+        lifecycle: LifecycleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetOffboardingScheduleReview(
+            schedules,
+            lifecycle,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun listOffboardingSchedules(
+        schedules: OffboardingScheduleRepository,
+        lifecycle: LifecycleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListOffboardingSchedules(
+            schedules,
+            lifecycle,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun getOffboardingSchedule(
+        schedules: OffboardingScheduleRepository,
+        lifecycle: LifecycleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetOffboardingSchedule(
+            schedules,
+            lifecycle,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun scheduleOffboarding(
+        schedules: OffboardingScheduleRepository,
+        lifecycle: LifecycleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ScheduleOffboarding(
+            schedules,
+            lifecycle,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun cancelOffboardingSchedule(
+        schedules: OffboardingScheduleRepository,
+        lifecycle: LifecycleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        CancelOffboardingSchedule(
+            schedules,
+            lifecycle,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun recoverOffboardingSchedule(
+        schedules: OffboardingScheduleRepository,
+        lifecycle: LifecycleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        RecoverOffboardingSchedule(
+            schedules,
+            lifecycle,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun executeOffboardingSchedule(
+        schedules: OffboardingScheduleRepository,
+        lifecycle: LifecycleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        roles: RoleTemplateRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        ExecuteOffboardingSchedule(
+            schedules,
+            lifecycle,
+            people,
+            companies,
+            members,
+            identities,
+            roles,
+            jobs,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun abortOffboardingSchedule(
+        schedules: OffboardingScheduleRepository,
+        lifecycle: LifecycleRepository,
+        people: PeopleRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = AbortOffboardingSchedule(schedules, lifecycle, people, jobs, journal, transactions, clock)
+
+    @Bean
     fun selfProfileProjectionSource(sql: DSLContext): SelfProfileProjectionDataSource =
         PostgresSelfProfileProjectionDataSource(sql)
 
@@ -765,6 +974,7 @@ class PeopleConfiguration {
     @Bean
     fun cancelLifecycleCase(
         lifecycle: LifecycleRepository,
+        schedules: OffboardingScheduleRepository,
         companies: CompanyRepository,
         identities: IdentityRepository,
         members: MembershipRepository,
@@ -777,6 +987,7 @@ class PeopleConfiguration {
     ) =
         CancelLifecycleCase(
             lifecycle,
+            schedules,
             companies,
             identities,
             members,
@@ -817,6 +1028,7 @@ class PeopleConfiguration {
     @Bean
     fun completeOffboarding(
         lifecycle: LifecycleRepository,
+        schedules: OffboardingScheduleRepository,
         people: PeopleRepository,
         companies: CompanyRepository,
         identities: IdentityRepository,
@@ -830,6 +1042,7 @@ class PeopleConfiguration {
     ) =
         CompleteOffboarding(
             lifecycle,
+            schedules,
             people,
             companies,
             identities,

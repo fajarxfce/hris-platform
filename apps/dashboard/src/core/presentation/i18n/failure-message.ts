@@ -1602,6 +1602,10 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Complete or cancel the other open lifecycle cases for this employment first.",
     "Selesaikan atau batalkan proses lifecycle lain yang masih terbuka untuk employment ini.",
   ],
+  offboarding_cancellation_required: [
+    "Cancel the active offboarding schedule before continuing.",
+    "Batalkan jadwal offboarding yang masih aktif sebelum melanjutkan.",
+  ],
   offboarding_date_not_reached: [
     "Offboarding can be completed after the last working date in the company timezone.",
     "Offboarding dapat diselesaikan setelah hari kerja terakhir dalam zona waktu perusahaan.",

@@ -44,6 +44,17 @@ When a workflow needs both organization structure and company guards, acquire st
 
 Lifecycle case operations acquire people guards before case locks, followed by company, membership, and ordered account guards. Template operations acquire the template guard before access guards. Shared case reads cannot hold access guards while waiting for a writer that needs them. Multi-query aggregate reads need their resource guard; paginated case/task projections instead use one bounded SQL snapshot.
 
+Scheduled offboarding retains a separate, immutable authorization and existing
+fixed-total background job. Its use cases own admission, departure policy,
+cancellation and terminal-job recovery. Worker/cancellation/recovery acquire the
+job before People, case and access guards. Bounded reads join schedule/job metadata
+without taking job locks. Execution matches the locked request and captured security
+version, then rechecks current authority and reviewed sources. Interactive proof
+age does not authorize background execution. Employment, scoped access, case,
+schedule, job progress and journal commit atomically; interruption or stale work
+rolls back. Queue-wide recovery gains no additional People RLS scope. See
+[scheduled offboarding](offboarding-schedules.md).
+
 Approval aggregate reads acquire the shared approval guard before company, membership, and actor-account guards. They observe headers and assignment overrides coherently; mutations retain the exclusive approval guard. Both readers and administrative commands revalidate live session assurance after waiting, including before returning an existing operation receipt.
 
 Interactive work-calendar reads and commands also revalidate current session

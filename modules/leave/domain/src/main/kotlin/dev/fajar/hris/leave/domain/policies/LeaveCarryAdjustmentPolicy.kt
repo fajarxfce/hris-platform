@@ -14,15 +14,8 @@ fun planLeaveCarryAdjustment(
     now: Instant,
 ): Result<LeaveCarryMovement?> {
     if (bucket == null) return validateLeaveBalanceAdjustment(balance, delta).map { null }
-    val valid = validateLeaveCarryBucket(bucket)
+    val valid = validateLeaveCarryBalance(balance, bucket)
     if (valid is Result.Failed) return valid
-    if (
-        bucket.year != balance.year ||
-            bucket.availableHalfDays > balance.availableHalfDays ||
-            bucket.reservedHalfDays > balance.reservedHalfDays ||
-            bucket.consumedHalfDays > balance.consumedHalfDays
-    )
-        return Result.Failed(Failure(FailureKind.CONFLICT, "leave_carry_conflict"))
     val expiration = planLeaveCarryExpiry(bucket, now)
     if (expiration is Result.Failed) return expiration
     val expiry = (expiration as Result.Success).value

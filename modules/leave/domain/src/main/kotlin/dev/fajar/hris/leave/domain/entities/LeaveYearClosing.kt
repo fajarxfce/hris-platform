@@ -19,4 +19,5 @@ data class LeaveYearClosing(
     val reason: String,
     val carryTracking: Boolean = false,
     val timezone: String? = null,
+    val batchId: UUID? = null,
 )

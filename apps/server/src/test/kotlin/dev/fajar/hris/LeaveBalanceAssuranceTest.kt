@@ -321,6 +321,7 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
                             clock,
                             requests,
                             security,
+                            carry,
                         )
                         .execute(
                             actor,

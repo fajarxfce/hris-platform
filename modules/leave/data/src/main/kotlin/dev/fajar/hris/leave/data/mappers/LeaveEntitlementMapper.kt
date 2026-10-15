@@ -63,6 +63,7 @@ fun LeaveYearClosingsRecord.toClosing(json: ObjectMapper): LeaveYearClosing =
         reason,
         carryTracking,
         companyTimezone,
+        batchId,
     )
 
 fun LeaveYearClosing.toRow(company: UUID, json: ObjectMapper): LeaveYearClosingsRecord =
@@ -85,4 +86,5 @@ fun LeaveYearClosing.toRow(company: UUID, json: ObjectMapper): LeaveYearClosings
         it.reason = reason
         it.carryTracking = carryTracking
         it.companyTimezone = timezone
+        it.batchId = batchId
     }

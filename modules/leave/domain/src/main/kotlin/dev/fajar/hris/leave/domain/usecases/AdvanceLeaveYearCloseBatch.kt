@@ -27,6 +27,7 @@ class AdvanceLeaveYearCloseBatch(
     private val transactions: TransactionRunner,
     private val clock: Clock,
     private val requests: LeaveRequestRepository,
+    private val carry: LeaveCarryRepository,
 ) {
     fun execute(actor: Actor, lease: JobLease): Result<JobStep> {
         val kind = LeaveBatchKind.YEAR_CLOSE
@@ -142,7 +143,6 @@ class AdvanceLeaveYearCloseBatch(
             if (versionResult is Result.Failed) return@run versionResult
             val employeeVersion = (versionResult as Result.Success).value
             val owner = (ownerResult as Result.Success).value
-            val now = clock.instant()
             val closedResult =
                 entitlements.closing(company, target.employeeId, batch.typeId, batch.period.year)
             if (closedResult is Result.Failed) return@run closedResult
@@ -194,22 +194,36 @@ class AdvanceLeaveYearCloseBatch(
                                 batch.period.year,
                             )
                         if (pending is Result.Failed) return@run pending
-                        val rolloverResult =
-                            calculateLeaveYearRollover(
+                        val acquiredCarry =
+                            carry.buckets(
+                                company,
+                                target.employeeId,
+                                batch.typeId,
+                                setOf(batch.period.year),
+                            )
+                        if (acquiredCarry is Result.Failed) return@run acquiredCarry
+                        val bucket = (acquiredCarry as Result.Success).value.singleOrNull()
+                        val now = clock.instant()
+                        val planned =
+                            planLeaveYearClosing(
                                 balance,
-                                batch.policy.policy.accrual?.carryLimitHalfDays ?: 0,
+                                bucket,
+                                batch.policy.policy.accrual,
                                 destination,
                                 (pending as Result.Success).value,
+                                now,
+                                batch.timezone,
                             )
-                        if (rolloverResult is Result.Failed)
+                        if (planned is Result.Failed)
                             Result.Success(
                                 LeaveBatchOutcome(
                                     LeaveBatchResultStatus.FAILED,
-                                    failure = rolloverResult.failure,
+                                    failure = planned.failure,
                                 )
                             )
                         else {
-                            val rollover = (rolloverResult as Result.Success).value
+                            val plan = (planned as Result.Success).value
+                            val rollover = plan.rollover
                             val id = UUID.randomUUID()
                             val closing =
                                 LeaveYearClosing(
@@ -217,15 +231,18 @@ class AdvanceLeaveYearCloseBatch(
                                     target.employeeId,
                                     batch.typeId,
                                     batch.period.year,
-                                    balance.version,
-                                    balance.availableHalfDays,
-                                    balance.consumedHalfDays,
+                                    plan.source.version,
+                                    plan.source.availableHalfDays,
+                                    plan.source.consumedHalfDays,
                                     destination.version,
                                     rollover,
                                     batch.policy,
                                     actor.accountId,
                                     now,
                                     batch.reason,
+                                    true,
+                                    batch.timezone,
+                                    batch.id,
                                 )
                             val entries = mutableListOf<LeaveLedgerEntry>()
                             if (rollover.carryHalfDays > 0) {
@@ -279,9 +296,84 @@ class AdvanceLeaveYearCloseBatch(
                                         now,
                                         batch.reason,
                                     )
+                            val settlement =
+                                plan.settlement?.let {
+                                    LeaveCarryPosting(
+                                        UUID.randomUUID(),
+                                        it,
+                                        requireNotNull(bucket).version,
+                                        UUID.randomUUID(),
+                                    )
+                                }
+                            val settlementEntry =
+                                settlement?.let {
+                                    LeaveLedgerEntry(
+                                        it.ledgerEntryId,
+                                        target.employeeId,
+                                        batch.typeId,
+                                        batch.period.year,
+                                        LeaveLedgerKind.EXPIRE,
+                                        it.id,
+                                        null,
+                                        -it.movement.halfDays,
+                                        0,
+                                        0,
+                                        actor.accountId,
+                                        now,
+                                        batch.reason,
+                                        it.id,
+                                    )
+                                }
+                            val postings =
+                                plan.movements.mapIndexed { index, movement ->
+                                    val kind =
+                                        if (movement.effect == LeaveCarryEffect.TRANSFER)
+                                            LeaveLedgerKind.CARRY_OUT
+                                        else LeaveLedgerKind.EXPIRE
+                                    LeaveCarryPosting(
+                                        UUID.randomUUID(),
+                                        movement,
+                                        requireNotNull(bucket).version + index,
+                                        entries
+                                            .single {
+                                                it.year == batch.period.year && it.kind == kind
+                                            }
+                                            .id,
+                                    )
+                                }
+                            val award =
+                                if (rollover.carryHalfDays == 0) null
+                                else
+                                    LeaveCarryAward(
+                                        LeaveCarryBucket(
+                                            id,
+                                            batch.period.year + 1,
+                                            rollover.carryHalfDays,
+                                            rollover.carryHalfDays,
+                                            validity = plan.validity,
+                                        ),
+                                        target.employeeId,
+                                        batch.typeId,
+                                        batch.timezone,
+                                        batch.policy.policy.accrual?.carryValidityMonths,
+                                    )
                             val sourceMovements = entries.count { it.year == batch.period.year }
-                            entitlements
-                                .createClosing(company, closing)
+                            val settled =
+                                if (settlement == null) Result.Success(Unit)
+                                else
+                                    carry.append(company, listOf(settlement)).flatMap {
+                                        ledger.append(
+                                            company,
+                                            listOf(requireNotNull(settlementEntry)),
+                                        )
+                                    }
+                            settled
+                                .flatMap { entitlements.createClosing(company, closing) }
+                                .flatMap {
+                                    if (award == null) Result.Success(Unit)
+                                    else carry.create(company, award)
+                                }
+                                .flatMap { carry.append(company, postings) }
                                 .flatMap {
                                     if (entries.isEmpty()) Result.Success(Unit)
                                     else ledger.append(company, entries)
@@ -292,7 +384,7 @@ class AdvanceLeaveYearCloseBatch(
                                         target.employeeId,
                                         batch.typeId,
                                         batch.period.year,
-                                        balance.version + sourceMovements,
+                                        plan.source.version + sourceMovements,
                                         id,
                                     )
                                 }
@@ -331,7 +423,7 @@ class AdvanceLeaveYearCloseBatch(
                             result.resourceId,
                             result.failure?.code,
                             result.failure?.parameters ?: emptyMap(),
-                            now,
+                            clock.instant(),
                         ),
                     )
                 }

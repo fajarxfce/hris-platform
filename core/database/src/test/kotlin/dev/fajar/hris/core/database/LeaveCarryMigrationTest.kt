@@ -172,6 +172,29 @@ class LeaveCarryMigrationTest {
                 type,
             )
         }
+        Flyway.configure().dataSource(source).target("84").load().migrate()
+        assertNull(
+            sql.queryForObject(
+                "select batch_id from leave_year_closings where company_id=?",
+                UUID::class.java,
+                company,
+            )
+        )
+        assertEquals(beforeSync, sql.queryForList("select * from mobile_sync_changes order by id"))
+        assertEquals(
+            beforeClosing,
+            sql.queryForMap(
+                "select policy_snapshot,recorded_at from leave_year_closings where company_id=?",
+                company,
+            ),
+        )
+        assertThrows(DataAccessException::class.java) {
+            sql.update(
+                "update leave_year_closings set batch_id=? where company_id=?",
+                UUID.randomUUID(),
+                company,
+            )
+        }
         assertEquals(beforeLedger, sql.queryForList(ledgerQuery))
         assertEquals(beforeAccounts, sql.queryForList("select * from leave_accounts order by id"))
     }

@@ -339,6 +339,7 @@ class LeaveConfiguration {
         clock: Clock,
         requests: LeaveRequestRepository,
         security: IdentitySecurityPolicy,
+        carry: LeaveCarryRepository,
     ) =
         CloseEmployeeLeaveYear(
             ledger,
@@ -354,6 +355,7 @@ class LeaveConfiguration {
             clock,
             requests,
             security,
+            carry,
         )
 
     @Bean
@@ -863,6 +865,7 @@ class LeaveConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         requests: LeaveRequestRepository,
+        carry: LeaveCarryRepository,
     ) =
         AdvanceLeaveYearCloseBatch(
             batches,
@@ -878,6 +881,7 @@ class LeaveConfiguration {
             transactions,
             clock,
             requests,
+            carry,
         )
 
     @Bean

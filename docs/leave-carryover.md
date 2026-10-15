@@ -1,11 +1,10 @@
 # Leave carryover accounting
 
-Status: domain/storage accounting and request preview, submission, approval,
-withdrawal, cancellation and balance adjustment integration are implemented and
-tested. New public
-closing commands do not create tracked awards yet, and validity configuration is
-not exposed. Closing, worker and client integration remains; these
-changes have not been deployed.
+Status: domain/storage accounting, request transitions, balance adjustments and
+direct/batch year closing are implemented and tested. New public closings create
+tracked awards; absent validity still means no additional expiry. Optional
+validity configuration remains hidden until the expiry worker and client views
+are complete. These changes have not been deployed.
 
 ## Contract
 
@@ -32,8 +31,8 @@ cancellation restores the original funding source; any returned carried units
 past the boundary expire in the same transaction. They do not become ordinary
 credit. Balance reductions consume ordinary credit first, then explicitly deduct
 carried credit; additions remain ordinary. Expired free carry is settled before
-applying either adjustment. Year-end transfers also need explicit subledger
-movements so carried units cannot exceed the main balance.
+applying either adjustment. Year-end transfers and expiry also record explicit subledger movements so carried
+units cannot exceed the main balance.
 
 ## Request integration
 
@@ -68,6 +67,26 @@ invalid correction does not partially expire the account. Original command repla
 retains its first receipt after later balance changes and still requires current
 scope, independent authorship and session assurance. Concurrent corrections cannot
 both spend the same observed version.
+
+## Year closing
+
+Direct and batch closing share one pure calculation. An expired source bucket is
+settled before the closing snapshot is recorded; those units cannot receive a new
+award. Eligible source carry transfers first and any excess expires explicitly.
+A closing at or after the destination deadline awards zero carried units. New
+awards retain their original source, calendar and validity; no history is rewritten.
+
+Direct closing checks the caller's original observed source version before any
+settlement, then checks the destination version when credit will be transferred.
+The stored closing source version reflects the completed source expiry. Pending
+requests still prevent closing, and a stale review or late assurance/journal failure
+rolls back expiry, closing, award, ledger and receipt together.
+
+V84 retains an optional immutable batch origin. A batch closing must match its
+reviewed type, policy, actor, reason, selected employee and timezone, with an active
+job and a matching applied outcome in the same transaction. Changing the company's
+timezone after admission cannot shift the reviewed deadline. Historical closings
+keep a null batch origin; metadata cannot be added retrospectively.
 
 ## Storage boundary
 
@@ -147,10 +166,19 @@ and worker application contexts passed with the additional repository dependency
 Formatting and architecture checks passed. No client or development deployment
 was performed for this increment.
 
+Closing integration passed 59 domain tests, 93 API/PostgreSQL regressions and all
+68 worker tests. Seven new HTTP scenarios cover tracked public awards, source
+expiry before rollover, unlimited carry transfer, late destination closing,
+pending requests, original receipts, stale reviews, journal rollback and frozen
+batch timezone with missing-outcome rollback. Three additional assurance/cancellation
+cases exercise closing after acquisition and journaling. Both the V82-to-V83-to-V84
+carry upgrade and the existing account migration test passed, preserving historical
+ledger values, versions, policy evidence and sync records. Query generation,
+Kotlin compilation, formatting and architecture checks passed. No browser,
+native or development deployment was performed for this increment.
+
 ## Remaining integration
 
-- Apply carry movements in direct/batch year closing, retaining
-  current access and receipt guarantees before enabling tracked public awards.
 - Admit and execute bounded expiry work with immutable origin, lease fencing,
   original due times and explicit terminal-job recovery.
 - Expose validity and progress through scoped transport/sync models, dashboard

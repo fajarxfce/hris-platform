@@ -15,9 +15,14 @@ import org.springframework.dao.DataAccessException
 class LeaveCarryStorageTest : LeaveCarryStorageFixture() {
     @Test
     fun legacyCarryAndNullPolicyJsonRetainExistingBehavior() {
-        val f = accountingFixture(java.time.Instant.parse("2027-01-05T03:00:00Z"), carry = "3")
-        accountingBody(adjust(f, "3"))
-        accountingBody(closeYear(f))
+        val prepared = prepareCarry(months = null)
+        val legacy =
+            prepared.copy(
+                closing = prepared.closing.copy(carryTracking = false, timezone = null),
+                award = null,
+            )
+        success(storeCarry(legacy))
+        val f = legacy.f
         assertEquals(0, accountingRows(f, "leave_carry_buckets"))
         assertFalse(
             database()

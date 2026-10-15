@@ -27,6 +27,20 @@ fun validateLeaveCarryBucket(bucket: LeaveCarryBucket): Result<Unit> {
     return Result.Success(Unit)
 }
 
+/** A carry bucket is a subset of one main account, including its retained reservations. */
+fun validateLeaveCarryBalance(balance: LeaveBalance, bucket: LeaveCarryBucket): Result<Unit> {
+    val valid = validateLeaveCarryBucket(bucket)
+    if (valid is Result.Failed) return valid
+    if (
+        bucket.year != balance.year ||
+            bucket.availableHalfDays > balance.availableHalfDays ||
+            bucket.reservedHalfDays > balance.reservedHalfDays ||
+            bucket.consumedHalfDays > balance.consumedHalfDays
+    )
+        return Result.Failed(Failure(FailureKind.CONFLICT, "leave_carry_conflict"))
+    return Result.Success(Unit)
+}
+
 /** Pure funding plan for already charged work dates; repositories acquire the owned snapshots. */
 fun planLeaveCarryReservation(
     days: List<LeaveDay>,
@@ -58,14 +72,8 @@ fun planLeaveCarryReservation(
             return Result.Failed(Failure(FailureKind.CONFLICT, "leave_ledger_conflict"))
         val bucket = buckets.singleOrNull { it.year == balance.year }
         if (bucket != null) {
-            val checked = validateLeaveCarryBucket(bucket)
+            val checked = validateLeaveCarryBalance(balance, bucket)
             if (checked is Result.Failed) return checked
-            if (
-                bucket.availableHalfDays > balance.availableHalfDays ||
-                    bucket.reservedHalfDays > balance.reservedHalfDays ||
-                    bucket.consumedHalfDays > balance.consumedHalfDays
-            )
-                return Result.Failed(Failure(FailureKind.CONFLICT, "leave_carry_conflict"))
         }
         ordinary[balance.year] = balance.availableHalfDays - (bucket?.availableHalfDays ?: 0)
     }

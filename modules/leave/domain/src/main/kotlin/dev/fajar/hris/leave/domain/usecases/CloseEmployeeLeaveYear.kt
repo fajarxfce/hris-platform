@@ -26,6 +26,7 @@ class CloseEmployeeLeaveYear(
     private val clock: Clock,
     private val requests: LeaveRequestRepository,
     private val security: IdentitySecurityPolicy,
+    private val carry: LeaveCarryRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -81,10 +82,11 @@ class CloseEmployeeLeaveYear(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId, shared = true)
             if (accountLock is Result.Failed) return@run accountLock
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val currentAccess = (authority as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, currentAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val allowed = live.requirePermission("leave.year.close")
@@ -94,15 +96,20 @@ class CloseEmployeeLeaveYear(
             if ((accountResult as Result.Success).value == actor.accountId)
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "self_adjustment_denied"))
             (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+                return@run validateCompanySessionActor(
+                        actor,
+                        currentAccess,
+                        clock.instant(),
+                        security,
+                    )
+                    .map { _ -> it }
             }
             val companyResult = companies.find(company)
             if (companyResult is Result.Failed) return@run companyResult
             val settings =
                 (companyResult as Result.Success).value
                     ?: return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "company_not_found"))
-            val now = clock.instant()
-            val today = now.atZone(ZoneId.of(settings.timezone)).toLocalDate()
+            val today = clock.instant().atZone(ZoneId.of(settings.timezone)).toLocalDate()
             if (year >= today.year)
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "leave_year_not_ended"))
             val employeeVersion = people.currentVersion(company, employeeId)
@@ -130,15 +137,23 @@ class CloseEmployeeLeaveYear(
             val destination = (destinationResult as Result.Success).value
             val unresolved = requests.unresolvedYear(company, employeeId, typeId, year)
             if (unresolved is Result.Failed) return@run unresolved
-            val rolloverResult =
-                calculateLeaveYearRollover(
+            val acquiredCarry = carry.buckets(company, employeeId, typeId, setOf(year))
+            if (acquiredCarry is Result.Failed) return@run acquiredCarry
+            val bucket = (acquiredCarry as Result.Success).value.singleOrNull()
+            val now = clock.instant()
+            val planned =
+                planLeaveYearClosing(
                     balance,
-                    type.policy.accrual?.carryLimitHalfDays ?: 0,
+                    bucket,
+                    type.policy.accrual,
                     destination,
                     (unresolved as Result.Success).value,
+                    now,
+                    settings.timezone,
                 )
-            if (rolloverResult is Result.Failed) return@run rolloverResult
-            val rollover = (rolloverResult as Result.Success).value
+            if (planned is Result.Failed) return@run planned
+            val plan = (planned as Result.Success).value
+            val rollover = plan.rollover
             if (rollover.carryHalfDays > 0 && destination.version != expectedDestinationVersion)
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "stale_destination_balance_version")
@@ -149,15 +164,17 @@ class CloseEmployeeLeaveYear(
                     employeeId,
                     typeId,
                     year,
-                    balance.version,
-                    balance.availableHalfDays,
-                    balance.consumedHalfDays,
+                    plan.source.version,
+                    plan.source.availableHalfDays,
+                    plan.source.consumedHalfDays,
                     destination.version,
                     rollover,
                     LeavePolicySnapshot(type.id, type.code, type.appliedRevision, type.policy),
                     actor.accountId,
                     now,
                     reason,
+                    true,
+                    settings.timezone,
                 )
             val entries = mutableListOf<LeaveLedgerEntry>()
             if (rollover.carryHalfDays > 0) {
@@ -211,10 +228,76 @@ class CloseEmployeeLeaveYear(
                         now,
                         reason,
                     )
+            val settlement =
+                plan.settlement?.let {
+                    LeaveCarryPosting(
+                        UUID.randomUUID(),
+                        it,
+                        requireNotNull(bucket).version,
+                        UUID.randomUUID(),
+                    )
+                }
+            val settlementEntry =
+                settlement?.let {
+                    LeaveLedgerEntry(
+                        it.ledgerEntryId,
+                        employeeId,
+                        typeId,
+                        year,
+                        LeaveLedgerKind.EXPIRE,
+                        it.id,
+                        null,
+                        -it.movement.halfDays,
+                        0,
+                        0,
+                        actor.accountId,
+                        now,
+                        reason,
+                        it.id,
+                    )
+                }
+            val postings =
+                plan.movements.mapIndexed { index, movement ->
+                    val kind =
+                        if (movement.effect == LeaveCarryEffect.TRANSFER) LeaveLedgerKind.CARRY_OUT
+                        else LeaveLedgerKind.EXPIRE
+                    LeaveCarryPosting(
+                        UUID.randomUUID(),
+                        movement,
+                        requireNotNull(bucket).version + index,
+                        entries.single { it.year == year && it.kind == kind }.id,
+                    )
+                }
+            val award =
+                if (rollover.carryHalfDays == 0) null
+                else
+                    LeaveCarryAward(
+                        LeaveCarryBucket(
+                            id,
+                            year + 1,
+                            rollover.carryHalfDays,
+                            rollover.carryHalfDays,
+                            validity = plan.validity,
+                        ),
+                        employeeId,
+                        typeId,
+                        settings.timezone,
+                        type.policy.accrual?.carryValidityMonths,
+                    )
             val sourceMovements = entries.count { it.year == year }
             val receipt = MutationReceipt(id, 0)
-            entitlements
-                .createClosing(company, closing)
+            val settled =
+                if (settlement == null) Result.Success(Unit)
+                else
+                    carry.append(company, listOf(settlement)).flatMap {
+                        ledger.append(company, listOf(requireNotNull(settlementEntry)))
+                    }
+            settled
+                .flatMap { entitlements.createClosing(company, closing) }
+                .flatMap {
+                    if (award == null) Result.Success(Unit) else carry.create(company, award)
+                }
+                .flatMap { carry.append(company, postings) }
                 .flatMap {
                     if (entries.isEmpty()) Result.Success(Unit) else ledger.append(company, entries)
                 }
@@ -224,7 +307,7 @@ class CloseEmployeeLeaveYear(
                         employeeId,
                         typeId,
                         year,
-                        balance.version + sourceMovements,
+                        plan.source.version + sourceMovements,
                         id,
                     )
                 }
@@ -245,7 +328,10 @@ class CloseEmployeeLeaveYear(
                     )
                 }
                 .flatMap { operations.record(actor, key, receipt) }
-                .map { receipt }
+                .flatMap {
+                    validateCompanySessionActor(actor, currentAccess, clock.instant(), security)
+                        .map { receipt }
+                }
         }
     }
 }

@@ -83,6 +83,18 @@ class OffboardingScheduleHttpTest : OffboardingScheduleApiFixture() {
     }
 
     @Test
+    fun repeatedMidnightReviewMatchesTheExistingStoredScheduleConstraint() {
+        val f =
+            fixture(
+                future = true,
+                timezone = "America/Havana",
+                admitted = Instant.parse("2026-10-31T12:00:00Z"),
+            )
+        val prepared = scheduled(f)
+        assertEquals("2026-11-01T05:00:00Z", details(f, prepared.id)["scheduledFor"].asString())
+    }
+
+    @Test
     fun cancellationWakesAFutureJobAndRetainsItsOriginalJobAcknowledgement() {
         val f = fixture(future = true)
         val prepared = scheduled(f)

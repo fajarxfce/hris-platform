@@ -15,7 +15,9 @@ fun offboardingWindow(
     now: Instant,
 ): OffboardingWindow {
     val zone = ZoneId.of(timezone)
-    val scheduledFor = lastWorkingDate.plusDays(1).atStartOfDay(zone).toInstant()
+    // Resolve a repeated midnight to its later offset, matching the persisted PostgreSQL boundary.
+    val scheduledFor =
+        lastWorkingDate.plusDays(1).atStartOfDay(zone).withLaterOffsetAtOverlap().toInstant()
     return OffboardingWindow(
         timezone,
         now.atZone(zone).toLocalDate(),

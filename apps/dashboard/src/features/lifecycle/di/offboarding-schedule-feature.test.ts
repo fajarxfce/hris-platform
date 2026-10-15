@@ -291,6 +291,52 @@ describe("scheduled offboarding HTTP and domain boundary", () => {
       ),
     ).toMatchObject({ ok: true });
   });
+  it.each([
+    ["2026-10-31", "2026-11-01T05:00:00Z", "2026-11-08T05:00:00Z"],
+    ["2026-03-07", "2026-03-08T05:00:00Z", "2026-03-15T05:00:00Z"],
+  ])("accepts reviewed midnight after %s across overlap and gap", async (lastDay, start, end) => {
+    const request = vi.fn<HttpClient["request"]>(),
+      feature = createLifecycleFeature({ request });
+    request.mockResolvedValueOnce({
+      ...reviewWire,
+      case: { ...reviewWire.case, targetDate: lastDay },
+      companyTimezone: "America/Havana",
+      today: lastDay,
+      scheduledFor: start,
+      validUntil: end,
+    });
+    expect(
+      await feature.loadOffboardingScheduleReview.execute(access, caseId, signal()),
+    ).toMatchObject({ ok: true });
+    request.mockResolvedValueOnce({
+      ...wire,
+      companyTimezone: "America/Havana",
+      lastWorkingDate: lastDay,
+      createdAt: `${lastDay}T12:00:00Z`,
+      scheduledFor: start,
+      validUntil: end,
+    });
+    expect(
+      await feature.loadOffboardingSchedule.execute(access, caseId, id, signal()),
+    ).toMatchObject({ ok: true });
+  });
+  it("rejects the earlier occurrence of a reviewed repeated midnight", async () => {
+    const request = vi.fn<HttpClient["request"]>().mockResolvedValue({
+      ...reviewWire,
+      case: { ...reviewWire.case, targetDate: "2026-10-31" },
+      companyTimezone: "America/Havana",
+      today: "2026-10-31",
+      scheduledFor: "2026-11-01T04:00:00Z",
+      validUntil: "2026-11-08T04:00:00Z",
+    });
+    expect(
+      await createLifecycleFeature({ request }).loadOffboardingScheduleReview.execute(
+        access,
+        caseId,
+        signal(),
+      ),
+    ).toMatchObject({ ok: false, failure: { code: "invalid_response" } });
+  });
   it("rejects malformed review sources and opaque revisions", async () => {
     const request = vi.fn<HttpClient["request"]>(),
       action = createLifecycleFeature({ request }).loadOffboardingScheduleReview;

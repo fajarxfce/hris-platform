@@ -81,11 +81,13 @@ abstract class OffboardingScheduleApiFixture : LifecycleApiFixture() {
         operator: Boolean = false,
         ready: Boolean = true,
         timezone: String = "Asia/Jakarta",
+        admitted: Instant? = null,
     ): Fixture {
         val admittedAt =
-            Instant.now()
-                .truncatedTo(ChronoUnit.MICROS)
-                .minus(if (future) Duration.ZERO else Duration.ofDays(2))
+            admitted
+                ?: Instant.now()
+                    .truncatedTo(ChronoUnit.MICROS)
+                    .minus(if (future) Duration.ZERO else Duration.ofDays(2))
         clock.set(admittedAt)
         val owner = client()
         val ownerCsrf = login(owner)

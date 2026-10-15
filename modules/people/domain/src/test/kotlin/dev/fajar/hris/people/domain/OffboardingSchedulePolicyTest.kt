@@ -139,6 +139,14 @@ class OffboardingSchedulePolicyTest {
     }
 
     @Test
+    fun repeatedMidnightMatchesTheStoredLaterOffset() {
+        val repeated = offboardingWindow(LocalDate.of(2026, 10, 31), "America/Havana", now)
+        assertEquals(Instant.parse("2026-11-01T05:00:00Z"), repeated.scheduledFor)
+        val missing = offboardingWindow(LocalDate.of(2026, 3, 7), "America/Havana", now)
+        assertEquals(Instant.parse("2026-03-08T05:00:00Z"), missing.scheduledFor)
+    }
+
+    @Test
     fun schedulingIsBoundedAndATerminalJobNeedsItsPendingAuthorizationClosed() {
         val far = case.copy(targetDate = window.today.plusDays(366))
         assertTrue(

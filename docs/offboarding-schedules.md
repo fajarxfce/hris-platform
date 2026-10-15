@@ -121,3 +121,7 @@ execution or expire retained schedule data.
 
 See [lifecycle behavior](modules/people.md#lifecycle-checklists) and
 [job execution](jobs.md).
+
+Company-midnight boundaries use the later offset if midnight repeats during a
+timezone transition, or the next valid instant if midnight does not exist. This
+matches the stored PostgreSQL authorization constraint.

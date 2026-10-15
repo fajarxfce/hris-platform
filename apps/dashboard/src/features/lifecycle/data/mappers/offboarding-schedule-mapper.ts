@@ -1,8 +1,8 @@
+import { Temporal } from "@js-temporal/polyfill";
 import { InvalidHttpResponseError } from "../../../../core/data/http/http-response-error";
 import { isCalendarDate } from "../../../../core/domain/calendar-date";
 import type { AccountId, CompanyId } from "../../../../core/domain/identifiers";
 import { utcInstantMicroseconds } from "../../../../core/domain/utc-instant";
-import { zonedCalendarDate } from "../../../../core/domain/zoned-calendar-date";
 import type { JobId } from "../../../jobs/domain/entities/background-job";
 import type { EmployeeId } from "../../../people/domain/entities/employee";
 import type { LifecycleCaseId } from "../../domain/entities/lifecycle-case";
@@ -35,10 +35,12 @@ function scheduleWindowValid(
   )
     return false;
   try {
-    return (
-      zonedCalendarDate(timezone, new Date(Number(start / 1000n) - 1)) === lastDay &&
-      zonedCalendarDate(timezone, new Date(Number(start / 1000n))) > lastDay
-    );
+    // Match the server's later midnight when an offset repeats or skips local time.
+    const boundary = Temporal.PlainDate.from(lastDay)
+      .add({ days: 1 })
+      .toPlainDateTime("00:00")
+      .toZonedDateTime(timezone, { disambiguation: "later" });
+    return boundary.epochNanoseconds / 1000n === start;
   } catch {
     return false;
   }

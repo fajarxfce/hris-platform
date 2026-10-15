@@ -23,12 +23,25 @@ private val amendmentSummaryFields =
         R.STATUS,
         R.ACTION,
         R.LATEST_CALCULATION_ID,
+        R.LATEST_REVIEW_ID,
         R.ACTOR_ID,
         R.RECORDED_AT,
         R.REASON,
     )
 
 class PostgresPayrollAmendmentDataSource(private val sql: DSLContext) : PayrollAmendmentDataSource {
+    override fun preparers(company: UUID, id: UUID): Set<UUID> =
+        sql.selectDistinct(R.ACTOR_ID)
+            .from(R)
+            .where(
+                R.COMPANY_ID.eq(company),
+                R.AMENDMENT_ID.eq(id),
+                R.ACTION.`in`("SAVED", "CALCULATED", "CALCULATION_FAILED", "SUBMITTED"),
+            )
+            .orderBy(R.ACTOR_ID)
+            .limit(201)
+            .fetchSet(R.ACTOR_ID)
+
     override fun summary(company: UUID, id: UUID): PayrollAmendmentSummaryRow? =
         sql.select(*amendmentSummaryFields)
             .from(H)

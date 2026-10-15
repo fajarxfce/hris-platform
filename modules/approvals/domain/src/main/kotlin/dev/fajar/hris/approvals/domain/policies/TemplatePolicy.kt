@@ -22,7 +22,7 @@ fun validateApprovalTemplate(change: TemplateChange): Result<Unit> {
     )
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_approval_template"))
     if (
-        change.kind == ApprovalKind.PAYROLL &&
+        change.kind in setOf(ApprovalKind.PAYROLL, ApprovalKind.PAYROLL_AMENDMENT) &&
             change.stages.any { it.assignment == AssignmentKind.MANAGER }
     )
         return Result.Failed(Failure(FailureKind.VALIDATION, "payroll_approval_assignment_invalid"))

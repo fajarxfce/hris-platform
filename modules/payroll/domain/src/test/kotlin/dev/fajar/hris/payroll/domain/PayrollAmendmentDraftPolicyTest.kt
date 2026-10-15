@@ -236,7 +236,11 @@ class PayrollAmendmentDraftPolicyTest : PayrollAmendmentFixture() {
                 "Reviewed remuneration",
             )
         assertEquals(
-            PayrollAmendmentAvailableAction.entries.toSet(),
+            setOf(
+                PayrollAmendmentAvailableAction.EDIT,
+                PayrollAmendmentAvailableAction.CALCULATE,
+                PayrollAmendmentAvailableAction.CANCEL,
+            ),
             availablePayrollAmendmentActions(actor, summary, null, null),
         )
         assertEquals(

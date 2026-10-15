@@ -140,5 +140,6 @@ object PermissionCatalog {
                 "payroll.policy.manage",
                 "payroll.compensation.manage",
                 "payroll.amend",
+                "payroll.amend.review",
             )
 }

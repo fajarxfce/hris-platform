@@ -13,4 +13,5 @@ data class PayrollAmendmentSummaryRow(
     val actorId: UUID,
     val recordedAt: OffsetDateTime,
     val reason: String,
+    val latestReviewId: UUID? = null,
 )

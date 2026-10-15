@@ -97,35 +97,41 @@ test("named stages use paginated literal-name lookup and keep assignments when r
       ?.searchParams.get("after"),
   ).toBeNull();
 });
-test("new template type changes reset incompatible assignments and validate before writing", async ({
-  page,
-}) => {
-  const api = await installApprovalTemplateApi(page);
-  await page.goto(`/approvals/templates/new?${parameters}`);
-  await page.getByLabel("Name", { exact: true }).fill("Payroll review");
-  await page.getByRole("button", { name: "Add stage", exact: true }).click();
-  await page.getByRole("combobox", { name: "Type", exact: true }).selectOption("PAYROLL");
-  await expect(stage(page, 2)).toHaveCount(0);
-  await expect(stage(page, 1).getByLabel("Assignment", { exact: true })).toHaveValue("PERMISSION");
-  await expect(stage(page, 1).getByLabel("Required permission", { exact: true })).toHaveValue(
-    "payroll.review",
-  );
-  await page.getByLabel("Minimum amount", { exact: true }).fill("1e4");
-  await page.getByLabel("Reason", { exact: true }).fill("Introduce independent review");
-  await page.getByRole("button", { name: "Save template", exact: true }).click();
-  await expect(page.getByRole("alert")).toContainText("Check the template");
-  expect(api.writes).toEqual([]);
-  await page.getByLabel("Minimum amount", { exact: true }).fill("10000.00");
-  await page.getByRole("button", { name: "Save template", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText("Template saved.");
-  expect(api.writes[0]?.body).toMatchObject({
-    expectedVersion: null,
-    kind: "PAYROLL",
-    minimumAmount: "10000.00",
-    stages: [{ assignment: "PERMISSION", accountIds: [], permission: "payroll.review" }],
+for (const { kind, permission } of [
+  { kind: "PAYROLL", permission: "payroll.review" },
+  { kind: "PAYROLL_AMENDMENT", permission: "payroll.amend.review" },
+] as const)
+  test(`new ${kind} template resets incompatible assignments and validates before writing`, async ({
+    page,
+  }) => {
+    const api = await installApprovalTemplateApi(page);
+    await page.goto(`/approvals/templates/new?${parameters}`);
+    await page.getByLabel("Name", { exact: true }).fill("Payroll review");
+    await page.getByRole("button", { name: "Add stage", exact: true }).click();
+    await page.getByRole("combobox", { name: "Type", exact: true }).selectOption(kind);
+    await expect(stage(page, 2)).toHaveCount(0);
+    await expect(stage(page, 1).getByLabel("Assignment", { exact: true })).toHaveValue(
+      "PERMISSION",
+    );
+    await expect(stage(page, 1).getByLabel("Required permission", { exact: true })).toHaveValue(
+      permission,
+    );
+    await page.getByLabel("Minimum amount", { exact: true }).fill("1e4");
+    await page.getByLabel("Reason", { exact: true }).fill("Introduce independent review");
+    await page.getByRole("button", { name: "Save template", exact: true }).click();
+    await expect(page.getByRole("alert")).toContainText("Check the template");
+    expect(api.writes).toEqual([]);
+    await page.getByLabel("Minimum amount", { exact: true }).fill("10000.00");
+    await page.getByRole("button", { name: "Save template", exact: true }).click();
+    await expect(page.getByRole("status")).toContainText("Template saved.");
+    expect(api.writes[0]?.body).toMatchObject({
+      expectedVersion: null,
+      kind,
+      minimumAmount: "10000.00",
+      stages: [{ assignment: "PERMISSION", accountIds: [], permission }],
+    });
+    expect(api.reads).toEqual([]);
   });
-  expect(api.reads).toEqual([]);
-});
 test("uncertain template saves recover the same receipt across MFA and a conflict response", async ({
   page,
 }) => {

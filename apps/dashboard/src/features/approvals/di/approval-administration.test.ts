@@ -37,6 +37,32 @@ const change = (): ApprovalTemplateChange => ({
 });
 
 describe("approval administration boundary", () => {
+  it("keeps amendment approval on its independent permission and rejects manager assignment", async () => {
+    const request = vi.fn<HttpClient["request"]>().mockResolvedValue({ id, version: 3 });
+    const feature = createApprovalsFeature({ request });
+    const input: ApprovalTemplateChange = {
+      ...change(),
+      kind: "PAYROLL_AMENDMENT",
+      category: null,
+      stages: [{ assignment: "PERMISSION", accountIds: [], permission: "payroll.amend.review" }],
+    };
+    expect(await feature.saveTemplate.execute(access, operation, input, signal())).toMatchObject({
+      ok: true,
+    });
+    expect(request.mock.lastCall?.[0].body).toMatchObject({
+      kind: "PAYROLL_AMENDMENT",
+      stages: [{ permission: "payroll.amend.review" }],
+    });
+    request.mockClear();
+    for (const stages of [
+      [{ assignment: "MANAGER" as const, accountIds: [], permission: null }],
+      [{ assignment: "PERMISSION" as const, accountIds: [], permission: "payroll.review" }],
+    ])
+      expect(
+        await feature.saveTemplate.execute(access, operation, { ...input, stages }, signal()),
+      ).toMatchObject({ ok: false });
+    expect(request).not.toHaveBeenCalled();
+  });
   it("keeps an accepted whole threshold valid after PostgreSQL adds fractional zeros", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue({ id, version: 3 });
     const feature = createApprovalsFeature({ request });

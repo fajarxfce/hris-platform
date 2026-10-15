@@ -30,8 +30,8 @@ abstract class PayrollRunApiFixture : PayrollPeriodApiFixture() {
     protected fun calculationFixture(
         extraEmployees: Int = 0,
         prepare: Boolean = true,
+        f: ProcessingFixture = processingFixture(),
     ): CalculationFixture {
-        val f = processingFixture()
         val extra = if (extraEmployees == 0) emptySet() else largeRoster(f, extraEmployees)
         payrollBody(policy(f.payroll))
         if (prepare)

@@ -7,6 +7,7 @@ export const approvalKinds = [
   "EXPENSE",
   "OVERTIME",
   "PAYROLL",
+  "PAYROLL_AMENDMENT",
 ] as const;
 export type ApprovalKind = (typeof approvalKinds)[number];
 export const approvalStatuses = [

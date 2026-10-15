@@ -7,4 +7,5 @@ data class PayrollAmendmentDetailsResponse(
     val history: Page<PayrollAmendmentSummaryResponse>,
     val latestCalculation: PayrollAmendmentCalculationSummaryResponse?,
     val availableActions: Set<String>,
+    val latestReview: PayrollAmendmentReviewResponse?,
 )

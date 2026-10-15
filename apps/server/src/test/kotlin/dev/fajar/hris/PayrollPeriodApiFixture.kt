@@ -54,8 +54,7 @@ abstract class PayrollPeriodApiFixture : PayrollApiFixture() {
         periodCompanies.clear()
     }
 
-    protected fun processingFixture(): ProcessingFixture {
-        val f = payrollFixture()
+    protected fun processingFixture(f: PayrollFixture = payrollFixture()): ProcessingFixture {
         periodCompanies.add(f.company)
         val account =
             UUID.fromString(

@@ -67,7 +67,7 @@ abstract class PayrollApiFixture : PeopleApiFixture() {
         return PayrollMember(account, browser, login(browser, "$account@example.test"), permissions)
     }
 
-    protected fun payrollFixture(): PayrollFixture {
+    protected fun payrollFixture(bindAccount: Boolean = true): PayrollFixture {
         val admin = client()
         val csrf = login(admin)
         val company = company(admin, csrf)
@@ -82,7 +82,8 @@ abstract class PayrollApiFixture : PeopleApiFixture() {
                     "payroll.compensation.manage",
                 ),
             )
-        val employee = employee(admin, csrf, company, account = owner.account)
+        val employee =
+            employee(admin, csrf, company, account = owner.account.takeIf { bindAccount })
         return PayrollFixture(company, employee, admin, csrf, operator, owner)
     }
 

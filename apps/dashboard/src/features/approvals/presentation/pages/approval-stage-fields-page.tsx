@@ -49,7 +49,7 @@ export function ApprovalStageFieldsPage({
             <option
               key={assignment}
               value={assignment}
-              disabled={assignment === "MANAGER" && kind === "PAYROLL"}
+              disabled={assignment === "MANAGER" && !form.managerAllowed}
             >
               {text[assignment]}
             </option>

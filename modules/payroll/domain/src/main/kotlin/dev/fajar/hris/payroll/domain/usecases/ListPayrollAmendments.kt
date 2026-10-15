@@ -35,7 +35,7 @@ class ListPayrollAmendments(
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
-        val permission = actor.requirePermission("payroll.amend")
+        val permission = requirePayrollAmendmentRead(actor)
         if (permission is Result.Failed) return permission
         if (
             year !in 2024..2100 ||
@@ -61,7 +61,7 @@ class ListPayrollAmendments(
             val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
-            val allowed = live.requirePermission("payroll.amend")
+            val allowed = requirePayrollAmendmentRead(live)
             if (allowed is Result.Failed) return@run allowed
             amendments
                 .list(

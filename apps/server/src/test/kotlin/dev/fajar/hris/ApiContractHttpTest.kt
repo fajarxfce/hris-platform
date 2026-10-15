@@ -34,6 +34,52 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun amendmentReviewsPinDraftCalculationAndApprovalReferencesWithIndependentReadRoutes() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/payroll"
+        for ((path, method) in
+            listOf(
+                "$base/amendments/{amendmentId}/reviews" to "get",
+                "$base/amendments/{amendmentId}/reviews/{id}" to "put",
+                "$base/amendments/{amendmentId}/reviews/{id}/decisions" to "post",
+                "$base/amendments/{amendmentId}/reviews/{id}/withdraw" to "post",
+                "$base/amendment-reviews/{id}" to "get",
+            )) {
+            val operation = api["paths"][path][method]
+            assertTrue(operation["x-hris-company-admission"].asBoolean(), path)
+            assertEquals(
+                method != "get",
+                operation.path("parameters").any {
+                    it.path("name").asString() == "Idempotency-Key"
+                },
+                path,
+            )
+        }
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("expectedVersion", "calculationId", "reason"),
+            schemas["SubmitPayrollAmendmentReviewRequest"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf(
+                "expectedVersion",
+                "expectedReviewVersion",
+                "expectedApprovalVersion",
+                "decision",
+                "reason",
+            ),
+            schemas["DecidePayrollAmendmentReviewRequest"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            "string",
+            schemas["PayrollAmendmentReviewResponse"]["properties"]["exposure"]["type"].asString(),
+        )
+        assertTrue(
+            schemas["PayrollAmendmentReviewChangeResponse"]["properties"].has("amendmentRevision")
+        )
+    }
+
+    @Test
     fun amendmentPreparationAndPreviewExposeObservedVersionsAndServerCalculatedDifferences() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/payroll/payslips/{id}"
@@ -107,7 +153,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
             schemas["PayrollAmendmentCommandRequest"]["properties"].propertyNames().toSet(),
         )
         assertEquals(
-            setOf("amendment", "history", "latestCalculation", "availableActions"),
+            setOf("amendment", "history", "latestCalculation", "latestReview", "availableActions"),
             schemas["PayrollAmendmentDetailsResponse"]["properties"].propertyNames().toSet(),
         )
         assertEquals(

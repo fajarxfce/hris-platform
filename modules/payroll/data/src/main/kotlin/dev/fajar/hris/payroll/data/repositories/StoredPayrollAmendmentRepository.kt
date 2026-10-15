@@ -14,6 +14,10 @@ class StoredPayrollAmendmentRepository(
     private val source: PayrollAmendmentDataSource,
     private val json: ObjectMapper,
 ) : PayrollAmendmentRepository {
+    override fun preparers(company: UUID, id: UUID): Result<Set<UUID>> = safeDatabaseCall {
+        source.preparers(company, id).toSet()
+    }
+
     override fun summary(company: UUID, id: UUID): Result<PayrollAmendmentSummary?> =
         safeDatabaseCall {
             source.summary(company, id)?.let {

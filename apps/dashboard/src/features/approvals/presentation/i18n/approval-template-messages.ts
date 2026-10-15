@@ -70,6 +70,7 @@ const en = {
   "overtime.approve": "Overtime · company",
   "overtime.team.approve": "Overtime · team",
   "payroll.review": "Payroll review",
+  "payroll.amend.review": "Payroll amendment review",
 };
 const id: typeof en = {
   title: "Template approval",
@@ -142,6 +143,7 @@ const id: typeof en = {
   "overtime.approve": "Lembur · perusahaan",
   "overtime.team.approve": "Lembur · tim",
   "payroll.review": "Review payroll",
+  "payroll.amend.review": "Review koreksi payroll",
 };
 export const approvalTemplateMessages = (locale: Locale) => (locale === "id" ? id : en);
 export function approvalPermissionLabel(permission: string, locale: Locale): string {

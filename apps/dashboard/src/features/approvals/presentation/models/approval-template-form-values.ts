@@ -1,6 +1,10 @@
 import type { ApprovalAssignee } from "../../domain/entities/approval-assignee";
 import type { ApprovalKind } from "../../domain/entities/approval-request";
 import type { ApprovalAssignment, ApprovalTemplate } from "../../domain/entities/approval-template";
+import {
+  approvalActionPermissions,
+  approvalAllowsManager,
+} from "../../domain/policies/approval-template-policy";
 import type { ApprovalTemplateFields } from "../controllers/approval-template-editor-controller";
 
 export type ApprovalStageFormValue = {
@@ -35,13 +39,7 @@ export function approvalTemplateFormValues(
       assignment: stage.assignment,
       accounts: stage.accountIds.map((id) => ({ id, displayName: id })),
       permission: stage.permission ?? "",
-    })) ?? [
-      {
-        assignment: kind === "PAYROLL" ? "PERMISSION" : "MANAGER",
-        accounts: [],
-        permission: kind === "PAYROLL" ? "payroll.review" : "",
-      },
-    ],
+    })) ?? [defaultApprovalStage(kind)],
   };
 }
 export function approvalTemplateFields(values: ApprovalTemplateFormValues): ApprovalTemplateFields {
@@ -58,5 +56,14 @@ export function approvalTemplateFields(values: ApprovalTemplateFormValues): Appr
       accountIds: stage.accounts.map((account) => account.id),
       permission: stage.permission || null,
     })),
+  };
+}
+
+export function defaultApprovalStage(kind: ApprovalKind): ApprovalStageFormValue {
+  const managerAllowed = approvalAllowsManager(kind);
+  return {
+    assignment: managerAllowed ? "MANAGER" : "PERMISSION",
+    accounts: [],
+    permission: managerAllowed ? "" : (approvalActionPermissions[kind][0] ?? ""),
   };
 }

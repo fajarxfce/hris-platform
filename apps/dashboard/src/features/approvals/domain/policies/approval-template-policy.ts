@@ -12,7 +12,10 @@ export const approvalActionPermissions: Readonly<Record<ApprovalKind, readonly s
   EXPENSE: ["expenses.approve", "expenses.team.approve"],
   OVERTIME: ["overtime.approve", "overtime.team.approve"],
   PAYROLL: ["payroll.review"],
+  PAYROLL_AMENDMENT: ["payroll.amend.review"],
 };
+export const approvalAllowsManager = (kind: ApprovalKind): boolean =>
+  kind !== "PAYROLL" && kind !== "PAYROLL_AMENDMENT";
 export const isApprovalKind = (kind: string): kind is ApprovalKind =>
   approvalKinds.some((value) => value === kind);
 export const isApprovalDate = (value: string): boolean =>
@@ -34,7 +37,9 @@ export const validApprovalMinimumAmount = (value: string): boolean =>
 export function validApprovalStage(rule: ApprovalStageRule, kind: ApprovalKind): boolean {
   switch (rule.assignment) {
     case "MANAGER":
-      return kind !== "PAYROLL" && rule.accountIds.length === 0 && rule.permission === null;
+      return (
+        approvalAllowsManager(kind) && rule.accountIds.length === 0 && rule.permission === null
+      );
     case "NAMED":
       return (
         rule.permission === null &&

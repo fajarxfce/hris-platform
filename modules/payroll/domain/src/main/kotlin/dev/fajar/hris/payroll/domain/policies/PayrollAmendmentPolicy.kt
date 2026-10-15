@@ -156,11 +156,17 @@ fun availablePayrollAmendmentActions(
     amendment: PayrollAmendmentSummary,
     beneficiaryId: UUID?,
     latest: PayrollAmendmentCalculationSummary?,
+    latestReview: PayrollAmendmentReview? = null,
 ): Set<PayrollAmendmentAvailableAction> {
     if (
         "payroll.amend" !in actor.permissions ||
             beneficiaryId == actor.accountId ||
-            amendment.status == PayrollAmendmentStatus.CANCELLED ||
+            amendment.status !in
+                setOf(
+                    PayrollAmendmentStatus.DRAFT,
+                    PayrollAmendmentStatus.CALCULATED,
+                    PayrollAmendmentStatus.REJECTED,
+                ) ||
             amendment.version == PAYROLL_AMENDMENT_MAXIMUM_VERSION
     )
         return emptySet()
@@ -169,6 +175,12 @@ fun availablePayrollAmendmentActions(
         // The final revision remains available to cancel an exhausted draft.
         if (amendment.version >= PAYROLL_AMENDMENT_MAXIMUM_VERSION - 1) return@buildSet
         add(PayrollAmendmentAvailableAction.EDIT)
+        if (
+            latest != null &&
+                validatePayrollAmendmentSubmission(amendment, latest, latestReview) is
+                    Result.Success
+        )
+            add(PayrollAmendmentAvailableAction.SUBMIT)
         if (
             amendment.status == PayrollAmendmentStatus.DRAFT &&
                 (latest?.number ?: 0) < PAYROLL_AMENDMENT_MAXIMUM_CALCULATIONS

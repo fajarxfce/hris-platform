@@ -9,6 +9,9 @@ interface PayrollAmendmentRepository {
 
     fun find(company: UUID, id: UUID): Result<PayrollAmendment?>
 
+    /** At most 201 distinct actors; callers reject the sentinel beyond the approval bound. */
+    fun preparers(company: UUID, id: UUID): Result<Set<UUID>>
+
     fun revision(company: UUID, id: UUID, version: Long): Result<PayrollAmendment?>
 
     fun history(

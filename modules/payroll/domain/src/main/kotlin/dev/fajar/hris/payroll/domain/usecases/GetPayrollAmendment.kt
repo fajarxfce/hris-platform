@@ -22,12 +22,13 @@ class GetPayrollAmendment(
     private val transactions: TransactionRunner,
     private val clock: Clock,
     private val security: IdentitySecurityPolicy,
+    private val reviews: PayrollAmendmentReviewRepository,
 ) {
     fun execute(actor: Actor, id: UUID): Result<PayrollAmendmentDetails> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
-        val permission = actor.requirePermission("payroll.amend")
+        val permission = requirePayrollAmendmentRead(actor)
         if (permission is Result.Failed) return permission
         return transactions.run(actor) {
             val payrollGuard = policies.lock(company, shared = true)
@@ -46,7 +47,7 @@ class GetPayrollAmendment(
             val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
-            val allowed = live.requirePermission("payroll.amend")
+            val allowed = requirePayrollAmendmentRead(live)
             if (allowed is Result.Failed) return@run allowed
             val found = amendments.find(company, id)
             if (found is Result.Failed) return@run found
@@ -73,12 +74,22 @@ class GetPayrollAmendment(
                             Failure(FailureKind.UNEXPECTED, "payroll_amendment_calculation_missing")
                         )
                 }
+            val foundReview = reviews.latest(company, id)
+            if (foundReview is Result.Failed) return@run foundReview
+            val latestReview = (foundReview as Result.Success).value
             validateCompanySessionActor(actor, access, clock.instant(), security).map {
                 PayrollAmendmentDetails(
                     current,
                     (history as Result.Success).value,
                     latest,
-                    availablePayrollAmendmentActions(live, current.summary, beneficiaryId, latest),
+                    availablePayrollAmendmentActions(
+                        live,
+                        current.summary,
+                        beneficiaryId,
+                        latest,
+                        latestReview,
+                    ),
+                    latestReview,
                 )
             }
         }

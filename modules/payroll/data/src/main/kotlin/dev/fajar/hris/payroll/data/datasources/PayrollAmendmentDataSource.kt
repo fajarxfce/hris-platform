@@ -10,6 +10,8 @@ interface PayrollAmendmentDataSource {
 
     fun find(company: UUID, id: UUID): PayrollAmendmentRow?
 
+    fun preparers(company: UUID, id: UUID): Set<UUID>
+
     fun revision(company: UUID, id: UUID, version: Long): PayrollAmendmentRow?
 
     fun history(company: UUID, id: UUID, after: Long?, limit: Int): List<PayrollAmendmentSummaryRow>

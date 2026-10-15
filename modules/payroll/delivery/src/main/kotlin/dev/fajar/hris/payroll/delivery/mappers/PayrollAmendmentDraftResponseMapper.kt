@@ -23,6 +23,7 @@ fun PayrollAmendmentSummary.toResponse() =
         actorId,
         recordedAt,
         reason,
+        latestReviewId,
     )
 
 fun PayrollAmendment.toResponse() =
@@ -61,6 +62,7 @@ fun PayrollAmendmentDetails.toResponse() =
         Page(history.items.map { it.toResponse() }, history.nextCursor),
         latestCalculation?.toResponse(),
         availableActions.map { it.name }.toSet(),
+        latestReview?.toResponse(),
     )
 
 fun PayrollAmendmentCalculationAttempt.toResponse() =

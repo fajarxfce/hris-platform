@@ -20,6 +20,169 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class PayrollConfiguration {
     @Bean
+    fun payrollAmendmentReviewSource(sql: DSLContext): PayrollAmendmentReviewDataSource =
+        PostgresPayrollAmendmentReviewDataSource(sql)
+
+    @Bean
+    fun payrollAmendmentReviews(
+        source: PayrollAmendmentReviewDataSource
+    ): PayrollAmendmentReviewRepository = StoredPayrollAmendmentReviewRepository(source)
+
+    @Bean
+    fun submitPayrollAmendmentReview(
+        amendments: PayrollAmendmentRepository,
+        reviews: PayrollAmendmentReviewRepository,
+        sources: PayrollAmendmentSourceRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        approvals: ApprovalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        SubmitPayrollAmendmentReview(
+            amendments,
+            reviews,
+            sources,
+            policies,
+            people,
+            approvals,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun decidePayrollAmendmentReview(
+        amendments: PayrollAmendmentRepository,
+        reviews: PayrollAmendmentReviewRepository,
+        sources: PayrollAmendmentSourceRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        approvals: ApprovalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        DecidePayrollAmendmentReview(
+            amendments,
+            reviews,
+            sources,
+            policies,
+            people,
+            approvals,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun withdrawPayrollAmendmentReview(
+        amendments: PayrollAmendmentRepository,
+        reviews: PayrollAmendmentReviewRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        approvals: ApprovalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        WithdrawPayrollAmendmentReview(
+            amendments,
+            reviews,
+            policies,
+            people,
+            approvals,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun getPayrollAmendmentReview(
+        amendments: PayrollAmendmentRepository,
+        reviews: PayrollAmendmentReviewRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        approvals: ApprovalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollAmendmentReview(
+            amendments,
+            reviews,
+            policies,
+            people,
+            approvals,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun listPayrollAmendmentReviews(
+        amendments: PayrollAmendmentRepository,
+        policies: PayrollPolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+        reviews: PayrollAmendmentReviewRepository,
+    ) =
+        ListPayrollAmendmentReviews(
+            amendments,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+            reviews,
+        )
+
+    @Bean
     fun payrollAmendmentDraftSource(sql: DSLContext): PayrollAmendmentDataSource =
         PostgresPayrollAmendmentDataSource(sql)
 
@@ -128,6 +291,7 @@ class PayrollConfiguration {
         transactions: TransactionRunner,
         clock: Clock,
         security: IdentitySecurityPolicy,
+        reviews: PayrollAmendmentReviewRepository,
     ) =
         GetPayrollAmendment(
             amendments,
@@ -139,6 +303,7 @@ class PayrollConfiguration {
             transactions,
             clock,
             security,
+            reviews,
         )
 
     @Bean

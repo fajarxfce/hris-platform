@@ -3,7 +3,10 @@ import { type Control, useController } from "react-hook-form";
 import type { ApprovalAssignee } from "../../domain/entities/approval-assignee";
 import type { ApprovalKind } from "../../domain/entities/approval-request";
 import { approvalAssignments } from "../../domain/entities/approval-template";
-import { approvalActionPermissions } from "../../domain/policies/approval-template-policy";
+import {
+  approvalActionPermissions,
+  approvalAllowsManager,
+} from "../../domain/policies/approval-template-policy";
 import type { ApprovalTemplateFormValues } from "../models/approval-template-form-values";
 
 export function useApprovalStageForm(
@@ -23,12 +26,14 @@ export function useApprovalStageForm(
     if (pickerKind !== null && (!editable || pickerKind !== kind)) setPickerKind(null);
   }, [pickerKind, kind, editable]);
   return {
+    managerAllowed: approvalAllowsManager(kind),
     assignment: assignment.field,
     accounts: accounts.field.value,
     permission: permission.field,
     picker: editable && pickerKind === kind && assignment.field.value === "NAMED",
     changeAssignment: (value: string) => {
       if (!editable || !approvalAssignments.some((item) => item === value)) return;
+      if (value === "MANAGER" && !approvalAllowsManager(kind)) return;
       assignment.field.onChange(value);
       accounts.field.onChange([]);
       permission.field.onChange(

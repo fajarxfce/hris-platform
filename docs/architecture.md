@@ -208,6 +208,18 @@ signed differences. Failed rule evaluation is retained; interruption and technic
 failure roll back. Private drafts do not advance employee synchronization or
 change published payroll and payment evidence.
 
+Amendment review holds exclusive payroll, shared People, exclusive approval and
+shared access guards after its operation lock. Review readers use shared aggregate
+guards; actor and delegator account locks are ordered. Use cases coordinate the
+retained calculation, independent approval, review changes, draft revision and
+journal/receipt transaction. Repositories never invoke another repository. SQL
+constraints independently couple the business and approval evidence. Historical
+preparers and original/current beneficiaries remain ineligible, including through
+delegation. Submission and approval recheck the complete source year; retained
+reads, rejection, withdrawal and authorized receipt replay do not replace it.
+Recent assurance and current delegation validity are retained through completion.
+Approval remains separate from revised publication and employee synchronization.
+
 Employee expense draft saves, cancellations, submission and withdrawal check
 current session assurance after resource/access guards, before receipt replay,
 and before transaction completion. Late expiry rolls back claim state, immutable

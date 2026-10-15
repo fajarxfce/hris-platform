@@ -5,4 +5,5 @@ enum class ApprovalKind {
     EXPENSE,
     OVERTIME,
     PAYROLL,
+    PAYROLL_AMENDMENT,
 }

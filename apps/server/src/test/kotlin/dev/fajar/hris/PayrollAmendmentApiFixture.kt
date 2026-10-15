@@ -26,8 +26,7 @@ abstract class PayrollAmendmentApiFixture : PayrollTaxContinuityApiFixture() {
 
     @AfterEach fun clearAmendmentProbe() = amendmentProbe.clear()
 
-    protected fun amendmentFixture(): AmendmentFixture {
-        val f = calculationFixture()
+    protected fun amendmentFixture(f: CalculationFixture = calculationFixture()): AmendmentFixture {
         reviewTemplate(f)
         val (publication, assessment) = publishTaxRun(f, beginTaxRun(f))
         return AmendmentFixture(

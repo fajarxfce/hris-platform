@@ -94,7 +94,14 @@ class CancelPayrollAmendment(
             }
             if (current.summary.version != expectedVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
-            if (current.summary.status == PayrollAmendmentStatus.CANCELLED)
+            if (
+                current.summary.status !in
+                    setOf(
+                        PayrollAmendmentStatus.DRAFT,
+                        PayrollAmendmentStatus.CALCULATED,
+                        PayrollAmendmentStatus.REJECTED,
+                    )
+            )
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "payroll_amendment_not_editable")
                 )

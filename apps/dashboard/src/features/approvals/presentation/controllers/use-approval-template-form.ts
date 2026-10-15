@@ -8,6 +8,7 @@ import {
   type ApprovalTemplateFormValues,
   approvalTemplateFields,
   approvalTemplateFormValues,
+  defaultApprovalStage,
 } from "../models/approval-template-form-values";
 import type { ApprovalTemplateEditorController } from "./approval-template-editor-controller";
 
@@ -60,19 +61,11 @@ export function useApprovalTemplateForm(
       )
         return;
       kind.field.onChange(value);
-      stages.replace({
-        assignment: value === "PAYROLL" ? "PERMISSION" : "MANAGER",
-        accounts: [],
-        permission: value === "PAYROLL" ? "payroll.review" : "",
-      });
+      stages.replace(defaultApprovalStage(value));
     },
     addStage: () => {
       if (editable && form.getValues("stages").length < 8)
-        stages.append({
-          assignment: form.getValues("kind") === "PAYROLL" ? "PERMISSION" : "MANAGER",
-          accounts: [],
-          permission: form.getValues("kind") === "PAYROLL" ? "payroll.review" : "",
-        });
+        stages.append(defaultApprovalStage(form.getValues("kind")));
     },
     removeStage: (index: number) => {
       const count = form.getValues("stages").length;

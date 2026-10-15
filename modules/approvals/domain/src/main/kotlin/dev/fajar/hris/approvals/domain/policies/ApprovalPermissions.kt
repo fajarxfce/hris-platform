@@ -15,4 +15,5 @@ fun approvalPermissions(kind: ApprovalKind): Set<String> =
         ApprovalKind.EXPENSE -> setOf("expenses.approve", "expenses.team.approve")
         ApprovalKind.OVERTIME -> setOf("overtime.approve", "overtime.team.approve")
         ApprovalKind.PAYROLL -> setOf("payroll.review")
+        ApprovalKind.PAYROLL_AMENDMENT -> setOf("payroll.amend.review")
     }

@@ -20,6 +20,7 @@ abstract class PayrollAmendmentDraftAssuranceApiFixture : PayrollAmendmentDraftA
     @Autowired private lateinit var identities: IdentityRepository
     @Autowired private lateinit var operations: OperationRepository
     @Autowired private lateinit var journal: ChangeJournalRepository
+    @Autowired private lateinit var amendmentReviews: PayrollAmendmentReviewRepository
     protected val security = IdentitySecurityPolicy()
 
     protected data class AssuranceScene(
@@ -138,6 +139,7 @@ abstract class PayrollAmendmentDraftAssuranceApiFixture : PayrollAmendmentDraftA
                         transactions,
                         clock,
                         security,
+                        amendmentReviews,
                     )
                     .execute(actor, scene.draft.id)
             "history" ->

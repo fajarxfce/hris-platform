@@ -32,7 +32,7 @@ class GetPayrollAmendmentHistory(
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
-        val permission = actor.requirePermission("payroll.amend")
+        val permission = requirePayrollAmendmentRead(actor)
         if (permission is Result.Failed) return permission
         if ((after != null && after !in 0..PAYROLL_AMENDMENT_MAXIMUM_VERSION) || limit !in 1..100)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_page"))
@@ -53,7 +53,7 @@ class GetPayrollAmendmentHistory(
             val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
-            val allowed = live.requirePermission("payroll.amend")
+            val allowed = requirePayrollAmendmentRead(live)
             if (allowed is Result.Failed) return@run allowed
             val found = amendments.summary(company, id)
             if (found is Result.Failed) return@run found

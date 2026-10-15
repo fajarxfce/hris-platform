@@ -11,16 +11,18 @@ fun PayrollPayUnits.toSnapshotData() =
         total = total.toPlainString(),
         payable = payable.toPlainString(),
         unpaid = unpaid.toPlainString(),
-        employedDates = java.util.Set.copyOf(employedDates.map { item -> item }),
+        employedDates = java.util.List.copyOf(employedDates),
     )
 
-fun PayrollPayUnitsData.toDomain() =
-    PayrollPayUnits(
+fun PayrollPayUnitsData.toDomain(): PayrollPayUnits {
+    require(employedDates.distinct().size == employedDates.size)
+    return PayrollPayUnits(
         total = BigDecimal(total),
         payable = BigDecimal(payable),
         unpaid = BigDecimal(unpaid),
-        employedDates = java.util.Set.copyOf(employedDates.map { item -> item }),
+        employedDates = java.util.Collections.unmodifiableSet(LinkedHashSet(employedDates)),
     )
+}
 
 fun ProratedPay.toSnapshotData() =
     ProratedPayData(

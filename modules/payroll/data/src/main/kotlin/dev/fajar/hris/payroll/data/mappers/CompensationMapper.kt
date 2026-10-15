@@ -37,7 +37,7 @@ fun CompensationTerms.toData() =
         treatment.name,
         tax.toData(),
         insuranceWage.toPlainString(),
-        insurancePrograms.map { it.name }.toSet(),
+        insurancePrograms.map { it.name },
         insuranceExemptionReason,
         accidentRisk.name,
         additionalHealthDependents,
@@ -47,8 +47,9 @@ fun CompensationTerms.toData() =
         payBasis?.toData(),
     )
 
-fun CompensationTermsData.toTerms() =
-    CompensationTerms(
+fun CompensationTermsData.toTerms(): CompensationTerms {
+    require(insurancePrograms.distinct().size == insurancePrograms.size)
+    return CompensationTerms(
         BigDecimal(basicSalary),
         java.util.List.copyOf(
             fixedEarnings.map { FixedEarning(it.code, it.name, BigDecimal(it.amount), it.taxable) }
@@ -56,7 +57,10 @@ fun CompensationTermsData.toTerms() =
         TaxTreatment.valueOf(treatment),
         tax.toRegistration(),
         BigDecimal(insuranceWage),
-        java.util.Set.copyOf(insurancePrograms.map { InsuranceProgram.valueOf(it) }),
+        // Retained JSON arrays must survive mapping without changing their order.
+        java.util.Collections.unmodifiableSet(
+            insurancePrograms.mapTo(LinkedHashSet()) { InsuranceProgram.valueOf(it) }
+        ),
         insuranceExemptionReason,
         AccidentRisk.valueOf(accidentRisk),
         additionalHealthDependents,
@@ -65,6 +69,7 @@ fun CompensationTermsData.toTerms() =
         BigDecimal(otherNetDeduction),
         payBasis?.toBasis(),
     )
+}
 
 fun CompensationRow.toCompensation(json: ObjectMapper) =
     EmployeeCompensation(

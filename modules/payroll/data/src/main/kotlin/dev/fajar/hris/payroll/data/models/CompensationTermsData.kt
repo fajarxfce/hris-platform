@@ -6,7 +6,7 @@ data class CompensationTermsData(
     val treatment: String,
     val tax: TaxRegistrationData,
     val insuranceWage: String,
-    val insurancePrograms: Set<String>,
+    val insurancePrograms: List<String>,
     val insuranceExemptionReason: String?,
     val accidentRisk: String,
     val additionalHealthDependents: Int,

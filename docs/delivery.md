@@ -48,6 +48,20 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Retained payroll snapshot ordering
+
+Storage DTOs preserve insurance-program and employment-date arrays as lists.
+Mapping to domain uses owned, immutable sets that retain the stored iteration
+order. This prevents JSON decoding or `Set.copyOf` from changing an otherwise
+unchanged snapshot and causing a calculation to fail its history constraint.
+Duplicate stored set members are rejected. Existing snapshots and database
+constraints are not rewritten.
+
+Three mapper tests passed through real JSON serialization and deserialization,
+including different retained orders, duplicate rejection and mutation isolation.
+All four existing amendment-draft HTTP/PostgreSQL scenarios passed, covering
+calculation, editing, retained history, cancellation and original receipt recovery.
+
 ### Payroll amendment drafts
 
 Versioned drafts retain explicit source references, remuneration proposals and

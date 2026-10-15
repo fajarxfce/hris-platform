@@ -6,5 +6,5 @@ data class PayrollPayUnitsData(
     val total: String,
     val payable: String,
     val unpaid: String,
-    val employedDates: Set<LocalDate>,
+    val employedDates: List<LocalDate>,
 )

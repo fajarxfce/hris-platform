@@ -50,6 +50,27 @@ const PersonAccountBindingScreen = lazy(() =>
   ),
 );
 
+const LeaveBatchesScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-batches-screen").then((module) => ({
+    default: module.LeaveBatchesScreen,
+  })),
+);
+const LeaveBatchStartScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-batch-start-screen").then((module) => ({
+    default: module.LeaveBatchStartScreen,
+  })),
+);
+const LeaveBatchScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-batch-screen").then((module) => ({
+    default: module.LeaveBatchScreen,
+  })),
+);
+const LeaveBatchResumeScreen = lazy(() =>
+  import("../../features/leave/presentation/bindings/leave-batch-resume-screen").then((module) => ({
+    default: module.LeaveBatchResumeScreen,
+  })),
+);
+
 const LeaveBalancesScreen = lazy(() =>
   import("../../features/leave/presentation/bindings/leave-balances-screen").then((module) => ({
     default: module.LeaveBalancesScreen,
@@ -538,6 +559,70 @@ export function PortalRoutes({
               actions={identityAdministration}
               companyName={company.name}
               locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/batches"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveBatchesScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/batches/new"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveBatchStartScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/batches/:batchId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveBatchScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/leave/batches/:batchId/resume"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveBatchResumeScreen
+              accountId={accountId}
+              access={access}
+              leave={leave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
             />
           </Suspense>
         }

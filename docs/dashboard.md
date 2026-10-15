@@ -1050,6 +1050,42 @@ A definite version conflict disables saving until an explicit new review. Re-rev
 
 Drafts, pending writes, and unconfirmed outcomes use the workspace departure guard. Account/company replacement and disposal abort owned work and suppress late results. Equivalent verification, language, and theme changes retain the form without starting another command. Commands remain in memory; browser cancellation does not reverse a server commit or provide durable offline recovery.
 
+## Leave entitlement processing
+
+`/leave/batches` lists company accrual and year-closing processes in pages of
+20. History requires `leave.read`; each operation additionally requires its own
+posting or closing permission. Type selection opens a bounded picker on demand
+and does not require general policy or People administration.
+
+A new process first reviews the company-local period, effective policy and exact
+employee population on the server. The displayed policy can differ from the
+current head; submission sends that reviewed head and a detached copy of the
+employee IDs. Later hires do not enter an already reviewed command. The interface
+shows the population and policy rate separately, since eligibility is decided
+per employee. Year closing selects an ended year and explicitly describes carryover.
+
+Detail distinguishes current job status from batch metadata. Employee progress
+excludes the final metadata checkpoint; applied, unchanged, skipped and failed
+counts remain separate. Each outcome includes minimal employee labels, a
+localized failure when applicable and a link to that employee/type/year ledger.
+Result pages retain the originating directory cursor. History preserves previous
+job attempts and immutable policy references. General job monitoring and
+cancellation reuse the existing authorized Jobs page.
+
+Resume requires the current server action and corresponding operation grant. It
+reviews the batch version and submits an explicit reason. It does not replay
+employees whose outcome is already recorded. Creation and resume retain the
+original command and operation after response loss, including through later MFA
+or version conflicts. Definite first-attempt conflicts require a new review;
+confirmed denial removes private visible data. Draft and uncertain-command
+navigation protections remain separate from read acquisition.
+
+Each detail controller owns one request and at most thirty delayed progress
+updates. Hidden pages cancel pending reads and timers, terminal jobs and failures
+stop observation, and only explicit refresh replenishes the update budget.
+Company/page replacement and disposal reject late results. English/Indonesian
+views use existing Fluent command bars, resource tables and semantic tokens.
+
 ## Company account review
 
 `/administration/members` lists the active company's accounts with separate global

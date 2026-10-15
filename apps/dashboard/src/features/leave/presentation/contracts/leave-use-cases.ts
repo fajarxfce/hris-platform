@@ -3,6 +3,9 @@ import type { DecideLeaveRequest } from "../../domain/usecases/decide-leave-requ
 import type { DownloadLeaveAttachment } from "../../domain/usecases/download-leave-attachment";
 import type { LoadEmployeeLeaveBalances } from "../../domain/usecases/load-employee-leave-balances";
 import type { LoadLeaveAdjustmentCatalog } from "../../domain/usecases/load-leave-adjustment-catalog";
+import type { LoadLeaveBatch } from "../../domain/usecases/load-leave-batch";
+import type { LoadLeaveBatchTypes } from "../../domain/usecases/load-leave-batch-types";
+import type { LoadLeaveBatches } from "../../domain/usecases/load-leave-batches";
 import type { LoadLeaveLedger } from "../../domain/usecases/load-leave-ledger";
 import type { LoadLeavePolicies } from "../../domain/usecases/load-leave-policies";
 import type { LoadLeavePolicy } from "../../domain/usecases/load-leave-policy";
@@ -13,13 +16,23 @@ import type { LoadLeaveRequestTypes } from "../../domain/usecases/load-leave-req
 import type { LoadLeaveRequests } from "../../domain/usecases/load-leave-requests";
 import type { PreviewLeaveRequest } from "../../domain/usecases/preview-leave-request";
 import type { RequestLeaveCancellation } from "../../domain/usecases/request-leave-cancellation";
+import type { ResumeLeaveBatch } from "../../domain/usecases/resume-leave-batch";
 import type { ReviewLeaveAction } from "../../domain/usecases/review-leave-action";
 import type { ReviewLeaveBalanceAdjustment } from "../../domain/usecases/review-leave-balance-adjustment";
+import type { ReviewLeaveBatch } from "../../domain/usecases/review-leave-batch";
 import type { SaveLeavePolicy } from "../../domain/usecases/save-leave-policy";
+import type { StartLeaveBatch } from "../../domain/usecases/start-leave-batch";
 import type { SubmitLeaveRequest } from "../../domain/usecases/submit-leave-request";
 import type { WithdrawLeaveRequest } from "../../domain/usecases/withdraw-leave-request";
 
 export type LeaveUseCases = Readonly<{
+  loadBatchTypes: Pick<LoadLeaveBatchTypes, "execute">;
+  reviewBatch: Pick<ReviewLeaveBatch, "execute">;
+  loadBatches: Pick<LoadLeaveBatches, "execute">;
+  loadBatch: Pick<LoadLeaveBatch, "execute">;
+  startBatch: Pick<StartLeaveBatch, "execute">;
+  resumeBatch: Pick<ResumeLeaveBatch, "execute">;
+
   loadPreparationEmployees: Pick<LoadLeavePreparationEmployees, "execute">;
   loadPreparationEvidence: Pick<LoadLeavePreparationEvidence, "execute">;
   loadRequestTypes: Pick<LoadLeaveRequestTypes, "execute">;

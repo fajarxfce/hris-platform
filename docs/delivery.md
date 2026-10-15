@@ -10,7 +10,7 @@ including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) r
 - Mobile API: native sessions, atomic command receipts, optimistic versions, and consistent localizable JSON problems are implemented. Owned expense/leave-request/leave-balance/overtime/payslip/payment-progress account-owned inbox, daily attendance and calendar-source bootstrap/incremental synchronization, explicit client collection selection, encrypted scope-bound cursors, bounded post-commit publication, retention, and worker lifecycle are implemented. Inbox, Attendance and calendar sources require explicit selection; the omitted-selection projection remains compatible with earlier clients. Mobile consumer coverage is tracked in the completion document.
 - API description: generated OpenAPI 3.1, exact registered-route coverage, filter authentication contracts, safe localizable problems, binary negotiation metadata, and CI artifacts are implemented. Runtime documentation is optional and authenticated, with a single canonical locale and bounded cache.
 - Identity: password sign-in, persistent cookie sessions, CSRF/session rotation, bootstrap, current-company permissions, revocation checks, credential-race handling, shared sign-in limits, and bounded password verification implemented. Company member administration is implemented, including versioned grants/revocation and sensitive-grant restrictions. Authenticator MFA, recovery codes, live credential revocation, and recent-authentication gates are implemented. Direct native password sign-in, pending MFA sessions, native authenticator enrollment, access/refresh rotation, reuse detection, session management, and native MFA renewal are implemented. Configured OIDC sign-in and account bindings are implemented. Configurable company role templates, versioned assignment snapshots, and global account activation/permission administration are implemented. Local invitations, one-use password recovery, and durable SMTP delivery are implemented.
-- Organization and people: company setup, organization units with bounded name/code search and coherent parent details, employee onboarding, scoped directories, and effective employment revisions implemented. Restricted profile editing, immutable history, and cancellation of scheduled employment revisions are implemented. Atomic cross-company transfer with source membership revocation is implemented. Versioned lifecycle checklists, task assignment/history, and explicit offboarding with access revocation are implemented. CSV preview/apply jobs, field errors, partial outcomes, cancellation, and explicit recovery are implemented. Independently authorized initial person/account binding and historical account identity are implemented. Reviewed scheduled offboarding is implemented in the backend, worker and dashboard, including cancellation, retained attempts and terminal-job recovery. [Scheduled onboarding](onboarding-schedules.md) is implemented in the backend and worker; dashboard controls are next.
+- Organization and people: company setup, organization units with bounded name/code search and coherent parent details, employee onboarding, scoped directories, and effective employment revisions implemented. Restricted profile editing, immutable history, and cancellation of scheduled employment revisions are implemented. Atomic cross-company transfer with source membership revocation is implemented. Versioned lifecycle checklists, task assignment/history, and explicit offboarding with access revocation are implemented. CSV preview/apply jobs, field errors, partial outcomes, cancellation, and explicit recovery are implemented. Independently authorized initial person/account binding and historical account identity are implemented. Reviewed scheduled offboarding is implemented in the backend, worker and dashboard, including cancellation, retained attempts and terminal-job recovery. [Scheduled onboarding](onboarding-schedules.md) is implemented in the backend, worker and dashboard, including reviewed scheduling and original-command recovery.
 - Approvals: effective templates, immutable snapshots, assignment/delegation, inbox, optimistic decision storage, and pure transitions implemented. Bounded policy/delegation administration, live-access revalidation, and serialization of revocation/reassignment with decisions are implemented. Leave submission, staged decisions, withdrawal, and cancellation apply atomic business consequences. Expense submission, staged decisions, return-for-correction, and withdrawal are integrated. Overtime and payroll review also use the shared boundary, including retained maker exclusions.
 - Workforce: versioned shifts, weekly schedules, roster overrides, holidays, and scoped calendar reads implemented. Attendance capture and independent verification are implemented. Versioned HR corrections are implemented. Durable monthly factual closing and explicit recovery are implemented. Planned/actual overtime, independent staged review, withdrawal, immutable evidence, closing gates/snapshots, and employee synchronization are implemented. Late adjustments and bulk/reset workflows remain planned.
 - Leave: effective policies, independent balance adjustments, immutable scoped ledger, snapshotted requests, staged approval, withdrawal, and cancellation implemented. Required/optional validated attachments, immutable business references, and scoped content downloads are implemented. Versioned ledger projections, independent monthly/annual entitlement posting, immutable evidence, explicit year closing with bounded carryover/expiry, closed-year guards, and owned balance sync are implemented. Durable company accrual/year-closing batches, per-employee outcomes, cancellation, and bounded recovery are implemented. Payroll cutoff integration is implemented; automatic scheduling remains planned.
@@ -70,7 +70,7 @@ Backend and dashboard date validation now agree with PostgreSQL when a local
 midnight repeats or is skipped. All 2,958 dashboard tests across 253 files passed,
 including the new boundary cases, with architecture, Biome and strict TypeScript.
 The generic job monitor recognizes scheduled onboarding. Its dedicated dashboard
-workflow and browser acceptance remain the next increment.
+workflow and browser acceptance followed in the dashboard scheduled-onboarding increment below.
 
 The previously validated retained-payslip APK was installed on the authorized
 phone after its source and artifact hashes matched the validation manifest.
@@ -4726,4 +4726,43 @@ historical policy revisions, scoped labels and original-owner recovery. One
 review suite initially failed to start its PostgreSQL container; its isolated
 rerun used corrected fixture expectations for the existing HTTP/JSON contracts.
 Architecture and format checks, test compilation and both application JAR builds
-passed. Dashboard controls and browser/worker acceptance are the next increment.
+passed. Dashboard controls and their browser/worker acceptance follow below.
+
+### Dashboard entitlement processing
+
+Company readers can browse leave processes and bounded employee outcomes.
+Accrual/year-closing operators review the selected period, effective policy and
+exact employee population before submission, without People or policy-administration
+access. Detail separates job state, employee progress and applied/unchanged/skipped/failed
+counts, retains prior attempts, and opens the corresponding employee ledger.
+Current server actions gate explicit resume; general job cancellation uses the
+existing Jobs page. Uncertain commands retain original payloads and operation
+keys through later MFA and conflicts. Hidden/disposed views cancel observation;
+progress has one request and at most thirty delayed updates.
+
+The full dashboard check passed architecture, Biome, strict TypeScript and all
+3,123 tests. After the shared policy-conflict message was made independent of a
+specific module and one additional first-rejection case was added, thirty focused
+tests, the production build and the affected browser flow passed. All 48 Leave
+request/policy/balance/batch browser scenarios passed before that final wording
+refinement. Desktop and narrow dark Indonesian screenshots were inspected, with
+no page overflow at 200% text. Existing CSS-specificity and bundle-size advisories
+remain; no performance claim is inferred from these checks.
+
+The isolated API/PostgreSQL/worker browser test passed after the fictional
+fixed-term employee fixture was given its required contract end date. A committed
+accrual response was dropped and recovered with the original command: one eligible
+employee received exactly one grant and the excluded contract produced a skipped
+outcome. Explicit year closing then closed the source balance and transferred
+one day exactly once to the following year. Test processes and their disposable
+database were stopped. Terminal-job resume is covered by the backend transaction/worker
+and browser transport tests; the real browser scenario covered posting and closing.
+[Backend and dashboard CI for the preparation contract](https://github.com/fajarxfce/hris-platform/actions/runs/38763244598)
+passed all shards and the dependent integration job.
+
+Development API and worker were restarted with the validated artifacts and the
+existing V80 schema. Running JAR digests match the validated builds; both
+application contexts started. Readiness passed on loopback and WireGuard, and
+the dashboard returned HTTP 200 at `10.77.77.1:5173`. The private document
+services and VPN bindings were preserved. No mobile artifact changed in this
+increment, and no phone installation or UI interaction was performed.

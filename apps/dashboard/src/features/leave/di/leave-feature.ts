@@ -1,10 +1,12 @@
 import type { HttpClient } from "../../../core/data/http/http-client";
 import type { FileRepository } from "../../../core/domain/files/file-repository";
 import { HttpLeaveBalanceDataSource } from "../data/datasources/http-leave-balance-data-source";
+import { HttpLeaveBatchDataSource } from "../data/datasources/http-leave-batch-data-source";
 import { HttpLeavePolicyDataSource } from "../data/datasources/http-leave-policy-data-source";
 import { HttpLeavePreparationDataSource } from "../data/datasources/http-leave-preparation-data-source";
 import { HttpLeaveRequestDataSource } from "../data/datasources/http-leave-request-data-source";
 import { RemoteLeaveBalanceRepository } from "../data/repositories/remote-leave-balance-repository";
+import { RemoteLeaveBatchRepository } from "../data/repositories/remote-leave-batch-repository";
 import { RemoteLeavePolicyRepository } from "../data/repositories/remote-leave-policy-repository";
 import { RemoteLeavePreparationRepository } from "../data/repositories/remote-leave-preparation-repository";
 import { RemoteLeaveRequestRepository } from "../data/repositories/remote-leave-request-repository";
@@ -13,6 +15,9 @@ import { DecideLeaveRequest } from "../domain/usecases/decide-leave-request";
 import { DownloadLeaveAttachment } from "../domain/usecases/download-leave-attachment";
 import { LoadEmployeeLeaveBalances } from "../domain/usecases/load-employee-leave-balances";
 import { LoadLeaveAdjustmentCatalog } from "../domain/usecases/load-leave-adjustment-catalog";
+import { LoadLeaveBatch } from "../domain/usecases/load-leave-batch";
+import { LoadLeaveBatchTypes } from "../domain/usecases/load-leave-batch-types";
+import { LoadLeaveBatches } from "../domain/usecases/load-leave-batches";
 import { LoadLeaveLedger } from "../domain/usecases/load-leave-ledger";
 import { LoadLeavePolicies } from "../domain/usecases/load-leave-policies";
 import { LoadLeavePolicy } from "../domain/usecases/load-leave-policy";
@@ -23,9 +28,12 @@ import { LoadLeaveRequestTypes } from "../domain/usecases/load-leave-request-typ
 import { LoadLeaveRequests } from "../domain/usecases/load-leave-requests";
 import { PreviewLeaveRequest } from "../domain/usecases/preview-leave-request";
 import { RequestLeaveCancellation } from "../domain/usecases/request-leave-cancellation";
+import { ResumeLeaveBatch } from "../domain/usecases/resume-leave-batch";
 import { ReviewLeaveAction } from "../domain/usecases/review-leave-action";
 import { ReviewLeaveBalanceAdjustment } from "../domain/usecases/review-leave-balance-adjustment";
+import { ReviewLeaveBatch } from "../domain/usecases/review-leave-batch";
 import { SaveLeavePolicy } from "../domain/usecases/save-leave-policy";
+import { StartLeaveBatch } from "../domain/usecases/start-leave-batch";
 import { SubmitLeaveRequest } from "../domain/usecases/submit-leave-request";
 import { WithdrawLeaveRequest } from "../domain/usecases/withdraw-leave-request";
 
@@ -33,6 +41,7 @@ export function createLeaveFeature(
   http: HttpClient,
   files: Pick<FileRepository, "downloadBinary">,
 ) {
+  const batches = new RemoteLeaveBatchRepository(new HttpLeaveBatchDataSource(http));
   const requests = new RemoteLeaveRequestRepository(new HttpLeaveRequestDataSource(http));
   const policies = new RemoteLeavePolicyRepository(new HttpLeavePolicyDataSource(http));
   const balances = new RemoteLeaveBalanceRepository(new HttpLeaveBalanceDataSource(http));
@@ -40,6 +49,13 @@ export function createLeaveFeature(
     new HttpLeavePreparationDataSource(http),
   );
   return {
+    loadBatchTypes: new LoadLeaveBatchTypes(batches),
+    reviewBatch: new ReviewLeaveBatch(batches),
+    loadBatches: new LoadLeaveBatches(batches),
+    loadBatch: new LoadLeaveBatch(batches),
+    startBatch: new StartLeaveBatch(batches),
+    resumeBatch: new ResumeLeaveBatch(batches),
+
     loadPreparationEmployees: new LoadLeavePreparationEmployees(preparation),
     loadPreparationEvidence: new LoadLeavePreparationEvidence(preparation),
     loadRequestTypes: new LoadLeaveRequestTypes(preparation),

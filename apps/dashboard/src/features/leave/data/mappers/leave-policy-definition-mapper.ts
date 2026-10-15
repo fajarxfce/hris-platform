@@ -14,7 +14,9 @@ import type {
   LeaveTypePageDto,
 } from "../models/leave-type-dto";
 
-export function toLeavePolicyTerms(raw: LeavePolicyTermsDto): LeavePolicyTerms {
+export function toLeavePolicyTerms(
+  raw: Omit<LeavePolicyTermsDto, "active" | "effectiveFrom">,
+): LeavePolicyTerms {
   if (new Set(raw.allowedContracts).size !== raw.allowedContracts.length)
     throw new InvalidHttpResponseError();
   return Object.freeze({

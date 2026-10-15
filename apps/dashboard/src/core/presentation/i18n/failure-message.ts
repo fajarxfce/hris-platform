@@ -1522,6 +1522,87 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Kebijakan cuti ini tidak lagi tersedia.",
   ],
   invalid_leave_policy: ["Check the leave policy fields.", "Periksa isian kebijakan cuti."],
+  invalid_leave_batch: [
+    "Check the leave type, period and reason.",
+    "Periksa jenis cuti, periode, dan alasan.",
+  ],
+  leave_batch_not_found: ["This leave process is unavailable.", "Proses cuti ini tidak tersedia."],
+  leave_batch_active: [
+    "Another process is active for this leave type and period. Review its progress first.",
+    "Proses lain masih aktif untuk jenis cuti dan periode ini. Tinjau progresnya terlebih dahulu.",
+  ],
+  leave_batch_employee_limit: [
+    "The reviewed selection must contain between 1 and 5,000 employees.",
+    "Pilihan yang ditinjau harus berisi 1 sampai 5.000 karyawan.",
+  ],
+  leave_batch_employee_unavailable: [
+    "An employee in the reviewed selection is no longer available. Review the selection again.",
+    "Karyawan dalam pilihan yang ditinjau tidak lagi tersedia. Tinjau kembali pilihan.",
+  ],
+  leave_batch_policy_changed: [
+    "The leave policy changed. Review the process before continuing.",
+    "Kebijakan cuti berubah. Tinjau proses sebelum melanjutkan.",
+  ],
+  leave_batch_not_stopped: [
+    "This process has not stopped. Review its current progress.",
+    "Proses ini belum berhenti. Tinjau progres terbarunya.",
+  ],
+  leave_batch_changed: [
+    "The process changed. Reload its current details.",
+    "Proses berubah. Muat ulang detail terbarunya.",
+  ],
+  leave_batch_job_obsolete: [
+    "This job has been replaced. Reload the leave process.",
+    "Job ini sudah digantikan. Muat ulang proses cuti.",
+  ],
+  leave_batch_attempt_limit: [
+    "This process has reached its limit of eight attempts.",
+    "Proses ini telah mencapai batas delapan percobaan.",
+  ],
+  leave_batch_checkpoint_inconsistent: [
+    "The recorded progress needs administrator review before this process can continue.",
+    "Progres tercatat perlu diperiksa administrator sebelum proses dilanjutkan.",
+  ],
+  leave_batch_resume_owner_required: [
+    "Only the account that submitted this process can resume it.",
+    "Hanya akun yang mengajukan proses ini yang dapat melanjutkannya.",
+  ],
+  leave_accrual_not_configured: [
+    "This leave type has no scheduled accrual policy for the selected period.",
+    "Jenis cuti ini belum memiliki kebijakan akrual terjadwal untuk periode terpilih.",
+  ],
+  leave_accrual_not_due: [
+    "Accrual is not due for the selected period.",
+    "Akrual belum jatuh tempo untuk periode terpilih.",
+  ],
+  leave_accrual_frequency_changed: [
+    "The accrual frequency differs from an existing posting in this year.",
+    "Frekuensi akrual berbeda dari pencatatan yang sudah ada pada tahun ini.",
+  ],
+  leave_year_not_ended: [
+    "The selected leave year has not ended in the company timezone.",
+    "Tahun cuti terpilih belum berakhir pada zona waktu perusahaan.",
+  ],
+  stale_policy_version: [
+    "The policy changed. Review the current version before continuing.",
+    "Kebijakan berubah. Tinjau versi terbaru sebelum melanjutkan.",
+  ],
+  leave_account_inconsistent: [
+    "The recorded leave balance needs administrator review.",
+    "Saldo cuti tercatat perlu diperiksa administrator.",
+  ],
+  leave_resolution_required: [
+    "Resolve pending leave requests and reservations before closing this year.",
+    "Selesaikan pengajuan cuti dan reservasi yang masih aktif sebelum menutup tahun ini.",
+  ],
+  leave_destination_year_closed: [
+    "The next leave year is already closed and cannot receive carryover.",
+    "Tahun cuti berikutnya sudah ditutup dan tidak dapat menerima sisa cuti.",
+  ],
+  employment_history_capacity: [
+    "The employment history exceeds the processing limit. Contact your administrator.",
+    "Riwayat hubungan kerja melewati batas pemrosesan. Hubungi administrator.",
+  ],
   invalid_leave_accrual_policy: [
     "Check the entitlement and carryover limits.",
     "Periksa hak cuti dan batas carryover.",

@@ -1,8 +1,10 @@
 # Leave carryover accounting
 
-Status: the domain and storage foundation is implemented and tested. It is not
-enabled in public commands or deployed. Existing carryover keeps its current
-behavior until command, worker and client integration is validated.
+Status: domain/storage accounting and request preview, submission, approval,
+withdrawal and cancellation integration are implemented and tested. New public
+closing commands do not create tracked awards yet, and validity configuration is
+not exposed. Adjustment, closing, worker and client integration remains; these
+changes have not been deployed.
 
 ## Contract
 
@@ -29,6 +31,26 @@ cancellation restores the original funding source; any returned carried units
 past the boundary expire in the same transaction. They do not become ordinary
 credit. Negative adjustments and year-end transfers need explicit subledger
 movements so carried units cannot exceed the main balance.
+
+## Request integration
+
+Preview and submission use the same carry-first funding policy under the employee
+ledger guard. The preview revision includes the current carry buckets and selected
+funding. Crossing a deadline can therefore invalidate a review even when ordinary
+credit could still fund the same dates. Expired free carry is excluded even when
+the expiry worker has not settled the ledger yet.
+
+Submission freezes original funding alongside its request and approval snapshot.
+Decisions and withdrawals apply only the financial effect of the actual workflow
+transition: an intermediate review or withdrawal of a cancellation request does
+not release credit. Late approval consumes its original reservation. A late refund,
+withdrawal or rejection restores that source and expires any remaining free units
+in the same transaction. Existing ordinary requests have no inferred carry funding.
+
+Date and evidence inputs are bounded and copied before acquisition. Current
+session assurance is checked after guarded acquisition and again through receipt
+and journal completion. Late failure or cancellation rolls back the request,
+funding, ledger, approval, evidence references, journal and operation receipt.
 
 ## Storage boundary
 
@@ -71,7 +93,7 @@ before exposing the new policy in the dashboard.
 
 ## Observed validation
 
-All 45 Leave domain tests passed, including 17 carry-policy scenarios covering
+The foundation passed 45 Leave domain tests, including 17 carry-policy scenarios covering
 company-local/leap-year validity, half-day units, ineligible future work dates,
 the exact deadline, cross-year funding, retained reservations, late refunds,
 immutable plans and unit conservation.
@@ -81,18 +103,29 @@ and existing year-closing, rollback and balance-sync regressions. A final run
 passed the 14 carry storage cases and four mapper/ownership/cancellation cases.
 They cover missing counterparts, early expiry, simultaneous expiry, retained
 funding through approval/refund, rejected retrospective funding, cross-company
-reads/writes and immutable history. These fixtures coordinate real repositories
-directly; they do not claim that public carry commands are implemented.
+reads/writes and immutable history. The storage fixtures coordinate repositories
+directly; subsequent request tests use the actual HTTP commands against these
+tracked awards.
 
 Both application contexts passed, including all 68 worker tests. The V82-to-V83
 upgrade test and the existing ledger-upgrade test passed against PostgreSQL 18.
 Kotlin compilation, query generation, formatting and architecture checks passed.
 No browser, device or development deployment was performed for this increment.
 
+Request integration first passed 46 domain, 73 API/PostgreSQL and all 68 worker
+tests. The final focused run passed 48 domain and 52 API/PostgreSQL tests, including
+nine new HTTP funding scenarios and ten assurance/cancellation/input-ownership
+scenarios. Coverage includes half-days, future dates, deadline changes, simultaneous
+reservations, staged decisions, original receipt replay, late journal rollback and
+recovery after assurance renewal. Pure completion plans validate both cross-year
+funding and the version capacity for a subsequent expiry. Formatting and
+architecture checks passed. No browser, native or development deployment was
+performed for this increment.
+
 ## Remaining integration
 
-- Apply funding plans in preview, submission, decisions, withdrawal, adjustments,
-  and direct/batch year closing, retaining current access and receipt guarantees.
+- Apply carry movements in adjustments and direct/batch year closing, retaining
+  current access and receipt guarantees before enabling tracked public awards.
 - Admit and execute bounded expiry work with immutable origin, lease fencing,
   original due times and explicit terminal-job recovery.
 - Expose validity and progress through scoped transport/sync models, dashboard

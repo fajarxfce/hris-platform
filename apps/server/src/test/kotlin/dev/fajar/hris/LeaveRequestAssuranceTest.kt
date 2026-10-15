@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Import
 
 @Import(AccountLockProbeConfiguration::class)
 class LeaveRequestAssuranceTest : ApprovalApiFixture() {
+    @Autowired private lateinit var carry: LeaveCarryRepository
     @Autowired private lateinit var requests: LeaveRequestRepository
     @Autowired private lateinit var ledger: LeaveLedgerRepository
     @Autowired private lateinit var policies: LeavePolicyRepository
@@ -80,6 +81,7 @@ class LeaveRequestAssuranceTest : ApprovalApiFixture() {
                 clock,
                 cutoffs,
                 security,
+                carry,
             )
         val read: (Actor) -> Result<*> = { requestedActor ->
             if (operation == "preview")
@@ -146,6 +148,7 @@ class LeaveRequestAssuranceTest : ApprovalApiFixture() {
                 clock,
                 cutoffs,
                 IdentitySecurityPolicy(enforceMfa = false),
+                carry,
             )
         val actor =
             Actor(
@@ -328,6 +331,7 @@ class LeaveRequestAssuranceTest : ApprovalApiFixture() {
                             references,
                             cutoffs,
                             security,
+                            carry,
                         )
                         .execute(
                             current,
@@ -353,6 +357,7 @@ class LeaveRequestAssuranceTest : ApprovalApiFixture() {
                             clock,
                             cutoffs,
                             security,
+                            carry,
                         )
                         .execute(
                             current,
@@ -376,6 +381,7 @@ class LeaveRequestAssuranceTest : ApprovalApiFixture() {
                             clock,
                             cutoffs,
                             security,
+                            carry,
                         )
                         .execute(current, key, id, version, "Leave plan changed")
                 else ->

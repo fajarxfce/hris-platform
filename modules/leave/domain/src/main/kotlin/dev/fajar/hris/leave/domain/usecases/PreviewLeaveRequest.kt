@@ -29,6 +29,7 @@ class PreviewLeaveRequest(
     private val clock: Clock,
     private val cutoffs: PayrollCutoffRepository,
     private val security: IdentitySecurityPolicy,
+    private val carry: LeaveCarryRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -41,13 +42,14 @@ class PreviewLeaveRequest(
             if (scope == LeavePreparationScope.SELF) "leave.self.manage" else "leave.manage"
         val admitted = actor.requirePermission(permission)
         if (admitted is Result.Failed) return admitted
-        val valid = validateLeaveDateSelection(days)
+        val selectedDays = days.take(LEAVE_DATE_LIMIT + 1)
+        val valid = validateLeaveDateSelection(selectedDays)
         if (valid is Result.Failed) return valid
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
-        val from = days.minOf { it.workDate }
-        val until = days.maxOf { it.workDate }
+        val from = selectedDays.minOf { it.workDate }
+        val until = selectedDays.maxOf { it.workDate }
         return transactions.run(actor) {
             val ledgerGuard = ledger.lock(company, employeeId, shared = true)
             if (ledgerGuard is Result.Failed) return@run ledgerGuard
@@ -108,7 +110,7 @@ class PreviewLeaveRequest(
                 cutoffs.frozenMonths(
                     company,
                     employeeId,
-                    days.map { YearMonth.from(it.workDate) }.toSet(),
+                    selectedDays.map { YearMonth.from(it.workDate) }.toSet(),
                 )
             if (frozen is Result.Failed) return@run frozen
             if ((frozen as Result.Success).value)
@@ -123,9 +125,9 @@ class PreviewLeaveRequest(
                     is Result.Failed -> return@run result
                     is Result.Success -> result.value
                 }
-            val selected = days.map { it.workDate }.toSet()
+            val selected = selectedDays.map { it.workDate }.toSet()
             val first =
-                when (val result = leavePolicyDate(days, calendar)) {
+                when (val result = leavePolicyDate(selectedDays, calendar)) {
                     is Result.Failed -> return@run result
                     is Result.Success -> result.value
                 }
@@ -139,7 +141,12 @@ class PreviewLeaveRequest(
             val history = people.effectiveRevisions(company, employeeId, from, until)
             if (history is Result.Failed) return@run history
             val planned =
-                planLeaveDays(days, calendar, (history as Result.Success).value, type.policy)
+                planLeaveDays(
+                    selectedDays,
+                    calendar,
+                    (history as Result.Success).value,
+                    type.policy,
+                )
             if (planned is Result.Failed) return@run planned
             val charged = (planned as Result.Success).value
             val occupied = requests.occupancy(company, employeeId, from, until)
@@ -155,6 +162,14 @@ class PreviewLeaveRequest(
                 if (enough is Result.Failed) return@run enough
                 balances += LeavePreviewBalance(value, movement.reservedDelta)
             }
+            val acquiredCarry =
+                carry.buckets(company, employeeId, typeId, balances.map { it.balance.year }.toSet())
+            if (acquiredCarry is Result.Failed) return@run acquiredCarry
+            val carryBuckets = (acquiredCarry as Result.Success).value
+            val funding =
+                planLeaveCarryReservation(charged, balances.map { it.balance }, carryBuckets, now)
+            if (funding is Result.Failed) return@run funding
+            val carryAllocations = (funding as Result.Success).value
             val included = charged.map { it.workDate }.toSet()
             val result =
                 LeaveRequestPreview(
@@ -170,9 +185,11 @@ class PreviewLeaveRequest(
                         employeeId,
                         settings.timezone,
                         LeavePolicySnapshot(type.id, type.code, type.appliedRevision, type.policy),
-                        days,
+                        selectedDays,
                         charged,
                         balances,
+                        carryBuckets,
+                        carryAllocations,
                     ),
                 )
             validateCompanySessionActor(actor, access, clock.instant(), security).map { result }

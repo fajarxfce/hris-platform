@@ -29,6 +29,7 @@ class WithdrawLeaveRequest(
     private val clock: Clock,
     private val cutoffs: PayrollCutoffRepository,
     private val security: IdentitySecurityPolicy,
+    private val carry: LeaveCarryRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -70,10 +71,10 @@ class WithdrawLeaveRequest(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
-            val checkedActor =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checkedActor = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checkedActor is Result.Failed) return@run checkedActor
             val live = (checkedActor as Result.Success).value
             if ("leave.manage" !in live.permissions && "leave.self.manage" !in live.permissions)
@@ -130,23 +131,82 @@ class WithdrawLeaveRequest(
             }
             val now = clock.instant()
             val entries =
-                movements.map {
-                    LeaveLedgerEntry(
-                        UUID.randomUUID(),
+                movements
+                    .map {
+                        LeaveLedgerEntry(
+                            UUID.randomUUID(),
+                            employeeId,
+                            request.policy.typeId,
+                            it.year,
+                            it.kind,
+                            id,
+                            id,
+                            it.availableDelta,
+                            it.reservedDelta,
+                            it.consumedDelta,
+                            actor.accountId,
+                            now,
+                            reason,
+                        )
+                    }
+                    .toMutableList()
+            val carryPostings = mutableListOf<LeaveCarryPosting>()
+            val effect = if (cancellation) null else LeaveBalanceEffect.RELEASE
+            if (effect != null && request.carryAllocationCount != 0) {
+                val acquiredFunding = carry.allocations(company, id)
+                if (acquiredFunding is Result.Failed) return@run acquiredFunding
+                val allocations = (acquiredFunding as Result.Success).value
+                if (allocations.size != request.carryAllocationCount || allocations.isEmpty())
+                    return@run Result.Failed(Failure(FailureKind.CONFLICT, "leave_carry_conflict"))
+                val acquiredCarry =
+                    carry.buckets(
+                        company,
                         employeeId,
                         request.policy.typeId,
-                        it.year,
-                        it.kind,
-                        id,
-                        id,
-                        it.availableDelta,
-                        it.reservedDelta,
-                        it.consumedDelta,
-                        actor.accountId,
-                        now,
-                        reason,
+                        allocations.map { it.year }.toSet(),
                     )
+                if (acquiredCarry is Result.Failed) return@run acquiredCarry
+                val plannedCarry =
+                    planLeaveCarryRequestCompletion(
+                        request.carryAllocationCount,
+                        allocations,
+                        (acquiredCarry as Result.Success).value,
+                        effect,
+                        now,
+                    )
+                if (plannedCarry is Result.Failed) return@run plannedCarry
+                for (plan in (plannedCarry as Result.Success).value) {
+                    val movementId = UUID.randomUUID()
+                    val entry =
+                        if (plan.movement.effect == LeaveCarryEffect.EXPIRE) {
+                            LeaveLedgerEntry(
+                                    UUID.randomUUID(),
+                                    employeeId,
+                                    request.policy.typeId,
+                                    plan.year,
+                                    LeaveLedgerKind.EXPIRE,
+                                    movementId,
+                                    null,
+                                    -plan.movement.halfDays,
+                                    0,
+                                    0,
+                                    actor.accountId,
+                                    now,
+                                    reason.ifBlank { "Carry validity ended" },
+                                    movementId,
+                                )
+                                .also { entries += it }
+                        } else entries.single { it.year == plan.year && it.kind == effect.kind }
+                    carryPostings +=
+                        LeaveCarryPosting(
+                            movementId,
+                            plan.movement,
+                            plan.expectedVersion,
+                            entry.id,
+                            if (plan.movement.effect == LeaveCarryEffect.EXPIRE) null else id,
+                        )
                 }
+            }
             approvals
                 .cancel(company, approvalId, approval.version)
                 .flatMap {
@@ -162,8 +222,9 @@ class WithdrawLeaveRequest(
                     )
                 }
                 .flatMap { receipt ->
-                    ledger
-                        .append(company, entries)
+                    carry
+                        .append(company, carryPostings)
+                        .flatMap { ledger.append(company, entries) }
                         .flatMap {
                             if (cancellation) Result.Success(Unit)
                             else
@@ -186,7 +247,10 @@ class WithdrawLeaveRequest(
                                 ),
                             )
                         }
-                        .map { receipt }
+                        .flatMap {
+                            validateCompanySessionActor(actor, access, clock.instant(), security)
+                                .map { receipt }
+                        }
                 }
         }
     }

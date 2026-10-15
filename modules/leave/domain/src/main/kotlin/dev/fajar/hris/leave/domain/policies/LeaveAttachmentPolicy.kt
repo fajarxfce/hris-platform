@@ -5,15 +5,17 @@ import dev.fajar.hris.documents.domain.entities.*
 import dev.fajar.hris.leave.domain.entities.LeaveAttachment
 import java.util.UUID
 
+const val LEAVE_ATTACHMENT_LIMIT = 3
+
 fun validateLeaveAttachmentIds(ids: List<UUID>): Result<Unit> =
     when {
-        ids.size > 3 ->
+        ids.size > LEAVE_ATTACHMENT_LIMIT ->
             Result.Failed(
                 Failure(
                     FailureKind.VALIDATION,
                     "invalid_leave_attachments",
                     fields = mapOf("attachmentRevisionIds" to "too_many"),
-                    parameters = mapOf("maximum" to "3"),
+                    parameters = mapOf("maximum" to LEAVE_ATTACHMENT_LIMIT.toString()),
                 )
             )
         ids.toSet().size != ids.size ->

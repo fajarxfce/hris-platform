@@ -7,6 +7,8 @@ import dev.fajar.hris.workforce.domain.entities.*
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
+const val LEAVE_DATE_LIMIT = 366
+
 fun validateRequestedLeaveDays(days: List<RequestedLeaveDay>, reason: String): Result<Unit> {
     if (reason.isBlank() || reason.length > 1000)
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_leave_request"))
@@ -15,7 +17,7 @@ fun validateRequestedLeaveDays(days: List<RequestedLeaveDay>, reason: String): R
 
 fun validateLeaveDateSelection(days: List<RequestedLeaveDay>): Result<Unit> {
     if (
-        days.size !in 1..366 ||
+        days.size !in 1..LEAVE_DATE_LIMIT ||
             days.map { it.workDate }.toSet().size != days.size ||
             days.any { it.workDate.year !in 1900..2200 }
     )

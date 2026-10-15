@@ -163,8 +163,44 @@ fun planLeaveCarryCompletion(
         }
     val movement = LeaveCarryMovement(bucket.id, kind, halfDays)
     return applyLeaveCarryMovement(bucket, movement).flatMap { updated ->
-        planLeaveCarryExpiry(updated, now).map { expiry ->
-            java.util.List.copyOf(listOfNotNull(movement, expiry))
+        planLeaveCarryExpiry(updated, now).flatMap { expiry ->
+            if (expiry == null) Result.Success(java.util.List.of(movement))
+            else
+                applyLeaveCarryMovement(updated, expiry).map { java.util.List.of(movement, expiry) }
         }
     }
+}
+
+/** Completes the original funding across a request's years without acquiring or persisting data. */
+fun planLeaveCarryRequestCompletion(
+    expectedAllocations: Int,
+    allocations: List<LeaveCarryAllocation>,
+    buckets: List<LeaveCarryBucket>,
+    effect: LeaveBalanceEffect,
+    now: Instant,
+): Result<List<LeaveCarryPostingPlan>> {
+    if (
+        effect == LeaveBalanceEffect.RESERVE ||
+            expectedAllocations !in 0..2 ||
+            allocations.size != expectedAllocations ||
+            buckets.size != expectedAllocations ||
+            allocations.map { it.bucketId }.toSet().size != allocations.size ||
+            allocations.map { it.year }.toSet().size != allocations.size ||
+            buckets.map { it.id }.toSet().size != buckets.size ||
+            buckets.map { it.year }.toSet().size != buckets.size
+    )
+        return Result.Failed(Failure(FailureKind.CONFLICT, "leave_carry_conflict"))
+    val plans = mutableListOf<LeaveCarryPostingPlan>()
+    for (allocation in allocations.sortedBy { it.year }) {
+        val bucket =
+            buckets.singleOrNull { it.id == allocation.bucketId && it.year == allocation.year }
+                ?: return Result.Failed(Failure(FailureKind.CONFLICT, "leave_carry_conflict"))
+        val completed = planLeaveCarryCompletion(bucket, effect, allocation.halfDays, now)
+        if (completed is Result.Failed) return completed
+        plans +=
+            (completed as Result.Success).value.mapIndexed { index, movement ->
+                LeaveCarryPostingPlan(movement, bucket.year, bucket.version + index)
+            }
+    }
+    return Result.Success(java.util.List.copyOf(plans))
 }

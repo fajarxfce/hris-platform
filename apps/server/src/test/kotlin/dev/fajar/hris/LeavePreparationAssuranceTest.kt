@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Import
 
 @Import(LeavePreparationProbeConfiguration::class)
 class LeavePreparationAssuranceTest : LeaveAttachmentApiFixture() {
+    @Autowired private lateinit var carry: LeaveCarryRepository
     @Autowired private lateinit var people: PeopleRepository
     @Autowired private lateinit var documents: DocumentRepository
     @Autowired private lateinit var companies: CompanyRepository
@@ -261,6 +262,7 @@ class LeavePreparationAssuranceTest : LeaveAttachmentApiFixture() {
                         clock,
                         cutoffs,
                         security,
+                        carry,
                     )
                     .execute(
                         actor,

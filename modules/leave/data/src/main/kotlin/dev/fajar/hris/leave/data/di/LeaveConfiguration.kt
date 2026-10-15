@@ -246,6 +246,7 @@ class LeaveConfiguration {
         clock: Clock,
         cutoffs: PayrollCutoffRepository,
         security: IdentitySecurityPolicy,
+        carry: LeaveCarryRepository,
     ) =
         PreviewLeaveRequest(
             requests,
@@ -260,6 +261,7 @@ class LeaveConfiguration {
             clock,
             cutoffs,
             security,
+            carry,
         )
 
     @Bean
@@ -587,6 +589,7 @@ class LeaveConfiguration {
         references: DocumentReferenceRepository,
         cutoffs: PayrollCutoffRepository,
         security: IdentitySecurityPolicy,
+        carry: LeaveCarryRepository,
     ) =
         SubmitLeaveRequest(
             requests,
@@ -606,6 +609,7 @@ class LeaveConfiguration {
             references,
             cutoffs,
             security,
+            carry,
         )
 
     @Bean
@@ -623,6 +627,7 @@ class LeaveConfiguration {
         clock: Clock,
         cutoffs: PayrollCutoffRepository,
         security: IdentitySecurityPolicy,
+        carry: LeaveCarryRepository,
     ) =
         DecideLeaveRequest(
             requests,
@@ -638,6 +643,7 @@ class LeaveConfiguration {
             clock,
             cutoffs,
             security,
+            carry,
         )
 
     @Bean
@@ -654,6 +660,7 @@ class LeaveConfiguration {
         clock: Clock,
         cutoffs: PayrollCutoffRepository,
         security: IdentitySecurityPolicy,
+        carry: LeaveCarryRepository,
     ) =
         WithdrawLeaveRequest(
             requests,
@@ -668,6 +675,7 @@ class LeaveConfiguration {
             clock,
             cutoffs,
             security,
+            carry,
         )
 
     @Bean

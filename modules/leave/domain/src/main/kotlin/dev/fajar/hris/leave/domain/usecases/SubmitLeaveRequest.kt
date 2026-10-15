@@ -40,6 +40,7 @@ class SubmitLeaveRequest(
     private val references: DocumentReferenceRepository,
     private val cutoffs: PayrollCutoffRepository,
     private val security: IdentitySecurityPolicy,
+    private val carry: LeaveCarryRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -54,9 +55,11 @@ class SubmitLeaveRequest(
     ): Result<MutationReceipt> {
         if ("leave.manage" !in actor.permissions && "leave.self.manage" !in actor.permissions)
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
-        val valid = validateRequestedLeaveDays(days, reason)
+        val selectedDays = days.take(LEAVE_DATE_LIMIT + 1)
+        val selectedEvidence = attachmentRevisionIds.take(LEAVE_ATTACHMENT_LIMIT + 1)
+        val valid = validateRequestedLeaveDays(selectedDays, reason)
         if (valid is Result.Failed) return valid
-        val attachmentInput = validateLeaveAttachmentIds(attachmentRevisionIds)
+        val attachmentInput = validateLeaveAttachmentIds(selectedEvidence)
         if (attachmentInput is Result.Failed) return attachmentInput
         if (previewRevision != null && !Regex("[0-9a-f]{64}").matches(previewRevision))
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_leave_preview"))
@@ -65,18 +68,16 @@ class SubmitLeaveRequest(
                 "leave.request_submit",
                 operationId,
                 listOf(id.toString(), employeeId.toString(), typeId.toString(), reason) +
-                    days
+                    selectedDays
                         .sortedBy { it.workDate }
                         .flatMap { listOf(it.workDate.toString(), it.portion.name) } +
-                    (if (attachmentRevisionIds.isEmpty()) emptyList()
-                    else
-                        listOf("attachments") +
-                            attachmentRevisionIds.map { it.toString() }.sorted()) +
+                    (if (selectedEvidence.isEmpty()) emptyList()
+                    else listOf("attachments") + selectedEvidence.map { it.toString() }.sorted()) +
                     (previewRevision?.let { listOf("preview", it) } ?: emptyList()),
             )
         val company = requireNotNull(actor.companyId)
-        val from = days.minOf { it.workDate }
-        val until = days.maxOf { it.workDate }
+        val from = selectedDays.minOf { it.workDate }
+        val until = selectedDays.maxOf { it.workDate }
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
@@ -90,7 +91,7 @@ class SubmitLeaveRequest(
             if (policyGuard is Result.Failed) return@run policyGuard
             val peopleLock = people.lockReportingLines(company)
             if (peopleLock is Result.Failed) return@run peopleLock
-            if (attachmentRevisionIds.isNotEmpty()) {
+            if (selectedEvidence.isNotEmpty()) {
                 val documentLock = documents.lock(company)
                 if (documentLock is Result.Failed) return@run documentLock
             }
@@ -102,10 +103,10 @@ class SubmitLeaveRequest(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
-            val checkedActor =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checkedActor = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checkedActor is Result.Failed) return@run checkedActor
             val live = (checkedActor as Result.Success).value
             if ("leave.manage" !in live.permissions && "leave.self.manage" !in live.permissions)
@@ -141,7 +142,7 @@ class SubmitLeaveRequest(
                 cutoffs.frozenMonths(
                     company,
                     employeeId,
-                    days.map { java.time.YearMonth.from(it.workDate) }.toSet(),
+                    selectedDays.map { java.time.YearMonth.from(it.workDate) }.toSet(),
                 )
             if (frozen is Result.Failed) return@run frozen
             if ((frozen as Result.Success).value)
@@ -152,7 +153,7 @@ class SubmitLeaveRequest(
             if (calendarResult is Result.Failed) return@run calendarResult
             val calendar = (calendarResult as Result.Success).value
             val first =
-                when (val result = leavePolicyDate(days, calendar)) {
+                when (val result = leavePolicyDate(selectedDays, calendar)) {
                     is Result.Failed -> return@run result
                     is Result.Success -> result.value
                 }
@@ -161,7 +162,7 @@ class SubmitLeaveRequest(
             val type = (typeResult as Result.Success).value
             if (type == null || !type.active)
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "leave_type_unavailable"))
-            if (type.policy.attachmentRequired && attachmentRevisionIds.isEmpty())
+            if (type.policy.attachmentRequired && selectedEvidence.isEmpty())
                 return@run Result.Failed(
                     Failure(
                         FailureKind.VALIDATION,
@@ -170,7 +171,7 @@ class SubmitLeaveRequest(
                     )
                 )
             val attachments = mutableListOf<LeaveAttachment>()
-            for (revisionId in attachmentRevisionIds.sortedBy { it.toString() }) {
+            for (revisionId in selectedEvidence.sortedBy { it.toString() }) {
                 val revisionResult = documents.revision(company, revisionId)
                 if (revisionResult is Result.Failed) return@run revisionResult
                 val revision =
@@ -192,7 +193,12 @@ class SubmitLeaveRequest(
             val history = people.effectiveRevisions(company, employeeId, from, until)
             if (history is Result.Failed) return@run history
             val planned =
-                planLeaveDays(days, calendar, (history as Result.Success).value, type.policy)
+                planLeaveDays(
+                    selectedDays,
+                    calendar,
+                    (history as Result.Success).value,
+                    type.policy,
+                )
             if (planned is Result.Failed) return@run planned
             val charged = (planned as Result.Success).value
             val occupied = requests.occupancy(company, employeeId, from, until)
@@ -208,6 +214,14 @@ class SubmitLeaveRequest(
                 if (enough is Result.Failed) return@run enough
                 balances += LeavePreviewBalance(balance.value, movement.reservedDelta)
             }
+            val acquiredCarry =
+                carry.buckets(company, employeeId, typeId, balances.map { it.balance.year }.toSet())
+            if (acquiredCarry is Result.Failed) return@run acquiredCarry
+            val carryBuckets = (acquiredCarry as Result.Success).value
+            val funding =
+                planLeaveCarryReservation(charged, balances.map { it.balance }, carryBuckets, now)
+            if (funding is Result.Failed) return@run funding
+            val carryAllocations = (funding as Result.Success).value
             if (
                 previewRevision != null &&
                     previewRevision !=
@@ -221,9 +235,11 @@ class SubmitLeaveRequest(
                                 type.appliedRevision,
                                 type.policy,
                             ),
-                            days,
+                            selectedDays,
                             charged,
                             balances,
+                            carryBuckets,
+                            carryAllocations,
                         )
             )
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "leave_preview_changed"))
@@ -276,6 +292,7 @@ class SubmitLeaveRequest(
                     null,
                     0,
                     attachments.toList(),
+                    carryAllocations.size,
                 )
             val entries =
                 movements.map {
@@ -295,12 +312,27 @@ class SubmitLeaveRequest(
                         reason,
                     )
                 }
-            if (attachmentRevisionIds.isNotEmpty()) {
+            val carryPostings =
+                carryAllocations.map { allocation ->
+                    val bucket = carryBuckets.single { it.id == allocation.bucketId }
+                    LeaveCarryPosting(
+                        UUID.randomUUID(),
+                        LeaveCarryMovement(
+                            bucket.id,
+                            LeaveCarryEffect.RESERVE,
+                            allocation.halfDays,
+                        ),
+                        bucket.version,
+                        entries.single { it.year == allocation.year }.id,
+                        id,
+                    )
+                }
+            if (selectedEvidence.isNotEmpty()) {
                 val retained =
                     references.retain(
                         company,
                         DocumentReferenceOrigin(DocumentReferenceKind.LEAVE_REQUEST, id, 0),
-                        attachmentRevisionIds.toSet(),
+                        selectedEvidence.toSet(),
                         actor.accountId,
                         now,
                     )
@@ -310,8 +342,10 @@ class SubmitLeaveRequest(
                 .create(company, snapshot)
                 .flatMap { requests.create(company, request) }
                 .flatMap { receipt ->
-                    ledger
-                        .append(company, entries)
+                    carry
+                        .allocate(company, id, carryAllocations)
+                        .flatMap { carry.append(company, carryPostings) }
+                        .flatMap { ledger.append(company, entries) }
                         .flatMap { operations.record(actor, key, receipt) }
                         .flatMap {
                             journal.record(
@@ -328,7 +362,10 @@ class SubmitLeaveRequest(
                                 ),
                             )
                         }
-                        .map { receipt }
+                        .flatMap {
+                            validateCompanySessionActor(actor, access, clock.instant(), security)
+                                .map { receipt }
+                        }
                 }
         }
     }

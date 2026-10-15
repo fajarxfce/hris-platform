@@ -63,6 +63,180 @@ class LeaveCarryFundingPolicyTest {
         )
 
     @Test
+    fun requestCompletionRequiresEveryOriginalAllocationAndKeepsEachYearSeparate() {
+        val first = bucket(available = 2, reserved = 2)
+        val second = bucket(available = 1, reserved = 1, year = 2028)
+        val allocations =
+            listOf(
+                LeaveCarryAllocation(first.id, 2027, 2),
+                LeaveCarryAllocation(second.id, 2028, 1),
+            )
+        val result =
+            planLeaveCarryRequestCompletion(
+                2,
+                allocations.reversed(),
+                listOf(second, first),
+                LeaveBalanceEffect.RELEASE,
+                expiry,
+            )
+        val plans = (result as Result.Success).value
+        assertEquals(listOf(2027, 2027, 2028), plans.map { it.year })
+        assertEquals(
+            listOf(LeaveCarryEffect.RELEASE, LeaveCarryEffect.EXPIRE, LeaveCarryEffect.RELEASE),
+            plans.map { it.movement.effect },
+        )
+        assertEquals(listOf(0L, 1L, 0L), plans.map { it.expectedVersion })
+        assertEquals(4, plans[1].movement.halfDays)
+        assertThrows(UnsupportedOperationException::class.java) {
+            (plans as MutableList<LeaveCarryPostingPlan>).clear()
+        }
+        assertTrue(
+            planLeaveCarryRequestCompletion(
+                2,
+                allocations.take(1),
+                listOf(first),
+                LeaveBalanceEffect.RELEASE,
+                expiry,
+            )
+                is Result.Failed
+        )
+        assertTrue(
+            planLeaveCarryRequestCompletion(
+                2,
+                listOf(allocations.first(), allocations.first()),
+                listOf(first, second),
+                LeaveBalanceEffect.RELEASE,
+                expiry,
+            )
+                is Result.Failed
+        )
+        assertTrue(
+            planLeaveCarryRequestCompletion(
+                1,
+                allocations.take(1),
+                listOf(second),
+                LeaveBalanceEffect.RELEASE,
+                expiry,
+            )
+                is Result.Failed
+        )
+        assertEquals(
+            Result.Success(emptyList<LeaveCarryPostingPlan>()),
+            planLeaveCarryRequestCompletion(
+                0,
+                emptyList(),
+                emptyList(),
+                LeaveBalanceEffect.RELEASE,
+                expiry,
+            ),
+        )
+        assertTrue(
+            planLeaveCarryRequestCompletion(
+                0,
+                emptyList(),
+                emptyList(),
+                LeaveBalanceEffect.RESERVE,
+                expiry,
+            )
+                is Result.Failed
+        )
+    }
+
+    @Test
+    fun completionRejectsAnExpiryThatWouldExceedTheStoredVersionLimit() {
+        val original = bucket(available = 2, reserved = 2).copy(version = 999999999L)
+        assertTrue(
+            planLeaveCarryCompletion(original, LeaveBalanceEffect.RELEASE, 2, before)
+                is Result.Success
+        )
+        assertTrue(
+            planLeaveCarryCompletion(original, LeaveBalanceEffect.RELEASE, 2, expiry)
+                is Result.Failed
+        )
+        assertEquals(999999999L, original.version)
+    }
+
+    @Test
+    fun reviewRevisionRetainsOriginalFundingAndNormalizesEquivalentSnapshots() {
+        val carry = bucket()
+        val date = day("2027-03-31")
+        val balances = listOf(LeavePreviewBalance(balance(carry, ordinary = 2), 2))
+        val policy =
+            LeavePolicySnapshot(
+                UUID(0, 10),
+                "ANNUAL",
+                0,
+                LeavePolicy("Annual leave", true, true, 0, emptySet(), 30),
+            )
+        val selected = listOf(RequestedLeaveDay(date.workDate, date.portion))
+        val company = UUID(0, 1)
+        val employee = UUID(0, 2)
+        val funding = listOf(LeaveCarryAllocation(carry.id, carry.year, 2))
+        val before =
+            leavePreviewRevision(
+                company,
+                employee,
+                "Asia/Jakarta",
+                policy,
+                selected,
+                listOf(date),
+                balances,
+                listOf(carry),
+                funding,
+            )
+        assertEquals(
+            before,
+            leavePreviewRevision(
+                company,
+                employee,
+                "Asia/Jakarta",
+                policy,
+                selected,
+                listOf(date),
+                balances,
+                listOf(carry.copy()),
+                funding.toList(),
+            ),
+        )
+        assertNotEquals(
+            before,
+            leavePreviewRevision(
+                company,
+                employee,
+                "Asia/Jakarta",
+                policy,
+                selected,
+                listOf(date),
+                balances,
+                listOf(carry),
+                emptyList(),
+            ),
+        )
+        assertEquals(
+            leavePreviewRevision(
+                company,
+                employee,
+                "Asia/Jakarta",
+                policy,
+                selected,
+                listOf(date),
+                balances,
+            ),
+            leavePreviewRevision(
+                company,
+                employee,
+                "Asia/Jakarta",
+                policy,
+                selected,
+                listOf(date),
+                balances,
+                emptyList(),
+                emptyList(),
+            ),
+        )
+    }
+
+    @Test
     fun expiryConfigurationIsOptionalAndRequiresPositiveCarriedCredit() {
         val policy = LeaveAccrualPolicy(LeaveAccrualFrequency.ANNUAL, 24, 6)
         assertEquals(Result.Success(Unit), validateLeaveAccrualPolicy(policy, true))

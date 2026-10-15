@@ -14,6 +14,8 @@ fun leavePreviewRevision(
     selected: List<RequestedLeaveDay>,
     days: List<LeaveDay>,
     balances: List<LeavePreviewBalance>,
+    carryBuckets: List<LeaveCarryBucket> = emptyList(),
+    carryAllocations: List<LeaveCarryAllocation> = emptyList(),
 ): String {
     val fields = buildList {
         addAll(
@@ -67,6 +69,33 @@ fun leavePreviewRevision(
                     )
                 )
             }
+        if (carryBuckets.isNotEmpty()) {
+            addAll(listOf("carry", carryBuckets.size.toString()))
+            carryBuckets
+                .sortedBy { it.year }
+                .forEach {
+                    addAll(
+                        listOf(
+                            it.id.toString(),
+                            it.year.toString(),
+                            it.version.toString(),
+                            it.availableHalfDays.toString(),
+                            it.reservedHalfDays.toString(),
+                            it.consumedHalfDays.toString(),
+                            it.validity?.through?.toString() ?: "",
+                            it.validity?.expiresAt?.toString() ?: "",
+                        )
+                    )
+                }
+            addAll(listOf("carry-funding", carryAllocations.size.toString()))
+            carryAllocations
+                .sortedBy { it.year }
+                .forEach {
+                    addAll(
+                        listOf(it.bucketId.toString(), it.year.toString(), it.halfDays.toString())
+                    )
+                }
+        }
     }
     return HexFormat.of()
         .formatHex(

@@ -77,6 +77,6 @@ internal fun writePayslipLayout(
     if (calculation.taxInput.nonCashTaxable.signum() != 0)
         canvas.row(text(PayslipText.NON_CASH), money(calculation.taxInput.nonCashTaxable))
     canvas.paragraph("${text(PayslipText.RULE)}: ${calculation.tax.ruleId}", 9f)
-    canvas.paragraph("${text(PayslipText.REFERENCE)}: ${summary.id}", 8f)
+    canvas.paragraph("${text(PayslipText.REFERENCE)}: ${summary.id} / v${summary.version}", 8f)
     canvas.paragraph("${text(PayslipText.PUBLISHED)}: ${summary.publishedAt}", 8f)
 }

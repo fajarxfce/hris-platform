@@ -12,6 +12,7 @@ import dev.fajar.hris.schema.tables.LeaveRequests.LEAVE_REQUESTS as L
 import dev.fajar.hris.schema.tables.MobileSyncChanges.MOBILE_SYNC_CHANGES as C
 import dev.fajar.hris.schema.tables.MobileSyncHeads.MOBILE_SYNC_HEADS as H
 import dev.fajar.hris.schema.tables.OvertimeRequests.OVERTIME_REQUESTS as O
+import dev.fajar.hris.schema.tables.PayrollAssessmentHeads.PAYROLL_ASSESSMENT_HEADS as PH
 import dev.fajar.hris.schema.tables.PayrollAssessments.PAYROLL_ASSESSMENTS as P
 import dev.fajar.hris.schema.tables.PayrollPaymentHeads.PAYROLL_PAYMENT_HEADS as S
 import dev.fajar.hris.schema.tables.RosterDays.ROSTER_DAYS as R
@@ -102,9 +103,11 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
             sql.select(
                     DSL.inline("PAYSLIPS").`as`("collection"),
                     P.ID.`as`("resource_id"),
-                    DSL.inline(0L).`as`("resource_version"),
+                    PH.REVISION.`as`("resource_version"),
                 )
                 .from(P)
+                .join(PH)
+                .on(PH.COMPANY_ID.eq(P.COMPANY_ID).and(PH.ASSESSMENT_ID.eq(P.ID)))
                 .where(
                     P.COMPANY_ID.eq(selection.companyId),
                     P.EMPLOYMENT_ID.`in`(selection.employmentIds),

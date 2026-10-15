@@ -16,4 +16,5 @@ fun Record.toPayrollAmendmentSummaryRow() =
         get(R.RECORDED_AT)!!,
         get(R.REASON)!!,
         get(R.LATEST_REVIEW_ID),
+        get(R.LATEST_PUBLICATION_ID),
     )

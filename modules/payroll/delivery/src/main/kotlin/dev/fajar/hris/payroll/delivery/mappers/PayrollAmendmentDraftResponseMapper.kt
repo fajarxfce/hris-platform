@@ -24,6 +24,7 @@ fun PayrollAmendmentSummary.toResponse() =
         recordedAt,
         reason,
         latestReviewId,
+        latestPublicationId,
     )
 
 fun PayrollAmendment.toResponse() =

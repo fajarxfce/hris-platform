@@ -1,0 +1,18 @@
+package dev.fajar.hris.payroll.delivery.responses
+
+import java.time.Instant
+import java.util.UUID
+
+data class PayrollPaymentRecoveryResponse(
+    val id: UUID,
+    val assessmentId: UUID,
+    val assessmentRevision: Long,
+    val paymentVersion: Long,
+    val amount: String,
+    val currency: String,
+    val transactionReference: String,
+    val occurredAt: Instant,
+    val recordedAt: Instant,
+    val actorId: UUID,
+    val reason: String,
+)

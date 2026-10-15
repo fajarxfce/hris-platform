@@ -80,6 +80,23 @@ fun validatePayrollPaymentInstructions(
         }
     )
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_payroll_payment_destination"))
+    if (
+        items.any { item ->
+            val supplied =
+                listOf(item.assessmentRevision, item.paymentVersion, item.amount).count {
+                    it != null
+                }
+            supplied !in setOf(0, 3) ||
+                (item.assessmentRevision?.let { it < 0 } == true) ||
+                (item.paymentVersion?.let { it < 0 } == true) ||
+                (item.amount?.let {
+                    it.signum() <= 0 ||
+                        it.scale() > 2 ||
+                        it > java.math.BigDecimal("999999999999.99")
+                } == true)
+        }
+    )
+        return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_payroll_payment_observation"))
     return Result.Success(Unit)
 }
 
@@ -123,3 +140,23 @@ fun validatePayrollPaymentResults(
         )
     return Result.Success(Unit)
 }
+
+fun requirePayrollPaymentObservation(
+    instruction: PayrollPaymentInstruction,
+    payable: PayrollPayable,
+): Result<Unit> =
+    when {
+        payable.amount.signum() <= 0 ->
+            Result.Failed(Failure(FailureKind.CONFLICT, "payroll_assessment_not_payable"))
+        instruction.assessmentRevision == null &&
+            (payable.assessmentRevision != 0L ||
+                payable.confirmedPaid.signum() != 0 ||
+                payable.confirmedRecovered.signum() != 0) ->
+            Result.Failed(Failure(FailureKind.CONFLICT, "payroll_payment_observation_required"))
+        instruction.assessmentRevision != null &&
+            (instruction.assessmentRevision != payable.assessmentRevision ||
+                instruction.paymentVersion != payable.paymentVersion ||
+                instruction.amount?.compareTo(payable.amount) != 0) ->
+            Result.Failed(Failure(FailureKind.CONFLICT, "payroll_payment_balance_changed"))
+        else -> Result.Success(Unit)
+    }

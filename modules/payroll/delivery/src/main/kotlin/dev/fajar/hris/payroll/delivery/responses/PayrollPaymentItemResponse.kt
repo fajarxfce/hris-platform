@@ -19,4 +19,6 @@ data class PayrollPaymentItemResponse(
     val batchVersion: Long,
     val transactionReference: String?,
     val occurredAt: Instant?,
+    val assessmentRevision: Long,
+    val observedPaymentVersion: Long?,
 )

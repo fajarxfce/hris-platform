@@ -19,4 +19,5 @@ fun Record.toPayslipSummaryRow() =
         get("withheld", BigDecimal::class.java)!!,
         get("take_home", BigDecimal::class.java)!!,
         get("published_at", OffsetDateTime::class.java)!!,
+        get("revision", Long::class.javaObjectType)!!,
     )

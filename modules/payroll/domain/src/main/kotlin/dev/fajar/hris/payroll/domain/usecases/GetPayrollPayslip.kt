@@ -27,12 +27,15 @@ class GetPayrollPayslip(
         actor: Actor,
         id: UUID,
         scope: PayrollPayslipReadScope = PayrollPayslipReadScope.AUTHORIZED,
+        revision: Long? = null,
     ): Result<PayrollPayslip> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         if (!canReadPayrollPayslips(actor))
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
+        if (revision != null && (revision < 0 || revision == Long.MAX_VALUE))
+            return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_payslip_revision"))
         return transactions.run(actor) {
             val peopleGuard = people.lockReportingLines(company, shared = true)
             if (peopleGuard is Result.Failed) return@run peopleGuard
@@ -70,7 +73,7 @@ class GetPayrollPayslip(
                         )
                     ids.toSet()
                 }
-            assessments.payslip(company, id, allowedEmployees).flatMap { payslip ->
+            assessments.payslip(company, id, allowedEmployees, revision).flatMap { payslip ->
                 validateCompanySessionActor(actor, access, clock.instant(), security).flatMap {
                     if (payslip == null)
                         Result.Failed(Failure(FailureKind.NOT_FOUND, "payroll_payslip_not_found"))

@@ -26,8 +26,9 @@ class StoredPayrollAssessmentRepository(
         company: UUID,
         id: UUID,
         allowedEmployees: Set<UUID>?,
+        revision: Long?,
     ): Result<PayrollPayslip?> = safeDatabaseCall {
-        source.payslip(company, id, allowedEmployees)?.toPayslip(json)
+        source.payslip(company, id, allowedEmployees, revision)?.toPayslip(json)
     }
 
     override fun payslips(

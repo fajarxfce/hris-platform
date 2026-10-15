@@ -19,6 +19,230 @@ import tools.jackson.databind.ObjectMapper
 
 @Configuration(proxyBeanMethods = false)
 class PayrollConfiguration {
+
+    @Bean
+    fun confirmPayrollPaymentRecovery(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+    ) =
+        ConfirmPayrollPaymentRecovery(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+            operations = operations,
+            journal = journal,
+        )
+
+    @Bean
+    fun listPayrollPaymentRecoveries(
+        payments: PayrollPaymentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListPayrollPaymentRecoveries(
+            payments = payments,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
+    fun payrollAmendmentPublicationSource(sql: DSLContext): PayrollAmendmentPublicationDataSource =
+        PostgresPayrollAmendmentPublicationDataSource(sql)
+
+    @Bean
+    fun payrollAmendmentPublications(
+        source: PayrollAmendmentPublicationDataSource
+    ): PayrollAmendmentPublicationRepository = StoredPayrollAmendmentPublicationRepository(source)
+
+    @Bean
+    fun startPayrollAmendmentPublication(
+        publications: PayrollAmendmentPublicationRepository,
+        amendments: PayrollAmendmentRepository,
+        reviews: PayrollAmendmentReviewRepository,
+        sources: PayrollAmendmentSourceRepository,
+        policies: PayrollPolicyRepository,
+        payments: PayrollPaymentRepository,
+        approvals: ApprovalRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+        operations: OperationRepository,
+    ) =
+        StartPayrollAmendmentPublication(
+            publications = publications,
+            amendments = amendments,
+            reviews = reviews,
+            sources = sources,
+            policies = policies,
+            payments = payments,
+            approvals = approvals,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            jobs = jobs,
+            journal = journal,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+            operations = operations,
+        )
+
+    @Bean
+    fun advancePayrollAmendmentPublication(
+        publications: PayrollAmendmentPublicationRepository,
+        amendments: PayrollAmendmentRepository,
+        reviews: PayrollAmendmentReviewRepository,
+        sources: PayrollAmendmentSourceRepository,
+        policies: PayrollPolicyRepository,
+        payments: PayrollPaymentRepository,
+        approvals: ApprovalRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        AdvancePayrollAmendmentPublication(
+            publications = publications,
+            amendments = amendments,
+            reviews = reviews,
+            sources = sources,
+            policies = policies,
+            payments = payments,
+            approvals = approvals,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            jobs = jobs,
+            journal = journal,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
+    @Bean
+    fun abortPayrollAmendmentPublication(
+        publications: PayrollAmendmentPublicationRepository,
+        amendments: PayrollAmendmentRepository,
+        policies: PayrollPolicyRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        AbortPayrollAmendmentPublication(
+            publications = publications,
+            amendments = amendments,
+            policies = policies,
+            jobs = jobs,
+            journal = journal,
+            transactions = transactions,
+            clock = clock,
+        )
+
+    @Bean
+    fun recoverPayrollAmendmentPublication(
+        publications: PayrollAmendmentPublicationRepository,
+        amendments: PayrollAmendmentRepository,
+        reviews: PayrollAmendmentReviewRepository,
+        policies: PayrollPolicyRepository,
+        approvals: ApprovalRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+    ) =
+        RecoverPayrollAmendmentPublication(
+            publications = publications,
+            amendments = amendments,
+            reviews = reviews,
+            policies = policies,
+            approvals = approvals,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            jobs = jobs,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+            operations = operations,
+            journal = journal,
+        )
+
+    @Bean
+    fun listPayrollAmendmentPublications(
+        publications: PayrollAmendmentPublicationRepository,
+        amendments: PayrollAmendmentRepository,
+        reviews: PayrollAmendmentReviewRepository,
+        policies: PayrollPolicyRepository,
+        approvals: ApprovalRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListPayrollAmendmentPublications(
+            publications = publications,
+            amendments = amendments,
+            reviews = reviews,
+            policies = policies,
+            approvals = approvals,
+            people = people,
+            companies = companies,
+            members = members,
+            identities = identities,
+            jobs = jobs,
+            transactions = transactions,
+            security = security,
+            clock = clock,
+        )
+
     @Bean
     fun payrollAmendmentReviewSource(sql: DSLContext): PayrollAmendmentReviewDataSource =
         PostgresPayrollAmendmentReviewDataSource(sql)

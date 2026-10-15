@@ -6,6 +6,10 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 interface PayrollPaymentDataSource {
+    fun recoveries(company: UUID, assessment: UUID): List<PayrollPaymentRecoveriesRecord>
+
+    fun insertRecovery(row: PayrollPaymentRecoveriesRecord)
+
     fun progressHead(
         company: UUID,
         assessment: UUID,

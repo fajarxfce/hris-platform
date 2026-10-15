@@ -70,6 +70,13 @@ opening/cumulative-history corruption, runtime view isolation, current-source
 mapping, retained review history, concurrency, interruption and rollback.
 No dashboard or mobile source changed in this increment.
 
+The API and worker JARs built and their images were deployed with the document and
+WireGuard overlays. Development validated all 76 migrations and applied V76.
+Current assessment heads matched the new evidence view, and both runtime roles
+had SELECT access. API and worker startup completed with zero restarts and no
+error log entries. Loopback/VPN API and dashboard/proxy probes returned HTTP 200
+from the VPS; no physical-device validation was part of this backend increment.
+
 ### Independent payroll amendment review
 
 A separate amendment grant and approval kind bind each review to its retained
@@ -4267,3 +4274,41 @@ execution is tracked by the subsequent CI run.
 The [complete CI run for `9277d97e`](https://github.com/fajarxfce/hris-platform/actions/runs/38673765653)
 passed all four backend shards, all four dashboard shards and the dependent
 API/worker browser integration job.
+
+
+### Revised payroll publication and settlement
+
+Approved amendments now have separately authorized publication attempts with an
+immutable initiating credential, exact calculation/review versions and a fenced
+worker lease. The full corrected suffix, assessment heads, current THR ownership,
+job outcome, journal and employee sync changes commit together. Stopped attempts
+retain the approved basis; an exhausted terminal job requires an explicit,
+versioned recovery before another attempt. Current authority and beneficiary
+checks remain mandatory through admission, receipt recovery and completion.
+
+Payment progress now carries its own assessment revision and financial balance.
+New instructions observe the current positive amount and both versions; confirmed
+returns retain separate immutable bank evidence. Existing transfers are retained,
+prepared/pending instructions block publication, and negative balances require
+explicit recovery. Current and retained payslips use exact revisions, including
+PDF acquisition and employee synchronization.
+
+Backend validation covers 533 current cases: 345 API/contract cases, 104 payroll
+domain cases, three data cases, 19 database cases and all 62 worker cases. The
+broader API regression run was followed by successful reruns of the two changed
+payment test classes, covering live assurance during receipt recovery and
+zero-balance rejection. Coverage includes populated V76-to-V78 migration,
+concurrent commands, source changes, replacement operators, raw-write rejection,
+late results, cancellation, lease expiry and atomic rollback. Architecture and
+formatting checks and both application JAR builds passed. The local publication
+fixture retained 5,000 references in 1,745 ms and listed 200 payable references
+from that set in 1,119 ms.
+
+API and worker were drained before applying V77 and V78 to the existing development
+database. Assessment/revision/head counts and existing instructions were retained;
+new table RLS and runtime grants were checked. Both updated applications started
+with zero restarts and no error-level startup logs. Loopback/VPN API health,
+dashboard and its same-origin API proxy returned HTTP 200 from the VPS. The private
+document services, database volume and WireGuard bindings were retained.
+Dashboard amendment/return-entry screens and revised mobile delivery remain
+separate work; this backend increment does not complete those client workflows.

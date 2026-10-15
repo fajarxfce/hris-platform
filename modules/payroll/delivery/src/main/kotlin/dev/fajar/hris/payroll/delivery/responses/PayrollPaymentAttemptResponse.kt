@@ -10,4 +10,6 @@ data class PayrollPaymentAttemptResponse(
     val createdAt: Instant,
     val releasedAt: Instant?,
     val resolvedAt: Instant?,
+    val amount: String,
+    val assessmentRevision: Long,
 )

@@ -88,6 +88,7 @@ const kinds: Readonly<Record<string, readonly [string, string]>> = {
   WORKFORCE_CLOSE: ["Attendance closing", "Penutupan kehadiran"],
   PAYROLL_CALCULATE: ["Payroll calculation", "Perhitungan payroll"],
   PAYROLL_FINALIZE: ["Payroll finalization", "Finalisasi payroll"],
+  PAYROLL_AMENDMENT_PUBLISH: ["Payroll amendment publication", "Publikasi koreksi payroll"],
   LEAVE_ACCRUAL: ["Leave accrual", "Penambahan hak cuti"],
   LEAVE_YEAR_CLOSE: ["Leave year closing", "Penutupan tahun cuti"],
   DOCUMENT_VALIDATE: ["Document validation", "Validasi dokumen"],

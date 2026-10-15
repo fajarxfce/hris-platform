@@ -5,6 +5,8 @@ enum class PayrollAmendmentStatus {
     CALCULATED,
     IN_REVIEW,
     APPROVED,
+    PUBLISHING,
+    PUBLISHED,
     REJECTED,
     CANCELLED,
 }

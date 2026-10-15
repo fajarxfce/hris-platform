@@ -57,40 +57,80 @@ class PayrollPaymentAssuranceTest : PayrollPaymentAssuranceApiFixture() {
         "cancel,false",
         "reconcile,false",
     )
-    fun expiryDuringEvidenceAcquisitionRejectsNewCommandsAndOriginalReceipts(
-        action: String,
-        mfa: Boolean,
-    ) {
+    fun expiryDuringEvidenceAcquisitionRejectsNewCommands(action: String, mfa: Boolean) {
         val scene = preparePaymentScenario(action, mfa)
-        for (replay in listOf(false, true)) {
-            if (replay) {
-                val result = commandPayment(scene, renewedActor(scene))
-                assertTrue(result is Result.Success, result.toString())
-            }
-            val actor = expiringActor(scene)
-            val before = paymentSnapshot(scene)
-            val stage = if (action == "cancel") "batch" else "candidates"
-            paymentProbe.afterRead = { company, kind ->
-                if (company == scene.fixture.payroll.company && kind == stage)
-                    clock.set(clock.instant().plusSeconds(2))
-            }
-            try {
-                val result = commandPayment(scene, actor)
-                assertEquals(
-                    "recent_authentication_required",
-                    (result as Result.Failed).failure.code,
-                )
-                assertEquals(before, paymentSnapshot(scene))
-            } finally {
-                paymentProbe.clear()
-                payrollProbe.afterJournal = null
-            }
+        val actor = expiringActor(scene)
+        val before = paymentSnapshot(scene)
+        val stage = if (action == "cancel") "batch" else "candidates"
+        paymentProbe.afterRead = { company, kind ->
+            if (company == scene.fixture.payroll.company && kind == stage)
+                clock.set(clock.instant().plusSeconds(2))
         }
-        val committed = paymentSnapshot(scene)
-        val replayed = commandPayment(scene, renewedActor(scene))
-        assertTrue(replayed is Result.Success, replayed.toString())
-        assertTrue((replayed as Result.Success).value.replayed)
-        assertEquals(committed, paymentSnapshot(scene))
+        try {
+            val result = commandPayment(scene, actor)
+            assertEquals("recent_authentication_required", (result as Result.Failed).failure.code)
+            assertEquals(before, paymentSnapshot(scene))
+        } finally {
+            paymentProbe.clear()
+        }
+        val restored = commandPayment(scene, renewedActor(scene))
+        assertTrue(restored is Result.Success, restored.toString())
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "prepare,true",
+        "release,true",
+        "cancel,true",
+        "reconcile,true",
+        "prepare,false",
+        "release,false",
+        "cancel,false",
+        "reconcile,false",
+    )
+    fun originalReceiptsRequireLiveAssuranceAfterAuthorizationWaits(action: String, mfa: Boolean) {
+        val scene = preparePaymentScenario(action, mfa)
+        val saved = commandPayment(scene, renewedActor(scene))
+        assertTrue(saved is Result.Success, saved.toString())
+        val actor = expiringActor(scene)
+        val before = paymentSnapshot(scene)
+        val barrier = AccountLockProbe.Barrier(actor.accountId)
+        val candidateReads = java.util.concurrent.atomic.AtomicInteger()
+        paymentProbe.afterRead = { company, kind ->
+            if (company == scene.fixture.payroll.company && kind == "candidates")
+                candidateReads.incrementAndGet()
+        }
+        accountProbe.current.set(barrier)
+        try {
+            Executors.newSingleThreadExecutor().use { pool ->
+                val pending = pool.submit<Result<MutationReceipt>> { commandPayment(scene, actor) }
+                try {
+                    assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                    clock.set(clock.instant().plusSeconds(2))
+                    barrier.release.countDown()
+                    val failed = pending.get(10, TimeUnit.SECONDS)
+                    assertEquals(
+                        "recent_authentication_required",
+                        (failed as Result.Failed).failure.code,
+                    )
+                    assertEquals(before, paymentSnapshot(scene))
+                } finally {
+                    barrier.release.countDown()
+                    accountProbe.current.set(null)
+                }
+            }
+            val replayed = commandPayment(scene, renewedActor(scene))
+            assertEquals(
+                (saved as Result.Success).value.copy(replayed = true),
+                (replayed as Result.Success).value,
+            )
+            assertEquals(before, paymentSnapshot(scene))
+            if (action == "prepare") assertEquals(0, candidateReads.get())
+        } finally {
+            barrier.release.countDown()
+            accountProbe.current.set(null)
+            paymentProbe.clear()
+        }
     }
 
     @ParameterizedTest

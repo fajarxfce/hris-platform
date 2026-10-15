@@ -6,6 +6,10 @@ import java.time.Instant
 import java.util.UUID
 
 interface PayrollPaymentRepository {
+    fun recoveries(companyId: UUID, assessmentId: UUID): Result<List<PayrollPaymentRecovery>>
+
+    fun recordRecovery(companyId: UUID, recovery: PayrollPaymentRecovery): Result<Unit>
+
     fun progress(
         companyId: UUID,
         assessmentId: UUID,

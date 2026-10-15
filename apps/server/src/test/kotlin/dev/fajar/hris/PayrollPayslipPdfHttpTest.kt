@@ -84,7 +84,7 @@ class PayrollPayslipPdfHttpTest : PayrollFinalizationApiFixture() {
                 .headers()
                 .firstValue("Content-Disposition")
                 .orElseThrow()
-                .contains("payslip-$id-en.pdf")
+                .contains("payslip-$id-v0-en.pdf")
         )
         assertTrue(english.headers().allValues("Cache-Control").any { "no-store" in it })
         assertEquals(

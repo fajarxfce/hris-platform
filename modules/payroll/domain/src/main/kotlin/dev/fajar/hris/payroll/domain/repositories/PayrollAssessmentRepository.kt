@@ -8,7 +8,12 @@ import java.util.UUID
 interface PayrollAssessmentRepository {
     fun taxHistory(company: UUID, id: UUID, revision: Long): Result<PayrollTaxAssessment?>
 
-    fun payslip(company: UUID, id: UUID, allowedEmployees: Set<UUID>?): Result<PayrollPayslip?>
+    fun payslip(
+        company: UUID,
+        id: UUID,
+        allowedEmployees: Set<UUID>?,
+        revision: Long? = null,
+    ): Result<PayrollPayslip?>
 
     fun payslips(
         company: UUID,

@@ -1,5 +1,6 @@
 package dev.fajar.hris.payroll.data.models
 
+import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -10,4 +11,6 @@ data class PayrollPaymentProgressRow(
     val createdAt: OffsetDateTime,
     val releasedAt: OffsetDateTime?,
     val resolvedAt: OffsetDateTime?,
+    val amount: BigDecimal,
+    val assessmentRevision: Long,
 )

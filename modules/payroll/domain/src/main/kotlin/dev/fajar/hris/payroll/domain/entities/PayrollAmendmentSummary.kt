@@ -19,4 +19,5 @@ data class PayrollAmendmentSummary(
     val recordedAt: Instant,
     val reason: String,
     val latestReviewId: UUID? = null,
+    val latestPublicationId: UUID? = null,
 )

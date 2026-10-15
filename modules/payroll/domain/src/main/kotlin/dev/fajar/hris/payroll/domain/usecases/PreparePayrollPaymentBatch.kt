@@ -52,7 +52,15 @@ class PreparePayrollPaymentBatch(
                             it.destination.bankCode,
                             it.destination.accountNumber,
                             it.destination.accountName,
-                        )
+                        ) +
+                            if (it.assessmentRevision == null) emptyList()
+                            else
+                                listOf(
+                                    "assessment-observation",
+                                    it.assessmentRevision.toString(),
+                                    it.paymentVersion.toString(),
+                                    it.amount!!.toPlainString(),
+                                )
                     },
             )
         return transactions.run(actor) {
@@ -73,6 +81,9 @@ class PreparePayrollPaymentBatch(
             val liveAccess = (acquired as Result.Success).value
             val checked = validatePayrollPaymentActor(actor, liveAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
+            (replay as Result.Success).value?.let {
+                return@run Result.Success(it)
+            }
             val candidates = payments.candidates(company, items.map { it.assessmentId }.toSet())
             if (candidates is Result.Failed) return@run candidates
             val evidence = (candidates as Result.Success).value
@@ -83,9 +94,6 @@ class PreparePayrollPaymentBatch(
             val completion =
                 validatePayrollPaymentActor(actor, liveAccess, clock.instant(), security)
             if (completion is Result.Failed) return@run completion
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
-            }
             val found = payments.find(company, id)
             if (found is Result.Failed) return@run found
             if ((found as Result.Success).value != null)
@@ -111,6 +119,14 @@ class PreparePayrollPaymentBatch(
                     Failure(FailureKind.CONFLICT, "payroll_payment_attempt_limit")
                 )
             val byAssessment = evidence.associateBy { it.assessmentId }
+            for (instruction in ordered) {
+                val observation =
+                    requirePayrollPaymentObservation(
+                        instruction,
+                        byAssessment.getValue(instruction.assessmentId),
+                    )
+                if (observation is Result.Failed) return@run observation
+            }
             val snapshot =
                 ordered.map { instruction ->
                     val payable = byAssessment.getValue(instruction.assessmentId)
@@ -129,6 +145,8 @@ class PreparePayrollPaymentBatch(
                         0,
                         null,
                         null,
+                        payable.assessmentRevision,
+                        payable.paymentVersion,
                     )
                 }
             val batch =

@@ -6,4 +6,5 @@ data class PayrollPaymentProgressResponse(
     val assessmentId: UUID,
     val version: Long,
     val attempts: List<PayrollPaymentAttemptResponse>,
+    val settlement: PayrollSettlementResponse,
 )

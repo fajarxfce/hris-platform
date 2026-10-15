@@ -17,6 +17,7 @@ fun PayrollPayslipSummaryRow.toPayslipSummary() =
         withheld,
         takeHome,
         publishedAt.toInstant(),
+        version,
     )
 
 fun PayrollPayslipRow.toPayslip(json: ObjectMapper) =

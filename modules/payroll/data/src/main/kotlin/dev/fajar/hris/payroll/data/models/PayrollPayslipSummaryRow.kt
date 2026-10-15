@@ -15,4 +15,5 @@ data class PayrollPayslipSummaryRow(
     val withheld: BigDecimal,
     val takeHome: BigDecimal,
     val publishedAt: OffsetDateTime,
+    val version: Long,
 )

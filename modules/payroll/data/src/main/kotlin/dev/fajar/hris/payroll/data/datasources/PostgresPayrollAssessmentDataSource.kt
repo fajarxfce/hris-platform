@@ -47,6 +47,7 @@ class PostgresPayrollAssessmentDataSource(private val sql: DSLContext) :
         company: UUID,
         id: UUID,
         allowedEmployees: Set<UUID>?,
+        revision: Long?,
     ): PayrollPayslipRow? =
         sql.fetchOne(
                 """
@@ -54,13 +55,18 @@ class PostgresPayrollAssessmentDataSource(private val sql: DSLContext) :
                   SELECT a.* FROM payroll_assessments a WHERE a.company_id=? AND a.id=?
                     AND (?::uuid[] IS NULL OR a.employment_id=ANY(?::uuid[])) LIMIT 1
                 )
-                SELECT a.id,a.employment_id,a.tax_month,a.published_at,t.employee_number,t.employee_name,r.planned_payment_date,
+                SELECT a.id,a.employment_id,a.tax_month,o.published_at,o.revision,t.employee_number,t.employee_name,r.planned_payment_date,
                   o.taxable_gross,o.withheld,o.take_home,o.calculation::text calculation,f.company_code,f.company_name
                 FROM selected a
                   CROSS JOIN LATERAL(SELECT t.employee_number,t.employee_name FROM payroll_run_targets t
                     WHERE t.company_id=a.company_id AND t.run_id=a.run_id AND t.ordinal=a.ordinal LIMIT 1) t
-                  CROSS JOIN LATERAL(SELECT o.taxable_gross,o.withheld,o.take_home,o.calculation FROM payroll_run_results o
-                    WHERE o.company_id=a.company_id AND o.run_id=a.run_id AND o.ordinal=a.ordinal LIMIT 1) o
+                  CROSS JOIN LATERAL(SELECT e.revision,e.published_at,e.calculation,
+                      (e.calculation->'tax'->>'taxableGross')::numeric(16,2) taxable_gross,
+                      (e.calculation->'tax'->>'withheld')::numeric(16,2) withheld,
+                      (e.calculation->'tax'->>'takeHome')::numeric(16,2) take_home
+                    FROM payroll_assessment_heads h JOIN payroll_assessment_evidence e
+                      ON e.company_id=h.company_id AND e.assessment_id=h.assessment_id AND e.revision=coalesce(?::bigint,h.revision)
+                    WHERE h.company_id=a.company_id AND h.assessment_id=a.id LIMIT 1) o
                   CROSS JOIN LATERAL(SELECT r.planned_payment_date FROM payroll_runs r WHERE r.company_id=a.company_id AND r.id=a.run_id LIMIT 1) r
                   CROSS JOIN LATERAL(SELECT f.company_code,f.company_name FROM payroll_finalizations f
                     WHERE f.company_id=a.company_id AND f.id=a.finalization_id AND f.published_at IS NOT NULL LIMIT 1) f
@@ -70,6 +76,7 @@ class PostgresPayrollAssessmentDataSource(private val sql: DSLContext) :
                 id,
                 allowedEmployees?.toTypedArray(),
                 allowedEmployees?.toTypedArray(),
+                revision,
             )
             ?.let {
                 PayrollPayslipRow(
@@ -106,13 +113,18 @@ class PostgresPayrollAssessmentDataSource(private val sql: DSLContext) :
                     ))
                   ORDER BY a.tax_month DESC,a.id LIMIT ?
                 )
-                SELECT a.id,a.employment_id,a.tax_month,a.published_at,t.employee_number,t.employee_name,r.planned_payment_date,
+                SELECT a.id,a.employment_id,a.tax_month,o.published_at,o.revision,t.employee_number,t.employee_name,r.planned_payment_date,
                   o.taxable_gross,o.withheld,o.take_home
                 FROM selected a
                   CROSS JOIN LATERAL(SELECT t.employee_number,t.employee_name FROM payroll_run_targets t
                     WHERE t.company_id=a.company_id AND t.run_id=a.run_id AND t.ordinal=a.ordinal LIMIT 1) t
-                  CROSS JOIN LATERAL(SELECT o.taxable_gross,o.withheld,o.take_home FROM payroll_run_results o
-                    WHERE o.company_id=a.company_id AND o.run_id=a.run_id AND o.ordinal=a.ordinal LIMIT 1) o
+                  CROSS JOIN LATERAL(SELECT e.revision,e.published_at,
+                      (e.calculation->'tax'->>'taxableGross')::numeric(16,2) taxable_gross,
+                      (e.calculation->'tax'->>'withheld')::numeric(16,2) withheld,
+                      (e.calculation->'tax'->>'takeHome')::numeric(16,2) take_home
+                    FROM payroll_assessment_heads h JOIN payroll_assessment_evidence e
+                      ON e.company_id=h.company_id AND e.assessment_id=h.assessment_id AND e.revision=h.revision
+                    WHERE h.company_id=a.company_id AND h.assessment_id=a.id LIMIT 1) o
                   CROSS JOIN LATERAL(SELECT r.planned_payment_date FROM payroll_runs r WHERE r.company_id=a.company_id AND r.id=a.run_id LIMIT 1) r
                 ORDER BY a.tax_month DESC,a.id
                 """

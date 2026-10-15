@@ -9,4 +9,7 @@ enum class PayrollAmendmentAction {
     REJECTED,
     WITHDRAWN,
     CANCELLED,
+    PUBLICATION_STARTED,
+    PUBLISHED,
+    PUBLICATION_STOPPED,
 }

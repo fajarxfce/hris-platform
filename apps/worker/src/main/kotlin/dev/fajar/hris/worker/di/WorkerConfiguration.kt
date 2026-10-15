@@ -253,6 +253,13 @@ class WorkerConfiguration {
     ): JobTask = PayrollCalculationTask(resolve, advance, abort)
 
     @Bean
+    fun payrollAmendmentPublicationTask(
+        resolve: ResolveActor,
+        advance: AdvancePayrollAmendmentPublication,
+        abort: AbortPayrollAmendmentPublication,
+    ): JobTask = PayrollAmendmentPublicationTask(resolve, advance, abort)
+
+    @Bean
     fun payrollFinalizationTask(
         resolve: ResolveActor,
         advance: AdvancePayrollFinalization,

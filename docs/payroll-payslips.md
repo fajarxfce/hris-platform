@@ -4,13 +4,13 @@ The [dashboard workflow](dashboard.md#published-payslips) provides the directory
 retained calculation detail, independently refreshed payment history and explicit
 Indonesian/English PDF downloads.
 
-Finalized, published payroll assessments provide the immutable payslip. Draft, calculated, or approved runs are not employee payslips. JSON and PDF share the same current company, credential, and employee/finance authorization. Company administration alone does not grant payroll access.
+Published payroll assessments provide the current payslip and its immutable retained revisions. Draft, calculated, or approved runs are not employee payslips. JSON and PDF share the same current company, credential, and employee/finance authorization. Company administration alone does not grant payroll access.
 
 ## API
 
 - `GET /api/v1/companies/{companyId}/payroll/payslips` returns lightweight newest-first pages. Optional month filters are bounded; `limit` is at most 200. Optional `query` searches the retained employee name or number.
-- `GET .../payslips/{id}` returns the retained calculation and issuer/employee labels.
-- `GET .../payslips/{id}/pdf?language=ID` downloads an Indonesian PDF. Use `language=EN` for English; the default is `ID`. Other values return a structured HTTP 400 problem.
+- `GET .../payslips/{id}` returns the current published revision and retained issuer/employee labels. Add `revision=0` or another retained revision to request that exact statement.
+- `GET .../payslips/{id}/pdf?language=ID` downloads an Indonesian PDF. Use `language=EN` for English; the default is `ID`. Send the displayed `revision` to export that exact statement. Other values return a structured HTTP 400 problem.
 - `GET .../payslips/{id}/payments` returns payment progress independently of the original payslip. A published payslip is not proof of bank settlement.
 
 Cookie and native bearer authentication are supported. PDF clients should accept both `application/pdf` and `application/problem+json`, then inspect status and content type before saving bytes. Error codes and parameters remain unlocalized; the selected document language changes only PDF labels and number formatting.
@@ -25,9 +25,9 @@ from the first page. An omitted or blank query retains the unfiltered contract.
 
 All four endpoints accept `scope=AUTHORIZED|SELF`, defaulting to `AUTHORIZED` for existing clients. `AUTHORIZED` follows the reader's current company/self grants. Employee-facing screens should send `scope=SELF`: it always limits results to the account's own employments, even when the account also has company-wide finance access. Scope never grants a missing permission. An unbound self reader receives an empty list or `payroll_payslip_not_found` for detail, payment progress and PDF; an explicit foreign `employeeId` filter returns `access_denied`. Keep scope unchanged when following a page cursor.
 
-Interactive reads check current credentials, intersected permissions and MFA after acquiring their guards and again after data acquisition. PDF rendering happens outside the transaction; access is rechecked afterward before returning metadata, including HEAD/304 responses, and before releasing content bytes.
+Interactive reads check current credentials, intersected permissions and MFA after acquiring their guards and again after data acquisition. PDF rendering happens outside the transaction; the selected revision remains pinned while access is rechecked before metadata, including HEAD/304 responses, and before releasing bytes. A missing revision returns `payroll_payslip_not_found`; it never falls back to a different statement.
 
-The attachment name contains the assessment ID and language, without employee names. Responses set `Content-Length`, a SHA-256 ETag, `private, no-store`, and `nosniff`. The shared download transport supports one byte range, `If-Range`, authorized `If-None-Match`/304 responses, and HEAD metadata. Unsupported ranges return 416. Conditional requests recheck current access; a cached ETag is not authorization. PDF generation is eager and bounded, including when negotiating metadata. The JSON summary collections remain the lightweight [mobile synchronization](synchronization.md) contract. Sensitive offline copies need the account/company partition and access-expiry policy in the [mobile API](mobile-api.md).
+The attachment name contains the assessment ID, revision and language, such as `payslip-{id}-v1-en.pdf`, without employee names. Responses set `Content-Length`, a SHA-256 ETag, `private, no-store`, and `nosniff`. The shared download transport supports one byte range, `If-Range`, authorized `If-None-Match`/304 responses, and HEAD metadata. Unsupported ranges return 416. Conditional requests recheck current access; a cached ETag is not authorization. PDF generation is eager and bounded, including when negotiating metadata. The JSON summary collections remain the lightweight [mobile synchronization](synchronization.md) contract. Sensitive offline copies need the account/company partition and access-expiry policy in the [mobile API](mobile-api.md).
 
 ## Representation
 

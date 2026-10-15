@@ -194,21 +194,44 @@ assessment versions. A newly published month or another amendment invalidates
 that review. It requires an explicit recalculation, never an automatic replacement
 of the user's approved facts.
 
-## Revised publication (planned)
+## Revised publication
 
-Draft revisions, calculation attempts and decisions are retained separately.
-The implemented lifecycle ends at approved or withdrawn/rejected review. The next
-stage adds publishing and published states. Cancellation cannot reverse a
-publication. Publication will retain current scoped authority, recent
-authentication, observed versions and stable operation IDs.
+The API publishes an approved amendment through a separately authorized worker
+attempt. The dedicated `payroll.amend.publish` permission is not included in the
+default roles. Current and originally captured beneficiaries cannot publish their
+own amendment. Admission retains recent authentication/MFA through queue waits,
+receipt replay and completion; the worker retains its initiating credential,
+current authority, authentication age and exact lease.
 
-Publication advances every affected assessment together. Its transaction includes
-the amendment, revised assessment heads, financial differences, audit/outbox,
-employee synchronization and the fenced publication job. Ordinary calculation and
-finalization already bind the previous assessment's ID and revision: calculation
-reads that exact retained history, and finalization checks it against the current
-head. A future amendment cannot silently change the tax history of a prepared run.
-The dashboard shows the retained predecessor revision with its source references.
+| Method | Path below `/api/v1/companies/{companyId}/payroll` | Result |
+| --- | --- | --- |
+| GET | `/amendments/{amendmentId}/publications` | At most eight retained attempts, jobs, amendment state and recovery hints |
+| PUT | `/amendments/{amendmentId}/publications/{id}` | Admit the exact approved basis and its publication job |
+| POST | `/amendments/{amendmentId}/publications/{id}/recover` | Explicitly restore an approved amendment after an exhausted terminal job |
+
+Admission requires an `Idempotency-Key`, client-generated publication ID,
+`expectedVersion`, `reviewId`, `expectedReviewVersion`, `expectedApprovalVersion`,
+`calculationId` and `reason`. It changes `APPROVED` to `PUBLISHING`; successful
+publication changes it to `PUBLISHED`. A lost response replays the original
+receipt after current authorization, even after the worker finishes. Another
+operation cannot publish a second copy. Cancellation cannot reverse publication.
+
+The worker rechecks the complete observed year, approved calculation and every
+retained predecessor. It publishes the entire corrected suffix, assessment heads,
+current THR ownership, amendment outcome, employee sync changes and successful
+job checkpoint in one transaction. Original assessments, calculations, approvals
+and payments remain retained. A following ordinary run reads the revised
+predecessor explicitly; a run using the previous revision cannot be finalized.
+
+Failed or cancelled execution restores the same approved proposal and records a
+stopped attempt. An expired or replaced lease cannot publish or clean up another
+attempt. Generic scheduler exhaustion may leave the amendment awaiting explicit
+recovery; that command requires observed amendment/job versions and current
+publisher authority. It creates no new calculation or publication. A different
+authorized operator can recover an unavailable initiator's job. Source changes
+still require withdrawal, explicit source review and recalculation before another
+publication. There are at most eight publication attempts per amendment; admission
+reserves both its start and outcome revisions before the cancellation-only slot.
 
 ## Payment differences
 
@@ -221,16 +244,20 @@ negative transfer or an automatic deduction from future salary.
 Prepared instructions must be cancelled and pending bank outcomes resolved before
 publication changes their basis. New instructions retain the reviewed assessment
 revision and current payable amount. Confirmed payments and bank references remain
-immutable. A confirmed recovery needs its own scoped evidence and receipt.
+immutable. A confirmed recovery needs its own scoped evidence and receipt. The implemented
+[settlement contract](payroll-payments.md#confirmed-recoveries) exposes the current
+entitlement, confirmed transfers/returns and observed payment version separately
+from immutable individual instructions.
 
 ## Delivery sequence
 
 1. Guarded preparation and deterministic recalculation from retained sources: implemented.
 2. Versioned drafts, retained calculations and independent approval: implemented in the API.
 3. Atomic revised assessment publication, ordinary tax-continuity integration,
-   payment balances and confirmed recoveries.
-4. Dashboard workflows, amended employee statements/PDFs and mobile incremental
-   synchronization, followed by real API/worker and device acceptance.
+   payment balances and confirmed recoveries: implemented in the API/worker.
+4. Dashboard amendment/settlement workflows and revised mobile delivery remain.
+   Canonical current/retained statements, revision-pinned PDFs and sync versions
+   are available in the API; client integration and end-to-end acceptance follow.
 
 Each stage requires isolation, competing-change, lost-response, assurance-expiry,
 cancellation and cleanup tests where applicable. The feature is not complete at

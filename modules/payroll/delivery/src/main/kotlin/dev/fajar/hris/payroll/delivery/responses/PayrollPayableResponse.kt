@@ -13,4 +13,6 @@ data class PayrollPayableResponse(
     val amount: String,
     val currency: String,
     val publishedAt: Instant,
+    val assessmentRevision: Long,
+    val paymentVersion: Long,
 )

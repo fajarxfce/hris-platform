@@ -5,6 +5,7 @@ import dev.fajar.hris.schema.tables.PayrollPayableCandidates.PAYROLL_PAYABLE_CAN
 import dev.fajar.hris.schema.tables.PayrollPaymentActions.PAYROLL_PAYMENT_ACTIONS as A
 import dev.fajar.hris.schema.tables.PayrollPaymentBatches.PAYROLL_PAYMENT_BATCHES as B
 import dev.fajar.hris.schema.tables.PayrollPaymentItems.PAYROLL_PAYMENT_ITEMS as I
+import dev.fajar.hris.schema.tables.PayrollPaymentRecoveries.PAYROLL_PAYMENT_RECOVERIES as REC
 import dev.fajar.hris.schema.tables.PayrollPaymentResults.PAYROLL_PAYMENT_RESULTS as R
 import dev.fajar.hris.schema.tables.records.*
 import java.time.OffsetDateTime
@@ -13,8 +14,28 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresPayrollPaymentDataSource(private val sql: DSLContext) : PayrollPaymentDataSource {
+    override fun recoveries(company: UUID, assessment: UUID): List<PayrollPaymentRecoveriesRecord> =
+        sql.selectFrom(REC)
+            .where(REC.COMPANY_ID.eq(company), REC.ASSESSMENT_ID.eq(assessment))
+            .orderBy(REC.RECORDED_AT, REC.ID)
+            .limit(20)
+            .fetch()
+
+    override fun insertRecovery(row: PayrollPaymentRecoveriesRecord) {
+        sql.insertInto(REC).set(row).execute()
+    }
+
     override fun progress(company: UUID, assessment: UUID): List<PayrollPaymentProgressRow> =
-        sql.select(B.ID, I.ID, I.STATUS, B.CREATED_AT, B.RELEASED_AT, I.OCCURRED_AT)
+        sql.select(
+                B.ID,
+                I.ID,
+                I.STATUS,
+                B.CREATED_AT,
+                B.RELEASED_AT,
+                I.OCCURRED_AT,
+                I.AMOUNT,
+                I.ASSESSMENT_REVISION,
+            )
             .from(I)
             .join(B)
             .on(B.COMPANY_ID.eq(I.COMPANY_ID).and(B.ID.eq(I.BATCH_ID)))
@@ -30,6 +51,8 @@ class PostgresPayrollPaymentDataSource(private val sql: DSLContext) : PayrollPay
                     requireNotNull(it[B.CREATED_AT]),
                     it[B.RELEASED_AT],
                     it[I.OCCURRED_AT],
+                    requireNotNull(it[I.AMOUNT]),
+                    requireNotNull(it[I.ASSESSMENT_REVISION]),
                 )
             }
 
@@ -40,9 +63,9 @@ class PostgresPayrollPaymentDataSource(private val sql: DSLContext) : PayrollPay
     ): PayrollPaymentHeadRow? =
         sql.fetchOne(
                 """
-                SELECT a.id,coalesce(h.version,0) AS version FROM payroll_assessments a
-                LEFT JOIN payroll_payment_heads h ON h.company_id=a.company_id AND h.assessment_id=a.id
-                WHERE a.company_id=? AND a.id=? AND (?::uuid[] IS NULL OR a.employment_id=ANY(?::uuid[]))
+                SELECT assessment_id AS id,payment_version AS version,assessment_revision,entitlement,paid_amount,recovered_amount
+                FROM payroll_settlement_balances
+                WHERE company_id=? AND assessment_id=? AND (?::uuid[] IS NULL OR employment_id=ANY(?::uuid[]))
                 """
                     .trimIndent(),
                 company,
@@ -54,6 +77,10 @@ class PostgresPayrollPaymentDataSource(private val sql: DSLContext) : PayrollPay
                 PayrollPaymentHeadRow(
                     it.get("id", UUID::class.java)!!,
                     it.get("version", Long::class.javaObjectType)!!,
+                    it.get("assessment_revision", Long::class.javaObjectType)!!,
+                    it.get("entitlement", java.math.BigDecimal::class.java)!!,
+                    it.get("paid_amount", java.math.BigDecimal::class.java)!!,
+                    it.get("recovered_amount", java.math.BigDecimal::class.java)!!,
                 )
             }
 
@@ -84,7 +111,7 @@ class PostgresPayrollPaymentDataSource(private val sql: DSLContext) : PayrollPay
             .from(I)
             .where(I.COMPANY_ID.eq(company))
             .and(I.ASSESSMENT_ID.`in`(assessments))
-            .and(I.STATUS.`in`("PREPARED", "PENDING", "SUCCEEDED"))
+            .and(I.STATUS.`in`("PREPARED", "PENDING"))
             .fetch(I.ASSESSMENT_ID)
             .filterNotNull()
             .toSet()
@@ -112,7 +139,7 @@ class PostgresPayrollPaymentDataSource(private val sql: DSLContext) : PayrollPay
                     .from(I)
                     .where(I.COMPANY_ID.eq(C.COMPANY_ID))
                     .and(I.ASSESSMENT_ID.eq(C.ASSESSMENT_ID))
-                    .and(I.STATUS.`in`("PREPARED", "PENDING", "SUCCEEDED"))
+                    .and(I.STATUS.`in`("PREPARED", "PENDING"))
             )
         val attempts =
             DSL.selectCount()
@@ -136,6 +163,7 @@ class PostgresPayrollPaymentDataSource(private val sql: DSLContext) : PayrollPay
             .where(C.COMPANY_ID.eq(company))
             .and(C.PUBLISHED_AT.ge(from))
             .and(C.PUBLISHED_AT.lt(until))
+            .and(C.AMOUNT.gt(java.math.BigDecimal.ZERO))
             .and(available)
             .and(attempts.lt(20))
             .and(before)

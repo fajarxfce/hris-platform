@@ -13,4 +13,8 @@ data class PayrollPayable(
     val plannedPaymentDate: LocalDate,
     val amount: BigDecimal,
     val publishedAt: Instant,
+    val assessmentRevision: Long = 0,
+    val paymentVersion: Long = 0,
+    val confirmedPaid: BigDecimal = BigDecimal.ZERO,
+    val confirmedRecovered: BigDecimal = BigDecimal.ZERO,
 )

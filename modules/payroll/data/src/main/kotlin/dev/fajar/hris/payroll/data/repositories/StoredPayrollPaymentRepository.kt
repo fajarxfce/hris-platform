@@ -12,6 +12,23 @@ import java.util.UUID
 
 class StoredPayrollPaymentRepository(private val source: PayrollPaymentDataSource) :
     PayrollPaymentRepository {
+    override fun recoveries(
+        companyId: UUID,
+        assessmentId: UUID,
+    ): Result<List<PayrollPaymentRecovery>> = safeDatabaseCall {
+        val rows = source.recoveries(companyId, assessmentId)
+        require(
+            rows.size <= 20 &&
+                rows.all { it.companyId == companyId && it.assessmentId == assessmentId }
+        )
+        java.util.List.copyOf(rows.map { it.toRecovery() })
+    }
+
+    override fun recordRecovery(companyId: UUID, recovery: PayrollPaymentRecovery): Result<Unit> =
+        safeDatabaseCall {
+            source.insertRecovery(recovery.toRecord(companyId))
+        }
+
     override fun progress(
         companyId: UUID,
         assessmentId: UUID,
@@ -29,8 +46,16 @@ class StoredPayrollPaymentRepository(private val source: PayrollPaymentDataSourc
                         it.createdAt.toInstant(),
                         it.releasedAt?.toInstant(),
                         it.resolvedAt?.toInstant(),
+                        it.amount,
+                        it.assessmentRevision,
                     )
                 },
+                PayrollSettlement(
+                    head.assessmentRevision,
+                    head.entitlement,
+                    head.confirmedPaid,
+                    head.confirmedRecovered,
+                ),
             )
         }
     }

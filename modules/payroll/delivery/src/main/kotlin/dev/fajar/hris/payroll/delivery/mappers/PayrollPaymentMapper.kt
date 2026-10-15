@@ -22,6 +22,9 @@ fun PayrollPaymentInstructionRequest.toInstruction() =
             destination.accountNumber,
             destination.accountName,
         ),
+        assessmentRevision,
+        paymentVersion,
+        amount,
     )
 
 fun PayrollPaymentResultRequest.toResult() =
@@ -45,6 +48,8 @@ fun PayrollPayable.toResponse() =
         amount.toPlainString(),
         "IDR",
         publishedAt,
+        assessmentRevision,
+        paymentVersion,
     )
 
 fun PayrollPaymentBatch.toResponse() =
@@ -84,6 +89,8 @@ fun PayrollPaymentItem.toResponse() =
         batchVersion,
         transactionReference,
         occurredAt,
+        assessmentRevision,
+        observedPaymentVersion,
     )
 
 fun PayrollPaymentSummary.toResponse() =
@@ -134,6 +141,17 @@ fun PayrollPaymentProgress.toResponse() =
                 it.createdAt,
                 it.releasedAt,
                 it.resolvedAt,
+                it.amount.toPlainString(),
+                it.assessmentRevision,
             )
         },
+        PayrollSettlementResponse(
+            settlement.assessmentRevision,
+            settlement.entitlement.toPlainString(),
+            settlement.confirmedPaid.toPlainString(),
+            settlement.confirmedRecovered.toPlainString(),
+            settlement.payable.toPlainString(),
+            settlement.recoverable.toPlainString(),
+            "IDR",
+        ),
     )

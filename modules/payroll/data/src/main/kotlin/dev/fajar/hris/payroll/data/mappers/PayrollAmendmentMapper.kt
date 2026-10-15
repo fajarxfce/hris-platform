@@ -70,6 +70,7 @@ fun PayrollAmendmentSummaryRow.toAmendmentSummary(): PayrollAmendmentSummary {
         recordedAt.toInstant(),
         reason,
         latestReviewId,
+        latestPublicationId,
     )
 }
 
@@ -104,6 +105,7 @@ fun PayrollAmendment.toRevisionRecord(company: UUID, json: ObjectMapper) =
         it.action = summary.action.name
         it.latestCalculationId = summary.latestCalculationId
         it.latestReviewId = summary.latestReviewId
+        it.latestPublicationId = summary.latestPublicationId
         it.terms = JSONB.valueOf(json.writeValueAsString(terms.toData()))
         it.actorId = summary.actorId
         it.recordedAt = summary.recordedAt.atOffset(ZoneOffset.UTC)

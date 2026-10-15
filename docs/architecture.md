@@ -227,7 +227,27 @@ Ordinary calculation targets capture the predecessor's ID and revision. Domain
 continuity and database arithmetic checks use that exact revision, while publication
 readiness compares the current head under the payroll guard. A history read cannot
 substitute a newer revision or fall back to revision zero when one is missing.
-Amendment publication must independently authorize any later assessment revision.
+Amendment publication independently authorizes each later assessment revision.
+Admission holds the operation, payroll, payment, People, approval, access and
+queue guards. The worker owns its fenced job before acquiring those resource
+guards, rechecks the exact approved basis and full source year, and commits all
+revisions, current heads, THR ownership, employee invalidation and job outcome
+atomically. A stale lease or substituted initiating proof cannot publish. Generic
+queue leasing does not inspect private company rows; terminal/progress validation
+runs within the scoped publication transaction.
+
+Failed execution restores the exact approved basis without replacing its review
+or calculation. Explicit recovery reads the immutable job pointer, locks that job
+before payroll, and retains current operator authority through its receipt/journal
+transaction. An exhausted job creates no implicit recalculation or new attempt.
+
+Settlement compares current entitlement with immutable successful transfers and
+confirmed returns. Payment commands serialize with publication through the payment
+guard, retain observed assessment/payment versions and freeze each instruction's
+amount. Confirmed returns have separate scoped evidence and a shared bank-reference
+registry; they never become negative instructions. The independently synchronized
+payment projection carries its own entitlement and assessment revision. PDF
+acquisition and post-render authorization retain the selected statement revision.
 
 Amendment acquisition selects the current head through a security-invoker evidence
 view; it never falls back to original results. The repository maps its raw rows

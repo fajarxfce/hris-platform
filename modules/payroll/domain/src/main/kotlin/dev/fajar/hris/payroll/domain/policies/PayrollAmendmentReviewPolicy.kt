@@ -16,7 +16,11 @@ const val PAYROLL_AMENDMENT_MAXIMUM_REVIEWS = 8
 const val PAYROLL_AMENDMENT_REVIEW_REVISION_RESERVE = 12L
 
 fun requirePayrollAmendmentRead(actor: Actor): Result<Unit> =
-    if ("payroll.amend" in actor.permissions || "payroll.amend.review" in actor.permissions)
+    if (
+        "payroll.amend" in actor.permissions ||
+            "payroll.amend.review" in actor.permissions ||
+            "payroll.amend.publish" in actor.permissions
+    )
         Result.Success(Unit)
     else Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
 

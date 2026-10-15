@@ -24,6 +24,7 @@ private val amendmentSummaryFields =
         R.ACTION,
         R.LATEST_CALCULATION_ID,
         R.LATEST_REVIEW_ID,
+        R.LATEST_PUBLICATION_ID,
         R.ACTOR_ID,
         R.RECORDED_AT,
         R.REASON,

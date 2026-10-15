@@ -48,8 +48,13 @@ class PayrollPayslipReadProbeConfiguration {
         probe: PayrollPayslipReadProbe,
     ): PayrollAssessmentRepository =
         object : PayrollAssessmentRepository by delegate {
-            override fun payslip(company: UUID, id: UUID, allowedEmployees: Set<UUID>?) =
-                delegate.payslip(company, id, allowedEmployees).also {
+            override fun payslip(
+                company: UUID,
+                id: UUID,
+                allowedEmployees: Set<UUID>?,
+                revision: Long?,
+            ) =
+                delegate.payslip(company, id, allowedEmployees, revision).also {
                     probe.afterRead(company, "details")
                 }
 

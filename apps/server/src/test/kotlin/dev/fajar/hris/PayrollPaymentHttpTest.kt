@@ -66,7 +66,7 @@ class PayrollPaymentHttpTest : PayrollPaymentApiFixture() {
         payrollError(
             preparePayrollPayment(f, UUID.randomUUID(), listOf(instruction(f.ownedAssessment))),
             409,
-            "payroll_assessment_payment_reserved",
+            "payroll_assessment_not_payable",
         )
         payrollError(
             get(f.maker.client, "${f.path}/$id/export"),

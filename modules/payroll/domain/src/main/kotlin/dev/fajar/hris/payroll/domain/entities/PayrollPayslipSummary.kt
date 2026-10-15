@@ -15,10 +15,8 @@ data class PayrollPayslipSummary(
     val withheld: BigDecimal,
     val takeHome: BigDecimal,
     val publishedAt: Instant,
+    val version: Long = 0,
 ) {
     val currency: String
         get() = "IDR"
-
-    val version: Long
-        get() = 0
 }

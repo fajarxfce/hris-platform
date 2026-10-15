@@ -17,6 +17,10 @@ fun PayrollPayableCandidatesRecord.toPayable() =
         requireNotNull(plannedPaymentDate),
         requireNotNull(amount),
         requireNotNull(publishedAt).toInstant(),
+        requireNotNull(assessmentRevision),
+        requireNotNull(paymentVersion),
+        requireNotNull(paidAmount),
+        requireNotNull(recoveredAmount),
     )
 
 fun PayrollPaymentItemsRecord.toItem() =
@@ -39,6 +43,8 @@ fun PayrollPaymentItemsRecord.toItem() =
         requireNotNull(batchVersion),
         transactionReference,
         occurredAt?.toInstant(),
+        requireNotNull(assessmentRevision),
+        observedPaymentVersion,
     )
 
 fun PayrollPaymentBatchesRecord.toBatch(items: List<PayrollPaymentItemsRecord>) =
@@ -113,6 +119,8 @@ fun PayrollPaymentItem.toRecord(company: UUID, batch: UUID) =
         it.id = id
         it.batchId = batch
         it.assessmentId = assessmentId
+        it.assessmentRevision = assessmentRevision
+        it.observedPaymentVersion = observedPaymentVersion
         it.employmentId = employmentId
         it.employeeNumber = employeeNumber
         it.employeeName = employeeName

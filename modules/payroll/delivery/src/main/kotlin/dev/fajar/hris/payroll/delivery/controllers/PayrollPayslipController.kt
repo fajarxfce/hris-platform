@@ -44,7 +44,8 @@ class PayrollPayslipController(
         actor: Actor,
         @PathVariable id: UUID,
         @RequestParam(defaultValue = "AUTHORIZED") scope: PayrollPayslipReadScope,
-    ): PayrollPayslipResponse = get.execute(actor, id, scope).response().toResponse()
+        @RequestParam(required = false) revision: Long?,
+    ): PayrollPayslipResponse = get.execute(actor, id, scope, revision).response().toResponse()
 
     @GetMapping("/{id}/pdf", produces = ["application/pdf"])
     fun pdf(
@@ -52,18 +53,19 @@ class PayrollPayslipController(
         @PathVariable id: UUID,
         @RequestParam(defaultValue = "ID") language: PayrollDocumentLanguage,
         @RequestParam(defaultValue = "AUTHORIZED") scope: PayrollPayslipReadScope,
+        @RequestParam(required = false) revision: Long?,
         request: HttpServletRequest,
         response: HttpServletResponse,
     ) {
-        val payslip = get.execute(actor, id, scope).response()
+        val payslip = get.execute(actor, id, scope, revision).response()
         val bytes = pdf.write(payslip, language)
-        get.execute(actor, id, scope).response()
+        get.execute(actor, id, scope, payslip.summary.version).response()
         val digest = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes))
         writeBinaryDownloadResponse(
             request,
             response,
             BinaryDownloadMetadata(
-                "payslip-$id-${language.name.lowercase()}.pdf",
+                "payslip-$id-v${payslip.summary.version}-${language.name.lowercase()}.pdf",
                 "application/pdf",
                 bytes.size.toLong(),
                 "\"$digest\"",
@@ -71,7 +73,7 @@ class PayrollPayslipController(
             downloads,
             PAYSLIP_PDF_MAXIMUM_BYTES,
         ) { offset, length ->
-            get.execute(actor, id, scope).map {
+            get.execute(actor, id, scope, payslip.summary.version).map {
                 bytes.copyOfRange(offset.toInt(), offset.toInt() + length)
             }
         }

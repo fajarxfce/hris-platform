@@ -487,6 +487,7 @@ class LeaveConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         security: IdentitySecurityPolicy,
+        carry: LeaveCarryRepository,
     ) =
         AdjustLeaveBalance(
             ledger,
@@ -500,6 +501,7 @@ class LeaveConfiguration {
             members,
             identities,
             security,
+            carry,
         )
 
     @Bean

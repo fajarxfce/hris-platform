@@ -29,6 +29,7 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
     @Autowired private lateinit var operations: OperationRepository
     @Autowired private lateinit var journal: ChangeJournalRepository
     @Autowired private lateinit var requests: LeaveRequestRepository
+    @Autowired private lateinit var carry: LeaveCarryRepository
 
     @ParameterizedTest
     @ValueSource(
@@ -273,6 +274,7 @@ class LeaveBalanceAssuranceTest : LeaveAccountingApiFixture() {
                             members,
                             identities,
                             security,
+                            carry,
                         )
                         .execute(actor, key, f.employee, f.type, 2026, 2, "Reviewed adjustment", 1)
                 }

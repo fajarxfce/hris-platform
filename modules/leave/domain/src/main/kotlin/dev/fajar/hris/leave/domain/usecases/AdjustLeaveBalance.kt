@@ -6,7 +6,7 @@ import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
 import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.leave.domain.entities.*
-import dev.fajar.hris.leave.domain.policies.validateLeaveBalanceAdjustment
+import dev.fajar.hris.leave.domain.policies.planLeaveCarryAdjustment
 import dev.fajar.hris.leave.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -25,6 +25,7 @@ class AdjustLeaveBalance(
     private val members: MembershipRepository,
     private val identities: IdentityRepository,
     private val security: IdentitySecurityPolicy,
+    private val carry: LeaveCarryRepository,
 ) {
     fun execute(
         actor: Actor,
@@ -77,10 +78,11 @@ class AdjustLeaveBalance(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId, shared = true)
             if (accountLock is Result.Failed) return@run accountLock
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val currentAccess = (authority as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, currentAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val allowed = live.requirePermission("leave.manage")
@@ -90,7 +92,13 @@ class AdjustLeaveBalance(
             if ((ownerResult as Result.Success).value == actor.accountId)
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "self_adjustment_denied"))
             (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+                return@run validateCompanySessionActor(
+                        actor,
+                        currentAccess,
+                        clock.instant(),
+                        security,
+                    )
+                    .map { _ -> it }
             }
             val employeeResult = people.find(company, employeeId, LocalDate.of(year, 12, 31))
             if (employeeResult is Result.Failed) return@run employeeResult
@@ -107,8 +115,13 @@ class AdjustLeaveBalance(
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "leave_year_closed"))
             if (current.version != expectedVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_balance_version"))
-            val valid = validateLeaveBalanceAdjustment(current, delta)
-            if (valid is Result.Failed) return@run valid
+            val acquiredCarry = carry.buckets(company, employeeId, typeId, setOf(year))
+            if (acquiredCarry is Result.Failed) return@run acquiredCarry
+            val bucket = (acquiredCarry as Result.Success).value.singleOrNull()
+            val now = clock.instant()
+            val planned = planLeaveCarryAdjustment(current, bucket, delta, now)
+            if (planned is Result.Failed) return@run planned
+            val movement = (planned as Result.Success).value
             val entryId = UUID.randomUUID()
             val entry =
                 LeaveLedgerEntry(
@@ -123,12 +136,43 @@ class AdjustLeaveBalance(
                     0,
                     0,
                     actor.accountId,
-                    clock.instant(),
+                    now,
                     reason,
                 )
+            val posting =
+                movement?.let {
+                    LeaveCarryPosting(
+                        UUID.randomUUID(),
+                        it,
+                        requireNotNull(bucket).version,
+                        if (it.effect == LeaveCarryEffect.EXPIRE) UUID.randomUUID() else entry.id,
+                    )
+                }
+            val expiry =
+                posting
+                    ?.takeIf { it.movement.effect == LeaveCarryEffect.EXPIRE }
+                    ?.let {
+                        LeaveLedgerEntry(
+                            it.ledgerEntryId,
+                            employeeId,
+                            typeId,
+                            year,
+                            LeaveLedgerKind.EXPIRE,
+                            it.id,
+                            null,
+                            -it.movement.halfDays,
+                            0,
+                            0,
+                            actor.accountId,
+                            now,
+                            reason,
+                            it.id,
+                        )
+                    }
             val receipt = MutationReceipt(entry.id, 0)
-            ledger
-                .append(company, listOf(entry))
+            carry
+                .append(company, listOfNotNull(posting))
+                .flatMap { ledger.append(company, listOfNotNull(expiry, entry)) }
                 .flatMap { operations.record(actor, key, receipt) }
                 .flatMap {
                     journal.record(
@@ -146,7 +190,10 @@ class AdjustLeaveBalance(
                         ),
                     )
                 }
-                .map { receipt }
+                .flatMap {
+                    validateCompanySessionActor(actor, currentAccess, clock.instant(), security)
+                        .map { receipt }
+                }
         }
     }
 }

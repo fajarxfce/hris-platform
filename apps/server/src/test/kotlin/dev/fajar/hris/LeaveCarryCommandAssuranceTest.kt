@@ -46,7 +46,8 @@ class LeaveCarryCommandAssuranceTest : LeaveCarryStorageFixture() {
 
     private fun actor(c: PreparedCarry, operation: String): Actor {
         val reviewer = operation == "decide"
-        val account = if (reviewer) c.f.managerAccount else c.f.account
+        val operator = if (operation == "adjust") accountingActor(c.f) else null
+        val account = operator?.accountId ?: if (reviewer) c.f.managerAccount else c.f.account
         database()
             .update(
                 "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
@@ -55,10 +56,11 @@ class LeaveCarryCommandAssuranceTest : LeaveCarryStorageFixture() {
         return Actor(
             account,
             c.f.company,
-            if (reviewer) setOf("leave.team.approve") else setOf("leave.self.manage"),
+            operator?.permissions
+                ?: if (reviewer) setOf("leave.team.approve") else setOf("leave.self.manage"),
             clock.instant(),
             UUID.randomUUID(),
-            credentialVersion = 0,
+            credentialVersion = operator?.credentialVersion ?: 0,
             mfaVerifiedAt = clock.instant(),
         )
     }
@@ -104,6 +106,31 @@ class LeaveCarryCommandAssuranceTest : LeaveCarryStorageFixture() {
         revision: String? = null,
     ): Result<*> =
         when (operation) {
+            "adjust" ->
+                AdjustLeaveBalance(
+                        carryLedger,
+                        carryPolicies,
+                        people,
+                        operations,
+                        journal,
+                        transactions,
+                        clock,
+                        companies,
+                        members,
+                        identities,
+                        security,
+                        carry,
+                    )
+                    .execute(
+                        actor,
+                        key,
+                        c.f.employee,
+                        c.f.type,
+                        2027,
+                        -2,
+                        "Carry adjustment fixture",
+                        1,
+                    )
             "preview" ->
                 PreviewLeaveRequest(
                         carryRequests,
@@ -197,6 +224,8 @@ class LeaveCarryCommandAssuranceTest : LeaveCarryStorageFixture() {
         "withdraw,journal",
         "submit,carry",
         "preview,carry",
+        "adjust,carry",
+        "adjust,journal",
     )
     fun assuranceThatExpiresAfterAcquisitionOrJournalingRollsBackAllPrivateWork(
         operation: String,
@@ -243,7 +272,7 @@ class LeaveCarryCommandAssuranceTest : LeaveCarryStorageFixture() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["submit", "decide", "withdraw"])
+    @ValueSource(strings = ["submit", "decide", "withdraw", "adjust"])
     fun cancellationAfterJournalCannotCommitTheCarryTransitionOrReceipt(operation: String) {
         val (c, id) = prepared(operation)
         val actor = actor(c, operation)

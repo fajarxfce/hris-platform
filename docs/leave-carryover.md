@@ -1,9 +1,10 @@
 # Leave carryover accounting
 
 Status: domain/storage accounting and request preview, submission, approval,
-withdrawal and cancellation integration are implemented and tested. New public
+withdrawal, cancellation and balance adjustment integration are implemented and
+tested. New public
 closing commands do not create tracked awards yet, and validity configuration is
-not exposed. Adjustment, closing, worker and client integration remains; these
+not exposed. Closing, worker and client integration remains; these
 changes have not been deployed.
 
 ## Contract
@@ -29,7 +30,9 @@ Approval consumes the original reservation, including an approval after its
 validity boundary. Expiry removes only free units. Rejection, withdrawal or approved
 cancellation restores the original funding source; any returned carried units
 past the boundary expire in the same transaction. They do not become ordinary
-credit. Negative adjustments and year-end transfers need explicit subledger
+credit. Balance reductions consume ordinary credit first, then explicitly deduct
+carried credit; additions remain ordinary. Expired free carry is settled before
+applying either adjustment. Year-end transfers also need explicit subledger
 movements so carried units cannot exceed the main balance.
 
 ## Request integration
@@ -51,6 +54,20 @@ Date and evidence inputs are bounded and copied before acquisition. Current
 session assurance is checked after guarded acquisition and again through receipt
 and journal completion. Late failure or cancellation rolls back the request,
 funding, ledger, approval, evidence references, journal and operation receipt.
+
+## Balance adjustments
+
+An adjustment first verifies the caller's observed main-balance version under the
+employee guard. Its pure policy settles expired free carry before checking the
+signed delta. A reduction uses ordinary credit first and records only the carried
+portion as `DEDUCT`; additions cannot replenish a carry bucket. Reserved and
+consumed original funding remains unchanged.
+
+Expiry, adjustment, subledger movements, journal and receipt commit together. An
+invalid correction does not partially expire the account. Original command replay
+retains its first receipt after later balance changes and still requires current
+scope, independent authorship and session assurance. Concurrent corrections cannot
+both spend the same observed version.
 
 ## Storage boundary
 
@@ -122,9 +139,17 @@ funding and the version capacity for a subsequent expiry. Formatting and
 architecture checks passed. No browser, native or development deployment was
 performed for this increment.
 
+Adjustment integration passed 53 domain tests, 44 focused API/PostgreSQL tests
+and all 68 worker tests. New coverage includes ordinary-first reductions, late
+positive corrections, retained reservations, competing adjustments, incomplete
+command rollback, expired assurance and cancellation after journaling. Both API
+and worker application contexts passed with the additional repository dependency.
+Formatting and architecture checks passed. No client or development deployment
+was performed for this increment.
+
 ## Remaining integration
 
-- Apply carry movements in adjustments and direct/batch year closing, retaining
+- Apply carry movements in direct/batch year closing, retaining
   current access and receipt guarantees before enabling tracked public awards.
 - Admit and execute bounded expiry work with immutable origin, lease fencing,
   original due times and explicit terminal-job recovery.

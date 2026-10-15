@@ -385,10 +385,14 @@ deletion hides retained history, and confirmed denials remain gated through fail
 cleanup and retries. Archive acquisition cannot advance the feed or reopen access.
 Domain, MVI, HTTP and SQLite/IndexedDB contracts cover these boundaries; assembled
 UI tests cover historical navigation, offline reads and a revision-pinned PDF at
-200% text. Android emulator acceptance verified an offline installation upgrade
-and reconnection using the development revision-zero fixture. Nonzero revisions
-were exercised by automated tests, separately from actual-server native acceptance.
-Phone delivery is pending availability. See the mobile
+200% text. Android emulator acceptance also used an isolated API/PostgreSQL/worker
+with a real approved amendment and confirmed returns. Current and original
+statements reopened after an offline process restart, retained the latest payment
+balance and preserved all five encrypted records through reconnection. Native
+revision-zero English and revision-one Indonesian PDFs matched the server's exact
+SHA-256. The validated WireGuard APK was already installed on the authorized
+Android 16 phone using install-only delivery. This additional acceptance used an
+emulator-only API override and did not replace that phone APK. See the mobile
 [implementation](https://github.com/fajarxfce/hris-mobile/blob/main/docs/payroll.md)
 and [executed validation](https://github.com/fajarxfce/hris-mobile/blob/main/docs/validation.md).
 
@@ -412,9 +416,10 @@ and [executed validation](https://github.com/fajarxfce/hris-mobile/blob/main/doc
    staged decisions, withdrawal and history are implemented. Publication review,
    admission, bounded progress, retained attempts and terminal-job recovery are
    implemented in the dashboard. Native retained-revision navigation and immutable
-   encrypted history are implemented.
-   The current/retained statements and sync contracts are
-   available in the API. The revised APK awaits phone connectivity.
+   encrypted history are implemented and validated against a published amendment
+   on Android. The current/retained statements and sync contracts are available
+   in the API. The validated APK has been delivered to the authorized phone;
+   device UI acceptance remains separate from install-only delivery.
 
 Each stage requires isolation, competing-change, lost-response, assurance-expiry,
 cancellation and cleanup tests where applicable. The feature is not complete at

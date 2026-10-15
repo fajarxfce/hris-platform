@@ -5,7 +5,9 @@ import dev.fajar.hris.core.http.*
 import dev.fajar.hris.leave.delivery.mappers.*
 import dev.fajar.hris.leave.delivery.requests.*
 import dev.fajar.hris.leave.delivery.responses.*
+import dev.fajar.hris.leave.domain.entities.LeaveBatchKind
 import dev.fajar.hris.leave.domain.usecases.*
+import java.time.YearMonth
 import java.util.UUID
 import org.springframework.web.bind.annotation.*
 
@@ -17,7 +19,29 @@ class LeaveBatchController(
     private val resume: ResumeLeaveBatch,
     private val get: GetLeaveBatch,
     private val list: ListLeaveBatches,
+    private val review: ReviewLeaveBatch,
+    private val types: ListLeaveBatchTypes,
 ) {
+    @GetMapping("/batches/types")
+    fun types(
+        actor: Actor,
+        @RequestParam kind: LeaveBatchKind,
+        @RequestParam(required = false) after: String?,
+        @RequestParam(defaultValue = "20") limit: Int,
+    ): Page<LeaveTypeResponse> =
+        types.execute(actor, kind, after, limit).response().let {
+            Page(it.items.map { type -> type.toResponse() }, it.nextCursor)
+        }
+
+    @GetMapping("/batches/review")
+    fun review(
+        actor: Actor,
+        @RequestParam kind: LeaveBatchKind,
+        @RequestParam typeId: UUID,
+        @RequestParam period: YearMonth,
+    ): LeaveBatchReviewResponse =
+        review.execute(actor, kind, typeId, period).response().toResponse()
+
     @PostMapping("/accrual-batches")
     fun accrue(
         actor: Actor,

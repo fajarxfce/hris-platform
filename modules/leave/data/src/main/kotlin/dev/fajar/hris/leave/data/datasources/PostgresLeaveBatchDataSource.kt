@@ -1,10 +1,13 @@
 package dev.fajar.hris.leave.data.datasources
 
+import dev.fajar.hris.leave.data.models.LeaveBatchEmployeeRow
 import dev.fajar.hris.schema.tables.BackgroundJobs.BACKGROUND_JOBS as J
+import dev.fajar.hris.schema.tables.Employments.EMPLOYMENTS as E
 import dev.fajar.hris.schema.tables.LeaveBatchAttempts.LEAVE_BATCH_ATTEMPTS as A
 import dev.fajar.hris.schema.tables.LeaveBatchResults.LEAVE_BATCH_RESULTS as R
 import dev.fajar.hris.schema.tables.LeaveBatchTargets.LEAVE_BATCH_TARGETS as T
 import dev.fajar.hris.schema.tables.LeaveBatches.LEAVE_BATCHES as B
+import dev.fajar.hris.schema.tables.Persons.PERSONS as P
 import dev.fajar.hris.schema.tables.records.*
 import java.time.LocalDate
 import java.util.UUID
@@ -103,6 +106,22 @@ class PostgresLeaveBatchDataSource(private val sql: DSLContext) : LeaveBatchData
             .orderBy(R.ORDINAL)
             .limit(limit)
             .fetch()
+
+    override fun employees(company: UUID, ids: Set<UUID>): List<LeaveBatchEmployeeRow> =
+        sql.select(E.ID, E.EMPLOYEE_NUMBER, P.LEGAL_NAME)
+            .from(E)
+            .leftJoin(P)
+            .on(P.ID.eq(E.PERSON_ID))
+            .where(E.COMPANY_ID.eq(company), E.ID.`in`(ids))
+            .orderBy(E.ID)
+            .limit(200)
+            .fetch {
+                LeaveBatchEmployeeRow(
+                    requireNotNull(it.value1()),
+                    requireNotNull(it.value2()),
+                    it.value3(),
+                )
+            }
 
     override fun attempts(company: UUID, batch: UUID): List<LeaveBatchAttemptsRecord> =
         sql.selectFrom(A)

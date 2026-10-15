@@ -90,6 +90,12 @@ class StoredLeaveBatchRepository(
         )
     }
 
+    override fun employees(companyId: UUID, ids: Set<UUID>): Result<List<LeaveEmployeeReference>> =
+        safeDatabaseCall {
+            val rows = source.employees(companyId, ids).associateBy { it.id }
+            ids.map { id -> LeaveEmployeeReference(id, rows[id]?.number, rows[id]?.name) }
+        }
+
     override fun attempts(companyId: UUID, batchId: UUID): Result<List<LeaveBatchAttempt>> =
         safeDatabaseCall {
             source.attempts(companyId, batchId).map { it.toAttempt() }

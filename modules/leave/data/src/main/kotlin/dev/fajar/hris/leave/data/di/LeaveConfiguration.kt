@@ -706,6 +706,40 @@ class LeaveConfiguration {
         )
 
     @Bean
+    fun listLeaveBatchTypes(
+        policies: LeavePolicyRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = ListLeaveBatchTypes(policies, identities, members, transactions, clock, security)
+
+    @Bean
+    fun reviewLeaveBatch(
+        batches: LeaveBatchRepository,
+        policies: LeavePolicyRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        ReviewLeaveBatch(
+            batches,
+            policies,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun getLeaveBatch(
         batches: LeaveBatchRepository,
         jobs: JobRepository,
@@ -713,7 +747,23 @@ class LeaveConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetLeaveBatch(batches, jobs, companies, members, identities, transactions)
+        policies: LeavePolicyRepository,
+        people: PeopleRepository,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetLeaveBatch(
+            batches,
+            jobs,
+            companies,
+            members,
+            identities,
+            transactions,
+            policies,
+            people,
+            clock,
+            security,
+        )
 
     @Bean
     fun listLeaveBatches(
@@ -722,7 +772,9 @@ class LeaveConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListLeaveBatches(batches, companies, members, identities, transactions)
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = ListLeaveBatches(batches, companies, members, identities, transactions, clock, security)
 
     @Bean
     fun resumeLeaveBatch(
@@ -736,6 +788,7 @@ class LeaveConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         ResumeLeaveBatch(
             batches,
@@ -748,6 +801,7 @@ class LeaveConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -763,6 +817,7 @@ class LeaveConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         StartLeaveAccrualBatch(
             batches,
@@ -776,6 +831,7 @@ class LeaveConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 
     @Bean
@@ -791,6 +847,7 @@ class LeaveConfiguration {
         journal: ChangeJournalRepository,
         transactions: TransactionRunner,
         clock: Clock,
+        security: IdentitySecurityPolicy,
     ) =
         StartLeaveYearCloseBatch(
             batches,
@@ -804,5 +861,6 @@ class LeaveConfiguration {
             journal,
             transactions,
             clock,
+            security,
         )
 }

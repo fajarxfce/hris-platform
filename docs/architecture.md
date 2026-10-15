@@ -362,6 +362,17 @@ retain scope, and all three reads recheck session assurance after acquisition.
 
 Interactive leave balance, ledger, and entitlement reads revalidate current session assurance after resource and access guards. Independent adjustments, entitlement posting, and year closing use the same post-acquisition check before mutation or original receipt replay. A proof that expires while waiting cannot authorize the later result; cancellation unwinds the transaction and releases its guards.
 
+Batch entitlement preparation acquires shared policy, People and access guards.
+Its type discovery requires the selected posting/closing capability rather than
+policy administration. Review returns the effective policy and an owned, bounded
+employee selection; submitting those IDs cannot silently include later hires.
+Batch details acquire job, batch, shared policy, People and access guards, then
+project names/numbers for the returned outcome page only. Recovery hints use
+current authority and retained attempts. Interactive batch reads revalidate
+session assurance after acquisition; admission/resume retain it after queue waits
+and through journaling and receipt completion. Background execution keeps its
+separate initiating-credential and lease authority.
+
 The employee balance directory and ledger acquire a shared employee-ledger guard, then the shared policy, people, and access guards. The directory datasource returns a bounded account/type projection in one query. Its repository maps rows and pagination inside the database failure boundary; the use case owns current employee scope and assurance. Minimal labels do not expose administrative policy revision reasons or require unrelated people-administration grants.
 
 Import recovery and cancellation acquire the previous job before the import header, matching worker order. Import reads protect the header and row outcomes with a shared resource guard before access guards. Privileged commands recheck recent authentication after a pending resource or queue acquisition; an earlier check cannot authorize work indefinitely.

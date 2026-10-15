@@ -4707,3 +4707,23 @@ original cancellation receipt afterward. One attempt remained, employment was
 unchanged and no case was created. The disposable database and both test
 applications were stopped. Due initiation is covered by the backend worker tests;
 this browser acceptance does not claim to have waited for a future start date.
+
+### Entitlement batch preparation and recovery reads
+
+Accrual/year-closing operators can discover type references and review the
+company-local period, effective policy and bounded employee selection without
+policy or People administration. Submitting the retained employee IDs preserves
+that selection across later hires. Batch detail returns minimal labels for the
+current outcome page and current recovery hints. Request reads recheck MFA after
+acquisition; admission/resume retain assurance after queue waits and through
+journal and original-receipt completion. Background authority remains separate.
+
+Validation passed with 102 focused API/PostgreSQL/contract cases across the
+affected runs, 20 Leave domain tests and all 68 worker tests. Coverage includes
+current-grant intersection, assurance expiry during waits and after reads/writes,
+transaction rollback, cancellation cleanup, caller-owned input mutation,
+historical policy revisions, scoped labels and original-owner recovery. One
+review suite initially failed to start its PostgreSQL container; its isolated
+rerun used corrected fixture expectations for the existing HTTP/JSON contracts.
+Architecture and format checks, test compilation and both application JAR builds
+passed. Dashboard controls and browser/worker acceptance are the next increment.

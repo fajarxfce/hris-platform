@@ -1,5 +1,6 @@
 package dev.fajar.hris.leave.data.datasources
 
+import dev.fajar.hris.leave.data.models.LeaveBatchEmployeeRow
 import dev.fajar.hris.schema.tables.records.*
 import java.time.LocalDate
 import java.util.UUID
@@ -28,6 +29,8 @@ interface LeaveBatchDataSource {
     fun counts(company: UUID, batch: UUID): Map<String, Int>
 
     fun results(company: UUID, batch: UUID, after: Int?, limit: Int): List<LeaveBatchResultsRecord>
+
+    fun employees(company: UUID, ids: Set<UUID>): List<LeaveBatchEmployeeRow>
 
     fun attempts(company: UUID, batch: UUID): List<LeaveBatchAttemptsRecord>
 

@@ -9,4 +9,6 @@ data class LeaveBatchDetails(
     val attempts: List<LeaveBatchAttempt>,
     val job: BackgroundJob,
     val results: Page<LeaveBatchResult>,
+    val employees: List<LeaveEmployeeReference>,
+    val availableActions: Set<LeaveBatchAction>,
 )

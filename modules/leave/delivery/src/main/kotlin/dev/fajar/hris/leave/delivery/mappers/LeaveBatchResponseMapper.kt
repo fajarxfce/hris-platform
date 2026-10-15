@@ -4,6 +4,17 @@ import dev.fajar.hris.core.domain.Page
 import dev.fajar.hris.leave.delivery.responses.*
 import dev.fajar.hris.leave.domain.entities.*
 
+fun LeaveBatchReview.toResponse() =
+    LeaveBatchReviewResponse(
+        kind.name,
+        period,
+        companyDate,
+        timezone,
+        type.toResponse(),
+        totalEmployees,
+        employeeIds,
+    )
+
 fun LeaveBatch.toResponse() =
     LeaveBatchResponse(
         id,
@@ -56,4 +67,6 @@ fun LeaveBatchDetails.toResponse() =
             job.failureCode,
         ),
         Page(results.items.map { it.toResponse() }, results.nextCursor),
+        employees.map { it.toResponse() },
+        availableActions.map { it.name }.toSet(),
     )

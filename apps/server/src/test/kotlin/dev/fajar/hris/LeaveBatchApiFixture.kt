@@ -32,6 +32,10 @@ abstract class LeaveBatchApiFixture : LeaveAccountingApiFixture() {
             )
     }
 
+    protected fun trackBatchCompany(f: LeaveFixture) {
+        companies += f.company
+    }
+
     protected fun batchBody(
         f: LeaveFixture,
         id: UUID = UUID.randomUUID(),
@@ -60,7 +64,7 @@ abstract class LeaveBatchApiFixture : LeaveAccountingApiFixture() {
         client: HttpClient = f.admin,
         csrf: String = f.adminCsrf,
     ): HttpResponse<String> {
-        companies += f.company
+        trackBatchCompany(f)
         return command(
             client,
             "/api/v1/companies/${f.company}/leave/${if(kind==JobKind.LEAVE_ACCRUAL) "accrual-batches" else "year-close-batches"}",

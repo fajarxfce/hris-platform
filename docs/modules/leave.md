@@ -175,3 +175,27 @@ before evaluating today's preview; its payload includes the original revision.
 The field is optional for existing direct-submit consumers, which retain the
 same server-side eligibility, authorization and accounting checks. New clients
 that show a preview should always send its revision.
+
+## Entitlement batch preparation
+
+Batch type discovery requires the selected accrual/closing permission and returns
+bounded current type labels, including archived or future definitions. It does
+not grant policy administration or expose revision reasons. Preparation resolves
+the selected period's effective policy and its independent current head, derives
+the company-local date, and returns an immutable selection of up to 5,000 company
+employee IDs. Clients submit that reviewed selection explicitly; later hires do
+not silently enter an already reviewed command. Preparation creates no work or
+reservation, and admission still validates the IDs and policy version.
+
+Batch detail includes names and employee numbers only for its returned outcome
+page, without acquiring private profiles or requiring People administration.
+Recovery hints require the original author, current operation permission, an
+unchanged policy, a stopped job, remaining attempt capacity and no active
+replacement. The command rechecks those conditions independently. Results already
+recorded remain immutable when work is resumed.
+
+Interactive batch discovery, preparation, history and detail recheck current MFA
+after acquisition. Admission and resume recheck it after queue waits and through
+journal/receipt completion. A late failure rolls back the job, batch, targets,
+attempt, audit and receipt together. Background workers retain their separate
+credential, permission and lease checks. See the [API contracts](../api-conventions.md).

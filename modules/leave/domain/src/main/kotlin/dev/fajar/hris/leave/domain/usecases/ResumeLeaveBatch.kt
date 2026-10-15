@@ -1,7 +1,8 @@
 package dev.fajar.hris.leave.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
@@ -22,6 +23,7 @@ class ResumeLeaveBatch(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -77,10 +79,10 @@ class ResumeLeaveBatch(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId, shared = true)
             if (accountLock is Result.Failed) return@run accountLock
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val permission = live.requirePermission(batch.kind.permission)
@@ -133,6 +135,8 @@ class ResumeLeaveBatch(
             if (pending is Result.Failed) return@run pending
             if ((pending as Result.Success).value >= 100)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "job_queue_full"))
+            val assured = validateCompanySessionActor(actor, access, clock.instant(), security)
+            if (assured is Result.Failed) return@run assured
             val now = clock.instant()
             val remaining = batch.totalEmployees - counts.completed
             val request =
@@ -170,7 +174,10 @@ class ResumeLeaveBatch(
                             ),
                         )
                         .flatMap { operations.record(actor, key, receipt) }
-                        .map { receipt }
+                        .flatMap {
+                            validateCompanySessionActor(actor, access, clock.instant(), security)
+                                .map { receipt }
+                        }
                 }
         }
     }

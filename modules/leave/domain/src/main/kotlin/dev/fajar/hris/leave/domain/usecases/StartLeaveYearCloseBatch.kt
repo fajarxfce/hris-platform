@@ -1,7 +1,8 @@
 package dev.fajar.hris.leave.domain.usecases
 
 import dev.fajar.hris.core.domain.*
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
@@ -25,6 +26,7 @@ class StartLeaveYearCloseBatch(
     private val journal: ChangeJournalRepository,
     private val transactions: TransactionRunner,
     private val clock: Clock,
+    private val security: IdentitySecurityPolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -36,13 +38,15 @@ class StartLeaveYearCloseBatch(
         employeeIds: Set<UUID>?,
         reason: String,
     ): Result<MutationReceipt> {
+        val selectedEmployees = employeeIds?.toSet()
         val kind = LeaveBatchKind.YEAR_CLOSE
         val permission = actor.requirePermission(kind.permission)
         if (permission is Result.Failed) return permission
         if (year !in 1900..2199)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_leave_batch"))
         val period = YearMonth.of(year, 12)
-        val valid = validateLeaveBatchInput(period, expectedPolicyVersion, employeeIds, reason)
+        val valid =
+            validateLeaveBatchInput(period, expectedPolicyVersion, selectedEmployees, reason)
         if (valid is Result.Failed) return valid
         val company = requireNotNull(actor.companyId)
         val key =
@@ -55,7 +59,7 @@ class StartLeaveYearCloseBatch(
                     period.toString(),
                     expectedPolicyVersion.toString(),
                     reason,
-                    employeeIds?.map { it.toString() }?.sorted()?.joinToString(","),
+                    selectedEmployees?.map { it.toString() }?.sorted()?.joinToString(","),
                 ),
             )
         return transactions.run(actor) {
@@ -73,10 +77,10 @@ class StartLeaveYearCloseBatch(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId, shared = true)
             if (accountLock is Result.Failed) return@run accountLock
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val allowed = (checked as Result.Success).value.requirePermission(kind.permission)
             if (allowed is Result.Failed) return@run allowed
@@ -99,18 +103,18 @@ class StartLeaveYearCloseBatch(
                     )
             if (type.version != expectedPolicyVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_policy_version"))
-            if (period.year >= today.year)
-                return@run Result.Failed(Failure(FailureKind.VALIDATION, "leave_year_not_ended"))
+            val due = validateLeaveBatchPolicy(kind, period, today, type)
+            if (due is Result.Failed) return@run due
             val active = batches.active(company, typeId, kind, period)
             if (active is Result.Failed) return@run active
             if ((active as Result.Success).value)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "leave_batch_active"))
             val selected =
-                if (employeeIds == null) people.employeeIds(company, 5001)
-                else people.existingEmployeeIds(company, employeeIds).map { it.toList() }
+                if (selectedEmployees == null) people.employeeIds(company, 5001)
+                else people.existingEmployeeIds(company, selectedEmployees).map { it.toList() }
             if (selected is Result.Failed) return@run selected
             val ids = (selected as Result.Success).value
-            if (employeeIds != null && ids.toSet() != employeeIds)
+            if (selectedEmployees != null && ids.toSet() != selectedEmployees)
                 return@run Result.Failed(
                     Failure(FailureKind.VALIDATION, "leave_batch_employee_unavailable")
                 )
@@ -124,6 +128,8 @@ class StartLeaveYearCloseBatch(
             if (pending is Result.Failed) return@run pending
             if ((pending as Result.Success).value >= 100)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "job_queue_full"))
+            val assured = validateCompanySessionActor(actor, access, clock.instant(), security)
+            if (assured is Result.Failed) return@run assured
             val request =
                 JobRequest(
                     UUID.randomUUID(),
@@ -181,7 +187,11 @@ class StartLeaveYearCloseBatch(
                     )
                 }
                 .flatMap { operations.record(actor, key, receipt) }
-                .map { receipt }
+                .flatMap {
+                    validateCompanySessionActor(actor, access, clock.instant(), security).map {
+                        receipt
+                    }
+                }
         }
     }
 }

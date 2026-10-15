@@ -41,6 +41,8 @@ interface LeaveBatchRepository {
         limit: Int,
     ): Result<Page<LeaveBatchResult>>
 
+    fun employees(companyId: UUID, ids: Set<UUID>): Result<List<LeaveEmployeeReference>>
+
     fun attempts(companyId: UUID, batchId: UUID): Result<List<LeaveBatchAttempt>>
 
     fun transition(

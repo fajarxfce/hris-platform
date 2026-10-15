@@ -8,4 +8,6 @@ data class LeaveBatchDetailsResponse(
     val attempts: List<LeaveBatchAttemptResponse>,
     val job: LeaveBatchProgressResponse,
     val results: Page<LeaveBatchResultResponse>,
+    val employees: List<LeaveEmployeeReferenceResponse>,
+    val availableActions: Set<String>,
 )

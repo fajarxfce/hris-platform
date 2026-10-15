@@ -99,6 +99,11 @@ class StoredLifecycleRepository(
         source.completedOffboardingDate(companyId, employeeId)
     }
 
+    override fun hasCompletedCase(companyId: UUID, employeeId: UUID, kind: LifecycleKind) =
+        safeDatabaseCall {
+            source.hasCompletedCase(companyId, employeeId, kind.name)
+        }
+
     override fun hasOpenCases(companyId: UUID, employeeId: UUID, exceptId: UUID?) =
         safeDatabaseCall {
             source.hasOpenCases(companyId, employeeId, exceptId)

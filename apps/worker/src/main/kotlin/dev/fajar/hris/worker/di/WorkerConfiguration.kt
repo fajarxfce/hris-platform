@@ -23,6 +23,13 @@ import org.springframework.transaction.PlatformTransactionManager
 @Configuration(proxyBeanMethods = false)
 class WorkerConfiguration {
     @Bean
+    fun onboardingScheduleTask(
+        resolve: ResolveActor,
+        execute: ExecuteOnboardingSchedule,
+        abort: AbortOnboardingSchedule,
+    ): JobTask = OnboardingScheduleTask(resolve, execute, abort)
+
+    @Bean
     fun offboardingScheduleTask(
         resolve: ResolveActor,
         execute: ExecuteOffboardingSchedule,

@@ -99,7 +99,7 @@ class OffboardingSchedulePolicyTest {
     ) =
         OffboardingScheduleDetails(
             schedule.copy(status = status),
-            OffboardingScheduleJob(schedule.jobId, jobStatus, 1, 1, false, 0, null, null),
+            LifecycleScheduleJob(schedule.jobId, jobStatus, 1, 1, false, 0, null, null),
         )
 
     private fun code(result: Result<*>) = (result as Result.Failed).failure.code

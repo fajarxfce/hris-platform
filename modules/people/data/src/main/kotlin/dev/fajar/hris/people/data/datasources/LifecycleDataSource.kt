@@ -35,6 +35,8 @@ interface LifecycleDataSource {
 
     fun completedOffboardingDate(companyId: UUID, employeeId: UUID): LocalDate?
 
+    fun hasCompletedCase(companyId: UUID, employeeId: UUID, kind: String): Boolean
+
     fun hasOpenCases(companyId: UUID, employeeId: UUID, exceptId: UUID?): Boolean
 
     fun tasks(companyId: UUID, ids: Set<UUID>): List<LifecycleTasksRecord>

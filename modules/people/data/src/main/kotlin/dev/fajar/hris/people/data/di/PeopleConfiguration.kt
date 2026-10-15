@@ -18,6 +18,206 @@ import org.springframework.context.annotation.Configuration
 @Configuration(proxyBeanMethods = false)
 class PeopleConfiguration {
     @Bean
+    fun onboardingScheduleSource(sql: DSLContext): OnboardingScheduleDataSource =
+        PostgresOnboardingScheduleDataSource(sql)
+
+    @Bean
+    fun onboardingSchedules(
+        source: OnboardingScheduleDataSource,
+        json: tools.jackson.databind.ObjectMapper,
+    ): OnboardingScheduleRepository = StoredOnboardingScheduleRepository(source, json)
+
+    @Bean
+    fun getOnboardingScheduleReview(
+        schedules: OnboardingScheduleRepository,
+        lifecycle: LifecycleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetOnboardingScheduleReview(
+            schedules,
+            lifecycle,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun listOnboardingSchedules(
+        schedules: OnboardingScheduleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListOnboardingSchedules(
+            schedules,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun getOnboardingSchedule(
+        schedules: OnboardingScheduleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetOnboardingSchedule(
+            schedules,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun scheduleOnboarding(
+        schedules: OnboardingScheduleRepository,
+        lifecycle: LifecycleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ScheduleOnboarding(
+            schedules,
+            lifecycle,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun cancelOnboardingSchedule(
+        schedules: OnboardingScheduleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        CancelOnboardingSchedule(
+            schedules,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun recoverOnboardingSchedule(
+        schedules: OnboardingScheduleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        RecoverOnboardingSchedule(
+            schedules,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun executeOnboardingSchedule(
+        schedules: OnboardingScheduleRepository,
+        lifecycle: LifecycleRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        ExecuteOnboardingSchedule(
+            schedules,
+            lifecycle,
+            people,
+            companies,
+            members,
+            identities,
+            jobs,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun abortOnboardingSchedule(
+        schedules: OnboardingScheduleRepository,
+        people: PeopleRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = AbortOnboardingSchedule(schedules, people, jobs, journal, transactions, clock)
+
+    @Bean
     fun offboardingScheduleSource(sql: DSLContext): OffboardingScheduleDataSource =
         PostgresOffboardingScheduleDataSource(sql)
 

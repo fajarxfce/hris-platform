@@ -119,7 +119,8 @@ replacement publishes. Root checks passed with 1,498 desktop/JVM/UI tests, 108
 targeted Chromium tests, Android assembly and production Web compilation. API 35
 acceptance verified offline upgrade, balance acquisition, another offline process
 restart and an Indonesian PDF saved with its revision in the filename. Phone
-delivery is pending ADB availability; the emulator retained its application data.
+delivery followed in the retained-revision update below; the emulator retained
+its application data.
 The [retained payslip navigation](https://github.com/fajarxfce/hris-mobile/commit/7df15e15)
 adds previous/next revision selection, an owned encrypted statement archive and
 exact-revision acquisition. Already acquired statements remain available offline;
@@ -129,7 +130,9 @@ the feed cursor or clear a confirmed denial. Root checks passed with 1,527 tests
 API 35 acceptance verified offline upgrade and reconnection with unchanged stored
 record hashes. The real development fixture uses revision zero; automated tests
 cover historical navigation, immutable archive writes and a pinned historical PDF.
-Phone delivery remains pending after a bounded ADB connection timeout.
+The validated APK was installed on the authorized Android 16 phone after its
+source inputs and artifact matched the validation manifest. Delivery was
+install-only; no phone UI was opened or operated.
 The [native expense pages](https://github.com/fajarxfce/hris-mobile/commit/a213e1a)
 now provide owned claim history, month/status filters, draft and submission details,
 receipt metadata, approval activity and payment progress. Encrypted list/detail
@@ -258,10 +261,10 @@ against an isolated API/PostgreSQL fixture with independent operators.
 | --- | --- |
 | Mobile identity | Native OIDC handoff and external-provider acceptance. Android MFA and device-session workflows are validated; iOS physical acceptance remains separate. |
 | Mobile foundation | Offline drafts for the remaining workflows, stable ownership for the remaining read projections, consistent sync status, deep links and push registration. Expense working copies, owned encrypted company restoration, age-independent stored reads and account-owned Inbox/Leave/Overtime/Workforce/Payroll/Expense/Directory/Document catalog/private profile records are implemented; the mobile sync model records each remaining collection. |
-| People | Reviewed scheduled offboarding is implemented across the backend, worker and dashboard, including cancellation, retained attempts and terminal-job recovery. Scheduled onboarding remains pending. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
+| People | Reviewed scheduled offboarding is implemented across the backend, worker and dashboard, including cancellation, retained attempts and terminal-job recovery. [Scheduled onboarding](onboarding-schedules.md) is implemented in the backend and worker; its dashboard workflow is next. Dashboard company transfers and initial employee/account binding are implemented and verified with native employee access. |
 | Workforce | Bulk/reset and late corrections; physical location acceptance. Shift templates, company holidays, calendars, weekly scheduling, daily rosters, employee attendance evidence/review/corrections and their history, company-wide exception review queues, overtime planning with reviewed calendars, directories/details/history, actual-time submission, independent review and withdrawal, dashboard monthly closing/recovery with published employee results, and mobile work calendars, overtime planning/actual time/withdrawal with durable recovery, and online/offline capture are implemented and verified against the real API. |
 | Leave | Team calendar, entitlement batches and year closing; scheduled accrual/expiry. Dashboard request creation includes scoped employee/evidence selection, server calculation, preview conflicts and original-command recovery, verified against an isolated API/PostgreSQL instance. Mobile balances, filtered history, request details, submission with published document evidence, and durable withdrawal/cancellation flows are implemented and verified against the development API. |
-| Payroll | Native acceptance against an amended server dataset and phone delivery. Backend, worker and dashboard workflows are implemented through amendment publication, independent review and payment settlement. Mobile supports current/retained statements, independent balances, encrypted offline records, incremental synchronization and revision-pinned PDF saving. See [delivery stages and validation limits](payroll-amendments.md) and the [module status](modules/payroll.md). |
+| Payroll | Native acceptance against an amended server dataset. Backend, worker and dashboard workflows are implemented through amendment publication, independent review and payment settlement. Mobile supports current/retained statements, independent balances, encrypted offline records, incremental synchronization and revision-pinned PDF saving. See [delivery stages and validation limits](payroll-amendments.md) and the [module status](modules/payroll.md). |
 | Communications | Mobile push hints and navigation. Dashboard audience groups, drafts, bounded named audience selection, publication review, preview, scheduling, cancellation/recovery and archival, and the mobile inbox with durable read/acknowledgement commands are implemented. |
 | Identity administration | Dashboard platform users, role/membership changes, invitations, provider bindings and sessions; company membership and grant review is implemented |
 | Reporting | Attendance, leave, overtime, expenses and payroll reports, authorized bounded exports and export history |

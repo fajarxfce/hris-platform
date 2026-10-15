@@ -130,6 +130,18 @@ class PostgresLifecycleDataSource(private val sql: DSLContext) : LifecycleDataSo
             .and(C.STATUS.eq("COMPLETED"))
             .fetchOne(C.TARGET_DATE)
 
+    override fun hasCompletedCase(companyId: UUID, employeeId: UUID, kind: String) =
+        sql.fetchExists(
+            sql.selectOne()
+                .from(C)
+                .where(
+                    C.COMPANY_ID.eq(companyId),
+                    C.EMPLOYMENT_ID.eq(employeeId),
+                    C.KIND.eq(kind),
+                    C.STATUS.eq("COMPLETED"),
+                )
+        )
+
     override fun hasOpenCases(companyId: UUID, employeeId: UUID, exceptId: UUID?) =
         sql.fetchExists(
             sql.selectOne()

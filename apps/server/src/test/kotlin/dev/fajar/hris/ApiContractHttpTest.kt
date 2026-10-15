@@ -34,6 +34,66 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun scheduledOnboardingReviewsSelectedDatesAndKeepsQueueAuthorityPrivate() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/employees/{employmentId}/onboarding-schedules"
+        for ((path, method) in
+            listOf(
+                base to "get",
+                "$base/review" to "get",
+                "$base/{id}" to "get",
+                base to "post",
+                "$base/{id}/cancel" to "post",
+                "$base/{id}/recover" to "post",
+            )) {
+            val operation = api["paths"][path][method]
+            assertTrue(operation["x-hris-company-admission"].asBoolean(), path)
+            assertEquals(
+                method == "post",
+                operation.path("parameters").any { it.path("name").asString() == "Idempotency-Key" },
+            )
+        }
+        val query =
+            api["paths"]["$base/review"]["get"]["parameters"].filter {
+                it["in"].asString() == "query"
+            }
+        assertTrue(
+            query
+                .map { it["name"].asString() }
+                .containsAll(listOf("templateId", "targetDate", "startsOn"))
+        )
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf(
+                "id",
+                "caseId",
+                "templateId",
+                "employmentVersion",
+                "templateVersion",
+                "basisRevision",
+                "targetDate",
+                "startsOn",
+                "assignees",
+                "reason",
+            ),
+            schemas["OnboardingScheduleRequest"]["properties"].propertyNames().toSet(),
+        )
+        for (response in
+            listOf(
+                "OnboardingScheduleResponse",
+                "OnboardingScheduleReviewResponse",
+                "OnboardingScheduleJobResponse",
+            )) for (field in
+            listOf(
+                "credentialVersion",
+                "authenticatedAt",
+                "request",
+                "birthDate",
+                "email",
+            )) assertFalse(schemas[response]["properties"].has(field), "$response.$field")
+    }
+
+    @Test
     fun scheduledOffboardingPinsItsReviewedBasisAndKeepsCredentialsOutOfResponses() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/lifecycle/cases/{caseId}/offboarding-schedules"

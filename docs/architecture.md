@@ -55,6 +55,16 @@ schedule, job progress and journal commit atomically; interruption or stale work
 rolls back. Queue-wide recovery gains no additional People RLS scope. See
 [scheduled offboarding](offboarding-schedules.md).
 
+Scheduled onboarding uses the same queue with a distinct authorization and job
+kind. Its admission captures the effective employment, immutable template revision,
+company-local dates and a bounded assignee selection. Execution creates an open
+case with pending tasks; it cannot complete tasks, activate accounts or modify
+employment. Job, People, template and access guards precede current-source and
+credential checks. A manual open or completed case prevents repeated initiation.
+The new case, initial history, authorization outcome, checkpoint and journal share
+one transaction. Retained template definitions stay in the existing revision
+history. See [scheduled onboarding](onboarding-schedules.md).
+
 Approval aggregate reads acquire the shared approval guard before company, membership, and actor-account guards. They observe headers and assignment overrides coherently; mutations retain the exclusive approval guard. Both readers and administrative commands revalidate live session assurance after waiting, including before returning an existing operation receipt.
 
 Interactive work-calendar reads and commands also revalidate current session

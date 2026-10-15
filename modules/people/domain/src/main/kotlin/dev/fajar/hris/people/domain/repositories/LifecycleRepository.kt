@@ -37,6 +37,8 @@ interface LifecycleRepository {
 
     fun completedOffboardingDate(companyId: UUID, employeeId: UUID): Result<LocalDate?>
 
+    fun hasCompletedCase(companyId: UUID, employeeId: UUID, kind: LifecycleKind): Result<Boolean>
+
     fun hasOpenCases(companyId: UUID, employeeId: UUID, exceptId: UUID? = null): Result<Boolean>
 
     fun create(actor: Actor, case: LifecycleCase, reason: String): Result<MutationReceipt>

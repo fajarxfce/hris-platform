@@ -1,0 +1,324 @@
+package dev.fajar.hris
+
+import dev.fajar.hris.core.database.safeDatabaseCall
+import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.jobs.domain.entities.*
+import java.net.http.HttpResponse
+import java.time.Instant
+import java.util.UUID
+import java.util.concurrent.*
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataAccessException
+import org.springframework.jdbc.core.JdbcTemplate
+
+class OnboardingScheduleTransactionHttpTest : OnboardingScheduleApiFixture() {
+    @Autowired private lateinit var runtimeJdbc: JdbcTemplate
+
+    private val evidence =
+        listOf(
+            "employment_revisions",
+            "lifecycle_cases",
+            "lifecycle_tasks",
+            "lifecycle_events",
+            "audit_entries",
+            "outbox_events",
+            "operation_receipts",
+            "onboarding_schedules",
+            "background_jobs",
+        )
+
+    @Test
+    fun competingRetriesKeepOneAuthorizationAndChangedPayloadCannotReplaceTheReceipt() {
+        val f = fixture(future = true)
+        val prepared = prepare(f)
+        Executors.newFixedThreadPool(2).use { pool ->
+            val responses =
+                (1..2)
+                    .map { pool.submit<HttpResponse<String>> { submit(f, prepared) } }
+                    .map { ok(it.get(10, TimeUnit.SECONDS)) }
+            assertEquals(responses[0], responses[1])
+        }
+        val changed =
+            prepared.copy(
+                body =
+                    prepared.body.replace(
+                        "Reviewed scheduled onboarding",
+                        "Different reviewed initiation",
+                    )
+            )
+        assertEquals(409, submit(f, changed).statusCode())
+        val competing =
+            prepared.copy(id = UUID.randomUUID(), operation = UUID.randomUUID()).let {
+                it.copy(body = it.body.replace(prepared.id.toString(), it.id.toString()))
+            }
+        val refused = submit(f, competing)
+        assertEquals(409, refused.statusCode(), refused.body())
+        assertEquals("onboarding_schedule_active", json.readTree(refused.body())["code"].asString())
+        assertEquals(1, count(f, "onboarding_schedules"))
+        assertEquals(1, count(f, "background_jobs"))
+        assertEquals("ACTIVE", employmentStatus(f))
+    }
+
+    @Test
+    fun twoWorkersWithOneLeaseCannotCommitTwoInitiations() {
+        val f = fixture()
+        scheduled(f)
+        val lease = claim().single()
+        clock.set(Instant.now())
+        Executors.newFixedThreadPool(2).use { pool ->
+            val results =
+                (1..2)
+                    .map {
+                        pool.submit<Result<JobStep>> { executeSchedule.execute(f.actor, lease) }
+                    }
+                    .map { it.get(10, TimeUnit.SECONDS) }
+            assertEquals(1, results.count { it == Result.Success(JobStep(1, true)) })
+            assertEquals(
+                1,
+                results.count {
+                    it == Result.Failed(Failure(FailureKind.CONFLICT, "job_lease_lost"))
+                },
+                results.toString(),
+            )
+        }
+        assertEquals(1, count(f, "employment_revisions"))
+        assertEquals(1, count(f, "lifecycle_cases"))
+    }
+
+    @Test
+    fun checkpointFailureRollsBackEmploymentAccessCaseAndAllEvidence() {
+        val f = fixture()
+        val prepared = scheduled(f)
+        val lease = claim().single()
+        val before = evidence.associateWith { count(f, it) }
+        scheduleProbe.failCheckpoint.set(f.company)
+        assertEquals(
+            Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_checkpoint_failure")),
+            execute(f, lease),
+        )
+        assertEquals(before, evidence.associateWith { count(f, it) })
+        assertUnchanged(f, prepared.id)
+        assertEquals(Result.Success(JobStep(1, true)), execute(f, lease))
+        assertEquals(1, count(f, "employment_revisions"))
+    }
+
+    @Test
+    fun interruptionAfterCheckpointReleasesResourcesAndCannotCommitALateInitiation() {
+        val f = fixture()
+        val prepared = scheduled(f)
+        val lease = claim().single()
+        val before = evidence.associateWith { count(f, it) }
+        val entered = CountDownLatch(1)
+        val exited = CountDownLatch(1)
+        val neverReleased = CountDownLatch(1)
+        scheduleProbe.afterCheckpoint.set(
+            OnboardingScheduleProbe.Hook(f.company) {
+                entered.countDown()
+                neverReleased.await()
+            }
+        )
+        Executors.newSingleThreadExecutor().use { pool ->
+            val pending =
+                pool.submit<Result<JobStep>> {
+                    try {
+                        execute(f, lease)
+                    } finally {
+                        exited.countDown()
+                    }
+                }
+            try {
+                assertTrue(entered.await(5, TimeUnit.SECONDS))
+                assertTrue(pending.cancel(true))
+                assertTrue(exited.await(10, TimeUnit.SECONDS))
+                assertEquals(before, evidence.associateWith { count(f, it) })
+                assertUnchanged(f, prepared.id)
+                val retried =
+                    pool
+                        .submit<Result<JobStep>> {
+                            assertFalse(Thread.currentThread().isInterrupted)
+                            execute(f, lease)
+                        }
+                        .get(10, TimeUnit.SECONDS)
+                assertEquals(Result.Success(JobStep(1, true)), retried)
+            } finally {
+                neverReleased.countDown()
+                pending.cancel(true)
+            }
+        }
+    }
+
+    @Test
+    fun lateLeaseExpiryRollsBackTheCheckpointAndOldOwnersCannotFinishAReplacement() {
+        val f = fixture()
+        val prepared = scheduled(f)
+        val first = claim().single()
+        val before = evidence.associateWith { count(f, it) }
+        scheduleProbe.afterCheckpoint.set(
+            OnboardingScheduleProbe.Hook(f.company) {
+                runtimeJdbc.update(
+                    "update background_jobs set lease_until=clock_timestamp()-interval '1 second' where id=?",
+                    first.job.request.id,
+                )
+            }
+        )
+        assertEquals(
+            Result.Failed(Failure(FailureKind.CONFLICT, "job_lease_lost")),
+            execute(f, first),
+        )
+        assertEquals(before, evidence.associateWith { count(f, it) })
+        assertUnchanged(f, prepared.id)
+        database()
+            .update(
+                "update background_jobs set lease_until=clock_timestamp()-interval '1 second' where id=?",
+                first.job.request.id,
+            )
+        val replacement = claim().single()
+        assertNotEquals(first.token, replacement.token)
+        assertEquals(
+            Result.Failed(Failure(FailureKind.CONFLICT, "job_lease_lost")),
+            execute(f, first),
+        )
+        assertEquals(
+            Result.Success(Unit),
+            abortSchedule.execute(first, Failure(FailureKind.UNAVAILABLE, "fixture_late_failure")),
+        )
+        assertEquals("SCHEDULED", details(f, prepared.id, freshReader(f))["status"].asString())
+        assertEquals(Result.Success(JobStep(1, true)), execute(f, replacement))
+    }
+
+    @Test
+    fun crossingTheFinalPreparationBoundaryDuringJournalingRollsBackAllCaseEvidence() {
+        val f = fixture()
+        val prepared = scheduled(f)
+        val limit = Instant.parse(details(f, prepared.id)["validUntil"].asString())
+        val lease = claim().single()
+        val before = evidence.associateWith { count(f, it) }
+        scheduleProbe.afterJournal.set(
+            OnboardingScheduleProbe.JournalHook(f.company, "people.lifecycle_started") {
+                clock.set(limit)
+            }
+        )
+        val failed = execute(f, lease) as Result.Failed
+        assertEquals("onboarding_schedule_review_required", failed.failure.code)
+        assertEquals(before, evidence.associateWith { count(f, it) })
+        assertUnchanged(f, prepared.id)
+        assertEquals(Result.Success(Unit), abortSchedule.execute(lease, failed.failure))
+        assertEquals(0, count(f, "lifecycle_cases"))
+    }
+
+    @Test
+    fun storageRejectsForgedEmploymentTemplateAssigneesAndJobEvidence() {
+        val f = fixture()
+        ok(
+            revise(
+                f.browser,
+                f.csrf,
+                f.company,
+                f.employee,
+                0,
+                terms(f.firstDay.toString(), start = f.firstDay.toString(), status = "PROBATION"),
+            )
+        )
+        val prepared = prepare(f)
+        val before = evidence.associateWith { count(f, it) }
+        for (field in listOf("effective", "template", "assignee", "job")) {
+            scheduleProbe.transformCreate.set(
+                OnboardingScheduleProbe.Transform(f.company) {
+                    when (field) {
+                        "effective" -> it.copy(appliedEmploymentRevision = 0)
+                        "template" ->
+                            it.copy(template = it.template.copy(version = it.template.version + 1))
+                        "assignee" -> it.copy(assignees = mapOf("equipment" to UUID.randomUUID()))
+                        else -> it.copy(jobId = UUID.randomUUID())
+                    }
+                }
+            )
+            val rejected = submit(f, prepared)
+            assertEquals(409, rejected.statusCode(), "$field: ${rejected.body()}")
+            assertEquals(before, evidence.associateWith { count(f, it) })
+        }
+        ok(submit(f, prepared))
+    }
+
+    @Test
+    fun retainedAuthorizationIsImmutableAndAnotherCompanyCannotReadIt() {
+        val f = fixture()
+        val prepared = scheduled(f)
+        val lease = claim().single()
+        for (sql in
+            listOf(
+                "delete from onboarding_schedules where company_id=?",
+                "update onboarding_schedules set reason='Rewritten' where company_id=?",
+                "update onboarding_schedules set status='STARTED',version=1,finished_at=now() where company_id=?",
+            )) assertThrows(DataAccessException::class.java) { database().update(sql, f.company) }
+        assertThrows(DataAccessException::class.java) {
+            database()
+                .update(
+                    "update background_jobs set status='SUCCEEDED',completed_items=1,finished_at=now(),lease_owner=null,lease_token=null,lease_until=null where id=?",
+                    lease.job.request.id,
+                )
+        }
+        val other = fixture()
+        val hidden =
+            transactions.run(other.actor) {
+                safeDatabaseCall {
+                    runtimeJdbc.queryForObject(
+                        "select count(*) from onboarding_schedules where company_id=?",
+                        Int::class.java,
+                        f.company,
+                    )
+                }
+            }
+        assertEquals(Result.Success(0), hidden)
+        assertEquals(404, get(other.browser, "${other.path}/${prepared.id}").statusCode())
+        assertEquals(Result.Success(JobStep(1, true)), execute(f, lease))
+        assertThrows(DataAccessException::class.java) {
+            database()
+                .update(
+                    "update onboarding_schedules set finished_at=finished_at+interval '1 second' where company_id=?",
+                    f.company,
+                )
+        }
+    }
+
+    @Test
+    fun terminalJobCannotCommitAnIncompleteOrAlteredChecklist() {
+        val f = fixture()
+        val prepared = scheduled(f)
+        val lease = claim().single()
+        val before = evidence.associateWith { count(f, it) }
+        for (field in listOf("name", "missing_task", "assignee", "timestamp")) {
+            scheduleProbe.transformCaseCreate.set(
+                OnboardingScheduleProbe.CaseTransform(f.company) { case ->
+                    when (field) {
+                        "name" -> case.copy(templateName = "Substituted checklist")
+                        "missing_task" -> case.copy(tasks = case.tasks.dropLast(1))
+                        "assignee" ->
+                            case.copy(
+                                tasks = case.tasks.map { it.copy(assigneeId = f.actor.accountId) }
+                            )
+                        else -> case.copy(createdAt = case.createdAt.plusSeconds(1))
+                    }
+                }
+            )
+            val failed = execute(f, lease)
+            assertTrue(failed is Result.Failed, "$field: $failed")
+            assertEquals(before, evidence.associateWith { count(f, it) }, field)
+            assertUnchanged(f, prepared.id)
+        }
+        assertEquals(Result.Success(JobStep(1, true)), execute(f, lease))
+        assertEquals(1, count(f, "lifecycle_cases"))
+    }
+
+    private fun assertUnchanged(f: Fixture, id: UUID) {
+        assertEquals("ACTIVE", employmentStatus(f))
+        assertEquals(0, count(f, "lifecycle_cases"))
+        val detail = details(f, id, freshReader(f))
+        assertEquals("SCHEDULED", detail["status"].asString())
+        assertEquals("RUNNING", detail["job"]["status"].asString())
+        assertEquals(0, detail["job"]["completedItems"].asInt())
+        assertEquals(0, detail["version"].asLong())
+    }
+}

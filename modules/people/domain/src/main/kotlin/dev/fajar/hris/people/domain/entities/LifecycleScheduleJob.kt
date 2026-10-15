@@ -5,7 +5,7 @@ import java.time.Instant
 import java.util.UUID
 
 /** Bounded job metadata; the initiating credential and request payload are never delivered. */
-data class OffboardingScheduleJob(
+data class LifecycleScheduleJob(
     val id: UUID,
     val status: JobStatus,
     val version: Long,

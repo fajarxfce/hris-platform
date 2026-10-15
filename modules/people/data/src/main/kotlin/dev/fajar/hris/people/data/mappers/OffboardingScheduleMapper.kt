@@ -35,7 +35,7 @@ fun OffboardingSchedulesRecord.toOffboardingSchedule() =
 fun OffboardingScheduleRow.toOffboardingScheduleDetails() =
     OffboardingScheduleDetails(
         schedule.toOffboardingSchedule(),
-        OffboardingScheduleJob(
+        LifecycleScheduleJob(
             schedule.jobId,
             JobStatus.valueOf(jobStatus),
             jobVersion,

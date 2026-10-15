@@ -47,3 +47,11 @@ permissions and departure sources; its transaction closes employment, applicable
 company access, case, schedule and job together. Cancellation stops execution and
 terminal-job recovery closes evidence without scheduling a replacement. See
 [scheduled offboarding](offboarding-schedules.md).
+
+`PEOPLE_ONBOARD_START` prepares one reviewed onboarding checklist within its retained
+company-local window. Its single fixed-total item creates the case and pending
+tasks atomically. The worker rechecks initiating credentials, current authority,
+employment/template revisions and assignee access. Changed sources require a new
+review; cancellation creates no case. Feature-owned recovery can close a stopped
+job's remaining authorization without replacing it. See
+[scheduled onboarding](onboarding-schedules.md).

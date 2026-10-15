@@ -232,6 +232,8 @@ test("Today renews company time after midnight even when only the selected date 
       .getByRole("table", { name: "November 2026", exact: true })
       .getByRole("button", { name: /November 1, 2026,/u }),
   ).toHaveAttribute("aria-current", "date");
-  expect(api.reads.filter((read) => read.kind === "month")).toHaveLength(2);
-  expect(api.reads.at(-1)?.url.searchParams.get("date")).toBe("2026-11-01");
+  await expect.poll(() => api.reads.filter((read) => read.kind === "month").length).toBe(2);
+  await expect
+    .poll(() => api.reads.findLast((read) => read.kind === "date")?.url.searchParams.get("date"))
+    .toBe("2026-11-01");
 });

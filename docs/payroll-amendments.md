@@ -1,7 +1,7 @@
 # Payroll amendments
 
-Implementation is in progress. Published payroll and confirmed bank evidence remain
-immutable. An amendment creates a separately reviewed assessment revision; it never
+Published payroll and confirmed bank evidence remain immutable. An amendment
+creates a separately reviewed assessment revision; it never
 edits an original run, approval, payslip or payment result.
 
 ## Preparation and preview
@@ -370,6 +370,28 @@ tests, separately from the actual worker publication. Screenshots were inspected
 No backend schema or mobile binary changed in this dashboard increment. Existing
 CSS specificity and bundle-size advisories remain.
 
+## Mobile retained revisions
+
+Employee payslip detail supports explicit previous/next selection and a return to
+the latest statement. Each acquired revision has an immutable encrypted record,
+owned by account, API audience and company. Existing current statements are retained
+before feed updates replace them. Already acquired history reads locally without
+an age limit; missing history uses an exact authorized revision request. Selecting
+an older statement retains current stored payment progress, and PDF export pins
+the selected statement through its save dialog.
+
+Cancelled selection cannot publish into a replacement route or company. Parent
+deletion hides retained history, and confirmed denials remain gated through failed
+cleanup and retries. Archive acquisition cannot advance the feed or reopen access.
+Domain, MVI, HTTP and SQLite/IndexedDB contracts cover these boundaries; assembled
+UI tests cover historical navigation, offline reads and a revision-pinned PDF at
+200% text. Android emulator acceptance verified an offline installation upgrade
+and reconnection using the development revision-zero fixture. Nonzero revisions
+were exercised by automated tests, separately from actual-server native acceptance.
+Phone delivery is pending availability. See the mobile
+[implementation](https://github.com/fajarxfce/hris-mobile/blob/main/docs/payroll.md)
+and [executed validation](https://github.com/fajarxfce/hris-mobile/blob/main/docs/validation.md).
+
 ## Delivery sequence
 
 1. Guarded preparation and deterministic recalculation from retained sources: implemented.
@@ -381,7 +403,7 @@ CSS specificity and bundle-size advisories remain.
    are implemented.
    Real API/PostgreSQL/worker acceptance covers approved negative corrections,
    partial/full returns, competing balances and original-command recovery.
-   Native current-revision payslips,
+   Native current and retained-revision payslips,
    independent balances, compatible offline acquisition and revision-pinned PDF
    export are implemented and validated on the emulator. The amendment directory,
    retained proposals, calculations and revision history are implemented in the
@@ -389,7 +411,8 @@ CSS specificity and bundle-size advisories remain.
    Retained calculation/cancellation commands and independent review submission,
    staged decisions, withdrawal and history are implemented. Publication review,
    admission, bounded progress, retained attempts and terminal-job recovery are
-   implemented in the dashboard. Native retained-revision navigation remains.
+   implemented in the dashboard. Native retained-revision navigation and immutable
+   encrypted history are implemented.
    The current/retained statements and sync contracts are
    available in the API. The revised APK awaits phone connectivity.
 

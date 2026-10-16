@@ -5276,3 +5276,20 @@ start retained the total and original company date. Ciphertext comparisons and a
 services were stopped and AVD data retained. The standard WireGuard APK output was
 restored; no additional phone interaction was performed.
 See [mobile validation](https://github.com/fajarxfce/hris-mobile/blob/main/docs/validation.md#android-carried-balance-upgrade-acceptance).
+
+## Invitation and credential completion assurance
+
+Invitation creation and resend now require current authenticator enrollment and
+session/recent assurance through journal and receipt completion. Failed late
+checks roll back pending accounts, credential revisions, superseded challenges,
+encrypted mail and audit together. Replay keeps the original result under current
+authority even when SMTP is disabled. Invitation versions cannot overflow.
+Public invitation/password confirmation also rechecks link validity after its
+journal write, retaining the original credentials and unused link on failure.
+
+Validation passed 33 API/PostgreSQL cases, 23 Identity domain/data tests and all
+71 worker tests, plus architecture, formatting and both application JAR builds.
+New scenarios cover late recent/session expiry, missing current enrollment,
+original-receipt replay after waits, interruption, and both public confirmation
+purposes. Tests used disposable accounts. No development credentials, external
+email, mobile source or phone installation changed in this increment.

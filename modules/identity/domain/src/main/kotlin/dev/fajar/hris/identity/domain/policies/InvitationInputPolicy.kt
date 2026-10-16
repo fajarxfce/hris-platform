@@ -36,7 +36,7 @@ fun validateInvitation(
             displayName.none { it.isISOControl() } &&
             reason.isNotBlank() &&
             reason.length <= 1000 &&
-            (expectedVersion == null || expectedVersion >= 0)
+            (expectedVersion == null || expectedVersion in 0 until Long.MAX_VALUE)
     )
         Result.Success(Unit)
     else Result.Failed(Failure(FailureKind.VALIDATION, "invalid_invitation"))

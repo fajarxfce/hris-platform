@@ -75,6 +75,14 @@ class ConfirmAccountCredential(
                         ),
                     )
                 }
+                .flatMap {
+                    if (credentialChallengeUsable(challenge, account, clock.instant()))
+                        Result.Success(Unit)
+                    else
+                        Result.Failed(
+                            Failure(FailureKind.VALIDATION, "credential_link_unavailable")
+                        )
+                }
         }
     }
 }

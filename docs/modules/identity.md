@@ -143,7 +143,14 @@ command. A successful self-edit revalidates the now-revoked application session.
 
 Public `POST /api/v1/auth/password-recovery` accepts `email` and returns an empty 202 for missing, inactive, OIDC-only, throttled, or mail-disabled accounts. Eligible accounts receive one usable recovery link for 30 minutes. Repeated requests do not invalidate a pending link or enqueue duplicate email. Limits are three attempts per account and thirty per observed origin in a 15-minute window, stored independently of login limits. Technical persistence failures remain errors rather than falsely claiming a completed mutation; no account details appear in responses.
 
-`POST /api/v1/auth/invitations/accept` and `POST /api/v1/auth/password-recovery/confirm` accept `token` and a new `password` of 12–128 characters. These exact public routes retain CSRF protection. Use the public cookie/CSRF transport without an Authorization header. Tokens are bound to account, purpose, expiry, and current security version and serialized under the account lock. Expiry is checked again after password hashing. Acceptance or recovery advances credential versions, invalidates existing browser/native credentials, and preserves authenticator enrollment and recovery codes. It returns 204 without signing in automatically. After a lost confirmation response, try signing in with the new password; do not replay a one-use confirmation automatically.
+Invitation commands check current authenticator enrollment, session assurance and
+recent proof under their account guards and again after journal/receipt writes.
+Late expiry, cancellation or failure rolls back the account, superseded links,
+encrypted delivery, audit and operation receipt together. Resends reject an
+exhausted version counter. Original receipts still require current assurance and
+remain available when mail delivery is subsequently disabled.
+
+`POST /api/v1/auth/invitations/accept` and `POST /api/v1/auth/password-recovery/confirm` accept `token` and a new `password` of 12–128 characters. These exact public routes retain CSRF protection. Use the public cookie/CSRF transport without an Authorization header. Tokens are bound to account, purpose, expiry, and current security version and serialized under the account lock. Expiry is checked again after password hashing and journal completion. Acceptance or recovery advances credential versions, invalidates existing browser/native credentials, and preserves authenticator enrollment and recovery codes. It returns 204 without signing in automatically. After a lost confirmation response, try signing in with the new password; do not replay a one-use confirmation automatically.
 
 Account/password writes, challenge consumption, queue supersession, and audit/outbox share the transaction. Invitation receipts are included in that transaction. Plaintext links, passwords, provider errors, and encryption keys are not returned by administrative APIs or logged. [SMTP configuration and delivery](../mail.md) describes limits and at-least-once delivery. No production provider or browser acceptance screen has been validated yet.
 

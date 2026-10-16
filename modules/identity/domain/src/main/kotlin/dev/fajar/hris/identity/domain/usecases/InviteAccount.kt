@@ -62,7 +62,16 @@ class InviteAccount(
             )
                 return@run Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "session_revoked"))
             val currentAssurance =
-                requireRecentIdentityAdministration(actor, clock.instant(), security)
+                validateSessionAssurance(
+                        currentAuthor.account,
+                        currentAuthor.platformPermissions,
+                        actor.mfaVerifiedAt,
+                        clock.instant(),
+                        security,
+                    )
+                    .flatMap {
+                        requireRecentIdentityAdministration(actor, clock.instant(), security)
+                    }
             if (currentAssurance is Result.Failed) return@run currentAssurance
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
@@ -120,6 +129,16 @@ class InviteAccount(
                         ),
                     )
                 }
+                .flatMap {
+                    validateSessionAssurance(
+                        currentAuthor.account,
+                        currentAuthor.platformPermissions,
+                        actor.mfaVerifiedAt,
+                        clock.instant(),
+                        security,
+                    )
+                }
+                .flatMap { requireRecentIdentityAdministration(actor, clock.instant(), security) }
                 .map { receipt }
         }
     }

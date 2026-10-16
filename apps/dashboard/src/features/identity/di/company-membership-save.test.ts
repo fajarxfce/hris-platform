@@ -57,6 +57,7 @@ it("rejects invalid authority, identifiers and pre-cancellation before membershi
 
 it.each<Partial<CompanyMembershipChange>>([
   { accountId: "../other" },
+  { expectedVersion: null },
   { expectedVersion: -1 },
   { expectedVersion: 0.5 },
   { expectedVersion: Number.MAX_SAFE_INTEGER },

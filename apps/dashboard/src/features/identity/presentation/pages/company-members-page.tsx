@@ -5,6 +5,7 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { companyMemberMessages } from "../i18n/company-member-messages";
+import { companyMembershipCreationMessages } from "../i18n/company-membership-creation-messages";
 import type { companyMemberRows } from "../models/company-member-view";
 import type { CompanyMembersState } from "../models/company-members-state";
 
@@ -13,6 +14,7 @@ export function CompanyMembersPage({
   rows,
   locale,
   companyName,
+  createTo,
   firstPage,
   onRefresh,
   onFirst,
@@ -23,6 +25,7 @@ export function CompanyMembersPage({
   rows: ReturnType<typeof companyMemberRows>;
   locale: Locale;
   companyName: string;
+  createTo: string | null;
   firstPage: boolean;
   onRefresh: () => void;
   onFirst: () => void;
@@ -36,9 +39,18 @@ export function CompanyMembersPage({
         title={text.title}
         context={companyName}
         actions={
-          <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
-            {messages(locale).refresh}
-          </AppButton>
+          <>
+            {createTo && (
+              <Link to={createTo}>{companyMembershipCreationMessages(locale).title}</Link>
+            )}
+            <AppButton
+              appearance="subtle"
+              icon={<ArrowClockwise20Regular />}
+              aria-label={messages(locale).refresh}
+              disabled={state.stage === "loading"}
+              onClick={onRefresh}
+            />
+          </>
         }
       />
       <AppFailure failure={state.failure} locale={locale} />
@@ -70,3 +82,6 @@ export function CompanyMembersPage({
     </section>
   );
 }
+
+import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";

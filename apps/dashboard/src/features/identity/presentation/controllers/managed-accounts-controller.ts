@@ -1,17 +1,17 @@
 import type { PlatformAccess } from "../../domain/entities/platform-access";
-import type { IdentityAdministrationUseCases } from "../contracts/identity-administration-use-cases";
+import type { ManagedAccountsQuery } from "../contracts/managed-accounts-query";
 import {
   initialManagedAccountsState,
   type ManagedAccountsState,
 } from "../models/managed-accounts-state";
-export class ManagedAccountsController {
+export class ManagedAccountsController<Access = PlatformAccess> {
   #state = initialManagedAccountsState;
   #active = false;
   #pending: AbortController | null = null;
   #listeners = new Set<() => void>();
   constructor(
-    private readonly load: IdentityAdministrationUseCases["loadManagedAccounts"],
-    private readonly access: PlatformAccess,
+    private readonly load: ManagedAccountsQuery<Access>,
+    private readonly access: Access,
     private readonly query: string,
     private readonly after: string | null,
   ) {}

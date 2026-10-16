@@ -27,7 +27,8 @@ export class RemoteCompanyMemberRepository implements CompanyMemberRepository {
         },
         signal,
       );
-      if (receipt.id.toLowerCase() !== accountId || receipt.version !== input.expectedVersion + 1)
+      const expectedReceiptVersion = input.expectedVersion === null ? 0 : input.expectedVersion + 1;
+      if (receipt.id.toLowerCase() !== accountId || receipt.version !== expectedReceiptVersion)
         throw new InvalidHttpResponseError();
       return Object.freeze({ id: receipt.id.toLowerCase(), version: receipt.version });
     });

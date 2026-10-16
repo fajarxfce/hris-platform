@@ -22,6 +22,10 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "This account cannot receive active company access. Review its account status.",
     "Akun ini belum dapat menerima akses perusahaan aktif. Periksa status akunnya.",
   ],
+  company_member_already_exists: [
+    "This account already has company access. Review its existing access before changing it.",
+    "Akun ini sudah memiliki akses perusahaan. Tinjau akses yang sudah ada sebelum mengubahnya.",
+  ],
   role_template_unavailable: [
     "Choose an active role from this company, or retain an already applied version.",
     "Pilih role aktif dalam perusahaan ini, atau pertahankan versi yang sudah diterapkan.",

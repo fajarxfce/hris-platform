@@ -1,5 +1,5 @@
 import { MessageBar, MessageBarBody, useRestoreFocusTarget } from "@fluentui/react-components";
-import { Add20Regular, ArrowClockwise20Regular, Delete20Regular } from "@fluentui/react-icons";
+import { ArrowClockwise20Regular } from "@fluentui/react-icons";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
@@ -7,12 +7,11 @@ import { AppCheckbox } from "../../../../core/presentation/components/app-checkb
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
 import { AppLoading } from "../../../../core/presentation/components/app-loading";
 import { AppPageHeader } from "../../../../core/presentation/components/app-page-header";
-import { AppTextArea } from "../../../../core/presentation/components/app-text-area";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useCompanyMembershipForm } from "../controllers/use-company-membership-form";
 import { companyMembershipMessages } from "../i18n/company-membership-messages";
 import type { CompanyMembershipEditorState } from "../models/company-membership-editor-state";
-import { RolePermissions } from "../widgets/role-permissions";
+import { MembershipAccessFields } from "../widgets/membership-access-fields";
 
 export function CompanyMembershipEditorPage({
   state,
@@ -111,83 +110,11 @@ export function CompanyMembershipEditorPage({
               disabled={!form.editable}
               onChange={(_, data) => form.active.onChange(data.checked === true)}
             />
-            <section className="app-panel" aria-label={text.roles}>
-              <div className="app-member-role-heading">
-                <h2>{text.roles}</h2>
-                <AppButton
-                  {...restore}
-                  icon={<Add20Regular />}
-                  disabled={!form.canAddRole}
-                  onClick={() => form.openPicker(null)}
-                >
-                  {text.addRole}
-                </AppButton>
-              </div>
-              <p>
-                {text.roleHint} {text.limit}
-              </p>
-              {form.requiresRoleReview && <p role="alert">{text.reviewRequired}</p>}
-              {form.roleViews.length === 0 && <p>{text.noRoles}</p>}
-              {form.roleViews.map((role) => (
-                <section className="app-member-role" key={role.id} aria-label={role.name}>
-                  <div className="app-member-role-heading">
-                    <div>
-                      <h3 className="app-member-role-name">
-                        {role.name} ({role.code})
-                      </h3>
-                      <p className="app-member-role-version">{role.versionLabel}</p>
-                    </div>
-                    <div className="app-form-actions">
-                      <AppButton
-                        {...restore}
-                        appearance="subtle"
-                        disabled={!form.editable}
-                        onClick={() => form.openPicker(role.id)}
-                      >
-                        {text.replace}
-                      </AppButton>
-                      <AppButton
-                        {...restore}
-                        appearance="subtle"
-                        icon={<Delete20Regular />}
-                        disabled={!form.editable}
-                        aria-label={`${text.remove}: ${role.name}`}
-                        onClick={() => form.removeRole(role.id)}
-                      />
-                    </div>
-                  </div>
-                  <details>
-                    <summary>{role.permissionsLabel}</summary>
-                    <RolePermissions
-                      title={text.permissions}
-                      empty={text.none}
-                      groups={role.groups}
-                    />
-                  </details>
-                </section>
-              ))}
-              {state.failure?.fields.roleTemplates && <p role="alert">{text.invalidRoles}</p>}
-            </section>
-            <RolePermissions
-              title={text.direct}
-              empty={text.none}
-              groups={form.groups}
-              editable={form.editable}
-              onSelect={form.selectPermission}
-            />
-            {state.failure?.fields.permissions && <p role="alert">{text.invalidPermissions}</p>}
-            <RolePermissions
-              title={text.effective}
-              empty={text.none}
-              groups={form.effectiveGroups}
-            />
-            <AppTextArea
-              label={text.reason}
-              {...form.reason}
-              maxLength={1000}
-              required
-              readOnly={!form.editable}
-              error={state.failure?.fields.reason ? text.invalid : undefined}
+            <MembershipAccessFields
+              form={form}
+              failure={state.failure}
+              roleHint={text.roleHint}
+              locale={locale}
             />
             <div className="app-form-actions">
               <AppButton appearance="primary" type="submit" disabled={!form.canSave}>

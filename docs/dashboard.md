@@ -1185,6 +1185,36 @@ browser exercised password sign-in, MFA, directory/detail reads, and logout agai
 the local server using fictional development data. Both membership reads returned
 200. No external invitations or messages were sent.
 
+## Company account assignment
+
+**Add account** opens a separate account picker for the selected company.
+Discovery requires both company identity administration and global account
+administration; company-only operators cannot enumerate outside accounts.
+Explicit name/email search uses fifty-row pages. Inactive, pending-invitation and
+initiating accounts cannot be selected. The selected account is reviewed again
+before the form opens. Existing membership, including inactive membership, links
+to its existing access instead of becoming a new assignment.
+
+The form reviews current role versions and direct permissions, previews their
+combined grants and requires a reason. Up to eight roles may be selected. It
+shares role selection, permission fields and navigation protection with the
+existing access editor. Account access and employee-profile linking remain
+separate operations.
+
+Creation uses the existing membership endpoint with no observed version and
+accepts only an initial version-zero receipt. A concurrently created membership
+cannot be overwritten. Unknown outcomes retain the original command through
+verification and later conflicts. Changed account eligibility requires a new
+review; changed role versions require explicit reselection. Search context
+survives returning to the picker. Closing or replacing the company cancels owned
+work and discards late results.
+
+All 3,533 unit tests and 46 related browser scenarios passed. Real API/PostgreSQL
+acceptance recovered a lost creation response and verified access with an
+independent native employee session: only the selected company became available,
+and no employee-profile binding was created. Desktop and Indonesian dark layouts
+at 390 pixels with doubled text were inspected.
+
 ## Company access editing
 
 `/administration/members/{accountId}/edit` reviews one existing member's account
@@ -1241,7 +1271,7 @@ All 3,487 dashboard unit tests and eleven account browser scenarios passed.
 An isolated API/PostgreSQL scenario verified administration without company
 access, lost-response recovery, reactivation and self-edit session revocation.
 Desktop and Indonesian dark views at 390 pixels with doubled text were inspected.
-Invitations, new company assignments, provider bindings and session administration
+Invitations, provider bindings and session administration
 remain subsequent workflows.
 
 ## Employee account binding

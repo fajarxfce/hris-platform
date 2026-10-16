@@ -24,14 +24,22 @@ export function normalizeCompanyMembershipChange(
 }
 
 export function validateCompanyMembershipChange(input: CompanyMembershipChange): Failure | null {
-  const fields: Record<string, string> = {};
-  if (!isUuid(input.accountId)) fields.accountId = "invalid_value";
+  const fields: Record<string, string> = { ...validateCompanyMembershipTerms(input)?.fields };
   if (
+    input.expectedVersion === null ||
     !Number.isSafeInteger(input.expectedVersion) ||
     input.expectedVersion < 0 ||
     input.expectedVersion >= Number.MAX_SAFE_INTEGER
   )
     fields.expectedVersion = "invalid_value";
+  return Object.keys(fields).length ? { code: "invalid_membership", fields, parameters: {} } : null;
+}
+
+export function validateCompanyMembershipTerms(
+  input: Omit<CompanyMembershipChange, "expectedVersion">,
+): Failure | null {
+  const fields: Record<string, string> = {};
+  if (!isUuid(input.accountId)) fields.accountId = "invalid_value";
   if (typeof input.active !== "boolean") fields.active = "invalid_value";
   if (!input.reason.length || input.reason.length > 1000) fields.reason = "invalid_reason";
   if (
@@ -69,6 +77,7 @@ export const companyMembershipSaveWasRejected = (failure: Failure): boolean =>
     "cannot_self_grant_sensitive_access",
     "platform_administrator_required",
     "stale_version",
+    "operation_payload_mismatch",
     "data_conflict",
     "access_denied",
     "company_access_denied",

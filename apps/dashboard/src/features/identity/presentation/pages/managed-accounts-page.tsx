@@ -1,15 +1,15 @@
-import { ArrowClockwise20Regular, Search20Regular } from "@fluentui/react-icons";
+import { ArrowClockwise20Regular } from "@fluentui/react-icons";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
 import { AppLoading } from "../../../../core/presentation/components/app-loading";
 import { AppPageHeader } from "../../../../core/presentation/components/app-page-header";
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
-import { AppTextField } from "../../../../core/presentation/components/app-text-field";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useManagedAccountSearch } from "../controllers/use-managed-account-search";
 import { managedAccountMessages } from "../i18n/managed-account-messages";
 import type { managedAccountRows } from "../models/managed-account-view";
 import type { ManagedAccountsState } from "../models/managed-accounts-state";
+import { AccountSearchBar } from "../widgets/account-search-bar";
 
 export function ManagedAccountsPage({
   state,
@@ -56,27 +56,7 @@ export function ManagedAccountsPage({
         }
       />
       <AppFailure failure={state.failure} locale={locale} />
-      <search aria-label={text.search}>
-        <form className="app-command-bar app-command-bar-panel" onSubmit={search.submit} noValidate>
-          <AppTextField
-            label={text.search}
-            placeholder={text.searchHint}
-            type="search"
-            contentBefore={<Search20Regular />}
-            {...search.query}
-            maxLength={100}
-            error={search.invalid ? text.invalidSearch : undefined}
-          />
-          <AppButton type="submit" appearance="subtle" icon={<Search20Regular />}>
-            {text.searchAction}
-          </AppButton>
-          {hasQuery && (
-            <AppButton appearance="subtle" onClick={onReset}>
-              {text.reset}
-            </AppButton>
-          )}
-        </form>
-      </search>
+      <AccountSearchBar search={search} locale={locale} hasQuery={hasQuery} onReset={onReset} />
       {state.stage === "loading" && <AppLoading label={messages(locale).loading} />}
       {state.page &&
         (rows.length === 0 ? (

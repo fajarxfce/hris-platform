@@ -87,6 +87,15 @@ An inactive global account may have its company access disabled; it cannot recei
 active company access until the account itself is active. Changing membership
 status does not activate the global account.
 
+The [dashboard assignment workflow](../dashboard.md#company-account-assignment)
+discovers global accounts only for authorized platform/company administrators.
+Its preparation use case coordinates account, membership and role repository
+contracts through the existing secured reads. The review does not reserve
+eligibility. Creation sends a null observed membership version; current server
+guards, target eligibility and role checks remain authoritative. A concurrently
+created membership requires review through its existing editor, while lost
+responses retain the original creation receipt.
+
 The [dashboard access editor](../dashboard.md#company-access-editing) exposes
 existing member activation, direct permissions and explicit role retention or
 replacement. It reviews the observed membership version, retains original-command

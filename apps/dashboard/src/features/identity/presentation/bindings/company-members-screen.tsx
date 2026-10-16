@@ -3,7 +3,10 @@ import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import type { AccountId } from "../../../../core/domain/identifiers";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
+import type { PlatformAccess } from "../../domain/entities/platform-access";
 import type { CompanyAccess } from "../../domain/entities/session";
+import { canManagePlatformAccounts } from "../../domain/policies/account-access-policy";
+import { canManageCompanyMembers } from "../../domain/policies/company-member-policy";
 import type { IdentityAdministrationUseCases } from "../contracts/identity-administration-use-cases";
 import { CompanyMembersController } from "../controllers/company-members-controller";
 import { companyMemberRows } from "../models/company-member-view";
@@ -12,6 +15,7 @@ import { CompanyMembersPage } from "../pages/company-members-page";
 type Props = {
   accountId: AccountId;
   access: CompanyAccess;
+  platform: PlatformAccess;
   actions: IdentityAdministrationUseCases;
   companyName: string;
   locale: Locale;
@@ -56,6 +60,12 @@ function CompanyMembersBinding(props: Props & { after: string | null }) {
       rows={rows}
       locale={props.locale}
       companyName={props.companyName}
+      createTo={
+        canManageCompanyMembers(props.access.permissions) &&
+        canManagePlatformAccounts(props.platform)
+          ? `/administration/members/new?company=${props.access.companyId}`
+          : null
+      }
       firstPage={props.after === null}
       onRefresh={controller.refresh}
       onFirst={() => setParameters({ company: props.access.companyId })}

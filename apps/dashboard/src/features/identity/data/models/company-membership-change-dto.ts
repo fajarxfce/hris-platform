@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export type CompanyMembershipChangeDto = {
-  expectedVersion: number;
+  expectedVersion: number | null;
   active: boolean;
   permissions: string[];
   roleTemplates: { id: string; version: number; retainApplied: boolean }[];

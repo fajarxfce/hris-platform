@@ -48,6 +48,36 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### New company account assignment
+
+Company identity administrators with global account-discovery authority can
+select an existing active account, review current role versions and direct
+permissions, and grant initial company access. Existing membership is never
+overwritten by this flow. Preparation coordinates the existing repository
+contracts in a use case; the versioned server command independently rechecks
+current eligibility and access. Shared form fields retain the existing edit
+workflow, and unknown outcomes keep their original operation and payload.
+
+Architecture, Biome, TypeScript and all 3,533 dashboard unit tests passed. Forty-six
+related browser scenarios passed, including account/role changes, concurrent
+assignment, response loss through MFA and later conflicts, protected navigation,
+company replacement and transport cancellation. The cancellation scenario holds
+its response until route disposal has actually aborted the request. Desktop and
+Indonesian dark views at 390 pixels with doubled text were inspected; the shorter
+editor heading wraps between words. Existing CSS and bundle-size warnings remain.
+
+Three isolated API/PostgreSQL workflows passed with the shared fields: new company
+assignment, existing membership editing and global account administration. The
+new flow recovered an original version-zero receipt after a lost committed
+response. A separate native employee session gained only the selected company's
+permissions; another company remained denied and no employee profile was linked.
+All accounts and authentication used disposable fixtures. Native acceptance used
+API requests, with no additional APK or physical-device validation.
+
+This increment requires no new endpoint, server source change or database
+migration. Development continues to use the previously validated API and worker;
+the dashboard and API health both returned HTTP 200 through WireGuard from the VPS.
+
 ### Platform account administration dashboard
 
 Global account search, bounded cursor pages, exact review and versioned access
@@ -77,6 +107,9 @@ The API and worker running in development match the validated JAR hashes. Their
 deployment preserved the existing database and document services. WireGuard API
 health and dashboard access both returned HTTP 200 from the VPS. No mobile code
 or phone installation changed in this increment.
+
+The [hosted backend/dashboard workflow](https://github.com/fajarxfce/hris-platform/actions/runs/38846167583)
+passed all backend and dashboard shards and the API/database integration job.
 
 ### Global account review and completion assurance
 

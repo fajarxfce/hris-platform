@@ -9,8 +9,10 @@ import { RemoteManagedAccountRepository } from "../data/repositories/remote-mana
 import { RemoteRoleTemplateRepository } from "../data/repositories/remote-role-template-repository";
 import { BeginMfaEnrollment } from "../domain/usecases/begin-mfa-enrollment";
 import { ConfirmMfaEnrollment } from "../domain/usecases/confirm-mfa-enrollment";
+import { CreateCompanyMembership } from "../domain/usecases/create-company-membership";
 import { LoadAssignablePermissions } from "../domain/usecases/load-assignable-permissions";
 import { LoadCompanyAccess } from "../domain/usecases/load-company-access";
+import { LoadCompanyAccountCandidates } from "../domain/usecases/load-company-account-candidates";
 import { LoadCompanyMember } from "../domain/usecases/load-company-member";
 import { LoadCompanyMembers } from "../domain/usecases/load-company-members";
 import { LoadIdentityProviders } from "../domain/usecases/load-identity-providers";
@@ -19,6 +21,7 @@ import { LoadManagedAccounts } from "../domain/usecases/load-managed-accounts";
 import { LoadRoleTemplate } from "../domain/usecases/load-role-template";
 import { LoadRoleTemplates } from "../domain/usecases/load-role-templates";
 import { LoadSession } from "../domain/usecases/load-session";
+import { PrepareCompanyMembership } from "../domain/usecases/prepare-company-membership";
 import { SaveAccountAccess } from "../domain/usecases/save-account-access";
 import { SaveCompanyMembership } from "../domain/usecases/save-company-membership";
 import { SaveRoleTemplate } from "../domain/usecases/save-role-template";
@@ -33,6 +36,9 @@ export function createIdentityFeature(http: HttpClient) {
   const roles = new RemoteRoleTemplateRepository(new HttpRoleTemplateDataSource(http));
   const accounts = new RemoteManagedAccountRepository(new HttpManagedAccountDataSource(http));
   return {
+    loadCompanyAccountCandidates: new LoadCompanyAccountCandidates(accounts),
+    prepareCompanyMembership: new PrepareCompanyMembership(members, accounts, roles),
+    createCompanyMembership: new CreateCompanyMembership(members),
     loadManagedAccounts: new LoadManagedAccounts(accounts),
     loadManagedAccount: new LoadManagedAccount(accounts),
     saveAccountAccess: new SaveAccountAccess(accounts),

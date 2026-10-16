@@ -622,6 +622,7 @@ export function PortalRoutes({
             <CompanyMemberRoutes
               accountId={accountId}
               access={access}
+              platform={platformAccess}
               actions={identityAdministration}
               companyName={company.name}
               locale={locale}

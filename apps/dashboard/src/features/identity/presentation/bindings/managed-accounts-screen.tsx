@@ -61,6 +61,7 @@ function ManagedAccountsBinding(
       rows={rows}
       search={search}
       locale={props.locale}
+      inviteTo={`/platform/accounts/new${props.context ? `?${props.context}` : ""}`}
       firstPage={props.after === null}
       hasQuery={props.query.length > 0}
       onRefresh={controller.refresh}

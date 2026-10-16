@@ -1,12 +1,16 @@
 import { FluentProvider, webDarkTheme, webLightTheme } from "@fluentui/react-components";
 import { useEffect, useReducer, useSyncExternalStore } from "react";
+import { useLocation } from "react-router-dom";
 import { AppPreferences } from "../core/presentation/components/app-preferences";
 import type { Locale } from "../core/presentation/i18n/messages";
 import { AuthScreen } from "../features/identity/presentation/bindings/auth-screen";
+import { CredentialConfirmationScreen } from "../features/identity/presentation/bindings/credential-confirmation-screen";
+import { PasswordRecoveryScreen } from "../features/identity/presentation/bindings/password-recovery-screen";
 import { VerificationDialog } from "../features/identity/presentation/bindings/verification-dialog";
 import type { ApplicationDependencies } from "./application-dependencies";
 import { useIdentityLifecycle } from "./lifecycle/use-identity-lifecycle";
 import { PortalWorkspace } from "./portal-workspace";
+import { accountCredentialRoute } from "./routing/account-credential-route";
 
 export function Application(props: ApplicationDependencies) {
   const { identity } = props;
@@ -18,7 +22,8 @@ export function Application(props: ApplicationDependencies) {
   const [locale, setLocale] = useReducer((_previous: Locale, next: Locale) => next, "en");
   const [dark, toggleTheme] = useReducer((previous: boolean) => !previous, false);
   const [collapsed, toggleNavigation] = useReducer((previous: boolean) => !previous, false);
-  useIdentityLifecycle(identity);
+  const credentialRoute = accountCredentialRoute(useLocation().pathname);
+  useIdentityLifecycle(identity, credentialRoute === null);
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
@@ -27,11 +32,32 @@ export function Application(props: ApplicationDependencies) {
       theme={dark ? webDarkTheme : webLightTheme}
       style={{ colorScheme: dark ? "dark" : "light" }}
     >
-      {state.session &&
-      (state.workspace !== null ||
-        state.stage === "ready" ||
-        state.stage === "loading" ||
-        state.stage === "unavailable") ? (
+      {credentialRoute !== null ? (
+        <div className="app-auth-shell">
+          <header className="app-auth-preferences">
+            <AppPreferences
+              locale={locale}
+              dark={dark}
+              onLocaleChanged={setLocale}
+              onThemeChanged={toggleTheme}
+            />
+          </header>
+          {credentialRoute === "requestRecovery" ? (
+            <PasswordRecoveryScreen actions={props.accountCredentials} locale={locale} />
+          ) : (
+            <CredentialConfirmationScreen
+              key={credentialRoute}
+              actions={props.accountCredentials}
+              kind={credentialRoute}
+              locale={locale}
+            />
+          )}
+        </div>
+      ) : state.session &&
+        (state.workspace !== null ||
+          state.stage === "ready" ||
+          state.stage === "loading" ||
+          state.stage === "unavailable") ? (
         <PortalWorkspace
           key={state.workspace?.revision ?? "pending"}
           {...props}
@@ -56,7 +82,9 @@ export function Application(props: ApplicationDependencies) {
           <AuthScreen identity={identity} state={state} locale={locale} />
         </div>
       )}
-      <VerificationDialog identity={identity} state={state} locale={locale} />
+      {credentialRoute === null && (
+        <VerificationDialog identity={identity} state={state} locale={locale} />
+      )}
     </FluentProvider>
   );
 }

@@ -5293,3 +5293,30 @@ New scenarios cover late recent/session expiry, missing current enrollment,
 original-receipt replay after waits, interruption, and both public confirmation
 purposes. Tests used disposable accounts. No development credentials, external
 email, mobile source or phone installation changed in this increment.
+
+## Dashboard invitations and public credentials
+
+Platform accounts now provides invitation creation and explicit resend from a
+reviewed pending account. The form retains an uncertain command through MFA and
+later conflicts; a definite stale version requires protected review. Queue
+admission is reported separately from delivery. Public invitation acceptance and
+password recovery clear URL tokens, validate password confirmation, retain no
+browser-storage secrets and stop requests on departure. An ambiguous password
+confirmation directs a sign-in attempt without replaying the one-use command.
+The explicit sign-in action clears any pre-existing browser session.
+
+Architecture, Biome, TypeScript and all 3,595 unit tests passed, including 62 new
+transport/domain/controller cases. All 28 affected browser scenarios passed. The
+six invitation scenarios passed again after reusing the existing two-column form
+layout and removing stretched row spacing. Desktop and dark 390-pixel Indonesian
+layouts at doubled text were inspected. Existing CSS specificity and bundle-size
+advisories remain.
+
+The isolated API/PostgreSQL/worker browser workflow passed with a real loopback
+SMTP exchange: create with a lost committed response, replay one receipt, replace
+the delivered link, reject the old link, activate with no company grants, then
+recover a password after its committed confirmation response is lost. Previous
+browser and native tokens returned 401; the replacement password signed in.
+Two bounded SMTP-fixture tests verified recipient restrictions, capacity and
+socket/thread/file cleanup. Temporary captured mail was removed on shutdown.
+No production email provider, real credentials or phone UI was used.

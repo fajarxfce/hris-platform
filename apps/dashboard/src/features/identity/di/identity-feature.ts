@@ -1,15 +1,21 @@
 import type { HttpClient } from "../../../core/data/http/http-client";
+import { HttpAccountCredentialDataSource } from "../data/datasources/http-account-credential-data-source";
+import { HttpAccountInvitationDataSource } from "../data/datasources/http-account-invitation-data-source";
 import { HttpCompanyMemberDataSource } from "../data/datasources/http-company-member-data-source";
 import { HttpIdentityDataSource } from "../data/datasources/http-identity-data-source";
 import { HttpManagedAccountDataSource } from "../data/datasources/http-managed-account-data-source";
 import { HttpRoleTemplateDataSource } from "../data/datasources/http-role-template-data-source";
+import { RemoteAccountCredentialRepository } from "../data/repositories/remote-account-credential-repository";
+import { RemoteAccountInvitationRepository } from "../data/repositories/remote-account-invitation-repository";
 import { RemoteCompanyMemberRepository } from "../data/repositories/remote-company-member-repository";
 import { RemoteIdentityRepository } from "../data/repositories/remote-identity-repository";
 import { RemoteManagedAccountRepository } from "../data/repositories/remote-managed-account-repository";
 import { RemoteRoleTemplateRepository } from "../data/repositories/remote-role-template-repository";
 import { BeginMfaEnrollment } from "../domain/usecases/begin-mfa-enrollment";
+import { ConfirmAccountCredential } from "../domain/usecases/confirm-account-credential";
 import { ConfirmMfaEnrollment } from "../domain/usecases/confirm-mfa-enrollment";
 import { CreateCompanyMembership } from "../domain/usecases/create-company-membership";
+import { InviteAccount } from "../domain/usecases/invite-account";
 import { LoadAssignablePermissions } from "../domain/usecases/load-assignable-permissions";
 import { LoadCompanyAccess } from "../domain/usecases/load-company-access";
 import { LoadCompanyAccountCandidates } from "../domain/usecases/load-company-account-candidates";
@@ -22,6 +28,7 @@ import { LoadRoleTemplate } from "../domain/usecases/load-role-template";
 import { LoadRoleTemplates } from "../domain/usecases/load-role-templates";
 import { LoadSession } from "../domain/usecases/load-session";
 import { PrepareCompanyMembership } from "../domain/usecases/prepare-company-membership";
+import { RequestPasswordRecovery } from "../domain/usecases/request-password-recovery";
 import { SaveAccountAccess } from "../domain/usecases/save-account-access";
 import { SaveCompanyMembership } from "../domain/usecases/save-company-membership";
 import { SaveRoleTemplate } from "../domain/usecases/save-role-template";
@@ -32,10 +39,19 @@ import { VerifyMfa } from "../domain/usecases/verify-mfa";
 export function createIdentityFeature(http: HttpClient) {
   const source = new HttpIdentityDataSource(http);
   const repository = new RemoteIdentityRepository(source);
+  const invitations = new RemoteAccountInvitationRepository(
+    new HttpAccountInvitationDataSource(http),
+  );
+  const credentials = new RemoteAccountCredentialRepository(
+    new HttpAccountCredentialDataSource(http),
+  );
   const members = new RemoteCompanyMemberRepository(new HttpCompanyMemberDataSource(http));
   const roles = new RemoteRoleTemplateRepository(new HttpRoleTemplateDataSource(http));
   const accounts = new RemoteManagedAccountRepository(new HttpManagedAccountDataSource(http));
   return {
+    inviteAccount: new InviteAccount(invitations),
+    confirmAccountCredential: new ConfirmAccountCredential(credentials),
+    requestPasswordRecovery: new RequestPasswordRecovery(credentials),
     loadCompanyAccountCandidates: new LoadCompanyAccountCandidates(accounts),
     prepareCompanyMembership: new PrepareCompanyMembership(members, accounts, roles),
     createCompanyMembership: new CreateCompanyMembership(members),

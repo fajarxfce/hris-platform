@@ -2,6 +2,27 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_invitation: [
+    "Review the recipient, name and reason.",
+    "Periksa penerima, nama, dan alasan undangan.",
+  ],
+  account_cannot_be_invited: [
+    "This account cannot receive an invitation. Review its current status.",
+    "Akun ini tidak dapat menerima undangan. Tinjau status terbarunya.",
+  ],
+  mail_not_configured: [
+    "Email delivery is not configured. Contact your administrator.",
+    "Pengiriman email belum dikonfigurasi. Hubungi administrator.",
+  ],
+  credential_link_unavailable: [
+    "This link is invalid, expired or already used.",
+    "Tautan ini tidak valid, kedaluwarsa, atau sudah digunakan.",
+  ],
+  invalid_recovery_request: ["Enter a valid email address.", "Masukkan alamat email yang valid."],
+  password_length: [
+    "Use a password of 12–128 characters.",
+    "Gunakan password sepanjang 12–128 karakter.",
+  ],
   invalid_account_access: [
     "Review the account status, platform permissions and reason.",
     "Periksa status akun, permission platform, dan alasan perubahan.",

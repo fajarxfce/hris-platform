@@ -12,6 +12,7 @@ import sys
 import time
 from urllib.error import URLError
 from urllib.request import urlopen
+from dashboard_mail_fixture import DashboardMailFixture
 
 
 root = Path(__file__).resolve().parents[1]
@@ -23,6 +24,7 @@ port = 18081 if with_worker else 18080
 container = None
 api = None
 worker = None
+mail = None
 logs = root / (".work/worker-integration" if with_worker else ".work/dashboard-integration")
 environment_file = logs / "postgres.env"
 
@@ -36,7 +38,7 @@ def stop(_signal, _frame):
 
 
 def main():
-    global container, api, worker
+    global container, api, worker, mail
     if not jar.is_file():
         raise RuntimeError("Build the API with ./gradlew :apps:server:bootJar first")
     if with_worker and not worker_jar.is_file():
@@ -45,6 +47,8 @@ def main():
     logs.mkdir(parents=True, exist_ok=True)
     for event in (signal.SIGINT, signal.SIGTERM):
         signal.signal(event, stop)
+    if with_worker:
+        mail = DashboardMailFixture(logs / "mail.json")
     database_password = secrets.token_urlsafe(24)
     environment_file.write_text(f"POSTGRES_PASSWORD={database_password}\n")
     initialization = logs / "runtime-role.sql"
@@ -91,7 +95,16 @@ def main():
         "HRIS_SYNC_ACTIVE_KEY": "v1",
         "HRIS_SECURE_COOKIES": "false",  # Loopback HTTP fixture only.
         "HRIS_OIDC_ENABLED": "false",
-        "HRIS_MAIL_ENABLED": "false",
+        "HRIS_MAIL_ENABLED": "true" if mail else "false",
+        "HRIS_MAIL_HOST": "127.0.0.1",
+        "HRIS_MAIL_PORT": str(mail.port if mail else 1),
+        "HRIS_MAIL_FROM": "no-reply@example.test",
+        "HRIS_MAIL_USERNAME": "",
+        "HRIS_MAIL_PASSWORD": "",
+        "HRIS_MAIL_TRANSPORT": "PLAINTEXT",
+        "HRIS_MAIL_ALLOW_LOOPBACK_PLAINTEXT": "true",
+        "HRIS_PUBLIC_URL": "http://127.0.0.1:4175",
+        "HRIS_AUTH_LINKS_ALLOW_LOOPBACK_HTTP": "true",
         "HRIS_STORAGE_ENABLED": "false",
         "HRIS_DOCUMENT_SCANNER_ENABLED": "false",
         "HRIS_FCM_ENABLED": "false",
@@ -184,4 +197,6 @@ finally:
                     subprocess.run(docker + ["rm", "-f", container], capture_output=True, timeout=20, check=True)
         finally:
             environment_file.unlink(missing_ok=True)
+            if mail is not None:
+                mail.close()
 sys.exit(exit_code)

@@ -1,5 +1,6 @@
 import { Title2 } from "@fluentui/react-components";
 import { Eye20Regular, EyeOff20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
 import { AppLoading } from "../../../../core/presentation/components/app-loading";
@@ -7,6 +8,7 @@ import { AppTextField } from "../../../../core/presentation/components/app-text-
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { IdentityController } from "../controllers/identity-controller";
 import type { AuthForms } from "../controllers/use-auth-forms";
+import { accountCredentialMessages } from "../i18n/account-credential-messages";
 import type { IdentityState } from "../models/identity-state";
 import { MfaChallengeContent } from "./mfa-challenge-content";
 import { MfaRecoveryContent } from "./mfa-recovery-content";
@@ -61,6 +63,7 @@ export function AuthPage({ state, actions, forms, locale }: Props) {
                 {text.signIn}
               </AppButton>
             </form>
+            <Link to="/auth/recover-password">{accountCredentialMessages(locale).forgot}</Link>
             {state.providers.length > 0 && (
               <div className="app-sso-links">
                 {state.providers.map((provider) => (

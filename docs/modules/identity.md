@@ -152,7 +152,15 @@ remain available when mail delivery is subsequently disabled.
 
 `POST /api/v1/auth/invitations/accept` and `POST /api/v1/auth/password-recovery/confirm` accept `token` and a new `password` of 12–128 characters. These exact public routes retain CSRF protection. Use the public cookie/CSRF transport without an Authorization header. Tokens are bound to account, purpose, expiry, and current security version and serialized under the account lock. Expiry is checked again after password hashing and journal completion. Acceptance or recovery advances credential versions, invalidates existing browser/native credentials, and preserves authenticator enrollment and recovery codes. It returns 204 without signing in automatically. After a lost confirmation response, try signing in with the new password; do not replay a one-use confirmation automatically.
 
-Account/password writes, challenge consumption, queue supersession, and audit/outbox share the transaction. Invitation receipts are included in that transaction. Plaintext links, passwords, provider errors, and encryption keys are not returned by administrative APIs or logged. [SMTP configuration and delivery](../mail.md) describes limits and at-least-once delivery. No production provider or browser acceptance screen has been validated yet.
+Account/password writes, challenge consumption, queue supersession, and audit/outbox share the transaction. Invitation receipts are included in that transaction. Plaintext links, passwords, provider errors, and encryption keys are not returned by administrative APIs or logged. [SMTP configuration and delivery](../mail.md) describes limits and at-least-once delivery.
+
+The [dashboard invitation and credential flow](../dashboard.md#account-invitations-and-password-recovery)
+includes administrator creation/resend, public acceptance and password recovery.
+Browser bindings own URL-fragment capture and removal; controllers own requests
+and transient input. Repositories preserve technical failure classification,
+while use cases validate purpose and input. A real API/worker acceptance scenario
+used disposable accounts and loopback SMTP, including native-session revocation.
+No production email provider has been configured or validated by these tests.
 
 
 Native push endpoints have account/session ownership, encrypted tokens, optimistic registration versions, atomic receipts/audit, bounded lifetime, and explicit disable. Bearer authentication supplies the session identity; callers cannot register for an arbitrary session. See [mobile API](../mobile-api.md#native-push-registration) for rotation, logout/account switching, and transport contracts.

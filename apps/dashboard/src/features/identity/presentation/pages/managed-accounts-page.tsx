@@ -1,4 +1,5 @@
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
 import { AppLoading } from "../../../../core/presentation/components/app-loading";
@@ -6,6 +7,7 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useManagedAccountSearch } from "../controllers/use-managed-account-search";
+import { accountInvitationMessages } from "../i18n/account-invitation-messages";
 import { managedAccountMessages } from "../i18n/managed-account-messages";
 import type { managedAccountRows } from "../models/managed-account-view";
 import type { ManagedAccountsState } from "../models/managed-accounts-state";
@@ -23,6 +25,7 @@ export function ManagedAccountsPage({
   onNext,
   onOpen,
   onReset,
+  inviteTo,
 }: {
   state: ManagedAccountsState;
   rows: ReturnType<typeof managedAccountRows>;
@@ -35,6 +38,7 @@ export function ManagedAccountsPage({
   onNext: () => void;
   onOpen: (id: string) => void;
   onReset: () => void;
+  inviteTo: string;
 }) {
   const text = managedAccountMessages(locale);
   return (
@@ -46,13 +50,16 @@ export function ManagedAccountsPage({
         title={text.title}
         context={text.scope}
         actions={
-          <AppButton
-            appearance="subtle"
-            icon={<ArrowClockwise20Regular />}
-            aria-label={messages(locale).refresh}
-            disabled={state.stage === "loading"}
-            onClick={onRefresh}
-          />
+          <>
+            <Link to={inviteTo}>{accountInvitationMessages(locale).invite}</Link>
+            <AppButton
+              appearance="subtle"
+              icon={<ArrowClockwise20Regular />}
+              aria-label={messages(locale).refresh}
+              disabled={state.stage === "loading"}
+              onClick={onRefresh}
+            />
+          </>
         }
       />
       <AppFailure failure={state.failure} locale={locale} />

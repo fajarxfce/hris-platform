@@ -26,3 +26,21 @@ When disabled, the repository returns `mail_not_configured`. No production email
 `HRIS_PUBLIC_URL` is a trusted HTTPS origin with no path, query, user information, or fragment. Both applications validate it at startup when mail is enabled; request Host headers never generate links. Explicit `HRIS_AUTH_LINKS_ALLOW_LOOPBACK_HTTP=true` permits only loopback HTTP during development. Links carry their token in the URL fragment. The frontend must move it into owned state and clear the fragment before further navigation.
 
 Invitation/recovery tokens contain 256 random bits. The challenge table stores only hashes; the delivery queue temporarily stores the token encrypted with account/challenge-bound associated data. It is erased after delivery, terminal failure, or supersession. Credential changes revoke outstanding links and previous sessions while preserving MFA. See [identity](modules/identity.md) for the API flow.
+
+## Browser delivery and acceptance
+
+Use the dashboard's HTTPS origin for `HRIS_PUBLIC_URL`; the browser routes are
+`/auth/accept-invitation` and `/auth/reset-password`. The dashboard clears token
+fragments before interaction, never persists them in browser storage and does not
+automatically repeat a one-use password confirmation. Administrative **Invite
+account** reports queue admission. Actual delivery is performed by the worker
+using the same identity keyring as the API.
+
+`npm run test:integration:worker -- account-invitations.spec.ts` in
+`apps/dashboard` starts an isolated database, API, worker and loopback SMTP sink.
+Both application JARs must already be built. The fixture admits only owned
+`example.test`/`example.invalid` recipients and bounds connections, lines, message
+size and retained messages. Captured fixture links are written atomically to a
+mode-600 temporary file and removed with the fixture. No production configuration
+or external provider is used. `python3 tool/test_dashboard_mail_fixture.py`
+checks sink capacity and socket/thread/file cleanup.

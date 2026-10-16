@@ -6,6 +6,7 @@ import { AppLoading } from "../../../../core/presentation/components/app-loading
 import { AppPageHeader } from "../../../../core/presentation/components/app-page-header";
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { accountInvitationMessages } from "../i18n/account-invitation-messages";
 import { managedAccountMessages } from "../i18n/managed-account-messages";
 import type { ManagedAccountState } from "../models/managed-account-state";
 import type { managedAccountProperties } from "../models/managed-account-view";
@@ -16,6 +17,7 @@ export function ManagedAccountPage({
   locale,
   backTo,
   editTo,
+  inviteTo,
   onRefresh,
 }: {
   state: ManagedAccountState;
@@ -23,6 +25,7 @@ export function ManagedAccountPage({
   locale: Locale;
   backTo: string;
   editTo: string;
+  inviteTo: string;
   onRefresh: () => void;
 }) {
   const text = managedAccountMessages(locale);
@@ -38,6 +41,9 @@ export function ManagedAccountPage({
           <>
             <Link to={backTo}>{text.back}</Link>
             {state.review && <Link to={editTo}>{text.edit}</Link>}
+            {state.review?.account.invitationPending && (
+              <Link to={inviteTo}>{accountInvitationMessages(locale).resend}</Link>
+            )}
             <AppButton
               appearance="subtle"
               icon={<ArrowClockwise20Regular />}

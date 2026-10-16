@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import type { IdentityController } from "../../features/identity/presentation/controllers/identity-controller";
 
 /** Reconnect and foreground revalidation share the controller's single owned request. */
-export function useIdentityLifecycle(identity: IdentityController) {
+export function useIdentityLifecycle(identity: IdentityController, enabled = true) {
   useEffect(() => {
+    if (!enabled) return;
     const refresh = () => {
       const stage = identity.getSnapshot().stage;
       if (document.visibilityState === "visible" && (stage === "ready" || stage === "unavailable"))
@@ -17,5 +18,5 @@ export function useIdentityLifecycle(identity: IdentityController) {
       window.removeEventListener("online", refresh);
       identity.deactivate();
     };
-  }, [identity]);
+  }, [identity, enabled]);
 }

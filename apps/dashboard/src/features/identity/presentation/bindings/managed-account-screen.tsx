@@ -47,6 +47,7 @@ function ManagedAccountBinding(props: ManagedAccountScreenProps & { id: string; 
       locale={props.locale}
       backTo={`/platform/accounts${query}`}
       editTo={`/platform/accounts/${encodeURIComponent(props.id)}/edit${query}`}
+      inviteTo={`/platform/accounts/${encodeURIComponent(props.id)}/invite${query}`}
       onRefresh={controller.refresh}
     />
   );

@@ -438,6 +438,13 @@ a {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
+.app-account-invitation {
+  align-content: start;
+}
+.app-account-invitation > p {
+  margin: 0;
+  max-width: 70ch;
+}
 .app-text-field,
 .app-text-field .fui-Input,
 .app-text-area-field,

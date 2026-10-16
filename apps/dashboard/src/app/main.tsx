@@ -64,6 +64,7 @@ const router = createBrowserRouter([
           clientBuild={__HRIS_DASHBOARD_BUILD__}
           identity={identity}
           identityAdministration={identityFeature}
+          accountCredentials={identityFeature}
           reporting={reporting}
           administration={administration}
           approvals={approvals}

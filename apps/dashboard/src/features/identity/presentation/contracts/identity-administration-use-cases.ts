@@ -1,4 +1,5 @@
 import type { CreateCompanyMembership } from "../../domain/usecases/create-company-membership";
+import type { InviteAccount } from "../../domain/usecases/invite-account";
 import type { LoadAssignablePermissions } from "../../domain/usecases/load-assignable-permissions";
 import type { LoadCompanyAccountCandidates } from "../../domain/usecases/load-company-account-candidates";
 import type { LoadCompanyMember } from "../../domain/usecases/load-company-member";
@@ -13,6 +14,7 @@ import type { SaveCompanyMembership } from "../../domain/usecases/save-company-m
 import type { SaveRoleTemplate } from "../../domain/usecases/save-role-template";
 
 export type IdentityAdministrationUseCases = Readonly<{
+  inviteAccount: Pick<InviteAccount, "execute">;
   loadCompanyAccountCandidates: Pick<LoadCompanyAccountCandidates, "execute">;
   prepareCompanyMembership: Pick<PrepareCompanyMembership, "execute">;
   createCompanyMembership: Pick<CreateCompanyMembership, "execute">;

@@ -28,6 +28,13 @@ full local search, paging and department filters. API 35 acceptance reopened Hom
 attendance without connectivity after advancing the emulator clock by 73 hours.
 Company policy controls maintenance, minimum builds and module availability, with
 fresh admission before inbox synchronization and command delivery.
+The [shared Inbox read restrictions](https://github.com/fajarxfce/hris-mobile/commit/25819040f7d992559ca1e73567cdc0697afbdd8f)
+now cover list, detail, unread counts and retained actions. Root checks passed
+with 1,679 workspace tests, four build-convention tests and 67 selected Chromium
+tests. API 35 acceptance retained the same encrypted message and denial across an
+offline cold start and failed retry, then recovered access and confirmed a read
+action through the real API/PostgreSQL/worker fixture. The validated WireGuard
+APK was installed on the phone with install-only delivery.
 The [employee calendar and attendance replica](https://github.com/fajarxfce/hris-mobile/commit/d57f496)
 retains encrypted attendance days, effective weekly assignments, roster overrides
 and holidays independently of the displayed month/week. Local queries resolve

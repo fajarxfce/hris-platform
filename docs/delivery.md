@@ -48,6 +48,28 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Shared native Inbox read admission
+
+The [mobile client](https://github.com/fajarxfce/hris-mobile/commit/25819040f7d992559ca1e73567cdc0697afbdd8f)
+now shares confirmed read restrictions across Inbox list, detail, unread counts
+and retained actions. An encrypted record survives restoration; a process-owned
+buffer covers pending or failed persistence. Complete admitted acquisition can
+clear only the denial revision it observed before starting. Facts, permission
+to read them, action reviews and pending commands remain separate.
+
+Root checks passed with 1,679 workspace tests, four build-convention tests,
+architecture, formatting and static analysis. All 67 selected Inbox Chromium
+tests and Android dev assembly passed. API 35 acceptance used an isolated API,
+PostgreSQL and worker, with a local HTTP fault proxy supplying a scope denial.
+An offline cold start and failed retry retained identical encrypted facts and
+denial metadata. Reconnection reopened the message, and a confirmed read action
+cleared its unread badge and retired its command. The owned services and emulator
+were stopped; no backend source or development service was changed.
+
+The validated WireGuard APK was installed on the authorized phone with
+`--install-only`; its installed hash matched the validation artifact. See
+[client evidence](https://github.com/fajarxfce/hris-mobile/blob/25819040/docs/validation.md#shared-inbox-read-admission).
+
 ### Database recovery and V90 development delivery
 
 Private PostgreSQL backups now include a custom database archive, password-free

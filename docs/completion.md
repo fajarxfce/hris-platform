@@ -104,6 +104,15 @@ encrypted commands retain original input and operation keys across response loss
 offline process restoration and explicit replay. API 35 acceptance verified a real
 plan, actual time, cancelled approval and distinct versioned history entries; the
 validated APK was installed on the phone without opening it.
+The [shared Overtime read restrictions](https://github.com/fajarxfce/hris-mobile/commit/5ddbda710d7c1f2bb2a60784a458042b2017714c)
+retain confirmed denials independently of fact cleanup. Overview, detail, forms
+and retained commands remain closed until admitted acquisition completes; a newer
+denial wins over older pending work. Root checks passed with 1,603 tests and 250
+selected Chromium tests. API 35 acceptance verified persisted denial across an
+offline cold start and failed retry, recovery of the actual-time form, and another
+offline read with unchanged encrypted facts. Android assembly passed; the existing
+GitHub Actions workflow handles production Web validation after the local optimizer
+exceeded available host memory. Phone delivery is pending ADB availability.
 The [native payslip pages](https://github.com/fajarxfce/hris-mobile/commit/46d8b2f)
 now provide annual history, published amounts, payment progress and English/Indonesian
 PDF saving. Every read requests employee SELF scope. API 35 acceptance verified

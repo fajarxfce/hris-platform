@@ -1,5 +1,6 @@
 import type { CreateCompanyMembership } from "../../domain/usecases/create-company-membership";
 import type { InviteAccount } from "../../domain/usecases/invite-account";
+import type { LoadAccountDeviceSessions } from "../../domain/usecases/load-account-device-sessions";
 import type { LoadAssignablePermissions } from "../../domain/usecases/load-assignable-permissions";
 import type { LoadCompanyAccountCandidates } from "../../domain/usecases/load-company-account-candidates";
 import type { LoadCompanyMember } from "../../domain/usecases/load-company-member";
@@ -11,12 +12,15 @@ import type { LoadRoleTemplate } from "../../domain/usecases/load-role-template"
 import type { LoadRoleTemplates } from "../../domain/usecases/load-role-templates";
 import type { PrepareCompanyMembership } from "../../domain/usecases/prepare-company-membership";
 import type { PrepareOidcBinding } from "../../domain/usecases/prepare-oidc-binding";
+import type { RevokeAccountDeviceSession } from "../../domain/usecases/revoke-account-device-session";
 import type { SaveAccountAccess } from "../../domain/usecases/save-account-access";
 import type { SaveCompanyMembership } from "../../domain/usecases/save-company-membership";
 import type { SaveOidcBinding } from "../../domain/usecases/save-oidc-binding";
 import type { SaveRoleTemplate } from "../../domain/usecases/save-role-template";
 
 export type IdentityAdministrationUseCases = Readonly<{
+  loadAccountDeviceSessions: Pick<LoadAccountDeviceSessions, "execute">;
+  revokeAccountDeviceSession: Pick<RevokeAccountDeviceSession, "execute">;
   loadOidcBindings: Pick<LoadOidcBindings, "execute">;
   prepareOidcBinding: Pick<PrepareOidcBinding, "execute">;
   saveOidcBinding: Pick<SaveOidcBinding, "execute">;

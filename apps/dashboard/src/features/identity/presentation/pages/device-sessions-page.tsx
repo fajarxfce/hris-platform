@@ -1,5 +1,6 @@
 import { MessageBar, MessageBarBody } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppDialog } from "../../../../core/presentation/components/app-dialog";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -18,6 +19,8 @@ export function DeviceSessionsPage({
   properties,
   locale,
   visible,
+  context,
+  backLink,
   onRefresh,
   onReview,
   onDismiss,
@@ -28,6 +31,8 @@ export function DeviceSessionsPage({
   properties: ReturnType<typeof deviceSessionProperties>;
   locale: Locale;
   visible: boolean;
+  context?: string;
+  backLink?: Readonly<{ to: string; label: string }>;
   onRefresh: () => void;
   onReview: (id: string) => void;
   onDismiss: () => void;
@@ -41,15 +46,18 @@ export function DeviceSessionsPage({
     >
       <AppPageHeader
         title={text.title}
-        context={messages(locale).navigationAccount}
+        context={context ?? messages(locale).navigationAccount}
         actions={
-          <AppButton
-            appearance="subtle"
-            icon={<ArrowClockwise20Regular />}
-            aria-label={messages(locale).refresh}
-            disabled={["loading", "confirming", "revoking"].includes(state.stage)}
-            onClick={onRefresh}
-          />
+          <>
+            {backLink && <Link to={backLink.to}>{backLink.label}</Link>}
+            <AppButton
+              appearance="subtle"
+              icon={<ArrowClockwise20Regular />}
+              aria-label={messages(locale).refresh}
+              disabled={["loading", "confirming", "revoking"].includes(state.stage)}
+              onClick={onRefresh}
+            />
+          </>
         }
       />
       <p>{text.description}</p>

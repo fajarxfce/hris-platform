@@ -49,6 +49,7 @@ function ManagedAccountBinding(props: ManagedAccountScreenProps & { id: string; 
       editTo={`/platform/accounts/${encodeURIComponent(props.id)}/edit${query}`}
       inviteTo={`/platform/accounts/${encodeURIComponent(props.id)}/invite${query}`}
       ssoTo={`/platform/accounts/${encodeURIComponent(props.id)}/sso${query}`}
+      sessionsTo={`/platform/accounts/${encodeURIComponent(props.id)}/sessions${query}`}
       onRefresh={controller.refresh}
     />
   );

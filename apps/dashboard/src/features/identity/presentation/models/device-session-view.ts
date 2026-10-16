@@ -1,5 +1,6 @@
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { DeviceSession } from "../../domain/entities/device-session";
+import type { ManagedAccount } from "../../domain/entities/managed-account";
 import { deviceSessionMessages } from "../i18n/device-session-messages";
 
 export function deviceSessionRows(sessions: readonly DeviceSession[], locale: Locale) {
@@ -14,11 +15,21 @@ export function deviceSessionRows(sessions: readonly DeviceSession[], locale: Lo
     ],
   }));
 }
-export function deviceSessionProperties(session: DeviceSession | null, locale: Locale) {
+export function deviceSessionProperties(
+  session: DeviceSession | null,
+  locale: Locale,
+  account?: ManagedAccount | null,
+) {
   if (!session) return [];
   const text = deviceSessionMessages(locale);
   const time = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   return [
+    ...(account
+      ? [
+          { label: text.account, value: account.displayName },
+          { label: text.accountEmail, value: account.email },
+        ]
+      : []),
     { label: text.device, value: session.deviceName },
     { label: text.created, value: time.format(new Date(session.createdAt)) },
     { label: text.expires, value: time.format(new Date(session.expiresAt)) },

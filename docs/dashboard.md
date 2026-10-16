@@ -694,6 +694,29 @@ access/refresh rejection, independent device/account access, CSRF rejection,
 foreign-session non-disclosure and replacing the signed-in dashboard account.
 Ending credentials does not remotely erase an offline application's local data.
 
+## Account app sessions
+
+Platform accounts → account details → App sessions
+(`/platform/accounts/:accountId/sessions`) reviews one account's app credentials.
+The page retains account-directory return context and shows the selected account's
+name and email in its revocation confirmation. Only global `identity.manage`
+authorizes this route and its dedicated use cases; company grants do not supply
+platform authority. The API independently enforces current access and recent MFA.
+
+The account-scoped controller shares the existing resource table and confirmation
+page with own-account sessions, but uses separate repository and use-case
+contracts. It owns one read or revocation, cancels superseded requests and clears
+metadata on account/access replacement or hidden workspaces. Equivalent permission
+arrays do not recreate the controller. Revalidation cannot cause a rejected read
+loop or resend a revocation after MFA.
+
+An uncertain result retains its exact account/session target for explicit retry
+or fresh-list reconciliation. Pending work protects navigation. A confirmed
+revocation removes only that session; rotation does not change its family ID.
+The isolated API/PostgreSQL workflow verifies these boundaries with an enrolled
+test administrator, lost committed responses, CSRF rejection, unrelated accounts,
+retained device and browser access, and replacement of the dashboard account.
+
 ## Company and group headcount
 
 `/reports/headcount?asOf=2026-10-01` loads the [group headcount API](reporting.md), initially selecting the active company. The default date uses that company's time zone. The controlled form can select one to 32 companies and keeps edits separate from the applied URL filters. Apply stores the date and a sorted `companies` selection; browser history restores both. The report shows distinct people, employment records, status, and contract totals with the source definition's historical limits. A group also displays company-level counts. The unique-person total comes from the backend and is never summed from company buckets.

@@ -48,6 +48,29 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Account app-session administration dashboard
+
+Platform account details now link to a scoped app-session review. Its confirmation
+identifies the selected account and device, and uncertain revocations retain the
+same target for explicit retry or list reconciliation. Separate administration
+contracts enforce global authority while reusing the existing Fluent table and
+dialog. Hidden workspaces and replaced access cancel pending reads and clear
+private metadata. MFA verification does not resend a business action.
+
+Architecture, Biome, TypeScript and all 3,685 dashboard unit tests passed,
+including 32 new boundary/controller scenarios. All 36 related browser scenarios
+passed, including ten new administrative cases. Desktop and Indonesian dark
+layouts at 390 pixels with doubled text were inspected; dialog actions remained
+usable through scrolling. Existing CSS and bundle-size advisories remain.
+
+Both isolated API/PostgreSQL session workflows passed. The new administrative
+workflow verified response-loss recovery, repeated 204 acknowledgement, revoked
+native access/refresh tokens, retained independent devices/accounts/cookies,
+CSRF rejection and dashboard account replacement. The first attempt stopped at
+the test administrator's MFA enrollment screen; the fixture now completes its
+owned enrollment before exercising administration. No real credentials, mobile
+artifact or physical-device interaction were used.
+
 ### Account app-session administration API
 
 Platform administrators can list and end a selected account's app sessions using

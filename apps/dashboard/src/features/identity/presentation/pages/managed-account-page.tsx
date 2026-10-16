@@ -7,6 +7,7 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { accountInvitationMessages } from "../i18n/account-invitation-messages";
+import { deviceSessionMessages } from "../i18n/device-session-messages";
 import { managedAccountMessages } from "../i18n/managed-account-messages";
 import { oidcBindingMessages } from "../i18n/oidc-binding-messages";
 import type { ManagedAccountState } from "../models/managed-account-state";
@@ -20,6 +21,7 @@ export function ManagedAccountPage({
   editTo,
   inviteTo,
   ssoTo,
+  sessionsTo,
   onRefresh,
 }: {
   state: ManagedAccountState;
@@ -29,6 +31,7 @@ export function ManagedAccountPage({
   editTo: string;
   inviteTo: string;
   ssoTo: string;
+  sessionsTo: string;
   onRefresh: () => void;
 }) {
   const text = managedAccountMessages(locale);
@@ -45,6 +48,7 @@ export function ManagedAccountPage({
             <Link to={backTo}>{text.back}</Link>
             {state.review && <Link to={editTo}>{text.edit}</Link>}
             {state.review && <Link to={ssoTo}>{oidcBindingMessages(locale).title}</Link>}
+            {state.review && <Link to={sessionsTo}>{deviceSessionMessages(locale).title}</Link>}
             {state.review?.account.invitationPending && (
               <Link to={inviteTo}>{accountInvitationMessages(locale).resend}</Link>
             )}

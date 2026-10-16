@@ -2,6 +2,7 @@ import { Link, Route, Routes } from "react-router-dom";
 import { AppPageHeader } from "../../../../core/presentation/components/app-page-header";
 import { messages } from "../../../../core/presentation/i18n/messages";
 import { AccountAccessEditorScreen } from "../bindings/account-access-editor-screen";
+import { AccountDeviceSessionsScreen } from "../bindings/account-device-sessions-screen";
 import { AccountInvitationScreen } from "../bindings/account-invitation-screen";
 import { ManagedAccountScreen } from "../bindings/managed-account-screen";
 import { ManagedAccountsScreen } from "../bindings/managed-accounts-screen";
@@ -15,6 +16,10 @@ export function PlatformAccountRoutes(props: ManagedAccountScreenProps) {
     <Routes>
       <Route path="/platform/accounts" element={<ManagedAccountsScreen {...props} />} />
       <Route path="/platform/accounts/new" element={<AccountInvitationScreen {...props} />} />
+      <Route
+        path="/platform/accounts/:managedAccountId/sessions"
+        element={<AccountDeviceSessionsScreen {...props} />}
+      />
       <Route
         path="/platform/accounts/:managedAccountId/sso"
         element={<OidcBindingsScreen {...props} />}

@@ -68,8 +68,12 @@ request still needs current authority. A missing or mismatched session returns
 `native_session_not_found`. Cookie requests retain CSRF protection. Independent
 devices, other accounts and the account's browser session remain unchanged.
 
-The administrative dashboard entry point remains planned. The own-account page
-continues to use its existing endpoints and pending-MFA cleanup semantics.
+The [administrative dashboard](../dashboard.md#account-app-sessions) provides
+account-scoped review and confirmed revocation from Platform accounts. It shows
+the reviewed account in the confirmation and retains the same session family
+after an uncertain response. Verification never resubmits an action. The
+own-account page continues to use its existing endpoints and pending-MFA cleanup
+semantics.
 
 ## Native session cleanup
 

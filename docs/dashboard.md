@@ -665,6 +665,35 @@ The authorized workspace owns one pending navigation decision. Editors declare d
 
 The keyboard skip control moves focus to the owned main content element without adding a native hash-history entry. This keeps browser history inside the router's navigation protection.
 
+## App sessions
+
+Account → App sessions (`/account/sessions`) lists the signed-in account's HRIS
+app sessions independently of company membership or administration grants. Each
+row shows the supplied device name, sign-in time and absolute session expiry.
+Device names are display labels, not attestation. Browser cookies are separate
+from these app credentials.
+
+Ending a session requires confirmation of its metadata. The existing own-account
+API retains its authorization and CSRF boundaries; the dashboard sends no account
+selector or token. A successful empty acknowledgement removes that row. A lost
+response retains the exact session ID for an explicit, idempotent retry, or a
+fresh list can resolve its current presence. Only the defined missing-session
+result has the same outcome as successful revocation. No action is retried by a
+timer, read boundary or session revalidation.
+
+The feature controller owns one read or revocation. Pending actions protect
+departures; an explicit departure aborts acquisition without claiming that a
+server write was rolled back. Scope replacement and hidden workspaces cancel
+pending work and clear private metadata. Readmission of the same account cannot
+silently loop on a rejected credential. Confirmation uses the shared Fluent focus
+and visibility boundary. English/Indonesian tables contain narrow-screen overflow,
+and the scrollable dialog retains usable actions with doubled text.
+
+The isolated API/PostgreSQL workflow verifies lost-response recovery, native
+access/refresh rejection, independent device/account access, CSRF rejection,
+foreign-session non-disclosure and replacing the signed-in dashboard account.
+Ending credentials does not remotely erase an offline application's local data.
+
 ## Company and group headcount
 
 `/reports/headcount?asOf=2026-10-01` loads the [group headcount API](reporting.md), initially selecting the active company. The default date uses that company's time zone. The controlled form can select one to 32 companies and keeps edits separate from the applied URL filters. Apply stores the date and a sorted `companies` selection; browser history restores both. The report shows distinct people, employment records, status, and contract totals with the source definition's historical limits. A group also displays company-level counts. The unique-person total comes from the backend and is never summed from company buckets.

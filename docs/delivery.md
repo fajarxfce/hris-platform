@@ -48,6 +48,29 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Dashboard app sessions
+
+Accounts can inspect and end their own app sessions without company membership.
+The existing metadata and revocation APIs retain their account and CSRF scope.
+Confirmation, explicit recovery after response loss, current-list reconciliation,
+protected departure and cancellation are implemented. Session revalidation cannot
+silently repeat a rejected read in an unchanged workspace. No backend schema or
+API change was required.
+
+Architecture, Biome, TypeScript and all 3,653 dashboard unit tests passed. Seventeen
+related browser scenarios passed, including ten app-session cases, authentication
+and navigation regressions. Checks covered focus restoration, pending departure,
+late reads/writes, account revocation, readmission without a loop and explicit
+recovery. Desktop and Indonesian dark views at 390 pixels with doubled text were
+inspected; dialog actions remained operable after scrolling. Existing CSS and
+bundle advisories remain; no performance benchmark is claimed.
+
+An isolated API/PostgreSQL browser workflow verified a lost committed revocation
+response and idempotent retry, rejection of the old native access/refresh tokens,
+unchanged independent devices and accounts, CSRF rejection, foreign-session
+non-disclosure and switching the dashboard account. Credentials belonged only to
+disposable fixtures. No mobile artifact or physical-device validation was added.
+
 ### SSO binding dashboard
 
 Platform account details now provide bounded SSO binding pages, exact review,

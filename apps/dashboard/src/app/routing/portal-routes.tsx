@@ -13,6 +13,7 @@ import type {
   CompanyAccess,
   CompanyMembership,
 } from "../../features/identity/domain/entities/session";
+import type { DeviceSessionUseCases } from "../../features/identity/presentation/contracts/device-session-use-cases";
 import type { IdentityAdministrationUseCases } from "../../features/identity/presentation/contracts/identity-administration-use-cases";
 import type { JobsUseCases } from "../../features/jobs/presentation/contracts/jobs-use-cases";
 import type { LeaveUseCases } from "../../features/leave/presentation/contracts/leave-use-cases";
@@ -26,6 +27,11 @@ import type { WorkforceUseCases } from "../../features/workforce/presentation/co
 import { approvalResourceRoute } from "./approval-resource-route";
 
 const noPlatformPermissions: readonly string[] = Object.freeze([]);
+const DeviceSessionsScreen = lazy(() =>
+  import("../../features/identity/presentation/bindings/device-sessions-screen").then((module) => ({
+    default: module.DeviceSessionsScreen,
+  })),
+);
 const PlatformAccountRoutes = lazy(() =>
   import("../../features/identity/presentation/navigation/platform-account-routes").then(
     (module) => ({ default: module.PlatformAccountRoutes }),
@@ -442,6 +448,7 @@ export function PortalRoutes({
   accountId,
   platformPermissions = noPlatformPermissions,
   identityAdministration,
+  deviceSessions,
   company,
   companies,
   access,
@@ -465,6 +472,7 @@ export function PortalRoutes({
   accountId: AccountId;
   platformPermissions?: readonly string[];
   identityAdministration: IdentityAdministrationUseCases;
+  deviceSessions: DeviceSessionUseCases;
   company: CompanyMembership | null;
   companies: readonly CompanyMembership[];
   access: CompanyAccess | null;
@@ -485,6 +493,7 @@ export function PortalRoutes({
   nextIdentifier: () => string;
 }) {
   const platform = useMatch("/platform/*");
+  const ownSessions = useMatch("/account/sessions");
   const platformAccess = useMemo(
     () => Object.freeze({ accountId, permissions: platformPermissions }),
     [accountId, platformPermissions],
@@ -498,6 +507,12 @@ export function PortalRoutes({
           locale={locale}
           nextIdentifier={nextIdentifier}
         />
+      </Suspense>
+    );
+  if (ownSessions)
+    return (
+      <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+        <DeviceSessionsScreen accountId={accountId} actions={deviceSessions} locale={locale} />
       </Suspense>
     );
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;

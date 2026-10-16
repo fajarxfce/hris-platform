@@ -89,6 +89,7 @@ export function PortalWorkspace(
                   accountId={state.workspace.accountId}
                   platformPermissions={state.workspace.platformPermissions}
                   identityAdministration={props.identityAdministration}
+                  deviceSessions={props.deviceSessions}
                   companies={state.workspace.companies}
                   access={state.workspace.access}
                   reporting={props.reporting}

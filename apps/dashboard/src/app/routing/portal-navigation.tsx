@@ -10,6 +10,7 @@ import {
 } from "../../features/documents/presentation/navigation/documents-navigation";
 import { expenseNavigation } from "../../features/expenses/presentation/navigation/expense-navigation";
 import type { CompanyAccess } from "../../features/identity/domain/entities/session";
+import { deviceSessionNavigation } from "../../features/identity/presentation/navigation/device-session-navigation";
 import { identityNavigation } from "../../features/identity/presentation/navigation/identity-navigation";
 import { platformAccountNavigation } from "../../features/identity/presentation/navigation/platform-account-navigation";
 import { jobsNavigation } from "../../features/jobs/presentation/navigation/jobs-navigation";
@@ -76,5 +77,6 @@ export function portalNavigation(
       label: text.navigationPlatform,
       items: platformAccountNavigation(platformPermissions, locale),
     },
+    { id: "account", label: text.navigationAccount, items: deviceSessionNavigation(locale) },
   ].filter((section) => section.items.length > 0);
 }

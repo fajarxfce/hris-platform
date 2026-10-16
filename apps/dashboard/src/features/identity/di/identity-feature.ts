@@ -2,6 +2,7 @@ import type { HttpClient } from "../../../core/data/http/http-client";
 import { HttpAccountCredentialDataSource } from "../data/datasources/http-account-credential-data-source";
 import { HttpAccountInvitationDataSource } from "../data/datasources/http-account-invitation-data-source";
 import { HttpCompanyMemberDataSource } from "../data/datasources/http-company-member-data-source";
+import { HttpDeviceSessionDataSource } from "../data/datasources/http-device-session-data-source";
 import { HttpIdentityDataSource } from "../data/datasources/http-identity-data-source";
 import { HttpManagedAccountDataSource } from "../data/datasources/http-managed-account-data-source";
 import { HttpOidcBindingDataSource } from "../data/datasources/http-oidc-binding-data-source";
@@ -9,6 +10,7 @@ import { HttpRoleTemplateDataSource } from "../data/datasources/http-role-templa
 import { RemoteAccountCredentialRepository } from "../data/repositories/remote-account-credential-repository";
 import { RemoteAccountInvitationRepository } from "../data/repositories/remote-account-invitation-repository";
 import { RemoteCompanyMemberRepository } from "../data/repositories/remote-company-member-repository";
+import { RemoteDeviceSessionRepository } from "../data/repositories/remote-device-session-repository";
 import { RemoteIdentityRepository } from "../data/repositories/remote-identity-repository";
 import { RemoteManagedAccountRepository } from "../data/repositories/remote-managed-account-repository";
 import { RemoteOidcBindingRepository } from "../data/repositories/remote-oidc-binding-repository";
@@ -23,6 +25,7 @@ import { LoadCompanyAccess } from "../domain/usecases/load-company-access";
 import { LoadCompanyAccountCandidates } from "../domain/usecases/load-company-account-candidates";
 import { LoadCompanyMember } from "../domain/usecases/load-company-member";
 import { LoadCompanyMembers } from "../domain/usecases/load-company-members";
+import { LoadDeviceSessions } from "../domain/usecases/load-device-sessions";
 import { LoadIdentityProviders } from "../domain/usecases/load-identity-providers";
 import { LoadManagedAccount } from "../domain/usecases/load-managed-account";
 import { LoadManagedAccounts } from "../domain/usecases/load-managed-accounts";
@@ -33,6 +36,7 @@ import { LoadSession } from "../domain/usecases/load-session";
 import { PrepareCompanyMembership } from "../domain/usecases/prepare-company-membership";
 import { PrepareOidcBinding } from "../domain/usecases/prepare-oidc-binding";
 import { RequestPasswordRecovery } from "../domain/usecases/request-password-recovery";
+import { RevokeDeviceSession } from "../domain/usecases/revoke-device-session";
 import { SaveAccountAccess } from "../domain/usecases/save-account-access";
 import { SaveCompanyMembership } from "../domain/usecases/save-company-membership";
 import { SaveOidcBinding } from "../domain/usecases/save-oidc-binding";
@@ -54,7 +58,10 @@ export function createIdentityFeature(http: HttpClient) {
   const roles = new RemoteRoleTemplateRepository(new HttpRoleTemplateDataSource(http));
   const accounts = new RemoteManagedAccountRepository(new HttpManagedAccountDataSource(http));
   const oidc = new RemoteOidcBindingRepository(new HttpOidcBindingDataSource(http));
+  const devices = new RemoteDeviceSessionRepository(new HttpDeviceSessionDataSource(http));
   return {
+    loadDeviceSessions: new LoadDeviceSessions(devices),
+    revokeDeviceSession: new RevokeDeviceSession(devices),
     loadOidcBindings: new LoadOidcBindings(accounts, oidc),
     prepareOidcBinding: new PrepareOidcBinding(accounts, oidc),
     saveOidcBinding: new SaveOidcBinding(oidc),

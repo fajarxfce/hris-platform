@@ -4,6 +4,7 @@ import type { CommunicationsUseCases } from "../features/communications/presenta
 import type { DocumentsUseCases } from "../features/documents/presentation/contracts/documents-use-cases";
 import type { ExpenseUseCases } from "../features/expenses/presentation/contracts/expense-use-cases";
 import type { AccountCredentialUseCases } from "../features/identity/presentation/contracts/account-credential-use-cases";
+import type { DeviceSessionUseCases } from "../features/identity/presentation/contracts/device-session-use-cases";
 import type { IdentityAdministrationUseCases } from "../features/identity/presentation/contracts/identity-administration-use-cases";
 import type { IdentityController } from "../features/identity/presentation/controllers/identity-controller";
 import type { JobsUseCases } from "../features/jobs/presentation/contracts/jobs-use-cases";
@@ -21,6 +22,7 @@ export type ApplicationDependencies = Readonly<{
   identity: IdentityController;
   identityAdministration: IdentityAdministrationUseCases;
   accountCredentials: AccountCredentialUseCases;
+  deviceSessions: DeviceSessionUseCases;
   reporting: ReportingUseCases;
   administration: AdministrationUseCases;
   approvals: ApprovalsUseCases;

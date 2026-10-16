@@ -37,6 +37,13 @@ Account locks serialize session creation, rotation, MFA updates, and revocation.
 
 Native MFA verification and recovery-code regeneration return new native credentials. They do not elevate a browser cookie. Elevation rejects an obsolete session version after a competing refresh. A proof is consumed before transport credential elevation; a lost response or failure in that handoff requires another authenticator code, recovery code, or a fresh sign-in. Native clients must not automatically repeat one-use MFA actions. Initial MFA enrollment uses the shared sign-in handshake. Session listings and revocation are always restricted to the current account. Account, company-list, and native-session metadata reads revalidate credentials under a shared account guard. Own-session revocation retains its cleanup semantics if credentials change after request admission; it never reveals another account's session or creates access.
 
+The [dashboard app-session page](../dashboard.md#app-sessions) provides own-account
+listing and confirmed revocation without company or administration grants. It uses
+the existing native-session endpoints and their metadata-only responses. A lost
+DELETE response keeps its exact session for explicit retry or list reconciliation;
+no new scope or token disclosure is introduced. Cross-account session management
+remains separate from this self-service capability.
+
 ## OIDC
 
 Spring Security handles authorization code, PKCE, ID-token validation, state, and nonce. Account resolution uses only an explicitly linked issuer/subject. Global credential administration is distinct from company membership administration. Provider role/email/MFA claims do not bypass local authorization. See [SSO configuration](../sso.md) for registration, revocation, request/resource limits, and the client flow.

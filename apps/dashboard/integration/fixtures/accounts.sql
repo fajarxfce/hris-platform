@@ -91,7 +91,9 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000070', 'browser-assignment-member@example.invalid', 'Browser Assignment Member'),
   ('a0000000-0000-4000-8000-000000000071', 'browser-invitation-admin@example.invalid', 'Browser Invitation Admin'),
   ('a0000000-0000-4000-8000-000000000072', 'browser-oidc-admin@example.invalid', 'Browser SSO Admin'),
-  ('a0000000-0000-4000-8000-000000000073', 'browser-oidc-member@example.invalid', 'Browser SSO Member')
+  ('a0000000-0000-4000-8000-000000000073', 'browser-oidc-member@example.invalid', 'Browser SSO Member'),
+  ('a0000000-0000-4000-8000-000000000074', 'browser-session-owner@example.invalid', 'Browser Session Owner'),
+  ('a0000000-0000-4000-8000-000000000075', 'browser-session-other@example.invalid', 'Browser Other Session Owner')
 ) AS fixture(id, email, name)
 WHERE bootstrap.email = 'browser-admin@example.invalid'
 ON CONFLICT DO NOTHING;

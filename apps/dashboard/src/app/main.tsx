@@ -65,6 +65,7 @@ const router = createBrowserRouter([
           identity={identity}
           identityAdministration={identityFeature}
           accountCredentials={identityFeature}
+          deviceSessions={identityFeature}
           reporting={reporting}
           administration={administration}
           approvals={approvals}

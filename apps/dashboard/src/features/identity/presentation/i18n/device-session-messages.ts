@@ -1,0 +1,37 @@
+import type { Locale } from "../../../../core/presentation/i18n/messages";
+
+const english = {
+  title: "App sessions",
+  description: "Manage sign-ins from the HRIS app.",
+  directory: "Signed-in devices",
+  device: "Device name",
+  created: "Signed in",
+  expires: "Expires",
+  end: "End session",
+  confirm: "End this app session?",
+  consequence: "The app will need to sign in again to reconnect.",
+  review: "Session details",
+  empty: "No active app sessions.",
+  pending: "Ending session",
+  unconfirmed: "The session may have ended. Retry or refresh the list to check.",
+  retry: "Retry ending session",
+  ended: "This app session has ended.",
+} as const;
+const indonesian: Record<keyof typeof english, string> = {
+  title: "Sesi aplikasi",
+  description: "Kelola sesi login dari aplikasi HRIS.",
+  directory: "Perangkat yang login",
+  device: "Nama perangkat",
+  created: "Waktu login",
+  expires: "Berlaku hingga",
+  end: "Akhiri sesi",
+  confirm: "Akhiri sesi aplikasi ini?",
+  consequence: "Aplikasi perlu login kembali untuk terhubung.",
+  review: "Detail sesi",
+  empty: "Tidak ada sesi aplikasi aktif.",
+  pending: "Mengakhiri sesi",
+  unconfirmed: "Sesi mungkin sudah berakhir. Coba lagi atau refresh daftar untuk memeriksanya.",
+  retry: "Coba akhiri sesi lagi",
+  ended: "Sesi aplikasi ini telah berakhir.",
+};
+export const deviceSessionMessages = (locale: Locale) => (locale === "id" ? indonesian : english);

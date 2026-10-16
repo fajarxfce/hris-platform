@@ -76,7 +76,9 @@ class MembershipController(
                 body.active,
                 body.permissions,
                 body.reason,
-                body.roleTemplates.map { RoleTemplateSelection(it.id, it.version) },
+                body.roleTemplates.map {
+                    RoleTemplateSelection(it.id, it.version, it.retainApplied)
+                },
             )
             .response()
             .toResponse()

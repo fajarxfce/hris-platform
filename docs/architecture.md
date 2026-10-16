@@ -84,6 +84,15 @@ after acquisition. Role saves snapshot permission inputs before any wait and ret
 session/recent MFA checks through journal and receipt completion. Late failure or
 cancellation rolls back all role changes and their immutable evidence together.
 
+Membership edits explicitly distinguish current role selections from retaining an
+already applied snapshot. Retention reads the reviewed member's immutable grant;
+it cannot import another member's roles or reactivate inactive access. Reactivation
+requires current active definitions and the existing sensitive-grant checks.
+Selection inputs are detached before waits, and session/recent MFA is checked
+through completion of the membership, source snapshots, audit and receipt.
+Member reads also revalidate assurance after acquisition. A globally inactive
+account can have its company access disabled without activating that account.
+
 Approval aggregate reads acquire the shared approval guard before company, membership, and actor-account guards. They observe headers and assignment overrides coherently; mutations retain the exclusive approval guard. Both readers and administrative commands revalidate live session assurance after waiting, including before returning an existing operation receipt.
 
 Interactive work-calendar reads and commands also revalidate current session

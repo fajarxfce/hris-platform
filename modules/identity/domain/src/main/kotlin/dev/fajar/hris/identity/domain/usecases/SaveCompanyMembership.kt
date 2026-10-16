@@ -32,11 +32,13 @@ class SaveCompanyMembership(
             val recent = requireRecentMfa(actor, clock.instant(), security.recentAuthenticationAge)
             if (recent is Result.Failed) return recent
         }
+        val selectedPermissions = permissions.toSet()
+        val selectedRoles = roleTemplates.toList()
         if (
-            !PermissionCatalog.assignable.containsAll(permissions) ||
-                roleTemplates.size > 8 ||
-                roleTemplates.map { it.id }.distinct().size != roleTemplates.size ||
-                roleTemplates.any { it.version < 0 } ||
+            !PermissionCatalog.assignable.containsAll(selectedPermissions) ||
+                selectedRoles.size > 8 ||
+                selectedRoles.map { it.id }.distinct().size != selectedRoles.size ||
+                selectedRoles.any { it.version < 0 } ||
                 reason.isBlank() ||
                 reason.length > 1000 ||
                 (expectedVersion ?: 0) < 0
@@ -55,16 +57,22 @@ class SaveCompanyMembership(
                     active.toString(),
                     reason,
                 ) +
-                    permissions.sorted() +
-                    roleTemplates
+                    selectedPermissions.sorted() +
+                    selectedRoles
                         .sortedBy { it.id }
-                        .flatMap { listOf("template", it.id.toString(), it.version.toString()) },
+                        .flatMap {
+                            listOf(
+                                if (it.retainApplied) "retained-template" else "template",
+                                it.id.toString(),
+                                it.version.toString(),
+                            )
+                        },
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
-            if (roleTemplates.isNotEmpty()) {
-                val roleLock = roles.lock(company)
+            if (selectedRoles.isNotEmpty()) {
+                val roleLock = roles.lock(company, shared = true)
                 if (roleLock is Result.Failed) return@run roleLock
             }
             val companyGuard = identities.lockCompany(company, shared = true)
@@ -75,10 +83,11 @@ class SaveCompanyMembership(
                 val accountGuard = identities.lockAccount(id, shared = true)
                 if (accountGuard is Result.Failed) return@run accountGuard
             }
+            val accessed = identities.access(actor.accountId, company)
+            if (accessed is Result.Failed) return@run accessed
+            val currentAccess = (accessed as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+                validateCompanySessionActor(actor, currentAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val permission = live.requirePermission("identity.manage")
@@ -91,8 +100,32 @@ class SaveCompanyMembership(
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
+            val existing = members.find(company, accountId)
+            if (existing is Result.Failed) return@run existing
+            val member = (existing as Result.Success).value
+            if (member?.version != expectedVersion)
+                return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
+            val retained =
+                if (selectedRoles.any { it.retainApplied }) {
+                    if (member == null || (active && !member.membershipActive))
+                        return@run Result.Failed(
+                            Failure(FailureKind.VALIDATION, "role_template_review_required")
+                        )
+                    val grant = roles.application(company, accountId, member.version)
+                    if (grant is Result.Failed) return@run grant
+                    (grant as Result.Success).value?.roleTemplates.orEmpty()
+                } else emptyList()
             val applied = mutableListOf<AppliedRoleTemplate>()
-            for (selection in roleTemplates.sortedBy { it.id }) {
+            for (selection in selectedRoles.sortedBy { it.id }) {
+                if (selection.retainApplied) {
+                    val previous = retained.find { it.id == selection.id }
+                    if (previous == null || previous.version != selection.version)
+                        return@run Result.Failed(
+                            Failure(FailureKind.CONFLICT, "stale_role_template")
+                        )
+                    applied += previous
+                    continue
+                }
                 val found = roles.find(company, selection.id)
                 if (found is Result.Failed) return@run found
                 val role = (found as Result.Success).value
@@ -111,7 +144,7 @@ class SaveCompanyMembership(
                         role.permissions,
                     )
             }
-            val effectivePermissions = permissions + applied.flatMap { it.permissions }
+            val effectivePermissions = selectedPermissions + applied.flatMap { it.permissions }
             if (!PermissionCatalog.assignable.containsAll(effectivePermissions))
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "invalid_membership"))
             if (
@@ -121,9 +154,6 @@ class SaveCompanyMembership(
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "cannot_remove_own_administration")
                 )
-            val existing = members.find(company, accountId)
-            if (existing is Result.Failed) return@run existing
-            val member = (existing as Result.Success).value
             val previousGrants =
                 if (member?.membershipActive == true) member.permissions else emptySet()
             val added = effectivePermissions - previousGrants
@@ -159,7 +189,8 @@ class SaveCompanyMembership(
             }
             val target = identities.access(accountId, null)
             if (target is Result.Failed) return@run target
-            if ((target as Result.Success).value?.account?.active != true)
+            val targetAccount = (target as Result.Success).value?.account
+            if (targetAccount == null || (active && !targetAccount.active))
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "account_unavailable"))
             members
                 .save(company, accountId, expectedVersion, active, effectivePermissions)
@@ -169,7 +200,7 @@ class SaveCompanyMembership(
                             actor,
                             accountId,
                             receipt.version,
-                            MembershipGrant(permissions.toSet(), applied.toList()),
+                            MembershipGrant(selectedPermissions, applied.toList()),
                         )
                         .flatMap { operations.record(actor, key, receipt) }
                         .flatMap {
@@ -187,6 +218,23 @@ class SaveCompanyMembership(
                                     reason,
                                 ),
                             )
+                        }
+                        .flatMap {
+                            validateCompanySessionActor(
+                                actor,
+                                currentAccess,
+                                clock.instant(),
+                                security,
+                            )
+                        }
+                        .flatMap {
+                            if (security.enforceMfa)
+                                requireRecentMfa(
+                                    actor,
+                                    clock.instant(),
+                                    security.recentAuthenticationAge,
+                                )
+                            else Result.Success(Unit)
                         }
                         .map { receipt }
                 }

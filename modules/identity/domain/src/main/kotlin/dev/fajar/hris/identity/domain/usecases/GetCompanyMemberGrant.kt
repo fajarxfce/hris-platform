@@ -28,25 +28,32 @@ class GetCompanyMemberGrant(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val accessed = identities.access(actor.accountId, company)
+            if (accessed is Result.Failed) return@run accessed
+            val currentAccess = (accessed as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, currentAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val permission = live.requirePermission("identity.manage")
             if (permission is Result.Failed) return@run permission
-            members.find(company, accountId).flatMap { member ->
-                if (member == null)
-                    Result.Failed(Failure(FailureKind.NOT_FOUND, "company_member_not_found"))
-                else
-                    roles.application(company, accountId, member.version).map { grant ->
-                        CompanyMemberGrant(
-                            member,
-                            grant ?: MembershipGrant(member.permissions, emptyList()),
-                        )
-                    }
-            }
+            members
+                .find(company, accountId)
+                .flatMap { member ->
+                    if (member == null)
+                        Result.Failed(Failure(FailureKind.NOT_FOUND, "company_member_not_found"))
+                    else
+                        roles.application(company, accountId, member.version).map { grant ->
+                            CompanyMemberGrant(
+                                member,
+                                grant ?: MembershipGrant(member.permissions, emptyList()),
+                            )
+                        }
+                }
+                .flatMap { grant ->
+                    validateCompanySessionActor(actor, currentAccess, clock.instant(), security)
+                        .map { grant }
+                }
         }
     }
 }

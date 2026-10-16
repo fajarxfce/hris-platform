@@ -34,6 +34,19 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun membershipRoleRetentionIsAnOptionalExplicitSelection() {
+        val schema = contract()["components"]["schemas"]["RoleTemplateSelectionRequest"]
+        assertEquals(
+            setOf("id", "version", "retainApplied"),
+            schema["properties"].propertyNames().toSet(),
+        )
+        assertEquals("boolean", schema["properties"]["retainApplied"]["type"].asString())
+        assertFalse(
+            schema.path("required").iterator().asSequence().any { it.asString() == "retainApplied" }
+        )
+    }
+
+    @Test
     fun carryBalanceFactsHaveOneCompatibleShapeForAccountAndDirectoryReads() {
         val schemas = contract()["components"]["schemas"]
         for (name in listOf("LeaveBalanceResponse", "LeaveAccountResponse")) {

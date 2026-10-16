@@ -67,6 +67,26 @@ verification; changing a definition never implicitly reapplies member grants.
 
 Membership writes accept direct `permissions` and up to eight distinct `roleTemplates` selections, each with `id` and `version`. The use case validates current active templates in the same company and records their full permission snapshots with the resulting membership version. Existing members retain their granted permissions when a template changes or is archived. Reapplying a changed template requires an explicit membership update and expected membership version. Refresh the template before retrying a stale selection.
 
+A selection can explicitly set `retainApplied: true` to keep the immutable role
+snapshot already present in the reviewed membership version. It may survive later
+definition changes or archival, but cannot copy another member's grant or apply a
+historical revision for the first time. Reactivating an inactive membership
+requires current active role selections, including applicable sensitive-grant
+checks. The default `false` preserves existing current-version validation and
+operation keys. Retained and newly applied selections share the eight-role bound
+and cannot repeat the same role. Command inputs are detached before waits; the
+observed membership version is checked before acquiring role evidence.
+
+Member reads check session assurance again after acquisition. Membership commands
+retain current session and recent-MFA checks through journal/receipt completion,
+rolling back membership values, role snapshots and journal evidence on late
+failure or cancellation. Role definitions use their shared guard before company,
+exclusive membership and ordered account guards.
+
+An inactive global account may have its company access disabled; it cannot receive
+active company access until the account itself is active. Changing membership
+status does not activate the global account.
+
 `GET /companies/{companyId}/members/{accountId}` returns effective membership access and the direct/template sources used for that version. Older grants without a recorded template application are represented as direct permissions. Template application history is immutable; access, source snapshots, receipts, and audit/outbox commit together.
 
 Sensitive-grant checks run on the combined permissions. A company administrator cannot use a role template to bypass the platform-administrator requirement for payroll/payment access or grant those permissions to themselves. Reactivating a membership counts as granting its permissions again. Membership and template changes retain recent-MFA checks when enforcement is enabled. A template name never substitutes for a server permission check.

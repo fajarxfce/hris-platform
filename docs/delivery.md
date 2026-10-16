@@ -48,6 +48,28 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Reviewed membership role retention
+
+Membership commands now support explicit retention of the reviewed member's
+previously applied role versions. Current selections retain their original
+validation and operation keys; retention has distinct command identity. A role's
+later revision or archival cannot silently change an existing grant. Retention
+cannot borrow another membership's evidence or reactivate inactive access.
+Reactivation requires current active definitions and applicable platform authority.
+Globally inactive accounts can have company access disabled, while active company
+grants still require an active account.
+
+Reads recheck session assurance after acquiring their values. Commands detach
+inputs before waiting and recheck assurance after journal/receipt writes, so late
+expiry, cancellation or failures roll back grants and evidence together.
+
+Validation passed 88 API/PostgreSQL cases, 23 Identity domain/data tests, all 71
+worker tests, architecture, formatting and both application JAR builds. New cases
+cover retained/changed/archived definitions, legacy payload receipt recovery,
+member/company isolation, reactivation and sensitive grants, immutable inputs,
+late MFA, failure rollback and cancellation. Dashboard editing and development
+deployment are recorded with their subsequent validation.
+
 ### Company role review API
 
 Current role definitions and immutable revisions have a scoped, bounded review

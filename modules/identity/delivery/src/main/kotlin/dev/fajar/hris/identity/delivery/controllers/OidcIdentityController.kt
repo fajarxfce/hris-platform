@@ -2,6 +2,7 @@ package dev.fajar.hris.identity.delivery.controllers
 
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.core.http.*
+import dev.fajar.hris.identity.delivery.mappers.toResponse
 import dev.fajar.hris.identity.delivery.requests.OidcIdentityRequest
 import dev.fajar.hris.identity.delivery.responses.OidcIdentityResponse
 import dev.fajar.hris.identity.domain.usecases.*
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/identity/accounts/{accountId}/oidc")
 class OidcIdentityController(
     private val list: ListOidcIdentities,
+    private val get: GetOidcIdentity,
     private val save: SaveOidcIdentity,
 ) {
     @GetMapping
@@ -22,20 +24,15 @@ class OidcIdentityController(
         @RequestParam(defaultValue = "50") size: Int,
     ): Page<OidcIdentityResponse> =
         list.execute(actor, accountId, after, size).response().let { page ->
-            Page(
-                page.items.map {
-                    OidcIdentityResponse(
-                        it.id,
-                        it.issuer,
-                        it.subject,
-                        it.active,
-                        it.version,
-                        it.linkedAt,
-                    )
-                },
-                page.nextCursor,
-            )
+            Page(page.items.map { it.toResponse() }, page.nextCursor)
         }
+
+    @GetMapping("/{id}")
+    fun get(
+        actor: Actor,
+        @PathVariable accountId: UUID,
+        @PathVariable id: UUID,
+    ): OidcIdentityResponse = get.execute(actor, accountId, id).response().toResponse()
 
     @PutMapping("/{id}")
     fun save(

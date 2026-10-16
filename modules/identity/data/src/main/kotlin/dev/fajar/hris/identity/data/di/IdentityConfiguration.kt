@@ -301,7 +301,18 @@ class IdentityConfiguration {
         links: OidcIdentityRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListOidcIdentities(links, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListOidcIdentities(links, identities, transactions, security, clock)
+
+    @Bean
+    fun getOidcIdentity(
+        links: OidcIdentityRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetOidcIdentity(links, identities, transactions, security, clock)
 
     @Bean
     fun signInWithOidc(

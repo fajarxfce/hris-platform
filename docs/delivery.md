@@ -48,6 +48,27 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### SSO binding review and completion assurance
+
+An exact account-scoped binding endpoint now supports review without scanning
+directory pages. Collection and exact reads revalidate session assurance after
+acquisition. Binding commands retain current MFA enrollment and recent proof
+through journal and receipt completion, including original-command replay and
+permitted changes to the initiating account.
+
+Forty-three API/PostgreSQL tests, 23 identity domain/data tests and all 71 worker
+tests passed, along with formatting, architecture checks and both application
+JARs. Controlled late expiry, failures and interruption left binding, credential,
+audit and receipt state unchanged; renewed authority could complete the original
+operation. Exact HTTP review verified account isolation, observed versions and
+revoked owner sessions. Existing isolated OIDC protocol and concurrency tests
+also passed. No live provider or physical-device validation was performed.
+
+The preceding invitation increment was deployed to development with its validated
+API and worker JARs. The database and document services were retained. Dashboard
+`10.77.77.1:5173` and API health `10.77.77.1:8088` returned HTTP 200 from the VPS;
+that reachability check did not operate a user's authenticated session.
+
 ### New company account assignment
 
 Company identity administrators with global account-discovery authority can

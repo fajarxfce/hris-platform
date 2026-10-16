@@ -318,6 +318,48 @@ class OidcHttpTest : ApiIntegrationTest() {
     }
 
     @Test
+    fun exactBindingReviewRetainsAccountScopeAndObservedVersion() {
+        val f = fixture()
+        val owner = client()
+        login(owner, "${f.account}@example.test")
+        val path = "/api/v1/identity/accounts/${f.account}/oidc/${f.identity}"
+        for (reader in listOf(f.admin, owner)) {
+            val response = get(reader, path)
+            assertEquals(200, response.statusCode(), response.body())
+            val body = json.readTree(response.body())
+            assertEquals(f.identity.toString(), body["id"].asString())
+            assertEquals(provider.issuer, body["issuer"].asString())
+            assertEquals(f.subject, body["subject"].asString())
+            assertEquals(0, body["version"].asInt())
+            assertTrue(body["active"].asBoolean())
+            assertFalse(body.has("accountId"))
+            assertFalse(body.has("linkedBy"))
+        }
+        val another = fixture()
+        assertEquals(
+            403,
+            get(owner, "/api/v1/identity/accounts/${another.account}/oidc/${another.identity}")
+                .statusCode(),
+        )
+        for (reader in listOf(f.admin, owner)) {
+            for (id in listOf(another.identity, UUID.randomUUID())) {
+                val response = get(reader, "/api/v1/identity/accounts/${f.account}/oidc/$id")
+                assertEquals(404, response.statusCode(), response.body())
+                assertEquals(
+                    "oidc_identity_not_found",
+                    json.readTree(response.body())["code"].asString(),
+                )
+            }
+        }
+        assertEquals(200, save(f, version = 0, active = false).statusCode())
+        val updated = get(f.admin, path)
+        assertEquals(200, updated.statusCode(), updated.body())
+        assertEquals(1, json.readTree(updated.body())["version"].asInt())
+        assertFalse(json.readTree(updated.body())["active"].asBoolean())
+        assertEquals(401, get(owner, path).statusCode())
+    }
+
+    @Test
     fun failedAuditRollsBackTheBindingCredentialVersionAndGlobalReceipt() {
         val f = fixture(false)
         val key = UUID.randomUUID()

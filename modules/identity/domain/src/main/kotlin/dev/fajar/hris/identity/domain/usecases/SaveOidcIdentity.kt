@@ -37,7 +37,7 @@ class SaveOidcIdentity(
             issuer.length !in 1..500 ||
                 subject.length !in 1..255 ||
                 subject.any(Char::isISOControl) ||
-                (expectedVersion ?: 0) < 0 ||
+                (expectedVersion != null && expectedVersion !in 0 until Long.MAX_VALUE) ||
                 reason.isBlank() ||
                 reason.length > 1000
         )
@@ -72,10 +72,10 @@ class SaveOidcIdentity(
                     if (guard is Result.Failed) return@run guard
                 }
             }
-            val checked =
-                identities.access(actor.accountId, null).flatMap {
-                    validatePlatformCommandActor(actor, it)
-                }
+            val acquired = identities.access(actor.accountId, null)
+            if (acquired is Result.Failed) return@run acquired
+            val access = (acquired as Result.Success).value
+            val checked = validatePlatformSessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             if ("identity.manage" !in live.permissions)
@@ -144,6 +144,12 @@ class SaveOidcIdentity(
                         )
                     }
                     .flatMap { operations.record(actor, key, receipt) }
+                    .flatMap {
+                        validatePlatformSessionActor(actor, access, clock.instant(), security)
+                    }
+                    .flatMap {
+                        requireRecentIdentityAdministration(actor, clock.instant(), security)
+                    }
                     .map { receipt }
             }
         }

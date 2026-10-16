@@ -30,6 +30,19 @@ Only a platform administrator may use `PUT /api/v1/identity/accounts/{accountId}
 
 Credential changes require recent authentication and applicable MFA, increment the account security version, revoke older sessions, and commit their audit/outbox and receipt together. Replays do not repeat that change. Account-level receipts are isolated from company receipts and from other actors. `GET` on the same account collection supports bounded pagination and allows the account owner or a platform administrator to inspect bindings.
 
+`GET /api/v1/identity/accounts/{accountId}/oidc/{id}` reviews one exact binding
+and its observed version. A binding belonging to another account and an unknown
+binding return the same `oidc_identity_not_found` response. Collection and exact
+reads hold the initiating account guard and revalidate current authority and
+session assurance before and after acquisition.
+
+Commands check current MFA enrollment and recent proof after ordered account
+guards, including before receipt replay. They retain those checks through journal
+and receipt completion. Expiry, failure or cancellation rolls back the binding,
+credential version and evidence together. Editing the initiating account uses
+its guarded access snapshot, allowing the change to commit before the original
+credential is revoked. A renewed credential can recover the original receipt.
+
 ## Client flow and resource ownership
 
 `GET /api/v1/auth/providers` returns the enabled provider label and authorization path. Open that path in a browser. A successful callback redirects to `/auth/complete`; the frontend then fetches a new CSRF token and `/api/v1/me`, including any required application MFA step. Failure redirects to `/login?sso=failed` without provider error details. These are frontend routes; dashboard integration is tracked separately in delivery status.

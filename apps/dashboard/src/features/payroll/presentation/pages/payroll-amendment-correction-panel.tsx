@@ -4,11 +4,15 @@ import { AppCheckbox } from "../../../../core/presentation/components/app-checkb
 import { AppConfirmationDialog } from "../../../../core/presentation/components/app-confirmation-dialog";
 import { AppDetailsPanel } from "../../../../core/presentation/components/app-details-panel";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
+import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
+import { AppSelect } from "../../../../core/presentation/components/app-select";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { usePayrollAmendmentCorrectionForm } from "../controllers/use-payroll-amendment-correction-form";
 import { payrollAmendmentEditorMessages } from "../i18n/payroll-amendment-editor-messages";
+import type { payrollAmendmentAttendanceChoiceView } from "../models/payroll-amendment-attendance-view";
 export function PayrollAmendmentCorrectionPanel({
   form,
+  attendance,
   locale,
   month,
   compensation,
@@ -17,6 +21,7 @@ export function PayrollAmendmentCorrectionPanel({
   onRemove,
 }: {
   form: ReturnType<typeof usePayrollAmendmentCorrectionForm>;
+  attendance: ReturnType<typeof payrollAmendmentAttendanceChoiceView>;
   locale: Locale;
   month: string;
   compensation: ReactNode;
@@ -35,6 +40,22 @@ export function PayrollAmendmentCorrectionPanel({
     >
       <AppFailure failure={form.failure} locale={locale} />
       <form className="app-editor-form app-amendment-month-form" onSubmit={form.submit} noValidate>
+        <AppSelect
+          label={text.attendanceSource}
+          name={form.attendance.name}
+          ref={form.attendance.ref}
+          onBlur={form.attendance.onBlur}
+          value={form.attendance.value}
+          onChange={(_event, data) => form.attendance.onChange(data.value)}
+        >
+          {attendance.options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </AppSelect>
+        {attendance.stale && <p role="status">{text.attendanceChanged}</p>}
+        <AppPropertyList title={text.attendanceSource} items={attendance.properties} />
         <AppCheckbox
           label={text.includeCompensation}
           checked={form.withCompensation}

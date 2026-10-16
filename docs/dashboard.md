@@ -497,6 +497,21 @@ proposals use `/payroll/amendments/:id/edit`. A month panel reuses compensation
 and input fields, retaining the published tax registration. The owning page
 protects both applied corrections and unapplied panel input on departure.
 
+The month panel distinguishes published attendance from the latest available HR
+revision. **Keep published attendance** preserves that month's existing facts;
+selecting a revision explicitly replaces them. Attendance-only proposals are
+supported. A previously selected revision stays visible after another correction
+but requires a deliberate choice before a new preview or save. Refresh never
+silently substitutes a source. Older APIs without attendance metadata retain
+ordinary compensation/input editing.
+
+Previews and retained calculations show the exact attendance reference and its
+full monthly calendar, including schedule, recorded attendance, holidays and
+approved overtime minutes. Original closing facts remain distinguishable from
+adjusted facts. The proposal records the author's choice separately from the
+calculation's retained evidence. Later HR corrections do not replace evidence
+already used for independent review or publication.
+
 Preview is required before saving. Changing a correction invalidates that
 preview; changing the reason does not repeat financial acquisition. New published
 revisions require explicit review before replacing a draft's observed sources.

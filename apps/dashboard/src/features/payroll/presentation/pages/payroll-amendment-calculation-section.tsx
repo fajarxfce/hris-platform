@@ -6,6 +6,7 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { PayrollAmendmentCalculation } from "../../domain/entities/payroll-amendment-calculation";
 import { payrollAmendmentMessages } from "../i18n/payroll-amendment-messages";
 import type { payrollAmendmentInspectionView } from "../models/payroll-amendment-view";
+import { PayrollAmendmentAttendanceSection } from "./payroll-amendment-attendance-section";
 import { PayrollCalculationOutputSection } from "./payroll-calculation-output-section";
 export function PayrollAmendmentCalculationSection({
   calculation,
@@ -59,6 +60,7 @@ export function PayrollAmendmentCalculationSection({
                 ]}
                 rows={view.comparison}
               />
+              <PayrollAmendmentAttendanceSection view={view.attendance} />
               <details className="app-amendment-disclosure">
                 <summary>{text.viewOriginal}</summary>
                 <div className="app-amendment-evidence">

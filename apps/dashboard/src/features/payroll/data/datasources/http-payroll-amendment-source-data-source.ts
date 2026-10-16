@@ -1,6 +1,6 @@
 import type { HttpClient } from "../../../../core/data/http/http-client";
 import {
-  type PayrollAmendmentTermsDto,
+  type PayrollAmendmentProposalDto,
   payrollAmendmentPreviewDto,
 } from "../models/payroll-amendment-dto";
 import {
@@ -39,7 +39,7 @@ export class HttpPayrollAmendmentSourceDataSource implements PayrollAmendmentSou
   async preview(
     company: string,
     assessment: string,
-    terms: PayrollAmendmentTermsDto,
+    terms: PayrollAmendmentProposalDto,
     signal: AbortSignal,
   ) {
     return payrollAmendmentPreviewDto.parse(

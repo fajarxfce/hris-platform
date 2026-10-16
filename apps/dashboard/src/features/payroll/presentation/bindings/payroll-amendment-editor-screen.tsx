@@ -101,6 +101,7 @@ function PayrollAmendmentEditorBinding(
           source={selected}
           correction={correction}
           locale={locale}
+          timezone={props.timezone}
           failure={state.failure}
           correctionIndex={
             state.terms?.corrections.findIndex(

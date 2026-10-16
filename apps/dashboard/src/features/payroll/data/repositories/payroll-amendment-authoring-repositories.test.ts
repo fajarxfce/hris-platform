@@ -143,7 +143,15 @@ describe("amendment source and save transport", () => {
     const terms = amendmentRevision(0).terms,
       { http, sources } = fixture(amendmentPreview());
     expect((await sources.preview(company, payslipId(), terms, signal)).ok).toBe(true);
-    expect(http.request.mock.calls[0]?.[0]).toMatchObject({ method: "POST", body: terms });
+    expect(http.request.mock.calls[0]?.[0]).toMatchObject({
+      method: "POST",
+      body: {
+        ...terms,
+        corrections: terms.corrections.map(
+          ({ workAdjustmentId: _attendance, ...correction }) => correction,
+        ),
+      },
+    });
     expect(http.request.mock.calls[0]?.[0].operationId).toBeUndefined();
     const substituted = amendmentPreview();
     assert(substituted.sourceVersions[0]);
@@ -173,7 +181,12 @@ describe("amendment source and save transport", () => {
       expect(request).toMatchObject({
         method: "PUT",
         operationId: operation,
-        body: input,
+        body: {
+          ...input,
+          corrections: input.corrections.map(
+            ({ workAdjustmentId: _attendance, ...correction }) => correction,
+          ),
+        },
         path: `/api/v1/companies/${company}/payroll/amendments/${amendmentId()}`,
       });
       http.request.mockResolvedValue({ id: amendmentId(), version: 999 });

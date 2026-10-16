@@ -71,8 +71,25 @@ expiry, mapping failure and cancellation. The first run exposed premature draft
 acquisition and changed preview-conflict classification; both were corrected and
 the affected suites passed on the final run. Existing and new API contracts passed.
 
-Dashboard and real browser acceptance are recorded separately. This increment
-does not migrate development services or install an APK.
+The dashboard offers explicit source selection, attendance-only proposals and
+readable retained monthly evidence. A newer HR correction does not replace a
+selected source or an uncertain command. Source mapping is shared with ordinary
+payroll inputs. Older APIs retain their existing editing flow. Shared selects now
+grow with enlarged text instead of clipping their labels vertically.
+
+Dashboard architecture, Biome, TypeScript and all 3,752 unit tests passed. All 83
+affected Chromium scenarios passed, including four new amendment-attendance
+cases. The first browser run exposed a duplicate month heading; the actual page
+heading was corrected and the existing navigation test passed. Desktop and dark
+390-pixel Indonesian layouts at doubled text were inspected.
+
+Two isolated API/PostgreSQL/worker browser workflows passed. Amendment acceptance
+selected a closed-attendance revision, recovered the original save after response
+loss, calculated, recorded a newer HR correction, independently approved and
+published the retained facts, and completed the existing payment-return workflow.
+Monthly input preparation, stale-source review and independent verification also
+passed with the shared mapper. Disposable fixture resources were removed. No
+development services were migrated and no APK was installed.
 
 ### Payroll attendance source revisions
 

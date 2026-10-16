@@ -534,7 +534,18 @@ a {
 .app-select-field select {
   width: 100%;
   min-width: 0;
+  height: calc(1lh + var(--app-select-inset, 12px));
   text-overflow: ellipsis;
+}
+.app-select-field .fui-Select[data-size="small"] {
+  --app-select-inset: 8px;
+}
+.app-select-field .fui-Select[data-size="large"] {
+  --app-select-inset: 18px;
+}
+.app-select-field .fui-Select__icon > svg {
+  max-width: 100%;
+  max-height: 100%;
 }
 .app-editor-parent {
   display: grid;

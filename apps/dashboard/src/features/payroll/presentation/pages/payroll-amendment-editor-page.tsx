@@ -15,6 +15,7 @@ import { payrollAmendmentEditorMessages } from "../i18n/payroll-amendment-editor
 import { payrollAmendmentMessages } from "../i18n/payroll-amendment-messages";
 import type { PayrollAmendmentEditorState } from "../models/payroll-amendment-editor-state";
 import type { payrollAmendmentEditorView } from "../models/payroll-amendment-editor-view";
+import { PayrollAmendmentAttendanceSection } from "./payroll-amendment-attendance-section";
 export function PayrollAmendmentEditorPage(props: {
   state: PayrollAmendmentEditorState;
   view: ReturnType<typeof payrollAmendmentEditorView>;
@@ -124,6 +125,9 @@ export function PayrollAmendmentEditorPage(props: {
                   ]}
                   rows={view.comparison}
                 />
+                {view.attendance.map((row) => (
+                  <PayrollAmendmentAttendanceSection key={row.id} view={row.view} />
+                ))}
               </>
             )}
             <form className="app-editor-form" onSubmit={form.submit} noValidate>

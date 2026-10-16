@@ -8,6 +8,7 @@ import { amendmentCalculation, amendmentSummary } from "./payroll-amendments";
 import { calculationEmployee } from "./payroll-calculations";
 import { inputTerms } from "./payroll-inputs";
 import { payslipId } from "./payroll-payslips";
+import { workDays } from "./payroll-work";
 export function amendmentPreparation(
   multiple = false,
   revision = 0,
@@ -31,6 +32,9 @@ export function amendmentPreparation(
       compensation: compensationTerms(),
       input: inputTerms(),
       calculation: structuredClone(calculation),
+      workAdjustmentId: null,
+      availableWorkAdjustment: null,
+      workDays: workDays(row.month),
     })),
   };
 }
@@ -61,6 +65,8 @@ export function amendmentPreview(
           month: row.month,
           compensation: correction?.compensation ?? row.compensation,
           input: correction?.input ?? row.input,
+          workAdjustmentId: correction?.workAdjustmentId ?? row.workAdjustmentId,
+          workDays: correction?.workAdjustmentId ? workDays(row.month, true) : row.workDays,
           original: structuredClone(row.calculation),
           calculation: structuredClone(changed ? retained.calculation : row.calculation),
           difference: changed

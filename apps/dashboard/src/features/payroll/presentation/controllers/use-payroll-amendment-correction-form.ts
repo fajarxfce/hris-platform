@@ -35,10 +35,12 @@ export function usePayrollAmendmentCorrectionForm(
     defaultValues: {
       compensation: correction ? correction.compensation !== null : true,
       input: correction?.input != null,
+      workAdjustmentId: correction?.workAdjustmentId ?? "",
     },
   });
   const withCompensation = useController({ control: choices.control, name: "compensation" }).field;
   const withInput = useController({ control: choices.control, name: "input" }).field;
+  const attendance = useController({ control: choices.control, name: "workAdjustmentId" }).field;
   const [validation, setValidation] = useState<{
     kind: "compensation" | "input" | null;
     failure: Failure;
@@ -57,6 +59,7 @@ export function usePayrollAmendmentCorrectionForm(
     withInput: withInput.value,
     changeCompensation: (checked: boolean) => withCompensation.onChange(checked),
     changeInput: (checked: boolean) => withInput.onChange(checked),
+    attendance: { ...attendance, onChange: (value: string) => attendance.onChange(value) },
     failure: validation?.failure ?? null,
     compensationFailure: validation?.kind === "compensation" ? validation.failure : null,
     inputFailure: validation?.kind === "input" ? validation.failure : null,
@@ -78,10 +81,24 @@ export function usePayrollAmendmentCorrectionForm(
         setValidation({ kind: "input", failure: monthInput.failure });
         return;
       }
-      if (!comp && !monthInput) {
+      if (!comp && !monthInput && !selection.workAdjustmentId) {
         setValidation({
           kind: null,
           failure: { code: "invalid_payroll_amendment_corrections", fields: {}, parameters: {} },
+        });
+        return;
+      }
+      if (
+        selection.workAdjustmentId &&
+        selection.workAdjustmentId !== source.availableWorkAdjustment?.id
+      ) {
+        setValidation({
+          kind: null,
+          failure: {
+            code: "stale_workforce_version",
+            fields: {},
+            parameters: { assessmentId: source.source.assessmentId },
+          },
         });
         return;
       }
@@ -89,6 +106,7 @@ export function usePayrollAmendmentCorrectionForm(
         assessmentId: source.source.assessmentId,
         compensation: comp?.ok ? comp.value.terms : null,
         input: monthInput?.ok ? monthInput.value.terms : null,
+        workAdjustmentId: selection.workAdjustmentId || null,
       });
     }),
   };

@@ -33,6 +33,7 @@ export type PayrollAmendmentCorrection = Readonly<{
   assessmentId: string;
   compensation: CompensationTerms | null;
   input: PayrollInputTerms | null;
+  workAdjustmentId: string | null;
 }>;
 export type PayrollAmendmentTerms = Readonly<{
   sourceVersions: readonly PayrollAmendmentSource[];

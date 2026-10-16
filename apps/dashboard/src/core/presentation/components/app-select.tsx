@@ -14,7 +14,7 @@ export const AppSelect = forwardRef<HTMLSelectElement, Props>(function AppSelect
       validationState={error ? "error" : "none"}
       validationMessage={error ?? null}
     >
-      <Select {...select} select={{ ref }} />
+      <Select {...select} data-size={select.size ?? "medium"} select={{ ref }} />
     </Field>
   );
 });

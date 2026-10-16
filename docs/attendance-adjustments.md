@@ -114,9 +114,9 @@ acquisition and late authentication expiry roll back the whole command. See
    the executed checks.
 2. Payroll source selection for unfinalized inputs is implemented and validated
    in the API, database, worker and dashboard, including a real browser workflow.
-   Amendment selection is implemented and validated in the backend; its
+   Amendment selection is implemented in the backend and dashboard; its
    [delivery record](delivery.md#attendance-sources-for-payroll-amendments) includes
-   the executed API, domain, data and worker checks. Payroll-owned read
+   the executed API, domain, data, worker and real browser checks. Payroll-owned read
    projections acquire immutable references; clients never submit replacement
    work or leave facts. Independent verification, approval and publication remain
    required.

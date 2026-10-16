@@ -7,7 +7,7 @@ import type {
   PayrollAmendmentSourceSearch,
 } from "../../domain/entities/payroll-amendment-preparation";
 import { normalizePayrollInputTerms } from "../../domain/policies/payroll-input-validation";
-import type { PayrollAmendmentTermsDto } from "../models/payroll-amendment-dto";
+import type { PayrollAmendmentProposalDto } from "../models/payroll-amendment-dto";
 import type {
   PayrollAmendmentCandidatesDto,
   PayrollAmendmentPreparationDto,
@@ -18,6 +18,7 @@ import {
   toCompensationTermsDto,
 } from "./compensation-mapper";
 import { toPayrollCalculationOutput } from "./payroll-calculation-output-mapper";
+import { toPayrollWorkAdjustment, toPayrollWorkDays } from "./payroll-work-mapper";
 export function toPayrollAmendmentCandidates(
   raw: PayrollAmendmentCandidatesDto,
   company: CompanyId,
@@ -69,7 +70,9 @@ export function toPayrollAmendmentPreparation(
       source.assessmentId !== sourceVersions[index]?.assessmentId ||
       source.revision !== sourceVersions[index]?.revision ||
       (index > 0 && row.month <= (raw.assessments[index - 1]?.month ?? "")) ||
-      row.month.slice(0, 4) !== raw.assessments[0]?.month.slice(0, 4)
+      row.month.slice(0, 4) !== raw.assessments[0]?.month.slice(0, 4) ||
+      ((row.workAdjustmentId !== null || row.availableWorkAdjustment !== null) &&
+        row.workDays === null)
     )
       throw new InvalidHttpResponseError();
     return Object.freeze({
@@ -79,6 +82,11 @@ export function toPayrollAmendmentPreparation(
       compensation: toCompensationTerms(row.compensation),
       input: normalizePayrollInputTerms(row.input),
       calculation: toPayrollCalculationOutput(row.calculation),
+      workAdjustmentId: row.workAdjustmentId?.toLowerCase() ?? null,
+      availableWorkAdjustment: row.availableWorkAdjustment
+        ? toPayrollWorkAdjustment(row.availableWorkAdjustment, row.month)
+        : null,
+      workDays: row.workDays ? toPayrollWorkDays(row.workDays, row.month) : null,
     });
   });
   return Object.freeze({
@@ -88,7 +96,9 @@ export function toPayrollAmendmentPreparation(
     assessments: Object.freeze(assessments),
   });
 }
-export function toPayrollAmendmentTermsDto(terms: PayrollAmendmentTerms): PayrollAmendmentTermsDto {
+export function toPayrollAmendmentTermsDto(
+  terms: PayrollAmendmentTerms,
+): PayrollAmendmentProposalDto {
   return {
     sourceVersions: terms.sourceVersions.map((row) => ({
       assessmentId: row.assessmentId,
@@ -96,6 +106,7 @@ export function toPayrollAmendmentTermsDto(terms: PayrollAmendmentTerms): Payrol
     })),
     corrections: terms.corrections.map((row) => ({
       assessmentId: row.assessmentId,
+      ...(row.workAdjustmentId ? { workAdjustmentId: row.workAdjustmentId } : {}),
       compensation: row.compensation ? toCompensationTermsDto(row.compensation) : null,
       input: row.input
         ? {

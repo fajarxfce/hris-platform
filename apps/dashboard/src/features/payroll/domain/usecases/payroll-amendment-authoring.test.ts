@@ -10,6 +10,7 @@ import {
 } from "../../../../../tests/fixtures/payroll-amendments";
 import { calculationCompany } from "../../../../../tests/fixtures/payroll-calculations";
 import { payslipId } from "../../../../../tests/fixtures/payroll-payslips";
+import { workAdjustment, workAdjustmentId } from "../../../../../tests/fixtures/payroll-work";
 import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
 import { failed, success } from "../../../../core/domain/result";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
@@ -72,6 +73,61 @@ function fixture() {
   return { preparation, sources, amendments };
 }
 describe("amendment authoring policy", () => {
+  it("requires an explicit current attendance selection and supports attendance-only proposals", async () => {
+    const f = fixture(),
+      raw = amendmentPreparation();
+    assert(raw.assessments[0]);
+    raw.assessments[0].availableWorkAdjustment = workAdjustment(2);
+    const preparation = toPayrollAmendmentPreparation(raw, access.companyId, payslipId()),
+      terms = {
+        ...amendmentRevision(0).terms,
+        corrections: [
+          {
+            assessmentId: payslipId(),
+            compensation: null,
+            input: null,
+            workAdjustmentId: workAdjustmentId(2).toUpperCase(),
+          },
+        ],
+      },
+      preview = new PreviewPayrollAmendment(f.sources);
+    expect((await preview.execute(access, preparation, terms, signal)).ok).toBe(true);
+    expect(f.sources.preview.mock.calls[0]?.[2].corrections[0]?.workAdjustmentId).toBe(
+      workAdjustmentId(2),
+    );
+    assert(terms.corrections[0]);
+    terms.corrections[0].workAdjustmentId = workAdjustmentId();
+    expect(await preview.execute(access, preparation, terms, signal)).toMatchObject({
+      ok: false,
+      failure: { code: "stale_workforce_version" },
+    });
+    expect(f.sources.preview).toHaveBeenCalledTimes(1);
+  });
+  it("restores a retained attendance choice without adopting a newer correction or changing assessment acknowledgement", async () => {
+    const f = fixture(),
+      raw = amendmentPreparation(),
+      retained = amendmentDetails(0);
+    assert(raw.assessments[0] && retained.amendment.terms.corrections[0]);
+    raw.assessments[0].availableWorkAdjustment = workAdjustment(2);
+    retained.amendment.terms.corrections[0].workAdjustmentId = workAdjustmentId();
+    f.sources.prepare.mockResolvedValue(
+      success(toPayrollAmendmentPreparation(raw, access.companyId, payslipId())),
+    );
+    f.amendments.get.mockResolvedValue(
+      success(toPayrollAmendmentDetails(retained, access.companyId, amendmentId())),
+    );
+    const result = await new LoadPayrollAmendmentEditor(f.amendments, f.sources).execute(
+      access,
+      { kind: "edit", amendmentId: amendmentId() },
+      signal,
+    );
+    assert(result.ok);
+    expect(result.value.sourcesChanged).toBe(false);
+    expect(result.value.current?.terms.corrections[0]?.workAdjustmentId).toBe(workAdjustmentId());
+    expect(result.value.preparation.assessments[0]?.availableWorkAdjustment?.id).toBe(
+      workAdjustmentId(2),
+    );
+  });
   it.each([[], ["payroll.read"], ["payroll.amend.review"], ["payroll.amend.publish"]])(
     "does not grant authoring to %j",
     async (...permissions) => {

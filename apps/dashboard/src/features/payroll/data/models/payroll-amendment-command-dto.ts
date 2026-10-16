@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { payrollAmendmentTermsDto } from "./payroll-amendment-dto";
 
 export type PayrollAmendmentCommandDto = Readonly<{ expectedVersion: number; reason: string }>;
-export type PayrollAmendmentSaveDto = z.infer<typeof payrollAmendmentTermsDto> & {
+export type PayrollAmendmentSaveDto = z.input<typeof payrollAmendmentTermsDto> & {
   firstAssessmentId: string;
   expectedVersion: number | null;
   reason: string;

@@ -6,6 +6,7 @@ import {
 import { amendmentId, amendmentRevision } from "../../../../../tests/fixtures/payroll-amendments";
 import { calculationCompany } from "../../../../../tests/fixtures/payroll-calculations";
 import { payslipId } from "../../../../../tests/fixtures/payroll-payslips";
+import { workAdjustmentId } from "../../../../../tests/fixtures/payroll-work";
 import type { CompanyId } from "../../../../core/domain/identifiers";
 import { failed, type Result, success } from "../../../../core/domain/result";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
@@ -85,6 +86,46 @@ async function reviewed(f: ReturnType<typeof fixture>) {
   await f.controller.preview();
 }
 describe("amendment editor ownership", () => {
+  it("retains the selected attendance and operation through an uncertain save", async () => {
+    const f = fixture();
+    await start(f);
+    f.controller.openCorrection(payslipId());
+    f.controller.applyCorrection({
+      assessmentId: payslipId(),
+      compensation: null,
+      input: null,
+      workAdjustmentId: workAdjustmentId(),
+    });
+    await f.controller.preview();
+    f.actions.saveAmendment.execute.mockResolvedValueOnce(failed("connection_unavailable"));
+    await f.controller.save("Reviewed attendance");
+    expect(f.controller.getSnapshot().stage).toBe("unconfirmed");
+    const submitted = f.actions.saveAmendment.execute.mock.calls[0];
+    f.controller.openCorrection(payslipId());
+    f.controller.applyCorrection({
+      assessmentId: payslipId(),
+      compensation: null,
+      input: null,
+      workAdjustmentId: workAdjustmentId(2),
+    });
+    await f.controller.retrySave();
+    expect(f.actions.saveAmendment.execute.mock.calls[1]?.slice(0, 4)).toEqual(
+      submitted?.slice(0, 4),
+    );
+    expect(submitted?.[3].corrections[0]?.workAdjustmentId).toBe(workAdjustmentId());
+    f.controller.deactivate();
+  });
+  it("treats stale attendance as a definite conflict requiring source reload", async () => {
+    const f = fixture();
+    await reviewed(f);
+    f.actions.saveAmendment.execute.mockResolvedValueOnce(failed("stale_workforce_version"));
+    await f.controller.save("Reviewed attendance");
+    expect(f.controller.getSnapshot().stage).toBe("conflict");
+    await f.controller.retrySave();
+    expect(f.actions.saveAmendment.execute).toHaveBeenCalledTimes(1);
+    expect(f.controller.getSnapshot().operationId).toBeNull();
+    f.controller.deactivate();
+  });
   it("owns one activation and ignores late reads after disposal", async () => {
     const f = fixture(),
       waiting = pending<Result<PayrollAmendmentEditorContext>>();

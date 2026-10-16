@@ -3,6 +3,7 @@ import { compensationEmployeeDto, compensationTermsDto } from "./compensation-dt
 import { payrollAmendmentSourceDto, payrollAmendmentSummaryDto } from "./payroll-amendment-dto";
 import { payrollCalculationOutputDto } from "./payroll-calculation-dto";
 import { payrollInputTermsDto } from "./payroll-input-dto";
+import { payrollWorkAdjustmentDto, payrollWorkDaysDto } from "./payroll-work-dto";
 export const payrollAmendmentCandidatesDto = z.object({
   items: z
     .array(
@@ -31,6 +32,9 @@ export const payrollAmendmentPreparationDto = z.object({
         compensation: compensationTermsDto,
         input: payrollInputTermsDto,
         calculation: payrollCalculationOutputDto,
+        workAdjustmentId: z.uuid().nullable().default(null),
+        availableWorkAdjustment: payrollWorkAdjustmentDto.nullable().default(null),
+        workDays: payrollWorkDaysDto.nullable().default(null),
       }),
     )
     .min(1)

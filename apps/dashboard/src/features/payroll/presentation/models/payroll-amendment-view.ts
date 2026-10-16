@@ -2,9 +2,11 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { PayrollAmendmentSummary } from "../../domain/entities/payroll-amendment";
 import { payrollAmendmentDifferenceFields } from "../../domain/entities/payroll-amendment-calculation";
 import type { PayrollAmendmentInspection } from "../../domain/entities/payroll-amendment-search";
+import { payrollAmendmentEditorMessages } from "../i18n/payroll-amendment-editor-messages";
 import { payrollAmendmentMessages } from "../i18n/payroll-amendment-messages";
 import { payrollInputMessages } from "../i18n/payroll-input-messages";
 import { compensationTermsView } from "./compensation-view";
+import { payrollAmendmentAttendanceView } from "./payroll-amendment-attendance-view";
 import { payrollCalculationOutputView } from "./payroll-calculation-output-view";
 import { payrollInputTermsView } from "./payroll-input-view";
 import { payrollAmountView } from "./payroll-policy-view";
@@ -40,6 +42,7 @@ export function payrollAmendmentInspectionView(
 ) {
   const text = payrollAmendmentMessages(locale),
     inputText = payrollInputMessages(locale),
+    authorText = payrollAmendmentEditorMessages(locale),
     s = data.selected.summary,
     time = new Intl.DateTimeFormat(locale, {
       dateStyle: "medium",
@@ -88,6 +91,12 @@ export function payrollAmendmentInspectionView(
       return {
         id: correction.assessmentId,
         label: month ?? `${text.correction} ${index + 1}`,
+        attendance: [
+          {
+            label: authorText.attendanceSource,
+            value: correction.workAdjustmentId ?? authorText.keepAttendance,
+          },
+        ],
         compensation: correction.compensation
           ? compensationTermsView(correction.compensation, locale)
           : null,
@@ -155,6 +164,14 @@ export function payrollAmendmentInspectionView(
         ],
       })) ?? [],
     selectedMonth: selected?.month ?? null,
+    attendance: selected
+      ? payrollAmendmentAttendanceView(
+          selected.month,
+          selected.workAdjustmentId,
+          selected.workDays,
+          locale,
+        )
+      : null,
     selectedSource: selected
       ? `${selected.source.assessmentId} · ${text.sourceRevision} ${selected.source.revision}`
       : null,

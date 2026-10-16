@@ -1,6 +1,6 @@
 import type {
   PayrollAmendmentPreviewDto,
-  PayrollAmendmentTermsDto,
+  PayrollAmendmentProposalDto,
 } from "../models/payroll-amendment-dto";
 import type {
   PayrollAmendmentCandidatesDto,
@@ -21,7 +21,7 @@ export interface PayrollAmendmentSourceDataSource {
   preview(
     company: string,
     assessment: string,
-    terms: PayrollAmendmentTermsDto,
+    terms: PayrollAmendmentProposalDto,
     signal: AbortSignal,
   ): Promise<PayrollAmendmentPreviewDto>;
 }

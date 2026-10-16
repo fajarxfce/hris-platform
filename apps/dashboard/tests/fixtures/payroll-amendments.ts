@@ -8,6 +8,7 @@ import { compensationActor, compensationTerms } from "./compensations";
 import { calculationEmployee, calculationEmployeeId } from "./payroll-calculations";
 import { inputTerms } from "./payroll-inputs";
 import { payslipId } from "./payroll-payslips";
+import { workDays } from "./payroll-work";
 export const amendmentId = (index = 1) =>
   `fa100000-0000-4000-8000-${String(index).padStart(12, "0")}`;
 export const amendmentCalculationId = "fa200000-0000-4000-8000-000000000001";
@@ -41,7 +42,14 @@ export function amendmentRevision(version = 1, index = 1): PayrollAmendmentDto {
     summary: amendmentSummary(version, index),
     terms: {
       sourceVersions: [{ assessmentId: payslipId(index), revision: 0 }],
-      corrections: [{ assessmentId: payslipId(index), compensation, input: inputTerms() }],
+      corrections: [
+        {
+          assessmentId: payslipId(index),
+          compensation,
+          input: inputTerms(),
+          workAdjustmentId: null,
+        },
+      ],
     },
   };
 }
@@ -95,6 +103,8 @@ export function amendmentCalculation(index = 1, failed = false): PayrollAmendmen
               month: "2026-09",
               compensation,
               input: inputTerms(),
+              workAdjustmentId: null,
+              workDays: workDays(),
               original,
               calculation,
               difference: { ...difference },

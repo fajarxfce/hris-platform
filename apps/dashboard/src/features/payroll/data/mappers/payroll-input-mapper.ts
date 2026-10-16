@@ -1,5 +1,4 @@
 import { InvalidHttpResponseError } from "../../../../core/data/http/http-response-error";
-import { isCalendarDate } from "../../../../core/domain/calendar-date";
 import type { CompanyId } from "../../../../core/domain/identifiers";
 import type { PayrollInput, PayrollInputSummary } from "../../domain/entities/payroll-input";
 import type { PayrollInputChange } from "../../domain/entities/payroll-input-change";
@@ -19,6 +18,7 @@ import type {
   PayrollInputReviewDto,
   PayrollInputSummaryDto,
 } from "../models/payroll-input-dto";
+import { toPayrollWorkAdjustment } from "./payroll-work-mapper";
 export function toPayrollInputSummary(
   raw: PayrollInputSummaryDto,
   employee: string,
@@ -104,22 +104,11 @@ export function toPayrollInputReview(
         periodId: raw.source.periodId.toLowerCase(),
         jobId: raw.source.jobId?.toLowerCase() ?? null,
         adjustment: raw.source.adjustment
-          ? Object.freeze({
-              ...raw.source.adjustment,
-              id: raw.source.adjustment.id.toLowerCase(),
-            })
+          ? toPayrollWorkAdjustment(raw.source.adjustment, month)
           : null,
       })
     : null;
-  if (
-    source?.adjustment &&
-    (!source.closed ||
-      !source.includesEmployee ||
-      !source.jobId ||
-      !isCalendarDate(source.adjustment.workDate) ||
-      source.adjustment.workDate.slice(0, 7) !== month ||
-      !Number.isFinite(Date.parse(source.adjustment.recordedAt)))
-  )
+  if (source?.adjustment && (!source.closed || !source.includesEmployee || !source.jobId))
     throw new InvalidHttpResponseError();
   if (
     (after !== null && (!current || Number(after) > current.version)) ||

@@ -3,6 +3,7 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { PayrollAmendmentCorrection } from "../../domain/entities/payroll-amendment";
 import type { PayrollAmendmentBasis } from "../../domain/entities/payroll-amendment-preparation";
 import { usePayrollAmendmentCorrectionForm } from "../controllers/use-payroll-amendment-correction-form";
+import { payrollAmendmentAttendanceChoiceView } from "../models/payroll-amendment-attendance-view";
 import { payrollAmendmentCorrectionFailure } from "../models/payroll-amendment-editor-view";
 import { PayrollAmendmentCorrectionPanel } from "../pages/payroll-amendment-correction-panel";
 import { CompensationTermFields } from "./compensation-term-fields";
@@ -11,6 +12,7 @@ export function PayrollAmendmentCorrectionBinding({
   source,
   correction,
   locale,
+  timezone,
   failure,
   correctionIndex,
   onApply,
@@ -21,6 +23,7 @@ export function PayrollAmendmentCorrectionBinding({
   source: PayrollAmendmentBasis;
   correction: PayrollAmendmentCorrection | null;
   locale: Locale;
+  timezone: string;
   failure: Failure | null;
   correctionIndex: number;
   onApply: (input: PayrollAmendmentCorrection) => void;
@@ -38,6 +41,12 @@ export function PayrollAmendmentCorrectionBinding({
   return (
     <PayrollAmendmentCorrectionPanel
       form={form}
+      attendance={payrollAmendmentAttendanceChoiceView(
+        source,
+        form.attendance.value,
+        locale,
+        timezone,
+      )}
       locale={locale}
       month={source.month}
       canRemove={correction !== null}

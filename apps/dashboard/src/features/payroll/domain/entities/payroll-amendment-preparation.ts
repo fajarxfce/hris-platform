@@ -9,6 +9,8 @@ import type {
 import type { PayrollAmendmentSearch } from "./payroll-amendment-search";
 import type { PayrollCalculationOutput } from "./payroll-calculation-output";
 import type { PayrollInputTerms } from "./payroll-input-terms";
+import type { PayrollWorkAdjustment } from "./payroll-work-adjustment";
+import type { PayrollWorkDay } from "./payroll-work-day";
 
 export type PayrollAmendmentSourceSearch = Omit<PayrollAmendmentSearch, "status">;
 export type PayrollAmendmentCandidate = Readonly<{
@@ -32,6 +34,9 @@ export type PayrollAmendmentBasis = Readonly<{
   compensation: CompensationTerms;
   input: PayrollInputTerms;
   calculation: PayrollCalculationOutput;
+  workAdjustmentId: string | null;
+  availableWorkAdjustment: PayrollWorkAdjustment | null;
+  workDays: readonly PayrollWorkDay[] | null;
 }>;
 export type PayrollAmendmentPreparation = Readonly<{
   companyId: CompanyId;

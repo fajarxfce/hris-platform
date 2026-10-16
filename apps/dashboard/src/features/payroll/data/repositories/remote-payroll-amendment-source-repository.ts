@@ -44,7 +44,13 @@ export class RemotePayrollAmendmentSourceRepository implements PayrollAmendmentS
       );
       if (
         preview.firstAssessmentId !== assessment ||
-        !sameAmendmentSources(preview.sourceVersions, terms.sourceVersions)
+        !sameAmendmentSources(preview.sourceVersions, terms.sourceVersions) ||
+        terms.corrections.some(
+          (correction) =>
+            correction.workAdjustmentId !== null &&
+            preview.calculations.find((row) => row.source.assessmentId === correction.assessmentId)
+              ?.workAdjustmentId !== correction.workAdjustmentId,
+        )
       )
         throw new InvalidHttpResponseError();
       return preview;

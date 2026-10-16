@@ -7,6 +7,7 @@ import {
   payrollHolidayKinds,
   payrollPriorHolidayPayments,
 } from "../../domain/entities/payroll-input-terms";
+import { payrollWorkAdjustmentDto } from "./payroll-work-dto";
 
 const version = z.number().int().min(0).max(999);
 const sourceVersion = z.number().int().min(0).max(Number.MAX_SAFE_INTEGER);
@@ -87,16 +88,7 @@ export const payrollInputReviewDto = z.object({
       closed: z.boolean(),
       jobId: z.uuid().nullable(),
       includesEmployee: z.boolean(),
-      adjustment: z
-        .object({
-          id: z.uuid(),
-          revision: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
-          workDate: date,
-          recordedAt: z.iso.datetime({ offset: true }),
-          reason: z.string().min(1).max(1000),
-        })
-        .nullable()
-        .default(null),
+      adjustment: payrollWorkAdjustmentDto.nullable().default(null),
     })
     .nullable(),
   current: payrollInputDto.nullable(),

@@ -6,6 +6,7 @@ import {
 import { compensationEmployeeDto, compensationTermsDto } from "./compensation-dto";
 import { payrollCalculationOutputDto, payrollRunFailureDto } from "./payroll-calculation-dto";
 import { payrollInputTermsDto } from "./payroll-input-dto";
+import { payrollWorkDaysDto } from "./payroll-work-dto";
 
 const version = z.number().int().min(0).max(999),
   sourceRevision = z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
@@ -21,6 +22,7 @@ export const payrollAmendmentCorrectionDto = z.object({
   assessmentId: z.uuid(),
   compensation: compensationTermsDto.nullable(),
   input: payrollInputTermsDto.nullable(),
+  workAdjustmentId: z.uuid().nullable().default(null),
 });
 export const payrollAmendmentTermsDto = z.object({
   sourceVersions: z.array(payrollAmendmentSourceDto).min(1).max(12),
@@ -88,6 +90,8 @@ export const payrollAmendmentPreviewDto = z.object({
         month,
         compensation: compensationTermsDto,
         input: payrollInputTermsDto,
+        workAdjustmentId: z.uuid().nullable().default(null),
+        workDays: payrollWorkDaysDto.nullable().default(null),
         original: payrollCalculationOutputDto,
         calculation: payrollCalculationOutputDto,
         difference: payrollAmendmentDifferenceDto,
@@ -130,6 +134,7 @@ export type PayrollAmendmentSummaryDto = z.infer<typeof payrollAmendmentSummaryD
 export type PayrollAmendmentPageDto = z.infer<typeof payrollAmendmentPageDto>;
 export type PayrollAmendmentHistoryDto = z.infer<typeof payrollAmendmentHistoryDto>;
 export type PayrollAmendmentTermsDto = z.infer<typeof payrollAmendmentTermsDto>;
+export type PayrollAmendmentProposalDto = z.input<typeof payrollAmendmentTermsDto>;
 export type PayrollAmendmentDetailsDto = z.infer<typeof payrollAmendmentDetailsDto>;
 export type PayrollAmendmentCalculationDto = z.infer<typeof payrollAmendmentCalculationDto>;
 export type PayrollAmendmentCalculationSummaryDto = z.infer<

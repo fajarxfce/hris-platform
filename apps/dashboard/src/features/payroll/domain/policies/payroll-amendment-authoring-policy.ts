@@ -38,6 +38,7 @@ export function normalizeAmendmentTerms(terms: PayrollAmendmentTerms): PayrollAm
           assessmentId: row.assessmentId.toLowerCase(),
           compensation: row.compensation ? normalizeCompensationTerms(row.compensation) : null,
           input: row.input ? normalizePayrollInputTerms(row.input) : null,
+          workAdjustmentId: row.workAdjustmentId?.toLowerCase() ?? null,
         }),
       ),
     ),
@@ -62,7 +63,8 @@ export function validateAmendmentTerms(
     !terms.corrections.some((row) => row.assessmentId === first) ||
     terms.corrections.some(
       (row) =>
-        (row.compensation === null && row.input === null) ||
+        (row.compensation === null && row.input === null && row.workAdjustmentId === null) ||
+        (row.workAdjustmentId !== null && !isUuid(row.workAdjustmentId)) ||
         !terms.sourceVersions.some((source) => source.assessmentId === row.assessmentId),
     )
   )
@@ -86,6 +88,15 @@ export function validateAmendmentProposal(
     );
     if (!first || !source || source.month < first.month)
       return { code: "invalid_payroll_amendment_corrections", fields: {}, parameters: {} };
+    if (
+      correction.workAdjustmentId !== null &&
+      correction.workAdjustmentId !== source.availableWorkAdjustment?.id
+    )
+      return {
+        code: "stale_workforce_version",
+        fields: {},
+        parameters: { assessmentId: correction.assessmentId },
+      };
     if (correction.compensation) {
       const tax = correction.compensation.tax,
         original = source.compensation.tax;
@@ -163,6 +174,7 @@ export const amendmentAccessLost = (failure: Failure): boolean =>
 export const amendmentContextChanged = (failure: Failure): boolean =>
   [
     "stale_version",
+    "stale_workforce_version",
     "payroll_amendment_sources_changed",
     "payroll_amendment_not_editable",
     "payroll_amendment_basis_changed",

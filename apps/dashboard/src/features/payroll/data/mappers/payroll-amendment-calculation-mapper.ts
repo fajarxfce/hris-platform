@@ -16,6 +16,7 @@ import { toCompensationEmployee, toCompensationTerms } from "./compensation-mapp
 import { toPayrollCalculationFailure } from "./payroll-calculation-mapper";
 import { toPayrollCalculationOutput } from "./payroll-calculation-output-mapper";
 import { payrollCalculationMinor } from "./payroll-run-employee-mapper";
+import { toPayrollWorkDays } from "./payroll-work-mapper";
 export function toPayrollAmendmentCalculationSummary(
   raw: PayrollAmendmentCalculationSummaryDto,
   amendment: string,
@@ -60,7 +61,8 @@ export function toPayrollAmendmentPreview(
           expected.assessmentId === source.assessmentId && expected.revision === source.revision,
       ) ||
       (index > 0 && row.month <= (raw.calculations[index - 1]?.month ?? "")) ||
-      row.month.slice(0, 4) !== raw.calculations[0]?.month.slice(0, 4)
+      row.month.slice(0, 4) !== raw.calculations[0]?.month.slice(0, 4) ||
+      (row.workAdjustmentId !== null && row.workDays === null)
     )
       throw new InvalidHttpResponseError();
     for (const key of payrollAmendmentDifferenceFields) {
@@ -84,6 +86,8 @@ export function toPayrollAmendmentPreview(
       month: row.month,
       compensation: toCompensationTerms(row.compensation),
       input: normalizePayrollInputTerms(row.input),
+      workAdjustmentId: row.workAdjustmentId?.toLowerCase() ?? null,
+      workDays: row.workDays ? toPayrollWorkDays(row.workDays, row.month) : null,
       original: toPayrollCalculationOutput(row.original),
       calculation: toPayrollCalculationOutput(row.calculation),
       difference: Object.freeze({ ...row.difference }),

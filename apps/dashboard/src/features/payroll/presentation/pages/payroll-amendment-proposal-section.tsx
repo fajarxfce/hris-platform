@@ -32,6 +32,7 @@ export function PayrollAmendmentProposalSection({
             <p className="app-reference">
               {text.source}: {row.id}
             </p>
+            <AppPropertyList title={text.attendance} items={row.attendance} />
             <h3>{text.compensation}</h3>
             {row.compensation ? (
               <CompensationTermsProperties view={row.compensation} locale={locale} />

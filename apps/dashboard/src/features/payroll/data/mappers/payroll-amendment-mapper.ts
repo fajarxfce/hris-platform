@@ -73,6 +73,7 @@ export function toPayrollAmendmentTerms(
         assessmentId: row.assessmentId.toLowerCase(),
         compensation: row.compensation ? toCompensationTerms(row.compensation) : null,
         input: row.input ? normalizePayrollInputTerms(row.input) : null,
+        workAdjustmentId: row.workAdjustmentId?.toLowerCase() ?? null,
       }),
     );
   if (
@@ -81,7 +82,7 @@ export function toPayrollAmendmentTerms(
     !corrections.some((row) => row.assessmentId === first) ||
     corrections.some(
       (row) =>
-        (row.compensation === null && row.input === null) ||
+        (row.compensation === null && row.input === null && row.workAdjustmentId === null) ||
         !sources.some((source) => source.assessmentId === row.assessmentId),
     )
   )

@@ -2,7 +2,9 @@ import { randomUUID } from "node:crypto";
 import { type BrowserContext, expect } from "@playwright/test";
 import { z } from "zod";
 import { payrollCalculationMinor } from "../../src/features/payroll/data/mappers/payroll-run-employee-mapper";
-import { compensationTermsDto } from "../../src/features/payroll/data/models/compensation-dto";
+import { payrollAmendmentCalculationDto } from "../../src/features/payroll/data/models/payroll-amendment-dto";
+import { payrollAmendmentPreparationDto } from "../../src/features/payroll/data/models/payroll-amendment-preparation-dto";
+import { recordClosedAttendanceAdjustment } from "./attendance-adjustments";
 import { exercisePayrollAmendmentAuthoring } from "./payroll-amendment-authoring";
 import {
   exercisePayrollAmendmentCalculation,
@@ -67,18 +69,21 @@ export async function publishNegativePayrollAmendment(input: {
     `${base}/payroll/payslips/${assessment}/amendment-preparation`,
   );
   expect(preparationResponse.status()).toBe(200);
-  const source = z.object({ assessmentId: z.uuid(), revision: z.number().int().nonnegative() }),
-    preparation = z
-      .object({
-        firstAssessmentId: z.uuid(),
-        sourceVersions: z.array(source),
-        assessments: z.array(z.object({ source, compensation: compensationTermsDto })),
-      })
-      .parse(await preparationResponse.json());
+  const preparation = payrollAmendmentPreparationDto.parse(await preparationResponse.json());
   expect(preparation.firstAssessmentId).toBe(assessment);
   expect(preparation.assessments).toHaveLength(1);
   const original = preparation.assessments[0];
   if (!original) throw new Error("Published source required");
+  const attendance = await recordClosedAttendanceAdjustment({
+    operator: admin,
+    company,
+    employee: original.employee.id,
+    workDate: `${month}-01`,
+    absence: true,
+    headers: adminHeaders,
+  });
+  expect(attendance.version).toBe(1);
+  expect(original.workAdjustmentId).toBeNull();
   const basic = payrollCalculationMinor(original.compensation.basicSalary) - 100_000_000n;
   expect(basic > 0n).toBe(true);
   const amendment = await exercisePayrollAmendmentAuthoring({
@@ -87,6 +92,7 @@ export async function publishNegativePayrollAmendment(input: {
       assessment,
       month,
       basicSalary: `${basic / 100n}.${String(basic % 100n).padStart(2, "0")}`,
+      workAdjustmentId: attendance.id,
     }),
     draft = `${base}/payroll/amendments/${amendment}`;
   await exercisePayrollAmendmentCalculation({ author, company, amendment, month });
@@ -111,6 +117,23 @@ export async function publishNegativePayrollAmendment(input: {
     amendment,
     headers: () => headers(authorToken),
   });
+  const laterAttendance = await recordClosedAttendanceAdjustment({
+    operator: admin,
+    company,
+    employee: original.employee.id,
+    workDate: `${month}-01`,
+    absence: false,
+    headers: adminHeaders,
+  });
+  expect(laterAttendance.version).toBe(2);
+  const calculatedFacts = await author.request.get(
+    `${draft}/calculations/${retained.latestCalculation.id}`,
+  );
+  expect(calculatedFacts.status()).toBe(200);
+  const selectedFacts = payrollAmendmentCalculationDto.parse(await calculatedFacts.json()).preview
+    ?.calculations[0];
+  expect(selectedFacts?.workAdjustmentId).toBe(attendance.id);
+  expect(selectedFacts?.workDays?.[0]?.attendance).toBe("ABSENCE_RECORDED");
   const template = await admin.request.put(`${base}/approvals/templates/${randomUUID()}`, {
     headers: adminHeaders(),
     data: {
@@ -131,5 +154,14 @@ export async function publishNegativePayrollAmendment(input: {
     month,
   });
   await exercisePayrollAmendmentPublication({ publisher, company, amendment, month, approved });
+  const publishedResponse = await author.request.get(
+    `${base}/payroll/payslips/${assessment}/amendment-preparation`,
+  );
+  expect(publishedResponse.status()).toBe(200);
+  const published = payrollAmendmentPreparationDto.parse(await publishedResponse.json())
+    .assessments[0];
+  expect(published?.workAdjustmentId).toBe(attendance.id);
+  expect(published?.availableWorkAdjustment?.id).toBe(laterAttendance.id);
+  expect(published?.workDays).toEqual(selectedFacts?.workDays);
   return { financeVersion, publisherHeaders: () => headers(publisherToken), reviewerToken };
 }

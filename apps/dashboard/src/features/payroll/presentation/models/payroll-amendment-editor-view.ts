@@ -4,6 +4,7 @@ import { payrollAmendmentDifferenceFields } from "../../domain/entities/payroll-
 import type { PayrollAmendmentCandidate } from "../../domain/entities/payroll-amendment-preparation";
 import { payrollAmendmentEditorMessages } from "../i18n/payroll-amendment-editor-messages";
 import { payrollAmendmentMessages } from "../i18n/payroll-amendment-messages";
+import { payrollAmendmentAttendanceView } from "./payroll-amendment-attendance-view";
 import type { PayrollAmendmentEditorState } from "./payroll-amendment-editor-state";
 import { payrollAmountView } from "./payroll-policy-view";
 export function payrollAmendmentCandidateRows(
@@ -67,6 +68,7 @@ export function payrollAmendmentEditorView(state: PayrollAmendmentEditorState, l
           [
             correction?.compensation ? text.proposedCompensation : null,
             correction?.input ? text.proposedInput : null,
+            correction?.workAdjustmentId ? text.proposedAttendance : null,
           ]
             .filter(Boolean)
             .join(", ") || text.unchanged,
@@ -90,6 +92,11 @@ export function payrollAmendmentEditorView(state: PayrollAmendmentEditorState, l
           payrollAmountView(row.calculation.tax.takeHome, locale),
           payrollAmountView(row.difference.takeHome, locale),
         ],
+      })) ?? [],
+    attendance:
+      preview?.calculations.map((row) => ({
+        id: row.source.assessmentId,
+        view: payrollAmendmentAttendanceView(row.month, row.workAdjustmentId, row.workDays, locale),
       })) ?? [],
   };
 }

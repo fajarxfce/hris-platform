@@ -6,8 +6,8 @@ import type {
 import type {
   PayrollAmendmentCalculationDto,
   PayrollAmendmentDto,
-  PayrollAmendmentTermsDto,
 } from "../src/features/payroll/data/models/payroll-amendment-dto";
+import { payrollAmendmentTermsDto } from "../src/features/payroll/data/models/payroll-amendment-dto";
 import { amendmentPreparation, amendmentPreview } from "./fixtures/payroll-amendment-authoring";
 import {
   amendmentCalculation,
@@ -17,6 +17,7 @@ import {
 } from "./fixtures/payroll-amendments";
 import { calculationCompany, calculationEmployeeId } from "./fixtures/payroll-calculations";
 import { payslipId } from "./fixtures/payroll-payslips";
+import { workAdjustment, workAdjustmentId } from "./fixtures/payroll-work";
 import { installIdentityApi } from "./identity-api";
 
 function gate() {
@@ -34,6 +35,8 @@ export async function installPayrollAmendmentAuthoringApi(
     count?: number;
     publishedRevision?: number;
     calculationFails?: boolean;
+    attendanceRevision?: number;
+    retainedAttendanceRevision?: number;
   } = {},
 ) {
   const permissions = options.permissions ?? ["payroll.amend"],
@@ -48,7 +51,13 @@ export async function installPayrollAmendmentAuthoringApi(
   const drafts = new Map<string, PayrollAmendmentDto[]>([[amendmentId(), [amendmentRevision(0)]]]),
     calculations = new Map<string, PayrollAmendmentCalculationDto>(),
     receipts = new Map<string, { id: string; version: number; input: string; action: string }>();
+  if (options.retainedAttendanceRevision !== undefined) {
+    const correction = drafts.get(amendmentId())?.[0]?.terms.corrections[0];
+    if (!correction) throw new Error("A draft correction fixture is required");
+    correction.workAdjustmentId = workAdjustmentId(options.retainedAttendanceRevision);
+  }
   let publishedRevision = options.publishedRevision ?? 0,
+    attendanceRevision = options.attendanceRevision ?? null,
     denied = false;
   let loseNextAction: string | null = null;
   let fail: { action: string; code: string; status: number } | null = null;
@@ -128,14 +137,27 @@ export async function installPayrollAmendmentAuthoringApi(
     }
     if (action === "prepare" || action === "preview") {
       const preparation = amendmentPreparation(options.multiple, publishedRevision);
+      for (const row of preparation.assessments) {
+        row.availableWorkAdjustment =
+          attendanceRevision === null ? null : workAdjustment(attendanceRevision, row.month);
+      }
       if (id !== payslipId()) return problem("payroll_assessment_not_found", 404);
       if (action === "prepare") return route.fulfill({ json: preparation });
-      const terms = body as PayrollAmendmentTermsDto;
+      const terms = payrollAmendmentTermsDto.parse(body);
       if (
         terms.sourceVersions.some((row) => row.revision !== publishedRevision) ||
         terms.sourceVersions.length !== preparation.sourceVersions.length
       )
         return problem("payroll_amendment_sources_changed", 409);
+      if (
+        terms.corrections.some(
+          (row) =>
+            row.workAdjustmentId !== null &&
+            row.workAdjustmentId !==
+              (attendanceRevision === null ? null : workAdjustmentId(attendanceRevision)),
+        )
+      )
+        return problem("stale_workforce_version", 409);
       return route.fulfill({ json: amendmentPreview(preparation, terms) });
     }
     if (action === "save" && id) {
@@ -153,6 +175,15 @@ export async function installPayrollAmendmentAuthoringApi(
       if (current !== input.expectedVersion) return problem("stale_version", 409);
       if (input.sourceVersions.some((row) => row.revision !== publishedRevision))
         return problem("payroll_amendment_sources_changed", 409);
+      if (
+        input.corrections.some(
+          (row) =>
+            row.workAdjustmentId != null &&
+            row.workAdjustmentId !==
+              (attendanceRevision === null ? null : workAdjustmentId(attendanceRevision)),
+        )
+      )
+        return problem("stale_workforce_version", 409);
       const version = (current ?? -1) + 1;
       const summary = {
         ...amendmentSummary(0),
@@ -165,7 +196,10 @@ export async function installPayrollAmendmentAuthoringApi(
         summary,
         terms: structuredClone({
           sourceVersions: input.sourceVersions,
-          corrections: input.corrections,
+          corrections: input.corrections.map((row) => ({
+            ...row,
+            workAdjustmentId: row.workAdjustmentId ?? null,
+          })),
         }),
       });
       drafts.set(id, revisions);
@@ -294,6 +328,9 @@ export async function installPayrollAmendmentAuthoringApi(
     },
     setPublishedRevision(value: number) {
       publishedRevision = value;
+    },
+    setAttendanceRevision(value: number) {
+      attendanceRevision = value;
     },
     loseNextSave() {
       loseNextAction = "save";

@@ -35,14 +35,41 @@ Access tokens last ten minutes. Refresh tokens belong to an absolute thirty-day 
 
 Account locks serialize session creation, rotation, MFA updates, and revocation. Limits are ten active sessions and one hundred issued, unexpired sessions per account, a ten-second minimum rotation interval, and 5,000 rotations per session; exceeding the rotation ceiling requires signing in again. Expired sessions are deleted in bounded batches during later exchanges, with consumed hashes removed by foreign-key cascade. Expired replay ciphertext is cleared during subsequent rotations. The periodic worker also retires expired session/replay material for accounts that do not sign in again, as described below.
 
-Native MFA verification and recovery-code regeneration return new native credentials. They do not elevate a browser cookie. Elevation rejects an obsolete session version after a competing refresh. A proof is consumed before transport credential elevation; a lost response or failure in that handoff requires another authenticator code, recovery code, or a fresh sign-in. Native clients must not automatically repeat one-use MFA actions. Initial MFA enrollment uses the shared sign-in handshake. Session listings and revocation are always restricted to the current account. Account, company-list, and native-session metadata reads revalidate credentials under a shared account guard. Own-session revocation retains its cleanup semantics if credentials change after request admission; it never reveals another account's session or creates access.
+Native MFA verification and recovery-code regeneration return new native credentials. They do not elevate a browser cookie. Elevation rejects an obsolete session version after a competing refresh. A proof is consumed before transport credential elevation; a lost response or failure in that handoff requires another authenticator code, recovery code, or a fresh sign-in. Native clients must not automatically repeat one-use MFA actions. Initial MFA enrollment uses the shared sign-in handshake. The `/auth/native/sessions` listing and revocation endpoints are restricted to the current account. Account, company-list, and native-session metadata reads revalidate credentials under a shared account guard. Own-session revocation retains its cleanup semantics if credentials change after request admission; it never reveals another account's session or creates access.
 
 The [dashboard app-session page](../dashboard.md#app-sessions) provides own-account
 listing and confirmed revocation without company or administration grants. It uses
 the existing native-session endpoints and their metadata-only responses. A lost
 DELETE response keeps its exact session for explicit retry or list reconciliation;
 no new scope or token disclosure is introduced. Cross-account session management
-remains separate from this self-service capability.
+uses the separately authorized endpoints below.
+
+## Account session administration
+
+`GET /identity/accounts/{accountId}/native-sessions` lists the selected account's
+unrevoked, unexpired app sessions matching its current credential version. The
+native-session policy bounds the response (ten by default, fifty maximum). Reads
+acquire only metadata; token hashes and replay ciphertext are excluded from the
+list query. The response contains session ID, device label, creation and expiry.
+
+`DELETE /identity/accounts/{accountId}/native-sessions/{sessionId}` ends that
+session family. Both endpoints require current global `identity.manage` and
+session assurance; a company grant cannot supply this authority. Revocation also
+requires recent authentication/MFA. The use cases acquire initiating and target
+account guards in identifier order, then recheck current access. Assurance is
+checked again after acquisition and through journal completion. They can clean up
+an inactive account's retained session without reactivating its access.
+
+Revocation and its audit/outbox commit together. It targets the immutable family
+ID, so a concurrent token rotation cannot redirect or invalidate the intent.
+Repeated DELETE requests return 204 without writing another audit. No operation
+key or rotation version is required for this naturally idempotent action; each
+request still needs current authority. A missing or mismatched session returns
+`native_session_not_found`. Cookie requests retain CSRF protection. Independent
+devices, other accounts and the account's browser session remain unchanged.
+
+The administrative dashboard entry point remains planned. The own-account page
+continues to use its existing endpoints and pending-MFA cleanup semantics.
 
 ## Native session cleanup
 

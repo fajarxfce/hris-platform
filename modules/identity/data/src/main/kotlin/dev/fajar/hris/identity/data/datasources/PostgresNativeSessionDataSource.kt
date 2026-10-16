@@ -36,7 +36,23 @@ class PostgresNativeSessionDataSource(private val sql: DSLContext) : NativeSessi
             .fetchOne()
 
     override fun list(accountId: UUID, at: Instant, limit: Int): List<NativeSessionsRecord> =
-        sql.selectFrom(S)
+        sql.select(
+                S.ID,
+                S.ACCOUNT_ID,
+                S.DEVICE_NAME,
+                S.CREATED_AT,
+                S.AUTHENTICATED_AT,
+                S.MFA_VERIFIED_AT,
+                S.CREDENTIAL_VERSION,
+                S.EXPIRES_AT,
+                S.ACCESS_EXPIRES_AT,
+                S.ROTATED_AT,
+                S.REVOKED_AT,
+                S.VERSION,
+                S.EXCHANGE_OPERATION_ID,
+                S.EXCHANGE_REPLAY_UNTIL,
+            )
+            .from(S)
             .where(S.ACCOUNT_ID.eq(accountId))
             .and(S.REVOKED_AT.isNull)
             .and(S.EXPIRES_AT.gt(OffsetDateTime.ofInstant(at, ZoneOffset.UTC)))
@@ -47,7 +63,7 @@ class PostgresNativeSessionDataSource(private val sql: DSLContext) : NativeSessi
             )
             .orderBy(S.CREATED_AT.desc(), S.ID)
             .limit(limit)
-            .fetch()
+            .fetchInto(S)
 
     override fun countIssued(accountId: UUID, at: Instant): Long =
         sql.selectCount()

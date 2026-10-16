@@ -34,6 +34,27 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun accountSessionAdministrationKeepsGlobalAuthenticationAndMetadataOnlyResponses() {
+        val api = contract()
+        val path = "/api/v1/identity/accounts/{accountId}/native-sessions"
+        val read = api["paths"][path]["get"]
+        val revoke = api["paths"]["$path/{sessionId}"]["delete"]
+        for (operation in listOf(read, revoke)) {
+            assertTrue(operation["x-hris-authentication-required"].asBoolean())
+            assertFalse(operation["x-hris-company-admission"].asBoolean())
+        }
+        assertTrue(revoke["responses"].has("204"))
+        assertFalse(revoke["responses"]["204"].has("content"))
+        assertFalse(revoke.has("requestBody"))
+        assertEquals(
+            setOf("id", "deviceName", "createdAt", "expiresAt"),
+            api["components"]["schemas"]["NativeSessionResponse"]["properties"]
+                .propertyNames()
+                .toSet(),
+        )
+    }
+
+    @Test
     fun managedAccountReviewIsGlobalAndContainsOnlyAdministrativeMetadata() {
         val api = contract()
         val operation = api["paths"]["/api/v1/identity/accounts/{id}"]["get"]

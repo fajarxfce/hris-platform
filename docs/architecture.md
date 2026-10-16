@@ -434,6 +434,16 @@ The request actor retains company and platform permissions separately. The union
 
 Global credential administration takes its administration or provider-subject guard before ordered actor/target accounts. Recent authentication is rechecked after waiting. Account locking reads current access fields in a fresh SQL snapshot after acquiring the row guard; directory projections select versions and permissions together in one bounded query. This avoids both stale permissions after a lock wait and mixed-version list responses.
 
+Account-level app-session administration uses the native-session and identity
+repository contracts with distinct read/revoke use cases. Ordered initiating and
+target account guards serialize credential rotation and revocation; shared read
+guards retain current access while metadata is acquired. Platform scope and
+session/recent assurance are checked after waits and through completion. An end
+action names the immutable session family, not a rotating token version. Its
+audit and revocation share one transaction, and repeated DELETE requests do not
+create another journal entry. Datasources select metadata and perform scoped
+writes without owning administrative permission or session policy.
+
 ## Storage and jobs
 
 Native session retention has a separate identity repository/source contract that

@@ -48,6 +48,30 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Account app-session administration API
+
+Platform administrators can list and end a selected account's app sessions using
+separate, global endpoints. Ordered account guards retain current credentials and
+MFA/recent assurance through acquisition and journal completion. Revocation names
+the session family, so rotating its tokens does not invalidate the requested end
+action. Repeated DELETE requests retain one audit record. Both own and
+administrative listings now acquire metadata without token hashes or ciphertext.
+
+All 94 selected API/PostgreSQL tests, 26 identity domain tests, 14 identity data
+tests and 81 worker tests passed, with formatting, architecture and both JARs.
+The 23 new session scenarios cover bounded reads, private response contracts,
+CSRF, native bearer access, exact ownership, independent devices/accounts/cookies,
+current authority, MFA expiry during acquisition, late journal failure, competing
+deletes, rotation races, opposing administrators and pending cancellation. The 49
+API-contract scenarios include the new authenticated routes and their empty 204
+acknowledgement. The complete check took 6m46s. Dashboard integration is the next
+increment; no mobile artifact or physical-device validation is claimed here.
+
+The validated API and worker JARs were deployed to development without another
+migration. Their running digests match the builds; API health and the WireGuard
+dashboard returned HTTP 200. Both processes started without errors, and the
+retention task retained its 60-second interval.
+
 ### Periodic native-session retention
 
 The worker now performs bounded session and replay-envelope cleanup through a

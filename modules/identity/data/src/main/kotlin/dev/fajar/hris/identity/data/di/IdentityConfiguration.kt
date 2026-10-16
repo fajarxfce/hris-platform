@@ -269,6 +269,36 @@ class IdentityConfiguration {
     ) = RevokeNativeSession(sessions, transactions, journal, clock)
 
     @Bean
+    fun listAccountNativeSessions(
+        sessions: dev.fajar.hris.identity.domain.repositories.NativeSessionRepository,
+        accounts: dev.fajar.hris.identity.domain.repositories.AccountAdministrationRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        policy: dev.fajar.hris.identity.domain.entities.NativeSessionPolicy,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+    ) =
+        ListAccountNativeSessions(
+            sessions,
+            accounts,
+            identities,
+            transactions,
+            clock,
+            policy,
+            security,
+        )
+
+    @Bean
+    fun revokeAccountNativeSession(
+        sessions: dev.fajar.hris.identity.domain.repositories.NativeSessionRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        journal: ChangeJournalRepository,
+        clock: Clock,
+        security: dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy,
+    ) = RevokeAccountNativeSession(sessions, identities, transactions, journal, clock, security)
+
+    @Bean
     fun elevateNative(
         sessions: dev.fajar.hris.identity.domain.repositories.NativeSessionRepository,
         transactions: TransactionRunner,

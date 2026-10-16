@@ -9,6 +9,8 @@ interface AccountAdministrationDataSource {
 
     fun list(query: String, after: UUID?, limit: Int): List<AccountAdministrationRow>
 
+    fun get(id: UUID): AccountAdministrationRow?
+
     fun update(id: UUID, expectedVersion: Long, active: Boolean): Long?
 
     fun replacePermissions(id: UUID, permissions: Set<String>)

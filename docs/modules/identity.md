@@ -103,11 +103,25 @@ Role/member commands and reads revalidate active company membership, credentials
 
 `GET /identity/accounts` provides a bounded global account directory for platform administrators. Queries acquire only administrative fields; password hashes and authenticator secrets are not selected or returned. Company membership administrators do not gain access to this directory. The initiating account is guarded and revalidated; each page selects account versions and platform grants in one SQL snapshot. A concurrent account update cannot pair an old observed version with new grants.
 
+`GET /identity/accounts/{accountId}` reviews one exact account and the assignable
+platform permission catalog. It uses the same minimal projection in one SQL
+snapshot. Directory and review use cases hold the initiating account's shared
+guard and check current platform authority and session assurance after waiting
+and after acquisition. Neither read requires a selected company or acquires
+employee profiles, password hashes or authenticator values.
+
 `PUT /identity/accounts/{accountId}/access` changes account activation and platform permissions with an expected account version, idempotency key, and reason. Every successful access change advances the credential version, invalidating existing cookie and native sessions. Reactivation requires a new sign-in. Company memberships remain recorded and still need their own grants.
 
 Access changes serialize global administration and lock/revalidate the initiating account before changing the target. Recent authentication/MFA is checked again after pending account guards, including when returning an original receipt. Two competing administrators cannot both disable one another. Administrators cannot remove their own administration. Pending invitations cannot be activated through this endpoint; explicitly disabling one cancels its pending status and advances the credential version. Invitation acceptance uses the separate, one-use workflow below.
 
 Account IDs and login email addresses remain immutable. Credential/version counters cannot move backwards. Account updates, permission changes, receipts, and audit/outbox share a transaction. The endpoint retains recent authentication and MFA requirements; it never accepts passwords or changes authenticator enrollment.
+
+Command permissions are detached before admission and resource waits. Current
+enrollment, session assurance and recent proof are required under the account
+guards and through journal/receipt completion. Late expiry, failures and
+cancellation roll back access and credential changes together. A permitted edit
+of the initiating account still succeeds, then requires a new sign-in; fresh
+authentication can recover the original receipt.
 
 ## Invitations and password recovery
 

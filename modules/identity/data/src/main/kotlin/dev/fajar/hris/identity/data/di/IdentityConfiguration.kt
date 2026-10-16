@@ -388,7 +388,18 @@ class IdentityConfiguration {
         accounts: AccountAdministrationRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = ListManagedAccounts(accounts, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = ListManagedAccounts(accounts, identities, transactions, security, clock)
+
+    @Bean
+    fun getManagedAccount(
+        accounts: AccountAdministrationRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetManagedAccount(accounts, identities, transactions, security, clock)
 
     @Bean
     fun saveAccountAccess(

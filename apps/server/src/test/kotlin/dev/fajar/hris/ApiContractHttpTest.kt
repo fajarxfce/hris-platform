@@ -34,6 +34,32 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun managedAccountReviewIsGlobalAndContainsOnlyAdministrativeMetadata() {
+        val api = contract()
+        val operation = api["paths"]["/api/v1/identity/accounts/{id}"]["get"]
+        assertTrue(operation["x-hris-authentication-required"].asBoolean())
+        assertFalse(operation["x-hris-company-admission"].asBoolean())
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("account", "assignablePermissions"),
+            schemas["ManagedAccountReviewResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf(
+                "id",
+                "email",
+                "displayName",
+                "active",
+                "invitationPending",
+                "mfaConfigured",
+                "platformPermissions",
+                "version",
+            ),
+            schemas["ManagedAccountResponse"]["properties"].propertyNames().toSet(),
+        )
+    }
+
+    @Test
     fun membershipRoleRetentionIsAnOptionalExplicitSelection() {
         val schema = contract()["components"]["schemas"]["RoleTemplateSelectionRequest"]
         assertEquals(

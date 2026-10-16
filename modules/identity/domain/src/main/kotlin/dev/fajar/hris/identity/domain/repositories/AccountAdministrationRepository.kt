@@ -11,6 +11,8 @@ interface AccountAdministrationRepository {
 
     fun list(query: String, after: UUID?, limit: Int): Result<Page<ManagedAccount>>
 
+    fun get(id: UUID): Result<ManagedAccount?>
+
     fun save(
         id: UUID,
         expectedVersion: Long,

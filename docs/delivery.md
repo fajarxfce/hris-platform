@@ -48,6 +48,26 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Global account review and completion assurance
+
+An exact-account review endpoint returns the minimal administrative projection
+and assignable platform permissions. It is independent of company selection and
+shares the directory's coherent account/version/grant snapshot. Both reads check
+current platform authority and session assurance before and after acquisition.
+Access commands detach their permission inputs before waits and check current
+enrollment and recent assurance through journal/receipt completion. Permitted
+self-edits revoke the old session and retain receipt recovery after a fresh login.
+
+Validation passed 72 distinct API/PostgreSQL cases, 23 Identity domain/data tests,
+all 71 worker tests, architecture, formatting and both application JAR builds.
+Coverage includes exact response fields, global/company authority separation,
+revocation while waiting, concurrent coherent reads, late MFA, rollback of access
+and credential versions, cancellation, detached inputs and self-edit receipt
+recovery. Two new test assertions were corrected before their passing rerun:
+Jackson array iteration and the receipt's expected replay marker. No production
+behavior was changed to satisfy those assertions. Dashboard and deployment
+validation are recorded with the subsequent integration.
+
 ### Company access editor
 
 The dashboard now edits an existing member's company activation, direct

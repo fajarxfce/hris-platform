@@ -10,6 +10,93 @@ import org.junit.jupiter.api.Test
 import org.springframework.dao.DataAccessException
 
 class AccountAdministrationHttpTest : ApiIntegrationTest() {
+    @Test
+    fun accountReviewReturnsExactAdministrativeFieldsAndThePlatformCatalog() {
+        val admin = client()
+        val csrf = login(admin)
+        val target = account()
+        database()
+            .update(
+                "update accounts set mfa_secret_encrypted='owned-fixture-only' where id=?",
+                target,
+            )
+        val path = "/api/v1/identity/accounts/$target"
+        val response = get(admin, path)
+        assertEquals(200, response.statusCode(), response.body())
+        val review = json.readTree(response.body())
+        assertEquals(setOf("account", "assignablePermissions"), review.propertyNames().toSet())
+        assertEquals(
+            setOf(
+                "id",
+                "email",
+                "displayName",
+                "active",
+                "invitationPending",
+                "mfaConfigured",
+                "platformPermissions",
+                "version",
+            ),
+            review["account"].propertyNames().toSet(),
+        )
+        assertEquals(target.toString(), review["account"]["id"].asString())
+        assertTrue(review["account"]["mfaConfigured"].asBoolean())
+        assertEquals(0, review["account"]["version"].asLong())
+        assertEquals(
+            setOf("identity.manage", "companies.create"),
+            review["assignablePermissions"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
+        assertFalse(response.body().contains("owned-fixture-only"))
+        val saved = save(admin, csrf, target, permissions = setOf("companies.create"))
+        assertEquals(200, saved.statusCode(), saved.body())
+        val changed = json.readTree(get(admin, path).body())["account"]
+        assertFalse(changed["active"].asBoolean())
+        assertEquals(1, changed["version"].asLong())
+        assertEquals("companies.create", changed["platformPermissions"][0].asString())
+        assertEquals(404, get(admin, "/api/v1/identity/accounts/${UUID.randomUUID()}").statusCode())
+        val local = client()
+        login(local, "${account()}@example.test")
+        assertEquals(403, get(local, path).statusCode())
+        assertEquals(422, save(admin, csrf, target, version = Long.MAX_VALUE).statusCode())
+    }
+
+    @Test
+    fun permittedSelfChangesRevokeTheSessionAndReplayAfterFreshSignIn() {
+        val id = account(admin = true)
+        val browser = client()
+        var csrf = login(browser, "$id@example.test")
+        val key = UUID.randomUUID()
+        val original =
+            save(
+                browser,
+                csrf,
+                id,
+                active = true,
+                permissions = setOf("identity.manage"),
+                key = key,
+            )
+        assertEquals(200, original.statusCode(), original.body())
+        assertEquals(401, get(browser, "/api/v1/me").statusCode())
+        csrf = login(browser, "$id@example.test")
+        val replay =
+            save(
+                browser,
+                csrf,
+                id,
+                active = true,
+                permissions = setOf("identity.manage"),
+                key = key,
+            )
+        assertEquals(200, replay.statusCode(), replay.body())
+        assertEquals(original.body(), replay.body())
+        assertEquals(
+            1L,
+            json
+                .readTree(get(browser, "/api/v1/identity/accounts/$id").body())["account"][
+                    "version"]
+                .asLong(),
+        )
+    }
+
     private fun account(admin: Boolean = false, pending: Boolean = false): UUID {
         val id = UUID.randomUUID()
         database()

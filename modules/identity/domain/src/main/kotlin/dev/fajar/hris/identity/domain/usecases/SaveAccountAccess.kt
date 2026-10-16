@@ -25,25 +25,27 @@ class SaveAccountAccess(
         permissions: Set<String>,
         reason: String,
     ): Result<MutationReceipt> {
+        val selectedPermissions = permissions.toSet()
         if (actor.companyId != null || "identity.manage" !in actor.permissions)
             return Result.Failed(Failure(FailureKind.FORBIDDEN, "platform_administrator_required"))
         val recent = requireRecentIdentityAdministration(actor, clock.instant(), security)
         if (recent is Result.Failed) return recent
         if (
             expectedVersion < 0 ||
-                !PermissionCatalog.platformAdministrator.containsAll(permissions) ||
+                expectedVersion == Long.MAX_VALUE ||
+                !PermissionCatalog.platformAdministrator.containsAll(selectedPermissions) ||
                 reason.isBlank() ||
                 reason.length > 1000
         )
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_account_access"))
-        if (id == actor.accountId && (!active || "identity.manage" !in permissions))
+        if (id == actor.accountId && (!active || "identity.manage" !in selectedPermissions))
             return Result.Failed(Failure(FailureKind.CONFLICT, "cannot_remove_own_administration"))
         val key =
             OperationKey(
                 "identity.account_access_save",
                 operationId,
                 listOf(id.toString(), expectedVersion.toString(), active.toString(), reason) +
-                    permissions.sorted(),
+                    selectedPermissions.sorted(),
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
@@ -66,7 +68,16 @@ class SaveAccountAccess(
             )
                 return@run Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "session_revoked"))
             val currentAssurance =
-                requireRecentIdentityAdministration(actor, clock.instant(), security)
+                validateSessionAssurance(
+                        currentAuthor.account,
+                        currentAuthor.platformPermissions,
+                        actor.mfaVerifiedAt,
+                        clock.instant(),
+                        security,
+                    )
+                    .flatMap {
+                        requireRecentIdentityAdministration(actor, clock.instant(), security)
+                    }
             if (currentAssurance is Result.Failed) return@run currentAssurance
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
@@ -80,7 +91,7 @@ class SaveAccountAccess(
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "invitation_acceptance_required")
                 )
-            accounts.save(id, expectedVersion, active, permissions).flatMap { receipt ->
+            accounts.save(id, expectedVersion, active, selectedPermissions).flatMap { receipt ->
                 operations
                     .record(actor, key, receipt)
                     .flatMap {
@@ -92,11 +103,23 @@ class SaveAccountAccess(
                                 "identity.account_access_saved",
                                 mapOf(
                                     "active" to active.toString(),
-                                    "permissions" to permissions.sorted().joinToString(","),
+                                    "permissions" to selectedPermissions.sorted().joinToString(","),
                                 ),
                                 reason,
                             ),
                         )
+                    }
+                    .flatMap {
+                        validateSessionAssurance(
+                            currentAuthor.account,
+                            currentAuthor.platformPermissions,
+                            actor.mfaVerifiedAt,
+                            clock.instant(),
+                            security,
+                        )
+                    }
+                    .flatMap {
+                        requireRecentIdentityAdministration(actor, clock.instant(), security)
                     }
                     .map { receipt }
             }

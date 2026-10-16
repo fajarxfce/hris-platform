@@ -18,6 +18,10 @@ class StoredAccountAdministrationRepository(private val source: AccountAdministr
         source.lockAccount(id)?.toManagedAccount()
     }
 
+    override fun get(id: UUID): Result<ManagedAccount?> = safeDatabaseCall {
+        source.get(id)?.toManagedAccount()
+    }
+
     override fun list(query: String, after: UUID?, limit: Int): Result<Page<ManagedAccount>> =
         safeDatabaseCall {
             val rows = source.list(query, after, limit + 1)

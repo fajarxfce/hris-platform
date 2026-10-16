@@ -37,6 +37,18 @@ private fun awaitAccountGuard(probe: AccountLockProbe, id: UUID) {
         }
 }
 
+private fun awaitDirectoryResult(probe: AccountDirectoryProbe, query: String) {
+    probe.current
+        .get()
+        ?.takeIf { it.query == query }
+        ?.let {
+            if (probe.current.compareAndSet(it, null)) {
+                it.entered.countDown()
+                check(it.release.await(5, TimeUnit.SECONDS))
+            }
+        }
+}
+
 @TestConfiguration(proxyBeanMethods = false)
 @Import(AccountLockProbeConfiguration::class)
 class IdentityAdministrationProbeConfiguration {
@@ -81,16 +93,14 @@ class IdentityAdministrationProbeConfiguration {
                 limit: Int,
             ): List<AccountAdministrationRow> {
                 val rows = delegate.list(query, after, limit)
-                probe.current
-                    .get()
-                    ?.takeIf { it.query == query }
-                    ?.let {
-                        if (probe.current.compareAndSet(it, null)) {
-                            it.entered.countDown()
-                            check(it.release.await(5, TimeUnit.SECONDS))
-                        }
-                    }
+                awaitDirectoryResult(probe, query)
                 return rows
+            }
+
+            override fun get(id: UUID): AccountAdministrationRow? {
+                val row = delegate.get(id)
+                awaitDirectoryResult(probe, id.toString())
+                return row
             }
         }
 }

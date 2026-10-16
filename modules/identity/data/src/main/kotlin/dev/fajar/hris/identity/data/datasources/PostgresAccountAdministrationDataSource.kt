@@ -48,6 +48,11 @@ class PostgresAccountAdministrationDataSource(private val sql: DSLContext) :
             .fetchOne()
             ?.version
 
+    override fun get(id: UUID): AccountAdministrationRow? =
+        selectManagedAccounts(sql).where(ACCOUNTS.ID.eq(id)).fetchOne {
+            it.toAccountAdministrationRow()
+        }
+
     override fun replacePermissions(id: UUID, permissions: Set<String>) {
         sql.deleteFrom(PLATFORM_PERMISSIONS).where(PLATFORM_PERMISSIONS.ACCOUNT_ID.eq(id)).execute()
         if (permissions.isNotEmpty())

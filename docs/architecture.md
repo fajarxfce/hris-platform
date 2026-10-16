@@ -93,6 +93,15 @@ through completion of the membership, source snapshots, audit and receipt.
 Member reads also revalidate assurance after acquisition. A globally inactive
 account can have its company access disabled without activating that account.
 
+Global account directory and exact-account review use a minimal single-query
+projection of observed account versions and platform grants. Use cases hold the
+initiating account's shared guard and revalidate platform scope and session
+assurance before and after acquisition. Account commands detach permission input
+before waits, then retain current enrollment and recent assurance through atomic
+access, credential, journal and receipt completion. The account access command
+retains its global administration guard and ordered account locks; company
+membership administration never supplies global authority.
+
 Approval aggregate reads acquire the shared approval guard before company, membership, and actor-account guards. They observe headers and assignment overrides coherently; mutations retain the exclusive approval guard. Both readers and administrative commands revalidate live session assurance after waiting, including before returning an existing operation receipt.
 
 Interactive work-calendar reads and commands also revalidate current session

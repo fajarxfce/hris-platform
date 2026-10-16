@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -227,11 +229,12 @@ class IdentityAdministrationAccessHttpTest : CredentialApiFixture() {
 
     @Test
     fun accountMetadataReadsRejectCredentialsRevokedWhileWaiting() {
-        for (mode in listOf("directory", "oidcOther", "oidcOwn", "sessions", "me")) {
+        for (mode in listOf("directory", "review", "oidcOther", "oidcOwn", "sessions", "me")) {
             val f = administrator()
             val path =
                 when (mode) {
                     "directory" -> "/api/v1/identity/accounts"
+                    "review" -> "/api/v1/identity/accounts/${localAccount()}"
                     "oidcOther" -> "/api/v1/identity/accounts/${localAccount()}/oidc"
                     "oidcOwn" -> "/api/v1/identity/accounts/${f.id}/oidc"
                     "sessions" -> "/api/v1/auth/native/sessions"
@@ -252,11 +255,14 @@ class IdentityAdministrationAccessHttpTest : CredentialApiFixture() {
 
     @Test
     fun onlyCurrentAdministratorsCanReadOtherAccountsButOwnersRetainTheirOwnMetadata() {
-        for (mode in listOf("directory", "oidc")) {
+        for (mode in listOf("directory", "review", "oidc")) {
             val f = administrator()
             val path =
-                if (mode == "directory") "/api/v1/identity/accounts"
-                else "/api/v1/identity/accounts/${localAccount()}/oidc"
+                when (mode) {
+                    "directory" -> "/api/v1/identity/accounts"
+                    "review" -> "/api/v1/identity/accounts/${localAccount()}"
+                    else -> "/api/v1/identity/accounts/${localAccount()}/oidc"
+                }
             val denied =
                 waiting(f.id, { get(f.browser, path) }) {
                     database().update("delete from platform_permissions where account_id=?", f.id)
@@ -337,8 +343,9 @@ class IdentityAdministrationAccessHttpTest : CredentialApiFixture() {
         )
     }
 
-    @Test
-    fun accountDirectoryKeepsObservedVersionAndPermissionsInOneSnapshot() {
+    @ParameterizedTest
+    @ValueSource(strings = ["directory", "review"])
+    fun accountReadsKeepObservedVersionAndPermissionsInOneSnapshot(mode: String) {
         val reader = administrator()
         val writer = administrator()
         val target = localAccount()
@@ -347,7 +354,9 @@ class IdentityAdministrationAccessHttpTest : CredentialApiFixture() {
                 "insert into platform_permissions(account_id,permission) values(?,'companies.create')",
                 target,
             )
-        val path = "/api/v1/identity/accounts?query=$target&limit=1"
+        val path =
+            if (mode == "directory") "/api/v1/identity/accounts?query=$target&limit=1"
+            else "/api/v1/identity/accounts/$target"
         val barrier = AccountDirectoryProbe.Barrier(target.toString())
         directoryProbe.current.set(barrier)
         Executors.newSingleThreadExecutor().use { pool ->
@@ -359,11 +368,13 @@ class IdentityAdministrationAccessHttpTest : CredentialApiFixture() {
                 barrier.release.countDown()
                 val response = pending.get(10, TimeUnit.SECONDS)
                 assertEquals(200, response.statusCode(), response.body())
-                val old = json.readTree(response.body())["items"][0]
+                val acquired = json.readTree(response.body())
+                val old = if (mode == "directory") acquired["items"][0] else acquired["account"]
                 assertEquals(0, old["version"].asLong())
                 assertTrue(old["active"].asBoolean())
                 assertEquals("companies.create", old["platformPermissions"][0].asString())
-                val fresh = json.readTree(get(reader.browser, path).body())["items"][0]
+                val reloaded = json.readTree(get(reader.browser, path).body())
+                val fresh = if (mode == "directory") reloaded["items"][0] else reloaded["account"]
                 assertEquals(1, fresh["version"].asLong())
                 assertFalse(fresh["active"].asBoolean())
                 assertTrue(fresh["platformPermissions"].isEmpty)

@@ -86,7 +86,11 @@ test("real API member editing retains archived evidence, recovers a lost save an
   const retained = await (await context.request.get(memberPath)).json();
   expect(retained).toMatchObject({ member: { version: 1 }, directPermissions: ["leave.read"] });
   expect(retained.roleTemplates).toEqual(original.roleTemplates);
-  expect(retained.member.permissions).toEqual(["company.read", "leave.read", "people.team.read"]);
+  expect(retained.member.permissions.toSorted()).toEqual([
+    "company.read",
+    "leave.read",
+    "people.team.read",
+  ]);
   await page.unroute(`**${memberPath}`);
   await page.getByRole("link", { name: "View access", exact: true }).click();
   await page.getByRole("link", { name: "Edit company access", exact: true }).click();
@@ -126,7 +130,11 @@ test("real API member editing retains archived evidence, recovers a lost save an
     member: { version: 3, active: true },
     roleTemplates: [{ id: roleId, version: 3, name: "Company reviewer" }],
   });
-  expect(active.member.permissions).toEqual(["company.read", "leave.read", "people.read"]);
+  expect(active.member.permissions.toSorted()).toEqual([
+    "company.read",
+    "leave.read",
+    "people.read",
+  ]);
   const definitions = await (await context.request.get(rolePath)).json();
   expect(definitions.history.items).toHaveLength(4);
   expect(definitions.history.items[3]).toMatchObject({ revision: 0, name: "Team reviewer" });

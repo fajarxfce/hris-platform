@@ -63,8 +63,24 @@ selection, immutable history, original receipt recovery, current evidence after
 waiting, transaction rollback, cancellation, detached input terms, different
 companies/employees/jobs and worker recovery. Architecture, formatting and both
 application JARs passed. No development migration or physical-device validation
-was performed for this increment. Dashboard validation and amendment source
-selection remain in progress.
+was performed for this increment. Amendment source selection remains in progress.
+
+The dashboard now displays and pins the reviewed source through preparation,
+independent verification and original-command recovery. Architecture, formatting,
+TypeScript and all 3,735 unit tests passed. Forty selected Chromium scenarios
+passed, including four new attendance-source cases. Screenshot review found
+colliding labels at doubled text size; narrow property panels now stack complete
+label/value rows. The corrected Indonesian dark layout at 390 pixels was inspected.
+Existing CSS specificity and bundle-size advisories remain.
+
+An isolated API/PostgreSQL/worker browser workflow verified original closing
+preparation, two later attendance revisions, stale-source review, exact retry
+after lost save and verification responses, independently verified replacement
+input, retained history and revoked access. Its first attempt read the receipt's
+`version` under the wrong test field; the corrected scenario passed. Original
+commands omit the optional adjustment field for older API compatibility.
+The disposable fixture stopped and removed its resources. No development services
+were migrated and no APK was installed.
 
 ### Closed attendance adjustment API
 

@@ -17,7 +17,11 @@ import {
 
 export type PayrollInputFields = Omit<
   PayrollInputChange,
-  "expectedVersion" | "expectedEmploymentVersion" | "workJobId" | "expectedWorkPeriodVersion"
+  | "expectedVersion"
+  | "expectedEmploymentVersion"
+  | "workJobId"
+  | "expectedWorkPeriodVersion"
+  | "workAdjustmentId"
 >;
 type Submission = Readonly<{ operation: OperationId; input: PayrollInputChange }>;
 export class PayrollInputEditorController {
@@ -90,6 +94,7 @@ export class PayrollInputEditorController {
         ...fields,
         expectedVersion: this.#state.context.current?.version ?? null,
         workJobId: this.#state.context.source.jobId,
+        workAdjustmentId: this.#state.context.source.adjustment?.id ?? null,
         expectedWorkPeriodVersion: this.#state.context.source.version,
         expectedEmploymentVersion: this.#state.context.employee.employmentVersion,
       }),

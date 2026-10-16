@@ -41,6 +41,7 @@ export function inputRecord(version = 0): PayrollInputDto {
     earningsMonth: inputMonth,
     version,
     workJobId: inputJob,
+    workAdjustmentId: null,
     workPeriodVersion: 2,
     employmentVersion: 7,
     terms: inputTerms(),
@@ -63,6 +64,7 @@ export function inputReview(
           terms: _t,
           workJobId: _j,
           workPeriodVersion: _w,
+          workAdjustmentId: _a,
           employmentVersion: _e,
           ...summary
         } = first + i === current.version ? current : inputRecord(first + i);
@@ -79,6 +81,7 @@ export function inputReview(
       closed: true,
       jobId: inputJob,
       includesEmployee: true,
+      adjustment: null,
     },
     current,
     history: {
@@ -87,5 +90,15 @@ export function inputReview(
     },
     frozen: false,
     availableActions: ["PREPARE"],
+  };
+}
+
+export function inputAdjustment(revision = 1) {
+  return {
+    id: `ba600000-0000-4000-8000-${String(revision).padStart(12, "0")}`,
+    revision,
+    workDate: "2026-09-02",
+    recordedAt: "2026-10-02T01:00:00Z",
+    reason: "Reviewed late attendance evidence",
   };
 }

@@ -29,6 +29,7 @@ const access: CompanyAccess = {
   signal = new AbortController().signal;
 const input = (): PayrollInputChange => ({
   workJobId: inputJob,
+  workAdjustmentId: null,
   expectedWorkPeriodVersion: 2,
   expectedEmploymentVersion: 7,
   expectedVersion: null,

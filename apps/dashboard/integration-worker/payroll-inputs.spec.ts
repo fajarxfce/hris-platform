@@ -123,6 +123,7 @@ test("monthly input preparation uses closed worker evidence and independent vers
     await expect(editor.getByRole("status")).toContainText("Input saved.");
     expect(writes).toHaveLength(2);
     expect(writes[1]).toEqual(writes[0]);
+    expect(writes[0]?.body).not.toHaveProperty("workAdjustmentId");
     await editor.getByRole("link", { name: "View input", exact: true }).click();
     await expect(editor.getByRole("link", { name: "Verify input", exact: true })).toHaveCount(0);
     const stored = await preparer.request.get(`${input}/review`);
@@ -233,6 +234,107 @@ test("monthly input preparation uses closed worker evidence and independent vers
       fullPage: true,
       animations: "disabled",
     });
+
+    const adjustments = `${base}/workforce/employees/${employee}/attendance/adjustments`,
+      workDate = `${month}-02`;
+    const adjustAttendance = async (absence: boolean) => {
+      const review = await context.request.get(`${adjustments}/review?workDate=${workDate}`);
+      expect(review.status()).toBe(200);
+      const observed = (await review.json()) as { revision: string };
+      const response = await context.request.post(adjustments, {
+        headers: headers(),
+        data: {
+          workDate,
+          reviewRevision: observed.revision,
+          clockIn: absence ? null : `${workDate}T01:00:00Z`,
+          clockOut: absence ? null : `${workDate}T09:00:00Z`,
+          breakMinutes: absence ? 0 : 60,
+          decisions: [],
+          reason: absence ? "Reviewed absence after closing" : "Reviewed worked day after closing",
+        },
+      });
+      expect(response.status()).toBe(200);
+      return (await response.json()) as { id: string; version: number };
+    };
+    const firstAdjustment = await adjustAttendance(false);
+    expect(firstAdjustment.version).toBe(1);
+    await editor.goto(`/payroll/inputs/${employee}/edit?company=${company}&month=${month}`);
+    await expect(
+      editor.getByRole("region", { name: "Attendance source", exact: true }),
+    ).toContainText("Attendance revision 1");
+    await editor
+      .getByLabel("Reason", { exact: true })
+      .fill("Prepare input using corrected attendance");
+    dropSave = true;
+    await editor.getByRole("button", { name: "Save draft", exact: true }).click();
+    await expect(editor.getByRole("status")).toContainText("The result is unconfirmed.");
+    const latestAdjustment = await adjustAttendance(true);
+    expect(latestAdjustment.version).toBe(2);
+    await editor.getByRole("button", { name: "Retry request", exact: true }).click();
+    await expect(editor.getByRole("status")).toContainText("Input saved.");
+    expect(writes).toHaveLength(4);
+    expect(writes[2]?.body.workAdjustmentId).toBe(firstAdjustment.id);
+    expect(writes[3]).toEqual(writes[2]);
+    await editor.getByRole("link", { name: "View input", exact: true }).click();
+    await expect(editor.getByRole("region", { name: "Revision 3", exact: true })).toContainText(
+      firstAdjustment.id,
+    );
+    await expect(
+      editor.getByRole("region", { name: "Attendance source", exact: true }),
+    ).toContainText("Attendance revision 2");
+    await checker.goto(`/payroll/inputs/${employee}?company=${company}&month=${month}`);
+    await expect(
+      checker.getByText(
+        "The attendance or employment version has changed. Prepare a new input before verification.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await expect(checker.getByRole("link", { name: "Verify input", exact: true })).toHaveCount(0);
+    await editor.getByRole("link", { name: "Edit input", exact: true }).click();
+    await editor.getByLabel("Reason", { exact: true }).fill("Review the latest attendance source");
+    await editor.getByRole("button", { name: "Save draft", exact: true }).click();
+    await expect(editor.getByRole("status")).toContainText("Input saved.");
+    expect(writes[4]?.body.workAdjustmentId).toBe(latestAdjustment.id);
+    expect(writes[4]?.operation).not.toBe(writes[2]?.operation);
+    await checker.goto(`/payroll/inputs/${employee}/verify?company=${company}&month=${month}`);
+    await expect(
+      checker.getByRole("region", { name: "Attendance source", exact: true }),
+    ).toContainText("Reviewed absence after closing");
+    await checker
+      .getByLabel("Reason", { exact: true })
+      .fill("Independently verify corrected attendance source");
+    dropVerify = true;
+    await checker.getByRole("button", { name: "Verify input", exact: true }).click();
+    await expect(checker.getByRole("status")).toContainText("The result is unconfirmed.");
+    await checker.getByRole("button", { name: "Retry request", exact: true }).click();
+    await expect(checker.getByRole("status")).toContainText("Input verified.");
+    expect(verifications).toHaveLength(4);
+    expect(verifications[2]?.body.expectedVersion).toBe(4);
+    expect(verifications[3]).toEqual(verifications[2]);
+    const adjusted = await preparer.request.get(`${input}/review`);
+    expect(adjusted.status()).toBe(200);
+    const finalReview = (await adjusted.json()) as PayrollInputReviewDto;
+    expect(finalReview.current).toMatchObject({
+      version: 5,
+      status: "VERIFIED",
+      workJobId: original.source.jobId,
+      workPeriodVersion: original.source.version,
+      workAdjustmentId: latestAdjustment.id,
+    });
+    expect(finalReview.history.items).toHaveLength(6);
+    await checker.getByRole("link", { name: "View input", exact: true }).click();
+    await checker.getByRole("tab", { name: "History", exact: true }).click();
+    await checker.getByRole("button", { name: "View revision: Revision 0", exact: true }).click();
+    await expect(checker.getByRole("dialog")).toContainText("Original closing");
+    await checker.getByRole("button", { name: "Close", exact: true }).click();
+    await checker.getByRole("tab", { name: "Overview", exact: true }).click();
+    await checker.evaluate(() => window.scrollTo(0, 0));
+    await checker.screenshot({
+      path: "../../.work/dashboard-payroll-attendance-real-source.png",
+      fullPage: true,
+      animations: "disabled",
+    });
+    await checker.getByRole("tab", { name: "History", exact: true }).click();
     const revoke = await context.request.put(`${base}/members/${reviewerId}`, {
       headers: headers(),
       data: {

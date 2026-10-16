@@ -5,6 +5,7 @@ import type {
 } from "../src/features/payroll/data/models/payroll-input-dto";
 import {
   inputActor,
+  inputAdjustment,
   inputEmployee,
   inputId,
   inputJob,
@@ -35,6 +36,7 @@ export async function installPayrollInputApi(
   let failure: string | null = null,
     drop = false,
     sourceVersion = 2;
+  let adjustment: ReturnType<typeof inputAdjustment> | null = null;
   await page.route("**/api/v1/companies/*/payroll/**", async (route) => {
     const request = route.request(),
       url = new URL(request.url()),
@@ -95,6 +97,7 @@ export async function installPayrollInputApi(
         if (raw.source) {
           raw.source.earningsMonth = month;
           raw.source.version = sourceVersion;
+          raw.source.adjustment = adjustment;
         }
         raw.history = {
           items: revisions.filter((r) => after === null || r.version > Number(after)).slice(0, 20),
@@ -104,7 +107,8 @@ export async function installPayrollInputApi(
           ? ["PREPARE"]
           : permissions.includes("payroll.review") &&
               current?.status === "DRAFT" &&
-              current.workPeriodVersion === sourceVersion
+              current.workPeriodVersion === sourceVersion &&
+              current.workAdjustmentId === (adjustment?.id ?? null)
             ? ["VERIFY"]
             : [];
         return route.fulfill({ json: raw });
@@ -131,7 +135,10 @@ export async function installPayrollInputApi(
     let next: PayrollInputDto;
     if (request.method() === "PUT") {
       const command = body as unknown as PayrollInputChangeDto;
-      if (command.expectedWorkPeriodVersion !== sourceVersion)
+      if (
+        command.expectedWorkPeriodVersion !== sourceVersion ||
+        (command.workAdjustmentId ?? null) !== (adjustment?.id ?? null)
+      )
         return problem("stale_workforce_version");
       next = {
         ...inputRecord((current?.version ?? -1) + 1),
@@ -140,11 +147,14 @@ export async function installPayrollInputApi(
         reason: command.reason,
         workJobId: inputJob,
         workPeriodVersion: sourceVersion,
+        workAdjustmentId: command.workAdjustmentId ?? null,
         employmentVersion: command.expectedEmploymentVersion,
         preparedBy: inputActor,
       };
     } else {
       if (!current) return problem("payroll_input_not_found", 404);
+      if (current.workAdjustmentId !== (adjustment?.id ?? null))
+        return problem("stale_workforce_version");
       next = {
         ...current,
         version: current.version + 1,
@@ -175,6 +185,10 @@ export async function installPayrollInputApi(
     },
     advanceSource: () => {
       sourceVersion++;
+    },
+    adjustAttendance: () => {
+      adjustment = inputAdjustment((adjustment?.revision ?? 0) + 1);
+      return adjustment;
     },
   };
 }

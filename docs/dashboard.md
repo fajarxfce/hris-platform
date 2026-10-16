@@ -199,16 +199,26 @@ inputs require explicit values; the form does not invent missing attendance or
 statutory declarations. Saving requires `payroll.calculate` and pins the observed
 employment, closed attendance and input versions with one reason and operation ID.
 
+The source panel distinguishes the original closing from an attendance adjustment
+and shows the latter's revision, work date, recording time and reason. Saving pins
+the reviewed adjustment ID; current and historical input panels retain their own
+reference. A newer correction requires another explicit input review and an
+independent verification. An uncertain save keeps its original source even after
+another correction. Original-closing commands omit the optional adjustment field,
+so the same dashboard continues to work with an older API during rollout.
+
 The verification page shows the exact revision and submits its observed version
-with `payroll.review`. Current beneficiaries and all historical preparers are
-excluded. Missing or changed sources and frozen inputs remove unavailable actions;
-the API independently revalidates eligibility at command time.
+with `payroll.review`, alongside the current attendance source. Current
+beneficiaries and all historical preparers are excluded. Missing or changed
+sources and frozen inputs remove unavailable actions; the API independently
+revalidates eligibility at command time.
 
 A lost response retains the original immutable command through later rejected
 retries. Definite conflicts require protected reload. Confirmed access loss removes
 private evidence. Locale/theme changes retain form values, and draft departure is
 protected. Editor state remains in browser memory. Tables scroll within their
-panels on narrow screens.
+panels on narrow screens. Property panels stack labels above values when their
+available width is narrow, including with enlarged text.
 
 ## Opening tax history
 

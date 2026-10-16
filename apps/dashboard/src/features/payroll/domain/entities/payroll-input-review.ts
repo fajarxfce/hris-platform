@@ -1,4 +1,5 @@
 import type { PayrollInput, PayrollInputSummary } from "./payroll-input";
+import type { PayrollWorkAdjustment } from "./payroll-work-adjustment";
 export type PayrollInputEmployeeReference = Readonly<{
   id: string;
   employeeNumber: string;
@@ -31,6 +32,7 @@ export type PayrollInputWorkSource = Readonly<{
   closed: boolean;
   jobId: string | null;
   includesEmployee: boolean;
+  adjustment: PayrollWorkAdjustment | null;
 }>;
 export type PayrollInputReview = Readonly<{
   earningsMonth: string;

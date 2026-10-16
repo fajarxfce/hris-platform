@@ -1,5 +1,6 @@
 import { assert, describe, expect, it, vi } from "vitest";
 import {
+  inputAdjustment,
   inputCompany,
   inputEmployee,
   inputId,
@@ -197,7 +198,7 @@ describe("monthly input presentation ownership", () => {
       value: {
         ...next,
         employee: { ...next.employee, employmentVersion: 8 },
-        source: { ...next.source, version: 3 },
+        source: { ...next.source, version: 3, adjustment: inputAdjustment() },
       },
     });
     await controller.refresh();
@@ -206,6 +207,7 @@ describe("monthly input presentation ownership", () => {
       expectedVersion: 24,
       expectedEmploymentVersion: 8,
       expectedWorkPeriodVersion: 3,
+      workAdjustmentId: inputAdjustment().id,
     });
     expect(useCases.saveInput.execute.mock.calls[1]?.[3]).not.toBe(
       useCases.saveInput.execute.mock.calls[0]?.[3],

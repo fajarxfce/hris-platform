@@ -366,6 +366,7 @@ a {
 }
 .app-resource-panel {
   min-width: 0;
+  container-type: inline-size;
   background: var(--colorNeutralBackground1);
   border: 1px solid var(--colorNeutralStroke2);
   padding: 24px;
@@ -378,15 +379,25 @@ a {
 .app-property-list {
   margin: 0;
   display: grid;
-  grid-template-columns: minmax(100px, 180px) 1fr;
+  grid-template-columns: minmax(100px, 180px) minmax(0, 1fr);
   gap: 16px;
 }
 .app-property-list dt {
   color: var(--colorNeutralForeground3);
+  overflow-wrap: anywhere;
 }
 .app-property-list dd {
   margin: 0;
   overflow-wrap: anywhere;
+}
+@container (max-width: 28rem) {
+  .app-property-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .app-property-row {
+    display: grid;
+    gap: 4px;
+  }
 }
 .app-portal-collapsed {
   grid-template-columns: 56px minmax(0, 1fr);
@@ -721,9 +732,6 @@ a {
   .app-directory-filters,
   .app-organization-filters {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .app-property-list {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
   .app-topbar .app-account-avatar {
     display: none;

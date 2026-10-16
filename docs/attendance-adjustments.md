@@ -71,9 +71,12 @@ employee/month revision; Payroll cannot invent or replace Workforce facts.
 
 Verification preserves the selected reference and requires it to remain current.
 A later correction requires another draft and independent verification. Historical
-input revisions retain their own selection. Existing operation receipts still
-replay their original outcome after current authority checks; a changed selection
-is a different command payload.
+input revisions retain their own selection. The dashboard distinguishes the
+current source from each retained input reference and includes source metadata
+on the verification page. Original-closing commands omit the optional field for
+compatibility with older APIs; absence and null both select the original closing.
+Existing operation receipts still replay their original outcome after current
+authority checks; a changed selection is a different command payload.
 
 Calculation admission captures the latest adjustment reference for each employee
 under the shared month guard. A verified input that no longer matches that cutoff
@@ -93,7 +96,8 @@ selection and its dashboard review remain separate work below.
    passed; [delivery records](delivery.md#closed-attendance-adjustment-api) contain
    the executed checks.
 2. Payroll source selection for unfinalized inputs is implemented and validated
-   in the API, database and worker. Amendment selection remains in progress. Payroll-owned read
+   in the API, database, worker and dashboard, including a real browser workflow.
+   Amendment selection remains in progress. Payroll-owned read
    projections acquire immutable references; clients never submit replacement
    work or leave facts. Independent verification, approval and publication remain
    required.

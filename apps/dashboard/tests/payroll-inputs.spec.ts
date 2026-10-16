@@ -1,5 +1,5 @@
 import { expect, type Page, test } from "@playwright/test";
-import { inputEmployee } from "./fixtures/payroll-inputs";
+import { inputAdjustment, inputEmployee } from "./fixtures/payroll-inputs";
 import { companyIds } from "./identity-api";
 import { installPayrollInputApi } from "./payroll-input-api";
 
@@ -170,4 +170,128 @@ test("readers cannot prepare and company replacement clears the prior input", as
     page.getByRole("table", { name: "Monthly payroll inputs", exact: true }),
   ).toContainText("South Payroll Employee");
   await expect(page.getByText("Prepare input revision 2", { exact: true })).toHaveCount(0);
+});
+
+test("adjusted input recovery retains its selected evidence after another correction", async ({
+  page,
+}) => {
+  const api = await installPayrollInputApi(page);
+  const first = api.adjustAttendance();
+  await fillBasic(page);
+  await expect(page.getByRole("region", { name: "Attendance source", exact: true })).toContainText(
+    "Attendance revision 1",
+  );
+  api.dropNext();
+  await page.getByRole("button", { name: "Save draft", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("The result is unconfirmed.");
+  api.adjustAttendance();
+  await page.getByRole("button", { name: "Retry request", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Input saved.");
+  expect(api.writes[0]?.body.workAdjustmentId).toBe(first.id);
+  expect(api.writes[1]).toEqual(api.writes[0]);
+  await page.getByRole("link", { name: "View input", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Attendance source", exact: true })).toContainText(
+    "Attendance revision 2",
+  );
+  await expect(page.getByRole("region", { name: "Revision 3", exact: true })).toContainText(
+    first.id,
+  );
+  await expect(
+    page.getByText(
+      "The attendance or employment version has changed. Prepare a new input before verification.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+});
+
+test("attendance revision changes require a new explicit form review", async ({ page }) => {
+  const api = await installPayrollInputApi(page);
+  api.adjustAttendance();
+  await fillBasic(page);
+  const next = api.adjustAttendance();
+  await page.getByRole("button", { name: "Save draft", exact: true }).click();
+  await page.getByRole("button", { name: "Reload review", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Leave page", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Attendance source", exact: true })).toContainText(
+    "Attendance revision 2",
+  );
+  await page.getByLabel("Reason", { exact: true }).fill("Reviewed updated attendance");
+  await page.getByRole("button", { name: "Save draft", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Input saved.");
+  expect(api.writes[0]?.body.workAdjustmentId).toBe(inputAdjustment().id);
+  expect(api.writes[1]?.body.workAdjustmentId).toBe(next.id);
+  expect(api.writes[1]?.operation).not.toBe(api.writes[0]?.operation);
+});
+
+test("independent review displays adjusted evidence and rejects a later source change", async ({
+  page,
+}) => {
+  const api = await installPayrollInputApi(page, ["payroll.review"]);
+  const selected = api.adjustAttendance();
+  const current = api.revisions.at(-1);
+  expect(current).toBeDefined();
+  if (current) current.workAdjustmentId = selected.id;
+  await page.goto(detail);
+  await page.getByRole("link", { name: "Verify input", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Attendance source", exact: true })).toContainText(
+    selected.reason,
+  );
+  await page.getByLabel("Reason", { exact: true }).fill("Independent attendance source review");
+  api.adjustAttendance();
+  await page.getByRole("button", { name: "Verify input", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Reload review", exact: true })).toBeVisible();
+  expect(api.writes).toHaveLength(1);
+});
+
+test("adjusted source details remain readable with enlarged text in the narrow dark layout", async ({
+  page,
+}) => {
+  const api = await installPayrollInputApi(page);
+  api.adjustAttendance();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await fillBasic(page);
+  await page.getByRole("combobox", { name: "Language", exact: true }).selectOption("id");
+  await page.getByRole("button", { name: "Tema", exact: true }).click();
+  await page.evaluate(() => {
+    const nodes = [
+      ...document.querySelectorAll<HTMLElement>(".app-report-content, .app-report-content *"),
+    ].map((node) => {
+      const style = getComputedStyle(node);
+      return {
+        node,
+        font: Number.parseFloat(style.fontSize),
+        line: Number.parseFloat(style.lineHeight),
+      };
+    });
+    for (const { node, font, line } of nodes) {
+      if (Number.isFinite(font)) node.style.fontSize = `${font * 2}px`;
+      if (Number.isFinite(line)) node.style.lineHeight = `${line * 2}px`;
+    }
+  });
+  await expect(page.getByRole("region", { name: "Sumber attendance", exact: true })).toContainText(
+    "Revisi attendance 1",
+  );
+  expect(
+    await page.getByRole("region", { name: "Sumber attendance", exact: true }).evaluate((panel) =>
+      [...panel.querySelectorAll(".app-property-row")].every((row, index, rows) => {
+        const label = row.querySelector("dt")?.getBoundingClientRect();
+        const value = row.querySelector("dd")?.getBoundingClientRect();
+        const previous = rows[index - 1]?.getBoundingClientRect();
+        return (
+          label && value && value.top >= label.bottom && (!previous || label.top >= previous.bottom)
+        );
+      }),
+    ),
+  ).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  );
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({
+    path: "../../.work/dashboard-payroll-attendance-source-narrow.png",
+    fullPage: true,
+    animations: "disabled",
+  });
+  await page.getByRole("button", { name: "Simpan draft", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Input disimpan.");
 });

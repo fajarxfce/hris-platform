@@ -71,6 +71,7 @@ export const payrollInputSummaryDto = z.object({
 });
 export const payrollInputDto = payrollInputSummaryDto.extend({
   workJobId: z.uuid(),
+  workAdjustmentId: z.uuid().nullable().default(null),
   workPeriodVersion: sourceVersion,
   employmentVersion: sourceVersion,
   terms: payrollInputTermsDto,
@@ -86,6 +87,16 @@ export const payrollInputReviewDto = z.object({
       closed: z.boolean(),
       jobId: z.uuid().nullable(),
       includesEmployee: z.boolean(),
+      adjustment: z
+        .object({
+          id: z.uuid(),
+          revision: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
+          workDate: date,
+          recordedAt: z.iso.datetime({ offset: true }),
+          reason: z.string().min(1).max(1000),
+        })
+        .nullable()
+        .default(null),
     })
     .nullable(),
   current: payrollInputDto.nullable(),
@@ -108,6 +119,7 @@ export type PayrollInputReviewDto = z.infer<typeof payrollInputReviewDto>;
 export type PayrollInputReceiptDto = z.infer<typeof payrollInputReceiptDto>;
 export type PayrollInputChangeDto = {
   workJobId: string;
+  workAdjustmentId?: string;
   expectedWorkPeriodVersion: number;
   expectedEmploymentVersion: number;
   expectedVersion: number | null;

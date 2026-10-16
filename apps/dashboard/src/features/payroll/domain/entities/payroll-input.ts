@@ -18,6 +18,7 @@ export type PayrollInput = PayrollInputSummary &
     companyId: CompanyId;
     workJobId: string;
     workPeriodVersion: number;
+    workAdjustmentId: string | null;
     employmentVersion: number;
     terms: PayrollInputTerms;
   }>;

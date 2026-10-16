@@ -1,4 +1,5 @@
 import { InvalidHttpResponseError } from "../../../../core/data/http/http-response-error";
+import { isCalendarDate } from "../../../../core/domain/calendar-date";
 import type { CompanyId } from "../../../../core/domain/identifiers";
 import type { PayrollInput, PayrollInputSummary } from "../../domain/entities/payroll-input";
 import type { PayrollInputChange } from "../../domain/entities/payroll-input-change";
@@ -45,13 +46,15 @@ export function toPayrollInput(
   employee: string,
   month: string,
 ): PayrollInput {
-  const { workJobId, workPeriodVersion, employmentVersion, terms, ...summary } = raw;
+  const { workJobId, workPeriodVersion, workAdjustmentId, employmentVersion, terms, ...summary } =
+    raw;
   if (validatePayrollInputTerms(month, terms)) throw new InvalidHttpResponseError();
   return Object.freeze({
     ...toPayrollInputSummary(summary, employee, month),
     companyId: company,
     workJobId: workJobId.toLowerCase(),
     workPeriodVersion,
+    workAdjustmentId: workAdjustmentId?.toLowerCase() ?? null,
     employmentVersion,
     terms: normalizePayrollInputTerms(terms),
   });
@@ -100,8 +103,24 @@ export function toPayrollInputReview(
         ...raw.source,
         periodId: raw.source.periodId.toLowerCase(),
         jobId: raw.source.jobId?.toLowerCase() ?? null,
+        adjustment: raw.source.adjustment
+          ? Object.freeze({
+              ...raw.source.adjustment,
+              id: raw.source.adjustment.id.toLowerCase(),
+            })
+          : null,
       })
     : null;
+  if (
+    source?.adjustment &&
+    (!source.closed ||
+      !source.includesEmployee ||
+      !source.jobId ||
+      !isCalendarDate(source.adjustment.workDate) ||
+      source.adjustment.workDate.slice(0, 7) !== month ||
+      !Number.isFinite(Date.parse(source.adjustment.recordedAt)))
+  )
+    throw new InvalidHttpResponseError();
   if (
     (after !== null && (!current || Number(after) > current.version)) ||
     (!current && (raw.history.items.length || raw.history.nextCursor !== null))
@@ -149,6 +168,7 @@ export function toPayrollInputReview(
     (current?.status !== "DRAFT" ||
       current.workJobId !== source?.jobId ||
       current.workPeriodVersion !== source?.version ||
+      current.workAdjustmentId !== (source?.adjustment?.id ?? null) ||
       current.employmentVersion !== raw.employee.employmentVersion)
   )
     throw new InvalidHttpResponseError();
@@ -165,6 +185,7 @@ export function toPayrollInputReview(
 export function toPayrollInputChangeDto(input: PayrollInputChange): PayrollInputChangeDto {
   return {
     workJobId: input.workJobId,
+    ...(input.workAdjustmentId === null ? {} : { workAdjustmentId: input.workAdjustmentId }),
     expectedWorkPeriodVersion: input.expectedWorkPeriodVersion,
     expectedEmploymentVersion: input.expectedEmploymentVersion,
     expectedVersion: input.expectedVersion,

@@ -6,7 +6,7 @@ import type { PayrollScreenProps } from "../contracts/payroll-screen-props";
 import { PayrollInputVerificationController } from "../controllers/payroll-input-verification-controller";
 import { usePayrollInputVerification } from "../controllers/use-payroll-input-verification";
 import { payrollInputReviewParameters } from "../models/payroll-input-route";
-import { payrollInputView } from "../models/payroll-input-view";
+import { payrollInputReviewView, payrollInputView } from "../models/payroll-input-view";
 import { PayrollInputVerificationPage } from "../pages/payroll-input-verification-page";
 export function PayrollInputVerificationScreen(props: PayrollScreenProps) {
   const [parameters] = useSearchParams(),
@@ -57,11 +57,16 @@ function PayrollInputVerificationBinding(
       state.context?.current ? payrollInputView(state.context.current, locale, timezone) : null,
     [state.context, locale, timezone],
   );
+  const source = useMemo(
+    () => (state.context ? payrollInputReviewView(state.context, locale, timezone).source : null),
+    [state.context, locale, timezone],
+  );
   return (
     <PayrollInputVerificationPage
       state={state}
       form={form}
       view={view}
+      source={source}
       locale={locale}
       companyName={props.companyName}
       backTo={props.backTo}

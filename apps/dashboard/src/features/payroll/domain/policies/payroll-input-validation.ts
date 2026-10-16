@@ -56,6 +56,7 @@ export function normalizePayrollInput(input: PayrollInputChange): PayrollInputCh
   return Object.freeze({
     ...input,
     workJobId: input.workJobId.toLowerCase(),
+    workAdjustmentId: input.workAdjustmentId?.toLowerCase() ?? null,
     terms: normalizePayrollInputTerms(input.terms),
     reason: input.reason.trim(),
   });
@@ -156,6 +157,7 @@ export function validatePayrollInputTerms(month: string, t: PayrollInputTerms): 
 export function validatePayrollInput(month: string, input: PayrollInputChange): Failure | null {
   if (
     !isUuid(input.workJobId) ||
+    (input.workAdjustmentId !== null && !isUuid(input.workAdjustmentId)) ||
     !Number.isSafeInteger(input.expectedWorkPeriodVersion) ||
     input.expectedWorkPeriodVersion < 0 ||
     !Number.isSafeInteger(input.expectedEmploymentVersion) ||

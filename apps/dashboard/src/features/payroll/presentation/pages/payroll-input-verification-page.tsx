@@ -1,18 +1,20 @@
 import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppPageHeader } from "../../../../core/presentation/components/app-page-header";
+import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { AppTextArea } from "../../../../core/presentation/components/app-text-area";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { usePayrollInputVerification } from "../controllers/use-payroll-input-verification";
 import { payrollInputFieldError, payrollInputMessages } from "../i18n/payroll-input-messages";
 import type { PayrollInputCommandState } from "../models/payroll-input-command-state";
-import type { payrollInputView } from "../models/payroll-input-view";
+import type { payrollInputReviewView, payrollInputView } from "../models/payroll-input-view";
 import { PayrollInputCommandStatus } from "./payroll-input-command-status";
 import { PayrollInputProperties } from "./payroll-input-properties";
 export function PayrollInputVerificationPage({
   state,
   form,
   view,
+  source,
   locale,
   companyName,
   backTo,
@@ -21,6 +23,7 @@ export function PayrollInputVerificationPage({
   state: PayrollInputCommandState;
   form: ReturnType<typeof usePayrollInputVerification>;
   view: ReturnType<typeof payrollInputView> | null;
+  source: ReturnType<typeof payrollInputReviewView>["source"] | null;
   locale: Locale;
   companyName: string;
   backTo: string;
@@ -48,6 +51,7 @@ export function PayrollInputVerificationPage({
       {state.context && view && (
         <>
           <p>{text.verifyNote}</p>
+          {source && <AppPropertyList title={text.source} items={source} />}
           <PayrollInputProperties view={view} locale={locale} />
           <form className="app-editor-form" onSubmit={form.submit} noValidate>
             <AppTextArea

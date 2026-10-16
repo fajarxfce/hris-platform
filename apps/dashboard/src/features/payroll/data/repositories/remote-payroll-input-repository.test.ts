@@ -1,5 +1,6 @@
 import { assert, describe, expect, it, vi } from "vitest";
 import {
+  inputAdjustment,
   inputCompany,
   inputEmployee,
   inputId,
@@ -26,6 +27,79 @@ function fixture(raw: unknown) {
   };
 }
 describe("monthly payroll input transport", () => {
+  it("retains selected and current attendance revisions as separate immutable evidence", async () => {
+    const raw = inputReview(inputRecord());
+    assert(raw.source && raw.current);
+    raw.current.workAdjustmentId = inputAdjustment().id;
+    raw.source.adjustment = inputAdjustment(2);
+    const { repository } = fixture(raw);
+    const result = await repository.review(company, inputEmployee, inputMonth, null, signal);
+    assert(result.ok);
+    expect(result.value.current?.workAdjustmentId).toBe(inputAdjustment().id);
+    expect(result.value.source?.adjustment?.revision).toBe(2);
+    raw.source.adjustment.reason = "Changed after acquisition";
+    expect(result.value.source?.adjustment?.reason).toBe("Reviewed late attendance evidence");
+    expect(Object.isFrozen(result.value.source?.adjustment)).toBe(true);
+  });
+
+  it("accepts a legacy response as the original closing without losing explicit adjusted references", async () => {
+    const raw = inputReview();
+    const { repository, http } = fixture({
+      ...raw,
+      current: { ...raw.current, workAdjustmentId: undefined },
+      source: { ...raw.source, adjustment: undefined },
+    });
+    const result = await repository.review(company, inputEmployee, inputMonth, null, signal);
+    assert(result.ok);
+    expect(result.value.current?.workAdjustmentId).toBeNull();
+    expect(result.value.source?.adjustment).toBeNull();
+    assert(result.value.current);
+    http.request.mockResolvedValue({ id: inputId, version: 3 });
+    expect(
+      (
+        await repository.save(
+          company,
+          inputEmployee,
+          inputMonth,
+          "ba900000-0000-4000-8000-000000000001" as OperationId,
+          {
+            workJobId: inputJob,
+            workAdjustmentId: null,
+            expectedWorkPeriodVersion: 2,
+            expectedEmploymentVersion: 7,
+            expectedVersion: 2,
+            terms: result.value.current.terms,
+            reason: "Retain the original closing",
+          },
+          signal,
+        )
+      ).ok,
+    ).toBe(true);
+    expect(http.request.mock.calls.at(-1)?.[0].body).not.toHaveProperty("workAdjustmentId");
+  });
+
+  it.each([
+    "wrong month",
+    "invalid date",
+    "unclosed",
+    "missing employee",
+    "invalid revision",
+    "stale verification",
+  ])("rejects invalid adjustment evidence: %s", async (condition) => {
+    const raw = inputReview();
+    assert(raw.source);
+    raw.source.adjustment = inputAdjustment();
+    if (condition === "wrong month") raw.source.adjustment.workDate = "2026-08-02";
+    if (condition === "invalid date") raw.source.adjustment.workDate = "2026-09-31";
+    if (condition === "unclosed") raw.source.closed = false;
+    if (condition === "missing employee") raw.source.includesEmployee = false;
+    if (condition === "invalid revision") raw.source.adjustment.revision = 0;
+    if (condition === "stale verification") raw.availableActions = ["VERIFY"];
+    const { repository } = fixture(raw);
+    expect(await repository.review(company, inputEmployee, inputMonth, null, signal)).toMatchObject(
+      { ok: false, failure: { code: "invalid_response" } },
+    );
+  });
   it("maps a coherent paginated review, source, exact money and immutable nested values", async () => {
     const raw = inputReview(inputRecord(23)),
       { http, repository } = fixture(raw);
@@ -189,6 +263,7 @@ describe("monthly payroll input transport", () => {
     const operation = "ba900000-0000-4000-8000-000000000001" as OperationId,
       input = {
         workJobId: inputJob,
+        workAdjustmentId: inputAdjustment().id,
         expectedWorkPeriodVersion: 2,
         expectedEmploymentVersion: 7,
         expectedVersion: null,

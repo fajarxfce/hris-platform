@@ -17,6 +17,13 @@ export function payrollInputView(input: PayrollInput, locale: Locale, timezone: 
       { label: text.scheduledMonthUnits, value: t.scheduledMonthUnits ?? text.notSpecified },
       { label: text.reviewReference, value: t.reviewReference },
       { label: text.workVersion, value: String(input.workPeriodVersion) },
+      {
+        label: text.source,
+        value: input.workAdjustmentId ? text.adjustedAttendance : text.originalClosing,
+      },
+      ...(input.workAdjustmentId
+        ? [{ label: text.adjustmentReference, value: input.workAdjustmentId }]
+        : []),
       { label: text.employmentVersion, value: String(input.employmentVersion) },
       { label: text.preparedBy, value: input.preparedBy },
       { label: text.verifiedBy, value: input.verifiedBy ?? "—" },
@@ -90,6 +97,24 @@ export function payrollInputReviewView(
       { label: text.status, value: s?.closed ? text.closed : text.notClosed },
       { label: text.workVersion, value: s ? String(s.version) : "—" },
       { label: text.included, value: s?.includesEmployee ? text.yes : text.no },
+      {
+        label: text.source,
+        value: !s?.closed
+          ? "—"
+          : s.adjustment
+            ? `${text.attendanceAdjustment} ${s.adjustment.revision}`
+            : text.originalClosing,
+      },
+      ...(s?.adjustment
+        ? [
+            { label: text.workDate, value: s.adjustment.workDate },
+            {
+              label: `${text.recorded} (${timezone})`,
+              value: time.format(new Date(s.adjustment.recordedAt)),
+            },
+            { label: text.reason, value: s.adjustment.reason },
+          ]
+        : []),
     ],
     notice: review.frozen
       ? text.frozen
@@ -100,7 +125,8 @@ export function payrollInputReviewView(
           : review.current &&
               (review.current.employmentVersion !== review.employee.employmentVersion ||
                 review.current.workJobId !== s.jobId ||
-                review.current.workPeriodVersion !== s.version)
+                review.current.workPeriodVersion !== s.version ||
+                review.current.workAdjustmentId !== (s.adjustment?.id ?? null))
             ? text.sourceChanged
             : null,
     history: review.history.items.map((row) => ({

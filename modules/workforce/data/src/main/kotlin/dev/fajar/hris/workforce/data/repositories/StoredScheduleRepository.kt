@@ -146,6 +146,7 @@ class StoredScheduleRepository(
         shift: ShiftSnapshot?,
         expectedVersion: Long?,
         reason: String,
+        active: Boolean,
     ): Result<MutationReceipt> {
         val company = requireNotNull(actor.companyId)
         return safeDatabaseCall {
@@ -159,6 +160,7 @@ class StoredScheduleRepository(
                                 JSONB.valueOf(json.writeValueAsString(snapshot.toData()))
                             }
                         it.version = expectedVersion ?: 0
+                        it.active = active
                     }
                 if (expectedVersion == null) {
                     calendars.insertRoster(row)
@@ -174,6 +176,7 @@ class StoredScheduleRepository(
                             it.employmentId = employeeId
                             it.workDate = day
                             it.revision = version
+                            it.active = active
                             it.shift =
                                 shift?.let { snapshot ->
                                     JSONB.valueOf(json.writeValueAsString(snapshot.toData()))

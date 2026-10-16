@@ -60,7 +60,8 @@ under the existing precedence and closed-period rules. The employee calendar
 directory and review now support effective weekly assignments and per-date roster
 editing. Forms retain original selected shift revisions across catalog paging,
 use the corresponding schedule/roster version and recover explicitly after an
-unknown response. Bulk editing and roster reset remain separate work. The mobile employee
+unknown response. Bulk editing remains separate work; the roster reset API is
+described below. The mobile employee
 application provides its own [weekly calendar](https://github.com/fajarxfce/hris-mobile/blob/main/docs/workforce.md)
 with a bounded encrypted offline snapshot. Its attendance route also supports
 foreground location evidence, online capture windows, encrypted offline commands,
@@ -71,6 +72,36 @@ remain a separate mobile increment.
 Calendar precedence is explicit roster, active holiday, then the effective weekly pattern. A null roster shift means an explicit day off. Calendars distinguish work, off, and unassigned dates. Overnight shifts retain their starting work date. Nonexistent DST local times return a dated validation failure; ambiguous local times use the earlier offset and elapsed UTC minutes. Calendar reads are bounded to 62 days and holiday queries to 366 days.
 
 Calendar commands and reads revalidate live company membership, credentials, the original/live permission intersection, and current MFA age under guards. A proof that expires while a request waits cannot authorize its result or an existing command receipt. Receipts require current authority but do not reapply a successful command's mutable period or shift checks. Calendar reads hold a shared schedule guard across their component queries; concurrent readers can proceed while schedule writers wait. Assignment and roster commands protect employment references before checking eligibility. The lock order is schedule, applicable months, people, company, membership, then account.
+
+### Roster reset contract
+
+`POST /workforce/employees/{id}/roster/{day}/reset` restores the calendar beneath a
+reviewed daily override. It requires `workforce.manage`, an idempotency key, the
+observed roster version and a reason. An active row with a null shift still means
+an explicit day off. Reset instead records an inactive revision, allowing the
+active holiday, effective weekly pattern or unassigned date to apply.
+
+Migration V87 retains the day ID and every original revision. Reset advances the
+version; a later ordinary roster save uses that version and reactivates the same
+ID. Old creates or stale edits cannot silently replace the retained head. Calendar
+review includes `rosterOverrides`, with date, active status, observed version and
+the frozen shift. This metadata remains separate from the resolved day's origin.
+
+The command rejects a locked month, unavailable employment, stale version or
+already inactive override. It validates the restored rule's local time before
+mutation. Captured attendance retains its original schedule; resetting an open
+calendar does not rewrite evidence or published closing snapshots. Current
+authority and MFA are checked after guards and through atomic revision, journal,
+receipt and sync publication capture. Replaying the original receipt requires
+current authority without repeating mutable calendar eligibility checks.
+
+Reset publishes a versioned `ROSTER_DAYS` deletion. Bootstrap omits inactive heads,
+and the owned canonical endpoint returns `roster_day_not_found` for a withdrawn
+override. A subsequent save publishes an upsert at the same ID and a higher
+version. Clients must also handle a known missing roster during hydration of an
+older upsert; unrelated transport and authorization failures remain failures.
+The administrative reset controls and mobile compatibility check are delivered
+before activating this migration in development.
 
 Attendance capture and independent verification are implemented. Server-issued capture windows last 120 seconds, bind account/employment/device, and can be consumed once. They establish recent server contact, not device attestation. A client offline flag, absent/expired proof, doubtful capture time, location violations, or an invalid punch sequence produces a pending event. Offline events never enter accepted totals before review.
 
@@ -116,7 +147,7 @@ company-wide exception queue adds bounded date/status filters, paginated review
 and links to the independently authorized day view. Resolved pairs leave the
 queue; later pending evidence on a corrected day remains visible for review.
 
-Overtime requests, actual-time submission, independent staged review, withdrawal, and closed-period snapshots are implemented. Late payroll adjustments, roster reset/bulk editing, and lifecycle cleanup remain planned. Accepted attendance totals are factual inputs; they are not a finalized payroll result.
+Overtime requests, actual-time submission, independent staged review, withdrawal, and closed-period snapshots are implemented. Reviewed roster reset is implemented in the API. Late payroll adjustments, bulk editing, and lifecycle cleanup remain planned. Accepted attendance totals are factual inputs; they are not a finalized payroll result.
 
 ## Monthly attendance closing
 

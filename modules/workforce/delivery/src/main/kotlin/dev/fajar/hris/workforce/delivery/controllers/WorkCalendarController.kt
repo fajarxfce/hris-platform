@@ -19,6 +19,7 @@ class WorkCalendarController(
     private val shift: GetShift,
     private val assign: AssignWeeklySchedule,
     private val roster: SetRosterDay,
+    private val resetRoster: ResetRosterDay,
     private val calendar: GetEmployeeCalendar,
     private val saveHoliday: SaveWorkHoliday,
     private val holidays: ListWorkHolidays,
@@ -97,6 +98,19 @@ class WorkCalendarController(
                 body.expectedVersion,
                 body.reason,
             )
+            .response()
+            .toResponse()
+
+    @PostMapping("/employees/{id}/roster/{day}/reset")
+    fun resetRoster(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @PathVariable day: LocalDate,
+        @RequestHeader("Idempotency-Key") operationId: UUID,
+        @RequestBody body: RosterResetRequest,
+    ): MutationResponse =
+        resetRoster
+            .execute(actor, operationId, id, day, body.expectedVersion, body.reason)
             .response()
             .toResponse()
 

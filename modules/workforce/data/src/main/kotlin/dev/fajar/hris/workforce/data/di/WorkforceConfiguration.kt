@@ -319,6 +319,34 @@ class WorkforceConfiguration {
         )
 
     @Bean
+    fun resetRosterDay(
+        periods: WorkPeriodRepository,
+        schedules: ScheduleRepository,
+        people: PeopleRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ResetRosterDay(
+            periods,
+            schedules,
+            people,
+            operations,
+            journal,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun selfWorkforceEmployments(
         people: PeopleRepository,
         companies: CompanyRepository,

@@ -40,7 +40,7 @@ class SetRosterDay(
         val access = actor.requirePermission("workforce.manage")
         if (access is Result.Failed) return access
         if (
-            (version ?: 0) < 0 ||
+            (version ?: 0) !in 0 until Long.MAX_VALUE ||
                 (reference?.version ?: 0) < 0 ||
                 reason.isBlank() ||
                 reason.length > 1000
@@ -129,6 +129,14 @@ class SetRosterDay(
                                 reason,
                             ),
                         )
+                    }
+                    .flatMap {
+                        identities
+                            .access(actor.accountId, company)
+                            .flatMap {
+                                validateCompanySessionActor(actor, it, clock.instant(), security)
+                            }
+                            .flatMap { it.requirePermission("workforce.manage") }
                     }
                     .map { receipt }
             }

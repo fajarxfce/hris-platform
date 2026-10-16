@@ -59,31 +59,42 @@ class GetEmployeeCalendarReview(
             val permission =
                 (authorized as Result.Success).value.requirePermission("workforce.read")
             if (permission is Result.Failed) return@run permission
-            people.find(company, employeeId, until).flatMap { employee ->
-                if (employee == null)
-                    return@flatMap Result.Failed(
-                        Failure(FailureKind.NOT_FOUND, "employee_not_found")
-                    )
-                val reference =
-                    WorkforceEmployeeReference(
-                        employee.id,
-                        employee.employeeNumber,
-                        employee.person.legalName,
-                        employee.terms.status,
-                        employee.version,
-                    )
-                schedules.calendar(company, employeeId, from, until).flatMap { facts ->
-                    resolveCalendar(facts).map { calendar ->
-                        EmployeeCalendarReview(
-                            reference,
-                            from,
-                            until,
-                            calendar,
-                            effectiveScheduleAssignment(facts.assignments, from),
+            people
+                .find(company, employeeId, until)
+                .flatMap { employee ->
+                    if (employee == null)
+                        return@flatMap Result.Failed(
+                            Failure(FailureKind.NOT_FOUND, "employee_not_found")
                         )
+                    val reference =
+                        WorkforceEmployeeReference(
+                            employee.id,
+                            employee.employeeNumber,
+                            employee.person.legalName,
+                            employee.terms.status,
+                            employee.version,
+                        )
+                    schedules.calendar(company, employeeId, from, until).flatMap { facts ->
+                        resolveCalendar(facts).map { calendar ->
+                            EmployeeCalendarReview(
+                                reference,
+                                from,
+                                until,
+                                calendar,
+                                effectiveScheduleAssignment(facts.assignments, from),
+                                facts.roster.toList(),
+                            )
+                        }
                     }
                 }
-            }
+                .flatMap { review ->
+                    identities
+                        .access(actor.accountId, company)
+                        .flatMap {
+                            validateCompanySessionActor(actor, it, clock.instant(), security)
+                        }
+                        .map { review }
+                }
         }
     }
 }

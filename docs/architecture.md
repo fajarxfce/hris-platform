@@ -110,6 +110,14 @@ that expires while waiting cannot authorize calendar data, a mutation, or receip
 replay. This uses the identity domain's pure policy with an explicit clock and
 security configuration; background execution retains its separate authority.
 
+Roster reset uses its own command use case and the existing schedule repository.
+An inactive head retains its identity and version; the calendar resolver ignores
+it while administrative review exposes the observed revision for a subsequent
+edit. The datasource only stores the selected state and immutable history.
+Reset eligibility, period guards and restored local-time validation remain in
+domain. Its committed sync deletion removes the mobile override without replacing
+attendance evidence. See [roster reset](modules/workforce.md#roster-reset-contract).
+
 Attendance capture, capture windows, verification, corrections, daily reads and
 correction history apply the same interactive assurance policy after their guards.
 An original receipt retains its data but still requires current session assurance.

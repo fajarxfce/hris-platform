@@ -63,6 +63,7 @@ fun RosterDaysRecord.toRoster(json: ObjectMapper): RosterOverride =
         workDate,
         shift?.let { json.readValue(it.data(), ShiftSnapshotData::class.java).toSnapshot() },
         version,
+        active,
     )
 
 fun WorkHolidaysRecord.toHoliday(): WorkHoliday = WorkHoliday(id, workDate, name, active, version)

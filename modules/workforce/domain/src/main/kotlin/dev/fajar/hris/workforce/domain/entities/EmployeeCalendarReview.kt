@@ -8,4 +8,5 @@ data class EmployeeCalendarReview(
     val until: LocalDate,
     val calendar: EmployeeCalendar,
     val assignmentAtStart: ScheduleAssignment?,
+    val rosterOverrides: List<RosterOverride> = emptyList(),
 )

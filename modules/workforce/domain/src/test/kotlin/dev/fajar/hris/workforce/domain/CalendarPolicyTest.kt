@@ -98,6 +98,37 @@ class CalendarPolicyTest {
     }
 
     @Test
+    fun resetOverridesRetainVersionsButNoLongerReplaceTheEffectiveCalendar() {
+        val date = LocalDate.parse("2026-10-08")
+        val reset = RosterOverride(date, null, 3, active = false)
+        val facts = CalendarFacts(date, date, null, emptyList(), listOf(reset), emptyList())
+        assertEquals(
+            ScheduledDay.Unassigned(date),
+            (resolveCalendar(facts) as Result.Success).value.days.single(),
+        )
+        val holiday = WorkHoliday(UUID.randomUUID(), date, "Holiday", true, 1)
+        assertEquals(
+            CalendarOrigin.HOLIDAY,
+            ((resolveCalendar(facts.copy(holidays = listOf(holiday))) as Result.Success)
+                    .value
+                    .days
+                    .single() as ScheduledDay.Off)
+                .origin,
+        )
+        val assigned =
+            facts.copy(
+                assignments = listOf(ScheduleAssignment(date, 2, mapOf(date.dayOfWeek to shift())))
+            )
+        assertEquals(
+            CalendarOrigin.PATTERN,
+            ((resolveCalendar(assigned) as Result.Success).value.days.single() as ScheduledDay.Work)
+                .origin,
+        )
+        assertEquals(reset, facts.roster.single())
+        assertEquals(3, facts.roster.single().version)
+    }
+
+    @Test
     fun futureScheduleRevisionsDoNotChangeEarlierDates() {
         val first = LocalDate.parse("2026-10-08")
         val second = first.plusDays(1)

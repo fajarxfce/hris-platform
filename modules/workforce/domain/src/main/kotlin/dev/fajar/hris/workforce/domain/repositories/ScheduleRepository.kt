@@ -47,6 +47,7 @@ interface ScheduleRepository {
         shift: ShiftSnapshot?,
         expectedVersion: Long?,
         reason: String,
+        active: Boolean = true,
     ): Result<MutationReceipt>
 
     fun findHoliday(companyId: UUID, id: UUID): Result<WorkHoliday?>

@@ -5462,3 +5462,21 @@ browser and native tokens returned 401; the replacement password signed in.
 Two bounded SMTP-fixture tests verified recipient restrictions, capacity and
 socket/thread/file cleanup. Temporary captured mail was removed on shutdown.
 No production email provider, real credentials or phone UI was used.
+
+## Retained roster reset API
+
+The reset command withdraws a reviewed daily override while retaining its ID,
+continuous version and immutable revisions. A later roster edit reactivates that
+head. Calendar review exposes the observed override separately from the resolved
+day. Reset publishes a versioned sync deletion; bootstrap and canonical reads
+omit inactive overrides. Existing attendance evidence remains unchanged.
+
+Validation passed 111 selected API/PostgreSQL cases, including all 50 OpenAPI
+contracts, 42 Workforce and 20 Sync domain tests, two migration tests and all
+81 worker tests. Architecture, formatting and both application JAR builds passed.
+Scenarios cover original-command replay after reactivation, competing reset/edit,
+period locking, restored DST gaps, ownership, current MFA and permission changes,
+journal/receipt failure, cancellation, immutable history and sync publication.
+The migration upgrade preserves existing rows and emits no backfill changes.
+
+Development migration waits for dashboard and mobile compatibility validation.

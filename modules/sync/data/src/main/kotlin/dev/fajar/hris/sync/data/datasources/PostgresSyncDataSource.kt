@@ -172,6 +172,7 @@ class PostgresSyncDataSource(private val sql: DSLContext) : SyncDataSource {
                 .where(
                     R.COMPANY_ID.eq(selection.companyId),
                     R.EMPLOYMENT_ID.`in`(selection.employmentIds),
+                    R.ACTIVE.isTrue,
                     DSL.inline("ROSTER_DAYS").`in`(selection.collections),
                 )
         val holidays =

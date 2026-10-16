@@ -8,4 +8,5 @@ data class EmployeeCalendarReviewResponse(
     val until: LocalDate,
     val calendar: EmployeeCalendarResponse,
     val assignmentAtStart: ScheduleAssignmentResponse?,
+    val rosterOverrides: List<RosterOverrideResponse>,
 )

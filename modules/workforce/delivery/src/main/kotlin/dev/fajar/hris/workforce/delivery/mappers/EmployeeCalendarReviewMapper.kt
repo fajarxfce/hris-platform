@@ -14,4 +14,7 @@ fun EmployeeCalendarReview.toResponse(): EmployeeCalendarReviewResponse =
         until,
         calendar.toResponse(),
         assignmentAtStart?.toResponse(),
+        rosterOverrides.map {
+            RosterOverrideResponse(it.workDate, it.version, it.active, it.shift?.toResponse())
+        },
     )

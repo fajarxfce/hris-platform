@@ -34,6 +34,35 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun rosterResetRetainsTheCommandAndReviewVersionContracts() {
+        val api = contract()
+        val operation =
+            api["paths"][
+                "/api/v1/companies/{companyId}/workforce/employees/{id}/roster/{day}/reset"]["post"]
+        assertTrue(operation["x-hris-authentication-required"].asBoolean())
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        assertTrue(
+            operation["parameters"].any {
+                it["name"].asString() == "Idempotency-Key" && it["required"].asBoolean()
+            }
+        )
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("expectedVersion", "reason"),
+            schemas["RosterResetRequest"]["required"]
+                .iterator()
+                .asSequence()
+                .map { it.asString() }
+                .toSet(),
+        )
+        assertTrue(schemas["EmployeeCalendarReviewResponse"]["properties"].has("rosterOverrides"))
+        assertEquals(
+            setOf("workDate", "version", "active", "shift"),
+            schemas["RosterOverrideResponse"]["properties"].propertyNames().toSet(),
+        )
+    }
+
+    @Test
     fun accountSessionAdministrationKeepsGlobalAuthenticationAndMetadataOnlyResponses() {
         val api = contract()
         val path = "/api/v1/identity/accounts/{accountId}/native-sessions"
@@ -1142,7 +1171,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
             schemas["WorkforceEmployeeResponse"]["properties"].properties().map { it.key }.toSet(),
         )
         assertEquals(
-            setOf("employee", "from", "until", "calendar", "assignmentAtStart"),
+            setOf("employee", "from", "until", "calendar", "assignmentAtStart", "rosterOverrides"),
             schemas["EmployeeCalendarReviewResponse"]["properties"]
                 .properties()
                 .map { it.key }

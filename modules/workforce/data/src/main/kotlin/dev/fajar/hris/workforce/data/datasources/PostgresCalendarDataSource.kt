@@ -24,7 +24,7 @@ class PostgresCalendarDataSource(private val sql: DSLContext) : CalendarDataSour
             .fetchOneInto(A)
 
     override fun rosterDay(companyId: UUID, id: UUID): RosterDaysRecord? =
-        sql.selectFrom(R).where(R.COMPANY_ID.eq(companyId), R.ID.eq(id)).fetchOne()
+        sql.selectFrom(R).where(R.COMPANY_ID.eq(companyId), R.ID.eq(id), R.ACTIVE.isTrue).fetchOne()
 
     override fun lock(companyId: UUID, shared: Boolean) {
         val function = if (shared) "pg_advisory_xact_lock_shared" else "pg_advisory_xact_lock"
@@ -106,6 +106,7 @@ class PostgresCalendarDataSource(private val sql: DSLContext) : CalendarDataSour
     override fun updateRoster(row: RosterDaysRecord, expectedVersion: Long): Long? =
         sql.update(R)
             .set(R.SHIFT, row.shift)
+            .set(R.ACTIVE, row.active)
             .set(R.VERSION, expectedVersion + 1)
             .where(R.COMPANY_ID.eq(row.companyId))
             .and(R.EMPLOYMENT_ID.eq(row.employmentId))

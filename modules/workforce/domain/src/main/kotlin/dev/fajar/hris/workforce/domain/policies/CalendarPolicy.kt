@@ -18,7 +18,7 @@ fun resolveCalendar(facts: CalendarFacts): Result<EmployeeCalendar> {
     if (span !in 0..61)
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_calendar_range"))
     val days = mutableListOf<ScheduledDay>()
-    val roster = facts.roster.associateBy { it.workDate }
+    val roster = facts.roster.filter { it.active }.associateBy { it.workDate }
     val holidays = facts.holidays.filter { it.active }.associateBy { it.workDate }
     for (offset in 0..span) {
         val date = facts.from.plusDays(offset)

@@ -31,7 +31,8 @@ fun availablePayrollInputActions(
                 current?.status == PayrollInputStatus.DRAFT &&
                 current.employmentVersion == employee.employmentVersion &&
                 current.workJobId == source.jobId &&
-                current.workPeriodVersion == source.version
+                current.workPeriodVersion == source.version &&
+                current.workAdjustmentId == source.adjustment?.id
         )
             add(PayrollInputAvailableAction.VERIFY)
     }

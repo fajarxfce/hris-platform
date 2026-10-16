@@ -48,6 +48,24 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Payroll attendance source revisions
+
+Monthly input preparation and independent verification now select the current
+immutable attendance adjustment explicitly. Calculation targets retain that
+reference at cutoff; workers reject stale inputs and read the exact selected
+snapshot even after another correction. Source references remain visible in input
+history, run targets and result facts. Original closings and published payroll
+remain unchanged.
+
+All 173 selected API/PostgreSQL scenarios, 108 payroll domain tests, seven payroll
+data tests and 81 worker tests passed. Eleven new API scenarios cover source
+selection, immutable history, original receipt recovery, current evidence after
+waiting, transaction rollback, cancellation, detached input terms, different
+companies/employees/jobs and worker recovery. Architecture, formatting and both
+application JARs passed. No development migration or physical-device validation
+was performed for this increment. Dashboard validation and amendment source
+selection remain in progress.
+
 ### Closed attendance adjustment API
 
 HR can review and correct one day in a closed month without replacing the original

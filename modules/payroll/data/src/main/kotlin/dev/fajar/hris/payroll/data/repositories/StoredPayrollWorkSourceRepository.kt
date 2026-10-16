@@ -3,6 +3,7 @@ package dev.fajar.hris.payroll.data.repositories
 import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.Result
 import dev.fajar.hris.payroll.data.datasources.PayrollWorkSourceDataSource
+import dev.fajar.hris.payroll.domain.entities.PayrollWorkAdjustment
 import dev.fajar.hris.payroll.domain.entities.PayrollWorkSource
 import dev.fajar.hris.payroll.domain.repositories.PayrollWorkSourceRepository
 import java.time.YearMonth
@@ -19,6 +20,21 @@ class StoredPayrollWorkSourceRepository(private val source: PayrollWorkSourceDat
         source.period(company, month.atDay(1), lock)?.let { row ->
             val includes =
                 row.jobId?.let { source.includesEmployee(company, it, employee) } ?: false
+            val adjustment =
+                row.jobId
+                    ?.let { source.latestAdjustment(company, it, employee) }
+                    ?.let {
+                        require(
+                            includes && it.revision >= 1 && YearMonth.from(it.workDate) == month
+                        )
+                        PayrollWorkAdjustment(
+                            it.id,
+                            it.revision,
+                            it.workDate,
+                            it.recordedAt.toInstant(),
+                            it.reason,
+                        )
+                    }
             PayrollWorkSource(
                 row.id,
                 YearMonth.from(row.month),
@@ -26,6 +42,7 @@ class StoredPayrollWorkSourceRepository(private val source: PayrollWorkSourceDat
                 row.status == "CLOSED",
                 row.jobId,
                 includes,
+                adjustment,
             )
         }
     }

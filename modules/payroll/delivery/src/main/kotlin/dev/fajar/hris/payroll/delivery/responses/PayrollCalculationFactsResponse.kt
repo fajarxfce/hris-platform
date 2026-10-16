@@ -1,6 +1,7 @@
 package dev.fajar.hris.payroll.delivery.responses
 
 import java.time.*
+import java.util.UUID
 
 data class PayrollCalculationFactsResponse(
     val month: String,
@@ -13,4 +14,5 @@ data class PayrollCalculationFactsResponse(
     val workDays: List<PayrollWorkDayResponse>,
     val leaveDays: List<PayrollLeaveDayResponse>,
     val taxHistory: PayrollTaxOpeningTermsResponse,
+    val workAdjustmentId: UUID?,
 )

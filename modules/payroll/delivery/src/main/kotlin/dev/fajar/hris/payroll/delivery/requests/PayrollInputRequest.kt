@@ -9,4 +9,5 @@ data class PayrollInputRequest(
     val terms: PayrollInputTermsRequest,
     val expectedVersion: Long? = null,
     val reason: String,
+    val workAdjustmentId: UUID? = null,
 )

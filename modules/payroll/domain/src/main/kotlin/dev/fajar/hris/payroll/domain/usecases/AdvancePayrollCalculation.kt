@@ -225,6 +225,7 @@ class AdvancePayrollCalculation(
                                 run.workJobId,
                                 target.employeeId,
                                 run.earningsMonth,
+                                reviewedInput.workAdjustmentId,
                             )
                         if (work is Result.Failed) return@run work
                         val days = (work as Result.Success).value
@@ -247,6 +248,7 @@ class AdvancePayrollCalculation(
                                     days,
                                     (leave as Result.Success).value,
                                     (history as Result.Success).value,
+                                    reviewedInput.workAdjustmentId,
                                 )
                             facts = snapshot
                             calculateMonthlyPayroll(snapshot)

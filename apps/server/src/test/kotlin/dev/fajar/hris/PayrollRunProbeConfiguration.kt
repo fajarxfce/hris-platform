@@ -119,8 +119,13 @@ class PayrollRunProbeConfiguration {
                     probe.afterRead?.invoke("review", company)
                 }
 
-            override fun workSnapshot(company: UUID, job: UUID, employee: UUID): String? {
-                val raw = source.workSnapshot(company, job, employee)
+            override fun workSnapshot(
+                company: UUID,
+                job: UUID,
+                employee: UUID,
+                adjustmentId: UUID?,
+            ): String? {
+                val raw = source.workSnapshot(company, job, employee, adjustmentId)
                 return probe.snapshot?.invoke(raw) ?: raw
             }
         }

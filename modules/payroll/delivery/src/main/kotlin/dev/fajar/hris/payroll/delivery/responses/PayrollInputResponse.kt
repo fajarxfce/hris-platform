@@ -17,4 +17,5 @@ data class PayrollInputResponse(
     val verifiedBy: UUID?,
     val recordedAt: Instant,
     val reason: String,
+    val workAdjustmentId: UUID?,
 )

@@ -1,6 +1,7 @@
 package dev.fajar.hris.payroll.data.datasources
 
 import dev.fajar.hris.payroll.data.models.*
+import dev.fajar.hris.schema.Tables.ATTENDANCE_ADJUSTMENTS as A
 import dev.fajar.hris.schema.tables.WorkPeriodSnapshots.WORK_PERIOD_SNAPSHOTS as S
 import dev.fajar.hris.schema.tables.WorkPeriods.WORK_PERIODS as W
 import dev.fajar.hris.schema.tables.records.WorkPeriodsRecord
@@ -27,10 +28,11 @@ class PostgresPayrollCalculationSourceDataSource(private val sql: DSLContext) :
                 )
                 SELECT e.id,e.employee_number,p.legal_name,e.version,c.revision compensation_revision,
                     i.id input_id,i.version input_revision,o.id opening_id,o.version opening_revision,
-                    a.id previous_assessment_id,coalesce(a.revision,0) previous_assessment_revision
+                    a.id previous_assessment_id,coalesce(a.revision,0) previous_assessment_revision,
+                    wa.id work_adjustment_id
                 FROM selected m
                 JOIN LATERAL (
-                    SELECT e.id,e.employee_number,e.person_id,e.version FROM employments e
+                    SELECT e.id,e.company_id,e.employee_number,e.person_id,e.version FROM employments e
                     WHERE e.company_id=? AND e.id=m.employment_id LIMIT 1
                 ) e ON true
                 JOIN LATERAL (
@@ -55,6 +57,12 @@ class PostgresPayrollCalculationSourceDataSource(private val sql: DSLContext) :
                     WHERE a.company_id=? AND a.person_id=e.person_id AND a.tax_month>=? AND a.tax_month<?
                     ORDER BY a.tax_month DESC LIMIT 1
                 ) a ON true
+                LEFT JOIN LATERAL (
+                    SELECT wa.id FROM attendance_adjustments wa
+                    JOIN work_periods w ON w.company_id=wa.company_id AND w.job_id=wa.job_id
+                    WHERE wa.company_id=e.company_id AND wa.employment_id=e.id AND w.month=?
+                    ORDER BY wa.revision DESC LIMIT 1
+                ) wa ON true
                 ORDER BY e.id
                 """,
                 company,
@@ -72,6 +80,7 @@ class PostgresPayrollCalculationSourceDataSource(private val sql: DSLContext) :
                 company,
                 LocalDate.of(month.year, 1, 1),
                 LocalDate.of(month.year + 1, 1, 1),
+                month,
             )
             .fetch { r ->
                 PayrollRunTargetRow(
@@ -86,6 +95,7 @@ class PostgresPayrollCalculationSourceDataSource(private val sql: DSLContext) :
                     r.get("opening_revision", Long::class.javaObjectType),
                     r.get("previous_assessment_id", UUID::class.java),
                     r.get("previous_assessment_revision", Long::class.javaObjectType)!!,
+                    r.get("work_adjustment_id", UUID::class.java),
                 )
             }
 
@@ -101,12 +111,29 @@ class PostgresPayrollCalculationSourceDataSource(private val sql: DSLContext) :
             month,
         ) as Boolean
 
-    override fun workSnapshot(company: UUID, job: UUID, employee: UUID): String? =
-        sql.select(S.PAYLOAD)
-            .from(S)
-            .where(S.COMPANY_ID.eq(company), S.JOB_ID.eq(job), S.EMPLOYMENT_ID.eq(employee))
-            .fetchOne(S.PAYLOAD)
-            ?.data()
+    override fun workSnapshot(
+        company: UUID,
+        job: UUID,
+        employee: UUID,
+        adjustmentId: UUID?,
+    ): String? =
+        if (adjustmentId == null)
+            sql.select(S.PAYLOAD)
+                .from(S)
+                .where(S.COMPANY_ID.eq(company), S.JOB_ID.eq(job), S.EMPLOYMENT_ID.eq(employee))
+                .fetchOne(S.PAYLOAD)
+                ?.data()
+        else
+            sql.select(A.PAYLOAD)
+                .from(A)
+                .where(
+                    A.COMPANY_ID.eq(company),
+                    A.ID.eq(adjustmentId),
+                    A.JOB_ID.eq(job),
+                    A.EMPLOYMENT_ID.eq(employee),
+                )
+                .fetchOne(A.PAYLOAD)
+                ?.data()
 
     override fun leaveDays(
         company: UUID,

@@ -14,4 +14,5 @@ data class PayrollWorkSource(
     val closed: Boolean,
     val jobId: UUID?,
     val includesEmployee: Boolean,
+    val adjustment: PayrollWorkAdjustment? = null,
 )

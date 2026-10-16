@@ -70,7 +70,9 @@ fun requirePayrollSources(
             Result.Failed(Failure(FailureKind.CONFLICT, "payroll_input_verification_required"))
         input.employmentVersion != target.employmentVersion ->
             Result.Failed(Failure(FailureKind.CONFLICT, "stale_employment_version"))
-        input.workJobId != run.workJobId || input.workPeriodVersion != run.workPeriodVersion ->
+        input.workJobId != run.workJobId ||
+            input.workPeriodVersion != run.workPeriodVersion ||
+            input.workAdjustmentId != target.workAdjustmentId ->
             Result.Failed(Failure(FailureKind.CONFLICT, "stale_workforce_version"))
         opening == null ->
             Result.Failed(Failure(FailureKind.CONFLICT, "payroll_tax_opening_required"))

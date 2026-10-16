@@ -128,7 +128,8 @@ class VerifyPayrollInput(
             if (
                 !source.includesEmployee ||
                     source.jobId != current.workJobId ||
-                    source.version != current.workPeriodVersion
+                    source.version != current.workPeriodVersion ||
+                    source.adjustment?.id != current.workAdjustmentId
             )
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_workforce_version"))
             val verified =

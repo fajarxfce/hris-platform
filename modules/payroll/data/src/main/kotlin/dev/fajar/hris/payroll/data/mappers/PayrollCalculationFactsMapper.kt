@@ -18,6 +18,7 @@ fun PayrollCalculationFacts.toSnapshotData() =
         workDays = java.util.List.copyOf(workDays.map { item -> item.toSnapshotData() }),
         leaveDays = java.util.List.copyOf(leaveDays.map { item -> item.toSnapshotData() }),
         taxHistory = taxHistory.toData(),
+        workAdjustmentId = workAdjustmentId,
     )
 
 fun PayrollCalculationFactsData.toDomain() =
@@ -32,6 +33,7 @@ fun PayrollCalculationFactsData.toDomain() =
         workDays = java.util.List.copyOf(workDays.map { item -> item.toDomain() }),
         leaveDays = java.util.List.copyOf(leaveDays.map { item -> item.toDomain() }),
         taxHistory = taxHistory.toTerms(),
+        workAdjustmentId = workAdjustmentId,
     )
 
 fun PayrollPolicy.toSnapshotData() =

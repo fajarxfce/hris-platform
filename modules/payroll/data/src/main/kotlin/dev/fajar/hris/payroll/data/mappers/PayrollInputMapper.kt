@@ -86,6 +86,7 @@ fun PayrollInputRevisionsRecord.toInput(json: ObjectMapper) =
         verifiedBy,
         recordedAt.toInstant(),
         reason,
+        workAdjustmentId,
     )
 
 fun PayrollInputSummaryRow.toSummary() =

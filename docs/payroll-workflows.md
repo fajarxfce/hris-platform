@@ -27,6 +27,13 @@ Expiry during journal/receipt completion rolls the complete command back.
 
 A prepared input references the exact closed workforce snapshot for its company, employment, and earnings month. The command carries the observed workforce and employment versions. Missing, unfinished, foreign, or changed source evidence blocks preparation. Payroll reads a scoped projection of the workforce reference; it does not edit factual workforce records or depend on their implementation module.
 
+When a [late attendance correction](attendance-adjustments.md#payroll-input-sources)
+exists, preparation also supplies its `workAdjustmentId`. Work-source and review
+responses expose the current immutable reference. Verification preserves it and
+checks that it is still current. Null means the original closing, not automatic
+selection of a newer snapshot. Calculation pins the current reference at admission,
+rejects stale verified inputs and keeps that exact source through worker recovery.
+
 Inputs contain:
 
 - Up to forty uniquely coded variable cash earnings with explicit taxable classification.

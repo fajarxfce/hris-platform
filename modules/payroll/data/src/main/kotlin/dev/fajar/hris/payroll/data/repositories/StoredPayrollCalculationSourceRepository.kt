@@ -3,6 +3,7 @@ package dev.fajar.hris.payroll.data.repositories
 import dev.fajar.hris.core.database.safeDatabaseCall
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.payroll.data.datasources.*
+import dev.fajar.hris.payroll.data.mappers.toPayrollWorkDays
 import dev.fajar.hris.payroll.data.models.*
 import dev.fajar.hris.payroll.domain.entities.*
 import dev.fajar.hris.payroll.domain.repositories.*
@@ -50,6 +51,7 @@ class StoredPayrollCalculationSourceRepository(
                 r.taxOpeningRevision,
                 r.previousAssessmentId,
                 r.previousAssessmentRevision,
+                r.workAdjustmentId,
             )
         }
     }
@@ -64,26 +66,12 @@ class StoredPayrollCalculationSourceRepository(
         job: UUID,
         employee: UUID,
         month: YearMonth,
+        adjustmentId: UUID?,
     ): Result<List<PayrollWorkDay>?> = safeDatabaseCall {
-        source.workSnapshot(company, job, employee)?.let { payload ->
-            val raw = json.readValue(payload, PayrollClosedWorkData::class.java)
-            require(
-                raw.employeeId == employee &&
-                    raw.month == month.toString() &&
-                    raw.days.size == month.lengthOfMonth()
-            )
-            raw.days.map { day ->
-                require(day.schedule.workDate == day.workDate && day.overtime.size <= 24)
-                PayrollWorkDay(
-                    day.workDate,
-                    PayrollScheduleKind.valueOf(day.schedule.kind),
-                    PayrollAttendanceKind.valueOf(day.fact),
-                    day.schedule.holidayId != null,
-                    day.overtime.map {
-                        PayrollOvertimeEvidence(it.requestId, it.revision, it.approvedMinutes)
-                    },
-                )
-            }
+        source.workSnapshot(company, job, employee, adjustmentId)?.let { payload ->
+            json
+                .readValue(payload, PayrollClosedWorkData::class.java)
+                .toPayrollWorkDays(employee, month)
         }
     }
 

@@ -122,6 +122,7 @@ class StoredPayrollInputRepository(
                             it.earningsMonth = input.earningsMonth.atDay(1)
                             it.workJobId = input.workJobId
                             it.workPeriodVersion = input.workPeriodVersion
+                            it.workAdjustmentId = input.workAdjustmentId
                             it.employmentVersion = input.employmentVersion
                             it.status = input.status.name
                             it.terms = JSONB.valueOf(json.writeValueAsString(input.terms.toData()))

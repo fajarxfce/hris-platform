@@ -17,6 +17,7 @@ fun PayrollCalculationFacts.toCalculationResponse() =
         workDays = java.util.List.copyOf(workDays.map { item -> item.toCalculationResponse() }),
         leaveDays = java.util.List.copyOf(leaveDays.map { item -> item.toCalculationResponse() }),
         taxHistory = taxHistory.toResponse(),
+        workAdjustmentId = workAdjustmentId,
     )
 
 fun PayrollPolicy.toCalculationResponse() =

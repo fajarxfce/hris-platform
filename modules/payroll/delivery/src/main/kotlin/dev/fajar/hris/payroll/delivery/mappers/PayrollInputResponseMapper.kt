@@ -47,6 +47,7 @@ fun PayrollInput.toResponse() =
         verifiedBy,
         recordedAt,
         reason,
+        workAdjustmentId,
     )
 
 fun PayrollInputSummary.toResponse() =
@@ -70,4 +71,7 @@ fun PayrollWorkSource.toResponse() =
         closed,
         jobId,
         includesEmployee,
+        adjustment?.let {
+            PayrollWorkAdjustmentResponse(it.id, it.revision, it.workDate, it.recordedAt, it.reason)
+        },
     )

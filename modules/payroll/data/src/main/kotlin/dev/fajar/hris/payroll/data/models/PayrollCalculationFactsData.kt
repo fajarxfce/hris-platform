@@ -1,6 +1,8 @@
 package dev.fajar.hris.payroll.data.models
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import java.time.*
+import java.util.UUID
 
 data class PayrollCalculationFactsData(
     val month: String,
@@ -13,4 +15,5 @@ data class PayrollCalculationFactsData(
     val workDays: List<PayrollWorkDayData>,
     val leaveDays: List<PayrollLeaveDayData>,
     val taxHistory: PayrollTaxOpeningTermsData,
+    @get:JsonInclude(JsonInclude.Include.NON_NULL) val workAdjustmentId: UUID? = null,
 )

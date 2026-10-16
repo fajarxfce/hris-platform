@@ -46,6 +46,7 @@ fun PayrollRunTarget.toResponse() =
         taxOpeningRevision,
         previousAssessmentId,
         previousAssessmentRevision,
+        workAdjustmentId,
     )
 
 fun PayrollRunItem.toResponse() =

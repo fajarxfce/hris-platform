@@ -39,13 +39,20 @@ class SavePayrollInput(
         terms: PayrollInputTerms,
         expectedVersion: Long?,
         reason: String,
+        workAdjustmentId: UUID? = null,
     ): Result<MutationReceipt> {
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         val access = actor.requirePermission("payroll.calculate")
         if (access is Result.Failed) return access
-        val valid = validatePayrollInput(month, terms, reason)
+        val commandTerms =
+            terms.copy(
+                earnings = java.util.List.copyOf(terms.earnings),
+                deductions = java.util.List.copyOf(terms.deductions),
+                dayResolutions = java.util.List.copyOf(terms.dayResolutions),
+            )
+        val valid = validatePayrollInput(month, commandTerms, reason)
         if (valid is Result.Failed) return valid
         if (
             (expectedVersion != null && expectedVersion !in 0..999) ||
@@ -65,7 +72,10 @@ class SavePayrollInput(
                     employmentVersion.toString(),
                     expectedVersion?.toString(),
                     reason,
-                ) + payrollInputParts(terms),
+                ) +
+                    payrollInputParts(commandTerms) +
+                    (workAdjustmentId?.let { listOf("workAdjustmentId", it.toString()) }
+                        ?: emptyList()),
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
@@ -129,7 +139,11 @@ class SavePayrollInput(
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "payroll_workforce_employee_missing")
                 )
-            if (source.jobId != workJob || source.version != workPeriodVersion)
+            if (
+                source.jobId != workJob ||
+                    source.version != workPeriodVersion ||
+                    source.adjustment?.id != workAdjustmentId
+            )
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_workforce_version"))
             val found = inputs.find(company, employee, month)
             if (found is Result.Failed) return@run found
@@ -149,12 +163,13 @@ class SavePayrollInput(
                     workJob,
                     workPeriodVersion,
                     employmentVersion,
-                    terms,
+                    commandTerms,
                     PayrollInputStatus.DRAFT,
                     actor.accountId,
                     null,
                     clock.instant(),
                     reason,
+                    workAdjustmentId,
                 )
             inputs.save(company, input, expectedVersion).flatMap { receipt ->
                 journal

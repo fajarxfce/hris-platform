@@ -15,7 +15,7 @@ interface PayrollCalculationSourceDataSource {
 
     fun pendingLeave(company: UUID, period: UUID, month: LocalDate): Boolean
 
-    fun workSnapshot(company: UUID, job: UUID, employee: UUID): String?
+    fun workSnapshot(company: UUID, job: UUID, employee: UUID, adjustmentId: UUID?): String?
 
     fun leaveDays(
         company: UUID,

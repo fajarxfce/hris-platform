@@ -60,16 +60,43 @@ owns DTO mapping and the database failure boundary. Use cases coordinate the
 existing period, attendance, correction, People and access repositories. Pure
 policies own review comparison and replacing a single day in the frozen snapshot.
 
+## Payroll input sources
+
+Payroll's work-source and input-review responses expose the current adjustment
+reference, revision, date, time and reason. Preparing an input supplies
+`workAdjustmentId` together with the original closing job and observed work-period
+and employment versions. Null selects the original closing and is valid only
+while that employee has no adjustment. The reference must match the latest
+employee/month revision; Payroll cannot invent or replace Workforce facts.
+
+Verification preserves the selected reference and requires it to remain current.
+A later correction requires another draft and independent verification. Historical
+input revisions retain their own selection. Existing operation receipts still
+replay their original outcome after current authority checks; a changed selection
+is a different command payload.
+
+Calculation admission captures the latest adjustment reference for each employee
+under the shared month guard. A verified input that no longer matches that cutoff
+produces `stale_workforce_version`, rather than a successful result from old facts.
+After admission, the worker reads the exact selected immutable snapshot. Later
+corrections cannot change an active run's source. The result retains the reference
+alongside its factual days; absence, proration and overtime rules remain explicit.
+
+Original closing snapshots, calculation results and published assessments remain
+immutable. This input path does not amend a finalized assessment. Amendment source
+selection and its dashboard review remain separate work below.
+
 ## Delivery sequence
 
 1. Workforce review, atomic correction, exact revision reads and bounded history
    are implemented. Transaction, access, concurrency, cancellation and sync tests
    passed; [delivery records](delivery.md#closed-attendance-adjustment-api) contain
    the executed checks.
-2. Explicit payroll source selection for unfinalized inputs and amendments. A
-   payroll-owned read projection acquires immutable adjustment references; clients
-   never submit replacement work or leave facts. Existing independent verification,
-   approval and publication gates remain in force.
+2. Payroll source selection for unfinalized inputs is implemented and validated
+   in the API, database and worker. Amendment selection remains in progress. Payroll-owned read
+   projections acquire immutable references; clients never submit replacement
+   work or leave facts. Independent verification, approval and publication remain
+   required.
 3. Dashboard before/after review, evidence decisions, revision history and pinned
    command recovery. Original and adjusted facts must be distinguishable.
 4. Real API/browser acceptance and employee replica acceptance, followed by

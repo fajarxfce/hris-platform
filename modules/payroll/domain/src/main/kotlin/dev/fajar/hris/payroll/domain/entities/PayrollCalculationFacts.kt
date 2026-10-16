@@ -3,6 +3,7 @@ package dev.fajar.hris.payroll.domain.entities
 import dev.fajar.hris.people.domain.entities.EmploymentTerms
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.UUID
 
 /** Acquired and versioned by the use case; this value performs no I/O. */
 data class PayrollCalculationFacts(
@@ -16,4 +17,5 @@ data class PayrollCalculationFacts(
     val workDays: List<PayrollWorkDay>,
     val leaveDays: List<PayrollLeaveDay>,
     val taxHistory: PayrollTaxOpeningTerms,
+    val workAdjustmentId: UUID? = null,
 )

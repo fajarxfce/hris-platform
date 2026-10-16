@@ -77,6 +77,7 @@ class PayrollInputController(
                 body.terms.toTerms(),
                 body.expectedVersion,
                 body.reason,
+                body.workAdjustmentId,
             )
             .response()
             .toResponse()

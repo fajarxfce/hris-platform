@@ -18,6 +18,7 @@ class PayrollPeriodProbe {
     @Volatile var afterInputRead: ((String, UUID) -> Unit)? = null
     @Volatile var omitInputRevision = false
     @Volatile var beforeInputAppend: ((PayrollInputRevisionsRecord) -> Unit)? = null
+    @Volatile var beforeWorkSourceRead: ((UUID) -> Unit)? = null
 
     fun clear() {
         afterRead = null
@@ -27,6 +28,7 @@ class PayrollPeriodProbe {
         omitPeriodChange = false
         omitInputRevision = false
         beforeInputAppend = null
+        beforeWorkSourceRead = null
     }
 }
 
@@ -164,9 +166,11 @@ class PayrollPeriodProbeConfiguration {
                 company: UUID,
                 month: LocalDate,
                 lock: Boolean,
-            ): WorkPeriodsRecord? =
-                source.period(company, month, lock).also {
+            ): WorkPeriodsRecord? {
+                probe.beforeWorkSourceRead?.invoke(company)
+                return source.period(company, month, lock).also {
                     probe.afterInputRead?.invoke("source", company)
                 }
+            }
         }
 }

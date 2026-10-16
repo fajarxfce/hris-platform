@@ -17,4 +17,5 @@ data class PayrollRunTarget(
     val taxOpeningRevision: Long?,
     val previousAssessmentId: UUID? = null,
     val previousAssessmentRevision: Long = 0,
+    val workAdjustmentId: UUID? = null,
 )

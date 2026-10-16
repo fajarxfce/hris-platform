@@ -162,6 +162,16 @@ current scope and assurance through acquisition and completion. See
 [late attendance corrections](attendance-adjustments.md) for the contract and
 remaining payroll/dashboard integration.
 
+Payroll inputs retain the exact selected attendance adjustment independently of
+the original closing version. Their use cases acquire the shared month guard
+before People and access guards, compare current evidence, and preserve it through
+independent verification. Calculation admission captures each employee's current
+reference under that same guard. Workers compare the pinned input and target,
+then acquire only the exact immutable snapshot. Source mapping and validation
+remain inside the payroll database failure boundary; later Workforce corrections
+cannot replace an active run's facts. Payroll keeps read ownership without
+importing Workforce data implementations or modifying closed attendance.
+
 Payroll policy review holds the shared company payroll guard before company,
 membership and account guards. Current configuration, the selected month's
 effective policy and bounded revision history remain coherent under concurrent

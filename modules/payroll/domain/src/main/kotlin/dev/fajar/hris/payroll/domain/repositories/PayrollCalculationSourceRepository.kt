@@ -18,6 +18,7 @@ interface PayrollCalculationSourceRepository {
         job: UUID,
         employee: UUID,
         month: YearMonth,
+        adjustmentId: UUID? = null,
     ): Result<List<PayrollWorkDay>?>
 
     fun leaveDays(company: UUID, employee: UUID, month: YearMonth): Result<List<PayrollLeaveDay>>

@@ -128,8 +128,11 @@ acquisition and late authentication expiry roll back the whole command. See
 4. Real API/browser acceptance passed, including late offline captures, overnight
    correction, a lost committed response, a subsequent correction and original
    receipt recovery. Original closing facts remain unchanged; the owned employee
-   API exposes the latest corrected day. Android replica acceptance and compatible
-   development delivery remain separate. See the
+   API exposes the latest corrected day. Android replica acceptance also passed:
+   corrected overnight work survived an offline cold start, and reconnecting
+   acquired a later absence without changing other attendance or roster facts.
+   Physical location acceptance and compatible development delivery remain
+   separate. See the
    [executed checks](delivery.md#closed-attendance-adjustment-dashboard).
 
 The sequence records remaining implementation and validation. A retained Workforce

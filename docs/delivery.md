@@ -48,6 +48,24 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Android attendance adjustment acceptance
+
+An API 35 emulator used an isolated API/PostgreSQL/worker and fictional employee.
+Public closing and adjustment workflows retained the original monthly snapshot,
+then applied independently reviewed late captures and five hours of overnight
+work. Mobile attendance changed from seven to twelve hours. An offline cold start
+reopened Home and monthly history with unchanged ciphertexts and active generations,
+while the server independently recorded a later absence.
+
+After reconnecting, mobile acquired the latest corrected day and displayed one
+present day, one absence and seven hours. The canonical day advanced from version
+four to five; the original worked day and roster were unchanged. Both server
+corrections retained the original closing response. See
+[executed mobile checks](https://github.com/fajarxfce/hris-mobile/blob/main/docs/validation.md#android-acceptance-with-closed-attendance-adjustments).
+These checks used source `13e196a`; the subsequent reusable month-label correction
+has its own UI verification. No phone installation or development migration was
+performed for this acceptance.
+
 ### Closed attendance adjustment dashboard
 
 Published employee results now open a day review that separates original closing

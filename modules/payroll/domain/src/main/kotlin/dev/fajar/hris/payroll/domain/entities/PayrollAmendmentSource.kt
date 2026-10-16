@@ -12,4 +12,6 @@ data class PayrollAmendmentSource(
     val opening: PayrollTaxOpening,
     val facts: PayrollCalculationFacts,
     val calculation: PayrollMonthlyCalculation,
+    val workJobId: UUID,
+    val availableWorkAdjustment: PayrollWorkAdjustment? = null,
 )

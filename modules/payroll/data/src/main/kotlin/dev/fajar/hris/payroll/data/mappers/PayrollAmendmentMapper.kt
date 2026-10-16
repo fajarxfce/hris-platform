@@ -17,6 +17,7 @@ fun PayrollAmendmentTerms.toData() =
                 it.assessmentId,
                 it.compensation?.toData(),
                 it.input?.toData(),
+                it.workAdjustmentId,
             )
         },
     )
@@ -28,7 +29,7 @@ fun PayrollAmendmentTermsData.toTerms(): PayrollAmendmentTerms {
     require(corrections.map { it.assessmentId }.distinct().size == corrections.size)
     require(
         corrections.all { item ->
-            (item.compensation != null || item.input != null) &&
+            (item.compensation != null || item.input != null || item.workAdjustmentId != null) &&
                 sourceVersions.any { it.assessmentId == item.assessmentId }
         }
     )
@@ -42,6 +43,7 @@ fun PayrollAmendmentTermsData.toTerms(): PayrollAmendmentTerms {
                     it.assessmentId,
                     it.compensation?.toTerms(),
                     it.input?.toTerms(),
+                    it.workAdjustmentId,
                 )
             }
         ),

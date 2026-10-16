@@ -6,4 +6,5 @@ data class PayrollAmendmentRemunerationResponse(
     val assessmentId: UUID,
     val compensation: CompensationTermsResponse?,
     val input: PayrollInputTermsResponse?,
+    val workAdjustmentId: UUID?,
 )

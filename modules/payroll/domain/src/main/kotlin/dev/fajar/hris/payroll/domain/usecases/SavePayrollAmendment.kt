@@ -42,6 +42,7 @@ class SavePayrollAmendment(
         if (permission is Result.Failed) return permission
         val valid = validatePayrollAmendmentDraft(firstAssessmentId, terms, expectedVersion, reason)
         if (valid is Result.Failed) return valid
+        val proposal = snapshotPayrollAmendmentTerms(terms)
         val key =
             OperationKey(
                 "payroll.amendment_save",
@@ -51,13 +52,17 @@ class SavePayrollAmendment(
                     firstAssessmentId.toString(),
                     expectedVersion?.toString(),
                     reason,
-                ) + payrollAmendmentParts(terms),
+                ) + payrollAmendmentParts(proposal),
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
             if (replay is Result.Failed) return@run replay
             val payrollGuard = policies.lock(company)
             if (payrollGuard is Result.Failed) return@run payrollGuard
+            if (proposal.corrections.any { it.workAdjustmentId != null }) {
+                val workGuard = sources.lockWorkPeriods(company, firstAssessmentId)
+                if (workGuard is Result.Failed) return@run workGuard
+            }
             val peopleGuard = people.lockReportingLines(company, shared = true)
             if (peopleGuard is Result.Failed) return@run peopleGuard
             val companyGuard = companies.lock(company, shared = true)
@@ -138,14 +143,24 @@ class SavePayrollAmendment(
                 if (current == null) initialSources else sources.sources(company, firstAssessmentId)
             if (acquired is Result.Failed) return@run acquired
             val year = (acquired as Result.Success).value
+            val acquiredAttendance =
+                sources.attendance(
+                    company,
+                    payrollAmendmentAttendanceReferences(proposal.corrections),
+                )
+            if (acquiredAttendance is Result.Failed) return@run acquiredAttendance
+            val attendance = (acquiredAttendance as Result.Success).value
             val corrections =
                 preparePayrollAmendmentCorrections(
                     firstAssessmentId,
                     year,
-                    terms.sourceVersions,
-                    terms.corrections,
+                    proposal.sourceVersions,
+                    proposal.corrections,
+                    attendance,
                 )
             if (corrections is Result.Failed) return@run corrections
+            val currentAttendance = requireCurrentPayrollAmendmentAttendance(attendance)
+            if (currentAttendance is Result.Failed) return@run currentAttendance
             val remuneration =
                 validatePayrollAmendmentRemuneration((corrections as Result.Success).value, reason)
             if (remuneration is Result.Failed) return@run remuneration
@@ -174,32 +189,32 @@ class SavePayrollAmendment(
                     reason,
                     current?.summary?.latestReviewId,
                 )
-            amendments.save(company, PayrollAmendment(summary, terms), expectedVersion).flatMap {
-                receipt ->
-                journal
-                    .record(
-                        actor,
-                        ChangeRecord(
-                            "payroll_amendment",
-                            id,
-                            "payroll.amendment_saved",
-                            mapOf(
-                                "assessmentId" to firstAssessmentId.toString(),
-                                "version" to receipt.version.toString(),
+            amendments
+                .save(company, PayrollAmendment(summary, proposal), expectedVersion)
+                .flatMap { receipt ->
+                    journal
+                        .record(
+                            actor,
+                            ChangeRecord(
+                                "payroll_amendment",
+                                id,
+                                "payroll.amendment_saved",
+                                mapOf(
+                                    "assessmentId" to firstAssessmentId.toString(),
+                                    "version" to receipt.version.toString(),
+                                ),
+                                reason,
                             ),
-                            reason,
-                        ),
-                    )
-                    .flatMap { operations.record(actor, key, receipt) }
-                    .flatMap {
-                        validateCompanySessionActor(actor, access, clock.instant(), security)
-                    }
-                    .flatMap {
-                        requirePayrollMutation(it, "payroll.amend", clock.instant(), security).map {
-                            receipt
+                        )
+                        .flatMap { operations.record(actor, key, receipt) }
+                        .flatMap {
+                            validateCompanySessionActor(actor, access, clock.instant(), security)
                         }
-                    }
-            }
+                        .flatMap {
+                            requirePayrollMutation(it, "payroll.amend", clock.instant(), security)
+                                .map { receipt }
+                        }
+                }
         }
     }
 }

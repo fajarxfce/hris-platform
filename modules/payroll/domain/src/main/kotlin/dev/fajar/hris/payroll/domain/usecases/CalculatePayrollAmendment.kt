@@ -51,6 +51,8 @@ class CalculatePayrollAmendment(
             if (replay is Result.Failed) return@run replay
             val payrollGuard = policies.lock(company)
             if (payrollGuard is Result.Failed) return@run payrollGuard
+            val workGuard = sources.lockAmendmentWorkPeriods(company, id)
+            if (workGuard is Result.Failed) return@run workGuard
             val peopleGuard = people.lockReportingLines(company, shared = true)
             if (peopleGuard is Result.Failed) return@run peopleGuard
             val companyGuard = companies.lock(company, shared = true)
@@ -74,11 +76,11 @@ class CalculatePayrollAmendment(
             if (allowed is Result.Failed) return@run allowed
             val found = amendments.find(company, id)
             if (found is Result.Failed) return@run found
-            val current =
-                (found as Result.Success).value
-                    ?: return@run Result.Failed(
-                        Failure(FailureKind.NOT_FOUND, "payroll_amendment_not_found")
-                    )
+            val current = (found as Result.Success).value
+            if (current == null)
+                return@run Result.Failed(
+                    Failure(FailureKind.NOT_FOUND, "payroll_amendment_not_found")
+                )
             val beneficiary = people.accountForEmployee(company, current.summary.employee.id)
             if (beneficiary is Result.Failed) return@run beneficiary
             if ((beneficiary as Result.Success).value == actor.accountId)
@@ -119,14 +121,24 @@ class CalculatePayrollAmendment(
             val acquired = sources.sources(company, current.summary.firstAssessmentId)
             if (acquired is Result.Failed) return@run acquired
             val year = (acquired as Result.Success).value
+            val acquiredAttendance =
+                sources.attendance(
+                    company,
+                    payrollAmendmentAttendanceReferences(current.terms.corrections),
+                )
+            if (acquiredAttendance is Result.Failed) return@run acquiredAttendance
+            val attendance = (acquiredAttendance as Result.Success).value
             val corrections =
                 preparePayrollAmendmentCorrections(
                     current.summary.firstAssessmentId,
                     year,
                     current.terms.sourceVersions,
                     current.terms.corrections,
+                    attendance,
                 )
             if (corrections is Result.Failed) return@run corrections
+            val currentAttendance = requireCurrentPayrollAmendmentAttendance(attendance)
+            if (currentAttendance is Result.Failed) return@run currentAttendance
             // Only a completed pure rule evaluation is retained as a failed attempt.
             // Acquisition/persistence failures roll back; interruption is never converted.
             val calculated =

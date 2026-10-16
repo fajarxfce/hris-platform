@@ -86,8 +86,25 @@ corrections cannot change an active run's source. The result retains the referen
 alongside its factual days; absence, proration and overtime rules remain explicit.
 
 Original closing snapshots, calculation results and published assessments remain
-immutable. This input path does not amend a finalized assessment. Amendment source
-selection and its dashboard review remain separate work below.
+immutable. Finalized assessments use the separate amendment flow below.
+
+## Published payroll amendments
+
+An amendment correction can explicitly select `workAdjustmentId` from its
+preparation response. Payroll acquires the exact Workforce snapshot through its
+own bounded projection and database failure boundary. The reference must match
+the company, employee, original closing and month. Preview, saving and calculation
+require the latest revision under the shared month guard. A stale choice returns
+`stale_workforce_version` without recording a calculation failure.
+
+Omitting the amendment reference retains the currently published facts, including
+a previously applied adjustment. It never adopts a new correction automatically.
+The selected reference and full factual calendar are retained with the calculation.
+Independent review and publication keep that selection through subsequent HR
+edits, while checking the observed payroll assessment versions and current access.
+Storage rejects substituted references and factual days. Cancellation, malformed
+acquisition and late authentication expiry roll back the whole command. See
+[the amendment contract](payroll-amendments.md#attendance-source-selection).
 
 ## Delivery sequence
 
@@ -97,7 +114,9 @@ selection and its dashboard review remain separate work below.
    the executed checks.
 2. Payroll source selection for unfinalized inputs is implemented and validated
    in the API, database, worker and dashboard, including a real browser workflow.
-   Amendment selection remains in progress. Payroll-owned read
+   Amendment selection is implemented and validated in the backend; its
+   [delivery record](delivery.md#attendance-sources-for-payroll-amendments) includes
+   the executed API, domain, data and worker checks. Payroll-owned read
    projections acquire immutable references; clients never submit replacement
    work or leave facts. Independent verification, approval and publication remain
    required.

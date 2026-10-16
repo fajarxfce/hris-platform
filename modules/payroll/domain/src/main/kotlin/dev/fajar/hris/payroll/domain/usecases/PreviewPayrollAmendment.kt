@@ -34,13 +34,17 @@ class PreviewPayrollAmendment(
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         val permission = requirePayrollMutation(actor, "payroll.amend", clock.instant(), security)
         if (permission is Result.Failed) return permission
-        if (observed.size !in 1..12 || remuneration.size !in 1..12)
-            return Result.Failed(
-                Failure(FailureKind.VALIDATION, "invalid_payroll_amendment_corrections")
-            )
+        val submitted = PayrollAmendmentTerms(observed, remuneration)
+        val valid = validatePayrollAmendmentProposal(assessmentId, submitted)
+        if (valid is Result.Failed) return valid
+        val proposal = snapshotPayrollAmendmentTerms(submitted)
         return transactions.run(actor) {
             val payrollGuard = policies.lock(company, shared = true)
             if (payrollGuard is Result.Failed) return@run payrollGuard
+            if (proposal.corrections.any { it.workAdjustmentId != null }) {
+                val workGuard = sources.lockWorkPeriods(company, assessmentId)
+                if (workGuard is Result.Failed) return@run workGuard
+            }
             val peopleGuard = people.lockReportingLines(company, shared = true)
             if (peopleGuard is Result.Failed) return@run peopleGuard
             val companyGuard = companies.lock(company, shared = true)
@@ -76,9 +80,24 @@ class PreviewPayrollAmendment(
                 return@run Result.Failed(
                     Failure(FailureKind.FORBIDDEN, "payroll_amendment_self_preparation_forbidden")
                 )
+            val acquiredAttendance =
+                sources.attendance(
+                    company,
+                    payrollAmendmentAttendanceReferences(proposal.corrections),
+                )
+            if (acquiredAttendance is Result.Failed) return@run acquiredAttendance
+            val attendance = (acquiredAttendance as Result.Success).value
             val corrections =
-                preparePayrollAmendmentCorrections(assessmentId, year, observed, remuneration)
+                preparePayrollAmendmentCorrections(
+                    assessmentId,
+                    year,
+                    proposal.sourceVersions,
+                    proposal.corrections,
+                    attendance,
+                )
             if (corrections is Result.Failed) return@run corrections
+            val currentAttendance = requireCurrentPayrollAmendmentAttendance(attendance)
+            if (currentAttendance is Result.Failed) return@run currentAttendance
             val preview =
                 recalculatePayrollAmendment(
                     assessmentId,

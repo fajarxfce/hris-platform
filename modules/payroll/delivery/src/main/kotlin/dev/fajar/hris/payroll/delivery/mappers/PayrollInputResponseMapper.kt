@@ -71,7 +71,8 @@ fun PayrollWorkSource.toResponse() =
         closed,
         jobId,
         includesEmployee,
-        adjustment?.let {
-            PayrollWorkAdjustmentResponse(it.id, it.revision, it.workDate, it.recordedAt, it.reason)
-        },
+        adjustment?.toResponse(),
     )
+
+fun PayrollWorkAdjustment.toResponse() =
+    PayrollWorkAdjustmentResponse(id, revision, workDate, recordedAt, reason)

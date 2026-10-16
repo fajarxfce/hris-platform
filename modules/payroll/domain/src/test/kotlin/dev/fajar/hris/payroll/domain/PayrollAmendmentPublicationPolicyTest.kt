@@ -76,6 +76,21 @@ class PayrollAmendmentPublicationPolicyTest : PayrollAmendmentFixture() {
                 .code,
         )
         val changed = year.mapIndexed { i, it -> if (i == 0) it.copy(revision = 1) else it }
+        val forged =
+            proposed.copy(
+                calculations =
+                    proposed.calculations.mapIndexed { i, it ->
+                        if (i == 0)
+                            it.copy(facts = it.facts.copy(workAdjustmentId = UUID.randomUUID()))
+                        else it
+                    }
+            )
+        assertEquals(
+            "payroll_amendment_recalculation_required",
+            (requirePayrollAmendmentPublicationSources(amendment, forged, year) as Result.Failed)
+                .failure
+                .code,
+        )
         assertEquals(
             "payroll_amendment_sources_changed",
             (requirePayrollAmendmentPublicationSources(amendment, proposed, changed)

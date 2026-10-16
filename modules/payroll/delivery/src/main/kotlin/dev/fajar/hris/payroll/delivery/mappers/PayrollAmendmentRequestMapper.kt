@@ -7,7 +7,12 @@ fun PayrollAmendmentSourceReferenceRequest.toReference() =
     PayrollAmendmentSourceReference(assessmentId, revision)
 
 fun PayrollAmendmentRemunerationRequest.toRemuneration() =
-    PayrollAmendmentRemuneration(assessmentId, compensation?.toTerms(), input?.toTerms())
+    PayrollAmendmentRemuneration(
+        assessmentId,
+        compensation?.toTerms(),
+        input?.toTerms(),
+        workAdjustmentId,
+    )
 
 fun SavePayrollAmendmentRequest.toTerms() =
     PayrollAmendmentTerms(

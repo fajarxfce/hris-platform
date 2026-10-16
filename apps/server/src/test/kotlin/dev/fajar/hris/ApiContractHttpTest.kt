@@ -643,8 +643,18 @@ class ApiContractHttpTest : PeopleApiFixture() {
             schemas["PayrollAmendmentPreviewRequest"]["properties"].propertyNames().toSet(),
         )
         assertEquals(
-            setOf("assessmentId", "compensation", "input"),
+            setOf("assessmentId", "compensation", "input", "workAdjustmentId"),
             schemas["PayrollAmendmentRemunerationRequest"]["properties"].propertyNames().toSet(),
+        )
+        for (response in
+            listOf("PayrollAmendmentBasisResponse", "PayrollAmendmentCalculationResponse")) {
+            val properties = schemas[response]["properties"].propertyNames().toSet()
+            assertTrue("workAdjustmentId" in properties)
+            assertTrue("workDays" in properties)
+        }
+        assertTrue(
+            "availableWorkAdjustment" in
+                schemas["PayrollAmendmentBasisResponse"]["properties"].propertyNames().toSet()
         )
         assertEquals(
             setOf("firstAssessmentId", "sourceVersions", "calculations", "difference"),

@@ -30,7 +30,8 @@ does not reserve a revision; preparation acquires the complete published year.
 
 Send `sourceVersions` containing every `assessmentId` and `revision` returned by
 preparation, plus one to twelve `corrections`. Each correction identifies an
-assessment and supplies proposed `compensation`, `input`, or both. The first
+assessment and supplies proposed `compensation`, `input`, an owner-provided
+`workAdjustmentId`, or a combination of them. The first
 selected assessment must have a correction; earlier months cannot be changed by
 that proposal. The ordinary one-MiB JSON request bound applies. Money remains a
 decimal string in both directions.
@@ -38,6 +39,8 @@ decimal string in both directions.
 The server acquires retained facts under the shared payroll guard and constructs
 the calculation basis. Clients cannot provide calculated amounts, cumulative tax
 history, work/leave evidence, policy versions or replacement tax registration.
+An attendance selection supplies only its immutable reference; Payroll acquires
+and validates the factual days itself.
 Original immutable assessments retain revision zero in a separate revision ledger.
 Revised publication belongs to the later stage below.
 
@@ -51,6 +54,34 @@ failures remain sanitized domain failures.
 
 These endpoints create no approval, job, payment, operation receipt or published
 revision. They do not provide the draft, approval or settlement workflows below.
+
+## Attendance source selection
+
+Preparation distinguishes the published `workAdjustmentId` from the latest
+`availableWorkAdjustment` metadata. It also exposes the full bounded calendar
+used by the published assessment. A correction may supply the available
+`workAdjustmentId` without replacing compensation or monthly inputs.
+
+An omitted or null amendment reference retains the published work facts,
+including a correction already applied by an earlier amendment. It neither
+resets attendance to the original closing nor adopts the latest Workforce edit.
+An explicit selection must belong to the same company, employee, original closing
+job and assessment month. Preview, save and calculation require the latest
+employee snapshot under shared month guards; a missing, substituted or outdated
+reference returns `stale_workforce_version` and requires another review.
+
+After calculation, independent review and publication retain that exact immutable
+selection even if HR creates another attendance revision. The observed payroll
+assessment versions must still match. The result and subsequent published
+assessment expose the selected reference and its factual days. Existing monthly
+pay decisions remain explicit; a changed fact can require a corresponding input
+correction before calculation succeeds.
+
+The database checks reference ownership, current selection at new draft/calculation
+writes, and equality between retained results and the selected owner snapshot.
+Forged references or factual days roll back the complete attempt. Original
+closings and earlier assessments are not rewritten. See
+[late attendance corrections](attendance-adjustments.md).
 
 ## Saved drafts and calculation attempts
 
@@ -175,7 +206,8 @@ published month in the year, at most twelve assessments. Earlier months are reta
 as tax-continuity evidence. Corrected remuneration uses the existing monthly rule
 engine; no client may supply a calculated net payment or withholding result.
 
-The preparation path accepts proposed compensation and monthly-input corrections.
+The preparation path accepts proposed compensation, monthly-input corrections,
+and an exact attendance adjustment reference.
 Employment, closed work, leave, payroll policy and opening evidence retain their
 own module ownership. Adopting a corrected source requires an explicit versioned
 reference to evidence supplied by that owner. A payroll amendment must not disguise

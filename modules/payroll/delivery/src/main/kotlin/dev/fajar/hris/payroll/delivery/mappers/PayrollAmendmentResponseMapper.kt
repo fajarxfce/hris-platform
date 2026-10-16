@@ -26,6 +26,11 @@ fun PayrollAmendmentPreparation.toResponse() =
                     it.facts.compensation.toResponse(),
                     it.facts.input.toResponse(),
                     it.calculation.toCalculationResponse(),
+                    it.facts.workAdjustmentId,
+                    it.availableWorkAdjustment?.toResponse(),
+                    java.util.List.copyOf(
+                        it.facts.workDays.map { day -> day.toCalculationResponse() }
+                    ),
                 )
             }
         ),
@@ -60,6 +65,10 @@ fun PayrollAmendmentPreview.toResponse() =
                     it.original.toCalculationResponse(),
                     it.calculation.toCalculationResponse(),
                     it.difference.toResponse(),
+                    it.facts.workAdjustmentId,
+                    java.util.List.copyOf(
+                        it.facts.workDays.map { day -> day.toCalculationResponse() }
+                    ),
                 )
             }
         ),

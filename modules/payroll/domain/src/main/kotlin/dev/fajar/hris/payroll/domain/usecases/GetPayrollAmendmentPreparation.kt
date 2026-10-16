@@ -31,6 +31,8 @@ class GetPayrollAmendmentPreparation(
         return transactions.run(actor) {
             val payrollGuard = policies.lock(company, shared = true)
             if (payrollGuard is Result.Failed) return@run payrollGuard
+            val workGuard = sources.lockWorkPeriods(company, assessmentId)
+            if (workGuard is Result.Failed) return@run workGuard
             val peopleGuard = people.lockReportingLines(company, shared = true)
             if (peopleGuard is Result.Failed) return@run peopleGuard
             val companyGuard = companies.lock(company, shared = true)

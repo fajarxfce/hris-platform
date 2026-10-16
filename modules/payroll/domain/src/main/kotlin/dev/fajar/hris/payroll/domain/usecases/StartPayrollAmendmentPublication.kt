@@ -173,11 +173,18 @@ class StartPayrollAmendmentPublication(
             val preview = calculation.preview!!
             val acquiredSources = sources.sources(company, current.summary.firstAssessmentId)
             if (acquiredSources is Result.Failed) return@run acquiredSources
+            val acquiredAttendance =
+                sources.attendance(
+                    company,
+                    payrollAmendmentAttendanceReferences(current.terms.corrections),
+                )
+            if (acquiredAttendance is Result.Failed) return@run acquiredAttendance
             val fresh =
                 requirePayrollAmendmentPublicationSources(
                     current,
                     preview,
                     (acquiredSources as Result.Success).value,
+                    (acquiredAttendance as Result.Success).value,
                 )
             if (fresh is Result.Failed) return@run fresh
             val reserved =

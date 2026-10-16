@@ -58,6 +58,7 @@ fun requirePayrollAmendmentPublicationSources(
     amendment: PayrollAmendment,
     preview: PayrollAmendmentPreview,
     sources: List<PayrollAmendmentSource>,
+    attendance: List<PayrollAmendmentAttendance> = emptyList(),
 ): Result<Unit> {
     if (Thread.currentThread().isInterrupted) throw InterruptedException()
     val proposal =
@@ -66,8 +67,10 @@ fun requirePayrollAmendmentPublicationSources(
             sources,
             amendment.terms.sourceVersions,
             amendment.terms.corrections,
+            attendance,
         )
     if (proposal is Result.Failed) return proposal
+    val corrected = (proposal as Result.Success).value.associateBy { it.assessmentId }
     val observed = sources.map { PayrollAmendmentSourceReference(it.assessmentId, it.revision) }
     if (
         sources.size !in 1..12 ||
@@ -88,6 +91,7 @@ fun requirePayrollAmendmentPublicationSources(
     for ((index, result) in preview.calculations.withIndex()) {
         if (Thread.currentThread().isInterrupted) throw InterruptedException()
         val source = sources[first + index]
+        val expectedFacts = corrected[source.assessmentId]?.facts ?: source.facts
         val predecessor = sources.getOrNull(first + index - 1)
         val expectedRevision = predecessor?.let { it.revision + if (index > 0) 1 else 0 } ?: 0
         val expectedReference =
@@ -101,6 +105,7 @@ fun requirePayrollAmendmentPublicationSources(
                 result.target.previousAssessmentRevision != expectedRevision ||
                 result.original != source.calculation ||
                 result.facts.month != source.facts.month ||
+                result.facts.copy(taxHistory = expectedFacts.taxHistory) != expectedFacts ||
                 (predecessor != null && result.facts.taxHistory.reference != expectedReference)
         )
             return Result.Failed(

@@ -31,18 +31,37 @@ fun validatePayrollAmendmentDraft(
 ): Result<Unit> {
     val command = validatePayrollAmendmentCommand(expectedVersion, reason)
     if (command is Result.Failed) return command
+    val proposal = validatePayrollAmendmentProposal(firstAssessmentId, terms)
+    if (proposal is Result.Failed) return proposal
+    if (
+        terms.sourceVersions.none { it.assessmentId == firstAssessmentId } ||
+            terms.corrections.any { change ->
+                terms.sourceVersions.none { it.assessmentId == change.assessmentId }
+            }
+    )
+        return Result.Failed(
+            Failure(FailureKind.VALIDATION, "invalid_payroll_amendment_corrections")
+        )
+    return Result.Success(Unit)
+}
+
+fun validatePayrollAmendmentProposal(
+    firstAssessmentId: UUID,
+    terms: PayrollAmendmentTerms,
+): Result<Unit> {
+    if (Thread.currentThread().isInterrupted) throw InterruptedException()
     if (
         terms.sourceVersions.size !in 1..12 ||
             terms.corrections.size !in 1..12 ||
             terms.sourceVersions.map { it.assessmentId }.distinct().size !=
                 terms.sourceVersions.size ||
             terms.sourceVersions.any { it.revision < 0 || it.revision == Long.MAX_VALUE } ||
-            terms.sourceVersions.none { it.assessmentId == firstAssessmentId } ||
             terms.corrections.map { it.assessmentId }.distinct().size != terms.corrections.size ||
             terms.corrections.none { it.assessmentId == firstAssessmentId } ||
             terms.corrections.any { change ->
-                (change.compensation == null && change.input == null) ||
-                    terms.sourceVersions.none { it.assessmentId == change.assessmentId }
+                (change.compensation == null &&
+                    change.input == null &&
+                    change.workAdjustmentId == null)
             }
     )
         return Result.Failed(
@@ -148,8 +167,37 @@ fun payrollAmendmentParts(terms: PayrollAmendmentTerms): List<String?> =
                 ) +
                     (it.compensation?.let(::compensationOperationParts) ?: emptyList()) +
                     listOf("input", (it.input != null).toString()) +
-                    (it.input?.let(::payrollInputParts) ?: emptyList())
+                    (it.input?.let(::payrollInputParts) ?: emptyList()) +
+                    (it.workAdjustmentId?.let { id -> listOf("workAdjustmentId", id.toString()) }
+                        ?: emptyList())
             }
+
+/** Detach caller-owned collections before resource waits and operation canonicalization. */
+fun snapshotPayrollAmendmentTerms(terms: PayrollAmendmentTerms): PayrollAmendmentTerms =
+    PayrollAmendmentTerms(
+        java.util.List.copyOf(terms.sourceVersions),
+        java.util.List.copyOf(
+            terms.corrections.map { change ->
+                change.copy(
+                    compensation =
+                        change.compensation?.let {
+                            it.copy(
+                                fixedEarnings = java.util.List.copyOf(it.fixedEarnings),
+                                insurancePrograms = java.util.Set.copyOf(it.insurancePrograms),
+                            )
+                        },
+                    input =
+                        change.input?.let {
+                            it.copy(
+                                earnings = java.util.List.copyOf(it.earnings),
+                                deductions = java.util.List.copyOf(it.deductions),
+                                dayResolutions = java.util.List.copyOf(it.dayResolutions),
+                            )
+                        },
+                )
+            }
+        ),
+    )
 
 fun availablePayrollAmendmentActions(
     actor: Actor,

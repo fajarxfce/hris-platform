@@ -126,12 +126,19 @@ class SubmitPayrollAmendmentReview(
                     )
             val acquired = sources.sources(company, current.summary.firstAssessmentId)
             if (acquired is Result.Failed) return@run acquired
+            val acquiredAttendance =
+                sources.attendance(
+                    company,
+                    payrollAmendmentAttendanceReferences(current.terms.corrections),
+                )
+            if (acquiredAttendance is Result.Failed) return@run acquiredAttendance
             val basis =
                 preparePayrollAmendmentCorrections(
                     current.summary.firstAssessmentId,
                     (acquired as Result.Success).value,
                     current.terms.sourceVersions,
                     current.terms.corrections,
+                    (acquiredAttendance as Result.Success).value,
                 )
             if (basis is Result.Failed) return@run basis
             val preparers = amendments.preparers(company, amendmentId)

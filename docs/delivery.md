@@ -48,6 +48,32 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Attendance sources for payroll amendments
+
+Amendment preparation exposes current attendance revisions alongside published
+facts. An author can select an exact revision without changing remuneration.
+Preview, save and calculation require the current employee/month reference under
+the shared closing guard. Independent review and publication retain the selected
+immutable calendar even after HR records another correction. Omitting the choice
+keeps the published attendance, including a previously applied revision.
+
+The database rejects substituted references and calendar facts. New proposals
+detach caller-owned collections before waiting. Calculation acquires its month
+guards through a minimal scoped projection; private draft acquisition still
+follows current authorization. No repository or datasource coordinates another
+repository or datasource.
+
+All 241 selected API/PostgreSQL scenarios, 114 payroll domain tests, seven payroll
+data tests and 81 worker tests passed, together with architecture, formatting and
+both application JARs. New cases cover attendance-only amendments, competing
+corrections, immutable publication, receipt recovery, forged storage, late session
+expiry, mapping failure and cancellation. The first run exposed premature draft
+acquisition and changed preview-conflict classification; both were corrected and
+the affected suites passed on the final run. Existing and new API contracts passed.
+
+Dashboard and real browser acceptance are recorded separately. This increment
+does not migrate development services or install an APK.
+
 ### Payroll attendance source revisions
 
 Monthly input preparation and independent verification now select the current

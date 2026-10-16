@@ -90,7 +90,17 @@ abstract class PayrollAmendmentFixture : MonthlyPayrollFixture() {
                     calculation.taxInput,
                     calculation.tax,
                 )
-            PayrollAmendmentSource(company, id, 0, person, target, opening, current, calculation)
+            PayrollAmendmentSource(
+                company,
+                id,
+                0,
+                person,
+                target,
+                opening,
+                current,
+                calculation,
+                UUID.randomUUID(),
+            )
         }
     }
 

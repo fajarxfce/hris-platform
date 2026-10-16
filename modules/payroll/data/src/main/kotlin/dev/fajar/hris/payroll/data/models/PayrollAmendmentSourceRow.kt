@@ -15,4 +15,6 @@ data class PayrollAmendmentSourceRow(
     val calculation: String,
     val revision: Long,
     val previousAssessmentRevision: Long,
+    val workJobId: UUID,
+    val availableWorkAdjustment: PayrollWorkAdjustmentRow?,
 )

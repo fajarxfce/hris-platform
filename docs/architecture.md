@@ -172,6 +172,15 @@ remain inside the payroll database failure boundary; later Workforce corrections
 cannot replace an active run's facts. Payroll keeps read ownership without
 importing Workforce data implementations or modifying closed attendance.
 
+Payroll amendments consume those same owner-provided attendance references.
+Preparation, saves and calculation acquire shared work-period guards before
+People and access guards. Calculation resolves the retained assessment identity
+for locking without loading private draft terms before current authorization.
+Use cases require the selected attendance to be current at preparation/calculation;
+review and publication compare its exact immutable facts without adopting later
+corrections. Payroll owns the bounded raw projection and repository mapping.
+Clients never supply replacement factual days, and null retains published evidence.
+
 Payroll policy review holds the shared company payroll guard before company,
 membership and account guards. Current configuration, the selected month's
 effective policy and bounded revision history remain coherent under concurrent

@@ -37,6 +37,7 @@ fun PayrollAmendment.toResponse() =
                     it.assessmentId,
                     it.compensation?.toResponse(),
                     it.input?.toResponse(),
+                    it.workAdjustmentId,
                 )
             },
         ),

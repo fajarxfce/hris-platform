@@ -28,5 +28,7 @@ fun PayrollAmendmentSourceRow.toAmendmentSource(json: ObjectMapper): PayrollAmen
         opening.toOpening(json),
         facts,
         calculation,
+        workJobId,
+        availableWorkAdjustment?.toWorkAdjustment(month),
     )
 }

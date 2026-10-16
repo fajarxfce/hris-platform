@@ -48,6 +48,30 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Company access editor
+
+The dashboard now edits an existing member's company activation, direct
+permissions and reviewed role versions. Applied snapshots remain unchanged until
+explicit replacement; the bounded role picker distinguishes archived definitions
+and prevents duplicate selections. Reactivation requires current active roles,
+and globally inactive accounts cannot receive active company access.
+
+All 3,438 dashboard unit tests, architecture/format/type checks, 23 role/member
+browser scenarios and an isolated API/PostgreSQL workflow passed. Controlled
+cases covered pending/disposed reads and saves, company replacement, denied
+access, protected departures, MFA, version conflicts and original-command
+recovery. Real API acceptance retained an archived applied role, lost a committed
+response, recovered its original receipt, disabled access and explicitly selected
+a current role before reactivation. No external messages or real MFA credentials
+were used. Desktop and Indonesian dark layouts at 390 pixels with doubled text
+were inspected. The latter exposed a 15-pixel overflow; wrapping long account
+text resolved it before the passing browser run.
+
+The validated API and worker JARs were deployed to the development stack without
+replacing the database or document services. Local health and the WireGuard API
+returned success. This increment changes the dashboard and backend; it does not
+install or operate the mobile application.
+
 ### Reviewed membership role retention
 
 Membership commands now support explicit retention of the reviewed member's

@@ -1,3 +1,4 @@
+import { ArrowClockwise20Regular } from "@fluentui/react-icons";
 import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -6,6 +7,7 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { companyMemberMessages } from "../i18n/company-member-messages";
+import { companyMembershipMessages } from "../i18n/company-membership-messages";
 import type { CompanyMemberState } from "../models/company-member-state";
 import type { companyMemberProperties } from "../models/company-member-view";
 
@@ -15,6 +17,7 @@ export function CompanyMemberPage({
   locale,
   companyName,
   backTo,
+  editTo,
   onRefresh,
 }: {
   state: CompanyMemberState;
@@ -22,6 +25,7 @@ export function CompanyMemberPage({
   locale: Locale;
   companyName: string;
   backTo: string;
+  editTo: string;
   onRefresh: () => void;
 }) {
   const text = companyMemberMessages(locale);
@@ -33,9 +37,14 @@ export function CompanyMemberPage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
-            <AppButton disabled={state.stage === "loading"} onClick={onRefresh}>
-              {messages(locale).refresh}
-            </AppButton>
+            {state.grant && <Link to={editTo}>{companyMembershipMessages(locale).edit}</Link>}
+            <AppButton
+              appearance="subtle"
+              icon={<ArrowClockwise20Regular />}
+              aria-label={messages(locale).refresh}
+              disabled={state.stage === "loading"}
+              onClick={onRefresh}
+            />
           </>
         }
       />

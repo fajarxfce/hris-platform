@@ -15,6 +15,7 @@ import { LoadIdentityProviders } from "../domain/usecases/load-identity-provider
 import { LoadRoleTemplate } from "../domain/usecases/load-role-template";
 import { LoadRoleTemplates } from "../domain/usecases/load-role-templates";
 import { LoadSession } from "../domain/usecases/load-session";
+import { SaveCompanyMembership } from "../domain/usecases/save-company-membership";
 import { SaveRoleTemplate } from "../domain/usecases/save-role-template";
 import { SignIn } from "../domain/usecases/sign-in";
 import { SignOut } from "../domain/usecases/sign-out";
@@ -32,6 +33,7 @@ export function createIdentityFeature(http: HttpClient) {
     saveRoleTemplate: new SaveRoleTemplate(roles),
     loadCompanyMembers: new LoadCompanyMembers(members),
     loadCompanyMember: new LoadCompanyMember(members),
+    saveCompanyMembership: new SaveCompanyMembership(members),
     loadSession: new LoadSession(repository),
     loadCompanyAccess: new LoadCompanyAccess(repository),
     loadProviders: new LoadIdentityProviders(repository),

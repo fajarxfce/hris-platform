@@ -39,15 +39,12 @@ const RoleTemplateRoutes = lazy(() =>
   })),
 );
 
-const CompanyMembersScreen = lazy(() =>
-  import("../../features/identity/presentation/bindings/company-members-screen").then((module) => ({
-    default: module.CompanyMembersScreen,
-  })),
-);
-const CompanyMemberScreen = lazy(() =>
-  import("../../features/identity/presentation/bindings/company-member-screen").then((module) => ({
-    default: module.CompanyMemberScreen,
-  })),
+const CompanyMemberRoutes = lazy(() =>
+  import("../../features/identity/presentation/navigation/company-member-routes").then(
+    (module) => ({
+      default: module.CompanyMemberRoutes,
+    }),
+  ),
 );
 
 const PersonAccountBindingScreen = lazy(() =>
@@ -594,29 +591,16 @@ export function PortalRoutes({
         }
       />
       <Route
-        path="/administration/members"
+        path="/administration/members/*"
         element={
           <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
-            <CompanyMembersScreen
+            <CompanyMemberRoutes
               accountId={accountId}
               access={access}
               actions={identityAdministration}
               companyName={company.name}
               locale={locale}
-            />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/administration/members/:memberId"
-        element={
-          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
-            <CompanyMemberScreen
-              accountId={accountId}
-              access={access}
-              actions={identityAdministration}
-              companyName={company.name}
-              locale={locale}
+              nextIdentifier={nextIdentifier}
             />
           </Suspense>
         }

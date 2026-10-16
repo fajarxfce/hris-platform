@@ -87,6 +87,12 @@ An inactive global account may have its company access disabled; it cannot recei
 active company access until the account itself is active. Changing membership
 status does not activate the global account.
 
+The [dashboard access editor](../dashboard.md#company-access-editing) exposes
+existing member activation, direct permissions and explicit role retention or
+replacement. It reviews the observed membership version, retains original-command
+recovery and requires current role selection before reactivation. Its role picker
+acquires bounded company pages only while open.
+
 `GET /companies/{companyId}/members/{accountId}` returns effective membership access and the direct/template sources used for that version. Older grants without a recorded template application are represented as direct permissions. Template application history is immutable; access, source snapshots, receipts, and audit/outbox commit together.
 
 Sensitive-grant checks run on the combined permissions. A company administrator cannot use a role template to bypass the platform-administrator requirement for payroll/payment access or grant those permissions to themselves. Reactivating a membership counts as granting its permissions again. Membership and template changes retain recent-MFA checks when enforcement is enabled. A template name never substitutes for a server permission check.

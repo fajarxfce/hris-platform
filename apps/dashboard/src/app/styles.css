@@ -1123,6 +1123,30 @@ a {
   margin-top: 0;
   max-width: 960px;
 }
+.app-member-role-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.app-member-role {
+  border-top: 1px solid var(--colorNeutralStroke2);
+  padding-block: 12px;
+  overflow-wrap: anywhere;
+}
+.app-member-summary {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.app-member-role-name {
+  margin: 0;
+  font-size: 1em;
+}
+.app-member-role-version {
+  margin-block: 4px;
+  color: var(--colorNeutralForeground2);
+}
 @media (max-width: 700px) {
   .app-role-permission-options {
     grid-template-columns: minmax(0, 1fr);

@@ -65,6 +65,7 @@ function CompanyMemberBinding(props: Props & { memberId: string }) {
       companyName={props.companyName}
       onRefresh={controller.refresh}
       backTo={`/administration/members?company=${props.access.companyId}`}
+      editTo={`/administration/members/${encodeURIComponent(props.memberId)}/edit?company=${props.access.companyId}`}
     />
   );
 }

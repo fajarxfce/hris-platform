@@ -63,6 +63,16 @@ export function toCompanyMemberGrant(
       permissions: Object.freeze([...role.permissions]),
     });
   });
+  const effective = new Set([
+    ...value.directPermissions,
+    ...roles.flatMap((role) => role.permissions),
+  ]);
+  if (
+    roles.length > 8 ||
+    effective.size !== member.permissions.length ||
+    member.permissions.some((permission) => !effective.has(permission))
+  )
+    throw new InvalidHttpResponseError();
   return Object.freeze({
     member,
     directPermissions: Object.freeze([...value.directPermissions]),

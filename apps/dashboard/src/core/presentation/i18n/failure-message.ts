@@ -2,6 +2,38 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_membership: [
+    "Review the permissions, role versions and reason.",
+    "Periksa permission, versi role, dan alasan perubahan.",
+  ],
+  account_unavailable: [
+    "This account cannot receive active company access. Review its account status.",
+    "Akun ini belum dapat menerima akses perusahaan aktif. Periksa status akunnya.",
+  ],
+  role_template_unavailable: [
+    "Choose an active role from this company, or retain an already applied version.",
+    "Pilih role aktif dalam perusahaan ini, atau pertahankan versi yang sudah diterapkan.",
+  ],
+  role_template_review_required: [
+    "Review active role versions before granting or reactivating company access.",
+    "Tinjau versi role yang aktif sebelum memberikan atau mengaktifkan kembali akses perusahaan.",
+  ],
+  stale_role_template: [
+    "A selected role version changed. Review its current definition or retain the applied version.",
+    "Versi role yang dipilih berubah. Tinjau definisi terbaru atau pertahankan versi yang sudah diterapkan.",
+  ],
+  cannot_remove_own_administration: [
+    "You cannot remove your own company administration access.",
+    "Anda tidak dapat mencabut akses administrasi perusahaan Anda sendiri.",
+  ],
+  cannot_self_grant_sensitive_access: [
+    "An independent platform administrator must approve this sensitive access.",
+    "Administrator platform lain harus menyetujui akses sensitif ini.",
+  ],
+  platform_administrator_required: [
+    "A platform administrator must grant this sensitive access.",
+    "Pemberian akses sensitif ini memerlukan administrator platform.",
+  ],
   invalid_role_template: [
     "Check the role name, code, permissions and reason.",
     "Periksa nama, kode, permission, dan alasan perubahan role.",

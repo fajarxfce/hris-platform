@@ -1175,7 +1175,7 @@ boundaries, and acquires no employee profiles. Account/company changes and dispo
 cancel reads; refresh and failed access remove prior accounts and grants. Repeated
 or malformed cursors, duplicate identities, wrong-account details, and oversized
 payloads are rejected. Language/theme changes only reformat the current snapshot.
-Account creation, role/membership changes, invitations, and employee linkage are
+Account creation, company-access editing, invitations, and employee linkage are
 separate commands.
 
 Validation includes the dashboard architecture checks, 661 unit tests, production
@@ -1184,6 +1184,35 @@ access, refresh failures, and pending reads during a company change. A separate
 browser exercised password sign-in, MFA, directory/detail reads, and logout against
 the local server using fictional development data. Both membership reads returned
 200. No external invitations or messages were sent.
+
+## Company access editing
+
+`/administration/members/{accountId}/edit` reviews one existing member's account
+status, company-access version, direct permissions and applied role snapshots.
+It requires `identity.manage` and never acquires private employee profiles. The
+editor shows the combined permissions before saving and requires a reason.
+
+Previously applied roles remain pinned until explicitly replaced or removed.
+The role picker loads one page of at most twenty company definitions on demand;
+archived and duplicate selections are unavailable. Up to eight roles may be
+selected. Replacing a role reviews its current version. Reactivating company
+access requires current active role selections. A globally inactive account may
+have its company access disabled, but cannot be reactivated here. The API
+independently enforces these rules, sensitive grants and administrator protection.
+
+Saves retain one observed member version, detached payload and operation ID.
+Unknown outcomes keep that command through MFA and later conflicts; explicit
+retry checks the original receipt. A confirmed membership conflict requires a
+protected reload. Read cancellation, company/account replacement and disposal
+clear private data; closing the picker cancels its read and removes its cache.
+Form departures use the shared unsaved/pending-command protection.
+
+Validation passed all 3,438 dashboard unit tests, 23 role/member browser scenarios
+and an isolated API/PostgreSQL workflow. The latter retained an archived applied
+role, recovered a deliberately lost committed response and required explicit
+current-role selection before reactivation. Desktop and Indonesian dark views at
+390 pixels with doubled text were inspected; long account text wraps within the
+available width. Global account provisioning remains a separate workflow.
 
 ## Employee account binding
 

@@ -97,22 +97,10 @@ fun completeApiContract(api: OpenAPI) {
             "/api/v1/auth/native/login",
         )
     val browserOnly = setOf("/api/v1/auth/login", "/api/v1/auth/logout", "/api/v1/auth/csrf")
-    val errorDescriptions =
-        mapOf(
-            "400" to "Malformed request or unsupported transport value.",
-            "401" to "Authentication is missing, expired, or revoked.",
-            "403" to "Current access or authentication assurance is insufficient.",
-            "404" to "The resource is absent or outside the permitted scope.",
-            "408" to "Reading the request body exceeded its finite time budget.",
-            "409" to
-                "Version, idempotency, sync scope, or business state conflicts. Resolve by code; do not blindly retry.",
-            "413" to "The request body exceeds the bounded transport size.",
-            "422" to "Domain validation failed. Translate code and field codes locally.",
-            "429" to
-                "Admission limit reached. Respect Retry-After when supplied and use a finite retry budget.",
-            "500" to "Unexpected failure. Use the correlation ID for diagnosis.",
-            "503" to "A required dependency or configured capability is unavailable.",
-        )
+    val problems = apiProblemResponses()
+    problems.forEach { (status, response) ->
+        api.components.addResponses("Problem$status", response)
+    }
     for ((path, item) in api.paths) {
         for ((method, operation) in item.readOperationsMap()) {
             operation.operationId =
@@ -261,25 +249,15 @@ fun completeApiContract(api: OpenAPI) {
                 }
             }
             val responses = operation.responses ?: ApiResponses().also { operation.responses = it }
-            for ((status, description) in errorDescriptions) {
+            for (status in problems.keys) {
                 responses.putIfAbsent(
                     status,
-                    ApiResponse()
-                        .description(description)
-                        .content(
-                            Content()
-                                .addMediaType(
-                                    "application/problem+json",
-                                    MediaType()
-                                        .schema(
-                                            Schema<Any>().`$ref`("#/components/schemas/ApiProblem")
-                                        ),
-                                )
-                        ),
+                    ApiResponse().`$ref`("#/components/responses/Problem$status"),
                 )
             }
             describeBinaryTransport(path, method, operation)
             for ((status, response) in operation.responses) {
+                if (response.`$ref` != null) continue
                 response.addHeaderObject(
                     "X-Request-ID",
                     Header().schema(StringSchema().format("uuid")),

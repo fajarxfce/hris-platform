@@ -33,6 +33,38 @@ class ApiContractHttpTest : PeopleApiFixture() {
         return json.readTree(response.body())
     }
 
+    private fun response(document: JsonNode, operation: JsonNode, status: String): JsonNode {
+        val response = operation["responses"][status]
+        val reference = response.get("\$ref") ?: return response
+        assertTrue(reference.asString().startsWith("#/components/responses/"))
+        val resolved = document.at(reference.asString().removePrefix("#"))
+        assertFalse(resolved.isMissingNode)
+        return resolved
+    }
+
+    @Test
+    fun sharedProblemsRetainTheirTraceAndRetryHeadersWithoutDuplicatingEveryResponse() {
+        val api = contract()
+        val operation = api["paths"]["/api/v1/auth/csrf"]["get"]
+        val statuses =
+            setOf("400", "401", "403", "404", "408", "409", "413", "422", "429", "500", "503")
+        for (status in statuses) {
+            val reference = operation["responses"][status]
+            assertEquals(setOf("\$ref"), reference.propertyNames().toSet())
+            val resolved = response(api, operation, status)
+            assertEquals("uuid", resolved["headers"]["X-Request-ID"]["schema"]["format"].asString())
+            assertEquals(
+                "#/components/schemas/ApiProblem",
+                resolved["content"]["application/problem+json"]["schema"]["\$ref"].asString(),
+            )
+            assertEquals(status in setOf("429", "503"), resolved["headers"].has("Retry-After"))
+        }
+        assertEquals(
+            statuses.map { "Problem$it" }.toSet(),
+            api["components"]["responses"].propertyNames().toSet(),
+        )
+    }
+
     @Test
     fun bulkRosterSeparatesReadOnlyReviewFromTheIdempotentBoundedCommand() {
         val api = contract()
@@ -1361,8 +1393,8 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 )
                 assertEquals(
                     "#/components/schemas/ApiProblem",
-                    operation["responses"]["422"]["content"]["application/problem+json"]["schema"][
-                            "\$ref"]
+                    response(document, operation, "422")["content"]["application/problem+json"][
+                            "schema"]["\$ref"]
                         .asString(),
                 )
             }
@@ -1542,7 +1574,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
             "binary",
             payslip["responses"]["200"]["content"]["application/pdf"]["schema"]["format"].asString(),
         )
-        assertNotNull(payslip["responses"]["403"]["content"]["application/problem+json"])
+        assertNotNull(response(document, payslip, "403")["content"]["application/problem+json"])
         assertEquals(
             "binary",
             payslip["responses"]["206"]["content"]["application/pdf"]["schema"]["format"].asString(),

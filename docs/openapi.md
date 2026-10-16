@@ -22,6 +22,11 @@ The description uses a relative server URL so environment addresses and session 
 
 Documentation has one canonical English locale and a one-entry cache. Changing `Accept-Language` does not build additional localized descriptions. Application error translation remains the client's responsibility.
 
+Shared JSON problems use local references under `components.responses`. Their
+definitions retain correlation and retry headers; feature-specific and binary
+responses keep their own metadata. Consumers must resolve standard OpenAPI
+references. The compact description remains subject to the existing 2 MiB limit.
+
 ## Client compatibility
 
 Translate `ApiProblem.code`, field codes, and safe interpolation parameters in the client. New error codes and response properties are additive; preserve an unknown-code fallback. Nullable fields remain nullable in generated clients. Keep money as decimal strings and month values as `YYYY-MM`.

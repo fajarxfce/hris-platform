@@ -12,7 +12,7 @@ including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) r
 - Identity: password sign-in, persistent cookie sessions, CSRF/session rotation, bootstrap, current-company permissions, revocation checks, credential-race handling, shared sign-in limits, and bounded password verification implemented. Company member administration is implemented, including versioned grants/revocation and sensitive-grant restrictions. Authenticator MFA, recovery codes, live credential revocation, and recent-authentication gates are implemented. Direct native password sign-in, pending MFA sessions, native authenticator enrollment, access/refresh rotation, reuse detection, session management, and native MFA renewal are implemented. Configured OIDC sign-in and account bindings are implemented. Configurable company role templates, versioned assignment snapshots, and global account activation/permission administration are implemented. Local invitations, one-use password recovery, and durable SMTP delivery are implemented.
 - Organization and people: company setup, organization units with bounded name/code search and coherent parent details, employee onboarding, scoped directories, and effective employment revisions implemented. Restricted profile editing, immutable history, and cancellation of scheduled employment revisions are implemented. Atomic cross-company transfer with source membership revocation is implemented. Versioned lifecycle checklists, task assignment/history, and explicit offboarding with access revocation are implemented. CSV preview/apply jobs, field errors, partial outcomes, cancellation, and explicit recovery are implemented. Independently authorized initial person/account binding and historical account identity are implemented. Reviewed scheduled offboarding is implemented in the backend, worker and dashboard, including cancellation, retained attempts and terminal-job recovery. [Scheduled onboarding](onboarding-schedules.md) is implemented in the backend, worker and dashboard, including reviewed scheduling and original-command recovery.
 - Approvals: effective templates, immutable snapshots, assignment/delegation, inbox, optimistic decision storage, and pure transitions implemented. Bounded policy/delegation administration, live-access revalidation, and serialization of revocation/reassignment with decisions are implemented. Leave submission, staged decisions, withdrawal, and cancellation apply atomic business consequences. Expense submission, staged decisions, return-for-correction, and withdrawal are integrated. Overtime and payroll review also use the shared boundary, including retained maker exclusions.
-- Workforce: versioned shifts, weekly schedules, roster overrides, holidays, and scoped calendar reads implemented. Attendance capture and independent verification are implemented. Versioned HR corrections are implemented. Durable monthly factual closing and explicit recovery are implemented. Planned/actual overtime, independent staged review, withdrawal, immutable evidence, closing gates/snapshots, and employee synchronization are implemented. Reviewed reset is validated across the API, dashboard and mobile. Reviewed bulk editing is implemented and validated in the API and dashboard; late adjustments remain in progress.
+- Workforce: versioned shifts, weekly schedules, roster overrides, holidays, and scoped calendar reads implemented. Attendance capture and independent verification are implemented. Versioned HR corrections are implemented. Durable monthly factual closing and explicit recovery are implemented. Planned/actual overtime, independent staged review, withdrawal, immutable evidence, closing gates/snapshots, and employee synchronization are implemented. Reviewed reset, bulk editing and closed-month attendance adjustments are implemented and validated across their API, dashboard and mobile consumers. Development delivery through V90 is complete.
 - Leave: effective policies, independent balance adjustments, immutable scoped ledger, snapshotted requests, staged approval, withdrawal, and cancellation implemented. Required/optional validated attachments, immutable business references, and scoped content downloads are implemented. Versioned ledger projections, independent monthly/annual entitlement posting, immutable evidence, explicit year closing with bounded carryover/expiry, closed-year guards, and owned balance sync are implemented. Durable company accrual/year-closing batches, per-employee outcomes, cancellation, and bounded recovery are implemented. Payroll cutoff integration and reviewed finite accrual scheduling are implemented in the backend; the scheduling dashboard and isolated browser acceptance are implemented. Durable carry expiry and scoped history/detail/recovery APIs are implemented and tested after the accounting, request, adjustment and closing integration. Dashboard carry history, recovery, balance views and optional validity configuration are implemented; mobile carry views and native offline-upgrade acceptance are validated.
 - Documents: the bounded private S3 adapter, Garage compatibility, fenced temporary-object cleanup, and authorized resumable upload/status/cancellation are implemented. Bounded ClamAV/Tika inspection, fenced validation jobs, publication, and explicit recovery are implemented. Authorized bounded Range/ETag downloads and optional private Garage/ClamAV deployment configuration are implemented. Bounded storage inventory jobs, explicit resume, and conservative orphan reconciliation are implemented. Immutable business evidence references and enforced expense/leave registration are implemented. Explicit versioned retention policies, archival/restoration, legal hold, and guarded retirement of unreferenced accepted revisions are implemented. Physical deletion uses the existing cleanup worker; immutable metadata and business references remain retained.
 - Expenses: effective category policies, immutable history, scoped reads, and independent policy administration are implemented. Versioned claim drafts, bounded lines/receipt references, current self/team/company scope, cancellation, and draft history are implemented. Immutable evidence submission, maker snapshots, approval routing, exact reviewer scope, and withdrawal are implemented. Independent staged review, current duplicate acknowledgement, rejection, and return/resubmission are implemented. Scoped receipt downloads, independent payment preparation/release, bounded instruction export, per-item reconciliation, and scoped claim payment progress are implemented. Bank-specific formats and settlement corrections remain planned.
@@ -47,6 +47,50 @@ Performance targets on a 4-vCPU/16-GiB reference deployment: interactive API p95
 Commits are atomic and include relevant tests/docs. No co-author trailers. Push increments; releases and production deployment require explicit instructions. Documentation and demo data must not contain secrets or real employee data.
 
 ## Observed validation
+
+### Database recovery and V90 development delivery
+
+Private PostgreSQL backups now include a custom database archive, password-free
+cluster role definitions and a checksummed manifest. The verifier restores only
+to an owned temporary PostgreSQL container on an internal network, checks runtime
+role privileges and schema constraints, and optionally rehearses current migrations.
+Cancellation, unknown creation outcomes and failed cleanup retain explicit resource
+ownership. Twenty-one tool tests, architecture checks and Kotlin formatting passed;
+the first formatting check required wrapping the new Gradle task's command line.
+The tool tests are included in the root `check` task.
+
+The actual development V86 checkpoint restored successfully, then migrated and
+validated through V90. A fresh V90 backup also restored and validated with the
+committed utility. Both checks retained runtime roles without superuser or RLS
+bypass, found no unvalidated constraints, and removed their temporary containers,
+networks and credentials. Initial rehearsal setup exposed a tmpfs parent-permission
+issue, missing cluster roles in database-only archives, and PostgreSQL's original
+grantor requirement; the final process preserves the original bootstrap role.
+Only SQL recovery was exercised; object-storage and secret-manager recovery remain
+separate. See [database recovery](database-recovery.md).
+
+Development was upgraded on 16 October 2026 after the compatible Android client
+had been installed. API and worker JARs from `9155dd17` passed assembly, and their
+image payload hashes matched the artifacts. Its complete nine-job CI run passed.
+Old image references, a drained database checkpoint and protected configuration
+were retained outside Git. No application database connections remained when the
+final checkpoint was taken.
+
+Migrations V87–V90 applied successfully. Counts in all 180 existing non-Flyway
+relations were unchanged; the new attendance-adjustment table retained forced RLS
+and the expected runtime grants. The existing PostgreSQL container and volume were
+preserved. The new API and worker started without a restart, API health returned
+`200 / UP` on loopback and WireGuard, and the dashboard returned `200` with its
+same-origin unauthenticated account request correctly returning `401`.
+Document services remained private. No production deployment or phone UI
+interaction was part of this upgrade.
+
+The installed [Leave working-copy client](https://github.com/fajarxfce/hris-mobile/commit/b32241c6d8e40523e1043d68c8da1bf2d609ca06)
+also retains unfinished input separately from server facts and delivery commands.
+Its [local and native acceptance](https://github.com/fajarxfce/hris-mobile/blob/b32241c6/docs/validation.md#leave-working-copies)
+includes offline restart after a 73-hour clock advance, an offline edit, one
+confirmed half-day request, matching-draft cleanup and explicit discard. Physical
+delivery used install-only; the application was not driven on the user's phone.
 
 ### Completion during blocked navigation
 

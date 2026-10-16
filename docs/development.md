@@ -82,6 +82,11 @@ there is no weak-random fallback.
 
 Changing a secret in .env does not rotate an existing PostgreSQL role password. Rotate credentials explicitly, preserving the named volume. Never delete the database volume to apply an application upgrade.
 
+Use [database recovery verification](database-recovery.md) for private logical
+backups, role definitions and isolated restore/migration rehearsals. The utility
+never restores into the live Compose stack. Keep matching encryption keys and
+private document bytes in the deployment's separate protected backup.
+
 ## JSON integer input
 
 API JSON integer fields reject fractional numbers rather than truncating them.

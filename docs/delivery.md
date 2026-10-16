@@ -5500,3 +5500,19 @@ recover one committed save after response loss, resolve a competing roster edit,
 reset with another lost response, then reactivate the retained head. The API
 review confirmed pattern precedence after reset and a higher roster version
 after reactivation. Development activation still waits for mobile validation.
+
+## Native roster reset acceptance
+
+The mobile client now recognizes a withdrawn roster during canonical acquisition
+without blocking the next change page. Its root checks passed 1,535 desktop tests;
+128 Workforce domain Chromium tests, Android assembly and the Web distribution
+passed. Five new regressions cover bootstrap/delta races, stale versions, unrelated
+failures and cancellation.
+
+An isolated API/PostgreSQL/worker and API 35 emulator verified the public reset
+command, a retained version-one tombstone, offline Home/calendar cold start and
+version-two overnight reactivation. Schedule and holiday ciphertext remained
+unchanged; no HRIS crash entry was present. The standard WireGuard APK was restored
+and its signature verified. See [client evidence](https://github.com/fajarxfce/hris-mobile/blob/main/docs/validation.md#roster-reset-synchronization).
+The phone's ADB endpoint is unavailable; client delivery and development activation
+remain staged. Temporary services were removed and emulator data retained.

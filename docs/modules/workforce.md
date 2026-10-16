@@ -101,8 +101,9 @@ and the owned canonical endpoint returns `roster_day_not_found` for a withdrawn
 override. A subsequent save publishes an upsert at the same ID and a higher
 version. Clients must also handle a known missing roster during hydration of an
 older upsert; unrelated transport and authorization failures remain failures.
-The administrative reset controls and mobile compatibility check are delivered
-before activating this migration in development.
+The mobile client handles this race and is tested against reset, offline process
+restart and reactivation. See [native validation](https://github.com/fajarxfce/hris-mobile/blob/main/docs/validation.md#roster-reset-synchronization).
+Roll out client compatibility before enabling administrative reset.
 
 Attendance capture and independent verification are implemented. Server-issued capture windows last 120 seconds, bind account/employment/device, and can be consumed once. They establish recent server contact, not device attestation. A client offline flag, absent/expired proof, doubtful capture time, location violations, or an invalid punch sequence produces a pending event. Offline events never enter accepted totals before review.
 

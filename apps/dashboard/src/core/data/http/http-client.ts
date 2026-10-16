@@ -9,6 +9,7 @@ export type HttpRequest = Readonly<{
   operationId?: string;
   timeoutMilliseconds?: number;
   response?:
+    | Readonly<{ type: "empty"; status: 202 | 204 }>
     | Readonly<{ type: "text"; mediaType: "text/csv"; maximumBytes: number }>
     | Readonly<{ type: "binary"; mediaType: string; byteLength: number; etag: string }>
     | Readonly<{ type: "binary"; mediaType: string; maximumBytes: number }>;

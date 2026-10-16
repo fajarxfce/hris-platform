@@ -6,6 +6,7 @@ import {
   RequestBodyTooLargeError,
 } from "./http-response-error";
 import { readBinaryResponse } from "./read-binary-response";
+import { readEmptyResponse } from "./read-empty-response";
 import { readJsonResponse } from "./read-json-response";
 import { readTextResponse } from "./read-text-response";
 
@@ -51,7 +52,9 @@ export class FetchHttpClient implements HttpClient {
     const budget =
       representation && "byteLength" in representation
         ? representation.byteLength
-        : representation?.maximumBytes;
+        : representation && "maximumBytes" in representation
+          ? representation.maximumBytes
+          : undefined;
     if (
       budget !== undefined &&
       (!Number.isSafeInteger(budget) ||
@@ -143,7 +146,8 @@ export class FetchHttpClient implements HttpClient {
         headers.set("Upload-Checksum-Sha256", uploadHeaders["Upload-Checksum-Sha256"]);
       }
       if (request.operationId) headers.set("Idempotency-Key", request.operationId);
-      if (request.response) headers.set("Accept", request.response.mediaType);
+      if (request.response && request.response.type !== "empty")
+        headers.set("Accept", request.response.mediaType);
       return await this.send(
         request.path,
         method,
@@ -179,6 +183,8 @@ export class FetchHttpClient implements HttpClient {
     });
     let value: unknown;
     if (!response.ok || !representation) value = await readJsonResponse(response, maximumBytes);
+    else if (representation.type === "empty")
+      value = await readEmptyResponse(response, representation.status);
     else if (representation.type === "binary") {
       const content = await readBinaryResponse(response, representation, signal);
       try {

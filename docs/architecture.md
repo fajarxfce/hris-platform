@@ -594,6 +594,12 @@ each acquired buffer after its HTTP operation. It never retries automatically or
 publishes content. A reserved part uses the current operator's server-issued
 continuation; replacing page ownership requires reselecting identical content.
 
+HTTP datasources may explicitly require an empty 202 or 204 acknowledgement. The
+transport verifies that status and bounds even empty stream chunks, rejecting
+unexpected bytes and releasing the reader on failure. Error responses retain the
+problem-JSON boundary. Current CSRF acquisition, request deadlines, cancellation
+and the absence of automatic retries apply to these commands as well.
+
 
 People owns a public coworker projection for mobile synchronization. Its worker
 use case selects company-local eligibility and the next effective transition;

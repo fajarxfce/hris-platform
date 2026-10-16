@@ -1,16 +1,20 @@
 import { useMemo } from "react";
-import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { WorkforceEmployeeSearch } from "../../domain/entities/workforce-employee-search";
+import { canManageCalendars } from "../../domain/policies/calendar-policy";
 import type { WorkforceScreenProps } from "../contracts/workforce-screen-props";
 import { useWorkforceEmployeeFilters } from "../controllers/use-workforce-employee-filters";
 import { useWorkforceEmployees } from "../controllers/use-workforce-employees";
+import { rosterBulkMessages } from "../i18n/roster-bulk-messages";
 import {
   calendarParameters,
   calendarPath,
   calendarsPath,
   calendarWeekFrom,
+  rosterBulkParameters,
+  rosterBulkPath,
   workforceEmployeeParameters,
   workforceEmployeeSearch,
 } from "../models/calendar-route";
@@ -72,6 +76,15 @@ function WorkforceCalendarsBinding(
       rows={rows}
       locale={props.locale}
       companyName={props.companyName}
+      actions={
+        state.page?.bulkRosterSupported && canManageCalendars(props.access.permissions) ? (
+          <Link
+            to={`${rosterBulkPath}?${rosterBulkParameters(props.access.companyId, props.search.asOf)}`}
+          >
+            {rosterBulkMessages(props.locale).title}
+          </Link>
+        ) : null
+      }
       firstPage={props.search.after === null}
       onFirst={() => props.onSearch({ ...props.search, after: null })}
       onNext={() => {

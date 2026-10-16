@@ -12,7 +12,7 @@ including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) r
 - Identity: password sign-in, persistent cookie sessions, CSRF/session rotation, bootstrap, current-company permissions, revocation checks, credential-race handling, shared sign-in limits, and bounded password verification implemented. Company member administration is implemented, including versioned grants/revocation and sensitive-grant restrictions. Authenticator MFA, recovery codes, live credential revocation, and recent-authentication gates are implemented. Direct native password sign-in, pending MFA sessions, native authenticator enrollment, access/refresh rotation, reuse detection, session management, and native MFA renewal are implemented. Configured OIDC sign-in and account bindings are implemented. Configurable company role templates, versioned assignment snapshots, and global account activation/permission administration are implemented. Local invitations, one-use password recovery, and durable SMTP delivery are implemented.
 - Organization and people: company setup, organization units with bounded name/code search and coherent parent details, employee onboarding, scoped directories, and effective employment revisions implemented. Restricted profile editing, immutable history, and cancellation of scheduled employment revisions are implemented. Atomic cross-company transfer with source membership revocation is implemented. Versioned lifecycle checklists, task assignment/history, and explicit offboarding with access revocation are implemented. CSV preview/apply jobs, field errors, partial outcomes, cancellation, and explicit recovery are implemented. Independently authorized initial person/account binding and historical account identity are implemented. Reviewed scheduled offboarding is implemented in the backend, worker and dashboard, including cancellation, retained attempts and terminal-job recovery. [Scheduled onboarding](onboarding-schedules.md) is implemented in the backend, worker and dashboard, including reviewed scheduling and original-command recovery.
 - Approvals: effective templates, immutable snapshots, assignment/delegation, inbox, optimistic decision storage, and pure transitions implemented. Bounded policy/delegation administration, live-access revalidation, and serialization of revocation/reassignment with decisions are implemented. Leave submission, staged decisions, withdrawal, and cancellation apply atomic business consequences. Expense submission, staged decisions, return-for-correction, and withdrawal are integrated. Overtime and payroll review also use the shared boundary, including retained maker exclusions.
-- Workforce: versioned shifts, weekly schedules, roster overrides, holidays, and scoped calendar reads implemented. Attendance capture and independent verification are implemented. Versioned HR corrections are implemented. Durable monthly factual closing and explicit recovery are implemented. Planned/actual overtime, independent staged review, withdrawal, immutable evidence, closing gates/snapshots, and employee synchronization are implemented. Reviewed reset is validated across the API, dashboard and mobile. The bounded bulk editing API is implemented and tested; its dashboard and late adjustments remain in progress.
+- Workforce: versioned shifts, weekly schedules, roster overrides, holidays, and scoped calendar reads implemented. Attendance capture and independent verification are implemented. Versioned HR corrections are implemented. Durable monthly factual closing and explicit recovery are implemented. Planned/actual overtime, independent staged review, withdrawal, immutable evidence, closing gates/snapshots, and employee synchronization are implemented. Reviewed reset is validated across the API, dashboard and mobile. Reviewed bulk editing is implemented and validated in the API and dashboard; late adjustments remain in progress.
 - Leave: effective policies, independent balance adjustments, immutable scoped ledger, snapshotted requests, staged approval, withdrawal, and cancellation implemented. Required/optional validated attachments, immutable business references, and scoped content downloads are implemented. Versioned ledger projections, independent monthly/annual entitlement posting, immutable evidence, explicit year closing with bounded carryover/expiry, closed-year guards, and owned balance sync are implemented. Durable company accrual/year-closing batches, per-employee outcomes, cancellation, and bounded recovery are implemented. Payroll cutoff integration and reviewed finite accrual scheduling are implemented in the backend; the scheduling dashboard and isolated browser acceptance are implemented. Durable carry expiry and scoped history/detail/recovery APIs are implemented and tested after the accounting, request, adjustment and closing integration. Dashboard carry history, recovery, balance views and optional validity configuration are implemented; mobile carry views and native offline-upgrade acceptance are validated.
 - Documents: the bounded private S3 adapter, Garage compatibility, fenced temporary-object cleanup, and authorized resumable upload/status/cancellation are implemented. Bounded ClamAV/Tika inspection, fenced validation jobs, publication, and explicit recovery are implemented. Authorized bounded Range/ETag downloads and optional private Garage/ClamAV deployment configuration are implemented. Bounded storage inventory jobs, explicit resume, and conservative orphan reconciliation are implemented. Immutable business evidence references and enforced expense/leave registration are implemented. Explicit versioned retention policies, archival/restoration, legal hold, and guarded retirement of unreferenced accepted revisions are implemented. Physical deletion uses the existing cleanup worker; immutable metadata and business references remain retained.
 - Expenses: effective category policies, immutable history, scoped reads, and independent policy administration are implemented. Versioned claim drafts, bounded lines/receipt references, current self/team/company scope, cancellation, and draft history are implemented. Immutable evidence submission, maker snapshots, approval routing, exact reviewer scope, and withdrawal are implemented. Independent staged review, current duplicate acknowledgement, rejection, and return/resubmission are implemented. Scoped receipt downloads, independent payment preparation/release, bounded instruction export, per-item reconciliation, and scoped claim payment progress are implemented. Bank-specific formats and settlement corrections remain planned.
@@ -5538,3 +5538,35 @@ omitted the required array fields; the request schema now declares them and all
 The dashboard is the next increment. Development activation still follows the
 mobile reset compatibility rollout; this check did not deploy services, install an
 APK or interact with a physical device. See [the command contract](roster-bulk.md).
+
+## Bulk roster dashboard
+
+The dashboard now selects explicit employees and dates, reviews every proposed
+schedule and applies one reasoned command. Employee and shift selections survive
+search and paging. The visible 200-entry limit, before/after table and unchanged
+status make the scope reviewable. Definite conflicts require another preview;
+unknown results retain the original payload and operation through explicit retry
+and MFA renewal. Inactive pickers cancel their requests, and company replacement
+rejects late results.
+
+The employee directory advertises API support separately from permissions. Missing
+metadata on an older server keeps the bulk entry and selection hidden while
+ordinary calendars remain available. Eighty-four selected API/PostgreSQL scenarios
+passed with the new response and OpenAPI metadata, formatting, architecture and
+both application JARs; this increment changes no worker DI or storage schema.
+
+Dashboard architecture, formatting, TypeScript and all 3,727 unit tests passed,
+including 35 new boundary/controller/form scenarios. Twenty calendar and bulk
+browser scenarios passed, including ten new cases. Light desktop and Indonesian
+dark layouts at 390 pixels were inspected; the roster review remained usable
+with its computed text sizes doubled. Existing CSS and bundle-size advisories
+remain.
+
+Both isolated API/PostgreSQL browser workflows passed. Bulk acceptance verified
+three changed cells alongside an unchanged version, original-receipt recovery
+after a newer edit, reset to weekly schedules, retained head versions, and a
+competing revision that left every other selected cell untouched. A subsequent
+review applied the full selection once. CSRF rejection was also exercised.
+These workflows use disposable accounts and data. No services were deployed and
+no APK was installed; development activation retains the compatible-mobile
+rollout described above. See [bulk roster editing](roster-bulk.md).

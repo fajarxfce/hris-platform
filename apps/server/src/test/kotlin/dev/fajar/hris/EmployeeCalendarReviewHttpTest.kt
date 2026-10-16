@@ -35,6 +35,7 @@ class EmployeeCalendarReviewHttpTest : WorkforceAccessApiFixture() {
         val first = get(f.employeeClient, "$path&limit=1")
         assertEquals(200, first.statusCode(), first.body())
         val page = json.readTree(first.body())
+        assertTrue(page["bulkRosterSupported"].asBoolean())
         assertEquals(1, page["items"].size())
         assertEquals(
             setOf("id", "employeeNumber", "legalName", "status", "version"),
@@ -43,6 +44,7 @@ class EmployeeCalendarReviewHttpTest : WorkforceAccessApiFixture() {
         val next = get(f.employeeClient, "$path&limit=1&after=${page["nextCursor"].asString()}")
         assertEquals(200, next.statusCode(), next.body())
         val nextPage = json.readTree(next.body())
+        assertTrue(nextPage["bulkRosterSupported"].asBoolean())
         assertTrue(nextPage["nextCursor"].isNull)
         assertEquals(
             setOf(f.employee.toString(), second.toString()),

@@ -73,10 +73,25 @@ or shift eligibility. It never reapplies an older batch over newer roster edits.
 
 ## Client and deployment
 
-The dashboard must retain the original command after an unknown response, keep
-review separate from submission and cancel reads when company/account ownership
-changes. A fresh review is needed after changing a selection. Confirmation shows
-both changed and unchanged dates; a zero-change review cannot be submitted.
+The dashboard opens **Bulk edit roster** from Work calendars. Date-range and
+weekday controls produce explicit dates. Employee search holds one bounded page;
+selection persists across pages up to the 50-employee limit. The visible entry
+count prevents a selection above 200 cells from reaching review. Shift selection
+retains its observed snapshot through search and paging.
+
+Review shows every employee/date's current and proposed schedule, including
+unchanged entries. A reason accompanies the separate save action. A zero-change
+review cannot be submitted. Definite conflicts preserve the input and require
+another preview. An unknown response instead retains the original operation,
+selection, revision and reason for explicit recovery, including through MFA
+renewal and later rejections. No business command is automatically replayed.
+Departures protect pending changes; company/account replacement cancels the
+owner and rejects late responses. Browser drafts are held in memory.
+
+The workforce employee directory advertises `bulkRosterSupported`. An older
+response without that flag maps to unsupported: ordinary calendars remain
+available, while the new entry and bulk employee selection remain hidden.
+This transport capability does not grant read or management permission.
 
 Employee mobile clients consume ordinary `ROSTER_DAYS` changes. Reset compatibility
 must be delivered before enabling reset controls, as described in the

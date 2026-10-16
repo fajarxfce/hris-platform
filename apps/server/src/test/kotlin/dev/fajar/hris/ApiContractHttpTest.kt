@@ -1219,6 +1219,15 @@ class ApiContractHttpTest : PeopleApiFixture() {
         assertEquals(32, parameters.getValue("after")["schema"]["maxLength"].asInt())
         val schemas = api["components"]["schemas"]
         assertEquals(
+            "boolean",
+            schemas["WorkforceEmployeePageResponse"]["properties"]["bulkRosterSupported"]["type"]
+                .asString(),
+        )
+        assertEquals(
+            50,
+            schemas["WorkforceEmployeePageResponse"]["properties"]["items"]["maxItems"].asInt(),
+        )
+        assertEquals(
             setOf("id", "employeeNumber", "legalName", "status", "version"),
             schemas["WorkforceEmployeeResponse"]["properties"].properties().map { it.key }.toSet(),
         )

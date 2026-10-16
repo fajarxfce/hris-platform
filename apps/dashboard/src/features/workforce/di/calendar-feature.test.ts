@@ -288,8 +288,18 @@ describe("work-calendar data boundaries", () => {
     if (accepted.ok) {
       expect(accepted.value.items[0]).not.toHaveProperty("email");
       expect(Object.isFrozen(accepted.value.items)).toBe(true);
+      expect(accepted.value.bulkRosterSupported).toBe(false);
     }
     expect(request.mock.lastCall?.[0].path).toContain("asOf=2026-10-12&query=Employee&limit=50");
+    request.mockResolvedValue({
+      items: [employeeDtoFixture()],
+      nextCursor: null,
+      bulkRosterSupported: true,
+    });
+    expect(await feature.loadWorkforceEmployees.execute(access, search, signal())).toMatchObject({
+      ok: true,
+      value: { bulkRosterSupported: true },
+    });
     for (const dto of [
       { items: [employeeDtoFixture(), employeeDtoFixture()], nextCursor: null },
       { items: [employeeDtoFixture()], nextCursor: "EMP-001" },

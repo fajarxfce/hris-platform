@@ -13,6 +13,7 @@ import { OvertimeActionScreen } from "../bindings/overtime-action-screen";
 import { OvertimePlanScreen } from "../bindings/overtime-plan-screen";
 import { OvertimeRequestScreen } from "../bindings/overtime-request-screen";
 import { OvertimeRequestsScreen } from "../bindings/overtime-requests-screen";
+import { RosterBulkScreen } from "../bindings/roster-bulk-screen";
 import { RosterDayScreen } from "../bindings/roster-day-screen";
 import { ShiftEditorScreen } from "../bindings/shift-editor-screen";
 import { ShiftScreen } from "../bindings/shift-screen";
@@ -59,6 +60,7 @@ export function WorkforceRoutes(props: WorkforceScreenProps) {
         element={<AttendanceEditorScreen {...props} kind="correction" />}
       />
       <Route path="calendars" element={<WorkforceCalendarsScreen {...props} />} />
+      <Route path="calendars/bulk" element={<RosterBulkScreen {...props} />} />
       <Route path="calendars/:employeeId" element={<EmployeeCalendarScreen {...props} />} />
       <Route path="calendars/:employeeId/schedule" element={<WeeklyScheduleScreen {...props} />} />
       <Route

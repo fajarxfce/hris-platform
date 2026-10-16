@@ -4,6 +4,9 @@ import type { CalendarRange } from "../../domain/entities/calendar-range";
 import type { WorkforceEmployeeSearch } from "../../domain/entities/workforce-employee-search";
 
 export const calendarsPath = "/workforce/calendars";
+export const rosterBulkPath = `${calendarsPath}/bulk`;
+export const rosterBulkParameters = (company: CompanyId, from: string): URLSearchParams =>
+  new URLSearchParams({ company, from });
 export const calendarPath = (id: string): string => `${calendarsPath}/${encodeURIComponent(id)}`;
 export function calendarWeekFrom(from: string): CalendarRange {
   if (!isCalendarDate(from)) return { from, until: from };

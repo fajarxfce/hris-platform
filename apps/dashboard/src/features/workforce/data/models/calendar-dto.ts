@@ -22,6 +22,7 @@ export const workforceEmployeeDto = z.object({
 export const workforceEmployeePageDto = z.object({
   items: z.array(workforceEmployeeDto).max(50),
   nextCursor: z.string().min(2).max(32).nullable(),
+  bulkRosterSupported: z.boolean().optional(),
 });
 export const shiftSnapshotDto = z.object({
   id: z.uuid(),

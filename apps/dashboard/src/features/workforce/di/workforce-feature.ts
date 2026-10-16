@@ -11,6 +11,7 @@ import { RemoteHolidayRepository } from "../data/repositories/remote-holiday-rep
 import { RemoteOvertimeRepository } from "../data/repositories/remote-overtime-repository";
 import { RemoteShiftRepository } from "../data/repositories/remote-shift-repository";
 import { RemoteWorkPeriodRepository } from "../data/repositories/remote-work-period-repository";
+import { ApplyRosterBulk } from "../domain/usecases/apply-roster-bulk";
 import { AssignWeeklySchedule } from "../domain/usecases/assign-weekly-schedule";
 import { CloseWorkPeriod } from "../domain/usecases/close-work-period";
 import { CorrectAttendance } from "../domain/usecases/correct-attendance";
@@ -36,6 +37,7 @@ import { ResetRosterDay } from "../domain/usecases/reset-roster-day";
 import { ReviewAttendance } from "../domain/usecases/review-attendance";
 import { ReviewOvertimeAction } from "../domain/usecases/review-overtime-action";
 import { ReviewOvertimePlan } from "../domain/usecases/review-overtime-plan";
+import { ReviewRosterBulk } from "../domain/usecases/review-roster-bulk";
 import { SaveHoliday } from "../domain/usecases/save-holiday";
 import { SaveShift } from "../domain/usecases/save-shift";
 import { SetRosterDay } from "../domain/usecases/set-roster-day";
@@ -71,6 +73,8 @@ export function createWorkforceFeature(http: HttpClient) {
     correctAttendance: new CorrectAttendance(attendance),
     loadWorkforceEmployees: new LoadWorkforceEmployees(calendars),
     loadCalendarReview: new LoadCalendarReview(calendars),
+    reviewRosterBulk: new ReviewRosterBulk(calendars),
+    applyRosterBulk: new ApplyRosterBulk(calendars),
     assignWeeklySchedule: new AssignWeeklySchedule(calendars),
     setRosterDay: new SetRosterDay(calendars),
     resetRosterDay: new ResetRosterDay(calendars),

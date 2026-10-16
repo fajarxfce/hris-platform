@@ -29,9 +29,9 @@ class WorkforceEmployeeController(
         @Parameter(schema = Schema(minimum = "1", maximum = "50"))
         @RequestParam(defaultValue = "50")
         limit: Int,
-    ): Page<WorkforceEmployeeResponse> =
+    ): WorkforceEmployeePageResponse =
         list.execute(actor, asOf, query, after, limit).response().let { page ->
-            Page(page.items.map { it.toResponse() }, page.nextCursor)
+            WorkforceEmployeePageResponse(page.items.map { it.toResponse() }, page.nextCursor)
         }
 
     @GetMapping("/{id}/calendar/review")

@@ -188,6 +188,56 @@ a {
   gap: 24px;
   min-width: 0;
 }
+.app-roster-bulk-date-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.app-roster-bulk-shifts,
+.app-roster-bulk-reason {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+}
+.app-roster-bulk-review {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
+  gap: 24px;
+}
+.app-roster-bulk-selection-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.app-roster-bulk-selected-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 4px 24px;
+  max-height: 16rem;
+  overflow: auto;
+  padding: 0;
+  list-style: none;
+}
+.app-roster-bulk-selected-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+.app-roster-bulk-selection p,
+.app-roster-bulk-reason p {
+  margin: 8px 0;
+}
+@media (max-width: 640px) {
+  .app-roster-bulk-date-fields,
+  .app-roster-bulk-review {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .app-resource-filters {
   display: flex;
   flex-wrap: wrap;
@@ -431,6 +481,11 @@ a {
   grid-template-columns: minmax(0, 1fr);
   gap: 24px;
   margin-top: 24px;
+}
+.app-roster-bulk-fields {
+  width: 100%;
+  max-width: none;
+  margin: 0;
 }
 .app-editor-fields {
   display: grid;

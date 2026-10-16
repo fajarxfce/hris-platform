@@ -31,5 +31,9 @@ export function toWorkforceEmployeePage(
         dto.nextCursor === after))
   )
     throw new InvalidHttpResponseError();
-  return Object.freeze({ items: Object.freeze(items), nextCursor: dto.nextCursor });
+  return Object.freeze({
+    items: Object.freeze(items),
+    nextCursor: dto.nextCursor,
+    bulkRosterSupported: dto.bulkRosterSupported ?? false,
+  });
 }

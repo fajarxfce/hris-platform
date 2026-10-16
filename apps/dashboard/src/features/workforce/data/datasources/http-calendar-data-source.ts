@@ -9,10 +9,41 @@ import {
   type WorkforceEmployeeSearchDto,
   workforceEmployeePageDto,
 } from "../models/calendar-dto";
+import {
+  type RosterBulkApplyDto,
+  type RosterBulkSelectionDto,
+  rosterBulkReviewDto,
+} from "../models/roster-bulk-dto";
 import type { CalendarDataSource } from "./calendar-data-source";
 
 export class HttpCalendarDataSource implements CalendarDataSource {
   constructor(private readonly http: HttpClient) {}
+  async reviewBulk(company: string, body: RosterBulkSelectionDto, signal: AbortSignal) {
+    return rosterBulkReviewDto.parse(
+      await this.http.request(
+        { path: `/api/v1/companies/${company}/workforce/roster/bulk/review`, method: "POST", body },
+        signal,
+      ),
+    );
+  }
+  async applyBulk(
+    company: string,
+    operation: string,
+    body: RosterBulkApplyDto,
+    signal: AbortSignal,
+  ) {
+    return calendarReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/workforce/roster/bulk`,
+          method: "POST",
+          operationId: operation,
+          body,
+        },
+        signal,
+      ),
+    );
+  }
   async employees(company: string, search: WorkforceEmployeeSearchDto, signal: AbortSignal) {
     const query = new URLSearchParams({ asOf: search.asOf, query: search.query, limit: "50" });
     if (search.after !== null) query.set("after", search.after);

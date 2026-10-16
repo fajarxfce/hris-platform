@@ -8,8 +8,24 @@ import type {
   WorkforceEmployeePageDto,
   WorkforceEmployeeSearchDto,
 } from "../models/calendar-dto";
+import type {
+  RosterBulkApplyDto,
+  RosterBulkReviewDto,
+  RosterBulkSelectionDto,
+} from "../models/roster-bulk-dto";
 
 export interface CalendarDataSource {
+  reviewBulk(
+    company: string,
+    selection: RosterBulkSelectionDto,
+    signal: AbortSignal,
+  ): Promise<RosterBulkReviewDto>;
+  applyBulk(
+    company: string,
+    operation: string,
+    body: RosterBulkApplyDto,
+    signal: AbortSignal,
+  ): Promise<CalendarReceiptDto>;
   employees(
     company: string,
     search: WorkforceEmployeeSearchDto,

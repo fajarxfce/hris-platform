@@ -1,5 +1,6 @@
 import { Text } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import type { ReactNode } from "react";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -24,6 +25,7 @@ export function WorkforceEmployeesPage(props: {
   onNext: () => void;
   onOpen: (id: string) => void;
   labels?: Readonly<{ title: string; directory: string; filters: string; view: string }>;
+  actions?: ReactNode;
 }) {
   const { state, filters, locale } = props;
   const text = calendarMessages(locale);
@@ -34,13 +36,16 @@ export function WorkforceEmployeesPage(props: {
         title={heading.title}
         context={props.companyName}
         actions={
-          <AppButton
-            icon={<ArrowClockwise20Regular />}
-            disabled={state.loading}
-            onClick={state.refresh}
-          >
-            {messages(locale).refresh}
-          </AppButton>
+          <>
+            {props.actions}
+            <AppButton
+              icon={<ArrowClockwise20Regular />}
+              disabled={state.loading}
+              onClick={state.refresh}
+            >
+              {messages(locale).refresh}
+            </AppButton>
+          </>
         }
       />
       <form onSubmit={filters.apply} noValidate>

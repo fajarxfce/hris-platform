@@ -607,6 +607,27 @@ conflicts require protected reload; unknown outcomes retain the exact operation
 and payload through MFA renewal and explicit retry. Company changes cancel the
 previous owner and discard its query cache. Browser drafts are not durable storage.
 
+## Bulk roster editing
+
+Work calendars links to `/workforce/calendars/bulk` when the API advertises
+support and the actor holds both calendar permissions. The company-pinned page
+selects explicit employees, a range of at most 31 days and optional weekdays.
+Search and paging retain selected employees; a visible count enforces at most
+50 employees and 200 employee/date entries. Shift, day off and following the
+underlying calendar are distinct instructions.
+
+A separate review displays current and proposed schedules with changed/unchanged
+status, followed by a reasoned save. Unchanged selections cannot be submitted.
+Conflicts preserve the form for another review. An uncertain response pins the
+entire original command through explicit retry and MFA renewal. Verification
+does not replay it. Editing pickers unmount during review and submission, which
+cancels their unused requests; owner replacement suppresses late results.
+
+The Fluent command bar, summary, reason field and resource table retain usable
+actions at narrow widths and enlarged text. Before/after rows scroll horizontally
+when needed. Browser input is not durable offline storage. See the
+[reviewed command contract](roster-bulk.md).
+
 ## Attendance review and corrections
 
 `/workforce/attendance` selects employees without acquiring private profiles.

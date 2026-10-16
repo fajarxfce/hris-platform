@@ -41,7 +41,7 @@ const snapshot = () =>
     periodMonth,
     employeeId as EmployeeId,
   );
-const page = () => ({ items: [snapshot().employee], nextCursor: null });
+const page = () => ({ items: [snapshot().employee], nextCursor: null, bulkRosterSupported: false });
 const clients: QueryClient[] = [];
 afterEach(() => {
   cleanup();

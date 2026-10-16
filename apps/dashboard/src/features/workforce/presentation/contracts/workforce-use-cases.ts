@@ -1,3 +1,4 @@
+import type { ApplyRosterBulk } from "../../domain/usecases/apply-roster-bulk";
 import type { AssignWeeklySchedule } from "../../domain/usecases/assign-weekly-schedule";
 import type { CloseWorkPeriod } from "../../domain/usecases/close-work-period";
 import type { CorrectAttendance } from "../../domain/usecases/correct-attendance";
@@ -23,6 +24,7 @@ import type { ResetRosterDay } from "../../domain/usecases/reset-roster-day";
 import type { ReviewAttendance } from "../../domain/usecases/review-attendance";
 import type { ReviewOvertimeAction } from "../../domain/usecases/review-overtime-action";
 import type { ReviewOvertimePlan } from "../../domain/usecases/review-overtime-plan";
+import type { ReviewRosterBulk } from "../../domain/usecases/review-roster-bulk";
 import type { SaveHoliday } from "../../domain/usecases/save-holiday";
 import type { SaveShift } from "../../domain/usecases/save-shift";
 import type { SetRosterDay } from "../../domain/usecases/set-roster-day";
@@ -30,6 +32,8 @@ import type { SubmitOvertimeActual } from "../../domain/usecases/submit-overtime
 import type { WithdrawOvertimeRequest } from "../../domain/usecases/withdraw-overtime-request";
 
 export type WorkforceUseCases = Readonly<{
+  reviewRosterBulk: Pick<ReviewRosterBulk, "execute">;
+  applyRosterBulk: Pick<ApplyRosterBulk, "execute">;
   loadWorkPeriodOverview: Pick<LoadWorkPeriodOverview, "execute">;
   loadWorkPeriodEmployees: Pick<LoadWorkPeriodEmployees, "execute">;
   loadWorkPeriodSnapshot: Pick<LoadWorkPeriodSnapshot, "execute">;

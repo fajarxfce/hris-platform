@@ -1349,6 +1349,22 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Review the work date, selected shift and reason.",
     "Periksa tanggal kerja, pilihan shift, dan alasan.",
   ],
+  invalid_roster_bulk_selection: [
+    "Select up to 50 employees and 200 entries within 31 days, with a valid schedule.",
+    "Pilih maksimal 50 karyawan dan 200 entri dalam rentang 31 hari, dengan jadwal yang valid.",
+  ],
+  invalid_roster_bulk_change: [
+    "Review the selection and enter a reason before saving.",
+    "Tinjau pilihan dan masukkan alasan sebelum menyimpan.",
+  ],
+  roster_bulk_changed: [
+    "The reviewed employment or schedules changed. Edit the selection and review it again.",
+    "Employment atau jadwal yang ditinjau berubah. Ubah pilihan dan tinjau kembali.",
+  ],
+  roster_bulk_unchanged: [
+    "No roster changes are needed. Review the current selection.",
+    "Tidak ada perubahan roster yang diperlukan. Tinjau pilihan saat ini.",
+  ],
   roster_override_required: [
     "This day already follows the calendar. Reload its current schedule.",
     "Tanggal ini sudah mengikuti kalender. Muat ulang jadwal terbarunya.",

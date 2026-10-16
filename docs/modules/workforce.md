@@ -22,6 +22,8 @@ Administrative selection uses `GET /workforce/employees?asOf=yyyy-MM-dd`, under
 `workforce.read`, with at most 50 employee references per page and bounded search.
 It returns only ID, employee number, legal name, employment status and version.
 The People feature's availability and profile permissions remain independent.
+The page separately advertises `bulkRosterSupported`; this API capability does
+not grant management access. Clients treat its absence on an older API as false.
 
 `GET /workforce/employees/{id}/calendar/review?from=...&until=...` returns that
 reference, the resolved calendar, and the weekly assignment effective at `from`.
@@ -151,7 +153,7 @@ company-wide exception queue adds bounded date/status filters, paginated review
 and links to the independently authorized day view. Resolved pairs leave the
 queue; later pending evidence on a corrected day remains visible for review.
 
-Overtime requests, actual-time submission, independent staged review, withdrawal, and closed-period snapshots are implemented. Reviewed roster reset is implemented in the API, dashboard and mobile sync. The reviewed bulk editing API is implemented and tested. Its dashboard, late payroll adjustments and lifecycle cleanup remain in progress. Accepted attendance totals are factual inputs; they are not a finalized payroll result.
+Overtime requests, actual-time submission, independent staged review, withdrawal, and closed-period snapshots are implemented. Reviewed roster reset is implemented in the API, dashboard and mobile sync. Reviewed bulk editing is implemented and validated in the API and dashboard. Late payroll adjustments and lifecycle cleanup remain in progress. Accepted attendance totals are factual inputs; they are not a finalized payroll result.
 
 ## Monthly attendance closing
 

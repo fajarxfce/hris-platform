@@ -6,6 +6,8 @@ import type { LeaveBatchDetails } from "../../domain/entities/leave-batch-detail
 import type { LeaveBatchReview } from "../../domain/entities/leave-batch-review";
 import type { LeavePolicyTerms } from "../../domain/entities/leave-policy-terms";
 import { leaveBatchMessages } from "../i18n/leave-batch-messages";
+import { leavePolicyMessages } from "../i18n/leave-policy-messages";
+import { leaveCarryValidityText } from "./leave-policy-view";
 export function leaveBatchPeriodLabel(
   period: string,
   kind: LeaveBatch["kind"],
@@ -49,6 +51,10 @@ export function leaveBatchPolicyView(policy: LeavePolicyTerms, locale: Locale) {
       ? [
           { label: text.days, value: number.format(Number(policy.accrual.daysPerPeriod)) },
           { label: text.carryLimit, value: number.format(Number(policy.accrual.carryLimitDays)) },
+          {
+            label: leavePolicyMessages(locale).carryValidity,
+            value: leaveCarryValidityText(policy.accrual.carryValidityMonths, locale),
+          },
         ]
       : []),
     { label: text.serviceMonths, value: number.format(policy.minServiceMonths) },

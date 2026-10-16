@@ -86,10 +86,16 @@ it("editing observes the latest head, preserves its immutable code and detaches 
   const held = deferred<Result<MutationReceipt>>();
   own.save.mockReturnValueOnce(held.promise);
   const contracts: ("PERMANENT" | "FIXED_TERM")[] = ["PERMANENT"];
-  const accrual = { frequency: "MONTHLY" as const, daysPerPeriod: "1.5", carryLimitDays: "3.5" };
+  const accrual = {
+    frequency: "MONTHLY" as const,
+    daysPerPeriod: "1.5",
+    carryLimitDays: "3.5",
+    carryValidityMonths: 3,
+  };
   const saving = own.controller.save({ ...fields, allowedContracts: contracts, accrual });
   contracts.splice(0);
   accrual.daysPerPeriod = "30";
+  accrual.carryValidityMonths = 12;
   await own.controller.save(fields);
   await own.controller.refresh();
   expect(own.save).toHaveBeenCalledTimes(1);
@@ -98,7 +104,7 @@ it("editing observes the latest head, preserves its immutable code and detaches 
     expectedVersion: 23,
     code: "LEAVE001",
     allowedContracts: ["PERMANENT"],
-    accrual: { daysPerPeriod: "1.5" },
+    accrual: { daysPerPeriod: "1.5", carryValidityMonths: 3 },
   });
   held.resolve(success({ id: policy.current.id, version: 24 }));
   await saving;

@@ -15,6 +15,8 @@ const en = {
   codeHint: "Letters, numbers, underscores or hyphens. The code cannot be changed later.",
   accrualHint: "Saving a policy does not post leave balances.",
   daysHint: "Use 0.5 for half a day. Whole-day policies require whole days.",
+  carryValidityHint:
+    "Counted from 1 January of the destination year. Requires a carryover limit greater than zero. Existing awards keep their original deadline.",
   monthlyHint: "0.5–31 days per month.",
   annualHint: "0.5–366 days per year.",
   contracts: "Eligible contracts",
@@ -43,6 +45,8 @@ const id: Record<keyof typeof en, string> = {
     "Huruf, angka, garis bawah, atau tanda hubung. Kode tidak dapat diubah setelah disimpan.",
   accrualHint: "Menyimpan kebijakan tidak menambahkan saldo cuti.",
   daysHint: "Gunakan 0.5 untuk setengah hari. Kebijakan hari penuh memerlukan jumlah hari bulat.",
+  carryValidityHint:
+    "Dihitung sejak 1 Januari pada tahun tujuan. Batas carryover harus lebih dari nol. Saldo yang sudah diberikan tetap mengikuti batas waktu awalnya.",
   monthlyHint: "0.5–31 hari per bulan.",
   annualHint: "0.5–366 hari per tahun.",
   contracts: "Kontrak yang memenuhi syarat",

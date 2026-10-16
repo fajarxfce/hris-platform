@@ -16,6 +16,7 @@ import {
 } from "../i18n/leave-policy-editor-messages";
 import { leavePolicyMessages } from "../i18n/leave-policy-messages";
 import type { LeavePolicyEditorState } from "../models/leave-policy-editor-state";
+import { leaveCarryValidityOptions } from "../models/leave-policy-view";
 
 export function LeavePolicyEditorPage({
   state,
@@ -240,7 +241,24 @@ export function LeavePolicyEditorPage({
                       locale,
                     )}
                   />
+                  <AppSelect
+                    label={policy.carryValidity}
+                    {...form.carryValidityMonths}
+                    disabled={!form.editable}
+                    aria-describedby="leave-carry-validity-hint"
+                    error={leavePolicyFieldError(
+                      state.failure?.fields["accrual.carryValidityMonths"],
+                      locale,
+                    )}
+                  >
+                    {leaveCarryValidityOptions(locale).map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </AppSelect>
                 </div>
+                <p id="leave-carry-validity-hint">{text.carryValidityHint}</p>
               </>
             )}
             <AppTextField

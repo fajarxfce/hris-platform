@@ -6,6 +6,32 @@ import type { LeavePolicyTerms } from "../../domain/entities/leave-policy-terms"
 import { leaveMessages } from "../i18n/leave-messages";
 import { leavePolicyMessages } from "../i18n/leave-policy-messages";
 
+export function leaveCarryValidityText(months: number | null, locale: Locale): string {
+  const text = leavePolicyMessages(locale);
+  return months === null
+    ? text.noCarryExpiry
+    : text.carryFromJanuary.replace(
+        "{duration}",
+        new Intl.NumberFormat(locale, { style: "unit", unit: "month", unitDisplay: "long" }).format(
+          months,
+        ),
+      );
+}
+export function leaveCarryValidityOptions(locale: Locale) {
+  const number = new Intl.NumberFormat(locale, {
+    style: "unit",
+    unit: "month",
+    unitDisplay: "long",
+  });
+  return [
+    { value: "", label: leavePolicyMessages(locale).noCarryExpiry },
+    ...Array.from({ length: 12 }, (_, index) => ({
+      value: String(index + 1),
+      label: number.format(index + 1),
+    })),
+  ];
+}
+
 export function leavePolicyTermsView(policy: LeavePolicyTerms, locale: Locale) {
   const text = leaveMessages(locale);
   const own = leavePolicyMessages(locale);
@@ -23,6 +49,10 @@ export function leavePolicyTermsView(policy: LeavePolicyTerms, locale: Locale) {
       ? [
           { label: own.perPeriod, value: number.format(Number(policy.accrual.daysPerPeriod)) },
           { label: own.carryLimit, value: number.format(Number(policy.accrual.carryLimitDays)) },
+          {
+            label: own.carryValidity,
+            value: leaveCarryValidityText(policy.accrual.carryValidityMonths, locale),
+          },
         ]
       : []),
   ];

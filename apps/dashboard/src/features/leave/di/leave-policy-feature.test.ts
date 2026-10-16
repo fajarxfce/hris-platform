@@ -255,3 +255,69 @@ describe("administrative leave policy boundary", () => {
     await expect(result).rejects.toMatchObject({ name: "AbortError" });
   });
 });
+
+it("reads legacy omitted validity and keeps distinct immutable current and historical deadlines", async () => {
+  const raw = leavePolicyRecord(0, 1, 2);
+  const request = vi.fn<HttpClient["request"]>().mockResolvedValue(raw);
+  const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
+  for (const row of [raw.current, ...raw.history.items]) {
+    if (row.accrual) Reflect.deleteProperty(row.accrual, "carryValidityMonths");
+  }
+  const legacy = await feature.loadPolicy.execute(access, raw.current.id, null, signal());
+  expect(legacy).toMatchObject({
+    ok: true,
+    value: { current: { accrual: { carryValidityMonths: null } } },
+  });
+  if (!raw.current.accrual || !newest(raw).accrual) throw new Error("Missing accrual fixture");
+  raw.current.accrual.carryValidityMonths = 12;
+  for (const row of raw.history.items) if (row.accrual) row.accrual.carryValidityMonths = 1;
+  const finite = await feature.loadPolicy.execute(access, raw.current.id, null, signal());
+  expect(finite).toMatchObject({
+    ok: true,
+    value: { current: { accrual: { carryValidityMonths: 12 } } },
+  });
+  raw.current.accrual.carryValidityMonths = 3;
+  if (!finite.ok) throw new Error("Expected retained policy");
+  expect(finite.value.current.accrual?.carryValidityMonths).toBe(12);
+  expect(finite.value.history.items.map((row) => row.accrual?.carryValidityMonths)).toEqual([
+    1, 1, 1,
+  ]);
+  expect(Object.isFrozen(finite.value.current.accrual)).toBe(true);
+});
+it.each([-1, 0, 13, 1.5, "3"])(
+  "maps malformed validity %s to a safe response failure",
+  async (months) => {
+    const raw = leavePolicyRecord(0, 1, 2);
+    const request = vi.fn<HttpClient["request"]>().mockResolvedValue({
+      ...raw,
+      current: {
+        ...raw.current,
+        accrual: { ...raw.current.accrual, carryValidityMonths: months },
+      },
+    });
+    const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
+    expect(await feature.loadPolicy.execute(access, raw.current.id, null, signal())).toMatchObject({
+      ok: false,
+      failure: { code: "invalid_response" },
+    });
+  },
+);
+it("rejects a deadline whose response has no carried allowance", async () => {
+  const raw = leavePolicyRecord(0, 1, 2);
+  const feature = createLeaveFeature(
+    {
+      request: vi.fn().mockResolvedValue({
+        ...raw,
+        current: {
+          ...raw.current,
+          accrual: { ...raw.current.accrual, carryLimitDays: "0", carryValidityMonths: 3 },
+        },
+      }),
+    },
+    { downloadBinary: vi.fn() },
+  );
+  expect(await feature.loadPolicy.execute(access, raw.current.id, null, signal())).toMatchObject({
+    ok: false,
+    failure: { code: "invalid_response" },
+  });
+});

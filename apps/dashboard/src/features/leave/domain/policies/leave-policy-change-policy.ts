@@ -15,6 +15,7 @@ export function normalizeLeavePolicyChange(input: LeavePolicyChange): LeavePolic
     accrual: input.accrual
       ? Object.freeze({
           ...input.accrual,
+          carryValidityMonths: input.accrual.carryValidityMonths ?? null,
           daysPerPeriod: input.accrual.daysPerPeriod.trim().replace(/\.0$/u, ""),
           carryLimitDays: input.accrual.carryLimitDays.trim().replace(/\.0$/u, ""),
         })
@@ -82,6 +83,9 @@ export function validateLeavePolicyChange(input: LeavePolicyChange): Failure | n
     (!input.allowPartialDays && !Number.isInteger(carry))
   )
     fields["accrual.carryLimitDays"] = "out_of_range";
+  const months = accrual.carryValidityMonths;
+  if (months !== null && (!Number.isInteger(months) || months < 1 || months > 12 || carry <= 0))
+    fields["accrual.carryValidityMonths"] = "out_of_range";
   return Object.keys(fields).length
     ? { code: "invalid_leave_accrual_policy", fields, parameters: {} }
     : null;

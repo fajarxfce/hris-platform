@@ -438,10 +438,13 @@ a {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
+.app-text-field,
+.app-text-field .fui-Input,
 .app-text-area-field,
 .app-text-area-field .fui-Textarea {
   min-width: 0;
 }
+.app-text-field input,
 .app-text-area-field textarea {
   min-width: 0;
   width: 100%;

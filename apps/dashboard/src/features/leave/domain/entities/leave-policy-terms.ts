@@ -10,5 +10,6 @@ export type LeavePolicyTerms = Readonly<{
     frequency: "MANUAL" | "MONTHLY" | "ANNUAL";
     daysPerPeriod: string;
     carryLimitDays: string;
+    carryValidityMonths: number | null;
   }> | null;
 }>;

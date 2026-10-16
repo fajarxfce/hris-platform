@@ -19,7 +19,12 @@ export function leavePolicyRecord(company = 0, number = 1, version = 0): LeavePo
     allowedContracts: ["PERMANENT", "FIXED_TERM"],
     maxRequestDays: 14,
     attachmentRequired: true,
-    accrual: { frequency: "MONTHLY", daysPerPeriod: "1.5", carryLimitDays: "3.5" },
+    accrual: {
+      frequency: "MONTHLY",
+      daysPerPeriod: "1.5",
+      carryLimitDays: "3.5",
+      carryValidityMonths: null,
+    },
     active: number !== 1,
     effectiveFrom: version > 0 ? "2027-01-01" : "2026-01-01",
     version,

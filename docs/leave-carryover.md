@@ -4,8 +4,8 @@ Status: accounting, request transitions, adjustments, year closing, the durable
 expiry worker, scoped history and terminal recovery are implemented and tested
 across the API, dashboard and mobile read views. New public closings create tracked
 awards; absent validity still means no additional expiry. The API accepts optional
-validity configuration. Dashboard policy editing and native acceptance of finite
-awards are the remaining integration steps.
+validity configuration, exposed in dashboard policy editing and processing review.
+Native acceptance covers finite awards and an offline in-place upgrade.
 
 ## Contract
 
@@ -360,10 +360,32 @@ January/December bounds, invalid configuration, fractional input, absent metadat
 and late closing. Architecture, formatting and both application JAR builds passed;
 the previously validated 71 worker tests remained up to date.
 
-## Remaining integration
+## Dashboard and native acceptance
 
-- Validate finite carry awards in the Android emulator, including an offline upgrade.
-- Add optional validity to dashboard policy editing and processing review.
+The policy form supports optional validity, with local domain validation for whole
+months and a positive carry limit. Current policies, historical revisions and
+processing reviews retain the value. Uncertain saves preserve that same immutable
+input through account verification and later conflicts. Earlier responses without
+the field remain readable as policies without an additional deadline.
+
+Dashboard architecture, formatting, types and all 3,352 unit tests passed. Fifty
+Chromium scenarios and the production build passed. At 390 pixels, Indonesian dark
+mode and 200% text retained the draft without horizontal page overflow; the screenshot
+was inspected. Shared text fields now shrink with their containing form. Existing
+bundle-size and CSS specificity warnings remain.
+
+An isolated API/PostgreSQL/worker browser scenario configured twelve months in the
+editor, recovered an accrual response loss, and closed the prior year with one carry
+credit. Changing the current policy to three months preserved that award's original
+December date, queued expiry obligation and retained processing snapshot.
+
+An API 35 emulator acquired a finite award with the preceding APK, then upgraded
+without API access. Existing ciphertexts and the 5.5-day total remained readable.
+Reconnection hydrated the included 3.5-day carry award without changing ledger
+versions. Another offline cold start retained the new records and original date;
+200% text remained readable, and no HRIS crash records were present. See
+[native acceptance](https://github.com/fajarxfce/hris-mobile/blob/main/docs/validation.md#android-carried-balance-upgrade-acceptance).
+The temporary fixture and emulator were stopped with AVD data preserved.
 
 The optional-policy API is deployed to development. Its running JAR matches the
 validated build; API health returned 200 on loopback and the WireGuard interface

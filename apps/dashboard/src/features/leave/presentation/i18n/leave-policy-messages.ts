@@ -37,6 +37,9 @@ const en = {
   noAccrual: "Not configured",
   perPeriod: "Days per period",
   carryLimit: "Carryover limit (days)",
+  carryValidity: "Carryover validity",
+  noCarryExpiry: "No additional deadline",
+  carryFromJanuary: "{duration} from 1 January",
   choose: "Select a revision to review its terms.",
 } as const;
 const id: Record<keyof typeof en, string> = {
@@ -76,6 +79,9 @@ const id: Record<keyof typeof en, string> = {
   noAccrual: "Belum diatur",
   perPeriod: "Hari per periode",
   carryLimit: "Batas carryover (hari)",
+  carryValidity: "Masa berlaku carryover",
+  noCarryExpiry: "Tanpa batas waktu tambahan",
+  carryFromJanuary: "{duration} sejak 1 Januari",
   choose: "Pilih revisi untuk melihat ketentuannya.",
 };
 export const leavePolicyMessages = (locale: Locale): Readonly<Record<keyof typeof en, string>> =>

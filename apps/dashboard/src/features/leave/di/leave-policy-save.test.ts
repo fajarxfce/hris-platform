@@ -24,7 +24,12 @@ const change: LeavePolicyChange = {
   attachmentRequired: true,
   expectedVersion: null,
   reason: "Annual policy review",
-  accrual: { frequency: "MONTHLY", daysPerPeriod: "1.5", carryLimitDays: "3.5" },
+  accrual: {
+    frequency: "MONTHLY",
+    daysPerPeriod: "1.5",
+    carryLimitDays: "3.5",
+    carryValidityMonths: null,
+  },
 };
 
 it("normalizes one scoped policy command with exact observed version and decimal strings", async () => {
@@ -41,7 +46,12 @@ it("normalizes one scoped policy command with exact observed version and decimal
       code: " annual ",
       name: " Annual leave ",
       reason: " Annual policy review ",
-      accrual: { frequency: "ANNUAL", daysPerPeriod: "12.0", carryLimitDays: "3.5" },
+      accrual: {
+        frequency: "ANNUAL",
+        daysPerPeriod: "12.0",
+        carryLimitDays: "3.5",
+        carryValidityMonths: null,
+      },
     },
     signal(),
   );
@@ -63,7 +73,12 @@ it("normalizes one scoped policy command with exact observed version and decimal
       attachmentRequired: true,
       expectedVersion: null,
       reason: "Annual policy review",
-      accrual: { frequency: "ANNUAL", daysPerPeriod: "12", carryLimitDays: "3.5" },
+      accrual: {
+        frequency: "ANNUAL",
+        daysPerPeriod: "12",
+        carryLimitDays: "3.5",
+        carryValidityMonths: null,
+      },
     },
   });
   request.mockResolvedValue({ id: change.id, version: 24 });
@@ -112,22 +127,50 @@ it.each<[string, Partial<LeavePolicyChange>, string]>([
   ["version overflow", { expectedVersion: Number.MAX_SAFE_INTEGER }, "expectedVersion"],
   [
     "monthly excess",
-    { accrual: { frequency: "MONTHLY", daysPerPeriod: "31.5", carryLimitDays: "0" } },
+    {
+      accrual: {
+        frequency: "MONTHLY",
+        daysPerPeriod: "31.5",
+        carryLimitDays: "0",
+        carryValidityMonths: null,
+      },
+    },
     "accrual.daysPerPeriod",
   ],
   [
     "quarter day",
-    { accrual: { frequency: "MONTHLY", daysPerPeriod: "1.25", carryLimitDays: "0" } },
+    {
+      accrual: {
+        frequency: "MONTHLY",
+        daysPerPeriod: "1.25",
+        carryLimitDays: "0",
+        carryValidityMonths: null,
+      },
+    },
     "accrual.daysPerPeriod",
   ],
   [
     "manual allowance",
-    { accrual: { frequency: "MANUAL", daysPerPeriod: "1", carryLimitDays: "0" } },
+    {
+      accrual: {
+        frequency: "MANUAL",
+        daysPerPeriod: "1",
+        carryLimitDays: "0",
+        carryValidityMonths: null,
+      },
+    },
     "accrual.daysPerPeriod",
   ],
   [
     "zero annual allowance",
-    { accrual: { frequency: "ANNUAL", daysPerPeriod: "0", carryLimitDays: "0" } },
+    {
+      accrual: {
+        frequency: "ANNUAL",
+        daysPerPeriod: "0",
+        carryLimitDays: "0",
+        carryValidityMonths: null,
+      },
+    },
     "accrual.daysPerPeriod",
   ],
   ["whole-day entitlement", { allowPartialDays: false }, "accrual.daysPerPeriod"],
@@ -135,13 +178,25 @@ it.each<[string, Partial<LeavePolicyChange>, string]>([
     "whole-day carry",
     {
       allowPartialDays: false,
-      accrual: { frequency: "ANNUAL", daysPerPeriod: "12", carryLimitDays: "0.5" },
+      accrual: {
+        frequency: "ANNUAL",
+        daysPerPeriod: "12",
+        carryLimitDays: "0.5",
+        carryValidityMonths: null,
+      },
     },
     "accrual.carryLimitDays",
   ],
   [
     "carry excess",
-    { accrual: { frequency: "ANNUAL", daysPerPeriod: "12", carryLimitDays: "367" } },
+    {
+      accrual: {
+        frequency: "ANNUAL",
+        daysPerPeriod: "12",
+        carryLimitDays: "367",
+        carryValidityMonths: null,
+      },
+    },
     "accrual.carryLimitDays",
   ],
 ])("rejects %s before I/O with a field failure", async (_, fields, field) => {
@@ -203,3 +258,85 @@ it("preserves server validation and propagates cancellation after a pending save
   resolve({ id: change.id, version: 0 });
   await expect(saved).rejects.toMatchObject({ name: "AbortError" });
 });
+
+it.each([-1, 0, 13, 1.5, Number.NaN, Number.POSITIVE_INFINITY])(
+  "rejects invalid carry validity %s before transport",
+  async (months) => {
+    const request = vi.fn<HttpClient["request"]>();
+    const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
+    expect(
+      await feature.savePolicy.execute(
+        access,
+        operation,
+        {
+          ...change,
+          accrual: {
+            frequency: "MANUAL",
+            daysPerPeriod: "0",
+            carryLimitDays: "3.5",
+            carryValidityMonths: months,
+          },
+        },
+        signal(),
+      ),
+    ).toMatchObject({
+      ok: false,
+      failure: {
+        code: "invalid_leave_accrual_policy",
+        fields: { "accrual.carryValidityMonths": "out_of_range" },
+      },
+    });
+    expect(request).not.toHaveBeenCalled();
+  },
+);
+it("does not admit a finite deadline without a positive carry limit", async () => {
+  const request = vi.fn<HttpClient["request"]>();
+  const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
+  expect(
+    await feature.savePolicy.execute(
+      access,
+      operation,
+      {
+        ...change,
+        accrual: {
+          frequency: "MANUAL",
+          daysPerPeriod: "0",
+          carryLimitDays: "0",
+          carryValidityMonths: 3,
+        },
+      },
+      signal(),
+    ),
+  ).toMatchObject({
+    ok: false,
+    failure: { fields: { "accrual.carryValidityMonths": "out_of_range" } },
+  });
+  expect(request).not.toHaveBeenCalled();
+});
+it.each([null, 1, 12])(
+  "delivers exact optional validity %s in the original command",
+  async (months) => {
+    const request = vi.fn<HttpClient["request"]>().mockResolvedValue({ id: change.id, version: 0 });
+    const feature = createLeaveFeature({ request }, { downloadBinary: vi.fn() });
+    const result = await feature.savePolicy.execute(
+      access,
+      operation,
+      {
+        ...change,
+        accrual: {
+          frequency: "MANUAL",
+          daysPerPeriod: "0",
+          carryLimitDays: "0.5",
+          carryValidityMonths: months,
+        },
+      },
+      signal(),
+    );
+    expect(result.ok).toBe(true);
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request.mock.lastCall?.[0]).toMatchObject({
+      operationId: operation,
+      body: { accrual: { carryValidityMonths: months } },
+    });
+  },
+);

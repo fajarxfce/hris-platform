@@ -22,6 +22,13 @@ const terms = z.object({
       frequency: z.enum(["MANUAL", "MONTHLY", "ANNUAL"]),
       daysPerPeriod: days,
       carryLimitDays: days,
+      carryValidityMonths: z
+        .number()
+        .int()
+        .min(1)
+        .max(12)
+        .nullish()
+        .transform((value) => value ?? null),
     })
     .nullable(),
   active: z.boolean(),

@@ -31,6 +31,7 @@ export function useLeavePolicyForm(
   const frequency = useController({ name: "frequency", control: form.control });
   const daysPerPeriod = useController({ name: "daysPerPeriod", control: form.control });
   const carryLimitDays = useController({ name: "carryLimitDays", control: form.control });
+  const carryValidityMonths = useController({ name: "carryValidityMonths", control: form.control });
   const depart = useNavigationProtection(
     state.stage === "saving"
       ? "pending"
@@ -56,6 +57,7 @@ export function useLeavePolicyForm(
     frequency: frequency.field,
     daysPerPeriod: daysPerPeriod.field,
     carryLimitDays: carryLimitDays.field,
+    carryValidityMonths: carryValidityMonths.field,
     editable: state.stage === "editing",
     submit: form.handleSubmit((input) => controller.save(leavePolicyFields(input))),
     refresh: () =>

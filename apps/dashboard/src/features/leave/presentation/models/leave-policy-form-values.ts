@@ -17,6 +17,7 @@ export type LeavePolicyFormValues = {
   frequency: "NONE" | "MANUAL" | "MONTHLY" | "ANNUAL";
   daysPerPeriod: string;
   carryLimitDays: string;
+  carryValidityMonths: string;
 };
 export function leavePolicyFormValues(
   policy: LeavePolicyDefinition | null,
@@ -38,6 +39,7 @@ export function leavePolicyFormValues(
     frequency: policy?.accrual?.frequency ?? "NONE",
     daysPerPeriod: policy?.accrual?.daysPerPeriod ?? "",
     carryLimitDays: policy?.accrual?.carryLimitDays ?? "0",
+    carryValidityMonths: String(policy?.accrual?.carryValidityMonths ?? ""),
   };
 }
 export function leavePolicyFields(values: LeavePolicyFormValues): LeavePolicyFields {
@@ -67,6 +69,12 @@ export function leavePolicyFields(values: LeavePolicyFormValues): LeavePolicyFie
             frequency: values.frequency,
             daysPerPeriod: values.frequency === "MANUAL" ? "0" : values.daysPerPeriod,
             carryLimitDays: values.carryLimitDays,
+            carryValidityMonths:
+              values.carryValidityMonths === ""
+                ? null
+                : /^\d{1,2}$/u.test(values.carryValidityMonths)
+                  ? Number(values.carryValidityMonths)
+                  : Number.NaN,
           },
   };
 }

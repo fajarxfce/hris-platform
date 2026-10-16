@@ -15,5 +15,6 @@ export type LeavePolicyChangeDto = Readonly<{
     frequency: "MANUAL" | "MONTHLY" | "ANNUAL";
     daysPerPeriod: string;
     carryLimitDays: string;
+    carryValidityMonths: number | null;
   }> | null;
 }>;

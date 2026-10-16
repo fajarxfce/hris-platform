@@ -13,6 +13,7 @@ export const AppTextField = forwardRef<HTMLInputElement, Props>(function AppText
 ) {
   return (
     <Field
+      className="app-text-field"
       label={label}
       validationState={error ? "error" : "none"}
       validationMessage={error ?? null}

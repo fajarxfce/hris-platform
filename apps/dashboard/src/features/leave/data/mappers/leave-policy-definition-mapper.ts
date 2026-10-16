@@ -19,6 +19,12 @@ export function toLeavePolicyTerms(
 ): LeavePolicyTerms {
   if (new Set(raw.allowedContracts).size !== raw.allowedContracts.length)
     throw new InvalidHttpResponseError();
+  if (
+    raw.accrual &&
+    raw.accrual.carryValidityMonths !== null &&
+    Number(raw.accrual.carryLimitDays) <= 0
+  )
+    throw new InvalidHttpResponseError();
   return Object.freeze({
     name: raw.name,
     paid: raw.paid,

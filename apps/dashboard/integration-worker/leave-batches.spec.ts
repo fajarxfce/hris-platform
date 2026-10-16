@@ -75,6 +75,12 @@ test("reviewed accrual and year closing preserve one posting across response los
   });
   expect(policy.status()).toBe(200);
   await policy.dispose();
+  await page.goto(`/leave/policies/${type}/edit?company=${company}`);
+  await expect(page.getByLabel("Carryover validity", { exact: true })).toHaveValue("");
+  await page.getByLabel("Carryover validity", { exact: true }).selectOption("12");
+  await page.getByLabel("Reason", { exact: true }).fill("Carryover validity reviewed");
+  await page.getByRole("button", { name: "Save policy", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Policy saved.");
   const writes: { operation: string; body: unknown }[] = [];
   let lose = true;
   await page.route(`**${base}/leave/accrual-batches`, async (route) => {
@@ -172,6 +178,9 @@ test("reviewed accrual and year closing preserve one posting across response los
     .click();
   await page.getByLabel("Leave year", { exact: true }).fill(String(year));
   await page.getByRole("button", { name: "Review selection", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Applied policy", exact: true })).toContainText(
+    "12 months from 1 January",
+  );
   await page.getByLabel("Reason", { exact: true }).fill("Year-end carryover reviewed");
   const posted = page.waitForResponse(
     (response) =>
@@ -215,8 +224,46 @@ test("reviewed accrual and year closing preserve one posting across response los
   await sourceResponse.dispose();
   await destinationResponse.dispose();
   expect(source.balance).toMatchObject({ availableDays: "0", closed: true });
-  expect(destination.balance).toMatchObject({ availableDays: "1", closed: false });
+  expect(destination.balance).toMatchObject({
+    availableDays: "1",
+    closed: false,
+    carry: {
+      awardedDays: "1",
+      availableDays: "1",
+      validThrough: `${year + 1}-12-31`,
+      expiresAt: `${year + 1}-12-31T17:00:00Z`,
+      timezone: "Asia/Jakarta",
+    },
+  });
   expect(source.entries.items.filter((entry) => entry.kind === "GRANT")).toHaveLength(1);
   expect(source.entries.items.filter((entry) => entry.kind === "CARRY_OUT")).toHaveLength(1);
+  await page.goto(`/leave/policies/${type}/edit?company=${company}`);
+  await page.getByLabel("Carryover validity", { exact: true }).selectOption("3");
+  await page.getByLabel("Reason", { exact: true }).fill("Revised validity for future awards");
+  await page.getByRole("button", { name: "Save policy", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Policy saved.");
+  const retained = await context.request.get(
+    `${base}/leave/employees/${eligible}/balances/${type}/${year + 1}`,
+  );
+  expect(retained.status()).toBe(200);
+  expect(((await retained.json()) as LeaveLedgerDto).balance).toEqual(destination.balance);
+  await retained.dispose();
+  const expiry = await context.request.get(`${base}/leave/carry-expiries`);
+  expect(expiry.status()).toBe(200);
+  const obligations = (await expiry.json()).items;
+  expect(obligations).toHaveLength(1);
+  expect(obligations[0]).toMatchObject({
+    expiresAt: `${year + 1}-12-31T17:00:00Z`,
+    status: "QUEUED",
+  });
+  await expiry.dispose();
+  await page.goto(`/leave/batches/${closingId}?company=${company}`);
+  await page
+    .locator("summary")
+    .filter({ hasText: /^Applied policy$/u })
+    .click();
+  await expect(page.getByRole("region", { name: "Applied policy", exact: true })).toContainText(
+    "12 months from 1 January",
+  );
   expect(destination.entries.items.filter((entry) => entry.kind === "CARRY_IN")).toHaveLength(1);
 });

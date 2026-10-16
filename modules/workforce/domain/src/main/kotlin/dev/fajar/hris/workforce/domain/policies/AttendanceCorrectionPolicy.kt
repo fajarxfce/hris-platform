@@ -3,7 +3,6 @@ package dev.fajar.hris.workforce.domain.policies
 import dev.fajar.hris.core.domain.*
 import java.time.*
 import java.time.temporal.ChronoUnit
-import kotlin.math.abs
 
 fun validateAttendanceCorrection(
     date: LocalDate,
@@ -24,6 +23,7 @@ fun validateAttendanceCorrection(
         return if (breakMinutes == 0) Result.Success(Unit)
         else Result.Failed(Failure(FailureKind.VALIDATION, "invalid_attendance_correction"))
     val duration = Duration.between(clockIn, clockOut)
+    val dateStart = date.atStartOfDay(ZoneOffset.UTC).toInstant()
     if (
         duration.isNegative ||
             duration.isZero ||
@@ -32,7 +32,8 @@ fun validateAttendanceCorrection(
             clockIn != clockIn.truncatedTo(ChronoUnit.MINUTES) ||
             clockOut != clockOut.truncatedTo(ChronoUnit.MINUTES) ||
             clockOut.isAfter(at.plusSeconds(30)) ||
-            abs(ChronoUnit.DAYS.between(date, clockIn.atOffset(ZoneOffset.UTC).toLocalDate())) > 2
+            clockIn.isBefore(dateStart.minus(Duration.ofDays(2))) ||
+            !clockIn.isBefore(dateStart.plus(Duration.ofDays(3)))
     )
         return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_attendance_correction"))
     return Result.Success(Unit)

@@ -152,6 +152,16 @@ after acquisition and before returning private results or completing a write.
 A late failure rolls back period/job changes, targets, journal and receipt together.
 Background closing retains its separate initiating-credential and lease authority.
 
+Closed attendance adjustments retain a separate, append-only employee snapshot
+revision. Their use cases coordinate period, attendance, correction and adjustment
+repositories; public pure policies compare observed sources and replace one day.
+The existing exclusive month guard serializes revisions across different dates.
+Reviews, correction, snapshot, journal, receipt and daily sync capture commit
+together, while the original closing remains immutable. Reads and commands retain
+current scope and assurance through acquisition and completion. See
+[late attendance corrections](attendance-adjustments.md) for the contract and
+remaining payroll/dashboard integration.
+
 Payroll policy review holds the shared company payroll guard before company,
 membership and account guards. Current configuration, the selected month's
 effective policy and bounded revision history remain coherent under concurrent

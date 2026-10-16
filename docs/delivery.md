@@ -48,6 +48,28 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Closed attendance adjustment API
+
+HR can review and correct one day in a closed month without replacing the original
+closing. The command explicitly verifies every pending capture, appends an
+attendance correction and a monthly employee snapshot revision, and publishes the
+daily sync changes in the same transaction as its audit and receipt. Exact retained
+revisions and bounded history are available under current Workforce read scope.
+Omitted time fields are rejected; an absence explicitly supplies two null times.
+
+All 140 selected API/PostgreSQL cases, 61 Workforce domain tests and 81 worker tests
+passed across the affected suites. The adjustment coverage adds 40 API scenarios
+and eight domain tests for source integrity, original evidence, competing days,
+duplicate delivery, original-command recovery, explicit verification, independent
+ownership, current authority/MFA, cancellation and complete rollback. Formatting,
+architecture and both application JARs passed. Initial failures were nullable
+fixture return types and the OpenAPI size bound; the shared-response change keeps
+the compact description near 1.14 MB, with all 53 contract tests passing.
+
+Payroll source selection, the dashboard review workflow and native acceptance
+remain in progress. No development migration or phone installation is claimed for
+this increment.
+
 ### Account app-session administration dashboard
 
 Platform account details now link to a scoped app-session review. Its confirmation

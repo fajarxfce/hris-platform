@@ -17,6 +17,14 @@ class StoredWorkPeriodRepository(
     private val source: WorkPeriodDataSource,
     private val json: ObjectMapper,
 ) : WorkPeriodRepository {
+    override fun lockExisting(
+        companyId: UUID,
+        month: YearMonth,
+        exclusive: Boolean,
+    ): Result<WorkPeriod?> = safeDatabaseCall {
+        source.find(companyId, month.atDay(1), if (exclusive) "UPDATE" else "SHARE")?.toPeriod()
+    }
+
     override fun lockMonth(
         companyId: UUID,
         month: YearMonth,

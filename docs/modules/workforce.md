@@ -139,7 +139,7 @@ continuation. Pages are live observations, not a frozen export or action approva
 The subsequent day read and review/correction command authorize independently.
 Locations, devices, personal profiles and raw evidence are not returned here.
 
-HR corrections are implemented as immutable revisions with optimistic versions and required reasons. They retain original evidence and snapshots, expose a paginated history, and prohibit self-correction. Pending evidence must be resolved first. Later punches on a corrected day remain pending and cannot overwrite the correction; reviewers can reject that evidence or HR can publish another explicit correction. An explicit absence has null clock-in/out and zero break minutes.
+In a mutable period, HR corrections are immutable revisions with optimistic versions and required reasons. They retain original evidence and snapshots, expose a paginated history, and prohibit self-correction. Pending evidence must be resolved first. Later punches on a corrected day remain pending and cannot overwrite the correction; reviewers can reject that evidence or HR can publish another explicit correction. An explicit absence has null clock-in/out and zero break minutes.
 
 The dashboard now exposes bounded employee attendance, daily capture evidence,
 independent review, and versioned corrections in the company timezone. Unknown
@@ -161,7 +161,7 @@ Overtime requests, actual-time submission, independent staged review, withdrawal
 
 Each employee produces an immutable monthly snapshot, committed with its fenced checkpoint. Pending evidence recorded before this attempt and incomplete accepted pairs block closing. Facts distinguish worked time, explicitly corrected absence, unrecorded scheduled days, off days, and missing schedules. A missing record never automatically becomes a paid absence. The final transaction publishes the closed period, successful job, and audit/outbox together.
 
-Attendance commands hold a shared month lock before their employee/day lock. Starting closing takes the exclusive month lock. Roster and holiday changes also honor the month gate; weekly assignments cannot rewrite a locked month. Moving a holiday checks both dates. Raw late attendance remains pending and is stamped with the current closing job ID. Current-attempt late evidence does not change the snapshot. Evidence from an earlier failed attempt must be resolved before another close can succeed. Closed-period late evidence may be rejected, but accepting it or modifying factual totals requires a future explicit adjustment workflow.
+Attendance commands hold a shared month lock before their employee/day lock. Starting closing takes the exclusive month lock. Roster and holiday changes also honor the month gate; weekly assignments cannot rewrite a locked month. Moving a holiday checks both dates. Raw late attendance remains pending and is stamped with the current closing job ID. Current-attempt late evidence does not change the snapshot. Evidence from an earlier failed attempt must be resolved before another close can succeed. Closed-period late evidence may be rejected through ordinary verification. Accepting it or correcting factual totals uses the separate adjustment contract below.
 
 Cancellation and permanent failure leave the month in `REVIEW_REQUIRED`. Transient failures retain checkpoints for bounded retry. If a worker repeatedly crashes until its job exhausts all attempts, the period remains frozen until an authorized `POST /workforce/periods/{yyyy-MM}/recover` verifies that the job has stopped. A new close creates another attempt; old snapshots are retained. Worker steps re-resolve the initiating account's current credentials and company permission; fenced cleanup remains possible after revocation.
 
@@ -196,8 +196,27 @@ Dashboard contracts validate period/attempt consistency, complete monthly result
 and immutable calendar evidence. Employee discovery reuses the shared reference
 page mapper, which only needs its observed cursor. Closing/recovery commands pin
 the original month, period version, reason and operation; explicit retry performs
-no fresh read or current-clock check. New form and monitoring views remain the
-next dashboard increment.
+no fresh read or current-clock check. The dashboard includes closing, monitoring,
+stopped-attempt recovery and published employee results.
+
+## Closed attendance adjustments
+
+The [adjustment API](../attendance-adjustments.md) reviews one closed day and
+requires explicit corrected times or absence, a reason, and a decision for every
+pending capture. It retains original evidence and the closing snapshot while
+appending a new employee snapshot revision. Different dates share the same ordered
+monthly revision; stale reviews cannot overwrite a concurrent correction.
+
+Event verification, the correction, revision, journal, receipt and daily mobile
+sync changes commit atomically. Self-correction and self-verification are denied;
+current company/team authority and MFA remain required through completion and
+receipt recovery. Exact revisions and bounded history retain the existing
+Workforce read scopes.
+
+Targeted API/PostgreSQL, domain, worker, contract and build checks passed. Explicit
+payroll source selection, the dashboard adjustment workflow and native acceptance
+remain in progress. Existing payroll calculations continue to use their original
+frozen sources.
 
 
 ## Overtime requests

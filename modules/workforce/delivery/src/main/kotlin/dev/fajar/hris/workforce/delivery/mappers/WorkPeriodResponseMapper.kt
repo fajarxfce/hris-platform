@@ -20,17 +20,18 @@ fun WorkPeriodEmployeeSnapshot.toResponse() =
     WorkPeriodSnapshotResponse(
         snapshot.employeeId,
         snapshot.month.toString(),
-        snapshot.days.map {
-            ClosedWorkDayResponse(
-                it.workDate,
-                it.fact.name,
-                it.acceptedMinutes,
-                it.schedule.toResponse(),
-                it.evidenceIds,
-                it.correctionId,
-                it.overtime.map { item -> item.toResponse() },
-            )
-        },
+        snapshot.days.map { it.toResponse() },
         employee.toResponse(),
         period.toResponse(),
+    )
+
+fun ClosedWorkDay.toResponse() =
+    ClosedWorkDayResponse(
+        workDate,
+        fact.name,
+        acceptedMinutes,
+        schedule.toResponse(),
+        evidenceIds,
+        correctionId,
+        overtime.map { it.toResponse() },
     )

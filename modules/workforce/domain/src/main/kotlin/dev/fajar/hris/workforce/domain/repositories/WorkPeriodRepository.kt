@@ -8,6 +8,9 @@ import java.time.YearMonth
 import java.util.UUID
 
 interface WorkPeriodRepository {
+    /** Acquire an existing period without creating a row during a read or late correction. */
+    fun lockExisting(companyId: UUID, month: YearMonth, exclusive: Boolean): Result<WorkPeriod?>
+
     fun lockMonth(companyId: UUID, month: YearMonth, exclusive: Boolean): Result<WorkPeriod>
 
     fun lockRange(companyId: UUID, from: YearMonth): Result<List<WorkPeriod>>

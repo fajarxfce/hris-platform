@@ -66,6 +66,44 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun closedAttendanceAdjustmentsRetainSeparateReadReviewHistoryAndIdempotentWriteContracts() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/workforce/employees/{id}/attendance/adjustments"
+        for ((path, method) in
+            listOf(
+                base to "post",
+                base to "get",
+                "$base/review" to "get",
+                "$base/{adjustmentId}" to "get",
+            )) {
+            val operation = api["paths"][path][method]
+            assertTrue(operation["x-hris-authentication-required"].asBoolean())
+            assertTrue(operation["x-hris-company-admission"].asBoolean())
+        }
+        assertTrue(
+            api["paths"][base]["post"]["parameters"].any {
+                it["name"].asString() == "Idempotency-Key" && it["required"].asBoolean()
+            }
+        )
+        val schema = api["components"]["schemas"]["AttendanceAdjustmentRequest"]
+        assertEquals(
+            setOf("workDate", "reviewRevision", "clockIn", "clockOut", "decisions", "reason"),
+            schema["required"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
+        assertEquals(32, schema["properties"]["decisions"]["maxItems"].asInt())
+        assertEquals(64, schema["properties"]["reviewRevision"]["maxLength"].asInt())
+        assertEquals(1000, schema["properties"]["reason"]["maxLength"].asInt())
+        assertEquals(
+            50,
+            api["paths"][base]["get"]["parameters"]
+                .iterator()
+                .asSequence()
+                .single { it["name"].asString() == "limit" }["schema"]["maximum"]
+                .asInt(),
+        )
+    }
+
+    @Test
     fun bulkRosterSeparatesReadOnlyReviewFromTheIdempotentBoundedCommand() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/workforce/roster/bulk"

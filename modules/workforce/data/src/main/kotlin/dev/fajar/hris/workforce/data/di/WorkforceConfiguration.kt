@@ -9,11 +9,13 @@ import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.data.datasources.*
+import dev.fajar.hris.workforce.data.repositories.StoredAttendanceAdjustmentRepository
 import dev.fajar.hris.workforce.data.repositories.StoredAttendanceCorrectionRepository
 import dev.fajar.hris.workforce.data.repositories.StoredAttendanceRepository
 import dev.fajar.hris.workforce.data.repositories.StoredOvertimeRepository
 import dev.fajar.hris.workforce.data.repositories.StoredScheduleRepository
 import dev.fajar.hris.workforce.data.repositories.StoredWorkPeriodRepository
+import dev.fajar.hris.workforce.domain.repositories.AttendanceAdjustmentRepository
 import dev.fajar.hris.workforce.domain.repositories.AttendanceCorrectionRepository
 import dev.fajar.hris.workforce.domain.repositories.AttendanceRepository
 import dev.fajar.hris.workforce.domain.repositories.OvertimeRepository
@@ -28,6 +30,124 @@ import tools.jackson.databind.ObjectMapper
 
 @Configuration(proxyBeanMethods = false)
 class WorkforceConfiguration {
+    @Bean
+    fun attendanceAdjustmentSource(sql: DSLContext): AttendanceAdjustmentDataSource =
+        PostgresAttendanceAdjustmentDataSource(sql)
+
+    @Bean
+    fun attendanceAdjustments(
+        source: AttendanceAdjustmentDataSource,
+        json: ObjectMapper,
+    ): AttendanceAdjustmentRepository = StoredAttendanceAdjustmentRepository(source, json)
+
+    @Bean
+    fun attendanceAdjustmentReview(
+        periods: WorkPeriodRepository,
+        adjustments: AttendanceAdjustmentRepository,
+        attendance: AttendanceRepository,
+        corrections: AttendanceCorrectionRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetAttendanceAdjustmentReview(
+            periods,
+            adjustments,
+            attendance,
+            corrections,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun adjustClosedAttendance(
+        periods: WorkPeriodRepository,
+        adjustments: AttendanceAdjustmentRepository,
+        attendance: AttendanceRepository,
+        corrections: AttendanceCorrectionRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        AdjustClosedAttendance(
+            periods,
+            adjustments,
+            attendance,
+            corrections,
+            people,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun attendanceAdjustmentHistory(
+        periods: WorkPeriodRepository,
+        adjustments: AttendanceAdjustmentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListAttendanceAdjustments(
+            periods,
+            adjustments,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun attendanceAdjustmentDetails(
+        periods: WorkPeriodRepository,
+        adjustments: AttendanceAdjustmentRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetAttendanceAdjustment(
+            periods,
+            adjustments,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
     @Bean
     fun ownedWorkSchedule(
         schedules: ScheduleRepository,

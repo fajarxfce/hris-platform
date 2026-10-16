@@ -8,6 +8,7 @@ fun LeaveAccrualPolicy.toResponse(): LeaveAccrualPolicyResponse =
         frequency.name,
         halfDaysPerPeriod.toLeaveDays(),
         carryLimitHalfDays.toLeaveDays(),
+        carryValidityMonths,
     )
 
 fun LeaveBalance.toResponse(): LeaveBalanceResponse =

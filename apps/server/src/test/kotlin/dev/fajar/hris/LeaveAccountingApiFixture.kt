@@ -35,9 +35,18 @@ abstract class LeaveAccountingApiFixture : LeaveApiFixture() {
         frequency: String = "MONTHLY",
         days: String = "1",
         carry: String = "2",
+        validityMonths: Int? = null,
     ): LeaveFixture {
         val f = leaveFixture(at)
-        accountingBody(accountingPolicy(f, frequency = frequency, days = days, carry = carry))
+        accountingBody(
+            accountingPolicy(
+                f,
+                frequency = frequency,
+                days = days,
+                carry = carry,
+                validityMonths = validityMonths,
+            )
+        )
         return f
     }
 
@@ -51,6 +60,7 @@ abstract class LeaveAccountingApiFixture : LeaveApiFixture() {
         minService: Int = 0,
         partial: Boolean = true,
         key: UUID = UUID.randomUUID(),
+        validityMonths: Number? = null,
     ): HttpResponse<String> =
         command(
             f.admin,
@@ -69,6 +79,7 @@ abstract class LeaveAccountingApiFixture : LeaveApiFixture() {
                             "frequency" to frequency,
                             "daysPerPeriod" to days,
                             "carryLimitDays" to carry,
+                            "carryValidityMonths" to validityMonths,
                         ),
                     "reason" to "Entitlement policy",
                 )

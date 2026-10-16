@@ -5053,3 +5053,26 @@ The UTC-read follow-up passed 33 API/storage/mapper cases and the three worker
 scenarios. Existing awards retain their persisted instant even when current
 timezone conversion differs; new awards still validate their calendar. Formatting,
 architecture and all 34 local documentation link targets passed.
+
+
+### Public carry validity and retained mobile balances
+
+The Leave policy API now accepts optional 1–12-month carry validity, requires a
+positive carry limit and returns it in policy heads, history and snapshots. Existing
+awards retain their original calendar/UTC deadline through later policy updates and
+original-command replay. Fractional JSON integer input is rejected before mutation,
+including optimistic versions. No migration or DI change is needed.
+
+Validation passed 201 affected API/PostgreSQL cases, including seven new public
+configuration regressions, plus architecture, formatting and both application JAR
+builds. The 71 unchanged worker test results remained up to date. The mobile increment
+passed root checks, Android dev assembly, 200 Chromium cases and production Web
+build. Its original-date/amount layout was inspected at 200% Indonesian text; the
+staged schema upgrade keeps prior encrypted facts through failure and restart.
+The validated phone APK was installed with `--install-only` and its digest verified.
+Dashboard controls and Android finite-award acceptance remain separate next steps.
+
+The optional-policy API is deployed to development. Its running JAR matches the
+validated build; API health returned 200 on loopback and the WireGuard interface
+from the VPS, and the dashboard returned 200. The worker, database and document
+service containers retained their existing identities and volumes.

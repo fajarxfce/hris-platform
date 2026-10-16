@@ -2,10 +2,10 @@
 
 Status: accounting, request transitions, adjustments, year closing, the durable
 expiry worker, scoped history and terminal recovery are implemented and tested
-across the API and dashboard.
-New public closings create tracked awards; absent validity still means no
-additional expiry. Optional validity configuration remains hidden until client
-views and synchronization are complete. These changes have not been deployed.
+across the API, dashboard and mobile read views. New public closings create tracked
+awards; absent validity still means no additional expiry. The API accepts optional
+validity configuration. Dashboard policy editing and native acceptance of finite
+awards are the remaining integration steps.
 
 ## Contract
 
@@ -326,7 +326,7 @@ Kotlin formatting and architecture checks passed.
 The additive read API and V83–V85 are deployed to development. Both application
 JAR hashes were verified in their running containers; API health succeeded on
 loopback and the WireGuard interface from the VPS. Existing database/document
-containers were preserved. Optional validity configuration remains hidden.
+containers were preserved. The subsequent optional-policy API increment is described below.
 
 Dashboard ledger review now displays the tracked breakdown and original calendar
 deadline separately from the account totals. Responses without metadata remain
@@ -337,9 +337,35 @@ API/PostgreSQL/worker scenario also verified the published expired/available
 breakdown in the ledger page after the single debit. Type/build, architecture and
 changed-file formatting checks passed; screenshots were inspected.
 
+## Mobile balances and policy configuration
+
+Employee balances now show the carried amount, original calendar validity and
+posted expiry/transfer/deduction facts. Record format 3 acquires the new metadata
+without changing ledger versions and preserves the published format while its
+replacement is staged. Root checks, Android assembly, 200 targeted Chromium cases
+and production Web distribution passed. The Indonesian 200% layout was inspected,
+and the validated APK was installed on the authorized phone without opening its UI.
+See [mobile validation](https://github.com/fajarxfce/hris-mobile/blob/main/docs/validation.md#carried-leave-balances).
+
+`accrual.carryValidityMonths` is an optional integer from 1 to 12 and requires a
+positive carryover limit. Omitted/null input adds no carry-specific deadline.
+The policy head, revision history and submitted snapshots return the value.
+Changing a policy never changes an existing award's date or UTC boundary. The
+HTTP parser rejects fractional integer inputs, including observed versions,
+with the existing `invalid_request` response instead of truncating them.
+
+The public-policy increment passed 201 API/PostgreSQL scenarios, including seven
+new cases for retained deadlines, policy history, original-command replay,
+January/December bounds, invalid configuration, fractional input, absent metadata
+and late closing. Architecture, formatting and both application JAR builds passed;
+the previously validated 71 worker tests remained up to date.
+
 ## Remaining integration
 
-- Consume carried-balance metadata in employee views and upgrade the mobile
-  replica while retaining owned offline records.
-- Validate native behavior before exposing optional validity in policy editing.
-  The additive API is already deployed.
+- Validate finite carry awards in the Android emulator, including an offline upgrade.
+- Add optional validity to dashboard policy editing and processing review.
+
+The optional-policy API is deployed to development. Its running JAR matches the
+validated build; API health returned 200 on loopback and the WireGuard interface
+from the VPS, and the dashboard returned 200. The worker, database and document
+service containers retained their existing identities and volumes.

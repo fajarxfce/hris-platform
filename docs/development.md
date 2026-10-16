@@ -82,6 +82,13 @@ there is no weak-random fallback.
 
 Changing a secret in .env does not rotate an existing PostgreSQL role password. Rotate credentials explicitly, preserving the named volume. Never delete the database volume to apply an application upgrade.
 
+## JSON integer input
+
+API JSON integer fields reject fractional numbers rather than truncating them.
+This includes optimistic versions and carry-validity months. Clients send exact
+integer values; malformed input keeps the stable `invalid_request` response and
+never reaches a business mutation. Decimal amounts keep their string contracts.
+
 ## Validation records
 
 Use ignored .work/ for local logs and transient notes. Record actual checks in docs/delivery.md with the relevant capability. Unimplemented roadmap entries remain marked planned.

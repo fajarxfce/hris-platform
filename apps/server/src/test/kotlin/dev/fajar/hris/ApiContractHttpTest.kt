@@ -56,7 +56,17 @@ class ApiContractHttpTest : PeopleApiFixture() {
             ),
             schemas["LeaveCarryBalanceResponse"]["properties"].propertyNames().toSet(),
         )
-        assertFalse(schemas["LeaveAccrualPolicyRequest"]["properties"].has("carryValidityMonths"))
+        for (name in listOf("LeaveAccrualPolicyRequest", "LeaveAccrualPolicyResponse")) {
+            assertTrue(schemas[name]["properties"].has("carryValidityMonths"), name)
+        }
+        val validity = schemas["LeaveAccrualPolicyRequest"]["properties"]["carryValidityMonths"]
+        assertEquals(1, validity["minimum"].asInt())
+        assertEquals(12, validity["maximum"].asInt())
+        assertFalse(
+            schemas["LeaveAccrualPolicyRequest"].path("required").any {
+                it.asString() == "carryValidityMonths"
+            }
+        )
     }
 
     @Test

@@ -4,4 +4,5 @@ data class LeaveAccrualPolicyResponse(
     val frequency: String,
     val daysPerPeriod: String,
     val carryLimitDays: String,
+    val carryValidityMonths: Int?,
 )

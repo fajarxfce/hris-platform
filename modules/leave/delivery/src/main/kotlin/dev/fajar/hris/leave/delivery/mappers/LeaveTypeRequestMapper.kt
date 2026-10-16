@@ -23,6 +23,7 @@ fun LeaveTypeRequest.toType(id: UUID): LeaveType =
                     it.frequency,
                     parseHalfDays(it.daysPerPeriod),
                     parseHalfDays(it.carryLimitDays),
+                    it.carryValidityMonths,
                 )
             },
         ),

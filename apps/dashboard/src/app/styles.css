@@ -1086,3 +1086,45 @@ a {
     max-width: 540px;
   }
 }
+
+.app-role-permissions {
+  min-width: 0;
+}
+.app-role-permission-empty {
+  margin: 12px 16px;
+}
+.app-role-permission-group {
+  border-top: 1px solid var(--colorNeutralStroke2);
+  padding: 12px 16px;
+}
+.app-role-permission-group > summary {
+  cursor: pointer;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.app-role-permission-count {
+  margin-inline-start: 12px;
+  color: var(--colorNeutralForeground2);
+  font-size: 0.875em;
+  font-weight: 400;
+}
+.app-role-permission-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+  margin-top: 12px;
+}
+.app-role-permission-group ul {
+  display: grid;
+  gap: 8px;
+  padding-inline-start: 20px;
+}
+.app-role-editor .app-editor-form {
+  margin-top: 0;
+  max-width: 960px;
+}
+@media (max-width: 700px) {
+  .app-role-permission-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -2,6 +2,23 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_role_template: [
+    "Check the role name, code, permissions and reason.",
+    "Periksa nama, kode, permission, dan alasan perubahan role.",
+  ],
+  role_template_not_found: [
+    "This role is unavailable for your current company access.",
+    "Role ini tidak tersedia untuk akses perusahaan saat ini.",
+  ],
+  role_template_limit: [
+    "This company has reached its limit of 128 role definitions. Review an existing role.",
+    "Perusahaan ini sudah memiliki 128 definisi role. Tinjau role yang sudah ada.",
+  ],
+  role_code_immutable: [
+    "A saved role code cannot change. Reload its current definition.",
+    "Kode role yang sudah disimpan tidak dapat diubah. Muat ulang definisinya.",
+  ],
+
   invalid_leave_calendar_month: [
     "Choose a valid month between 1900 and 2200.",
     "Pilih bulan yang valid antara 1900 dan 2200.",

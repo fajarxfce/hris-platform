@@ -80,7 +80,9 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000059', 'browser-leave-batches-admin@example.invalid', 'Browser Leave Batches Admin'),
   ('a0000000-0000-4000-8000-000000000060', 'browser-leave-calendar-admin@example.invalid', 'Browser Leave Calendar Admin'),
   ('a0000000-0000-4000-8000-000000000061', 'browser-leave-schedule-admin@example.invalid', 'Browser Leave Schedule Admin'),
-  ('a0000000-0000-4000-8000-000000000062', 'browser-carry-operator@example.invalid', 'Browser Carry Operator')
+  ('a0000000-0000-4000-8000-000000000062', 'browser-carry-operator@example.invalid', 'Browser Carry Operator'),
+  ('a0000000-0000-4000-8000-000000000063', 'browser-role-admin@example.invalid', 'Browser Role Admin'),
+  ('a0000000-0000-4000-8000-000000000064', 'browser-role-member@example.invalid', 'Browser Role Member')
 ) AS fixture(id, email, name)
 WHERE bootstrap.email = 'browser-admin@example.invalid'
 ON CONFLICT DO NOTHING;
@@ -119,7 +121,8 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000057'),
   ('a0000000-0000-4000-8000-000000000059'),
   ('a0000000-0000-4000-8000-000000000060'),
-  ('a0000000-0000-4000-8000-000000000061')
+  ('a0000000-0000-4000-8000-000000000061'),
+  ('a0000000-0000-4000-8000-000000000063')
 ) AS fixture(account_id)
 WHERE platform_permissions.account_id = (SELECT id FROM accounts WHERE email = 'browser-admin@example.invalid')
 ON CONFLICT DO NOTHING;

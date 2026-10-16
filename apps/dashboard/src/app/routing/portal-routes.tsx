@@ -33,6 +33,12 @@ const CommunicationsRoutes = lazy(() =>
   ),
 );
 
+const RoleTemplateRoutes = lazy(() =>
+  import("../../features/identity/presentation/navigation/role-template-routes").then((module) => ({
+    default: module.RoleTemplateRoutes,
+  })),
+);
+
 const CompanyMembersScreen = lazy(() =>
   import("../../features/identity/presentation/bindings/company-members-screen").then((module) => ({
     default: module.CompanyMembersScreen,
@@ -565,6 +571,22 @@ export function PortalRoutes({
               people={people}
               loadMembers={identityAdministration.loadCompanyMembers}
               companyName={company.name}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/administration/roles/*"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <RoleTemplateRoutes
+              accountId={accountId}
+              access={access}
+              actions={identityAdministration}
+              companyName={company.name}
+              timezone={company.timezone}
               locale={locale}
               nextIdentifier={nextIdentifier}
             />

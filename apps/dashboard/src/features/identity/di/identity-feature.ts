@@ -1,15 +1,21 @@
 import type { HttpClient } from "../../../core/data/http/http-client";
 import { HttpCompanyMemberDataSource } from "../data/datasources/http-company-member-data-source";
 import { HttpIdentityDataSource } from "../data/datasources/http-identity-data-source";
+import { HttpRoleTemplateDataSource } from "../data/datasources/http-role-template-data-source";
 import { RemoteCompanyMemberRepository } from "../data/repositories/remote-company-member-repository";
 import { RemoteIdentityRepository } from "../data/repositories/remote-identity-repository";
+import { RemoteRoleTemplateRepository } from "../data/repositories/remote-role-template-repository";
 import { BeginMfaEnrollment } from "../domain/usecases/begin-mfa-enrollment";
 import { ConfirmMfaEnrollment } from "../domain/usecases/confirm-mfa-enrollment";
+import { LoadAssignablePermissions } from "../domain/usecases/load-assignable-permissions";
 import { LoadCompanyAccess } from "../domain/usecases/load-company-access";
 import { LoadCompanyMember } from "../domain/usecases/load-company-member";
 import { LoadCompanyMembers } from "../domain/usecases/load-company-members";
 import { LoadIdentityProviders } from "../domain/usecases/load-identity-providers";
+import { LoadRoleTemplate } from "../domain/usecases/load-role-template";
+import { LoadRoleTemplates } from "../domain/usecases/load-role-templates";
 import { LoadSession } from "../domain/usecases/load-session";
+import { SaveRoleTemplate } from "../domain/usecases/save-role-template";
 import { SignIn } from "../domain/usecases/sign-in";
 import { SignOut } from "../domain/usecases/sign-out";
 import { VerifyMfa } from "../domain/usecases/verify-mfa";
@@ -18,7 +24,12 @@ export function createIdentityFeature(http: HttpClient) {
   const source = new HttpIdentityDataSource(http);
   const repository = new RemoteIdentityRepository(source);
   const members = new RemoteCompanyMemberRepository(new HttpCompanyMemberDataSource(http));
+  const roles = new RemoteRoleTemplateRepository(new HttpRoleTemplateDataSource(http));
   return {
+    loadRoleTemplates: new LoadRoleTemplates(roles),
+    loadRoleTemplate: new LoadRoleTemplate(roles),
+    loadAssignablePermissions: new LoadAssignablePermissions(roles),
+    saveRoleTemplate: new SaveRoleTemplate(roles),
     loadCompanyMembers: new LoadCompanyMembers(members),
     loadCompanyMember: new LoadCompanyMember(members),
     loadSession: new LoadSession(repository),

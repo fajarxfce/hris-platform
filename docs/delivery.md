@@ -61,7 +61,32 @@ and all 71 worker tests. Coverage includes shared readers versus a writer,
 cancellation cleanup, late proof expiry, revoked authority, immutable input,
 original-command recovery and atomic rollback. OpenAPI coverage, architecture,
 Kotlin formatting and API/worker JAR builds passed. Dashboard integration and
-development deployment are pending for this increment.
+development deployment are recorded separately below.
+
+### Company role dashboard
+
+Company role administration now provides a permission catalog grouped by module,
+creation/editing, archival and bounded immutable revision review. Commands retain
+their observed version and original operation through response loss, MFA and later
+conflicts. Explicit current review resolves a definite conflict; company changes
+and disposal cancel requests and discard private views and forms.
+
+Dashboard architecture, Biome, TypeScript, all 3,394 unit tests and the production
+build passed. Thirteen controlled role/member browser scenarios passed. Desktop
+and 390-pixel Indonesian dark layouts with actual text doubled were inspected.
+The existing two CSS specificity advisories and main-bundle size warning remain.
+
+One browser workflow against an owned API/PostgreSQL fixture passed, covering
+creation, a committed save with a lost response, receipt recovery with the same
+command, revision history and archival. An earlier member grant retained its
+permissions throughout; archived roles rejected new applications. The fixture
+used fictional accounts and stopped its processes and database after completion.
+
+The validated API and worker JARs are deployed to development and their running
+digests match the builds. API health returned 200 on loopback and WireGuard, and
+the dashboard returned 200 from the VPS. Database and document-service container
+identities and volumes remained unchanged. No phone installation was required
+for this backend/dashboard increment.
 
 ### Leave carried-balance dashboard
 

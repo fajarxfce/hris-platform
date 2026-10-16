@@ -1131,6 +1131,36 @@ stop observation, and only explicit refresh replenishes the update budget.
 Company/page replacement and disposal reject late results. English/Indonesian
 views use existing Fluent command bars, resource tables and semantic tokens.
 
+## Company role administration
+
+`/administration/roles` provides company-scoped role directories, current
+definitions, revision history and explicit create/edit actions. Access requires
+`identity.manage`. Each directory/history page holds at most twenty entries;
+company and cursor belong to the route. The editor groups the server permission
+catalog by module and requires a name, stable code and reason. Archiving a role
+prevents new applications without changing existing membership grants.
+
+Each save pins the reviewed version, detached permission selection and one
+operation ID. An uncertain response retains that exact command through MFA
+verification and later conflicts; explicit retry retrieves its original receipt.
+A definite first conflict requires protected reloading. Navigation protections
+cover unsaved and unconfirmed work, while disposal or company replacement aborts
+requests and clears the retained form. Refresh/access failure removes private
+views. Locale/theme changes preserve the observation and form.
+
+Domain use cases validate scope and bounded input; repositories map DTOs inside
+the HTTP failure boundary. Mapping rejects inconsistent current/history values,
+duplicate permissions, non-progressing cursors and mismatched receipts. Feature
+controllers own requests and command recovery; pages render their state using
+existing Fluent command bars, tables and fields.
+
+Validation passed all 3,394 dashboard unit tests, thirteen role/member browser
+scenarios and an isolated API/PostgreSQL browser workflow. The latter verified
+creation, revision history, lost-response recovery, archival and unchanged access
+for a member with an earlier applied role. Desktop and Indonesian dark views at
+390 pixels with actual text sizes doubled were inspected. No global account or
+membership editing workflow is implied by role administration.
+
 ## Company account review
 
 `/administration/members` lists the active company's accounts with separate global

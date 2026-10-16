@@ -60,6 +60,11 @@ journal/receipt completion. Expiry, cancellation or a late failure rolls back th
 definition, revision, audit, outbox and receipt together. Successful replay retains
 the original result and still requires current authority and assurance.
 
+The [dashboard role workflow](../dashboard.md#company-role-administration)
+provides scoped creation, permission selection, editing, archival and revision
+review. Pending saves retain their original operation through response loss and
+verification; changing a definition never implicitly reapplies member grants.
+
 Membership writes accept direct `permissions` and up to eight distinct `roleTemplates` selections, each with `id` and `version`. The use case validates current active templates in the same company and records their full permission snapshots with the resulting membership version. Existing members retain their granted permissions when a template changes or is archived. Reapplying a changed template requires an explicit membership update and expected membership version. Refresh the template before retrying a stale selection.
 
 `GET /companies/{companyId}/members/{accountId}` returns effective membership access and the direct/template sources used for that version. Older grants without a recorded template application are represented as direct permissions. Template application history is immutable; access, source snapshots, receipts, and audit/outbox commit together.

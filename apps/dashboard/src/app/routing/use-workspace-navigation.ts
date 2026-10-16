@@ -19,7 +19,11 @@ export function useWorkspaceNavigation(suspended: boolean) {
   const blocker = useBlocker(shouldBlock);
   useLayoutEffect(() => controller.suspend(suspended), [controller, suspended]);
   useEffect(() => {
-    if (blocker.state === "blocked") controller.request(blocker.proceed, blocker.reset);
+    if (blocker.state !== "blocked") return;
+    // Completion may clear protection after the router blocked this intent but
+    // before its effect runs. Cancel that old intent instead of treating it as new.
+    if (controller.getSnapshot().protection === "none") blocker.reset();
+    else controller.request(blocker.proceed, blocker.reset);
   }, [blocker.state, blocker.proceed, blocker.reset, controller]);
   useEffect(() => () => controller.reset(), [controller]);
   useEffect(() => {

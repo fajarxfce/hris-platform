@@ -48,6 +48,21 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Completion during blocked navigation
+
+Ending an app session could finish after a link or Back action was blocked but
+before the router registered that pending departure. The delayed callback treated
+the now-unprotected page as a new navigation request. The router binding now
+cancels that obsolete intent; a subsequent explicit action can navigate normally.
+
+Two deterministic tests reproduced the failure before the fix using the real
+memory router. All seven router/controller tests pass, including pending
+confirmation, Stay, explicit departure and subsequent unprotected navigation.
+Dashboard architecture, Biome, TypeScript and all 3,775 unit tests passed. The
+production dashboard build and 50 related Chromium scenarios passed across own
+and administrative app sessions, employee creation, Expense and Leave drafts,
+and shared navigation. No API contract or backend code changed.
+
 ### Android attendance adjustment acceptance
 
 An API 35 emulator used an isolated API/PostgreSQL/worker and fictional employee.

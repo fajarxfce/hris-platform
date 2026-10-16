@@ -119,6 +119,16 @@ For an existing local database, add `HRIS_WORKER_DATABASE_PASSWORD` to `.env`, r
 
 Run the worker directly with `./gradlew :apps:worker:bootRun`, using `HRIS_DATABASE_URL`, `HRIS_WORKER_DATABASE_USER`, and `HRIS_WORKER_DATABASE_PASSWORD`. Do not use migration credentials for either application. `hris.worker.enabled=false` disables scheduling for controlled maintenance/test contexts; it is not a substitute for draining already-running workers. Shutdown cancels timers, interrupts owned work, and waits at most 40 seconds. Expired leases become available for recovery, and every business checkpoint rejects stale ownership.
 
+Native session retention uses a separate, single-thread fixed-delay task. Apply
+migration V86 before starting the updated worker. The default interval is 60
+seconds; `HRIS_NATIVE_SESSION_CLEANUP_INTERVAL_SECONDS` accepts 1–3,600 seconds and
+`HRIS_NATIVE_SESSION_CLEANUP_ENABLED=false` disables this task. Global
+`hris.worker.enabled=false` disables it too. No additional encryption key or
+administrator identity is required. The worker login needs its existing
+`hris_worker_capability` membership; do not grant this capability to the API role.
+See [native session cleanup](modules/identity.md#native-session-cleanup) for batch
+bounds, replay retention and shutdown behavior.
+
 Spring Batch metadata stores attempt execution/checkpoint diagnostics separately from the company job projection. The public API uses the latter and never exposes Batch tables or raw job parameters. Metadata retention/archival is a separate operational policy; no unbounded in-memory job registry is retained.
 
 The dashboard browser suite runs in four CI shards, each retaining a 15-minute

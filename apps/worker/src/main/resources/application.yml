@@ -23,3 +23,7 @@ logging:
   level:
     org.springframework.boot.jooq.autoconfigure.ExceptionTranslatorExecuteListener: "OFF"
     org.springframework.batch: WARN
+hris:
+  native-session-cleanup:
+    enabled: ${HRIS_NATIVE_SESSION_CLEANUP_ENABLED:true}
+    interval-seconds: ${HRIS_NATIVE_SESSION_CLEANUP_INTERVAL_SECONDS:60}

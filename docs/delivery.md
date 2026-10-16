@@ -48,6 +48,31 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Periodic native-session retention
+
+The worker now performs bounded session and replay-envelope cleanup through a
+dedicated identity use case/repository/source. Migration V86 restricts its SQL
+entry point to the worker capability, validates finite cutoffs and retains a
+24-hour period after absolute expiry. Clearing replay ciphertext preserves the
+consumed hashes needed to detect token reuse. One lifecycle-owned task runs every
+60 seconds by default; competing workers skip rows already owned by another pass.
+
+Twenty-two native API/PostgreSQL tests, 26 identity domain tests, 14 identity data
+tests and all 81 worker tests passed. The ten new worker scenarios cover retained
+active/revoked accounts, quota evidence, real refresh-reuse revocation, bounded
+draining, a 10,000-row dependent cascade, competing passes, locked rows, capability
+and cutoff rejection, late-failure rollback, shutdown during pending work and
+timer/queue disposal. The worker suite completed in 4m49s.
+Architecture and formatting checks, both application JARs and Compose validation
+passed. These checks do not establish reference-workload performance.
+
+V86 was applied to development before restarting the API and worker. Their
+running JAR digests match the validated builds, the API health reports `UP`, and
+the worker started its 60-second task without cleanup errors. Database privilege
+inspection confirmed that the worker can execute the cleanup function and the
+API cannot. Existing database and document-service containers were retained;
+the WireGuard dashboard still returned HTTP 200. No phone interaction was needed.
+
 ### Dashboard app sessions
 
 Accounts can inspect and end their own app sessions without company membership.

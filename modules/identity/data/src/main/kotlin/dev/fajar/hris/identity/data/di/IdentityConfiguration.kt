@@ -194,6 +194,23 @@ class IdentityConfiguration {
     @Bean fun nativeSessionPolicy() = dev.fajar.hris.identity.domain.entities.NativeSessionPolicy()
 
     @Bean
+    fun nativeSessionCleanupSource(sql: DSLContext): NativeSessionCleanupDataSource =
+        PostgresNativeSessionCleanupDataSource(sql)
+
+    @Bean
+    fun nativeSessionCleanup(
+        source: NativeSessionCleanupDataSource
+    ): dev.fajar.hris.identity.domain.repositories.NativeSessionCleanupRepository =
+        dev.fajar.hris.identity.data.repositories.StoredNativeSessionCleanupRepository(source)
+
+    @Bean
+    fun maintainNativeSessions(
+        cleanup: dev.fajar.hris.identity.domain.repositories.NativeSessionCleanupRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = MaintainNativeSessions(cleanup, transactions, clock)
+
+    @Bean
     fun nativeStore(sql: DSLContext): NativeSessionDataSource = PostgresNativeSessionDataSource(sql)
 
     @Bean

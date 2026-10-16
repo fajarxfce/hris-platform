@@ -436,6 +436,16 @@ Global credential administration takes its administration or provider-subject gu
 
 ## Storage and jobs
 
+Native session retention has a separate identity repository/source contract that
+returns cleanup counts. Its use case owns the retention clock, transaction and
+empty company scope; the fixed-delay worker only invokes that use case. A
+security-invoker database operation requires the worker capability and cannot
+return credentials. Ordered, bounded selections skip locked rows, preserve
+consumed hashes needed for reuse detection, and retire parent records only after
+24 elapsed hours beyond absolute expiry. Replay cleanup never changes live
+credential versions or access. Cancellation rolls back the batch and releases
+its owned resources. See [identity retention](modules/identity.md#native-session-cleanup).
+
 Private S3-compatible object storage holds documents; the self-hosted distribution uses Garage. Uploads are resumable and bounded, downloads support Range/ETag, and documents are not readable until validation completes. Metadata and authorization stay in PostgreSQL.
 
 Spring Batch provides persistent checkpoints for payroll/import/export. An outbox dispatches external delivery after commit. Jobs are idempotent, bounded, interruptible, and owned by the application lifecycle. Retries are explicit and failures stay inspectable. User-facing job use cases coordinate identity and company repository contracts for live access checks. Cancellation locks the job before company/member/account guards, matching worker lock order. Global worker leasing remains a separate capability boundary.

@@ -33,7 +33,7 @@ The first mobile sign-in uses the same password/OIDC and MFA handshake as the we
 
 Access tokens last ten minutes. Refresh tokens belong to an absolute thirty-day session and rotate on each successful refresh. Both are random 256-bit values; only SHA-256 hashes are indexed in PostgreSQL. The response needed for retry is encrypted using the configured identity keyring, bound to account, session, and operation ID, and replayable for two minutes. An identical retry returns the original successor only while it is still current. A different operation or a stale consumed token revokes the session, and that revocation commits before HTTP 401 is returned. Keep one refresh operation in flight per session and reuse its operation ID after a lost response.
 
-Account locks serialize session creation, rotation, MFA updates, and revocation. Limits are ten active sessions and one hundred issued, unexpired sessions per account, a ten-second minimum rotation interval, and 5,000 rotations per session; exceeding the rotation ceiling requires signing in again. Expired sessions are deleted in bounded batches during later exchanges, with consumed hashes removed by foreign-key cascade. Expired replay ciphertext is cleared during subsequent rotations. Periodic cleanup by the worker remains planned; quiet accounts retain expired encrypted rows until that cleanup or a later exchange.
+Account locks serialize session creation, rotation, MFA updates, and revocation. Limits are ten active sessions and one hundred issued, unexpired sessions per account, a ten-second minimum rotation interval, and 5,000 rotations per session; exceeding the rotation ceiling requires signing in again. Expired sessions are deleted in bounded batches during later exchanges, with consumed hashes removed by foreign-key cascade. Expired replay ciphertext is cleared during subsequent rotations. The periodic worker also retires expired session/replay material for accounts that do not sign in again, as described below.
 
 Native MFA verification and recovery-code regeneration return new native credentials. They do not elevate a browser cookie. Elevation rejects an obsolete session version after a competing refresh. A proof is consumed before transport credential elevation; a lost response or failure in that handoff requires another authenticator code, recovery code, or a fresh sign-in. Native clients must not automatically repeat one-use MFA actions. Initial MFA enrollment uses the shared sign-in handshake. Session listings and revocation are always restricted to the current account. Account, company-list, and native-session metadata reads revalidate credentials under a shared account guard. Own-session revocation retains its cleanup semantics if credentials change after request admission; it never reveals another account's session or creates access.
 
@@ -43,6 +43,37 @@ the existing native-session endpoints and their metadata-only responses. A lost
 DELETE response keeps its exact session for explicit retry or list reconciliation;
 no new scope or token disclosure is introduced. Cross-account session management
 remains separate from this self-service capability.
+
+## Native session cleanup
+
+The worker runs one retention pass every 60 seconds by default. Its use case owns
+the clock, transaction and a 24-hour retention period after absolute session
+expiry. Each pass removes at most four expired sessions and clears at most 128
+exchange replay envelopes and 128 consumed-refresh replay envelopes. Expired
+parents awaiting deletion do not compete with the separate replay queues.
+
+Clearing a replay envelope does not remove its consumed token hash, rotate a
+credential, or revoke an active session. Hashes continue to detect refresh reuse
+until the parent session is deleted. Parent deletion cascades to consumed hashes
+and push registrations; the session's existing audit records remain. The maximum
+rotation policy bounds each parent's dependent rows. Accounts in the retention
+period, including revoked or disabled accounts' unexpired sessions, remain
+recorded and cannot bypass the issued-session quota through cleanup.
+
+Migration V86 adds partial expiry indexes and a worker-capability-only,
+security-invoker SQL operation. It returns counts without acquiring credential
+material into the process. Limits and finite cutoffs are checked again in the
+database, which rejects future cutoffs and a retention period shorter than 24
+elapsed hours. Ordered `FOR UPDATE SKIP LOCKED` selections support competing
+workers; busy rows remain eligible for a later pass. All three cleanup stages
+share one transaction and the existing statement/lock deadlines. A failure or
+interruption rolls back the batch.
+
+`HRIS_NATIVE_SESSION_CLEANUP_ENABLED=false` disables this poller;
+`HRIS_NATIVE_SESSION_CLEANUP_INTERVAL_SECONDS` accepts 1–3,600 seconds. The default
+is 60. Global `hris.worker.enabled=false` also disables its timer. The worker owns
+one fixed-delay task, creates no per-session queue and cancels its task on
+shutdown. Existing on-sign-in cleanup remains independently available.
 
 ## OIDC
 

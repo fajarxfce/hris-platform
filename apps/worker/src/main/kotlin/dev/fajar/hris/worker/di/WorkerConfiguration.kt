@@ -46,6 +46,44 @@ class WorkerConfiguration {
     @Bean fun workerSettings() = WorkerSettings()
 
     @Bean
+    @ConditionalOnProperty(
+        name = ["hris.worker.enabled", "hris.native-session-cleanup.enabled"],
+        havingValue = "true",
+        matchIfMissing = true,
+    )
+    fun nativeSessionCleanupTimer() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 1
+            setThreadNamePrefix("hris-native-cleanup-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(15)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = ["hris.worker.enabled", "hris.native-session-cleanup.enabled"],
+        havingValue = "true",
+        matchIfMissing = true,
+    )
+    fun nativeSessionCleanupWorker(
+        maintain: dev.fajar.hris.identity.domain.usecases.MaintainNativeSessions,
+        @org.springframework.beans.factory.annotation.Qualifier("nativeSessionCleanupTimer")
+        timer: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+        @org.springframework.beans.factory.annotation.Value(
+            "\${hris.native-session-cleanup.interval-seconds:60}"
+        )
+        intervalSeconds: Long,
+    ) =
+        dev.fajar.hris.worker.identity.NativeSessionCleanupWorker(
+            maintain,
+            timer,
+            java.time.Duration.ofSeconds(intervalSeconds),
+        )
+
+    @Bean
     @Primary
     fun workerTransactions(
         manager: PlatformTransactionManager,

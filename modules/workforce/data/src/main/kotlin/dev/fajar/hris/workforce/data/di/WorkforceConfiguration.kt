@@ -347,6 +347,58 @@ class WorkforceConfiguration {
         )
 
     @Bean
+    fun reviewRosterBulk(
+        schedules: ScheduleRepository,
+        periods: WorkPeriodRepository,
+        people: PeopleRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ReviewRosterBulk(
+            schedules,
+            periods,
+            people,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun applyRosterBulk(
+        schedules: ScheduleRepository,
+        periods: WorkPeriodRepository,
+        people: PeopleRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ApplyRosterBulk(
+            schedules,
+            periods,
+            people,
+            operations,
+            journal,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
     fun selfWorkforceEmployments(
         people: PeopleRepository,
         companies: CompanyRepository,

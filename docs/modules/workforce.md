@@ -61,7 +61,9 @@ directory and review now support effective weekly assignments and per-date roste
 editing. Forms retain original selected shift revisions across catalog paging,
 use the corresponding schedule/roster version and recover explicitly after an
 unknown response. The daily editor also restores the underlying calendar through
-the reviewed reset command described below. Bulk editing remains separate work.
+the reviewed reset command described below. The [bulk editing API](../roster-bulk.md)
+provides bounded before/after review and an atomic multi-employee/date command;
+its dashboard remains the next delivery step.
 The mobile employee
 application provides its own [weekly calendar](https://github.com/fajarxfce/hris-mobile/blob/main/docs/workforce.md)
 with a bounded encrypted offline snapshot. Its attendance route also supports
@@ -149,7 +151,7 @@ company-wide exception queue adds bounded date/status filters, paginated review
 and links to the independently authorized day view. Resolved pairs leave the
 queue; later pending evidence on a corrected day remains visible for review.
 
-Overtime requests, actual-time submission, independent staged review, withdrawal, and closed-period snapshots are implemented. Reviewed roster reset is implemented in the API and dashboard. Late payroll adjustments, bulk editing, and lifecycle cleanup remain planned. Accepted attendance totals are factual inputs; they are not a finalized payroll result.
+Overtime requests, actual-time submission, independent staged review, withdrawal, and closed-period snapshots are implemented. Reviewed roster reset is implemented in the API, dashboard and mobile sync. The reviewed bulk editing API is implemented and tested. Its dashboard, late payroll adjustments and lifecycle cleanup remain in progress. Accepted attendance totals are factual inputs; they are not a finalized payroll result.
 
 ## Monthly attendance closing
 

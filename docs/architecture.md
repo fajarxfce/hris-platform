@@ -118,6 +118,14 @@ Reset eligibility, period guards and restored local-time validation remain in
 domain. Its committed sync deletion removes the mobile override without replacing
 attendance evidence. See [roster reset](modules/workforce.md#roster-reset-contract).
 
+Bulk roster editing has separate review and command use cases. Both coordinate
+the existing schedule, employment and period repository contracts; named pure
+policies calculate proposed days and compare reviewed content. A bounded explicit
+employee/date selection is detached before waits. The command owns one transaction
+for all changed cells, their history, journal, receipt and sync capture; no use
+case calls another use case and no datasource owns admission policy. See
+[reviewed roster editing](roster-bulk.md).
+
 Attendance capture, capture windows, verification, corrections, daily reads and
 correction history apply the same interactive assurance policy after their guards.
 An original receipt retains its data but still requires current session assurance.

@@ -34,6 +34,58 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun bulkRosterSeparatesReadOnlyReviewFromTheIdempotentBoundedCommand() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/workforce/roster/bulk"
+        val read = api["paths"]["$base/review"]["post"]
+        val write = api["paths"][base]["post"]
+        for (operation in listOf(read, write)) {
+            assertTrue(operation["x-hris-authentication-required"].asBoolean())
+            assertTrue(operation["x-hris-company-admission"].asBoolean())
+        }
+        assertFalse(read.path("parameters").any { it["name"].asString() == "Idempotency-Key" })
+        assertTrue(
+            write["parameters"].any {
+                it["name"].asString() == "Idempotency-Key" && it["required"].asBoolean()
+            }
+        )
+        val schemas = api["components"]["schemas"]
+        val selection = schemas["RosterBulkReviewRequest"]
+        assertEquals(
+            setOf("employeeIds", "dates", "mode"),
+            selection["required"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
+        assertEquals(50, selection["properties"]["employeeIds"]["maxItems"].asInt())
+        assertEquals(31, selection["properties"]["dates"]["maxItems"].asInt())
+        assertTrue(selection["properties"]["dates"]["uniqueItems"].asBoolean())
+        assertEquals(
+            setOf("selection", "reviewRevision", "reason"),
+            schemas["RosterBulkApplyRequest"]["required"]
+                .iterator()
+                .asSequence()
+                .map { it.asString() }
+                .toSet(),
+        )
+        assertEquals(
+            setOf(
+                "employeeIds",
+                "dates",
+                "mode",
+                "shiftId",
+                "shiftVersion",
+                "employees",
+                "revision",
+                "changeCount",
+            ),
+            schemas["RosterBulkReviewResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("workDate", "expectedVersion", "overrideActive", "before", "after", "changed"),
+            schemas["RosterBulkDayResponse"]["properties"].propertyNames().toSet(),
+        )
+    }
+
+    @Test
     fun rosterResetRetainsTheCommandAndReviewVersionContracts() {
         val api = contract()
         val operation =

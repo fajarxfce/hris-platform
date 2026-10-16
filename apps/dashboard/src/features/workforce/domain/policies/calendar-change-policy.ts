@@ -2,6 +2,7 @@ import { isCalendarDate } from "../../../../core/domain/calendar-date";
 import { isUuid } from "../../../../core/domain/identifiers";
 import { type Failure, failed, type Result, success } from "../../../../core/domain/result";
 import type { RosterDayChange } from "../entities/roster-day-change";
+import type { RosterReset } from "../entities/roster-reset";
 import { type Weekday, weekdays } from "../entities/schedule-assignment";
 import type { ShiftReference } from "../entities/shift-reference";
 import type { WeeklyScheduleChange } from "../entities/weekly-schedule-change";
@@ -64,11 +65,32 @@ export function normalizeRosterDay(input: RosterDayChange): Result<RosterDayChan
     }),
   );
 }
+export function normalizeRosterReset(input: RosterReset): Result<RosterReset> {
+  if (
+    !isUuid(input.employeeId) ||
+    !isCalendarDate(input.workDate) ||
+    input.expectedVersion === null ||
+    !isObservedCalendarVersion(input.expectedVersion) ||
+    !input.reason.trim() ||
+    input.reason.length > 1000
+  )
+    return failed("invalid_roster_change");
+  return success(
+    Object.freeze({
+      employeeId: input.employeeId.toLowerCase(),
+      workDate: input.workDate,
+      expectedVersion: input.expectedVersion,
+      reason: input.reason.trim(),
+    }),
+  );
+}
 /** This classification applies only before an unknown outcome has been observed. */
 export function calendarChangeWasRejected(failure: Failure): boolean {
   return [
     "invalid_schedule_change",
     "invalid_roster_change",
+    "roster_override_required",
+    "shift_timezone_gap",
     "stale_version",
     "data_conflict",
     "employee_unavailable",

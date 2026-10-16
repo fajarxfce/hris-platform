@@ -155,6 +155,95 @@ test("an explicit roster day off keeps its own version through a lost response",
   await expect(page.getByRole("table").first()).toContainText("Shift 1");
 });
 
+test("reset replays one command and a later override uses the retained version", async ({
+  page,
+}) => {
+  const api = await installCalendarsApi(page);
+  const roster = `${detail}/roster/2026-10-13?${query}`;
+  await page.goto(roster);
+  await page.getByLabel("Shift", { exact: true }).selectOption("calendar");
+  await expect(page.getByLabel("Search shifts", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Removes this override", { exact: false })).toBeVisible();
+  await page.getByLabel("Reason", { exact: true }).fill("Return to regular schedule");
+  api.loseNextSave();
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("The save outcome is not confirmed");
+  await expect(page.getByLabel("Shift", { exact: true })).toBeDisabled();
+  await page.getByRole("button", { name: "Retry save", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Calendar saved.");
+  expect(api.writes[0]?.path).toContain("/roster/2026-10-13/reset");
+  expect(api.writes[0]?.body).toEqual({ expectedVersion: 6, reason: "Return to regular schedule" });
+  expect(api.writes[1]).toEqual(api.writes[0]);
+  expect(api.commits).toBe(1);
+  await page.getByRole("link", { name: "View calendar", exact: true }).last().click();
+  const day = page
+    .getByRole("table", { name: "Work calendar", exact: true })
+    .getByRole("row")
+    .filter({ hasText: "Oct 13, 2026" });
+  await expect(day).toContainText("Weekly schedule");
+  await expect(day).not.toContainText("Daily roster");
+  await page.getByRole("button", { name: "Set daily roster: Oct 13, 2026", exact: true }).click();
+  await expect(page.getByText("Reviewed roster version: 7", { exact: true })).toBeVisible();
+  await expect(page.getByRole("option", { name: "Follow calendar", exact: true })).toHaveCount(0);
+  await page.getByLabel("Shift", { exact: true }).selectOption(`${identifier(2)}:0`);
+  await page.getByLabel("Reason", { exact: true }).fill("New coverage");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Calendar saved.");
+  expect(api.writes[2]?.body).toEqual({
+    shift: { id: identifier(2), version: 0 },
+    expectedVersion: 7,
+    reason: "New coverage",
+  });
+  expect(api.commits).toBe(2);
+});
+
+test("reset controls remain readable at narrow width with enlarged text in both themes", async ({
+  page,
+}) => {
+  const api = await installCalendarsApi(page);
+  await page.goto(`${detail}/roster/2026-10-13?${query}`);
+  await page.getByLabel("Shift", { exact: true }).selectOption("calendar");
+  await page.getByLabel("Reason", { exact: true }).fill("Regular schedule");
+  await page.screenshot({ path: "../../.work/dashboard-roster-reset-light.png", fullPage: true });
+  await page.getByRole("combobox", { name: "Language", exact: true }).selectOption("id");
+  await page.getByRole("button", { name: "Tema", exact: true }).click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = "200%";
+  });
+  await expect(page.getByRole("combobox", { name: "Shift", exact: true })).toHaveValue("calendar");
+  await expect(page.getByLabel("Alasan", { exact: true })).toHaveValue("Regular schedule");
+  await expect(page.getByText("Menghapus pengaturan khusus", { exact: false })).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+    .toBe(true);
+  await page.screenshot({
+    path: "../../.work/dashboard-roster-reset-dark-narrow.png",
+    fullPage: true,
+  });
+  expect(api.writes).toHaveLength(0);
+});
+
+test("a pending reset cannot restore a receipt after company replacement", async ({ page }) => {
+  const api = await installCalendarsApi(page);
+  await page.goto(`${detail}/roster/2026-10-13?${query}`);
+  await page.getByLabel("Shift", { exact: true }).selectOption("calendar");
+  await page.getByLabel("Reason", { exact: true }).fill("Regular calendar");
+  const pending = api.holdSave();
+  try {
+    await page.getByRole("button", { name: "Save", exact: true }).click();
+    await pending.started;
+    await page.getByRole("combobox", { name: "Company", exact: true }).selectOption(companyIds[1]);
+    await departure(page).getByRole("button", { name: "Leave page", exact: true }).click();
+    pending.release();
+    await expect(page.getByRole("table")).toContainText("South Employee");
+    await expect(page.getByRole("status").filter({ hasText: "Calendar saved." })).toHaveCount(0);
+    expect(api.writes).toHaveLength(1);
+  } finally {
+    pending.release();
+  }
+});
+
 test("a pending save protects company departure and cannot restore the previous company after release", async ({
   page,
 }) => {

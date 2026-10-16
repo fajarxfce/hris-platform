@@ -3,6 +3,7 @@ import type { CompanyId, OperationId } from "../../../../core/domain/identifiers
 import type { EmployeeId } from "../../../people/domain/entities/employee";
 import type { CalendarRange } from "../../domain/entities/calendar-range";
 import type { RosterDayChange } from "../../domain/entities/roster-day-change";
+import type { RosterReset } from "../../domain/entities/roster-reset";
 import type { WeeklyScheduleChange } from "../../domain/entities/weekly-schedule-change";
 import type { WorkforceEmployeeSearch } from "../../domain/entities/workforce-employee-search";
 import type { CalendarRepository } from "../../domain/repositories/calendar-repository";
@@ -49,6 +50,27 @@ export class RemoteCalendarRepository implements CalendarRepository {
           change.employeeId,
           operation,
           toWeeklyScheduleDto(change),
+          signal,
+        ),
+        change.employeeId,
+        change.expectedVersion,
+      ),
+    );
+  }
+  resetRoster(
+    company: CompanyId,
+    operation: OperationId,
+    change: RosterReset,
+    signal: AbortSignal,
+  ) {
+    return safeHttpCall(signal, async () =>
+      toCalendarReceipt(
+        await this.source.resetRoster(
+          company,
+          change.employeeId,
+          change.workDate,
+          operation,
+          { expectedVersion: change.expectedVersion, reason: change.reason },
           signal,
         ),
         change.employeeId,

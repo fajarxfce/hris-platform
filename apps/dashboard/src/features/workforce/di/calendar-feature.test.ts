@@ -44,6 +44,7 @@ describe("work-calendar data boundaries", () => {
       ok: true,
       value: {
         scheduleVersion: 4,
+        supportsRosterReset: false,
         employee: { id: employeeId, companyId: company },
         assignmentAtStart: { revision: 2, days: { MONDAY: { revision: 0 } } },
       },

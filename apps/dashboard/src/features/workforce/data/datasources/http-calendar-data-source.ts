@@ -4,6 +4,7 @@ import {
   calendarReceiptDto,
   calendarReviewDto,
   type RosterDayChangeDto,
+  type RosterResetDto,
   type WeeklyScheduleChangeDto,
   type WorkforceEmployeeSearchDto,
   workforceEmployeePageDto,
@@ -45,6 +46,26 @@ export class HttpCalendarDataSource implements CalendarDataSource {
         {
           path: `/api/v1/companies/${company}/workforce/employees/${employee}/schedule`,
           method: "PUT",
+          operationId: operation,
+          body,
+        },
+        signal,
+      ),
+    );
+  }
+  async resetRoster(
+    company: string,
+    employee: string,
+    day: string,
+    operation: string,
+    body: RosterResetDto,
+    signal: AbortSignal,
+  ) {
+    return calendarReceiptDto.parse(
+      await this.http.request(
+        {
+          path: `/api/v1/companies/${company}/workforce/employees/${employee}/roster/${day}/reset`,
+          method: "POST",
           operationId: operation,
           body,
         },

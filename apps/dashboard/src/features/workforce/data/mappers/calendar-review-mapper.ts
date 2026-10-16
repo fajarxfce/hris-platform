@@ -4,6 +4,7 @@ import type { CompanyId } from "../../../../core/domain/identifiers";
 import type { EmployeeId } from "../../../people/domain/entities/employee";
 import type { CalendarRange } from "../../domain/entities/calendar-range";
 import type { CalendarReview } from "../../domain/entities/calendar-review";
+import type { RosterOverride } from "../../domain/entities/roster-override";
 import type { CalendarReviewDto } from "../models/calendar-dto";
 import { toScheduledDay, toShiftSnapshot } from "./scheduled-day-mapper";
 import { toWorkforceEmployee } from "./workforce-employee-mapper";
@@ -42,11 +43,62 @@ export function toCalendarReview(
   )
     throw new InvalidHttpResponseError();
   if (assignment !== null && firstDay?.kind === "UNASSIGNED") throw new InvalidHttpResponseError();
+  // Older servers expose only active overrides through the resolved day.
+  const overrides: readonly RosterOverride[] =
+    dto.rosterOverrides === undefined
+      ? days.flatMap((day) =>
+          day.kind !== "UNASSIGNED" && day.origin === "ROSTER"
+            ? [
+                Object.freeze({
+                  workDate: day.workDate,
+                  version: day.originVersion,
+                  active: true,
+                  shift: day.kind === "WORK" ? day.shift : null,
+                }),
+              ]
+            : [],
+        )
+      : dto.rosterOverrides.map((row) => {
+          if (
+            !isCalendarDate(row.workDate) ||
+            row.workDate < range.from ||
+            row.workDate > range.until ||
+            (!row.active && row.shift !== null)
+          )
+            throw new InvalidHttpResponseError();
+          return Object.freeze({
+            ...row,
+            shift: row.shift === null ? null : toShiftSnapshot(row.shift),
+          });
+        });
+  const byDate = new Map(overrides.map((row) => [row.workDate, row]));
+  if (
+    byDate.size !== overrides.length ||
+    overrides.some(
+      (row, index) => index > 0 && row.workDate <= (overrides[index - 1]?.workDate ?? ""),
+    )
+  )
+    throw new InvalidHttpResponseError();
+  for (const day of days) {
+    const override = byDate.get(day.workDate);
+    if (override?.active) {
+      if (
+        day.kind === "UNASSIGNED" ||
+        day.origin !== "ROSTER" ||
+        day.originVersion !== override.version ||
+        JSON.stringify(day.kind === "WORK" ? day.shift : null) !== JSON.stringify(override.shift)
+      )
+        throw new InvalidHttpResponseError();
+    } else if (day.kind !== "UNASSIGNED" && day.origin === "ROSTER")
+      throw new InvalidHttpResponseError();
+  }
   return Object.freeze({
     employee,
     range: Object.freeze({ ...range }),
     scheduleVersion: version,
     days: Object.freeze(days),
+    rosterOverrides: Object.freeze(overrides),
+    supportsRosterReset: dto.rosterOverrides !== undefined,
     assignmentAtStart:
       assignment === null
         ? null

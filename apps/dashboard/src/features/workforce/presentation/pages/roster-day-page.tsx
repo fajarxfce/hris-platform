@@ -41,12 +41,24 @@ export function RosterDayPage(props: {
       />
       {state.review && (
         <>
-          <ShiftCatalogControls catalog={props.catalog} locale={locale} disabled={!form.editable} />
+          {!form.resetting && (
+            <ShiftCatalogControls
+              catalog={props.catalog}
+              locale={locale}
+              disabled={!form.editable}
+            />
+          )}
           <form className="app-editor-form" onSubmit={form.submit}>
             <AppTextField label={text.date} value={props.date} readOnly type="date" />
-            <Text>{text.rosterPolicy}</Text>
-            <Text>{text.snapshots}</Text>
+            <Text>{form.resetting ? text.resetPolicy : text.rosterPolicy}</Text>
+            {form.rosterVersion !== null && (
+              <Text>
+                {text.rosterVersion}: {form.rosterVersion}
+              </Text>
+            )}
+            {!form.resetting && <Text>{text.snapshots}</Text>}
             <AppSelect label={text.shift} {...form.shift} disabled={!form.editable}>
+              {form.canReset && <option value="calendar">{text.followCalendar}</option>}
               <option value="">{text.OFF}</option>
               {form.options.map((option) => (
                 <option key={option.key} value={option.key}>

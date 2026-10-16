@@ -32,6 +32,7 @@ import { LoadWorkPeriodSnapshot } from "../domain/usecases/load-work-period-snap
 import { LoadWorkforceEmployees } from "../domain/usecases/load-workforce-employees";
 import { PlanOvertimeRequest } from "../domain/usecases/plan-overtime-request";
 import { RecoverWorkPeriod } from "../domain/usecases/recover-work-period";
+import { ResetRosterDay } from "../domain/usecases/reset-roster-day";
 import { ReviewAttendance } from "../domain/usecases/review-attendance";
 import { ReviewOvertimeAction } from "../domain/usecases/review-overtime-action";
 import { ReviewOvertimePlan } from "../domain/usecases/review-overtime-plan";
@@ -72,6 +73,7 @@ export function createWorkforceFeature(http: HttpClient) {
     loadCalendarReview: new LoadCalendarReview(calendars),
     assignWeeklySchedule: new AssignWeeklySchedule(calendars),
     setRosterDay: new SetRosterDay(calendars),
+    resetRosterDay: new ResetRosterDay(calendars),
     loadHolidays: new LoadHolidays(holidays),
     loadHoliday: new LoadHoliday(holidays),
     saveHoliday: new SaveHoliday(holidays),

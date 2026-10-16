@@ -33,6 +33,11 @@ function actions() {
         .fn<WorkforceUseCases["setRosterDay"]["execute"]>()
         .mockResolvedValue(success({ id: employeeId, version: 0 })),
     },
+    resetRosterDay: {
+      execute: vi
+        .fn<WorkforceUseCases["resetRosterDay"]["execute"]>()
+        .mockResolvedValue(success({ id: employeeId, version: 8 })),
+    },
   };
 }
 describe("calendar command ownership", () => {
@@ -97,7 +102,7 @@ describe("calendar command ownership", () => {
     expect(api.assignWeeklySchedule.execute.mock.lastCall?.[2].expectedVersion).toBe(9);
     controller.deactivate();
   });
-  it("uses a roster version only for an explicit override, including a day off", async () => {
+  it("uses the retained roster version independently of the resolved day's origin", async () => {
     const initial = calendarFixture({ from: date, until: date });
     const initialDay = initial.days[0];
     if (!initialDay) throw new Error("Fixture day missing");
@@ -113,9 +118,18 @@ describe("calendar command ownership", () => {
       { kind: "OFF", workDate: date, origin: "ROSTER", originVersion: 7, holidayId: null },
       { kind: "UNASSIGNED", workDate: date },
     ];
-    for (const day of days) {
+    for (const [index, day] of days.entries()) {
       const api = actions();
-      api.loadCalendarReview.execute.mockResolvedValue(success({ ...initial, days: [day] }));
+      const active = day.kind !== "UNASSIGNED" && day.origin === "ROSTER";
+      const version = active ? 7 : index === 0 ? null : 8;
+      api.loadCalendarReview.execute.mockResolvedValue(
+        success({
+          ...initial,
+          days: [day],
+          rosterOverrides:
+            version === null ? [] : [{ workDate: date, version, active, shift: null }],
+        }),
+      );
       const controller = new RosterDayController(api, access, employeeId, date, () =>
         identifier(99),
       );
@@ -127,10 +141,110 @@ describe("calendar command ownership", () => {
         workDate: date,
         shift: null,
         reason: "Explicit day off",
-        expectedVersion: day.kind !== "UNASSIGNED" && day.origin === "ROSTER" ? 7 : null,
+        expectedVersion: version,
       });
       controller.deactivate();
     }
+  });
+  it("pins one reset through duplicate clicks, lost responses and later rejection", async () => {
+    const api = actions();
+    api.loadCalendarReview.execute.mockResolvedValue(
+      success({
+        ...calendarFixture({ from: date, until: date }),
+        supportsRosterReset: true,
+        days: [
+          { kind: "OFF", workDate: date, origin: "ROSTER", originVersion: 7, holidayId: null },
+        ],
+        rosterOverrides: [{ workDate: date, version: 7, active: true, shift: null }],
+      }),
+    );
+    const response = deferred<Result<MutationReceipt>>();
+    api.resetRosterDay.execute.mockReturnValueOnce(response.promise);
+    const controller = new RosterDayController(api, access, employeeId, date, () => identifier(99));
+    controller.activate();
+    await vi.waitFor(() => expect(controller.getSnapshot().stage).toBe("editing"));
+    const fields = { reset: true, shift: null, reason: "Return to regular schedule" };
+    const pending = controller.save(fields);
+    fields.reason = "Caller changed its mind";
+    await controller.save(fields);
+    expect(api.resetRosterDay.execute).toHaveBeenCalledTimes(1);
+    expect(api.setRosterDay.execute).not.toHaveBeenCalled();
+    const original = api.resetRosterDay.execute.mock.calls[0];
+    expect(original?.[2]).toEqual({
+      employeeId,
+      workDate: date,
+      expectedVersion: 7,
+      reason: "Return to regular schedule",
+    });
+    expect(Object.isFrozen(original?.[2])).toBe(true);
+    response.resolve(failed("request_timeout"));
+    await pending;
+    await controller.refresh();
+    expect(api.loadCalendarReview.execute).toHaveBeenCalledTimes(1);
+    for (const code of ["mfa_required", "roster_override_required", "stale_version"]) {
+      api.resetRosterDay.execute.mockResolvedValueOnce(failed(code));
+      await controller.retrySave();
+      expect(controller.getSnapshot().stage).toBe("unconfirmed");
+    }
+    await controller.retrySave();
+    expect(controller.getSnapshot().stage).toBe("saved");
+    for (const call of api.resetRosterDay.execute.mock.calls) {
+      expect(call[1]).toBe(original?.[1]);
+      expect(call[2]).toBe(original?.[2]);
+    }
+    controller.deactivate();
+  });
+  it("only resets a reviewed active override and ignores a late receipt after disposal", async () => {
+    const api = actions();
+    const controller = new RosterDayController(api, access, employeeId, date, () => identifier(99));
+    controller.activate();
+    await vi.waitFor(() => expect(controller.getSnapshot().stage).toBe("editing"));
+    const fields = { reset: true, shift: null, reason: "Regular calendar" };
+    await controller.save(fields);
+    expect(api.resetRosterDay.execute).not.toHaveBeenCalled();
+    const initial = calendarFixture({ from: date, until: date });
+    api.loadCalendarReview.execute.mockResolvedValue(
+      success({
+        ...initial,
+        rosterOverrides: [{ workDate: date, version: 7, active: false, shift: null }],
+      }),
+    );
+    await controller.refresh();
+    await controller.save(fields);
+    expect(api.resetRosterDay.execute).not.toHaveBeenCalled();
+    api.loadCalendarReview.execute.mockResolvedValue(
+      success({
+        ...initial,
+        rosterOverrides: [{ workDate: date, version: 7, active: true, shift: null }],
+        supportsRosterReset: false,
+      }),
+    );
+    await controller.refresh();
+    await controller.save(fields);
+    expect(api.resetRosterDay.execute).not.toHaveBeenCalled();
+    api.loadCalendarReview.execute.mockResolvedValue(
+      success({
+        ...initial,
+        supportsRosterReset: true,
+        days: [
+          { kind: "OFF", workDate: date, origin: "ROSTER", originVersion: 7, holidayId: null },
+        ],
+        rosterOverrides: [{ workDate: date, version: 7, active: true, shift: null }],
+      }),
+    );
+    await controller.refresh();
+    const response = deferred<Result<MutationReceipt>>();
+    api.resetRosterDay.execute.mockReturnValueOnce(response.promise);
+    const pending = controller.save(fields);
+    controller.deactivate();
+    expect(api.resetRosterDay.execute.mock.calls[0]?.[3].aborted).toBe(true);
+    controller.activate();
+    await vi.waitFor(() => expect(controller.getSnapshot().stage).toBe("editing"));
+    response.resolve(success({ id: employeeId, version: 8 }));
+    await pending;
+    expect(controller.getSnapshot().receipt).toBeNull();
+    expect(controller.getSnapshot().stage).toBe("editing");
+    controller.deactivate();
   });
   it("does not turn an unknown roster save into an editable request after later rejection", async () => {
     const api = actions();

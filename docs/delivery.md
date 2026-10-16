@@ -5480,3 +5480,23 @@ journal/receipt failure, cancellation, immutable history and sync publication.
 The migration upgrade preserves existing rows and emits no backfill changes.
 
 Development migration waits for dashboard and mobile compatibility validation.
+
+## Dashboard roster reset
+
+The daily roster editor now offers **Follow calendar** for an active override.
+It retains the reviewed version, required reason and original operation through
+an uncertain response and explicit retry. After reset, the next ordinary edit
+uses the retained version. Current review metadata is validated against the
+resolved day; older APIs retain ordinary editing without the reset control.
+Company replacement cancels the editor and rejects late results.
+
+Architecture, Biome, TypeScript, all 3,692 unit tests and ten calendar browser
+scenarios passed. Desktop and dark 390-pixel Indonesian layouts with doubled
+root text were inspected. The initial narrow-layout test had an ambiguous
+label selector; the corrected control-role selector passed on rerun.
+
+The isolated API/PostgreSQL workflow passed: preserve later weekly assignments,
+recover one committed save after response loss, resolve a competing roster edit,
+reset with another lost response, then reactivate the retained head. The API
+review confirmed pattern precedence after reset and a higher roster version
+after reactivation. Development activation still waits for mobile validation.

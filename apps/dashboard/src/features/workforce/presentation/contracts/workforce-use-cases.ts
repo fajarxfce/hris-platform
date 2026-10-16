@@ -19,6 +19,7 @@ import type { LoadWorkPeriodSnapshot } from "../../domain/usecases/load-work-per
 import type { LoadWorkforceEmployees } from "../../domain/usecases/load-workforce-employees";
 import type { PlanOvertimeRequest } from "../../domain/usecases/plan-overtime-request";
 import type { RecoverWorkPeriod } from "../../domain/usecases/recover-work-period";
+import type { ResetRosterDay } from "../../domain/usecases/reset-roster-day";
 import type { ReviewAttendance } from "../../domain/usecases/review-attendance";
 import type { ReviewOvertimeAction } from "../../domain/usecases/review-overtime-action";
 import type { ReviewOvertimePlan } from "../../domain/usecases/review-overtime-plan";
@@ -52,6 +53,7 @@ export type WorkforceUseCases = Readonly<{
   loadCalendarReview: Pick<LoadCalendarReview, "execute">;
   assignWeeklySchedule: Pick<AssignWeeklySchedule, "execute">;
   setRosterDay: Pick<SetRosterDay, "execute">;
+  resetRosterDay: Pick<ResetRosterDay, "execute">;
   loadHoliday: Pick<LoadHoliday, "execute">;
   loadHolidays: Pick<LoadHolidays, "execute">;
   saveHoliday: Pick<SaveHoliday, "execute">;

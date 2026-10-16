@@ -3,6 +3,7 @@ import type { MutationReceipt } from "../../../../core/domain/mutation-receipt";
 import { failed, type Result } from "../../../../core/domain/result";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { RosterDayChange } from "../../domain/entities/roster-day-change";
+import type { RosterReset } from "../../domain/entities/roster-reset";
 import { calendarChangeWasRejected } from "../../domain/policies/calendar-change-policy";
 import { canManageCalendars } from "../../domain/policies/calendar-policy";
 import type { WorkforceUseCases } from "../contracts/workforce-use-cases";
@@ -11,8 +12,11 @@ import {
   initialCalendarEditorState,
 } from "../models/calendar-editor-state";
 
-export type RosterDayFields = Pick<RosterDayChange, "shift" | "reason">;
-type Submission = Readonly<{ operation: OperationId; change: RosterDayChange }>;
+export type RosterDayFields = Pick<RosterDayChange, "shift" | "reason"> & { reset?: boolean };
+type Submission = Readonly<
+  | { kind: "override"; operation: OperationId; change: RosterDayChange }
+  | { kind: "reset"; operation: OperationId; change: RosterReset }
+>;
 
 /** Owns the observed per-day roster version and one immutable command until acknowledgement. */
 export class RosterDayController {
@@ -22,7 +26,10 @@ export class RosterDayController {
   #submission: Submission | null = null;
   #listeners = new Set<() => void>();
   constructor(
-    private readonly actions: Pick<WorkforceUseCases, "loadCalendarReview" | "setRosterDay">,
+    private readonly actions: Pick<
+      WorkforceUseCases,
+      "loadCalendarReview" | "setRosterDay" | "resetRosterDay"
+    >,
     private readonly access: CompanyAccess,
     readonly employeeId: string,
     readonly date: string,
@@ -89,17 +96,32 @@ export class RosterDayController {
     if (!this.#active || this.#state.stage !== "editing" || !this.#state.review) return;
     const day = this.#state.review.days[0];
     if (!day) return;
-    const version = day.kind !== "UNASSIGNED" && day.origin === "ROSTER" ? day.originVersion : null;
-    this.#submission = Object.freeze({
-      operation: this.nextIdentifier() as OperationId,
-      change: Object.freeze({
-        ...fields,
-        employeeId: this.employeeId,
-        workDate: this.date,
-        expectedVersion: version,
-        shift: fields.shift === null ? null : Object.freeze({ ...fields.shift }),
-      }),
-    });
+    const override = this.#state.review.rosterOverrides.find((row) => row.workDate === this.date);
+    if (fields.reset) {
+      if (!this.#state.review.supportsRosterReset || !override?.active) return;
+      this.#submission = Object.freeze({
+        kind: "reset",
+        operation: this.nextIdentifier() as OperationId,
+        change: Object.freeze({
+          employeeId: this.employeeId,
+          workDate: this.date,
+          expectedVersion: override.version,
+          reason: fields.reason,
+        }),
+      });
+    } else {
+      this.#submission = Object.freeze({
+        kind: "override",
+        operation: this.nextIdentifier() as OperationId,
+        change: Object.freeze({
+          employeeId: this.employeeId,
+          workDate: this.date,
+          expectedVersion: override?.version ?? null,
+          reason: fields.reason,
+          shift: fields.shift === null ? null : Object.freeze({ ...fields.shift }),
+        }),
+      });
+    }
     await this.submit(false);
   };
   retrySave = async (): Promise<void> => {
@@ -119,12 +141,20 @@ export class RosterDayController {
     try {
       let result: Result<MutationReceipt>;
       try {
-        result = await this.actions.setRosterDay.execute(
-          this.access,
-          submission.operation,
-          submission.change,
-          pending.signal,
-        );
+        result =
+          submission.kind === "reset"
+            ? await this.actions.resetRosterDay.execute(
+                this.access,
+                submission.operation,
+                submission.change,
+                pending.signal,
+              )
+            : await this.actions.setRosterDay.execute(
+                this.access,
+                submission.operation,
+                submission.change,
+                pending.signal,
+              );
       } catch {
         if (pending.signal.aborted) return;
         result = failed("unexpected_error");
@@ -143,9 +173,12 @@ export class RosterDayController {
         this.#submission = null;
         this.publish({
           ...this.#state,
-          stage: ["stale_version", "employee_not_found", "shift_changed"].includes(
-            result.failure.code,
-          )
+          stage: [
+            "stale_version",
+            "employee_not_found",
+            "shift_changed",
+            "roster_override_required",
+          ].includes(result.failure.code)
             ? "conflict"
             : "editing",
           failure: result.failure,

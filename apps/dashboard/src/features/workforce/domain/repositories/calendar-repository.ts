@@ -5,6 +5,7 @@ import type { EmployeeId } from "../../../people/domain/entities/employee";
 import type { CalendarRange } from "../entities/calendar-range";
 import type { CalendarReview } from "../entities/calendar-review";
 import type { RosterDayChange } from "../entities/roster-day-change";
+import type { RosterReset } from "../entities/roster-reset";
 import type { WeeklyScheduleChange } from "../entities/weekly-schedule-change";
 import type { WorkforceEmployeePage } from "../entities/workforce-employee-page";
 import type { WorkforceEmployeeSearch } from "../entities/workforce-employee-search";
@@ -31,6 +32,12 @@ export interface CalendarRepository {
     company: CompanyId,
     operation: OperationId,
     change: RosterDayChange,
+    signal: AbortSignal,
+  ): Promise<Result<MutationReceipt>>;
+  resetRoster(
+    company: CompanyId,
+    operation: OperationId,
+    change: RosterReset,
     signal: AbortSignal,
   ): Promise<Result<MutationReceipt>>;
 }

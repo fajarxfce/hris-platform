@@ -3,6 +3,7 @@ import type {
   CalendarReceiptDto,
   CalendarReviewDto,
   RosterDayChangeDto,
+  RosterResetDto,
   WeeklyScheduleChangeDto,
   WorkforceEmployeePageDto,
   WorkforceEmployeeSearchDto,
@@ -33,6 +34,14 @@ export interface CalendarDataSource {
     day: string,
     operation: string,
     body: RosterDayChangeDto,
+    signal: AbortSignal,
+  ): Promise<CalendarReceiptDto>;
+  resetRoster(
+    company: string,
+    employee: string,
+    day: string,
+    operation: string,
+    body: RosterResetDto,
     signal: AbortSignal,
   ): Promise<CalendarReceiptDto>;
 }

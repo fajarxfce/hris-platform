@@ -2,6 +2,7 @@ import type { Page } from "@playwright/test";
 import type {
   CalendarReviewDto,
   RosterDayChangeDto,
+  RosterResetDto,
   ShiftSnapshotDto,
   WeeklyScheduleChangeDto,
 } from "../src/features/workforce/data/models/calendar-dto";
@@ -53,15 +54,16 @@ export async function installCalendarsApi(
     days: { MONDAY: { id: original.id, revision: 0, details: original.details } },
   };
   let scheduleVersion = 4;
-  const rosters = new Map<string, { shift: ShiftSnapshotDto | null; version: number }>([
-    ["2026-10-13", { shift: null, version: 6 }],
-  ]);
+  const rosters = new Map<
+    string,
+    { shift: ShiftSnapshotDto | null; version: number; active: boolean }
+  >([["2026-10-13", { shift: null, version: 6, active: true }]]);
   const reads: URL[] = [];
   const writes: {
     company: string;
     path: string;
     operation: string | undefined;
-    body: WeeklyScheduleChangeDto | RosterDayChangeDto;
+    body: WeeklyScheduleChangeDto | RosterDayChangeDto | RosterResetDto;
   }[] = [];
   const receipts = new Map<string, { payload: string; version: number }>();
   let lost = false;
@@ -74,8 +76,12 @@ export async function installCalendarsApi(
     const request = route.request();
     const url = new URL(request.url());
     const company = url.pathname.split("/")[4] ?? "";
-    if (request.method() === "PUT") {
-      const body = request.postDataJSON() as WeeklyScheduleChangeDto | RosterDayChangeDto;
+    const reset = request.method() === "POST" && url.pathname.endsWith("/reset");
+    if (request.method() === "PUT" || reset) {
+      const body = request.postDataJSON() as
+        | WeeklyScheduleChangeDto
+        | RosterDayChangeDto
+        | RosterResetDto;
       const operation = request.headers()["idempotency-key"];
       writes.push({ company, path: url.pathname, operation, body });
       const waiting = pendingSave;
@@ -98,12 +104,18 @@ export async function installCalendarsApi(
             ? { json: { id: employeeId, version: receipt.version } }
             : { status: 409, json: { code: "operation_payload_mismatch" } },
         );
-      const date = url.pathname.split("/").at(-1) ?? "";
+      const date = url.pathname.split("/").at(reset ? -2 : -1) ?? "";
       const weekly = "days" in body;
       const expected = weekly ? scheduleVersion : (rosters.get(date)?.version ?? null);
       if (body.expectedVersion !== expected)
         return route.fulfill({ status: 409, json: { code: "stale_version" } });
-      const references = weekly ? Object.values(body.days) : body.shift ? [body.shift] : [];
+      if (reset && !rosters.get(date)?.active)
+        return route.fulfill({ status: 409, json: { code: "roster_override_required" } });
+      const references = weekly
+        ? Object.values(body.days)
+        : "shift" in body && body.shift
+          ? [body.shift]
+          : [];
       if (
         references.some(
           (reference) =>
@@ -129,7 +141,12 @@ export async function installCalendarsApi(
             Object.entries(body.days).map(([day, shift]) => [day, snapshot(shift.id)]),
           ),
         };
-      } else rosters.set(date, { shift: body.shift ? snapshot(body.shift.id) : null, version });
+      } else
+        rosters.set(date, {
+          shift: "shift" in body && body.shift ? snapshot(body.shift.id) : null,
+          version,
+          active: !reset,
+        });
       receipts.set(key, { payload, version });
       commits += 1;
       if (lost) {
@@ -167,12 +184,16 @@ export async function installCalendarsApi(
       ...fixture,
       employee,
       assignmentAtStart: assignment,
+      rosterOverrides: [...rosters.entries()]
+        .filter(([date]) => date >= from && date <= until)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([workDate, roster]) => ({ workDate, ...roster })),
       calendar: {
         scheduleVersion,
         days: fixture.calendar.days.map((day) => {
           const weekday = weekdays[(new Date(`${day.workDate}T00:00:00Z`).getUTCDay() + 6) % 7];
           const roster = rosters.get(day.workDate);
-          const shift = roster ? roster.shift : weekday ? assignment.days[weekday] : null;
+          const shift = roster?.active ? roster.shift : weekday ? assignment.days[weekday] : null;
           return {
             ...day,
             kind: shift ? "WORK" : "OFF",
@@ -180,8 +201,8 @@ export async function installCalendarsApi(
             startsAt: shift ? day.startsAt : null,
             endsAt: shift ? day.endsAt : null,
             plannedMinutes: shift ? 450 : 0,
-            origin: roster ? "ROSTER" : "PATTERN",
-            originVersion: roster?.version ?? assignment.revision,
+            origin: roster?.active ? "ROSTER" : "PATTERN",
+            originVersion: roster?.active ? roster.version : assignment.revision,
           };
         }),
       },

@@ -7,7 +7,7 @@ export type WeeklyScheduleFormValues = {
   days: Record<Weekday, ShiftSnapshot | null>;
   reason: string;
 };
-export type RosterDayFormValues = { shift: ShiftSnapshot | null; reason: string };
+export type RosterDayFormValues = { shift: ShiftSnapshot | null; reason: string; reset: boolean };
 export function weeklyScheduleFormValues(review: CalendarReview | null): WeeklyScheduleFormValues {
   return {
     days: Object.fromEntries(
@@ -18,7 +18,7 @@ export function weeklyScheduleFormValues(review: CalendarReview | null): WeeklyS
 }
 export function rosterDayFormValues(review: CalendarReview | null): RosterDayFormValues {
   const day = review?.days[0];
-  return { shift: day?.kind === "WORK" ? day.shift : null, reason: "" };
+  return { shift: day?.kind === "WORK" ? day.shift : null, reason: "", reset: false };
 }
 export function weeklyScheduleReferences(
   days: WeeklyScheduleFormValues["days"],

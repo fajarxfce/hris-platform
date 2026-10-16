@@ -54,6 +54,17 @@ export const calendarReviewDto = z.object({
       days: z.partialRecord(weekday, shiftSnapshotDto),
     })
     .nullable(),
+  rosterOverrides: z
+    .array(
+      z.object({
+        workDate: date,
+        version,
+        active: z.boolean(),
+        shift: shiftSnapshotDto.nullable(),
+      }),
+    )
+    .max(62)
+    .optional(),
 });
 export const calendarReceiptDto = z.object({ id: z.uuid(), version });
 export type WorkforceEmployeeDto = z.infer<typeof workforceEmployeeDto>;
@@ -78,5 +89,9 @@ export type WeeklyScheduleChangeDto = Readonly<{
 export type RosterDayChangeDto = Readonly<{
   shift: ShiftReferenceDto | null;
   expectedVersion: number | null;
+  reason: string;
+}>;
+export type RosterResetDto = Readonly<{
+  expectedVersion: number;
   reason: string;
 }>;

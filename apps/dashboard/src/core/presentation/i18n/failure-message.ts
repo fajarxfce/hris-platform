@@ -1349,6 +1349,14 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Review the work date, selected shift and reason.",
     "Periksa tanggal kerja, pilihan shift, dan alasan.",
   ],
+  roster_override_required: [
+    "This day already follows the calendar. Reload its current schedule.",
+    "Tanggal ini sudah mengikuti kalender. Muat ulang jadwal terbarunya.",
+  ],
+  shift_timezone_gap: [
+    "The shift crosses an invalid local time. Review its hours and timezone.",
+    "Shift melewati waktu lokal yang tidak valid. Periksa jam dan zona waktunya.",
+  ],
   shift_changed: [
     "A selected shift has changed. Reload and select its current revision.",
     "Shift yang dipilih telah berubah. Muat ulang dan pilih revisi terbarunya.",

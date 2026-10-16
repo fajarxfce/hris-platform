@@ -591,6 +591,15 @@ schedule version, including future assignments. Later effective assignments keep
 their dates. A daily roster instead uses that date's own observed version; an
 explicit day off remains a versioned override of the weekly pattern and holidays.
 
+For an active daily override, the shift selector offers **Follow calendar**.
+Saving it with a reason restores the underlying weekly schedule or company holiday
+without changing captured attendance. The reviewed roster version remains available
+after reset, so a subsequent override uses that version. Reset controls require
+the new review metadata; an older API still supports ordinary calendar editing.
+An uncertain reset retains its original command through explicit retry and MFA
+renewal, including if the retained roster later changes. Company or account
+replacement cancels the editor and suppresses late receipts.
+
 Shift selection holds one catalog page and at most seven selected snapshots.
 Searching or paging does not replace a selection with a newer template revision.
 Changed templates require explicitly selecting an active revision. Definite

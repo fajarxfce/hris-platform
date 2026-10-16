@@ -44,6 +44,10 @@ const en = {
     "Applies from this date until the next effective assignment. Later assignments keep their dates.",
   rosterPolicy:
     "Overrides the weekly schedule and holiday for this date. Day off creates an explicit roster entry.",
+  followCalendar: "Follow calendar",
+  resetPolicy:
+    "Removes this override so the weekly schedule and company holidays apply. Attendance evidence stays unchanged.",
+  rosterVersion: "Reviewed roster version",
   snapshots:
     "Assigned shifts retain their original revision. Select a current, active revision before saving a changed template.",
   shift: "Shift",
@@ -113,6 +117,10 @@ const id: typeof en = {
     "Berlaku sejak tanggal ini sampai jadwal efektif berikutnya. Tanggal jadwal berikutnya tetap berlaku.",
   rosterPolicy:
     "Menggantikan jadwal mingguan dan hari libur pada tanggal ini. Pilihan Libur membuat roster khusus.",
+  followCalendar: "Ikuti kalender",
+  resetPolicy:
+    "Menghapus pengaturan khusus agar jadwal mingguan dan hari libur perusahaan berlaku. Bukti presensi tetap tersimpan.",
+  rosterVersion: "Versi roster yang ditinjau",
   snapshots:
     "Shift yang sudah ditetapkan menyimpan revisi aslinya. Pilih revisi aktif terbaru jika template telah berubah.",
   shift: "Shift",

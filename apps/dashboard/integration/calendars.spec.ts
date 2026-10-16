@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 import type {
   CalendarReviewDto,
   RosterDayChangeDto,
+  RosterResetDto,
   WeeklyScheduleChangeDto,
 } from "../src/features/workforce/data/models/calendar-dto";
 import { authenticatorCode } from "./fixtures/authenticator";
@@ -110,12 +111,13 @@ test("real schedule editing preserves future assignments, replays one commit and
   const writes: {
     path: string;
     operation: string;
-    body: WeeklyScheduleChangeDto | RosterDayChangeDto;
+    body: WeeklyScheduleChangeDto | RosterDayChangeDto | RosterResetDto;
   }[] = [];
   let loseWeekly = true;
+  let loseReset = false;
   await page.route("**/api/v1/companies/*/workforce/employees/**", async (route) => {
     const request = route.request();
-    if (request.method() !== "PUT") return route.continue();
+    if (!["PUT", "POST"].includes(request.method())) return route.continue();
     const path = new URL(request.url()).pathname;
     writes.push({
       path,
@@ -124,6 +126,12 @@ test("real schedule editing preserves future assignments, replays one commit and
     });
     if (loseWeekly && path.endsWith("/schedule")) {
       loseWeekly = false;
+      const committed = await route.fetch();
+      expect(committed.status()).toBe(200);
+      return route.abort("failed");
+    }
+    if (loseReset && path.endsWith("/reset")) {
+      loseReset = false;
       const committed = await route.fetch();
       expect(committed.status()).toBe(200);
       return route.abort("failed");
@@ -206,4 +214,50 @@ test("real schedule editing preserves future assignments, replays one commit and
     expect.objectContaining({ kind: "OFF", origin: "ROSTER", originVersion: 2 }),
   ]);
   expect(new Set(writes.map((write) => write.operation)).size).toBe(4);
+
+  await page.getByRole("link", { name: "View calendar", exact: true }).last().click();
+  await page.getByRole("button", { name: "Set daily roster: Oct 13, 2026", exact: true }).click();
+  await page.getByLabel("Shift", { exact: true }).selectOption("calendar");
+  await page.getByLabel("Reason", { exact: true }).fill("Restore regular calendar");
+  loseReset = true;
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("The save outcome is not confirmed");
+  await page.getByRole("button", { name: "Retry save", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Calendar saved.");
+  expect(writes[5]?.body).toEqual({ expectedVersion: 2, reason: "Restore regular calendar" });
+  expect(writes[6]).toEqual(writes[5]);
+  const resetResponse = await context.request.get(
+    `${employeeBase}/calendar/review?from=2026-10-13&until=2026-10-13`,
+  );
+  expect(resetResponse.status()).toBe(200);
+  const reset = (await resetResponse.json()) as CalendarReviewDto;
+  expect(reset.calendar.days).toEqual([
+    expect.objectContaining({ kind: "OFF", origin: "PATTERN", originVersion: 2 }),
+  ]);
+  expect(reset.rosterOverrides).toEqual([
+    { workDate: "2026-10-13", version: 3, active: false, shift: null },
+  ]);
+
+  await page.getByRole("link", { name: "View calendar", exact: true }).last().click();
+  await page.getByRole("button", { name: "Set daily roster: Oct 13, 2026", exact: true }).click();
+  await expect(page.getByText("Reviewed roster version: 3", { exact: true })).toBeVisible();
+  await expect(page.getByRole("option", { name: "Follow calendar", exact: true })).toHaveCount(0);
+  await page.getByLabel("Shift", { exact: true }).selectOption(`${shift}:1`);
+  await page.getByLabel("Reason", { exact: true }).fill("New coverage after reset");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("Calendar saved.");
+  expect(writes[7]?.body).toEqual({
+    shift: { id: shift, version: 1 },
+    expectedVersion: 3,
+    reason: "New coverage after reset",
+  });
+  const reactivatedResponse = await context.request.get(
+    `${employeeBase}/calendar/review?from=2026-10-13&until=2026-10-13`,
+  );
+  expect(reactivatedResponse.status()).toBe(200);
+  const reactivated = (await reactivatedResponse.json()) as CalendarReviewDto;
+  expect(reactivated.calendar.days).toEqual([
+    expect.objectContaining({ kind: "WORK", origin: "ROSTER", originVersion: 4 }),
+  ]);
+  expect(new Set(writes.map((write) => write.operation)).size).toBe(6);
 });

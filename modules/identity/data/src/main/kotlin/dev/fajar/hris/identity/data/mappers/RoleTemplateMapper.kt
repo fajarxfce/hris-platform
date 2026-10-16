@@ -8,6 +8,18 @@ import tools.jackson.databind.ObjectMapper
 fun CompanyRoleTemplatesRecord.toRoleTemplate() =
     CompanyRoleTemplate(id, companyId, code, name, permissions.toSet(), active, version)
 
+fun RoleTemplateRevisionsRecord.toRoleTemplateRevision() =
+    RoleTemplateRevision(
+        revision,
+        code,
+        name,
+        permissions.toSet(),
+        active,
+        actorId,
+        reason,
+        recordedAt.toInstant(),
+    )
+
 fun CompanyRoleTemplate.toRoleRow() =
     CompanyRoleTemplatesRecord().also {
         it.id = id

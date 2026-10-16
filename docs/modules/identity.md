@@ -45,7 +45,20 @@ Binding changes lock the provider subject before actor/target accounts in stable
 
 ## Company role templates
 
-`GET/PUT /companies/{companyId}/role-templates` lists or saves named, versioned permission templates. Codes are stable, definitions can be archived, and changes retain immutable revisions. There are at most 128 definitions per company, including archived entries. `GET .../role-templates/permissions` returns the server permission catalog; defining a template does not assign its permissions to anyone.
+`GET /companies/{companyId}/role-templates` lists named, versioned permission templates; `PUT .../role-templates/{id}` creates or changes one. Codes are stable, definitions can be archived, and changes retain immutable revisions. There are at most 128 definitions per company, including archived entries. `GET .../role-templates/permissions` returns the server permission catalog; defining a template does not assign its permissions to anyone.
+
+`GET .../role-templates/{id}` returns the current definition and descending,
+immutable revision history. `historyLimit` is bounded to 1–200 (default 25), and
+`historyAfter` selects revisions below the returned cursor. Invalid or forward
+cursors are rejected. Current and historical definitions share the company role
+read guard, acquired before company, membership and account guards. Readers can
+run together; saves wait until their coherent review is acquired.
+
+Role reads revalidate session assurance after acquisition. Saves detach their
+permission input before waiting and retain current session and recent MFA through
+journal/receipt completion. Expiry, cancellation or a late failure rolls back the
+definition, revision, audit, outbox and receipt together. Successful replay retains
+the original result and still requires current authority and assurance.
 
 Membership writes accept direct `permissions` and up to eight distinct `roleTemplates` selections, each with `id` and `version`. The use case validates current active templates in the same company and records their full permission snapshots with the resulting membership version. Existing members retain their granted permissions when a template changes or is archived. Reapplying a changed template requires an explicit membership update and expected membership version. Refresh the template before retrying a stale selection.
 

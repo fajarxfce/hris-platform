@@ -77,6 +77,13 @@ The new case, initial history, authorization outcome, checkpoint and journal sha
 one transaction. Retained template definitions stay in the existing revision
 history. See [scheduled onboarding](onboarding-schedules.md).
 
+Company role review holds the shared role guard before company, membership and
+actor-account guards. The current definition and bounded revision history are read
+coherently; catalog pages remain one-query reads. Both revalidate session assurance
+after acquisition. Role saves snapshot permission inputs before any wait and retain
+session/recent MFA checks through journal and receipt completion. Late failure or
+cancellation rolls back all role changes and their immutable evidence together.
+
 Approval aggregate reads acquire the shared approval guard before company, membership, and actor-account guards. They observe headers and assignment overrides coherently; mutations retain the exclusive approval guard. Both readers and administrative commands revalidate live session assurance after waiting, including before returning an existing operation receipt.
 
 Interactive work-calendar reads and commands also revalidate current session

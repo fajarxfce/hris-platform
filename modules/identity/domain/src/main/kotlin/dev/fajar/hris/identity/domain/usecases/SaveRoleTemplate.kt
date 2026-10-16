@@ -36,13 +36,14 @@ class SaveRoleTemplate(
             val recent = requireRecentMfa(actor, clock.instant(), security.recentAuthenticationAge)
             if (recent is Result.Failed) return recent
         }
+        val selectedPermissions = permissions.toSet()
         val normalizedCode = code.trim().uppercase()
         val normalizedName = name.trim()
         if (
             !normalizedCode.matches(Regex("[A-Z0-9][A-Z0-9_-]{1,31}")) ||
                 normalizedName.isBlank() ||
                 normalizedName.length > 200 ||
-                !PermissionCatalog.assignable.containsAll(permissions) ||
+                !PermissionCatalog.assignable.containsAll(selectedPermissions) ||
                 (expectedVersion ?: 0) < 0 ||
                 reason.isBlank() ||
                 reason.length > 1000
@@ -62,7 +63,7 @@ class SaveRoleTemplate(
                     normalizedName,
                     active.toString(),
                     reason,
-                ) + permissions.sorted(),
+                ) + selectedPermissions.sorted(),
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
@@ -75,10 +76,11 @@ class SaveRoleTemplate(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val accessed = identities.access(actor.accountId, company)
+            if (accessed is Result.Failed) return@run accessed
+            val currentAccess = (accessed as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+                validateCompanySessionActor(actor, currentAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val permission = live.requirePermission("identity.manage")
@@ -110,7 +112,7 @@ class SaveRoleTemplate(
                     company,
                     normalizedCode,
                     normalizedName,
-                    permissions.toSet(),
+                    selectedPermissions,
                     active,
                     previous?.version ?: 0,
                 )
@@ -131,6 +133,18 @@ class SaveRoleTemplate(
                                 reason,
                             ),
                         )
+                    }
+                    .flatMap {
+                        validateCompanySessionActor(actor, currentAccess, clock.instant(), security)
+                    }
+                    .flatMap {
+                        if (security.enforceMfa)
+                            requireRecentMfa(
+                                actor,
+                                clock.instant(),
+                                security.recentAuthenticationAge,
+                            )
+                        else Result.Success(Unit)
                     }
                     .map { receipt }
             }

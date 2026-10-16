@@ -333,6 +333,16 @@ class IdentityConfiguration {
     ) = ListRoleTemplates(roles, identities, members, transactions, security, clock)
 
     @Bean
+    fun getRoleTemplate(
+        roles: RoleTemplateRepository,
+        identities: IdentityRepository,
+        members: MembershipRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetRoleTemplate(roles, identities, members, transactions, security, clock)
+
+    @Bean
     fun saveRoleTemplate(
         roles: RoleTemplateRepository,
         operations: dev.fajar.hris.core.domain.OperationRepository,

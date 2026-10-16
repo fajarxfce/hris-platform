@@ -7,9 +7,9 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresRoleTemplateDataSource(private val sql: DSLContext) : RoleTemplateDataSource {
-    override fun lock(companyId: UUID) {
-        sql.query("select pg_advisory_xact_lock(hashtextextended(?,0))", "roles:$companyId")
-            .execute()
+    override fun lock(companyId: UUID, shared: Boolean) {
+        val function = if (shared) "pg_advisory_xact_lock_shared" else "pg_advisory_xact_lock"
+        sql.query("select $function(hashtextextended(?,0))", "roles:$companyId").execute()
     }
 
     override fun find(companyId: UUID, id: UUID) =
@@ -31,6 +31,20 @@ class PostgresRoleTemplateDataSource(private val sql: DSLContext) : RoleTemplate
             .where(COMPANY_ROLE_TEMPLATES.COMPANY_ID.eq(companyId))
             .and(after?.let { COMPANY_ROLE_TEMPLATES.ID.gt(it) } ?: DSL.noCondition())
             .orderBy(COMPANY_ROLE_TEMPLATES.ID)
+            .limit(limit)
+            .fetch()
+
+    override fun history(
+        companyId: UUID,
+        id: UUID,
+        after: Long?,
+        limit: Int,
+    ): List<RoleTemplateRevisionsRecord> =
+        sql.selectFrom(ROLE_TEMPLATE_REVISIONS)
+            .where(ROLE_TEMPLATE_REVISIONS.COMPANY_ID.eq(companyId))
+            .and(ROLE_TEMPLATE_REVISIONS.ROLE_ID.eq(id))
+            .and(after?.let { ROLE_TEMPLATE_REVISIONS.REVISION.lt(it) } ?: DSL.noCondition())
+            .orderBy(ROLE_TEMPLATE_REVISIONS.REVISION.desc())
             .limit(limit)
             .fetch()
 

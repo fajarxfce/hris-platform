@@ -48,6 +48,21 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Company role review API
+
+Current role definitions and immutable revisions have a scoped, bounded review
+endpoint. Shared role guards keep the current definition and history coherent;
+reads recheck session assurance after acquisition. Saves retain a detached
+permission selection and require applicable session/recent MFA through transaction
+completion, including journal and receipt rollback on late failure.
+
+Validation passed 73 distinct API/PostgreSQL cases, 23 Identity domain/data tests
+and all 71 worker tests. Coverage includes shared readers versus a writer,
+cancellation cleanup, late proof expiry, revoked authority, immutable input,
+original-command recovery and atomic rollback. OpenAPI coverage, architecture,
+Kotlin formatting and API/worker JAR builds passed. Dashboard integration and
+development deployment are pending for this increment.
+
 ### Leave carried-balance dashboard
 
 The ledger page shows tracked carry as a subset of its main account: exact day

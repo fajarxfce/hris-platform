@@ -4,13 +4,20 @@ import dev.fajar.hris.schema.tables.records.*
 import java.util.UUID
 
 interface RoleTemplateDataSource {
-    fun lock(companyId: UUID)
+    fun lock(companyId: UUID, shared: Boolean)
 
     fun find(companyId: UUID, id: UUID): CompanyRoleTemplatesRecord?
 
     fun count(companyId: UUID): Int
 
     fun list(companyId: UUID, after: UUID?, limit: Int): List<CompanyRoleTemplatesRecord>
+
+    fun history(
+        companyId: UUID,
+        id: UUID,
+        after: Long?,
+        limit: Int,
+    ): List<RoleTemplateRevisionsRecord>
 
     fun insert(row: CompanyRoleTemplatesRecord)
 

@@ -15,7 +15,9 @@ class StoredRoleTemplateRepository(
     private val source: RoleTemplateDataSource,
     private val json: ObjectMapper,
 ) : RoleTemplateRepository {
-    override fun lock(companyId: UUID): Result<Unit> = safeDatabaseCall { source.lock(companyId) }
+    override fun lock(companyId: UUID, shared: Boolean): Result<Unit> = safeDatabaseCall {
+        source.lock(companyId, shared)
+    }
 
     override fun find(companyId: UUID, id: UUID): Result<CompanyRoleTemplate?> = safeDatabaseCall {
         source.find(companyId, id)?.toRoleTemplate()
@@ -32,6 +34,19 @@ class StoredRoleTemplateRepository(
         Page(
             rows.take(limit).map { it.toRoleTemplate() },
             if (rows.size > limit) rows[limit - 1].id.toString() else null,
+        )
+    }
+
+    override fun history(
+        companyId: UUID,
+        id: UUID,
+        after: Long?,
+        limit: Int,
+    ): Result<Page<RoleTemplateRevision>> = safeDatabaseCall {
+        val rows = source.history(companyId, id, after, limit + 1)
+        Page(
+            rows.take(limit).map { it.toRoleTemplateRevision() },
+            if (rows.size > limit) rows[limit - 1].revision.toString() else null,
         )
     }
 

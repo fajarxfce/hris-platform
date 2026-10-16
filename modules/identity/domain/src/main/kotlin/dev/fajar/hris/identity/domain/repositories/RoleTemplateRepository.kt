@@ -5,13 +5,20 @@ import dev.fajar.hris.identity.domain.entities.*
 import java.util.UUID
 
 interface RoleTemplateRepository {
-    fun lock(companyId: UUID): Result<Unit>
+    fun lock(companyId: UUID, shared: Boolean = false): Result<Unit>
 
     fun find(companyId: UUID, id: UUID): Result<CompanyRoleTemplate?>
 
     fun count(companyId: UUID): Result<Int>
 
     fun list(companyId: UUID, after: UUID?, limit: Int): Result<Page<CompanyRoleTemplate>>
+
+    fun history(
+        companyId: UUID,
+        id: UUID,
+        after: Long?,
+        limit: Int,
+    ): Result<Page<RoleTemplateRevision>>
 
     fun save(
         actor: Actor,

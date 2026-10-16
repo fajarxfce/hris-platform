@@ -1,5 +1,5 @@
-import { lazy, Suspense } from "react";
-import { Link, Route, Routes } from "react-router-dom";
+import { lazy, Suspense, useMemo } from "react";
+import { Link, Route, Routes, useMatch } from "react-router-dom";
 import type { AccountId } from "../../core/domain/identifiers";
 import { AppLoading } from "../../core/presentation/components/app-loading";
 import { AppPageHeader } from "../../core/presentation/components/app-page-header";
@@ -24,6 +24,13 @@ import type { PeopleUseCases } from "../../features/people/presentation/contract
 import type { ReportingUseCases } from "../../features/reporting/presentation/contracts/reporting-use-cases";
 import type { WorkforceUseCases } from "../../features/workforce/presentation/contracts/workforce-use-cases";
 import { approvalResourceRoute } from "./approval-resource-route";
+
+const noPlatformPermissions: readonly string[] = Object.freeze([]);
+const PlatformAccountRoutes = lazy(() =>
+  import("../../features/identity/presentation/navigation/platform-account-routes").then(
+    (module) => ({ default: module.PlatformAccountRoutes }),
+  ),
+);
 
 const CommunicationsRoutes = lazy(() =>
   import("../../features/communications/presentation/navigation/communications-routes").then(
@@ -433,6 +440,7 @@ const PayrollRoutes = lazy(() =>
 export function PortalRoutes({
   clientBuild,
   accountId,
+  platformPermissions = noPlatformPermissions,
   identityAdministration,
   company,
   companies,
@@ -455,6 +463,7 @@ export function PortalRoutes({
 }: {
   clientBuild: number;
   accountId: AccountId;
+  platformPermissions?: readonly string[];
   identityAdministration: IdentityAdministrationUseCases;
   company: CompanyMembership | null;
   companies: readonly CompanyMembership[];
@@ -475,6 +484,22 @@ export function PortalRoutes({
   locale: Locale;
   nextIdentifier: () => string;
 }) {
+  const platform = useMatch("/platform/*");
+  const platformAccess = useMemo(
+    () => Object.freeze({ accountId, permissions: platformPermissions }),
+    [accountId, platformPermissions],
+  );
+  if (platform)
+    return (
+      <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+        <PlatformAccountRoutes
+          access={platformAccess}
+          actions={identityAdministration}
+          locale={locale}
+          nextIdentifier={nextIdentifier}
+        />
+      </Suspense>
+    );
   if (!company || !access) return <OverviewPage company={null} locale={locale} />;
   return (
     <Routes>

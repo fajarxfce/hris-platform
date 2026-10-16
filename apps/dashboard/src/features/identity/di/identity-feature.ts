@@ -1,9 +1,11 @@
 import type { HttpClient } from "../../../core/data/http/http-client";
 import { HttpCompanyMemberDataSource } from "../data/datasources/http-company-member-data-source";
 import { HttpIdentityDataSource } from "../data/datasources/http-identity-data-source";
+import { HttpManagedAccountDataSource } from "../data/datasources/http-managed-account-data-source";
 import { HttpRoleTemplateDataSource } from "../data/datasources/http-role-template-data-source";
 import { RemoteCompanyMemberRepository } from "../data/repositories/remote-company-member-repository";
 import { RemoteIdentityRepository } from "../data/repositories/remote-identity-repository";
+import { RemoteManagedAccountRepository } from "../data/repositories/remote-managed-account-repository";
 import { RemoteRoleTemplateRepository } from "../data/repositories/remote-role-template-repository";
 import { BeginMfaEnrollment } from "../domain/usecases/begin-mfa-enrollment";
 import { ConfirmMfaEnrollment } from "../domain/usecases/confirm-mfa-enrollment";
@@ -12,9 +14,12 @@ import { LoadCompanyAccess } from "../domain/usecases/load-company-access";
 import { LoadCompanyMember } from "../domain/usecases/load-company-member";
 import { LoadCompanyMembers } from "../domain/usecases/load-company-members";
 import { LoadIdentityProviders } from "../domain/usecases/load-identity-providers";
+import { LoadManagedAccount } from "../domain/usecases/load-managed-account";
+import { LoadManagedAccounts } from "../domain/usecases/load-managed-accounts";
 import { LoadRoleTemplate } from "../domain/usecases/load-role-template";
 import { LoadRoleTemplates } from "../domain/usecases/load-role-templates";
 import { LoadSession } from "../domain/usecases/load-session";
+import { SaveAccountAccess } from "../domain/usecases/save-account-access";
 import { SaveCompanyMembership } from "../domain/usecases/save-company-membership";
 import { SaveRoleTemplate } from "../domain/usecases/save-role-template";
 import { SignIn } from "../domain/usecases/sign-in";
@@ -26,7 +31,11 @@ export function createIdentityFeature(http: HttpClient) {
   const repository = new RemoteIdentityRepository(source);
   const members = new RemoteCompanyMemberRepository(new HttpCompanyMemberDataSource(http));
   const roles = new RemoteRoleTemplateRepository(new HttpRoleTemplateDataSource(http));
+  const accounts = new RemoteManagedAccountRepository(new HttpManagedAccountDataSource(http));
   return {
+    loadManagedAccounts: new LoadManagedAccounts(accounts),
+    loadManagedAccount: new LoadManagedAccount(accounts),
+    saveAccountAccess: new SaveAccountAccess(accounts),
     loadRoleTemplates: new LoadRoleTemplates(roles),
     loadRoleTemplate: new LoadRoleTemplate(roles),
     loadAssignablePermissions: new LoadAssignablePermissions(roles),

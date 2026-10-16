@@ -123,6 +123,11 @@ cancellation roll back access and credential changes together. A permitted edit
 of the initiating account still succeeds, then requires a new sign-in; fresh
 authentication can recover the original receipt.
 
+The [dashboard account workflow](../dashboard.md#platform-account-administration)
+provides the global directory, exact review and versioned access editing without
+requiring company membership. Unknown save outcomes retain their original
+command. A successful self-edit revalidates the now-revoked application session.
+
 ## Invitations and password recovery
 
 `POST /api/v1/identity/invitations` requires a global administrator, recent authentication/MFA, an Idempotency-Key, and `id`, `email`, `displayName`, and `reason`. It creates an inactive account without membership grants and queues an encrypted invitation. Explicit resends include `expectedVersion`, supersede prior links, and cannot convert an active or existing local-password account into an invitation. Invitations expire after 72 hours. Disabled SMTP rejects new administrative invitation creation with 503 before any mutation. An existing receipt remains retrievable after current authority and recent authentication are revalidated; replay does not enqueue another invitation or require SMTP to be enabled again.

@@ -48,6 +48,36 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Platform account administration dashboard
+
+Global account search, bounded cursor pages, exact review and versioned access
+editing are available independently of company membership. Forms explain session
+revocation, protect the initiating administrator and distinguish pending
+invitations. Private account values clear on access loss or disposal; an unknown
+save outcome retains one command for explicit receipt recovery. Self-edits
+revalidate the application session after the server revokes its credentials.
+
+Dashboard architecture, Biome, TypeScript and all 3,487 unit tests passed. Eleven
+account browser scenarios passed, including no-company access, company-only
+denial, original-command recovery through MFA and later conflicts, stale-version
+review, guarded departures, cancellation and revoked authority without a loop.
+Desktop and Indonesian dark layouts at 390 pixels with doubled text were
+inspected. Accessible directory actions identify the account by its displayed
+name. Existing CSS specificity and bundle-size warnings remain.
+
+Two isolated API/PostgreSQL browser workflows passed. Account administration
+searched an owned fixture without company membership, recovered a lost committed
+save, reactivated the target and verified session revocation after a permitted
+self-edit. Company membership editing retained archived role evidence and
+explicitly reviewed reactivation. Its assertions compare effective permission
+sets without assuming response array order, correcting the hosted CI failure.
+No external messages or real MFA credentials were used.
+
+The API and worker running in development match the validated JAR hashes. Their
+deployment preserved the existing database and document services. WireGuard API
+health and dashboard access both returned HTTP 200 from the VPS. No mobile code
+or phone installation changed in this increment.
+
 ### Global account review and completion assurance
 
 An exact-account review endpoint returns the minimal administrative projection
@@ -276,8 +306,8 @@ funding and paired ledger movements. Deferred constraints prevent missing
 funding, duplicate transitions, unpaired expiry, cross-scope writes and returned
 expired units becoming spendable. Existing carry and policy serialization remain
 compatible. This foundation did not enable public commands or deploy the changes.
-[Remaining integration](leave-carryover.md#remaining-integration) tracks dashboard/mobile
-views, synchronization and optional validity configuration.
+The subsequent [dashboard and native acceptance](leave-carryover.md#dashboard-and-native-acceptance)
+records the completed views, synchronization and optional validity configuration.
 
 Validation passed with 45 domain tests, 26 initial API/PostgreSQL scenarios and
 18 final storage/mapper scenarios, plus 68 worker tests and two migration tests.

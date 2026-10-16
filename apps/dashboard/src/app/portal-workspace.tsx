@@ -31,7 +31,11 @@ export function PortalWorkspace(
   const { state, identity, locale } = props;
   const navigation = useWorkspaceNavigation(state.workspace !== null && state.stage !== "ready");
   const menu = useNavigationMenu(
-    portalNavigation(state.workspace?.access ?? state.access, locale),
+    portalNavigation(
+      state.workspace?.access ?? state.access,
+      locale,
+      state.workspace?.platformPermissions ?? [],
+    ),
     props.collapsed,
   );
   const sessionActions = useMemo(
@@ -83,6 +87,7 @@ export function PortalWorkspace(
                 <PortalRoutes
                   clientBuild={props.clientBuild}
                   accountId={state.workspace.accountId}
+                  platformPermissions={state.workspace.platformPermissions}
                   identityAdministration={props.identityAdministration}
                   companies={state.workspace.companies}
                   access={state.workspace.access}

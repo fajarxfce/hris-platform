@@ -11,6 +11,7 @@ import {
 import { expenseNavigation } from "../../features/expenses/presentation/navigation/expense-navigation";
 import type { CompanyAccess } from "../../features/identity/domain/entities/session";
 import { identityNavigation } from "../../features/identity/presentation/navigation/identity-navigation";
+import { platformAccountNavigation } from "../../features/identity/presentation/navigation/platform-account-navigation";
 import { jobsNavigation } from "../../features/jobs/presentation/navigation/jobs-navigation";
 import { leaveNavigation } from "../../features/leave/presentation/navigation/leave-navigation";
 import { lifecycleNavigation } from "../../features/lifecycle/presentation/navigation/lifecycle-navigation";
@@ -24,6 +25,7 @@ import { workforceNavigation } from "../../features/workforce/presentation/navig
 export function portalNavigation(
   access: CompanyAccess | null,
   locale: Locale,
+  platformPermissions: readonly string[] = [],
 ): readonly AppNavigationSection[] {
   const text = messages(locale);
   return [
@@ -68,6 +70,11 @@ export function portalNavigation(
         ...documentRetentionNavigation(access, locale),
         ...jobsNavigation(access, locale),
       ],
+    },
+    {
+      id: "platform",
+      label: text.navigationPlatform,
+      items: platformAccountNavigation(platformPermissions, locale),
     },
   ].filter((section) => section.items.length > 0);
 }

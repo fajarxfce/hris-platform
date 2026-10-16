@@ -1139,6 +1139,23 @@ a {
   min-width: 0;
   overflow-wrap: anywhere;
 }
+
+.app-platform-account {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.app-platform-account .app-command-bar-panel .app-text-field {
+  flex: 1 1 260px;
+  max-width: 480px;
+  min-width: 0;
+}
+
+.app-account-permissions {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
 .app-member-role-name {
   margin: 0;
   font-size: 1em;

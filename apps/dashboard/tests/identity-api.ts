@@ -16,6 +16,7 @@ export async function installIdentityApi(
     failLogin?: string;
     noCompanies?: boolean;
     permissions?: readonly string[];
+    platformPermissions?: readonly string[];
     timezone?: string;
   } = {},
 ) {
@@ -24,6 +25,7 @@ export async function installIdentityApi(
   let verified = options.mfaVerified ?? !required;
   let configured = options.mfaConfigured ?? false;
   let permissions = options.permissions ?? ["company.read", "people.read"];
+  let platformPermissions = options.platformPermissions ?? [];
   let accessFailure: string | null = null;
   const reads = { session: 0, access: 0 };
   let csrf = 0;
@@ -91,7 +93,7 @@ export async function installIdentityApi(
                 name: index === 0 ? "North Company" : "South Company",
                 timezone: options.timezone ?? "Asia/Jakarta",
               })),
-        permissions: [],
+        permissions: required && !verified ? [] : platformPermissions,
         assurance: {
           required,
           verified,
@@ -154,6 +156,9 @@ export async function installIdentityApi(
     },
     setPermissions: (next: readonly string[]) => {
       permissions = next;
+    },
+    setPlatformPermissions: (next: readonly string[]) => {
+      platformPermissions = next;
     },
     denyAccess: (code: string | null) => {
       accessFailure = code;

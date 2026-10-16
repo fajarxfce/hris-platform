@@ -1214,6 +1214,36 @@ current-role selection before reactivation. Desktop and Indonesian dark views at
 390 pixels with doubled text were inspected; long account text wraps within the
 available width. Global account provisioning remains a separate workflow.
 
+## Platform account administration
+
+`/platform/accounts` is a separate global directory requiring platform
+`identity.manage`. It remains available without a selected company. Explicit
+name/email search and fifty-row cursor pages acquire only administrative account
+fields. Details show activation, pending invitation, MFA configuration status,
+platform permissions and the observed account version; no authenticator values
+or private employee profiles are acquired.
+
+The access editor uses the server's assignable permission catalog and requires
+a reason. It explains that saving invalidates the account's existing sessions.
+Administrators cannot deactivate themselves or remove their own administration.
+Pending invitations cannot be activated here; explicitly saving one as inactive
+cancels it. Company membership and HR permission changes remain separate.
+
+One observed version and detached command survive an unconfirmed response.
+Explicit retry checks the original receipt, including after MFA renewal or a
+later conflict. A definite version conflict requires protected reloading. Revoked
+authority clears private data and revalidates the application session; permitted
+self-edits return to sign-in when that session is revoked. Reads, saves and form
+state belong to the account editor and stop on disposal. Locale/theme changes
+retain the form without another acquisition.
+
+All 3,487 dashboard unit tests and eleven account browser scenarios passed.
+An isolated API/PostgreSQL scenario verified administration without company
+access, lost-response recovery, reactivation and self-edit session revocation.
+Desktop and Indonesian dark views at 390 pixels with doubled text were inspected.
+Invitations, new company assignments, provider bindings and session administration
+remain subsequent workflows.
+
 ## Employee account binding
 
 An unbound employee profile offers **Link account** to an independent operator with
@@ -1468,5 +1498,5 @@ copy and responsive Fluent components reuse the existing portal shell.
 Unit and browser tests cover disposal, finite polling, original-command recovery,
 MFA, company replacement and narrow dark-mode review. A real API/PostgreSQL/worker
 scenario verified recovery and one ledger debit after a lost successful response.
-Optional validity configuration and carried-balance presentation remain in the
-[carryover integration](leave-carryover.md#remaining-integration) backlog.
+Optional validity configuration and carried-balance presentation are covered by
+[dashboard and native acceptance](leave-carryover.md#dashboard-and-native-acceptance).

@@ -694,6 +694,40 @@ language/theme changes only reformat its current immutable page. Employee names
 and numbers share one column so actions fit the desktop review table; the same
 table scrolls within its own container on narrow layouts.
 
+## Attendance after closing
+
+A published employee result exposes **Adjustment history** and a review action on
+each date. The response's `adjustmentsSupported` metadata advertises API support
+independently of permissions; older APIs keep the ordinary closing view. Routes
+remain beneath `/workforce/periods/:month/employees/:employeeId`:
+
+- `/days/:workDate/adjustment` compares the original closing, current adjusted day
+  and captured evidence. The period's retained timezone determines input times.
+  Every pending capture starts with an empty decision. Corrected times or explicit
+  absence determine duration; Accept/Reject classifies the supporting evidence.
+- `/adjustments` reads up to 25 immutable revisions with a descending cursor.
+- `/adjustments/:adjustmentId` displays that exact revision and its full monthly
+  snapshot. Returning preserves the history page. The original closing remains
+  separately accessible.
+
+Use cases coordinate the adjustment and period repository contracts. Datasources
+perform HTTP I/O; repository acquisition, scope/calendar validation and DTO mapping
+share the existing HTTP failure boundary. Pages render prepared state. A single
+controller owns the review and one immutable command, including its evidence
+decisions, observed revision, reason and operation ID.
+
+Server hints preserve current correction authority and independent verification.
+Definite source conflicts require protected reload. An uncertain command keeps its
+original payload through explicit retry and later conflicts or MFA; a subsequent
+HR correction cannot substitute its result. Saved navigation opens the original
+receipt's exact revision. Forms remain in scoped browser memory.
+
+Hidden review acquisition is cancelled; readmission resumes an interrupted read
+without replaying a command. History/detail reads cancel when their workspace is
+hidden or replaced. Disposal clears owners and their query records; late results
+cannot enter another company. Theme and locale only reformat retained data.
+See [the Workforce contract](attendance-adjustments.md).
+
 ## Implemented foundation
 
 `apps/dashboard` provides password sign-in, configured SSO entry links, session bootstrap, authenticator enrollment/verification, and explicit acknowledgement of one-use recovery codes. The portal includes current-company selection, an authorized company overview, organization directories, parent details and editing, employee onboarding, directories, employment history, dated revisions and scheduled revision cancellation, separately authorized personal profiles with editing/history, lifecycle template catalogs and checklist editing, scoped case/checklist/history views, assigned-task queues, versioned task changes and assignment, company/group headcount reports, audit metadata search, client policy review and versioned editing, a job monitor with cancellation, employee CSV intake, result review and guarded apply/resume/cancel actions, responsive navigation, and English/Indonesian light/dark interfaces. Other business resource screens listed above remain subsequent work; the overview does not invent statistics.

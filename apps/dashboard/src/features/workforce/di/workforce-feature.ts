@@ -1,21 +1,27 @@
 import type { HttpClient } from "../../../core/data/http/http-client";
+import { HttpAttendanceAdjustmentDataSource } from "../data/datasources/http-attendance-adjustment-data-source";
 import { HttpAttendanceDataSource } from "../data/datasources/http-attendance-data-source";
 import { HttpCalendarDataSource } from "../data/datasources/http-calendar-data-source";
 import { HttpHolidayDataSource } from "../data/datasources/http-holiday-data-source";
 import { HttpOvertimeDataSource } from "../data/datasources/http-overtime-data-source";
 import { HttpShiftDataSource } from "../data/datasources/http-shift-data-source";
 import { HttpWorkPeriodDataSource } from "../data/datasources/http-work-period-data-source";
+import { RemoteAttendanceAdjustmentRepository } from "../data/repositories/remote-attendance-adjustment-repository";
 import { RemoteAttendanceRepository } from "../data/repositories/remote-attendance-repository";
 import { RemoteCalendarRepository } from "../data/repositories/remote-calendar-repository";
 import { RemoteHolidayRepository } from "../data/repositories/remote-holiday-repository";
 import { RemoteOvertimeRepository } from "../data/repositories/remote-overtime-repository";
 import { RemoteShiftRepository } from "../data/repositories/remote-shift-repository";
 import { RemoteWorkPeriodRepository } from "../data/repositories/remote-work-period-repository";
+import { AdjustClosedAttendance } from "../domain/usecases/adjust-closed-attendance";
 import { ApplyRosterBulk } from "../domain/usecases/apply-roster-bulk";
 import { AssignWeeklySchedule } from "../domain/usecases/assign-weekly-schedule";
 import { CloseWorkPeriod } from "../domain/usecases/close-work-period";
 import { CorrectAttendance } from "../domain/usecases/correct-attendance";
 import { DecideOvertimeRequest } from "../domain/usecases/decide-overtime-request";
+import { LoadAttendanceAdjustment } from "../domain/usecases/load-attendance-adjustment";
+import { LoadAttendanceAdjustmentReview } from "../domain/usecases/load-attendance-adjustment-review";
+import { LoadAttendanceAdjustments } from "../domain/usecases/load-attendance-adjustments";
 import { LoadAttendanceCorrectionHistory } from "../domain/usecases/load-attendance-correction-history";
 import { LoadAttendanceExceptions } from "../domain/usecases/load-attendance-exceptions";
 import { LoadCalendarReview } from "../domain/usecases/load-calendar-review";
@@ -45,6 +51,9 @@ import { SubmitOvertimeActual } from "../domain/usecases/submit-overtime-actual"
 import { WithdrawOvertimeRequest } from "../domain/usecases/withdraw-overtime-request";
 
 export function createWorkforceFeature(http: HttpClient) {
+  const adjustments = new RemoteAttendanceAdjustmentRepository(
+    new HttpAttendanceAdjustmentDataSource(http),
+  );
   const attendance = new RemoteAttendanceRepository(new HttpAttendanceDataSource(http));
   const calendars = new RemoteCalendarRepository(new HttpCalendarDataSource(http));
   const shifts = new RemoteShiftRepository(new HttpShiftDataSource(http));
@@ -52,6 +61,10 @@ export function createWorkforceFeature(http: HttpClient) {
   const overtime = new RemoteOvertimeRepository(new HttpOvertimeDataSource(http));
   const periods = new RemoteWorkPeriodRepository(new HttpWorkPeriodDataSource(http));
   return {
+    adjustClosedAttendance: new AdjustClosedAttendance(adjustments),
+    loadAttendanceAdjustment: new LoadAttendanceAdjustment(adjustments),
+    loadAttendanceAdjustments: new LoadAttendanceAdjustments(adjustments, periods),
+    loadAttendanceAdjustmentReview: new LoadAttendanceAdjustmentReview(adjustments),
     loadWorkPeriodOverview: new LoadWorkPeriodOverview(periods),
     loadWorkPeriodEmployees: new LoadWorkPeriodEmployees(periods),
     loadWorkPeriodSnapshot: new LoadWorkPeriodSnapshot(periods),

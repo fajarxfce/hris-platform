@@ -48,6 +48,37 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Closed attendance adjustment dashboard
+
+Published employee results now open a day review that separates original closing
+facts, current adjusted facts and capture evidence. Pending decisions start empty;
+the form uses the retained period timezone and requires a correction reason.
+Current server hints preserve correction and verification independence. History
+uses 25-row pages, and exact revisions show their retained monthly calendar.
+Unknown command outcomes keep their original operation, payload and receipt
+navigation even after another HR correction. Hidden/disposed reads cancel without
+substituting a new command or leaking into a replacement company.
+
+The API advertises adjustment support separately from permissions. Older servers
+retain their existing closing view. All 64 affected API/PostgreSQL scenarios
+passed, including OpenAPI and live closing/snapshot access, with architecture,
+formatting and both application JARs. No schema or worker DI changed here.
+
+Dashboard architecture, Biome, TypeScript and all 3,772 unit tests passed, including
+20 new boundary, controller and query-lifetime scenarios. All 18 related Chromium
+scenarios passed, including seven new adjustment cases. Desktop retained evidence
+and a dark Indonesian form at 390 pixels with doubled text were inspected.
+
+The isolated API/PostgreSQL/worker browser workflow passed: close reviewed
+attendance, receive two late offline captures, explicitly accept/reject their
+evidence and record overnight work, lose the committed response, record a later
+absence, then recover and inspect the original adjustment. History retained both
+revisions. The original closing response stayed identical, while the owned native
+attendance API exposed the latest correction and evidence decisions. The initial
+run used an ambiguous Clock-in label selector; selecting the form control by role
+resolved it. Disposable services were removed. Android replica/device acceptance
+and the staged development rollout remain separate; no APK was installed.
+
 ### Attendance sources for payroll amendments
 
 Amendment preparation exposes current attendance revisions alongside published

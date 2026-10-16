@@ -6,4 +6,5 @@ export type WorkPeriodSnapshot = Readonly<{
   employee: WorkforceEmployee;
   period: WorkPeriod;
   days: readonly ClosedWorkDay[];
+  adjustmentsSupported: boolean;
 }>;

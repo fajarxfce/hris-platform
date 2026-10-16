@@ -3,12 +3,14 @@ import { expect, test } from "@playwright/test";
 import { createAdminCompany } from "../integration/fixtures/admin-company";
 import type { WorkPeriodOverviewDto } from "../src/features/workforce/data/models/work-period-overview-dto";
 import type { WorkPeriodSnapshotDto } from "../src/features/workforce/data/models/work-period-snapshot-dto";
+import { exerciseAttendanceAdjustments } from "./fixtures/attendance-adjustment-workflow";
 
 test("closing reviews offline evidence, replays original receipts and publishes immutable employee results", async ({
   page,
   context,
   request,
 }) => {
+  test.setTimeout(180_000);
   const { company, csrf } = await createAdminCompany(
     page,
     context,
@@ -305,4 +307,15 @@ test("closing reviews offline evidence, replays original receipts and publishes 
       await request.get(`${base}/workforce/periods/${month}/employees`, { headers: nativeHeaders })
     ).status(),
   ).toBe(403);
+  await exerciseAttendanceAdjustments({
+    page,
+    admin: context,
+    request,
+    company,
+    employee,
+    workDate: monthEnd,
+    original: before,
+    nativeHeaders,
+    headers,
+  });
 });

@@ -94,6 +94,12 @@ class ApiContractHttpTest : PeopleApiFixture() {
         assertEquals(64, schema["properties"]["reviewRevision"]["maxLength"].asInt())
         assertEquals(1000, schema["properties"]["reason"]["maxLength"].asInt())
         assertEquals(
+            "boolean",
+            api["components"]["schemas"]["WorkPeriodSnapshotResponse"]["properties"][
+                    "adjustmentsSupported"]["type"]
+                .asString(),
+        )
+        assertEquals(
             50,
             api["paths"][base]["get"]["parameters"]
                 .iterator()

@@ -1255,3 +1255,14 @@ a {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+.app-adjustment-evidence {
+  display: grid;
+  gap: var(--spacingVerticalM);
+  padding-block: var(--spacingVerticalM);
+  border-bottom: 1px solid var(--colorNeutralStroke2);
+}
+
+.app-adjustment-evidence summary {
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}

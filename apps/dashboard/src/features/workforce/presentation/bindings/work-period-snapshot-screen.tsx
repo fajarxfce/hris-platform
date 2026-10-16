@@ -1,9 +1,13 @@
 import { useMemo } from "react";
-import { Navigate, useParams, useSearchParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import { canReadWorkPeriods } from "../../domain/policies/work-period-policy";
 import type { WorkforceScreenProps } from "../contracts/workforce-screen-props";
 import { useWorkPeriodSnapshot } from "../controllers/use-work-period-snapshot";
+import {
+  attendanceAdjustmentHistoryPath,
+  attendanceAdjustmentReviewPath,
+} from "../models/attendance-adjustment-route";
 import {
   workPeriodEmployeePath,
   workPeriodPath,
@@ -39,6 +43,7 @@ export function WorkPeriodSnapshotScreen(props: WorkforceScreenProps) {
 function WorkPeriodSnapshotBinding(
   props: WorkforceScreenProps & { month: string; employee: string },
 ) {
+  const navigate = useNavigate();
   const state = useWorkPeriodSnapshot(
     props.accountId,
     props.access,
@@ -57,6 +62,24 @@ function WorkPeriodSnapshotBinding(
       view={view}
       locale={props.locale}
       companyName={props.companyName}
+      adjustmentsTo={
+        state.snapshot?.adjustmentsSupported
+          ? attendanceAdjustmentHistoryPath(props.access.companyId, props.month, props.employee)
+          : null
+      }
+      onReviewDay={
+        state.snapshot?.adjustmentsSupported
+          ? (date) =>
+              navigate(
+                attendanceAdjustmentReviewPath(
+                  props.access.companyId,
+                  props.month,
+                  props.employee,
+                  date,
+                ),
+              )
+          : null
+      }
       backTo={
         canReadWorkPeriods(props.access.permissions)
           ? workPeriodPath(props.access.companyId, props.month)

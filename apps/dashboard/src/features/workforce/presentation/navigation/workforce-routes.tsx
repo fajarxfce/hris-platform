@@ -1,4 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { AttendanceAdjustmentDetailsScreen } from "../bindings/attendance-adjustment-details-screen";
+import { AttendanceAdjustmentHistoryScreen } from "../bindings/attendance-adjustment-history-screen";
+import { AttendanceAdjustmentScreen } from "../bindings/attendance-adjustment-screen";
 import { AttendanceCorrectionHistoryScreen } from "../bindings/attendance-correction-history-screen";
 import { AttendanceDayScreen } from "../bindings/attendance-day-screen";
 import { AttendanceDirectoryScreen } from "../bindings/attendance-directory-screen";
@@ -35,6 +38,18 @@ export function WorkforceRoutes(props: WorkforceScreenProps) {
       <Route
         path="periods/:month/employees/:employeeId"
         element={<WorkPeriodSnapshotScreen {...props} />}
+      />
+      <Route
+        path="periods/:month/employees/:employeeId/days/:workDate/adjustment"
+        element={<AttendanceAdjustmentScreen {...props} />}
+      />
+      <Route
+        path="periods/:month/employees/:employeeId/adjustments"
+        element={<AttendanceAdjustmentHistoryScreen {...props} />}
+      />
+      <Route
+        path="periods/:month/employees/:employeeId/adjustments/:adjustmentId"
+        element={<AttendanceAdjustmentDetailsScreen {...props} />}
       />
       <Route path="overtime" element={<OvertimeRequestsScreen {...props} />} />
       <Route path="overtime/new" element={<OvertimePlanScreen {...props} />} />

@@ -10,6 +10,7 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useWorkPeriodSnapshot } from "../controllers/use-work-period-snapshot";
+import { attendanceAdjustmentMessages } from "../i18n/attendance-adjustment-messages";
 import { workPeriodMessages } from "../i18n/work-period-messages";
 import type { workPeriodSnapshotView } from "../models/work-period-view";
 
@@ -19,6 +20,8 @@ export function WorkPeriodSnapshotPage(props: {
   locale: Locale;
   companyName: string;
   backTo: string | null;
+  adjustmentsTo: string | null;
+  onReviewDay: ((date: string) => void) | null;
 }) {
   const { state, view, locale } = props,
     text = workPeriodMessages(locale);
@@ -30,6 +33,9 @@ export function WorkPeriodSnapshotPage(props: {
         actions={
           <>
             {props.backTo && <Link to={props.backTo}>{text.back}</Link>}
+            {props.adjustmentsTo && (
+              <Link to={props.adjustmentsTo}>{attendanceAdjustmentMessages(locale).history}</Link>
+            )}
             <AppButton
               appearance="subtle"
               icon={<ArrowClockwise20Regular />}
@@ -62,6 +68,15 @@ export function WorkPeriodSnapshotPage(props: {
               { id: "overtime", label: text.overtime, numeric: true },
             ]}
             rows={view.days}
+            {...(props.onReviewDay
+              ? {
+                  action: {
+                    label: attendanceAdjustmentMessages(locale).review,
+                    onOpen: props.onReviewDay,
+                    columnId: "date",
+                  },
+                }
+              : {})}
           />
         </>
       )}

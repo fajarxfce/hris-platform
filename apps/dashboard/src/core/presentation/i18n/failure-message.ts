@@ -2,6 +2,47 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  attendance_adjustments_unavailable: [
+    "Attendance adjustments are not available on this server.",
+    "Penyesuaian attendance belum tersedia pada server ini.",
+  ],
+  invalid_attendance_adjustment: [
+    "Review the correction, reason and pending capture decisions.",
+    "Periksa koreksi, alasan, dan keputusan bukti pending.",
+  ],
+  invalid_attendance_adjustment_date: [
+    "Choose a valid work date from the closed month.",
+    "Pilih tanggal kerja yang valid pada bulan yang sudah ditutup.",
+  ],
+  attendance_adjustment_changed: [
+    "Attendance changed after this review. Reload before recording a new adjustment.",
+    "Attendance berubah setelah tinjauan ini. Muat ulang sebelum mencatat penyesuaian baru.",
+  ],
+  attendance_adjustment_evidence_changed: [
+    "The pending evidence changed. Reload and review every pending capture.",
+    "Bukti pending berubah. Muat ulang dan tinjau setiap bukti pending.",
+  ],
+  attendance_adjustment_requires_closed_period: [
+    "This action requires a closed attendance month.",
+    "Tindakan ini memerlukan bulan attendance yang sudah ditutup.",
+  ],
+  attendance_adjustment_source_invalid: [
+    "The attendance sources could not be verified. Reload the review.",
+    "Sumber attendance belum dapat diverifikasi. Muat ulang tinjauan.",
+  ],
+  attendance_adjustment_unchanged: [
+    "The proposed correction matches the recorded attendance.",
+    "Koreksi yang diajukan sama dengan attendance tercatat.",
+  ],
+  attendance_adjustment_version_exhausted: [
+    "This attendance history cannot accept another revision. Contact your administrator.",
+    "Riwayat attendance ini tidak dapat menerima revisi baru. Hubungi administrator.",
+  ],
+  attendance_adjustment_not_found: [
+    "This attendance revision is unavailable for your current access.",
+    "Revisi attendance ini tidak tersedia untuk akses Anda saat ini.",
+  ],
+
   invalid_oidc_identity: [
     "Review the configured provider, identity values and reason.",
     "Periksa konfigurasi provider, nilai identitas, dan alasan perubahan.",

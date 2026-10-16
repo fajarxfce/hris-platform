@@ -67,6 +67,7 @@ class WorkPeriodHttpTest : WorkPeriodApiFixture() {
         val response = get(f.employeeClient, "${f.path}/periods/2026-09/employees/${f.employee}")
         assertEquals(200, response.statusCode(), response.body())
         val snapshot = json.readTree(response.body())
+        assertTrue(snapshot["adjustmentsSupported"].asBoolean())
         assertEquals(30, snapshot.get("days").size())
         assertEquals("OFF", snapshot.get("days")[0].get("fact").asString())
         assertEquals("UNASSIGNED", snapshot.get("days")[1].get("fact").asString())

@@ -120,10 +120,17 @@ acquisition and late authentication expiry roll back the whole command. See
    projections acquire immutable references; clients never submit replacement
    work or leave facts. Independent verification, approval and publication remain
    required.
-3. Dashboard before/after review, evidence decisions, revision history and pinned
-   command recovery. Original and adjusted facts must be distinguishable.
-4. Real API/browser acceptance and employee replica acceptance, followed by
-   compatible development delivery.
+3. [Dashboard before/after review](dashboard.md#attendance-after-closing), explicit
+   evidence decisions, revision history and original-command recovery are
+   implemented. Original closing, current review and exact retained revisions
+   remain distinguishable. Older APIs hide the new entry points through optional
+   support metadata.
+4. Real API/browser acceptance passed, including late offline captures, overnight
+   correction, a lost committed response, a subsequent correction and original
+   receipt recovery. Original closing facts remain unchanged; the owned employee
+   API exposes the latest corrected day. Android replica acceptance and compatible
+   development delivery remain separate. See the
+   [executed checks](delivery.md#closed-attendance-adjustment-dashboard).
 
 The sequence records remaining implementation and validation. A retained Workforce
 revision alone does not complete payroll consumption or dashboard delivery.

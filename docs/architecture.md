@@ -160,7 +160,10 @@ Reviews, correction, snapshot, journal, receipt and daily sync capture commit
 together, while the original closing remains immutable. Reads and commands retain
 current scope and assurance through acquisition and completion. See
 [late attendance corrections](attendance-adjustments.md) for the contract and
-remaining payroll/dashboard integration.
+payroll/dashboard delivery records. The dashboard's adjustment use cases
+coordinate repository contracts, including the original closing needed for
+history context. Its command controller retains the reviewed evidence and exact
+operation through response loss; technical I/O and mapping remain in data.
 
 Payroll inputs retain the exact selected attendance adjustment independently of
 the original closing version. Their use cases acquire the shared month guard

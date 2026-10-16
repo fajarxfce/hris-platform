@@ -1,8 +1,12 @@
+import type { AdjustClosedAttendance } from "../../domain/usecases/adjust-closed-attendance";
 import type { ApplyRosterBulk } from "../../domain/usecases/apply-roster-bulk";
 import type { AssignWeeklySchedule } from "../../domain/usecases/assign-weekly-schedule";
 import type { CloseWorkPeriod } from "../../domain/usecases/close-work-period";
 import type { CorrectAttendance } from "../../domain/usecases/correct-attendance";
 import type { DecideOvertimeRequest } from "../../domain/usecases/decide-overtime-request";
+import type { LoadAttendanceAdjustment } from "../../domain/usecases/load-attendance-adjustment";
+import type { LoadAttendanceAdjustmentReview } from "../../domain/usecases/load-attendance-adjustment-review";
+import type { LoadAttendanceAdjustments } from "../../domain/usecases/load-attendance-adjustments";
 import type { LoadAttendanceCorrectionHistory } from "../../domain/usecases/load-attendance-correction-history";
 import type { LoadAttendanceExceptions } from "../../domain/usecases/load-attendance-exceptions";
 import type { LoadCalendarReview } from "../../domain/usecases/load-calendar-review";
@@ -32,6 +36,11 @@ import type { SubmitOvertimeActual } from "../../domain/usecases/submit-overtime
 import type { WithdrawOvertimeRequest } from "../../domain/usecases/withdraw-overtime-request";
 
 export type WorkforceUseCases = Readonly<{
+  adjustClosedAttendance: Pick<AdjustClosedAttendance, "execute">;
+  loadAttendanceAdjustment: Pick<LoadAttendanceAdjustment, "execute">;
+  loadAttendanceAdjustments: Pick<LoadAttendanceAdjustments, "execute">;
+  loadAttendanceAdjustmentReview: Pick<LoadAttendanceAdjustmentReview, "execute">;
+
   reviewRosterBulk: Pick<ReviewRosterBulk, "execute">;
   applyRosterBulk: Pick<ApplyRosterBulk, "execute">;
   loadWorkPeriodOverview: Pick<LoadWorkPeriodOverview, "execute">;

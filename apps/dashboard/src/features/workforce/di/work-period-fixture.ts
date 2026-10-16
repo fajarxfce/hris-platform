@@ -104,6 +104,7 @@ export function workPeriodSnapshotDtoFixture(): WorkPeriodSnapshotDto {
     month: periodMonth,
     employee: employeeDtoFixture(),
     period: workPeriodDtoFixture("CLOSED"),
+    adjustmentsSupported: false,
     days: calendar.calendar.days.map((schedule, index) => ({
       workDate: schedule.workDate,
       fact:

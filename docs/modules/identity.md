@@ -43,6 +43,14 @@ Spring Security handles authorization code, PKCE, ID-token validation, state, an
 
 Binding changes lock the provider subject before actor/target accounts in stable ID order. Current platform authority, credentials, and recent authentication are checked after those guards and before mutation or receipt replay. Changing an operator's own binding invalidates the origin session; fresh authentication can retrieve its existing receipt. Listing another account's bindings requires current platform administration; owners may inspect their own bindings without that grant.
 
+Exact binding review retains the account path boundary and observed version.
+Collection and exact reads revalidate current session assurance after acquisition;
+commands retain enrollment and recent-proof checks through journal and receipt
+completion. The [dashboard SSO workflow](../dashboard.md#sso-binding-administration)
+provides creation, bounded review and versioned activation without assigning
+company access. It preserves opaque subjects, immutable identity fields and
+original-command recovery. Provider registration remains deployment configuration.
+
 ## Company role templates
 
 `GET /companies/{companyId}/role-templates` lists named, versioned permission templates; `PUT .../role-templates/{id}` creates or changes one. Codes are stable, definitions can be archived, and changes retain immutable revisions. There are at most 128 definitions per company, including archived entries. `GET .../role-templates/permissions` returns the server permission catalog; defining a template does not assign its permissions to anyone.

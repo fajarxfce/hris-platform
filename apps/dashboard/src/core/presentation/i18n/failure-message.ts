@@ -2,6 +2,26 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_oidc_identity: [
+    "Review the configured provider, identity values and reason.",
+    "Periksa konfigurasi provider, nilai identitas, dan alasan perubahan.",
+  ],
+  oidc_identity_not_found: [
+    "This SSO binding is unavailable for this account.",
+    "Binding SSO ini tidak tersedia untuk akun ini.",
+  ],
+  oidc_binding_immutable: [
+    "Issuer and subject cannot change. Review the current binding.",
+    "Issuer dan subject tidak dapat diubah. Tinjau binding terbaru.",
+  ],
+  oidc_identity_limit: [
+    "This account has reached its active SSO binding limit.",
+    "Akun ini telah mencapai batas binding SSO aktif.",
+  ],
+  account_disabled: [
+    "This account is inactive. Review its account status before activation.",
+    "Akun ini nonaktif. Tinjau status akun sebelum aktivasi.",
+  ],
   invalid_invitation: [
     "Review the recipient, name and reason.",
     "Periksa penerima, nama, dan alasan undangan.",

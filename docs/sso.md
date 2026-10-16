@@ -26,6 +26,13 @@ Endpoints require HTTPS. `HRIS_OIDC_ALLOW_LOOPBACK_HTTP=true` permits HTTP only 
 
 Accounts are provisioned locally and linked using the provider's verified, stable `issuer + subject`. Matching email addresses and provider role claims never create links or grant HRIS permissions. Obtain the subject from the IdP administrator; a JWT decoded by a browser is not verification.
 
+In the dashboard, open **Platform accounts**, choose an account and select
+**SSO bindings**. Add a verified identity or review an existing binding to change
+its activation. Issuer and subject are immutable after creation; the subject is
+never trimmed or normalized. Saving ends the target account's existing sessions.
+The [dashboard workflow](dashboard.md#sso-binding-administration) retains the
+observed version and original command when a response is uncertain.
+
 Only a platform administrator may use `PUT /api/v1/identity/accounts/{accountId}/oidc/{id}`. Company administration alone cannot add a credential to a global account. The body has `issuer`, `subject`, `active`, `expectedVersion`, and `reason`; commands also require `Idempotency-Key`. Creating a binding uses a new UUID and null version. Updates can activate/deactivate that same binding; account, issuer, and subject are immutable. At most one active subject per account/issuer is allowed. Revoked bindings cannot be reassigned to another account.
 
 Credential changes require recent authentication and applicable MFA, increment the account security version, revoke older sessions, and commit their audit/outbox and receipt together. Replays do not repeat that change. Account-level receipts are isolated from company receipts and from other actors. `GET` on the same account collection supports bounded pagination and allows the account owner or a platform administrator to inspect bindings.

@@ -17,6 +17,7 @@ export default defineConfig({
   webServer: [
     {
       command: "python3 ../../tool/dashboard_backend_fixture.py",
+      env: { HRIS_TEST_OIDC_BINDINGS: "1" },
       wait: { stdout: /Browser API fixture ready;/u },
       reuseExistingServer: false,
       timeout: 120_000,

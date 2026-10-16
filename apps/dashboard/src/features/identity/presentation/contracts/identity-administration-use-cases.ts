@@ -6,14 +6,20 @@ import type { LoadCompanyMember } from "../../domain/usecases/load-company-membe
 import type { LoadCompanyMembers } from "../../domain/usecases/load-company-members";
 import type { LoadManagedAccount } from "../../domain/usecases/load-managed-account";
 import type { LoadManagedAccounts } from "../../domain/usecases/load-managed-accounts";
+import type { LoadOidcBindings } from "../../domain/usecases/load-oidc-bindings";
 import type { LoadRoleTemplate } from "../../domain/usecases/load-role-template";
 import type { LoadRoleTemplates } from "../../domain/usecases/load-role-templates";
 import type { PrepareCompanyMembership } from "../../domain/usecases/prepare-company-membership";
+import type { PrepareOidcBinding } from "../../domain/usecases/prepare-oidc-binding";
 import type { SaveAccountAccess } from "../../domain/usecases/save-account-access";
 import type { SaveCompanyMembership } from "../../domain/usecases/save-company-membership";
+import type { SaveOidcBinding } from "../../domain/usecases/save-oidc-binding";
 import type { SaveRoleTemplate } from "../../domain/usecases/save-role-template";
 
 export type IdentityAdministrationUseCases = Readonly<{
+  loadOidcBindings: Pick<LoadOidcBindings, "execute">;
+  prepareOidcBinding: Pick<PrepareOidcBinding, "execute">;
+  saveOidcBinding: Pick<SaveOidcBinding, "execute">;
   inviteAccount: Pick<InviteAccount, "execute">;
   loadCompanyAccountCandidates: Pick<LoadCompanyAccountCandidates, "execute">;
   prepareCompanyMembership: Pick<PrepareCompanyMembership, "execute">;

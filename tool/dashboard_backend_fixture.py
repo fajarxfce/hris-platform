@@ -94,7 +94,16 @@ def main():
         "HRIS_SYNC_KEYS": f"v1:{base64.b64encode(secrets.token_bytes(32)).decode()}",
         "HRIS_SYNC_ACTIVE_KEY": "v1",
         "HRIS_SECURE_COOKIES": "false",  # Loopback HTTP fixture only.
-        "HRIS_OIDC_ENABLED": "false",
+        # Binding administration exercises configured values without contacting an IdP.
+        # OIDC protocol acceptance uses the separate signed loopback provider in API tests.
+        "HRIS_OIDC_ENABLED": "true" if os.environ.get("HRIS_TEST_OIDC_BINDINGS") == "1" else "false",
+        "HRIS_OIDC_ISSUER": "https://oidc.example.test",
+        "HRIS_OIDC_CLIENT_ID": "owned-browser-fixture",
+        "HRIS_OIDC_CLIENT_SECRET": "owned-fixture-only",
+        "HRIS_OIDC_AUTHORIZATION_URI": "https://oidc.example.test/authorize",
+        "HRIS_OIDC_TOKEN_URI": "https://oidc.example.test/token",
+        "HRIS_OIDC_JWK_SET_URI": "https://oidc.example.test/jwks",
+        "HRIS_OIDC_ALLOW_LOOPBACK_HTTP": "true",
         "HRIS_MAIL_ENABLED": "true" if mail else "false",
         "HRIS_MAIL_HOST": "127.0.0.1",
         "HRIS_MAIL_PORT": str(mail.port if mail else 1),
@@ -103,7 +112,7 @@ def main():
         "HRIS_MAIL_PASSWORD": "",
         "HRIS_MAIL_TRANSPORT": "PLAINTEXT",
         "HRIS_MAIL_ALLOW_LOOPBACK_PLAINTEXT": "true",
-        "HRIS_PUBLIC_URL": "http://127.0.0.1:4175",
+        "HRIS_PUBLIC_URL": "http://127.0.0.1:4175" if with_worker else "http://127.0.0.1:4174",
         "HRIS_AUTH_LINKS_ALLOW_LOOPBACK_HTTP": "true",
         "HRIS_STORAGE_ENABLED": "false",
         "HRIS_DOCUMENT_SCANNER_ENABLED": "false",

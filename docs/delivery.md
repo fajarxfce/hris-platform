@@ -48,6 +48,32 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### SSO binding dashboard
+
+Platform account details now provide bounded SSO binding pages, exact review,
+creation and versioned activation. Issuer and subject remain immutable, including
+the subject's original case and whitespace. Unconfirmed responses retain their
+operation through MFA and subsequent conflicts. A saved edit can explicitly
+reacquire its current binding on the same route; self-edits revalidate the revoked
+session. Reads, forms and pending commands retain their existing disposal and
+navigation ownership.
+
+Architecture, Biome, TypeScript and all 3,624 dashboard unit tests passed. Thirty-one
+related browser scenarios passed, including original-command recovery, repeated
+activation, current-version review, account/cursor context, pending navigation and
+aborting a read before its delayed response. Desktop and Indonesian dark views at
+390 pixels with doubled text were inspected. Existing CSS and bundle advisories
+remain; these checks do not establish a performance benchmark.
+
+An isolated API/PostgreSQL browser workflow verified creation after response loss,
+deactivation/reactivation, unchanged platform grants, revoked employee cookies and
+native tokens, and a self-edit ending the administrator session. This fixture uses
+owned accounts and configured binding values without contacting a provider;
+signed OIDC protocol acceptance remains in the backend tests. Development API and
+worker JARs now match the validated SSO backend build. Database and document
+services were retained; dashboard HTTP 200 and API health `UP` were verified from
+the VPS. No mobile artifact or physical-device validation was added.
+
 ### SSO binding review and completion assurance
 
 An exact account-scoped binding endpoint now supports review without scanning

@@ -8,6 +8,7 @@ import { AppPropertyList } from "../../../../core/presentation/components/app-pr
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { accountInvitationMessages } from "../i18n/account-invitation-messages";
 import { managedAccountMessages } from "../i18n/managed-account-messages";
+import { oidcBindingMessages } from "../i18n/oidc-binding-messages";
 import type { ManagedAccountState } from "../models/managed-account-state";
 import type { managedAccountProperties } from "../models/managed-account-view";
 
@@ -18,6 +19,7 @@ export function ManagedAccountPage({
   backTo,
   editTo,
   inviteTo,
+  ssoTo,
   onRefresh,
 }: {
   state: ManagedAccountState;
@@ -26,6 +28,7 @@ export function ManagedAccountPage({
   backTo: string;
   editTo: string;
   inviteTo: string;
+  ssoTo: string;
   onRefresh: () => void;
 }) {
   const text = managedAccountMessages(locale);
@@ -41,6 +44,7 @@ export function ManagedAccountPage({
           <>
             <Link to={backTo}>{text.back}</Link>
             {state.review && <Link to={editTo}>{text.edit}</Link>}
+            {state.review && <Link to={ssoTo}>{oidcBindingMessages(locale).title}</Link>}
             {state.review?.account.invitationPending && (
               <Link to={inviteTo}>{accountInvitationMessages(locale).resend}</Link>
             )}

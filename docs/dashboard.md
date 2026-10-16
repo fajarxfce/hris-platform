@@ -1271,7 +1271,39 @@ All 3,487 dashboard unit tests and eleven account browser scenarios passed.
 An isolated API/PostgreSQL scenario verified administration without company
 access, lost-response recovery, reactivation and self-edit session revocation.
 Desktop and Indonesian dark views at 390 pixels with doubled text were inspected.
-Provider bindings and session administration remain subsequent workflows.
+Session administration remains a subsequent workflow.
+
+## SSO binding administration
+
+Account details link to `/platform/accounts/{accountId}/sso`, with fifty-row
+cursor pages and exact binding review. Platform `identity.manage` is required;
+no selected company or employee profile is needed. The account directory's
+filters and the binding page cursor retain separate navigation context.
+
+**Add SSO binding** reviews an active account and accepts the issuer and subject
+verified by the identity provider administrator. The subject is preserved exactly,
+including case and whitespace. Existing bindings keep their account, issuer and
+subject immutable; their editor changes activation with an observed version and
+reason. Inactive accounts can have existing bindings deactivated. Activating a
+binding still requires the deployment's configured provider and an active account.
+See [provider configuration](sso.md).
+
+Controllers own reads, immutable pending commands and cancellation. Unknown save
+outcomes retain the original operation through explicit retry, MFA renewal and
+later conflicts. Definite version conflicts require a protected fresh review.
+Reviewing a saved edit explicitly reacquires the current binding on the same
+route. Successful self-edits revalidate the revoked application session. Changes
+to locale or theme retain the form; disposal cancels pending work and clears it.
+
+All 3,624 dashboard unit tests and 31 related browser scenarios passed. Checks
+include bounded pagination, account context, immutable values, lost responses,
+MFA, competing versions, repeated activation changes, protected navigation and
+aborted acquisition before a delayed response. Desktop and Indonesian dark views
+at 390 pixels with doubled text were inspected; long account text wraps.
+An isolated API/PostgreSQL browser workflow verified original-command recovery,
+activation versions, revoked employee cookies/native tokens and a self-edit that
+ends the administrator's session. This fixture administers configured bindings
+without contacting a provider; signed OIDC exchanges have separate backend tests.
 
 ## Account invitations and password recovery
 

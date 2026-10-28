@@ -2,6 +2,8 @@
 
 Read docs/architecture.md, docs/product.md, and docs/delivery.md before changing boundaries or implementing capabilities.
 
+For continuation across the three repositories, first read [docs/agent-handoff.md](docs/agent-handoff.md). Keep its current work, validation and next steps updated in Git when handing work over; local `.work` notes are supplementary.
+
 - Domain contains entities, repository contracts, use cases, and pure policies. No Spring, SQL, Jackson, SDK, or DI annotations in domain.
 - Datasources implement contracts, perform raw I/O, return raw values/DTOs, and preserve technical exceptions. Never datasource-to-datasource dependencies or application policy.
 - Repositories coordinate datasource contracts and map values/errors into domain Result. Never repository-to-repository dependencies or UI state.

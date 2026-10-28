@@ -17,8 +17,10 @@ arrivals over fifteen minutes through the real API and worker. All 20,000 reques
 passed, with every endpoint p95 below one second (maximum endpoint p95 93.753 ms).
 Independent database counts matched the accepted events, audits and sync heads.
 The retained report includes CPU/memory limits, actual cgroup peaks, artifacts and
-the shared-host limitations. Payroll/file workloads and a dedicated deployment
-retain their own acceptance requirements.
+the shared-host limitations. The subsequent homogeneous January payroll calculation
+completed all 5,000 results in 85.972 seconds with exact decimal totals and no OOM
+kills. File workloads, other payroll mixes and a dedicated deployment retain their
+own acceptance requirements.
 
 ## Backup and recovery
 

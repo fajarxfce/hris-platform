@@ -5,6 +5,22 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+The [payroll workload](workload.md#payroll-calculation) passed a full 5,000-employee
+January resident/gross calculation on the same constrained real API/worker/PostgreSQL
+fixture. Actual workforce closing and source preparation took 90.753 seconds.
+Public admission took 1.830 seconds; admission through observed completed calculation
+took 85.972 seconds. All 5,000 results, employees and audit entries were present,
+with no failures, reconciled decimal totals and no OOM kills. Owned resources and
+private fixture data were removed. A two-employee smoke, eleven tool regressions,
+architecture and formatting also passed. This measures the documented calculation scenario, excluding human
+reviews/publication and other payroll mixes; shared-host limitations remain.
+
+The [tracked report](measurements/payroll-2026-10-28.json) retains exact measurements
+and artifact identities. Local logs are `.work/payroll-workload-smoke.log` and
+`.work/payroll-workload-5000.log`. [Agent handoff](agent-handoff.md), linked from
+`AGENTS.md`, now records all three repository branches, accepted increments, commands,
+external dependencies and the next work so continuation does not depend on chat.
+
 The complete local attendance workload now passes 5,000 arrivals over 900 seconds:
 20,000 real native-refresh/window/clock-in/read requests, zero errors, and exact
 server counts for 5,000 accepted events, employees, audit entries and sync heads.

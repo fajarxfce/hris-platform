@@ -8,6 +8,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 import measure_attendance as measurement
+from measure_payroll import payroll_outcome_passes
 from workload_fixture import WorkloadFixture
 
 
@@ -113,6 +114,41 @@ class MeasurementTest(unittest.TestCase):
             with self.assertRaisesRegex(measurement.WorkloadError, "cancelled"):
                 api.call("/owned")
             self.assertEqual(1, connection.request.call_count)
+
+
+class PayrollOutcomeTest(unittest.TestCase):
+    def evidence(self):
+        from decimal import Decimal
+        count = 5000
+        values = {"results": count, "employees": count, "succeeded": count, "audit": count, "amountVariants": 1}
+        for total, one in (("taxableGross", "oneTaxableGross"), ("withheld", "oneWithheld"), ("takeHome", "oneTakeHome")):
+            values[one] = "49999999999.99"
+            values[total] = str(count * Decimal(values[one]))
+        return values, {"run": {"status": "CALCULATED", "failed": 0}, "job": {"status": "SUCCEEDED"}}
+
+    def test_cent_discrepancy_is_not_hidden_by_large_aggregate_amounts(self):
+        from decimal import Decimal
+        counts, view = self.evidence()
+        self.assertTrue(payroll_outcome_passes(counts, view, 5000))
+        counts["takeHome"] = str(Decimal(counts["takeHome"]) + Decimal("0.01"))
+        self.assertFalse(payroll_outcome_passes(counts, view, 5000))
+
+    def test_fast_failed_partial_or_unaudited_cohort_cannot_pass(self):
+        for field in ("results", "employees", "succeeded", "audit"):
+            counts, view = self.evidence()
+            counts[field] = 4999
+            self.assertFalse(payroll_outcome_passes(counts, view, 5000), field)
+        counts, view = self.evidence()
+        view["run"]["failed"] = 1
+        self.assertFalse(payroll_outcome_passes(counts, view, 5000))
+        view["run"]["failed"] = 0
+        view["job"]["status"] = "FAILED"
+        self.assertFalse(payroll_outcome_passes(counts, view, 5000))
+
+    def test_missing_or_inconsistent_financial_results_cannot_pass(self):
+        for changes in ({"taxableGross": None}, {"oneWithheld": None}, {"amountVariants": 2}):
+            counts, view = self.evidence()
+            self.assertFalse(payroll_outcome_passes(counts | changes, view, 5000))
 
 
 class FixtureOwnershipTest(unittest.TestCase):

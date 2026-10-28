@@ -131,11 +131,59 @@ passed. Owned temporary
 containers, network and data volume were removed after the full run. These are
 local observations, with private HTTP and providers disabled.
 
+## Payroll calculation
+
+`python3 tool/measure_payroll.py --employees 2` runs a smoke exercise;
+`--employees 5000` runs the complete cohort. The same owned deployment, CPU set,
+memory/disk configuration and cleanup contracts apply. Do not run the attendance
+and payroll measurements concurrently on those CPUs.
+
+Setup closes actual workforce evidence through the worker. A separate preparer and
+reviewer authenticate with MFA and use the public API to prepare/verify one
+canonical compensation, monthly input and tax opening. The other fictional
+employees receive those exact terms and contiguous draft/verified revisions through
+SQL; every input references its own actual closed attendance. Database constraints
+remain active. This is load-data preparation, not 5,000 individual human reviews.
+
+The cohort has January resident/gross compensation, fixed earnings and configured
+insurance, zero opening tax history and explicit paid-day decisions on otherwise
+unassigned calendars. One public admission starts the real worker calculation.
+An independent review actor polls once per second. Time includes admission, queue
+wait, all retained employee calculations and observation of completion. Preparation,
+human review, publication, finalization, payments and other compensation mixes are
+outside that interval. Both preparation closing and calculation have twenty-minute
+deadlines; failure does not silently retry or count as a passing fast result.
+
+Independent SQL requires 5,000 distinct employees/results/audits and zero failures.
+The homogeneous monetary results must reconcile exactly with decimal arithmetic.
+The run and job must be `CALCULATED` and `SUCCEEDED`, with the resource contracts
+intact. The retained report includes cumulative CPU counters, memory peaks, artifact
+identities and separate preparation/admission/calculation durations.
+
+The [28 October full report](measurements/payroll-2026-10-28.json) passed all these
+checks. Preparation took 90.753 seconds; admission took 1.830 seconds; admission
+through observed completion took **85.972 seconds** for 5,000 successful results.
+The ten-minute target passed for this scenario. Gross/tax/take-home totals were
+IDR 54,920,005,000.00 / 1,647,600,000.00 / 48,352,403,750.00, with 5,000 audits.
+These fictional totals check consistency and do not replace statutory rule review.
+
+| Service | Cgroup peak memory including setup (MiB) | CPU seconds during calculation |
+| --- | ---: | ---: |
+| PostgreSQL | 510.32 | 35.129 |
+| API | 687.74 | 3.468 |
+| Worker | 494.05 | 28.055 |
+
+No OOM kills occurred and all owned resources were removed. A preceding two-employee
+smoke completed calculation in 2.395 seconds. Eleven workload-tool tests now pass,
+including failed/partial cohort rejection and exact cent reconciliation at large
+aggregate values. The shared VPS/private HTTP limitations above also apply here.
+
 ## Acceptance limits
 
 A CPU set and memory ceilings constrain this local experiment. A shared VPS still
 has different CPU contention, storage, network/TLS costs and kernel/cache behavior
 from a dedicated reference deployment. Record those differences when interpreting
-results. These measurements do not establish payroll throughput, full-signature
-document inspection/upload memory, phone/network latency or general capacity across
-all HRIS modules. Those workloads require their own observed runs.
+results. These measurements cover the documented attendance and payroll-calculation
+scenarios. Full-signature document inspection/upload memory, other payroll mixes,
+phone/network latency and general capacity across HRIS modules require their own
+observed runs.

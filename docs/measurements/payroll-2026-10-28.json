@@ -1,0 +1,148 @@
+{
+  "context": {
+    "dateUtc": "2026-10-28",
+    "host": "Shared VPS",
+    "hostVirtualCpus": 8,
+    "hostMemoryGiBClass": 32,
+    "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+    "serverCpuSet": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "driverCpuSet": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "dedicatedReferenceHost": false
+  },
+  "measurement": {
+    "format": 1,
+    "scenario": "payroll-calculation",
+    "employees": 5000,
+    "earningsMonth": "2026-01",
+    "preparationSeconds": 90.753,
+    "admissionSeconds": 1.83,
+    "elapsedSeconds": 85.972,
+    "pollIntervalSeconds": 1,
+    "behaviorPassed": true,
+    "resourceContractPassed": true,
+    "tenMinuteTargetPassed": true,
+    "database": {
+      "results": 5000,
+      "employees": 5000,
+      "succeeded": 5000,
+      "amountVariants": 1,
+      "taxableGross": "54920005000.00",
+      "withheld": "1647600000.00",
+      "takeHome": "48352403750.00",
+      "oneTaxableGross": "10984001.00",
+      "oneWithheld": "329520.00",
+      "oneTakeHome": "9670480.75",
+      "audit": 5000,
+      "maxFactBytes": 9304,
+      "maxCalculationBytes": 2398
+    },
+    "failures": {},
+    "status": "CALCULATED",
+    "jobStatus": "SUCCEEDED",
+    "before": {
+      "database": {
+        "image": "sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+        "cpuSet": "0,1,2,3",
+        "memoryLimit": 8589934592,
+        "running": true,
+        "oomKilled": false,
+        "cgroup": {
+          "memory.current": "424087552",
+          "memory.peak": "431124480",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+          "cpu.stat": "usage_usec 29278837\nuser_usec 14129721\nsystem_usec 15149116\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "api": {
+        "image": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+        "cpuSet": "0,1,2,3",
+        "memoryLimit": 4294967296,
+        "running": true,
+        "oomKilled": false,
+        "cgroup": {
+          "memory.current": "705150976",
+          "memory.peak": "712392704",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+          "cpu.stat": "usage_usec 40009847\nuser_usec 38837579\nsystem_usec 1172267\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "worker": {
+        "image": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+        "cpuSet": "0,1,2,3",
+        "memoryLimit": 4294967296,
+        "running": true,
+        "oomKilled": false,
+        "cgroup": {
+          "memory.current": "489811968",
+          "memory.peak": "496570368",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+          "cpu.stat": "usage_usec 44507790\nuser_usec 38545447\nsystem_usec 5962343\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      }
+    },
+    "after": {
+      "database": {
+        "image": "sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+        "cpuSet": "0,1,2,3",
+        "memoryLimit": 8589934592,
+        "running": true,
+        "oomKilled": false,
+        "cgroup": {
+          "memory.current": "535068672",
+          "memory.peak": "535109632",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+          "cpu.stat": "usage_usec 64407738\nuser_usec 35109363\nsystem_usec 29298374\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "api": {
+        "image": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+        "cpuSet": "0,1,2,3",
+        "memoryLimit": 4294967296,
+        "running": true,
+        "oomKilled": false,
+        "cgroup": {
+          "memory.current": "720973824",
+          "memory.peak": "721149952",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+          "cpu.stat": "usage_usec 43477829\nuser_usec 41994604\nsystem_usec 1483224\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "worker": {
+        "image": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+        "cpuSet": "0,1,2,3",
+        "memoryLimit": 4294967296,
+        "running": true,
+        "oomKilled": false,
+        "cgroup": {
+          "memory.current": "512528384",
+          "memory.peak": "518049792",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+          "cpu.stat": "usage_usec 72562360\nuser_usec 60521967\nsystem_usec 12040392\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      }
+    },
+    "driverCpus": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "sourceCommit": "51c4b1b3d677927a21a08a191f0f5aa165e9614f",
+    "kernel": "7.2.10-arch1-1",
+    "apiJarSha256": "e98a1cae2ba6adb96463a470c85c37af5c5e4ee29e680ea9aff1d931b30eb0b9",
+    "workerJarSha256": "f7fdf285002f3c297ce93e04629e9378b29b283a4f79be6a452a14d4a659f4bc",
+    "reviewAndPublicationMeasured": false,
+    "externalProvidersEnabled": false,
+    "temporaryResourcesRemoved": true
+  }
+}

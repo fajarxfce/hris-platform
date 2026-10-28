@@ -50,6 +50,17 @@ import org.springframework.context.annotation.Configuration
 @Configuration(proxyBeanMethods = false)
 class ReportingConfiguration {
     @Bean
+    fun reportSnapshotSource(sql: DSLContext): ReportSnapshotDataSource =
+        PostgresReportSnapshotDataSource(sql)
+
+    @Bean
+    fun reportSnapshots(
+        source: ReportSnapshotDataSource,
+        json: tools.jackson.databind.ObjectMapper,
+    ): dev.fajar.hris.reporting.domain.repositories.ReportSnapshotRepository =
+        dev.fajar.hris.reporting.data.repositories.StoredReportSnapshotRepository(source, json)
+
+    @Bean
     fun savedReportFilterSource(sql: DSLContext): SavedReportFilterDataSource =
         PostgresSavedReportFilterDataSource(sql)
 

@@ -8,4 +8,5 @@ dependencies {
     implementation(projects.modules.people.domain)
     implementation(projects.core.database)
     implementation(libs.spring.core)
+    implementation(libs.jackson.kotlin)
 }

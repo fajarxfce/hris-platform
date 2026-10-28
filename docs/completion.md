@@ -15,12 +15,14 @@ validation. A generated module or route does not complete a capability. Each
 workflow must enforce current scope, handle response loss and cancellation,
 provide localized errors, and pass the relevant real API and UI checks.
 
-Report exports now have bounded typed CSV encoding and a company-anchored source
-transaction boundary. V94 retains the requesting company's write scope while adding
-only selected report-input reads. The boundary passed 24 database, 11 headcount API
-and 82 worker tests, including rollback, scope cleanup and application DI. Durable
-snapshots, queued artifact generation, download/expiry and export history remain
-active work; this foundation does not expose an export workflow. See
+Report exports now have bounded typed CSV encoding, a company-anchored source
+transaction boundary and retained snapshot storage. V94 retains the requesting
+company's write scope while adding selected report-input reads. V95 prevents partial
+capture commits and bounds immutable rows, byte-prefix reads and expired cleanup.
+Validation passed 89 reporting, 24 database, 48 server/PostgreSQL and 82 worker tests
+across focused runs. Source-specific acquisition, queued artifact generation,
+download/expiry and export history remain active work; these foundations do not
+expose an export workflow. See
 [export contracts and evidence](report-exports.md).
 
 Historical attendance closings now have dashboard and exact-revision drill-down

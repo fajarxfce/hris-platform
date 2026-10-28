@@ -519,6 +519,17 @@ Private S3-compatible object storage holds documents; the self-hosted distributi
 
 Spring Batch provides persistent checkpoints for payroll/import/export. An outbox dispatches external delivery after commit. Jobs are idempotent, bounded, interruptible, and owned by the application lifecycle. Retries are explicit and failures stay inspectable. User-facing job use cases coordinate identity and company repository contracts for live access checks. Cancellation locks the job before company/member/account guards, matching worker lock order. Global worker leasing remains a separate capability boundary.
 
+Reporting owns retained export snapshot headers and rows. Capture and sealing share
+the source transaction; a deferred constraint prevents incomplete captures from
+committing. Sealed definitions, schemas, totals and row sequences are immutable.
+Stored byte lengths bound each returned page to one MiB and 500 rows; consumers
+advance by the actual prefix. Numeric strings preserve decimal values and scale
+independently of JSON number settings. Expired rows retire in scoped, bounded batches
+while the original metadata identity remains. This storage boundary supplies no
+report authority or live-page snapshot isolation. Report-specific acquisition,
+queued execution, artifact delivery and global cleanup remain separate work; see
+[retained report snapshots](report-exports.md#retained-snapshots).
+
 Interactive job reads and cancellation use the pure company-session policy to intersect original/live authority and check current MFA after waiting. Their domain details contain the resulting available actions; delivery only serializes them and cannot restore a permission from the originally resolved actor. This interactive policy is separate from background execution authority.
 
 Job operations retain the guarded access snapshot and check assurance again after

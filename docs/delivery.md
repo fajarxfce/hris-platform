@@ -70,6 +70,19 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Retained report snapshots
+
+V95 now protects owned snapshot headers and immutable, numbered rows. Unsealed
+captures cannot commit; row/byte quotas, bounded prefix reads and expired cleanup
+preserve the original definition and deadline. Across focused runs, 89 reporting,
+24 database, 48 server/PostgreSQL and 82 worker tests passed. Coverage includes
+competing capture/cleanup, 1,251 retained rows, long Unicode pages, late interruption,
+real SQL quota rejection, exact one-MiB append admission and an elapsed 168-hour
+lifetime across database DST transitions. Both application JARs,
+architecture and formatting passed. Source-specific capture, queued execution,
+private artifacts, download and history still remain open. See
+[snapshot storage and evidence](report-exports.md#retained-snapshots).
+
 ### Anchored report source transactions
 
 Export capture now has an explicit transaction port retaining its requesting company

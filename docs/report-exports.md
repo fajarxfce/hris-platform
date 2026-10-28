@@ -69,6 +69,50 @@ and its owned staging writes to commit together; it does not make independently
 paged live acquisitions into a historical snapshot. Large-detail capture and its
 retained row store remain part of the export implementation below.
 
+## Retained snapshots
+
+V95 introduces Reporting-owned snapshot headers and numbered rows, both protected
+by company **and** account RLS. Snapshot IDs are unique within a company, including
+between owners. The header retains the canonical selection, dataset,
+ordered typed columns, `report-export.v1` schema, CSV format, evaluation timestamp and
+original expiry. Capture timestamps use PostgreSQL's exact microsecond precision;
+expiry must follow evaluation by no more than 168 elapsed hours, independently of
+the database timezone or daylight-saving transitions. The schema and company
+selection are detached before I/O. These metadata and persistence ports confer no
+source permission and are not exposed as export endpoints.
+
+`begin`, row acquisition/insertion and `seal` belong to one use-case-owned transaction
+under current source/access guards. Sealing verifies the exact stored row/byte totals
+and a gap-free sequence starting at one. A deferred database constraint prevents an
+unsealed header from committing, including an interrupted or incomplete capture.
+Headers and rows become immutable; a competing begin cannot replace an existing
+identity or deadline. Empty captures seal with zero rows and retain their CSV schema.
+Known source projections can insert their rows with one coherent `INSERT ... SELECT`
+before sealing. The seven report-specific projections and their queued orchestration
+still need to be connected; successive live reads are not a snapshot strategy.
+
+One snapshot holds at most 100,000 rows and 100 MiB of staged JSON, independently of
+the eventual CSV limit. Database accounting updates once per insertion statement and
+enforces the aggregate quota before commit. Stored row byte lengths also let a read
+return a complete-row prefix of at most 500 rows **and** one MiB of cell JSON. A caller
+advances by the returned rows, never the requested page size. Nonempty remaining
+captures must make positive progress; gaps, invalid types or malformed pages fail
+without returning partial data. Application appends validate all cells before I/O
+and retain at most 500 rows/one MiB per batch.
+
+Cells store text or null in JSON, with the retained column type distinguishing text,
+integers and decimals. This avoids dependence on a parser's floating-point settings.
+Decimal values and scale survive storage, including negative scales; plain numeric
+CSV formatting and spreadsheet-text protection happen at rendering. Mapping retains
+the shared failure/cancellation boundary and returns detached row/cell collections.
+
+Expired row cleanup is owner/company scoped, takes a bounded batch with `SKIP LOCKED`,
+and also checks the database clock. An arbitrary future timestamp cannot delete live
+facts. Cleanup failure rolls back its batch; the immutable header, original totals,
+identity and deadline remain after the rows are retired. Scheduling that cleanup,
+current-authorized content delivery and export history still belong to the full
+workflow. These byte/row contracts do not establish measured process-memory targets.
+
 ## Validation and remaining delivery
 
 Validation passed 80 reporting tests (35 domain, 43 data, two delivery) and 26
@@ -91,8 +135,26 @@ both resolve the new port to their existing transaction owner. Both application 
 architecture and formatting checks passed in the same run. Test containers were
 disposed. This verifies the transaction boundary, not a running export workflow.
 
-Request admission and durable snapshots, private artifact publication, fenced worker
-execution, interruption recovery, expiry/cleanup, authorized downloads and export
+The retained row store subsequently passed 89 reporting tests (38 domain, 49 data,
+two delivery), 24 database/migration tests, 48 server/PostgreSQL cases and all 82
+worker tests across focused runs. Eleven new application-context/PostgreSQL cases cover
+1,251 retained rows, empty captures, long Unicode byte-prefix pages, owner/company
+isolation, competing capture and cleanup, cancellation/rollback, denied mutation and
+early deletion, exact original metadata after retirement, and real SQL row/100-MiB
+quota rejection. A one-query capture remains unchanged after its source is edited.
+One focused run repeated ten snapshot cases and 49 data tests after fixing
+an append separator count, including exact one-MiB acceptance and next-byte rejection.
+Numeric mapping preserves negative scales and rejects malformed or missing pages.
+A final run passed all 24 database tests, eleven snapshot cases and the six-case
+worker integration context. It verifies the exact lifetime across both New York
+DST transitions, including raw SQL rejection of an extra second.
+Both applications packaged successfully; architecture and formatting passed. Initial
+runs found a Jackson `map` overload compile error and a connection-failure fixture
+missing its SQLState; both were corrected without changing shared failure semantics.
+
+Report-specific snapshot acquisition, request admission, private artifact publication,
+fenced worker execution, interruption recovery, scheduled expiry/cleanup, authorized
+downloads and export
 history/dashboard remain to be implemented and validated. No export endpoint or worker
 kind is exposed by these foundations. Reporting has not yet been added to the worker
 import graph. No new browser, provider, workload or deployment acceptance is claimed.

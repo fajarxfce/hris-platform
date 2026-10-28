@@ -136,3 +136,11 @@ write scope; selected source companies gain no mutation rights. Validation passe
 packaging and architecture/format checks. Durable snapshots, queued execution,
 publication, expiry/download and export history remain open. See
 [source transaction boundaries](../report-exports.md#source-transaction-boundary).
+
+V95 now retains owned export snapshot headers and immutable numbered rows, rejecting
+partial commits and enforcing 100,000-row/100-MiB quotas. Reads consume a prefix of
+at most 500 rows and one MiB of cell JSON; expired rows retire in bounded batches.
+Across focused runs, 89 reporting, 24 database, 48 server/PostgreSQL and 82 worker
+tests passed with packaging and architecture/format checks. Report-specific capture,
+queued execution, artifacts, authorized downloads and export history remain open.
+See [snapshot storage and validation](../report-exports.md#retained-snapshots).

@@ -41,3 +41,12 @@ months; month scopes match the existing request directory. Backend checks passed
 31 reporting, 61 workforce, 84 API/PostgreSQL/OpenAPI and 81 worker tests. Its
 dashboard and scoped month navigation passed 3,801 tests, 12 report browser scenarios
 and real API/PostgreSQL reconciliation through approval, rejection and withdrawal. See [overtime definitions](../reporting.md#operational-overtime).
+
+Operational expense reporting now reads only the latest submitted claim lines,
+using their transaction dates and current claim status. Exact decimal IDR amounts
+and claim/line/distinct-employment counts reconcile with its scoped claim pages.
+Unsubmitted drafts are excluded; later unsent edits retain prior submitted evidence,
+and resubmission replaces the selected facts without counting them twice. Payments
+retain a separate definition. V92 indexes transaction dates. The backend passed
+42 reporting, 20 expense domain, 153 API/PostgreSQL/OpenAPI and 81 worker tests.
+Dashboard acceptance is next. See [expense definitions](../reporting.md#operational-expenses).

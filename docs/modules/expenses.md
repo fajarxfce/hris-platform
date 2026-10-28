@@ -18,6 +18,18 @@ draft authoring remains a subsequent delivery increment.
 
 Acceptance: category limits, company attachment access, concurrent submission, payment replay, failed/partial batch reconciliation, and immutable paid records.
 
+## Operational expense report
+
+The [reporting API](../reporting.md#operational-expenses) now aggregates exact IDR
+amounts from each claim's latest submitted lines, filtered by transaction dates.
+The report and paginated claim drill-down require company-wide expense and report
+authority. Unsubmitted drafts are excluded; returned/withdrawn submissions retain
+their original facts through later draft edits until resubmission replaces them.
+Current status is separate from immutable submitted content and bank settlement.
+Backend acceptance passed through staged approval, resubmission, scoped continuation,
+revocation, cancellation and real partial-payment/retry workflows. Dashboard
+acceptance remains in progress.
+
 ## Category policies
 
 `PUT /api/v1/companies/{companyId}/expenses/categories/{id}` creates or revises a category with an idempotency key, expected version (null on create), effective date, and reason. `expenses.policy.manage` is a distinct grant included in the company-administrator and finance permission catalogs; existing memberships/role snapshots require an explicit update to receive it.

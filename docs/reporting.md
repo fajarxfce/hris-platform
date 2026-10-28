@@ -268,6 +268,97 @@ Logs: `.work/overtime-dashboard-check.log`, `.work/overtime-dashboard-final-unit
 and `.work/overtime-dashboard-integration.log`. Screenshots:
 `.work/dashboard-overtime-report-real.png` and `.work/dashboard-overtime-report-mobile.png`.
 
+## Operational expenses
+
+`GET /api/v1/companies/{companyId}/reports/expenses?from=2026-01-01&until=2026-12-31`
+
+Requires `reports.read` together with company-wide `expenses.read` or
+`expenses.manage`, plus the `REPORTING` client-policy gate. Self/team, assigned
+reviewer and payment-only authority do not authorize company totals. The inclusive
+window is one to 366 transaction dates within 1900–2200. Invalid windows return
+`invalid_report_range` with `maximumDays: "366"`.
+
+Each claim contributes only the immutable lines from its **latest submission**,
+filtered by their original `occurredOn` transaction date. Unsubmitted drafts are
+excluded. After a return or withdrawal, later draft edits do not replace the
+submitted facts until a new submission succeeds. Resubmission replaces that
+claim's selected submission instead of adding another copy of its expenses.
+A line outside the window contributes nothing, even if its claim has another
+line inside. Claim creation, submission timestamps and current category settings
+do not substitute for these transaction dates.
+
+The response contains `companyId`, `from`, `until`, `evaluatedAt`,
+`definitionVersion: "expenses.v1"`, `currency: "IDR"`, `totals` and all six current
+claim `statuses`: `DRAFT`, `PENDING`, `RETURNED`, `APPROVED`, `REJECTED`, `CANCELLED`.
+Empty statuses have zero counts. Each count object contains:
+
+| Field | Definition |
+| --- | --- |
+| `claims` | Distinct claims with at least one latest-submitted line in the window. |
+| `employments` | Distinct employment records associated with those claims, independently counted for the total. |
+| `lines` | Selected transaction lines from those submissions. |
+| `amount` | Exact decimal IDR string summed from the selected immutable lines. Aggregate amounts may exceed a single claim's limit. |
+
+`DRAFT` includes previously submitted claims that are now being corrected;
+unsubmitted drafts still remain excluded. Return/rejection/cancellation preserves
+submitted history. A staged approval remains `PENDING` until every stage completes.
+The report describes submitted expense amounts at current claim status, not
+cash paid, outstanding settlement, recognized accounting expense or an immutable
+historical publication. Payment reservations, partial bank results and settlement
+have their own definitions. Later submissions or decisions can change old-date
+report results; `evaluatedAt` does not freeze them.
+
+`GET /api/v1/companies/{companyId}/reports/expenses/claims?from=2026-01-01&until=2026-12-31&status=APPROVED&limit=50`
+
+The drill-down uses exactly the same latest-submission and transaction-date
+projection. It accepts optional current `status`, `limit` 1–200 (default 50), and
+an opaque `after` cursor. The response repeats company, window, status, currency,
+evaluation time and definition, then supplies `items` and `nextCursor`. Each item
+has claim `id`, exact `submissionId`/`submissionNumber`, employment ID and submitted
+employee labels/title, current claim `status`/`version`, `submittedAt`, clipped
+`lines`/`amount`, and the full frozen `submissionAmount`. Private profiles, draft
+changes, reasons, receipts and payment destinations are not acquired by this view.
+Authorized clients can open the identified immutable submission separately.
+
+Ordering is descending submission time and claim UUID. The bounded cursor retains
+the report definition, company, date window, status and ordering key. It does not
+look up the previous row, so a status change does not invalidate continuation.
+Each page is a fresh read: a resubmitted claim can move forward in the ordering or
+leave the selected dates. Refresh from the first page to reconcile the latest
+state. These are not immutable export cursors. The ordinary expense directory
+filters claim creation dates; it cannot replace this transaction-date drill-down.
+
+One SQL projection joins the latest submission to its frozen draft lines and
+submitted-line references, with coherent claim aggregates and total/status buckets.
+V92 adds a company/transaction-date index to support source selection. Normal RLS
+and finite query/transaction timeouts apply. At most seven aggregate rows or 201
+page rows reach application mapping. Mapping checks counts, exact cent quantities,
+claim limits, distinct-employment bounds, reconciliation, duplicate/order/cursor
+progress and frozen reference metadata inside the sanitized database boundary.
+Shared company, membership and account guards retain original/live report/source
+permissions, credentials and MFA after waits, with assurance checked again after
+acquisition. Cancellation unwinds resources. Responses are `no-store`; reporting
+performs no operational mutation.
+
+On 28 October 2026, this backend passed 42 reporting domain/data/delivery tests,
+20 expense domain tests, 153 distinct selected API/PostgreSQL/OpenAPI tests and all
+81 worker tests. The first API run passed 146 cases; the final 13-case run repeated
+seven report cases and added payment coverage. It verified exact cents and totals
+above the individual claim limit, complete statuses, distinct employments, date
+gaps, excluded unsubmitted drafts, retained facts through category/draft edits,
+replacement on resubmission (including reuse of one draft revision), staged review,
+withdrawal/cancellation, stable continuation after status changes, source/report
+authority, RLS, client availability, revocation during admission, MFA expiry before
+and after acquisition, cancellation, sanitized recovery and concurrent decision
+serialization. Real payment preparation/release, partial success, confirmed failure,
+retry reservation and receipt replay leave the submitted totals unchanged.
+
+Architecture and formatting passed. OpenAPI remains bounded at 2,051,708 bytes with
+355 paths. The worker application suite validated the shared expense-domain change
+and V92 migration. Logs: `.work/expense-report-unit.log`,
+`.work/expense-report-validation.log`, `.work/expense-report-followup.log` and
+`.work/expense-report-final-build.log`. Dashboard acceptance is the next increment.
+
 ## Validation
 
 On 28 October 2026, leave reporting passed 25 reporting domain/data/delivery tests,

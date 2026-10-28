@@ -68,10 +68,7 @@ class ListExpenseClaims(
             val now = clock.instant()
             val today = now.atZone(ZoneId.of(settings.timezone)).toLocalDate()
 
-            if (
-                scope == ExpenseClaimReadScope.SELF ||
-                    ("expenses.read" !in live.permissions && "expenses.manage" !in live.permissions)
-            ) {
+            if (scope == ExpenseClaimReadScope.SELF || !canReadCompanyExpenses(live.permissions)) {
                 if (employmentId == null)
                     return@run Result.Failed(
                         Failure(FailureKind.FORBIDDEN, "employee_scope_required")

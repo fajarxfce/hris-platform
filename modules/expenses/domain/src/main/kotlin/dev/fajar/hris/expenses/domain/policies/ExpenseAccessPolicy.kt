@@ -3,6 +3,9 @@ package dev.fajar.hris.expenses.domain.policies
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.expenses.domain.entities.ExpenseClaimReadScope
 
+fun canReadCompanyExpenses(permissions: Set<String>): Boolean =
+    "expenses.read" in permissions || "expenses.manage" in permissions
+
 fun canReadOwnExpenses(permissions: Set<String>): Boolean =
     permissions.any { it in setOf("expenses.self.manage", "expenses.read", "expenses.manage") }
 
@@ -36,7 +39,7 @@ fun canReadExpenseClaim(
     scope: ExpenseClaimReadScope = ExpenseClaimReadScope.AUTHORIZED,
 ): Boolean =
     (scope == ExpenseClaimReadScope.AUTHORIZED || employee.person.accountId == actor.accountId) &&
-        ("expenses.read" in actor.permissions ||
+        (canReadCompanyExpenses(actor.permissions) ||
             canManageExpenseClaim(actor, employee) ||
             ("expenses.team.read" in actor.permissions &&
                 employee.managerAccountId == actor.accountId &&

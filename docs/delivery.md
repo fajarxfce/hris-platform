@@ -70,6 +70,28 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Operational expense report API
+
+The expense report selects immutable transaction lines from each claim's latest
+submission. It returns exact decimal IDR totals and current-status buckets, with
+a matching bounded claim page and scoped continuation. Unsent draft edits preserve
+submitted history; resubmission replaces the chosen facts without duplication.
+The shared expense source predicate now explicitly names company-wide read/manage
+authority. Original/live report/source grants, credentials and MFA protect both
+reads. V92 adds the transaction-date index.
+
+Validation passed 42 reporting domain/data/delivery, 20 expense domain, 153 distinct
+selected API/PostgreSQL/OpenAPI and 81 worker tests. The initial API run passed 146;
+a final 13-case run covered the extended report and payment workflows. It verified
+partial-date amounts, exact cents beyond individual claim limits, status/employee
+reconciliation, unchanged submitted facts through editing, resubmission of both
+new and unchanged draft revisions, staged approval and original-receipt recovery,
+continuation after status changes, RLS, source grants, revocation, MFA, cancellation
+and coherent concurrent decisions. Real payment preparation, independent release,
+partial settlement, confirmed failure and retry reservation preserve report amounts.
+See [definitions and evidence](reporting.md#operational-expenses). Dashboard acceptance,
+financial closing reports and exports remain in progress.
+
 ### Operational overtime report API
 
 The annual overtime report provides exact requested/actual/approved minute totals,

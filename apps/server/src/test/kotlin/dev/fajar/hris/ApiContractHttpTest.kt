@@ -50,6 +50,37 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun expenseReportAndItsScopedDrillDownExposeExactDecimalAmounts() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/reports/expenses"
+        for (path in listOf(base, "$base/claims")) {
+            val operation = api["paths"][path]["get"]
+            assertTrue(operation["x-hris-authentication-required"].asBoolean())
+            assertTrue(operation["x-hris-company-admission"].asBoolean())
+            assertTrue(
+                operation["parameters"].any {
+                    it["name"].asString() == "from" && it["required"].asBoolean()
+                }
+            )
+            assertTrue(
+                operation["parameters"].any {
+                    it["name"].asString() == "until" && it["required"].asBoolean()
+                }
+            )
+        }
+        for (schema in
+            listOf("ExpenseReportCountsResponse", "ExpenseReportClaimResponse")) assertEquals(
+            "string",
+            api["components"]["schemas"][schema]["properties"]["amount"]["type"].asString(),
+        )
+        assertTrue(
+            api["paths"]["$base/claims"]["get"]["parameters"].any {
+                it["name"].asString() == "after"
+            }
+        )
+    }
+
+    @Test
     fun leaveReportAndItsScopedDrillDownExposeExactDecimalDays() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/reports/leave"

@@ -8,18 +8,22 @@ import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.reporting.data.datasources.*
 import dev.fajar.hris.reporting.data.repositories.StoredAttendanceExceptionReportRepository
+import dev.fajar.hris.reporting.data.repositories.StoredExpenseReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredHeadcountReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredLeaveReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredOvertimeReportRepository
 import dev.fajar.hris.reporting.domain.repositories.AttendanceExceptionReportRepository
+import dev.fajar.hris.reporting.domain.repositories.ExpenseReportRepository
 import dev.fajar.hris.reporting.domain.repositories.HeadcountReportRepository
 import dev.fajar.hris.reporting.domain.repositories.LeaveReportRepository
 import dev.fajar.hris.reporting.domain.repositories.OvertimeReportRepository
 import dev.fajar.hris.reporting.domain.usecases.GetAttendanceExceptionReport
+import dev.fajar.hris.reporting.domain.usecases.GetExpenseReport
 import dev.fajar.hris.reporting.domain.usecases.GetGroupHeadcountReport
 import dev.fajar.hris.reporting.domain.usecases.GetHeadcountReport
 import dev.fajar.hris.reporting.domain.usecases.GetLeaveReport
 import dev.fajar.hris.reporting.domain.usecases.GetOvertimeReport
+import dev.fajar.hris.reporting.domain.usecases.ListExpenseReportClaims
 import dev.fajar.hris.reporting.domain.usecases.ListLeaveReportRequests
 import java.time.Clock
 import org.jooq.DSLContext
@@ -46,6 +50,45 @@ class ReportingConfiguration {
         security: IdentitySecurityPolicy,
         clock: Clock,
     ) = GetOvertimeReport(reports, companies, members, identities, transactions, security, clock)
+
+    @Bean
+    fun expenseReportSource(sql: DSLContext): ExpenseReportDataSource =
+        PostgresExpenseReportDataSource(sql)
+
+    @Bean
+    fun expenseReports(source: ExpenseReportDataSource): ExpenseReportRepository =
+        StoredExpenseReportRepository(source)
+
+    @Bean
+    fun getExpenseReport(
+        reports: ExpenseReportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetExpenseReport(reports, companies, members, identities, transactions, security, clock)
+
+    @Bean
+    fun listExpenseReportClaims(
+        reports: ExpenseReportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListExpenseReportClaims(
+            reports,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun leaveReportSource(sql: DSLContext): LeaveReportDataSource =

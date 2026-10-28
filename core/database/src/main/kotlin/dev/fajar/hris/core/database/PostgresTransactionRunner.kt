@@ -16,7 +16,8 @@ class PostgresTransactionRunner(
 ) :
     TransactionRunner,
     dev.fajar.hris.core.domain.CrossCompanyTransactionRunner,
-    dev.fajar.hris.core.domain.CompanyReadTransactionRunner {
+    dev.fajar.hris.core.domain.CompanyReadTransactionRunner,
+    dev.fajar.hris.core.domain.ReportSourceTransactionRunner {
     init {
         require(statementTimeout.toMillis() in 1..300_000)
         require(lockTimeout.toMillis() in 1..statementTimeout.toMillis())
@@ -43,6 +44,16 @@ class PostgresTransactionRunner(
     ): Result<T> {
         require(actor.companyId == null && companies.size in 1..32)
         return runScoped(actor, null, companies.toSet(), operation)
+    }
+
+    override fun <T> runWithReportSources(
+        actor: Actor,
+        companies: Set<java.util.UUID>,
+        operation: () -> Result<T>,
+    ): Result<T> {
+        val selected = companies.toSet()
+        require(actor.companyId != null && selected.size in 1..32)
+        return runScoped(actor, null, selected, operation)
     }
 
     private fun <T> runScoped(

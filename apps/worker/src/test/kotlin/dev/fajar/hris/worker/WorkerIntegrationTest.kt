@@ -62,7 +62,13 @@ class WorkerIntegrationTest {
     @Autowired private lateinit var runner: JobRunExecutor
     @Autowired private lateinit var jobs: JobRepository
     @Autowired private lateinit var transactions: TransactionRunner
+    @Autowired private lateinit var reportSources: ReportSourceTransactionRunner
     private val companies = mutableListOf<UUID>()
+
+    @Test
+    fun reportSourcePortUsesTheWorkerTransactionOwner() {
+        assertSame(transactions, reportSources)
+    }
 
     private fun database() =
         JdbcTemplate(

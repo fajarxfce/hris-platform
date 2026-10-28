@@ -553,4 +553,353 @@ class PostgresIsolationTest {
             jdbc.queryForObject("select cardinality(current_read_company_ids())", Int::class.java),
         )
     }
+
+    @Test
+    fun anchoredReportSourcesPermitOwnedCaptureButNoSourceWritesOrPrivateProfiles() {
+        admin.update(
+            "insert into accounts(id,email,display_name) values(?,?,'Export scope fixture') on conflict do nothing",
+            actorId,
+            "$actorId@example.test",
+        )
+        val third = UUID.randomUUID()
+        admin.update(
+            "insert into companies(id,code,name,timezone) values(?,?,'Unselected company','UTC')",
+            third,
+            "E${third.toString().take(8)}",
+        )
+        val sources =
+            listOf(companyA, companyB, third).associateWith { company ->
+                val person = UUID.randomUUID()
+                val employment = UUID.randomUUID()
+                admin.update(
+                    "insert into persons(id,owner_company_id,legal_name,nationality) values(?,?,'Export private profile','ID')",
+                    person,
+                    company,
+                )
+                admin.update(
+                    "insert into employments(company_id,id,person_id,employee_number) values(?,?,?,?)",
+                    company,
+                    employment,
+                    person,
+                    "E${employment.toString().take(8)}",
+                )
+                admin.update(
+                    "insert into employment_revisions(company_id,employment_id,revision,effective_from,contract_kind,start_date,status,actor_id,reason) values(?,?,0,'2026-01-01','PERMANENT','2026-01-01','ACTIVE',?,'Export scope fixture')",
+                    company,
+                    employment,
+                    actorId,
+                )
+                admin.update(
+                    "insert into employment_revisions(company_id,employment_id,revision,effective_from,contract_kind,start_date,status,actor_id,reason) values(?,?,1,'2026-02-01','PERMANENT','2026-01-01','SUSPENDED',?,'Export scope fixture')",
+                    company,
+                    employment,
+                    actorId,
+                )
+                admin.update(
+                    "insert into employment_revision_cancellations(company_id,employment_id,revision,actor_id,reason) values(?,?,1,?,'Export scope fixture')",
+                    company,
+                    employment,
+                    actorId,
+                )
+                org.springframework.transaction.support
+                    .TransactionTemplate(JdbcTransactionManager(requireNotNull(admin.dataSource)))
+                    .execute {
+                        admin.update(
+                            "insert into company_client_policy_heads(company_id) values(?)",
+                            company,
+                        )
+                        admin.update(
+                            """insert into company_client_policy_revisions(company_id,version,activate_at,disabled_modules,
+                    minimum_android_build,minimum_ios_build,minimum_web_build,recorded_at,actor_id,reason)
+                    values(?,0,now(),'{}',0,0,0,now(),?,'Export scope fixture')""",
+                            company,
+                            actorId,
+                        )
+                    }
+                employment
+            }
+        val captured = UUID.randomUUID()
+        // The anchor deliberately does not belong to the explicit report selection.
+        assertEquals(
+            Result.Success(Unit),
+            transactions.runWithReportSources(actor(companyA), setOf(companyB)) {
+                assertEquals(
+                    companyA,
+                    jdbc.queryForObject("select current_company_id()", UUID::class.java),
+                )
+                assertNull(
+                    jdbc.queryForObject("select current_secondary_company_id()", UUID::class.java)
+                )
+                for (table in
+                    listOf(
+                        "employments",
+                        "employment_revisions",
+                        "employment_revision_cancellations",
+                        "company_client_policy_heads",
+                        "company_client_policy_revisions",
+                    )) {
+                    assertEquals(
+                        setOf(companyA, companyB),
+                        jdbc
+                            .queryForList(
+                                "select distinct company_id from $table",
+                                UUID::class.java,
+                            )
+                            .toSet(),
+                    )
+                    assertEquals(
+                        0,
+                        jdbc.update(
+                            "update $table set company_id=company_id where company_id=?",
+                            companyB,
+                        ),
+                    )
+                    assertEquals(0, jdbc.update("delete from $table where company_id=?", companyB))
+                }
+                assertEquals(
+                    0,
+                    jdbc.queryForObject(
+                        "select count(*) from persons where owner_company_id in (?,?)",
+                        Int::class.java,
+                        companyB,
+                        third,
+                    ),
+                )
+                assertEquals(
+                    listOf(companyA),
+                    jdbc.queryForList("select id from companies", UUID::class.java),
+                )
+                assertEquals(
+                    0,
+                    jdbc.update(
+                        "update employments set employee_number='EXPORT_FORBIDDEN' where company_id=?",
+                        companyB,
+                    ),
+                )
+                assertEquals(0, jdbc.update("delete from employments where company_id=?", companyB))
+                // Capture a selected source value and owned journal in the same transaction.
+                assertEquals(
+                    1,
+                    jdbc.update(
+                        """insert into audit_entries(id,company_id,actor_id,resource_type,resource_id,action,correlation_id,details)
+                    select ?,?,?, 'fixture',?, 'export_source_capture',?,jsonb_build_object('employment',id)
+                    from employments where company_id=? and id=?""",
+                        captured,
+                        companyA,
+                        actorId,
+                        captured,
+                        UUID.randomUUID(),
+                        companyB,
+                        sources.getValue(companyB),
+                    ),
+                )
+                Result.Success(Unit)
+            },
+        )
+        assertEquals(
+            sources.getValue(companyB).toString(),
+            admin.queryForObject(
+                "select details->>'employment' from audit_entries where id=?",
+                String::class.java,
+                captured,
+            ),
+        )
+        val forbidden = Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
+        assertEquals(
+            forbidden,
+            transactions.runWithReportSources(actor(companyA), setOf(companyB)) {
+                safeDatabaseCall {
+                    jdbc.update(
+                        "insert into employments(company_id,id,person_id,employee_number) select company_id,?,person_id,'EXPORT_FORBIDDEN' from employments where id=?",
+                        UUID.randomUUID(),
+                        sources.getValue(companyB),
+                    )
+                }
+            },
+        )
+        assertEquals(
+            forbidden,
+            transactions.runWithReportSources(actor(companyA), setOf(companyB)) {
+                safeDatabaseCall { insertReportScopeJournal(UUID.randomUUID(), companyB) }
+            },
+        )
+        assertEquals(0, jdbc.queryForObject("select count(*) from employments", Int::class.java))
+        assertEquals(
+            0,
+            jdbc.queryForObject("select cardinality(current_read_company_ids())", Int::class.java),
+        )
+    }
+
+    @Test
+    fun anchoredReportCaptureRollsBackOnFailureAndCancellationAndClearsReusedContext() {
+        val rejected = Result.Failed(Failure(FailureKind.CONFLICT, "export_capture_rejected"))
+        val rolledBack = mutableListOf<UUID>()
+        fun write(): UUID =
+            UUID.randomUUID().also {
+                rolledBack += it
+                insertReportScopeJournal(it, companyA)
+            }
+        assertEquals(
+            rejected,
+            transactions.runWithReportSources(actor(companyA), setOf(companyB)) {
+                write()
+                rejected
+            },
+        )
+        assertThrows(CancellationException::class.java) {
+            transactions.runWithReportSources<Unit>(actor(companyA), setOf(companyB)) {
+                write()
+                throw CancellationException()
+            }
+        }
+        try {
+            assertThrows(InterruptedException::class.java) {
+                transactions.runWithReportSources(actor(companyA), setOf(companyB)) {
+                    write()
+                    Thread.currentThread().interrupt()
+                    Result.Success(Unit)
+                }
+            }
+        } finally {
+            Thread.interrupted()
+        }
+        rolledBack.forEach {
+            assertEquals(
+                0,
+                admin.queryForObject(
+                    "select count(*) from audit_entries where id=?",
+                    Int::class.java,
+                    it,
+                ),
+            )
+        }
+        assertEquals(
+            0,
+            jdbc.queryForObject("select cardinality(current_read_company_ids())", Int::class.java),
+        )
+        // Source transactions must not inherit the transfer scope, even from connection defaults.
+        jdbc.queryForObject(
+            "select set_config('hris.secondary_company_id',?,false)",
+            String::class.java,
+            companyB.toString(),
+        )
+        jdbc.queryForObject(
+            "select set_config('hris.read_company_ids',?,false)",
+            String::class.java,
+            "{$companyB}",
+        )
+        try {
+            assertEquals(
+                Result.Success(Unit),
+                transactions.runWithReportSources(actor(companyA), setOf(companyA)) {
+                    assertNull(
+                        jdbc.queryForObject(
+                            "select current_secondary_company_id()",
+                            UUID::class.java,
+                        )
+                    )
+                    assertEquals(
+                        "{$companyA}",
+                        jdbc.queryForObject(
+                            "select current_read_company_ids()::text",
+                            String::class.java,
+                        ),
+                    )
+                    Result.Success(Unit)
+                },
+            )
+            for (transfer in listOf(false, true)) {
+                val check = {
+                    Result.Success(
+                        jdbc.queryForObject(
+                            "select cardinality(current_read_company_ids())",
+                            Int::class.java,
+                        )
+                    )
+                }
+                assertEquals(
+                    Result.Success(0),
+                    if (transfer) transactions.run(actor(companyA), companyB, check)
+                    else transactions.run(actor(companyA), check),
+                )
+            }
+            assertEquals(
+                Result.Success(Unit),
+                transactions.run(actor(null), setOf(companyA)) {
+                    assertNull(jdbc.queryForObject("select current_company_id()", UUID::class.java))
+                    assertNull(
+                        jdbc.queryForObject(
+                            "select current_secondary_company_id()",
+                            UUID::class.java,
+                        )
+                    )
+                    Result.Success(Unit)
+                },
+            )
+        } finally {
+            jdbc.queryForObject(
+                "select set_config('hris.secondary_company_id','',false)",
+                String::class.java,
+            )
+            jdbc.queryForObject(
+                "select set_config('hris.read_company_ids','',false)",
+                String::class.java,
+            )
+        }
+    }
+
+    @Test
+    fun anchoredReportSelectionIsExplicitBoundedDetachedAndCannotNestTransactions() {
+        assertThrows(IllegalArgumentException::class.java) {
+            transactions.runWithReportSources<Unit>(actor(null), setOf(companyA)) {
+                fail("missing anchor entered")
+            }
+        }
+        for (selection in listOf(emptySet(), List(33) { UUID.randomUUID() }.toSet())) {
+            assertThrows(IllegalArgumentException::class.java) {
+                transactions.runWithReportSources<Unit>(actor(companyA), selection) {
+                    fail("invalid source selection entered")
+                }
+            }
+        }
+        val sources = List(32) { UUID.randomUUID() }.toMutableSet()
+        assertEquals(
+            Result.Success(32),
+            transactions.runWithReportSources(actor(companyA), sources) {
+                sources.clear()
+                Result.Success(
+                    jdbc.queryForObject(
+                        "select cardinality(current_read_company_ids())",
+                        Int::class.java,
+                    )
+                )
+            },
+        )
+        assertThrows(IllegalStateException::class.java) {
+            transactions.run(actor(companyA)) {
+                transactions.runWithReportSources<Unit>(actor(companyA), setOf(companyB)) {
+                    fail("nested source scope entered")
+                }
+            }
+        }
+        assertThrows(IllegalStateException::class.java) {
+            transactions.runWithReportSources(actor(companyA), setOf(companyB)) {
+                transactions.run<Unit>(actor(companyA)) { fail("nested ordinary scope entered") }
+            }
+        }
+        assertEquals(
+            0,
+            jdbc.queryForObject("select cardinality(current_read_company_ids())", Int::class.java),
+        )
+    }
+
+    private fun insertReportScopeJournal(id: UUID, company: UUID): Int =
+        jdbc.update(
+            "insert into audit_entries(id,company_id,actor_id,resource_type,resource_id,action,correlation_id) values(?,?,?,'fixture',?,'export_scope',?)",
+            id,
+            company,
+            actorId,
+            id,
+            UUID.randomUUID(),
+        )
 }

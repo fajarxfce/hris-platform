@@ -128,3 +128,11 @@ cases and saved-filter regressions passed; 80 reporting and 26 API/PostgreSQL ca
 were validated across focused runs. Queued execution, snapshots, private artifacts,
 retention/download and history still remain open. See
 [export contracts and remaining delivery](../report-exports.md).
+
+Export capture now has a separate company-anchored transaction port and V94 SELECT
+scope for the existing five report input tables. The requesting company retains its
+write scope; selected source companies gain no mutation rights. Validation passed
+24 database, 11 headcount API and 82 worker tests with both application contexts,
+packaging and architecture/format checks. Durable snapshots, queued execution,
+publication, expiry/download and export history remain open. See
+[source transaction boundaries](../report-exports.md#source-transaction-boundary).

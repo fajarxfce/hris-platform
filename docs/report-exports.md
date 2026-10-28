@@ -45,6 +45,30 @@ Private storage currently accepts at most 5 MiB per object, so an encoded part f
 without enlarging the shared storage limit. The worker must also bound its source
 page acquisition, staged rows, retained parts, attempts and total export size.
 
+## Source transaction boundary
+
+`ReportSourceTransactionRunner.runWithReportSources` retains the requesting actor's
+company for owned capture and journal writes while installing an explicit, detached
+selection of one to 32 source companies. The anchor need not belong to that set.
+V94 extends the existing report SELECT policies to support this anchored context;
+only employments, employment revisions/cancellations and client-policy heads/revisions
+gain selected-company reads. Source-company writes and private profile reads gain no
+additional scope. Transfer context is cleared on entry. Ordinary, transfer and global
+report transactions continue to install their own explicit contexts.
+
+This is a transaction capability, not authorization or an export endpoint. The
+owning use case must check the anchor and every source's original/current grants,
+credentials, client policy and assurance after ordered guards, and retain those
+checks through capture and journal completion. A source query must filter the exact
+selection even when the anchor's ordinary reads are also visible. Existing global
+group reads still require an actor with no company. Transaction-local settings are
+discarded on success, failed results or cancellation, and nested owners are rejected.
+
+The port keeps READ COMMITTED isolation. It allows one coherent source acquisition
+and its owned staging writes to commit together; it does not make independently
+paged live acquisitions into a historical snapshot. Large-detail capture and its
+retained row store remain part of the export implementation below.
+
 ## Validation and remaining delivery
 
 Validation passed 80 reporting tests (35 domain, 43 data, two delivery) and 26
@@ -57,9 +81,18 @@ extending formula handling to supplementary formatting and combining code points
 Architecture and formatting checks passed. The initial test compile used an unavailable
 assertion library; tests were changed to the repository's existing JUnit assertions.
 
+The anchored source boundary subsequently passed 24 database/migration tests,
+11 group-headcount API/PostgreSQL cases and all 82 worker tests. Three new database
+cases cover selected reads on all five permitted tables, denied source mutations,
+private-profile exclusion, owned capture/journal writes, failure/cancellation/late
+interruption rollback, reused connections, cleared transfer context, detached and
+bounded selections, and rejected nested transaction owners. API and worker contexts
+both resolve the new port to their existing transaction owner. Both application JARs,
+architecture and formatting checks passed in the same run. Test containers were
+disposed. This verifies the transaction boundary, not a running export workflow.
+
 Request admission and durable snapshots, private artifact publication, fenced worker
 execution, interruption recovery, expiry/cleanup, authorized downloads and export
 history/dashboard remain to be implemented and validated. No export endpoint or worker
-kind is exposed by this foundation. It changes neither the worker import graph nor
-the dashboard; no new worker-context, browser, provider or deployment acceptance is
-claimed here.
+kind is exposed by these foundations. Reporting has not yet been added to the worker
+import graph. No new browser, provider, workload or deployment acceptance is claimed.

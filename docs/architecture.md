@@ -48,7 +48,18 @@ destination permissions, without calling the transfer use case or reserving
 eligibility. Destination pickers authorize their own scoped reads. The command
 rechecks all current conditions and its source version independently.
 
-CompanyReadTransactionRunner provides a separate, explicit SELECT scope for group reporting. A global actor may select one to 32 companies; the use case must authorize every selection before reading report inputs. Policies are limited to employment history and company client settings, with no additional write scope. Company policy, company, membership, and account guards are acquired in that order, with company IDs sorted within each stage. Original and current grants, credentials, MFA assurance, and per-company client availability are checked after waiting. One SQL snapshot computes global and per-company counts without loading profiles. Every other transaction owner clears the read selection, and transaction-local context is discarded on success, failure, or cancellation.
+CompanyReadTransactionRunner provides a separate, explicit SELECT scope for group reporting. A global actor may select one to 32 companies; the use case must authorize every selection before reading report inputs. Policies are limited to employment history and company client settings, with no additional write scope. Company policy, company, membership, and account guards are acquired in that order, with company IDs sorted within each stage. Original and current grants, credentials, MFA assurance, and per-company client availability are checked after waiting. One SQL snapshot computes global and per-company counts without loading profiles. Ordinary and transfer transactions clear the read selection; anchored report transactions install their own selection. Transaction-local context is discarded on success, failure, or cancellation.
+
+ReportSourceTransactionRunner supplies an explicit company-anchored source scope
+for export capture. The anchor keeps its ordinary write scope while one to 32
+selected companies add only the same five employment/client-policy SELECT inputs.
+V94 permits that selection alongside an anchor without adding mutation policies.
+The anchor may be outside the report selection; queries must still filter the exact
+authorized source set. Use cases must authorize the anchor and every selected source
+under ordered guards before capture or receipt replay. Transfer scope is cleared,
+and the global-only CompanyReadTransactionRunner contract remains unchanged.
+This port retains ordinary READ COMMITTED semantics: capture must use a coherent
+source query, not treat successive live pages as an immutable execution snapshot.
 
 Audit search belongs to administration. Its datasource selects an explicit metadata projection; reasons and change payloads are not acquired. Repository mapping and finite overfetch pagination share the database failure boundary. The use case owns time/filter policy, cursor compatibility, and current audit access/MFA checks. Immutable cursor records permit stable descending timestamp/ID navigation without blocking audit writers, while separate pages remain live reads. This history view does not substitute for commit-ordered mobile synchronization.
 

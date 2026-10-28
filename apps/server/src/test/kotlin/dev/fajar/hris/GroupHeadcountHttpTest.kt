@@ -5,6 +5,17 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class GroupHeadcountHttpTest : GroupHeadcountApiFixture() {
+    @org.springframework.beans.factory.annotation.Autowired
+    private lateinit var reportSources: dev.fajar.hris.core.domain.ReportSourceTransactionRunner
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private lateinit var transactions: dev.fajar.hris.core.domain.TransactionRunner
+
+    @Test
+    fun reportSourcePortUsesTheApplicationTransactionOwner() {
+        assertSame(transactions, reportSources)
+    }
+
     @Test
     fun oneSnapshotReturnsCompanyBucketsAndDistinctPersonsAcrossEmploymentHistory() {
         val f = fixture()

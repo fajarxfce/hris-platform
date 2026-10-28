@@ -70,6 +70,17 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Anchored report source transactions
+
+Export capture now has an explicit transaction port retaining its requesting company
+and selecting up to 32 source companies. V94 permits only the existing five report
+input tables to be read across that selection; source writes gain no scope. Failure,
+cancellation, pool reuse and nested-owner cases passed with 24 database/migration
+tests, 11 headcount API cases and all 82 worker tests. Both contexts resolve the same
+transaction owner; packaging, architecture and formatting passed. Durable snapshots,
+queued execution, artifacts and download/history remain open. See
+[the source boundary and evidence](report-exports.md#source-transaction-boundary).
+
 ### Report export selection and CSV foundations
 
 Canonical report selections now have a shared pure policy; saved filters retain

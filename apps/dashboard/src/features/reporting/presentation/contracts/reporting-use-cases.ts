@@ -1,3 +1,6 @@
+import type { DeleteReportFilter } from "../../domain/usecases/delete-report-filter";
+import type { GetSavedReportFilter } from "../../domain/usecases/get-saved-report-filter";
+import type { ListSavedReportFilters } from "../../domain/usecases/list-saved-report-filters";
 import type { LoadAttendanceClosingEmployees } from "../../domain/usecases/load-attendance-closing-employees";
 import type { LoadAttendanceClosingReport } from "../../domain/usecases/load-attendance-closing-report";
 import type { LoadAttendanceExceptionReport } from "../../domain/usecases/load-attendance-exception-report";
@@ -9,8 +12,13 @@ import type { LoadLeaveReportRequests } from "../../domain/usecases/load-leave-r
 import type { LoadOvertimeReport } from "../../domain/usecases/load-overtime-report";
 import type { LoadPayrollCostReport } from "../../domain/usecases/load-payroll-cost-report";
 import type { LoadReportCatalogue } from "../../domain/usecases/load-report-catalogue";
+import type { SaveReportFilter } from "../../domain/usecases/save-report-filter";
 
 export type ReportingUseCases = Readonly<{
+  listSavedFilters: Pick<ListSavedReportFilters, "execute">;
+  getSavedFilter: Pick<GetSavedReportFilter, "execute">;
+  saveFilter: Pick<SaveReportFilter, "execute">;
+  deleteFilter: Pick<DeleteReportFilter, "execute">;
   loadCatalogue: Pick<LoadReportCatalogue, "execute">;
   loadAttendanceClosings: Pick<LoadAttendanceClosingReport, "execute">;
   loadAttendanceClosingEmployees: Pick<LoadAttendanceClosingEmployees, "execute">;

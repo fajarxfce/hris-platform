@@ -1865,3 +1865,16 @@ are ignored. DTO mapping rejects another company, repeated or unknown kinds and
 unsupported definition versions. No catalogue or result data enters a shared cache.
 Saved-filter authoring, recovery and export history remain in progress. See
 [the catalogue contract](reporting.md#report-catalogue).
+
+## Personal report filters
+
+The report catalogue opens the current account/company's saved-filter directory.
+Each of the seven reports can seed a new filter from its applied selection. Review
+supports typed editing, current report navigation and confirmed deletion. The
+fifty-entry directory and every editor own their requests and dispose obsolete
+account/company state. Unknown selected headcount companies remain explicit until
+removed; metadata does not confer source access. Original commands and observed
+versions survive response loss and in-place MFA, with protected departures and
+explicit recovery. All 3,872 dashboard tests, 25 distinct browser cases and an
+isolated independent-owner API/PostgreSQL workflow passed. See
+[contracts and evidence](reporting.md#saved-filter-dashboard).

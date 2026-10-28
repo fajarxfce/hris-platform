@@ -9,6 +9,7 @@ import type { ReportingUseCases } from "../contracts/reporting-use-cases";
 import { AttendanceClosingReportController } from "../controllers/attendance-closing-report-controller";
 import { useAttendanceClosingReportFilters } from "../controllers/use-attendance-closing-report-filters";
 import { attendanceClosingReportView } from "../models/attendance-closing-report-view";
+import { saveAppliedReportFilter } from "../models/saved-report-filter-route";
 import { AttendanceClosingReportPage } from "../pages/attendance-closing-report-page";
 
 type Props = {
@@ -96,6 +97,17 @@ function AttendanceClosingReportBinding(
   );
   return (
     <AttendanceClosingReportPage
+      savedFilterTo={
+        state.report
+          ? saveAppliedReportFilter(props.access.companyId, "ATTENDANCE_CLOSINGS", {
+              asOf: null,
+              from: props.from,
+              until: props.until,
+              status: null,
+              companies: [],
+            })
+          : null
+      }
       state={state}
       view={view}
       filters={filters}

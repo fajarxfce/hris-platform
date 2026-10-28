@@ -1,5 +1,6 @@
 import { Text } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -11,6 +12,7 @@ import { AppTextField } from "../../../../core/presentation/components/app-text-
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { useAttendanceReportFilters } from "../controllers/use-attendance-report-filters";
 import { reportingMessages } from "../i18n/reporting-messages";
+import { savedReportFilterMessages } from "../i18n/saved-report-filter-messages";
 import type { AttendanceReportState } from "../models/attendance-report-state";
 import type { attendanceReportView } from "../models/attendance-report-view";
 
@@ -21,6 +23,7 @@ export function AttendanceReportPage({
   companyName,
   locale,
   onRefresh,
+  savedFilterTo = null,
   onOpenDay,
 }: {
   state: AttendanceReportState;
@@ -29,6 +32,7 @@ export function AttendanceReportPage({
   companyName: string;
   locale: Locale;
   onRefresh: () => void;
+  savedFilterTo?: string | null;
   onOpenDay: (date: string) => void;
 }) {
   const text = reportingMessages(locale);
@@ -39,13 +43,18 @@ export function AttendanceReportPage({
         title={text.attendanceTitle}
         context={`${companyName} / ${shared.reports}`}
         actions={
-          <AppButton
-            icon={<ArrowClockwise20Regular />}
-            onClick={onRefresh}
-            disabled={state.stage === "loading"}
-          >
-            {shared.refresh}
-          </AppButton>
+          <>
+            <AppButton
+              icon={<ArrowClockwise20Regular />}
+              onClick={onRefresh}
+              disabled={state.stage === "loading"}
+            >
+              {shared.refresh}
+            </AppButton>
+            {savedFilterTo && (
+              <Link to={savedFilterTo}>{savedReportFilterMessages(locale).saveApplied}</Link>
+            )}
+          </>
         }
       />
       <form onSubmit={filters.apply} noValidate>

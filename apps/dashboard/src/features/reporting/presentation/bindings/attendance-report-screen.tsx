@@ -9,6 +9,7 @@ import type { ReportingUseCases } from "../contracts/reporting-use-cases";
 import { AttendanceReportController } from "../controllers/attendance-report-controller";
 import { useAttendanceReportFilters } from "../controllers/use-attendance-report-filters";
 import { attendanceReportView } from "../models/attendance-report-view";
+import { saveAppliedReportFilter } from "../models/saved-report-filter-route";
 import { AttendanceReportPage } from "../pages/attendance-report-page";
 
 type Props = {
@@ -78,6 +79,17 @@ function AttendanceReportBinding(
   const filters = useAttendanceReportFilters(props.from, props.until, props.locale, props.onApply);
   return (
     <AttendanceReportPage
+      savedFilterTo={
+        state.report
+          ? saveAppliedReportFilter(props.access.companyId, "ATTENDANCE_EXCEPTIONS", {
+              asOf: null,
+              from: props.from,
+              until: props.until,
+              status: null,
+              companies: [],
+            })
+          : null
+      }
       state={state}
       view={view}
       filters={filters}

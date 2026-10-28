@@ -9,6 +9,7 @@ import type { ReportingUseCases } from "../contracts/reporting-use-cases";
 import { ExpenseReportController } from "../controllers/expense-report-controller";
 import { useExpenseReportFilters } from "../controllers/use-expense-report-filters";
 import { expenseReportView } from "../models/expense-report-view";
+import { saveAppliedReportFilter } from "../models/saved-report-filter-route";
 import { ExpenseReportPage } from "../pages/expense-report-page";
 
 type Props = {
@@ -72,6 +73,17 @@ function ExpenseReportBinding(
   const filters = useExpenseReportFilters(props.from, props.until, props.locale, props.onApply);
   return (
     <ExpenseReportPage
+      savedFilterTo={
+        state.report
+          ? saveAppliedReportFilter(props.access.companyId, "EXPENSES", {
+              asOf: null,
+              from: props.from,
+              until: props.until,
+              status: null,
+              companies: [],
+            })
+          : null
+      }
       state={state}
       view={view}
       filters={filters}

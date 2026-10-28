@@ -942,3 +942,52 @@ contract now contains 362 paths; its existing response-size test remains unchang
 The first PostgreSQL run exposed missing explicit date/timestamp casts in raw SQL;
 those casts were corrected before the final successful runs. No UI or deployment
 acceptance is claimed for this backend increment.
+
+## Saved-filter dashboard
+
+The report catalogue links to the initiating account/company's saved-filter directory.
+All seven report screens offer **Save applied filter** only after their current
+report was acquired. The action captures the applied selection, independently of
+unfinished filter-form edits. Authoring uses absolute dates/months, current report
+kinds and optional overtime status. Private names never enter navigation URLs.
+
+The bounded directory exposes at most fifty active filters. Review supports renaming,
+changing the typed selection, opening the persisted selection and confirmed deletion.
+Unknown or no-longer-available headcount companies remain explicit selections; a
+name edit does not silently replace them with the anchor. Their IDs remain visible
+without fetching foreign company labels. The actual report independently checks each
+selected company's access. Source revocation disables opening/saving that report but
+retains current `reports.read` metadata and cleanup access. Company-pinned headcount
+links reset their selection before a replacement company's read.
+
+HTTP acquisition and strict DTO mapping share the existing safe repository boundary.
+Scope, IDs, supported definitions, canonical parameters, bounded versions, precise
+instant ordering and mutation receipts are checked before exposure. Domain policies
+reuse each report's range checks. Detached immutable selections prevent caller edits
+from changing an in-flight command. Routes contain known report destinations only.
+
+One mounted account/company owns each directory/editor, request and subscription.
+Refresh, company replacement and disposal cancel obsolete work and erase its state;
+late results cannot restore it. Editors retain the original command ID, payload and
+observed version after an uncertain response, including after later MFA or version
+rejections. They perform no implicit retry. Pending/uncertain commands and dirty
+forms use the workspace's departure protection; confirmed first-attempt conflicts
+require a fresh review. In-place MFA verification retains the form and command.
+
+Validation: all 3,872 dashboard tests in 336 files passed, with TypeScript,
+architecture and formatting checks. Twenty-five distinct Chromium cases passed
+across focused runs: fourteen saved-filter cases and eleven catalogue/headcount
+regressions. They cover all seven report kinds, applied versus unsent fields,
+unknown group selections, quota presentation, original-command recovery through MFA,
+confirmed conflict review, deletion confirmation, protected departures and company
+replacement. Initial browser failures were two mismatched test labels, corrected
+before the final fourteen-case run. The Indonesian dark editor at 390 pixels and
+the real API directory empty state were visually inspected.
+
+An isolated API/PostgreSQL/browser workflow passed with independent administrator
+and reader MFA accounts. It verified one stored filter after a deliberately lost
+save response, owner-only reads, source revocation, blocked report opening, continued
+owner cleanup and receipt recovery after a lost deletion response. Both repetitions
+used the original command. The reader context and fixture resources were disposed.
+This increment does not represent deployment, native delivery or export acceptance.
+Bounded asynchronous exports and export history remain open.

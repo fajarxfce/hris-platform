@@ -9,6 +9,7 @@ import type { ReportingUseCases } from "../contracts/reporting-use-cases";
 import { OvertimeReportController } from "../controllers/overtime-report-controller";
 import { useOvertimeReportFilters } from "../controllers/use-overtime-report-filters";
 import { overtimeReportView } from "../models/overtime-report-view";
+import { saveAppliedReportFilter } from "../models/saved-report-filter-route";
 import { OvertimeReportPage } from "../pages/overtime-report-page";
 
 type Props = {
@@ -99,6 +100,17 @@ function OvertimeReportBinding(
   );
   return (
     <OvertimeReportPage
+      savedFilterTo={
+        state.report
+          ? saveAppliedReportFilter(props.access.companyId, "OVERTIME", {
+              asOf: null,
+              from: props.from,
+              until: props.until,
+              status: props.status,
+              companies: [],
+            })
+          : null
+      }
       state={state}
       view={view}
       filters={filters}

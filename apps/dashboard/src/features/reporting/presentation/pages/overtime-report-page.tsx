@@ -1,5 +1,6 @@
 import { Text } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -13,6 +14,7 @@ import { type Locale, messages } from "../../../../core/presentation/i18n/messag
 import { overtimeStatuses } from "../../../workforce/domain/entities/overtime-request";
 import type { useOvertimeReportFilters } from "../controllers/use-overtime-report-filters";
 import { reportingMessages } from "../i18n/reporting-messages";
+import { savedReportFilterMessages } from "../i18n/saved-report-filter-messages";
 import type { OvertimeReportState } from "../models/overtime-report-state";
 import type { overtimeReportView } from "../models/overtime-report-view";
 
@@ -23,6 +25,7 @@ export function OvertimeReportPage({
   companyName,
   locale,
   onRefresh,
+  savedFilterTo = null,
   onOpenMonth,
 }: {
   state: OvertimeReportState;
@@ -31,6 +34,7 @@ export function OvertimeReportPage({
   companyName: string;
   locale: Locale;
   onRefresh: () => void;
+  savedFilterTo?: string | null;
   onOpenMonth: (month: string) => void;
 }) {
   const text = reportingMessages(locale);
@@ -41,13 +45,18 @@ export function OvertimeReportPage({
         title={text.overtimeTitle}
         context={`${companyName} / ${shared.reports}`}
         actions={
-          <AppButton
-            icon={<ArrowClockwise20Regular />}
-            onClick={onRefresh}
-            disabled={state.stage === "loading"}
-          >
-            {shared.refresh}
-          </AppButton>
+          <>
+            <AppButton
+              icon={<ArrowClockwise20Regular />}
+              onClick={onRefresh}
+              disabled={state.stage === "loading"}
+            >
+              {shared.refresh}
+            </AppButton>
+            {savedFilterTo && (
+              <Link to={savedFilterTo}>{savedReportFilterMessages(locale).saveApplied}</Link>
+            )}
+          </>
         }
       />
       <form onSubmit={filters.apply} noValidate>

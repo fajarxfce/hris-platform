@@ -9,6 +9,7 @@ import type { ReportingUseCases } from "../contracts/reporting-use-cases";
 import { PayrollCostReportController } from "../controllers/payroll-cost-report-controller";
 import { usePayrollCostReportFilters } from "../controllers/use-payroll-cost-report-filters";
 import { payrollCostReportView } from "../models/payroll-cost-report-view";
+import { saveAppliedReportFilter } from "../models/saved-report-filter-route";
 import { PayrollCostReportPage } from "../pages/payroll-cost-report-page";
 
 type Props = {
@@ -91,6 +92,17 @@ function PayrollCostReportBinding(
   const filters = usePayrollCostReportFilters(props.from, props.until, props.locale, props.onApply);
   return (
     <PayrollCostReportPage
+      savedFilterTo={
+        state.report
+          ? saveAppliedReportFilter(props.access.companyId, "PAYROLL_COSTS", {
+              asOf: null,
+              from: props.from,
+              until: props.until,
+              status: null,
+              companies: [],
+            })
+          : null
+      }
       state={state}
       view={view}
       filters={filters}

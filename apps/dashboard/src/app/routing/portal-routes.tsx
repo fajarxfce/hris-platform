@@ -395,6 +395,16 @@ const EmploymentCancellationScreen = lazy(() =>
   ),
 );
 
+const SavedReportFiltersScreen = lazy(() =>
+  import("../../features/reporting/presentation/bindings/saved-report-filters-screen").then(
+    (module) => ({ default: module.SavedReportFiltersScreen }),
+  ),
+);
+const ReportFilterEditorScreen = lazy(() =>
+  import("../../features/reporting/presentation/bindings/report-filter-editor-screen").then(
+    (module) => ({ default: module.ReportFilterEditorScreen }),
+  ),
+);
 const ReportCatalogueScreen = lazy(() =>
   import("../../features/reporting/presentation/bindings/report-catalogue-screen").then(
     (module) => ({ default: module.ReportCatalogueScreen }),
@@ -1797,6 +1807,56 @@ export function PortalRoutes({
               jobs={jobs}
               companyName={company.name}
               locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/saved-filters"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <SavedReportFiltersScreen
+              accountId={accountId}
+              access={access}
+              actions={reporting}
+              companyName={company.name}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/saved-filters/new"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ReportFilterEditorScreen
+              accountId={accountId}
+              access={access}
+              actions={reporting}
+              companyName={company.name}
+              locale={locale}
+              companies={companies}
+              timezone={company.timezone}
+              nextIdentifier={nextIdentifier}
+              creating={true}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/saved-filters/:filterId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ReportFilterEditorScreen
+              accountId={accountId}
+              access={access}
+              actions={reporting}
+              companyName={company.name}
+              locale={locale}
+              companies={companies}
+              timezone={company.timezone}
+              nextIdentifier={nextIdentifier}
+              creating={false}
             />
           </Suspense>
         }

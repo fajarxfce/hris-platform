@@ -9,6 +9,7 @@ import type { ReportingUseCases } from "../contracts/reporting-use-cases";
 import { LeaveReportController } from "../controllers/leave-report-controller";
 import { useLeaveReportFilters } from "../controllers/use-leave-report-filters";
 import { leaveReportView } from "../models/leave-report-view";
+import { saveAppliedReportFilter } from "../models/saved-report-filter-route";
 import { LeaveReportPage } from "../pages/leave-report-page";
 
 type Props = {
@@ -72,6 +73,17 @@ function LeaveReportBinding(
   const filters = useLeaveReportFilters(props.from, props.until, props.locale, props.onApply);
   return (
     <LeaveReportPage
+      savedFilterTo={
+        state.report
+          ? saveAppliedReportFilter(props.access.companyId, "LEAVE", {
+              asOf: null,
+              from: props.from,
+              until: props.until,
+              status: null,
+              companies: [],
+            })
+          : null
+      }
       state={state}
       view={view}
       filters={filters}

@@ -112,3 +112,11 @@ the protected storage. Validation passed 72 reporting tests, 21 database/migrati
 tests and 87 distinct API/PostgreSQL/OpenAPI cases, plus packaging and architecture/
 format checks. Dashboard authoring/recovery, exports and export history remain open.
 See [personal saved filters](../reporting.md#personal-saved-filters).
+
+The dashboard now implements personal saved-filter directories, typed authoring for
+all seven report kinds, persisted-selection navigation and confirmed deletion.
+Original command recovery survives response loss and in-place MFA; unknown group
+selections remain intact. All 3,872 dashboard tests, 25 distinct Chromium cases and
+an isolated two-account API/PostgreSQL/browser workflow passed. Exports, retention
+and export history remain open. See
+[saved-filter dashboard behavior and evidence](../reporting.md#saved-filter-dashboard).

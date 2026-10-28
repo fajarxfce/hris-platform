@@ -1,0 +1,81 @@
+import type { Locale } from "../../../../core/presentation/i18n/messages";
+
+const english = {
+  title: "Saved filters",
+  create: "Create filter",
+  edit: "Review filter",
+  name: "Filter name",
+  selection: "Selection",
+  empty: "No saved filters in this company yet.",
+  introduction:
+    "Save up to 50 personal selections in each company. Dates stay as saved; report data is refreshed when opened.",
+  save: "Save filter",
+  saveApplied: "Save applied filter",
+  saved: "Filter saved.",
+  deleted: "Filter deleted.",
+  back: "Back to saved filters",
+  catalogue: "Report catalogue",
+  review: "Review",
+  open: "Open saved selection",
+  remove: "Delete filter",
+  confirmDelete: "Delete this saved filter?",
+  deleteMessage: "This removes your saved name and selection. Report data is unaffected.",
+  unavailable:
+    "You can review or delete this filter. Opening or saving this report requires its current source permissions.",
+  unconfirmed:
+    "The result is unconfirmed. Recover the original command before making another change.",
+  retry: "Recover original command",
+  operation: "Operation",
+  reload: "Reload current filter",
+  version: "Version",
+  asOf: "As of",
+  from: "From",
+  until: "Until",
+  companies: "Companies",
+  chooseCompanies: "Select companies",
+  selected: "selected",
+  unavailableCompany: "Unavailable company",
+  groupHint:
+    "Retained companies are checked again when the report opens. Remove an unavailable selection only if you want to change the filter.",
+  limit: "All 50 filter slots are used. Delete an existing filter to create another.",
+};
+const indonesian: typeof english = {
+  title: "Filter tersimpan",
+  create: "Buat filter",
+  edit: "Tinjau filter",
+  name: "Nama filter",
+  selection: "Pilihan",
+  empty: "Belum ada filter tersimpan di perusahaan ini.",
+  introduction:
+    "Simpan hingga 50 pilihan pribadi per perusahaan. Tanggal tetap sesuai simpanan; data laporan diperbarui saat dibuka.",
+  save: "Simpan filter",
+  saveApplied: "Simpan filter terapan",
+  saved: "Filter tersimpan.",
+  deleted: "Filter dihapus.",
+  back: "Kembali ke filter tersimpan",
+  catalogue: "Katalog laporan",
+  review: "Tinjau",
+  open: "Buka pilihan tersimpan",
+  remove: "Hapus filter",
+  confirmDelete: "Hapus filter tersimpan ini?",
+  deleteMessage: "Nama dan pilihan pribadi Anda akan dihapus. Data laporan tetap tersedia.",
+  unavailable:
+    "Anda dapat meninjau atau menghapus filter ini. Membuka atau menyimpan laporan memerlukan izin sumber terkini.",
+  unconfirmed: "Hasil belum terkonfirmasi. Pulihkan perintah awal sebelum membuat perubahan lain.",
+  retry: "Pulihkan perintah awal",
+  operation: "Operasi",
+  reload: "Muat ulang filter terkini",
+  version: "Versi",
+  asOf: "Per tanggal",
+  from: "Dari",
+  until: "Sampai",
+  companies: "Perusahaan",
+  chooseCompanies: "Pilih perusahaan",
+  selected: "dipilih",
+  unavailableCompany: "Perusahaan tidak tersedia",
+  groupHint:
+    "Izin perusahaan yang tersimpan diperiksa lagi saat laporan dibuka. Hapus pilihan yang tidak tersedia hanya jika ingin mengubah filter.",
+  limit: "Semua 50 slot filter terpakai. Hapus filter yang sudah ada untuk membuat yang baru.",
+};
+export const savedReportFilterMessages = (locale: Locale) =>
+  locale === "id" ? indonesian : english;

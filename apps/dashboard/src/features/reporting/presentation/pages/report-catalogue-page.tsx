@@ -1,5 +1,6 @@
 import { Text } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
 import { AppLoading } from "../../../../core/presentation/components/app-loading";
@@ -7,6 +8,7 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { reportCatalogueMessages } from "../i18n/report-catalogue-messages";
+import { savedReportFilterMessages } from "../i18n/saved-report-filter-messages";
 import type { ReportCatalogueState } from "../models/report-catalogue-state";
 import type { reportCatalogueRows } from "../models/report-catalogue-view";
 
@@ -15,6 +17,7 @@ export function ReportCataloguePage({
   rows,
   companyName,
   locale,
+  savedFiltersTo,
   onRefresh,
   onOpen,
 }: {
@@ -22,6 +25,7 @@ export function ReportCataloguePage({
   rows: ReturnType<typeof reportCatalogueRows>;
   companyName: string;
   locale: Locale;
+  savedFiltersTo: string;
   onRefresh: () => void;
   onOpen: (id: string) => void;
 }) {
@@ -33,13 +37,16 @@ export function ReportCataloguePage({
         title={text.title}
         context={`${companyName} / ${shared.reports}`}
         actions={
-          <AppButton
-            icon={<ArrowClockwise20Regular />}
-            onClick={onRefresh}
-            disabled={state.stage === "loading"}
-          >
-            {shared.refresh}
-          </AppButton>
+          <>
+            <Link to={savedFiltersTo}>{savedReportFilterMessages(locale).title}</Link>
+            <AppButton
+              icon={<ArrowClockwise20Regular />}
+              onClick={onRefresh}
+              disabled={state.stage === "loading"}
+            >
+              {shared.refresh}
+            </AppButton>
+          </>
         }
       />
       <AppFailure failure={state.failure} locale={locale} />

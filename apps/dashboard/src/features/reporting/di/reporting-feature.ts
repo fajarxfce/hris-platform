@@ -7,6 +7,7 @@ import { HttpLeaveReportDataSource } from "../data/datasources/http-leave-report
 import { HttpOvertimeReportDataSource } from "../data/datasources/http-overtime-report-data-source";
 import { HttpPayrollCostReportDataSource } from "../data/datasources/http-payroll-cost-report-data-source";
 import { HttpReportCatalogueDataSource } from "../data/datasources/http-report-catalogue-data-source";
+import { HttpSavedReportFilterDataSource } from "../data/datasources/http-saved-report-filter-data-source";
 import { RemoteAttendanceClosingReportRepository } from "../data/repositories/remote-attendance-closing-report-repository";
 import { RemoteAttendanceExceptionReportRepository } from "../data/repositories/remote-attendance-exception-report-repository";
 import { RemoteExpenseReportRepository } from "../data/repositories/remote-expense-report-repository";
@@ -15,6 +16,10 @@ import { RemoteLeaveReportRepository } from "../data/repositories/remote-leave-r
 import { RemoteOvertimeReportRepository } from "../data/repositories/remote-overtime-report-repository";
 import { RemotePayrollCostReportRepository } from "../data/repositories/remote-payroll-cost-report-repository";
 import { RemoteReportCatalogueRepository } from "../data/repositories/remote-report-catalogue-repository";
+import { RemoteSavedReportFilterRepository } from "../data/repositories/remote-saved-report-filter-repository";
+import { DeleteReportFilter } from "../domain/usecases/delete-report-filter";
+import { GetSavedReportFilter } from "../domain/usecases/get-saved-report-filter";
+import { ListSavedReportFilters } from "../domain/usecases/list-saved-report-filters";
 import { LoadAttendanceClosingEmployees } from "../domain/usecases/load-attendance-closing-employees";
 import { LoadAttendanceClosingReport } from "../domain/usecases/load-attendance-closing-report";
 import { LoadAttendanceExceptionReport } from "../domain/usecases/load-attendance-exception-report";
@@ -26,8 +31,10 @@ import { LoadLeaveReportRequests } from "../domain/usecases/load-leave-report-re
 import { LoadOvertimeReport } from "../domain/usecases/load-overtime-report";
 import { LoadPayrollCostReport } from "../domain/usecases/load-payroll-cost-report";
 import { LoadReportCatalogue } from "../domain/usecases/load-report-catalogue";
+import { SaveReportFilter } from "../domain/usecases/save-report-filter";
 
 export function createReportingFeature(http: HttpClient) {
+  const filters = new RemoteSavedReportFilterRepository(new HttpSavedReportFilterDataSource(http));
   const closings = new RemoteAttendanceClosingReportRepository(
     new HttpAttendanceClosingReportDataSource(http),
   );
@@ -39,6 +46,10 @@ export function createReportingFeature(http: HttpClient) {
     new HttpAttendanceExceptionReportDataSource(http),
   );
   return {
+    listSavedFilters: new ListSavedReportFilters(filters),
+    getSavedFilter: new GetSavedReportFilter(filters),
+    saveFilter: new SaveReportFilter(filters),
+    deleteFilter: new DeleteReportFilter(filters),
     loadCatalogue: new LoadReportCatalogue(
       new RemoteReportCatalogueRepository(new HttpReportCatalogueDataSource(http)),
     ),

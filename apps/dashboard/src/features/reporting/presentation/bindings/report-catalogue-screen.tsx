@@ -7,6 +7,7 @@ import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import type { ReportingUseCases } from "../contracts/reporting-use-cases";
 import { ReportCatalogueController } from "../controllers/report-catalogue-controller";
 import { reportCatalogueRows, reportPaths } from "../models/report-catalogue-view";
+import { savedReportFiltersPath } from "../models/saved-report-filter-route";
 import { ReportCataloguePage } from "../pages/report-catalogue-page";
 
 type Props = {
@@ -41,6 +42,7 @@ function ReportCatalogueBinding({ access, loadCatalogue, companyName, locale }: 
   );
   return (
     <ReportCataloguePage
+      savedFiltersTo={savedReportFiltersPath(access.companyId)}
       state={state}
       rows={rows}
       companyName={companyName}

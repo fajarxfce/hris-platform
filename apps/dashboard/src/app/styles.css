@@ -1266,3 +1266,13 @@ a {
   cursor: pointer;
   overflow-wrap: anywhere;
 }
+
+.app-report-filter-fields {
+  display: grid;
+  gap: 16px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  max-width: 720px;
+}

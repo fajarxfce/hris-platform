@@ -2,6 +2,31 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_report_filter: ["This filter reference is invalid.", "Referensi filter tidak valid."],
+  invalid_report_filter_name: [
+    "Enter a filter name of 1–80 characters without control characters.",
+    "Masukkan nama filter 1–80 karakter tanpa karakter kontrol.",
+  ],
+  unsupported_report_definition: [
+    "This saved report definition is unsupported. Review the current report catalogue.",
+    "Definisi laporan tersimpan belum didukung. Tinjau katalog laporan terkini.",
+  ],
+  invalid_report_filter_parameters: [
+    "Check the report dates, status and company selection.",
+    "Periksa tanggal, status, dan pilihan perusahaan laporan.",
+  ],
+  report_filter_not_found: [
+    "This filter is unavailable in your current account and company.",
+    "Filter tidak tersedia untuk akun dan perusahaan Anda saat ini.",
+  ],
+  report_filter_limit: [
+    "You have reached the limit of 50 saved filters in this company. Delete an existing filter first.",
+    "Batas 50 filter tersimpan di perusahaan ini sudah tercapai. Hapus filter yang sudah ada terlebih dahulu.",
+  ],
+  report_filter_version_limit: [
+    "This filter cannot be edited again. Save a new filter or delete this one.",
+    "Filter tidak dapat diedit lagi. Simpan filter baru atau hapus filter ini.",
+  ],
   attendance_adjustments_unavailable: [
     "Attendance adjustments are not available on this server.",
     "Penyesuaian attendance belum tersedia pada server ini.",

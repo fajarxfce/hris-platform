@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useSyncExternalStore } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import type { AccountId, CompanyId } from "../../../../core/domain/identifiers";
 import { companyDate } from "../../../../core/presentation/dates/company-date";
 import type { Locale } from "../../../../core/presentation/i18n/messages";
@@ -9,6 +9,7 @@ import { HeadcountController } from "../controllers/headcount-controller";
 import { useHeadcountFilters } from "../controllers/use-headcount-filters";
 import { reportingMessages } from "../i18n/reporting-messages";
 import { headcountView } from "../models/headcount-view";
+import { saveAppliedReportFilter } from "../models/saved-report-filter-route";
 import { HeadcountPage } from "../pages/headcount-page";
 
 type Props = {
@@ -33,6 +34,13 @@ export function HeadcountScreen(props: Props) {
       ),
     [parameters, props.access.companyId],
   );
+  if (parameters.has("company") && parameters.get("company") !== props.access.companyId)
+    return (
+      <Navigate
+        replace
+        to={`/reports/headcount?${new URLSearchParams({ company: props.access.companyId, asOf: today, companies: props.access.companyId })}`}
+      />
+    );
   return (
     <HeadcountBinding
       key={`${props.accountId}:${props.access.companyId}`}
@@ -40,7 +48,11 @@ export function HeadcountScreen(props: Props) {
       asOf={asOf}
       selected={selected}
       onFiltersChanged={(date, companies) =>
-        setParameters({ asOf: date, companies: [...companies].sort().join(",") })
+        setParameters({
+          company: props.access.companyId,
+          asOf: date,
+          companies: [...companies].sort().join(","),
+        })
       }
     />
   );
@@ -79,6 +91,17 @@ function HeadcountBinding({
   const filters = useHeadcountFilters(asOf, selected, companies, locale, onFiltersChanged);
   return (
     <HeadcountPage
+      savedFilterTo={
+        state.report
+          ? saveAppliedReportFilter(access.companyId, "HEADCOUNT", {
+              asOf,
+              from: null,
+              until: null,
+              status: null,
+              companies: selected,
+            })
+          : null
+      }
       state={state}
       view={view}
       filters={filters}

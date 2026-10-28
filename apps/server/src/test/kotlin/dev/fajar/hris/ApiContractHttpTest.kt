@@ -25,6 +25,42 @@ class ApiContractHttpTest : PeopleApiFixture() {
     private lateinit var mappings: RequestMappingHandlerMapping
 
     @Test
+    fun attendanceClosingReportsExposeIndependentOriginalAndCurrentFactsWithPublishedReferences() {
+        val api = contract()
+        val operation =
+            api["paths"]["/api/v1/companies/{companyId}/reports/attendance-closings"]["get"]
+        assertTrue(operation["x-hris-authentication-required"].asBoolean())
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        for (name in listOf("from", "until")) assertTrue(
+            operation["parameters"].any {
+                it["name"].asString() == name && it["required"].asBoolean()
+            }
+        )
+        val schemas = api["components"]["schemas"]
+        val counts = schemas["AttendanceClosingCountsResponse"]["properties"]
+        for (name in
+            listOf(
+                "closedMonths",
+                "employmentMonths",
+                "employments",
+                "adjustedEmploymentMonths",
+                "days",
+                "scheduledDays",
+                "scheduledMinutes",
+            )) assertEquals("integer", counts[name]["type"].asString())
+        assertEquals(counts["original"], counts["current"])
+        assertEquals(
+            "integer",
+            schemas["AttendanceClosingFactsResponse"]["properties"]["acceptedMinutes"]["type"]
+                .asString(),
+        )
+        assertEquals(
+            "string",
+            schemas["AttendanceClosingReferenceResponse"]["properties"]["jobId"]["type"].asString(),
+        )
+    }
+
+    @Test
     fun publishedPayrollCostReportsExposeBoundedMonthsAndExactDecimalStrings() {
         val api = contract()
         val operation = api["paths"]["/api/v1/companies/{companyId}/reports/payroll-costs"]["get"]

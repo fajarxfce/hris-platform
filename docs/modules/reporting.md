@@ -65,3 +65,12 @@ bounded projection. Backend checks passed 49 reporting, 114 payroll domain,
 workflow through original publication, payment, amendment and returns. Exact month
 navigation retains report filters through browser return. Historical selection,
 saved filters and exports remain open. See [payroll cost definitions](../reporting.md#published-payroll-costs).
+
+Historical attendance closing aggregates now retain the published original facts
+beside the latest applied employee corrections across one to twelve months. Partial
+and cancelled attempts are excluded, successive adjustments count once, and empty
+published closings keep their identity. Original/current grants and MFA protect the
+bounded SQL projection. Validation passed 56 reporting tests and 146 distinct
+API/PostgreSQL/OpenAPI cases across focused runs, plus architecture, formatting
+and API packaging. Dashboard, revision-aware drill-down and exports remain in
+progress. See [closing definitions and evidence](../reporting.md#historical-attendance-closings).

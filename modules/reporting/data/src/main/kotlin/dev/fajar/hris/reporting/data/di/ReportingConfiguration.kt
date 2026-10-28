@@ -7,18 +7,21 @@ import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.reporting.data.datasources.*
+import dev.fajar.hris.reporting.data.repositories.StoredAttendanceClosingReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredAttendanceExceptionReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredExpenseReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredHeadcountReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredLeaveReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredOvertimeReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredPayrollCostReportRepository
+import dev.fajar.hris.reporting.domain.repositories.AttendanceClosingReportRepository
 import dev.fajar.hris.reporting.domain.repositories.AttendanceExceptionReportRepository
 import dev.fajar.hris.reporting.domain.repositories.ExpenseReportRepository
 import dev.fajar.hris.reporting.domain.repositories.HeadcountReportRepository
 import dev.fajar.hris.reporting.domain.repositories.LeaveReportRepository
 import dev.fajar.hris.reporting.domain.repositories.OvertimeReportRepository
 import dev.fajar.hris.reporting.domain.repositories.PayrollCostReportRepository
+import dev.fajar.hris.reporting.domain.usecases.GetAttendanceClosingReport
 import dev.fajar.hris.reporting.domain.usecases.GetAttendanceExceptionReport
 import dev.fajar.hris.reporting.domain.usecases.GetExpenseReport
 import dev.fajar.hris.reporting.domain.usecases.GetGroupHeadcountReport
@@ -35,6 +38,35 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration(proxyBeanMethods = false)
 class ReportingConfiguration {
+    @Bean
+    fun attendanceClosingReportSource(sql: DSLContext): AttendanceClosingReportDataSource =
+        PostgresAttendanceClosingReportDataSource(sql)
+
+    @Bean
+    fun attendanceClosingReports(
+        source: AttendanceClosingReportDataSource
+    ): AttendanceClosingReportRepository = StoredAttendanceClosingReportRepository(source)
+
+    @Bean
+    fun getAttendanceClosingReport(
+        reports: AttendanceClosingReportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetAttendanceClosingReport(
+            reports,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
     @Bean
     fun payrollCostReportSource(sql: DSLContext): PayrollCostReportDataSource =
         PostgresPayrollCostReportDataSource(sql)

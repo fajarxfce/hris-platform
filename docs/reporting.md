@@ -531,6 +531,98 @@ claim a performance benchmark or deployment.
 Local logs: `.work/payroll-cost-dashboard-{check,browser,browser-final,integration}.log`.
 Historical closing reports, saved filters and exports remain separate open work.
 
+## Historical attendance closings
+
+`GET /api/v1/companies/{companyId}/reports/attendance-closings?from=2026-01&until=2026-12`
+
+Requires both `reports.read` and company-wide `workforce.read`, with `REPORTING`
+client availability. Self/team attendance reads, verification, correction and closing
+authority do not independently authorize these company totals. The inclusive
+selection is one to twelve calendar months in 2000–2100 and may cross a year boundary.
+Invalid windows return `invalid_report_month_range` with `maximumMonths: "12"`,
+`minimumYear: "2000"` and `maximumYear: "2100"`.
+
+Only successfully closed periods contribute. A worker's partial snapshots, cancelled
+or failed attempts and periods awaiting review contribute nothing. The original
+projection uses the immutable snapshots belonging to the published closing job.
+The current projection chooses each employee/month's latest applied attendance
+adjustment, or its original snapshot when none exists. Earlier revisions are not
+added together. A late capture alone does not change either projection. Subsequent
+hires, roster changes or private-profile edits cannot replace retained closing facts.
+
+The response contains company, month bounds, `evaluatedAt`,
+`definitionVersion: "attendance-closings.v1"`, `totals` and complete ordered `months`.
+Each month has nullable `closing` metadata: period ID, job ID, closing version,
+closed timestamp and frozen timezone. A null reference means no published closing;
+a closed period with no employees retains its reference and zero employee/day
+counts. The closing version identifies the original closing, not adjustment heads.
+
+| Common count | Definition |
+| --- | --- |
+| `closedMonths` | Published periods in the selected window. |
+| `employmentMonths` | Employee snapshots selected from those closing jobs. |
+| `employments` | Distinct employment records, counted independently for the overall total. |
+| `adjustedEmploymentMonths` | Selected employee/month snapshots with at least one applied adjustment; repeated corrections still count once. |
+| `days` | Full calendar dates retained for the selected employee snapshots. |
+| `scheduledDays` | Retained days with a work-shift schedule, independently of their attendance fact. |
+| `scheduledMinutes` | Sum of those frozen planned minutes; adjustments retain the original schedules. |
+
+Both `original` and `current` contain these factual measures:
+
+| Fact count | Definition |
+| --- | --- |
+| `workedDays` | Stored `WORKED` days, including recorded work on an otherwise unassigned/off date. |
+| `absenceDays` | Explicitly recorded absence; missing captures alone do not establish absence. |
+| `unrecordedDays` | Stored scheduled work dates without accepted work or an explicit correction. |
+| `offDays` | Stored `OFF` facts without overriding work/absence. |
+| `unassignedDays` | Stored `UNASSIGNED` facts without overriding work/absence. |
+| `acceptedMinutes` | Retained accepted/corrected attendance duration after its recorded break. |
+
+The five fact buckets partition `days`. Overnight work belongs to its original
+work date. These measures do not classify approved leave, replace approved overtime
+minutes or recalculate payroll; those modules retain separate definitions. Original
+closing totals remain historical evidence. Current totals reflect the latest applied
+corrections visible to this read, not arbitrary past-as-of or immutable export state.
+Separate drill-down reads can observe a subsequent correction; a retained export
+must pin its selected closing jobs and adjustment references.
+
+One RLS SQL snapshot aggregates both fact sets without loading private employee
+profiles, names, raw captures, reasons or snapshot payloads into the JVM. It returns
+at most thirteen aggregate rows. Existing company/month, closing-snapshot and
+adjustment-revision indexes support the selection; no migration is added. Snapshot
+shapes, identities, ordered dates, known fact categories, retained schedules and
+bounded durations are validated. Acquisition and mapping share the sanitized
+database failure boundary and preserve cancellation. The repository reconciles
+all month totals, distinct employment bounds and published references before freezing
+its result. Each closing admits at most 5,000 employees; the annual range therefore
+bounds employee snapshots at 60,000. Integer counters use 64-bit values. Planned
+minutes permit offset transitions while accepted work stays within 24 hours/day.
+
+Original/live report/source grants, credentials and MFA are retained under shared
+company, membership and account guards, with assurance rechecked after acquisition.
+The query does not lock payroll or current attendance writers. Responses are
+`no-store`.
+
+Backend validation passed 56 reporting domain/data/delivery tests and 146 distinct
+selected API/PostgreSQL/OpenAPI cases across focused runs: 133 related closing,
+adjustment and contract cases, plus all thirteen new report cases. The final
+thirteen-case run passed in fifty seconds. It covers partial publication, cancelled
+attempt replacement, late evidence, successive corrections and original receipt
+recovery, exact original/latest snapshot reconciliation, empty closings, grants,
+RLS, availability, concurrent publication/adjustments, pending revocation, MFA expiry,
+cancellation and sanitized failure recovery. PostgreSQL tests caught a nullable
+jOOQ primitive conversion: the total row's null closing version became zero. The
+boxed nullable mapping now preserves the aggregate's missing reference. Fixture
+array traversal and the original snapshot's direct `days` response were corrected.
+
+Architecture/format checks and the API boot JAR build passed. The worker's existing
+81-case suite remained up to date; Reporting is not in its imported graph, and this
+increment changes no Workforce implementation. OpenAPI has 357 paths and 2,066,020
+bytes. Logs: `.work/attendance-closing-unit.log`,
+`.work/attendance-closing-api-final.log`, `.work/attendance-closing-api-followup.log`
+and `.work/attendance-closing-api-confirmed.log`. No workload benchmark or deployment
+was performed. Dashboard, revision-aware drill-down and export acceptance remain open.
+
 ## Validation
 
 On 28 October 2026, leave reporting passed 25 reporting domain/data/delivery tests,

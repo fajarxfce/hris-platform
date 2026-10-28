@@ -103,3 +103,12 @@ API/PostgreSQL/OpenAPI cases, 3,841 dashboard tests, fifteen distinct Chromium
 scenarios and an isolated independent-reader revocation workflow. Saved filters,
 bounded asynchronous exports and export history remain open. See
 [the catalogue contract and evidence](../reporting.md#report-catalogue).
+
+Personal saved-filter APIs now retain bounded names and typed main-report selections
+per account/company, with owner RLS, observed versions and original-command receipts.
+Deleting a filter clears its definition while retaining the version identity; source
+revocation still permits owner cleanup and never authorizes a report. V93 introduces
+the protected storage. Validation passed 72 reporting tests, 21 database/migration
+tests and 87 distinct API/PostgreSQL/OpenAPI cases, plus packaging and architecture/
+format checks. Dashboard authoring/recovery, exports and export history remain open.
+See [personal saved filters](../reporting.md#personal-saved-filters).

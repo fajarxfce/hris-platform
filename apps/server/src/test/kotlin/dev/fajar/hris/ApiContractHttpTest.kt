@@ -25,6 +25,47 @@ class ApiContractHttpTest : PeopleApiFixture() {
     private lateinit var mappings: RequestMappingHandlerMapping
 
     @Test
+    fun personalReportFiltersDocumentPrivateMetadataAndVersionedIdempotentCommands() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/reports/saved-filters"
+        for ((path, method) in
+            listOf(
+                base to "get",
+                "$base/{filterId}" to "get",
+                "$base/{filterId}" to "put",
+                "$base/{filterId}/delete" to "post",
+            )) {
+            val operation = api["paths"][path][method]
+            assertTrue(operation["x-hris-authentication-required"].asBoolean())
+            assertTrue(operation["x-hris-company-admission"].asBoolean())
+            if (method != "get")
+                assertTrue(
+                    operation["parameters"].any {
+                        it["name"].asString() == "Idempotency-Key" && it["required"].asBoolean()
+                    }
+                )
+        }
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            50,
+            schemas["SavedReportFiltersResponse"]["properties"]["items"]["maxItems"].asInt(),
+        )
+        assertEquals(
+            32,
+            schemas["ReportFilterParametersRequest"]["properties"]["companies"]["maxItems"].asInt(),
+        )
+        assertEquals(
+            80,
+            schemas["SaveReportFilterRequest"]["properties"]["name"]["maxLength"].asInt(),
+        )
+        assertEquals(
+            10000,
+            schemas["DeleteReportFilterRequest"]["properties"]["expectedVersion"]["maximum"].asInt(),
+        )
+        assertNull(schemas["SavedReportFilterResponse"]["properties"].get("accountId"))
+    }
+
+    @Test
     fun reportCatalogueDocumentsCompanyAdmissionAndBoundedDefinitionIdentities() {
         val api = contract()
         val operation = api["paths"]["/api/v1/companies/{companyId}/reports/catalogue"]["get"]

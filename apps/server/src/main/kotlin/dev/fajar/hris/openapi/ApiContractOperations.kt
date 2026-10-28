@@ -14,6 +14,7 @@ import java.math.BigDecimal
 fun completeApiContract(api: OpenAPI) {
     // Springdoc removes unused definitions before invoking customizers. Add the
     // filter/problem schemas together with the operations that reference them.
+    completeSavedFilterSchemaBounds(api)
     val shared = apiContractComponents()
     shared.schemas.forEach { (name, schema) -> api.components.addSchemas(name, schema) }
     shared.securitySchemes.forEach { (name, scheme) ->
@@ -358,4 +359,32 @@ fun describeBinaryTransport(path: String, method: PathItem.HttpMethod, operation
             "Authorized finalized payslip with ID/EN labels, generated eagerly within a 1 MiB/16-page bound and four concurrent renders. Current authorization also gates conditional requests and content reads. HEAD returns metadata only. The bounded shared download transport supports Range/ETag; admission or late access failure may return an empty error body."
         else
             "The actual Content-Type follows the validated document. HEAD returns authorized metadata without bytes. Admission failure can return an empty 429/503 response. A failure after streaming starts cannot become a JSON problem; discard incomplete bytes and resume using Range/ETag."
+}
+
+private fun completeSavedFilterSchemaBounds(api: OpenAPI) {
+    val schemas = api.components.schemas
+    schemas["SavedReportFiltersResponse"]?.properties?.get("items")?.maxItems = 50
+    for (name in listOf("ReportFilterParametersRequest", "ReportFilterParametersResponse")) {
+        val properties = schemas[name]?.properties ?: continue
+        properties["companies"]?.maxItems = 32
+        properties["companies"]?.uniqueItems = true
+        for (field in listOf("asOf", "from", "until")) properties[field]?.maxLength = 10
+        properties["status"]?.maxLength = 32
+    }
+    for (name in listOf("SaveReportFilterRequest", "SavedReportFilterResponse")) {
+        val properties = schemas[name]?.properties ?: continue
+        properties["name"]?.maxLength = 80
+        properties["name"]?.minLength = 1
+        properties["definitionVersion"]?.maxLength = 64
+    }
+    for ((name, field) in
+        listOf(
+            "SaveReportFilterRequest" to "expectedVersion",
+            "DeleteReportFilterRequest" to "expectedVersion",
+            "SavedReportFilterResponse" to "version",
+        )) {
+        val value = schemas[name]?.properties?.get(field) ?: continue
+        value.minimum = BigDecimal.ZERO
+        value.maximum = BigDecimal(10000)
+    }
 }

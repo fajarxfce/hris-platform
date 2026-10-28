@@ -882,3 +882,63 @@ and success after renewed verification. Existing isolation, grant/credential rac
 cancellation, coherent totals and client-policy checks also passed. This follow-up
 changes backend admission only; the catalogue's fifteen browser cases and isolated
 API/browser acceptance are recorded above.
+
+## Personal saved filters
+
+Saved filters belong to the initiating account and anchor company. The API retains
+only a personal name, one catalogue kind/definition version and that report's main
+parameters. It never stores query text, executable routes, cursors or report results.
+The owner comes from the authenticated actor; another administrator cannot read or
+edit the selection. V93 enforces both account and company RLS and protects identity,
+monotonic versions and deletion records. Group-report SELECT scope adds no access
+to saved filters.
+
+- `GET /api/v1/companies/{companyId}/reports/saved-filters` returns at most fifty
+  active entries for the current account/company.
+- `GET .../saved-filters/{filterId}` reads the current active definition.
+- `PUT .../saved-filters/{filterId}` accepts `name`, `kind`, `definitionVersion`,
+  `parameters` and nullable `expectedVersion`; null creates a new identity.
+- `POST .../saved-filters/{filterId}/delete` requires `expectedVersion`.
+
+Both commands require `Idempotency-Key` and return the stable ID/version receipt.
+Canonical names are trimmed and bounded to eighty characters. Versioned selections
+retain absolute dates/months and reuse each report's existing range policies.
+Headcount takes `asOf` and up to thirty-two unique company IDs; an omitted/empty
+selection means the anchor company. An explicit selection is preserved even if it
+excludes that company. Attendance exceptions, leave, overtime and expenses use
+`from`/`until` dates. Closing and payroll cost reports use `from`/`until` months.
+Only overtime accepts optional current `status`. Unrelated fields, unsupported
+versions and noncanonical dates are rejected.
+
+Reads and deletion require current `reports.read`. Saving also requires the selected
+report's source grant in the anchor company. Retaining metadata after losing source
+access permits cleanup; it never permits opening that report. Every actual report
+retains its own authorization, including every explicitly selected headcount company.
+No foreign company labels or source facts are looked up when saving a selection.
+
+Command receipts precede an exclusive account/company filter guard, followed by
+shared company/member/account guards. This serializes the active-entry limit and
+observed-version changes without locking other owners' filters. Read projections
+use one bounded SQL snapshot. Original/live grants, credentials and MFA are checked
+after waits and through acquisition or journal completion. The mutation, receipt,
+audit and outbox commit together. Journal details contain only kind/version metadata.
+
+Deletion clears the name, kind, definition version and parameters, retaining only
+identity/version/timestamps. A deleted ID cannot be recreated or reset; an original
+receipt may still be recovered after current authorization. New saves stop at version
+9,999, reserving version 10,000 for deletion. Deleting an already deleted observed
+version can recover a receipt without emitting another change. Deletion releases an
+active slot. Personal filter authoring in the dashboard and bounded exports remain
+in progress.
+
+Validation passed 72 reporting domain/data/delivery tests, 21 database/isolation and
+migration tests, and 87 distinct API/PostgreSQL/OpenAPI cases across focused runs
+(61 contract cases and 26 saved-filter cases). The final saved-filter run covers
+competing quota admissions and revisions, replay and payload mismatch, both RLS
+partitions, group-scope exclusion, source revocation, eleven MFA-expiry stages,
+write/journal failure rollback, interruption cleanup and erased deletion recovery.
+API packaging, generated jOOQ, architecture and formatting checks passed. The API
+contract now contains 362 paths; its existing response-size test remains unchanged.
+The first PostgreSQL run exposed missing explicit date/timestamp casts in raw SQL;
+those casts were corrected before the final successful runs. No UI or deployment
+acceptance is claimed for this backend increment.

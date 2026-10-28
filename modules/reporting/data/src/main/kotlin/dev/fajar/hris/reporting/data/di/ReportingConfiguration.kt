@@ -1,7 +1,9 @@
 package dev.fajar.hris.reporting.data.di
 
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
+import dev.fajar.hris.core.domain.ChangeJournalRepository
 import dev.fajar.hris.core.domain.CompanyReadTransactionRunner
+import dev.fajar.hris.core.domain.OperationRepository
 import dev.fajar.hris.core.domain.TransactionRunner
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
@@ -15,6 +17,7 @@ import dev.fajar.hris.reporting.data.repositories.StoredHeadcountReportRepositor
 import dev.fajar.hris.reporting.data.repositories.StoredLeaveReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredOvertimeReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredPayrollCostReportRepository
+import dev.fajar.hris.reporting.data.repositories.StoredSavedReportFilterRepository
 import dev.fajar.hris.reporting.domain.repositories.AttendanceClosingReportRepository
 import dev.fajar.hris.reporting.domain.repositories.AttendanceExceptionReportRepository
 import dev.fajar.hris.reporting.domain.repositories.ExpenseReportRepository
@@ -22,6 +25,8 @@ import dev.fajar.hris.reporting.domain.repositories.HeadcountReportRepository
 import dev.fajar.hris.reporting.domain.repositories.LeaveReportRepository
 import dev.fajar.hris.reporting.domain.repositories.OvertimeReportRepository
 import dev.fajar.hris.reporting.domain.repositories.PayrollCostReportRepository
+import dev.fajar.hris.reporting.domain.repositories.SavedReportFilterRepository
+import dev.fajar.hris.reporting.domain.usecases.DeleteReportFilter
 import dev.fajar.hris.reporting.domain.usecases.GetAttendanceClosingReport
 import dev.fajar.hris.reporting.domain.usecases.GetAttendanceExceptionReport
 import dev.fajar.hris.reporting.domain.usecases.GetExpenseReport
@@ -31,9 +36,12 @@ import dev.fajar.hris.reporting.domain.usecases.GetLeaveReport
 import dev.fajar.hris.reporting.domain.usecases.GetOvertimeReport
 import dev.fajar.hris.reporting.domain.usecases.GetPayrollCostReport
 import dev.fajar.hris.reporting.domain.usecases.GetReportCatalogue
+import dev.fajar.hris.reporting.domain.usecases.GetSavedReportFilter
 import dev.fajar.hris.reporting.domain.usecases.ListAttendanceClosingEmployees
 import dev.fajar.hris.reporting.domain.usecases.ListExpenseReportClaims
 import dev.fajar.hris.reporting.domain.usecases.ListLeaveReportRequests
+import dev.fajar.hris.reporting.domain.usecases.ListSavedReportFilters
+import dev.fajar.hris.reporting.domain.usecases.SaveReportFilter
 import java.time.Clock
 import org.jooq.DSLContext
 import org.springframework.context.annotation.Bean
@@ -41,6 +49,93 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration(proxyBeanMethods = false)
 class ReportingConfiguration {
+    @Bean
+    fun savedReportFilterSource(sql: DSLContext): SavedReportFilterDataSource =
+        PostgresSavedReportFilterDataSource(sql)
+
+    @Bean
+    fun savedReportFilters(source: SavedReportFilterDataSource): SavedReportFilterRepository =
+        StoredSavedReportFilterRepository(source)
+
+    @Bean
+    fun listSavedReportFilters(
+        filters: SavedReportFilterRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListSavedReportFilters(
+            filters,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun getSavedReportFilter(
+        filters: SavedReportFilterRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetSavedReportFilter(filters, companies, members, identities, transactions, security, clock)
+
+    @Bean
+    fun saveReportFilter(
+        filters: SavedReportFilterRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+    ) =
+        SaveReportFilter(
+            filters,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+            operations,
+            journal,
+        )
+
+    @Bean
+    fun deleteReportFilter(
+        filters: SavedReportFilterRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+    ) =
+        DeleteReportFilter(
+            filters,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+            operations,
+            journal,
+        )
+
     @Bean
     fun getReportCatalogue(
         companies: CompanyRepository,

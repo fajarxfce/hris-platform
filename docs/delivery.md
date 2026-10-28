@@ -5,6 +5,24 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+[Deployment and cutover](deployment.md) now has a concrete procedure and a private
+release-record template: retained artifacts, exact project/overlays, HTTPS, secret
+custody, target-sized restore rehearsal, final stopped checkpoint, controlled
+migration/startup, worker side effects, canaries and rollback/reconciliation gates.
+It does not execute a live deployment or claim RPO/RTO.
+
+`tool/review_deployment.py` consumes at most 4 MiB of rendered Compose JSON and
+returns fixed API/worker flag projections plus safe minimum-wiring issues. It
+checks shared runtime flags, scanner/storage dependency, FCM read-only credential
+mounts, private service bindings and optional production transport requirements.
+It emits no provider identifiers/addresses, paths, secrets or raw parse errors.
+Runtime/provider checks remain explicitly false. Six tool regressions passed,
+as did actual rendering of base/documents/documents-plus-push files with fictional
+values. The root `deploymentToolCheck`, sixteen workload regressions, architecture
+and formatting passed in 22 seconds. Log: `.work/deployment-review-checks.log`.
+The dashboard/API contract and application graphs are unchanged; actual running
+worker/provider health remains subsequent work.
+
 The [full-signature document workload](workload.md#document-upload-inspection-and-download)
 passed the real API/worker/PostgreSQL/Garage/ClamAV pipeline: two distinct 100-MiB
 PDF uploads in 7.809 seconds, observed readiness in 9.376 seconds and four complete

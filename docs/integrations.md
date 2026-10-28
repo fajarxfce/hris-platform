@@ -38,6 +38,21 @@ admission reacquires the configuration. There is no polling timer or persistent
 configuration cache. The view uses English/Indonesian copy and the shared portal
 header/resource table, with a UTC observation time and narrow-screen layout.
 
+## Operator review of API and worker wiring
+
+The [deployment runbook](deployment.md#https-secrets-and-service-wiring) includes
+`tool/review_deployment.py`, which accepts rendered Compose JSON on stdin and emits
+fixed API/worker enablement flags, minimal-wiring checks and safe issue codes.
+Provider values, paths and secrets are never output. The worker projection covers
+SMTP, FCM, storage and scanning; Firebase/OIDC request handlers belong to the API.
+API/worker FCM flags may intentionally differ with `compose.push.yml`.
+
+This is an operator's static review of the selected deployment files. It does not
+change the dashboard response, inspect live JVM property binding or check provider/
+worker health. Six redaction/bounds/configuration regressions and actual rendering
+of the base, documents and documents-plus-push files passed with fictional values.
+Running worker status and real provider acceptance remain separate work.
+
 ## Validation
 
 Backend checks passed 184 tests: seven Administration domain, five Administration

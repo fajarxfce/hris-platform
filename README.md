@@ -41,6 +41,8 @@ The dashboard requires Node.js 24 or newer. From `apps/dashboard`, run `npm ci`,
 - [Payslip JSON and PDF delivery](docs/payroll-payslips.md)
 - [Incremental synchronization](docs/synchronization.md)
 - [Dashboard design](docs/dashboard.md)
+- [Deployment and cutover runbook](docs/deployment.md)
+- [Agent continuation across the three repositories](docs/agent-handoff.md)
 - [Delivery and validation](docs/delivery.md)
 
 ## License

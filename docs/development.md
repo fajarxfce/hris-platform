@@ -28,7 +28,7 @@ the full suite and its individual test, query and transaction deadlines.
 
 ## Local runtime
 
-Copy .env.example to .env and generate distinct secrets. Run docker compose up --build -d after building both application jars. PostgreSQL and API bind localhost only. A migration container owns schema changes; runtime receives only hris_app credentials without superuser/BYPASSRLS. For private Garage/ClamAV services, follow [document service configuration](storage.md#private-document-services) and include `compose.documents.yml`. TLS deployment is configured separately.
+Copy .env.example to .env and generate distinct secrets. Run docker compose up --build -d after building both application jars. PostgreSQL and API bind localhost only. A migration container owns schema changes; runtime receives only hris_app credentials without superuser/BYPASSRLS. For private Garage/ClamAV services, follow [document service configuration](storage.md#private-document-services) and include `compose.documents.yml`. Use the [deployment/cutover runbook](deployment.md) for target-specific HTTPS, configuration review, final checkpoints, migration and rollback; this local startup command is not a live release procedure.
 
 The image build context admits the API and worker JARs explicitly through
 `.dockerignore`; source files and environment secrets remain excluded. Build both

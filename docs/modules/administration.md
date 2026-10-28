@@ -50,6 +50,13 @@ successful delivery still require separate verification. Backend checks passed 1
 tests including the full worker graph; focused dashboard/browser and independent
 MFA API acceptance passed. See [configuration contract and evidence](../integrations.md).
 
+The [deployment runbook](../deployment.md) and private release-record template now
+cover target preparation, ingress drain, verified database/content/key checkpoints,
+controlled migration/startup, provider canaries and rollback decisions. The static
+Compose reviewer reports API/worker flags and minimum wiring without secret values;
+six regressions and three actual Compose combinations passed. Effective runtime
+health/provider delivery and execution against an approved target remain separate.
+
 ## Client availability and module flags
 
 Versioned company client policy is implemented, including future activation, immutable history, paired build headers, bounded maintenance, and server admission for feature endpoints and sync selections. Settings writes retain idempotent receipts and current permission/recent-authentication checks. [Client policy](../client-policy.md) defines recovery, scheduling, and mobile behavior. These availability controls do not grant permissions or interrupt already admitted transactions/jobs.

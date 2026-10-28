@@ -11,11 +11,11 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
-| `hris-platform` | `feat/firebase-auth` | Document workload/scan-budget correction below; previous payroll/handoff `1af02465` |
+| `hris-platform` | `feat/firebase-auth` | Deployment review/runbook below; document workload `ed7a760e`, payroll/handoff `1af02465` |
 | `hris-mobile` | `feat/native-push` | `60456c48` — Android URL/inbox archival acceptance |
 | `compose-fluent-starter` | `fix/push-token-lifecycle` | `a16325ef` — existing validated foundation |
 
-The current increment contains the document probe, scan-budget correction and accepted report.
+The current increment contains the static deployment reviewer and cutover runbook.
 Inspect `git status`, `git log` and
 the upstream before continuing. Mobile and Starter were clean at this update.
 
@@ -34,7 +34,39 @@ from a Git push. Completing an increment does not complete the PRD.
 outside these Git repositories. The tracked documents linked here are the durable
 handoff; a fresh clone must not depend on those local files or previous chat history.
 
-## Current checkpoint: full-signature document workload passed
+## Current checkpoint: deployment review and cutover runbook
+
+[Deployment](deployment.md) now provides the release/maintenance/checkpoint/
+migration/startup/rollback procedure, with a [private record template](deployment-record.md).
+It identifies the concrete target inputs still needed and preserves the distinction
+between writing a runbook and executing a live release. No live stack, proxy,
+credential, route or volume was changed by this increment.
+
+[review_deployment.py](../tool/review_deployment.py) accepts normalized Compose JSON
+on stdin (maximum 4 MiB). It emits six API flags, four worker flags, fixed minimum-
+wiring checks and safe categories. It checks scanner/storage dependency, shared
+runtime flags, the worker FCM read-only existing-file bind, private service bindings
+and optional production HTTPS/secure-cookie/development-transport rules. The
+`minimumWiringPassed` field is not runtime readiness: process/provider checks are
+explicitly false. It never emits provider addresses/IDs, paths, secrets or parser
+messages; it does not validate key contents or arbitrary JVM property overrides.
+
+Six deployment-tool regressions passed, including malformed/deep/oversized input
+and redaction even when a secret is supplied as an invalid boolean. Three actual
+Compose combinations (base, documents, documents plus push) rendered and passed
+with fictional values. Root `deploymentToolCheck`, the existing sixteen workload
+tests, architecture and formatting passed in 22 seconds. Log:
+`.work/deployment-review-checks.log`. Static rendering starts no service and contacts
+no provider. No application graph or dashboard/API response changed.
+
+Next: implement/verify running worker integration status and provider health under
+an explicit bounded observation contract; the static tool cannot substitute for
+that. Continue remaining native/provider acceptance and reconcile module criteria.
+Live deployment still requires the actual target, maintained HTTPS origin,
+credential custody, reviewed checkpoint/window and explicit release instruction.
+Do independent implementation/acceptance work before requesting missing inputs.
+
+## Previous checkpoint: full-signature document workload passed — `ed7a760e`
 
 [measure_documents.py](../tool/measure_documents.py) owns the complete real
 API/worker/PostgreSQL/Garage/ClamAV/updater pipeline through
@@ -81,9 +113,9 @@ EICAR probe passed. All owned containers, two networks and four volumes were
 removed after the full run. Its private directory was removed automatically;
 the failed-run directory was removed after diagnosis. No workload is active.
 
-Next: worker integration configuration/health and the deployment/cutover runbook,
-then remaining native/provider acceptance and the module-criteria reconciliation
-below. Update this tracked handoff, completion, delivery and the relevant contract
+The subsequent static deployment review/runbook is recorded above. Running worker
+health, remaining native/provider acceptance and module-criteria reconciliation
+remain. Update this tracked handoff, completion, delivery and the relevant contract
 with each observed result; commit and push each atomic increment.
 
 ## Previous checkpoint: payroll workload passed
@@ -215,9 +247,9 @@ order, not a claim that every module criterion has been exhaustively audited.
 1. The documented attendance/payroll/file workloads now have observed local results.
    Retain the distinction between these separate VPS experiments and a dedicated
    reference deployment; mixed workloads and other corpora remain unmeasured.
-2. Worker integration configuration/health evidence and the complete deployment/
-   cutover runbook remain. API startup flags do not prove worker configuration or
-   provider delivery; isolated recovery does not establish a live cutover/RPO/RTO.
+2. Running worker integration status/provider health remain. The static deployment
+   reviewer and cutover runbook now exist, but do not establish live process/provider
+   health. Isolated recovery does not establish a live cutover/RPO/RTO.
 3. Native/provider acceptance still includes actual Google identity exchange,
    FCM registration/delivery and the remaining iOS/physical-device cases. Read the
    current Mobile validation/native-push documents before choosing the next case.

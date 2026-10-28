@@ -39,6 +39,11 @@ tasks.register<Exec>("workloadToolCheck") {
     commandLine("python3", "-m", "unittest", "discover", "-s", "tool", "-p", "test_workload.py")
 }
 
+tasks.register<Exec>("deploymentToolCheck") {
+    group = "verification"
+    commandLine("python3", "-m", "unittest", "discover", "-s", "tool", "-p", "test_deployment.py")
+}
+
 tasks.register<JavaExec>("formatCheck") {
     group = "verification"
     classpath = formatter
@@ -81,6 +86,7 @@ tasks.named("check") {
         "databaseRecoveryCheck",
         "recoverySetCheck",
         "workloadToolCheck",
+        "deploymentToolCheck",
     )
     dependsOn(subprojects.filter { it.buildFile.exists() }.map { "${it.path}:check" })
 }

@@ -70,6 +70,17 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Report export selection and CSV foundations
+
+Canonical report selections now have a shared pure policy; saved filters retain
+their existing behavior. Typed CSV encoding bounds each complete-row part to one MiB,
+retains exact numbers and reports the consumed prefix for resumable pagination.
+Validation passed 80 reporting tests and 26 saved-filter API/PostgreSQL cases across
+focused runs, with packaging and architecture/format checks. The final codec tests
+cover supplementary Unicode formula prefixes and 1,251 ordered records across parts.
+Request/job/artifact, download/retention and export history delivery remain open;
+see [the export contract](report-exports.md).
+
 ### Personal saved-filter dashboard
 
 Typed personal-filter creation/editing, persisted-selection opening, directory and

@@ -120,3 +120,11 @@ selections remain intact. All 3,872 dashboard tests, 25 distinct Chromium cases 
 an isolated two-account API/PostgreSQL/browser workflow passed. Exports, retention
 and export history remain open. See
 [saved-filter dashboard behavior and evidence](../reporting.md#saved-filter-dashboard).
+
+Export selection and bounded typed CSV encoding now share the canonical report
+parameter policy. The encoder reports the exact complete-row prefix accepted within
+one MiB, preserves decimal values and protects spreadsheet text. Eight new domain
+cases and saved-filter regressions passed; 80 reporting and 26 API/PostgreSQL cases
+were validated across focused runs. Queued execution, snapshots, private artifacts,
+retention/download and history still remain open. See
+[export contracts and remaining delivery](../report-exports.md).

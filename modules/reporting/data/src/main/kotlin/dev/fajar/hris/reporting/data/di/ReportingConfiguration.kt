@@ -12,17 +12,20 @@ import dev.fajar.hris.reporting.data.repositories.StoredExpenseReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredHeadcountReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredLeaveReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredOvertimeReportRepository
+import dev.fajar.hris.reporting.data.repositories.StoredPayrollCostReportRepository
 import dev.fajar.hris.reporting.domain.repositories.AttendanceExceptionReportRepository
 import dev.fajar.hris.reporting.domain.repositories.ExpenseReportRepository
 import dev.fajar.hris.reporting.domain.repositories.HeadcountReportRepository
 import dev.fajar.hris.reporting.domain.repositories.LeaveReportRepository
 import dev.fajar.hris.reporting.domain.repositories.OvertimeReportRepository
+import dev.fajar.hris.reporting.domain.repositories.PayrollCostReportRepository
 import dev.fajar.hris.reporting.domain.usecases.GetAttendanceExceptionReport
 import dev.fajar.hris.reporting.domain.usecases.GetExpenseReport
 import dev.fajar.hris.reporting.domain.usecases.GetGroupHeadcountReport
 import dev.fajar.hris.reporting.domain.usecases.GetHeadcountReport
 import dev.fajar.hris.reporting.domain.usecases.GetLeaveReport
 import dev.fajar.hris.reporting.domain.usecases.GetOvertimeReport
+import dev.fajar.hris.reporting.domain.usecases.GetPayrollCostReport
 import dev.fajar.hris.reporting.domain.usecases.ListExpenseReportClaims
 import dev.fajar.hris.reporting.domain.usecases.ListLeaveReportRequests
 import java.time.Clock
@@ -32,6 +35,25 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration(proxyBeanMethods = false)
 class ReportingConfiguration {
+    @Bean
+    fun payrollCostReportSource(sql: DSLContext): PayrollCostReportDataSource =
+        PostgresPayrollCostReportDataSource(sql)
+
+    @Bean
+    fun payrollCostReports(source: PayrollCostReportDataSource): PayrollCostReportRepository =
+        StoredPayrollCostReportRepository(source)
+
+    @Bean
+    fun getPayrollCostReport(
+        reports: PayrollCostReportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetPayrollCostReport(reports, companies, members, identities, transactions, security, clock)
+
     @Bean
     fun overtimeReportSource(sql: DSLContext): OvertimeReportDataSource =
         PostgresOvertimeReportDataSource(sql)

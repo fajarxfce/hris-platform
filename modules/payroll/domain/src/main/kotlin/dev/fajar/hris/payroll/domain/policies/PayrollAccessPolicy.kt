@@ -27,3 +27,6 @@ fun canReadPayrollPolicy(actor: Actor): Boolean =
 
 fun canReadCompensation(actor: Actor): Boolean =
     "payroll.read" in actor.permissions || "payroll.compensation.manage" in actor.permissions
+
+/** Company-wide payroll evidence; administrative mutation grants do not imply this scope. */
+fun canReadCompanyPayroll(actor: Actor): Boolean = "payroll.read" in actor.permissions

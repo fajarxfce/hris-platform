@@ -25,6 +25,38 @@ class ApiContractHttpTest : PeopleApiFixture() {
     private lateinit var mappings: RequestMappingHandlerMapping
 
     @Test
+    fun publishedPayrollCostReportsExposeBoundedMonthsAndExactDecimalStrings() {
+        val api = contract()
+        val operation = api["paths"]["/api/v1/companies/{companyId}/reports/payroll-costs"]["get"]
+        assertTrue(operation["x-hris-authentication-required"].asBoolean())
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        for (name in listOf("from", "until")) assertTrue(
+            operation["parameters"].any {
+                it["name"].asString() == name && it["required"].asBoolean()
+            }
+        )
+        val counts = api["components"]["schemas"]["PayrollCostReportCountsResponse"]["properties"]
+        for (field in
+            listOf(
+                "employerCost",
+                "taxableGross",
+                "employeeDeductions",
+                "withheld",
+                "takeHome",
+            )) assertEquals("string", counts[field]["type"].asString())
+        for (field in listOf("assessments", "employments", "revisedAssessments")) assertEquals(
+            "integer",
+            counts[field]["type"].asString(),
+        )
+        assertEquals(
+            "string",
+            api["components"]["schemas"]["PayrollCostReportMonthResponse"]["properties"]["month"][
+                    "type"]
+                .asString(),
+        )
+    }
+
+    @Test
     fun overtimeReportsExposeScopeAndExactMinuteCountersWithMonthlyDrillDownBounds() {
         val api = contract()
         val operation = api["paths"]["/api/v1/companies/{companyId}/reports/overtime"]["get"]

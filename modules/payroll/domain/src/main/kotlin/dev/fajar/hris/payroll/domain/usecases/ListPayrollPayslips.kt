@@ -80,10 +80,7 @@ class ListPayrollPayslips(
             val range = validatePayrollPayslipRange(start, end, cursor)
             if (range is Result.Failed) return@run range
             val allowedEmployees =
-                if (
-                    scope == PayrollPayslipReadScope.AUTHORIZED &&
-                        "payroll.read" in current.permissions
-                )
+                if (scope == PayrollPayslipReadScope.AUTHORIZED && canReadCompanyPayroll(current))
                     null
                 else {
                     val owned = people.employeeIdsForAccount(company, actor.accountId, 201)

@@ -53,3 +53,12 @@ Its dashboard and exact-submission navigation passed 3,813 tests, 13 distinct
 Chromium scenarios and an isolated API/PostgreSQL correction/resubmission workflow.
 Validated report return context retains company, dates, status and page through
 review. See [expense definitions](../reporting.md#operational-expenses).
+
+Published payroll costs now aggregate each assessment's latest published immutable
+revision across one to twelve earnings months. Exact employer cost, gross,
+deductions, signed withholding and take-home reconcile with published payslips;
+repeated amendments count once and payment results retain a separate definition.
+Current report and company-wide payroll access, credentials and MFA protect the
+bounded projection. Backend checks passed 49 reporting, 114 payroll domain,
+101 distinct API/PostgreSQL/OpenAPI and 81 worker tests. Dashboard, historical
+selection and exports remain open. See [payroll cost definitions](../reporting.md#published-payroll-costs).

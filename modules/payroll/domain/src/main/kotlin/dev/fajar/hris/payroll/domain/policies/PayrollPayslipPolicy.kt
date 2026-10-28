@@ -7,7 +7,7 @@ import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 fun canReadPayrollPayslips(actor: Actor): Boolean =
-    "payroll.read" in actor.permissions || "payroll.self.read" in actor.permissions
+    canReadCompanyPayroll(actor) || "payroll.self.read" in actor.permissions
 
 fun decodePayrollPayslipCursor(value: String?): Result<PayrollPayslipCursor?> {
     if (value == null) return Result.Success(null)

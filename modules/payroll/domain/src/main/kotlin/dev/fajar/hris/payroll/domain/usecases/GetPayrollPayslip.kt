@@ -7,6 +7,7 @@ import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.payroll.domain.entities.PayrollPayslip
 import dev.fajar.hris.payroll.domain.entities.PayrollPayslipReadScope
+import dev.fajar.hris.payroll.domain.policies.canReadCompanyPayroll
 import dev.fajar.hris.payroll.domain.policies.canReadPayrollPayslips
 import dev.fajar.hris.payroll.domain.repositories.PayrollAssessmentRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -54,10 +55,7 @@ class GetPayrollPayslip(
             if (!canReadPayrollPayslips(current))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
             val allowedEmployees =
-                if (
-                    scope == PayrollPayslipReadScope.AUTHORIZED &&
-                        "payroll.read" in current.permissions
-                )
+                if (scope == PayrollPayslipReadScope.AUTHORIZED && canReadCompanyPayroll(current))
                     null
                 else {
                     val owned = people.employeeIdsForAccount(company, actor.accountId, 201)

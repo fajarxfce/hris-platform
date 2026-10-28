@@ -404,6 +404,90 @@ screenshots were inspected in `.work/dashboard-expense-report-real.png` and
 `.work/dashboard-expense-report-mobile.png`. Existing CSS specificity and build
 chunk-size warnings remain; this is no performance measurement.
 
+
+## Published payroll costs
+
+`GET /api/v1/companies/{companyId}/reports/payroll-costs?from=2026-01&until=2026-12`
+
+Requires `reports.read` and the canonical company-wide `payroll.read` scope, plus
+`REPORTING` client availability. Self payslip access, compensation/policy management,
+amendment authority and payment permissions do not independently authorize these
+company totals. Both parameters are earnings/tax months (`YYYY-MM`). The inclusive
+window is one to twelve months within 2024–2100; it can cross a year boundary.
+Invalid windows return `invalid_report_month_range` with `maximumMonths: "12"`,
+`minimumYear: "2024"` and `maximumYear: "2100"`.
+
+Each published person/month assessment contributes exactly one current published
+revision. The query joins the assessment head to its immutable revision evidence;
+it never adds original and amended results together. Draft/calculated/reviewed runs,
+unpublished finalization jobs and unissued amendment calculations contribute nothing.
+A later compensation, policy or workforce change cannot replace published facts.
+An approved, successfully published amendment replaces the selected revision for
+its affected months. This is the current published view, not an arbitrary historical
+as-of statement. Separate exports or historical selections must pin their revisions.
+
+The response contains company, month bounds, `evaluatedAt`,
+`definitionVersion: "payroll-costs.v1"`, `currency: "IDR"`, `totals`, and an ordered
+`months` array with every selected month, including zero months. Each count object
+contains:
+
+| Field | Definition |
+| --- | --- |
+| `assessments` | Published person/month assessments in the selection. |
+| `employments` | Distinct employment records, counted independently for the overall total. |
+| `revisedAssessments` | Selected assessments whose published revision is greater than zero; an assessment amended repeatedly still counts once. |
+| `employerCost` | Sum of the stored monthly employer-cost result. |
+| `taxableGross` | Sum of the stored taxable gross, independently from employer cost and cash pay. |
+| `employeeDeductions` | Stored retirement, donation and other net deductions, excluding withholding. |
+| `withheld` | Signed stored withholding, including negative final-period tax refunds. |
+| `takeHome` | Stored nonnegative employee take-home amounts. |
+
+All five money fields are exact decimal strings with two fractional digits. The
+report performs no new salary or tax calculation. The published payroll policy's
+employer cost includes cash earnings, taxable noncash amounts, tax/deduction
+allowances and the retained employer old-age/pension contributions. Net pay, tax
+and cost remain separate measures; a refund can make take-home exceed employer
+cost. Bank reservations, release, reconciliation and confirmed recoveries do not
+change these published amounts.
+
+One company-scoped SQL snapshot returns at most thirteen aggregate rows. It reads
+scalar calculation amounts from the security-invoker assessment-evidence view;
+private profiles, frozen salary inputs, labels and payment destinations do not
+enter the report payload. The existing `payroll_payslip_month` index supports month
+selection; this increment adds no migration. Normal RLS and finite transaction/query
+timeouts apply. Mapping rejects missing amounts, invalid decimal/count bounds,
+duplicate or out-of-window months, inconsistent employee counts and non-reconciling
+totals. Cancellation and technical mapping failures stay inside the existing safe
+database boundary. Company, membership and account guards retain original/live
+report and source authority, credentials and MFA before and after acquisition.
+
+A month can be reconciled with the existing `/payroll/payslips` directory using
+that same month for `from` and `until`. Its summaries retain each exact published
+revision for detail review. These are independent live reads; a publication between
+reads can change the selected latest revision. Responses are `no-store`.
+
+Backend validation passed 49 reporting domain/data/delivery tests, 114 payroll
+domain tests, 101 distinct selected API/PostgreSQL/OpenAPI tests, and all 81 worker
+tests. The API selection includes the eleven new cost-report scenarios, existing
+payslip/source assurance, amendment publication and 57 contract cases. Coverage
+reconciles four published months against exact payslip revisions, including a
+December tax refund, two successive amendments, unchanged amounts through bank
+settlement and publication receipt replay, exclusion before publication, later
+compensation changes, zero months, RLS, independent source/report grants, module
+availability, revocation, MFA expiry, cancellation, recovery and a coherent read
+during concurrent publication. Data checks also retain cents beyond the binary
+floating-point safe integer range and reject inconsistent aggregates.
+
+The final four-case API rerun passed after correcting test fixtures for explicit
+payroll grants, Jackson array iteration, future-effective compensation and the
+existing 422 validation status. Production access and frozen-period policy remain
+unchanged. Architecture, formatting and both application boot JAR builds passed.
+OpenAPI has 356 paths and is
+2,057,966 bytes, within its 2 MiB bound. Logs are retained locally in
+`.work/payroll-cost-{unit,validation,api,api-final,api-followup,build}.log`.
+Dashboard and historical/export acceptance remain open. No performance or live
+deployment claim is made.
+
 ## Validation
 
 On 28 October 2026, leave reporting passed 25 reporting domain/data/delivery tests,

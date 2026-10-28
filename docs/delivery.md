@@ -70,6 +70,31 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Published payroll cost report API
+
+The published payroll cost API now selects one current published revision per
+assessment and reconciles complete monthly buckets and distinct employment totals.
+Its exact IDR fields preserve final-period refunds and avoid amendment duplication.
+Backend validation passed 49 reporting, 114 payroll domain, 101 distinct
+API/PostgreSQL/OpenAPI and 81 worker tests. Dashboard, historical selections and
+exports remain in progress. See [payroll cost definitions](reporting.md#published-payroll-costs).
+
+One RLS SQL snapshot selects the latest published head and its immutable evidence,
+without loading employee labels, private facts or payment destinations. Original
+and live report/source grants and session assurance are checked through acquisition.
+The existing month index supports the one-to-twelve-month window; no migration is
+added. The canonical company-wide payroll predicate is reused by payslip reads.
+
+The selected API tests cover original/revised publication, two amendments counted
+once, real bank settlement invariance, exact payslip reconciliation through a final
+annual refund, later salary changes, independent grants, availability, RLS, pending
+revocation, expired MFA, cancellation/recovery and concurrent publication. Worker
+composition passed all 81 cases. Initial API failures were test-fixture assumptions;
+explicit source grants, indexed Jackson array traversal, future-effective salary
+changes and the existing 422 validation status were corrected. The final four-case
+API run passed in 45 seconds. Architecture/formatting passed; no workload benchmark
+or production deployment is claimed. See the report document for exact evidence.
+
 ### Operational expense report API
 
 The expense report selects immutable transaction lines from each claim's latest

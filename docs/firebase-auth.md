@@ -85,6 +85,19 @@ acceptance must be recorded separately from local signed fixtures.
 
 ## Validation
 
+On 28 October 2026, production API `8305f435` verified a real Firebase password
+login from `cmp-fajar` against Google's public signing keys in an isolated local
+API/PostgreSQL fixture. A temporary Firebase UID had an explicit fixture binding.
+Native issuance succeeded and `/me` reported MFA required and unverified. Android
+Mobile `d191c61d` then completed the same provider exchange through its login UI,
+enrolled and verified HRIS MFA, acknowledged recovery codes and reached company
+selection without assigned company access. The temporary Firebase account was
+deleted and the owned fixture stopped. No live HRIS database was changed.
+
+Google system account UI launch/dismissal passed on Android; actual Google token
+exchange, physical devices and iOS remain separate acceptance. Detailed evidence is
+in the [Mobile validation record](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/validation.md).
+
 Domain tests cover project/provider/tenant/time policy, rate limits, late expiry
 and interruption. Data tests exercise real RSA verification, malformed JWTs,
 bounded HTTP streaming, concurrent key caching, retry backoff, timeout and

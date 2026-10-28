@@ -11,11 +11,11 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
-| `hris-platform` | `feat/firebase-auth` | Worker reports below; deployment runbook `d765f155`, document workload `ed7a760e` |
-| `hris-mobile` | `feat/native-push` | `60456c48` — Android URL/inbox archival acceptance |
-| `compose-fluent-starter` | `fix/push-token-lifecycle` | `a16325ef` — existing validated foundation |
+| `hris-platform` | `feat/firebase-auth` | `e806caed` — worker reports; deployment runbook `d765f155`, document workload `ed7a760e` |
+| `hris-mobile` | `feat/native-push` | `9dbaf730` — tracked handoff; acceptance `60456c48` |
+| `compose-fluent-starter` | `fix/push-token-lifecycle` | `1606765` — tracked handoff; validated foundation `a16325e` |
 
-The current increment contains actual worker reports and schema-98 acceptance.
+The latest implementation contains actual worker reports and schema-98 acceptance.
 Inspect `git status`, `git log` and
 the upstream before continuing. Mobile and Starter were clean at this update.
 
@@ -33,6 +33,14 @@ from a Git push. Completing an increment does not complete the PRD.
 `/home/fajar/hris/PRD-PROGRESS.md` and `REPO-TRACE.md` are local supplementary notes
 outside these Git repositories. The tracked documents linked here are the durable
 handoff; a fresh clone must not depend on those local files or previous chat history.
+
+Both [Mobile](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/agent-handoff.md)
+and [Starter](https://github.com/fajarxfce/compose-fluent-starter/blob/fix/push-token-lifecycle/docs/agent-handoff.md)
+now have their own tracked entry point, linked from `AGENTS.md` and `README.md`.
+Their handoff-only commits were pushed and remote heads verified. Current module
+summaries distinguish completed authoring/export/worker work from historical
+implementation stages, so an old "planned" paragraph cannot silently become the
+next task. These documentation changes require no application test rerun.
 
 ## Current checkpoint: running worker reports and schema-98 recovery
 
@@ -307,7 +315,8 @@ family; review new persisted encryption contracts before raising the ceiling aga
   passed global-permission/MFA and three-account revocation acceptance. The API
   projection acquires no provider identifiers/secrets. Validation included 184
   backend tests, the complete worker graph, 3,922 dashboard tests and seventeen
-  distinct Chromium cases. Worker configuration and provider health are separate.
+  distinct Chromium cases. Worker observations were subsequently implemented in
+  `e806caed`; provider health remains separate.
 - Platform `aaa596a0`: real API/PostgreSQL/worker/private Garage/browser export
   acceptance passed 1,201-row multipart downloads, exact bytes/ranges, immutable
   captured source, owner/source permissions and lost-admission receipt recovery.
@@ -323,9 +332,10 @@ order, not a claim that every module criterion has been exhaustively audited.
 1. The documented attendance/payroll/file workloads now have observed local results.
    Retain the distinction between these separate VPS experiments and a dedicated
    reference deployment; mixed workloads and other corpora remain unmeasured.
-2. Running worker integration status/provider health remain. The static deployment
-   reviewer and cutover runbook now exist, but do not establish live process/provider
-   health. Isolated recovery does not establish a live cutover/RPO/RTO.
+2. Actual worker integration reports are implemented and accepted in `e806caed`.
+   Provider health/delivery remains separate. The static deployment reviewer and
+   cutover runbook do not establish those outcomes; isolated recovery does not
+   establish a live cutover/RPO/RTO.
 3. Native/provider acceptance still includes actual Google identity exchange,
    FCM registration/delivery and the remaining iOS/physical-device cases. Read the
    current Mobile validation/native-push documents before choosing the next case.

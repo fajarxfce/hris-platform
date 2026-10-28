@@ -49,8 +49,30 @@ command for explicit retry, including after MFA recovery or a later rejection.
 A definite version conflict requires protected reload before a new decision.
 Access loss clears evidence without guessing the outcome of a pending write.
 Form input and retry state belong to the current browser editor; leaving a dirty,
-pending or unconfirmed editor requires a navigation decision. Draft authoring
-remains a subsequent workflow.
+pending or unconfirmed editor requires a navigation decision. Draft creation and
+returned-claim editing are implemented in the separate authoring flow below.
+
+## Expense draft authoring
+
+`/expenses/claims/new` selects an authorized employee and collects the claim title,
+description, change reason and bounded item list. Item editing retains decimal IDR
+amounts, transaction dates, category, optional cost center and scoped receipt
+references. Reference lookups and item dialogs preserve the surrounding input.
+Saving captures stable claim/item identities and one immutable operation; response
+loss exposes an explicit retry of that exact command.
+
+Editing existing or returned claims uses the reviewed version. A conflicting
+revision requires explicit reload; it does not silently replace entered input.
+Submission, cancellation and withdrawal use their separately reviewed actions.
+Submitted evidence remains immutable while a returned claim receives a new draft
+revision. Dirty/pending/uncertain editors retain the existing navigation protection.
+
+The real API/PostgreSQL workflow in
+[`expense-claims.spec.ts`](../apps/dashboard/integration/expense-claims.spec.ts)
+exercises creation, response-loss replay, competing revisions, submitted actions,
+independent review and returned-claim correction. See [claim drafts](modules/expenses.md#claim-drafts)
+for backend bounds and authorization. This documents the already implemented flow;
+no new expense behavior is introduced by the continuation update.
 
 ## Expense payments
 

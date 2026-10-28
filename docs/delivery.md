@@ -5,6 +5,16 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+All three repositories now have a tracked `docs/agent-handoff.md` linked from
+`AGENTS.md` and `README.md`. Mobile `9dbaf730` and Starter `1606765` were pushed and
+remote heads verified; their notes identify accepted native work, completed
+generic ports, missing provider/device inputs and continuation commands. Platform
+records worker implementation `e806caed` and current sibling branches. Local
+Markdown targets and referenced Git history were checked. Stale expense authoring,
+report-export and worker-status summaries were reconciled with their existing
+implementation/evidence; no application behavior changed in this documentation
+increment, so application tests were not repeated.
+
 [Worker integration reports](integrations.md#running-worker-observations) now
 publish actual worker-bound SMTP/FCM/storage/scanner flags and first/last database
 timestamps. One lifecycle-owned 30-second reporter uses a transactional registry

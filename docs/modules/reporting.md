@@ -10,6 +10,23 @@ Screens: role overview, report catalogue, filters, drill-down, export history.
 
 Acceptance: totals reconcile, row/resource isolation, historical definitions, export interruption, bounded memory, and expired export access.
 
+## Current delivery
+
+The seven summary reports, three supported detail datasets, catalogue and personal
+saved filters are implemented. The export lifecycle includes reviewed admission,
+retained snapshots, bounded worker execution, private artifacts, owned history,
+authorized CSV downloads, cancellation/recovery and scheduled retention. Dashboard
+and real API/PostgreSQL/worker/Garage-S3/browser acceptance passed, including exact
+1,201-row multipart output and source/owner authorization. Provider interruption
+and physical expiry currently have controlled-provider backend coverage rather
+than the real S3/browser experiment. See [current export evidence](../report-exports.md#real-private-storage-browser-acceptance).
+
+## Implementation and acceptance record
+
+The entries below retain the sequence of accepted increments. Work described as
+open at an earlier stage is superseded by subsequent records and the current
+delivery summary above; it must not be treated as a fresh implementation task.
+
 Operational attendance exception aggregates are implemented in the backend with
 report/source permissions, a 31-day window, coherent totals/day buckets and current
 MFA checks. They reconcile with the workforce exception directory; missing evidence
@@ -19,7 +36,7 @@ authorized exception directory; real API/browser acceptance covers review and
 correction reconciliation. See the exact
 [report definitions and validation](../reporting.md#operational-attendance-exceptions).
 
-Company headcount is implemented with effective-date status/contract counts, a separate distinct-person total, current source/report permissions, a single bounded aggregate response, and a responsive dashboard report. Group headcount selects up to 32 independently authorized companies and computes the distinct global person count in the same SQL snapshot as company buckets. Its explicit SELECT scope adds no mutation permission; access, MFA, and client policy are rechecked after ordered guards. The dashboard supports applied company/date filters, company breakdowns, and cancellation of obsolete group reads. [Reporting API](../reporting.md) documents the exact definitions and historical limits. Other metrics and exports remain planned.
+Company headcount is implemented with effective-date status/contract counts, a separate distinct-person total, current source/report permissions, a single bounded aggregate response, and a responsive dashboard report. Group headcount selects up to 32 independently authorized companies and computes the distinct global person count in the same SQL snapshot as company buckets. Its explicit SELECT scope adds no mutation permission; access, MFA, and client policy are rechecked after ordered guards. The dashboard supports applied company/date filters, company breakdowns, and cancellation of obsolete group reads. [Reporting API](../reporting.md) documents the exact definitions and historical limits. Subsequent metric and export delivery is recorded below.
 
 Operational leave reporting and its scoped request drill-down are implemented with
 one to 366 submitted work dates, current status buckets, distinct employment counts

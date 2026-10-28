@@ -13,8 +13,10 @@ coherent current claim/history review, immutable submission evidence, payment
 progress and scoped receipt downloads. Independent reviewers can approve, reject
 or return submitted evidence with both observed versions and operation recovery.
 Approval source links use submission IDs. Finance preparation, release,
-cancellation/replacement and reconciliation are implemented separately; dashboard
-draft authoring remains a subsequent delivery increment.
+cancellation/replacement and reconciliation are implemented separately. Dashboard
+draft creation/editing, submitted actions and returned-claim correction are also
+implemented and exercised in `apps/dashboard/integration/expense-claims.spec.ts`.
+See [draft authoring](../dashboard.md#expense-draft-authoring) for the current contract.
 
 Acceptance: category limits, company attachment access, concurrent submission, payment replay, failed/partial batch reconciliation, and immutable paid records.
 

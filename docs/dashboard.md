@@ -806,6 +806,24 @@ The isolated API/PostgreSQL workflow verifies these boundaries with an enrolled
 test administrator, lost committed responses, CSRF rejection, unrelated accounts,
 retained device and browser access, and replacement of the dashboard account.
 
+## Operational attendance report
+
+`/reports/attendance-exceptions` shows six reconciled metrics and a daily table for
+one to 31 work dates. It requires current `reports.read` and `workforce.read`.
+Applied filters remain in a company-bound URL; partial edits wait for Apply and
+browser history restores prior selections. Changing company/account cancels the
+old owner. Pending/failed refreshes and access denials show no obsolete counts.
+Responses must match the selected company/window, version and complete daily
+sequence, with bounded safe-integer totals.
+
+The date column opens the existing exception directory for that company/day and
+stays visible on narrow screens. The report describes current operational evidence;
+it does not infer absence from missing events or replace closing/payroll snapshots.
+English/Indonesian copy, themes, filter history, cancellation, scope rejection and
+failure recovery passed browser checks. A real API/PostgreSQL browser workflow
+reconciled report totals with independent review, lost-response recovery, competing
+corrections and late-evidence rejection. See [reporting evidence](reporting.md#validation).
+
 ## Company and group headcount
 
 `/reports/headcount?asOf=2026-10-01` loads the [group headcount API](reporting.md), initially selecting the active company. The default date uses that company's time zone. The controlled form can select one to 32 companies and keeps edits separate from the applied URL filters. Apply stores the date and a sorted `companies` selection; browser history restores both. The report shows distinct people, employment records, status, and contract totals with the source definition's historical limits. A group also displays company-level counts. The unique-person total comes from the backend and is never summed from company buckets.

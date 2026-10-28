@@ -18,8 +18,10 @@ provide localized errors, and pass the relevant real API and UI checks.
 The operational attendance exception report now supplies coherent per-date and
 overall counts with current report/source access and MFA checks. It passed 15
 reporting-domain/data and 83 HTTP/PostgreSQL/OpenAPI tests, plus architecture and
-format checks. Its dashboard, historical closing reports and exports remain active
-work; see [reporting](reporting.md). This is an increment within the reporting PRD.
+format checks. Its dashboard and date drill-down passed 3,781 dashboard tests,
+11 Chromium scenarios and a real API/PostgreSQL workflow through review and
+correction reconciliation. Historical closing reports, other metrics and exports
+remain active work; see [reporting](reporting.md).
 
 Mobile native password sign-in, MFA enrollment/verification, recovery acknowledgement,
 secure refresh, device-session management and remote logout, company selection, current access, product flavors, localizable API

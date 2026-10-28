@@ -401,6 +401,12 @@ const HeadcountScreen = lazy(() =>
   })),
 );
 
+const AttendanceReportScreen = lazy(() =>
+  import("../../features/reporting/presentation/bindings/attendance-report-screen").then(
+    (module) => ({ default: module.AttendanceReportScreen }),
+  ),
+);
+
 const AuditScreen = lazy(() =>
   import("../../features/administration/presentation/bindings/audit-screen").then((module) => ({
     default: module.AuditScreen,
@@ -1757,6 +1763,21 @@ export function PortalRoutes({
               access={access}
               loadHeadcount={reporting.loadHeadcount}
               companies={companies}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/attendance-exceptions"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <AttendanceReportScreen
+              accountId={accountId}
+              access={access}
+              loadAttendanceExceptions={reporting.loadAttendanceExceptions}
+              companyName={company.name}
               timezone={company.timezone}
               locale={locale}
             />

@@ -82,8 +82,18 @@ and MFA is checked again after the read. Concurrent evidence/review commits cann
 mix daily and total snapshots. Cancellation releases transaction resources, and
 errors remain sanitized. Responses are `no-store`.
 
-The backend endpoint is implemented; its dashboard and report drill-down remain
-active work. Other source metrics and immutable export jobs are subsequent capabilities.
+The dashboard at `/reports/attendance-exceptions` applies company-bound URL date
+filters, renders the six totals and daily table, and opens the existing workforce
+exception directory for the selected date/company. Its date action stays visible
+on narrow screens. Partial filter edits do not fetch until applied; browser history
+restores applied filters. Company/account replacement and disposal cancel owned
+requests and ignore late responses. A refresh removes prior values, and a denial
+or failed retry cannot expose them. Client mapping checks scope, definition,
+complete dates, safe integer bounds and reconciliation before publishing a report.
+No report payload enters browser persistence or a shared query cache.
+
+Other source metrics, historical closing reports and immutable export jobs remain
+subsequent capabilities.
 
 ## Validation
 
@@ -97,5 +107,24 @@ Architecture and formatting passed; the 81-test worker suite remained up to date
 because its classpath did not change. Logs are `.work/attendance-report-validation.log`
 and `.work/attendance-report-format.log`. Dashboard and export acceptance are still
 active work; these backend checks do not claim historical closing-report coverage.
+
+The dashboard subsequently passed its full 3,781-test suite, architecture and
+TypeScript checks, 11 attendance/headcount Chromium scenarios and production build.
+All four attendance scenarios passed again after moving drill-down to the date
+column for narrow screens. The real API/PostgreSQL browser fixture completed MFA,
+captured offline evidence, opened the report and drilled into the same company/day,
+recovered a lost committed review response, reconciled overlapping exception kinds,
+and retained raw evidence through corrections and late-event rejection. Report counts
+followed those committed changes. The owned fixture stopped and removed its database.
+Evidence is in `.work/attendance-dashboard-check.log`,
+`.work/attendance-dashboard-browser.log`, `.work/attendance-dashboard-final-browser.log`
+and `.work/attendance-dashboard-integration.log`; desktop/mobile screenshots are
+`.work/dashboard-attendance-report-real.png` and `.work/dashboard-attendance-report-mobile.png`.
+
+Dependency audit found advisories in Zod 4.6.5 and the test-only jsdom dependency
+undici 8.11.2. Zod is now pinned to 4.6.7 and the lockfile resolves undici 8.12.3;
+these were the only changed package versions. The complete and runtime-only audits
+reported zero known vulnerabilities after the update. The dashboard/browser checks
+above used those versions.
 
 The company/group reporting check passed architecture and format checks, server/worker builds, and 61 tests: 10 reporting domain/data, 15 database, and 36 HTTP/PostgreSQL. Coverage includes shared persons, empty companies, effective history, selection bounds, RLS read/write isolation, pooled context cleanup, native/browser build gates, maintenance, module flags, permission and credential revocation while waiting, expired MFA, coherent concurrent snapshots, and cancellation. OpenAPI validates 228 paths and 254 operations. No group browser workflow, device validation, deployment, or group-report performance benchmark is claimed by this backend check.

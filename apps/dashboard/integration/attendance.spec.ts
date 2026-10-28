@@ -179,8 +179,27 @@ test("offline evidence requires independent review, replays one decision, and pr
   const dayPage = `/workforce/attendance/${employee}/days/${workDate}?company=${company}`;
   const exceptionsPage = `/workforce/attendance/exceptions?company=${company}&from=${workDate}&until=${workDate}`;
   const exceptionsApi = `${base}/workforce/attendance/exceptions?from=${workDate}&until=${workDate}`;
+  const reportPage = `/reports/attendance-exceptions?company=${company}&from=${workDate}&until=${workDate}`;
+  const reportApi = `${base}/reports/attendance-exceptions?from=${workDate}&until=${workDate}`;
   expect((await request.get(exceptionsApi, { headers: nativeHeaders })).status()).toBe(403);
-  await page.goto(exceptionsPage);
+  expect((await request.get(reportApi, { headers: nativeHeaders })).status()).toBe(403);
+  await page.goto(reportPage);
+  await expect(
+    page.getByRole("region", { name: "Employee days with exceptions", exact: true }),
+  ).toContainText("1");
+  await expect(
+    page.getByRole("region", { name: "Employment records affected", exact: true }),
+  ).toContainText("1");
+  await expect(
+    page.getByRole("region", { name: "Events awaiting review", exact: true }),
+  ).toContainText("2");
+  await page.screenshot({
+    path: "../../.work/dashboard-attendance-report-real.png",
+    fullPage: true,
+    animations: "disabled",
+  });
+  await page.getByRole("button", { name: /^View exceptions:/u }).click();
+  await expect(page).toHaveURL(new URL(exceptionsPage, page.url()).href);
   const exceptions = page.getByRole("table", { name: "Employee days", exact: true });
   await expect(exceptions.getByRole("row")).toHaveCount(2);
   await expect(exceptions.getByRole("cell", { name: "2", exact: true })).toBeVisible();
@@ -225,6 +244,16 @@ test("offline evidence requires independent review, replays one decision, and pr
   await expect(page.getByRole("status")).toContainText("Attendance updated.");
   expect(reviewRequests).toHaveLength(2);
   expect(reviewRequests[0]).toEqual(reviewRequests[1]);
+  await page.goto(reportPage);
+  await expect(
+    page.getByRole("region", { name: "Employee days with exceptions", exact: true }),
+  ).toContainText("1");
+  await expect(
+    page.getByRole("region", { name: "Employee days awaiting review", exact: true }),
+  ).toContainText("1");
+  await expect(
+    page.getByRole("region", { name: "Employee days with incomplete clocks", exact: true }),
+  ).toContainText("1");
   await page.goto(exceptionsPage);
   await expect(exceptions.getByRole("cell", { name: "1", exact: true })).toBeVisible();
   await expect(exceptions.getByRole("cell", { name: "Incomplete", exact: true })).toBeVisible();
@@ -367,4 +396,15 @@ test("offline evidence requires independent review, replays one decision, and pr
     correction: { version: 1 },
   });
   expect(finalDay[0]?.entries).toHaveLength(3);
+  await page.goto(reportPage);
+  await expect(
+    page.getByRole("region", { name: "Employee days with exceptions", exact: true }),
+  ).toContainText("0");
+  await expect(
+    page.getByRole("region", { name: "Events awaiting review", exact: true }),
+  ).toContainText("0");
+  await expect(
+    page.getByRole("region", { name: "Employee days with evidence", exact: true }),
+  ).toContainText("1");
+  await expect(page.getByRole("button", { name: /^View exceptions:/u })).toBeDisabled();
 });

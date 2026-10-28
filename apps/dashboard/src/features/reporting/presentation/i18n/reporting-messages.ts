@@ -1,6 +1,20 @@
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 
 const english = {
+  attendanceTitle: "Attendance report",
+  from: "From date",
+  until: "Until date",
+  byDate: "By work date",
+  workDate: "Work date",
+  affectedDays: "Employee days with exceptions",
+  affectedEmployments: "Employment records affected",
+  pendingDays: "Employee days awaiting review",
+  incompleteDays: "Employee days with incomplete clocks",
+  pendingEvents: "Events awaiting review",
+  observedDays: "Employee days with evidence",
+  viewExceptions: "View exceptions",
+  attendanceDefinition:
+    "Counts are per employment and work date. Pending and incomplete clocks can overlap. Reviews and corrections can change earlier results; days without evidence do not imply absence.",
   headcount: "Headcount",
   companies: "Companies",
   company: "Company",
@@ -26,6 +40,20 @@ const english = {
 
 type ReportingMessages = { readonly [K in keyof typeof english]: string };
 const indonesian: ReportingMessages = {
+  attendanceTitle: "Laporan presensi",
+  from: "Dari tanggal",
+  until: "Sampai tanggal",
+  byDate: "Per tanggal kerja",
+  workDate: "Tanggal kerja",
+  affectedDays: "Hari karyawan dengan masalah",
+  affectedEmployments: "Hubungan kerja terdampak",
+  pendingDays: "Hari karyawan menunggu review",
+  incompleteDays: "Hari karyawan dengan clock belum lengkap",
+  pendingEvents: "Bukti menunggu review",
+  observedDays: "Hari karyawan dengan bukti",
+  viewExceptions: "Lihat masalah",
+  attendanceDefinition:
+    "Hitungan per hubungan kerja dan tanggal kerja. Bukti tertunda dan clock belum lengkap dapat tumpang tindih. Review dan koreksi dapat mengubah hasil sebelumnya; hari tanpa bukti tidak berarti absen.",
   headcount: "Headcount",
   companies: "Perusahaan",
   company: "Perusahaan",

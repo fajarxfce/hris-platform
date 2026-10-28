@@ -2408,6 +2408,10 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Choose a valid date between 1900 and 2100.",
     "Pilih tanggal yang valid antara tahun 1900 dan 2100.",
   ],
+  invalid_report_range: [
+    "Choose a date range of up to 31 days between 1900 and 2100.",
+    "Pilih rentang maksimal 31 hari antara tahun 1900 dan 2100.",
+  ],
   invalid_employee_date: ["Choose a valid effective date.", "Pilih tanggal efektif yang valid."],
   invalid_employee_search: [
     "Use up to 120 characters for the search.",

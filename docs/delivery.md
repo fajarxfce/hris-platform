@@ -10,7 +10,11 @@ that reconciles with the existing exception directory. Fifteen reporting-domain/
 and 83 selected HTTP/PostgreSQL/OpenAPI tests passed, together with architecture and
 format checks. The worker's 81-test suite remained up to date. Live grants/MFA,
 concurrent reviews, cancellation, bounded rows and failure recovery are covered;
-dashboard, closed-period reporting and export acceptance remain active work. See
+the dashboard subsequently passed 3,781 unit/UI tests, 11 Chromium scenarios,
+production build and real API/browser review/correction reconciliation. Date
+drill-down remains visible on narrow screens. Zod/undici advisory fixes passed
+those checks and both dependency audits returned zero known vulnerabilities.
+Closed-period reporting, other metrics and exports remain active work. See
 [reporting definitions and evidence](reporting.md#operational-attendance-exceptions).
 
 - Repository and product/architecture specification: initialized.

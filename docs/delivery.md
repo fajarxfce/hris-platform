@@ -70,6 +70,30 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Owned export access and scheduled retirement
+
+Public commands/history/detail and Range/ETag/HEAD CSV downloads now use the retained
+export lifecycle. Each bounded private-object read verifies length/digest and
+rechecks current credentials, source grants, client policy, MFA and expiry before
+releasing bytes. Owned status and cancellation remain usable after source or
+availability loss without bypassing owner/report/session checks. V97 adds a minimal
+worker expiry queue; per-item cleanup deletes at most 500 rows, waits for original
+object reservations, and preserves metadata. Unknown report formats and inactive
+owners do not block cleanup. Failed-item backoff is separately fenced after rollback.
+
+Validation passed 338 distinct tests across focused runs: 115 Reporting, 11 core HTTP,
+24 database, 98 server and 90 worker. Both JARs, architecture and format passed.
+The full worker suite exercised the changed shared graph. Seven HTTP cases include
+1,201-row, three-part content, private history, conditional downloads and revocation
+or expiry during provider reads. Six worker cases cover bounded cleanup, competing
+workers, future formats, object dependencies, RLS, audit rollback and shutdown.
+The broader matrix had one wrong 400-versus-422 validation assertion; after its
+correction, all seven HTTP cases passed in the final focused run. Earlier fixture
+corrections addressed raw column/accessor names and overlapping concurrent queue
+selection. Test containers were disposed. Real private S3 and browser export
+acceptance, dashboard delivery and workload measurements remain open. See
+[contracts and detailed evidence](report-exports.md).
+
 ### Authorized export admission and fenced worker execution
 
 Reporting now connects idempotent request/cancel/resume use cases to its registered

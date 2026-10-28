@@ -251,6 +251,61 @@ job after permission loss, without reopening source access. A stale lease cannot
 change a newer attempt. Generic exhausted-job recovery also handles a stranded
 queued/rendering export whose previous job is already terminal.
 
+## Owned history and authorized downloads
+
+The public API under `/api/v1/companies/{companyId}/reports/exports` provides:
+
+| Method and suffix | Contract |
+| --- | --- |
+| `POST` | Start a server-owned export from a canonical selection and `SUMMARY`/`DETAIL` dataset; requires `Idempotency-Key`. |
+| `GET` | Owned history, newest first; `size` is 1–50, with paired `beforeAt`/`beforeId` keyset cursor. |
+| `GET /{exportId}` | Owned status, selection, progress, current job outcome and fixed expiry. |
+| `POST /{exportId}/cancel` | Idempotent cancellation with the observed `expectedVersion`. |
+| `POST /{exportId}/resume` | Idempotent recovery with the observed version and current source/client authority. |
+| `GET /{exportId}/content` | Authorized CSV download, including implicit `HEAD`, Range/If-Range and conditional ETag responses. |
+
+History, detail and cancellation require current owner/company access, `reports.read`
+and live MFA. Their explicit HTTP availability exemption lets owners inspect and
+stop retained work after a source grant or reporting availability changes. It does
+not exempt authentication, company membership, credentials or MFA. Start, resume
+and content retain normal client availability checks. Status responses omit saved
+grants, client details, storage keys and credential information.
+
+Downloads validate the sealed snapshot, complete immutable part manifest, byte/row
+counts and manifest-derived ETag. Each response block is at most one MiB; it can
+cross multiple stored parts. Every acquired object is at most one MiB and must match
+its retained SHA-256 and length before slicing. Provider reads occur outside SQL;
+a new guarded transaction rechecks credentials, original/current source authority,
+MFA, client policy, expiry and the pinned export version/tag after each object read.
+The shared binary transport owns four response slots, a 60-second deadline,
+interruption and no-store headers. No public object URL bypasses those checks.
+
+## Scheduled retirement
+
+V97 captures a minimal expiry queue on admission and backfills unretired exports.
+The global worker can discover only queue identities and deadlines. Snapshot facts
+and execution records retain owner/company RLS; updating or removing queue entries
+requires the corresponding scoped worker transaction. API actors cannot discover or
+reschedule even their own queue entries. Database guards retain immutable identity
+and expiry, bound postponement, and reject queue deletion before physical retirement.
+
+Each scheduled pass selects at most four due entries. Independent transactions take
+job, owner, export and queue locks, stop expired active execution, request job
+cancellation, delete at most 500 expired snapshot rows and attempt retirement.
+Cleanup reads minimal raw metadata, so an unknown future report format and an
+inactive owner do not prevent deletion. Database-clock expiry remains mandatory.
+Retirement waits for absent rows, completed object cleanup and the original one-hour
+grace where uploads were reserved; immutable metadata remains available to its owner.
+Private objects use the existing cleanup worker and durable reservations.
+
+Progress schedules another pass after one second; waiting for objects uses 60
+seconds. A failed item rolls back business changes and journal, then independently
+postpones its unchanged observed queue entry for 60 seconds. Other selected items
+still run. Competing workers cannot overwrite a newer schedule or double-delete
+rows. One owned timer runs with a one-minute fixed delay, interrupts outstanding
+work on shutdown and cannot restart after disposal. Disabling worker execution
+allocates neither this worker nor its timer.
+
 ## Validation and remaining delivery
 
 Validation passed 80 reporting tests (35 domain, 43 data, two delivery) and 26
@@ -346,11 +401,27 @@ and after its durable cleanup reservation. The final eight-case run repeated the
 execution checks after adding assurance coverage. Initial runs corrected an encoder
 API invocation and fixture clock/grant/Batch-schema assumptions before passing.
 
-No public export HTTP endpoint, real S3 upload, browser export acceptance or workload
-claim follows from these controlled-provider tests. Public command/history/download,
-scheduled snapshot retirement and dashboard delivery remain open.
+Those execution tests use controlled storage. Public access and scheduled retirement
+were subsequently validated as described below.
 
-Public command/history/detail adapters, current-authorized range downloads,
-scheduled snapshot retirement and export history/dashboard remain to be delivered.
-Private provider I/O is exercised with controlled test storage; real S3/browser
-acceptance, workload measurement and deployment are separate and not yet claimed.
+Access/retirement validation passed 338 distinct tests across focused runs: 115
+Reporting (52 domain, 61 data, two delivery), 11 core HTTP, 24 database, 98 server and
+90 worker cases. Both application JARs, architecture and format checks passed. The
+entire worker suite exercised the changed dependency graph. The broader run had one
+incorrect HTTP validation expectation; after correcting it from 400 to 422, all
+seven export HTTP cases passed in the final focused run. Earlier fixture corrections
+fixed a cleanup-lease accessor, staged-row column and the mistaken assumption that
+two simultaneous four-item scans must choose different entries.
+
+HTTP tests exercise private keysets, another member's exclusion, command replay,
+status/cancellation after source or availability loss, and 1,201 retained rows across
+three CSV parts. Full/range/conditional/HEAD responses, short/corrupt provider bytes,
+and credential, permission, policy, MFA or expiry changes during reads are covered.
+Runtime API RLS cannot discover or disable its own expired queue entry. Six retention
+worker cases cover unknown formats, deactivated owners, bounded deletion, fairness,
+competing workers, object-cleanup dependencies, atomic audit rollback, scoped queue
+policies and interruption before commit. Test containers were disposed.
+
+The export dashboard and real API/PostgreSQL/worker/private-S3/browser acceptance
+remain active delivery. Provider I/O in these tests is controlled; real S3,
+workload measurement and deployment have not been demonstrated by this increment.

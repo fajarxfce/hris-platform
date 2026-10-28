@@ -209,6 +209,11 @@ fun completeApiContract(api: OpenAPI) {
                             if (schema.maximum == null) schema.maximum = BigDecimal(200)
                         }
                     }
+                    "size" ->
+                        if (path.endsWith("/reports/exports")) {
+                            parameter.schema?.minimum = BigDecimal.ONE
+                            parameter.schema?.maximum = BigDecimal(50)
+                        }
                     "companies" ->
                         if (path == "/api/v1/reports/headcount") {
                             parameter.schema =
@@ -305,6 +310,7 @@ fun describeBinaryTransport(path: String, method: PathItem.HttpMethod, operation
     }
     if (method != PathItem.HttpMethod.GET) return
     val payslipPdf = path.endsWith("/payroll/payslips/{id}/pdf")
+    val reportCsv = path.endsWith("/reports/exports/{exportId}/content")
     if (path.endsWith("/payments/{id}/export")) {
         operation.responses["200"] =
             ApiResponse()
@@ -313,7 +319,7 @@ fun describeBinaryTransport(path: String, method: PathItem.HttpMethod, operation
                 .addHeaderObject("Content-Disposition", Header().schema(StringSchema()))
         return
     }
-    if (!payslipPdf && !path.endsWith("/{revisionId}/content")) return
+    if (!payslipPdf && !reportCsv && !path.endsWith("/{revisionId}/content")) return
     for ((name, description) in
         mapOf(
             "Range" to "Single byte range; multiple/unsatisfiable ranges return 416.",
@@ -337,7 +343,8 @@ fun describeBinaryTransport(path: String, method: PathItem.HttpMethod, operation
                 .content(
                     Content()
                         .addMediaType(
-                            if (payslipPdf) "application/pdf" else "application/octet-stream",
+                            if (payslipPdf) "application/pdf"
+                            else if (reportCsv) "text/csv" else "application/octet-stream",
                             MediaType().schema(BinarySchema()),
                         )
                 )

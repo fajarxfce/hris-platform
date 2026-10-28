@@ -25,6 +25,35 @@ class ApiContractHttpTest : PeopleApiFixture() {
     private lateinit var mappings: RequestMappingHandlerMapping
 
     @Test
+    fun reportExportsDescribeOwnedRecoveryAndAuthorizedCsvRanges() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/reports/exports"
+        for (path in listOf(base, "$base/{exportId}", "$base/{exportId}/cancel")) {
+            val operation = api["paths"][path][if (path.endsWith("cancel")) "post" else "get"]
+            assertTrue(operation["x-hris-authentication-required"].asBoolean())
+            assertFalse(operation["x-hris-company-admission"].asBoolean())
+        }
+        for (path in listOf(base, "$base/{exportId}/resume")) {
+            val operation = api["paths"][path]["post"]
+            assertTrue(operation["x-hris-company-admission"].asBoolean())
+            assertTrue(
+                operation["parameters"].any {
+                    it["name"].asString() == "Idempotency-Key" && it["required"].asBoolean()
+                }
+            )
+        }
+        val content = api["paths"]["$base/{exportId}/content"]["get"]
+        assertTrue(content["x-hris-company-admission"].asBoolean())
+        for (status in listOf("200", "206")) assertTrue(
+            content["responses"][status]["content"].has("text/csv")
+        )
+        for (status in listOf("304", "416")) assertTrue(content["responses"].has(status))
+        for (name in listOf("Range", "If-Range", "If-None-Match")) assertTrue(
+            content["parameters"].any { it["name"].asString() == name }
+        )
+    }
+
+    @Test
     fun personalReportFiltersDocumentPrivateMetadataAndVersionedIdempotentCommands() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/reports/saved-filters"

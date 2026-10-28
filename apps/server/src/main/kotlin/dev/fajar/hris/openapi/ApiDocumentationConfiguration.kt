@@ -68,7 +68,10 @@ class ApiDocumentationConfiguration {
             handler.beanType.packageName.removePrefix("dev.fajar.hris.").substringBefore('.')
         operation.addExtension(
             "x-hris-company-admission",
-            feature !in dev.fajar.hris.availability.companyPolicyExemptPackages,
+            feature !in dev.fajar.hris.availability.companyPolicyExemptPackages &&
+                !handler.hasMethodAnnotation(
+                    dev.fajar.hris.core.http.CompanyAvailabilityExempt::class.java
+                ),
         )
         operation.addExtension(
             "x-hris-group-admission",

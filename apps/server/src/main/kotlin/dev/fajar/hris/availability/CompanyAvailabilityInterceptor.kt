@@ -22,7 +22,13 @@ class CompanyAvailabilityInterceptor(private val check: CheckCompanyAvailability
         val feature =
             handler.beanType.packageName.removePrefix("dev.fajar.hris.").substringBefore('.')
         // Configuration, identity recovery, company administration, and job inspection stay usable.
-        if (feature in companyPolicyExemptPackages) return true
+        if (
+            feature in companyPolicyExemptPackages ||
+                handler.hasMethodAnnotation(
+                    dev.fajar.hris.core.http.CompanyAvailabilityExempt::class.java
+                )
+        )
+            return true
         val modules =
             if (feature == "sync") requestedSyncModules(request, actor).response()
             else companyModulePackages[feature]?.let { setOf(it) } ?: emptySet()

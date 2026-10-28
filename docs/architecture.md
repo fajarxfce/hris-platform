@@ -542,7 +542,7 @@ fence accepted parts; database triggers own progress counters and complete-row
 publication. Active, retained, attempt, part and byte quotas bound the lifecycle.
 Physical retirement requires actual expiry and completed row/object cleanup; it
 retains the original identity and metadata. Admission must generate export resource
-identities on the server, independently from caller command keys. Public admission/download and scheduled retirement remain pending; see
+identities on the server, independently from caller command keys. See
 [execution records](report-exports.md#execution-records-and-private-parts).
 
 
@@ -555,6 +555,22 @@ publication each commit atomically. Unique upload reservations commit before pro
 I/O; a new guarded transaction validates its receipt and accepts the part. Progress
 counts capture, accepted parts and publication, including positive empty-file progress.
 No repository invokes another repository and no provider call holds source locks.
+
+Owned export status and cancellation explicitly exempt only client availability;
+HTTP authentication, company resolution and use-case credential/MFA checks remain.
+Public content validates its complete immutable manifest and pinned tag. Provider
+reads are bounded and outside transactions; fresh source/access guards validate
+current authority and expiry after each object read before releasing the verified
+bytes. The shared binary writer owns response concurrency, timeout and interruption.
+
+V97 grants global worker discovery only over minimal export expiry-queue metadata.
+Execution/snapshot facts remain scoped. Per-item cleanup locks job, owner, export
+and queue, atomically stops execution, deletes a bounded row batch, journals and
+retires only when database-clock expiry and existing object-cleanup guards allow it.
+Minimal raw cleanup projections do not decode report formats or require an active
+owner. Failed business transactions roll back; a separate queue-only conditional
+postponement prevents repeated failures from starving later work. The owned timer
+and worker are both conditional on worker execution and terminate on disposal.
 
 
 Interactive job reads and cancellation use the pure company-session policy to intersect original/live authority and check current MFA after waiting. Their domain details contain the resulting available actions; delivery only serializes them and cannot restore a permission from the originally resolved actor. This interactive policy is separate from background execution authority.

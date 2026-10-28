@@ -169,8 +169,8 @@ worker now connect those records to all seven summary and three detail captures.
 Rendering freezes facts, consumes bounded CSV prefixes, reserves cleanup before
 private provider writes, and fences acceptance/publication with current source
 access and job ownership. Recovery retains accepted parts and original expiry.
-Public command/history/download adapters, scheduled snapshot retirement and the
-export dashboard remain open. See [worker execution](../report-exports.md#admission-and-worker-execution).
+Public adapters and scheduled retirement are recorded below; dashboard delivery
+remains open. See [worker execution](../report-exports.md#admission-and-worker-execution).
 
 Execution validation passed 226 distinct tests across focused runs: 111 Reporting,
 two core-job, 29 API-context/PostgreSQL and 84 worker cases. Both packages and
@@ -178,3 +178,15 @@ architecture/format checks passed. The complete worker graph was exercised after
 adding Reporting; storage providers remain controlled fixtures pending real S3 and
 browser acceptance. Detailed boundaries and failed-run corrections are recorded in
 [export validation](../report-exports.md#validation-and-remaining-delivery).
+
+Public export commands, private history/detail and authorized CSV downloads now
+expose the retained lifecycle. Range, ETag and HEAD preserve current authority and
+verify each private part before releasing its bytes. Owned status and cancellation
+remain available after source/availability loss while retaining owner, credential,
+report permission and MFA checks. V97 schedules bounded row retirement, waits for
+private-object cleanup and preserves metadata; future formats and inactive owners
+do not block cleanup. Validation passed 338 distinct tests across focused runs,
+including seven export HTTP and six retention worker cases, the full 90-test worker
+graph, both packages and architecture/format checks. The dashboard and real S3/browser
+acceptance remain open. See [public contracts](../report-exports.md#owned-history-and-authorized-downloads)
+and [retirement](../report-exports.md#scheduled-retirement).

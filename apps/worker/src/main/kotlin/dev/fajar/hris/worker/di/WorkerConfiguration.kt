@@ -23,6 +23,35 @@ import org.springframework.transaction.PlatformTransactionManager
 @Configuration(proxyBeanMethods = false)
 class WorkerConfiguration {
     @Bean
+    @ConditionalOnProperty(
+        name = ["hris.worker.enabled"],
+        havingValue = "true",
+        matchIfMissing = true,
+    )
+    fun reportExportCleanupTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 1
+            setThreadNamePrefix("hris-report-expiry-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(15)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = ["hris.worker.enabled"],
+        havingValue = "true",
+        matchIfMissing = true,
+    )
+    fun reportExportCleanupWorker(
+        maintain: dev.fajar.hris.reporting.domain.usecases.MaintainReportExports,
+        @org.springframework.beans.factory.annotation.Qualifier("reportExportCleanupTimers")
+        timer: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+    ) = dev.fajar.hris.worker.reporting.ReportExportCleanupWorker(maintain, timer)
+
+    @Bean
     fun reportExportTask(
         resolve: ResolveActor,
         advance: dev.fajar.hris.reporting.domain.usecases.AdvanceReportExport,

@@ -59,6 +59,66 @@ import org.springframework.context.annotation.Configuration
 @Configuration(proxyBeanMethods = false)
 class ReportingConfiguration {
     @Bean
+    fun reportExportExpirySource(sql: DSLContext): ReportExportExpiryDataSource =
+        PostgresReportExportExpiryDataSource(sql)
+
+    @Bean
+    fun reportExportExpiry(
+        source: ReportExportExpiryDataSource
+    ): dev.fajar.hris.reporting.domain.repositories.ReportExportExpiryRepository =
+        dev.fajar.hris.reporting.data.repositories.StoredReportExportExpiryRepository(source)
+
+    @Bean
+    fun maintainReportExports(
+        expiry: dev.fajar.hris.reporting.domain.repositories.ReportExportExpiryRepository,
+        exports: ReportExportRepository,
+        snapshots: ReportSnapshotRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) =
+        dev.fajar.hris.reporting.domain.usecases.MaintainReportExports(
+            expiry,
+            exports,
+            snapshots,
+            jobs,
+            journal,
+            transactions,
+            clock,
+        )
+
+    @Bean
+    fun readReportExports(
+        exports: ReportExportRepository,
+        snapshots: ReportSnapshotRepository,
+        jobs: JobRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        storage: ObjectStorageRepository,
+        transactions: TransactionRunner,
+        sources: ReportSourceTransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        dev.fajar.hris.reporting.domain.usecases.ReadReportExports(
+            exports,
+            snapshots,
+            jobs,
+            policies,
+            companies,
+            members,
+            identities,
+            storage,
+            transactions,
+            sources,
+            security,
+            clock,
+        )
+
+    @Bean
     fun manageReportExports(
         exports: ReportExportRepository,
         jobs: JobRepository,

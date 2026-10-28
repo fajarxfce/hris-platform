@@ -15,6 +15,15 @@ validation. A generated module or route does not complete a capability. Each
 workflow must enforce current scope, handle response loss and cancellation,
 provide localized errors, and pass the relevant real API and UI checks.
 
+The operational leave report and matching request drill-down now read frozen
+working dates within an annual window and preserve exact half-day quantities.
+Current status buckets include rejected/cancelled history separately from active
+leave; report/source grants and MFA protect both projections. Validation passed
+25 reporting tests, 90 API/PostgreSQL/OpenAPI tests and 81 worker tests, including
+pagination after status changes and concurrent decision serialization. The leave
+report dashboard and live browser acceptance are next; historical financial reports
+and exports remain open. See [reporting](reporting.md#operational-leave).
+
 The operational attendance exception report now supplies coherent per-date and
 overall counts with current report/source access and MFA checks. It passed 15
 reporting-domain/data and 83 HTTP/PostgreSQL/OpenAPI tests, plus architecture and

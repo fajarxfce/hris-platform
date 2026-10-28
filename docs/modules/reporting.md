@@ -20,3 +20,12 @@ correction reconciliation. See the exact
 [report definitions and validation](../reporting.md#operational-attendance-exceptions).
 
 Company headcount is implemented with effective-date status/contract counts, a separate distinct-person total, current source/report permissions, a single bounded aggregate response, and a responsive dashboard report. Group headcount selects up to 32 independently authorized companies and computes the distinct global person count in the same SQL snapshot as company buckets. Its explicit SELECT scope adds no mutation permission; access, MFA, and client policy are rechecked after ordered guards. The dashboard supports applied company/date filters, company breakdowns, and cancellation of obsolete group reads. [Reporting API](../reporting.md) documents the exact definitions and historical limits. Other metrics and exports remain planned.
+
+Operational leave reporting and its scoped request drill-down are implemented with
+one to 366 submitted work dates, current status buckets, distinct employment counts
+and exact half-day quantities. Frozen request days retain policy/calendar history;
+released allocations do not erase rejected/cancelled requests. Both reads recheck
+report/source grants and MFA, with bounded RLS projections and scoped continuations.
+V91 adds the date-envelope index. The backend passed 25 reporting tests, 90 selected
+API/PostgreSQL/OpenAPI tests and 81 worker tests. The dashboard consumer remains
+in progress; see [leave definitions and evidence](../reporting.md#operational-leave).

@@ -95,7 +95,92 @@ No report payload enters browser persistence or a shared query cache.
 Other source metrics, historical closing reports and immutable export jobs remain
 subsequent capabilities.
 
+## Operational leave
+
+`GET /api/v1/companies/{companyId}/reports/leave?from=2026-01-01&until=2026-12-31`
+
+Requires both current `reports.read` and company-wide `leave.read`, with the
+`REPORTING` client-policy gate. Team/self leave grants are insufficient. The
+inclusive window is one to 366 days, within 1900–2200, allowing a complete leap
+year. Invalid ranges return `invalid_report_range` with `maximumDays: "366"`.
+
+The report selects the immutable requested **working dates** inside that window,
+not submission dates or the whole envelope between a request's first and last day.
+Scheduled off days and holidays excluded at submission remain excluded. Later
+policy, roster or employment-label edits cannot rewrite the submitted facts. A
+request crossing the report boundary contributes only its included portions.
+
+The response has `companyId`, `from`, `until`, `evaluatedAt`,
+`definitionVersion: "leave.v1"`, `totals`, and all five ordered `statuses` entries
+(`PENDING`, `APPROVED`, `REJECTED`, `CANCELLED`, `CANCELLATION_PENDING`). An empty
+status has zero counts. Each count object contains:
+
+| Field | Definition |
+| --- | --- |
+| `requests` | Distinct requests with at least one submitted working date in the window. |
+| `employments` | Distinct employment records among those requests, not unique persons. The grand total is not the sum across statuses. |
+| `days` | Exact decimal string: each full portion contributes `1`, each half portion `0.5`, clipped to the report window. |
+
+Statuses are current. Approved leave awaiting cancellation approval stays separate
+as `CANCELLATION_PENDING`; its ledger consumption remains until approval completes.
+Rejected and cancelled requests remain in this report even after allocations are
+released. Therefore the grand total describes submitted request history, **not**
+active occupancy, consumed balance, entitlement, payroll expense, or a closing
+snapshot. Totals for requests and days reconcile with the status buckets; employment
+counts use an independent distinct total. Subsequent decisions can move requests
+between buckets without changing their frozen dates or overall requested days.
+
+`GET /api/v1/companies/{companyId}/reports/leave/requests?from=2026-01-01&until=2026-12-31&status=APPROVED&limit=50`
+
+This drill-down uses the same source definition and authorization. Optional `status`
+selects one bucket; omission selects all statuses. `limit` is 1–200 (default 50).
+The response repeats the company/window/status, evaluation time and definition,
+with `items` and `nextCursor`. Items contain the request ID, employment ID, submitted
+employee/type labels, current status/version, submission time, clipped `days`, and
+`requestDays` for the complete submitted request. Reasons, attachments, private
+profiles and approval assignments are not acquired by this projection. Authorized
+clients can open the existing leave-request detail separately.
+
+Requests sort by immutable submission time then UUID, both descending. The bounded
+opaque `after` token retains company, dates, status and that ordering key. Reusing it
+for another filter returns `invalid_page`. A last-row status change does not break
+continuation because no current-row lookup is needed. Each page is a fresh read;
+counts/pages may change after new submissions or decisions. Refresh from the first
+page to reconcile a later state. This is not an immutable export cursor.
+
+One SQL snapshot produces each aggregate or page under normal RLS. The shared raw
+projection expands only overlapping request snapshots and filters their actual
+working dates; a company/date-envelope index supports candidate selection. At most
+six aggregate rows or 201 drill-down rows reach application mapping. Counts, units,
+status completeness, ordering, duplicates and continuation progress are checked
+inside the database failure boundary. Query/lock/transaction timeouts remain finite.
+Company, membership and account guards retain current scope, original/live grants,
+credential version and MFA checks after waiting; assurance is checked again after
+acquisition. Cancellation unwinds the read and failures stay sanitized. Responses
+are `no-store`. Reporting does not mutate operational leave.
+
+The dashboard consumer and live browser acceptance are the next increment. This
+backend report does not close historical reporting, financial metrics or export
+requirements.
+
 ## Validation
+
+On 28 October 2026, leave reporting passed 25 reporting domain/data/delivery tests,
+90 selected HTTP/PostgreSQL/OpenAPI tests and the 81-test worker suite. Architecture
+and formatting checks passed. The new coverage exercises exact half-day output,
+all statuses, partial windows and gaps, excluded off days, frozen policy/roster
+facts, cancellation refunds, distinct employments, date/page/cursor bounds, matching
+aggregate and drill-down semantics, RLS and source grants, REPORTING availability,
+revoked credentials/permissions after waits, MFA expiry before/after acquisition,
+read cancellation, sanitized failure recovery, and concurrent decision serialization.
+The real PostgreSQL continuation test caught a missing timestamp parameter cast;
+the corrected query passes after the previous row changes status. OpenAPI remains
+bounded at 2,032,863 bytes with 352 paths. Evidence is in
+`.work/leave-report-unit.log`, `.work/leave-report-validation.log` and
+`.work/leave-report-format.log`. The complete worker suite ran after migration V91
+and remained up to date in the final targeted rerun. Dashboard/browser acceptance
+for this report remains pending.
+
 
 On 28 October 2026, operational attendance reporting passed 15 reporting-domain/data
 tests and 83 selected HTTP/PostgreSQL/OpenAPI tests. Sixteen new regressions cover

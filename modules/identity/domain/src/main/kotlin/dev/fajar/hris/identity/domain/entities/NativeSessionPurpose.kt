@@ -4,4 +4,5 @@ package dev.fajar.hris.identity.domain.entities
 enum class NativeSessionPurpose {
     VERIFIED_EXCHANGE,
     PASSWORD_SIGN_IN,
+    FIREBASE_SIGN_IN,
 }

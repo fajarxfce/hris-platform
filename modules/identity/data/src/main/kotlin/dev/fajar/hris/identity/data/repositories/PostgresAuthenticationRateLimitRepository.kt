@@ -23,6 +23,10 @@ class PostgresAuthenticationRateLimitRepository(
                 dev.fajar.hris.identity.domain.entities.AuthenticationAttemptKind.SIGN_IN -> ""
                 dev.fajar.hris.identity.domain.entities.AuthenticationAttemptKind
                     .PASSWORD_RECOVERY -> "password-recovery:"
+                dev.fajar.hris.identity.domain.entities.AuthenticationAttemptKind
+                    .FIREBASE_VERIFICATION -> "firebase-verification:"
+                dev.fajar.hris.identity.domain.entities.AuthenticationAttemptKind
+                    .FIREBASE_SIGN_IN -> "firebase-sign-in:"
             }
         val start =
             Instant.ofEpochSecond(

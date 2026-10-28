@@ -79,11 +79,25 @@ tests and Android assembly. All these commits are pushed.
 
 The requested Firebase project `cmp-fajar` has local ignored Android configuration
 for all HRIS/starter flavors. Configuration processing proves a matching build,
-not token issuance or provider delivery. Background registration renewal, Firebase
-Authentication exchange, physical FCM/APNs delivery and iOS acceptance remain open.
-Firebase Auth currently returns `CONFIGURATION_NOT_FOUND`; its Console setup and
-provider activation remain external dependencies, along with worker FCM credentials
-and iOS/APNs configuration. See Mobile's
+not token issuance or provider delivery. Mobile `5a3fb6ee` adds bounded background
+registration renewal and retained retries, validated with 1,797 desktop/UI tests,
+106 related Chromium tests and configured Android assembly. Worker composition
+`23d17e77` addresses duplicate Koin metadata during native framework linking;
+cross-platform CI evidence remains tracked in Mobile. Starter `7562e67` passed
+Linux, Windows and Apple in run `40637280819`.
+
+The [Firebase Authentication exchange](firebase-auth.md) now accepts verified
+email/password and Google identities through approved HRIS issuer/UID bindings.
+It preserves HRIS MFA, credential revocation, native idempotency and cookie
+isolation. All 76 selected API/PostgreSQL tests, 57 identity domain/data tests and
+81 worker tests passed; OpenAPI generation/validation and architecture checks
+also passed. Real Firebase login and Mobile SDK/UI integration remain open.
+
+The user enabled Email/password and Google; public Firebase configuration now
+returns HTTP 200, and the public Google web client ID was discovered and validated
+in all three Android HRIS flavor configurations. Worker FCM credentials and
+iOS/APNs configuration remain unavailable. Physical FCM/APNs delivery and iOS
+acceptance remain open. See Mobile's
 [native push contract](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/native-push.md)
 for boundaries and validation evidence.
 

@@ -7,8 +7,9 @@ import java.time.Clock
 import java.util.UUID
 
 /**
- * Called only after the OIDC transport has verified signature, issuer, audience, time, state and
- * nonce.
+ * Called only after a trusted transport verifies signature, issuer, audience and time. Browser OIDC
+ * additionally verifies state and nonce; Firebase native exchange requires recent authentication
+ * and the configured project. Neither flow derives a link from an email claim.
  */
 class SignInWithOidc(
     private val links: OidcIdentityRepository,
@@ -18,7 +19,7 @@ class SignInWithOidc(
     private val clock: Clock,
 ) {
     fun execute(issuer: String, subject: String, correlationId: UUID): Result<Account> {
-        if (!policy.enabled || issuer != policy.issuer || subject.length !in 1..255)
+        if (!policy.accepts(issuer) || subject.length !in 1..255)
             return Result.Failed(Failure(FailureKind.UNAUTHENTICATED, "sso_sign_in_failed"))
         val found = links.resolve(issuer, subject)
         if (found is Result.Failed) return found

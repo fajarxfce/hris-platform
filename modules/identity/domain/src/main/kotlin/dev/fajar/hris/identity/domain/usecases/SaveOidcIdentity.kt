@@ -88,7 +88,7 @@ class SaveOidcIdentity(
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
-            if (active && (!oidc.enabled || issuer != oidc.issuer))
+            if (active && !oidc.accepts(issuer))
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "invalid_oidc_identity"))
             val account =
                 target

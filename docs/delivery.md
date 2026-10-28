@@ -5828,3 +5828,42 @@ review applied the full selection once. CSRF rejection was also exercised.
 These workflows use disposable accounts and data. No services were deployed and
 no APK was installed; development activation retains the compatible-mobile
 rollout described above. See [bulk roster editing](roster-bulk.md).
+
+## Native Firebase Authentication exchange
+
+The API supports Firebase email/password and Google identities from one configured
+project. Public configuration and a stateless, idempotent native login endpoint
+are documented in [Firebase Authentication](firebase-auth.md). JCA verifies RS256
+signatures against the fixed Google key endpoint before exact issuer/audience,
+UID, provider, tenant and recent-authentication policy. Approved HRIS identity
+links remain mandatory; email and provider MFA/role claims cannot grant access.
+
+The native session retains Firebase's original authentication time and the HRIS
+account's current security version. Existing HRIS MFA, rotation and revocation
+apply. Origin and verified-subject budgets bound verification and receipt retries.
+The bounded HTTP key cache owns its timeout, cancellation, expiry, refresh backoff
+and shutdown; disabled configuration acquires no provider transport. No private
+provider key or live login credential is required by the API.
+
+Validation used JDK 21 and isolated PostgreSQL 18.6 with separate migration/runtime
+roles. All 76 selected API/PostgreSQL tests passed: nine Firebase tests, six native
+password tests, eight browser OIDC tests and 53 OpenAPI contract tests. All 57
+identity domain/data tests and 81 worker tests passed. Runtime checks include both
+API and worker DI graphs, including the enabled production Firebase graph without
+a test key replacement; architecture and formatting checks also passed.
+
+The Firebase regressions cover both providers, approved admin binding, no email
+autolinking, HRIS MFA, link revocation, browser-cookie isolation, invalid proof,
+unavailable keys, rate limits, concurrent session issuance and lost-response
+receipt replay. Data/domain checks cover real RSA signatures, streaming bounds,
+timeouts, cancellation, cache contention and late proof expiry. Test signing keys
+are ephemeral; the transport fixture stores only a public certificate.
+
+Logs: `.work/firebase-session-final-validation.log`,
+`.work/firebase-http-validation.log` (81 worker tests passed; its initial API run
+found a test-only Jackson array coercion fixed before the final successful run),
+`.work/firebase-enabled-graph-validation.log`, and
+`.work/firebase-quality-validation.log`. OpenAPI generated 2,015,021 bytes,
+within the existing 2 MiB contract bound. No live Firebase login, client SDK/UI
+acceptance, provider revocation lookup or physical-device acceptance is claimed.
+The user enabled both providers; public Firebase configuration now responds 200.

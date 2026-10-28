@@ -312,7 +312,74 @@ class IdentityConfiguration {
         @org.springframework.beans.factory.annotation.Value("\${HRIS_OIDC_ENABLED:false}")
         enabled: Boolean,
         @org.springframework.beans.factory.annotation.Value("\${HRIS_OIDC_ISSUER:}") issuer: String,
-    ) = OidcPolicy(enabled, issuer)
+        firebase: FirebaseSignInPolicy,
+    ) = OidcPolicy(enabled, issuer, if (firebase.enabled) setOf(firebase.issuer) else emptySet())
+
+    @Bean
+    fun firebaseSignInPolicy(
+        @org.springframework.beans.factory.annotation.Value("\${HRIS_FIREBASE_AUTH_ENABLED:false}")
+        enabled: Boolean,
+        @org.springframework.beans.factory.annotation.Value("\${HRIS_FIREBASE_PROJECT_ID:}")
+        projectId: String,
+        security: IdentitySecurityPolicy,
+    ) =
+        FirebaseSignInPolicy(
+            enabled,
+            projectId,
+            minOf(security.recentAuthenticationAge, java.time.Duration.ofHours(1)),
+        )
+
+    @Bean(destroyMethod = "shutdownNow")
+    @org.springframework.context.annotation.Lazy
+    fun firebaseHttpClient(): java.net.http.HttpClient =
+        java.net.http.HttpClient.newBuilder()
+            .connectTimeout(java.time.Duration.ofSeconds(3))
+            .followRedirects(java.net.http.HttpClient.Redirect.NEVER)
+            .build()
+
+    @Bean
+    @org.springframework.context.annotation.Lazy
+    fun firebaseKeys(
+        @org.springframework.beans.factory.annotation.Qualifier("firebaseHttpClient")
+        clients: org.springframework.beans.factory.ObjectProvider<java.net.http.HttpClient>,
+        clock: Clock,
+    ): dev.fajar.hris.identity.data.firebase.datasources.FirebaseKeyDataSource =
+        dev.fajar.hris.identity.data.firebase.datasources.GoogleFirebaseKeyDataSource(
+            clients.getObject(),
+            clock,
+        )
+
+    @Bean
+    fun firebaseIdentities(
+        policy: FirebaseSignInPolicy,
+        keys:
+            org.springframework.beans.factory.ObjectProvider<
+                dev.fajar.hris.identity.data.firebase.datasources.FirebaseKeyDataSource
+            >,
+    ): dev.fajar.hris.identity.domain.repositories.FirebaseIdentityRepository =
+        if (!policy.enabled)
+            dev.fajar.hris.identity.domain.repositories.FirebaseIdentityRepository {
+                dev.fajar.hris.core.domain.Result.Failed(
+                    dev.fajar.hris.core.domain.Failure(
+                        dev.fajar.hris.core.domain.FailureKind.UNAVAILABLE,
+                        "firebase_sign_in_unavailable",
+                    )
+                )
+            }
+        else
+            dev.fajar.hris.identity.data.firebase.repositories.VerifiedFirebaseIdentityRepository(
+                keys.getObject(),
+                dev.fajar.hris.identity.data.firebase.datasources.JcaFirebaseTokenDataSource(),
+            )
+
+    @Bean
+    fun verifyFirebaseSignIn(
+        identities: dev.fajar.hris.identity.domain.repositories.FirebaseIdentityRepository,
+        limits: dev.fajar.hris.identity.domain.repositories.AuthenticationRateLimitRepository,
+        transactions: TransactionRunner,
+        policy: FirebaseSignInPolicy,
+        clock: Clock,
+    ) = VerifyFirebaseSignIn(identities, limits, transactions, policy, clock)
 
     @Bean
     fun oidcSource(sql: DSLContext): OidcIdentityDataSource = PostgresOidcIdentityDataSource(sql)

@@ -95,6 +95,8 @@ fun completeApiContract(api: OpenAPI) {
             "/api/v1/auth/invitations/accept",
             "/api/v1/auth/native/refresh",
             "/api/v1/auth/native/login",
+            "/api/v1/auth/native/firebase",
+            "/api/v1/auth/native/firebase/login",
         )
     val browserOnly = setOf("/api/v1/auth/login", "/api/v1/auth/logout", "/api/v1/auth/csrf")
     val problems = apiProblemResponses()
@@ -124,8 +126,12 @@ fun completeApiContract(api: OpenAPI) {
             if (mutation) cookie.addList("csrfToken")
             operation.security =
                 when {
-                    path in setOf("/api/v1/auth/native/refresh", "/api/v1/auth/native/login") ->
-                        emptyList()
+                    path in
+                        setOf(
+                            "/api/v1/auth/native/refresh",
+                            "/api/v1/auth/native/login",
+                            "/api/v1/auth/native/firebase/login",
+                        ) -> emptyList()
                     path in publicPaths && !mutation -> emptyList()
                     path in browserOnly || transport == "COOKIE" -> listOf(cookie)
                     transport == "NATIVE" -> listOf(SecurityRequirement().addList("nativeBearer"))

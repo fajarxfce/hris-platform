@@ -50,7 +50,8 @@ class IssueNativeSession(
                     now,
                     security,
                 )
-            // A freshly verified password can create a pending native session. Every business
+            // Fresh password or Firebase authentication can create a pending native session. Every
+            // business
             // request still passes ResolveActor's live MFA gate; the browser exchange must
             // already satisfy that gate. A request cannot select its own issuance purpose.
             if (purpose == NativeSessionPurpose.VERIFIED_EXCHANGE && assurance is Result.Failed)

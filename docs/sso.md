@@ -1,5 +1,8 @@
 # Single sign-on
 
+Native Firebase email/password and Google sign-in use a separate
+[Firebase token exchange](firebase-auth.md) and the same approved account bindings.
+
 The backend supports one configured OIDC provider per deployment using Spring Security authorization-code login, S256 PKCE, and RS256 ID tokens. It can use an appropriately configured Entra ID, Okta, or Keycloak client. Local password login remains available. No live provider tenant has been registered or validated by this repository.
 
 ## Provider registration

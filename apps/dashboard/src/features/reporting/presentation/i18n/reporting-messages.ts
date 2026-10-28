@@ -1,6 +1,28 @@
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 
 const english = {
+  expenseTitle: "Expense report",
+  expenseClaimsTitle: "Expense report claims",
+  expenseClaims: "Claims",
+  expenseLines: "Transaction lines in period",
+  expenseByStatus: "By current status",
+  expenseStatus: "Status",
+  expenseEmployee: "Employee",
+  expenseNumber: "Employee number",
+  expenseClaimTitle: "Claim title",
+  expenseSubmission: "Submission number",
+  periodAmount: "Amount in period",
+  submissionAmount: "Amount in whole submission",
+  allClaims: "All claims",
+  viewClaims: "View claims",
+  viewSubmission: "View submission",
+  emptyExpenseReport: "No submitted transactions match this period and status.",
+  DRAFT: "Draft after submission",
+  RETURNED: "Returned",
+  expenseDefinition:
+    "IDR amounts from each claim's latest submitted transactions in this period, grouped by current status. Draft edits count only after resubmission. These totals include rejected and cancelled claims and do not show payments.",
+  expenseRowsDefinition:
+    "Amount in period uses the submitted transaction dates; the whole submission may include other dates. Open a row to view that exact submission. Each page reflects current claims; resubmitting can move a claim to an earlier page.",
   overtimeTitle: "Overtime report",
   overtimeStatus: "Status",
   requests: "Requests",
@@ -81,6 +103,28 @@ const english = {
 
 type ReportingMessages = { readonly [K in keyof typeof english]: string };
 const indonesian: ReportingMessages = {
+  expenseTitle: "Laporan klaim biaya",
+  expenseClaimsTitle: "Klaim dalam laporan biaya",
+  expenseClaims: "Klaim",
+  expenseLines: "Rincian transaksi dalam periode",
+  expenseByStatus: "Per status saat ini",
+  expenseStatus: "Status",
+  expenseEmployee: "Karyawan",
+  expenseNumber: "Nomor karyawan",
+  expenseClaimTitle: "Judul klaim",
+  expenseSubmission: "Nomor pengajuan",
+  periodAmount: "Nominal dalam periode",
+  submissionAmount: "Nominal seluruh pengajuan",
+  allClaims: "Semua klaim",
+  viewClaims: "Lihat klaim",
+  viewSubmission: "Buka pengajuan",
+  emptyExpenseReport: "Tidak ada transaksi yang diajukan dalam periode dan status ini.",
+  DRAFT: "Draft setelah pengajuan",
+  RETURNED: "Dikembalikan",
+  expenseDefinition:
+    "Nominal IDR dari transaksi pengajuan terakhir setiap klaim dalam periode ini, menurut status saat ini. Perubahan draft dihitung setelah diajukan ulang. Total mencakup klaim ditolak dan dibatalkan serta tidak menunjukkan pembayaran.",
+  expenseRowsDefinition:
+    "Nominal dalam periode memakai tanggal transaksi saat pengajuan; seluruh pengajuan dapat memuat tanggal lain. Buka baris untuk melihat pengajuan tersebut. Setiap halaman mengikuti klaim saat dibaca; pengajuan ulang dapat memindahkan klaim ke halaman sebelumnya.",
   overtimeTitle: "Laporan lembur",
   overtimeStatus: "Status",
   requests: "Pengajuan",

@@ -13,6 +13,7 @@ import {
   expenseClaimSearchFromRoute,
   expenseSubmissionPath,
 } from "../models/expense-claim-route";
+import { expenseReportOrigin, expenseReportReturn } from "../models/expense-report-origin";
 import { expenseSubmissionView } from "../models/expense-submission-view";
 import { ExpenseSubmissionPage } from "../pages/expense-submission-page";
 import { ExpenseEvidenceDownloads } from "./expense-evidence-downloads";
@@ -75,6 +76,7 @@ function ExpenseSubmissionBinding(props: ExpenseScreenProps & { id: string }) {
     expenseClaimSearchFromRoute(parameters, props.access.companyId, today),
   );
   const sourceClaim = state.submission?.canReadClaim ?? false;
+  const reportOrigin = expenseReportOrigin(parameters, props.access.companyId);
   if (sourceClaim && state.submission && !canBrowseCompanyExpenses(props.access.permissions))
     directory.set("employmentId", state.submission.employmentId);
   const canDecide =
@@ -98,6 +100,7 @@ function ExpenseSubmissionBinding(props: ExpenseScreenProps & { id: string }) {
       locale={props.locale}
       tab={tab}
       backTo={backTo}
+      reportTo={reportOrigin ? expenseReportReturn(props.access.companyId, reportOrigin) : null}
       backLabel={sourceClaim ? text.viewClaim : approvalAccess ? text.approvals : text.overview}
       approvalTo={
         approvalAccess && state.submission

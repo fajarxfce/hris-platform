@@ -28,6 +28,7 @@ export function ExpenseSubmissionPage(props: {
   locale: Locale;
   backTo: string;
   backLabel: string;
+  reportTo?: string | null;
   approvalTo: string | null;
   tab: "items" | "reviews" | "approval";
   onRefresh: () => void;
@@ -49,6 +50,7 @@ export function ExpenseSubmissionPage(props: {
           context={props.companyName}
           actions={
             <>
+              {props.reportTo && <Link to={props.reportTo}>{text.backToReport}</Link>}
               <Link to={props.backTo}>{props.backLabel}</Link>
               {props.canDecide && (
                 <>

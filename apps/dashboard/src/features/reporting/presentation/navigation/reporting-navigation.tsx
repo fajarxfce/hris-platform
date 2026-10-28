@@ -3,6 +3,7 @@ import type { AppNavigationItem } from "../../../../core/presentation/components
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import { canReadAttendanceReport } from "../../domain/policies/attendance-report-policy";
+import { canReadExpenseReport } from "../../domain/policies/expense-report-policy";
 import { canReadHeadcount } from "../../domain/policies/headcount-policy";
 import { canReadLeaveReport } from "../../domain/policies/leave-report-policy";
 import { canReadOvertimeReport } from "../../domain/policies/overtime-report-policy";
@@ -15,6 +16,15 @@ export function reportingNavigation(
   const permissions = access?.permissions ?? [];
   const text = messages(locale);
   return [
+    ...(canReadExpenseReport(permissions)
+      ? [
+          {
+            to: "/reports/expenses",
+            label: reportingMessages(locale).expenseTitle,
+            icon: <DataBarVertical20Regular />,
+          },
+        ]
+      : []),
     ...(canReadOvertimeReport(permissions)
       ? [
           {

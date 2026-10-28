@@ -27,8 +27,10 @@ authority. Unsubmitted drafts are excluded; returned/withdrawn submissions retai
 their original facts through later draft edits until resubmission replaces them.
 Current status is separate from immutable submitted content and bank settlement.
 Backend acceptance passed through staged approval, resubmission, scoped continuation,
-revocation, cancellation and real partial-payment/retry workflows. Dashboard
-acceptance remains in progress.
+revocation, cancellation and real partial-payment/retry workflows. The dashboard
+now displays matching totals/claim pages and opens each exact submission with a
+validated report return link. Browser/API acceptance verifies correction and
+resubmission without replacing frozen evidence or losing the report selection.
 
 ## Category policies
 

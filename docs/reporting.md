@@ -357,7 +357,52 @@ Architecture and formatting passed. OpenAPI remains bounded at 2,051,708 bytes w
 355 paths. The worker application suite validated the shared expense-domain change
 and V92 migration. Logs: `.work/expense-report-unit.log`,
 `.work/expense-report-validation.log`, `.work/expense-report-followup.log` and
-`.work/expense-report-final-build.log`. Dashboard acceptance is the next increment.
+`.work/expense-report-final-build.log`.
+
+### Expense dashboard
+
+`/reports/expenses` applies company-bound transaction dates and displays claim,
+employment, line and exact IDR totals with all six current status buckets.
+`/reports/expenses/claims` retains those dates and optional status, with 50-row
+first/next navigation. It shows submitted employee/title labels, submission number,
+lines in the period, the selected amount and the full submission amount separately.
+Rows open the exact `submissionId`; the existing claim link remains available.
+A validated same-company report return link preserves dates, status and page through
+submission tabs, evidence selection, review actions and their result. Invalid
+origins cannot introduce an arbitrary return URL or another company's cursor.
+Transaction-date report filters do not become claim-directory creation dates.
+
+The lazy routes own their requests per account/company/window. Refresh, replaced
+filters and disposal clear old data and cancel pending work; obsolete successes
+and failures cannot restore it. Mapping validates scope, definition, safe counters,
+exact cent reconciliation, claim limits, order and cursor progress before publishing
+frozen data. Decimal display shares a core formatter with Expenses without floating
+point conversion. Forms retain edits until Apply; a company replacement resets to
+its local year-to-date range and removes the prior status/page. No report data is
+persisted or polled.
+
+Dashboard acceptance on 28 October 2026 passed all 3,813 tests in 323 files,
+architecture/Biome/TypeScript checks and the production build. Thirteen distinct
+Chromium scenarios passed (five report scenarios and eight existing expense
+scenarios), including localized amounts, 390px dark layout, first/next pages,
+failed refresh/retry, source grants, invalid annual windows, company replacement,
+and return to page two when the exact submission is unavailable. The final five
+report scenarios were confirmed together after an earlier runner returned SIGTERM
+after reporting all five passed.
+
+An isolated API/PostgreSQL browser workflow enrolled separate administrator and
+reviewer accounts, excluded an unsubmitted draft, clipped three submitted lines
+from 223.56 IDR to 123.46 IDR within the window, and returned the claim through the
+review UI while preserving the report filter. Saving a corrected draft retained
+123.46 IDR and the original submitted title. Resubmitting replaced the selected
+facts with one line/claim at 200.02 IDR and opened submission two; submission one
+remained immutable at 223.56 IDR. The fixture cleaned up its API and database.
+Logs: `.work/expense-dashboard-check.log`, `.work/expense-dashboard-browser.log`,
+`.work/expense-dashboard-browser-confirmed.log` and
+`.work/expense-dashboard-integration.log`. Desktop/light and narrow/Indonesian/dark
+screenshots were inspected in `.work/dashboard-expense-report-real.png` and
+`.work/dashboard-expense-report-mobile.png`. Existing CSS specificity and build
+chunk-size warnings remain; this is no performance measurement.
 
 ## Validation
 

@@ -806,6 +806,25 @@ The isolated API/PostgreSQL workflow verifies these boundaries with an enrolled
 test administrator, lost committed responses, CSRF rejection, unrelated accounts,
 retained device and browser access, and replacement of the dashboard account.
 
+## Operational expense report
+
+`/reports/expenses` uses applied transaction dates, exact IDR totals, current-status
+buckets and company-wide expense/report authority. Status rows and All claims open
+`/reports/expenses/claims` with matching dates and optional status, separately from
+the existing claim directory's creation-date filter. The paginated table shows
+submitted labels and submission numbers, with period and full-submission amounts
+in separate columns. A row opens its exact immutable submission. Its report link
+retains the original date/status/page selection through tabs, evidence and review
+outcomes, including when the submission becomes unavailable; View claim remains a
+separate navigation option.
+
+Both owned read controllers clear stale data on refresh/disposal and ignore late
+results. Company changes reset the applied filters. Decimal mapping/reconciliation
+and a shared core IDR formatter preserve exact cents beyond individual claim limits.
+The five report browser scenarios, eight expense regressions, all 3,813 dashboard
+tests and a real API/PostgreSQL correction/resubmission workflow passed.
+See [definitions and validation](reporting.md#expense-dashboard).
+
 ## Operational overtime report
 
 `/reports/overtime` shows exact requested, actual and approved minutes, request and

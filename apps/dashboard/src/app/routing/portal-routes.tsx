@@ -401,6 +401,17 @@ const HeadcountScreen = lazy(() =>
   })),
 );
 
+const ExpenseReportScreen = lazy(() =>
+  import("../../features/reporting/presentation/bindings/expense-report-screen").then((module) => ({
+    default: module.ExpenseReportScreen,
+  })),
+);
+const ExpenseReportClaimsScreen = lazy(() =>
+  import("../../features/reporting/presentation/bindings/expense-report-claims-screen").then(
+    (module) => ({ default: module.ExpenseReportClaimsScreen }),
+  ),
+);
+
 const LeaveReportScreen = lazy(() =>
   import("../../features/reporting/presentation/bindings/leave-report-screen").then((module) => ({
     default: module.LeaveReportScreen,
@@ -1779,6 +1790,36 @@ export function PortalRoutes({
               access={access}
               loadHeadcount={reporting.loadHeadcount}
               companies={companies}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/expenses"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ExpenseReportScreen
+              accountId={accountId}
+              access={access}
+              loadExpenses={reporting.loadExpenses}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/expenses/claims"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ExpenseReportClaimsScreen
+              accountId={accountId}
+              access={access}
+              loadExpenseClaims={reporting.loadExpenseClaims}
+              companyName={company.name}
               timezone={company.timezone}
               locale={locale}
             />

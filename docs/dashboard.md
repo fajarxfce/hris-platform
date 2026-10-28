@@ -1620,6 +1620,11 @@ Navigation entries are owned by their features. The portal composes accessible
 sections for people, time and attendance, requests, communications and administration.
 Local menu search filters only authorized entries. A detail route selects its most
 specific visible ancestor; the existing departure guard still owns navigation.
+Matching uses the destination pathname while retaining its original query/fragment
+for navigation. Company-pinned export links therefore select Exports on creation,
+detail and history routes, without selecting the parent catalogue. Two menu tests
+and fourteen export/catalogue/navigation Chromium scenarios passed, together with
+architecture, Biome, TypeScript and production build checks.
 The sidebar scrolls independently and retains an icon rail on narrow viewports.
 
 The compact rail ignores the desktop search while its field is hidden. Returning

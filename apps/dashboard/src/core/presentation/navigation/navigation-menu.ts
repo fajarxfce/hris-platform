@@ -8,10 +8,12 @@ export function activeNavigationDestination(
   return (
     sections
       .flatMap((section) => section.items)
+      .map((item) => ({ to: item.to, path: item.to.split(/[?#]/u, 1)[0] ?? item.to }))
       .filter(
-        (item) => pathname === item.to || (item.to !== "/" && pathname.startsWith(`${item.to}/`)),
+        (item) =>
+          pathname === item.path || (item.path !== "/" && pathname.startsWith(`${item.path}/`)),
       )
-      .sort((first, second) => second.to.length - first.to.length)[0]?.to ?? null
+      .sort((first, second) => second.path.length - first.path.length)[0]?.to ?? null
   );
 }
 

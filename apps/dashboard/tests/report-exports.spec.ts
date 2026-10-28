@@ -17,12 +17,22 @@ test("applied filters create one export, progress to ready and download exact CS
   ).toBeVisible();
   await page.getByLabel("As of date", { exact: true }).fill("2026-10-20");
   await page.getByRole("link", { name: "Export applied filters", exact: true }).click();
+  const navigation = page.getByRole("navigation");
+  await expect(
+    navigation.getByRole("link", { name: "Report exports", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
+  await expect(
+    navigation.getByRole("link", { name: "Report catalogue", exact: true }),
+  ).not.toHaveAttribute("aria-current", "page");
   await expect(page.getByRole("region", { name: "Applied filters", exact: true })).toContainText(
     "2026-10-01",
   );
   await expect(page.getByLabel("Contents", { exact: true }).locator("option")).toHaveCount(1);
   await page.getByRole("button", { name: "Create CSV export", exact: true }).click();
   await page.getByRole("link", { name: "View export", exact: true }).click();
+  await expect(
+    navigation.getByRole("link", { name: "Report exports", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
   await expect(page.getByRole("region", { name: "Status", exact: true })).toContainText("Queued");
   api.ready();
   await page.getByRole("button", { name: "Refresh", exact: true }).click();
@@ -33,6 +43,9 @@ test("applied filters create one export, progress to ready and download exact CS
   expect(await readFile(await download.path())).toEqual(api.csv);
   await expect(page.getByRole("status")).toContainText("The file has been sent to your browser.");
   await page.getByRole("link", { name: "Back to history", exact: true }).click();
+  await expect(
+    navigation.getByRole("link", { name: "Report exports", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
   await expect(page.getByRole("table", { name: "Export history", exact: true })).toContainText(
     "Ready",
   );

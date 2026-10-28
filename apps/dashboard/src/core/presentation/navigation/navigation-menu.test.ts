@@ -16,6 +16,18 @@ const sections = [
     label: "Time and attendance",
     items: [{ to: "/workforce/attendance", label: "Attendance", icon: null }],
   },
+  {
+    id: "reports",
+    label: "Reporting",
+    items: [
+      {
+        to: "/reports?companies=longer-than-the-export-destination",
+        label: "Catalogue",
+        icon: null,
+      },
+      { to: "/reports/exports?company=one#history", label: "Exports", icon: null },
+    ],
+  },
 ];
 
 describe("workspace menu projection", () => {
@@ -29,6 +41,13 @@ describe("workspace menu projection", () => {
     expect(activeNavigationDestination(sections, "/approvals-extra")).toBeNull();
     expect(activeNavigationDestination(sections, "/")).toBe("/");
     expect(activeNavigationDestination([], "/workforce/attendance")).toBeNull();
+    for (const path of ["/reports/exports", "/reports/exports/new", "/reports/exports/one"])
+      expect(activeNavigationDestination(sections, path)).toBe(
+        "/reports/exports?company=one#history",
+      );
+    expect(activeNavigationDestination(sections, "/reports/exports-extra")).toBe(
+      "/reports?companies=longer-than-the-export-destination",
+    );
   });
   it("filters labels and sections without introducing destinations or mutating the source", () => {
     expect(filterNavigationMenu(sections, "  ATTENDANCE ").map((section) => section.id)).toEqual([

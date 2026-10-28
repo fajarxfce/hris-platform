@@ -5,6 +5,27 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+Database/content/key recovery now captures one quiesced checkpoint and a separate
+private key pack, then verifies copied PostgreSQL and Garage without starting
+application processes against restored records. Two complete local exercises
+passed using the real fictional API/worker/PostgreSQL/Garage deployment. The final
+run restored schema 97, two encrypted records under old/current identity keys and
+104 objects totalling 2,098,795 bytes. Inventory traversed multiple pages and
+covered empty, Unicode/punctuation and multi-block content. A second verification
+retained the original bytes after source changes; a wrong retired key failed even
+after its metadata checksum was recomputed. Owned containers, networks and private
+fixture data were removed.
+
+Validation passed twenty recovery-tool regressions, the existing 21 database-tool
+tests, three JVM cipher tests, API packaging, architecture and formatting. Coverage
+includes archive traversal/extensions, size/deadline limits, cancellation, source
+replacement, private key/manifest binding and failed cleanup ownership. The new CI
+job repeats the real exercise and uploads only its sanitized summary; no hosted CI
+result is claimed for this branch. Local logs: `.work/recovery-set-integration-final.log`,
+`.work/recovery-final-checks.log` and `.work/recovery-key-verifier.log`. See
+[commands, bounds and recovery limits](recovery-set.md). Live cutover, RPO/RTO and
+production workload/provider acceptance remain separate work.
+
 Platform integration review now shows the API's six startup enablement flags,
 including for administrators without a company. It reads no provider identifiers
 or secrets and rechecks current authority, credentials and MFA. The dashboard

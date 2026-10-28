@@ -85,7 +85,11 @@ Changing a secret in .env does not rotate an existing PostgreSQL role password. 
 Use [database recovery verification](database-recovery.md) for private logical
 backups, role definitions and isolated restore/migration rehearsals. The utility
 never restores into the live Compose stack. Keep matching encryption keys and
-private document bytes in the deployment's separate protected backup.
+private document bytes in the deployment's protected backup. With the configured
+Garage layout, [recovery sets](recovery-set.md) capture and verify the database,
+content and separate key pack together. `recoverySetCheck` runs their bounded I/O,
+manifest, ownership and cleanup regressions; `tool/check_recovery_set.py` runs the
+real fictional API/worker/PostgreSQL/Garage exercise after both JARs are built.
 
 ## JSON integer input
 

@@ -30,6 +30,14 @@ Both ClamAV containers use a non-root UID, a read-only root filesystem, and no L
 
 Persist and back up PostgreSQL, Garage metadata, and Garage content as one consistent recovery set, with the necessary credentials stored separately and protected. Signature files use a separate persistent volume and can be downloaded again. Do not remove volumes during an upgrade. Document retention rules and storage inventory reconciliation are tracked separately from temporary-object cleanup.
 
+[Recovery sets](recovery-set.md) now provide that bounded checkpoint for the
+configured Garage layout, with API/worker/Garage stopped and PostgreSQL running.
+Restoration verifies all live object keys, lengths and hashes on an isolated copy,
+plus the database and retained identity keys. A real fictional deployment passed
+104 objects across multiple pages, including empty, Unicode and multi-block data;
+later source writes did not affect the checkpoint. This is isolated restore
+evidence, not a live cutover or a production capacity measurement.
+
 `python3 tool/check_document_services.py` validates the merged configuration and starts only uniquely labelled temporary test containers. It checks Garage bucket initialization, the exact configured health commands, and clean/EICAR scan results using an owned minimal signature database. It then removes its own containers. It does not start the deployment, contact a real bucket, or download production signature databases.
 
 ## Temporary-object cleanup

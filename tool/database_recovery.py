@@ -117,47 +117,57 @@ def backup_database(directory, compose_files):
         container = captured(compose + ["ps", "-q", "database"], log)
         if not re.fullmatch(r"[a-f0-9]{64}", container):
             raise RecoveryError("Exactly one running Compose database is required")
-        service = captured(["docker", "inspect", "--format",
-                            '{{index .Config.Labels "com.docker.compose.service"}}', container], log)
-        if service != "database":
-            raise RecoveryError("The selected container is not the Compose database service")
-        image = captured(["docker", "inspect", "--format", "{{.Config.Image}}", container], log)
-        schema = query(container, "SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank DESC LIMIT 1;", log)
-        archive = directory / "database.partial"
-        roles = directory / "roles.partial"
-        try:
-            with create_file(archive) as output:
-                command(["docker", "exec", "--env", "PGOPTIONS=-c statement_timeout=120000", container,
-                         "pg_dump", "-U", "hris_migrator", "-d", "hris", "--format=custom",
-                         "--lock-wait-timeout=10s"], log, stdout=output, timeout=300)
-                output.flush()
-                os.fsync(output.fileno())
-            private_file(archive, MAX_ARCHIVE_BYTES)
-            with archive.open("rb") as source:
-                command(["docker", "exec", "-i", container, "pg_restore", "--list"], log,
-                        stdin=source, stdout=log, timeout=60)
-            with create_file(roles) as output:
-                command(["docker", "exec", container, "pg_dumpall", "-U", "hris_migrator", "-l", "hris",
-                         "--roles-only", "--no-role-passwords"], log, stdout=output, timeout=60)
-                output.flush()
-                os.fsync(output.fileno())
-            private_file(roles, MAX_ROLES_BYTES)
-            restored_role_sql(roles)
-            archive.rename(directory / "database.dump")
-            roles.rename(directory / "roles.sql")
-            manifest = {
-                "format": 1, "createdAt": datetime.now(timezone.utc).isoformat(),
-                "database": "hris", "bootstrapRole": "hris_migrator", "postgresImage": image,
-                "observedSchema": schema,
-                "files": {name: file_record(directory / name) for name in ("database.dump", "roles.sql")},
-                "rolePasswordsIncluded": False, "externalSecretsIncluded": False, "objectStorageIncluded": False,
-            }
-            write_json(directory / "manifest.json", manifest)
-            return manifest
-        finally:
-            archive.unlink(missing_ok=True)
-            roles.unlink(missing_ok=True)
+        return dump_database_container(directory, container, log)
 
+
+def backup_database_container(directory, container):
+    """Checkpoint an already selected Compose database for a quiesced recovery set."""
+    directory = private_directory(directory, create=True)
+    with create_file(directory / "backup.log") as log:
+        return dump_database_container(directory, container, log)
+
+
+def dump_database_container(directory, container, log):
+    service = captured(["docker", "inspect", "--format",
+                        '{{index .Config.Labels "com.docker.compose.service"}}', container], log)
+    if service != "database":
+        raise RecoveryError("The selected container is not the Compose database service")
+    image = captured(["docker", "inspect", "--format", "{{.Config.Image}}", container], log)
+    schema = query(container, "SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank DESC LIMIT 1;", log)
+    archive = directory / "database.partial"
+    roles = directory / "roles.partial"
+    try:
+        with create_file(archive) as output:
+            command(["docker", "exec", "--env", "PGOPTIONS=-c statement_timeout=120000", container,
+                     "pg_dump", "-U", "hris_migrator", "-d", "hris", "--format=custom",
+                     "--lock-wait-timeout=10s"], log, stdout=output, timeout=300)
+            output.flush()
+            os.fsync(output.fileno())
+        private_file(archive, MAX_ARCHIVE_BYTES)
+        with archive.open("rb") as source:
+            command(["docker", "exec", "-i", container, "pg_restore", "--list"], log,
+                    stdin=source, stdout=log, timeout=60)
+        with create_file(roles) as output:
+            command(["docker", "exec", container, "pg_dumpall", "-U", "hris_migrator", "-l", "hris",
+                     "--roles-only", "--no-role-passwords"], log, stdout=output, timeout=60)
+            output.flush()
+            os.fsync(output.fileno())
+        private_file(roles, MAX_ROLES_BYTES)
+        restored_role_sql(roles)
+        archive.rename(directory / "database.dump")
+        roles.rename(directory / "roles.sql")
+        manifest = {
+            "format": 1, "createdAt": datetime.now(timezone.utc).isoformat(),
+            "database": "hris", "bootstrapRole": "hris_migrator", "postgresImage": image,
+            "observedSchema": schema,
+            "files": {name: file_record(directory / name) for name in ("database.dump", "roles.sql")},
+            "rolePasswordsIncluded": False, "externalSecretsIncluded": False, "objectStorageIncluded": False,
+        }
+        write_json(directory / "manifest.json", manifest)
+        return manifest
+    finally:
+        archive.unlink(missing_ok=True)
+        roles.unlink(missing_ok=True)
 
 def load_backup(directory):
     directory = private_directory(directory)
@@ -268,18 +278,22 @@ def inspect_restored_database(container, log):
     }
 
 
+def restore_database_container(container, directory, log):
+    command(["docker", "exec", "-i", container, "psql", "-X", "-U", "hris_migrator",
+             "-d", "hris", "-v", "ON_ERROR_STOP=1"], log,
+            input=restored_role_sql(directory / "roles.sql").encode(), stdout=log)
+    with (directory / "database.dump").open("rb") as source:
+        command(["docker", "exec", "-i", container, "pg_restore", "-U", "hris_migrator", "-d", "hris",
+                 "--single-transaction", "--exit-on-error"], log, stdin=source, stdout=log, timeout=300)
+
+
 def verify_backup(directory, *, migrate=False):
     directory, manifest = load_backup(directory)
     run_name = "verification-" + uuid.uuid4().hex
     with create_file(directory / (run_name + ".log")) as log:
         with recovery_database(directory, manifest["postgresImage"], log) as fixture:
             container, network, run_id, resources, flyway_env = fixture
-            command(["docker", "exec", "-i", container, "psql", "-X", "-U", "hris_migrator",
-                     "-d", "hris", "-v", "ON_ERROR_STOP=1"], log,
-                    input=restored_role_sql(directory / "roles.sql").encode(), stdout=log)
-            with (directory / "database.dump").open("rb") as source:
-                command(["docker", "exec", "-i", container, "pg_restore", "-U", "hris_migrator", "-d", "hris",
-                         "--single-transaction", "--exit-on-error"], log, stdin=source, stdout=log, timeout=300)
+            restore_database_container(container, directory, log)
             before = inspect_restored_database(container, log)
             after = before
             if migrate:

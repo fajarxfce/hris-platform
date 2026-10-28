@@ -10,6 +10,19 @@ Screens: settings, flags, integration status, audit explorer, job monitor.
 
 Acceptance: policy effective dates, restricted settings/audit access, safe retry, stale client policy, secret redaction, and recovery from backup.
 
+## Backup and recovery
+
+[Recovery sets](../recovery-set.md) capture the quiesced Compose database, Garage
+metadata/content and a separate private key pack. Success requires isolated
+restoration, exact object inventory and decryption of retained identity records
+with their original purposes; no application process runs against restored data.
+The real fictional API/worker/PostgreSQL/Garage exercise passed schema 97, two
+encrypted records under old/current keys and 104 objects (2,098,795 bytes), including
+multi-page and multi-block storage. It rejected a wrong retired key and proved
+independence from later source changes. All owned temporary resources were removed.
+This supplies recovery verification; live cutover, RPO/RTO, reference workload and
+deployment-specific provider credentials remain separate operational work.
+
 ## Integration configuration
 
 Global platform administrators can review six API startup enablement flags through

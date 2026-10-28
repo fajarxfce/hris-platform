@@ -93,6 +93,11 @@ database login secrets, external-provider configuration and private object bytes
 need their own protected backup. The utility deliberately does not copy `.env`,
 Firebase credentials or Garage data.
 
+For the configured single-node Garage deployment, [recovery sets](recovery-set.md)
+coordinate this database backup with stopped metadata/content and a separate key
+pack. Their isolated verifier checks every object and decrypts retained identity
+envelopes with the actual application cipher before acknowledging the checkpoint.
+
 Before upgrading, build and validate the application artifacts, retain the old
 images, rehearse migrations against a backup, drain the application roles, and
 take a final checkpoint. Apply migrations before starting the new API and worker.

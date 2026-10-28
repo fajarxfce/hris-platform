@@ -70,6 +70,20 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Report-specific export layouts and source capture
+
+Seven summary builders now retain the report definitions, distinct totals, exact
+units and explicit bucket identities. Three detail layouts capture leave, expense
+and closing rows through the live readers' shared SQL projections in one source
+snapshot. Exact open-header checks and SQL row/byte/validity gates prevent wrong
+captures and truncated output. All 99 reporting and 41 selected server/PostgreSQL
+tests passed, including four new source cases proving retained results through
+withdrawal, resubmission, draft edits and successive closing corrections. The worker's
+six-case context and both packaging tasks remained up to date; its imported graph
+is unchanged. Architecture and formatting passed, and containers were disposed.
+Queue admission/execution, private artifacts, download/expiry and export history
+remain open. See [source contracts and evidence](report-exports.md#report-layouts-and-source-capture).
+
 ### Retained report snapshots
 
 V95 now protects owned snapshot headers and immutable, numbered rows. Unsealed

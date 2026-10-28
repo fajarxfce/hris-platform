@@ -41,12 +41,12 @@ fun ReportSnapshotCapture.toSnapshotHeader(json: ObjectMapper): ReportSnapshotHe
     )
 }
 
-fun ReportSnapshotHeaderRow.toReportSnapshot(
+fun ReportSnapshotHeaderRow.toReportSnapshotCapture(
     company: UUID,
     account: UUID,
     snapshotId: UUID,
     json: ObjectMapper,
-): ReportSnapshot {
+): ReportSnapshotCapture {
     require(companyId == company && accountId == account && id == snapshotId)
     require(definition.length <= 32768 && columns.length <= 16384)
     val d = json.readTree(definition)
@@ -116,6 +116,16 @@ fun ReportSnapshotHeaderRow.toReportSnapshot(
         )
     val validated = validateReportSnapshotCapture(capture)
     require(validated is Result.Success && validated.value == capture)
+    return validated.value
+}
+
+fun ReportSnapshotHeaderRow.toReportSnapshot(
+    company: UUID,
+    account: UUID,
+    snapshotId: UUID,
+    json: ObjectMapper,
+): ReportSnapshot {
+    val capture = toReportSnapshotCapture(company, account, snapshotId, json)
     require(
         rows != null &&
             rows in 0..REPORT_SNAPSHOT_MAX_ROWS &&
@@ -123,7 +133,7 @@ fun ReportSnapshotHeaderRow.toReportSnapshot(
             storedBytes in 0..REPORT_SNAPSHOT_MAX_BYTES
     )
     require((rows == 0) == (storedBytes == 0L))
-    return ReportSnapshot(validated.value, rows, storedBytes)
+    return ReportSnapshot(capture, rows, storedBytes)
 }
 
 /** Numeric strings retain exact values independently of JSON parser floating-point settings. */

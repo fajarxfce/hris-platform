@@ -113,6 +113,50 @@ identity and deadline remain after the rows are retired. Scheduling that cleanup
 current-authorized content delivery and export history still belong to the full
 workflow. These byte/row contracts do not establish measured process-memory targets.
 
+## Report layouts and source capture
+
+The server owns the ordered columns for seven summary datasets and three detail
+datasets. Capture rejects a different column list, definition or format version.
+Every row retains the definition version, evaluation instant and selected date or
+month window; monetary layouts identify IDR. Instants use UTC with six fractional
+second digits. Counts and exact decimal quantities remain separate CSV cell types.
+Summary rows explicitly identify `TOTAL`, `COMPANY`, `DAY`, `STATUS` or `MONTH`.
+
+| Dataset | Retained summary | Detail rows |
+| --- | --- | --- |
+| Headcount | Distinct global person count and exactly the selected company buckets | Unsupported |
+| Attendance exceptions | Coherent total and date counts | Unsupported |
+| Leave | Status counts, exact half-day units and decimal days | Submitted requests with window and whole-request quantities |
+| Overtime | Selected status, clipped month boundaries and requested/actual/approved minutes | Unsupported |
+| Expenses | Current status counts and latest submitted amounts | Latest submission identity, frozen labels/title, window and whole-submission amounts |
+| Payroll costs | Published month counts and exact signed monetary totals | Unsupported |
+| Attendance closings | Publication references, original facts and latest corrections | Employment-month rows with exact closing and selected adjustment references |
+
+Headcount conversion preserves the aggregate's distinct global person count rather
+than summing company counts. The transaction's anchor is not implicitly added to an
+explicit company selection. An empty published closing retains its publication
+identity in the summary; an unpublished month has no closing reference. Detail rows
+represent qualifying employments only. Summary builders return detached, bounded
+rows and validate them with the existing typed CSV encoder.
+
+Leave, expense and closing capture share named SQL fragments with their live report
+readers. Each detail capture inserts from one SQL source snapshot; it does not read
+successive live pages or materialize all rows in the JVM. Leave and expense rows
+order by descending submission instant and UUID; closings order by month and
+employment UUID. The capture retains current status and labels at acquisition,
+frozen source facts and selected revision references. Later operational changes do
+not rewrite those rows. Future hires, partial closings and unsent replacement drafts
+follow the existing report definitions.
+
+The caller must own source authorization and the begin/capture/seal transaction.
+Before acquisition, the repository verifies the exact open header, owner, selection,
+layout and deadline. SQL examines at most the row limit plus one output candidate
+and admits no rows if the count, stored JSON bytes or source validity fails. A
+failed Result must roll back the transaction, including its new header. Sealing
+still validates the immutable store's sequence and quotas. The database may need
+to scan/aggregate/sort additional source records; these output bounds are not a
+measured query-memory or workload guarantee.
+
 ## Validation and remaining delivery
 
 Validation passed 80 reporting tests (35 domain, 43 data, two delivery) and 26
@@ -152,7 +196,23 @@ Both applications packaged successfully; architecture and formatting passed. Ini
 runs found a Jackson `map` overload compile error and a connection-failure fixture
 missing its SQLState; both were corrected without changing shared failure semantics.
 
-Report-specific snapshot acquisition, request admission, private artifact publication,
+The report-specific layouts and capture subsequently passed all 99 reporting tests
+(44 domain, 53 data, two delivery) and 41 selected server/PostgreSQL cases. Six new
+pure-domain cases cover all ten layouts, exact source units, group distinct persons,
+selected companies, signed money, clipped overtime months, publication references
+and detached bounded output. Four repository cases cover exact open-header matching,
+date/byte limits, failed or partial acquisition and preserved cancellation/error
+classification. Four new runtime/PostgreSQL cases exercise all three detail sources,
+empty captures, half-day and decimal rendering, SQL overflow without prefix insertion,
+rollback, future-hire exclusion and retained rows after withdrawal, draft changes,
+resubmission and successive attendance corrections. Existing live readers and all
+eleven retained-storage integration cases remain green. The six-case worker context
+and both application packaging tasks remained up to date; Reporting's worker import
+graph did not change. Architecture and formatting checks passed, and fixture containers
+were disposed. Initial runs corrected only new-test syntax, required fixture values
+and an inherited helper-name conflict before the integration run passed.
+
+Request admission, private artifact publication,
 fenced worker execution, interruption recovery, scheduled expiry/cleanup, authorized
 downloads and export
 history/dashboard remain to be implemented and validated. No export endpoint or worker

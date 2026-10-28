@@ -144,3 +144,12 @@ Across focused runs, 89 reporting, 24 database, 48 server/PostgreSQL and 82 work
 tests passed with packaging and architecture/format checks. Report-specific capture,
 queued execution, artifacts, authorized downloads and export history remain open.
 See [snapshot storage and validation](../report-exports.md#retained-snapshots).
+
+Known layouts now cover all seven summaries and the three existing detail datasets.
+Pure summary conversion retains global distinct persons and exact units; detail
+capture shares source SQL with live readers and admits a complete bounded snapshot
+in one query. Validation passed 99 reporting and 41 server/PostgreSQL cases; the
+six-case worker context and both packages remained up to date. Architecture and
+formatting passed. Queued execution, private artifacts, authorized downloads,
+scheduled retention and export history remain open. See
+[report-specific capture](../report-exports.md#report-layouts-and-source-capture).

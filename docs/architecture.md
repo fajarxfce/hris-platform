@@ -526,8 +526,11 @@ Stored byte lengths bound each returned page to one MiB and 500 rows; consumers
 advance by the actual prefix. Numeric strings preserve decimal values and scale
 independently of JSON number settings. Expired rows retire in scoped, bounded batches
 while the original metadata identity remains. This storage boundary supplies no
-report authority or live-page snapshot isolation. Report-specific acquisition,
-queued execution, artifact delivery and global cleanup remain separate work; see
+report authority. Known server-owned schemas and pure summary conversion retain
+metric definitions and exact units. Detail capture shares named SQL projections
+with live reports and inserts from one coherent source query; overflow admits no
+partial prefix. The caller owns begin/capture/seal and source authorization. Queued
+execution, artifact delivery and global cleanup remain separate work; see
 [retained report snapshots](report-exports.md#retained-snapshots).
 
 Interactive job reads and cancellation use the pure company-session policy to intersect original/live authority and check current MFA after waiting. Their domain details contain the resulting available actions; delivery only serializes them and cannot restore a permission from the originally resolved actor. This interactive policy is separate from background execution authority.

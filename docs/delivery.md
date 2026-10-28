@@ -5,6 +5,28 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+[Worker integration reports](integrations.md#running-worker-observations) now
+publish actual worker-bound SMTP/FCM/storage/scanner flags and first/last database
+timestamps. One lifecycle-owned 30-second reporter uses a transactional registry
+guard, five-minute expiry and a 64-process capacity bound. V98 limits writes to
+the worker role and keeps identity/first publication/flags immutable. Reads require
+original/current global authority, credentials and pre/post-acquisition MFA.
+The dashboard shows recent/stale/absent observations with independent request
+ownership and explicit refresh. Recency is less than 90 seconds at the displayed
+database observation time; it does not prove other worker loops or provider health.
+
+Validation passed 183 backend tests (8 domain, 8 data, 73 selected API and all 94
+worker cases), both JARs, architecture/formatting and 20 recovery/6 deployment/16
+workload tool tests. The dashboard passed all 3,940 tests across 342 files,
+architecture, Biome and strict TypeScript. Six focused Chromium cases passed,
+plus real API/PostgreSQL/worker acceptance in 41.2 seconds (1.2 minutes with setup):
+advancing actual publications, bound flags, a separate seeded stale row, company-
+only denial and independent-account revocation. Screenshots were inspected and
+owned fixtures removed. The full recovery-set exercise passed again at schema 98,
+including 104 objects/2,098,795 bytes, two retained envelopes, source independence
+and wrong-retired-key rejection. Logs and corrected initial failures are recorded
+in [integrations](integrations.md#validation) and [agent handoff](agent-handoff.md).
+
 [Deployment and cutover](deployment.md) now has a concrete procedure and a private
 release-record template: retained artifacts, exact project/overlays, HTTPS, secret
 custody, target-sized restore rehearsal, final stopped checkpoint, controlled
@@ -20,8 +42,9 @@ Runtime/provider checks remain explicitly false. Six tool regressions passed,
 as did actual rendering of base/documents/documents-plus-push files with fictional
 values. The root `deploymentToolCheck`, sixteen workload regressions, architecture
 and formatting passed in 22 seconds. Log: `.work/deployment-review-checks.log`.
-The dashboard/API contract and application graphs are unchanged; actual running
-worker/provider health remains subsequent work.
+That increment did not change the dashboard/API contract or application graphs;
+the subsequent worker publication capability is recorded above. Provider health
+remains separate acceptance work.
 
 The [full-signature document workload](workload.md#document-upload-inspection-and-download)
 passed the real API/worker/PostgreSQL/Garage/ClamAV pipeline: two distinct 100-MiB

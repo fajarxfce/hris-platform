@@ -260,6 +260,30 @@ class WorkerConfiguration {
         }
 
     @Bean
+    fun integrationObservationTimers() =
+        org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler().apply {
+            poolSize = 1
+            setThreadNamePrefix("hris-integration-observation-")
+            setRemoveOnCancelPolicy(true)
+            setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
+            setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
+            setWaitForTasksToCompleteOnShutdown(false)
+            setAwaitTerminationSeconds(15)
+        }
+
+    @Bean
+    @ConditionalOnProperty(
+        name = ["hris.worker.enabled"],
+        havingValue = "true",
+        matchIfMissing = true,
+    )
+    fun integrationObservationWorker(
+        publish: dev.fajar.hris.administration.domain.usecases.PublishWorkerIntegrationObservation,
+        @org.springframework.beans.factory.annotation.Qualifier("integrationObservationTimers")
+        timer: org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler,
+    ) = dev.fajar.hris.worker.integrations.WorkerIntegrationReporter(publish, timer)
+
+    @Bean
     @ConditionalOnProperty(
         name = ["hris.worker.enabled"],
         havingValue = "true",

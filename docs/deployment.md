@@ -222,9 +222,16 @@ recipients before doing so within the approved window:
 "${hris_compose[@]}" up -d --no-deps worker
 ```
 
-The worker has no HTTP server/actuator endpoint. Check stable process startup,
-restricted worker DB access, lack of restart/OOM loops and actual approved job
-progress/lease completion. Inspect bounded private logs without publishing account
+The worker has no HTTP server/actuator endpoint. An authorized global administrator
+can review actual process publications at `/platform/integrations` or
+`GET /api/v1/administration/integrations/workers`. Refresh to observe advancing
+database timestamps and the worker's bound SMTP/FCM/storage/scanner flags. Reports
+are recent for less than 90 seconds; stopped workers age and subsequent workers
+prune reports older than five minutes. Absence, stale reports or failed reads do
+not pass startup acceptance. See the [bounded observation contract](integrations.md).
+Check stable process startup, restricted worker DB access, lack of restart/OOM
+loops and actual approved job progress/lease completion. A recent reporter cannot
+prove those other worker activities or provider delivery. Inspect bounded private logs without publishing account
 or provider data. Startup flags only identify configured adapters. Real SMTP/FCM
 delivery, Google identity exchange and device/APNs acceptance require their own
 authorized recipients/devices; do not fabricate success from public Firebase config

@@ -39,7 +39,7 @@ passed. This adds a concrete procedure and static review, not live worker health
 provider delivery, target-specific cutover authorization or measured RPO/RTO.
 
 [Database/content/key recovery sets](recovery-set.md) now pass an isolated real
-API/worker/PostgreSQL/Garage exercise at schema 97: 104 objects (2,098,795 bytes),
+API/worker/PostgreSQL/Garage exercise, repeated at schema 98: 104 objects (2,098,795 bytes),
 two retained encrypted records using old/current keys, and a second restore after
 source storage changes. An incorrect retired key fails even with recomputed
 manifest metadata. Twenty recovery-tool tests, the existing 21 database-tool tests,
@@ -53,8 +53,13 @@ protect both the endpoint and the localized dashboard; company-only administrati
 is insufficient. Backend checks passed 184 tests including the full worker graph;
 all 3,922 dashboard tests and seventeen distinct Chromium cases passed across runs.
 Real API/PostgreSQL/browser acceptance verified three independent MFA accounts
-through permission revocation and removal of the old observation. Worker runtime
-configuration and provider health/delivery remain separate operational work. See
+through permission revocation and removal of the old observation. Actual worker
+reports now add four immutable bound flags and database publication times, with
+90-second recency, five-minute pruning and a 64-process bound. A later increment
+passed 183 backend tests including the full 94-test worker graph, all 3,940 dashboard
+tests, six focused browser cases and real worker/browser acceptance. The latter
+observed advancing publications and independent-account revocation; all fixtures
+were removed. These reports do not prove provider health/delivery or every job loop. See
 [integration configuration](integrations.md).
 
 Report export commands, owned history/status, authorized CSV Range/ETag downloads

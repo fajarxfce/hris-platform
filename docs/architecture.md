@@ -26,6 +26,16 @@ the repository query or domain entities.
 
 JDK 21, Spring Boot 4.1, Kotlin 2.3, Spring MVC, PostgreSQL 18, Flyway, and jOOQ. Gradle conventions own toolchain and quality configuration; the version catalog owns versions. jOOQ is generated from migrations against PostgreSQL. OpenAPI is reviewed and validated in CI.
 
+Administration owns a bounded ephemeral worker-integration registry. Each worker
+adapter owns one identity and a cancellable fixed-delay reporter; its use case
+coordinates immutable bound flags and registry repositories in a transaction.
+The global registry guard serializes capacity, expiry and publication using
+database time. V98 restricts mutations to the worker role and preserves immutable
+startup flags. The interactive read is a separate global-authority/MFA use case,
+with one bounded statement snapshot and safe acquisition/mapping. The dashboard
+owns per-account observations without persistent caching or background polling.
+These reports prove publication, not provider/job health. See [integrations](integrations.md).
+
 ## Transactions and failures
 
 Domain Result carries typed failures with stable codes, field codes, and safe unlocalized parameters. HTTP adapters expose one RFC 9457 problem contract; client applications own translation and retry decisions. Stateless safeDatabaseCall and storage/SDK-specific boundaries map technical exceptions once, preserve interruption/cancellation, and do not retry. False/null outcomes have operation-specific semantics.

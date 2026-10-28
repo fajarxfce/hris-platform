@@ -4,10 +4,12 @@ import dev.fajar.hris.administration.data.datasources.*
 import dev.fajar.hris.administration.data.repositories.ConfiguredIntegrationRepository
 import dev.fajar.hris.administration.data.repositories.StoredAuditRepository
 import dev.fajar.hris.administration.data.repositories.StoredCompanyClientPolicyRepository
+import dev.fajar.hris.administration.data.repositories.StoredWorkerIntegrationRepository
 import dev.fajar.hris.administration.domain.entities.IntegrationKind
 import dev.fajar.hris.administration.domain.repositories.AuditRepository
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.administration.domain.repositories.IntegrationConfigurationRepository
+import dev.fajar.hris.administration.domain.repositories.WorkerIntegrationRepository
 import dev.fajar.hris.administration.domain.usecases.*
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
@@ -45,6 +47,31 @@ class AdministrationConfiguration {
         security: IdentitySecurityPolicy,
         clock: Clock,
     ) = GetIntegrationConfiguration(configuration, identities, transactions, security, clock)
+
+    @Bean
+    fun workerIntegrationSource(sql: DSLContext): WorkerIntegrationDataSource =
+        PostgresWorkerIntegrationDataSource(sql)
+
+    @Bean
+    fun workerIntegrations(source: WorkerIntegrationDataSource): WorkerIntegrationRepository =
+        StoredWorkerIntegrationRepository(source)
+
+    @Bean
+    fun publishWorkerIntegrationObservation(
+        configuration: IntegrationConfigurationRepository,
+        registry: WorkerIntegrationRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = PublishWorkerIntegrationObservation(configuration, registry, transactions, clock)
+
+    @Bean
+    fun getWorkerIntegrationRegistry(
+        registry: WorkerIntegrationRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetWorkerIntegrationRegistry(registry, identities, transactions, security, clock)
 
     @Bean fun auditSource(sql: DSLContext): AuditDataSource = PostgresAuditDataSource(sql)
 

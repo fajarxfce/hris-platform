@@ -11,11 +11,11 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
-| `hris-platform` | `feat/firebase-auth` | Deployment review/runbook below; document workload `ed7a760e`, payroll/handoff `1af02465` |
+| `hris-platform` | `feat/firebase-auth` | Worker reports below; deployment runbook `d765f155`, document workload `ed7a760e` |
 | `hris-mobile` | `feat/native-push` | `60456c48` — Android URL/inbox archival acceptance |
 | `compose-fluent-starter` | `fix/push-token-lifecycle` | `a16325ef` — existing validated foundation |
 
-The current increment contains the static deployment reviewer and cutover runbook.
+The current increment contains actual worker reports and schema-98 acceptance.
 Inspect `git status`, `git log` and
 the upstream before continuing. Mobile and Starter were clean at this update.
 
@@ -34,7 +34,82 @@ from a Git push. Completing an increment does not complete the PRD.
 outside these Git repositories. The tracked documents linked here are the durable
 handoff; a fresh clone must not depend on those local files or previous chat history.
 
-## Current checkpoint: deployment review and cutover runbook
+## Current checkpoint: running worker reports and schema-98 recovery
+
+[Integration reports](integrations.md#running-worker-observations) now show four
+actual worker-bound flags (SMTP/FCM/storage/scanner), process UUID and first/last
+database publication times alongside the existing six API flags. The endpoint is
+`GET /api/v1/administration/integrations/workers`; the screen remains
+`/platform/integrations`. The worker reporter publishes every 30 seconds, owns its
+timer and stops/joins it on shutdown. Its use case serializes pruning/publication
+with a registry transaction guard, retains reports for five minutes and caps normal
+admission at 64 processes. V98 permits worker-role mutations only, preserves
+startup identity/flags and monotonic timestamps, and adds no encrypted family.
+
+The response distinguishes recent (less than 90 seconds), stale and absence at one
+database observation time. Future timestamps are stale; if all workers stop,
+their reports remain until later publication can prune them. These reports prove
+reporter/database publication, not provider delivery or every job loop. Original
+and current global `identity.manage`, credentials and pre/post-acquisition MFA
+guard reads. The localized browser owns each panel's cancellable request, clears
+old results on refresh and discards hidden/revoked/account-obsolete observations.
+No provider identifiers, paths or secrets enter the registry or responses.
+
+Completed validation:
+
+- 183 backend tests: 8 Administration domain, 8 data, 73 selected API/PostgreSQL/
+  OpenAPI and **all 94 worker tests**, including shared-DI application startup.
+  Both JARs, architecture, formatting and 20 recovery/6 deployment/16 workload
+  tool checks passed in 3m28s. Log: `.work/worker-observation-final-checks.log`.
+- Full dashboard check: **3,940 tests/342 files**, 60.97 seconds, plus architecture,
+  Biome and strict TypeScript. Administration contributes 66 cases. Log:
+  `.work/worker-dashboard-checks-2.log`.
+- Six focused Chromium cases passed (`.work/worker-browser-checks.log`), including
+  recent/stale/absent reports, independent API/worker flags, failed refresh,
+  localization, permissions and dark 390-pixel layout. Screenshots were inspected.
+- Actual API/PostgreSQL/worker/Chromium acceptance passed in 41.2 seconds (1.2m
+  including setup). It observed advancing **real** worker publications, bound
+  mail/push flags, a separately seeded stale process, company-only denial and
+  independent MFA operator revocation. Refresh removed the old view and returned
+  to sign-in. The seeded stale row does not claim an actual worker-stop experiment.
+  Log: `.work/worker-real-browser-checks.log`; image `.work/worker-reports-real.png`.
+- Full recovery-set exercise passed again at **schema 98**: 104 objects/2,098,795
+  bytes, two encrypted records, old/current keys, source independence and wrong-
+  retired-key rejection. Log: `.work/worker-recovery-set-checks.log`.
+
+Initial attempts found a missing Swagger annotation dependency, an untyped SQL
+timestamp parameter and a Jackson test-iteration mistake; the final matrix passes
+after their correction. Dashboard lint first encountered ignored `.work` native
+fixtures; those local files were formatted, and new non-null-assertion warnings
+were removed. Existing two stylesheet warnings and Vite chunk advisory remain.
+All owned browser/recovery containers, networks, volumes, private fixture data
+and connection files were removed. No acceptance fixture is active at this update.
+
+Reproduce the relevant acceptance after a warranted change (JDK/Docker environment
+below):
+
+```sh
+./gradlew --no-daemon :modules:administration:domain:test :modules:administration:data:test \
+  :apps:worker:test :apps:server:test --tests '*WorkerIntegrationHttpTest' \
+  --tests '*IntegrationConfigurationHttpTest' --tests '*ApiContractHttpTest' \
+  :apps:server:bootJar :apps:worker:bootJar architectureCheck formatCheck \
+  recoverySetCheck deploymentToolCheck workloadToolCheck
+python3 tool/check_recovery_set.py
+cd apps/dashboard
+npm run check
+npx playwright test tests/integration-configuration.spec.ts
+npx playwright test --config playwright.worker-integration.config.ts \
+  integration-worker/worker-integrations.spec.ts
+```
+
+Next: reconcile remaining module acceptance against the PRD and continue the
+independent missing workflows. Running reporter status is implemented; safe
+provider-health observations and real FCM/Google/iOS/device delivery retain their
+own contracts and missing inputs listed below. Do not mark the overall PRD done
+from these counts. No live deployment occurred or is authorized by a Git push.
+This HRIS administration capability requires no Mobile/Starter foundation port.
+
+## Previous checkpoint: deployment review and cutover runbook — `d765f155`
 
 [Deployment](deployment.md) now provides the release/maintenance/checkpoint/
 migration/startup/rollback procedure, with a [private record template](deployment-record.md).
@@ -59,9 +134,9 @@ tests, architecture and formatting passed in 22 seconds. Log:
 `.work/deployment-review-checks.log`. Static rendering starts no service and contacts
 no provider. No application graph or dashboard/API response changed.
 
-Next: implement/verify running worker integration status and provider health under
-an explicit bounded observation contract; the static tool cannot substitute for
-that. Continue remaining native/provider acceptance and reconcile module criteria.
+The subsequent running-worker observation contract is recorded above; the static
+tool cannot substitute for it. Continue remaining provider/native acceptance and
+reconcile module criteria.
 Live deployment still requires the actual target, maintained HTTPS origin,
 credential custody, reviewed checkpoint/window and explicit release instruction.
 Do independent implementation/acceptance work before requesting missing inputs.
@@ -213,7 +288,8 @@ hosted CI success is claimed for these branch pushes.
 
 Logs: `.work/recovery-set-integration-final.log`, `.work/recovery-final-checks.log`,
 `.work/recovery-key-verifier.log`. The schema ceiling in `tool/recovery_set.py` is
-deliberately 97: review new persisted encryption contracts before raising it.
+now 98 after the repeat exercise recorded above. V98 adds no encrypted record
+family; review new persisted encryption contracts before raising the ceiling again.
 
 ### Native acceptance and integrations
 

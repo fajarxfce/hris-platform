@@ -25,7 +25,8 @@ FILES = {"metadata.tar": MAX_METADATA, "content.tar": MAX_CONTENT,
 KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncActive", "syncKeys",
               "rpcSecret", "accessKey", "secretKey", "bucket"}
 # Review this bound when new migrations add another persisted encryption contract.
-MAX_SCHEMA = 97
+# V98 adds only ephemeral worker flags/timestamps; no new encrypted payload family.
+MAX_SCHEMA = 98
 ENVELOPES_SQL = """COPY (
 SELECT * FROM (
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope

@@ -7,12 +7,16 @@ import type { PlatformAccess } from "../../../identity/domain/entities/platform-
 import { canReadIntegrationConfiguration } from "../../domain/policies/integration-configuration-policy";
 import type { AdministrationUseCases } from "../contracts/administration-use-cases";
 import { IntegrationConfigurationController } from "../controllers/integration-configuration-controller";
+import { WorkerIntegrationsController } from "../controllers/worker-integrations-controller";
 import { integrationConfigurationView } from "../models/integration-configuration-view";
+import { workerIntegrationsView } from "../models/worker-integrations-view";
 import { IntegrationConfigurationPage } from "../pages/integration-configuration-page";
+import { WorkerIntegrationsPanel } from "../pages/worker-integrations-panel";
 
 export function IntegrationConfigurationScreen(props: {
   access: PlatformAccess;
   load: AdministrationUseCases["loadIntegrationConfiguration"];
+  loadWorkers: AdministrationUseCases["loadWorkerIntegrations"];
   locale: Locale;
 }) {
   const visible = useContext(WorkspaceVisibilityContext);
@@ -35,27 +39,60 @@ export function IntegrationConfigurationScreen(props: {
     controller.getSnapshot,
     controller.getSnapshot,
   );
+  const workers = useMemo(
+    () => new WorkerIntegrationsController(props.loadWorkers, access),
+    [props.loadWorkers, access],
+  );
+  const workerState = useSyncExternalStore(
+    workers.subscribe,
+    workers.getSnapshot,
+    workers.getSnapshot,
+  );
   useEffect(() => {
     if (visible) controller.activate();
     else controller.deactivate();
-    return controller.deactivate;
-  }, [controller, visible]);
+    if (visible && permitted) workers.activate();
+    else workers.deactivate();
+    return () => {
+      controller.deactivate();
+      workers.deactivate();
+    };
+  }, [controller, workers, visible, permitted]);
   useWorkspaceRevalidation(state.failure);
+  useWorkspaceRevalidation(workerState.failure);
   const revalidate = useContext(WorkspaceSessionContext)?.revalidate;
   useEffect(() => {
-    if (permitted && state.failure?.code === "platform_administrator_required") revalidate?.();
-  }, [state.failure, permitted, revalidate]);
+    if (
+      permitted &&
+      (state.failure?.code === "platform_administrator_required" ||
+        workerState.failure?.code === "platform_administrator_required")
+    )
+      revalidate?.();
+  }, [state.failure, workerState.failure, permitted, revalidate]);
   const view = useMemo(
     () => (state.review ? integrationConfigurationView(state.review, props.locale) : null),
     [state.review, props.locale],
   );
+  const workerView = useMemo(
+    () => (workerState.review ? workerIntegrationsView(workerState.review, props.locale) : null),
+    [workerState.review, props.locale],
+  );
+  const refresh = () => {
+    void controller.refresh();
+    if (permitted) void workers.refresh();
+  };
   return (
-    <IntegrationConfigurationPage
-      state={state}
-      view={view}
-      locale={props.locale}
-      visible={visible}
-      onRefresh={controller.refresh}
-    />
+    <>
+      <IntegrationConfigurationPage
+        state={state}
+        view={view}
+        locale={props.locale}
+        visible={visible}
+        onRefresh={refresh}
+      />
+      {permitted && (
+        <WorkerIntegrationsPanel state={workerState} view={workerView} locale={props.locale} />
+      )}
+    </>
   );
 }

@@ -583,6 +583,7 @@ export function PortalRoutes({
         <IntegrationConfigurationScreen
           access={platformAccess}
           load={administration.loadIntegrationConfiguration}
+          loadWorkers={administration.loadWorkerIntegrations}
           locale={locale}
         />
       </Suspense>

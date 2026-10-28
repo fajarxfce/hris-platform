@@ -1,10 +1,11 @@
-# Integration configuration review
+# Integration configuration and worker reports
 
 Platform administrators can review the API's startup enablement flags at
 `/platform/integrations`. The view works without a company assignment. Its fixed
 six-row catalogue identifies which API integrations were enabled when the process
-started; connection health, worker configuration and successful provider delivery
-require separate verification. Changing deployment settings requires the normal
+started. A separate worker table shows reports from actual worker processes;
+connection health and successful provider delivery require separate verification.
+Changing deployment settings requires the normal
 application restart/review procedure; this screen is read-only.
 
 | Integration | Startup flag |
@@ -38,6 +39,46 @@ admission reacquires the configuration. There is no polling timer or persistent
 configuration cache. The view uses English/Indonesian copy and the shared portal
 header/resource table, with a UTC observation time and narrow-screen layout.
 
+## Running worker observations
+
+`GET /api/v1/administration/integrations/workers` returns a database observation
+time and at most 64 process reports. Each report contains a random process UUID,
+first/last publication times, `RECENT`/`STALE` status and exactly four startup flags:
+`MAIL`, `PUSH`, `STORAGE` and `DOCUMENT_SCANNER`. The flags come from the worker's
+actual bound JVM configuration; they are not inferred from the API or Compose.
+No hostname, PID, provider address/identifier, credential path or secret is stored
+or returned. In particular, worker FCM can be enabled while API FCM is disabled.
+
+Each enabled worker owns one process identity and a fixed-delay 30-second
+publication task. A global advisory transaction guard serializes pruning and
+publication. The use case uses database time, retains reports for five minutes,
+and refuses a new process when 64 unexpired reports already exist. Only the worker
+database capability can insert/update/delete observations. First publication,
+identity and flags are immutable; later publication advances only the timestamp.
+Failed publication rolls back pruning. Shutdown cancels and joins the owned timer
+and leaves the last report to age. A new process has a new identity.
+
+A report is recent only when its last publication is no later than the observed
+database time and less than 90 seconds old. Exactly 90 seconds, or a future-dated
+publication, is stale. Reports older than five minutes are pruned on subsequent
+worker publication; if all workers stop, their stale rows remain visible. An empty
+registry means no retained report, not successful worker health. This observation
+proves that the reporter could publish through its restricted database connection;
+it does not prove every worker loop, queue, provider connection or delivery works.
+
+The read endpoint retains the same original/current global authority, account
+guard, credentials and pre/post-acquisition MFA checks as configuration review.
+Acquisition and mapping share one safe database boundary. The query returns one
+bounded statement snapshot; inconsistent/oversized rows fail instead of becoming
+an empty or healthy result. No provider I/O occurs during a dashboard review.
+
+The worker panel owns its request independently of the API panel. Refresh clears
+old reports, hides/disposal cancel requests, and account/admission changes discard
+late results. Failures remain distinct from absence. English/Indonesian copy
+states that status applies at the displayed UTC observation time and asks the
+operator to refresh for a new observation. There is no background browser timer
+or persistent health cache. The narrow table scrolls within its card.
+
 ## Operator review of API and worker wiring
 
 The [deployment runbook](deployment.md#https-secrets-and-service-wiring) includes
@@ -48,12 +89,46 @@ SMTP, FCM, storage and scanning; Firebase/OIDC request handlers belong to the AP
 API/worker FCM flags may intentionally differ with `compose.push.yml`.
 
 This is an operator's static review of the selected deployment files. It does not
-change the dashboard response, inspect live JVM property binding or check provider/
-worker health. Six redaction/bounds/configuration regressions and actual rendering
+inspect live JVM property binding or check provider/worker health. The running
+reports above supply their own distinct observations. Six redaction/bounds/configuration regressions and actual rendering
 of the base, documents and documents-plus-push files passed with fictional values.
-Running worker status and real provider acceptance remain separate work.
+Real provider acceptance remains separate work.
 
 ## Validation
+
+The worker-report increment passed 183 backend tests: eight Administration domain,
+eight Administration data, 73 selected API/PostgreSQL/OpenAPI and the complete
+94-test worker graph. Cases cover restricted-role writes, immutable flags,
+competing capacity admission, rollback after pruning, database-time expiry,
+90-second/future-time classification, shutdown during blocked publication,
+minimal projections, company-only denial, revocation while waiting, MFA expiry,
+cancellation and explicit recovery. Both JARs, architecture, formatting and the
+20 recovery, six deployment and sixteen workload tool tests passed in 3m28s.
+
+The complete dashboard check passed 3,940 tests across 342 files (60.97 seconds),
+including 66 Administration cases, plus architecture, Biome and strict TypeScript.
+Six focused Chromium cases passed, including worker/API flag differences,
+recent/stale/absent reports, failed refresh, localization and a dark 390-pixel
+layout. A separate real API/PostgreSQL/worker/browser scenario passed in 41.2
+seconds (1.2 minutes with setup). It observed two actual worker publications,
+verified bound mail/push flags, displayed a separately seeded stale process,
+denied a company administrator, and revoked the reviewer's global authority using
+an independent MFA account. Refresh removed the revoked observation and returned
+to sign-in. The stale fixture row does not claim an actual process-stop test.
+Screenshots were inspected; all owned fixture services and connection files were
+removed. No external provider was contacted by that acceptance workflow.
+
+The schema-98 recovery exercise also passed: 104 objects/2,098,795 bytes, two
+encrypted records, old/current keys, source independence and wrong-retired-key
+rejection. Owned resources were removed. Logs are
+`.work/worker-observation-final-checks.log`, `.work/worker-dashboard-checks-2.log`,
+`.work/worker-browser-checks.log`, `.work/worker-real-browser-checks.log` and
+`.work/worker-recovery-set-checks.log`. Initial checks found missing Swagger
+annotations, an untyped timestamp SQL parameter, a Jackson test-iteration mistake
+and formatting in ignored native fixture files; these were corrected before the
+passing runs. The existing two stylesheet warnings and Vite size advisory remain.
+
+### Earlier API configuration increment
 
 Backend checks passed 184 tests: seven Administration domain, five Administration
 data, 82 selected API/PostgreSQL/OpenAPI and the entire 90-test worker graph.

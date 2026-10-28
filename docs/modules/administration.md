@@ -31,7 +31,7 @@ acceptance requirements.
 metadata/content and a separate private key pack. Success requires isolated
 restoration, exact object inventory and decryption of retained identity records
 with their original purposes; no application process runs against restored data.
-The real fictional API/worker/PostgreSQL/Garage exercise passed schema 97, two
+The real fictional API/worker/PostgreSQL/Garage exercise passed again at schema 98, two
 encrypted records under old/current keys and 104 objects (2,098,795 bytes), including
 multi-page and multi-block storage. It rejected a wrong retired key and proved
 independence from later source changes. All owned temporary resources were removed.
@@ -45,10 +45,16 @@ the public configuration endpoint and `/platform/integrations`, including withou
 a company assignment. Original/current authority, credentials and MFA protect the
 read; the projection acquires no provider identifiers or secrets. Refresh, revoked
 access and hidden/disposed workspaces discard old observations. The localized view
-identifies API configuration explicitly; provider health, worker configuration and
-successful delivery still require separate verification. Backend checks passed 184
-tests including the full worker graph; focused dashboard/browser and independent
-MFA API acceptance passed. See [configuration contract and evidence](../integrations.md).
+identifies API configuration explicitly. Actual worker publications now expose
+four immutable startup flags, first/last database timestamps and bounded recency
+under the same global authority. A 30-second owned reporter serializes pruning
+and publication, retains reports for five minutes and caps admission at 64 process
+identities. Shutdown leaves the last observation to age; the browser displays
+status at the stated observation time. Provider health and successful delivery
+still require separate verification. The latest increment passed 183 backend
+tests including all 94 worker cases, 3,940 dashboard tests, six focused Chromium
+cases and real API/PostgreSQL/worker/browser acceptance through advancing reports
+and independent-account revocation. See [configuration contract and evidence](../integrations.md).
 
 The [deployment runbook](../deployment.md) and private release-record template now
 cover target preparation, ingress drain, verified database/content/key checkpoints,

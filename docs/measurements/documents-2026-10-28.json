@@ -1,0 +1,266 @@
+{
+  "format": 1,
+  "scenario": "document-upload-inspection-download",
+  "files": 2,
+  "bytesPerFile": 104857600,
+  "offeredConcurrentUploads": 2,
+  "offeredConcurrentDownloads": 4,
+  "pollIntervalSeconds": 0.5,
+  "uploadSeconds": 7.809,
+  "validationSeconds": 9.376,
+  "downloadSeconds": 3.841,
+  "uploadChunkMilliseconds": {
+    "count": 200,
+    "p50": 63.795,
+    "p95": 109.809,
+    "p99": 412.756,
+    "max": 701.401
+  },
+  "downloads": [
+    {
+      "seconds": 3.788581,
+      "bytes": 104857600
+    },
+    {
+      "seconds": 3.814174,
+      "bytes": 104857600
+    },
+    {
+      "seconds": 3.840441,
+      "bytes": 104857600
+    },
+    {
+      "seconds": 3.800688,
+      "bytes": 104857600
+    }
+  ],
+  "results": [
+    {
+      "size": 104857600,
+      "sha256": "9bb4d75a22f60200520df8e05c5be1b86b80b86eddc63a644daedc6ad766a8e3",
+      "status": "READY",
+      "failureCode": null,
+      "validationSeconds": 9.362
+    },
+    {
+      "size": 104857600,
+      "sha256": "52636ce9af8ae74e5ef9ac2ef53021e421cfa37478a84ebab98cd9d33c294777",
+      "status": "READY",
+      "failureCode": null,
+      "validationSeconds": 9.376
+    }
+  ],
+  "antivirusTest": {
+    "status": "REJECTED",
+    "failureCode": "document_unsafe",
+    "validationSeconds": 2.119
+  },
+  "behaviorPassed": true,
+  "resourceContractPassed": true,
+  "database": {
+    "revisions": 3,
+    "ready": 2,
+    "unsafe": 1,
+    "matchingReadyBytes": 209715200,
+    "scannerVersions": 1,
+    "published": 2,
+    "audit": 3,
+    "successfulJobs": 3,
+    "chunks": 201,
+    "distinctChunkDigests": 201
+  },
+  "before": {
+    "database": {
+      "image": "sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+      "cpuSet": "0,1,2,3",
+      "memoryLimit": 6442450944,
+      "running": true,
+      "oomKilled": false,
+      "cgroup": {
+        "memory.current": "232108032",
+        "memory.peak": "237072384",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cpu.stat": "usage_usec 4064690\nuser_usec 1656112\nsystem_usec 2408577\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      }
+    },
+    "updater": {
+      "image": "sha256:a01a78acf14e356f9d95c0eeb640ac9fa48a98a59933dea877f5a4d01573a0eb",
+      "cpuSet": "0,1,2,3",
+      "memoryLimit": 2147483648,
+      "running": true,
+      "oomKilled": false,
+      "cgroup": {
+        "memory.current": "117030912",
+        "memory.peak": "706240512",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cpu.stat": "usage_usec 8064765\nuser_usec 6908884\nsystem_usec 1155880\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      }
+    },
+    "scanner": {
+      "image": "sha256:a01a78acf14e356f9d95c0eeb640ac9fa48a98a59933dea877f5a4d01573a0eb",
+      "cpuSet": "0,1,2,3",
+      "memoryLimit": 3221225472,
+      "running": true,
+      "oomKilled": false,
+      "cgroup": {
+        "memory.current": "994680832",
+        "memory.peak": "1008443392",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cpu.stat": "usage_usec 8437091\nuser_usec 7890910\nsystem_usec 546181\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      }
+    },
+    "garage": {
+      "image": "sha256:9c96caa2612d3411acc5b0e6701fb238dbfba33e533a6d7d3d811a4b12d0d020",
+      "cpuSet": "0,1,2,3",
+      "memoryLimit": 1073741824,
+      "running": true,
+      "oomKilled": false,
+      "cgroup": {
+        "memory.current": "6053888",
+        "memory.peak": "13996032",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cpu.stat": "usage_usec 220998\nuser_usec 113996\nsystem_usec 107002\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      }
+    },
+    "api": {
+      "image": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+      "cpuSet": "0,1,2,3",
+      "memoryLimit": 2147483648,
+      "running": true,
+      "oomKilled": false,
+      "cgroup": {
+        "memory.current": "661929984",
+        "memory.peak": "666161152",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cpu.stat": "usage_usec 34138806\nuser_usec 33383283\nsystem_usec 755523\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      }
+    },
+    "worker": {
+      "image": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+      "cpuSet": "0,1,2,3",
+      "memoryLimit": 2147483648,
+      "running": true,
+      "oomKilled": false,
+      "cgroup": {
+        "memory.current": "484913152",
+        "memory.peak": "485257216",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cpu.stat": "usage_usec 19402956\nuser_usec 18910566\nsystem_usec 492389\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      }
+    }
+  },
+  "after": {
+    "database": {
+      "image": "sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+      "cpuSet": "0,1,2,3",
+      "memoryLimit": 6442450944,
+      "running": true,
+      "oomKilled": false,
+      "cgroup": {
+        "memory.current": "251908096",
+        "memory.peak": "252641280",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cpu.stat": "usage_usec 8646137\nuser_usec 3955877\nsystem_usec 4690259\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      }
+    },
+    "updater": {
+      "image": "sha256:a01a78acf14e356f9d95c0eeb640ac9fa48a98a59933dea877f5a4d01573a0eb",
+      "cpuSet": "0,1,2,3",
+      "memoryLimit": 2147483648,
+      "running": true,
+      "oomKilled": false,
+      "cgroup": {
+        "memory.current": "116658176",
+        "memory.peak": "706240512",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cpu.stat": "usage_usec 8185057\nuser_usec 7002188\nsystem_usec 1182868\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      }
+    },
+    "scanner": {
+      "image": "sha256:a01a78acf14e356f9d95c0eeb640ac9fa48a98a59933dea877f5a4d01573a0eb",
+      "cpuSet": "0,1,2,3",
+      "memoryLimit": 3221225472,
+      "running": true,
+      "oomKilled": false,
+      "cgroup": {
+        "memory.current": "994557952",
+        "memory.peak": "1796939776",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cpu.stat": "usage_usec 21057893\nuser_usec 19522503\nsystem_usec 1535389\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      }
+    },
+    "garage": {
+      "image": "sha256:9c96caa2612d3411acc5b0e6701fb238dbfba33e533a6d7d3d811a4b12d0d020",
+      "cpuSet": "0,1,2,3",
+      "memoryLimit": 1073741824,
+      "running": true,
+      "oomKilled": false,
+      "cgroup": {
+        "memory.current": "171999232",
+        "memory.peak": "178978816",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cpu.stat": "usage_usec 7140035\nuser_usec 3950526\nsystem_usec 3189508\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      }
+    },
+    "api": {
+      "image": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+      "cpuSet": "0,1,2,3",
+      "memoryLimit": 2147483648,
+      "running": true,
+      "oomKilled": false,
+      "cgroup": {
+        "memory.current": "986263552",
+        "memory.peak": "1002491904",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cpu.stat": "usage_usec 56759768\nuser_usec 52948802\nsystem_usec 3810965\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      }
+    },
+    "worker": {
+      "image": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+      "cpuSet": "0,1,2,3",
+      "memoryLimit": 2147483648,
+      "running": true,
+      "oomKilled": false,
+      "cgroup": {
+        "memory.current": "638009344",
+        "memory.peak": "643649536",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+        "cpu.stat": "usage_usec 23536341\nuser_usec 22807358\nsystem_usec 728982\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+      }
+    }
+  },
+  "signatures": {
+    "main": {
+      "Build time": "16 Dec 2025 23:18 +0000",
+      "Version": "63",
+      "Signatures": "3287027"
+    },
+    "daily": {
+      "Build time": "28 Oct 2026 06:24 +0000",
+      "Version": "28167",
+      "Signatures": "355829"
+    },
+    "bytecode": {
+      "Build time": "11 Sep 2025 08:29 -0400",
+      "Version": "339",
+      "Signatures": "80"
+    }
+  },
+  "scannerVersion": "ClamAV 1.5.4/28167/Wed Oct 28 06:24:17 2026",
+  "driverCpus": [
+    4,
+    5,
+    6,
+    7
+  ],
+  "kernel": "7.2.10-arch1-1",
+  "sourceCommit": "1af02465e90d9fe3a077bda1574838e8d4fc71be",
+  "serviceConfigurationSha256": {
+    "clamav/clamd.conf": "89a2316b90784f7bf22ccd1e390f28cb874b90ea31cec79d7f28fc81f9f7d304",
+    "clamav/freshclam.conf": "2e7f4f56e893df5940a9ccffd940514030b199bdcd151f29df7ac1da91e3f7ab",
+    "garage/garage.toml": "ffed5591457f2b37749812ea9cb12faacaf59f7e4b13ffd2d9b462743603a652"
+  },
+  "apiJarSha256": "e98a1cae2ba6adb96463a470c85c37af5c5e4ee29e680ea9aff1d931b30eb0b9",
+  "workerJarSha256": "f7fdf285002f3c297ce93e04629e9378b29b283a4f79be6a452a14d4a659f4bc",
+  "temporaryResourcesRemoved": true
+}

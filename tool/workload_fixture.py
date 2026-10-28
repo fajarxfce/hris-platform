@@ -23,21 +23,24 @@ def write_environment(path, values):
 
 
 class WorkloadFixture:
+    database_memory, api_memory, worker_memory, api_heap = "8g", "4g", "4g", "2g"
+
     def __init__(self, directory, log, run_id, cpus):
         self.directory, self.log, self.run_id, self.cpus = directory, log, run_id, cpus
         self.name = "hris-workload-" + run_id
         self.resources, self.containers = [], {}
         self.volume = None
+        self.extra_volumes = []
         self.retain_diagnostics = False
 
     def command(self, args, **kwargs):
         return docker.command(args, self.log, **kwargs)
 
-    def run(self, role, image, arguments=(), *, extra=(), memory):
+    def run(self, role, image, arguments=(), *, extra=(), memory, network=None):
         name = self.name + "-" + role
         self.resources.append(("container", name))
         self.command([
-            "docker", "run", "--detach", "--name", name, "--network", self.name,
+            "docker", "run", "--detach", "--name", name, "--network", network or self.name,
             "--network-alias", role, "--label", docker.LABEL + "=" + self.run_id,
             "--cpuset-cpus", ",".join(map(str, self.cpus)), "--memory", memory,
             "--memory-swap", memory, "--pids-limit=512", "--init",
@@ -67,7 +70,7 @@ class WorkloadFixture:
         })
         self.run("database", "postgres:18.6-alpine",
             ("postgres", "-c", "shared_buffers=2GB", "-c", "work_mem=16MB", "-c", "effective_cache_size=6GB"),
-            memory="8g", extra=(
+            memory=self.database_memory, extra=(
                 "--mount", f"type=volume,source={self.volume},target=/var/lib/postgresql",
                 "--mount", f"type=bind,source={ROOT / 'deploy/postgres/init-runtime.sh'},target=/docker-entrypoint-initdb.d/10-runtime.sh,readonly",
                 "--mount", f"type=bind,source={ROOT / 'deploy/postgres/configure-worker.sh'},target=/docker-entrypoint-initdb.d/20-worker.sh,readonly"))
@@ -89,18 +92,22 @@ class WorkloadFixture:
             "HRIS_STORAGE_ENABLED": "false", "HRIS_MAIL_ENABLED": "false", "HRIS_FCM_ENABLED": "false",
             "HRIS_FIREBASE_AUTH_ENABLED": "false", "HRIS_OIDC_ENABLED": "false", "HRIS_DOCUMENT_SCANNER_ENABLED": "false",
         }
+        common.update(self.service_environment())
         write_environment(self.directory / "api.env", common | {
             "HRIS_MIGRATIONS_ENABLED": "true", "HRIS_MIGRATION_USER": "hris_migrator",
             "HRIS_MIGRATION_PASSWORD": passwords["migration"], "HRIS_BOOTSTRAP_EMAIL": "workload-admin@example.invalid",
             "HRIS_BOOTSTRAP_PASSWORD": self.bootstrap_password, "HRIS_SECURE_COOKIES": "false",
         })
         write_environment(self.directory / "worker.env", common)
-        self.run("api", "eclipse-temurin:21-jre", ("java", "-Xmx2g", "-jar", "/app.jar"), memory="4g",
+        self.run("api", "eclipse-temurin:21-jre", ("java", "-Xmx" + self.api_heap, "-jar", "/app.jar"), memory=self.api_memory,
                  extra=("--mount", f"type=bind,source={ROOT / 'apps/server/build/libs/apps-server.jar'},target=/app.jar,readonly"))
         self.endpoint = container_endpoint(self.containers["api"], self.name, 8080, self.log)
 
+    def service_environment(self):
+        return {}
+
     def start_worker(self):
-        self.run("worker", "eclipse-temurin:21-jre", ("java", "-Xmx1g", "-jar", "/app.jar"), memory="4g",
+        self.run("worker", "eclipse-temurin:21-jre", ("java", "-Xmx1g", "-jar", "/app.jar"), memory=self.worker_memory,
                  extra=("--mount", f"type=bind,source={ROOT / 'apps/worker/build/libs/apps-worker.jar'},target=/app.jar,readonly"))
         deadline = time.monotonic() + 90
         while time.monotonic() < deadline:
@@ -123,31 +130,33 @@ class WorkloadFixture:
         result = {}
         for role, name in self.containers.items():
             info = json.loads(docker.captured(["docker", "inspect", name], self.log))[0]
-            counters = {}
-            for file in ("memory.current", "memory.peak", "memory.events", "cpu.stat"):
-                counters[file] = docker.captured(["docker", "exec", name, "cat", "/sys/fs/cgroup/" + file], self.log)
+            counters = self.cgroup_counters(name, info)
             result[role] = {"image": info["Image"], "cpuSet": info["HostConfig"]["CpusetCpus"],
                             "memoryLimit": info["HostConfig"]["Memory"], "running": info["State"]["Running"],
                             "oomKilled": info["State"]["OOMKilled"], "cgroup": counters}
         return result
 
+    def cgroup_counters(self, name, info):
+        return {file: docker.captured(["docker", "exec", name, "cat", "/sys/fs/cgroup/" + file], self.log)
+                for file in ("memory.current", "memory.peak", "memory.events", "cpu.stat")}
+
     def close(self):
         # Do not remove the volume if any container's removal is unconfirmed.
         docker.cleanup_owned(self.resources, self.run_id, self.log)
-        if self.volume is not None:
-            inspected = self.command(["docker", "volume", "inspect", "--format", '{{index .Labels "' + docker.LABEL + '"}}', self.volume], allow_failure=True)
+        for volume in ([self.volume] if self.volume is not None else []) + self.extra_volumes:
+            inspected = self.command(["docker", "volume", "inspect", "--format", '{{index .Labels "' + docker.LABEL + '"}}', volume], allow_failure=True)
             if inspected.returncode:
-                present = docker.captured(["docker", "volume", "ls", "--filter", "name=" + self.volume, "--format", "{{.Name}}"], self.log)
+                present = docker.captured(["docker", "volume", "ls", "--filter", "name=" + volume, "--format", "{{.Name}}"], self.log)
                 if present:
                     raise RuntimeError("Workload volume removal could not be confirmed")
             elif inspected.stdout.decode().strip() != self.run_id:
                 raise RuntimeError("Refused to remove another run's volume")
             else:
-                self.command(["docker", "volume", "rm", self.volume])
+                self.command(["docker", "volume", "rm", volume])
 
 
 @contextmanager
-def workload_fixture(cpus):
+def workload_fixture(cpus, fixture_type=WorkloadFixture):
     original_affinity = os.sched_getaffinity(0)
     if len(cpus) != 4 or len(set(cpus)) != 4 or not set(cpus) <= original_affinity:
         raise ValueError("Select exactly four available CPUs")
@@ -158,7 +167,7 @@ def workload_fixture(cpus):
     directory = Path(tempfile.mkdtemp(prefix="hris-workload-" + run_id + "-"))
     passed = False
     with docker.create_file(directory / "fixture.log") as log:
-        fixture = WorkloadFixture(directory, log, run_id, cpus)
+        fixture = fixture_type(directory, log, run_id, cpus)
         try:
             fixture.start()
             driver_cpus = original_affinity - set(cpus)

@@ -5,6 +5,26 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+The [full-signature document workload](workload.md#document-upload-inspection-and-download)
+passed the real API/worker/PostgreSQL/Garage/ClamAV pipeline: two distinct 100-MiB
+PDF uploads in 7.809 seconds, observed readiness in 9.376 seconds and four complete
+100-MiB downloads in 3.841 seconds, with matching SHA-256/lengths. EICAR was rejected
+without publication. Independent SQL confirmed 201 distinct committed chunks,
+two published revisions and three successful validation jobs/audits. Official
+main/daily/bytecode synchronization loaded about 3.64 million signatures.
+
+The first run found `MaxScanSize 150M` rejected these PDFs because it also counts
+extracted streams. The revised finite 250-MiB budget passed, retaining per-file,
+time, concurrency and container limits. All six services shared four CPUs and
+16 GiB of memory ceilings; scanner peak was 1,713.70 MiB with no OOM kills. Owned
+containers, networks, volumes and fixture data were removed. Reports retain the
+failed configuration and accepted run separately. Sixteen workload-tool tests,
+architecture/formatting and the existing real service health/clean/EICAR probe
+passed. Logs: `.work/document-workload-100.log`,
+`.work/document-workload-100-revised.log`, `.work/document-workload-checks.log`,
+`.work/document-services-revised.log`. This is the documented PDF/shared-VPS result;
+other corpora, mixed workloads and later signature reloads remain separate.
+
 The [payroll workload](workload.md#payroll-calculation) passed a full 5,000-employee
 January resident/gross calculation on the same constrained real API/worker/PostgreSQL
 fixture. Actual workforce closing and source preparation took 90.753 seconds.

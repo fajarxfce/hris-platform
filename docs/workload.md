@@ -178,12 +178,106 @@ smoke completed calculation in 2.395 seconds. Eleven workload-tool tests now pas
 including failed/partial cohort rejection and exact cent reconciliation at large
 aggregate values. The shared VPS/private HTTP limitations above also apply here.
 
+## Document upload, inspection and download
+
+`python3 tool/measure_documents.py --file-mib 100` exercises the complete document
+path through the actual API, worker, PostgreSQL, Garage and ClamAV. Use the same
+Linux/cgroup-v2/Docker/JDK prerequisites above. A smaller `--file-mib` (1–100) changes
+the workload explicitly. The fixture requires outbound access only for the owned
+FreshClam updater to acquire and verify official main/daily/bytecode databases.
+It stops on provider refusal/cooldown; do not repeatedly rerun against a provider
+that has asked the client to wait. No host port is published. Application services
+use an internal network; the updater uses a separate owned outbound network.
+
+All six services share the selected four CPUs. Memory ceilings total 16 GiB:
+PostgreSQL 6 GiB, API 2 GiB, worker 2 GiB, Garage 1 GiB, scanner 3 GiB and updater
+2 GiB. Both JVM heaps are 1 GiB. PostgreSQL settings otherwise match the earlier
+fixture. Garage metadata/content and antivirus definitions use separate owned
+volumes. Scanner/updater are non-root, read-only and capability-free, using the
+checked-in daemon/update configuration. The scanner retains two threads, four
+queued commands, a 60-second scan budget and 768 MiB temporary filesystem.
+Earlier attendance/payroll fixture defaults are unchanged.
+
+An MFA administrator creates a fictional company/employee and two document
+declarations through the API. The driver generates exact-size PDFs with valid
+cross-references and distinct deterministic uncompressed comment streams. Every
+one-MiB chunk differs within and between the files; the independent database check
+confirms this, preventing repeated-content deduplication from trivializing the
+measurement. These are simple blank-page PDFs, not a representative mixed document
+corpus, encrypted content or deeply nested archives.
+
+The two uploads are offered concurrently through normal one-MiB chunk requests.
+Two public validation admissions invoke the actual worker, storage reader, Tika
+detector and ClamAV; revision status is polled every half second. Once both are
+ready, four full downloads are offered concurrently, two per revision, and all
+400 MiB are read incrementally and matched against source size/SHA-256. Finally,
+the harmless standard EICAR string is uploaded through the same document path;
+the worker must reject it as `document_unsafe` without publishing its revision.
+
+The driver owns only the requested 1–4 transfer tasks and joins them on failure.
+Each upload chunk allows thirty seconds, a download seventy seconds, each transfer
+phase five minutes and validation four minutes. Binary response reads use 64 KiB
+buffers; chunk JSON responses are capped at 2 MiB. No hidden retry occurs. A
+failed or incomplete transfer cannot satisfy acceptance. Independent SQL requires
+two ready/published matching PDFs, one unsafe rejection, three successful validation
+jobs/audits and exactly 201 committed distinct chunk digests in the full scenario.
+The resource contract also requires six running services, the intended CPU/memory
+limits and no OOM kills. The report is written only after owned cleanup succeeds.
+
+### Observed document run — 28 October 2026
+
+The [first report](measurements/documents-2026-10-28-scan-limit.json) found a real
+configuration mismatch: `MaxScanSize 150M` rejected both 100-MiB PDFs with
+`Heuristics.Limits.Exceeded.MaxScanSize`. This scanner budget includes the original
+input and extracted PDF streams. All chunks committed and the worker safely refused
+publication; it did not establish successful file/download acceptance.
+
+The checked-in daemon now uses a finite `MaxScanSize 250M`, providing extraction
+headroom while preserving the 105-MiB per-file/stream limits, time/concurrency limits,
+encrypted/exceeded-limit alerts and 3-GiB scanner ceiling. The
+[second full report](measurements/documents-2026-10-28.json) passed:
+
+| Phase | Observed result |
+| --- | --- |
+| Two 100-MiB uploads | 7.809 seconds; 200 chunk requests, p95 109.809 ms |
+| Validation admission through observed readiness | 9.376 seconds; both `READY` |
+| Four 100-MiB downloads | 3.841 seconds; all four size/SHA-256 checks passed |
+| EICAR validation | 2.119 seconds; `REJECTED` / `document_unsafe` |
+| Database checks | 201 distinct committed chunks, two publications, three audits/jobs |
+
+FreshClam acquired and verified main 63 (3,287,027 signatures), daily 28167
+(355,829 signatures, built 28 October 2026) and bytecode 339 (80 signatures).
+ClamAV reported `1.5.4/28167`. The updater remained running during measurement;
+its peak includes initial download/database verification. This observes initial
+synchronization, not a later twelve-hour update/reload cycle.
+
+| Service | Cgroup peak including setup (MiB) | CPU seconds during file phases |
+| --- | ---: | ---: |
+| PostgreSQL | 240.94 | 4.581 |
+| API | 956.05 | 22.621 |
+| Worker | 613.83 | 4.133 |
+| Garage | 170.69 | 6.919 |
+| Scanner | 1,713.70 | 12.621 |
+| Signature updater | 673.52 | 0.120 |
+
+Peaks are individual cgroup peaks, not a simultaneous combined peak. No service
+was OOM-killed. All owned containers, two networks, four volumes and successful
+private fixture data were removed; the failed-run directory was removed after
+diagnosis. The report records exact image/JAR identities, configuration hashes,
+source commit and cgroup counters. The actual APIs/JARs required no source change.
+The fixture configuration and tools belong to the increment retaining this report.
+
+Sixteen workload-tool regressions passed, including distinct PDF chunks/valid
+offsets, truncated or changed downloads, deadlines despite progress, cancellation
+with joined siblings and lost signature-volume creation. The service configuration
+check also retains its separate minimal-signature health/clean/EICAR exercise.
+
 ## Acceptance limits
 
 A CPU set and memory ceilings constrain this local experiment. A shared VPS still
 has different CPU contention, storage, network/TLS costs and kernel/cache behavior
 from a dedicated reference deployment. Record those differences when interpreting
-results. These measurements cover the documented attendance and payroll-calculation
-scenarios. Full-signature document inspection/upload memory, other payroll mixes,
-phone/network latency and general capacity across HRIS modules require their own
-observed runs.
+results. These measurements cover the documented attendance, payroll calculation
+and full-signature document scenarios separately. Mixed simultaneous workloads,
+other payroll/document corpora, phone/network latency, later signature reloads and
+general capacity across HRIS modules require their own observed runs.

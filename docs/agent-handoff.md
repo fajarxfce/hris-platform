@@ -11,11 +11,11 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
-| `hris-platform` | `feat/firebase-auth` | Payroll measurement/handoff below; previous attendance baseline `51c4b1b3` |
+| `hris-platform` | `feat/firebase-auth` | Document workload/scan-budget correction below; previous payroll/handoff `1af02465` |
 | `hris-mobile` | `feat/native-push` | `60456c48` — Android URL/inbox archival acceptance |
 | `compose-fluent-starter` | `fix/push-token-lifecycle` | `a16325ef` — existing validated foundation |
 
-The current commit contains the payroll probe, accepted report and handoff.
+The current increment contains the document probe, scan-budget correction and accepted report.
 Inspect `git status`, `git log` and
 the upstream before continuing. Mobile and Starter were clean at this update.
 
@@ -34,7 +34,59 @@ from a Git push. Completing an increment does not complete the PRD.
 outside these Git repositories. The tracked documents linked here are the durable
 handoff; a fresh clone must not depend on those local files or previous chat history.
 
-## Current checkpoint: payroll workload passed
+## Current checkpoint: full-signature document workload passed
+
+[measure_documents.py](../tool/measure_documents.py) owns the complete real
+API/worker/PostgreSQL/Garage/ClamAV/updater pipeline through
+[document_workload_fixture.py](../tool/document_workload_fixture.py). It extends
+the existing fixture without changing attendance/payroll defaults. The separate
+[bounded transfer/PDF tool](../tool/document_workload_io.py) generates unique
+uncompressed PDF comment streams, owns 1–4 transfer tasks and checks all downloaded
+bytes. Application JARs needed no source changes; this increment changes the
+checked-in daemon's total scan budget and operational tooling/docs.
+
+The first run correctly refused publication of both 100-MiB PDFs because
+`MaxScanSize 150M` also counts the original input and extracted streams. Scanner
+logs identified `Heuristics.Limits.Exceeded.MaxScanSize`; this was a configuration
+failure, not accepted document performance. The finite budget is now 250 MiB,
+retaining 105-MiB stream/file limits, two scanner threads, a four-command queue,
+60-second scan deadline, encrypted/exceeded-limit alerts, 768-MiB temporary
+filesystem and the 3-GiB scanner ceiling.
+
+The corrected full run passed two distinct 100-MiB uploads (7.809 seconds), two
+ready revisions (9.376 seconds from validation admission), four complete downloads
+(3.841 seconds; all length/SHA-256 checks) and EICAR rejection (2.119 seconds).
+SQL found exactly 201 distinct committed chunks, two publications and three
+successful validation jobs/audits. The updater acquired and verified main 63,
+daily 28167 and bytecode 339: 3,642,936 signatures in total.
+
+All six services shared CPUs 0–3; the driver used 4–7. Memory ceilings totalled
+16 GiB: database/API/worker/Garage/scanner/updater 6/2/2/1/3/2 GiB. Peaks including
+setup were 240.94/956.05/613.83/170.69/1713.70/673.52 MiB respectively, without OOM
+kills. This is still the shared eight-CPU/32-GiB VPS, with private HTTP and the
+specified simple PDF corpus. It does not measure simultaneous attendance/payroll,
+other document corpora or a later scheduled signature update/reload.
+
+Tracked evidence:
+
+- [Accepted report](measurements/documents-2026-10-28.json)
+- [Initial scan-limit failure](measurements/documents-2026-10-28-scan-limit.json)
+- [Workload/limits/commands](workload.md#document-upload-inspection-and-download)
+
+Local logs: `.work/document-workload-100.log`,
+`.work/document-workload-100-revised.log`, `.work/document-workload-checks.log` and
+`.work/document-services-revised.log`. Sixteen workload-tool regressions,
+architecture/formatting and the existing real service configuration/health/clean/
+EICAR probe passed. All owned containers, two networks and four volumes were
+removed after the full run. Its private directory was removed automatically;
+the failed-run directory was removed after diagnosis. No workload is active.
+
+Next: worker integration configuration/health and the deployment/cutover runbook,
+then remaining native/provider acceptance and the module-criteria reconciliation
+below. Update this tracked handoff, completion, delivery and the relevant contract
+with each observed result; commit and push each atomic increment.
+
+## Previous checkpoint: payroll workload passed
 
 The executable probe is in [measure_payroll.py](../tool/measure_payroll.py), with
 fictional source preparation in [payroll_workload_data.py](../tool/payroll_workload_data.py).
@@ -85,19 +137,6 @@ It measures calculation admission/worker completion. Human review, finalization,
 publication, payments, annual reconciliation and other compensation mixes remain
 outside that measurement. The probe never submits bank instructions or contacts
 external providers.
-
-Next actions:
-
-1. Continue with the actual file/scanner workload and full signature/data memory.
-   Existing `tool/check_document_services.py` validates service behavior with a
-   minimal owned signature database; it does not supply the full workload result.
-2. Continue worker integration configuration/health and the deployment/cutover
-   runbook, followed by the remaining native/provider acceptance below.
-3. For any new exercise, distinguish measured success from setup failures. Inspect
-   relevant private diagnostics, fix the actual boundary/fixture, verify cleanup
-   and retain only sanitized evidence in Git.
-4. Update [workload](workload.md), [delivery](delivery.md), [completion](completion.md)
-   and this handoff with the next observed result. Commit and push each increment.
 
 ## Completed in the latest work
 
@@ -173,8 +212,9 @@ Platform contracts/evidence are linked from [completion](completion.md).
 Use the product/module contracts as the acceptance baseline; this is a continuation
 order, not a claim that every module criterion has been exhaustively audited.
 
-1. Measure the actual file/scanner workload, including full signature/data memory, and retain the
-   distinction between this VPS experiment and a dedicated reference deployment.
+1. The documented attendance/payroll/file workloads now have observed local results.
+   Retain the distinction between these separate VPS experiments and a dedicated
+   reference deployment; mixed workloads and other corpora remain unmeasured.
 2. Worker integration configuration/health evidence and the complete deployment/
    cutover runbook remain. API startup flags do not prove worker configuration or
    provider delivery; isolated recovery does not establish a live cutover/RPO/RTO.
@@ -211,7 +251,7 @@ existing Docker group, for example:
 sudo -n runuser -u fajar -g docker -- env \
   JAVA_HOME=/usr/lib/jvm/java-21-openjdk \
   PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin:/bin \
-  python3 tool/measure_payroll.py --employees 5000
+  python3 tool/measure_documents.py --file-mib 100
 ```
 
 Only rerun after confirming the preceding workload has stopped. Both JARs must

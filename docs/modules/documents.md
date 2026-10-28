@@ -104,6 +104,15 @@ Configure the daemon for at least the document limit (`StreamMaxLength 105M`, `M
 
 References: [ClamAV releases](https://github.com/Cisco-Talos/clamav/releases), [ClamAV Docker configuration](https://github.com/Cisco-Talos/clamav-docker/blob/main/clamav/README-alpine.md), [clamd protocol](https://docs.clamav.net/manual/Usage/Scanning.html#clamd), [Apache Tika](https://tika.apache.org/).
 
+The separate [full-signature workload](../workload.md#document-upload-inspection-and-download)
+now covers the real upload/worker/download pipeline with two distinct 100-MiB PDFs,
+four complete checked downloads and EICAR rejection. It found that the original
+150-MiB total scan budget rejected these PDFs after extraction. `MaxScanSize 250M`
+now provides finite extraction headroom while retaining the original file/time/
+concurrency/memory limits. Official signature synchronization and measured cgroup
+peaks are retained with the exact corpus and shared-host limitations. Routine
+minimal-signature tests remain distinct from that observed full measurement.
+
 ## Validation and publication
 
 After every chunk is committed, call `POST /revisions/{revisionId}/validate` with `expectedVersion`, a reason, and an idempotency key. The response is the revision mutation receipt; its status response exposes `validationJobId`. Observe that job through the existing company job API. `GET /revisions/{revisionId}/validation-attempts` returns the bounded, immutable attempt history to authorized document readers.

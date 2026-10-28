@@ -19,8 +19,11 @@ Independent database counts matched the accepted events, audits and sync heads.
 The retained report includes CPU/memory limits, actual cgroup peaks, artifacts and
 the shared-host limitations. The subsequent homogeneous January payroll calculation
 completed all 5,000 results in 85.972 seconds with exact decimal totals and no OOM
-kills. File workloads, other payroll mixes and a dedicated deployment retain their
-own acceptance requirements.
+kills. Full-signature document measurement passed two 100-MiB PDF uploads and
+validations, four checked downloads and EICAR rejection; scanner peak was 1,713.70
+MiB with no OOM kills. Its initial failure corrected the total scan budget to 250
+MiB. Other corpora, mixed workloads and a dedicated deployment retain their own
+acceptance requirements.
 
 ## Backup and recovery
 

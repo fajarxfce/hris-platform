@@ -8,6 +8,8 @@ import unittest
 from unittest.mock import Mock, patch
 
 import measure_attendance as measurement
+import document_workload_io as document_io
+from document_workload_fixture import DocumentWorkloadFixture
 from measure_payroll import payroll_outcome_passes
 from workload_fixture import WorkloadFixture
 
@@ -194,6 +196,85 @@ class FixtureOwnershipTest(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "another run"):
                     fixture.close()
             self.assertEqual(1, fixture.command.call_count)
+
+
+class DocumentWorkloadTest(unittest.TestCase):
+    def test_maximum_chunk_layout_contains_distinct_bytes_and_valid_pdf_offsets(self):
+        import hashlib
+        import re
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "sample.pdf"
+            source = document_io.make_pdf(path, 3 * document_io.MIB, "owned")
+            content = path.read_bytes()
+            self.assertEqual(3 * document_io.MIB, len(content))
+            self.assertEqual(hashlib.sha256(content).hexdigest(), source["sha256"])
+            self.assertEqual(3, len(set(source["chunkDigests"])))
+            xref = int(re.search(rb"startxref\n(\d+)", content)[1])
+            self.assertTrue(content[xref:].startswith(b"xref\n0 5\n"))
+            for number, entry in enumerate(content[xref:].splitlines()[3:7], 1):
+                self.assertTrue(content[int(entry[:10]):].startswith(f"{number} 0 obj\n".encode()))
+            length = int(re.search(rb"/Length (\d+)", content)[1])
+            start = content.index(b"stream\n") + len(b"stream\n")
+            self.assertTrue(content[start + length:].startswith(b"\nendstream\n"))
+            other = document_io.make_pdf(Path(root) / "other.pdf", 3 * document_io.MIB, "other")
+            self.assertFalse(set(source["chunkDigests"]) & set(other["chunkDigests"]))
+
+    def test_truncated_or_changed_download_fails_and_closes_its_resources(self):
+        import hashlib
+        for payload in (b"short", b"different"):
+            response = Mock(status=200)
+            response.getheader.return_value = "9"
+            response.read1.side_effect = [payload, b""]
+            with patch.object(document_io.http.client, "HTTPConnection") as constructor:
+                connection = constructor.return_value
+                connection.getresponse.return_value = response
+                with self.assertRaisesRegex(measurement.WorkloadError, "did not match"):
+                    document_io.transfer("http://127.0.0.1:1", "/owned", "private", threading.Event(),
+                        expected_size=9, expected_digest=hashlib.sha256(b"expected!").hexdigest())
+                response.close.assert_called_once()
+                connection.close.assert_called_once()
+                self.assertEqual(1, connection.request.call_count)
+
+    def test_download_progress_cannot_extend_the_total_deadline(self):
+        response = Mock(status=200)
+        response.getheader.return_value = "9"
+        response.read1.return_value = b"x"
+        with patch.object(document_io.http.client, "HTTPConnection") as constructor, \
+                patch.object(document_io.time, "monotonic", side_effect=[0, 10, 71]):
+            connection = constructor.return_value
+            connection.getresponse.return_value = response
+            with self.assertRaisesRegex(measurement.WorkloadError, "deadline"):
+                document_io.transfer("http://127.0.0.1:1", "/owned", "private", threading.Event(), expected_size=9)
+            self.assertEqual(1, response.read1.call_count)
+            response.close.assert_called_once()
+            connection.close.assert_called_once()
+
+    def test_transfer_failure_joins_cancelled_sibling(self):
+        entered, ended = threading.Event(), threading.Event()
+
+        def perform(number, stop):
+            if number == 0:
+                self.assertTrue(entered.wait(3))
+                raise RuntimeError("injected transfer failure")
+            entered.set()
+            self.assertTrue(stop.wait(3))
+            ended.set()
+
+        with self.assertRaisesRegex(RuntimeError, "injected"):
+            document_io.parallel_transfers([0, 1], perform)
+        self.assertTrue(ended.is_set())
+
+    def test_lost_signature_volume_creation_remains_owned_for_cleanup(self):
+        with tempfile.TemporaryDirectory() as root:
+            fixture = DocumentWorkloadFixture(Path(root), io.BytesIO(), "b" * 32, [0, 1, 2, 3])
+            fixture.command = Mock(side_effect=RuntimeError("lost creation response"))
+            with self.assertRaisesRegex(RuntimeError, "lost"):
+                fixture.volume_for("signatures")
+            self.assertEqual([fixture.name + "-signatures"], fixture.extra_volumes)
+            fixture.command = Mock(return_value=subprocess.CompletedProcess([], 0, (fixture.run_id + "\n").encode()))
+            with patch("workload_fixture.docker.cleanup_owned"):
+                fixture.close()
+            self.assertEqual(["docker", "volume", "rm", fixture.extra_volumes[0]], fixture.command.call_args.args[0])
 
 
 if __name__ == "__main__":

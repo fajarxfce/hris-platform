@@ -9,6 +9,10 @@ import {
   attendanceAdjustmentReviewPath,
 } from "../models/attendance-adjustment-route";
 import {
+  type AttendanceClosingOrigin,
+  attendanceClosingOrigin,
+} from "../models/attendance-closing-origin";
+import {
   workPeriodEmployeePath,
   workPeriodPath,
   workPeriodsPath,
@@ -34,6 +38,7 @@ export function WorkPeriodSnapshotScreen(props: WorkforceScreenProps) {
     <WorkPeriodSnapshotBinding
       key={`${props.accountId}:${props.access.companyId}:${month}:${employeeId}`}
       {...props}
+      origin={attendanceClosingOrigin(parameters, props.access.companyId, month)}
       month={month}
       employee={employeeId}
     />
@@ -41,7 +46,11 @@ export function WorkPeriodSnapshotScreen(props: WorkforceScreenProps) {
 }
 
 function WorkPeriodSnapshotBinding(
-  props: WorkforceScreenProps & { month: string; employee: string },
+  props: WorkforceScreenProps & {
+    month: string;
+    employee: string;
+    origin: AttendanceClosingOrigin | null;
+  },
 ) {
   const navigate = useNavigate();
   const state = useWorkPeriodSnapshot(
@@ -61,6 +70,7 @@ function WorkPeriodSnapshotBinding(
       state={state}
       view={view}
       locale={props.locale}
+      reportTo={props.origin?.to ?? null}
       companyName={props.companyName}
       adjustmentsTo={
         state.snapshot?.adjustmentsSupported

@@ -1,3 +1,5 @@
+import type { LoadAttendanceClosingEmployees } from "../../domain/usecases/load-attendance-closing-employees";
+import type { LoadAttendanceClosingReport } from "../../domain/usecases/load-attendance-closing-report";
 import type { LoadAttendanceExceptionReport } from "../../domain/usecases/load-attendance-exception-report";
 import type { LoadExpenseReport } from "../../domain/usecases/load-expense-report";
 import type { LoadExpenseReportClaims } from "../../domain/usecases/load-expense-report-claims";
@@ -8,6 +10,8 @@ import type { LoadOvertimeReport } from "../../domain/usecases/load-overtime-rep
 import type { LoadPayrollCostReport } from "../../domain/usecases/load-payroll-cost-report";
 
 export type ReportingUseCases = Readonly<{
+  loadAttendanceClosings: Pick<LoadAttendanceClosingReport, "execute">;
+  loadAttendanceClosingEmployees: Pick<LoadAttendanceClosingEmployees, "execute">;
   loadPayrollCosts: Pick<LoadPayrollCostReport, "execute">;
   loadExpenses: Pick<LoadExpenseReport, "execute">;
   loadExpenseClaims: Pick<LoadExpenseReportClaims, "execute">;

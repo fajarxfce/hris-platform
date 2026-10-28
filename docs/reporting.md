@@ -529,7 +529,7 @@ were inspected; actions remain in the first table column and overflow stays insi
 the table. Existing CSS-specificity and Vite chunk warnings remain. This does not
 claim a performance benchmark or deployment.
 Local logs: `.work/payroll-cost-dashboard-{check,browser,browser-final,integration}.log`.
-Historical closing reports, saved filters and exports remain separate open work.
+Historical attendance closing acceptance is recorded below; saved filters and exports remain open.
 
 ## Historical attendance closings
 
@@ -624,7 +624,7 @@ increment changes no Workforce implementation. OpenAPI has 357 paths and 2,066,0
 bytes. Logs: `.work/attendance-closing-unit.log`,
 `.work/attendance-closing-api-final.log`, `.work/attendance-closing-api-followup.log`
 and `.work/attendance-closing-api-confirmed.log`. No workload benchmark or deployment
-was performed. Dashboard and export acceptance remain open; the matching employee API is recorded below.
+was performed. The matching employee API and subsequent dashboard acceptance are recorded below. Exports remain open.
 
 ### Employee closing drill-down
 
@@ -671,7 +671,7 @@ projection, cancellation/recovery and concurrent publication/corrections. Initia
 compilation exposed the missing People domain dependency; both Reporting domain
 and data dependencies now declare it. OpenAPI has 358 paths and 2,072,345 bytes.
 Logs: `.work/attendance-closing-employees-unit.log` and
-`.work/attendance-closing-employees-api.log`. Dashboard and export acceptance remain
+`.work/attendance-closing-employees-api.log`. Subsequent dashboard acceptance is recorded below; exports remain
 open; no workload benchmark or deployment was performed.
 
 A follow-up real-workflow review found that the closing worker also retains
@@ -689,6 +689,66 @@ imports of domain query types; those ports now accept raw month/cursor arguments
 The architecture check was rerun separately after the fix. See
 `.work/attendance-closing-cohort-api.log` and
 `.work/attendance-closing-cohort-check.log`.
+
+### Attendance closing dashboard
+
+`/reports/attendance-closings` selects one to twelve company-bound months and
+shows published-month, employment-month, distinct-employment and adjusted-month
+counts. A compact comparison table keeps original and latest-corrected facts
+alongside their frozen calendar/planned-minute totals. Complete month rows expose
+publication state and a matching employee action; unclosed and published empty
+months remain distinct. The initial window is the company-local year to date.
+Applying filters updates the URL; changing company resets the window.
+
+`/reports/attendance-closings/employees` reads fifty historical employee rows at a
+time with a company/month continuation. Each row shows original/current minutes
+and absence, plus the selected revision. Opening a row navigates to its exact
+immutable attendance adjustment, or the original closing if no adjustment exists.
+Validated return context retains the report's window, month and employee page
+through the selected revision and its original closing, including an unavailable
+snapshot. Existing history and correction actions retain their own Workforce
+navigation; this report return context covers the selected read and original view.
+
+Both read controllers own cancellation and discard obsolete success/failure after
+replacement or disposal. Refresh and denial clear prior counts. DTO/repository
+mapping validates company/window/version, complete months, bounded integers,
+count reconciliation, original/current relations, frozen closing references,
+revision time, UUID ordering and scoped continuation before freezing results.
+No report cache or polling is introduced. Source/report grants are required before
+I/O and for navigation; server authorization remains independent. Raw datasources
+accept month/cursor values rather than importing domain query types.
+
+All 3,835 dashboard tests in 330 files, architecture/Biome/TypeScript checks and
+production build passed. Twenty-two distinct Chromium cases passed: the four new
+report cases, eleven existing closing cases and seven adjustment cases. The final
+four-case run passed in 8.5 seconds after narrowing the comparison table so both
+numeric columns fit a 390px viewport. Cases cover applied filters, company reset,
+source denial, failure/retry, exact-revision/original return navigation and a
+fifty-row continuation surviving an unavailable snapshot. English/light and
+Indonesian/dark layouts were inspected.
+
+The real API/PostgreSQL/worker closing workflow passed in 42.6 seconds including
+fixture startup (18.5 seconds for the test). It checks zero before publication,
+failed verification and receipt recovery, later successful closing, future-hire
+exclusion, two corrections with the first receipt retained, and original/latest
+fact reconciliation. Independent MFA-enrolled account 85 holds only company,
+workforce and report read grants. Its report selects revision two, excludes the
+future hire's worker snapshot, reconciles thirty calendar days, and opens the
+selected/original snapshots before returning to the same report window. Recorded
+absence changes from one to two while original accepted minutes stay 450. The
+fixture releases its reader, API/worker processes and PostgreSQL container.
+
+An initial acceptance fixture had a malformed tuple list and an optional base URL;
+compilation caught both before browser execution and both were corrected. Logs:
+`.work/attendance-closing-dashboard-check.log`,
+`.work/attendance-closing-dashboard-browser.log`,
+`.work/attendance-closing-dashboard-browser-final.log`,
+`.work/attendance-closing-dashboard-integration.log` and
+`.work/attendance-closing-dashboard-final-check.log`. Screenshots:
+`.work/attendance-closing-report-real.png` and
+`.work/attendance-closing-report-mobile.png`. Existing CSS/bundle warnings remain;
+no workload benchmark or deployment is claimed. Catalogue/saved filters and
+bounded exports/history remain open.
 
 ## Validation
 

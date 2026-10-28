@@ -4,11 +4,17 @@ import { createAdminCompany } from "../integration/fixtures/admin-company";
 import type { WorkPeriodOverviewDto } from "../src/features/workforce/data/models/work-period-overview-dto";
 import type { WorkPeriodSnapshotDto } from "../src/features/workforce/data/models/work-period-snapshot-dto";
 import { exerciseAttendanceAdjustments } from "./fixtures/attendance-adjustment-workflow";
+import {
+  exerciseClosingReport,
+  readClosingReport,
+} from "./fixtures/attendance-closing-report-workflow";
 
 test("closing reviews offline evidence, replays original receipts and publishes immutable employee results", async ({
   page,
   context,
   request,
+  browser,
+  baseURL,
 }) => {
   test.setTimeout(180_000);
   const { company, csrf } = await createAdminCompany(
@@ -172,6 +178,7 @@ test("closing reviews offline evidence, replays original receipts and publishes 
     ).status(),
   ).toBe(200);
 
+  expect((await readClosingReport(page, company, month)).totals.closedMonths).toBe(0);
   const writes: { operation: string; body: object }[] = [];
   let lose = true;
   await page.route(`**${base}/workforce/periods/${month}/close`, async (route) => {
@@ -307,6 +314,13 @@ test("closing reviews offline evidence, replays original receipts and publishes 
       await request.get(`${base}/workforce/periods/${month}/employees`, { headers: nativeHeaders })
     ).status(),
   ).toBe(403);
+  const reportBeforeAdjustments = await readClosingReport(page, company, month);
+  expect(reportBeforeAdjustments.totals).toMatchObject({
+    employmentMonths: 1,
+    days: before.days.length,
+    adjustedEmploymentMonths: 0,
+  });
+  expect(reportBeforeAdjustments.totals.original).toEqual(reportBeforeAdjustments.totals.current);
   await exerciseAttendanceAdjustments({
     page,
     admin: context,
@@ -316,6 +330,16 @@ test("closing reviews offline evidence, replays original receipts and publishes 
     workDate: monthEnd,
     original: before,
     nativeHeaders,
+    headers,
+  });
+  await exerciseClosingReport({
+    browser,
+    baseURL,
+    admin: context,
+    company,
+    employee,
+    month,
+    original: before,
     headers,
   });
 });

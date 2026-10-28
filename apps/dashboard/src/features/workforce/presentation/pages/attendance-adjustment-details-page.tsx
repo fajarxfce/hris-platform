@@ -18,6 +18,7 @@ export function AttendanceAdjustmentDetailsPage(props: {
   properties: readonly { label: string; value: string }[];
   locale: Locale;
   companyName: string;
+  reportTo?: string | null;
   backTo: string;
   originalTo: string;
 }) {
@@ -28,7 +29,12 @@ export function AttendanceAdjustmentDetailsPage(props: {
       <AppPageHeader
         title={text.details}
         context={`${props.companyName} / ${state.details?.snapshot.employee.legalName ?? text.title}`}
-        actions={<Link to={props.backTo}>{text.backHistory}</Link>}
+        actions={
+          <>
+            {props.reportTo && <Link to={props.reportTo}>{text.backReport}</Link>}
+            <Link to={props.backTo}>{text.backHistory}</Link>
+          </>
+        }
       />
       <div className="app-command-bar">
         <Link to={props.originalTo}>{text.original}</Link>

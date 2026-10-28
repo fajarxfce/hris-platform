@@ -84,3 +84,12 @@ Original/current counts reconcile with the aggregate while retained revisions st
 readable. Validation passed 61 reporting and 83 API/PostgreSQL/OpenAPI cases, plus
 architecture, formatting and API packaging. Dashboard and exports remain open. See
 [employee closing drill-down](../reporting.md#employee-closing-drill-down).
+
+Historical attendance closings now have dashboard and exact-revision drill-down
+acceptance. Applied month/company filters, complete publication state, original and
+latest-corrected comparisons, and bounded employee pages retain their report return
+context through the selected and original snapshots. Validation passed 3,835
+dashboard tests, twenty-two distinct Chromium cases and a real API/PostgreSQL/worker
+workflow with an independent MFA reader, failed/retried closing, future-hire
+exclusion and successive corrections. Catalogue/saved filters and exports remain
+open. See [closing dashboard evidence](../reporting.md#attendance-closing-dashboard).

@@ -19,6 +19,7 @@ export function WorkPeriodSnapshotPage(props: {
   view: ReturnType<typeof workPeriodSnapshotView> | null;
   locale: Locale;
   companyName: string;
+  reportTo?: string | null;
   backTo: string | null;
   adjustmentsTo: string | null;
   onReviewDay: ((date: string) => void) | null;
@@ -32,6 +33,9 @@ export function WorkPeriodSnapshotPage(props: {
         context={props.companyName}
         actions={
           <>
+            {props.reportTo && (
+              <Link to={props.reportTo}>{attendanceAdjustmentMessages(locale).backReport}</Link>
+            )}
             {props.backTo && <Link to={props.backTo}>{text.back}</Link>}
             {props.adjustmentsTo && (
               <Link to={props.adjustmentsTo}>{attendanceAdjustmentMessages(locale).history}</Link>

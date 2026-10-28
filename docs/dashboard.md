@@ -806,6 +806,17 @@ The isolated API/PostgreSQL workflow verifies these boundaries with an enrolled
 test administrator, lost committed responses, CSRF rejection, unrelated accounts,
 retained device and browser access, and replacement of the dashboard account.
 
+## Historical attendance closing reports
+
+Historical attendance closings now have dashboard and exact-revision drill-down
+acceptance. Applied month/company filters, complete publication state, original and
+latest-corrected comparisons, and bounded employee pages retain their report return
+context through the selected and original snapshots. Validation passed 3,835
+dashboard tests, twenty-two distinct Chromium cases and a real API/PostgreSQL/worker
+workflow with an independent MFA reader, failed/retried closing, future-hire
+exclusion and successive corrections. Catalogue/saved filters and exports remain
+open. See [closing dashboard evidence](reporting.md#attendance-closing-dashboard).
+
 ## Published payroll costs
 
 `/reports/payroll-costs` filters up to twelve earnings months and shows published

@@ -9,6 +9,11 @@ import {
   attendanceAdjustmentPath,
 } from "../models/attendance-adjustment-route";
 import { attendanceAdjustmentSummaryView } from "../models/attendance-adjustment-view";
+import {
+  type AttendanceClosingOrigin,
+  attendanceClosingOrigin,
+  withAttendanceClosingOrigin,
+} from "../models/attendance-closing-origin";
 import { workPeriodEmployeePath, workPeriodsPath } from "../models/work-period-route";
 import { workPeriodSnapshotView } from "../models/work-period-view";
 import { AttendanceAdjustmentDetailsPage } from "../pages/attendance-adjustment-details-page";
@@ -35,6 +40,7 @@ export function AttendanceAdjustmentDetailsScreen(props: WorkforceScreenProps) {
     <AttendanceAdjustmentDetailsBinding
       key={`${props.accountId}:${props.access.companyId}:${employeeId}:${month}:${adjustmentId}`}
       {...props}
+      origin={attendanceClosingOrigin(parameters, props.access.companyId, month)}
       employee={employeeId}
       month={month}
       id={adjustmentId}
@@ -44,6 +50,7 @@ export function AttendanceAdjustmentDetailsScreen(props: WorkforceScreenProps) {
 }
 function AttendanceAdjustmentDetailsBinding(
   props: WorkforceScreenProps & {
+    origin: AttendanceClosingOrigin | null;
     employee: string;
     month: string;
     id: string;
@@ -82,6 +89,7 @@ function AttendanceAdjustmentDetailsBinding(
       view={view}
       properties={properties}
       locale={props.locale}
+      reportTo={props.origin?.to ?? null}
       companyName={props.companyName}
       backTo={attendanceAdjustmentHistoryPath(
         props.access.companyId,
@@ -89,7 +97,10 @@ function AttendanceAdjustmentDetailsBinding(
         props.employee,
         props.before,
       )}
-      originalTo={workPeriodEmployeePath(props.access.companyId, props.month, props.employee)}
+      originalTo={withAttendanceClosingOrigin(
+        workPeriodEmployeePath(props.access.companyId, props.month, props.employee),
+        props.origin,
+      )}
     />
   );
 }

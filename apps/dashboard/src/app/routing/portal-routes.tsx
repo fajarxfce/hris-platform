@@ -428,6 +428,16 @@ const OvertimeReportScreen = lazy(() =>
     (module) => ({ default: module.OvertimeReportScreen }),
   ),
 );
+const AttendanceClosingReportScreen = lazy(() =>
+  import("../../features/reporting/presentation/bindings/attendance-closing-report-screen").then(
+    (module) => ({ default: module.AttendanceClosingReportScreen }),
+  ),
+);
+const AttendanceClosingEmployeesScreen = lazy(() =>
+  import("../../features/reporting/presentation/bindings/attendance-closing-employees-screen").then(
+    (module) => ({ default: module.AttendanceClosingEmployeesScreen }),
+  ),
+);
 const PayrollCostReportScreen = lazy(() =>
   import("../../features/reporting/presentation/bindings/payroll-cost-report-screen").then(
     (module) => ({ default: module.PayrollCostReportScreen }),
@@ -1869,6 +1879,36 @@ export function PortalRoutes({
               accountId={accountId}
               access={access}
               loadOvertime={reporting.loadOvertime}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/attendance-closings"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <AttendanceClosingReportScreen
+              accountId={accountId}
+              access={access}
+              loadAttendanceClosings={reporting.loadAttendanceClosings}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/attendance-closings/employees"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <AttendanceClosingEmployeesScreen
+              accountId={accountId}
+              access={access}
+              loadAttendanceClosingEmployees={reporting.loadAttendanceClosingEmployees}
               companyName={company.name}
               timezone={company.timezone}
               locale={locale}

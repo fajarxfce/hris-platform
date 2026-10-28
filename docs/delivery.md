@@ -70,6 +70,20 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Operational overtime report API
+
+The annual overtime report provides exact requested/actual/approved minute totals,
+actual-submission counts and distinct employments, with optional current status and
+complete clipped month buckets. It reconciles with the existing request directory
+and preserves frozen work dates, overnight attribution and submitted facts.
+Original/live source and reporting grants, credentials and MFA are checked through
+acquisition. One bounded RLS aggregate returns a coherent snapshot during concurrent
+approval. All 31 reporting, 61 workforce, 84 selected API/PostgreSQL/OpenAPI and 81
+worker tests passed, together with architecture and formatting. The shared workforce
+read policy now has a named company-wide predicate reused by directory and report.
+See [definitions and evidence](reporting.md#operational-overtime). Dashboard acceptance
+is still in progress; this increment does not complete financial reports or exports.
+
 ### Mobile company data status
 
 Account now opens [Data and sync](https://github.com/fajarxfce/hris-mobile/blob/b1b8b81f/docs/data-sync.md)

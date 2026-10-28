@@ -10,13 +10,16 @@ import dev.fajar.hris.reporting.data.datasources.*
 import dev.fajar.hris.reporting.data.repositories.StoredAttendanceExceptionReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredHeadcountReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredLeaveReportRepository
+import dev.fajar.hris.reporting.data.repositories.StoredOvertimeReportRepository
 import dev.fajar.hris.reporting.domain.repositories.AttendanceExceptionReportRepository
 import dev.fajar.hris.reporting.domain.repositories.HeadcountReportRepository
 import dev.fajar.hris.reporting.domain.repositories.LeaveReportRepository
+import dev.fajar.hris.reporting.domain.repositories.OvertimeReportRepository
 import dev.fajar.hris.reporting.domain.usecases.GetAttendanceExceptionReport
 import dev.fajar.hris.reporting.domain.usecases.GetGroupHeadcountReport
 import dev.fajar.hris.reporting.domain.usecases.GetHeadcountReport
 import dev.fajar.hris.reporting.domain.usecases.GetLeaveReport
+import dev.fajar.hris.reporting.domain.usecases.GetOvertimeReport
 import dev.fajar.hris.reporting.domain.usecases.ListLeaveReportRequests
 import java.time.Clock
 import org.jooq.DSLContext
@@ -25,6 +28,25 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration(proxyBeanMethods = false)
 class ReportingConfiguration {
+    @Bean
+    fun overtimeReportSource(sql: DSLContext): OvertimeReportDataSource =
+        PostgresOvertimeReportDataSource(sql)
+
+    @Bean
+    fun overtimeReports(source: OvertimeReportDataSource): OvertimeReportRepository =
+        StoredOvertimeReportRepository(source)
+
+    @Bean
+    fun getOvertimeReport(
+        reports: OvertimeReportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetOvertimeReport(reports, companies, members, identities, transactions, security, clock)
+
     @Bean
     fun leaveReportSource(sql: DSLContext): LeaveReportDataSource =
         PostgresLeaveReportDataSource(sql)

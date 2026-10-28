@@ -15,8 +15,11 @@ fun canManageOvertime(actor: Actor, employee: Employee?, today: java.time.LocalD
             employee?.person?.accountId == actor.accountId &&
             employee.terms.isWorkingOn(today))
 
+fun canReadCompanyOvertime(actor: Actor): Boolean =
+    actor.permissions.any { it in setOf("overtime.read", "overtime.manage", "workforce.read") }
+
 fun canReadOvertime(actor: Actor, employee: Employee?): Boolean =
-    actor.permissions.any { it in setOf("overtime.read", "overtime.manage", "workforce.read") } ||
+    canReadCompanyOvertime(actor) ||
         (employee != null &&
             (("overtime.self.manage" in actor.permissions &&
                 employee.person.accountId == actor.accountId) ||

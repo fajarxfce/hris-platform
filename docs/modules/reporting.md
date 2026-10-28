@@ -31,3 +31,12 @@ API/PostgreSQL/OpenAPI tests and 81 worker tests. Its dashboard passed 3,793 tes
 19 Chromium scenarios and real API/browser withdrawal/reconciliation, including
 preserved report and calendar return links. See
 [leave definitions and evidence](../reporting.md#operational-leave).
+
+Operational overtime has an annual bounded API with optional current status,
+exact requested/actual/approved minute totals, submitted-actual counts, distinct
+employments and complete clipped month buckets. It retains overnight work dates
+and immutable requested/submitted facts. Report grants combine with canonical
+company-wide overtime access and current MFA. One RLS query reconciles totals and
+months; month scopes match the existing request directory. Backend checks passed
+31 reporting, 61 workforce, 84 API/PostgreSQL/OpenAPI and 81 worker tests. Dashboard
+acceptance remains open. See [overtime definitions](../reporting.md#operational-overtime).

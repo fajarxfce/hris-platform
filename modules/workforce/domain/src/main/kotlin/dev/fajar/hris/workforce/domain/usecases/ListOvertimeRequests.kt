@@ -59,11 +59,7 @@ class ListOvertimeRequests(
             val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
-            if (
-                live.permissions.none {
-                    it in setOf("overtime.read", "overtime.manage", "workforce.read")
-                }
-            ) {
+            if (!canReadCompanyOvertime(live)) {
                 if (employeeId == null)
                     return@run Result.Failed(
                         Failure(FailureKind.FORBIDDEN, "employee_scope_required")

@@ -175,6 +175,67 @@ ignore obsolete reads. No report data enters persistent storage or a shared cach
 Status and request actions occupy the first table column on narrow screens. These
 operational reports do not close historical reporting, financial metrics or exports.
 
+## Operational overtime
+
+`GET /api/v1/companies/{companyId}/reports/overtime?from=2026-01-01&until=2026-12-31&status=APPROVED`
+
+Requires `reports.read` and company-wide overtime access (`overtime.read`,
+`overtime.manage` or `workforce.read`), with the `REPORTING` client-policy gate.
+Self/team and approval-only permissions do not authorize company aggregates.
+The inclusive window is one to 366 work dates within 2000–2100. Invalid windows
+return `invalid_report_range` with `maximumDays: "366"`, `minimumYear: "2000"`
+and `maximumYear: "2100"`. Optional `status` selects the current `PLANNED`,
+`PENDING`, `APPROVED`, `REJECTED` or `WITHDRAWN` state; omission includes all.
+
+The response repeats `companyId`, `from`, `until`, optional `status`, `evaluatedAt`
+and `definitionVersion: "overtime.v1"`. `totals` and each ordered `months` entry
+contain the following exact integer counts. Every calendar month intersecting the
+window appears, including empty months, with `month` (`YYYY-MM`), clipped inclusive
+`from`/`until` dates and `counts`. At most 13 month buckets are returned.
+
+| Field | Definition |
+| --- | --- |
+| `requests` | Requests whose frozen work date falls in the selected window and current status. |
+| `employments` | Distinct employment records among those requests. The overall total is independent of monthly distinct counts. |
+| `actualRequests` | Requests with submitted actual times, including subsequently rejected or withdrawn actuals. |
+| `requestedMinutes` | Net requested elapsed minutes, after the frozen requested break. |
+| `actualMinutes` | Net submitted actual elapsed minutes, after the frozen actual break. Unsubmitted plans contribute zero. |
+| `approvedMinutes` | Net actual minutes with completed approval. Partial staged approval contributes zero. |
+
+An overnight request belongs wholly to its original work date and month; it is
+not split at midnight. Requested and submitted actual times, breaks and work dates
+retain their stored facts after schedule/holiday changes. Rejected or withdrawn
+requests remain in selected history, including any already submitted actuals.
+These are operational quantities, not payable hours, payroll amounts or immutable
+closing snapshots. Later decisions can change current status and approved totals.
+
+A month can be reconciled through the existing overtime directory using its exact
+company, clipped `from`/`until` and optional `status`. Its normal resource grants,
+pagination and detail/actions remain authoritative. Each subsequent directory page
+is a fresh read; it is not pinned to the report's database snapshot.
+
+One SQL statement groups the total and months under normal company RLS and finite
+query/transaction timeouts, using the existing company/work-date index. At most
+14 raw aggregate rows reach mapping. Mapping validates cardinality, complete month
+bounds, state-consistent quantities, exact additive reconciliation and distinct
+employment bounds. Shared company, membership and account guards retain original
+and live authority, credentials and MFA after waits; assurance is checked again
+after acquisition. Concurrent decisions cannot mix total and monthly snapshots.
+Cancellation releases resources, failures are sanitized and responses are `no-store`.
+No new database migration or operational write is required.
+
+The backend passed 31 reporting domain/data tests, 61 workforce domain tests,
+84 selected HTTP/PostgreSQL/OpenAPI tests and all 81 worker tests on 28 October
+2026. Coverage includes every status, actual/plan withdrawal, overnight work dates,
+frozen calendar facts, staged approval, receipt replay, monthly directory
+reconciliation, empty partial months and leap windows, current source/report
+permissions, RLS, client availability, revoked grants/credentials while waiting,
+MFA expiry before/after reading, cancellation, sanitized recovery and a concurrent
+approval committed during a held report snapshot. Architecture and formatting
+passed. OpenAPI contains 353 paths in 2,039,264 bytes. Logs:
+`.work/overtime-report-unit.log`, `.work/overtime-report-validation.log`.
+Dashboard acceptance remains the next increment.
+
 ## Validation
 
 On 28 October 2026, leave reporting passed 25 reporting domain/data/delivery tests,

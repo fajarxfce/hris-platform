@@ -25,6 +25,31 @@ class ApiContractHttpTest : PeopleApiFixture() {
     private lateinit var mappings: RequestMappingHandlerMapping
 
     @Test
+    fun overtimeReportsExposeScopeAndExactMinuteCountersWithMonthlyDrillDownBounds() {
+        val api = contract()
+        val operation = api["paths"]["/api/v1/companies/{companyId}/reports/overtime"]["get"]
+        assertTrue(operation["x-hris-authentication-required"].asBoolean())
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        for (name in listOf("from", "until")) assertTrue(
+            operation["parameters"].any {
+                it["name"].asString() == name && it["required"].asBoolean()
+            }
+        )
+        assertTrue(operation["parameters"].any { it["name"].asString() == "status" })
+        for (name in listOf("requestedMinutes", "actualMinutes", "approvedMinutes")) assertEquals(
+            "integer",
+            api["components"]["schemas"]["OvertimeReportCountsResponse"]["properties"][name]["type"]
+                .asString(),
+        )
+        for (name in listOf("from", "until")) assertEquals(
+            "date",
+            api["components"]["schemas"]["OvertimeReportMonthResponse"]["properties"][name][
+                    "format"]
+                .asString(),
+        )
+    }
+
+    @Test
     fun leaveReportAndItsScopedDrillDownExposeExactDecimalDays() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/reports/leave"

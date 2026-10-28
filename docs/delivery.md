@@ -5,6 +5,17 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+Real export browser acceptance passed with the actual API, PostgreSQL, worker and
+private Garage/S3 service. Independent MFA accounts verified lost-admission recovery,
+owner/source isolation, retained headcount after source edits, and a 1,201-row leave
+CSV across three parts with exact hashes and cross-object byte ranges. Historical
+load uses fictional fixture records plus one API-created request; withdrawing that
+request leaves the export unchanged. The final workflow passed in 17.3 seconds
+(43.1 seconds including setup), alongside five storage cleanup tests, architecture,
+Biome, TypeScript and production build. Owned services/configuration were removed;
+CI now includes the dedicated workflow. Provider interruption and physical-expiry
+checks still use controlled backend tests. See [real S3 evidence](report-exports.md#real-private-storage-browser-acceptance).
+
 The operational leave report and matching request drill-down now read frozen
 working dates within an annual window and preserve exact half-day quantities.
 Current status buckets include rejected/cancelled history separately from active

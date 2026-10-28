@@ -1,6 +1,7 @@
 """Own isolated API/PostgreSQL processes, optionally with the real worker."""
 
 import base64
+import json
 import os
 from pathlib import Path
 import re
@@ -13,6 +14,7 @@ import time
 from urllib.error import URLError
 from urllib.request import urlopen
 from dashboard_mail_fixture import DashboardMailFixture
+from dashboard_storage_fixture import DashboardStorageFixture
 
 
 root = Path(__file__).resolve().parents[1]
@@ -20,13 +22,16 @@ docker = shlex.split(os.environ.get("HRIS_TEST_DOCKER_COMMAND", "docker"))
 jar = root / "apps/server/build/libs/apps-server.jar"
 worker_jar = root / "apps/worker/build/libs/apps-worker.jar"
 with_worker = os.environ.get("HRIS_TEST_WITH_WORKER") == "1"
+with_storage = os.environ.get("HRIS_TEST_WITH_STORAGE") == "1"
 port = 18081 if with_worker else 18080
 container = None
 api = None
 worker = None
 mail = None
+storage = None
 logs = root / (".work/worker-integration" if with_worker else ".work/dashboard-integration")
 environment_file = logs / "postgres.env"
+resource_file = logs / "database.json"
 
 
 def command(arguments, *, input=None):
@@ -38,7 +43,7 @@ def stop(_signal, _frame):
 
 
 def main():
-    global container, api, worker, mail
+    global container, api, worker, mail, storage
     if not jar.is_file():
         raise RuntimeError("Build the API with ./gradlew :apps:server:bootJar first")
     if with_worker and not worker_jar.is_file():
@@ -49,6 +54,8 @@ def main():
         signal.signal(event, stop)
     if with_worker:
         mail = DashboardMailFixture(logs / "mail.json")
+    if with_storage:
+        storage = DashboardStorageFixture(root, logs, docker)
     database_password = secrets.token_urlsafe(24)
     environment_file.write_text(f"POSTGRES_PASSWORD={database_password}\n")
     initialization = logs / "runtime-role.sql"
@@ -67,6 +74,7 @@ def main():
     if not re.fullmatch(r"[0-9a-f]{12,64}", created):
         raise RuntimeError("Unexpected fixture container identifier")
     container = created
+    resource_file.write_text(json.dumps({"container": container, "database": "hris_browser"}))
     deadline = time.monotonic() + 60
     while time.monotonic() < deadline:
         ready = subprocess.run(docker + ["exec", container, "pg_isready", "-h", "127.0.0.1", "-U", "fixture_migrator", "-d", "hris_browser"], capture_output=True, timeout=5)
@@ -120,6 +128,8 @@ def main():
         "SERVER_ADDRESS": "127.0.0.1",
         "SERVER_PORT": str(port),
     }
+    if storage is not None:
+        environment.update(storage.environment)
     with (logs / "backend.log").open("w") as output:
         api = subprocess.Popen(["java", "-jar", str(jar)], env=environment, stdout=output, stderr=subprocess.STDOUT)
         # Wait for the bootstrap transaction before provisioning separate scenario accounts.
@@ -206,6 +216,11 @@ finally:
                     subprocess.run(docker + ["rm", "-f", container], capture_output=True, timeout=20, check=True)
         finally:
             environment_file.unlink(missing_ok=True)
-            if mail is not None:
-                mail.close()
+            resource_file.unlink(missing_ok=True)
+            try:
+                if mail is not None:
+                    mail.close()
+            finally:
+                if storage is not None:
+                    storage.close()
 sys.exit(exit_code)

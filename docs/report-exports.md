@@ -463,6 +463,45 @@ production packaging passed; the existing Vite chunk-size advisory remains.
 Initial fixture corrections addressed optional TypeScript fields and a cursor's
 seven-day expiry boundary. Desktop/mobile screenshots were inspected.
 
-Real API/PostgreSQL/worker/private-S3/browser acceptance remains active delivery.
-The browser transport and storage tests above use controlled fixtures; real S3,
-workload measurement and deployment have not been demonstrated by this increment.
+### Real private-storage browser acceptance
+
+An isolated Chromium workflow now runs the actual API, PostgreSQL, worker and
+Garage v2.4.1 S3 service. It creates independent MFA administrator/reader accounts,
+applies headcount filters, and drops the first admission response after the server
+commits. Explicit retry retains the same operation/input and returns the same
+export without another history record. The worker publishes a real private object;
+the browser downloads its complete CSV. Full, conditional, HEAD and byte-range
+responses agree with its retained length and SHA-256. Adding another employment
+changes the live report but leaves the captured download and ETag unchanged.
+
+The administrator cannot discover or download the reader's export. Anonymous
+access to its exact S3 object is denied. Removing the reader's source permission
+retains owned status but denies conditional/HEAD content requests and removes the
+download action after session refresh.
+
+The same workflow exports 1,201 leave detail rows with exact 600.5-day totals.
+One request is created through the API; 1,200 fictional cancelled historical
+requests and their matching approvals/change records are provisioned directly in
+the owned fixture database. This exercises real capture SQL, not 1,201 leave
+commands. Three stored parts contain 500, 500 and 201 rows. The complete 399,053-byte
+CSV has unique request identities and correctly escaped quoted/comma names; every
+part matches its recorded byte range and digest. A range crossing two S3 objects
+returns the exact requested bytes. Withdrawing the API-created request afterward
+does not change the retained download.
+
+The final workflow passed in 17.3 seconds (43.1 seconds including service/build
+setup). Five storage-fixture lifecycle tests cover private configuration, normal
+disposal, lost creation responses, interruption, startup timeout, failed startup,
+non-loopback bindings and failed-removal retry. Architecture checks, four dashboard
+architecture tests, Biome, TypeScript and production build passed. Earlier
+acceptance runs corrected fixture-only permission and leave-version field names.
+Screenshots were inspected and all owned services/configuration files removed.
+
+Run `npm run test:integration:exports` in `apps/dashboard` after building both
+application JARs with JDK 21. Docker and Playwright Chromium are required. The
+optional storage fixture creates its own named container, ephemeral credentials,
+loopback-only port and bounded memory/tmpfs; no deployment bucket or data is used.
+CI runs this separately from the existing worker suite. This verifies local real
+S3 execution and access. Interrupted-provider recovery and physical expiry remain
+covered by the earlier controlled-storage/backend tests; production provider
+acceptance, reference-workload measurement and deployment are separate work.

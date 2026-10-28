@@ -15,7 +15,8 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:integration": "playwright test --config playwright.integration.config.ts",
-    "test:integration:worker": "playwright test --config playwright.worker-integration.config.ts"
+    "test:integration:worker": "playwright test --config playwright.worker-integration.config.ts",
+    "test:integration:exports": "playwright test --config playwright.export-integration.config.ts"
   },
   "dependencies": {
     "@fluentui/react-components": "9.74.9",

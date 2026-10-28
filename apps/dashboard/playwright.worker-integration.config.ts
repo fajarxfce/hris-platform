@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./integration-worker",
+  testIgnore: "report-exports.spec.ts",
   outputDir: "./worker-integration-test-results",
   workers: 1,
   timeout: 120_000,

@@ -114,6 +114,9 @@ jobs:
       - run: python3 ../../tool/test_dashboard_mail_fixture.py
       - run: npm run test:integration:worker
         timeout-minutes: 5
+      - run: python3 ../../tool/test_dashboard_storage_fixture.py
+      - run: npm run test:integration:exports
+        timeout-minutes: 5
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -121,3 +124,4 @@ jobs:
           path: |
             apps/dashboard/integration-report/
             apps/dashboard/worker-integration-report/
+            apps/dashboard/export-integration-report/

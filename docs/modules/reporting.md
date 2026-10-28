@@ -198,5 +198,15 @@ MFA. Bounded private CSV download, buffer disposal, current scope, hidden-worksp
 cancellation and localized narrow views are covered. All 3,910 dashboard tests and
 26 distinct Chromium scenarios passed across focused runs, including exact CSV
 contents and eight new export scenarios. Architecture, lint, TypeScript and build
-passed. Real API/worker/private-S3/browser acceptance remains open; see the
-[dashboard workflow](../report-exports.md#dashboard-workflow).
+passed; see the [dashboard workflow](../report-exports.md#dashboard-workflow).
+
+Real API/PostgreSQL/worker/Garage-S3/Chromium acceptance now covers lost-response
+admission recovery, current owner/source access and complete CSV downloads.
+Headcount remains unchanged after a new employment; 1,201 leave-detail rows form
+three private parts with exact hashes, unique identities and cross-object ranges.
+The historical load is fictional database provisioning plus one API-created request;
+withdrawing that request leaves the file unchanged. Five storage-fixture cleanup
+tests, architecture checks, TypeScript, Biome and production build passed. Local
+services and configuration files were disposed. Provider interruption/physical
+expiry remain covered by controlled backend tests. See
+[real storage acceptance](../report-exports.md#real-private-storage-browser-acceptance).

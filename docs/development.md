@@ -149,3 +149,13 @@ includes compilation; scenario and assertion timeouts remain unchanged. Run
 `npm run test:e2e` from `apps/dashboard` for the complete browser suite, or supply
 Playwright file/shard arguments. `npm run dev` remains the interactive development
 server on the separately configured development port.
+
+`npm run test:integration:exports` runs the export browser workflow against owned
+PostgreSQL, API, worker and Garage/S3 instances. Build both application JARs first;
+the harness uses JDK 21, Docker and Chromium. It uses the worker fixture's isolated
+ports 18081/4175, so run it sequentially with `test:integration:worker`. Its optional
+storage mode creates a private loopback bucket with ephemeral credentials and
+memory limits, and removes the named container and local configuration afterward.
+Run `python3 tool/test_dashboard_storage_fixture.py` from the repository root for
+bounded startup/interruption/cleanup checks without Docker. See
+[export acceptance](report-exports.md#real-private-storage-browser-acceptance).

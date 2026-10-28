@@ -52,7 +52,14 @@ const signal = () => new AbortController().signal;
 describe("leave report boundaries", () => {
   it("requires both source and report grants and an annual date window before I/O", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const feature = createReportingFeature({ request });
+    const feature = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    );
     for (const permissions of [
       [],
       ["reports.read"],
@@ -89,7 +96,14 @@ describe("leave report boundaries", () => {
 
   it("retains distinct employment counts and exact decimal quantities while rejecting incoherent data", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(dto);
-    const load = createReportingFeature({ request }).loadLeave;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadLeave;
     const result = await load.execute(access, from, until, signal());
     expect(result).toEqual({ ok: true, value: dto });
     if (!result.ok) throw new Error("Fixture failed");
@@ -132,7 +146,14 @@ describe("leave report boundaries", () => {
       nextCursor: null,
     };
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(page);
-    const load = createReportingFeature({ request }).loadLeaveRequests;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadLeaveRequests;
     expect(await load.execute(access, query, signal())).toEqual({ ok: true, value: page });
     expect(request.mock.lastCall?.[0].path).toContain(
       "/reports/leave/requests?from=2024-01-01&until=2024-12-31&limit=50&status=PENDING",
@@ -189,7 +210,14 @@ describe("leave report boundaries", () => {
         detail: "Private report diagnostic",
       }),
     );
-    const feature = createReportingFeature({ request });
+    const feature = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    );
     const failed = await feature.loadLeave.execute(access, from, until, signal());
     expect(failed).toMatchObject({ ok: false, failure: { code: "company_module_disabled" } });
     expect(JSON.stringify(failed)).not.toContain("Private report diagnostic");

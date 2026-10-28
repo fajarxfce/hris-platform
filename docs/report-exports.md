@@ -306,6 +306,33 @@ rows. One owned timer runs with a one-minute fixed delay, interrupts outstanding
 work on shutdown and cannot restart after disposal. Disabling worker execution
 allocates neither this worker nor its timer.
 
+## Dashboard workflow
+
+Each of the seven report pages offers export from its applied filters. The review
+retains that canonical selection independently of unapplied form edits, and lets
+users choose summary or supported detail contents. Creation uses a fresh command
+key while the server assigns the export identity. The review explains capture time,
+fixed expiry and per-owner limits. Catalogue and navigation link to owned history.
+
+History replaces one 20-item keyset page at a time, with older/newest navigation.
+Detail shows current progress, processing outcome and expiry, confirmed cancellation
+and eligible explicit recovery. Refresh is user-driven; no background polling is
+allocated. Reads clear obsolete metadata on refresh, failure, hidden workspace and
+account/company replacement. Status/cancellation work with report permission after
+source access is lost; creating, recovery and download additionally require source
+access, with authoritative checks on the server.
+
+A screen owns at most one command and retains its detached input, observed version
+and original key after an uncertain response. Recovery through MFA and later
+rejections never silently replaces that command. Leaving an unresolved command is
+protected; disposal clears it and suppresses late results. Download uses the shared
+bounded binary HTTP and browser file ports, validates exact size/media type and
+export-bound manifest ETag, and rechecks expiry before browser delivery. Buffers
+never enter UI state and are erased after completion, cancellation or failure. One
+owned download is cancelled on refresh, hidden workspace or disposal; denials remove
+stale detail before another action. English/Indonesian copy and narrow dark layouts
+use the existing portal components.
+
 ## Validation and remaining delivery
 
 Validation passed 80 reporting tests (35 domain, 43 data, two delivery) and 26
@@ -422,6 +449,20 @@ worker cases cover unknown formats, deactivated owners, bounded deletion, fairne
 competing workers, object-cleanup dependencies, atomic audit rollback, scoped queue
 policies and interruption before commit. Test containers were disposed.
 
-The export dashboard and real API/PostgreSQL/worker/private-S3/browser acceptance
-remain active delivery. Provider I/O in these tests is controlled; real S3,
+Dashboard validation subsequently passed all 3,910 unit/controller/UI tests, with
+136 Reporting tests repeated after fixture cleanup. Twenty-six distinct Chromium
+cases passed across focused runs, including eight new export scenarios. They cover
+applied filters, exact 1,201-row CSV download, original-command recovery through MFA,
+observed cancellation/resume, source loss, bounded keysets, late company reads,
+expired/denied content and Indonesian dark narrow review. The broader browser run
+initially navigated before the existing one-second browser URL lifetime ended;
+waiting for the completed download status fixed that test, and all eight export
+cases passed again. Two display-copy cases subsequently passed after removing
+implementation terms from product copy. Architecture, Biome, strict TypeScript and
+production packaging passed; the existing Vite chunk-size advisory remains.
+Initial fixture corrections addressed optional TypeScript fields and a cursor's
+seven-day expiry boundary. Desktop/mobile screenshots were inspected.
+
+Real API/PostgreSQL/worker/private-S3/browser acceptance remains active delivery.
+The browser transport and storage tests above use controlled fixtures; real S3,
 workload measurement and deployment have not been demonstrated by this increment.

@@ -55,7 +55,14 @@ const signal = () => new AbortController().signal;
 describe("expense report boundaries", () => {
   it("admits only company source/report authority and bounded transaction dates before I/O", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const feature = createReportingFeature({ request });
+    const feature = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    );
     for (const permissions of [
       [],
       ["reports.read"],
@@ -115,7 +122,14 @@ describe("expense report boundaries", () => {
 
   it("retains exact aggregate cents above the individual claim limit and rejects inconsistent reports", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(dto);
-    const load = createReportingFeature({ request }).loadExpenses;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadExpenses;
     const result = await load.execute(access, from, until, signal());
     expect(result).toEqual({ ok: true, value: dto });
     if (!result.ok) throw new Error("Invalid report fixture");
@@ -167,7 +181,14 @@ describe("expense report boundaries", () => {
       nextCursor: null,
     };
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(page);
-    const load = createReportingFeature({ request }).loadExpenseClaims;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadExpenseClaims;
     expect(await load.execute(access, query, signal())).toEqual({ ok: true, value: page });
     expect(request.mock.lastCall?.[0].path).toContain(
       "/reports/expenses/claims?from=2024-01-01&until=2024-12-31&limit=50&status=PENDING",
@@ -245,7 +266,14 @@ describe("expense report boundaries", () => {
         detail: "Private report diagnostic",
       }),
     );
-    const feature = createReportingFeature({ request });
+    const feature = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    );
     const failed = await feature.loadExpenses.execute(access, from, until, signal());
     expect(failed).toMatchObject({ ok: false, failure: { code: "company_module_disabled" } });
     expect(JSON.stringify(failed)).not.toContain("Private report diagnostic");

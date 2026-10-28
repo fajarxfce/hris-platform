@@ -56,7 +56,14 @@ const rejected = (code: string) => ({ ok: false, failure: { code } });
 describe("saved report filter boundary", () => {
   it("requires current report/source grants, while retaining metadata and cleanup after source loss", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const actions = createReportingFeature({ request });
+    const actions = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    );
     const denied = { companyId, permissions: ["people.read"] };
     expect(await actions.listSavedFilters.execute(denied, signal())).toMatchObject(
       rejected("access_denied"),
@@ -102,7 +109,14 @@ describe("saved report filter boundary", () => {
     "saves canonical %s selections and validates the observed receipt",
     async (kind) => {
       const request = vi.fn<HttpClient["request"]>().mockResolvedValue({ id, version: 5 });
-      const actions = createReportingFeature({ request });
+      const actions = createReportingFeature(
+        { request },
+        {
+          downloadBinary: async () => {
+            throw new Error("Unexpected file download");
+          },
+        },
+      );
       const month = kind === "ATTENDANCE_CLOSINGS" || kind === "PAYROLL_COSTS";
       const parameters: ReportFilterParameters =
         kind === "HEADCOUNT"
@@ -155,7 +169,14 @@ describe("saved report filter boundary", () => {
 
   it("rejects invalid selections and IDs before I/O and preserves the selected group on save", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue({ id, version: 0 });
-    const actions = createReportingFeature({ request });
+    const actions = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    );
     const invalid: Partial<SaveReportFilterChange>[] = [
       { name: "   " },
       { name: "a".repeat(81) },
@@ -222,7 +243,14 @@ describe("saved report filter boundary", () => {
 
   it("rejects wrong partitions, definitions, noncanonical values, oversized lists and timestamp regressions", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const actions = createReportingFeature({ request });
+    const actions = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    );
     for (const fields of [
       { id: crypto.randomUUID() },
       { companyId: foreign },
@@ -258,7 +286,14 @@ describe("saved report filter boundary", () => {
 
   it("requires matching save and deletion receipts, including erased identity recovery", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const actions = createReportingFeature({ request });
+    const actions = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    );
     for (const receipt of [
       { id: foreign, version: 0 },
       { id, version: 1 },
@@ -292,7 +327,14 @@ describe("saved report filter boundary", () => {
           resolve = done;
         }),
     );
-    const actions = createReportingFeature({ request });
+    const actions = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    );
     const selected = [foreign];
     const pending = actions.saveFilter.execute(
       access,

@@ -1,6 +1,5 @@
 import { Text } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
-import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -10,10 +9,10 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { AppTextField } from "../../../../core/presentation/components/app-text-field";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { ReportSelectionActions } from "../components/report-selection-actions";
 import type { useAttendanceClosingReportFilters } from "../controllers/use-attendance-closing-report-filters";
 import { attendanceClosingReportMessages } from "../i18n/attendance-closing-report-messages";
 import { reportingMessages } from "../i18n/reporting-messages";
-import { savedReportFilterMessages } from "../i18n/saved-report-filter-messages";
 import type { AttendanceClosingReportState } from "../models/attendance-closing-report-state";
 import type { attendanceClosingReportView } from "../models/attendance-closing-report-view";
 
@@ -54,7 +53,7 @@ export function AttendanceClosingReportPage({
               {shared.refresh}
             </AppButton>
             {savedFilterTo && (
-              <Link to={savedFilterTo}>{savedReportFilterMessages(locale).saveApplied}</Link>
+              <ReportSelectionActions savedFilterTo={savedFilterTo} locale={locale} />
             )}
           </>
         }

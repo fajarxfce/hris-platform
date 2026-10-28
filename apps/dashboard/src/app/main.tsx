@@ -33,12 +33,12 @@ const queries = new QueryClient({
   },
 });
 const http = new FetchHttpClient(undefined, { clientBuild: __HRIS_DASHBOARD_BUILD__ });
-const reporting = createReportingFeature(http);
 const administration = createAdministrationFeature(http);
 const approvals = createApprovalsFeature(http);
 const communications = createCommunicationsFeature(http);
 const jobs = createJobsFeature(http);
 const files = createBrowserFiles();
+const reporting = createReportingFeature(http, files);
 const documents = createDocumentsFeature(http, files, createBrowserFileInput(document));
 const leave = createLeaveFeature(http, files);
 const expense = createExpenseFeature(http, files);

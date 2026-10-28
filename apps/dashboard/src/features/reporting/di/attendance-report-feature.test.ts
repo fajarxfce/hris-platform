@@ -41,7 +41,14 @@ const signal = () => new AbortController().signal;
 describe("attendance report boundaries", () => {
   it("requires source/report grants and a bounded valid date window before I/O", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const load = createReportingFeature({ request }).loadAttendanceExceptions;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadAttendanceExceptions;
     for (const permissions of [
       [],
       ["reports.read"],
@@ -68,7 +75,14 @@ describe("attendance report boundaries", () => {
 
   it("keeps distinct employments and rejects wrong scopes, dates or partial/incoherent reports", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(dto);
-    const load = createReportingFeature({ request }).loadAttendanceExceptions;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadAttendanceExceptions;
     const result = await load.execute(access, from, until, signal());
     expect(result).toEqual({ ok: true, value: dto });
     if (!result.ok) throw new Error("Fixture did not load");
@@ -114,7 +128,14 @@ describe("attendance report boundaries", () => {
         detail: "Private diagnostic",
       }),
     );
-    const load = createReportingFeature({ request }).loadAttendanceExceptions;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadAttendanceExceptions;
     const failed = await load.execute(access, from, until, signal());
     expect(failed).toMatchObject({ ok: false, failure: { code: "company_module_disabled" } });
     expect(JSON.stringify(failed)).not.toContain("Private diagnostic");

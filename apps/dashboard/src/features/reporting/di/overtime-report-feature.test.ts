@@ -44,7 +44,14 @@ const signal = () => new AbortController().signal;
 describe("overtime report boundaries", () => {
   it("requires company source and report authority and validates annual dates and status before I/O", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(dto);
-    const load = createReportingFeature({ request }).loadOvertime;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadOvertime;
     for (const permissions of [
       [],
       ["reports.read"],
@@ -99,7 +106,14 @@ describe("overtime report boundaries", () => {
 
   it("requires matching scope, complete ordered clipped months and coherent exact integer totals", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(dto);
-    const load = createReportingFeature({ request }).loadOvertime;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadOvertime;
     const result = await load.execute(access, from, until, null, signal());
     expect(result).toEqual({ ok: true, value: { ...dto, status: null } });
     if (!result.ok) throw new Error("Fixture did not load");
@@ -149,7 +163,14 @@ describe("overtime report boundaries", () => {
 
   it("accepts every current status but refuses quantities inconsistent with that status", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const load = createReportingFeature({ request }).loadOvertime;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadOvertime;
     for (const status of overtimeStatuses) {
       const selected = {
         ...counts,
@@ -206,13 +227,14 @@ describe("overtime report boundaries", () => {
       .mockResolvedValue({ ...dto, from: start, until: end, totals: zero, months });
     expect(
       (
-        await createReportingFeature({ request }).loadOvertime.execute(
-          access,
-          start,
-          end,
-          null,
-          signal(),
-        )
+        await createReportingFeature(
+          { request },
+          {
+            downloadBinary: async () => {
+              throw new Error("Unexpected file download");
+            },
+          },
+        ).loadOvertime.execute(access, start, end, null, signal())
       ).ok,
     ).toBe(true);
   });
@@ -225,7 +247,14 @@ describe("overtime report boundaries", () => {
         detail: "PRIVATE diagnostic",
       }),
     );
-    const load = createReportingFeature({ request }).loadOvertime;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadOvertime;
     const result = await load.execute(access, from, until, null, signal());
     expect(result).toMatchObject({ ok: false, failure: { code: "company_module_disabled" } });
     expect(JSON.stringify(result)).not.toContain("PRIVATE");

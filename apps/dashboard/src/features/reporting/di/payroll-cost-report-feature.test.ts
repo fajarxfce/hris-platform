@@ -48,7 +48,14 @@ const signal = () => new AbortController().signal;
 describe("published payroll cost boundaries", () => {
   it("requires both company payroll and report grants and bounds earnings months before I/O", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(dto);
-    const load = createReportingFeature({ request }).loadPayrollCosts;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadPayrollCosts;
     for (const permissions of [
       [],
       ["reports.read"],
@@ -95,12 +102,14 @@ describe("published payroll cost boundaries", () => {
   it("reconciles signed cents and distinct employments, detaches inputs and exposes month navigation", async () => {
     const transport = structuredClone(dto);
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(transport);
-    const result = await createReportingFeature({ request }).loadPayrollCosts.execute(
-      access,
-      from,
-      until,
-      signal(),
-    );
+    const result = await createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadPayrollCosts.execute(access, from, until, signal());
     expect(result).toEqual({ ok: true, value: dto });
     if (!result.ok) throw new Error("Fixture did not load");
     expect(Object.isFrozen(result.value.months)).toBe(true);
@@ -117,7 +126,14 @@ describe("published payroll cost boundaries", () => {
 
   it("rejects wrong scopes, definitions, missing or unordered months and irreconcilable money/counts", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const load = createReportingFeature({ request }).loadPayrollCosts;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadPayrollCosts;
     const changes = [
       { companyId: "b721fda3-c884-498e-b1d9-9c79fc387187" },
       { from: "2026-10" },
@@ -180,7 +196,14 @@ describe("published payroll cost boundaries", () => {
       totals: large,
       months: [{ month: from, counts: large }],
     });
-    const load = createReportingFeature({ request }).loadPayrollCosts;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadPayrollCosts;
     expect(await load.execute(access, from, from, signal())).toMatchObject({
       ok: true,
       value: { totals: large },
@@ -222,7 +245,14 @@ describe("published payroll cost boundaries", () => {
         detail: "PRIVATE DETAIL",
       }),
     );
-    const load = createReportingFeature({ request }).loadPayrollCosts;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadPayrollCosts;
     const result = await load.execute(access, from, until, signal());
     expect(result).toMatchObject({ ok: false, failure: { code: "company_module_disabled" } });
     expect(JSON.stringify(result)).not.toContain("PRIVATE");

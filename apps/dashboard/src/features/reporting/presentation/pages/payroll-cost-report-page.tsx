@@ -1,6 +1,5 @@
 import { Text } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
-import { Link } from "react-router-dom";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppFailure } from "../../../../core/presentation/components/app-failure";
@@ -10,9 +9,9 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { AppTextField } from "../../../../core/presentation/components/app-text-field";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { ReportSelectionActions } from "../components/report-selection-actions";
 import type { usePayrollCostReportFilters } from "../controllers/use-payroll-cost-report-filters";
 import { reportingMessages } from "../i18n/reporting-messages";
-import { savedReportFilterMessages } from "../i18n/saved-report-filter-messages";
 import type { PayrollCostReportState } from "../models/payroll-cost-report-state";
 import type { payrollCostReportView } from "../models/payroll-cost-report-view";
 
@@ -52,7 +51,7 @@ export function PayrollCostReportPage({
               {shared.refresh}
             </AppButton>
             {savedFilterTo && (
-              <Link to={savedFilterTo}>{savedReportFilterMessages(locale).saveApplied}</Link>
+              <ReportSelectionActions savedFilterTo={savedFilterTo} locale={locale} />
             )}
           </>
         }

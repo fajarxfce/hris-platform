@@ -70,6 +70,28 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Report export dashboard
+
+All seven report pages now start export review from applied filters. Summary/detail
+selection, owned 20-item keyset history, explicit progress refresh, confirmed
+cancellation/recovery and bounded CSV download use the public lifecycle. Uncertain
+commands retain their original key/input through MFA and later rejections. Hidden
+workspaces and account/company replacement cancel reads/downloads and remove stale
+metadata; buffers are erased after the file operation. Copy is English/Indonesian.
+
+All 3,910 dashboard tests passed; 136 Reporting cases were repeated after test
+cleanup. Twenty-six distinct Chromium cases passed across focused runs, including
+eight export scenarios. The exact 1,201-row CSV, original-command replay, observed
+versions, source loss, pagination, delayed company reads, expired downloads and dark
+390-pixel review are covered. Architecture, Biome, TypeScript and production build
+passed with the existing Vite chunk advisory. Initial fixtures needed explicit
+optional-property types and an expiry correction of one microsecond. The broader
+browser run had one premature navigation after download; waiting for the completed
+file operation fixed the assertion, then all eight export cases passed. Two cases
+ran again after concise display-copy edits. Desktop/mobile screenshots were inspected.
+No backend production changes or live deployment belong to this increment; real
+API/worker/private-S3/browser acceptance remains open. See [workflow and evidence](report-exports.md).
+
 ### Owned export access and scheduled retirement
 
 Public commands/history/detail and Range/ETag/HEAD CSV downloads now use the retained

@@ -2,6 +2,139 @@ import type { Failure } from "../../domain/result";
 import type { Locale } from "./messages";
 
 const errors: Readonly<Record<string, readonly [string, string]>> = {
+  invalid_report_export: [
+    "Review the export reference, selected contents and current version.",
+    "Periksa referensi ekspor, pilihan isi, dan versi terkini.",
+  ],
+  invalid_report_export_range: [
+    "Review the export reference, selected contents and current version.",
+    "Periksa referensi ekspor, pilihan isi, dan versi terkini.",
+  ],
+  unsupported_report_export_dataset: [
+    "This export format is not supported for the selected report.",
+    "Format ekspor belum didukung untuk laporan pilihan.",
+  ],
+  unsupported_report_export_format: [
+    "This export format is not supported for the selected report.",
+    "Format ekspor belum didukung untuk laporan pilihan.",
+  ],
+  report_export_not_found: [
+    "This export is unavailable for your current account and company.",
+    "Ekspor tidak tersedia untuk akun dan perusahaan Anda saat ini.",
+  ],
+  report_export_expired: [
+    "This export has expired. Create a new export from the report.",
+    "Ekspor sudah kedaluwarsa. Buat ekspor baru dari laporan.",
+  ],
+  report_export_not_ready: [
+    "This export is not ready to download. Refresh its progress.",
+    "Ekspor belum siap diunduh. Segarkan progresnya.",
+  ],
+  report_export_not_running: [
+    "The export state changed. Refresh before choosing another action.",
+    "Status ekspor berubah. Segarkan sebelum memilih tindakan berikutnya.",
+  ],
+  report_export_not_stopped: [
+    "The export state changed. Refresh before choosing another action.",
+    "Status ekspor berubah. Segarkan sebelum memilih tindakan berikutnya.",
+  ],
+  report_export_changed: [
+    "The export state changed. Refresh before choosing another action.",
+    "Status ekspor berubah. Segarkan sebelum memilih tindakan berikutnya.",
+  ],
+  report_export_active_limit: [
+    "Two exports are already active. Wait for completion or cancel an active export.",
+    "Dua ekspor masih aktif. Tunggu hingga selesai atau batalkan ekspor aktif.",
+  ],
+  report_export_retention_limit: [
+    "Ten exports are awaiting expiry and cleanup. Try again after cleanup finishes.",
+    "Sepuluh ekspor masih menunggu kedaluwarsa dan pembersihan. Coba lagi setelah pembersihan selesai.",
+  ],
+  report_export_attempt_limit: [
+    "This export cannot resume again. Create a new export from the report.",
+    "Ekspor tidak dapat dilanjutkan lagi. Buat ekspor baru dari laporan.",
+  ],
+  report_export_cancelled: ["This export was cancelled.", "Ekspor ini dibatalkan."],
+  report_export_failed: [
+    "Processing stopped. Review the export and its available recovery action.",
+    "Pemrosesan berhenti. Tinjau ekspor dan tindakan pemulihan yang tersedia.",
+  ],
+  report_export_byte_limit: [
+    "This selection exceeds the export limit. Choose a smaller date range or company selection.",
+    "Pilihan melebihi batas ekspor. Kurangi rentang tanggal atau pilihan perusahaan.",
+  ],
+  report_export_part_limit: [
+    "This selection exceeds the export limit. Choose a smaller date range or company selection.",
+    "Pilihan melebihi batas ekspor. Kurangi rentang tanggal atau pilihan perusahaan.",
+  ],
+  report_export_part_too_large: [
+    "This selection exceeds the export limit. Choose a smaller date range or company selection.",
+    "Pilihan melebihi batas ekspor. Kurangi rentang tanggal atau pilihan perusahaan.",
+  ],
+  report_export_too_large: [
+    "This selection exceeds the export limit. Choose a smaller date range or company selection.",
+    "Pilihan melebihi batas ekspor. Kurangi rentang tanggal atau pilihan perusahaan.",
+  ],
+  report_snapshot_append_too_large: [
+    "This selection exceeds the export limit. Choose a smaller date range or company selection.",
+    "Pilihan melebihi batas ekspor. Kurangi rentang tanggal atau pilihan perusahaan.",
+  ],
+  report_export_content_integrity_failure: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
+  report_export_manifest_changed: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
+  invalid_report_export_manifest: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
+  invalid_report_export_part: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
+  invalid_report_export_state: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
+  invalid_report_export_columns: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
+  invalid_report_export_rows: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
+  report_export_job_missing: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
+  report_snapshot_not_found: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
+  report_snapshot_rows_changed: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
+  report_snapshot_capture_changed: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
+  report_export_source_invalid: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
+  report_export_source_mismatch: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
+  report_export_identity_conflict: [
+    "The export could not be verified. Refresh and contact your administrator if it persists.",
+    "Ekspor belum dapat diverifikasi. Segarkan dan hubungi administrator jika berlanjut.",
+  ],
   invalid_report_filter: ["This filter reference is invalid.", "Referensi filter tidak valid."],
   invalid_report_filter_name: [
     "Enter a filter name of 1–80 characters without control characters.",

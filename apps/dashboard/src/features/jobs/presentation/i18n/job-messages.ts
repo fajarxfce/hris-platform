@@ -84,6 +84,7 @@ const id: typeof en = {
 };
 export const jobMessages = (locale: Locale): typeof en => (locale === "id" ? id : en);
 const kinds: Readonly<Record<string, readonly [string, string]>> = {
+  REPORT_EXPORT: ["Report export", "Ekspor laporan"],
   ANNOUNCEMENT_PUBLISH: ["Announcement publication", "Publikasi pengumuman"],
   PEOPLE_OFFBOARD: ["Scheduled offboarding", "Offboarding terjadwal"],
   PEOPLE_ONBOARD_START: ["Scheduled onboarding", "Onboarding terjadwal"],

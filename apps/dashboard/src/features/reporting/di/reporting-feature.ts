@@ -1,4 +1,5 @@
 import type { HttpClient } from "../../../core/data/http/http-client";
+import type { FileRepository } from "../../../core/domain/files/file-repository";
 import { HttpAttendanceClosingReportDataSource } from "../data/datasources/http-attendance-closing-report-data-source";
 import { HttpAttendanceExceptionReportDataSource } from "../data/datasources/http-attendance-exception-report-data-source";
 import { HttpExpenseReportDataSource } from "../data/datasources/http-expense-report-data-source";
@@ -7,6 +8,7 @@ import { HttpLeaveReportDataSource } from "../data/datasources/http-leave-report
 import { HttpOvertimeReportDataSource } from "../data/datasources/http-overtime-report-data-source";
 import { HttpPayrollCostReportDataSource } from "../data/datasources/http-payroll-cost-report-data-source";
 import { HttpReportCatalogueDataSource } from "../data/datasources/http-report-catalogue-data-source";
+import { HttpReportExportDataSource } from "../data/datasources/http-report-export-data-source";
 import { HttpSavedReportFilterDataSource } from "../data/datasources/http-saved-report-filter-data-source";
 import { RemoteAttendanceClosingReportRepository } from "../data/repositories/remote-attendance-closing-report-repository";
 import { RemoteAttendanceExceptionReportRepository } from "../data/repositories/remote-attendance-exception-report-repository";
@@ -16,8 +18,10 @@ import { RemoteLeaveReportRepository } from "../data/repositories/remote-leave-r
 import { RemoteOvertimeReportRepository } from "../data/repositories/remote-overtime-report-repository";
 import { RemotePayrollCostReportRepository } from "../data/repositories/remote-payroll-cost-report-repository";
 import { RemoteReportCatalogueRepository } from "../data/repositories/remote-report-catalogue-repository";
+import { RemoteReportExportRepository } from "../data/repositories/remote-report-export-repository";
 import { RemoteSavedReportFilterRepository } from "../data/repositories/remote-saved-report-filter-repository";
 import { DeleteReportFilter } from "../domain/usecases/delete-report-filter";
+import { DownloadReportExport } from "../domain/usecases/download-report-export";
 import { GetSavedReportFilter } from "../domain/usecases/get-saved-report-filter";
 import { ListSavedReportFilters } from "../domain/usecases/list-saved-report-filters";
 import { LoadAttendanceClosingEmployees } from "../domain/usecases/load-attendance-closing-employees";
@@ -31,9 +35,15 @@ import { LoadLeaveReportRequests } from "../domain/usecases/load-leave-report-re
 import { LoadOvertimeReport } from "../domain/usecases/load-overtime-report";
 import { LoadPayrollCostReport } from "../domain/usecases/load-payroll-cost-report";
 import { LoadReportCatalogue } from "../domain/usecases/load-report-catalogue";
+import { ManageReportExports } from "../domain/usecases/manage-report-exports";
+import { ReadReportExports } from "../domain/usecases/read-report-exports";
 import { SaveReportFilter } from "../domain/usecases/save-report-filter";
 
-export function createReportingFeature(http: HttpClient) {
+export function createReportingFeature(
+  http: HttpClient,
+  files: Pick<FileRepository, "downloadBinary">,
+) {
+  const exports = new RemoteReportExportRepository(new HttpReportExportDataSource(http));
   const filters = new RemoteSavedReportFilterRepository(new HttpSavedReportFilterDataSource(http));
   const closings = new RemoteAttendanceClosingReportRepository(
     new HttpAttendanceClosingReportDataSource(http),
@@ -46,6 +56,9 @@ export function createReportingFeature(http: HttpClient) {
     new HttpAttendanceExceptionReportDataSource(http),
   );
   return {
+    readExports: new ReadReportExports(exports),
+    manageExports: new ManageReportExports(exports),
+    downloadExport: new DownloadReportExport(exports, files),
     listSavedFilters: new ListSavedReportFilters(filters),
     getSavedFilter: new GetSavedReportFilter(filters),
     saveFilter: new SaveReportFilter(filters),

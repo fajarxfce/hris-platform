@@ -572,6 +572,14 @@ owner. Failed business transactions roll back; a separate queue-only conditional
 postponement prevents repeated failures from starving later work. The owned timer
 and worker are both conditional on worker execution and terminate on disposal.
 
+The dashboard export controller owns one mounted account/company scope, one retained
+command and one cancellable file operation. Canonical selection policy is shared
+with saved filters. Reads replace bounded pages and discard obsolete results; no
+polling or binary cache is created. An uncertain command retains the exact detached
+input and key through workspace MFA suspension. Binary acquisition and saving stay
+in domain/data ports; presentation contains only status and actions, and all owned
+buffers are wiped when the download ends.
+
 
 Interactive job reads and cancellation use the pure company-session policy to intersect original/live authority and check current MFA after waiting. Their domain details contain the resulting available actions; delivery only serializes them and cannot restore a permission from the originally resolved actor. This interactive policy is separate from background execution authority.
 

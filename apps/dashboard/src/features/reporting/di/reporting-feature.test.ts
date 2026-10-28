@@ -29,7 +29,14 @@ const signal = () => new AbortController().signal;
 describe("headcount feature boundaries", () => {
   it("requires both permissions and valid bounded calendar dates before I/O", async () => {
     const request = vi.fn<HttpClient["request"]>();
-    const feature = createReportingFeature({ request });
+    const feature = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    );
     for (const permissions of [
       [],
       ["reports.read"],
@@ -63,7 +70,14 @@ describe("headcount feature boundaries", () => {
 
   it("keeps distinct people and validates response scope, definition and reconciled totals", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(dto);
-    const feature = createReportingFeature({ request });
+    const feature = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    );
     const loaded = await feature.loadHeadcount.execute(access, asOf, signal());
     expect(loaded).toEqual({ ok: true, value: dto });
     if (!loaded.ok) throw new Error("Fixture did not load");
@@ -133,7 +147,14 @@ describe("headcount feature boundaries", () => {
       ],
     };
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(group);
-    const feature = createReportingFeature({ request });
+    const feature = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    );
     const selected = [second, empty, companyId];
     const loaded = await feature.loadHeadcount.execute(access, asOf, signal(), selected);
     expect(loaded).toMatchObject({ ok: true, value: { totals: { employments: 6, persons: 3 } } });
@@ -168,7 +189,14 @@ describe("headcount feature boundaries", () => {
         detail: "Private operational text",
       }),
     );
-    const feature = createReportingFeature({ request });
+    const feature = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    );
     const result = await feature.loadHeadcount.execute(access, asOf, signal());
     expect(result).toMatchObject({
       ok: false,

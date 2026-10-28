@@ -190,3 +190,13 @@ including seven export HTTP and six retention worker cases, the full 90-test wor
 graph, both packages and architecture/format checks. The dashboard and real S3/browser
 acceptance remain open. See [public contracts](../report-exports.md#owned-history-and-authorized-downloads)
 and [retirement](../report-exports.md#scheduled-retirement).
+
+The export dashboard now starts from applied report filters, reviews summary/detail
+selection and shows owned paged history/progress. Confirmed cancellation/recovery
+retain observed versions; uncertain outcomes preserve their original command through
+MFA. Bounded private CSV download, buffer disposal, current scope, hidden-workspace
+cancellation and localized narrow views are covered. All 3,910 dashboard tests and
+26 distinct Chromium scenarios passed across focused runs, including exact CSV
+contents and eight new export scenarios. Architecture, lint, TypeScript and build
+passed. Real API/worker/private-S3/browser acceptance remains open; see the
+[dashboard workflow](../report-exports.md#dashboard-workflow).

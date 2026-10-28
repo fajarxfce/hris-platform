@@ -1,0 +1,32 @@
+import type { CompanyId } from "../../../../core/domain/identifiers";
+import type { JobStatus } from "../../../jobs/domain/entities/background-job";
+import type { ReportSelection } from "./report-selection";
+export type ReportExportDataset = "SUMMARY" | "DETAIL";
+export type StartReportExport = ReportSelection & Readonly<{ dataset: ReportExportDataset }>;
+export type ChangeReportExport = Readonly<{ id: string; expectedVersion: number }>;
+export type ReportExportCursor = Readonly<{ createdAt: string; id: string }>;
+export type ReportExportDetails = Readonly<{
+  id: string;
+  companyId: CompanyId;
+  selection: ReportSelection;
+  dataset: ReportExportDataset;
+  status: "QUEUED" | "RENDERING" | "READY" | "STOPPED";
+  version: number;
+  attempt: number;
+  createdAt: string;
+  updatedAt: string;
+  expiresAt: string;
+  expired: boolean;
+  retiredAt: string | null;
+  completedRows: number;
+  bytes: number;
+  jobId: string;
+  jobStatus: JobStatus;
+  cancellationRequested: boolean;
+  failureCode: string | null;
+}>;
+export type ReportExportHistory = Readonly<{
+  items: readonly ReportExportDetails[];
+  next: ReportExportCursor | null;
+}>;
+export type ReportExportReceipt = Readonly<{ id: string; version: number }>;

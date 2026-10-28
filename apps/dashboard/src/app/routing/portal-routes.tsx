@@ -395,6 +395,16 @@ const EmploymentCancellationScreen = lazy(() =>
   ),
 );
 
+const ReportExportHistoryScreen = lazy(() =>
+  import("../../features/reporting/presentation/bindings/report-export-history-screen").then(
+    (module) => ({ default: module.ReportExportHistoryScreen }),
+  ),
+);
+const ReportExportScreen = lazy(() =>
+  import("../../features/reporting/presentation/bindings/report-export-screen").then((module) => ({
+    default: module.ReportExportScreen,
+  })),
+);
 const SavedReportFiltersScreen = lazy(() =>
   import("../../features/reporting/presentation/bindings/saved-report-filters-screen").then(
     (module) => ({ default: module.SavedReportFiltersScreen }),
@@ -1807,6 +1817,57 @@ export function PortalRoutes({
               jobs={jobs}
               companyName={company.name}
               locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/exports"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ReportExportHistoryScreen
+              accountId={accountId}
+              access={access}
+              actions={reporting}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/exports/new"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ReportExportScreen
+              accountId={accountId}
+              access={access}
+              actions={reporting}
+              companyName={company.name}
+              companies={companies}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+              creating={true}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/exports/:exportId"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ReportExportScreen
+              accountId={accountId}
+              access={access}
+              actions={reporting}
+              companyName={company.name}
+              companies={companies}
+              timezone={company.timezone}
+              locale={locale}
+              nextIdentifier={nextIdentifier}
+              creating={false}
             />
           </Suspense>
         }

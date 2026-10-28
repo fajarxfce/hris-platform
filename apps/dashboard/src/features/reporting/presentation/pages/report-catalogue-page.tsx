@@ -8,6 +8,7 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { reportCatalogueMessages } from "../i18n/report-catalogue-messages";
+import { reportExportMessages } from "../i18n/report-export-messages";
 import { savedReportFilterMessages } from "../i18n/saved-report-filter-messages";
 import type { ReportCatalogueState } from "../models/report-catalogue-state";
 import type { reportCatalogueRows } from "../models/report-catalogue-view";
@@ -18,6 +19,7 @@ export function ReportCataloguePage({
   companyName,
   locale,
   savedFiltersTo,
+  exportsTo,
   onRefresh,
   onOpen,
 }: {
@@ -26,6 +28,7 @@ export function ReportCataloguePage({
   companyName: string;
   locale: Locale;
   savedFiltersTo: string;
+  exportsTo: string;
   onRefresh: () => void;
   onOpen: (id: string) => void;
 }) {
@@ -39,6 +42,7 @@ export function ReportCataloguePage({
         actions={
           <>
             <Link to={savedFiltersTo}>{savedReportFilterMessages(locale).title}</Link>
+            <Link to={exportsTo}>{reportExportMessages(locale).history}</Link>
             <AppButton
               icon={<ArrowClockwise20Regular />}
               onClick={onRefresh}

@@ -13,21 +13,23 @@ import type { LoadOvertimeReport } from "../../domain/usecases/load-overtime-rep
 import type { LoadPayrollCostReport } from "../../domain/usecases/load-payroll-cost-report";
 import type { LoadReportCatalogue } from "../../domain/usecases/load-report-catalogue";
 import type { SaveReportFilter } from "../../domain/usecases/save-report-filter";
+import type { ReportExportUseCases } from "./report-export-use-cases";
 
-export type ReportingUseCases = Readonly<{
-  listSavedFilters: Pick<ListSavedReportFilters, "execute">;
-  getSavedFilter: Pick<GetSavedReportFilter, "execute">;
-  saveFilter: Pick<SaveReportFilter, "execute">;
-  deleteFilter: Pick<DeleteReportFilter, "execute">;
-  loadCatalogue: Pick<LoadReportCatalogue, "execute">;
-  loadAttendanceClosings: Pick<LoadAttendanceClosingReport, "execute">;
-  loadAttendanceClosingEmployees: Pick<LoadAttendanceClosingEmployees, "execute">;
-  loadPayrollCosts: Pick<LoadPayrollCostReport, "execute">;
-  loadExpenses: Pick<LoadExpenseReport, "execute">;
-  loadExpenseClaims: Pick<LoadExpenseReportClaims, "execute">;
-  loadOvertime: Pick<LoadOvertimeReport, "execute">;
-  loadLeave: Pick<LoadLeaveReport, "execute">;
-  loadLeaveRequests: Pick<LoadLeaveReportRequests, "execute">;
-  loadHeadcount: Pick<LoadHeadcountReport, "execute">;
-  loadAttendanceExceptions: Pick<LoadAttendanceExceptionReport, "execute">;
-}>;
+export type ReportingUseCases = ReportExportUseCases &
+  Readonly<{
+    listSavedFilters: Pick<ListSavedReportFilters, "execute">;
+    getSavedFilter: Pick<GetSavedReportFilter, "execute">;
+    saveFilter: Pick<SaveReportFilter, "execute">;
+    deleteFilter: Pick<DeleteReportFilter, "execute">;
+    loadCatalogue: Pick<LoadReportCatalogue, "execute">;
+    loadAttendanceClosings: Pick<LoadAttendanceClosingReport, "execute">;
+    loadAttendanceClosingEmployees: Pick<LoadAttendanceClosingEmployees, "execute">;
+    loadPayrollCosts: Pick<LoadPayrollCostReport, "execute">;
+    loadExpenses: Pick<LoadExpenseReport, "execute">;
+    loadExpenseClaims: Pick<LoadExpenseReportClaims, "execute">;
+    loadOvertime: Pick<LoadOvertimeReport, "execute">;
+    loadLeave: Pick<LoadLeaveReport, "execute">;
+    loadLeaveRequests: Pick<LoadLeaveReportRequests, "execute">;
+    loadHeadcount: Pick<LoadHeadcountReport, "execute">;
+    loadAttendanceExceptions: Pick<LoadAttendanceExceptionReport, "execute">;
+  }>;

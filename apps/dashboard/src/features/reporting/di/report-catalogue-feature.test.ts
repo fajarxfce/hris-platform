@@ -28,7 +28,14 @@ const signal = () => new AbortController().signal;
 describe("report catalogue boundary", () => {
   it("requires reporting access before I/O and intersects returned sources with the initiating company grants", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(dto);
-    const load = createReportingFeature({ request }).loadCatalogue;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadCatalogue;
     expect(await load.execute({ companyId, permissions: ["people.read"] }, signal())).toMatchObject(
       { ok: false, failure: { code: "access_denied" } },
     );
@@ -49,7 +56,14 @@ describe("report catalogue boundary", () => {
   });
   it("bounds and validates response identities, definitions and company before exposing detached immutable metadata", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(dto);
-    const load = createReportingFeature({ request }).loadCatalogue;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadCatalogue;
     const result = await load.execute(access, signal());
     expect(result).toEqual({ ok: true, value: dto });
     if (!result.ok) throw new Error("Expected catalogue");
@@ -80,7 +94,14 @@ describe("report catalogue boundary", () => {
           resolve = done;
         }),
     );
-    const load = createReportingFeature({ request }).loadCatalogue;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadCatalogue;
     const selected = ["reports.read", "people.read"];
     const pending = load.execute({ companyId, permissions: selected }, signal());
     selected.push("payroll.read");

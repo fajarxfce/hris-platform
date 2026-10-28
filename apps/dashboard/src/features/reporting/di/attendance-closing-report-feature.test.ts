@@ -13,7 +13,14 @@ const query = { month: "2026-09", after: null };
 describe("attendance closing report boundary", () => {
   it("requires company source/report authority and rejects incompatible ranges and cursors before I/O", async () => {
     const request = vi.fn<HttpClient["request"]>().mockResolvedValue(report),
-      feature = createReportingFeature({ request });
+      feature = createReportingFeature(
+        { request },
+        {
+          downloadBinary: async () => {
+            throw new Error("Unexpected file download");
+          },
+        },
+      );
     for (const permissions of [
       [],
       ["reports.read"],
@@ -66,7 +73,14 @@ describe("attendance closing report boundary", () => {
         .fn<HttpClient["request"]>()
         .mockResolvedValueOnce(original)
         .mockResolvedValueOnce(employees),
-      feature = createReportingFeature({ request });
+      feature = createReportingFeature(
+        { request },
+        {
+          downloadBinary: async () => {
+            throw new Error("Unexpected file download");
+          },
+        },
+      );
     const result = await feature.loadAttendanceClosings.execute(
       access,
       report.from,
@@ -101,9 +115,16 @@ describe("attendance closing report boundary", () => {
       },
     ];
     for (const dto of invalid) {
-      const load = createReportingFeature({
-        request: vi.fn().mockResolvedValue(dto),
-      }).loadAttendanceClosings;
+      const load = createReportingFeature(
+        {
+          request: vi.fn().mockResolvedValue(dto),
+        },
+        {
+          downloadBinary: async () => {
+            throw new Error("Unexpected file download");
+          },
+        },
+      ).loadAttendanceClosings;
       expect((await load.execute(access, report.from, report.until, signal())).ok).toBe(false);
     }
     const row = page.items[0];
@@ -119,9 +140,16 @@ describe("attendance closing report boundary", () => {
     ])
       expect(
         (
-          await createReportingFeature({
-            request: vi.fn().mockResolvedValue(dto),
-          }).loadAttendanceClosingEmployees.execute(access, query, signal())
+          await createReportingFeature(
+            {
+              request: vi.fn().mockResolvedValue(dto),
+            },
+            {
+              downloadBinary: async () => {
+                throw new Error("Unexpected file download");
+              },
+            },
+          ).loadAttendanceClosingEmployees.execute(access, query, signal())
         ).ok,
       ).toBe(false);
   });
@@ -137,7 +165,14 @@ describe("attendance closing report boundary", () => {
       .fn<HttpClient["request"]>()
       .mockResolvedValueOnce({ ...page, items, nextCursor: after })
       .mockResolvedValueOnce({ ...page, items: [], nextCursor: null });
-    const load = createReportingFeature({ request }).loadAttendanceClosingEmployees;
+    const load = createReportingFeature(
+      { request },
+      {
+        downloadBinary: async () => {
+          throw new Error("Unexpected file download");
+        },
+      },
+    ).loadAttendanceClosingEmployees;
     expect(await load.execute(access, query, signal())).toMatchObject({
       ok: true,
       value: { nextCursor: after },

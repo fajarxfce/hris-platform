@@ -234,7 +234,39 @@ MFA expiry before/after reading, cancellation, sanitized recovery and a concurre
 approval committed during a held report snapshot. Architecture and formatting
 passed. OpenAPI contains 353 paths in 2,039,264 bytes. Logs:
 `.work/overtime-report-unit.log`, `.work/overtime-report-validation.log`.
-Dashboard acceptance remains the next increment.
+The dashboard at `/reports/overtime` defaults to the active company's year-to-date
+window. Date/status form edits wait for Apply; company-bound URL parameters retain
+applied filters through Back/Forward. Six totals and complete monthly rows show
+exact net minutes and independent employment counts. The first column opens the
+existing overtime directory with the same company, clipped month and status.
+Empty months retain zero counts with disabled actions. Pending refreshes, disposal,
+company/account replacement and access failures remove old values and cancel or
+ignore obsolete reads. Response mapping validates scope, version, complete buckets,
+state-consistent quantities and exact reconciliation before publication. No report
+payload enters browser persistence or a shared cache.
+
+Dashboard validation passed all 3,801 unit/UI tests in 319 files, architecture,
+Biome and TypeScript, production build, and 12 distinct report Chromium scenarios
+covering overtime, attendance and leave. The four overtime cases passed in the final
+rerun after correcting a test expectation for the directory's explicit `limit=50`.
+A focused 33-test reporting/localization run also passed after separating invalid
+report-status copy from the directory's shorter date-limit message. English/Indonesian
+and desktop/390px layouts were inspected.
+
+The existing real API/PostgreSQL overtime browser workflow now also verifies annual
+report totals, pending-status month navigation and browser return, then independently
+approves/rejects or withdraws requests through the existing guarded UI. It preserves
+original calendar facts, recovers lost plan/actual/decision/withdrawal receipts and
+replays original receipts without duplicate totals. Four requests for one employment
+reconcile to 540 requested, 375 actual and 135 approved minutes; the two withdrawn
+requests separately retain 240 requested and 120 actual minutes. Explicit refresh
+keeps that status selection. The owned fixture stopped its API and removed its
+database. Existing bundle/CSS warnings do not establish a performance result.
+
+Logs: `.work/overtime-dashboard-check.log`, `.work/overtime-dashboard-final-unit.log`,
+`.work/overtime-dashboard-browser.log`, `.work/overtime-dashboard-final-browser.log`
+and `.work/overtime-dashboard-integration.log`. Screenshots:
+`.work/dashboard-overtime-report-real.png` and `.work/dashboard-overtime-report-mobile.png`.
 
 ## Validation
 

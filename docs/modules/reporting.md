@@ -38,5 +38,6 @@ employments and complete clipped month buckets. It retains overnight work dates
 and immutable requested/submitted facts. Report grants combine with canonical
 company-wide overtime access and current MFA. One RLS query reconciles totals and
 months; month scopes match the existing request directory. Backend checks passed
-31 reporting, 61 workforce, 84 API/PostgreSQL/OpenAPI and 81 worker tests. Dashboard
-acceptance remains open. See [overtime definitions](../reporting.md#operational-overtime).
+31 reporting, 61 workforce, 84 API/PostgreSQL/OpenAPI and 81 worker tests. Its
+dashboard and scoped month navigation passed 3,801 tests, 12 report browser scenarios
+and real API/PostgreSQL reconciliation through approval, rejection and withdrawal. See [overtime definitions](../reporting.md#operational-overtime).

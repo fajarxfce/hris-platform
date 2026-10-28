@@ -806,6 +806,29 @@ The isolated API/PostgreSQL workflow verifies these boundaries with an enrolled
 test administrator, lost committed responses, CSRF rejection, unrelated accounts,
 retained device and browser access, and replacement of the dashboard account.
 
+## Operational overtime report
+
+`/reports/overtime` shows exact requested, actual and approved minutes, request and
+actual-submission counts, and distinct employments. The annual window and optional
+current status use company-bound applied URL filters; changing company resets to
+its local year-to-date dates. Month rows retain clipped bounds and open the existing
+overtime directory with the same scope/status. Empty months remain visible. The
+first-column action stays reachable on narrow screens.
+
+The controller owns and cancels each read; refresh, replacement, denial and disposal
+clear previous counts. Mapping checks company/window/status/version, complete months,
+safe integer amounts, state invariants and exact additive reconciliation. These
+operational facts retain original work dates and submitted times but use current
+status. They do not replace payroll or historical closing snapshots.
+
+Validation passed 3,801 unit/UI tests, architecture/Biome/TypeScript, production build,
+12 distinct report browser scenarios and a real API/PostgreSQL overtime workflow.
+The latter combines report reconciliation and scoped month navigation with planning,
+actual submission, independent decisions, withdrawal and original receipt recovery.
+The final four overtime browser cases and 33 reporting/localization tests passed
+again after focused fixes. Desktop and 390px layouts were inspected. See
+[definitions and evidence](reporting.md#operational-overtime).
+
 ## Operational leave report
 
 `/reports/leave` shows current request/status counts, distinct employments and exact

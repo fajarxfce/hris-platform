@@ -1,6 +1,19 @@
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 
 const english = {
+  overtimeTitle: "Overtime report",
+  overtimeStatus: "Status",
+  requests: "Requests",
+  actualRequests: "Requests with actual times",
+  requestedMinutes: "Requested minutes",
+  actualMinutes: "Actual minutes",
+  approvedMinutes: "Approved minutes",
+  byMonth: "By work month",
+  month: "Work month",
+  PLANNED: "Planned",
+  WITHDRAWN: "Withdrawn",
+  overtimeDefinition:
+    "Net minutes after breaks, grouped by the original work date. Rejected and withdrawn requests remain included in their status. Approval is counted after all stages finish. Later decisions can change these operational totals.",
   leaveTitle: "Leave report",
   leaveRequests: "Requests",
   leaveRequestsTitle: "Leave report requests",
@@ -68,6 +81,19 @@ const english = {
 
 type ReportingMessages = { readonly [K in keyof typeof english]: string };
 const indonesian: ReportingMessages = {
+  overtimeTitle: "Laporan lembur",
+  overtimeStatus: "Status",
+  requests: "Pengajuan",
+  actualRequests: "Pengajuan dengan waktu aktual",
+  requestedMinutes: "Menit rencana",
+  actualMinutes: "Menit aktual",
+  approvedMinutes: "Menit disetujui",
+  byMonth: "Per bulan kerja",
+  month: "Bulan kerja",
+  PLANNED: "Rencana",
+  WITHDRAWN: "Ditarik",
+  overtimeDefinition:
+    "Menit bersih setelah istirahat, menurut tanggal kerja asal. Pengajuan ditolak dan ditarik tetap dihitung dalam statusnya. Persetujuan dihitung setelah semua tahap selesai. Keputusan berikutnya dapat mengubah total operasional ini.",
   leaveTitle: "Laporan cuti",
   leaveRequests: "Pengajuan",
   leaveRequestsTitle: "Pengajuan dalam laporan cuti",

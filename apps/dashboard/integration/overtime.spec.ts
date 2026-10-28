@@ -159,6 +159,41 @@ test("overtime planning and actions recover real receipts, preserve original evi
   expect(await selfApproval.json()).toMatchObject({ code: "self_approval_denied" });
   await expect(page.getByRole("link", { name: "Approve overtime", exact: true })).toHaveCount(0);
 
+  const reportQuery = `company=${company}&from=${scenario.workDate.slice(0, 4)}-01-01&until=${scenario.workDate}`;
+  await page.goto(`/reports/overtime?${reportQuery}`);
+  await expect(page.getByRole("region", { name: "Requests", exact: true })).toContainText("1");
+  await expect(page.getByRole("region", { name: "Requested minutes", exact: true })).toContainText(
+    "180",
+  );
+  await expect(page.getByRole("region", { name: "Actual minutes", exact: true })).toContainText(
+    "135",
+  );
+  await expect(page.getByRole("region", { name: "Approved minutes", exact: true })).toContainText(
+    "0",
+  );
+  await page.getByLabel("Status", { exact: true }).selectOption("PENDING");
+  await page.getByRole("button", { name: "Apply", exact: true }).click();
+  await expect(page).toHaveURL(/status=PENDING/u);
+  const monthAction = page
+    .getByRole("table", { name: "By work month", exact: true })
+    .getByRole("button", { name: /^View requests:/u })
+    .last();
+  await expect(monthAction).toBeEnabled();
+  await monthAction.click();
+  await expect(page).toHaveURL(
+    new RegExp(
+      `from=${scenario.workDate.slice(0, 7)}-01&until=${scenario.workDate}&status=PENDING`,
+      "u",
+    ),
+  );
+  const requestTable = page.getByRole("table", { name: "Overtime requests", exact: true });
+  await expect(requestTable.getByRole("row")).toHaveCount(2);
+  await page.goBack();
+  await expect(page.getByLabel("Status", { exact: true })).toHaveValue("PENDING");
+  await expect(page.getByRole("region", { name: "Actual minutes", exact: true })).toContainText(
+    "135",
+  );
+
   const reviewer = await browser.newContext({ baseURL: new URL(page.url()).origin });
   try {
     const review = await reviewer.newPage();
@@ -358,4 +393,31 @@ test("overtime planning and actions recover real receipts, preserve original evi
   await expect(
     page.getByRole("table", { name: "History", exact: true }).getByRole("row"),
   ).toHaveCount(4);
+  await page.goto(`/reports/overtime?${reportQuery}`);
+  for (const [name, total] of [
+    ["Requests", "4"],
+    ["Employment records", "1"],
+    ["Requests with actual times", "3"],
+    ["Requested minutes", "540"],
+    ["Actual minutes", "375"],
+    ["Approved minutes", "135"],
+  ] as const)
+    await expect(page.getByRole("region", { name, exact: true })).toContainText(total);
+  await page.screenshot({
+    path: "../../.work/dashboard-overtime-report-real.png",
+    fullPage: true,
+    animations: "disabled",
+  });
+  await page.getByLabel("Status", { exact: true }).selectOption("WITHDRAWN");
+  await page.getByRole("button", { name: "Apply", exact: true }).click();
+  for (const [name, total] of [
+    ["Requests", "2"],
+    ["Requests with actual times", "1"],
+    ["Requested minutes", "240"],
+    ["Actual minutes", "120"],
+    ["Approved minutes", "0"],
+  ] as const)
+    await expect(page.getByRole("region", { name, exact: true })).toContainText(total);
+  await page.getByRole("button", { name: "Refresh", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Requests", exact: true })).toContainText("2");
 });

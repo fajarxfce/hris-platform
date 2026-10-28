@@ -2437,6 +2437,7 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "This page link is invalid. Return to the first page.",
     "Link halaman tidak valid. Kembali ke halaman pertama.",
   ],
+  invalid_report_status: ["Choose a valid report status.", "Pilih status laporan yang valid."],
   invalid_overtime_page: [
     "Choose valid dates covering up to 62 days and a valid overtime status.",
     "Pilih tanggal yang valid dengan rentang maksimal 62 hari dan status lembur yang valid.",
@@ -2709,6 +2710,15 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
 };
 
 export function failureMessage(failure: Failure, locale: Locale): string {
+  if (
+    failure.code === "invalid_report_range" &&
+    failure.parameters.maximumDays === "366" &&
+    failure.parameters.minimumYear === "2000" &&
+    failure.parameters.maximumYear === "2100"
+  )
+    return locale === "id"
+      ? "Pilih rentang maksimal 366 hari antara tahun 2000 dan 2100."
+      : "Choose a date range of up to 366 days between 2000 and 2100.";
   if (failure.code === "invalid_report_range" && failure.parameters.maximumDays === "366")
     return locale === "id"
       ? "Pilih rentang maksimal 366 hari antara tahun 1900 dan 2200."

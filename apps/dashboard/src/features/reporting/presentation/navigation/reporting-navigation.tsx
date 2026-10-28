@@ -5,6 +5,7 @@ import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import { canReadAttendanceReport } from "../../domain/policies/attendance-report-policy";
 import { canReadHeadcount } from "../../domain/policies/headcount-policy";
 import { canReadLeaveReport } from "../../domain/policies/leave-report-policy";
+import { canReadOvertimeReport } from "../../domain/policies/overtime-report-policy";
 import { reportingMessages } from "../i18n/reporting-messages";
 
 export function reportingNavigation(
@@ -14,6 +15,15 @@ export function reportingNavigation(
   const permissions = access?.permissions ?? [];
   const text = messages(locale);
   return [
+    ...(canReadOvertimeReport(permissions)
+      ? [
+          {
+            to: "/reports/overtime",
+            label: reportingMessages(locale).overtimeTitle,
+            icon: <DataBarVertical20Regular />,
+          },
+        ]
+      : []),
     ...(canReadLeaveReport(permissions)
       ? [
           {

@@ -8,8 +8,10 @@ import type { LoadLeaveReport } from "../../domain/usecases/load-leave-report";
 import type { LoadLeaveReportRequests } from "../../domain/usecases/load-leave-report-requests";
 import type { LoadOvertimeReport } from "../../domain/usecases/load-overtime-report";
 import type { LoadPayrollCostReport } from "../../domain/usecases/load-payroll-cost-report";
+import type { LoadReportCatalogue } from "../../domain/usecases/load-report-catalogue";
 
 export type ReportingUseCases = Readonly<{
+  loadCatalogue: Pick<LoadReportCatalogue, "execute">;
   loadAttendanceClosings: Pick<LoadAttendanceClosingReport, "execute">;
   loadAttendanceClosingEmployees: Pick<LoadAttendanceClosingEmployees, "execute">;
   loadPayrollCosts: Pick<LoadPayrollCostReport, "execute">;

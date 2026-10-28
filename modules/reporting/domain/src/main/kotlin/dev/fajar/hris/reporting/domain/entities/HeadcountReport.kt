@@ -10,5 +10,5 @@ data class HeadcountReport(
     val evaluatedAt: Instant,
     val counts: HeadcountCounts,
 ) {
-    val definitionVersion: String = "headcount.v1"
+    val definitionVersion: String = ReportKind.HEADCOUNT.definitionVersion
 }

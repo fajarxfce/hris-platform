@@ -818,3 +818,49 @@ reported zero known vulnerabilities after the update. The dashboard/browser chec
 above used those versions.
 
 The company/group reporting check passed architecture and format checks, server/worker builds, and 61 tests: 10 reporting domain/data, 15 database, and 36 HTTP/PostgreSQL. Coverage includes shared persons, empty companies, effective history, selection bounds, RLS read/write isolation, pooled context cleanup, native/browser build gates, maintenance, module flags, permission and credential revocation while waiting, expired MFA, coherent concurrent snapshots, and cancellation. OpenAPI validates 228 paths and 254 operations. No group browser workflow, device validation, deployment, or group-report performance benchmark is claimed by this backend check.
+
+## Report catalogue
+
+`GET /api/v1/companies/{companyId}/reports/catalogue` returns the company ID,
+evaluation time and at most seven `{ kind, definitionVersion }` entries. Stable
+kinds are `HEADCOUNT`, `ATTENDANCE_EXCEPTIONS`, `ATTENDANCE_CLOSINGS`, `LEAVE`,
+`OVERTIME`, `EXPENSES` and `PAYROLL_COSTS`. Their definitions share the constants
+used by the corresponding report responses, including group headcount.
+
+Discovery requires `reports.read` and current company membership, credentials,
+MFA and Reporting client admission. Shared company, membership and account guards
+precede the access snapshot. The catalogue intersects original and live permissions
+and uses each report's canonical source policy; team, self and decision grants do
+not become company reporting authority. A reader retaining only `reports.read`
+receives an empty catalogue. Revocation of Reporting itself denies discovery.
+No employment, attendance, leave, expense or payroll facts are acquired.
+
+The response is `no-store`; discovering a report never reserves permission to open
+it. Every report and drill-down keeps its own authorization. Group headcount still
+checks all explicitly selected companies independently. There are no result counts,
+private labels, query strings or executable routes in catalogue entries.
+
+The dashboard's `/reports` page provides localized coverage descriptions and links
+to the existing report screens. The catalogue uses the mounted account/company
+lifetime, validates company/kind/version/uniqueness and clears rows during refresh,
+failure or disposal. Late results cannot restore obsolete rows. Client source
+grants narrow server discovery; newly granted capabilities require current company
+access to be reacquired. Navigation is selected from known application routes.
+Personal saved filters and asynchronous exports remain separate pending work.
+
+Validation: 63 reporting domain/data/delivery tests and 70 selected API/PostgreSQL/
+OpenAPI cases passed, including source/grant intersection, company/member/account
+revocation, MFA expiry while waiting and interruption recovery. The contract has
+359 paths and remains below its existing two-MiB bound (2,076,745 bytes). API
+packaging and architecture/format checks passed. Reporting remains outside the
+worker import graph; no worker runtime change was made.
+
+All 3,841 dashboard unit/UI tests passed. Fifteen distinct Chromium scenarios passed
+across the catalogue, headcount and attendance-closing suites; the final four
+catalogue cases passed after correcting a test's existing headcount label and
+shortening the Indonesian attendance label. An isolated API/PostgreSQL/browser
+workflow passed with independent MFA accounts: source revocation empties discovery
+and denies the actual report. The fixture and reader context were disposed. The
+Indonesian dark 390-pixel catalogue and real API empty state were visually checked.
+These checks do not represent deployment, workload measurements or completed
+saved-filter/export delivery.

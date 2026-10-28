@@ -11,6 +11,6 @@ data class PayrollCostReport(
     val evaluatedAt: Instant,
     val aggregate: PayrollCostReportAggregate,
 ) {
-    val definitionVersion: String = "payroll-costs.v1"
+    val definitionVersion: String = ReportKind.PAYROLL_COSTS.definitionVersion
     val currency: String = "IDR"
 }

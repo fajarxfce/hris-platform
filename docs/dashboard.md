@@ -1850,3 +1850,18 @@ MFA, company replacement and narrow dark-mode review. A real API/PostgreSQL/work
 scenario verified recovery and one ledger debit after a lost successful response.
 Optional validity configuration and carried-balance presentation are covered by
 [dashboard and native acceptance](leave-carryover.md#dashboard-and-native-acceptance).
+
+## Report catalogue
+
+`/reports` is the company reporting entry point, available with `reports.read`.
+Its resource table presents the reports currently admitted by the API, with concise
+English/Indonesian coverage and date-window descriptions. Opening a report uses its
+existing screen and fresh authorization; the browser Back action returns to a new
+catalogue read. Empty source access has its own message.
+
+The controller owns one cancellable read per mounted account/company. Refresh and
+failure remove previous rows, replacement cancels pending work, and late results
+are ignored. DTO mapping rejects another company, repeated or unknown kinds and
+unsupported definition versions. No catalogue or result data enters a shared cache.
+Saved-filter authoring, recovery and export history remain in progress. See
+[the catalogue contract](reporting.md#report-catalogue).

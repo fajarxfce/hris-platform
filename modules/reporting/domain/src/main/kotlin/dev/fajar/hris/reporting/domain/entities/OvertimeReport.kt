@@ -13,5 +13,5 @@ data class OvertimeReport(
     val evaluatedAt: Instant,
     val aggregate: OvertimeReportAggregate,
 ) {
-    val definitionVersion = "overtime.v1"
+    val definitionVersion = ReportKind.OVERTIME.definitionVersion
 }

@@ -93,3 +93,13 @@ dashboard tests, twenty-two distinct Chromium cases and a real API/PostgreSQL/wo
 workflow with an independent MFA reader, failed/retried closing, future-hire
 exclusion and successive corrections. Catalogue/saved filters and exports remain
 open. See [closing dashboard evidence](../reporting.md#attendance-closing-dashboard).
+
+The role-aware report catalogue now has backend, dashboard and real API/browser
+acceptance. Seven stable definitions reuse their report source policies, intersect
+current grants after access guards, and retain current MFA. The bounded response
+contains metadata only. Localized discovery clears stale data on refresh, failure
+and account/company replacement. Validation passed 63 reporting tests, 70 selected
+API/PostgreSQL/OpenAPI cases, 3,841 dashboard tests, fifteen distinct Chromium
+scenarios and an isolated independent-reader revocation workflow. Saved filters,
+bounded asynchronous exports and export history remain open. See
+[the catalogue contract and evidence](../reporting.md#report-catalogue).

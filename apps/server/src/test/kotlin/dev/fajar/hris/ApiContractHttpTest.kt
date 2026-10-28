@@ -25,6 +25,17 @@ class ApiContractHttpTest : PeopleApiFixture() {
     private lateinit var mappings: RequestMappingHandlerMapping
 
     @Test
+    fun reportCatalogueDocumentsCompanyAdmissionAndBoundedDefinitionIdentities() {
+        val api = contract()
+        val operation = api["paths"]["/api/v1/companies/{companyId}/reports/catalogue"]["get"]
+        assertTrue(operation["x-hris-authentication-required"].asBoolean())
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val schema = api["components"]["schemas"]["ReportCatalogueEntryResponse"]["properties"]
+        assertEquals("string", schema["definitionVersion"]["type"].asString())
+        assertEquals(7, schema["kind"]["enum"].size())
+    }
+
+    @Test
     fun attendanceClosingEmployeesExposeScopedPagesAndExactRevisionReferences() {
         val api = contract()
         val operation =

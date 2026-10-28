@@ -6,6 +6,7 @@ import { HttpHeadcountReportDataSource } from "../data/datasources/http-headcoun
 import { HttpLeaveReportDataSource } from "../data/datasources/http-leave-report-data-source";
 import { HttpOvertimeReportDataSource } from "../data/datasources/http-overtime-report-data-source";
 import { HttpPayrollCostReportDataSource } from "../data/datasources/http-payroll-cost-report-data-source";
+import { HttpReportCatalogueDataSource } from "../data/datasources/http-report-catalogue-data-source";
 import { RemoteAttendanceClosingReportRepository } from "../data/repositories/remote-attendance-closing-report-repository";
 import { RemoteAttendanceExceptionReportRepository } from "../data/repositories/remote-attendance-exception-report-repository";
 import { RemoteExpenseReportRepository } from "../data/repositories/remote-expense-report-repository";
@@ -13,6 +14,7 @@ import { RemoteHeadcountReportRepository } from "../data/repositories/remote-hea
 import { RemoteLeaveReportRepository } from "../data/repositories/remote-leave-report-repository";
 import { RemoteOvertimeReportRepository } from "../data/repositories/remote-overtime-report-repository";
 import { RemotePayrollCostReportRepository } from "../data/repositories/remote-payroll-cost-report-repository";
+import { RemoteReportCatalogueRepository } from "../data/repositories/remote-report-catalogue-repository";
 import { LoadAttendanceClosingEmployees } from "../domain/usecases/load-attendance-closing-employees";
 import { LoadAttendanceClosingReport } from "../domain/usecases/load-attendance-closing-report";
 import { LoadAttendanceExceptionReport } from "../domain/usecases/load-attendance-exception-report";
@@ -23,6 +25,7 @@ import { LoadLeaveReport } from "../domain/usecases/load-leave-report";
 import { LoadLeaveReportRequests } from "../domain/usecases/load-leave-report-requests";
 import { LoadOvertimeReport } from "../domain/usecases/load-overtime-report";
 import { LoadPayrollCostReport } from "../domain/usecases/load-payroll-cost-report";
+import { LoadReportCatalogue } from "../domain/usecases/load-report-catalogue";
 
 export function createReportingFeature(http: HttpClient) {
   const closings = new RemoteAttendanceClosingReportRepository(
@@ -36,6 +39,9 @@ export function createReportingFeature(http: HttpClient) {
     new HttpAttendanceExceptionReportDataSource(http),
   );
   return {
+    loadCatalogue: new LoadReportCatalogue(
+      new RemoteReportCatalogueRepository(new HttpReportCatalogueDataSource(http)),
+    ),
     loadAttendanceClosings: new LoadAttendanceClosingReport(closings),
     loadAttendanceClosingEmployees: new LoadAttendanceClosingEmployees(closings),
     loadPayrollCosts: new LoadPayrollCostReport(

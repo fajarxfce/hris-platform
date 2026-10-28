@@ -30,6 +30,7 @@ import dev.fajar.hris.reporting.domain.usecases.GetHeadcountReport
 import dev.fajar.hris.reporting.domain.usecases.GetLeaveReport
 import dev.fajar.hris.reporting.domain.usecases.GetOvertimeReport
 import dev.fajar.hris.reporting.domain.usecases.GetPayrollCostReport
+import dev.fajar.hris.reporting.domain.usecases.GetReportCatalogue
 import dev.fajar.hris.reporting.domain.usecases.ListAttendanceClosingEmployees
 import dev.fajar.hris.reporting.domain.usecases.ListExpenseReportClaims
 import dev.fajar.hris.reporting.domain.usecases.ListLeaveReportRequests
@@ -40,6 +41,16 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration(proxyBeanMethods = false)
 class ReportingConfiguration {
+    @Bean
+    fun getReportCatalogue(
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetReportCatalogue(companies, members, identities, transactions, security, clock)
+
     @Bean
     fun attendanceClosingReportSource(sql: DSLContext): AttendanceClosingReportDataSource =
         PostgresAttendanceClosingReportDataSource(sql)

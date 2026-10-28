@@ -11,5 +11,5 @@ data class LeaveReport(
     val evaluatedAt: Instant,
     val aggregate: LeaveReportAggregate,
 ) {
-    val definitionVersion = "leave.v1"
+    val definitionVersion = ReportKind.LEAVE.definitionVersion
 }

@@ -9,6 +9,7 @@ import { canReadLeaveReport } from "../../domain/policies/leave-report-policy";
 import { canReadOvertimeReport } from "../../domain/policies/overtime-report-policy";
 import { canReadPayrollCostReport } from "../../domain/policies/payroll-cost-report-policy";
 import { attendanceClosingReportMessages } from "../i18n/attendance-closing-report-messages";
+import { reportCatalogueMessages } from "../i18n/report-catalogue-messages";
 import { reportingMessages } from "../i18n/reporting-messages";
 
 export function reportingNavigation(
@@ -18,6 +19,15 @@ export function reportingNavigation(
   const permissions = access?.permissions ?? [];
   const text = messages(locale);
   return [
+    ...(permissions.includes("reports.read")
+      ? [
+          {
+            to: "/reports",
+            label: reportCatalogueMessages(locale).title,
+            icon: <DataBarVertical20Regular />,
+          },
+        ]
+      : []),
     ...(canReadAttendanceReport(permissions)
       ? [
           {

@@ -11,5 +11,5 @@ data class ExpenseReport(
     val evaluatedAt: Instant,
     val aggregate: ExpenseReportAggregate,
 ) {
-    val definitionVersion = "expenses.v1"
+    val definitionVersion = ReportKind.EXPENSES.definitionVersion
 }

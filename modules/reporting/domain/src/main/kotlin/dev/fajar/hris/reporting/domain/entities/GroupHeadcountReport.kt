@@ -8,5 +8,5 @@ data class GroupHeadcountReport(
     val evaluatedAt: Instant,
     val counts: GroupHeadcountCounts,
 ) {
-    val definitionVersion: String = "headcount.v1"
+    val definitionVersion: String = ReportKind.HEADCOUNT.definitionVersion
 }

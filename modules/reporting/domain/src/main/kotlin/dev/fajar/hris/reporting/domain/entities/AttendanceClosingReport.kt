@@ -10,5 +10,5 @@ data class AttendanceClosingReport(
     val until: YearMonth,
     val evaluatedAt: Instant,
     val aggregate: AttendanceClosingReportAggregate,
-    val definitionVersion: String = "attendance-closings.v1",
+    val definitionVersion: String = ReportKind.ATTENDANCE_CLOSINGS.definitionVersion,
 )

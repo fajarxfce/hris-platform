@@ -11,5 +11,5 @@ data class AttendanceExceptionReport(
     val evaluatedAt: Instant,
     val aggregate: AttendanceExceptionAggregate,
 ) {
-    val definitionVersion = "attendance-exceptions.v1"
+    val definitionVersion = ReportKind.ATTENDANCE_EXCEPTIONS.definitionVersion
 }

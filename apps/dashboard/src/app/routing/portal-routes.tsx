@@ -395,6 +395,11 @@ const EmploymentCancellationScreen = lazy(() =>
   ),
 );
 
+const ReportCatalogueScreen = lazy(() =>
+  import("../../features/reporting/presentation/bindings/report-catalogue-screen").then(
+    (module) => ({ default: module.ReportCatalogueScreen }),
+  ),
+);
 const HeadcountScreen = lazy(() =>
   import("../../features/reporting/presentation/bindings/headcount-screen").then((module) => ({
     default: module.HeadcountScreen,
@@ -1790,6 +1795,20 @@ export function PortalRoutes({
               accountId={accountId}
               access={access}
               jobs={jobs}
+              companyName={company.name}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ReportCatalogueScreen
+              accountId={accountId}
+              access={access}
+              loadCatalogue={reporting.loadCatalogue}
               companyName={company.name}
               locale={locale}
             />

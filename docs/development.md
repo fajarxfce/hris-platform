@@ -156,6 +156,8 @@ the harness uses JDK 21, Docker and Chromium. It uses the worker fixture's isola
 ports 18081/4175, so run it sequentially with `test:integration:worker`. Its optional
 storage mode creates a private loopback bucket with ephemeral credentials and
 memory limits, and removes the named container and local configuration afterward.
+Generated export reports/results are excluded from both Git and Biome, like the
+other browser artifacts, so a local acceptance run does not contaminate source lint.
 Run `python3 tool/test_dashboard_storage_fixture.py` from the repository root for
 bounded startup/interruption/cleanup checks without Docker. See
 [export acceptance](report-exports.md#real-private-storage-browser-acceptance).

@@ -10,6 +10,8 @@
       "!integration-test-results",
       "!worker-integration-report",
       "!worker-integration-test-results",
+      "!export-integration-report",
+      "!export-integration-test-results",
       "!test-results"
     ]
   },

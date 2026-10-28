@@ -70,6 +70,16 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Attendance closing historical employee selection
+
+The aggregate and employee page now exclude future hires whose initial immutable
+employment revision is effective after the selected month. Worker target snapshots
+remain unchanged. The selection happens before pagination, and a real PostgreSQL
+case reconciles two captured worker snapshots to one historical employee and thirty
+days. All twenty-five closing API cases passed; architecture was checked separately
+after resolving two dashboard datasource imports. See
+[closing selection evidence](reporting.md#employee-closing-drill-down).
+
 ### Attendance closing employee report API
 
 The historical attendance report now has a matching bounded employee page with

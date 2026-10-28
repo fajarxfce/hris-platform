@@ -26,6 +26,41 @@ class AttendanceClosingEmployeesHttpTest : AttendanceClosingReportApiFixture() {
     }
 
     @Test
+    fun futureHireCapturedByTheWorkerCannotEnterHistoricalTotalsOrDisplaceAPage() {
+        val f = isolatedFixture()
+        val future = UUID.randomUUID()
+        reportBody(
+            command(
+                f.admin,
+                "/api/v1/companies/${f.company}/employees",
+                """{"id":"$future","employeeNumber":"FUTURE","person":{"id":"${UUID.randomUUID()}","legalName":"Future month employee","nationality":"ID"},"terms":{"effectiveFrom":"2026-10-01","startDate":"2026-10-01","contract":"PERMANENT","status":"ACTIVE"},"reason":"Future hire before closing"}""",
+                f.csrf,
+                UUID.randomUUID(),
+            )
+        )
+        finishMonth(f, "2026-09", 2)
+        assertEquals(
+            2,
+            database()
+                .queryForObject(
+                    "select count(*) from work_period_snapshots where company_id=?",
+                    Int::class.java,
+                    f.company,
+                ),
+        )
+        val aggregate = report(f, "2026-09", "2026-09")
+        assertEquals(1, aggregate["totals"]["employmentMonths"].asLong())
+        assertEquals(30, aggregate["totals"]["days"].asLong())
+        val selected = page(f, limit = 1)
+        assertEquals(1, selected["items"].size())
+        assertEquals(f.employee.toString(), selected["items"][0]["employeeId"].asString())
+        assertTrue(selected["nextCursor"].isNull)
+        assertEquals(aggregate["totals"], selected["items"][0]["counts"])
+        assertEquals(404, get(f.admin, "${f.path}/periods/2026-09/employees/$future").statusCode())
+        reconcile(f, aggregate)
+    }
+
+    @Test
     fun exactSelectedRevisionRemainsReadableAfterANewerCorrection() {
         val f = isolatedFixture()
         mixedCalendar(f)

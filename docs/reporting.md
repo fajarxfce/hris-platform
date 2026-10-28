@@ -545,7 +545,10 @@ Invalid windows return `invalid_report_month_range` with `maximumMonths: "12"`,
 Only successfully closed periods contribute. A worker's partial snapshots, cancelled
 or failed attempts and periods awaiting review contribute nothing. The original
 projection uses the immutable snapshots belonging to the published closing job.
-The current projection chooses each employee/month's latest applied attendance
+Only employments whose immutable initial revision is effective by month end are
+included. The closing worker also captures future hires; their snapshots are excluded
+from both aggregates and employee pages. Later hires or revisions cannot change
+this initial-date selection. The current projection chooses each employee/month's latest applied attendance
 adjustment, or its original snapshot when none exists. Earlier revisions are not
 added together. A late capture alone does not change either projection. Subsequent
 hires, roster changes or private-profile edits cannot replace retained closing facts.
@@ -560,7 +563,7 @@ counts. The closing version identifies the original closing, not adjustment head
 | Common count | Definition |
 | --- | --- |
 | `closedMonths` | Published periods in the selected window. |
-| `employmentMonths` | Employee snapshots selected from those closing jobs. |
+| `employmentMonths` | Historical employee snapshots selected from those closing jobs. |
 | `employments` | Distinct employment records, counted independently for the overall total. |
 | `adjustedEmploymentMonths` | Selected employee/month snapshots with at least one applied adjustment; repeated corrections still count once. |
 | `days` | Full calendar dates retained for the selected employee snapshots. |
@@ -633,8 +636,9 @@ includes display number/name, the original closing reference, nullable exact lat
 adjustment ID/revision/timestamp, and both original/current counts. The current
 snapshot opens the exact retained adjustment, or the original employee closing
 when no adjustment is selected. Later corrections never change that retained ID.
-Display names reflect current person labels with month-end employment context;
-they are not frozen closing evidence. Private profiles, reasons, evidence IDs and
+Display numbers and names use a minimal current employment/person projection;
+they are not frozen closing evidence. The immutable initial employment revision
+selects the same historical employees as the aggregate before pagination. Private profiles, reasons, evidence IDs and
 snapshot bodies do not cross the SQL/JVM boundary.
 
 Pages admit one to fifty rows. The source selects at most `limit + 1` employee
@@ -669,6 +673,22 @@ and data dependencies now declare it. OpenAPI has 358 paths and 2,072,345 bytes.
 Logs: `.work/attendance-closing-employees-unit.log` and
 `.work/attendance-closing-employees-api.log`. Dashboard and export acceptance remain
 open; no workload benchmark or deployment was performed.
+
+A follow-up real-workflow review found that the closing worker also retains
+snapshots for future hires that the historical Workforce directory omits. Both
+report projections now filter by the immutable initial employment revision's
+effective date before month-end; filtering happens before the employee page limit.
+This avoids acquiring missing historical labels or inflating calendar-day totals.
+The initial revision cannot be cancelled, and later revisions cannot precede it.
+Current display labels are acquired directly without changing the retained cohort.
+The PostgreSQL regression captures two worker snapshots, excludes the future hire,
+reconciles the remaining thirty days and verifies that pagination has no skipped
+or extra row. All twenty-five closing API cases passed in the focused run. The
+same invocation's architecture task caught two unfinished dashboard datasource
+imports of domain query types; those ports now accept raw month/cursor arguments.
+The architecture check was rerun separately after the fix. See
+`.work/attendance-closing-cohort-api.log` and
+`.work/attendance-closing-cohort-check.log`.
 
 ## Validation
 

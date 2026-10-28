@@ -16,7 +16,7 @@ class PostgresAttendanceClosingReportDataSource(private val sql: DSLContext) :
     ): List<AttendanceClosingReportRow> =
         sql.fetch(
                 """
-                ${projection("work_period_snapshots")}
+                ${projection(snapshots(false))}
                 select month,period_id,job_id,version,closed_at,timezone,
                   count(distinct period_id) closed_months,count(employment_id) employment_months,
                   count(distinct employment_id) employments,
@@ -48,14 +48,9 @@ class PostgresAttendanceClosingReportDataSource(private val sql: DSLContext) :
     ): List<AttendanceClosingEmployeeRow> =
         sql.fetch(
                 """
-            ${projection("""lateral (
-                select company_id,job_id,employment_id,payload from work_period_snapshots
-                where company_id=p.company_id and job_id=p.job_id
-                  and (?::uuid is null or employment_id>?::uuid)
-                order by employment_id limit ?
-            )""")}
+            ${projection(snapshots(true))}
             select p.month,p.period_id,p.job_id,p.version,p.closed_at,p.timezone,p.employment_id,
-                e.employee_number,e.legal_name employee_name,p.adjustment_id,p.adjustment_revision,p.adjustment_at,
+                e.employee_number,n.legal_name employee_name,p.adjustment_id,p.adjustment_revision,p.adjustment_at,
                 1 closed_months,1 employment_months,1 employments,
                 case when adjustment_revision>0 then 1 else 0 end adjusted_employment_months,
                 days,scheduled_days,scheduled_minutes,
@@ -65,8 +60,8 @@ class PostgresAttendanceClosingReportDataSource(private val sql: DSLContext) :
                     and current->>'employeeId'=employment_id::text and original->>'month'=to_char(month,'YYYY-MM')
                     and current->>'month'=to_char(month,'YYYY-MM'),false) then 0 else 1 end invalid_sources
             from projected p
-            left join lateral employees_at(p.company_id,(p.month+interval '1 month'-interval '1 day')::date) e
-                on e.id=p.employment_id
+            left join employments e on e.company_id=p.company_id and e.id=p.employment_id
+            left join persons n on n.id=e.person_id
             where p.employment_id is not null order by p.employment_id
             """
                     .trimIndent(),
@@ -88,6 +83,22 @@ class PostgresAttendanceClosingReportDataSource(private val sql: DSLContext) :
                     row.toReportRow(),
                 )
             }
+
+    // The immutable initial revision fixes whether an employment existed by month end.
+    // Closing targets may also include future hires; those snapshots are not historical results.
+    private fun snapshots(paged: Boolean) =
+        """
+        lateral (
+          select w.company_id,w.job_id,w.employment_id,w.payload from work_period_snapshots w
+          where w.company_id=p.company_id and w.job_id=p.job_id
+            and exists(select 1 from employment_revisions r
+              where r.company_id=w.company_id and r.employment_id=w.employment_id and r.revision=0
+                and r.effective_from<=(p.month+interval '1 month'-interval '1 day')::date)
+            ${if (paged) "and (?::uuid is null or w.employment_id>?::uuid)" else ""}
+          ${if (paged) "order by w.employment_id limit ?" else ""}
+        )
+    """
+            .trimIndent()
 
     private fun projection(snapshots: String) =
         """

@@ -18,6 +18,8 @@ provide localized errors, and pass the relevant real API and UI checks.
 The historical attendance report now has a matching bounded employee page with
 exact original closing and selected adjustment references. Ascending employment
 UUID continuations retain company/month scope through later corrections and hires.
+The immutable initial employment date excludes future hires captured by the worker
+before either aggregation or pagination; all twenty-five closing API cases pass.
 Original/current counts reconcile with the aggregate while retained revisions stay
 readable. Validation passed 61 reporting and 83 API/PostgreSQL/OpenAPI cases, plus
 architecture, formatting and API packaging. Dashboard and exports remain open. See

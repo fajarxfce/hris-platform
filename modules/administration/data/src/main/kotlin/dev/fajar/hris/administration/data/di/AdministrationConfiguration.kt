@@ -1,10 +1,13 @@
 package dev.fajar.hris.administration.data.di
 
 import dev.fajar.hris.administration.data.datasources.*
+import dev.fajar.hris.administration.data.repositories.ConfiguredIntegrationRepository
 import dev.fajar.hris.administration.data.repositories.StoredAuditRepository
 import dev.fajar.hris.administration.data.repositories.StoredCompanyClientPolicyRepository
+import dev.fajar.hris.administration.domain.entities.IntegrationKind
 import dev.fajar.hris.administration.domain.repositories.AuditRepository
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
+import dev.fajar.hris.administration.domain.repositories.IntegrationConfigurationRepository
 import dev.fajar.hris.administration.domain.usecases.*
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
@@ -17,6 +20,32 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration(proxyBeanMethods = false)
 class AdministrationConfiguration {
+    @Bean
+    fun integrationConfiguration(
+        environment: org.springframework.core.env.Environment
+    ): IntegrationConfigurationRepository =
+        ConfiguredIntegrationRepository(
+            mapOf(
+                    IntegrationKind.FIREBASE_AUTH to "HRIS_FIREBASE_AUTH_ENABLED",
+                    IntegrationKind.OIDC to "HRIS_OIDC_ENABLED",
+                    IntegrationKind.MAIL to "HRIS_MAIL_ENABLED",
+                    IntegrationKind.PUSH to "HRIS_FCM_ENABLED",
+                    IntegrationKind.STORAGE to "HRIS_STORAGE_ENABLED",
+                    IntegrationKind.DOCUMENT_SCANNER to "HRIS_DOCUMENT_SCANNER_ENABLED",
+                )
+                .filterValues { environment.getProperty(it, Boolean::class.java, false) }
+                .keys
+        )
+
+    @Bean
+    fun getIntegrationConfiguration(
+        configuration: IntegrationConfigurationRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetIntegrationConfiguration(configuration, identities, transactions, security, clock)
+
     @Bean fun auditSource(sql: DSLContext): AuditDataSource = PostgresAuditDataSource(sql)
 
     @Bean fun audits(source: AuditDataSource): AuditRepository = StoredAuditRepository(source)

@@ -2,6 +2,7 @@ import { Home20Regular } from "@fluentui/react-icons";
 import type { AppNavigationSection } from "../../core/presentation/components/app-portal-shell";
 import { type Locale, messages } from "../../core/presentation/i18n/messages";
 import { administrationNavigation } from "../../features/administration/presentation/navigation/administration-navigation";
+import { integrationConfigurationNavigation } from "../../features/administration/presentation/navigation/integration-configuration-navigation";
 import { approvalsNavigation } from "../../features/approvals/presentation/navigation/approvals-navigation";
 import { communicationsNavigation } from "../../features/communications/presentation/navigation/communications-navigation";
 import {
@@ -75,7 +76,10 @@ export function portalNavigation(
     {
       id: "platform",
       label: text.navigationPlatform,
-      items: platformAccountNavigation(platformPermissions, locale),
+      items: [
+        ...platformAccountNavigation(platformPermissions, locale),
+        ...integrationConfigurationNavigation(platformPermissions, locale),
+      ],
     },
     { id: "account", label: text.navigationAccount, items: deviceSessionNavigation(locale) },
   ].filter((section) => section.items.length > 0);

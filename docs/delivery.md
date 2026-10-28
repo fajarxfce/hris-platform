@@ -5,6 +5,15 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+Platform integration review now shows the API's six startup enablement flags,
+including for administrators without a company. It reads no provider identifiers
+or secrets and rechecks current authority, credentials and MFA. The dashboard
+clears observations on refresh, hiding, replacement and revoked access. Validation
+passed 184 backend tests including the full worker graph, all 3,922 dashboard
+tests (including 48 Administration cases), seventeen distinct Chromium cases across runs and a real three-account
+API/PostgreSQL/browser revocation workflow. Provider health and worker configuration
+are explicitly separate. See [contract, evidence and limits](integrations.md).
+
 Real export browser acceptance passed with the actual API, PostgreSQL, worker and
 private Garage/S3 service. Independent MFA accounts verified lost-admission recovery,
 owner/source isolation, retained headcount after source edits, and a 1,201-row leave

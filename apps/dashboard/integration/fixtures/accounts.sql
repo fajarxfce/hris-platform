@@ -109,7 +109,10 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000088', 'browser-report-filter-admin@example.invalid', 'Browser Report Filter Admin'),
   ('a0000000-0000-4000-8000-000000000089', 'browser-report-filter-reader@example.invalid', 'Browser Report Filter Reader'),
   ('a0000000-0000-4000-8000-000000000090', 'browser-report-export-admin@example.invalid', 'Browser Report Export Admin'),
-  ('a0000000-0000-4000-8000-000000000091', 'browser-report-export-reader@example.invalid', 'Browser Report Export Reader')
+  ('a0000000-0000-4000-8000-000000000091', 'browser-report-export-reader@example.invalid', 'Browser Report Export Reader'),
+  ('a0000000-0000-4000-8000-000000000092', 'browser-integration-admin@example.invalid', 'Browser Integration Admin'),
+  ('a0000000-0000-4000-8000-000000000093', 'browser-integration-company-admin@example.invalid', 'Browser Integration Company Admin'),
+  ('a0000000-0000-4000-8000-000000000094', 'browser-integration-operator@example.invalid', 'Browser Integration Operator')
 ) AS fixture(id, email, name)
 WHERE bootstrap.email = 'browser-admin@example.invalid'
 ON CONFLICT DO NOTHING;
@@ -161,7 +164,9 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000082'),
   ('a0000000-0000-4000-8000-000000000086'),
   ('a0000000-0000-4000-8000-000000000088'),
-  ('a0000000-0000-4000-8000-000000000090')
+  ('a0000000-0000-4000-8000-000000000090'),
+  ('a0000000-0000-4000-8000-000000000092'),
+  ('a0000000-0000-4000-8000-000000000094')
 ) AS fixture(account_id)
 WHERE platform_permissions.account_id = (SELECT id FROM accounts WHERE email = 'browser-admin@example.invalid')
 ON CONFLICT DO NOTHING;

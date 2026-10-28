@@ -27,6 +27,11 @@ import type { WorkforceUseCases } from "../../features/workforce/presentation/co
 import { approvalResourceRoute } from "./approval-resource-route";
 
 const noPlatformPermissions: readonly string[] = Object.freeze([]);
+const IntegrationConfigurationScreen = lazy(() =>
+  import(
+    "../../features/administration/presentation/bindings/integration-configuration-screen"
+  ).then((module) => ({ default: module.IntegrationConfigurationScreen })),
+);
 const DeviceSessionsScreen = lazy(() =>
   import("../../features/identity/presentation/bindings/device-sessions-screen").then((module) => ({
     default: module.DeviceSessionsScreen,
@@ -566,11 +571,22 @@ export function PortalRoutes({
   nextIdentifier: () => string;
 }) {
   const platform = useMatch("/platform/*");
+  const integrations = useMatch("/platform/integrations");
   const ownSessions = useMatch("/account/sessions");
   const platformAccess = useMemo(
     () => Object.freeze({ accountId, permissions: platformPermissions }),
     [accountId, platformPermissions],
   );
+  if (integrations)
+    return (
+      <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+        <IntegrationConfigurationScreen
+          access={platformAccess}
+          load={administration.loadIntegrationConfiguration}
+          locale={locale}
+        />
+      </Suspense>
+    );
   if (platform)
     return (
       <Suspense fallback={<AppLoading label={messages(locale).loading} />}>

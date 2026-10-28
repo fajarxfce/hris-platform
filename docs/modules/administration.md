@@ -10,6 +10,18 @@ Screens: settings, flags, integration status, audit explorer, job monitor.
 
 Acceptance: policy effective dates, restricted settings/audit access, safe retry, stale client policy, secret redaction, and recovery from backup.
 
+## Integration configuration
+
+Global platform administrators can review six API startup enablement flags through
+the public configuration endpoint and `/platform/integrations`, including without
+a company assignment. Original/current authority, credentials and MFA protect the
+read; the projection acquires no provider identifiers or secrets. Refresh, revoked
+access and hidden/disposed workspaces discard old observations. The localized view
+identifies API configuration explicitly; provider health, worker configuration and
+successful delivery still require separate verification. Backend checks passed 184
+tests including the full worker graph; focused dashboard/browser and independent
+MFA API acceptance passed. See [configuration contract and evidence](../integrations.md).
+
 ## Client availability and module flags
 
 Versioned company client policy is implemented, including future activation, immutable history, paired build headers, bounded maintenance, and server admission for feature endpoints and sync selections. Settings writes retain idempotent receipts and current permission/recent-authentication checks. [Client policy](../client-policy.md) defines recovery, scheduling, and mobile behavior. These availability controls do not grant permissions or interrupt already admitted transactions/jobs.

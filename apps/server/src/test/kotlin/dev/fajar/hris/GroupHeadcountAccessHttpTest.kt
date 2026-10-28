@@ -171,6 +171,59 @@ class GroupHeadcountAccessHttpTest : GroupHeadcountApiFixture() {
     }
 
     @Test
+    fun mfaExpiryWhileAcquiringGroupCountsCannotPublishAnyCompany() {
+        val f = fixture()
+        val second = anotherCompany(f)
+        database()
+            .update(
+                "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
+                f.account,
+            )
+        val security = IdentitySecurityPolicy()
+        val reader =
+            GetGroupHeadcountReport(
+                reports,
+                policies,
+                companies,
+                members,
+                identities,
+                transactions,
+                reads,
+                security,
+                clock,
+            )
+        val actor =
+            f.actor.copy(
+                companyId = null,
+                mfaVerifiedAt = clock.instant().minus(security.maximumMfaAge).plusSeconds(1),
+            )
+        val selected = listOf(f.company, second.company)
+        val barrier = HeadcountReportProbe.Barrier(f.company)
+        reportProbe.afterRead.set(barrier)
+        val result =
+            Executors.newSingleThreadExecutor().use { pool ->
+                val pending =
+                    pool.submit<Result<GroupHeadcountReport>> {
+                        reader.execute(actor, selected, date, client)
+                    }
+                try {
+                    assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                    clock.set(clock.instant().plusSeconds(2))
+                    barrier.release.countDown()
+                    pending.get(10, TimeUnit.SECONDS)
+                } finally {
+                    barrier.release.countDown()
+                    reportProbe.afterRead.set(null)
+                }
+            }
+        assertEquals("mfa_required", (result as Result.Failed).failure.code)
+        assertInstanceOf(
+            Result.Success::class.java,
+            reader.execute(actor.copy(mfaVerifiedAt = clock.instant()), selected, date, client),
+        )
+    }
+
+    @Test
     fun sharedGroupReadsAllowOtherSnapshotsAndKeepConcurrentEmploymentChangesCoherent() {
         val f = fixture()
         val second = anotherCompany(f)

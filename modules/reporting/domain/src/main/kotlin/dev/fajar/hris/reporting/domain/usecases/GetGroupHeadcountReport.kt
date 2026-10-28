@@ -4,6 +4,7 @@ import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.administration.domain.policies.*
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.AccountAccess
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.*
 import dev.fajar.hris.identity.domain.repositories.*
@@ -91,6 +92,7 @@ class GetGroupHeadcountReport(
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
             val now = clock.instant()
+            val guardedAccess = linkedMapOf<UUID, AccountAccess>()
             for (company in ordered) {
                 val found = identities.access(actor.accountId, company)
                 if (found is Result.Failed) return@run found
@@ -105,10 +107,11 @@ class GetGroupHeadcountReport(
                         current.account,
                         current.securityPermissions,
                         actor.mfaVerifiedAt,
-                        now,
+                        clock.instant(),
                         security,
                     )
                 if (assurance is Result.Failed) return@run assurance
+                guardedAccess[company] = current
                 val available =
                     policies.effective(company, now).flatMap {
                         validateClientAvailability(
@@ -126,7 +129,20 @@ class GetGroupHeadcountReport(
                         )
                     )
             }
-            reports.countGroup(ordered.toSet(), asOf).map { GroupHeadcountReport(asOf, now, it) }
+            reports.countGroup(ordered.toSet(), asOf).flatMap { counts ->
+                val completedAt = clock.instant()
+                for (company in ordered) {
+                    val assurance =
+                        validateCompanySessionActor(
+                            scopes.getValue(company),
+                            guardedAccess.getValue(company),
+                            completedAt,
+                            security,
+                        )
+                    if (assurance is Result.Failed) return@flatMap assurance
+                }
+                Result.Success(GroupHeadcountReport(asOf, now, counts))
+            }
         }
     }
 }

@@ -262,8 +262,9 @@ class ReportingConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
         clock: Clock,
-    ) = GetHeadcountReport(reports, companies, members, identities, transactions, clock)
+    ) = GetHeadcountReport(reports, companies, members, identities, transactions, security, clock)
 
     @Bean
     fun getGroupHeadcountReport(

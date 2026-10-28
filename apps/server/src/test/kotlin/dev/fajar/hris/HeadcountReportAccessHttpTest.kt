@@ -1,17 +1,86 @@
 package dev.fajar.hris
 
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
+import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.reporting.domain.entities.HeadcountReport
+import dev.fajar.hris.reporting.domain.repositories.HeadcountReportRepository
 import dev.fajar.hris.reporting.domain.usecases.GetHeadcountReport
 import java.net.http.HttpResponse
 import java.time.LocalDate
 import java.util.concurrent.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 
 class HeadcountReportAccessHttpTest : HeadcountReportApiFixture() {
     @Autowired private lateinit var getReport: GetHeadcountReport
+
+    @Autowired private lateinit var reports: HeadcountReportRepository
+    @Autowired private lateinit var companies: CompanyRepository
+    @Autowired private lateinit var members: MembershipRepository
+    @Autowired private lateinit var identities: IdentityRepository
+    @Autowired private lateinit var transactions: TransactionRunner
+
+    @ParameterizedTest
+    @ValueSource(strings = ["account", "projection"])
+    fun companyHeadcountRequiresCurrentMfaAfterBothGuardsAndSourceAcquisition(stage: String) {
+        val f = fixture()
+        database()
+            .update(
+                "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
+                f.account,
+            )
+        val security = IdentitySecurityPolicy()
+        val reader =
+            GetHeadcountReport(
+                reports,
+                companies,
+                members,
+                identities,
+                transactions,
+                security,
+                clock,
+            )
+        val actor =
+            f.actor.copy(
+                mfaVerifiedAt = clock.instant().minus(security.maximumMfaAge).plusSeconds(1)
+            )
+        val barrier = HeadcountReportProbe.Barrier(f.company)
+        if (stage == "projection") reportProbe.afterRead.set(barrier)
+        else
+            accountProbe.current.set(
+                AccountLockProbe.Barrier(f.account, barrier.entered, barrier.release)
+            )
+        val result =
+            Executors.newSingleThreadExecutor().use { pool ->
+                val pending =
+                    pool.submit<Result<HeadcountReport>> {
+                        reader.execute(actor, LocalDate.parse("2026-10-01"))
+                    }
+                try {
+                    assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                    clock.set(clock.instant().plusSeconds(2))
+                    barrier.release.countDown()
+                    pending.get(10, TimeUnit.SECONDS)
+                } finally {
+                    barrier.release.countDown()
+                    reportProbe.afterRead.set(null)
+                    accountProbe.current.set(null)
+                }
+            }
+        assertEquals("mfa_required", (result as Result.Failed).failure.code)
+        assertInstanceOf(
+            Result.Success::class.java,
+            reader.execute(
+                actor.copy(mfaVerifiedAt = clock.instant()),
+                LocalDate.parse("2026-10-01"),
+            ),
+        )
+    }
 
     private fun waiting(f: Fixture, change: () -> Unit): Result<HeadcountReport> {
         val barrier = AccountLockProbe.Barrier(f.account)

@@ -70,6 +70,15 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Headcount assurance through source acquisition
+
+Company headcount now checks current MFA after guards and after acquiring counts.
+Group headcount checks each selected company's protected access snapshot again
+before releasing the aggregate. Expiry yields `mfa_required`; renewed verification
+permits an explicit new read. Validation passed 63 reporting tests, 30 related
+API/PostgreSQL cases, API packaging and architecture/format checks. Definitions and
+query scope stay unchanged. See [headcount assurance](reporting.md#headcount-session-assurance).
+
 ### Report catalogue
 
 The company catalogue returns only the seven known definitions permitted by

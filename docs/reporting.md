@@ -864,3 +864,21 @@ and denies the actual report. The fixture and reader context were disposed. The
 Indonesian dark 390-pixel catalogue and real API empty state were visually checked.
 These checks do not represent deployment, workload measurements or completed
 saved-filter/export delivery.
+
+## Headcount session assurance
+
+Company headcount now retains the identity module's current-session policy after
+company/member/account guards and again after acquiring counts. Group headcount
+also rechecks every selected company's retained access snapshot after its aggregate
+returns. A proof expiring during source acquisition yields `mfa_required` and cannot
+release partial company counts. The existing guards protect those bounded access
+snapshots; rechecking assurance adds no report query or wider company scope.
+Definitions, effective dates and distinct-person counts remain unchanged.
+
+Validation passed 63 reporting tests and 30 selected API/PostgreSQL cases across
+company/group headcount and catalogue, plus API packaging and architecture/format
+checks. Controlled account/source waits cover MFA expiry, denial of acquired counts
+and success after renewed verification. Existing isolation, grant/credential races,
+cancellation, coherent totals and client-policy checks also passed. This follow-up
+changes backend admission only; the catalogue's fifteen browser cases and isolated
+API/browser acceptance are recorded above.

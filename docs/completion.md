@@ -63,8 +63,29 @@ It rejects other-account/company targets and never marks a message read implicit
 Root checks passed with 1,732 desktop tests, 17 application Chromium tests and
 Android assembly. Starter `29081c5` carries the generic ownership/lifecycle port,
 with 286 desktop tests, three application Chromium tests and Android assembly.
-These are local validated increments; native push registration/hint processing,
-provider delivery, and live platform URL acceptance remain separate work.
+These are local validated increments; provider delivery and live platform URL
+acceptance remain separate work.
+
+Mobile `f98a7884` adds session-owned native push registration and retained SDK
+retirement; `d941a544` mounts explicit opt-in, disable and recovery in Settings.
+Mobile `ea2c58b7` receives bounded data-only Inbox hints, persists encrypted
+account-owned queues, synchronizes canonical Inbox state and applies current
+admission before a generic local notification. Attempt evidence survives account
+changes and uncertain OS delivery; reception cannot choose display text or bypass
+resource-link admission. Root checks passed with 1,788 desktop/UI tests, 113 related
+Chromium tests and configured Android assembly. The reusable notification path
+fix `b77d991f` is ported as starter `7562e67`, with 291 desktop tests, eight Chromium
+tests and Android assembly. All these commits are pushed.
+
+The requested Firebase project `cmp-fajar` has local ignored Android configuration
+for all HRIS/starter flavors. Configuration processing proves a matching build,
+not token issuance or provider delivery. Background registration renewal, Firebase
+Authentication exchange, physical FCM/APNs delivery and iOS acceptance remain open.
+Firebase Auth currently returns `CONFIGURATION_NOT_FOUND`; its Console setup and
+provider activation remain external dependencies, along with worker FCM credentials
+and iOS/APNs configuration. See Mobile's
+[native push contract](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/native-push.md)
+for boundaries and validation evidence.
 
 The [employee calendar and attendance replica](https://github.com/fajarxfce/hris-mobile/commit/d57f496)
 retains encrypted attendance days, effective weekly assignments, roster overrides

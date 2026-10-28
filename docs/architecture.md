@@ -530,7 +530,7 @@ report authority. Known server-owned schemas and pure summary conversion retain
 metric definitions and exact units. Detail capture shares named SQL projections
 with live reports and inserts from one coherent source query; overflow admits no
 partial prefix. The caller owns begin/capture/seal and source authorization. Queued
-execution, artifact delivery and global cleanup remain separate work; see
+execution owns this capture and artifact delivery; global cleanup remains separate work; see
 [retained report snapshots](report-exports.md#retained-snapshots).
 
 V96 adds owner-scoped export execution records and immutable upload/part evidence.
@@ -542,9 +542,19 @@ fence accepted parts; database triggers own progress counters and complete-row
 publication. Active, retained, attempt, part and byte quotas bound the lifecycle.
 Physical retirement requires actual expiry and completed row/object cleanup; it
 retains the original identity and metadata. Admission must generate export resource
-identities on the server, independently from caller command keys. Worker orchestration,
-public admission/download and scheduled retirement remain pending; see
+identities on the server, independently from caller command keys. Public admission/download and scheduled retirement remain pending; see
 [execution records](report-exports.md#execution-records-and-private-parts).
+
+
+Reporting use cases now own export admission, cancellation, recovery and worker
+orchestration. Original source grants are captured before waits; current credentials,
+source grants and client policy are checked under job/owner/export and ordered access
+guards. Interactive commands require live session assurance; worker execution uses
+background command authority. Capture/seal/checkpoint and final manifest/job/journal
+publication each commit atomically. Unique upload reservations commit before provider
+I/O; a new guarded transaction validates its receipt and accepts the part. Progress
+counts capture, accepted parts and publication, including positive empty-file progress.
+No repository invokes another repository and no provider call holds source locks.
 
 
 Interactive job reads and cancellation use the pure company-session policy to intersect original/live authority and check current MFA after waiting. Their domain details contain the resulting available actions; delivery only serializes them and cannot restore a permission from the originally resolved actor. This interactive policy is separate from background execution authority.

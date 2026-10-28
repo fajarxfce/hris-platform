@@ -15,14 +15,15 @@ validation. A generated module or route does not complete a capability. Each
 workflow must enforce current scope, handle response loss and cancellation,
 provide localized errors, and pass the relevant real API and UI checks.
 
-Report exports now have typed CSV layouts, coherent retained source snapshots and
-owned execution/upload/part records. V96 fences observed versions, preserves partial
-progress through explicit recovery, enforces active/physical-retention and byte quotas,
-and rejects incomplete publication. Across focused runs, 109 reporting, 24 database,
-21 server/PostgreSQL and 82 worker tests passed with packaging and architecture/format
-checks. Public admission, worker/provider orchestration, downloads, scheduled expiry
-and export history UI remain active work. These contracts do not expose a complete
-export workflow. See [export contracts and evidence](report-exports.md).
+Report export admission/cancel/resume use cases and the registered worker now
+connect retained snapshots to private CSV generation and atomic publication. Source
+access, lease fencing, cleanup reservations and recovery preserve original facts,
+accepted parts and expiry. Validation passed 226 distinct tests across focused runs,
+including both application contexts and actual Spring Batch with controlled storage;
+both packages and architecture/format checks passed. Public command/history/download
+adapters, scheduled snapshot retirement, export dashboard and real S3/browser
+acceptance remain active work. This is not a complete user-facing export workflow.
+See [export contracts and evidence](report-exports.md).
 
 Historical attendance closings now have dashboard and exact-revision drill-down
 acceptance. Applied month/company filters, complete publication state, original and

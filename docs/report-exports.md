@@ -88,8 +88,8 @@ unsealed header from committing, including an interrupted or incomplete capture.
 Headers and rows become immutable; a competing begin cannot replace an existing
 identity or deadline. Empty captures seal with zero rows and retain their CSV schema.
 Known source projections can insert their rows with one coherent `INSERT ... SELECT`
-before sealing. The seven report-specific projections and their queued orchestration
-still need to be connected; successive live reads are not a snapshot strategy.
+before sealing. The queued worker connects the known projections to this capture transaction;
+successive live reads are not a snapshot strategy.
 
 One snapshot holds at most 100,000 rows and 100 MiB of staged JSON, independently of
 the eventual CSV limit. Database accounting updates once per insertion statement and
@@ -201,9 +201,55 @@ cleanup reservations and, for attempted uploads, the one-hour grace. The origina
 request, final metadata and part evidence remain immutable after retirement.
 History reads use a bounded owner-scoped keyset page.
 
-These are persistence and execution contracts. Public admission, current-authorized
-worker orchestration, provider writes, downloads and scheduled retirement are still
-being connected; this storage increment does not expose an export job or endpoint.
+These persistence contracts support the worker below. Public command/history
+routes, current-authorized downloads and scheduled retirement remain open.
+
+## Admission and worker execution
+
+`ManageReportExports` owns idempotent admission, observed-version cancellation and
+explicit recovery. Admission creates a new server export UUID independently of the
+command key, captures narrow original grants before resource waits, and checks each
+source plus the anchor under ordered client-policy/company/member/account guards.
+Current account credentials, original/live grant intersection, MFA and effective
+client availability are checked again after waits and journal work. Owner limits
+and the company queue's 100-pending-job limit share the mutation transaction. A
+response replay returns the same receipt without another queue item, slot or event.
+
+Recovery requires the old job to be failed or cancelled and preserves the original
+selection, source grants, client context, expiry, sealed facts and accepted parts.
+The current caller and original client must both pass current availability. A new
+job uses the current session's credential version; recovery cannot widen original
+source grants or prolong retention. Owner cancellation needs current `reports.read`
+and interactive assurance, so lost source permissions do not prevent stopping work.
+It immediately stops the export, requests job cancellation and leaves all cleanup
+reservations intact. HTTP adapters for these commands remain in the next increment.
+
+Reporting is now imported by both applications. The registered `REPORT_EXPORT`
+worker resolves its original account/session credentials with background command
+authority; interactive MFA proof age is not a durable job credential. Each step
+locks the job lease, owner and export before sorted source/access guards. It
+revalidates current credentials, original/live grants, policy transitions and expiry
+through capture, rendering and publication. One aggregate query supplies each small
+summary; each large detail capture uses the existing single-SQL source projection.
+Sealed snapshots survive retries and never reacquire live facts.
+
+Rendering reads bounded retained pages and advances by the CSV encoder's consumed
+row count. Each attempt gets a fresh object key and durable cleanup reservation
+before provider I/O outside the SQL transaction. The acknowledgement must match
+key, byte count, SHA-256 and a bounded safe provider ETag. Acceptance obtains a new
+fenced transaction and rechecks lease, cancellation, version, source authority and
+expiry. Failed or late acknowledgements leave a scheduled orphan; accepted keys
+are never overwritten or removed from expiry cleanup. Actual database-clock expiry
+also fences mutations even if an application clock is behind.
+
+Job progress uses an upper bound of 1,026 steps: snapshot capture, up to 1,024 parts,
+and final publication. An empty dataset still uploads its header and advances.
+Recovery can resume at the retained global part position. Publication validates
+all ordered manifest descriptors, rows and total bytes and commits `READY`, the
+successful job, checkpoint and journal together. Failure cleanup can stop a leased
+job after permission loss, without reopening source access. A stale lease cannot
+change a newer attempt. Generic exhausted-job recovery also handles a stranded
+queued/rendering export whose previous job is already terminal.
 
 ## Validation and remaining delivery
 
@@ -279,9 +325,32 @@ ambiguous PL/pgSQL CASE expression; parentheses corrected it before the successf
 runs. Tests exercised storage records and cleanup evidence, not new provider uploads
 or public export admission.
 
-Request admission, private artifact publication,
-fenced worker execution, interruption recovery, scheduled expiry/cleanup, authorized
-downloads and export
-history/dashboard remain to be implemented and validated. No export endpoint or worker
-kind is exposed by these foundations. Reporting has not yet been added to the worker
-import graph. No new browser, provider, workload or deployment acceptance is claimed.
+Export execution validation passed 226 distinct tests across focused runs: 111
+Reporting (52 domain, 57 data, two delivery), two core-job domain, 29 API-context/
+PostgreSQL cases and 84 worker cases. The complete existing 82-test worker suite
+ran after importing Reporting; two additional tests exercised the registered task
+through real Spring Batch and credential revocation before actor resolution. Both
+application JARs, architecture and formatting checks passed.
+
+Eight new API-context/PostgreSQL cases cover all seven summaries and three empty
+details, exact selected-source scope, server-generated IDs, concurrent owner quotas,
+response replay, orphan cleanup, cancellation during provider I/O, retained facts
+and parts across recovery, invalid provider receipts, revocation, credential changes,
+lease loss, expiry and disabled source policy. A synthetic 1,201-row wide capture
+exercises CSV byte-prefix progress, no skipped/duplicated rows, lost upload responses
+and recovery without recapture. Real source SQL is covered separately by the existing
+leave/expense/closing capture cases. Injected audit failure rolls back admission,
+capture and final publication. MFA expiry during journaling rolls back each of start,
+cancel and resume. Test providers assert that every put occurs outside a SQL transaction
+and after its durable cleanup reservation. The final eight-case run repeated these
+execution checks after adding assurance coverage. Initial runs corrected an encoder
+API invocation and fixture clock/grant/Batch-schema assumptions before passing.
+
+No public export HTTP endpoint, real S3 upload, browser export acceptance or workload
+claim follows from these controlled-provider tests. Public command/history/download,
+scheduled snapshot retirement and dashboard delivery remain open.
+
+Public command/history/detail adapters, current-authorized range downloads,
+scheduled snapshot retirement and export history/dashboard remain to be delivered.
+Private provider I/O is exercised with controlled test storage; real S3/browser
+acceptance, workload measurement and deployment are separate and not yet claimed.

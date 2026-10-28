@@ -34,6 +34,7 @@ import org.springframework.context.annotation.Import
     LeaveConfiguration::class,
     PayrollConfiguration::class,
     CommunicationsConfiguration::class,
+    dev.fajar.hris.reporting.data.di.ReportingConfiguration::class,
 )
 class WorkerApplication
 

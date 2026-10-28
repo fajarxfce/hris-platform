@@ -23,6 +23,13 @@ import org.springframework.transaction.PlatformTransactionManager
 @Configuration(proxyBeanMethods = false)
 class WorkerConfiguration {
     @Bean
+    fun reportExportTask(
+        resolve: ResolveActor,
+        advance: dev.fajar.hris.reporting.domain.usecases.AdvanceReportExport,
+        abort: dev.fajar.hris.reporting.domain.usecases.AbortReportExport,
+    ): JobTask = ReportExportTask(resolve, advance, abort)
+
+    @Bean
     fun onboardingScheduleTask(
         resolve: ResolveActor,
         execute: ExecuteOnboardingSchedule,

@@ -7,6 +7,8 @@ dependencies {
     implementation(projects.modules.organization.domain)
     implementation(projects.modules.people.domain)
     implementation(projects.core.database)
+    implementation(projects.core.jobs.domain)
+    implementation(projects.core.storage.domain)
     implementation(libs.spring.core)
     implementation(libs.jackson.kotlin)
 }

@@ -70,6 +70,41 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Authorized export admission and fenced worker execution
+
+Reporting now connects idempotent request/cancel/resume use cases to its registered
+worker. All supported captures freeze their facts; private writes reserve cleanup
+before I/O and recheck current authority and lease ownership before acceptance.
+Recovery retains completed parts and the original expiry; complete manifest, job
+success and journal publication commit together.
+
+Export execution validation passed 226 distinct tests across focused runs: 111
+Reporting (52 domain, 57 data, two delivery), two core-job domain, 29 API-context/
+PostgreSQL cases and 84 worker cases. The complete existing 82-test worker suite
+ran after importing Reporting; two additional tests exercised the registered task
+through real Spring Batch and credential revocation before actor resolution. Both
+application JARs, architecture and formatting checks passed.
+
+Eight new API-context/PostgreSQL cases cover all seven summaries and three empty
+details, exact selected-source scope, server-generated IDs, concurrent owner quotas,
+response replay, orphan cleanup, cancellation during provider I/O, retained facts
+and parts across recovery, invalid provider receipts, revocation, credential changes,
+lease loss, expiry and disabled source policy. A synthetic 1,201-row wide capture
+exercises CSV byte-prefix progress, no skipped/duplicated rows, lost upload responses
+and recovery without recapture. Real source SQL is covered separately by the existing
+leave/expense/closing capture cases. Injected audit failure rolls back admission,
+capture and final publication. MFA expiry during journaling rolls back each of start,
+cancel and resume. Test providers assert that every put occurs outside a SQL transaction
+and after its durable cleanup reservation. The final eight-case run repeated these
+execution checks after adding assurance coverage. Initial runs corrected an encoder
+API invocation and fixture clock/grant/Batch-schema assumptions before passing.
+
+No public export HTTP endpoint, real S3 upload, browser export acceptance or workload
+claim follows from these controlled-provider tests. Public command/history/download,
+scheduled snapshot retirement and dashboard delivery remain open.
+
+See [execution contracts](report-exports.md#admission-and-worker-execution).
+
 ### Durable export execution and private-part records
 
 V96 now protects owned request metadata, exact snapshot attachment, immutable upload

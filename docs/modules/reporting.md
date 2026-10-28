@@ -162,3 +162,19 @@ waits for actual expiry plus row/object-cleanup evidence. Across focused runs,
 both packages and architecture/format checks. Public admission, worker/provider
 orchestration, downloads, scheduled retention and history UI remain open. See
 [execution records](../report-exports.md#execution-records-and-private-parts).
+
+
+Idempotent admission/cancel/resume use cases and the registered `REPORT_EXPORT`
+worker now connect those records to all seven summary and three detail captures.
+Rendering freezes facts, consumes bounded CSV prefixes, reserves cleanup before
+private provider writes, and fences acceptance/publication with current source
+access and job ownership. Recovery retains accepted parts and original expiry.
+Public command/history/download adapters, scheduled snapshot retirement and the
+export dashboard remain open. See [worker execution](../report-exports.md#admission-and-worker-execution).
+
+Execution validation passed 226 distinct tests across focused runs: 111 Reporting,
+two core-job, 29 API-context/PostgreSQL and 84 worker cases. Both packages and
+architecture/format checks passed. The complete worker graph was exercised after
+adding Reporting; storage providers remain controlled fixtures pending real S3 and
+browser acceptance. Detailed boundaries and failed-run corrections are recorded in
+[export validation](../report-exports.md#validation-and-remaining-delivery).

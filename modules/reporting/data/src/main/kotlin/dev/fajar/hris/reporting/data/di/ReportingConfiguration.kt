@@ -4,9 +4,11 @@ import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepo
 import dev.fajar.hris.core.domain.ChangeJournalRepository
 import dev.fajar.hris.core.domain.CompanyReadTransactionRunner
 import dev.fajar.hris.core.domain.OperationRepository
+import dev.fajar.hris.core.domain.ReportSourceTransactionRunner
 import dev.fajar.hris.core.domain.TransactionRunner
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
+import dev.fajar.hris.jobs.domain.repositories.JobRepository
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.reporting.data.datasources.*
@@ -25,7 +27,12 @@ import dev.fajar.hris.reporting.domain.repositories.HeadcountReportRepository
 import dev.fajar.hris.reporting.domain.repositories.LeaveReportRepository
 import dev.fajar.hris.reporting.domain.repositories.OvertimeReportRepository
 import dev.fajar.hris.reporting.domain.repositories.PayrollCostReportRepository
+import dev.fajar.hris.reporting.domain.repositories.ReportExportRepository
+import dev.fajar.hris.reporting.domain.repositories.ReportSnapshotRepository
+import dev.fajar.hris.reporting.domain.repositories.ReportSnapshotSourceRepository
 import dev.fajar.hris.reporting.domain.repositories.SavedReportFilterRepository
+import dev.fajar.hris.reporting.domain.usecases.AbortReportExport
+import dev.fajar.hris.reporting.domain.usecases.AdvanceReportExport
 import dev.fajar.hris.reporting.domain.usecases.DeleteReportFilter
 import dev.fajar.hris.reporting.domain.usecases.GetAttendanceClosingReport
 import dev.fajar.hris.reporting.domain.usecases.GetAttendanceExceptionReport
@@ -41,7 +48,9 @@ import dev.fajar.hris.reporting.domain.usecases.ListAttendanceClosingEmployees
 import dev.fajar.hris.reporting.domain.usecases.ListExpenseReportClaims
 import dev.fajar.hris.reporting.domain.usecases.ListLeaveReportRequests
 import dev.fajar.hris.reporting.domain.usecases.ListSavedReportFilters
+import dev.fajar.hris.reporting.domain.usecases.ManageReportExports
 import dev.fajar.hris.reporting.domain.usecases.SaveReportFilter
+import dev.fajar.hris.storage.domain.repositories.*
 import java.time.Clock
 import org.jooq.DSLContext
 import org.springframework.context.annotation.Bean
@@ -49,6 +58,93 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration(proxyBeanMethods = false)
 class ReportingConfiguration {
+    @Bean
+    fun manageReportExports(
+        exports: ReportExportRepository,
+        jobs: JobRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        sources: ReportSourceTransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ManageReportExports(
+            exports,
+            jobs,
+            policies,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            sources,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun advanceReportExport(
+        exports: ReportExportRepository,
+        snapshots: ReportSnapshotRepository,
+        detailSources: ReportSnapshotSourceRepository,
+        headcount: HeadcountReportRepository,
+        attendance: AttendanceExceptionReportRepository,
+        leave: LeaveReportRepository,
+        expenses: ExpenseReportRepository,
+        overtime: OvertimeReportRepository,
+        payroll: PayrollCostReportRepository,
+        closings: AttendanceClosingReportRepository,
+        jobs: JobRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        storage: ObjectStorageRepository,
+        cleanup: ObjectCleanupRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        sources: ReportSourceTransactionRunner,
+        clock: Clock,
+    ) =
+        AdvanceReportExport(
+            exports,
+            snapshots,
+            detailSources,
+            headcount,
+            attendance,
+            leave,
+            expenses,
+            overtime,
+            payroll,
+            closings,
+            jobs,
+            policies,
+            companies,
+            members,
+            identities,
+            storage,
+            cleanup,
+            journal,
+            transactions,
+            sources,
+            clock,
+        )
+
+    @Bean
+    fun abortReportExport(
+        exports: ReportExportRepository,
+        jobs: JobRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+    ) = AbortReportExport(exports, jobs, journal, transactions, clock)
+
     @Bean
     fun reportExportSource(sql: DSLContext): ReportExportDataSource =
         PostgresReportExportDataSource(sql)

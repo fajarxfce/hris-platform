@@ -2,6 +2,8 @@ plugins { id("hris.kotlin") }
 
 dependencies {
     api(projects.core.domain)
+    api(projects.core.jobs.domain)
+    api(projects.core.storage.domain)
     api(projects.modules.expenses.domain)
     api(projects.modules.leave.domain)
     api(projects.modules.payroll.domain)

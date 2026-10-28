@@ -34,6 +34,8 @@ dependencies {
     implementation(projects.modules.people.data)
     implementation(projects.modules.workforce.domain)
     implementation(projects.modules.workforce.data)
+    implementation(projects.modules.reporting.domain)
+    implementation(projects.modules.reporting.data)
     implementation(libs.spring.jackson)
     implementation(libs.spring.batch)
     implementation(libs.spring.actuator)

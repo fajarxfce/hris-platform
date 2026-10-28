@@ -4,6 +4,7 @@ import { type Locale, messages } from "../../../../core/presentation/i18n/messag
 import type { CompanyAccess } from "../../../identity/domain/entities/session";
 import { canReadAttendanceReport } from "../../domain/policies/attendance-report-policy";
 import { canReadHeadcount } from "../../domain/policies/headcount-policy";
+import { canReadLeaveReport } from "../../domain/policies/leave-report-policy";
 import { reportingMessages } from "../i18n/reporting-messages";
 
 export function reportingNavigation(
@@ -13,6 +14,15 @@ export function reportingNavigation(
   const permissions = access?.permissions ?? [];
   const text = messages(locale);
   return [
+    ...(canReadLeaveReport(permissions)
+      ? [
+          {
+            to: "/reports/leave",
+            label: reportingMessages(locale).leaveTitle,
+            icon: <DataBarVertical20Regular />,
+          },
+        ]
+      : []),
     ...(canReadAttendanceReport(permissions)
       ? [
           {

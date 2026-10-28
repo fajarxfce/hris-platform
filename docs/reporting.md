@@ -159,9 +159,21 @@ credential version and MFA checks after waiting; assurance is checked again afte
 acquisition. Cancellation unwinds the read and failures stay sanitized. Responses
 are `no-store`. Reporting does not mutate operational leave.
 
-The dashboard consumer and live browser acceptance are the next increment. This
-backend report does not close historical reporting, financial metrics or export
-requirements.
+The dashboard exposes `/reports/leave` and `/reports/leave/requests`. The default
+window runs from the active company's current year start through its local date.
+Applied URL dates remain separate from form edits; browser history restores them.
+Status rows and the all-requests action open the exact company/window drill-down.
+Request pages retain status and bounded continuations, with first/next controls.
+The detail, action completion and history routes preserve validated report return
+context; a foreign company or invalid cursor cannot import that selection.
+
+Counts and decimal days are mapped and reconciled before publication. Exact day
+formatting avoids floating-point conversion even beyond JavaScript's safe integer
+precision. The UI distinguishes clipped days from the full request. Replacement,
+refresh, disposal and authorization failures clear the owned result and cancel or
+ignore obsolete reads. No report data enters persistent storage or a shared cache.
+Status and request actions occupy the first table column on narrow screens. These
+operational reports do not close historical reporting, financial metrics or exports.
 
 ## Validation
 
@@ -179,7 +191,25 @@ bounded at 2,032,863 bytes with 352 paths. Evidence is in
 `.work/leave-report-unit.log`, `.work/leave-report-validation.log` and
 `.work/leave-report-format.log`. The complete worker suite ran after migration V91
 and remained up to date in the final targeted rerun. Dashboard/browser acceptance
-for this report remains pending.
+for this report subsequently passed the checks below.
+
+The leave dashboard passed all 3,793 unit/UI tests across 317 files, architecture,
+Biome and TypeScript checks, and 19 Chromium scenarios covering leave reports,
+existing attendance reports and leave calendar return flows. A real API/PostgreSQL
+fixture completed MFA, created two half-day requests for one employment, reconciled
+the report and scoped rows, withdrew a request through the detail/action UI, returned
+to the original pending filter, selected the cancelled request, and verified that
+requested totals stayed unchanged while status buckets moved. The existing real
+calendar withdrawal/return scenario also passed. Both completed in the same owned
+fixture, which removed its API process and database. The report layout was inspected
+at desktop and 390px widths. A focused follow-up also confirmed retained page cursors
+and rejected incompatible status changes in return navigation.
+
+Logs: `.work/leave-dashboard-check.log`, `.work/leave-dashboard-browser.log`,
+`.work/leave-dashboard-integration.log`, `.work/leave-origin-validation.log`.
+Screenshots: `.work/dashboard-leave-report-real.png` and
+`.work/dashboard-leave-report-mobile.png`. Production build passed; existing large
+bundle/CSS warnings do not establish a performance result.
 
 
 On 28 October 2026, operational attendance reporting passed 15 reporting-domain/data

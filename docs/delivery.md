@@ -10,9 +10,10 @@ working dates within an annual window and preserve exact half-day quantities.
 Current status buckets include rejected/cancelled history separately from active
 leave; report/source grants and MFA protect both projections. Validation passed
 25 reporting tests, 90 API/PostgreSQL/OpenAPI tests and 81 worker tests, including
-pagination after status changes and concurrent decision serialization. The leave
-report dashboard and live browser acceptance are next; historical financial reports
-and exports remain open. See [reporting](reporting.md#operational-leave).
+pagination after status changes and concurrent decision serialization. Its dashboard
+passed 3,793 unit/UI tests, 19 Chromium scenarios and two real API/browser workflows
+through withdrawal, status reconciliation and preserved report/calendar return links.
+Historical financial reports and exports remain open. See [reporting](reporting.md#operational-leave).
 
 Operational attendance reporting now provides a company-scoped, 31-day aggregate
 that reconciles with the existing exception directory. Fifteen reporting-domain/data

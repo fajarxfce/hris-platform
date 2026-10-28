@@ -1,6 +1,7 @@
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 
 const en = {
+  backToReport: "Back to report requests",
   requests: "Leave requests",
   details: "Leave request",
   summary: "Request details",
@@ -79,6 +80,7 @@ const en = {
   CANCELLATION_REQUESTED: "Cancellation requested",
 };
 const id: typeof en = {
+  backToReport: "Kembali ke pengajuan laporan",
   requests: "Permintaan cuti",
   details: "Detail cuti",
   summary: "Ringkasan permintaan",

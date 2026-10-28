@@ -2709,6 +2709,10 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
 };
 
 export function failureMessage(failure: Failure, locale: Locale): string {
+  if (failure.code === "invalid_report_range" && failure.parameters.maximumDays === "366")
+    return locale === "id"
+      ? "Pilih rentang maksimal 366 hari antara tahun 1900 dan 2200."
+      : "Choose a date range of up to 366 days between 1900 and 2200.";
   const text = errors[failure.code];
   return (
     text?.[locale === "id" ? 1 : 0] ??

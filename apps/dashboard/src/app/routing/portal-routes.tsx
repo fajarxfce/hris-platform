@@ -401,6 +401,17 @@ const HeadcountScreen = lazy(() =>
   })),
 );
 
+const LeaveReportScreen = lazy(() =>
+  import("../../features/reporting/presentation/bindings/leave-report-screen").then((module) => ({
+    default: module.LeaveReportScreen,
+  })),
+);
+const LeaveReportRequestsScreen = lazy(() =>
+  import("../../features/reporting/presentation/bindings/leave-report-requests-screen").then(
+    (module) => ({ default: module.LeaveReportRequestsScreen }),
+  ),
+);
+
 const AttendanceReportScreen = lazy(() =>
   import("../../features/reporting/presentation/bindings/attendance-report-screen").then(
     (module) => ({ default: module.AttendanceReportScreen }),
@@ -1763,6 +1774,36 @@ export function PortalRoutes({
               access={access}
               loadHeadcount={reporting.loadHeadcount}
               companies={companies}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/leave"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveReportScreen
+              accountId={accountId}
+              access={access}
+              loadLeave={reporting.loadLeave}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/leave/requests"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <LeaveReportRequestsScreen
+              accountId={accountId}
+              access={access}
+              loadLeaveRequests={reporting.loadLeaveRequests}
+              companyName={company.name}
               timezone={company.timezone}
               locale={locale}
             />

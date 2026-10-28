@@ -806,6 +806,30 @@ The isolated API/PostgreSQL workflow verifies these boundaries with an enrolled
 test administrator, lost committed responses, CSRF rejection, unrelated accounts,
 retained device and browser access, and replacement of the dashboard account.
 
+## Operational leave report
+
+`/reports/leave` shows current request/status counts, distinct employments and exact
+submitted days inside an applied annual date window. It requires company-wide
+`leave.read` and `reports.read`. Rejected/cancelled history remains visible; this is
+not active leave, remaining balance or a historical closing report.
+
+Status and all-request drill-downs use `/reports/leave/requests` with the same
+company/dates, optional status and bounded cursor pages. Full request days stay
+separate from the clipped quantity. Detail, history and action completion retain
+validated report return context. Company/account replacement, refresh and disposal
+cancel pending reads; late results and failed authorization cannot restore old rows.
+Exact decimal formatting, scope/version mapping and aggregate reconciliation precede
+display. Applied filters survive Back/Forward, and first-column actions remain
+reachable at 390px widths in English/Indonesian light/dark layouts.
+
+Validation passed 3,793 unit/UI tests, architecture/Biome/TypeScript, production
+build, 19 report/calendar Chromium scenarios, and two real API/PostgreSQL browser
+workflows. The report workflow verified MFA, two half-day requests, withdrawal from
+a report detail, return to the retained filter and reconciliation of pending/cancelled
+buckets without changing total requested days. The existing calendar workflow also
+passed, and the owned API/database fixture cleaned up. See [report definitions and
+evidence](reporting.md#operational-leave). Historical reports and exports remain open.
+
 ## Operational attendance report
 
 `/reports/attendance-exceptions` shows six reconciled metrics and a daily table for

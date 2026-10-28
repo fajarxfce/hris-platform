@@ -13,6 +13,7 @@ import { LeaveActionController } from "../controllers/leave-action-controller";
 import { useLeaveActionForm } from "../controllers/use-leave-action-form";
 import { leaveActionCopy, leaveActionView } from "../models/leave-action-view";
 import { leaveCalendarOrigin } from "../models/leave-calendar-route";
+import { leaveReportOrigin } from "../models/leave-report-origin";
 import { leaveParameters, leaveQuery } from "../models/leave-route";
 import { LeaveActionPage } from "../pages/leave-action-page";
 import { LeaveEvidenceDownloads } from "./leave-evidence-downloads";
@@ -34,6 +35,7 @@ export function LeaveActionScreen(props: Props) {
     leaveQuery(parameters, props.access.companyId),
     null,
     leaveCalendarOrigin(parameters, props.access.companyId),
+    leaveReportOrigin(parameters, props.access.companyId),
   ).toString();
   if (parameters.has("company") && parameters.get("company") !== props.access.companyId)
     return <Navigate to={`/leave/requests?${query}`} replace />;

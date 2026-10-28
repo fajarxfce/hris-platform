@@ -27,5 +27,7 @@ and exact half-day quantities. Frozen request days retain policy/calendar histor
 released allocations do not erase rejected/cancelled requests. Both reads recheck
 report/source grants and MFA, with bounded RLS projections and scoped continuations.
 V91 adds the date-envelope index. The backend passed 25 reporting tests, 90 selected
-API/PostgreSQL/OpenAPI tests and 81 worker tests. The dashboard consumer remains
-in progress; see [leave definitions and evidence](../reporting.md#operational-leave).
+API/PostgreSQL/OpenAPI tests and 81 worker tests. Its dashboard passed 3,793 tests,
+19 Chromium scenarios and real API/browser withdrawal/reconciliation, including
+preserved report and calendar return links. See
+[leave definitions and evidence](../reporting.md#operational-leave).

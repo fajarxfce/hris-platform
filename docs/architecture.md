@@ -533,6 +533,20 @@ partial prefix. The caller owns begin/capture/seal and source authorization. Que
 execution, artifact delivery and global cleanup remain separate work; see
 [retained report snapshots](report-exports.md#retained-snapshots).
 
+V96 adds owner-scoped export execution records and immutable upload/part evidence.
+Original source grants and request metadata cannot change; they never substitute
+for current authorization. The caller owns job, owner and resource guards and the
+transaction, while private provider I/O remains outside it. A pending cleanup
+reservation precedes each upload attempt. Observed versions and exact signatures
+fence accepted parts; database triggers own progress counters and complete-row
+publication. Active, retained, attempt, part and byte quotas bound the lifecycle.
+Physical retirement requires actual expiry and completed row/object cleanup; it
+retains the original identity and metadata. Admission must generate export resource
+identities on the server, independently from caller command keys. Worker orchestration,
+public admission/download and scheduled retirement remain pending; see
+[execution records](report-exports.md#execution-records-and-private-parts).
+
+
 Interactive job reads and cancellation use the pure company-session policy to intersect original/live authority and check current MFA after waiting. Their domain details contain the resulting available actions; delivery only serializes them and cannot restore a permission from the originally resolved actor. This interactive policy is separate from background execution authority.
 
 Job operations retain the guarded access snapshot and check assurance again after

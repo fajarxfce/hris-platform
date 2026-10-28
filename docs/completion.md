@@ -15,14 +15,14 @@ validation. A generated module or route does not complete a capability. Each
 workflow must enforce current scope, handle response loss and cancellation,
 provide localized errors, and pass the relevant real API and UI checks.
 
-Report exports now have bounded typed CSV encoding, anchored source transactions,
-retained immutable snapshots, seven summary layouts and coherent detail capture for
-leave, expenses and attendance closings. The latest source increment passed 99
-reporting and 41 server/PostgreSQL tests, including retained facts after operational
-changes; the six-case worker context and both packaging tasks remained up to date.
-Architecture and formatting passed. Queued artifact generation, download/expiry and
-export history remain active work; these foundations do not expose an export
-workflow. See [export contracts and evidence](report-exports.md).
+Report exports now have typed CSV layouts, coherent retained source snapshots and
+owned execution/upload/part records. V96 fences observed versions, preserves partial
+progress through explicit recovery, enforces active/physical-retention and byte quotas,
+and rejects incomplete publication. Across focused runs, 109 reporting, 24 database,
+21 server/PostgreSQL and 82 worker tests passed with packaging and architecture/format
+checks. Public admission, worker/provider orchestration, downloads, scheduled expiry
+and export history UI remain active work. These contracts do not expose a complete
+export workflow. See [export contracts and evidence](report-exports.md).
 
 Historical attendance closings now have dashboard and exact-revision drill-down
 acceptance. Applied month/company filters, complete publication state, original and

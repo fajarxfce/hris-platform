@@ -153,3 +153,12 @@ six-case worker context and both packages remained up to date. Architecture and
 formatting passed. Queued execution, private artifacts, authorized downloads,
 scheduled retention and export history remain open. See
 [report-specific capture](../report-exports.md#report-layouts-and-source-capture).
+
+V96 now retains owned export execution state and immutable upload/part evidence.
+Exact snapshot attachment, version fencing, finite quotas, explicit recovery and
+complete publication are enforced in persistence. Retirement retains metadata and
+waits for actual expiry plus row/object-cleanup evidence. Across focused runs,
+109 reporting, 24 database, 21 server/PostgreSQL and 82 worker tests passed, with
+both packages and architecture/format checks. Public admission, worker/provider
+orchestration, downloads, scheduled retention and history UI remain open. See
+[execution records](../report-exports.md#execution-records-and-private-parts).

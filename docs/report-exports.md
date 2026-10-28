@@ -157,6 +157,54 @@ still validates the immutable store's sequence and quotas. The database may need
 to scan/aggregate/sort additional source records; these output bounds are not a
 measured query-memory or workload guarantee.
 
+## Execution records and private parts
+
+V96 stores an owned export request separately from its immutable captured facts.
+The request retains its selection, dataset, schema/format, original deadline,
+client transport/build and narrowly selected original source grants. It includes
+the anchor plus every selected source company; these stored grants confer no
+current authority. Admission and every content operation must still intersect them
+with current access. Admission must generate a fresh export UUID on the server,
+independently of the caller's idempotency key: that UUID also identifies its cleanup
+resource and must not be chosen to collide with another module's resource.
+
+The execution record progresses through queued, rendering, ready or stopped states.
+Each mutation observes a version. A captured snapshot can attach only when its
+owner, exact definition/columns and original expiry match the request. Recovery
+requires a new queued job for the same owner/export and a failed or cancelled prior
+job. It preserves the existing snapshot, accepted parts, row offset and deadline.
+Raw row/byte progress belongs to immutable part triggers; callers cannot edit it.
+
+Each upload attempt reserves a fresh company-prefixed key under
+`company/reports/export/upload`. A matching pending cleanup reservation must already
+exist before the upload reservation can commit. Its deletion deadline is at least
+one hour after the export's fixed expiry. The caller performs provider I/O after
+commit, then reacquires job/owner/export and access guards before accepting the
+exact reserved part. Acceptance matches its identity, row/byte offsets, byte count,
+digest and creation instant. Row locking rechecks the observed version after a
+competing write. Late responses cannot replace an accepted part. Cleanup remains
+scheduled for both accepted and abandoned objects.
+
+Limits are enforced in pure validation and PostgreSQL: two active and ten physically
+unretired exports per account/company; eight execution jobs per export; 1,024 accepted
+parts, 1,088 total reservations, and 256 MiB cumulative reserved bytes. Individual
+parts remain at most one MiB and 500 rows; accepted output remains at most 100 MiB
+and 100,000 rows. The cumulative reservation budget does not reset on failure or
+recovery. Stopping an export releases its active slot while retaining its physical
+retention slot. Failed cleanup cannot silently free that slot for more retained data.
+
+Publication requires all captured rows in a contiguous, ordered part manifest.
+An empty dataset has one header part. The opaque manifest tag hashes the ordered
+part descriptors and provider versions; it is not a SHA-256 of the concatenated CSV.
+Retirement requires database-clock expiry, absent captured rows, no remaining
+cleanup reservations and, for attempted uploads, the one-hour grace. The original
+request, final metadata and part evidence remain immutable after retirement.
+History reads use a bounded owner-scoped keyset page.
+
+These are persistence and execution contracts. Public admission, current-authorized
+worker orchestration, provider writes, downloads and scheduled retirement are still
+being connected; this storage increment does not expose an export job or endpoint.
+
 ## Validation and remaining delivery
 
 Validation passed 80 reporting tests (35 domain, 43 data, two delivery) and 26
@@ -211,6 +259,25 @@ and both application packaging tasks remained up to date; Reporting's worker imp
 graph did not change. Architecture and formatting checks passed, and fixture containers
 were disposed. Initial runs corrected only new-test syntax, required fixture values
 and an inherited helper-name conflict before the integration run passed.
+
+Execution-record validation subsequently passed 109 reporting tests (50 domain,
+57 data, two delivery), 24 database/migration cases, 21 server/PostgreSQL cases and
+all 82 worker tests. Six new domain and four repository cases cover authority and
+client metadata, exact time/state/size bounds, malformed acquisition, ordered
+manifests, empty output, detached data and cancellation/failure classification.
+Six new runtime/PostgreSQL cases cover retained parts through explicit recovery,
+exact snapshot attachment, required cleanup reservations, signature/version fencing,
+competing reservations, owner isolation, active/retained quotas, keyset history,
+expiry blockers and immutable evidence. Raw SQL admits exactly 1,088 reservations
+or 256 MiB of reserved bytes, then rolls back the next reservation and its cleanup
+row together. A final focused run repeated 57 data, 24 database, six export storage
+and six worker-context cases after strengthening duplicate insertion and publication
+checks. It proves a partially rendered file cannot publish and repeated insertion
+consumes no additional slot at quota. Both packages, architecture and formatting
+passed, and test containers were disposed. The initial migration compile found an
+ambiguous PL/pgSQL CASE expression; parentheses corrected it before the successful
+runs. Tests exercised storage records and cleanup evidence, not new provider uploads
+or public export admission.
 
 Request admission, private artifact publication,
 fenced worker execution, interruption recovery, scheduled expiry/cleanup, authorized

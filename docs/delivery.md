@@ -70,6 +70,21 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Durable export execution and private-part records
+
+V96 now protects owned request metadata, exact snapshot attachment, immutable upload
+reservations and accepted parts. Version/identity checks fence late responses and
+preserve captured facts, accepted output and the original expiry across explicit
+recovery. PostgreSQL enforces active and physically retained owner limits, finite
+attempt/part/byte budgets and complete publication; retirement waits for row and
+cleanup evidence to be gone. Across focused runs, 109 reporting, 24 database,
+21 server/PostgreSQL and all 82 worker tests passed. A final run repeated 57 data,
+24 database, six export-storage and six worker-context cases after strengthening
+repeated insertion and incomplete-publication checks. Both JARs, architecture and
+formatting passed; containers were disposed. Public admission, worker/provider I/O,
+current-authorized downloads, scheduled retention and history UI remain open. See
+[execution records and validation](report-exports.md#execution-records-and-private-parts).
+
 ### Report-specific export layouts and source capture
 
 Seven summary builders now retain the report definitions, distinct totals, exact

@@ -7,8 +7,12 @@ import {
   payrollFinalizationDetailsDto,
   payrollFinalizationPreparationDto,
 } from "../../src/features/payroll/data/models/payroll-finalization-dto";
-import { payrollPayslipPageDto } from "../../src/features/payroll/data/models/payroll-payslip-dto";
+import {
+  payrollPayslipDto,
+  payrollPayslipPageDto,
+} from "../../src/features/payroll/data/models/payroll-payslip-dto";
 import { payrollReviewPreparationDto } from "../../src/features/payroll/data/models/payroll-review-dto";
+import { exercisePayrollCostReport, readPayrollCostReport } from "./payroll-cost-report-workflow";
 import { exercisePayrollPayments } from "./payroll-payment-workflow";
 import { exercisePayrollPayslip } from "./payroll-payslip-workflow";
 import { exercisePayrollReturns } from "./payroll-return-workflow";
@@ -115,184 +119,229 @@ export async function exercisePayrollFinalization(input: {
   }
   const publisher = await browser.newContext({ baseURL });
   try {
-    const page = await publisher.newPage();
-    await signInAndEnrollAuthenticator(page, "browser-payroll-finalizer@example.invalid");
-    await page.getByRole("combobox", { name: "Company", exact: true }).selectOption(company);
-    for (const path of [
-      runPath,
-      `${base}/payroll/reviews/${review}`,
-      `${base}/payroll/payslips?from=${month}&until=${month}`,
-    ])
-      expect((await publisher.request.get(path)).status()).toBe(403);
-    await page.goto(`/payroll/publications?company=${company}&from=${month}&until=${month}`);
-    await page
-      .getByRole("button", {
-        name: new RegExp(`^Review finalization: Calculation 3 · ${month}$`, "u"),
-      })
-      .click();
-    await expect(page.getByRole("region", { name: "Reviewed totals", exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: /^(Calculation|Approval review)$/u })).toHaveCount(
-      0,
-    );
-    const preparation = payrollFinalizationPreparationDto.parse(
-      await (await publisher.request.get(`${runPath}/finalization-preparation`)).json(),
-    );
-    expect(preparation.availableActions).toEqual(["START"]);
-    expect(preparation.latestReview?.id).toBe(review);
-    const writes: { operation: string; body: Record<string, unknown> }[] = [];
-    let drop = true;
-    await page.route(`**${runPath}/finalizations`, async (route) => {
-      if (route.request().method() !== "POST") return route.continue();
-      writes.push({
-        operation: route.request().headers()["idempotency-key"] ?? "",
-        body: route.request().postDataJSON() as Record<string, unknown>,
-      });
-      const response = await route.fetch();
-      expect(response.status()).toBe(200);
-      if (drop) {
-        drop = false;
-        return route.abort("failed");
-      }
-      return route.fulfill({ response });
-    });
-    await page.getByRole("link", { name: "Review publication", exact: true }).click();
-    await page.getByLabel("Reason", { exact: true }).fill("Publish independently approved payroll");
-    await page.getByRole("button", { name: "Publish payroll", exact: true }).click();
-    await expect(
-      page.getByRole("button", { name: "Retry original command", exact: true }),
-    ).toBeVisible();
-    const id = String(writes[0]?.body.id),
-      path = `${base}/payroll/finalizations/${id}`;
-    await expect
-      .poll(
-        async () => {
-          const response = await publisher.request.get(path);
-          expect(response.status()).toBe(200);
-          return payrollFinalizationDetailsDto.parse(await response.json()).job.status;
-        },
-        { timeout: 30_000, intervals: [250, 500, 1000] },
-      )
-      .toBe("SUCCEEDED");
-    // The original acknowledgement must remain recoverable even after the worker changes the run.
-    await page.getByRole("button", { name: "Retry original command", exact: true }).click();
-    await expect(page.getByRole("status")).toContainText("Publication requested.");
-    expect(writes).toHaveLength(2);
-    expect(writes[1]).toEqual(writes[0]);
-    expect(writes[0]?.body).toMatchObject({
-      reviewId: review,
-      expectedRunVersion: preparation.run.version,
-      expectedReviewVersion: preparation.latestReview?.version,
-      expectedApprovalVersion: preparation.approvalVersion,
-    });
-    await page.getByRole("link", { name: "View publication", exact: true }).click();
-    await expect(page.getByRole("status")).toContainText(
-      "Payslips published. Payment is managed separately.",
-    );
-    const published = payrollFinalizationDetailsDto.parse(
-      await (await publisher.request.get(path)).json(),
-    );
-    expect(published.run).toMatchObject({ id: run, status: "FINALIZED", finalizationId: id });
-    expect(published.finalization).toMatchObject({
-      id,
-      number: 1,
-      reviewId: review,
-      actorId: finalizerId,
-    });
-    expect(published.finalization.publishedAt).not.toBeNull();
-    expect(published.totals).toEqual(preparation.totals);
-    expect(
-      (await (await publisher.request.get(`${runPath}/finalizations?limit=8`)).json()).items,
-    ).toHaveLength(1);
-    const complete = payrollFinalizationPreparationDto.parse(
-      await (await publisher.request.get(`${runPath}/finalization-preparation`)).json(),
-    );
-    expect(complete.availableActions).toEqual([]);
-    expect(complete.latestJobStatus).toBe("SUCCEEDED");
-    await page.screenshot({
-      path: "../../.work/dashboard-payroll-finalization-real-published.png",
-      fullPage: true,
-      animations: "disabled",
-    });
-    await page.getByRole("link", { name: "Job details", exact: true }).click();
-    await expect(page.getByRole("region", { name: "Job details", exact: true })).toContainText(
-      "Succeeded",
-    );
-    await page.goto(`/payroll/runs/${run}/finalizations?company=${company}`);
-    await expect(
-      page.getByRole("table", { name: "Publication history", exact: true }).getByRole("row"),
-    ).toHaveCount(2);
-    await expect(page.getByRole("link", { name: "Review publication", exact: true })).toHaveCount(
-      0,
-    );
-    const readGrant = await admin.request.put(
-      `${base}/members/a0000000-0000-4000-8000-000000000053`,
+    const costGrant = await admin.request.put(
+      `${base}/members/a0000000-0000-4000-8000-000000000084`,
       {
         headers: headers(),
         data: {
           active: true,
-          expectedVersion: 0,
-          permissions: ["company.read", "payroll.read"],
-          reason: "Inspect published payslip with independent read authority",
+          permissions: ["company.read", "payroll.read", "reports.read"],
+          reason: "Independent published payroll cost acceptance",
         },
       },
     );
-    expect(readGrant.status()).toBe(200);
-    const payslips = await finalReviewer.request.get(
-      `${base}/payroll/payslips?from=${month}&until=${month}&employeeId=${employee}`,
-    );
-    expect(payslips.status()).toBe(200);
-    const summaries = payrollPayslipPageDto.parse(await payslips.json()).items;
-    expect(summaries).toHaveLength(1);
-    const summary = summaries[0];
-    if (!summary) throw new Error("Published payslip required");
-    expect(summary.employeeId).toBe(employee);
-    for (const key of ["taxableGross", "withheld", "takeHome"] as const)
-      expect(payrollCalculationMinor(summary[key])).toBe(
-        payrollCalculationMinor(preparation.totals[key]),
+    expect(costGrant.status()).toBe(200);
+    const costReader = await browser.newContext({ baseURL });
+    try {
+      const reportPage = await costReader.newPage();
+      await signInAndEnrollAuthenticator(reportPage, "browser-payroll-cost-reader@example.invalid");
+      await reportPage
+        .getByRole("combobox", { name: "Company", exact: true })
+        .selectOption(company);
+      expect((await readPayrollCostReport(reportPage, company, month)).totals.assessments).toBe(0);
+      const page = await publisher.newPage();
+      await signInAndEnrollAuthenticator(page, "browser-payroll-finalizer@example.invalid");
+      await page.getByRole("combobox", { name: "Company", exact: true }).selectOption(company);
+      for (const path of [
+        runPath,
+        `${base}/payroll/reviews/${review}`,
+        `${base}/payroll/payslips?from=${month}&until=${month}`,
+      ])
+        expect((await publisher.request.get(path)).status()).toBe(403);
+      await page.goto(`/payroll/publications?company=${company}&from=${month}&until=${month}`);
+      await page
+        .getByRole("button", {
+          name: new RegExp(`^Review finalization: Calculation 3 · ${month}$`, "u"),
+        })
+        .click();
+      await expect(
+        page.getByRole("region", { name: "Reviewed totals", exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: /^(Calculation|Approval review)$/u }),
+      ).toHaveCount(0);
+      const preparation = payrollFinalizationPreparationDto.parse(
+        await (await publisher.request.get(`${runPath}/finalization-preparation`)).json(),
       );
-    const pdf = await finalReviewer.request.get(
-      `${base}/payroll/payslips/${summary.id}/pdf?language=EN`,
-    );
-    expect(pdf.status()).toBe(200);
-    expect(pdf.headers()["content-type"]).toContain("application/pdf");
-    expect((await pdf.body()).subarray(0, 5).toString()).toBe("%PDF-");
-    expect((await publisher.request.get(`${base}/payroll/payslips/${summary.id}`)).status()).toBe(
-      403,
-    );
-    await exercisePayrollPayslip({ reader: second, admin, company, month, summary, headers });
-    const revoked = await admin.request.put(`${base}/members/${finalizerId}`, {
-      headers: headers(),
-      data: {
-        active: true,
-        expectedVersion: 0,
-        permissions: ["company.read"],
-        reason: "Withdraw publication authority",
-      },
-    });
-    expect(revoked.status()).toBe(200);
-    await page.getByRole("button", { name: "Refresh", exact: true }).click();
-    await expect(page.getByRole("alert")).toBeVisible();
-    await expect(page.getByRole("region", { name: "Reviewed totals", exact: true })).toHaveCount(0);
-    const payment = await exercisePayrollPayments({
-      maker: second,
-      checker: page,
-      admin,
-      company,
-      month,
-      summary,
-      headers,
-    });
-    await exercisePayrollReturns({
-      author: preparer,
-      publisher: second,
-      finance: page,
-      admin,
-      company,
-      month,
-      summary,
-      batchId: payment.batchId,
-      headers,
-    });
+      expect(preparation.availableActions).toEqual(["START"]);
+      expect(preparation.latestReview?.id).toBe(review);
+      const writes: { operation: string; body: Record<string, unknown> }[] = [];
+      let drop = true;
+      await page.route(`**${runPath}/finalizations`, async (route) => {
+        if (route.request().method() !== "POST") return route.continue();
+        writes.push({
+          operation: route.request().headers()["idempotency-key"] ?? "",
+          body: route.request().postDataJSON() as Record<string, unknown>,
+        });
+        const response = await route.fetch();
+        expect(response.status()).toBe(200);
+        if (drop) {
+          drop = false;
+          return route.abort("failed");
+        }
+        return route.fulfill({ response });
+      });
+      await page.getByRole("link", { name: "Review publication", exact: true }).click();
+      await page
+        .getByLabel("Reason", { exact: true })
+        .fill("Publish independently approved payroll");
+      await page.getByRole("button", { name: "Publish payroll", exact: true }).click();
+      await expect(
+        page.getByRole("button", { name: "Retry original command", exact: true }),
+      ).toBeVisible();
+      const id = String(writes[0]?.body.id),
+        path = `${base}/payroll/finalizations/${id}`;
+      await expect
+        .poll(
+          async () => {
+            const response = await publisher.request.get(path);
+            expect(response.status()).toBe(200);
+            return payrollFinalizationDetailsDto.parse(await response.json()).job.status;
+          },
+          { timeout: 30_000, intervals: [250, 500, 1000] },
+        )
+        .toBe("SUCCEEDED");
+      // The original acknowledgement must remain recoverable even after the worker changes the run.
+      await page.getByRole("button", { name: "Retry original command", exact: true }).click();
+      await expect(page.getByRole("status")).toContainText("Publication requested.");
+      expect(writes).toHaveLength(2);
+      expect(writes[1]).toEqual(writes[0]);
+      expect(writes[0]?.body).toMatchObject({
+        reviewId: review,
+        expectedRunVersion: preparation.run.version,
+        expectedReviewVersion: preparation.latestReview?.version,
+        expectedApprovalVersion: preparation.approvalVersion,
+      });
+      await page.getByRole("link", { name: "View publication", exact: true }).click();
+      await expect(page.getByRole("status")).toContainText(
+        "Payslips published. Payment is managed separately.",
+      );
+      const published = payrollFinalizationDetailsDto.parse(
+        await (await publisher.request.get(path)).json(),
+      );
+      expect(published.run).toMatchObject({ id: run, status: "FINALIZED", finalizationId: id });
+      expect(published.finalization).toMatchObject({
+        id,
+        number: 1,
+        reviewId: review,
+        actorId: finalizerId,
+      });
+      expect(published.finalization.publishedAt).not.toBeNull();
+      expect(published.totals).toEqual(preparation.totals);
+      expect(
+        (await (await publisher.request.get(`${runPath}/finalizations?limit=8`)).json()).items,
+      ).toHaveLength(1);
+      const complete = payrollFinalizationPreparationDto.parse(
+        await (await publisher.request.get(`${runPath}/finalization-preparation`)).json(),
+      );
+      expect(complete.availableActions).toEqual([]);
+      expect(complete.latestJobStatus).toBe("SUCCEEDED");
+      await page.screenshot({
+        path: "../../.work/dashboard-payroll-finalization-real-published.png",
+        fullPage: true,
+        animations: "disabled",
+      });
+      await page.getByRole("link", { name: "Job details", exact: true }).click();
+      await expect(page.getByRole("region", { name: "Job details", exact: true })).toContainText(
+        "Succeeded",
+      );
+      await page.goto(`/payroll/runs/${run}/finalizations?company=${company}`);
+      await expect(
+        page.getByRole("table", { name: "Publication history", exact: true }).getByRole("row"),
+      ).toHaveCount(2);
+      await expect(page.getByRole("link", { name: "Review publication", exact: true })).toHaveCount(
+        0,
+      );
+      const readGrant = await admin.request.put(
+        `${base}/members/a0000000-0000-4000-8000-000000000053`,
+        {
+          headers: headers(),
+          data: {
+            active: true,
+            expectedVersion: 0,
+            permissions: ["company.read", "payroll.read"],
+            reason: "Inspect published payslip with independent read authority",
+          },
+        },
+      );
+      expect(readGrant.status()).toBe(200);
+      const payslips = await finalReviewer.request.get(
+        `${base}/payroll/payslips?from=${month}&until=${month}&employeeId=${employee}`,
+      );
+      expect(payslips.status()).toBe(200);
+      const summaries = payrollPayslipPageDto.parse(await payslips.json()).items;
+      expect(summaries).toHaveLength(1);
+      const summary = summaries[0];
+      if (!summary) throw new Error("Published payslip required");
+      const originalCosts = await exercisePayrollCostReport(reportPage, company, summary);
+      expect(summary.employeeId).toBe(employee);
+      for (const key of ["taxableGross", "withheld", "takeHome"] as const)
+        expect(payrollCalculationMinor(summary[key])).toBe(
+          payrollCalculationMinor(preparation.totals[key]),
+        );
+      const pdf = await finalReviewer.request.get(
+        `${base}/payroll/payslips/${summary.id}/pdf?language=EN`,
+      );
+      expect(pdf.status()).toBe(200);
+      expect(pdf.headers()["content-type"]).toContain("application/pdf");
+      expect((await pdf.body()).subarray(0, 5).toString()).toBe("%PDF-");
+      expect((await publisher.request.get(`${base}/payroll/payslips/${summary.id}`)).status()).toBe(
+        403,
+      );
+      await exercisePayrollPayslip({ reader: second, admin, company, month, summary, headers });
+      const revoked = await admin.request.put(`${base}/members/${finalizerId}`, {
+        headers: headers(),
+        data: {
+          active: true,
+          expectedVersion: 0,
+          permissions: ["company.read"],
+          reason: "Withdraw publication authority",
+        },
+      });
+      expect(revoked.status()).toBe(200);
+      await page.getByRole("button", { name: "Refresh", exact: true }).click();
+      await expect(page.getByRole("alert")).toBeVisible();
+      await expect(page.getByRole("region", { name: "Reviewed totals", exact: true })).toHaveCount(
+        0,
+      );
+      const payment = await exercisePayrollPayments({
+        maker: second,
+        checker: page,
+        admin,
+        company,
+        month,
+        summary,
+        headers,
+      });
+      expect((await readPayrollCostReport(reportPage, company, month)).totals).toEqual(
+        originalCosts.totals,
+      );
+      await exercisePayrollReturns({
+        author: preparer,
+        publisher: second,
+        finance: page,
+        admin,
+        company,
+        month,
+        summary,
+        batchId: payment.batchId,
+        headers,
+      });
+      const revisedResponse = await costReader.request.get(
+        `${base}/payroll/payslips/${summary.id}`,
+      );
+      expect(revisedResponse.status()).toBe(200);
+      const revisedSummary = payrollPayslipDto.parse(await revisedResponse.json()).summary;
+      expect(revisedSummary.version).toBe(1);
+      const revisedCosts = await exercisePayrollCostReport(reportPage, company, revisedSummary);
+      expect(revisedCosts.totals.employerCost).not.toBe(originalCosts.totals.employerCost);
+      const retained = await costReader.request.get(
+        `${base}/payroll/payslips/${summary.id}?revision=0`,
+      );
+      expect(payrollPayslipDto.parse(await retained.json()).summary).toEqual(summary);
+    } finally {
+      await costReader.close();
+    }
   } finally {
     await publisher.close();
   }

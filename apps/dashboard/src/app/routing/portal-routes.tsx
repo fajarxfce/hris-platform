@@ -428,6 +428,11 @@ const OvertimeReportScreen = lazy(() =>
     (module) => ({ default: module.OvertimeReportScreen }),
   ),
 );
+const PayrollCostReportScreen = lazy(() =>
+  import("../../features/reporting/presentation/bindings/payroll-cost-report-screen").then(
+    (module) => ({ default: module.PayrollCostReportScreen }),
+  ),
+);
 const AttendanceReportScreen = lazy(() =>
   import("../../features/reporting/presentation/bindings/attendance-report-screen").then(
     (module) => ({ default: module.AttendanceReportScreen }),
@@ -1864,6 +1869,21 @@ export function PortalRoutes({
               accountId={accountId}
               access={access}
               loadOvertime={reporting.loadOvertime}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/reports/payroll-costs"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <PayrollCostReportScreen
+              accountId={accountId}
+              access={access}
+              loadPayrollCosts={reporting.loadPayrollCosts}
               companyName={company.name}
               timezone={company.timezone}
               locale={locale}

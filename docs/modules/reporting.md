@@ -60,5 +60,8 @@ deductions, signed withholding and take-home reconcile with published payslips;
 repeated amendments count once and payment results retain a separate definition.
 Current report and company-wide payroll access, credentials and MFA protect the
 bounded projection. Backend checks passed 49 reporting, 114 payroll domain,
-101 distinct API/PostgreSQL/OpenAPI and 81 worker tests. Dashboard, historical
-selection and exports remain open. See [payroll cost definitions](../reporting.md#published-payroll-costs).
+101 distinct API/PostgreSQL/OpenAPI and 81 worker tests. The dashboard passed
+3,823 tests, fourteen distinct Chromium scenarios and a real API/PostgreSQL/worker
+workflow through original publication, payment, amendment and returns. Exact month
+navigation retains report filters through browser return. Historical selection,
+saved filters and exports remain open. See [payroll cost definitions](../reporting.md#published-payroll-costs).

@@ -70,6 +70,30 @@ Commits are atomic and include relevant tests/docs. No co-author trailers. Push 
 
 ## Observed validation
 
+### Published payroll cost dashboard
+
+The dashboard filters one to twelve earnings months and displays exact published
+cost/gross/deduction/withholding/take-home totals, separate payslip/revision and
+distinct employment counts, and complete month buckets. Month actions open the
+existing company payslip directory with the same bounds. Browser return retains
+the applied report window. Both report and company payroll read grants are required;
+self payslip and administration authority do not independently admit these totals.
+Owned cancellation and immutable validated results retain scope through replacement,
+revocation and explicit retry. The shared IDR formatter preserves negative fractions.
+
+All 3,823 tests in 326 dashboard files, architecture/Biome/TypeScript and production
+build passed. Fourteen distinct Chromium scenarios passed across focused runs,
+including all five new report cases and nine existing payslip cases. The final
+five-case run passed in eight seconds after correcting the test expectation for
+the directory's explicit empty query. A real API/PostgreSQL/worker workflow passed
+in 1.7 minutes including fixture startup: zero before publication, exact immutable
+statement reconciliation, payment invariance, one revised assessment after amendment
+and returns, preserved original statements and month/detail/browser-return navigation.
+It uses independent MFA-enrolled reader account 84 in the disposable fixture.
+Desktop/light and 390px Indonesian/dark layouts were inspected. Existing CSS and
+bundle warnings remain; no workload benchmark or deployment was performed. See
+[report evidence](reporting.md#payroll-cost-dashboard).
+
 ### Published payroll cost report API
 
 The published payroll cost API now selects one current published revision per

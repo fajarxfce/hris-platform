@@ -806,6 +806,24 @@ The isolated API/PostgreSQL workflow verifies these boundaries with an enrolled
 test administrator, lost committed responses, CSRF rejection, unrelated accounts,
 retained device and browser access, and replacement of the dashboard account.
 
+## Published payroll costs
+
+`/reports/payroll-costs` filters up to twelve earnings months and shows published
+payslips, distinct employments, revised payslips and exact IDR cost/gross/deduction/
+withholding/take-home totals. Negative withholding retains tax refunds, including
+amounts below one rupiah. Monthly rows open the existing company payslip directory
+with matching month bounds and authorized scope; browser return preserves the
+applied report selection. Zero months remain visible without a drill-down action.
+
+Current report and company payroll read grants authorize navigation and load.
+Owned cancellation, cleared refresh/denial state and validated frozen aggregates
+prevent old company results from returning. The shared core formatter retains
+large exact values and signed sub-rupiah amounts. All 3,823 dashboard tests and
+fourteen distinct Chromium scenarios passed, together with a real
+API/PostgreSQL/worker workflow through publication, bank payment, amendment and
+confirmed returns. The report reconciled with each selected immutable revision. See
+[definitions and evidence](reporting.md#payroll-cost-dashboard).
+
 ## Operational expense report
 
 `/reports/expenses` uses applied transaction dates, exact IDR totals, current-status

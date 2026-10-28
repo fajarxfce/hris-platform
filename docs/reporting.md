@@ -485,8 +485,51 @@ unchanged. Architecture, formatting and both application boot JAR builds passed.
 OpenAPI has 356 paths and is
 2,057,966 bytes, within its 2 MiB bound. Logs are retained locally in
 `.work/payroll-cost-{unit,validation,api,api-final,api-followup,build}.log`.
-Dashboard and historical/export acceptance remain open. No performance or live
-deployment claim is made.
+The dashboard is described below; historical/export acceptance remains open.
+No performance or live deployment claim is made.
+
+### Payroll cost dashboard
+
+`/reports/payroll-costs` uses company-bound earnings-month filters with a maximum
+of twelve months. The initial selection is the company's local year through the
+current month; replacing company resets it. The page shows published and revised
+payslip counts, distinct employment records, employer cost, taxable gross, employee
+deductions, signed withholding and take-home pay. Complete month rows retain zero
+buckets. A nonempty row opens the company payslip directory for that exact month
+with `scope=AUTHORIZED`; browser Back restores the applied report range. These
+remain independent live reads, so a new publication may change the latest facts.
+
+Navigation and load policy require both report and canonical company payroll read
+grants. DTO/repository mapping checks company/range/definition/currency, bounded
+ordered months, safe integer counts, distinct employment bounds and exact decimal
+reconciliation. BigInt cents preserve refunds and sums beyond binary float precision;
+the shared core IDR formatter now retains negative sub-rupiah signs. Frozen results
+are detached from transport values. Each mounted controller owns and cancels its
+read, clears data on refresh/disposal/denial and rejects obsolete responses. There
+is no report polling or shared report cache.
+
+All 3,823 tests in 326 dashboard files passed, together with architecture, Biome,
+TypeScript and production build checks. Fourteen distinct Chromium scenarios
+passed across focused runs: five cost-report cases and nine existing payslip cases.
+The final five-case run passed in eight seconds after correcting a fixture's
+expectation for the directory's explicit empty search query. Tests cover annual
+bounds, current source grants, exact signed amounts, malformed aggregates,
+cancellation, late results, denial/retry, applied filters and browser history,
+company replacement/logout, zero months and narrow Indonesian/dark layout.
+
+The real API/PostgreSQL/worker calculation/publication/payment workflow also passed
+in 1.7 minutes including fixture startup. A separate MFA-enrolled report reader
+verified zero before publication, exact reconciliation against all five amounts in
+the published statement, unchanged totals after bank payment, and one revised
+assessment after independent amendment publication and confirmed return workflows.
+The latest report reconciled with revision one while the original statement stayed
+unchanged. Monthly directory/detail navigation and browser return retained the
+applied range. The desktop English/light and 390px Indonesian/dark screenshots
+were inspected; actions remain in the first table column and overflow stays inside
+the table. Existing CSS-specificity and Vite chunk warnings remain. This does not
+claim a performance benchmark or deployment.
+Local logs: `.work/payroll-cost-dashboard-{check,browser,browser-final,integration}.log`.
+Historical closing reports, saved filters and exports remain separate open work.
 
 ## Validation
 

@@ -3,8 +3,10 @@ import type { Failure } from "../../../../core/domain/result";
 import type { PayrollPayslipScope, PayrollPayslipSearch } from "../entities/payroll-payslip";
 import { validPayrollMonth, validPayrollPeriodSearch } from "./payroll-period-policy";
 
+export const canReadCompanyPayroll = (permissions: readonly string[]): boolean =>
+  permissions.includes("payroll.read");
 export const canReadPayrollPayslips = (permissions: readonly string[]): boolean =>
-  permissions.includes("payroll.read") || permissions.includes("payroll.self.read");
+  canReadCompanyPayroll(permissions) || permissions.includes("payroll.self.read");
 export const validPayrollPayslipScope = (scope: PayrollPayslipScope): boolean =>
   scope === "AUTHORIZED" || scope === "SELF";
 export const validPayrollPayslipRevision = (revision: number): boolean =>

@@ -7,8 +7,11 @@ import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.reporting.data.datasources.*
+import dev.fajar.hris.reporting.data.repositories.StoredAttendanceExceptionReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredHeadcountReportRepository
+import dev.fajar.hris.reporting.domain.repositories.AttendanceExceptionReportRepository
 import dev.fajar.hris.reporting.domain.repositories.HeadcountReportRepository
+import dev.fajar.hris.reporting.domain.usecases.GetAttendanceExceptionReport
 import dev.fajar.hris.reporting.domain.usecases.GetGroupHeadcountReport
 import dev.fajar.hris.reporting.domain.usecases.GetHeadcountReport
 import java.time.Clock
@@ -18,6 +21,35 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration(proxyBeanMethods = false)
 class ReportingConfiguration {
+    @Bean
+    fun attendanceExceptionReportSource(sql: DSLContext): AttendanceExceptionReportDataSource =
+        PostgresAttendanceExceptionReportDataSource(sql)
+
+    @Bean
+    fun attendanceExceptionReports(
+        source: AttendanceExceptionReportDataSource
+    ): AttendanceExceptionReportRepository = StoredAttendanceExceptionReportRepository(source)
+
+    @Bean
+    fun getAttendanceExceptionReport(
+        reports: AttendanceExceptionReportRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetAttendanceExceptionReport(
+            reports,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
     @Bean
     fun headcountReportSource(sql: DSLContext): HeadcountReportDataSource =
         PostgresHeadcountReportDataSource(sql)

@@ -37,8 +37,65 @@ The use case captures company grants, then acquires ordered policy, company, mem
 
 An explicit transaction port adds bounded SELECT scope only to employment history and client policy inputs. It does not add mutation permissions, expose person profiles, or bypass RLS. One SQL statement produces the complete group snapshot, with cancellation and the standard finite database timeouts. Ordinary and cross-company mutation transactions clear this extra read scope. Cache identity must include the account, sorted company selection, date, and definition version; replace the complete group result atomically and discard it when access is revoked.
 
-Other source metrics, immutable export jobs, and drill-down are subsequent capabilities.
+## Operational attendance exceptions
+
+`GET /api/v1/companies/{companyId}/reports/attendance-exceptions?from=2026-09-01&until=2026-10-01`
+
+Requires both current `reports.read` and company-wide `workforce.read`, plus the
+`REPORTING` client-policy gate. Self/team grants do not authorize aggregates. The
+inclusive date window is one to 31 days, within 1900–2100. Invalid windows return
+`invalid_report_range` with `maximumDays: "31"`.
+
+The response contains `companyId`, `from`, `until`, `evaluatedAt`,
+`definitionVersion: "attendance-exceptions.v1"`, `totals` and an ascending `days`
+array of `{date, counts}`. Every requested date appears, including empty dates.
+Each count object has these integer fields:
+
+| Field | Definition |
+| --- | --- |
+| `observedDays` | Employment/date pairs with at least one captured event, including rejected events. |
+| `affectedDays` | Employment/date pairs with pending evidence, incomplete accepted clocks, or both. |
+| `affectedEmployments` | Distinct employments among those affected pairs. Across the whole window this is not the sum of per-date values. |
+| `pendingDays` | Employment/date pairs with at least one initially pending event still lacking a review. |
+| `incompleteDays` | Employment/date pairs with exactly one accepted clock-in XOR exactly one accepted clock-out, and no approved attendance correction. |
+| `pendingEvents` | Count of initially pending events with no review. |
+
+The definitions reconcile with the existing workforce exception directory at the
+same committed source state. A pair can be both pending and incomplete; it counts
+once in `affectedDays`. A correction resolves raw-clock incompleteness but does not
+hide subsequently received pending evidence. A review supersedes the event's
+initial decision. Dates without captured evidence do not count as observed or
+absent; this report does not infer missed shifts, lateness or payroll deductions.
+
+This is the current operational exception state for the selected work dates.
+Later reviews, evidence or corrections can change earlier-date counts. It is not
+an immutable closing/payroll snapshot or an as-recorded-at historical query.
+Closed-period financial reporting must use its own published work/payroll evidence.
+
+One SQL statement computes the grand total and per-date buckets under normal RLS
+and finite transaction/query timeouts. It returns at most 32 aggregate rows and
+does not materialize employee profiles or raw evidence in application memory. The
+mapper verifies cardinality and counter reconciliation before publishing the whole
+result. Company, membership and account guards protect live authorization; original
+and current grants, credential version and MFA are checked after lock acquisition,
+and MFA is checked again after the read. Concurrent evidence/review commits cannot
+mix daily and total snapshots. Cancellation releases transaction resources, and
+errors remain sanitized. Responses are `no-store`.
+
+The backend endpoint is implemented; its dashboard and report drill-down remain
+active work. Other source metrics and immutable export jobs are subsequent capabilities.
 
 ## Validation
+
+On 28 October 2026, operational attendance reporting passed 15 reporting-domain/data
+tests and 83 selected HTTP/PostgreSQL/OpenAPI tests. Sixteen new regressions cover
+counter reconciliation, overlapping kinds, distinct employment counts, empty dates,
+corrections and late evidence, date bounds, row isolation, source/report grants,
+reporting availability, pending revocation, MFA expiry before/after the query,
+concurrent review snapshots, cancellation and sanitized failure recovery.
+Architecture and formatting passed; the 81-test worker suite remained up to date
+because its classpath did not change. Logs are `.work/attendance-report-validation.log`
+and `.work/attendance-report-format.log`. Dashboard and export acceptance are still
+active work; these backend checks do not claim historical closing-report coverage.
 
 The company/group reporting check passed architecture and format checks, server/worker builds, and 61 tests: 10 reporting domain/data, 15 database, and 36 HTTP/PostgreSQL. Coverage includes shared persons, empty companies, effective history, selection bounds, RLS read/write isolation, pooled context cleanup, native/browser build gates, maintenance, module flags, permission and credential revocation while waiting, expired MFA, coherent concurrent snapshots, and cancellation. OpenAPI validates 228 paths and 254 operations. No group browser workflow, device validation, deployment, or group-report performance benchmark is claimed by this backend check.

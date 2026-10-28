@@ -10,4 +10,11 @@ Screens: role overview, report catalogue, filters, drill-down, export history.
 
 Acceptance: totals reconcile, row/resource isolation, historical definitions, export interruption, bounded memory, and expired export access.
 
+Operational attendance exception aggregates are implemented in the backend with
+report/source permissions, a 31-day window, coherent totals/day buckets and current
+MFA checks. They reconcile with the workforce exception directory; missing evidence
+does not imply absence, and the live exception state does not replace closing
+snapshots. The dashboard and drill-down remain active work. See the exact
+[report definitions and validation](../reporting.md#operational-attendance-exceptions).
+
 Company headcount is implemented with effective-date status/contract counts, a separate distinct-person total, current source/report permissions, a single bounded aggregate response, and a responsive dashboard report. Group headcount selects up to 32 independently authorized companies and computes the distinct global person count in the same SQL snapshot as company buckets. Its explicit SELECT scope adds no mutation permission; access, MFA, and client policy are rechecked after ordered guards. The dashboard supports applied company/date filters, company breakdowns, and cancellation of obsolete group reads. [Reporting API](../reporting.md) documents the exact definitions and historical limits. Other metrics and exports remain planned.

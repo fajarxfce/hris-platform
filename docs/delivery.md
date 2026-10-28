@@ -5,6 +5,14 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+Operational attendance reporting now provides a company-scoped, 31-day aggregate
+that reconciles with the existing exception directory. Fifteen reporting-domain/data
+and 83 selected HTTP/PostgreSQL/OpenAPI tests passed, together with architecture and
+format checks. The worker's 81-test suite remained up to date. Live grants/MFA,
+concurrent reviews, cancellation, bounded rows and failure recovery are covered;
+dashboard, closed-period reporting and export acceptance remain active work. See
+[reporting definitions and evidence](reporting.md#operational-attendance-exceptions).
+
 - Repository and product/architecture specification: initialized.
 - Backend foundation: implemented Gradle conventions, PostgreSQL migrations/jOOQ generation, transaction/error boundaries, company RLS, immutable audit/outbox storage, correlation IDs, CI, and local container configuration. Business capabilities and job processing are tracked below.
 - Mobile API: native sessions, atomic command receipts, optimistic versions, and consistent localizable JSON problems are implemented. Owned expense/leave-request/leave-balance/overtime/payslip/payment-progress account-owned inbox, daily attendance and calendar-source bootstrap/incremental synchronization, explicit client collection selection, encrypted scope-bound cursors, bounded post-commit publication, retention, and worker lifecycle are implemented. Inbox, Attendance and calendar sources require explicit selection; the omitted-selection projection remains compatible with earlier clients. Mobile consumer coverage is tracked in the completion document.

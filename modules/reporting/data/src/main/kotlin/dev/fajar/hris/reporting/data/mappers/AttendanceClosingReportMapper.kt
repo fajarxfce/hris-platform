@@ -27,14 +27,14 @@ fun List<AttendanceClosingReportRow>.toAttendanceClosingReportAggregate(
             totalRow.closedAt == null &&
             totalRow.timezone == null
     )
-    val totals = totalRow.toCounts()
+    val totals = totalRow.toAttendanceClosingCounts()
     val months =
         (0L..length).map { offset ->
             val month = from.plusMonths(offset)
             val row = indexed[month.atDay(1)]
             if (row == null) AttendanceClosingReportMonth(month, null, AttendanceClosingCounts())
             else {
-                val counts = row.toCounts()
+                val counts = row.toAttendanceClosingCounts()
                 check(
                     counts.closedMonths == 1L &&
                         counts.employmentMonths == counts.employments &&
@@ -90,7 +90,7 @@ fun List<AttendanceClosingReportRow>.toAttendanceClosingReportAggregate(
     return AttendanceClosingReportAggregate(totals, java.util.List.copyOf(months))
 }
 
-private fun AttendanceClosingReportRow.toCounts(): AttendanceClosingCounts {
+internal fun AttendanceClosingReportRow.toAttendanceClosingCounts(): AttendanceClosingCounts {
     val v = counts
     check(
         invalidSources == 0L &&

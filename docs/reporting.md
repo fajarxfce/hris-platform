@@ -621,7 +621,54 @@ increment changes no Workforce implementation. OpenAPI has 357 paths and 2,066,0
 bytes. Logs: `.work/attendance-closing-unit.log`,
 `.work/attendance-closing-api-final.log`, `.work/attendance-closing-api-followup.log`
 and `.work/attendance-closing-api-confirmed.log`. No workload benchmark or deployment
-was performed. Dashboard, revision-aware drill-down and export acceptance remain open.
+was performed. Dashboard and export acceptance remain open; the matching employee API is recorded below.
+
+### Employee closing drill-down
+
+`GET /api/v1/companies/{companyId}/reports/attendance-closings/employees?month=2026-09&limit=50&after=…`
+
+The matching page requires the same report/source grants and reporting availability.
+A month in 2000–2100 selects only its published closing job. Each employee row
+includes display number/name, the original closing reference, nullable exact latest
+adjustment ID/revision/timestamp, and both original/current counts. The current
+snapshot opens the exact retained adjustment, or the original employee closing
+when no adjustment is selected. Later corrections never change that retained ID.
+Display names reflect current person labels with month-end employment context;
+they are not frozen closing evidence. Private profiles, reasons, evidence IDs and
+snapshot bodies do not cross the SQL/JVM boundary.
+
+Pages admit one to fifty rows. The source selects at most `limit + 1` employee
+snapshots before projecting their bounded daily facts. Ordering is ascending
+employment UUID, independent of names, corrections and later hires. Continuations
+use `attendance-closings.v1|company|month|employmentId`, at most 110 characters,
+and must match the requested company and month. Empty/unpublished selections or
+an exhausted continuation return an empty page. The aggregate distinguishes a
+published empty closing. Each page is a separate live read; corrections may change
+current counts on subsequent reads, while its returned exact references remain
+readable under current access. This is not an immutable export or historical-as-of
+selection.
+
+The page uses the aggregate's shared SQL fact projection and validates each row's
+count/reference reconciliation, ordering, scope and revision timestamps before
+freezing the result. A shared People guard precedes company/member/account guards;
+original/live grants, credentials and MFA are checked through acquisition. No
+migration or Workforce write change is needed. Reporting now explicitly imports
+the People domain repository contract for that guard; the worker still does not
+import Reporting.
+
+Validation passed 61 reporting domain/data/delivery tests and 83 selected
+API/PostgreSQL/OpenAPI cases, including all twenty-four closing aggregate/page
+cases and fifty-nine contract checks. The API run completed in 87 seconds and
+rebuilt the boot JAR. Architecture and format checks passed. Coverage includes
+coherent original/latest references, a retained first revision after a second
+correction, page reconciliation, later hires, stable continuation, private-row
+isolation, invalid cursors, pending revocation, expiry during both lock waits and
+projection, cancellation/recovery and concurrent publication/corrections. Initial
+compilation exposed the missing People domain dependency; both Reporting domain
+and data dependencies now declare it. OpenAPI has 358 paths and 2,072,345 bytes.
+Logs: `.work/attendance-closing-employees-unit.log` and
+`.work/attendance-closing-employees-api.log`. Dashboard and export acceptance remain
+open; no workload benchmark or deployment was performed.
 
 ## Validation
 

@@ -25,6 +25,38 @@ class ApiContractHttpTest : PeopleApiFixture() {
     private lateinit var mappings: RequestMappingHandlerMapping
 
     @Test
+    fun attendanceClosingEmployeesExposeScopedPagesAndExactRevisionReferences() {
+        val api = contract()
+        val operation =
+            api["paths"]["/api/v1/companies/{companyId}/reports/attendance-closings/employees"][
+                "get"]
+        assertTrue(operation["x-hris-authentication-required"].asBoolean())
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        assertTrue(
+            operation["parameters"].any {
+                it["name"].asString() == "month" && it["required"].asBoolean()
+            }
+        )
+        val schemas = api["components"]["schemas"]
+        val props = schemas["AttendanceClosingEmployeeResponse"]["properties"]
+        for (name in
+            listOf(
+                "employeeId",
+                "employeeNumber",
+                "employeeName",
+                "closing",
+                "adjustment",
+                "counts",
+            )) assertNotNull(props[name])
+        assertEquals(
+            "integer",
+            schemas["AttendanceClosingAdjustmentReferenceResponse"]["properties"]["revision"][
+                    "type"]
+                .asString(),
+        )
+    }
+
+    @Test
     fun attendanceClosingReportsExposeIndependentOriginalAndCurrentFactsWithPublishedReferences() {
         val api = contract()
         val operation =

@@ -16,6 +16,81 @@ class PostgresAttendanceClosingReportDataSource(private val sql: DSLContext) :
     ): List<AttendanceClosingReportRow> =
         sql.fetch(
                 """
+                ${projection("work_period_snapshots")}
+                select month,period_id,job_id,version,closed_at,timezone,
+                  count(distinct period_id) closed_months,count(employment_id) employment_months,
+                  count(distinct employment_id) employments,
+                  count(*) filter(where employment_id is not null and adjustment_revision>0) adjusted_employment_months,
+                  coalesce(sum(days),0) days,coalesce(sum(scheduled_days),0) scheduled_days,coalesce(sum(scheduled_minutes),0) scheduled_minutes,
+                  coalesce(sum(original_worked),0) original_worked,coalesce(sum(original_absence),0) original_absence,
+                  coalesce(sum(original_unrecorded),0) original_unrecorded,coalesce(sum(original_off),0) original_off,
+                  coalesce(sum(original_unassigned),0) original_unassigned,coalesce(sum(original_minutes),0) original_minutes,
+                  coalesce(sum(current_worked),0) current_worked,coalesce(sum(current_absence),0) current_absence,
+                  coalesce(sum(current_unrecorded),0) current_unrecorded,coalesce(sum(current_off),0) current_off,
+                  coalesce(sum(current_unassigned),0) current_unassigned,coalesce(sum(current_minutes),0) current_minutes,
+                  coalesce(sum(case when employment_id is null then 0 else invalid_days+
+                    case when coalesce(complete and original->>'employeeId'=employment_id::text and current->>'employeeId'=employment_id::text
+                      and original->>'month'=to_char(month,'YYYY-MM') and current->>'month'=to_char(month,'YYYY-MM'),false) then 0 else 1 end end),0) invalid_sources
+                from projected group by grouping sets ((),(month,period_id,job_id,version,closed_at,timezone))
+                """
+                    .trimIndent(),
+                company,
+                from,
+                until,
+            )
+            .map { it.toReportRow() }
+
+    override fun employees(
+        company: UUID,
+        month: LocalDate,
+        after: UUID?,
+        limit: Int,
+    ): List<AttendanceClosingEmployeeRow> =
+        sql.fetch(
+                """
+            ${projection("""lateral (
+                select company_id,job_id,employment_id,payload from work_period_snapshots
+                where company_id=p.company_id and job_id=p.job_id
+                  and (?::uuid is null or employment_id>?::uuid)
+                order by employment_id limit ?
+            )""")}
+            select p.month,p.period_id,p.job_id,p.version,p.closed_at,p.timezone,p.employment_id,
+                e.employee_number,e.legal_name employee_name,p.adjustment_id,p.adjustment_revision,p.adjustment_at,
+                1 closed_months,1 employment_months,1 employments,
+                case when adjustment_revision>0 then 1 else 0 end adjusted_employment_months,
+                days,scheduled_days,scheduled_minutes,
+                original_worked,original_absence,original_unrecorded,original_off,original_unassigned,original_minutes,
+                current_worked,current_absence,current_unrecorded,current_off,current_unassigned,current_minutes,
+                invalid_days+case when coalesce(complete and original->>'employeeId'=employment_id::text
+                    and current->>'employeeId'=employment_id::text and original->>'month'=to_char(month,'YYYY-MM')
+                    and current->>'month'=to_char(month,'YYYY-MM'),false) then 0 else 1 end invalid_sources
+            from projected p
+            left join lateral employees_at(p.company_id,(p.month+interval '1 month'-interval '1 day')::date) e
+                on e.id=p.employment_id
+            where p.employment_id is not null order by p.employment_id
+            """
+                    .trimIndent(),
+                company,
+                month,
+                month,
+                after,
+                after,
+                limit,
+            )
+            .map { row ->
+                AttendanceClosingEmployeeRow(
+                    requireNotNull(row.get("employment_id", UUID::class.java)),
+                    requireNotNull(row.get("employee_number", String::class.java)),
+                    requireNotNull(row.get("employee_name", String::class.java)),
+                    row.get("adjustment_id", UUID::class.java),
+                    row.number("adjustment_revision"),
+                    row.get("adjustment_at", OffsetDateTime::class.java),
+                    row.toReportRow(),
+                )
+            }
+
+    private fun projection(snapshots: String) =
+        """
                 with published as materialized (
                   select id as period_id,company_id,month,job_id,version,closed_at,timezone,
                     extract(day from month+interval '1 month'-interval '1 day')::integer month_days
@@ -23,11 +98,11 @@ class PostgresAttendanceClosingReportDataSource(private val sql: DSLContext) :
                   where company_id=? and month between ? and ? and status='CLOSED'
                 ), selected as (
                   select p.*,s.employment_id,s.payload original,coalesce(a.payload,s.payload) current,
-                    coalesce(a.revision,0) adjustment_revision
+                    coalesce(a.revision,0) adjustment_revision,a.id adjustment_id,a.recorded_at adjustment_at
                   from published p
-                    left join work_period_snapshots s on s.company_id=p.company_id and s.job_id=p.job_id
+                    left join $snapshots s on s.company_id=p.company_id and s.job_id=p.job_id
                     left join lateral (
-                      select payload,revision from attendance_adjustments a
+                      select id,payload,revision,recorded_at from attendance_adjustments a
                       where a.company_id=p.company_id and a.job_id=p.job_id and a.employment_id=s.employment_id
                       order by revision desc limit 1
                     ) a on true
@@ -69,49 +144,30 @@ class PostgresAttendanceClosingReportDataSource(private val sql: DSLContext) :
                     cross join lateral (select s.current->'days'->(ordinal::integer-1) c) latest
                   ) d
                 )
-                select month,period_id,job_id,version,closed_at,timezone,
-                  count(distinct period_id) closed_months,count(employment_id) employment_months,
-                  count(distinct employment_id) employments,
-                  count(*) filter(where employment_id is not null and adjustment_revision>0) adjusted_employment_months,
-                  coalesce(sum(days),0) days,coalesce(sum(scheduled_days),0) scheduled_days,coalesce(sum(scheduled_minutes),0) scheduled_minutes,
-                  coalesce(sum(original_worked),0) original_worked,coalesce(sum(original_absence),0) original_absence,
-                  coalesce(sum(original_unrecorded),0) original_unrecorded,coalesce(sum(original_off),0) original_off,
-                  coalesce(sum(original_unassigned),0) original_unassigned,coalesce(sum(original_minutes),0) original_minutes,
-                  coalesce(sum(current_worked),0) current_worked,coalesce(sum(current_absence),0) current_absence,
-                  coalesce(sum(current_unrecorded),0) current_unrecorded,coalesce(sum(current_off),0) current_off,
-                  coalesce(sum(current_unassigned),0) current_unassigned,coalesce(sum(current_minutes),0) current_minutes,
-                  coalesce(sum(case when employment_id is null then 0 else invalid_days+
-                    case when coalesce(complete and original->>'employeeId'=employment_id::text and current->>'employeeId'=employment_id::text
-                      and original->>'month'=to_char(month,'YYYY-MM') and current->>'month'=to_char(month,'YYYY-MM'),false) then 0 else 1 end end),0) invalid_sources
-                from projected group by grouping sets ((),(month,period_id,job_id,version,closed_at,timezone))
-                """
-                    .trimIndent(),
-                company,
-                from,
-                until,
-            )
-            .map { row ->
-                AttendanceClosingReportRow(
-                    row.get("month", LocalDate::class.java),
-                    row.get("period_id", UUID::class.java),
-                    row.get("job_id", UUID::class.java),
-                    row.get("version", Long::class.javaObjectType),
-                    row.get("closed_at", OffsetDateTime::class.java),
-                    row.get("timezone", String::class.java),
-                    AttendanceClosingCountsRow(
-                        row.number("closed_months"),
-                        row.number("employment_months"),
-                        row.number("employments"),
-                        row.number("adjusted_employment_months"),
-                        row.number("days"),
-                        row.number("scheduled_days"),
-                        row.number("scheduled_minutes"),
-                        row.facts("original"),
-                        row.facts("current"),
-                    ),
-                    row.number("invalid_sources"),
-                )
-            }
+    """
+            .trimIndent()
+
+    private fun Record.toReportRow() =
+        AttendanceClosingReportRow(
+            get("month", LocalDate::class.java),
+            get("period_id", UUID::class.java),
+            get("job_id", UUID::class.java),
+            get("version", Long::class.javaObjectType),
+            get("closed_at", OffsetDateTime::class.java),
+            get("timezone", String::class.java),
+            AttendanceClosingCountsRow(
+                number("closed_months"),
+                number("employment_months"),
+                number("employments"),
+                number("adjusted_employment_months"),
+                number("days"),
+                number("scheduled_days"),
+                number("scheduled_minutes"),
+                facts("original"),
+                facts("current"),
+            ),
+            number("invalid_sources"),
+        )
 
     private fun Record.number(name: String): Long = requireNotNull(get(name, Long::class.java))
 

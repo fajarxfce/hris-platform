@@ -1,6 +1,7 @@
 package dev.fajar.hris
 
 import dev.fajar.hris.reporting.data.datasources.AttendanceClosingReportDataSource
+import dev.fajar.hris.reporting.data.dto.AttendanceClosingEmployeeRow
 import dev.fajar.hris.reporting.data.dto.AttendanceClosingReportRow
 import java.time.LocalDate
 import java.util.UUID
@@ -34,6 +35,24 @@ class AttendanceClosingReportProbeConfiguration {
         probe: AttendanceClosingReportProbe,
     ): AttendanceClosingReportDataSource =
         object : AttendanceClosingReportDataSource {
+            override fun employees(
+                company: UUID,
+                month: LocalDate,
+                after: UUID?,
+                limit: Int,
+            ): List<AttendanceClosingEmployeeRow> {
+                val result = delegate.employees(company, month, after, limit)
+                probe.afterRead
+                    .get()
+                    ?.takeIf { it.company == company }
+                    ?.let {
+                        it.entered.countDown()
+                        check(it.release.await(5, TimeUnit.SECONDS))
+                    }
+                probe.failure.getAndSet(null)?.let { throw it }
+                return result
+            }
+
             override fun aggregate(
                 company: UUID,
                 from: LocalDate,

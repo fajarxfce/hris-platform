@@ -74,3 +74,11 @@ bounded SQL projection. Validation passed 56 reporting tests and 146 distinct
 API/PostgreSQL/OpenAPI cases across focused runs, plus architecture, formatting
 and API packaging. Dashboard, revision-aware drill-down and exports remain in
 progress. See [closing definitions and evidence](../reporting.md#historical-attendance-closings).
+
+The historical attendance report now has a matching bounded employee page with
+exact original closing and selected adjustment references. Ascending employment
+UUID continuations retain company/month scope through later corrections and hires.
+Original/current counts reconcile with the aggregate while retained revisions stay
+readable. Validation passed 61 reporting and 83 API/PostgreSQL/OpenAPI cases, plus
+architecture, formatting and API packaging. Dashboard and exports remain open. See
+[employee closing drill-down](../reporting.md#employee-closing-drill-down).

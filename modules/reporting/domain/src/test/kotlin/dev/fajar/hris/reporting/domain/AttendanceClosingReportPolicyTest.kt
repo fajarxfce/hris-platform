@@ -10,6 +10,39 @@ import org.junit.jupiter.api.Test
 
 class AttendanceClosingReportPolicyTest {
     @Test
+    fun employeeContinuationsAreCanonicalAndBoundToCompanyAndMonth() {
+        val company = UUID.randomUUID()
+        val month = YearMonth.parse("2026-09")
+        val employee = UUID.randomUUID()
+        val cursor = attendanceClosingEmployeeCursor(company, month, employee)
+        assertEquals(
+            Result.Success(null),
+            parseAttendanceClosingEmployeeCursor(company, month, null),
+        )
+        assertEquals(
+            Result.Success(employee),
+            parseAttendanceClosingEmployeeCursor(company, month, cursor),
+        )
+        for (bad in
+            listOf(
+                "",
+                cursor.uppercase(),
+                "$cursor|extra",
+                cursor.replace(company.toString(), UUID.randomUUID().toString()),
+                cursor.replace("2026-09", "2026-10"),
+                "x".repeat(111),
+                "attendance-closings.v1|$company|$month|1-1-1-1-1",
+            )) {
+            assertEquals(
+                "invalid_page",
+                (parseAttendanceClosingEmployeeCursor(company, month, bad) as Result.Failed)
+                    .failure
+                    .code,
+            )
+        }
+    }
+
+    @Test
     fun companyWorkforceAndReportGrantsAreBothRequired() {
         val actor =
             Actor(

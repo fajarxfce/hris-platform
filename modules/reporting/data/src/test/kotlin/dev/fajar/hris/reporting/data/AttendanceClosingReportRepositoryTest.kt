@@ -36,6 +36,13 @@ class AttendanceClosingReportRepositoryTest {
     private val repo =
         StoredAttendanceClosingReportRepository(
             object : AttendanceClosingReportDataSource {
+                override fun employees(
+                    company: UUID,
+                    month: LocalDate,
+                    after: UUID?,
+                    limit: Int,
+                ): List<AttendanceClosingEmployeeRow> = error("Unexpected employee projection")
+
                 override fun aggregate(
                     company: UUID,
                     from: LocalDate,

@@ -6,6 +6,7 @@ import dev.fajar.hris.core.domain.TransactionRunner
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.reporting.data.datasources.*
 import dev.fajar.hris.reporting.data.repositories.StoredAttendanceClosingReportRepository
 import dev.fajar.hris.reporting.data.repositories.StoredAttendanceExceptionReportRepository
@@ -29,6 +30,7 @@ import dev.fajar.hris.reporting.domain.usecases.GetHeadcountReport
 import dev.fajar.hris.reporting.domain.usecases.GetLeaveReport
 import dev.fajar.hris.reporting.domain.usecases.GetOvertimeReport
 import dev.fajar.hris.reporting.domain.usecases.GetPayrollCostReport
+import dev.fajar.hris.reporting.domain.usecases.ListAttendanceClosingEmployees
 import dev.fajar.hris.reporting.domain.usecases.ListExpenseReportClaims
 import dev.fajar.hris.reporting.domain.usecases.ListLeaveReportRequests
 import java.time.Clock
@@ -60,6 +62,28 @@ class ReportingConfiguration {
         GetAttendanceClosingReport(
             reports,
             companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
+
+    @Bean
+    fun listAttendanceClosingEmployees(
+        reports: AttendanceClosingReportRepository,
+        companies: CompanyRepository,
+        people: PeopleRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        ListAttendanceClosingEmployees(
+            reports,
+            companies,
+            people,
             members,
             identities,
             transactions,

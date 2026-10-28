@@ -5,6 +5,24 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+The complete local attendance workload now passes 5,000 arrivals over 900 seconds:
+20,000 real native-refresh/window/clock-in/read requests, zero errors, and exact
+server counts for 5,000 accepted events, employees, audit entries and sync heads.
+Endpoint p95 values were 9.184, 15.676, 18.908 and 93.753 ms respectively. Arrival-lag
+p95 was 0.207 ms; completion from the planned arrival had p95 138.309 ms. The driver
+retained a fixed offered schedule and at most 32 in-flight workflows.
+
+The actual API/worker/PostgreSQL containers shared four CPUs and 16 GiB of summed
+memory ceilings; the driver used the other four host CPUs. Cgroup peaks including
+setup were 720.53/478.05/634.94 MiB respectively, with no OOM kills. The host is a
+shared eight-vCPU/32-GiB AMD EPYC VPS with private HTTP, so the observed result has
+explicit hardware/network limits. All owned containers, network and data volume
+were removed. A corrected twenty-employee smoke and eight measurement/ownership
+tests also passed. The [workload contract and retained report](workload.md) describe
+the fictional seed, actual API schedule template, cgroup evidence and remaining
+payroll/file/dedicated-deployment acceptance. Logs: `.work/attendance-workload-5000.log`
+and `.work/workload-tool-checks.log`. Architecture and formatting also passed.
+
 Database/content/key recovery now captures one quiesced checkpoint and a separate
 private key pack, then verifies copied PostgreSQL and Garage without starting
 application processes against restored records. Two complete local exercises

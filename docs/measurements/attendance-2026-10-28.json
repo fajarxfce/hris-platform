@@ -1,0 +1,183 @@
+{
+  "context": {
+    "dateUtc": "2026-10-28",
+    "host": "Shared VPS",
+    "hostVirtualCpus": 8,
+    "hostMemoryGiBClass": 32,
+    "cpuModel": "AMD EPYC 9V74 80-Core Processor",
+    "serverCpuSet": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "driverCpuSet": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "dedicatedReferenceHost": false
+  },
+  "measurement": {
+    "format": 1,
+    "scenario": "attendance-arrival",
+    "employees": 5000,
+    "arrivalSeconds": 900,
+    "elapsedSeconds": 899.938,
+    "arrivalsPerSecond": 5.555555555555555,
+    "maximumInFlight": 32,
+    "endpointMilliseconds": {
+      "refresh": {
+        "count": 5000,
+        "p50": 6.664,
+        "p95": 9.184,
+        "p99": 16.269,
+        "max": 224.154
+      },
+      "captureWindow": {
+        "count": 5000,
+        "p50": 12.251,
+        "p95": 15.676,
+        "p99": 21.323,
+        "max": 68.165
+      },
+      "clockIn": {
+        "count": 5000,
+        "p50": 14.89,
+        "p95": 18.908,
+        "p99": 25.858,
+        "max": 75.736
+      },
+      "attendanceRead": {
+        "count": 5000,
+        "p50": 85.606,
+        "p95": 93.753,
+        "p99": 112.676,
+        "max": 341.198
+      }
+    },
+    "arrivalLagMilliseconds": {
+      "count": 5000,
+      "p50": 0.189,
+      "p95": 0.207,
+      "p99": 0.218,
+      "max": 0.459
+    },
+    "scheduledCompletionMilliseconds": {
+      "count": 5000,
+      "p50": 120.291,
+      "p95": 138.309,
+      "p99": 167.659,
+      "max": 402.826
+    },
+    "errors": {},
+    "database": {
+      "events": 5000,
+      "accepted": 5000,
+      "employees": 5000,
+      "audit": 5000,
+      "heads": 5000
+    },
+    "before": {
+      "database": {
+        "image": "sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+        "cpuSet": "0,1,2,3",
+        "memoryLimit": 8589934592,
+        "running": true,
+        "oomKilled": false,
+        "cgroup": {
+          "memory.current": "489992192",
+          "memory.peak": "490266624",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+          "cpu.stat": "usage_usec 11804834\nuser_usec 6461282\nsystem_usec 5343551\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "api": {
+        "image": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+        "cpuSet": "0,1,2,3",
+        "memoryLimit": 4294967296,
+        "running": true,
+        "oomKilled": false,
+        "cgroup": {
+          "memory.current": "699416576",
+          "memory.peak": "699416576",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+          "cpu.stat": "usage_usec 34143040\nuser_usec 33209946\nsystem_usec 933093\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "worker": {
+        "image": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+        "cpuSet": "0,1,2,3",
+        "memoryLimit": 4294967296,
+        "running": true,
+        "oomKilled": false,
+        "cgroup": {
+          "memory.current": "481366016",
+          "memory.peak": "482148352",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+          "cpu.stat": "usage_usec 22163136\nuser_usec 21484976\nsystem_usec 678160\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      }
+    },
+    "after": {
+      "database": {
+        "image": "sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+        "cpuSet": "0,1,2,3",
+        "memoryLimit": 8589934592,
+        "running": true,
+        "oomKilled": false,
+        "cgroup": {
+          "memory.current": "660111360",
+          "memory.peak": "665784320",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+          "cpu.stat": "usage_usec 456488733\nuser_usec 352491417\nsystem_usec 103997316\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "api": {
+        "image": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+        "cpuSet": "0,1,2,3",
+        "memoryLimit": 4294967296,
+        "running": true,
+        "oomKilled": false,
+        "cgroup": {
+          "memory.current": "749748224",
+          "memory.peak": "755531776",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+          "cpu.stat": "usage_usec 142730420\nuser_usec 105111953\nsystem_usec 37618466\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      },
+      "worker": {
+        "image": "sha256:f37956012e0cb88400e5b3689aeae2d2d735364c1922ae2225536163b5a99f56",
+        "cpuSet": "0,1,2,3",
+        "memoryLimit": 4294967296,
+        "running": true,
+        "oomKilled": false,
+        "cgroup": {
+          "memory.current": "501268480",
+          "memory.peak": "501268480",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+          "cpu.stat": "usage_usec 31671937\nuser_usec 29299768\nsystem_usec 2372169\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        }
+      }
+    },
+    "sourceCommit": "a9b4d105c1e3a86e8af59e85e1675c7ac1b22cb0",
+    "kernel": "7.2.10-arch1-1",
+    "python": "3.14.8",
+    "driverCpus": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "apiJarSha256": "e98a1cae2ba6adb96463a470c85c37af5c5e4ee29e680ea9aff1d931b30eb0b9",
+    "workerJarSha256": "f7fdf285002f3c297ce93e04629e9378b29b283a4f79be6a452a14d4a659f4bc",
+    "externalProvidersEnabled": false,
+    "loginMeasured": false,
+    "privateHttp": true,
+    "resourceContractPassed": true,
+    "behaviorPassed": true,
+    "latencyTargetPassed": true,
+    "temporaryResourcesRemoved": true
+  }
+}

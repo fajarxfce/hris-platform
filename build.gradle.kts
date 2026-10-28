@@ -34,6 +34,11 @@ tasks.register<Exec>("recoverySetCheck") {
     commandLine("python3", "-m", "unittest", "discover", "-s", "tool", "-p", "test_recovery_*.py")
 }
 
+tasks.register<Exec>("workloadToolCheck") {
+    group = "verification"
+    commandLine("python3", "-m", "unittest", "discover", "-s", "tool", "-p", "test_workload.py")
+}
+
 tasks.register<JavaExec>("formatCheck") {
     group = "verification"
     classpath = formatter
@@ -70,6 +75,12 @@ tasks.register<JavaExec>("format") {
 }
 
 tasks.named("check") {
-    dependsOn("architectureCheck", "formatCheck", "databaseRecoveryCheck", "recoverySetCheck")
+    dependsOn(
+        "architectureCheck",
+        "formatCheck",
+        "databaseRecoveryCheck",
+        "recoverySetCheck",
+        "workloadToolCheck",
+    )
     dependsOn(subprojects.filter { it.buildFile.exists() }.map { "${it.path}:check" })
 }

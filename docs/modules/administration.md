@@ -10,6 +10,16 @@ Screens: settings, flags, integration status, audit explorer, job monitor.
 
 Acceptance: policy effective dates, restricted settings/audit access, safe retry, stale client policy, secret redaction, and recovery from backup.
 
+## Reference workload
+
+[Attendance measurement](../workload.md) now exercises 5,000 distinct employee
+arrivals over fifteen minutes through the real API and worker. All 20,000 requests
+passed, with every endpoint p95 below one second (maximum endpoint p95 93.753 ms).
+Independent database counts matched the accepted events, audits and sync heads.
+The retained report includes CPU/memory limits, actual cgroup peaks, artifacts and
+the shared-host limitations. Payroll/file workloads and a dedicated deployment
+retain their own acceptance requirements.
+
 ## Backup and recovery
 
 [Recovery sets](../recovery-set.md) capture the quiesced Compose database, Garage

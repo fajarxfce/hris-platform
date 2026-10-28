@@ -102,6 +102,11 @@ never reaches a business mutation. Decimal amounts keep their string contracts.
 
 Use ignored .work/ for local logs and transient notes. Record actual checks in docs/delivery.md with the relevant capability. Unimplemented roadmap entries remain marked planned.
 
+The [workload tool](workload.md) creates its own constrained API/worker/PostgreSQL
+deployment with fictional data. Run a small smoke scenario before the full
+5,000-employee attendance interval. `workloadToolCheck` validates its measurement
+and cleanup mechanics; it does not itself run or establish performance results.
+
 ## Identity encryption and MFA
 
 Before starting the local stack, generate a dedicated key with `openssl rand -base64 32` and set `HRIS_IDENTITY_KEYS=v1:<generated-value>` in the ignored `.env`. `HRIS_IDENTITY_ACTIVE_KEY` selects the key used for new encryption. Store production values in the deployment secret manager and retain them with encrypted backups. The application has no fallback encryption key.

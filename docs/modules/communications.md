@@ -73,8 +73,13 @@ response loss and MFA renewal. Definitive conflicts require a new review and pre
 Cancellation uses the existing job workflow; a worker must confirm a terminal status
 before recovery. Review refreshes are explicit and do not poll automatically.
 
-The mobile inbox currently synchronizes and reads encrypted correspondence;
-read/acknowledgement commands and push navigation remain separate work.
+The mobile inbox synchronizes and reads encrypted correspondence and retains
+explicit read/acknowledgement commands. HRIS application URLs have real
+API/Android acceptance: login/company gating, scoped navigation, unchanged read
+state and archival retained across offline process restoration. Native push
+registration and scoped hints are implemented, with provider delivery and
+physical/iOS acceptance still separate; see
+[client validation](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/validation.md#android-url-navigation).
 
 ## Audience references
 

@@ -72,6 +72,24 @@ class DeploymentReviewTest(unittest.TestCase):
             self.assertEqual(1, deployment.main([], source=io.BytesIO(payload), output=output))
             self.assertEqual({"format": 1, "minimumWiringPassed": False, "issues": ["invalid_or_oversized_compose_input"]}, json.loads(output.getvalue()))
 
+    def test_development_accepts_explicit_private_api_but_production_still_requires_loopback(self):
+        for address in ("10.77.77.1", "172.16.0.1", "172.31.255.254", "192.168.1.1"):
+            with self.subTest(address=address):
+                spec = self.specification()
+                spec["services"]["api"]["ports"].append({"host_ip": address, "target": 8080})
+                self.assertTrue(deployment.review(spec)["minimumWiringPassed"])
+                self.assertIn("api_public_binding", deployment.review(spec, production=True)["issues"])
+                spec["services"]["database"]["ports"][0]["host_ip"] = address
+                self.assertIn("database_public_binding", deployment.review(spec)["issues"])
+
+    def test_development_rejects_wildcard_public_link_local_and_non_rfc1918_api_bindings(self):
+        for address in ("0.0.0.0", "::", "", "localhost", "8.8.8.8", "169.254.1.1",
+                        "172.15.255.255", "172.32.0.1", "100.64.0.1", "192.0.2.1", "fc00::1"):
+            with self.subTest(address=address):
+                spec = self.specification()
+                spec["services"]["api"]["ports"].append({"host_ip": address, "target": 8080})
+                self.assertIn("api_public_binding", deployment.review(spec)["issues"])
+
 
 if __name__ == "__main__":
     unittest.main()

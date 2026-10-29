@@ -8,6 +8,17 @@ preserves earlier work; its old next-step statements are not the active queue.
 
 ## Current result and continuation
 
+The user subsequently requested a usable server for the installed phone and
+authorized continuing development startup. A new persistent private `hris-dev`
+stack is running at schema 101; API health returned HTTP 200 from the VPS and
+phone through WireGuard. Dashboard build/user service, private Garage/scanner,
+separate database roles and development configuration review passed. The current
+Android signing SHA-1 was registered in Firebase after exact-app verification.
+See [current runtime ownership, private paths and remaining setup](current-development-runtime.md).
+Continue fictional account/company provisioning and human Google sign-in. Leave
+this persistent stack running; statements below about cleaned fixtures refer to
+the earlier disposable acceptance runs, not this development environment.
+
 The user supplied the Firebase service-account path. It is installed privately at
 `/home/fajar/.config/hris/fcm-service-account.json` (directory 700, file 600), outside
 Git. **The sender credential question is resolved; do not ask for it again.**

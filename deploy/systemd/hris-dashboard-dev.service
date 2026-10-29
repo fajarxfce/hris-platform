@@ -1,0 +1,19 @@
+[Unit]
+Description=HRIS dashboard on the private development network
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+WorkingDirectory=%h/hris/hris-platform/apps/dashboard
+Environment=HRIS_API_PROXY=http://127.0.0.1:8088
+ExecStart=/usr/bin/node node_modules/vite/bin/vite.js preview --host 10.77.77.1 --port 5173 --strictPort
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=15
+MemoryMax=768M
+NoNewPrivileges=true
+UMask=0077
+
+[Install]
+WantedBy=default.target

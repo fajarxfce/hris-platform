@@ -61,6 +61,28 @@ set `host_ip` to its own private VPN address. Do not publish this HTTP developme
 port on a public interface. PostgreSQL, Garage and ClamAV remain private; staging
 and production clients require the deployed HTTPS origin.
 
+The configuration reviewer accepts explicit RFC 1918 API addresses in development
+mode. It still rejects wildcard/public bindings and any non-loopback database
+publication. `--production` requires loopback API bindings as well.
+
+For an unattended development dashboard, first run `npm ci` and `npm run build`
+in `apps/dashboard`. Review the checkout path, VPN address, Node path and API proxy
+in [the user-service example](../deploy/systemd/hris-dashboard-dev.service), then:
+
+```sh
+install -Dm644 deploy/systemd/hris-dashboard-dev.service ~/.config/systemd/user/hris-dashboard-dev.service
+systemctl --user daemon-reload
+systemctl --user enable --now hris-dashboard-dev.service
+```
+
+The service previews the existing `dist` on the private interface, bounds restart
+attempts and memory, and stops its owned process on shutdown. Rebuild the dashboard
+and restart the service after frontend changes. User lingering may be enabled with
+`sudo loginctl enable-linger "$USER"` when it must survive logout and start at boot.
+Inspect with `systemctl --user status hris-dashboard-dev.service`; stop/disable with
+`systemctl --user disable --now hris-dashboard-dev.service`. This is a development
+preview; deployed environments use the HTTPS frontend described in the runbook.
+
 If WireGuard's firewall drops forwarding to Docker, allow only the original
 private API destination and its established replies before those drop rules.
 Docker translates the destination before the forwarding hook, so match conntrack's

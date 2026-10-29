@@ -8,6 +8,9 @@ import sys
 from urllib.parse import urlsplit
 
 MAX_INPUT = 4 * 1024 ** 2
+DEVELOPMENT_NETWORKS = tuple(ipaddress.ip_network(value) for value in (
+    "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16",
+))
 FLAGS = {
     "FIREBASE_AUTH": "HRIS_FIREBASE_AUTH_ENABLED", "OIDC": "HRIS_OIDC_ENABLED",
     "SMTP": "HRIS_MAIL_ENABLED", "FCM": "HRIS_FCM_ENABLED",
@@ -32,13 +35,17 @@ def flag(environment, name, default=False):
     return None
 
 
-def private_bindings(service, allow_loopback):
+def private_bindings(service, allow_loopback, allow_private_api=False):
     for port in service.get("ports", []):
         if not allow_loopback or not isinstance(port, dict):
             return False
         try:
-            if not ipaddress.ip_address(port.get("host_ip", "")).is_loopback:
-                return False
+            address = ipaddress.ip_address(port.get("host_ip", ""))
+            if address.is_loopback:
+                continue
+            if allow_private_api and any(address in network for network in DEVELOPMENT_NETWORKS):
+                continue
+            return False
         except ValueError:
             return False
     return True
@@ -92,7 +99,10 @@ def review(specification, production=False):
                 issues.append(kind.lower() + "_runtime_flags_differ")
     for role in ("api", "worker", "database", "garage", "antivirus", "antivirus-update"):
         if role in services:
-            private = private_bindings(services[role], role in ("api", "database"))
+            private = private_bindings(
+                services[role], role in ("api", "database"),
+                allow_private_api=role == "api" and not production,
+            )
             result["checks"][role + "PrivateBindings"] = private
             if not private:
                 issues.append(role + "_public_binding")

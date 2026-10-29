@@ -108,7 +108,10 @@ The bounded review emits only fixed API/worker integration flags and safe issue
 categories. It checks minimum required fields, scanner/storage dependencies,
 shared API/worker flag agreement, the FCM read-only bind and private application/
 data-service port bindings. Production mode additionally checks secure cookies,
-the HTTPS origin shape and disabled development transport exceptions. Worker FCM
+the HTTPS origin shape and disabled development transport exceptions. Development
+mode permits explicitly bound RFC 1918 API addresses for private VPN access;
+production requires loopback API bindings. Database bindings always remain loopback,
+and worker/storage/scanner services must not publish host ports. Worker FCM
 may correctly be enabled while API FCM is disabled. The six API rows do not describe
 the worker; Firebase/OIDC request handling is not a worker capability.
 

@@ -160,6 +160,31 @@ operator login/MFA/Overview passed again, the document remained ready with ident
 download bytes, and the complete configuration review passed. Measured evidence is
 in [the sanitized runtime record](measurements/development-runtime-2026-10-29.json).
 
+## Verified checkpoint after Google acceptance
+
+After the user confirmed Google/company/Home, a new coordinated checkpoint captured
+that binding and session state. Data is private at
+`/home/fajar/.local/state/hris-platform/recovery-data/dev-google-20261029T103103`,
+with the separate key pack under `recovery-keys/dev-google-20261029T103103` and
+current configuration/access records in
+`/home/fajar/.config/hris/dev-google-configuration-checkpoint-2026-10-29`.
+This is the current local checkpoint; the initial checkpoint above remains historical.
+
+Capture and isolated verification took 8.921 seconds including graceful stops;
+14.851 seconds includes source restart. Verification passed schema 101, 187 public
+relations, zero failed migrations/invalid constraints, restricted runtime roles,
+one decrypted identity envelope and one 734-byte S3 object. Temporary recovery
+resources were cleaned and persistent source volumes retained. API and the
+WireGuard-bound dashboard returned HTTP 200; the same new Google native session
+remained valid after restart. A loopback dashboard probe was refused because its
+service binds `10.77.77.1`, not loopback; the correct configured address passed.
+
+The preceding attempt `dev-google-20261029T102855` failed because its key verifier
+inherited host Java 17 instead of the required Java 21. It created no complete
+recovery-set manifest and the source was restarted automatically. Private failure
+logs are retained; the successful retry explicitly selected JDK 21. Neither local
+checkpoint substitutes for off-host backup or production recovery acceptance.
+
 ## Continue safely
 
 Operator access and the active mobile login instructions are private in

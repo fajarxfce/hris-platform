@@ -30,7 +30,11 @@ preserving V16's one-active-subject-per-issuer rule. The user retried and confir
 Home; account-session metadata independently returned one new native session
 created at `2026-10-29T10:24:50.263372Z`. Actual Android Google → Firebase → HRIS →
 company/Home is accepted. Email and the binding receipt remain private. See
-[Google evidence](measurements/native-google-2026-10-29.json). Firebase Management
+[Google evidence](measurements/native-google-2026-10-29.json). A newer private checkpoint
+`dev-google-20261029T103103` now includes the accepted binding/session and passed
+isolated restoration; API/dashboard and the same Google session passed after restart.
+The initial Java-17 verifier failure and corrected JDK-21 run are retained in the
+current-runtime record. Firebase Management
 also supplied matching public iOS configs for all three HRIS flavors. Mobile's
 iOS Firebase Auth adapter has password/bundle loading and Google system-browser
 PKCE/code exchange under local and Apple verification; the generic Starter port

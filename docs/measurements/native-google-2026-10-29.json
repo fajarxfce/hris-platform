@@ -25,8 +25,7 @@
   },
   "limits": [
     "User-operated Google/company/Home confirmation plus authorized server session metadata, not an instrumented phone UI trace.",
-    "No claim of physical FCM, GPS, iOS/APNs or production deployment acceptance.",
-    "The earlier development recovery checkpoint predates this Google binding."
+    "No claim of physical FCM, GPS, iOS/APNs or production deployment acceptance."
   ],
   "privateMaterialOmitted": [
     "email",
@@ -37,5 +36,26 @@
     "tokens",
     "passwords",
     "privateKeys"
-  ]
+  ],
+  "checkpointAfterAcceptance": {
+    "name": "dev-google-20261029T103103",
+    "backupAndIsolatedVerificationPassed": true,
+    "captureAndVerifySeconds": 8.921,
+    "totalIncludingSourceRestartSeconds": 14.851,
+    "schema": 101,
+    "publicRelations": 187,
+    "failedMigrations": 0,
+    "invalidConstraints": 0,
+    "restrictedRuntimeRoles": true,
+    "identityEnvelopesVerified": 1,
+    "objects": 1,
+    "objectBytes": 734,
+    "apiHttpAfterRestart": 200,
+    "dashboardHttpAfterRestart": 200,
+    "sameNativeSessionRetainedAfterRestart": true,
+    "sourceVolumesPreserved": true,
+    "temporaryRecoveryResourcesCleaned": true,
+    "offHostBackup": false,
+    "precedingFailure": "Host Java 17 could not run the Java 21 key verifier; source restart succeeded, no complete recovery-set manifest was created."
+  }
 }

@@ -66,18 +66,33 @@ current signing SHA-1 was registered successfully:
 Management read-back confirmed registration and refreshed config contains Android
 and web OAuth clients. Only this development app's public certificate changed.
 
-The intended Google account had not yet signed into this Firebase project. A
-human sign-in from the installed phone is pending. Bind only its exact verified
-Firebase issuer/UID through the authenticated HRIS administration flow; matching
-email alone must never create an HRIS binding or grant. Google exchange and
-physical FCM/location acceptance are not established by configuration readiness.
+The user subsequently tried Google on the installed phone and reported HRIS's
+unlinked-account rejection. Exact Firebase lookup now confirmed a verified email
+and `google.com` provider. Its exact issuer/UID was bound through authenticated
+HRIS administration; the user has been asked to retry and confirm Home. That final
+HRIS/device step is still pending. Matching email alone did not create a binding.
+
+V16 permits one active subject per account/issuer. Adding the real Google UID while
+the fictional password UID remained active initially returned 409 `data_conflict`.
+The owned fictional binding was reviewed and deactivated through the public API,
+then the retained Google command succeeded. Binding history, employee account and
+grants were preserved. The previous emulator session was consequently revoked;
+its cached data remains on the stopped emulator. Do not reactivate its old Firebase
+binding over the real user's identity. No schema or authentication policy changed.
 
 The refreshed ignored Mobile `google-services.json` retains all three HRIS flavors.
 Its web client matches the installed APK, so certificate registration required no
 new phone build or installation. A separate, explicitly owned fictional Firebase
-email/password account was created and its exact returned UID bound through HRIS
-administration. Actual Android sign-in with that account passed below; it does not
-stand in for the pending human Google exchange.
+email/password account supplied the successful Android setup acceptance below;
+that binding is now retired in favor of the user's Google UID. It does not stand
+in for the pending user Home confirmation.
+
+Firebase Management also created the three HRIS iOS apps and returned matching
+ignored `apps/ios/Configuration/{dev,staging,prod}/GoogleService-Info.plist` files.
+Each has its exact bundle ID, project, OAuth client and reversed client. This
+resolves the unavailable public iOS configuration prerequisite. Mobile's iOS
+Firebase Auth adapter is being implemented and has no acceptance claim yet;
+APNs/device input and actual iOS provider acceptance remain separate.
 
 ## Usable fictional company and actual acceptance
 
@@ -131,7 +146,9 @@ schema 101, zero failed migrations/invalid constraints, 187 public relations,
 restricted API/worker roles, one decrypted identity envelope and one 734-byte S3
 object. Isolated verification resources were cleaned. A separate private
 `/home/fajar/.config/hris/dev-configuration-checkpoint-2026-10-29` retains matching
-configuration and access records. These are local checkpoints, not off-host backups.
+configuration and access records. This initial checkpoint precedes replacement of
+the fictional Firebase binding by the real Google UID. These are local checkpoints,
+not off-host backups; do not treat the earlier identity state as a current cutover.
 
 After restart, host and phone API/dashboard checks returned HTTP 200, browser
 operator login/MFA/Overview passed again, the document remained ready with identical
@@ -140,19 +157,17 @@ in [the sanitized runtime record](measurements/development-runtime-2026-10-29.js
 
 ## Continue safely
 
-Operator and fictional Firebase tester access are private in
+Operator access and the active mobile login instructions are private in
 `/home/fajar/.config/hris/dev-access.txt`. Its operator authenticator material must
 remain available; enrollment is not reset by a restart. The private `dev-*-state.json`
 files retain provisioning IDs/receipts, and `dev-admin-browser.json` is sensitive
 session material. Inspect deliberately without echoing contents or committing them.
 
-The user's Google email is already known privately. Do not ask for it or the FCM
-credential again. When the user has tried Google login, run the private
-`lookup-google-identity.py`; it performs one exact-email lookup, never enumeration.
-Only a confirmed Google provider with verified email can be bound to this employee
-using `bind-dev-firebase.mjs google`, after refreshing operator MFA with
-`provision-dev-admin.mjs`. The binding uses an authenticated public command and
-retains its operation ID. The user then retries Google login. Do not invent a UID,
+The user's Google email is already known privately and its exact binding is saved.
+Do not ask for the email or FCM credential again. Await the user's Home/error result
+from the requested retry; use the private session-metadata review and exact-email
+lookup if needed. The private `bind-dev-firebase.mjs google` retains the successful
+operation receipt; it is not a reason to add another binding. Do not invent a UID,
 set the real user's password, automatically link by email, or drive the phone UI.
 
 Private provisioning scripts are supplementary continuation aids for this existing

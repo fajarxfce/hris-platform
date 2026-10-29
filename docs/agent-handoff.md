@@ -23,8 +23,14 @@ download. A coordinated private recovery checkpoint passed schema/key/object che
 host and phone health, browser login and document download passed after restart.
 See [current runtime ownership, private paths and next actions](current-development-runtime.md)
 and [sanitized evidence](measurements/development-runtime-2026-10-29.json).
-Human Google sign-in is still pending; the user's exact email is already known
-privately, and its Firebase lookup still finds no account. Leave
+The user tried Google and received the expected unlinked-account rejection.
+Exact Firebase lookup then confirmed `google.com` and verified email. The old
+fictional password binding was deactivated before adding the confirmed Google UID,
+preserving V16's one-active-subject-per-issuer rule. The user Home retry is pending;
+email and successful binding receipt are already known privately. Firebase Management
+also supplied matching public iOS configs for all three HRIS flavors. Mobile's
+iOS Firebase Auth adapter is now being implemented; APNs/device acceptance remains.
+Leave
 this persistent stack running; statements below about cleaned fixtures refer to
 the earlier disposable acceptance runs, not this development environment.
 

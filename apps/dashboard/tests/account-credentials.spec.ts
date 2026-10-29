@@ -84,7 +84,11 @@ test("recovery acknowledges an empty 202 without revealing account eligibility",
   const f = await installAccountCredentialsApi(page);
   await page.goto("/");
   await page.getByRole("link", { name: "Forgot password?", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Password recovery", exact: true }),
+  ).toBeVisible();
   await page.getByLabel("Email", { exact: true }).fill("missing@example.test");
+  await expect(page.getByLabel("Email", { exact: true })).toHaveValue("missing@example.test");
   await page.getByRole("button", { name: "Send recovery link", exact: true }).click();
   await expect(page.getByRole("status")).toContainText(
     "If the account supports password recovery, an email will be sent.",

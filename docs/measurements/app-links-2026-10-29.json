@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-29",
+  "scope": "Public dashboard HTTPS-to-native handoff",
+  "baseline": "5e178827",
+  "local": {
+    "dashboardCheck": "passed",
+    "unitTests": 4002,
+    "unitFiles": 353,
+    "unitSeconds": 61.58,
+    "browserPassed": 14,
+    "browserSeconds": 9.0,
+    "handoffBrowserCases": 3,
+    "visualReview": {
+      "width": 320,
+      "height": 720,
+      "language": "id",
+      "theme": "dark",
+      "horizontalOverflow": false
+    }
+  },
+  "initialFailure": {
+    "stage": "related Chromium tests",
+    "passed": 13,
+    "failed": 1,
+    "cause": "Password recovery test filled login Email during navigation before recovery heading appeared.",
+    "correction": "Wait for recovery heading and assert filled value; no retry or timeout increase."
+  },
+  "limits": [
+    "No selected/published HTTPS domain",
+    "No actual OS domain verification",
+    "No actual Apple device/APNs test; physical iPhone testing waived by user",
+    "No production deployment"
+  ],
+  "nativeSource": "d36a1bc9e5f8b1e367d6d6db380d2da5ad312cad",
+  "nativeCi": 40887772486,
+  "nativeCiStatus": "in progress at this record"
+}

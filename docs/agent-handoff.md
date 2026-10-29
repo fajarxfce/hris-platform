@@ -21,6 +21,15 @@ phone data and running private development stack.
 
 ## Current result and continuation
 
+The public [Mobile HTTPS handoff](mobile-app-links.md) is implemented and validated
+locally: 4002 dashboard unit cases and 14 related Chromium cases passed. It admits
+only known environment/routes and activates no dashboard session/business request.
+Mobile source `d36a1bc9` supplies configurable native associations; full Mobile CI
+`40887772486` is still running. Wait for its proof before the generic Starter port.
+Native Android HTTPS routing is the active local acceptance; the controlled domain
+is still an optional deployment input. Physical iPhone testing is waived above.
+
+
 The user subsequently requested a usable server for the installed phone and
 authorized continuing development startup. A new persistent private `hris-dev`
 stack is running at schema 101; API health returned HTTP 200 from the VPS and

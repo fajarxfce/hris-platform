@@ -9,8 +9,10 @@ import { PasswordRecoveryScreen } from "../features/identity/presentation/bindin
 import { VerificationDialog } from "../features/identity/presentation/bindings/verification-dialog";
 import type { ApplicationDependencies } from "./application-dependencies";
 import { useIdentityLifecycle } from "./lifecycle/use-identity-lifecycle";
+import { MobileAppLinkPage } from "./mobile-app-link-page";
 import { PortalWorkspace } from "./portal-workspace";
 import { accountCredentialRoute } from "./routing/account-credential-route";
+import { mobileAppRoute } from "./routing/mobile-app-route";
 
 export function Application(props: ApplicationDependencies) {
   const { identity } = props;
@@ -22,8 +24,11 @@ export function Application(props: ApplicationDependencies) {
   const [locale, setLocale] = useReducer((_previous: Locale, next: Locale) => next, "en");
   const [dark, toggleTheme] = useReducer((previous: boolean) => !previous, false);
   const [collapsed, toggleNavigation] = useReducer((previous: boolean) => !previous, false);
-  const credentialRoute = accountCredentialRoute(useLocation().pathname);
-  useIdentityLifecycle(identity, credentialRoute === null);
+  const location = useLocation();
+  const credentialRoute = accountCredentialRoute(location.pathname);
+  const mobileRoute = mobileAppRoute(location.pathname, location.search, location.hash);
+  const publicRoute = credentialRoute !== null || mobileRoute !== null;
+  useIdentityLifecycle(identity, !publicRoute);
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
@@ -32,7 +37,7 @@ export function Application(props: ApplicationDependencies) {
       theme={dark ? webDarkTheme : webLightTheme}
       style={{ colorScheme: dark ? "dark" : "light" }}
     >
-      {credentialRoute !== null ? (
+      {publicRoute ? (
         <div className="app-auth-shell">
           <header className="app-auth-preferences">
             <AppPreferences
@@ -42,16 +47,18 @@ export function Application(props: ApplicationDependencies) {
               onThemeChanged={toggleTheme}
             />
           </header>
-          {credentialRoute === "requestRecovery" ? (
+          {mobileRoute !== null ? (
+            <MobileAppLinkPage route={mobileRoute} locale={locale} />
+          ) : credentialRoute === "requestRecovery" ? (
             <PasswordRecoveryScreen actions={props.accountCredentials} locale={locale} />
-          ) : (
+          ) : credentialRoute !== null ? (
             <CredentialConfirmationScreen
               key={credentialRoute}
               actions={props.accountCredentials}
               kind={credentialRoute}
               locale={locale}
             />
-          )}
+          ) : null}
         </div>
       ) : state.session &&
         (state.workspace !== null ||
@@ -82,9 +89,7 @@ export function Application(props: ApplicationDependencies) {
           <AuthScreen identity={identity} state={state} locale={locale} />
         </div>
       )}
-      {credentialRoute === null && (
-        <VerificationDialog identity={identity} state={state} locale={locale} />
-      )}
+      {!publicRoute && <VerificationDialog identity={identity} state={state} locale={locale} />}
     </FluentProvider>
   );
 }

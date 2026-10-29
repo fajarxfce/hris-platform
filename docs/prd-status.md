@@ -1,8 +1,10 @@
 # Current PRD review
 
-Reviewed 29 October 2026. The overall PRD is **not declared complete**: actual
-provider/device/deployment acceptance still needs external inputs. Mobile's new
-iOS provider and its generic Starter port both passed full CI. This page is the compact continuation map;
+Reviewed 29 October 2026. The current completion pass is implementing configurable
+HTTPS app links and proving the reusable port in Starter. The user waived physical
+iPhone testing; do not keep it as a completion blocker. Actual domain activation,
+APNs delivery and production deployment must still be distinguished from code/build
+acceptance. This page is the compact continuation map;
 [completion](completion.md) and [delivery](delivery.md) retain the detailed history.
 Read [agent handoff](agent-handoff.md) for the latest active work before starting.
 
@@ -87,7 +89,7 @@ contains no real email, UID, token or credential.
 
 | Work | Current evidence | Missing prerequisite |
 | --- | --- | --- |
-| iOS push/auth and physical application links | Matching public Firebase plists are installed; Mobile password/Google adapters passed full CI including 97 native cases/Xcode, and Starter independently passed all jobs with 77 native cases/Xcode. | Available iPhone/APNs setup and controlled HTTPS domain; implement native associations and HTTPS route admission, then exercise actual scoped login/push/link flows. |
+| iOS push/auth and HTTPS application links | Apple providers and the preceding Starter ports passed simulator/Xcode CI. Mobile `d36a1bc9` now implements configurable native associations/HTTPS admission; full CI and the generic port are in progress. The [public web handoff](mobile-app-links.md) passed local dashboard checks. | Physical iPhone testing is explicitly waived for this pass. Domain selection/publication and APNs credentials remain deployment settings; no actual OS verification or APNs delivery is claimed. |
 | Physical location and target deployment | Explicit no-location review, emulator/API and constrained 5,000-employee/scanner workload measurements accepted. Deployment/recovery guidance is implemented. | Available authorized device/environment, real provider configuration and a target-specific execution. A Git push is not live release authorization. |
 
 Earlier CI and generic ports are accepted. The discovered iOS Firebase adapter

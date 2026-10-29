@@ -3,6 +3,11 @@
 Use the [compact PRD status](prd-status.md) for the current module/acceptance map
 and active CI work. This document preserves the detailed implementation history.
 
+The [public HTTPS Mobile handoff](mobile-app-links.md) now passes 4002 unit cases
+and 14 related browser cases. It retains explicit native opening and independent
+account/company admission. Configurable native association verification and the
+Mobile-to-Starter port are active; physical iPhone testing was waived by the user.
+
 [Actual Android FCM delivery](native-fcm-acceptance.md) passed after the user supplied
 the private server credential. Two real publications produced foreground/background
 OS notifications; tapping the latter opened the expected Inbox item and company.

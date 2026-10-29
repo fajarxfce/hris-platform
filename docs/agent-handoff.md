@@ -2,7 +2,8 @@
 
 Updated 29 October 2026 (UTC). **The overall PRD is still in progress.** The user
 asked to continue through the remaining PRD, push each commit, and keep continuation
-notes in Git. Read this file first, then [completion](completion.md),
+notes in Git. Read this file first, then the compact [PRD status](prd-status.md),
+[completion](completion.md),
 [product](product.md), the relevant module contract and each repository's `AGENTS.md`.
 
 ## Current result and continuation
@@ -29,14 +30,17 @@ Continue the current CI/PRD reconciliation. Mobile CI
 was explicitly dispatched at `b0a95391`: prior cross-platform CI was at `d191c61d`,
 before the latest application fixes. Inspect its Linux/Android/Windows/Web and Apple
 simulator jobs, resolve failures and record the final commit/outcome. It is not a
-release/distribution workflow. Platform's Verify workflow now also supports manual dispatch with its existing
-shards, downstream integration, read-only repository permission and time bounds.
-Dispatch the current integrated branch and record the result; focused local runs
-do not substitute for the full CI matrix. All native-owned local resources are now cleaned.
+release/distribution workflow. Platform Verify
+[40816036721](https://github.com/fajarxfce/hris-platform/actions/runs/40816036721)
+is running at `d7184e83`, using the existing four backend/dashboard shards and
+downstream integration. Its new manual entry point preserves read-only repository
+permission and time bounds. Inspect every job and record the outcome; focused local
+runs do not substitute for the full matrix. All native-owned resources are cleaned.
 
 The eleven module screen/acceptance lists were reread and source TODO/placeholder
-searches found no obvious stub. Finish mapping the remaining delivery ledger to
-actual routes/contracts. Do not call fixture-only acceptance the whole PRD complete.
+searches found no obvious stub. The [compact review](prd-status.md) maps all eleven
+module contracts to actual workflows, the six native cases and external inputs.
+Do not call fixture-only acceptance the whole PRD complete.
 FCM credentials and Google/physical/iOS setup still need external inputs; do not
 repeat the pending Firebase credential question.
 
@@ -64,8 +68,8 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
 | `hris-platform` | `feat/firebase-auth` | Integrated `409abad4` + `f757bffd`; elapsed acceptance `1abdbce9` |
-| `hris-mobile` | `feat/native-push` | `bacfd39e` — native overtime evidence; app fixes `02743a9f` |
-| `compose-fluent-starter` | `fix/push-token-lifecycle` | `bae7058b` — integrated continuation handoff; validated foundation `a16325e` |
+| `hris-mobile` | `feat/native-push` | `ad675e57` — native attendance evidence; app fixes `02743a9f` |
+| `compose-fluent-starter` | `fix/push-token-lifecycle` | `5bfa9a9` — current CI/native continuation; validated foundation `a16325e` |
 
 The latest increments verify delivery observations, original payroll comparison
 and actual elapsed export retirement.

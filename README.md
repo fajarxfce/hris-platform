@@ -6,7 +6,7 @@ The dashboard follows Azure Portal interaction patterns. Employees use a separat
 
 ## Project status
 
-Implementation is in progress. [Delivery status](docs/delivery.md) distinguishes implemented capabilities from the roadmap. Payroll rules and integrations must pass their documented acceptance checks before operational use.
+Implementation is in progress. [Current PRD status](docs/prd-status.md) maps modules, acceptance evidence and remaining inputs. [Delivery status](docs/delivery.md) distinguishes implemented capabilities from the roadmap. Payroll rules and integrations must pass their documented acceptance checks before operational use.
 
 ## Build
 

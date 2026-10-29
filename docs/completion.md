@@ -1,5 +1,8 @@
 # End-to-end completion
 
+Use the [compact PRD status](prd-status.md) for the current module/acceptance map
+and active CI work. This document preserves the detailed implementation history.
+
 [Administrative push delivery](announcement-delivery.md) now provides a scoped
 API and dashboard for recipient states and device counters. V101 preserves raw
 dispatch privacy and captures worker progress/cleanup atomically. Validation passed

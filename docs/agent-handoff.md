@@ -16,10 +16,13 @@ The existing scenario now waits for the returned table and explicitly selects
 the level-one page heading. All four closing-report browser cases passed in 10.4s,
 with strict TypeScript and Biome; no application implementation changed.
 
-Push this correction and verify its exact head on an owned temporary CI ref so
-the active recovery run is not cancelled by branch concurrency. Record the new run
-URL here and retain the original failing trace. Do not call either earlier full
-run successful; inspect the corrected full matrix and sanitized restore artifact.
+Corrected full run [40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608)
+is now running at `9345c19b` on owned temporary ref
+`ci/closing-report-40820005213`, so active recovery run `40820005213` is not
+cancelled by branch concurrency. The same commit is pushed on `feat/firebase-auth`.
+Retain the original failing trace, inspect all corrected jobs and download the
+sanitized restore artifact before recording success. Remove only the owned CI ref
+after verification; no pull request or release was created.
 
 First Verify run [40816036721](https://github.com/fajarxfce/hris-platform/actions/runs/40816036721)
 passed all four backend and all four dashboard shards at `d7184e83`: 2,731 disjoint

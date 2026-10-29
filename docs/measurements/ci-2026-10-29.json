@@ -145,6 +145,30 @@
     "id": 40820005213,
     "url": "https://github.com/fajarxfce/hris-platform/actions/runs/40820005213",
     "head": "70e5098d540609bed43d05b93639fc2c88f48ca5",
-    "status": "running; inspect all jobs before calling verification passed"
+    "status": "running backend/recovery; dashboard shard 1 failed on ambiguous heading locator",
+    "observedDashboardFailure": {
+      "shard": 1,
+      "passed": 274,
+      "failed": 1,
+      "case": "closing months compare original and current facts and open the exact revision with report return",
+      "reason": "Unqualified heading locator matched both h1 and h2 after data loaded.",
+      "otherDashboardShards": "passed"
+    }
+  },
+  "closingHeadingCorrection": {
+    "commit": "9345c19b",
+    "applicationSourcesChanged": false,
+    "behavior": "Wait for the returned table and select the level-one page heading.",
+    "localBrowserCases": 4,
+    "localBrowserDuration": "10.4s",
+    "typeScript": "passed",
+    "biome": "passed"
+  },
+  "correctedFullRun": {
+    "id": 40820912608,
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/40820912608",
+    "head": "9345c19bad4a219ecdb9ac247f944b2959c4642a",
+    "temporaryRef": "ci/closing-report-40820005213",
+    "status": "running; earlier recovery run remains active"
   }
 }

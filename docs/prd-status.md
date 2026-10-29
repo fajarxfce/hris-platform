@@ -58,7 +58,7 @@ application foundation remains `9a13791`.
 
 | Repository | Current verification | Source/result boundary |
 | --- | --- | --- |
-| Platform | Replacement [40820005213](https://github.com/fajarxfce/hris-platform/actions/runs/40820005213), head `70e5098d`, running | First [40816036721](https://github.com/fajarxfce/hris-platform/actions/runs/40816036721) passed all test suites and actual restore but failed hidden-path report upload. The exact sanitized upload is corrected; [measurements](measurements/ci-2026-10-29.json) retain its failed conclusion. |
+| Platform | Corrected full [40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608), head `9345c19b`, running on an owned CI ref | First run passed tests/restore but failed hidden-path report upload. Run `40820005213` continues backend/recovery after a browser locator ambiguity; its correction passed four local cases. [Measurements](measurements/ci-2026-10-29.json) retain each run and failure. |
 | Mobile | Full [40815794384](https://github.com/fajarxfce/hris-mobile/actions/runs/40815794384), head `b0a95391`; Apple follow-up [40817592306](https://github.com/fajarxfce/hris-mobile/actions/runs/40817592306), head `451a2c4d`, running | Linux/Android, Windows and Web passed. Apple hit a compilation deadline; separate compile/test/Xcode bounds are under verification before Starter port. Hosted application sources match `02743a9f`; the later copy-only edit has separate local root/Android evidence. |
 | Starter | [40648662419](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40648662419), head `9a13791` | Passed; application/build/tool sources remain unchanged, so no repeat run is required solely for handoff edits. |
 

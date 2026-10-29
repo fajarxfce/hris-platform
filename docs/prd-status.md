@@ -1,8 +1,8 @@
 # Current PRD review
 
-Reviewed 29 October 2026. The overall PRD is **not declared complete**: the full
-current CI runs below are still running, and actual provider/device/deployment
-acceptance has external dependencies. This page is the compact continuation map;
+Reviewed 29 October 2026. The overall PRD is **not declared complete**: actual
+provider/device/deployment acceptance still needs external inputs. The current
+automated verification and generic Starter port are accepted. This page is the compact continuation map;
 [completion](completion.md) and [delivery](delivery.md) retain the detailed history.
 Read [agent handoff](agent-handoff.md) for the latest active work before starting.
 
@@ -58,12 +58,13 @@ application foundation remains `9a13791`.
 
 | Repository | Current verification | Source/result boundary |
 | --- | --- | --- |
-| Platform | Corrected full [40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608), head `9345c19b`, running on an owned CI ref | First run passed tests/restore but failed hidden-path report upload. Run `40820005213` passed backend/recovery and uploaded its checked summary, but failed a browser locator. The correction passed four local cases and all four hosted dashboard shards. [Measurements](measurements/ci-2026-10-29.json) retain each run and failure. |
+| Platform | Corrected full [40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608), head `9345c19b`, passed all ten jobs | First run passed tests/restore but failed hidden-path report upload. Run `40820005213` passed backend/recovery and uploaded its checked summary, but failed a browser locator. The correction passed all four backend/dashboard shards, actual API/worker/export integration and schema-101 restore with a downloaded sanitized report. The owned CI ref was removed after verification. [Measurements](measurements/ci-2026-10-29.json) retain each run and failure. |
 | Mobile | Full [40815794384](https://github.com/fajarxfce/hris-mobile/actions/runs/40815794384), head `b0a95391`; successful Apple follow-up [40817592306](https://github.com/fajarxfce/hris-mobile/actions/runs/40817592306), head `451a2c4d` | Linux/Android, Windows and Web passed in the full run, whose Apple deadline failure remains recorded. Corrected Apple passed 27 tests, Xcode and reports before Starter port. Hosted application sources match `02743a9f`; later copy-only `678783b3` has separate local root/Android evidence. |
 | Starter | Successful Apple [40820482699](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40820482699), port `1817e45`; prior full [40648662419](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40648662419), app `9a13791` | Generic CI port followed Mobile proof and independently passed 27 tests, Xcode and artifact upload. Local root passed with 306 desktop cases. Application sources are unchanged; the Apple-only run intentionally skipped verify/Windows. |
 
-Inspect all jobs and record actual outcomes. Resolve failures before calling a run
-passed. No production distribution workflow was invoked by these CI dispatches.
+All final jobs and downloaded reports were inspected. Prior failures remain
+recorded separately from their successful corrections. No production distribution
+workflow was invoked by these CI dispatches.
 
 ## External acceptance still required
 
@@ -74,7 +75,9 @@ passed. No production distribution workflow was invoked by these CI dispatches.
 | iOS push/auth and physical application links | Portable build/simulator checks and Android URL recovery are separate evidence. | iOS Firebase configuration, APNs/device setup and verified deployed association URLs. |
 | Physical location and target deployment | Explicit no-location review, emulator/API and constrained 5,000-employee/scanner workload measurements accepted. Deployment/recovery guidance is implemented. | Available authorized device/environment, real provider configuration and a target-specific execution. A Git push is not live release authorization. |
 
-Continue independent CI/implementation work while awaiting external inputs. Mark
-these rows complete only after their actual acceptance. The repository should never
+Current CI and identified generic ports are accepted; no additional concrete
+implementation gap was found in this review. Continue these rows when their
+inputs become available, and reopen implementation for an observed failure or
+documented requirement gap. Mark rows complete only after actual acceptance. The repository should never
 claim that a fixture sent a real FCM message, completed Google sign-in, or verified
 a physical deployment when it did not.

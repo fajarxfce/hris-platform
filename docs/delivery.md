@@ -25,11 +25,26 @@ are not included. The original downstream integration passed (40 API, 14 worker,
 one export case and the mail/storage fixture checks). Replacement
 [40820005213](https://github.com/fajarxfce/hris-platform/actions/runs/40820005213)
 at `70e5098d` passed recovery and uploaded the checked sanitized summary. Its
-overall result failed a browser locator, corrected in `9345c19b` and under full
-verification as `40820912608`. [Tracked measurements](measurements/ci-2026-10-29.json)
+overall result failed a browser locator, corrected in `9345c19b`; full verification
+`40820912608` then passed all ten jobs. [Tracked measurements](measurements/ci-2026-10-29.json)
 retain the original failures and successful artifact acceptance.
 
 ## Status
+
+Corrected full [Verify 40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608)
+passed all ten jobs at `9345c19b`. Downloaded reports confirm 2,731 disjoint API
+cases, 686 shared module tests, 94 worker passes and one separately accepted manual
+retention case skipped by this ordinary suite. Dashboard passed 3,997 unit tests,
+seven proxy regressions and 1,098 distinct Chromium scenarios; repeated suites are
+counted once. Actual integration passed 40 API/browser, 14 worker and one export
+case plus two mail/nine storage fixture checks. Schema-101 restore and its checked
+sanitized artifact passed. [Measurements](measurements/ci-2026-10-29.json) retain
+all runs, failures and source boundaries. The owned CI ref was removed afterward;
+the tested commit remains on the working branch. No release/deployment was invoked.
+
+Mobile's corrected Apple run and its independently validated Starter port also
+passed 27 simulator tests and complete unsigned Xcode builds each. Current handoffs
+retain exact sources, the later Mobile copy-only check and external acceptance.
 
 Full CI `40820005213` found a closing-report browser assertion that intermittently
 matched both the page and section heading after returning from an original closing.
@@ -37,7 +52,7 @@ The test now waits for the returned employee table and selects the level-one pag
 heading. Its four Chromium scenarios passed locally in 10.4s, with strict TypeScript
 and Biome. This changes the acceptance locator, not the report or its navigation.
 The original trace and failed shard remain recorded; the corrected full matrix
-runs as `40820912608` on the owned CI ref, allowing the earlier recovery job to
+passed as `40820912608` on the owned CI ref, allowing the earlier recovery job to
 complete successfully with its sanitized report uploaded and downloaded.
 
 End-to-end scope and remaining work are tracked in [completion](completion.md),

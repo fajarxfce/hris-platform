@@ -652,15 +652,21 @@ table below preserves accepted increments and earlier boundaries, not a list of
 features to implement again. A discovered behavior gap still requires a concrete
 fix and acceptance evidence. The PRD is not declared complete by this reconciliation.
 
+Current full Platform verification [40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608)
+passed all ten jobs at `9345c19b`, including the corrected report upload, browser
+assertion and actual integration. Mobile and Starter Apple corrections also passed
+independently, closing the generic port. [CI measurements](measurements/ci-2026-10-29.json)
+retain original failures and final proof. No CI or local test job remains active.
+
 | Remaining work | Current state and required acceptance |
 | --- | --- |
-| Finish current CI corrections | Platform [40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608) at `9345c19b` verifies the sanitized recovery upload and an unambiguous closing-report browser assertion; earlier run `40820005213` retains its browser failure and passed recovery/report upload. Mobile's Apple correction passed 27 simulator tests and the full Xcode build; its generic Starter port `1817e45` also passed [40820482699](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40820482699). Inspect all outcomes and download reports before acceptance. |
 | Real FCM send and scoped hints | Actual Firebase SDK registration, lost-response recovery and retirement passed. Actual sender delivery still requires the server-side `cmp-fajar` credential and a controlled recipient. Its path-only input question is already pending; do not repeat it or substitute the public Android config for a sender credential. |
 | Google sign-in exchange | Firebase email/password through HRIS and Android MFA passed. Google chooser/Back passed; a real eligible Google sign-in with correct Android OAuth/SHA setup must still exchange its proof through HRIS. The public web client ID is known; no client secret is needed. |
 | iOS provider and physical application links | Simulator build/tests do not prove push/auth on a device. Supply the iOS Firebase configuration, APNs/device setup and deployed HTTPS association endpoints, then exercise the actual scoped login/push/link flows. |
 | Physical location and target deployment | Emulator/no-location review and constrained workload/recovery evidence passed. Actual GPS and target-specific operation require the authorized device/environment and deployed provider configuration. Git push authorization does not authorize a production release. |
 
-Continue the running CI work while external inputs are unavailable. Reopen an
+CI and identified generic ports are accepted. Continue external acceptance when
+its input is available. Reopen an
 accepted implementation only for a documented requirement gap or observed failure;
 do not recreate completed replicas, drafts, summary observers or administrative
 screens based on a historical "next" paragraph.

@@ -9,7 +9,7 @@ preserves earlier work; its old next-step statements are not the active queue.
 ## Current result and continuation
 
 Corrected full Verify [40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608)
-is running at `9345c19bad4a219ecdb9ac247f944b2959c4642a`. All four backend and all
+passed all ten jobs at `9345c19bad4a219ecdb9ac247f944b2959c4642a`. All four backend and all
 four dashboard shards passed. Downloaded reports confirm 2,731 disjoint API tests,
 686 shared module tests and 94 worker passes; one opt-in elapsed-retention case
 is skipped by ordinary worker runs and was separately accepted below. Dashboard
@@ -19,8 +19,10 @@ Chromium cases. Repeated suites are counted once.
 Schema-101 recovery and report upload also passed on this exact head. The downloaded
 sanitized summary verifies 104 objects, 2,098,795 bytes, two encrypted records,
 old/current keys, original-source preservation, typed audit/delivery projections
-and cleanup. **Dashboard/API/worker/export integration is the only active job.**
-Inspect its outcome and retain the final logs/summary before closing CI work.
+and cleanup. Actual integration passed 40 API/browser cases (4.9m), 14 worker cases
+(4.5m), one storage export case (47.8s), two mail and nine storage fixture checks.
+**No CI or owned local test job remains active.** Logs and downloaded summaries
+were inspected; [tracked measurements](measurements/ci-2026-10-29.json) retain results.
 
 The two preceding failed runs remain in [measurements](measurements/ci-2026-10-29.json).
 Run `40816036721` passed tests/restore but excluded the hidden `.work` report during
@@ -29,10 +31,10 @@ passed backend/restore/upload but one browser locator matched both page and sect
 headings. `9345c19b` waits for the returned table and selects the level-one heading;
 its four local Chromium cases and the corrected full dashboard matrix passed.
 
-The final run uses the owned temporary ref `ci/closing-report-40820005213` so the
-previous recovery run could finish without cancellation. The same commit is pushed
-on `feat/firebase-auth`; newer commits change documentation only. Remove only this
-owned CI ref after verification. No PR, release or live deployment was created.
+The final run used owned temporary ref `ci/closing-report-40820005213` so the
+previous recovery run could finish without cancellation. That ref was removed
+after verification; the tested commit remains on `feat/firebase-auth`. Newer commits
+change documentation only. No PR, release or live deployment was created.
 
 Mobile's original full CI passed Linux/Android, Web and Windows but Apple cold
 compilation exceeded its combined deadline. Workflow correction `451a2c4d` passed
@@ -96,8 +98,8 @@ requirement. New behavior gaps still require implementation and relevant accepta
 
 ## Remaining delivery areas
 
-Finish the active CI job above, then continue these actual external cases when
-their input is available. [Remaining delivery](completion.md#remaining-delivery-sequence)
+Current CI and the generic Starter port are accepted. Continue these actual
+external cases when their input is available. [Remaining delivery](completion.md#remaining-delivery-sequence)
 and [PRD status](prd-status.md#external-acceptance-still-required) retain the scope.
 
 | Work | Required input and acceptance |

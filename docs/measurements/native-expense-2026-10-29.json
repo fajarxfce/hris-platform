@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-29",
+  "platformApplicationCommit": "b7f42070e7da6aacb4af6e4357cab4c2dabb4a16",
+  "fixtureParentCommit": "578a5031",
+  "schema": 101,
+  "mobileApplicationCommit": "02743a9f",
+  "device": "Owned Android 35 emulator-5560; no phone used",
+  "scenarioMinutes": 8.3,
+  "includingSetupMinutes": 8.8,
+  "server": {
+    "responseDropped": true,
+    "nativeCompanyWrites": 2,
+    "sameOperationAndInput": true,
+    "claims": 1,
+    "serverVersion": 0,
+    "draftRevision": 0,
+    "lines": 1,
+    "totalAmount": "25000.25",
+    "historyEntries": 1,
+    "submissions": 0,
+    "requests": 51
+  },
+  "nativeDriver": {
+    "editedDrafts": 1,
+    "companyWritesBeforeSave": 0,
+    "draftSummaryRequests": 30,
+    "afterDraftSummaryReloadRequests": 30,
+    "frozenSummaryDrafts": 0,
+    "frozenSummaryUnconfirmed": 1,
+    "beforePendingReloadRequests": 43,
+    "afterPendingReloadRequests": 43,
+    "offlineColdSummaryUnconfirmed": 1,
+    "offlineColdSummaryDrafts": 0,
+    "offlineFrozenCommandRestored": true,
+    "afterOfflineSummaryReloadRequests": 43,
+    "finalEmptySummaryRows": 6,
+    "signedOut": true,
+    "finalRequests": 51,
+    "forwardedSaveCommands": 2,
+    "sameOperationAndPayload": true,
+    "apkSha256": "2b603fff2e40e31ee9cf5a45e694ea6aae8c96ae6c72cd4168d920c2e239c0c9"
+  },
+  "checks": {
+    "proxyRegressions": 1,
+    "typeScript": true,
+    "biome": true,
+    "productionBuild": true,
+    "dashboardArchitecture": true,
+    "architectureRegressions": 4,
+    "screenshotsInspected": true
+  },
+  "cleanup": {
+    "ownedContainers": 0,
+    "forwardingRemoved": true,
+    "markersRemoved": true,
+    "emulatorStoppedWithDataRetained": true
+  },
+  "limitations": [
+    "Controlled loopback response loss after actual API commit",
+    "Manual native UI driver joins an automated independent API observer",
+    "Offline API transport via removed forwarding; Wi-Fi remained enabled",
+    "No proof of FCM, Google exchange or physical/iOS acceptance"
+  ]
+}

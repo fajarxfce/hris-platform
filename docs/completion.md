@@ -8,6 +8,16 @@ scenarios, real publication/browser acceptance and complete schema-101 recovery.
 History cleanup leaves Inbox facts intact and unavailable counts never imply
 success. Actual FCM message delivery remains dependent on server credentials.
 
+[Android expense save recovery](native-expense-acceptance.md) passed actual
+API/PostgreSQL/worker acceptance. One edited working copy became one unconfirmed
+command without double-counting; offline cold start retained it. Summary reloads
+stayed 30 → 30 before Save and 43 → 43 after response loss/restart. Exact retry
+left one version-zero draft, one line, IDR 25,000.25 and one history entry across
+51 native requests/two intended company writes. Six summary rows cleared and
+logout passed. The fixture passed in 8.3m/8.8m with setup; proxy regression,
+TypeScript, Biome, build and architecture checks passed. All owned resources were
+removed. The unchanged Mobile APK needs no implementation change or Starter port.
+
 [Android overtime response-loss recovery](native-overtime-acceptance.md) now
 passes actual API/PostgreSQL/worker acceptance. The unconfirmed original plan and
 Pending actions count survived offline cold start; summary reload stayed 39 → 39

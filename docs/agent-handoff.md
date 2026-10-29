@@ -7,26 +7,29 @@ notes in Git. Read this file first, then [completion](completion.md),
 
 ## Current result and next native case
 
-[Android overtime response-loss recovery](native-overtime-acceptance.md) now
-passes actual API/PostgreSQL/worker acceptance. The unconfirmed original plan and
-Pending actions count survived offline cold start; summary reload stayed 39 → 39
-requests. Exact replay left one version-zero plan, one history entry and 165 minutes
-across 54 requests/two intended company writes. Six summary rows cleared and logout
-passed. Fixture 7.7m/8.2m with setup; proxy regression, TypeScript, Biome, build and
-architecture passed. The unchanged validated APK was reused and all owned resources
-removed. This acceptance requires no Mobile implementation/Starter port.
+[Android expense save recovery](native-expense-acceptance.md) passed actual
+API/PostgreSQL/worker acceptance. One edited working copy became one unconfirmed
+command without double-counting; offline cold start retained it. Summary reloads
+stayed 30 → 30 before Save and 43 → 43 after response loss/restart. Exact retry
+left one version-zero draft, one line, IDR 25,000.25 and one history entry across
+51 native requests/two intended company writes. Six summary rows cleared and
+logout passed. The fixture passed in 8.3m/8.8m with setup; proxy regression,
+TypeScript, Biome, build and architecture checks passed. All owned resources were
+removed. The unchanged Mobile APK needs no implementation change or Starter port.
 
-Source artifacts are from integrated `b7f42070`, containing push delivery, payroll
-comparison and completed elapsed retention. The owned emulator and containers are
-stopped. Reproduction and exact assertions are in the new acceptance document;
-local markers must not be reused. No outstanding source change was found in Mobile.
+Source artifacts remain integrated `b7f42070` / schema 101; this fixture follows
+Overtime fixture `578a5031`. Reproduction and independent assertions are tracked in
+[native expense acceptance](native-expense-acceptance.md). The dedicated emulator,
+API/worker, proxy and all owned containers are stopped. Markers/forwarding were
+removed and emulator app data retained. Native screenshots were inspected.
 
-Continue native Expenses save-response loss next: its working-copy versus frozen
-command deduplication has a distinct pending-summary contract. Inspect the current
-expense fixture, saved command and working-copy flow before creating the owned
-case. Keep read-only summary observation, offline restart, exact retry and
-independent server counts explicit. Attendance/Leave command cases remain separate;
-FCM credentials and Google/physical/iOS setup still need their external inputs.
+Continue the native Leave submitted-command response-loss case next, distinguishing
+its frozen command from its working copy, then Attendance capture pending-summary
+recovery. Existing Leave working-copy and earlier capture acceptance are recorded;
+inspect those first and add only the missing outcome. Keep read-only summary
+observation, offline restart, exact retry and independent server counts explicit.
+FCM credentials and Google/physical/iOS setup still need their external inputs;
+do not repeat the pending Firebase credential question.
 
 ## Latest result: real elapsed retention passed
 
@@ -52,8 +55,8 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
 | `hris-platform` | `feat/firebase-auth` | Integrated `409abad4` + `f757bffd`; elapsed acceptance `1abdbce9` |
-| `hris-mobile` | `feat/native-push` | `42f5e04d` — coverage/handoff reconciliation; native acceptance `fc6380b3`, app fixes `02743a9f` |
-| `compose-fluent-starter` | `fix/push-token-lifecycle` | `1606765` — tracked handoff; validated foundation `a16325e` |
+| `hris-mobile` | `feat/native-push` | `bacfd39e` — native overtime evidence; app fixes `02743a9f` |
+| `compose-fluent-starter` | `fix/push-token-lifecycle` | `bae7058b` — integrated continuation handoff; validated foundation `a16325e` |
 
 The latest increments verify delivery observations, original payroll comparison
 and actual elapsed export retirement.

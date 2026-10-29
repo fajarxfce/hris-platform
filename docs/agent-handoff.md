@@ -15,13 +15,13 @@ all passed; live export data and inactive owners were preserved. See
 [elapsed retention](export-retention-acceptance.md) and its tracked measurements.
 The test is no longer running, so this checkout may be rebuilt.
 
-Integrate pushed descendant `f757bffd` (`feat/payroll-period-comparison`) from the
-isolated worktree. It includes push delivery `409abad4` and both validated features,
-with schema-101 recovery, full API/worker checks and real browser workflows.
-Preserve this elapsed result when resolving the handoff. Mobile documentation
-reconciliation `42f5e04d` is also pushed. Continue native Overtime pending-command
-acceptance through a committed-response loss, offline restart and summary/retry;
-provider credentials and physical/iOS acceptance remain separate.
+Pushed feature commits `409abad4` (push delivery/schema 101) and `f757bffd`
+(payroll comparison) are integrated into this branch, preserving elapsed result
+`1abdbce9`. Runtime/source changes match the validated feature branch; the merge
+changes continuation/result documentation only. All test-owned containers are gone.
+Mobile documentation reconciliation `42f5e04d` is pushed. Continue native Overtime
+pending-command acceptance through committed-response loss, offline restart and
+summary/retry. Provider credentials and physical/iOS cases remain separate.
 
 ## Workspace and delivery policy
 
@@ -29,11 +29,12 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
-| `hris-platform` | `feat/firebase-auth` | Native push fixture below; account audit/schema 100 `c282fa60` |
-| `hris-mobile` | `feat/native-push` | `02743a9f` — native registration recovery; transfer `965c8d72` |
+| `hris-platform` | `feat/firebase-auth` | Integrated `409abad4` + `f757bffd`; elapsed acceptance `1abdbce9` |
+| `hris-mobile` | `feat/native-push` | `42f5e04d` — coverage/handoff reconciliation; native acceptance `fc6380b3`, app fixes `02743a9f` |
 | `compose-fluent-starter` | `fix/push-token-lifecycle` | `1606765` — tracked handoff; validated foundation `a16325e` |
 
-The latest increment verifies native Firebase registration and recovery.
+The latest increments verify delivery observations, original payroll comparison
+and actual elapsed export retirement.
 Inspect `git status`, `git log` and
 the upstream before continuing. Mobile and Starter were clean at this update.
 
@@ -60,27 +61,87 @@ summaries distinguish completed authoring/export/worker work from historical
 implementation stages, so an old "planned" paragraph cannot silently become the
 next task. These documentation changes require no application test rerun.
 
-## Active work: elapsed retention and delivery-status gap
+## Integrated results: delivery observations and payroll comparison
 
-The [elapsed-time export acceptance](export-retention-acceptance.md) is running in
-this checkout. Its JUnit test owns real PostgreSQL/Garage and waits for the unchanged
-one-hour deletion grace. Progress is at `apps/worker/build/reports/elapsed-retention.json`;
-log `.work/export-retention-elapsed.log`, exec session 61217. Expiry is 02:16:08 UTC
-and physical grace ends 03:16:08 UTC on 29 October 2026. Do not rebuild worker
-classes/JARs or run another worker test in this checkout until it finishes. The
-75-minute timeout owns interruption/cleanup. Compilation/formatting passed; final
-acceptance is still pending. No clock/deadline/trigger is rewritten.
+The separately run [elapsed-time export acceptance](export-retention-acceptance.md)
+is complete. Its original checkpoint, final measurement and JUnit result are
+tracked; no live classpath must be preserved now. Feature work used the isolated
+`/home/fajar/hris/.worktrees/push-delivery` worktree while the one-hour test ran.
+Both feature branches are now integrated; no Mobile/Starter business port applies.
 
-A PRD review also found the Communications delivery-failures screen missing despite
-existing worker dispatch counters. Implement a current-authorized, bounded push
-status read and dashboard view in an isolated worktree while retention runs. Keep
-provider acceptance distinct from actual receipt on a device, preserve raw recipient/
-session RLS, and disclose only operational counts. The user authorized continuing
-through the PRD and pushing each commit; do not stop after a checkpoint.
+[Push delivery](announcement-delivery.md) has current/original permission and
+credential/MFA guards, a bounded operational aggregate, a minimal V101 forced-RLS
+projection and a localized explicit-refresh dashboard. Raw recipient/session RLS
+is unchanged. Upgrade waits for existing dispatch writers, and worker updates and
+cleanup capture atomically. History loss never implies successful delivery.
 
-Latest paired native upload/review evidence is Platform `ee6c04a3` and Mobile
-`fc6380b3`, both pushed and remote-verified. Starter remains `16067656`; this native
-acceptance needed no shared source change or port.
+Validation passed 117 API, 94 worker and three repository tests in 4m33s; the
+manual elapsed-retention test is the one skipped worker case. Dashboard check
+passed 3,974 tests in 349 files (96.93s), TypeScript, Biome (two existing CSS
+warnings), architecture and production build. Thirteen distinct Chromium cases
+passed across focused runs. The new foreground case found a duplicate request;
+visibility now settles with workspace admission before loading. The inspected
+Indonesian screenshot fits 390px. Both JARs and architecture/format checks passed.
+Real API/PostgreSQL/worker/browser publication, terminal/cleanup display and
+unchanged Inbox/read-only audit assertions passed in 45.5s (1.8m including setup).
+Terminal/retention states there are controlled SQL fixtures, not FCM proof.
+Twenty recovery-tool cases and complete schema-101 recovery passed: 104 objects,
+2,098,795 bytes, two encrypted records, old/current keys, exact delivery/audit
+projections and retained RLS/trigger privileges. The first recovery fixture tried
+a prohibited self-binding; its replacement uses an independent fictional recipient.
+Both attempts' owned resources/private configuration were removed.
+
+Commands and supplementary logs in the worktree:
+- `./gradlew --no-daemon :modules:communications:data:test :apps:server:test --tests '*Announcement*Test' --tests '*ApiContractHttpTest' :apps:worker:test :apps:server:bootJar :apps:worker:bootJar` → `.work/push-delivery-backend.log`.
+- `npm run check` in `apps/dashboard` → `.work/push-delivery-dashboard-check.log`.
+- `npx playwright test tests/announcement-delivery.spec.ts tests/announcements.spec.ts tests/announcement-publication.spec.ts`; the final delivery-only run is `.work/push-delivery-browser-rerun.log`.
+- `npm run test:integration:worker -- communications.spec.ts` → `.work/push-delivery-integration.log`.
+- `python3 tool/check_recovery_set.py` → `.work/push-delivery-recovery-real.log`.
+- [Tracked measurements](measurements/announcement-delivery-2026-10-29.json) retain sanitized results; local logs are supplementary.
+
+[Payroll period comparison](payroll-period-comparison.md), `f757bffd`, is integrated
+with its parent push delivery feature. No migration beyond V101 or Mobile/Starter
+port is needed. Both company payroll runs must have complete successful original results.
+One bounded SQL snapshot returns exact whole-run totals, employment matching and
+cursor pages. Current/original permissions, policy/resource guards and pre/post
+MFA protect disclosure. The UI clears obsolete amounts and owns explicit reads.
+
+Dashboard full check passed 3,997 tests in 352 files (56.38s), TypeScript,
+architecture and Biome (two existing CSS specificity warnings). Production build
+and both inspected browser layouts passed. Exact outcomes are retained in
+[measurements](measurements/payroll-comparison-2026-10-29.json).
+
+Payroll validation: 119 API, 94 worker and 12 data tests passed in 3m52s; the elapsed
+manual worker case was skipped by that ordinary suite and later passed separately. Architecture
+and Kotlin formatting passed in 21s. Twenty-three distinct Chromium cases passed
+across runs, including 50/1 employee pagination and narrow Indonesian layout.
+Actual five-actor January approval/publication and February calculation/browser
+acceptance passed in 18.5s (42.3s including setup), proving retained tax continuity,
+exact deltas, no comparison writes and live grant withdrawal. Owned fixture
+sessions/services/database were removed. See the tracked
+[measurements](measurements/payroll-comparison-2026-10-29.json).
+
+Commands in the worktree:
+- `./gradlew --no-daemon format :modules:payroll:data:test :apps:server:test --tests '*PayrollRun*Test' --tests '*ApiContractHttpTest' :apps:worker:test :apps:server:bootJar :apps:worker:bootJar` → `.work/payroll-comparison-backend.log`.
+- `npm run check` in `apps/dashboard` → `.work/payroll-comparison-dashboard-final.log`.
+- `npx playwright test tests/payroll-comparison.spec.ts tests/payroll-calculations.spec.ts tests/payroll-reviews.spec.ts`; final comparison-only run → `.work/payroll-comparison-browser-complete.log`.
+- `npm run test:integration:worker -- payroll-comparison.spec.ts` → `.work/payroll-comparison-real-browser-visual.log`.
+- `./gradlew --no-daemon architectureCheck formatCheck` → `.work/payroll-comparison-architecture.log`.
+
+Continue independent PRD reconciliation after every push. Mobile `42f5e04d` now
+corrects its stale local-first next-work list: all nine data-sync registrations,
+account-owned directory/profile/catalog scopes and six pending-action observers
+exist. Current employee drafts already cover Expense, Leave and Overtime.
+
+Next: a separately owned Android Overtime pending-command fixture should lose a
+successful plan response after commit, verify Pending actions without HTTP, survive
+offline process restart, recover the exact operation and prove a single server
+plan. Earlier native Overtime acceptance blocked transport before admission;
+application tests cover lost success but do not by themselves establish the newer
+summary/device combination. Reuse the validated loopback APK if app source stays
+unchanged. Then trace remaining concrete native cases. Firebase credentials,
+Google token exchange and physical/iOS setup remain separate; do not repeat the
+pending credential question or declare the PRD complete.
 
 ## Current checkpoint: native upload and inspection review
 

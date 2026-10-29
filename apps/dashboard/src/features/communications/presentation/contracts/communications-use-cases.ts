@@ -1,5 +1,6 @@
 import type { ArchiveAnnouncement } from "../../domain/usecases/archive-announcement";
 import type { LoadAnnouncement } from "../../domain/usecases/load-announcement";
+import type { LoadAnnouncementDelivery } from "../../domain/usecases/load-announcement-delivery";
 import type { LoadAnnouncementHistory } from "../../domain/usecases/load-announcement-history";
 import type { LoadAnnouncementReview } from "../../domain/usecases/load-announcement-review";
 import type { LoadAnnouncements } from "../../domain/usecases/load-announcements";
@@ -13,6 +14,7 @@ import type { SaveAnnouncement } from "../../domain/usecases/save-announcement";
 import type { SaveAudienceGroup } from "../../domain/usecases/save-audience-group";
 
 export type CommunicationsUseCases = Readonly<{
+  loadDelivery: Pick<LoadAnnouncementDelivery, "execute">;
   loadReview: Pick<LoadAnnouncementReview, "execute">;
   previewAudience: Pick<PreviewAnnouncementAudience, "execute">;
   publish: Pick<PublishAnnouncement, "execute">;

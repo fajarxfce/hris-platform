@@ -19,6 +19,37 @@ import tools.jackson.databind.ObjectMapper
 @Configuration(proxyBeanMethods = false)
 class CommunicationsConfiguration {
     @Bean
+    fun announcementDeliverySource(sql: DSLContext): AnnouncementDeliveryDataSource =
+        PostgresAnnouncementDeliveryDataSource(sql)
+
+    @Bean
+    fun announcementDelivery(
+        source: AnnouncementDeliveryDataSource
+    ): AnnouncementDeliveryRepository = StoredAnnouncementDeliveryRepository(source)
+
+    @Bean
+    fun getAnnouncementDelivery(
+        announcements: AnnouncementRepository,
+        delivery: AnnouncementDeliveryRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetAnnouncementDelivery(
+            announcements,
+            delivery,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun getAnnouncementReview(
         announcements: AnnouncementRepository,
         jobs: JobRepository,

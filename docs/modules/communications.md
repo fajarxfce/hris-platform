@@ -120,3 +120,14 @@ cleanup fixes passed 1,840 desktop/UI and 113 identity browser tests. The indepe
 server verified one registration, two identical saves and final version 1 without
 stored token material across 51 requests. No company mutation occurred. FCM message
 sending and scoped provider hints remain separate from this registration proof.
+
+## Administrative push delivery
+
+[Push delivery](../announcement-delivery.md) is available from the current
+announcement. A company-authorized aggregate and dashboard distinguish queued,
+processing, completed, failed, stopped and unavailable recipient history, with
+separate processed/accepted/rejected device counts. Explicit refresh and lifecycle
+cancellation preserve account/company ownership. V101 maintains the minimal
+projection atomically while preserving raw dispatch RLS. Seven-day operational
+cleanup never removes Inbox evidence or invents delivery success. Provider
+acceptance does not confirm receipt on a device.

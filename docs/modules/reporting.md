@@ -19,8 +19,8 @@ authorized CSV downloads, cancellation/recovery and scheduled retention. Dashboa
 and real API/PostgreSQL/worker/Garage-S3/browser acceptance passed, including exact
 1,201-row multipart output and source/owner authorization. Real Garage response
 loss now also passes owner cancellation/resume, retained first-part identity,
-unchanged expiry and exact final output after a lost resume response. Physical
-expiry retains controlled-provider backend coverage. See [current export evidence](../report-exports.md#real-storage-response-loss-and-resumed-output).
+unchanged expiry and exact final output after a lost resume response. [Actual elapsed expiry](../export-retention-acceptance.md) now passes the unchanged
+one-hour physical grace, lost deletion receipt retry and single audited retirement. See [current export evidence](../report-exports.md#real-storage-response-loss-and-resumed-output).
 
 ## Implementation and acceptance record
 

@@ -20,6 +20,7 @@ class PayrollRunController(
     private val employee: GetPayrollRunEmployee,
     private val list: ListPayrollRuns,
     private val review: GetPayrollCalculationReview,
+    private val comparison: GetPayrollRunComparison,
 ) {
     @GetMapping("/periods/{periodId}/calculation-review")
     fun review(actor: Actor, @PathVariable periodId: UUID): PayrollCalculationReviewResponse =
@@ -66,6 +67,17 @@ class PayrollRunController(
         @RequestParam(required = false) after: Int?,
         @RequestParam(defaultValue = "50") limit: Int,
     ): PayrollRunDetailsResponse = get.execute(actor, id, after, limit).response().toResponse()
+
+    @GetMapping("/runs/{id}/comparison")
+    fun compare(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestParam baselineId: UUID,
+        @RequestParam(required = false) after: UUID?,
+        @RequestParam(defaultValue = "50") limit: Int,
+        @RequestParam(defaultValue = "false") changedOnly: Boolean,
+    ): PayrollRunComparisonResponse =
+        comparison.execute(actor, id, baselineId, after, limit, changedOnly).response().toResponse()
 
     @GetMapping("/runs/{id}/employees/{employeeId}")
     fun employee(

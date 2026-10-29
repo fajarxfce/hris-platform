@@ -1510,6 +1510,55 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun payrollComparisonAdvertisesAnExplicitBaselineAndDecimalStrings() {
+        val api = contract()
+        val operation =
+            api["paths"]["/api/v1/companies/{companyId}/payroll/runs/{id}/comparison"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val parameters =
+            operation["parameters"].iterator().asSequence().associateBy { it["name"].asString() }
+        assertTrue(parameters.getValue("baselineId")["required"].asBoolean())
+        assertEquals("uuid", parameters.getValue("after")["schema"]["format"].asString())
+        val amounts = api["components"]["schemas"]["PayrollComparisonAmountsResponse"]["properties"]
+        assertEquals(setOf("taxableGross", "withheld", "takeHome"), amounts.propertyNames().toSet())
+        for (field in amounts.propertyNames()) assertEquals(
+            "string",
+            amounts[field]["type"].asString(),
+        )
+        val row = api["components"]["schemas"]["PayrollComparisonItemResponse"]["properties"]
+        assertEquals(
+            setOf("employmentId", "baseline", "current", "change", "delta"),
+            row.propertyNames().toSet(),
+        )
+    }
+
+    @Test
+    fun announcementDeliveryExposesOnlyCompanyScopedOperationalCounts() {
+        val api = contract()
+        val operation =
+            api["paths"]["/api/v1/companies/{companyId}/announcements/{id}/delivery"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val schema = api["components"]["schemas"]["AnnouncementDeliveryResponse"]["properties"]
+        assertEquals(
+            setOf(
+                "announcementId",
+                "recipientCount",
+                "pending",
+                "processing",
+                "completed",
+                "failed",
+                "superseded",
+                "unavailableRecipients",
+                "processedDevices",
+                "acceptedDevices",
+                "rejectedDevices",
+                "observedAt",
+            ),
+            schema.propertyNames().toSet(),
+        )
+    }
+
+    @Test
     fun publicationReviewUsesCompanyAdmissionAndItsOwnResponseContract() {
         val api = contract()
         val operation =

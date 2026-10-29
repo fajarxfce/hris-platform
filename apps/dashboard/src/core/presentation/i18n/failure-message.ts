@@ -768,6 +768,14 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "This action is unavailable. Return to the run to review its current status.",
     "Tindakan tidak tersedia. Kembali ke proses untuk memeriksa status saat ini.",
   ],
+  invalid_payroll_comparison: [
+    "Choose a different completed run from an earlier earnings month.",
+    "Pilih proses selesai dari bulan penghasilan sebelumnya yang berbeda.",
+  ],
+  payroll_comparison_unavailable: [
+    "Both runs must finish all employee calculations successfully before comparison. Review their results.",
+    "Kedua proses harus menyelesaikan kalkulasi semua karyawan sebelum dibandingkan. Tinjau hasilnya.",
+  ],
   payroll_run_not_found: [
     "The calculation run was not found.",
     "Proses perhitungan tidak ditemukan.",

@@ -12,6 +12,7 @@ import { AppResourceTable } from "../../../../core/presentation/components/app-r
 import { AppTabs } from "../../../../core/presentation/components/app-tabs";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
 import { payrollCalculationMessages } from "../i18n/payroll-calculation-messages";
+import { payrollComparisonMessages } from "../i18n/payroll-comparison-messages";
 import { payrollFinalizationMessages } from "../i18n/payroll-finalization-messages";
 import { payrollReviewMessages } from "../i18n/payroll-review-messages";
 import type { PayrollRunState } from "../models/payroll-calculation-state";
@@ -22,6 +23,7 @@ export function PayrollRunPage(props: {
   locale: Locale;
   companyName: string;
   backTo: string | null;
+  comparisonTo?: string | null;
   finalizationsTo: string | null;
   jobTo: string | null;
   reviewsTo: string | null;
@@ -53,6 +55,9 @@ export function PayrollRunPage(props: {
         >
           {messages(locale).refresh}
         </AppButton>
+        {props.comparisonTo && (
+          <Link to={props.comparisonTo}>{payrollComparisonMessages(locale).title}</Link>
+        )}
         {props.reviewsTo && (
           <Link to={props.reviewsTo}>{payrollReviewMessages(locale).reviews}</Link>
         )}

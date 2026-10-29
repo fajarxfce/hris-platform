@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-29",
+  "feature": "Original payroll period comparison",
+  "schema": 101,
+  "migrationRequired": false,
+  "backend": {
+    "api": {
+      "tests": 119,
+      "failures": 0
+    },
+    "worker": {
+      "passed": 94,
+      "skipped": 1,
+      "skipReason": "Manual elapsed-retention acceptance is running separately in the original checkout"
+    },
+    "payrollData": {
+      "tests": 12,
+      "failures": 0
+    },
+    "durationSeconds": 232,
+    "apiAndWorkerJars": true,
+    "architectureAndFormatSeconds": 21
+  },
+  "dashboard": {
+    "fullCheck": {
+      "tests": 3997,
+      "files": 352,
+      "durationSeconds": 56.38,
+      "failures": 0
+    },
+    "typecheck": true,
+    "architecture": true,
+    "biome": "pass; two existing CSS specificity warnings",
+    "productionBuild": true,
+    "distinctChromiumScenarios": 23,
+    "finalComparisonScenarios": 5,
+    "finalComparisonSuiteSeconds": 10.2,
+    "narrowScreenshotWidth": 390
+  },
+  "realApiWorkerBrowser": {
+    "passed": true,
+    "actors": 5,
+    "scenarioSeconds": 18.5,
+    "includingSetupSeconds": 42.3,
+    "baselineMonth": "2026-01",
+    "currentMonth": "2026-02",
+    "baselineFinalized": true,
+    "currentRetainsPreviousAssessment": true,
+    "allThreeMoneyFieldsReconciled": true,
+    "comparisonCompanyWrites": 0,
+    "liveGrantRevocation": true,
+    "ownedResourcesCleaned": true
+  },
+  "bounds": {
+    "employeesPerRun": 5000,
+    "httpPageMaximum": 200,
+    "dashboardPageSize": 50,
+    "browserPageFixture": [
+      50,
+      1
+    ],
+    "decimalAmounts": "two-place IDR strings; BigDecimal and BigInt minor units",
+    "largestTakeHomeTotalTested": "3250000000000000.00",
+    "smallestDeltaTested": "0.01"
+  },
+  "limitations": [
+    "Original successful calculations only; later amendments and payment activity remain separate",
+    "No Mobile/Starter business port",
+    "Independent FCM, Google exchange, physical/iOS and elapsed-retention acceptance are not proved by these tests"
+  ]
+}

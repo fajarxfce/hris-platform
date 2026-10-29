@@ -6,6 +6,7 @@ import { AppLoading } from "../../../../core/presentation/components/app-loading
 import { AppPageHeader } from "../../../../core/presentation/components/app-page-header";
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { announcementDeliveryMessages } from "../i18n/announcement-delivery-messages";
 import { announcementEditorMessages } from "../i18n/announcement-editor-messages";
 import { announcementMessages } from "../i18n/announcement-messages";
 import { announcementPublicationMessages } from "../i18n/announcement-publication-messages";
@@ -21,6 +22,7 @@ export function AnnouncementPage({
   backTo,
   historyTo,
   currentTo,
+  deliveryTo,
   publicationTo,
   editTo,
   jobTo,
@@ -34,6 +36,7 @@ export function AnnouncementPage({
   backTo: string;
   historyTo: string;
   currentTo: string | null;
+  deliveryTo?: string | null;
   publicationTo: string | null;
   editTo: string | null;
   jobTo: string | null;
@@ -49,6 +52,9 @@ export function AnnouncementPage({
           <>
             <Link to={backTo}>{text.back}</Link>
             {currentTo && <Link to={currentTo}>{text.current}</Link>}
+            {deliveryTo && (
+              <Link to={deliveryTo}>{announcementDeliveryMessages(locale).title}</Link>
+            )}
             {publicationTo && (
               <Link to={publicationTo}>{announcementPublicationMessages(locale).title}</Link>
             )}

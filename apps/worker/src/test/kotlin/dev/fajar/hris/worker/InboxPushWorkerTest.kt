@@ -164,6 +164,19 @@ class InboxPushWorkerTest : CommunicationsWorkerFixture() {
         assertEquals(Result.Success(Unit), deliver.execute(resumed))
         finish(inbox)
         assertEquals("COMPLETE", row(inbox)["state"])
+        assertEquals(
+            mapOf(
+                "state" to "COMPLETE",
+                "processed_count" to 2,
+                "accepted_count" to 2,
+                "rejected_count" to 0,
+            ),
+            database()
+                .queryForMap(
+                    "select state,processed_count,accepted_count,rejected_count from announcement_push_delivery where inbox_id=?",
+                    inbox,
+                ),
+        )
         assertEquals(2, row(inbox)["accepted_count"])
         assertEquals(2, row(inbox)["processed_count"])
         assertEquals(setOf(first.token, second.token), probe.messages.map { it.token }.toSet())
@@ -457,6 +470,15 @@ class InboxPushWorkerTest : CommunicationsWorkerFixture() {
             cleanup.execute(UUID.randomUUID(), 1),
         )
         assertEquals("push_delivery_expired", row(inbox)["failure_code"])
+        assertEquals(
+            "FAILED",
+            database()
+                .queryForObject(
+                    "select state from announcement_push_delivery where inbox_id=?",
+                    String::class.java,
+                    inbox,
+                ),
+        )
         val retention =
             LeaseInboxPush(
                 dispatches,
@@ -483,6 +505,15 @@ class InboxPushWorkerTest : CommunicationsWorkerFixture() {
             database()
                 .queryForObject(
                     "select count(*) from inbox_items where id=?",
+                    Int::class.java,
+                    inbox,
+                ),
+        )
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from announcement_push_delivery where inbox_id=?",
                     Int::class.java,
                     inbox,
                 ),

@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AnnouncementCommandScreen } from "../bindings/announcement-command-screen";
+import { AnnouncementDeliveryScreen } from "../bindings/announcement-delivery-screen";
 import { AnnouncementEditorScreen } from "../bindings/announcement-editor-screen";
 import { AnnouncementPublicationScreen } from "../bindings/announcement-publication-screen";
 import { AnnouncementScreen } from "../bindings/announcement-screen";
@@ -13,6 +14,10 @@ import { announcementParameters, announcementsPath } from "../models/announcemen
 export function CommunicationsRoutes(props: CommunicationsScreenProps) {
   return (
     <Routes>
+      <Route
+        path="announcements/:announcementId/delivery"
+        element={<AnnouncementDeliveryScreen {...props} />}
+      />
       <Route
         path="announcements/:announcementId/publication"
         element={<AnnouncementPublicationScreen {...props} />}

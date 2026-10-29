@@ -1923,3 +1923,16 @@ grants. It shows the historical status, permission codes and recorded reason,
 with an explicit retry and English/Indonesian text. Closing, scope/permission
 replacement and hidden workspace disposal discard private state and abort reads.
 Other source families and metadata-only readers do not acquire these details.
+
+## Payroll period comparison
+
+Completed runs with no failed employees link to [Period comparison](payroll-period-comparison.md).
+The page explicitly selects an earlier month/period and retains both original
+employment identities, three exact amount differences, whole-run totals and
+coverage. Changed-only filtering and 50-row cursor pages do not alter totals.
+The detail drawer links to either original employee result without another
+comparison request. Hiding, refresh, company/route changes and revoked access
+clear old monetary state and abort pending work; foreground admission precedes
+one reacquisition. English/Indonesian dark layout fits 390px with table scrolling.
+Real public January publication and February calculation/browser acceptance
+passed with retained tax continuity and independent authorization.

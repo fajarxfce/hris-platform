@@ -22,7 +22,12 @@ class AnnouncementController(
     private val archive: ArchiveAnnouncement,
     private val preview: PreviewAnnouncementAudience,
     private val review: GetAnnouncementReview,
+    private val delivery: GetAnnouncementDelivery,
 ) {
+    @GetMapping("/{id}/delivery")
+    fun delivery(actor: Actor, @PathVariable id: UUID) =
+        delivery.execute(actor, id).response().toResponse()
+
     @PutMapping("/{id}")
     fun save(
         actor: Actor,

@@ -5,6 +5,19 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+[Native Inbox response-loss acceptance](native-acceptance.md) now proves a retained
+command through offline Android process restart. The real API committed Mark as
+read before the proxy dropped its response. Pending actions retained one awaiting
+confirmation; local summary open/reload made no HTTP request (30 → 30). Reconnection
+and Retry sent the same operation/input, leaving server version 1 and acknowledgment
+absent. All six summary rows became empty and sign-out succeeded. Across 42 native
+requests there were exactly two company mutations for that same read command.
+Mobile `c650e0d7` records the native evidence. The new tracked fixture passed in
+6.0 minutes (6.4 with setup), with TypeScript/Biome/build checks; the unchanged
+Mobile implementation assembled in 45 seconds using a local API override. Owned
+services, connection files, markers and forwarding were removed, and the emulator
+stopped with data retained. No phone/provider acceptance or Starter port is implied.
+
 The [real export storage interruption](report-exports.md#real-storage-response-loss-and-resumed-output)
 workflow now drops a response after Garage stores the second PUT, preserves the
 first 500 accepted rows, cancels the unavailable run and resumes attempt two.

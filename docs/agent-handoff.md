@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 28 October 2026 (UTC). **The overall PRD is still in progress.** The user
+Updated 29 October 2026 (UTC). **The overall PRD is still in progress.** The user
 asked to continue through the remaining PRD, push each commit, and keep continuation
 notes in Git. Read this file first, then [completion](completion.md),
 [product](product.md), the relevant module contract and each repository's `AGENTS.md`.
@@ -11,11 +11,11 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
-| `hris-platform` | `feat/firebase-auth` | Real storage interruption below; worker reports `e806caed`, handoff reconciliation `bced70b6` |
-| `hris-mobile` | `feat/native-push` | `9dbaf730` — tracked handoff; acceptance `60456c48` |
+| `hris-platform` | `feat/firebase-auth` | Native command fixture below; storage interruption `3770b3ff`, worker reports `e806caed` |
+| `hris-mobile` | `feat/native-push` | `c650e0d7` — unconfirmed Inbox command acceptance; prior handoff `9dbaf730` |
 | `compose-fluent-starter` | `fix/push-token-lifecycle` | `1606765` — tracked handoff; validated foundation `a16325e` |
 
-The latest acceptance contains actual storage response-loss recovery.
+The latest acceptance contains native recovery after a committed response is lost.
 Inspect `git status`, `git log` and
 the upstream before continuing. Mobile and Starter were clean at this update.
 
@@ -42,7 +42,39 @@ summaries distinguish completed authoring/export/worker work from historical
 implementation stages, so an old "planned" paragraph cannot silently become the
 next task. These documentation changes require no application test rerun.
 
-## Current checkpoint: real export storage interruption
+## Current checkpoint: unconfirmed Inbox command on Android
+
+Mobile `c650e0d7` records a successful Android 35/API/PostgreSQL/worker command
+workflow. The new tracked [native fixture and protocol](native-acceptance.md)
+drops a Mark as read response after commit, holds native transport unavailable,
+and independently validates the exact-operation replay. The device retained
+**Awaiting confirmation: 1** through an offline force-stop/relaunch, including
+the original Retry action. Opening/reloading Pending actions kept the counter at
+30 → 30. Restoring transport and retrying produced exactly two forwarded read
+commands with equal operation/input hashes, server version 1 and no acknowledgment.
+All six summary rows became empty and sign-out succeeded. Total native requests: 42.
+
+The fixture passed in 6.0 minutes (6.4 with setup); the existing Mobile dev source
+assembled in 45 seconds using only a loopback endpoint override. TypeScript, Biome
+and the fixture's production browser build passed. Owned API/worker/database,
+private connection metadata, markers and forwarding were removed; the emulator
+was stopped without wiping data. Screenshots were inspected. An initial System UI
+warning and native driver activity/nested-navigation targets were corrected during
+execution; the app workflow and independent server assertions completed.
+
+Logs: `.work/inbox-native-fixture.log`, `inbox-native-server-result.json` and
+`inbox-native-http.json`; Mobile has `.work/inbox-command-*` images/results and
+`.work/pending-command-assembly.log`. Source/steps are tracked, while raw fixture
+diagnostics stay ignored. There is no native fixture active. Application source
+and shared foundations did not change, so this requires no Starter port.
+
+Next active work: close the Administration gap for global audit navigation.
+Current audit search excludes global account events and detailed disclosure;
+review its bounded metadata/access contract before implementing cross-account
+visibility. Retained metadata must not expose reasons or arbitrary change payloads.
+Continue the remaining PRD after each commit; do not end the long run at a checkpoint.
+
+## Previous checkpoint: real export storage interruption — `3770b3ff`
 
 The [export workflow](report-exports.md#real-storage-response-loss-and-resumed-output)
 now runs through an owned bounded loopback proxy in front of real Garage. The
@@ -68,12 +100,11 @@ both current JARs. Its config enables the optional fault boundary. CI runs the
 same case and all nine storage tooling tests. This does not claim physical expiry
 or a hosted CI result; uncertain objects retain their existing cleanup reservations.
 
-Next active work: native Pending actions acceptance for a command whose server
+The subsequent native Pending actions acceptance covers a command whose server
 write committed but response was lost, across offline process restoration and
-exact-operation recovery. The dedicated emulator and a loopback dev APK are being
-prepared; inspect `.work/pending-command-assembly.log` and emulator status before
-starting another fixture. This HRIS-specific acceptance requires no Starter port.
-Continue the PRD after each commit; the user's instruction is to keep running.
+exact-operation recovery; it is recorded above. The loopback dev APK and emulator
+data are retained, but the emulator and fixture were stopped. This HRIS-specific
+acceptance requires no Starter port.
 
 ## Previous checkpoint: running worker reports and schema-98 recovery — `e806caed`
 

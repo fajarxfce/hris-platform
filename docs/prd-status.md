@@ -1,12 +1,26 @@
 # Current PRD review
 
 Reviewed 29 October 2026. The implementation queue for this development pass is
-complete: eleven initial module areas, Mobile coverage, HTTPS associations/public
-handoff and the proven Starter port are reconciled below. The user waived physical
+reconciled for the eleven initial module areas, Mobile coverage and HTTPS links.
+The subsequent release-configuration audit below is active after concrete build
+failures were reproduced; its reusable port is not yet accepted. The user waived physical
 iPhone tests. Actual domain activation, APNs, physical GPS and production operation
 remain separate target observations; this is not a production-release declaration.
 [Completion](completion.md) preserves detailed history; [handoff](agent-handoff.md)
 contains current sources, device delivery and runtime preservation instructions.
+
+## Active release-configuration audit
+
+Mobile `3dc81d00` corrects actual distribution/build gaps and is running full
+[CI 40909156570](https://github.com/fajarxfce/hris-mobile/actions/runs/40909156570).
+The selected remote API must survive per-flavor project properties, optional HTTPS
+registrations must reach signed builds, and APK/Apple identities must match their
+domain artifacts. Actual signed Android packaging, the changed Xcode entry point
+and the independent Starter port are being verified. Root/Android and all 1,860
+build-73 desktop cases passed; seventeen distribution regressions and canonical
+verification of 31 missing SBOM POMs passed. Exact failures/results belong in the
+Mobile measurement and [current handoff](agent-handoff.md). No upload or live
+provider/domain deployment is part of this audit.
 
 ## Implementation and acceptance map
 

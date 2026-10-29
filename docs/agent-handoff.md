@@ -1,8 +1,8 @@
 # Agent continuation — HRIS workspace
 
 Updated 29 October 2026 (UTC). The user authorized continuing the PRD, pushing every
-atomic commit and keeping handoffs in Git. The development implementation queue is complete;
-physical/production observations remain separate. Read `AGENTS.md`, this page and [PRD status](prd-status.md),
+atomic commit and keeping handoffs in Git. The release-configuration audit below
+reopened delivery work after the previous checkpoint; physical/production observations remain separate. Read `AGENTS.md`, this page and [PRD status](prd-status.md),
 then the affected module contract. The [archived history](agent-history-2026-10-29.md)
 preserves earlier work; its old next-step statements are not the active queue.
 
@@ -18,6 +18,28 @@ the independently verified Starter port are complete.
 The controlled domain remains a deployment setting, not a reason to leave the
 configurable implementation unfinished. Preserve the accepted Google binding,
 phone data and running private development stack.
+
+## Active continuation: native distribution audit
+
+The user requested further work after the last checkpoint. Mobile `3dc81d00`
+fixes reproduced manual-distribution failures: unsupported HRIS demo selection,
+release API precedence, missing app-link input/signing verification, incomplete
+SBOM POM verification, build-1-only UI fixtures and dev release network XML lint.
+The last fixes add no HTTP host, authority, API or schema change. Native business
+workflows remain on the accepted implementation. Mobile root/Android passed
+1,860 desktop cases; all 1,860 also passed with release build 73 after correcting
+the fixture. Seventeen distribution regressions pass. Thirty-one added POM hashes
+match canonical HTTPS artifacts and preserve every prior hash.
+
+Mobile full [CI 40909156570](https://github.com/fajarxfce/hris-mobile/actions/runs/40909156570)
+is running at `3dc81d00`. The local signed APK/AAB/SBOM exercise uses a disposable
+fictional key and invalid host; it never uploads or installs that APK. Final local
+packaging and hosted Xcode evidence remain required before accepting the portable
+Starter port. HRIS remote-only policy, UI fixtures and private dev network config
+must stay in Mobile; generic helpers keep Starter's demo/remote choice.
+See [Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/agent-handoff.md)
+and its tracked distribution measurement. Preserve the installed phone, Google
+binding and private runtime. This work does not dispatch a distribution workflow.
 
 ## Completed implementation and continuation
 

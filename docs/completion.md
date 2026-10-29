@@ -687,8 +687,8 @@ passed 62 native cases/Xcode in `40861505322`.
 
 The current implementation increment is configurable HTTPS association/admission
 and the public web handoff, with real Android scope/offline/archive acceptance.
-Mobile full run `40887772486` and the following Starter port remain active at this
-record. Their final results belong in [the current handoff](agent-handoff.md).
+Mobile full run `40887772486` passed all four jobs and 103 native cases/Xcode;
+the following Starter port is under independent validation at this record. Their final results belong in [the current handoff](agent-handoff.md).
 The earlier provider runs above do not cover this new increment.
 
 | Deployment observation | Current boundary |

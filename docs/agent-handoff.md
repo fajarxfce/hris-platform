@@ -25,7 +25,14 @@ The public [Mobile HTTPS handoff](mobile-app-links.md) is implemented and valida
 locally: 4002 dashboard unit cases and 14 related Chromium cases passed. It admits
 only known environment/routes and activates no dashboard session/business request.
 Mobile source `d36a1bc9` supplies configurable native associations; full Mobile CI
-`40887772486` is still running. Wait for its proof before the generic Starter port.
+`40887772486` passed all four jobs, 103 native cases in 28 downloaded suites and
+the complete Xcode app. Only after this proof was the generic Starter port applied
+over `e29b0b2`; independent Starter local checks passed. The final parser correction `72341ef6`
+rejects reproduced Unicode host aliases after Mobile JVM/Chromium proof. It is
+now included in Starter `738db36`, which passed 326 desktop, 11 Chromium and six
+build-logic cases plus Android assembly and all configured native/domain artifacts.
+Final full CI is active: Mobile `40895095518`, Starter `40895798634`. Download
+both Apple reports and inspect every job before accepting the final heads.
 Native Android HTTPS routing passed: cold/login/company, invalid scope, offline
 reopen and archive denial, 28 requests with zero company writes and unchanged
 read/ack state. [Native measurements](measurements/native-https-2026-10-29.json)
@@ -180,7 +187,7 @@ requirement. New behavior gaps still require implementation and relevant accepta
 
 The preceding Apple provider ports are accepted. Configurable HTTPS admission and
 native associations are implemented in Mobile `d36a1bc9`; full CI `40887772486`
-and its upcoming Starter port are the current work. The public dashboard handoff
+passed all four jobs and 103 native cases/Xcode. Its Starter port is the current work. The public dashboard handoff
 and actual Android scoped/offline/archive case passed. The user waived physical
 iPhone testing for this completion pass. Deployment-specific evidence stays
 separate from these implementation results.

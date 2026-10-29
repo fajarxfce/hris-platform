@@ -646,7 +646,32 @@ against an isolated API/PostgreSQL fixture with independent operators.
 
 ## Remaining delivery sequence
 
-| Area | Remaining end-to-end work |
+Current queue, reconciled on 29 October 2026. The eleven module contracts and
+native data/command coverage are mapped in [PRD status](prd-status.md); the longer
+table below preserves accepted increments and earlier boundaries, not a list of
+features to implement again. A discovered behavior gap still requires a concrete
+fix and acceptance evidence. The PRD is not declared complete by this reconciliation.
+
+| Remaining work | Current state and required acceptance |
+| --- | --- |
+| Finish current CI corrections | Platform [40820005213](https://github.com/fajarxfce/hris-platform/actions/runs/40820005213) at `70e5098d` must retain its sanitized recovery artifact after the original run passed tests/restore but failed upload. Mobile's Apple correction passed 27 simulator tests and the full Xcode build; its generic Starter port `1817e45` is running as [40820482699](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40820482699). Inspect all outcomes and download reports before acceptance. |
+| Real FCM send and scoped hints | Actual Firebase SDK registration, lost-response recovery and retirement passed. Actual sender delivery still requires the server-side `cmp-fajar` credential and a controlled recipient. Its path-only input question is already pending; do not repeat it or substitute the public Android config for a sender credential. |
+| Google sign-in exchange | Firebase email/password through HRIS and Android MFA passed. Google chooser/Back passed; a real eligible Google sign-in with correct Android OAuth/SHA setup must still exchange its proof through HRIS. The public web client ID is known; no client secret is needed. |
+| iOS provider and physical application links | Simulator build/tests do not prove push/auth on a device. Supply the iOS Firebase configuration, APNs/device setup and deployed HTTPS association endpoints, then exercise the actual scoped login/push/link flows. |
+| Physical location and target deployment | Emulator/no-location review and constrained workload/recovery evidence passed. Actual GPS and target-specific operation require the authorized device/environment and deployed provider configuration. Git push authorization does not authorize a production release. |
+
+Continue the running CI work while external inputs are unavailable. Reopen an
+accepted implementation only for a documented requirement gap or observed failure;
+do not recreate completed replicas, drafts, summary observers or administrative
+screens based on a historical "next" paragraph.
+
+## Detailed delivery evidence by area
+
+This ledger retains the scope and test counts of its individual increments.
+Current acceptance and external prerequisites are summarized above and in the
+[PRD map](prd-status.md); historical test counts are not added together.
+
+| Area | Retained implementation and acceptance evidence |
 | --- | --- |
 | Mobile identity | Native OIDC handoff and external-provider acceptance. Android MFA and device-session workflows are validated; iOS physical acceptance remains separate. |
 | Mobile foundation | Reconcile any remaining draft/read-projection gaps against module acceptance; complete scoped provider hint acceptance after the accepted registration/recovery workflow, plus iOS/physical URL acceptance. Android application URLs passed real API/emulator acceptance, including unread-state preservation and archival across offline process restoration. Real API/Android acceptance of the pending-action summary passed for pristine and edited Leave drafts, offline restoration, reconnect and deletion. A subsequent actual Inbox command case retained awaiting confirmation through offline process restart, recovered the same operation/input after a lost response and left server version 1; a subsequent partial-download case retained one transfer through offline restart, resumed from one MiB and saved exact verified bytes; upload/inspection-review now also passes offline restarts, exact chunk replay, explicit retry and cancellation; other feature command outcomes retain separate validation. Company data status and bounded explicit synchronization cover nine datasets. Expense, Leave and Overtime planning/actual-time/withdrawal working copies, owned encrypted company restoration, age-independent stored reads and account-owned Inbox/Leave/Overtime/Workforce/Payroll/Expense/Directory/Document catalog/private profile records are implemented; the mobile sync model records each remaining collection. |

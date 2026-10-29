@@ -1,8 +1,8 @@
 # Agent continuation — HRIS workspace
 
 Updated 29 October 2026 (UTC). The user authorized continuing the PRD, pushing every
-atomic commit and keeping handoffs in Git. The overall PRD still requires actual
-external acceptance. Read `AGENTS.md`, this page and [PRD status](prd-status.md),
+atomic commit and keeping handoffs in Git. The development implementation queue is complete;
+physical/production observations remain separate. Read `AGENTS.md`, this page and [PRD status](prd-status.md),
 then the affected module contract. The [archived history](agent-history-2026-10-29.md)
 preserves earlier work; its old next-step statements are not the active queue.
 
@@ -13,32 +13,48 @@ The user explicitly waived physical iPhone testing for this completion pass
 completion, with each atomic commit pushed. Do not ask for an iPhone again or
 keep that test as a completion blocker. Simulator/contract tests and Xcode builds
 remain required; do not claim actual iOS sign-in or APNs delivery from them.
-Current work completes configurable HTTPS app-link admission and native/domain
-association output in Mobile before porting the reusable foundation to Starter.
+Configurable HTTPS admission/native associations, the public browser handoff and
+the independently verified Starter port are complete.
 The controlled domain remains a deployment setting, not a reason to leave the
 configurable implementation unfinished. Preserve the accepted Google binding,
 phone data and running private development stack.
 
-## Current result and continuation
+## Completed implementation and continuation
 
-The public [Mobile HTTPS handoff](mobile-app-links.md) is implemented and validated
-locally: 4002 dashboard unit cases and 14 related Chromium cases passed. It admits
-only known environment/routes and activates no dashboard session/business request.
-Mobile source `d36a1bc9` supplies configurable native associations; full Mobile CI
-`40887772486` passed all four jobs, 103 native cases in 28 downloaded suites and
-the complete Xcode app. Only after this proof was the generic Starter port applied
-over `e29b0b2`; independent Starter local checks passed. The final parser correction `72341ef6`
-rejects reproduced Unicode host aliases after Mobile JVM/Chromium proof. It is
-now included in Starter `738db36`, which passed 326 desktop, 11 Chromium and six
-build-logic cases plus Android assembly and all configured native/domain artifacts.
-Final full CI is active: Mobile `40895095518`, Starter `40895798634`. Download
-both Apple reports and inspect every job before accepting the final heads.
-Native Android HTTPS routing passed: cold/login/company, invalid scope, offline
-reopen and archive denial, 28 requests with zero company writes and unchanged
-read/ack state. [Native measurements](measurements/native-https-2026-10-29.json)
-retain the 3.2m/3.6m pass and cleanup. Domain publication remains a deployment
-input. Physical iPhone testing is waived above.
+The last implementation queue is closed: the [public HTTPS handoff](mobile-app-links.md)
+passed 4002 dashboard unit cases and 14 related Chromium cases at `d21a1346`.
+Native associations and bounded ASCII URL admission are implemented in Mobile and
+ported to Starter after the recorded source proof. Actual Android scope/offline/
+archive acceptance passed with 28 requests, no company writes and unchanged
+read/ack state. [Measurements](measurements/app-links-2026-10-29.json) retain exact
+sources, previous failures and all final verification.
 
+Final Mobile source `72341ef6` passed all four jobs in full
+[40895095518](https://github.com/fajarxfce/hris-mobile/actions/runs/40895095518).
+Downloaded Apple reports confirm 104 cases in 28 suites, zero failures/errors/skips
+and the complete Xcode app; compilation/tests/Xcode took 701s/77s/1040s.
+Starter port `738db36` independently passed all three jobs in full
+[40895798634](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40895798634),
+with 84 Apple cases in 24 downloaded suites, no failures/errors/skips and Xcode;
+compilation/tests/Xcode took 561s/84s/703s. Generated Android/Apple association
+checks passed, and the Xcode/Apple artifact success markers were inspected.
+No CI or owned local acceptance remains active from this increment.
+
+The authorized phone has application `72341ef6`, installed with `--install-only`.
+APK SHA-256 `5b3754d5097eb0a535d1a98cff5bc37e508ea12a008eec897895d9289797fe4d`,
+32,872,857 bytes. Its registered certificate/private WireGuard API match, and
+fixture values are absent from runtime code and the binary manifest. First-install
+time was unchanged; no phone UI was driven. Actual Google/Home acceptance remains
+attributed to the earlier `678783b3` user-operated APK. The private API/dashboard
+still returned HTTP 200; preserve the Google binding, keys, volumes and running stack.
+
+The implementation queue is complete for this development pass. Physical iPhone
+testing was explicitly waived. Public domain/DNS/TLS association, actual APNs,
+physical GPS and production deployment remain separate configuration/target
+observations; no result for those is inferred from builds or fixtures. Default
+native builds do not enable an unconfigured HTTPS host. Reopen implementation for
+an observed failure or a documented requirement; do not recreate accepted modules
+from old next-step paragraphs.
 
 The user subsequently requested a usable server for the installed phone and
 authorized continuing development startup. A new persistent private `hris-dev`
@@ -139,8 +155,8 @@ Its hosted CI and previous native recovery used earlier application `02743a9f`.
 | Repository | Working branch | Accepted source boundary |
 | --- | --- | --- |
 | `hris-platform` | `feat/firebase-auth` | Runtime integration `b7f42070` / schema 101; full CI `9345c19b`; later real-FCM fixture accepted locally |
-| `hris-mobile` | `feat/native-push` | Full CI accepted at `43cd8ec6`, including 97 native cases/Xcode; phone updated install-only to `72341ef6`; actual Google/Home acceptance used `678783b3` |
-| `compose-fluent-starter` | `fix/push-token-lifecycle` | Password port `8a75de5` accepted including 62 native cases/Xcode; Google port `e0c6071` passed local checks and all three full CI `40864341588` jobs including 77 native cases/Xcode |
+| `hris-mobile` | `feat/native-push` | Final application `72341ef6`: all four jobs in `40895095518`, 104 Apple cases/Xcode; installed on phone with data preserved |
+| `compose-fluent-starter` | `fix/push-token-lifecycle` | HTTPS port `738db36`: all three jobs in `40895798634`, 84 Apple cases/Xcode; local 326 desktop/11 browser and configured artifact checks |
 
 The repositories are siblings under `/home/fajar/hris`. Inspect Git status, history
 and upstream before editing; preserve unrelated work. Mobile was generated from
@@ -187,7 +203,8 @@ requirement. New behavior gaps still require implementation and relevant accepta
 
 The preceding Apple provider ports are accepted. Configurable HTTPS admission and
 native associations are implemented in Mobile `d36a1bc9`; full CI `40887772486`
-passed all four jobs and 103 native cases/Xcode. Its Starter port is the current work. The public dashboard handoff
+passed all four jobs and 103 native cases/Xcode. Its Starter port and final parser correction are accepted by the complete CI
+runs above; no implementation or test remains active from this increment. The public dashboard handoff
 and actual Android scoped/offline/archive case passed. The user waived physical
 iPhone testing for this completion pass. Deployment-specific evidence stays
 separate from these implementation results.

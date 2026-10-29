@@ -5,8 +5,9 @@ and active CI work. This document preserves the detailed implementation history.
 
 The [public HTTPS Mobile handoff](mobile-app-links.md) now passes 4002 unit cases
 and 14 related browser cases. It retains explicit native opening and independent
-account/company admission. Configurable native association verification and the
-Mobile-to-Starter port are active; physical iPhone testing was waived by the user.
+account/company admission. Configurable native associations and the
+Mobile-to-Starter port passed final full CI (104/84 native cases and Xcode); the
+user waived physical iPhone testing. The development implementation queue is closed.
 
 [Actual Android FCM delivery](native-fcm-acceptance.md) passed after the user supplied
 the private server credential. Two real publications produced foreground/background
@@ -146,9 +147,10 @@ employee application in [HRIS Mobile](https://github.com/fajarxfce/hris-mobile).
 The mobile repository is generated from Compose Fluent Starter and has its own
 history. Reusable foundation corrections also return to the starter.
 
-**The overall product PRD remains in progress.** Completed increments below do
-not close the remaining delivery sequence or substitute automated checks for
-live API/device/provider acceptance. The requirements in [product](product.md)
+The records below retain incremental acceptance and historical open work.
+[Current PRD status](prd-status.md) reconciles the completed implementation queue
+and separate deployment observations. Automated checks do not substitute for
+unperformed device/provider acceptance. The requirements in [product](product.md)
 and its module documents remain the acceptance baseline.
 
 [Delivery records](delivery.md) describe implemented behavior and observed
@@ -666,7 +668,8 @@ Current queue, reconciled on 29 October 2026. The eleven module contracts and
 native data/command coverage are mapped in [PRD status](prd-status.md); the longer
 table below preserves accepted increments and earlier boundaries, not a list of
 features to implement again. A discovered behavior gap still requires a concrete
-fix and acceptance evidence. The PRD is not declared complete by this reconciliation.
+fix and acceptance evidence. Implementation completion here does not claim physical or production deployment
+acceptance; those target observations stay separate.
 
 Current full Platform verification [40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608)
 passed all ten jobs at `9345c19b`, including the corrected report upload, browser
@@ -687,8 +690,10 @@ passed 62 native cases/Xcode in `40861505322`.
 
 The current implementation increment is configurable HTTPS association/admission
 and the public web handoff, with real Android scope/offline/archive acceptance.
-Mobile full run `40887772486` passed all four jobs and 103 native cases/Xcode;
-the following Starter port is under independent validation at this record. Their final results belong in [the current handoff](agent-handoff.md).
+Mobile foundation `40887772486` passed before porting. Final Mobile `72341ef6`
+passed all four jobs in `40895095518` with 104 native cases/Xcode; Starter `738db36`
+passed all three jobs in `40895798634` with 84 native cases/Xcode. Reports and
+logs were inspected; [the current handoff](agent-handoff.md) records closure.
 The earlier provider runs above do not cover this new increment.
 
 | Deployment observation | Current boundary |

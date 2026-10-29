@@ -1,12 +1,12 @@
 # Current PRD review
 
-Reviewed 29 October 2026. The current completion pass is implementing configurable
-HTTPS app links and proving the reusable port in Starter. The user waived physical
-iPhone testing; do not keep it as a completion blocker. Actual domain activation,
-APNs delivery and production deployment must still be distinguished from code/build
-acceptance. This page is the compact continuation map;
-[completion](completion.md) and [delivery](delivery.md) retain the detailed history.
-Read [agent handoff](agent-handoff.md) for the latest active work before starting.
+Reviewed 29 October 2026. The implementation queue for this development pass is
+complete: eleven initial module areas, Mobile coverage, HTTPS associations/public
+handoff and the proven Starter port are reconciled below. The user waived physical
+iPhone tests. Actual domain activation, APNs, physical GPS and production operation
+remain separate target observations; this is not a production-release declaration.
+[Completion](completion.md) preserves detailed history; [handoff](agent-handoff.md)
+contains current sources, device delivery and runtime preservation instructions.
 
 ## Implementation and acceptance map
 
@@ -61,11 +61,13 @@ the generic Google port to Starter `e0c6071`; these sources have separate proof 
 | Repository | Current verification | Source/result boundary |
 | --- | --- | --- |
 | Platform | Corrected full [40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608), head `9345c19b`, passed all ten jobs | First run passed tests/restore but failed hidden-path report upload. Run `40820005213` passed backend/recovery and uploaded its checked summary, but failed a browser locator. The correction passed all four backend/dashboard shards, actual API/worker/export integration and schema-101 restore with a downloaded sanitized report. The owned CI ref was removed after verification. [Measurements](measurements/ci-2026-10-29.json) retain each run and failure. |
-| Mobile | Full [40858176601](https://github.com/fajarxfce/hris-mobile/actions/runs/40858176601), head `43cd8ec6`, passed all four jobs | Linux/Android, Web, Windows and Apple passed; downloaded reports confirm 97 native cases in 26 suites, no failures/errors/skips and the complete Xcode app. Local root/Android and 82 identity/app Chromium cases also passed. Phone Google/Home acceptance uses the earlier installed `678783b3` APK. |
-| Starter | Password-only Apple [40861505322](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40861505322), port `8a75de5`, passed; full Google-port [40864341588](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40864341588), `e0c6071`, passed all three jobs | Password port independently passed 62 native cases in 18 suites and Xcode. Google port followed Mobile full CI, then independently passed 77 native cases in 22 downloaded suites and Xcode. Local root/Android, 320 desktop and 46 identity/app Chromium cases also passed. |
+| Mobile | Full [40895095518](https://github.com/fajarxfce/hris-mobile/actions/runs/40895095518), source `72341ef6`, passed all four jobs | 104 native cases in 28 downloaded suites, no failures/errors/skips, complete Xcode and configured associations. The source foundation `d36a1bc9` separately passed real Android scope/offline/archive acceptance. Final normal APK is installed on the phone. |
+| Starter | Full [40895798634](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40895798634), port `738db36`, passed all three jobs | 84 native cases in 24 downloaded suites, no failures/errors/skips, Xcode and configured associations. Local root/Android passed 326 desktop, 11 Chromium and six build-logic cases. Source Mobile proof preceded the respective port increments. |
 
-All final jobs and downloaded reports were inspected. No CI or owned local test
-remains active from this increment. Prior failures remain
+All final jobs and downloaded Apple reports/log success markers were inspected.
+No CI or owned local test remains active from this increment. Platform's newer
+public handoff separately passed 4002 unit/14 browser cases; its API/worker code
+and schema remain on the previously accepted baseline. Prior failures remain
 recorded separately from their successful corrections. No production distribution
 workflow was invoked by these CI dispatches.
 
@@ -89,7 +91,7 @@ contains no real email, UID, token or credential.
 
 | Work | Current evidence | Missing prerequisite |
 | --- | --- | --- |
-| iOS push/auth and HTTPS application links | Apple providers and the preceding Starter ports passed simulator/Xcode CI. Mobile `d36a1bc9` now implements configurable native associations/HTTPS admission; full CI and the generic port are in progress. The [public web handoff](mobile-app-links.md) passed local dashboard checks. | Physical iPhone testing is explicitly waived for this pass. Domain selection/publication and APNs credentials remain deployment settings; no actual OS verification or APNs delivery is claimed. |
+| iOS push/auth and HTTPS application links | Apple providers and the preceding Starter ports passed simulator/Xcode CI. Final Mobile `72341ef6` and Starter `738db36` passed all full CI jobs with 104/84 native cases and Xcode, including configurable native associations/ASCII HTTPS admission. The [public web handoff](mobile-app-links.md) passed local dashboard checks. | Physical iPhone testing is explicitly waived for this pass. Domain selection/publication and APNs credentials remain deployment settings; no actual OS verification or APNs delivery is claimed. |
 | Physical location and target deployment | Explicit no-location review, emulator/API and constrained 5,000-employee/scanner workload measurements accepted. Deployment/recovery guidance is implemented. | Available authorized device/environment, real provider configuration and a target-specific execution. A Git push is not live release authorization. |
 
 Earlier CI and generic ports are accepted. The discovered iOS Firebase adapter

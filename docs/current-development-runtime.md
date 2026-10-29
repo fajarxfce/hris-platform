@@ -56,7 +56,7 @@ mode, retaining production loopback and private data-service restrictions. All e
 reviewer tests passed, and the rendered complete dev configuration passed its
 sanitized minimum-wiring review. That review is separate from provider delivery.
 
-## Google login preparation
+## Accepted Google login on the phone
 
 Firebase Authentication and worker FCM are enabled for `cmp-fajar`. Exact-email
 provider lookup was authorized by the user; its private result is not tracked.
@@ -69,8 +69,12 @@ and web OAuth clients. Only this development app's public certificate changed.
 The user subsequently tried Google on the installed phone and reported HRIS's
 unlinked-account rejection. Exact Firebase lookup now confirmed a verified email
 and `google.com` provider. Its exact issuer/UID was bound through authenticated
-HRIS administration; the user has been asked to retry and confirm Home. That final
-HRIS/device step is still pending. Matching email alone did not create a binding.
+HRIS administration. The user then retried, selected the company and confirmed
+**“Sudah masuk Home”**. The authorized account-session API independently returned one
+new native session created at `2026-10-29T10:24:50.263372Z`. Google → Firebase → HRIS
+→ company/Home acceptance is complete on this installed Android APK. Matching
+email alone did not create a binding; no phone UI was driven. See
+[sanitized Google evidence](measurements/native-google-2026-10-29.json).
 
 V16 permits one active subject per account/issuer. Adding the real Google UID while
 the fictional password UID remained active initially returned 409 `data_conflict`.
@@ -85,13 +89,14 @@ Its web client matches the installed APK, so certificate registration required n
 new phone build or installation. A separate, explicitly owned fictional Firebase
 email/password account supplied the successful Android setup acceptance below;
 that binding is now retired in favor of the user's Google UID. It does not stand
-in for the pending user Home confirmation.
+in for this separate user-confirmed Google/Home acceptance.
 
 Firebase Management also created the three HRIS iOS apps and returned matching
 ignored `apps/ios/Configuration/{dev,staging,prod}/GoogleService-Info.plist` files.
 Each has its exact bundle ID, project, OAuth client and reversed client. This
 resolves the unavailable public iOS configuration prerequisite. Mobile's iOS
-Firebase Auth adapter is being implemented and has no acceptance claim yet;
+Firebase Auth adapter now has password/bundle and owned Google PKCE code changes,
+with local checks and Apple CI still in progress;
 APNs/device input and actual iOS provider acceptance remain separate.
 
 ## Usable fictional company and actual acceptance
@@ -164,9 +169,10 @@ files retain provisioning IDs/receipts, and `dev-admin-browser.json` is sensitiv
 session material. Inspect deliberately without echoing contents or committing them.
 
 The user's Google email is already known privately and its exact binding is saved.
-Do not ask for the email or FCM credential again. Await the user's Home/error result
-from the requested retry; use the private session-metadata review and exact-email
-lookup if needed. The private `bind-dev-firebase.mjs google` retains the successful
+Do not ask for the email, FCM credential or Home confirmation again: all three
+are resolved. The user-confirmed Home has a corresponding new native session;
+use the private session-metadata review and exact-email lookup only if a new
+problem requires it. The private `bind-dev-firebase.mjs google` retains the successful
 operation receipt; it is not a reason to add another binding. Do not invent a UID,
 set the real user's password, automatically link by email, or drive the phone UI.
 

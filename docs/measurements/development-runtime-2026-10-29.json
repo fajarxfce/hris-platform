@@ -116,5 +116,9 @@
     "Demo policies and employee data are fictional.",
     "Initial immediate-EOF dashboard netcat probe was empty; holding input open returned HTTP 200.",
     "Private operator setup initially reloaded before MFA verification completed; awaiting its HTTP 200 resolved the harness race without an application change."
-  ]
+  ],
+  "laterEvidence": {
+    "googlePhoneAcceptance": "native-google-2026-10-29.json",
+    "note": "This initial setup/checkpoint snapshot predates replacement of the fictional Firebase binding and user-confirmed Google Home."
+  }
 }

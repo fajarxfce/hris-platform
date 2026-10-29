@@ -1,0 +1,41 @@
+{
+  "reviewedAt": "2026-10-29T10:27:20.269800+00:00",
+  "purpose": "Actual Google sign-in through Firebase and HRIS on the user-operated Android phone",
+  "sources": {
+    "platformRuntime": "b7f42070",
+    "explicitBindingRecord": "533472ca",
+    "schema": 101,
+    "mobileApplication": "678783b3",
+    "apkSha256": "1883d1da41fdeabe77165de9fc75f1d106ff7583ae93aa92878940c7a2addd0e"
+  },
+  "acceptance": {
+    "initialUnlinkedAccountRejected": true,
+    "exactFirebaseLookup": true,
+    "verifiedEmail": true,
+    "provider": "google.com",
+    "explicitHrisIssuerUidBinding": true,
+    "oldFictionalBindingRetired": true,
+    "employeeGrantsUnchanged": true,
+    "userRetriedGoogleAndSelectedCompany": true,
+    "userConfirmedHome": true,
+    "nativeSessionCountAfterRetry": 1,
+    "nativeSessionCreatedAt": "2026-10-29T10:24:50.263372Z",
+    "phoneUiDrivenByAgent": false,
+    "newApkRequiredForBinding": false
+  },
+  "limits": [
+    "User-operated Google/company/Home confirmation plus authorized server session metadata, not an instrumented phone UI trace.",
+    "No claim of physical FCM, GPS, iOS/APNs or production deployment acceptance.",
+    "The earlier development recovery checkpoint predates this Google binding."
+  ],
+  "privateMaterialOmitted": [
+    "email",
+    "firebaseUid",
+    "accountId",
+    "sessionId",
+    "deviceName",
+    "tokens",
+    "passwords",
+    "privateKeys"
+  ]
+}

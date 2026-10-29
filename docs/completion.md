@@ -669,14 +669,21 @@ assertion and actual integration. Mobile and Starter Apple corrections also pass
 independently, closing the generic port. [CI measurements](measurements/ci-2026-10-29.json)
 retain original failures and final proof. No CI or local test job remains active.
 
+Actual Android Google sign-in is now accepted: the user confirmed Home after the
+explicit Firebase UID binding, and the authorized account-session API returned a
+new native session. The existing installed APK required no update. See
+[the exact acceptance boundary](measurements/native-google-2026-10-29.json).
+The current Mobile iOS provider increment and its later Starter port have their
+own pending verification; earlier accepted CI above does not cover that new code.
+
 | Remaining work | Current state and required acceptance |
 | --- | --- |
-| Google sign-in exchange | Firebase email/password through HRIS and Android MFA passed. Google chooser/Back passed; a real eligible Google sign-in with correct Android OAuth/SHA setup must still exchange its proof through HRIS. The public web client ID is known; no client secret is needed. |
-| iOS provider and physical application links | Simulator build/tests do not prove push/auth on a device. Supply the iOS Firebase configuration, APNs/device setup and deployed HTTPS association endpoints, then exercise the actual scoped login/push/link flows. |
+| iOS provider and physical application links | Matching Firebase public plists are now installed for all HRIS flavors. The newly implemented iOS password/Google adapter is under Mobile local/Apple verification before a generic Starter port. Complete APNs/device setup and deployed HTTPS association endpoints, then exercise actual scoped login/push/link flows; simulator tests do not prove them. |
 | Physical location and target deployment | Emulator/no-location review and constrained workload/recovery evidence passed. Actual GPS and target-specific operation require the authorized device/environment and deployed provider configuration. Git push authorization does not authorize a production release. |
 
-CI and identified generic ports are accepted. Continue external acceptance when
-its input is available. Reopen an
+Earlier CI and generic ports are accepted. Complete the new Mobile iOS provider
+verification and subsequent generic Starter port, then continue device/provider
+acceptance when its input is available. Reopen an
 accepted implementation only for a documented requirement gap or observed failure;
 do not recreate completed replicas, drafts, summary observers or administrative
 screens based on a historical "next" paragraph.

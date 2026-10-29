@@ -16,7 +16,7 @@ and acceptance evidence; the current CI result must be assessed separately.
 
 | PRD area | Implemented scope and retained evidence | Actual workflow example |
 | --- | --- | --- |
-| [Identity](modules/identity.md) | Accounts, roles/memberships, invitations, MFA, app sessions and explicit identity binding. Firebase email/password through HRIS was accepted; real Google token exchange remains external. | [Invitations/session replacement](../apps/dashboard/integration-worker/account-invitations.spec.ts), [bindings](../apps/dashboard/integration/oidc-bindings.spec.ts) |
+| [Identity](modules/identity.md) | Accounts, roles/memberships, invitations, MFA, app sessions and explicit identity binding. Firebase email/password and actual Android Google through HRIS/company/Home are accepted. | [Invitations/session replacement](../apps/dashboard/integration-worker/account-invitations.spec.ts), [bindings](../apps/dashboard/integration/oidc-bindings.spec.ts) |
 | [People](modules/people.md) | Effective-dated organization/employment, import, account binding, company transfer and scheduled lifecycle changes. | [Import](../apps/dashboard/integration/employee-imports.spec.ts), [transfer](../apps/dashboard/integration/employment-transfer.spec.ts), [scheduled onboarding](onboarding-schedules.md) |
 | [Workforce](modules/workforce.md) | Shifts, holidays, weekly/roster/bulk calendars, immutable attendance/review/corrections, planned/actual overtime and closing/adjustments. Physical GPS remains external. | [Attendance](../apps/dashboard/integration/attendance.spec.ts), [overtime](../apps/dashboard/integration/overtime.spec.ts), [closings](../apps/dashboard/integration-worker/work-periods.spec.ts) |
 | [Leave](modules/leave.md) | Effective policies, reviewed creation, independent staged actions, balances, accrual/year close/carry/expiry and team calendar. | [Creation/replay](../apps/dashboard/integration/leave-creation.spec.ts), [expiry](../apps/dashboard/integration-worker/leave-carry-expiry.spec.ts), [calendar](../apps/dashboard/integration/leave-calendar.spec.ts) |
@@ -78,15 +78,21 @@ or scheduling state. [Measurements](measurements/native-fcm-2026-10-29.json) ret
 the two initial timeouts and final pass. The sender credential path is in the handoff;
 do not repeat the resolved question or commit its contents.
 
+Actual Google sign-in on the installed Android phone is now accepted: the user
+confirmed company/Home and a new native session appeared in authorized server
+metadata. The explicit binding preserved the existing employee grants and retired
+the fictional provider UID. [Google evidence](measurements/native-google-2026-10-29.json)
+contains no real email, UID, token or credential.
+
 | Work | Current evidence | Missing prerequisite |
 | --- | --- | --- |
-| Google authentication exchange | Email/password through Firebase and HRIS accepted; Google chooser/Back accepted. | Actual eligible Google sign-in and Android OAuth/SHA configuration for a real token exchange. A public web client ID is already known. |
-| iOS push/auth and physical application links | Portable build/simulator checks and Android URL recovery are separate evidence. | iOS Firebase configuration, APNs/device setup and verified deployed association URLs. |
+| iOS push/auth and physical application links | Matching public Firebase plists are installed. The new password/Google adapter is under local/Apple verification; prior simulator and Android URL results have separate scope. | Complete Mobile verification, port the generic foundation, then exercise APNs/device and verified deployed association URLs. |
 | Physical location and target deployment | Explicit no-location review, emulator/API and constrained 5,000-employee/scanner workload measurements accepted. Deployment/recovery guidance is implemented. | Available authorized device/environment, real provider configuration and a target-specific execution. A Git push is not live release authorization. |
 
-Current CI and identified generic ports are accepted; no additional concrete
-implementation gap was found in this review. Continue these rows when their
-inputs become available, and reopen implementation for an observed failure or
+Earlier CI and generic ports are accepted. The subsequently discovered iOS Firebase
+adapter gap now has implementation under Mobile validation; its generic Starter
+port follows that proof. Continue the device/provider rows when their inputs
+become available, and reopen other implementation for an observed failure or
 documented requirement gap. Mark rows complete only after actual acceptance. The repository should never
 claim that a fixture sent a real FCM message, completed Google sign-in, or verified
 a physical deployment when it did not.

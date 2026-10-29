@@ -26,11 +26,15 @@ and [sanitized evidence](measurements/development-runtime-2026-10-29.json).
 The user tried Google and received the expected unlinked-account rejection.
 Exact Firebase lookup then confirmed `google.com` and verified email. The old
 fictional password binding was deactivated before adding the confirmed Google UID,
-preserving V16's one-active-subject-per-issuer rule. The user Home retry is pending;
-email and successful binding receipt are already known privately. Firebase Management
+preserving V16's one-active-subject-per-issuer rule. The user retried and confirmed
+Home; account-session metadata independently returned one new native session
+created at `2026-10-29T10:24:50.263372Z`. Actual Android Google → Firebase → HRIS →
+company/Home is accepted. Email and the binding receipt remain private. See
+[Google evidence](measurements/native-google-2026-10-29.json). Firebase Management
 also supplied matching public iOS configs for all three HRIS flavors. Mobile's
-iOS Firebase Auth adapter is now being implemented; APNs/device acceptance remains.
-Leave
+iOS Firebase Auth adapter has password/bundle loading and Google system-browser
+PKCE/code exchange under local and Apple verification; the generic Starter port
+waits for Mobile Apple proof. APNs/device acceptance remains. Leave
 this persistent stack running; statements below about cleaned fixtures refer to
 the earlier disposable acceptance runs, not this development environment.
 
@@ -47,7 +51,7 @@ retain the two preceding orchestration/observer timeouts and exact proof. Five n
 configuration tests, 12 related fixture checks, seven proxy regressions, TypeScript,
 Biome, build and architecture passed locally. All owned resources are cleaned.
 This increment adds an opt-in fixture, not a deployment or application change;
-there is no new generic Starter port. Google exchange and iOS/physical cases remain.
+there is no new generic Starter port. Actual Android Google exchange is accepted above; iOS/physical cases remain.
 
 Corrected full Verify [40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608)
 passed all ten jobs at `9345c19bad4a219ecdb9ac247f944b2959c4642a`. All four backend and all

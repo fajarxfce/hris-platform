@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-29",
+  "mobile": {
+    "run": 40909156570,
+    "head": "3dc81d00632f965201c2eecc01cfe9a5627d7f1f",
+    "url": "https://github.com/fajarxfce/hris-mobile/actions/runs/40909156570",
+    "conclusion": "success",
+    "jobs": {
+      "web": "success",
+      "windows": "success",
+      "apple": "success",
+      "verify": "success"
+    },
+    "apple": {
+      "tests": 104,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suites": 28,
+      "stepSeconds": {
+        "Compile iOS simulator tests": 791,
+        "Run iOS simulator tests": 122,
+        "Build iOS simulator app": 1295
+      },
+      "downloadedReportsInspected": true,
+      "xcodeAndDistributionMarkersConfirmed": true
+    }
+  },
+  "starter": {
+    "run": 40916187442,
+    "head": "77063862866bb52db5eade28733ceffce1588409",
+    "status": "in_progress",
+    "url": "https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40916187442"
+  },
+  "localSignedAndroidSeconds": {
+    "mobile": 215.572,
+    "starter": 136.647
+  },
+  "platformApplicationChanged": false,
+  "phoneInstalledThisIncrement": false,
+  "uploaded": false,
+  "privateRuntimePreserved": true
+}

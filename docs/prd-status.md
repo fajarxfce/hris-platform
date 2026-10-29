@@ -3,24 +3,41 @@
 Reviewed 29 October 2026. The implementation queue for this development pass is
 reconciled for the eleven initial module areas, Mobile coverage and HTTPS links.
 The subsequent release-configuration audit below is active after concrete build
-failures were reproduced; its reusable port is not yet accepted. The user waived physical
+failures were reproduced; its reusable port passed local checks and awaits independent hosted CI. The user waived physical
 iPhone tests. Actual domain activation, APNs, physical GPS and production operation
 remain separate target observations; this is not a production-release declaration.
 [Completion](completion.md) preserves detailed history; [handoff](agent-handoff.md)
 contains current sources, device delivery and runtime preservation instructions.
 
-## Active release-configuration audit
+## Release-configuration audit — Starter CI active
 
-Mobile `3dc81d00` corrects actual distribution/build gaps and is running full
+Mobile source `3dc81d00` passed all four jobs in full
 [CI 40909156570](https://github.com/fajarxfce/hris-mobile/actions/runs/40909156570).
-The selected remote API must survive per-flavor project properties, optional HTTPS
-registrations must reach signed builds, and APK/Apple identities must match their
-domain artifacts. Actual signed Android packaging, the changed Xcode entry point
-and the independent Starter port are being verified. Root/Android and all 1,860
-build-73 desktop cases passed; seventeen distribution regressions and canonical
-verification of 31 missing SBOM POMs passed. Exact failures/results belong in the
-Mobile measurement and [current handoff](agent-handoff.md). No upload or live
-provider/domain deployment is part of this audit.
+Downloaded Apple reports confirm 104 cases in 28 suites with zero failures/errors/
+skips; compilation/tests/Xcode took 791s/122s/1295s. Xcode's selected release API
+and remote backend were explicitly checked, along with native/domain artifacts.
+Its actual signed APK/AAB/SBOM fixture passed in 215.572s; all 1,860 desktop cases
+and 17 distribution regressions passed. Thirty-one missing POM hashes match the
+canonical HTTPS artifacts and preserve all prior hashes.
+
+The audit fixes reproduced release API precedence, optional app-link input and
+signer/domain artifact matching, release SBOM verification, HRIS demo selection,
+build-version fixtures and explicit dev XML lint attributes. No API/schema or
+business policy changed. The 15 portable files retain Starter's demo choice and
+IDs; HRIS policy, UI fixtures and private dev network XML remain downstream.
+
+Full [Starter CI 40916187442](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40916187442) is active at port `7706386`. All local
+checks passed: 326 desktop cases, 17 distribution and ten runner cases, actual
+signed APK/AAB/SBOM in 136.647s, and restored normal demo/dev plus production SBOM
+in 23s. Both packages retain the selected API/registration; actual signatures
+and packaged domain files/checksums passed. No upload or installation occurred.
+Final hosted jobs and downloaded Apple reports/Xcode markers remain required.
+
+Preserve the installed phone, Google binding and private runtime. No distribution
+workflow was dispatched. Physical Apple signing, domain publication and production
+release remain distinct target operations. See the tracked
+[distribution evidence](measurements/distribution-2026-10-29.json) and the
+[Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/agent-handoff.md).
 
 ## Implementation and acceptance map
 

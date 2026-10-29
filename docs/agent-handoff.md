@@ -19,27 +19,35 @@ The controlled domain remains a deployment setting, not a reason to leave the
 configurable implementation unfinished. Preserve the accepted Google binding,
 phone data and running private development stack.
 
-## Active continuation: native distribution audit
+## Native distribution audit — Starter CI active
 
-The user requested further work after the last checkpoint. Mobile `3dc81d00`
-fixes reproduced manual-distribution failures: unsupported HRIS demo selection,
-release API precedence, missing app-link input/signing verification, incomplete
-SBOM POM verification, build-1-only UI fixtures and dev release network XML lint.
-The last fixes add no HTTP host, authority, API or schema change. Native business
-workflows remain on the accepted implementation. Mobile root/Android passed
-1,860 desktop cases; all 1,860 also passed with release build 73 after correcting
-the fixture. Seventeen distribution regressions pass. Thirty-one added POM hashes
-match canonical HTTPS artifacts and preserve every prior hash.
+Mobile source `3dc81d00` passed all four jobs in full
+[CI 40909156570](https://github.com/fajarxfce/hris-mobile/actions/runs/40909156570).
+Downloaded Apple reports confirm 104 cases in 28 suites with zero failures/errors/
+skips; compilation/tests/Xcode took 791s/122s/1295s. Xcode's selected release API
+and remote backend were explicitly checked, along with native/domain artifacts.
+Its actual signed APK/AAB/SBOM fixture passed in 215.572s; all 1,860 desktop cases
+and 17 distribution regressions passed. Thirty-one missing POM hashes match the
+canonical HTTPS artifacts and preserve all prior hashes.
 
-Mobile full [CI 40909156570](https://github.com/fajarxfce/hris-mobile/actions/runs/40909156570)
-is running at `3dc81d00`. The local signed APK/AAB/SBOM exercise uses a disposable
-fictional key and invalid host; it never uploads or installs that APK. Final local
-packaging and hosted Xcode evidence remain required before accepting the portable
-Starter port. HRIS remote-only policy, UI fixtures and private dev network config
-must stay in Mobile; generic helpers keep Starter's demo/remote choice.
-See [Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/agent-handoff.md)
-and its tracked distribution measurement. Preserve the installed phone, Google
-binding and private runtime. This work does not dispatch a distribution workflow.
+The audit fixes reproduced release API precedence, optional app-link input and
+signer/domain artifact matching, release SBOM verification, HRIS demo selection,
+build-version fixtures and explicit dev XML lint attributes. No API/schema or
+business policy changed. The 15 portable files retain Starter's demo choice and
+IDs; HRIS policy, UI fixtures and private dev network XML remain downstream.
+
+Full [Starter CI 40916187442](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40916187442) is active at port `7706386`. All local
+checks passed: 326 desktop cases, 17 distribution and ten runner cases, actual
+signed APK/AAB/SBOM in 136.647s, and restored normal demo/dev plus production SBOM
+in 23s. Both packages retain the selected API/registration; actual signatures
+and packaged domain files/checksums passed. No upload or installation occurred.
+Final hosted jobs and downloaded Apple reports/Xcode markers remain required.
+
+Preserve the installed phone, Google binding and private runtime. No distribution
+workflow was dispatched. Physical Apple signing, domain publication and production
+release remain distinct target operations. See the tracked
+[distribution evidence](measurements/distribution-2026-10-29.json) and the
+[Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/agent-handoff.md).
 
 ## Completed implementation and continuation
 

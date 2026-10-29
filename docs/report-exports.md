@@ -543,3 +543,11 @@ Evidence: [sanitized report](measurements/report-export-storage-recovery-2026-10
 `.work/storage-recovery-browser-3.log` and `.work/storage-fault-tool-final.log`.
 The stopped/export screenshots were inspected. CI now runs all nine tooling cases
 before this same export workflow; no hosted CI result is inferred from that change.
+
+## Real-time retention acceptance in progress
+
+[The opt-in elapsed-time fixture](export-retention-acceptance.md) now compiles and
+is running against actual PostgreSQL/Garage. It preserves the one-hour physical
+grace and immutable deadlines, checks a live control, and recovers a lost delete
+result before releasing quota. Final acceptance remains pending until its bounded
+run completes; the existing controlled checks are not replaced by compilation.

@@ -42,6 +42,28 @@ summaries distinguish completed authoring/export/worker work from historical
 implementation stages, so an old "planned" paragraph cannot silently become the
 next task. These documentation changes require no application test rerun.
 
+## Active work: elapsed retention and delivery-status gap
+
+The [elapsed-time export acceptance](export-retention-acceptance.md) is running in
+this checkout. Its JUnit test owns real PostgreSQL/Garage and waits for the unchanged
+one-hour deletion grace. Progress is at `apps/worker/build/reports/elapsed-retention.json`;
+log `.work/export-retention-elapsed.log`, exec session 61217. Expiry is 02:16:08 UTC
+and physical grace ends 03:16:08 UTC on 29 October 2026. Do not rebuild worker
+classes/JARs or run another worker test in this checkout until it finishes. The
+75-minute timeout owns interruption/cleanup. Compilation/formatting passed; final
+acceptance is still pending. No clock/deadline/trigger is rewritten.
+
+A PRD review also found the Communications delivery-failures screen missing despite
+existing worker dispatch counters. Implement a current-authorized, bounded push
+status read and dashboard view in an isolated worktree while retention runs. Keep
+provider acceptance distinct from actual receipt on a device, preserve raw recipient/
+session RLS, and disclose only operational counts. The user authorized continuing
+through the PRD and pushing each commit; do not stop after a checkpoint.
+
+Latest paired native upload/review evidence is Platform `ee6c04a3` and Mobile
+`fc6380b3`, both pushed and remote-verified. Starter remains `16067656`; this native
+acceptance needed no shared source change or port.
+
 ## Current checkpoint: native upload and inspection review
 
 [Android upload/review recovery](native-upload-acceptance.md) now passes real

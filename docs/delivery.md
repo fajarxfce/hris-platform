@@ -6473,3 +6473,23 @@ found a test-only Jackson array coercion fixed before the final successful run),
 within the existing 2 MiB contract bound. No live Firebase login, client SDK/UI
 acceptance, provider revocation lookup or physical-device acceptance is claimed.
 The user enabled both providers; public Firebase configuration now responds 200.
+
+## Announcement delivery observations — 29 October 2026
+
+[Push delivery](announcement-delivery.md) closes the administrative delivery-status
+screen gap in the Communications PRD. The company-scoped aggregate preserves raw
+recipient/session RLS and distinguishes unavailable history from successful
+processing. V101 has a concurrent-writer backfill test, and full worker tests cover
+checkpoint capture and cleanup. Read-only dashboard requests own cancellation,
+company/account scope and foreground revalidation; a duplicate foreground request
+found by Chromium was corrected.
+
+Validation passed 117 API, 94 worker and three repository tests; the independent
+manual elapsed-export test was skipped in this suite. All 3,974 dashboard tests,
+13 distinct Chromium scenarios, both application JARs and architecture/formatting
+passed. Actual publication/Inbox/browser acceptance took 45.5 seconds (1.8 minutes
+including setup); terminal failure and cleanup were explicit SQL fixtures, with
+original Inbox rows unchanged. Schema-101 recovery restored the operational row
+and its RLS/trigger privileges alongside typed audit, storage and old/current keys.
+No Mobile application or Starter correction is required. FCM message sending and
+the overall PRD remain in progress.

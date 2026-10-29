@@ -8,7 +8,7 @@ It has no live restore destination and never stops or restarts the source servic
 Use Linux, Python 3.11+, Java 21, Docker and curl with SigV4 support. Build the
 current API JAR first; its offline key-verification entry point reuses the actual
 application cipher without starting Spring, an HTTP server, workers or providers.
-The checked-in Garage 2.4.1 single-node SQLite layout and database schemas 59–100
+The checked-in Garage 2.4.1 single-node SQLite layout and database schemas 59–101
 are supported. V99 adds only global audit metadata and no encrypted
 record family. New encryption contracts require reviewing the schema bound.
 
@@ -158,3 +158,13 @@ through normal V100 triggers is now included, and an additional independent
 restore compares all six typed audit columns exactly. No encrypted family was
 added; the reviewed ceiling includes schema 100. All owned resources are removed.
 Local evidence: `.work/account-audit-recovery-set.log`.
+
+The announcement-delivery increment passed a complete schema-101 exercise with
+104 objects/2,098,795 bytes and both retained key generations. A separate fictional
+recipient, public employee binding and public announcement request produced the
+operational row through the real worker. An independent restore preserved its
+exact seven typed fields, forced RLS and denied application-role execution of the
+capture trigger, alongside the existing typed account audit. Source storage
+changes and an incorrect retired key remained detected. The reviewed schema
+ceiling is now 101; all owned resources were removed. This proves restoration,
+not external FCM delivery. See [delivery measurements](measurements/announcement-delivery-2026-10-29.json).

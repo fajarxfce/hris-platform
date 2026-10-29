@@ -1510,6 +1510,32 @@ class ApiContractHttpTest : PeopleApiFixture() {
     }
 
     @Test
+    fun announcementDeliveryExposesOnlyCompanyScopedOperationalCounts() {
+        val api = contract()
+        val operation =
+            api["paths"]["/api/v1/companies/{companyId}/announcements/{id}/delivery"]["get"]
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        val schema = api["components"]["schemas"]["AnnouncementDeliveryResponse"]["properties"]
+        assertEquals(
+            setOf(
+                "announcementId",
+                "recipientCount",
+                "pending",
+                "processing",
+                "completed",
+                "failed",
+                "superseded",
+                "unavailableRecipients",
+                "processedDevices",
+                "acceptedDevices",
+                "rejectedDevices",
+                "observedAt",
+            ),
+            schema.propertyNames().toSet(),
+        )
+    }
+
+    @Test
     fun publicationReviewUsesCompanyAdmissionAndItsOwnResponseContract() {
         val api = contract()
         val operation =

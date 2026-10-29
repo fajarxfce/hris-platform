@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-29",
+  "scope": "announcement push delivery observations",
+  "backend": {
+    "apiTestsPassed": 117,
+    "workerTestsPassed": 94,
+    "workerManualElapsedTestSkipped": 1,
+    "repositoryTestsPassed": 3,
+    "combinedSeconds": 273
+  },
+  "dashboard": {
+    "unitTestsPassed": 3974,
+    "files": 349,
+    "seconds": 96.93,
+    "distinctChromiumScenariosPassed": 13
+  },
+  "actualWorkflow": {
+    "test": "integration-worker/communications.spec.ts",
+    "seconds": 45.5,
+    "includingSetup": "1.8 minutes",
+    "provider": "disabled",
+    "terminalAndCleanupStates": "owned SQL fault fixture",
+    "inboxEvidenceUnchanged": true,
+    "deliveryReadsDidNotWriteAudit": true
+  },
+  "recovery": {
+    "schema": 101,
+    "objects": 104,
+    "bytes": 2098795,
+    "identityEnvelopesVerified": 2,
+    "retainedIdentityKeyIds": [
+      "current",
+      "old"
+    ],
+    "announcementDeliveryRestored": true,
+    "typedAccountAuditRestored": true,
+    "sourceUnchangedByRestore": true,
+    "wrongRetiredKeyRejected": true,
+    "temporaryResourcesRemoved": true
+  }
+}

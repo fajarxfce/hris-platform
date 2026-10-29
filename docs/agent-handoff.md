@@ -11,11 +11,11 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
-| `hris-platform` | `feat/firebase-auth` | Native push fixture below; account audit/schema 100 `c282fa60` |
-| `hris-mobile` | `feat/native-push` | `02743a9f` — native registration recovery; transfer `965c8d72` |
+| `hris-platform` | `feat/firebase-auth` | Push delivery/schema 101 in `feat/push-delivery-observations`; elapsed test base `ecb17627` |
+| `hris-mobile` | `feat/native-push` | `fc6380b3` — native upload/review acceptance; app fixes `02743a9f` |
 | `compose-fluent-starter` | `fix/push-token-lifecycle` | `1606765` — tracked handoff; validated foundation `a16325e` |
 
-The latest increment verifies native Firebase registration and recovery.
+The latest increment implements and verifies administrative push-delivery observations.
 Inspect `git status`, `git log` and
 the upstream before continuing. Mobile and Starter were clean at this update.
 
@@ -42,10 +42,11 @@ summaries distinguish completed authoring/export/worker work from historical
 implementation stages, so an old "planned" paragraph cannot silently become the
 next task. These documentation changes require no application test rerun.
 
-## Active work: elapsed retention and delivery-status gap
+## Active work: elapsed retention and next PRD gaps
 
 The [elapsed-time export acceptance](export-retention-acceptance.md) is running in
-this checkout. Its JUnit test owns real PostgreSQL/Garage and waits for the unchanged
+the original `/home/fajar/hris/hris-platform` checkout at compiled commit
+`ecb17627` (schema 100). Its JUnit test owns real PostgreSQL/Garage and waits for the unchanged
 one-hour deletion grace. Progress is at `apps/worker/build/reports/elapsed-retention.json`;
 log `.work/export-retention-elapsed.log`, exec session 61217. Expiry is 02:16:08 UTC
 and physical grace ends 03:16:08 UTC on 29 October 2026. Do not rebuild worker
@@ -53,16 +54,49 @@ classes/JARs or run another worker test in this checkout until it finishes. The
 75-minute timeout owns interruption/cleanup. Compilation/formatting passed; final
 acceptance is still pending. No clock/deadline/trigger is rewritten.
 
-A PRD review also found the Communications delivery-failures screen missing despite
-existing worker dispatch counters. Implement a current-authorized, bounded push
-status read and dashboard view in an isolated worktree while retention runs. Keep
-provider acceptance distinct from actual receipt on a device, preserve raw recipient/
-session RLS, and disclose only operational counts. The user authorized continuing
-through the PRD and pushing each commit; do not stop after a checkpoint.
+The Communications delivery-status gap is now implemented and validated in
+`/home/fajar/hris/.worktrees/push-delivery`, branch
+`feat/push-delivery-observations`, based on `ecb17627`. Integrate this pushed branch
+into `feat/firebase-auth` after the original elapsed test finishes; preserve its
+measured result and do not rebuild its live classpath. No Mobile/Starter port
+applies. Continue the PRD after each commit.
 
-Latest paired native upload/review evidence is Platform `ee6c04a3` and Mobile
-`fc6380b3`, both pushed and remote-verified. Starter remains `16067656`; this native
-acceptance needed no shared source change or port.
+[Push delivery](announcement-delivery.md) has current/original permission and
+credential/MFA guards, a bounded operational aggregate, a minimal V101 forced-RLS
+projection and a localized explicit-refresh dashboard. Raw recipient/session RLS
+is unchanged. Upgrade waits for existing dispatch writers, and worker updates and
+cleanup capture atomically. History loss never implies successful delivery.
+
+Validation passed 117 API, 94 worker and three repository tests in 4m33s; the
+manual elapsed-retention test is the one skipped worker case. Dashboard check
+passed 3,974 tests in 349 files (96.93s), TypeScript, Biome (two existing CSS
+warnings), architecture and production build. Thirteen distinct Chromium cases
+passed across focused runs. The new foreground case found a duplicate request;
+visibility now settles with workspace admission before loading. The inspected
+Indonesian screenshot fits 390px. Both JARs and architecture/format checks passed.
+Real API/PostgreSQL/worker/browser publication, terminal/cleanup display and
+unchanged Inbox/read-only audit assertions passed in 45.5s (1.8m including setup).
+Terminal/retention states there are controlled SQL fixtures, not FCM proof.
+Twenty recovery-tool cases and complete schema-101 recovery passed: 104 objects,
+2,098,795 bytes, two encrypted records, old/current keys, exact delivery/audit
+projections and retained RLS/trigger privileges. The first recovery fixture tried
+a prohibited self-binding; its replacement uses an independent fictional recipient.
+Both attempts' owned resources/private configuration were removed.
+
+Commands and supplementary logs in the worktree:
+- `./gradlew --no-daemon :modules:communications:data:test :apps:server:test --tests '*Announcement*Test' --tests '*ApiContractHttpTest' :apps:worker:test :apps:server:bootJar :apps:worker:bootJar` → `.work/push-delivery-backend.log`.
+- `npm run check` in `apps/dashboard` → `.work/push-delivery-dashboard-check.log`.
+- `npx playwright test tests/announcement-delivery.spec.ts tests/announcements.spec.ts tests/announcement-publication.spec.ts`; the final delivery-only run is `.work/push-delivery-browser-rerun.log`.
+- `npm run test:integration:worker -- communications.spec.ts` → `.work/push-delivery-integration.log`.
+- `python3 tool/check_recovery_set.py` → `.work/push-delivery-recovery-real.log`.
+- [Tracked measurements](measurements/announcement-delivery-2026-10-29.json) retain sanitized results; local logs are supplementary.
+
+Next independent PRD reconciliation found **payroll period comparison** listed in
+`docs/modules/payroll.md`, but current comparison code appears limited to amendment
+before/after monthly amounts. Confirm whether run-to-run period comparison exists
+before implementing the missing read/dashboard; preserve decimal arithmetic and
+immutable payroll evidence. This is independent of the still-missing Firebase
+server credential and physical/iOS acceptance. Do not declare the PRD complete.
 
 ## Current checkpoint: native upload and inspection review
 

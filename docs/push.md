@@ -45,3 +45,12 @@ The payload contains `schemaVersion`, `eventCode=communications.inbox_available`
 ## Container opt-in
 
 Set `HRIS_FCM_ENABLED=true`, `HRIS_FCM_PROJECT_ID`, and `HRIS_FCM_SERVICE_ACCOUNT_FILE` in deployment configuration, then include `compose.push.yml` alongside `compose.yml`. The override mounts the credential file read-only into the worker and does not enable the API sender. Give container UID `10001` read access to the secret while keeping it unreadable by unrelated host users. Missing host files are rejected instead of being created as directories. The API and worker still require the same identity decryption keyring for registered endpoints. See [delivery status](delivery.md) for checks actually performed; no live distribution is enabled by the repository.
+
+## Administrator delivery observations
+
+The [announcement delivery view](announcement-delivery.md) exposes current bounded
+recipient-state and device-checkpoint counts to `announcements.manage`. V101 uses
+a minimal forced-RLS projection, maintained atomically by the raw dispatch trigger;
+raw recipient/session policies remain unchanged. Operational cleanup removes that
+projection row too, leaving publication/Inbox facts intact. Counts are explicit
+observations, not device receipt confirmations or a retry interface.

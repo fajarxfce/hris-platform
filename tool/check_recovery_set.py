@@ -30,13 +30,13 @@ def write_environment(path, values):
         output.write("".join(name + "=" + value + "\n" for name, value in values.items()).encode())
 
 
-def api(endpoint, path, *, body=None, token=None, post=False):
+def api(endpoint, path, *, body=None, token=None, post=False, method=None):
     headers = {"Content-Type": "application/json", "Idempotency-Key": str(uuid.uuid4())}
     if token:
         headers["Authorization"] = "Bearer " + token
     request = Request(endpoint + "/api/v1" + path, headers=headers,
                       data=json.dumps(body).encode() if body is not None else (b"" if post else None),
-                      method="POST" if post else "GET")
+                      method=method or ("POST" if post else "GET"))
     with build_opener(ProxyHandler({})).open(request, timeout=30) as response:
         content = response.read(2 * 1024 ** 2 + 1)
         assert len(content) <= 2 * 1024 ** 2
@@ -184,8 +184,31 @@ def main():
             enrollment = api(endpoint, "/auth/native/mfa/enrollment", token=token, post=True)
             token = api(endpoint, "/auth/native/mfa/enrollment/confirm", token=token, post=True,
                         body={"operationId": enrollment["operationId"], "code": authenticator(enrollment["secret"])})["credentials"]["accessToken"]
-            api(endpoint, "/companies", token=token, post=True,
-                body={"code": "RECOVERY", "name": "Fictional Recovery Company", "timezone": "Asia/Jakarta"})
+            company = api(endpoint, "/companies", token=token, post=True,
+                body={"code": "RECOVERY", "name": "Fictional Recovery Company", "timezone": "Asia/Jakarta"})["id"]
+            # Publish fictional correspondence through the real API and worker so
+            # the restored database contains operational projection evidence too.
+            owner = str(uuid.uuid4())
+            database.query(database_container,
+                "INSERT INTO accounts(id,email,display_name) VALUES('" + owner + "','recovery-recipient@example.invalid','Fictional recovery recipient')", log)
+            api(endpoint, "/companies/" + company + "/members/" + owner, token=token, method="PUT",
+                body={"active": True, "permissions": ["announcements.read"], "reason": "Owned delivery recipient"})
+            employee = str(uuid.uuid4())
+            base = "/companies/" + company
+            api(endpoint, base + "/employees", token=token, post=True, body={
+                "id": employee, "employeeNumber": "RECOVERY-RECIPIENT",
+                "person": {"id": str(uuid.uuid4()), "legalName": "Fictional Recovery Recipient", "nationality": "ID"},
+                "terms": {"effectiveFrom": "2025-01-01", "startDate": "2025-01-01", "status": "ACTIVE", "contract": "PERMANENT"},
+                "reason": "Owned delivery recovery fixture"})
+            api(endpoint, base + "/employees/" + employee + "/account-link", token=token, post=True,
+                body={"accountId": owner, "expectedVersion": 0, "reason": "Owned recipient identity"})
+            announcement = str(uuid.uuid4())
+            api(endpoint, base + "/announcements/" + announcement, token=token, method="PUT", body={
+                "title": "Fictional recovery announcement", "body": "Owned recovery fixture only.",
+                "audience": {"kind": "COMPANY", "targetIds": []}, "acknowledgementRequired": False,
+                "reason": "Owned recovery publication"})
+            api(endpoint, base + "/announcements/" + announcement + "/publish", token=token, post=True,
+                body={"expectedVersion": 0, "scheduledFor": None, "reason": "Owned recovery publication"})
             # Seed one fictional immutable source record through the normal capture
             # triggers, then verify every typed field after an independent restore.
             audit_id = str(uuid.uuid4())
@@ -226,6 +249,15 @@ def main():
                 time.sleep(0.5)
             else:
                 raise RuntimeError("Owned fixture worker startup timed out")
+            deadline = time.monotonic() + 45
+            while time.monotonic() < deadline:
+                if database.query(database_container,
+                    "SELECT count(*) FROM announcement_push_delivery WHERE announcement_id='" + announcement + "'", log) == "1":
+                    break
+                time.sleep(0.5)
+            else:
+                raise RuntimeError("Owned announcement publication did not reach its delivery projection")
+            delivery_query = "SELECT row_to_json(d)::text FROM announcement_push_delivery d WHERE announcement_id='" + announcement + "'"
             storage_endpoint = binding(garage, "3900/tcp")
             objects = {f"page/{index:03}": f"owned fixture {index}".encode() for index in range(101)}
             objects["empty/"] = b""
@@ -235,6 +267,8 @@ def main():
                 put_object(storage_endpoint, key, body, configuration, root, log)
             for container, timeout in ((source_api, 90), (worker, 120), (garage, 30)):
                 database.command(["docker", "stop", "--time", str(timeout), container], log, timeout=timeout + 10)
+            saved_delivery = json.loads(database.query(database_container, delivery_query, log))
+            assert saved_delivery["state"] == "PENDING" and saved_delivery["processed_count"] == 0
             retained_ids = database.query(database_container,
                 "SELECT DISTINCT split_part(envelope,'.',1) FROM (SELECT mfa_secret_encrypted AS envelope FROM accounts UNION ALL SELECT exchange_encrypted FROM native_sessions) retained WHERE envelope IS NOT NULL ORDER BY 1", log).splitlines()
             assert retained_ids == ['current', 'old']
@@ -263,6 +297,9 @@ def main():
             with database.recovery_database(root, database_manifest["postgresImage"], log) as restored:
                 database.restore_database_container(restored[0], database_directory, log)
                 assert json.loads(database.query(restored[0], audit_query, log)) == saved_audit
+                assert json.loads(database.query(restored[0], delivery_query, log)) == saved_delivery
+                assert database.query(restored[0], "SELECT relrowsecurity AND relforcerowsecurity FROM pg_class WHERE oid='public.announcement_push_delivery'::regclass", log) == "t"
+                assert database.query(restored[0], "SELECT has_function_privilege('hris_app','capture_announcement_push_delivery()','EXECUTE')", log) == "f"
 
             actual = s3_get(storage_endpoint, "/" + configuration["bucket"] + "/large/body", configuration, root, log, limit=1024, timeout=10)
             assert actual.read_bytes() == b"source changed after checkpoint"
@@ -287,7 +324,7 @@ def main():
                       "objects": len(objects), "bytes": sum(map(len, objects.values())),
                       "sourceUnchangedByRestore": True, "wrongRetiredKeyRejected": True,
                       "separateKeyPack": True, "temporaryResourcesRemoved": True,
-                      "typedAccountAuditRestored": True}
+                      "typedAccountAuditRestored": True, "announcementDeliveryRestored": True}
             result['retainedIdentityKeyIds'] = retained_ids
         except BaseException:
             for kind, name in resources:

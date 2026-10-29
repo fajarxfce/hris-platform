@@ -1,12 +1,15 @@
 import type { HttpClient } from "../../../core/data/http/http-client";
 import { HttpAnnouncementDataSource } from "../data/datasources/http-announcement-data-source";
+import { HttpAnnouncementDeliveryDataSource } from "../data/datasources/http-announcement-delivery-data-source";
 import { HttpAudienceGroupDataSource } from "../data/datasources/http-audience-group-data-source";
 import { HttpAudienceReferenceDataSource } from "../data/datasources/http-audience-reference-data-source";
+import { RemoteAnnouncementDeliveryRepository } from "../data/repositories/remote-announcement-delivery-repository";
 import { RemoteAnnouncementRepository } from "../data/repositories/remote-announcement-repository";
 import { RemoteAudienceGroupRepository } from "../data/repositories/remote-audience-group-repository";
 import { RemoteAudienceReferenceRepository } from "../data/repositories/remote-audience-reference-repository";
 import { ArchiveAnnouncement } from "../domain/usecases/archive-announcement";
 import { LoadAnnouncement } from "../domain/usecases/load-announcement";
+import { LoadAnnouncementDelivery } from "../domain/usecases/load-announcement-delivery";
 import { LoadAnnouncementHistory } from "../domain/usecases/load-announcement-history";
 import { LoadAnnouncementReview } from "../domain/usecases/load-announcement-review";
 import { LoadAnnouncements } from "../domain/usecases/load-announcements";
@@ -26,6 +29,9 @@ export function createCommunicationsFeature(http: HttpClient) {
     new HttpAudienceReferenceDataSource(http),
   );
   return {
+    loadDelivery: new LoadAnnouncementDelivery(
+      new RemoteAnnouncementDeliveryRepository(new HttpAnnouncementDeliveryDataSource(http)),
+    ),
     loadReview: new LoadAnnouncementReview(announcements),
     previewAudience: new PreviewAnnouncementAudience(announcements),
     publish: new PublishAnnouncement(announcements),

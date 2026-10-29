@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
 import { authenticatorCode } from "../integration/fixtures/authenticator";
+import { acceptAnnouncementDelivery } from "./fixtures/announcement-delivery-workflow";
 
 test("publication reaches the native inbox and sync preserves receipts, withdrawal, and recipient scope", async ({
   page,
@@ -255,6 +256,8 @@ test("publication reaches the native inbox and sync preserves receipts, withdraw
   await expect(
     page.getByRole("region", { name: "Publication · Asia/Jakarta", exact: true }),
   ).toContainText("Published");
+  if (!announcement) throw new Error("Missing announcement");
+  await acceptAnnouncementDelivery(page, context, company, announcement);
   await page.getByRole("link", { name: "View publication job", exact: true }).click();
   await expect(page).toHaveURL(/\/administration\/jobs\?company=.+&job=.+/);
   await expect(page.getByRole("dialog", { name: "Job details", exact: true })).toContainText(
@@ -280,6 +283,9 @@ test("publication reaches the native inbox and sync preserves receipts, withdraw
     "X-HRIS-Client-Build": "1",
   };
   try {
+    expect((await request.get(`${announcements}/delivery`, { headers: native })).status()).toBe(
+      403,
+    );
     const bootstrapResponse = await request.get(`${base}/sync/bootstrap`, {
       headers: native,
       params: { collections: "INBOX", limit: 50 },

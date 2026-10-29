@@ -132,7 +132,7 @@ Its hosted CI and previous native recovery used earlier application `02743a9f`.
 | Repository | Working branch | Accepted source boundary |
 | --- | --- | --- |
 | `hris-platform` | `feat/firebase-auth` | Runtime integration `b7f42070` / schema 101; full CI `9345c19b`; later real-FCM fixture accepted locally |
-| `hris-mobile` | `feat/native-push` | Full CI accepted at `43cd8ec6`, including 97 native cases/Xcode; phone remains on separately accepted `678783b3` |
+| `hris-mobile` | `feat/native-push` | Full CI accepted at `43cd8ec6`, including 97 native cases/Xcode; phone updated install-only to `d36a1bc9`; actual Google/Home acceptance used `678783b3` |
 | `compose-fluent-starter` | `fix/push-token-lifecycle` | Password port `8a75de5` accepted including 62 native cases/Xcode; Google port `e0c6071` passed local checks and all three full CI `40864341588` jobs including 77 native cases/Xcode |
 
 The repositories are siblings under `/home/fajar/hris`. Inspect Git status, history

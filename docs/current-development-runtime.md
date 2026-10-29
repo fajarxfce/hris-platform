@@ -4,6 +4,19 @@ Started 29 October 2026 with the user's authorization to continue after installi
 the Android dev APK. This is a private development environment, not a production
 release or proof that the remaining PRD acceptance has passed.
 
+## Latest authorized Android delivery
+
+The normal dev APK from Mobile application `d36a1bc9`, built at `0fc16ce4`, was
+installed successfully on the connected phone using `--install-only`. It retains
+the private WireGuard API; binary inspection excluded the fixture loopback endpoint
+and fictional app-link host. The APK is 32,872,797 bytes, SHA-256
+`85ef887b4904107482354e9d0ab40b51e2fad7b786c3112f3a24334b078dbde4`.
+The first-install time was unchanged and no phone UI was driven. Prior actual
+Google → HRIS → Home acceptance below used `678783b3`; an install success is not
+a new sign-in observation. [Delivery evidence](measurements/android-update-2026-10-29.json)
+retains that distinction. The persistent API/dashboard still returned HTTP 200
+after cleaning the separate HTTPS acceptance fixture.
+
 ## Ownership and persistence
 
 Compose project `hris-dev` runs from `/home/fajar/hris/hris-platform`. Its ignored

@@ -29,10 +29,10 @@ Continue the current CI/PRD reconciliation. Mobile CI
 was explicitly dispatched at `b0a95391`: prior cross-platform CI was at `d191c61d`,
 before the latest application fixes. Inspect its Linux/Android/Windows/Web and Apple
 simulator jobs, resolve failures and record the final commit/outcome. It is not a
-release/distribution workflow. Platform's branch has no CI run; its Verify workflow
-currently only admits main pushes/PRs. Add an explicit manual verification entry
-point and run the current integrated branch rather than assuming focused local
-runs cover the full CI matrix. All native-owned local resources are now cleaned.
+release/distribution workflow. Platform's Verify workflow now also supports manual dispatch with its existing
+shards, downstream integration, read-only repository permission and time bounds.
+Dispatch the current integrated branch and record the result; focused local runs
+do not substitute for the full CI matrix. All native-owned local resources are now cleaned.
 
 The eleven module screen/acceptance lists were reread and source TODO/placeholder
 searches found no obvious stub. Finish mapping the remaining delivery ledger to

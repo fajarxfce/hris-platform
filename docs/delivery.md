@@ -1,5 +1,21 @@
 # Delivery and validation
 
+## Verify a development branch
+
+The `Verify` workflow accepts manual dispatch as well as main pushes and pull
+requests. Feature branches can run the same bounded four-shard backend/dashboard
+matrix and downstream real API/worker browser integration before integration into
+main. From the intended checkout:
+
+```sh
+gh workflow run ci.yml --ref feat/firebase-auth
+```
+
+Record the run URL and exact head SHA, inspect every job, and retain failures and
+fixes in the handoff. Dispatch does not publish a release or deploy an application;
+normal temporary test artifacts have their existing retention. Native emulator,
+real elapsed-retention and external-provider acceptance remain separately recorded.
+
 ## Status
 
 End-to-end scope and remaining work are tracked in [completion](completion.md),

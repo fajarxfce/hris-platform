@@ -26,8 +26,11 @@ locally: 4002 dashboard unit cases and 14 related Chromium cases passed. It admi
 only known environment/routes and activates no dashboard session/business request.
 Mobile source `d36a1bc9` supplies configurable native associations; full Mobile CI
 `40887772486` is still running. Wait for its proof before the generic Starter port.
-Native Android HTTPS routing is the active local acceptance; the controlled domain
-is still an optional deployment input. Physical iPhone testing is waived above.
+Native Android HTTPS routing passed: cold/login/company, invalid scope, offline
+reopen and archive denial, 28 requests with zero company writes and unchanged
+read/ack state. [Native measurements](measurements/native-https-2026-10-29.json)
+retain the 3.2m/3.6m pass and cleanup. Domain publication remains a deployment
+input. Physical iPhone testing is waived above.
 
 
 The user subsequently requested a usable server for the installed phone and

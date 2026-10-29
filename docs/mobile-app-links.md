@@ -36,3 +36,26 @@ it now waits for the recovery heading before filling. The corrected run passed
 without retry or a larger timeout. The 320×720 Indonesian dark-mode screenshot
 was visually reviewed, with no horizontal overflow and a keyboard-focusable action.
 [Measurements](measurements/app-links-2026-10-29.json) retain the result and boundary.
+
+## Native routing acceptance
+
+Mobile `d36a1bc9` and Platform `d21a1346` / schema 101 passed an owned Android 35
+case with the fictional configured host `links.example.invalid`. The APK used a
+loopback API override and a separate isolated PostgreSQL/API/worker; it was never
+installed on the user's phone. A package-selected VIEW/BROWSABLE intent (no forced
+activity component) waited through cold login/company selection. Repeated opening
+returned to the list with one Back. Wrong account/company/query stayed closed;
+Android rejected the wrong environment/host before opening the activity. Account
+navigation survived background/resume; offline cold start retained the owned
+message. Archiving through the admin API made it unavailable and it stayed closed
+after offline cold start and failed refresh.
+
+Independent server observations verified 28 native requests, zero company writes,
+zero foreign-company requests, unchanged read/acknowledgement at version zero and
+404 after archive. The case passed in 3.2 minutes, 3.6 including setup. The first
+invocation failed before starting resources because its working directory was
+wrong; the corrected invocation passed. Owned API/worker/database/proxy/preview
+resources and the ADB reverse were removed; emulator data was retained and the
+persistent development API/dashboard still returned HTTP 200. The acceptance
+uses a fictional package-selected URL, not a publicly verified OS association.
+[Native measurements](measurements/native-https-2026-10-29.json) retain exact scope.

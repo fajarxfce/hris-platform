@@ -8,6 +8,15 @@ scenarios, real publication/browser acceptance and complete schema-101 recovery.
 History cleanup leaves Inbox facts intact and unavailable counts never imply
 success. Actual FCM message delivery remains dependent on server credentials.
 
+[Android Leave submission recovery](native-leave-acceptance.md) passed actual
+API/PostgreSQL/worker acceptance. One frozen command survived offline process
+restart without a duplicate draft; stable summary reload stayed 33 → 33. Exact
+replay left one version-zero request/history entry/approval, reserving 0.5 days
+once and leaving 1.5 available. Across 43 requests there were two intended writes
+and one read-only preview POST. Six summary rows cleared and logout passed.
+Fixture 2.8m/3.2m with setup; proxy, TypeScript, Biome, build and architecture checks
+passed. All owned resources were removed; no Mobile/Starter source change applies.
+
 [Android expense save recovery](native-expense-acceptance.md) passed actual
 API/PostgreSQL/worker acceptance. One edited working copy became one unconfirmed
 command without double-counting; offline cold start retained it. Summary reloads

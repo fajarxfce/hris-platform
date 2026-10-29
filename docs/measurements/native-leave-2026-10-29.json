@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-29",
+  "platformApplicationCommit": "b7f42070e7da6aacb4af6e4357cab4c2dabb4a16",
+  "fixtureParentCommit": "97e33310",
+  "schema": 101,
+  "mobileApplicationCommit": "02743a9f",
+  "device": "Owned Android 35 emulator-5560; no phone used",
+  "scenarioMinutes": 2.8,
+  "includingSetupMinutes": 3.2,
+  "server": {
+    "responseDropped": true,
+    "nativeCompanyWrites": 2,
+    "nativePreviewPosts": 1,
+    "sameOperationAndInput": true,
+    "leaveRequests": 1,
+    "serverVersion": 0,
+    "historyEntries": 1,
+    "approvalStages": 1,
+    "chargedDays": "0.5",
+    "availableDays": "1.5",
+    "reservedDays": "0.5",
+    "consumedDays": "0",
+    "balanceVersionIncrement": 1,
+    "requests": 43
+  },
+  "nativeDriver": {
+    "frozenSummaryUnconfirmed": 1,
+    "frozenSummaryDrafts": 0,
+    "beforeSummaryReloadRequests": 33,
+    "navigationAdmissionRequestsDuringInitialMeasurement": [
+      31,
+      33
+    ],
+    "afterSummaryReloadRequests": 33,
+    "offlineColdSummaryUnconfirmed": 1,
+    "offlineColdSummaryDrafts": 0,
+    "afterOfflineSummaryReloadRequests": 33,
+    "offlineFrozenCommandRestored": true,
+    "finalEmptySummaryRows": 6,
+    "signedOut": true,
+    "finalRequests": 43,
+    "forwardedSubmissionCommands": 2,
+    "sameOperationAndPayload": true,
+    "apkSha256": "2b603fff2e40e31ee9cf5a45e694ea6aae8c96ae6c72cd4168d920c2e239c0c9"
+  },
+  "checks": {
+    "proxyRegressions": 1,
+    "typeScript": true,
+    "biome": true,
+    "productionBuild": true,
+    "dashboardArchitecture": true,
+    "architectureRegressions": 4,
+    "screenshotsInspected": true
+  },
+  "cleanup": {
+    "ownedContainers": 0,
+    "forwardingRemoved": true,
+    "markersRemoved": true,
+    "emulatorStoppedWithDataRetained": true
+  },
+  "limitations": [
+    "Initial fixture failed by counting read-only preview POST as a write; corrected exact sequence passed a fresh run",
+    "Initial counter interval overlapped late navigation/session reads; final stable and offline reload are 33 to 33",
+    "Manual native driver joins independent automated server assertions",
+    "Controlled response loss and offline API forwarding; no provider or physical/iOS proof"
+  ]
+}

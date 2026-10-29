@@ -5,6 +5,19 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+[Android upload/review recovery](native-upload-acceptance.md) now passes real
+API/PostgreSQL/worker/Garage acceptance. A committed one-MiB chunk response was lost;
+Android retained the upload through offline restart and replayed the exact command.
+Failed inspection review survived a second offline restart. Explicit inspection
+retry, cancellation, local deletion and logout passed; six summary rows became
+empty before deleting the cancelled file. Counters stayed 32 → 32 and 42 → 42 on
+summary reload. The fixture observed 57 requests, nine intended company writes,
+four single-attempt chunks and one unpublished cancelled revision, passing in
+8.7m/9.2m with setup. Scanner-unavailable jobs were stopped through the real admin
+API; no database state or verdict was fabricated. Three proxy regressions, strict
+TypeScript, Biome, production build and architecture/format checks passed. All
+owned resources were removed. Application code and Starter need no change.
+
 [Android Firebase registration](native-push-acceptance.md) now passes actual SDK
 issuance, real API registration, committed-response loss, offline restart,
 original-command recovery, explicit token retirement and logout. Mobile `02743a9f`

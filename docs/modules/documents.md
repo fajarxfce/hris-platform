@@ -191,3 +191,12 @@ One command retires one revision of at most 100 parts / 100 MiB, with no object 
 The existing cleanup worker owns physical removal and its bounded retry/recovery rules. Quota stays reserved in that queue until deletion is acknowledged. A repeated command returns its original receipt and does not recreate completed cleanup. Metadata and audit history remain readable under their normal permissions after deletion. Inventory can conservatively recover an old retired object that reappears after cleanup, with the same age, scope, and recovery limits.
 
 Retirement makes the revision unavailable immediately. Downloads validate availability after each storage read; a read completed after retirement cannot publish those pending bytes. Retention, upload, and business-reference registration share the document guard. A competing hold, restore, or reference save cannot silently bypass the retirement decision. A stale retention version fails. A new hold after retirement protects remaining accepted revisions; it does not undo an already committed retirement. Restoring the document allows new uploads and preserves its retired history.
+
+## Native interrupted-upload acceptance
+
+[The Android fixture](../native-upload-acceptance.md) now verifies real API/storage
+chunk response loss, exact replay, two offline restarts, retained inspection review,
+explicit inspection retry/cancellation and local cleanup. One revision/four chunks
+retained single physical attempts; no uninspected evidence was published. The
+scanner-disabled worker and normal administrator cancellation supply the failed
+processing state. Full-signature antivirus acceptance remains the separate workload.

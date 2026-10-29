@@ -21,6 +21,7 @@
     "tests",
     "integration",
     "integration-worker",
+    "integration-native",
     "vite.config.ts",
     "playwright*.config.ts"
   ]

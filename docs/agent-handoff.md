@@ -42,7 +42,29 @@ summaries distinguish completed authoring/export/worker work from historical
 implementation stages, so an old "planned" paragraph cannot silently become the
 next task. These documentation changes require no application test rerun.
 
-## Current checkpoint: actual Firebase native registration
+## Current checkpoint: native upload and inspection review
+
+[Android upload/review recovery](native-upload-acceptance.md) now passes real
+API/PostgreSQL/worker/Garage acceptance. A committed one-MiB chunk response was lost;
+Android retained the upload through offline restart and replayed the exact command.
+Failed inspection review survived a second offline restart. Explicit inspection
+retry, cancellation, local deletion and logout passed; six summary rows became
+empty before deleting the cancelled file. Counters stayed 32 → 32 and 42 → 42 on
+summary reload. The fixture observed 57 requests, nine intended company writes,
+four single-attempt chunks and one unpublished cancelled revision, passing in
+8.7m/9.2m with setup. Scanner-unavailable jobs were stopped through the real admin
+API; no database state or verdict was fabricated. Three proxy regressions, strict
+TypeScript, Biome, production build and architecture/format checks passed. All
+owned resources were removed. Application code and Starter need no change.
+
+Continue with actual export physical retention/expiry against owned storage and
+other remaining product acceptance. Google token exchange, FCM sending/scoped hints
+and iOS/physical cases still need their external setup. Do not stop after this
+checkpoint or repeat the pending Firebase credential-location question. Native
+upload recovery/review needs no Mobile implementation fix or Starter port; record
+the paired Mobile validation commit after pushing the fixture.
+
+## Previous checkpoint: actual Firebase native registration
 
 [Android Firebase registration](native-push-acceptance.md) now passes actual SDK
 issuance, real API registration, committed-response loss, offline restart,
@@ -151,7 +173,7 @@ these results; no Starter port is required.
 Next: continue remaining independent PRD work after pushing this increment. Global
 metadata audit is complete; detailed source-aware disclosure and provider-health
 observations remain separate contracts. Native Pending actions now has real draft,
-unconfirmed Inbox-command and partial-download recovery evidence; upload/review
+unconfirmed Inbox-command, partial-download and upload/review recovery evidence; other feature
 and other feature outcomes retain their own coverage. Recheck actual provider
 configuration before asking for missing external inputs already listed below.
 

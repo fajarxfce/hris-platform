@@ -5,6 +5,18 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+[Saved account-access audit](account-access-audit.md) now discloses typed historical
+status, global permissions and reason through a separate V100 immutable projection.
+Reads require both global `audit.read` and `identity.manage`, current credentials
+and pre/post-acquisition MFA. The dashboard owns/cancels each detail independently.
+Real API/PostgreSQL/worker/Chromium acceptance passed in 7.9 seconds (38.6 with
+setup), proving independent-author disclosure, metadata-only denial, preservation
+after a later edit and revoked-session cleanup. Dashboard checks passed 3,956 tests;
+full worker/API, architecture/formatting, focused Chromium and recovery checks
+validate the change. Schema-100 recovery includes exact typed audit fields,
+104 objects/2,098,795 bytes and retained old/current keys. Other audit source
+families and remaining provider/device acceptance continue separately.
+
 [Android partial-download recovery](native-download-acceptance.md) passed against
 actual API/PostgreSQL/worker/Garage with a fictional accepted document inspection.
 A one-MiB partial file and Pending actions transfer count survived offline process
@@ -28,8 +40,8 @@ latter verified an independent grant, another actor's actual journal metadata,
 52-row pagination, company-only denial and revoked-session cleanup. Both JARs,
 architecture/formatting and twenty recovery-tool cases passed. Full isolated
 recovery passed at schema 99 with 104 objects/2,098,795 bytes and old/current keys.
-Owned resources were removed and screenshots inspected. Detailed source-aware
-audit disclosure and the remaining native/provider work remain separate; this
+Owned resources were removed and screenshots inspected. The newer account-access detail contract is linked above; other audit families
+and the remaining native/provider work remain separate; this
 increment needs no Mobile/Starter port or live deployment.
 
 [Native Inbox response-loss acceptance](native-acceptance.md) now proves a retained

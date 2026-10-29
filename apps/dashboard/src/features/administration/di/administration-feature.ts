@@ -9,6 +9,7 @@ import { RemoteClientPolicyRepository } from "../data/repositories/remote-client
 import { RemoteIntegrationConfigurationRepository } from "../data/repositories/remote-integration-configuration-repository";
 import { RemotePlatformAuditRepository } from "../data/repositories/remote-platform-audit-repository";
 import { RemoteWorkerIntegrationsRepository } from "../data/repositories/remote-worker-integrations-repository";
+import { GetPlatformAccountAccessAudit } from "../domain/usecases/get-platform-account-access-audit";
 import { LoadClientPolicyReview } from "../domain/usecases/load-client-policy-review";
 import { LoadIntegrationConfiguration } from "../domain/usecases/load-integration-configuration";
 import { LoadWorkerIntegrations } from "../domain/usecases/load-worker-integrations";
@@ -20,6 +21,7 @@ export function createAdministrationFeature(http: HttpClient) {
   const source = new HttpAuditDataSource(http);
   const audits = new RemoteAuditRepository(source);
   const policies = new RemoteClientPolicyRepository(new HttpClientPolicyDataSource(http));
+  const platformAudits = new RemotePlatformAuditRepository(new HttpPlatformAuditDataSource(http));
   return {
     loadWorkerIntegrations: new LoadWorkerIntegrations(
       new RemoteWorkerIntegrationsRepository(new HttpWorkerIntegrationsDataSource(http)),
@@ -30,9 +32,8 @@ export function createAdministrationFeature(http: HttpClient) {
       ),
     ),
     searchAudit: new SearchAuditEvents(audits),
-    searchPlatformAudit: new SearchPlatformAuditEvents(
-      new RemotePlatformAuditRepository(new HttpPlatformAuditDataSource(http)),
-    ),
+    searchPlatformAudit: new SearchPlatformAuditEvents(platformAudits),
+    getPlatformAccountAudit: new GetPlatformAccountAccessAudit(platformAudits),
     loadClientPolicy: new LoadClientPolicyReview(policies),
     saveClientPolicy: new SaveClientPolicy(policies),
   };

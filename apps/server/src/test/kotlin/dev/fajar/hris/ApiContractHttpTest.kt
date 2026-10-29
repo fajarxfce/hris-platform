@@ -25,6 +25,23 @@ class ApiContractHttpTest : PeopleApiFixture() {
     private lateinit var mappings: RequestMappingHandlerMapping
 
     @Test
+    fun accountAuditDetailHasAnExplicitTypedReadContract() {
+        val api = contract()
+        val op = api["paths"]["/api/v1/administration/audit-events/{eventId}/account-access"]["get"]
+        assertTrue(op["x-hris-authentication-required"].asBoolean())
+        assertFalse(op["x-hris-company-admission"].asBoolean())
+        val id =
+            op["parameters"].iterator().asSequence().single { it["name"].asString() == "eventId" }
+        assertEquals("uuid", id["schema"]["format"].asString())
+        assertEquals(
+            setOf("id", "accountId", "active", "permissions", "reason"),
+            api["components"]["schemas"]["PlatformAccountAccessAuditResponse"]["properties"]
+                .propertyNames()
+                .toSet(),
+        )
+    }
+
+    @Test
     fun openApiKeepsGlobalMetadataSeparateFromTheCompanyContract() {
         val document = contract()
         val path = "/api/v1/administration/audit-events"

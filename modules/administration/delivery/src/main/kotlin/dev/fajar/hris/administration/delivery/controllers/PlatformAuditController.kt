@@ -2,6 +2,7 @@ package dev.fajar.hris.administration.delivery.controllers
 
 import dev.fajar.hris.administration.delivery.responses.*
 import dev.fajar.hris.administration.domain.entities.AuditSearch
+import dev.fajar.hris.administration.domain.usecases.GetPlatformAccountAccessAudit
 import dev.fajar.hris.administration.domain.usecases.SearchPlatformAuditEvents
 import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.core.http.response
@@ -11,7 +12,25 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/administration/audit-events")
-class PlatformAuditController(private val search: SearchPlatformAuditEvents) {
+class PlatformAuditController(
+    private val search: SearchPlatformAuditEvents,
+    private val review: GetPlatformAccountAccessAudit,
+) {
+    @GetMapping("/{eventId}/account-access")
+    fun accountAccess(
+        actor: Actor,
+        @PathVariable eventId: UUID,
+    ): PlatformAccountAccessAuditResponse {
+        val result = review.execute(actor, eventId).response()
+        return PlatformAccountAccessAuditResponse(
+            result.id,
+            result.accountId,
+            result.active,
+            result.permissions,
+            result.reason,
+        )
+    }
+
     @GetMapping
     fun list(
         actor: Actor,

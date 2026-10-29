@@ -1,13 +1,29 @@
 package dev.fajar.hris.administration.data.datasources
 
 import dev.fajar.hris.administration.data.dto.AuditQueryRow
+import dev.fajar.hris.administration.data.dto.PlatformAccountAccessAuditRow
 import dev.fajar.hris.administration.data.mappers.toPlatformAuditEventRow
+import dev.fajar.hris.schema.tables.PlatformAccountAccessAudit.PLATFORM_ACCOUNT_ACCESS_AUDIT as D
 import dev.fajar.hris.schema.tables.PlatformAuditMetadata.PLATFORM_AUDIT_METADATA as A
 import java.util.UUID
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 
 class PostgresPlatformAuditDataSource(private val sql: DSLContext) : PlatformAuditDataSource {
+    override fun accountAccess(id: UUID) =
+        sql.select(D.ID, D.ACCOUNT_ID, D.ACTIVE, D.PERMISSIONS, D.REASON)
+            .from(D)
+            .where(D.ID.eq(id))
+            .fetchOne {
+                PlatformAccountAccessAuditRow(
+                    requireNotNull(it[D.ID]),
+                    requireNotNull(it[D.ACCOUNT_ID]),
+                    requireNotNull(it[D.ACTIVE]),
+                    requireNotNull(it[D.PERMISSIONS]).map(::requireNotNull),
+                    it[D.REASON],
+                )
+            }
+
     override fun find(id: UUID) =
         sql.select(
                 A.ID,

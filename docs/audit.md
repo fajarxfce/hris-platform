@@ -49,7 +49,9 @@ The time/filter/limit/cursor contract is the same as company history. Each item 
 Neither includes a company field. A company event cannot resolve as a global
 cursor. This is global account/integration history, not a combined search of all
 companies. Reasons and change payloads require a separate source-aware disclosure
-contract and are not acquired by this endpoint.
+contract and are not acquired by this endpoint. The first supported detail is
+[saved account access](account-access-audit.md), requiring both global `audit.read`
+and `identity.manage`; other source families remain metadata-only.
 
 V99 captures a seven-column append-only metadata projection in
 `platform_audit_metadata`. The migration locks journal writers across backfill

@@ -1,5 +1,6 @@
 import { Text } from "@fluentui/react-components";
 import { ArrowClockwise20Regular } from "@fluentui/react-icons";
+import type { ReactNode } from "react";
 import { AppButton } from "../../../../core/presentation/components/app-button";
 import { AppCommandBar } from "../../../../core/presentation/components/app-command-bar";
 import { AppDetailsPanel } from "../../../../core/presentation/components/app-details-panel";
@@ -30,6 +31,7 @@ export function AuditPage({
   onOlder,
   onOpen,
   onClose,
+  details,
 }: {
   state: Pick<AuditState, "stage" | "failure"> & { page: { nextCursor: string | null } | null };
   view: AuditPageView | null;
@@ -45,6 +47,7 @@ export function AuditPage({
   onOlder: () => void;
   onOpen: (id: string) => void;
   onClose: () => void;
+  details?: ReactNode;
 }) {
   const text = administrationMessages(locale);
   const shared = messages(locale);
@@ -123,6 +126,7 @@ export function AuditPage({
         onClose={onClose}
       >
         {event && <AppPropertyList title={text.metadata} items={event} />}
+        {event && details}
       </AppDetailsPanel>
     </section>
   );

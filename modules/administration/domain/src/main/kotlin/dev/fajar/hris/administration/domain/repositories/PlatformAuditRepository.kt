@@ -6,6 +6,8 @@ import dev.fajar.hris.core.domain.Result
 import java.util.UUID
 
 interface PlatformAuditRepository {
+    fun accountAccess(id: UUID): Result<PlatformAccountAccessAudit?>
+
     fun find(id: UUID): Result<PlatformAuditEvent?>
 
     fun search(query: AuditQuery): Result<Page<PlatformAuditEvent>>

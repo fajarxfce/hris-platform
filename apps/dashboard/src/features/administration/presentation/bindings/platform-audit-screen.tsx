@@ -4,6 +4,10 @@ import { WorkspaceVisibilityContext } from "../../../../core/presentation/contra
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import { useWorkspaceRevalidation } from "../../../../core/presentation/session/use-workspace-revalidation";
 import type { PlatformAccess } from "../../../identity/domain/entities/platform-access";
+import {
+  canReadAccountAudit,
+  isAccountAccessEvent,
+} from "../../domain/policies/platform-account-audit-policy";
 import type { AdministrationUseCases } from "../contracts/administration-use-cases";
 import { PlatformAuditController } from "../controllers/platform-audit-controller";
 import { useAuditFilters } from "../controllers/use-audit-filters";
@@ -14,10 +18,12 @@ import {
   platformAuditSearchParameters,
 } from "../models/platform-audit-route";
 import { AuditPage } from "../pages/audit-page";
+import { PlatformAccountAuditDetail } from "./platform-account-audit-detail";
 
 export function PlatformAuditScreen(props: {
   access: PlatformAccess;
   search: AdministrationUseCases["searchPlatformAudit"];
+  detail: AdministrationUseCases["getPlatformAccountAudit"];
   locale: Locale;
 }) {
   const visible = useContext(WorkspaceVisibilityContext);
@@ -25,9 +31,17 @@ export function PlatformAuditScreen(props: {
   const query = useMemo(() => platformAuditSearchFromParameters(parameters), [parameters]);
   const accountId = props.access.accountId;
   const permitted = props.access.permissions.includes("audit.read");
+  const canManage = props.access.permissions.includes("identity.manage");
   const access = useMemo(
-    () => Object.freeze({ accountId, permissions: Object.freeze(permitted ? ["audit.read"] : []) }),
-    [accountId, permitted],
+    () =>
+      Object.freeze({
+        accountId,
+        permissions: Object.freeze([
+          ...(permitted ? ["audit.read"] : []),
+          ...(canManage ? ["identity.manage"] : []),
+        ]),
+      }),
+    [accountId, permitted, canManage],
   );
   const controller = useMemo(
     () => new PlatformAuditController(props.search, access, query),
@@ -66,6 +80,16 @@ export function PlatformAuditScreen(props: {
       onRefresh={controller.refresh}
       onOpen={controller.openEvent}
       onClose={controller.closeEvent}
+      details={
+        state.selected && canReadAccountAudit(access) && isAccountAccessEvent(state.selected) ? (
+          <PlatformAccountAuditDetail
+            access={access}
+            event={state.selected}
+            load={props.detail}
+            locale={props.locale}
+          />
+        ) : null
+      }
       hasCursor={query.cursor !== null}
       onReset={filters.reset}
       onFirst={() => onQueryChanged({ ...query, cursor: null })}

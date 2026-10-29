@@ -2696,6 +2696,10 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Choose a valid UTC time window of up to 90 days, ending no later than now.",
     "Pilih rentang waktu UTC yang valid, maksimal 90 hari, dengan akhir tidak melewati waktu saat ini.",
   ],
+  audit_detail_not_found: [
+    "Detailed changes are unavailable for this event.",
+    "Detail perubahan tidak tersedia untuk event ini.",
+  ],
   invalid_audit_filter: [
     "Enter a valid action, resource type, or ID.",
     "Masukkan kode aksi, jenis resource, atau ID yang valid.",

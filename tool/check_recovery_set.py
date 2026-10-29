@@ -186,6 +186,17 @@ def main():
                         body={"operationId": enrollment["operationId"], "code": authenticator(enrollment["secret"])})["credentials"]["accessToken"]
             api(endpoint, "/companies", token=token, post=True,
                 body={"code": "RECOVERY", "name": "Fictional Recovery Company", "timezone": "Asia/Jakarta"})
+            # Seed one fictional immutable source record through the normal capture
+            # triggers, then verify every typed field after an independent restore.
+            audit_id = str(uuid.uuid4())
+            database.query(database_container,
+                "INSERT INTO audit_entries(id,actor_id,resource_type,resource_id,action,reason,details,correlation_id) "
+                "SELECT '" + audit_id + "',id,'account',id,'identity.account_access_saved',"
+                "'Owned recovery audit fixture','{\"active\":\"true\",\"permissions\":\"audit.read\"}'::jsonb,gen_random_uuid() "
+                "FROM accounts WHERE email='recovery-admin@example.invalid'", log)
+            audit_query = "SELECT row_to_json(a)::text FROM platform_account_access_audit a WHERE id='" + audit_id + "'"
+            saved_audit = json.loads(database.query(database_container, audit_query, log))
+            assert saved_audit["permissions"] == ["audit.read"] and saved_audit["active"] is True
             print("Owned source API created encrypted MFA and native-session records", flush=True)
             database.command(["docker", "stop", "--time", "90", source_api], log, timeout=100)
             database.command(["docker", "rm", source_api], log)
@@ -248,6 +259,11 @@ def main():
             put_object(storage_endpoint, "large/body", b"source changed after checkpoint", configuration, root, log)
             put_object(storage_endpoint, "later-object", b"not in checkpoint", configuration, root, log)
             report = recovery.verify_set(checkpoint, keys)
+            database_directory, database_manifest = database.load_backup(checkpoint / "database")
+            with database.recovery_database(root, database_manifest["postgresImage"], log) as restored:
+                database.restore_database_container(restored[0], database_directory, log)
+                assert json.loads(database.query(restored[0], audit_query, log)) == saved_audit
+
             actual = s3_get(storage_endpoint, "/" + configuration["bucket"] + "/large/body", configuration, root, log, limit=1024, timeout=10)
             assert actual.read_bytes() == b"source changed after checkpoint"
             actual.unlink()
@@ -270,7 +286,8 @@ def main():
                       "identityEnvelopesVerified": report["database"]["identityEnvelopesVerified"],
                       "objects": len(objects), "bytes": sum(map(len, objects.values())),
                       "sourceUnchangedByRestore": True, "wrongRetiredKeyRejected": True,
-                      "separateKeyPack": True, "temporaryResourcesRemoved": True}
+                      "separateKeyPack": True, "temporaryResourcesRemoved": True,
+                      "typedAccountAuditRestored": True}
             result['retainedIdentityKeyIds'] = retained_ids
         except BaseException:
             for kind, name in resources:

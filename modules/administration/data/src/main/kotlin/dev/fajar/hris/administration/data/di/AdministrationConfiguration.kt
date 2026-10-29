@@ -92,6 +92,15 @@ class AdministrationConfiguration {
         clock: Clock,
     ) = SearchPlatformAuditEvents(audits, identities, transactions, security, clock)
 
+    @Bean
+    fun getPlatformAccountAccessAudit(
+        audits: PlatformAuditRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetPlatformAccountAccessAudit(audits, identities, transactions, security, clock)
+
     @Bean fun auditSource(sql: DSLContext): AuditDataSource = PostgresAuditDataSource(sql)
 
     @Bean fun audits(source: AuditDataSource): AuditRepository = StoredAuditRepository(source)

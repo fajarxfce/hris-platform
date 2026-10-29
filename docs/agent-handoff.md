@@ -11,18 +11,18 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
-| `hris-platform` | `feat/firebase-auth` | Native transfer fixture below; global audit/schema 99 `adfb7b32` |
-| `hris-mobile` | `feat/native-push` | See Mobile handoff for partial-download acceptance; prior Inbox `c650e0d7` |
+| `hris-platform` | `feat/firebase-auth` | Typed account-access audit/schema 100 below; native transfer `f23b73ba` |
+| `hris-mobile` | `feat/native-push` | `965c8d72` — partial-download acceptance; prior Inbox `c650e0d7` |
 | `compose-fluent-starter` | `fix/push-token-lifecycle` | `1606765` — tracked handoff; validated foundation `a16325e` |
 
-The latest increment verifies Android partial-download recovery and saved bytes.
+The latest increment implements typed historical account-access audit disclosure.
 Inspect `git status`, `git log` and
 the upstream before continuing. Mobile and Starter were clean at this update.
 
 Mobile was generated from Starter and is the proving ground. Validate reusable
 foundation corrections in Mobile before porting them to Starter. HRIS business
-features stay in Mobile/Platform. The latest work changes operational tools and
-acceptance records; it requires no Starter port.
+features stay in Mobile/Platform. The latest work changes HRIS administration and recovery acceptance; it requires
+no Mobile/Starter port.
 
 The user has authorized continued implementation and a push after every atomic
 commit. Do not ask again for routine edits, tests, commits or pushes. Keep the
@@ -42,7 +42,45 @@ summaries distinguish completed authoring/export/worker work from historical
 implementation stages, so an old "planned" paragraph cannot silently become the
 next task. These documentation changes require no application test rerun.
 
-## Current checkpoint: native partial-download acceptance
+## Current checkpoint: typed account-access audit
+
+[Saved account-access audit](account-access-audit.md) adds
+`GET /api/v1/administration/audit-events/{eventId}/account-access` and an owned
+Fluent detail section at `/platform/audit`. Both global `audit.read` and
+`identity.manage` are required before and after acquisition; the shared account
+guard, current credentials and MFA are enforced. V100 backfills/captures only
+valid global `account` / `identity.account_access_saved` records into an immutable,
+source-validated typed projection. Raw journal RLS and metadata-only reads remain
+unchanged. No previous values/version are invented; later edits leave the saved
+status, permission codes and reason unchanged.
+
+Dashboard strict mapping matches event/account IDs and bounds Unicode reasons
+and unique permission codes. Closing/hiding/replacing scope or grants aborts and
+clears private details, with stale-response and explicit-retry coverage. All 3,956
+dashboard tests in 347 files passed with architecture/Biome/TypeScript. Both JARs,
+architecture/format checks and 206 distinct backend cases passed (97 API,
+94 worker, fourteen administration data and one migration).
+Eleven distinct focused Chromium cases cover shared metadata and the new panel.
+The real three-account API/PostgreSQL/worker/browser workflow passed in 7.9 seconds
+(38.6 including setup): independent author, both-grant disclosure, metadata-only
+denial, immutable history after another change, and management-grant revocation
+with session/UI cleanup. The exact fixture and test corrections are recorded in
+the contract; no live provider/deployment claim is implied.
+
+Full schema-100 recovery passed with old/current keys, two encrypted records,
+104 objects/2,098,795 bytes and all cleanup checks. The recovery fixture also
+restores all six typed fields of one source-captured audit row exactly. Twenty
+recovery-tool cases passed. The encryption-family review permits raising the
+ceiling from 99 to 100. Relevant supplementary logs use `.work/account-audit-*`.
+
+Continue the remaining PRD after pushing this increment. The user explicitly
+rejected stopping at a checkpoint. Other audit source families, real provider
+health/delivery and native Google/FCM/iOS acceptance remain. This turn rechecked
+FCM server credentials (none in the bounded workspace/config scan; relevant env
+variables unset) and asked the user for the credential file path, with no reply
+yet. Do not repeat the question or wait when independent work is available.
+
+## Previous checkpoint: native partial-download acceptance
 
 [Android partial-download recovery](native-download-acceptance.md) passed against
 actual API/PostgreSQL/worker/Garage with a fictional accepted document inspection.

@@ -589,6 +589,7 @@ export function PortalRoutes({
         <PlatformAuditScreen
           access={platformAccess}
           search={administration.searchPlatformAudit}
+          detail={administration.getPlatformAccountAudit}
           locale={locale}
         />
       </Suspense>

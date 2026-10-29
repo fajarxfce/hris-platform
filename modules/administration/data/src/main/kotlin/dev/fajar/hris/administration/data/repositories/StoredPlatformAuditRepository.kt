@@ -2,6 +2,7 @@ package dev.fajar.hris.administration.data.repositories
 
 import dev.fajar.hris.administration.data.datasources.PlatformAuditDataSource
 import dev.fajar.hris.administration.data.dto.AuditQueryRow
+import dev.fajar.hris.administration.data.mappers.toAccountAccessAudit
 import dev.fajar.hris.administration.data.mappers.toPlatformAuditEvent
 import dev.fajar.hris.administration.domain.entities.AuditQuery
 import dev.fajar.hris.administration.domain.repositories.PlatformAuditRepository
@@ -13,6 +14,10 @@ import java.util.UUID
 
 class StoredPlatformAuditRepository(private val source: PlatformAuditDataSource) :
     PlatformAuditRepository {
+    override fun accountAccess(id: UUID) = safeDatabaseCall {
+        source.accountAccess(id)?.toAccountAccessAudit(id)
+    }
+
     override fun find(id: UUID) = safeDatabaseCall { source.find(id)?.toPlatformAuditEvent() }
 
     override fun search(query: AuditQuery) = safeDatabaseCall {

@@ -1914,3 +1914,12 @@ versions survive response loss and in-place MFA, with protected departures and
 explicit recovery. All 3,872 dashboard tests, 25 distinct browser cases and an
 isolated independent-owner API/PostgreSQL workflow passed. See
 [contracts and evidence](reporting.md#saved-filter-dashboard).
+
+## Saved account-access audit
+
+The [platform audit detail](account-access-audit.md) adds an owned typed section
+inside the metadata drawer for account-access events and readers with both global
+grants. It shows the historical status, permission codes and recorded reason,
+with an explicit retry and English/Indonesian text. Closing, scope/permission
+replacement and hidden workspace disposal discard private state and abort reads.
+Other source families and metadata-only readers do not acquire these details.

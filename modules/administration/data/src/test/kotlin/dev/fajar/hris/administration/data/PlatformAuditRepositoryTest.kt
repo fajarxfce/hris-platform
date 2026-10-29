@@ -30,6 +30,8 @@ class PlatformAuditRepositoryTest {
     private fun repository(operation: () -> List<PlatformAuditEventRow>) =
         StoredPlatformAuditRepository(
             object : PlatformAuditDataSource {
+                override fun accountAccess(id: UUID): PlatformAccountAccessAuditRow? = null
+
                 override fun find(id: UUID) = operation().firstOrNull()
 
                 override fun search(query: AuditQueryRow): List<PlatformAuditEventRow> {

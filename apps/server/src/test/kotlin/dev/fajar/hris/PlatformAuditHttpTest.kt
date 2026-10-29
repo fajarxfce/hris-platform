@@ -264,6 +264,9 @@ class PlatformAuditHttpTest : ApiIntegrationTest() {
 
     private fun probe(read: () -> Result<Page<PlatformAuditEvent>>) =
         object : PlatformAuditRepository {
+            override fun accountAccess(id: UUID): Result<PlatformAccountAccessAudit?> =
+                error("Unexpected account detail read")
+
             override fun find(id: UUID): Result<PlatformAuditEvent?> =
                 error("Unexpected cursor read")
 

@@ -26,7 +26,7 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
               "rpcSecret", "accessKey", "secretKey", "bucket"}
 # Review this bound when new migrations add another persisted encryption contract.
 # V99 adds global audit metadata only; no new encrypted payload family.
-MAX_SCHEMA = 99
+MAX_SCHEMA = 100
 ENVELOPES_SQL = """COPY (
 SELECT * FROM (
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope

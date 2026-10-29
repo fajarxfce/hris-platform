@@ -11,15 +11,19 @@ notes in Git. Read this file first, then the compact [PRD status](prd-status.md)
 Replacement run `40820005213` exposed one intermittent browser-test ambiguity:
 the return-navigation assertion matched both the page `h1` and loaded-section
 `h2` named **Closing employees**. Dashboard shard 1 had 274 passes/one failure;
-the other three dashboard shards passed. Backend/recovery work is still running.
+the other three dashboard shards passed. That run is now complete: all backend
+shards and recovery passed, including the formerly failing artifact upload. Its
+overall result remains failure solely for the old browser assertion.
 The existing scenario now waits for the returned table and explicitly selects
 the level-one page heading. All four closing-report browser cases passed in 10.4s,
 with strict TypeScript and Biome; no application implementation changed.
 
 Corrected full run [40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608)
 is now running at `9345c19b` on owned temporary ref
-`ci/closing-report-40820005213`, so active recovery run `40820005213` is not
-cancelled by branch concurrency. The same commit is pushed on `feat/firebase-auth`.
+`ci/closing-report-40820005213`; the separate ref allowed run `40820005213` to
+finish recovery without cancellation. The same commit is pushed on `feat/firebase-auth`.
+All four corrected dashboard shards passed: 3,997 unit tests, seven native proxy
+regressions and 1,098 distinct browser cases. Backend/integration are still active.
 Retain the original failing trace, inspect all corrected jobs and download the
 sanitized restore artifact before recording success. Remove only the owned CI ref
 after verification; no pull request or release was created.
@@ -39,9 +43,11 @@ paths by default. The workflow now opts in only for the exact sanitized
 `.work/recovery-set-result-*.json` glob, never the whole private directory. YAML
 and result assertions passed locally. The first run concluded failure solely at
 that upload. Replacement [40820005213](https://github.com/fajarxfce/hris-platform/actions/runs/40820005213)
-is running at pushed `70e5098d`; inspect every job and the downloaded recovery
-artifact before recording success. [Sanitized measurements](measurements/ci-2026-10-29.json)
-retain both runs and distinguish execution from artifact publication.
+at `70e5098d` passed recovery and upload. Its downloaded artifact contains only
+the expected sanitized fields: schema 101, 104 objects, 2,098,795 bytes, two
+encrypted records and successful original-source/key/audit/delivery/cleanup checks.
+That second run still failed the browser locator corrected above.
+[Measurements](measurements/ci-2026-10-29.json) retain all run/result boundaries.
 
 [Android Attendance capture recovery](native-attendance-acceptance.md) passed
 actual API/PostgreSQL/worker acceptance. One capture without location survived
@@ -66,7 +72,9 @@ at `b0a95391` passed Linux/Android, Windows and Web but Apple cold compilation
 exceeded its combined 15-minute test limit. Mobile `451a2c4d` separates compilation,
 test execution and Xcode bounds. Its Apple-only follow-up
 [40817592306](https://github.com/fajarxfce/hris-mobile/actions/runs/40817592306)
-is running; port that generic CI correction to Starter only after it passes.
+passed 27 simulator cases, Xcode and report upload. Starter port `1817e45` then
+independently passed Apple run `40820482699` with the same 27 tests and complete
+Xcode build. Mobile and Starter ledgers are updated; no generic port remains.
 Mobile `678783b3` separately corrects English Expense item-count copy, with local
 root checks and Android assembly passed. Hosted runs above predate this copy edit.
 All native-owned resources are cleaned. No release/distribution was invoked.

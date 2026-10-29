@@ -24,8 +24,10 @@ upload now permits the exact `.work/recovery-set-result-*.json` glob only, retai
 are not included. The original downstream integration passed (40 API, 14 worker,
 one export case and the mail/storage fixture checks). Replacement
 [40820005213](https://github.com/fajarxfce/hris-platform/actions/runs/40820005213)
-is running at `70e5098d`; [tracked measurements](measurements/ci-2026-10-29.json)
-retain the original failed conclusion and the pending upload acceptance.
+at `70e5098d` passed recovery and uploaded the checked sanitized summary. Its
+overall result failed a browser locator, corrected in `9345c19b` and under full
+verification as `40820912608`. [Tracked measurements](measurements/ci-2026-10-29.json)
+retain the original failures and successful artifact acceptance.
 
 ## Status
 
@@ -35,7 +37,8 @@ The test now waits for the returned employee table and selects the level-one pag
 heading. Its four Chromium scenarios passed locally in 10.4s, with strict TypeScript
 and Biome. This changes the acceptance locator, not the report or its navigation.
 The original trace and failed shard remain recorded; the corrected full matrix
-must be verified without cancelling the active recovery job.
+runs as `40820912608` on the owned CI ref, allowing the earlier recovery job to
+complete successfully with its sanitized report uploaded and downloaded.
 
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.

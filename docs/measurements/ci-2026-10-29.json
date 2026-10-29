@@ -145,7 +145,7 @@
     "id": 40820005213,
     "url": "https://github.com/fajarxfce/hris-platform/actions/runs/40820005213",
     "head": "70e5098d540609bed43d05b93639fc2c88f48ca5",
-    "status": "running backend/recovery; dashboard shard 1 failed on ambiguous heading locator",
+    "status": "completed",
     "observedDashboardFailure": {
       "shard": 1,
       "passed": 274,
@@ -153,6 +153,71 @@
       "case": "closing months compare original and current facts and open the exact revision with report return",
       "reason": "Unqualified heading locator matched both h1 and h2 after data loaded.",
       "otherDashboardShards": "passed"
+    },
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "name": "dashboard (1)",
+        "conclusion": "failure"
+      },
+      {
+        "name": "dashboard (2)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (3)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (1)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (4)",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard (3)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (2)",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard (4)",
+        "conclusion": "success"
+      },
+      {
+        "name": "recovery-integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard-integration",
+        "conclusion": "skipped"
+      }
+    ],
+    "recoveryArtifact": {
+      "name": "recovery-verification-summary",
+      "downloaded": true,
+      "onlyExpectedSummaryFields": true,
+      "result": {
+        "restorePassed": true,
+        "schema": "101",
+        "identityEnvelopesVerified": 2,
+        "objects": 104,
+        "bytes": 2098795,
+        "sourceUnchangedByRestore": true,
+        "wrongRetiredKeyRejected": true,
+        "separateKeyPack": true,
+        "temporaryResourcesRemoved": true,
+        "typedAccountAuditRestored": true,
+        "announcementDeliveryRestored": true,
+        "retainedIdentityKeyIds": [
+          "current",
+          "old"
+        ]
+      }
     }
   },
   "closingHeadingCorrection": {
@@ -169,6 +234,20 @@
     "url": "https://github.com/fajarxfce/hris-platform/actions/runs/40820912608",
     "head": "9345c19bad4a219ecdb9ac247f944b2959c4642a",
     "temporaryRef": "ci/closing-report-40820005213",
-    "status": "running; earlier recovery run remains active"
+    "status": "running; all four dashboard shards passed; backend/integration pending",
+    "dashboard": {
+      "uniqueUnitTests": 3997,
+      "unitFiles": 352,
+      "nativeProxyTests": 7,
+      "browserShards": [
+        275,
+        275,
+        274,
+        274
+      ],
+      "uniqueBrowserTests": 1098,
+      "counting": "Repeated unit/proxy suites counted once; disjoint browser shards summed.",
+      "conclusion": "all four jobs passed"
+    }
   }
 }

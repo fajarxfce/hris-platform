@@ -8,6 +8,15 @@ scenarios, real publication/browser acceptance and complete schema-101 recovery.
 History cleanup leaves Inbox facts intact and unavailable counts never imply
 success. Actual FCM message delivery remains dependent on server credentials.
 
+[Android overtime response-loss recovery](native-overtime-acceptance.md) now
+passes actual API/PostgreSQL/worker acceptance. The unconfirmed original plan and
+Pending actions count survived offline cold start; summary reload stayed 39 → 39
+requests. Exact replay left one version-zero plan, one history entry and 165 minutes
+across 54 requests/two intended company writes. Six summary rows cleared and logout
+passed. Fixture 7.7m/8.2m with setup; proxy regression, TypeScript, Biome, build and
+architecture passed. The unchanged validated APK was reused and all owned resources
+removed. This acceptance requires no Mobile implementation/Starter port.
+
 [Payroll period comparison](payroll-period-comparison.md) now compares two
 successful original runs with exact decimal totals, employment matching and
 bounded employee pages. Backend validation passed 119 API, 94 worker and 12 data

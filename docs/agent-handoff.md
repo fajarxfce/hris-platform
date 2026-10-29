@@ -5,6 +5,29 @@ asked to continue through the remaining PRD, push each commit, and keep continua
 notes in Git. Read this file first, then [completion](completion.md),
 [product](product.md), the relevant module contract and each repository's `AGENTS.md`.
 
+## Current result and next native case
+
+[Android overtime response-loss recovery](native-overtime-acceptance.md) now
+passes actual API/PostgreSQL/worker acceptance. The unconfirmed original plan and
+Pending actions count survived offline cold start; summary reload stayed 39 → 39
+requests. Exact replay left one version-zero plan, one history entry and 165 minutes
+across 54 requests/two intended company writes. Six summary rows cleared and logout
+passed. Fixture 7.7m/8.2m with setup; proxy regression, TypeScript, Biome, build and
+architecture passed. The unchanged validated APK was reused and all owned resources
+removed. This acceptance requires no Mobile implementation/Starter port.
+
+Source artifacts are from integrated `b7f42070`, containing push delivery, payroll
+comparison and completed elapsed retention. The owned emulator and containers are
+stopped. Reproduction and exact assertions are in the new acceptance document;
+local markers must not be reused. No outstanding source change was found in Mobile.
+
+Continue native Expenses save-response loss next: its working-copy versus frozen
+command deduplication has a distinct pending-summary contract. Inspect the current
+expense fixture, saved command and working-copy flow before creating the owned
+case. Keep read-only summary observation, offline restart, exact retry and
+independent server counts explicit. Attendance/Leave command cases remain separate;
+FCM credentials and Google/physical/iOS setup still need their external inputs.
+
 ## Latest result: real elapsed retention passed
 
 The original checkout's separately owned export-retention acceptance finished
@@ -19,9 +42,8 @@ Pushed feature commits `409abad4` (push delivery/schema 101) and `f757bffd`
 (payroll comparison) are integrated into this branch, preserving elapsed result
 `1abdbce9`. Runtime/source changes match the validated feature branch; the merge
 changes continuation/result documentation only. All test-owned containers are gone.
-Mobile documentation reconciliation `42f5e04d` is pushed. Continue native Overtime
-pending-command acceptance through committed-response loss, offline restart and
-summary/retry. Provider credentials and physical/iOS cases remain separate.
+Mobile documentation reconciliation `42f5e04d` is pushed. Native Overtime committed-response loss and summary/retry are now accepted above.
+Provider credentials and physical/iOS cases remain separate.
 
 ## Workspace and delivery policy
 
@@ -133,15 +155,10 @@ corrects its stale local-first next-work list: all nine data-sync registrations,
 account-owned directory/profile/catalog scopes and six pending-action observers
 exist. Current employee drafts already cover Expense, Leave and Overtime.
 
-Next: a separately owned Android Overtime pending-command fixture should lose a
-successful plan response after commit, verify Pending actions without HTTP, survive
-offline process restart, recover the exact operation and prove a single server
-plan. Earlier native Overtime acceptance blocked transport before admission;
-application tests cover lost success but do not by themselves establish the newer
-summary/device combination. Reuse the validated loopback APK if app source stays
-unchanged. Then trace remaining concrete native cases. Firebase credentials,
-Google token exchange and physical/iOS setup remain separate; do not repeat the
-pending credential question or declare the PRD complete.
+The owned Android Overtime fixture described above now closes its original
+plan-response-loss/summary combination. Earlier normal delivery and blocked-before-
+admission acceptance remain in the Mobile ledger. Continue the explicit Expenses
+case; do not repeat the pending credential question or declare the PRD complete.
 
 ## Current checkpoint: native upload and inspection review
 

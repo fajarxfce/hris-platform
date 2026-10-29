@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-29",
+  "purpose": "Persistent private development runtime after authorized phone installation",
+  "sources": {
+    "platformRuntime": "b7f42070",
+    "platformRuntimeSetup": "703af975",
+    "schema": 101,
+    "mobileApplication": "678783b3",
+    "mobileHandoff": "a6f6740c",
+    "starterUnchanged": "a34e0c5"
+  },
+  "artifact": {
+    "kind": "normal Android dev APK",
+    "bytes": 32853128,
+    "sha256": "1883d1da41fdeabe77165de9fc75f1d106ff7583ae93aa92878940c7a2addd0e",
+    "api": "http://10.77.77.1:8088/api/v1/"
+  },
+  "configuration": {
+    "project": "hris-dev",
+    "separateRuntimeRoles": true,
+    "runtimeSuperuser": false,
+    "runtimeBypassRls": false,
+    "privateNamedVolumes": true,
+    "preexistingAnonymousVolumesPreserved": 60,
+    "firebaseAuth": true,
+    "workerFcm": true,
+    "storage": true,
+    "scanner": true,
+    "mailAfterSetup": false,
+    "genericOidc": false,
+    "minimumWiringPassed": true
+  },
+  "validation": {
+    "deploymentReviewerTests": 8,
+    "backendJarTasks": 125,
+    "backendBuildSeconds": 9,
+    "backendArtifactsUnchanged": true,
+    "dashboardBuild": true,
+    "systemdUnitVerified": true,
+    "dashboardRestartReady": true,
+    "dashboardEnabled": true,
+    "userLinger": true,
+    "rebootTested": false,
+    "hostApiHttp": 200,
+    "hostDashboardHttp": 200,
+    "phoneApiHttp": 200,
+    "phoneDashboardHttp": 200,
+    "phoneUiDriven": false,
+    "firewallChanged": false
+  },
+  "provisioning": {
+    "publicBusinessCommandsOnly": true,
+    "operatorBrowserLoginAndMfa": true,
+    "recoveryCodesSavedPrivately": 10,
+    "fictionalCompanies": 1,
+    "fictionalEmployees": 1,
+    "temporaryLoopbackInvitationDeliveredAndAccepted": true,
+    "externalEmailSent": false,
+    "temporaryCaptureCleaned": true,
+    "employeePermissions": 12,
+    "employeePlatformGrants": 0,
+    "independentPersonLink": true,
+    "ownedEmploymentCount": 1,
+    "employeeGlobalAccountReadHttp": 403,
+    "demoWeekdays": 5,
+    "fictionalLeaveDays": 2,
+    "expenseCategories": 1,
+    "independentApprovalKinds": 4
+  },
+  "firebase": {
+    "project": "cmp-fajar",
+    "developmentSha1RegisteredAndReadBack": true,
+    "installedWebClientMatches": true,
+    "fictionalPasswordAccountCreated": true,
+    "explicitReturnedUidBinding": true,
+    "actualAndroidPasswordExchange": true,
+    "humanGoogleExchange": "pending first user sign-in",
+    "humanGoogleAccountFoundAtLastExactLookup": false
+  },
+  "native": {
+    "device": "owned Android 35 emulator",
+    "sameNormalApkAsPhone": true,
+    "companySelection": true,
+    "homeEmployeeCompanySchedule": true,
+    "documentCatalogSynced": true,
+    "documentDetailsDownloaded": true,
+    "emulatorStoppedWithDataRetained": true
+  },
+  "document": {
+    "publicUpload": true,
+    "actualWorkerClamAvInspection": "READY",
+    "revisionVersion": 3,
+    "bytes": 734,
+    "sha256": "02e49d8b995d5e7e442604ce5e48d165c0948f3d63d7317711f1654816e22fad",
+    "downloadIdenticalBeforeAndAfterRestart": true
+  },
+  "checkpoint": {
+    "captureAndIsolatedVerificationSeconds": 7.668,
+    "excludesApplicationRestart": true,
+    "sourceServicesStoppedGracefully": true,
+    "sourceServicesRestarted": true,
+    "schema": 101,
+    "publicRelations": 187,
+    "failedMigrations": 0,
+    "invalidConstraints": 0,
+    "identityEnvelopesVerified": 1,
+    "storageObjects": 1,
+    "storageBytes": 734,
+    "ownedVerificationResourcesCleaned": true,
+    "privateConfigurationCheckpoint": true,
+    "offHostBackup": false
+  },
+  "limits": [
+    "No new actual FCM publication in this increment; separate earlier foreground/background acceptance remains valid.",
+    "No human Google token exchange, phone UI, physical location, iOS/APNs, deployed HTTPS association or production acceptance.",
+    "Demo policies and employee data are fictional.",
+    "Initial immediate-EOF dashboard netcat probe was empty; holding input open returned HTTP 200.",
+    "Private operator setup initially reloaded before MFA verification completed; awaiting its HTTP 200 resolved the harness race without an application change."
+  ]
+}

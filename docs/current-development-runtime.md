@@ -40,8 +40,10 @@ Both application JAR tasks passed (125 tasks, 9s, artifacts unchanged); Docker
 images built and migration exited successfully. SQL inspection confirms neither
 `hris_app` nor `hris_worker` is superuser or has BYPASSRLS. Host API health and
 dashboard requests returned HTTP 200. The phone independently reached API health
-over WireGuard with HTTP 200, without ADB forwarding or firewall changes. A raw
-netcat dashboard request has not yet established phone-browser acceptance.
+and dashboard HTML over WireGuard with HTTP 200, without ADB forwarding or firewall
+changes. Keep the netcat request input open until the response arrives; immediate
+stdin closure produced an empty dashboard response during the first probe. This
+is phone network evidence, not phone UI acceptance.
 
 Dashboard TypeScript/Vite build passed. The checked
 [user service](../deploy/systemd/hris-dashboard-dev.service) is installed, enabled
@@ -70,16 +72,90 @@ Firebase issuer/UID through the authenticated HRIS administration flow; matching
 email alone must never create an HRIS binding or grant. Google exchange and
 physical FCM/location acceptance are not established by configuration readiness.
 
+The refreshed ignored Mobile `google-services.json` retains all three HRIS flavors.
+Its web client matches the installed APK, so certificate registration required no
+new phone build or installation. A separate, explicitly owned fictional Firebase
+email/password account was created and its exact returned UID bound through HRIS
+administration. Actual Android sign-in with that account passed below; it does not
+stand in for the pending human Google exchange.
+
+## Usable fictional company and actual acceptance
+
+The bootstrap operator enrolled MFA through the dashboard, with its secret and ten
+recovery codes saved privately. Browser login and company Overview passed before
+and after the checkpoint. Public commands created `PT Contoh Nusantara` (`HRISDEMO`)
+and `Karyawan Demo` (`DEMO-001`). One temporary loopback SMTP capture ran inside the
+worker network namespace and accepted only fictional recipients. The real worker
+delivered one invitation, which was consumed through the public credential API.
+The capture stopped and removed its messages; API/worker are back to mail disabled.
+No external email was sent. No business rows or grants were inserted through SQL.
+
+The employee has the standard 12-permission employee role and no platform grants.
+An independent administrator linked its account to the person. Native login,
+company access and exactly one owned employment passed; global account-directory
+access returned 403. The bootstrap operator remains separate from this tester.
+
+The demo includes a Monday–Friday 08:00–17:00 remote shift with a 60-minute break,
+two fictional leave days in 2026, a demo expense category and independent operator
+approval for Leave, Leave cancellation, Overtime and Expenses. These are examples
+for trying the application, not statutory entitlements or production policies.
+
+The same normal dev APK installed on the phone was exercised on the owned Android
+35 emulator: Firebase email/password → company selection → Home showed the correct
+employee, company and schedule. Documents synchronized `Panduan HRIS Demo`; its
+detail then displayed **Downloaded**, 734 B. No phone UI was driven. The emulator
+was stopped with app data retained; its current local session belongs to this
+persistent demo environment, not the earlier disposable fixture.
+
+That PDF was declared/uploaded through public HRIS commands, inspected by the real
+worker using the configured private Garage/ClamAV, and published as `READY`, version
+3. Downloaded bytes matched SHA-256
+`02e49d8b995d5e7e442604ce5e48d165c0948f3d63d7317711f1654816e22fad`.
+The authenticated API/worker integration views also confirmed the current runtime
+flags. Retained reports from prior worker processes become stale normally; only the
+current process describes current flags. Real FCM acceptance remains recorded in
+its earlier dedicated fixture, rather than inferred from these configuration rows.
+
+## Verified initial checkpoint
+
+API, worker and Garage were stopped gracefully in that order. The existing
+`tool/recovery_set.py` captured and verified the `hris-dev` sources in isolated
+temporary services, then the source services were restarted. Capture plus isolated
+verification, including the stops, took 7.668s; this excludes application restart
+and is not a production recovery objective.
+
+The private data checkpoint is
+`/home/fajar/.local/state/hris-platform/recovery-data/dev-20261029T093500`; the separate
+key pack is under `recovery-keys/dev-20261029T093500`. Actual verification confirmed
+schema 101, zero failed migrations/invalid constraints, 187 public relations,
+restricted API/worker roles, one decrypted identity envelope and one 734-byte S3
+object. Isolated verification resources were cleaned. A separate private
+`/home/fajar/.config/hris/dev-configuration-checkpoint-2026-10-29` retains matching
+configuration and access records. These are local checkpoints, not off-host backups.
+
+After restart, host and phone API/dashboard checks returned HTTP 200, browser
+operator login/MFA/Overview passed again, the document remained ready with identical
+download bytes, and the complete configuration review passed. Measured evidence is
+in [the sanitized runtime record](measurements/development-runtime-2026-10-29.json).
+
 ## Continue safely
 
-Bootstrap operator access is private in `/home/fajar/.config/hris/dev-access.txt`.
-Provisioning recovery material and browser sessions, if present, are also private
-in that directory. Inspect those deliberately without echoing their contents.
-SMTP remains disabled outside a separately owned local invitation capture; no
-external email provider has been configured. Initial company/person data must be
-fictional. Use public commands with normal authorization, MFA, versions, audit and
-idempotency; do not bypass business policy by inserting accounts or grants in SQL.
+Operator and fictional Firebase tester access are private in
+`/home/fajar/.config/hris/dev-access.txt`. Its operator authenticator material must
+remain available; enrollment is not reset by a restart. The private `dev-*-state.json`
+files retain provisioning IDs/receipts, and `dev-admin-browser.json` is sensitive
+session material. Inspect deliberately without echoing contents or committing them.
 
-Continue account/company provisioning and real human Google exchange, then record
-each measured result here and in the handoff. Leave this persistent stack running;
-disposable acceptance fixture cleanup must target only its own resources.
+The user's Google email is already known privately. Do not ask for it or the FCM
+credential again. When the user has tried Google login, run the private
+`lookup-google-identity.py`; it performs one exact-email lookup, never enumeration.
+Only a confirmed Google provider with verified email can be bound to this employee
+using `bind-dev-firebase.mjs google`, after refreshing operator MFA with
+`provision-dev-admin.mjs`. The binding uses an authenticated public command and
+retains its operation ID. The user then retries Google login. Do not invent a UID,
+set the real user's password, automatically link by email, or drive the phone UI.
+
+Private provisioning scripts are supplementary continuation aids for this existing
+environment, not a general deployment interface. Do not rerun invitation setup
+without its owned capture or regenerate existing keyrings. Leave the persistent
+stack running; disposable fixture cleanup must target only its own resources.

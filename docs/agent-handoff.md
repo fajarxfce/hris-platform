@@ -14,8 +14,17 @@ stack is running at schema 101; API health returned HTTP 200 from the VPS and
 phone through WireGuard. Dashboard build/user service, private Garage/scanner,
 separate database roles and development configuration review passed. The current
 Android signing SHA-1 was registered in Firebase after exact-app verification.
-See [current runtime ownership, private paths and remaining setup](current-development-runtime.md).
-Continue fictional account/company provisioning and human Google sign-in. Leave
+Fictional company/employee provisioning is complete through public workflows:
+operator MFA, captured worker invitation, employee role, independent person link,
+schedule, demo Leave/Expense policies and four approval kinds. The same phone APK
+passed Firebase email/password, company/Home and downloaded-document UI on the
+owned emulator. The PDF passed real storage/scanner/worker publication and identical
+download. A coordinated private recovery checkpoint passed schema/key/object checks;
+host and phone health, browser login and document download passed after restart.
+See [current runtime ownership, private paths and next actions](current-development-runtime.md)
+and [sanitized evidence](measurements/development-runtime-2026-10-29.json).
+Human Google sign-in is still pending; the user's exact email is already known
+privately, and its Firebase lookup still finds no account. Leave
 this persistent stack running; statements below about cleaned fixtures refer to
 the earlier disposable acceptance runs, not this development environment.
 

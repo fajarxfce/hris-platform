@@ -18,7 +18,11 @@ export default defineConfig({
   webServer: [
     {
       command: "python3 ../../tool/dashboard_backend_fixture.py",
-      env: { HRIS_TEST_WITH_WORKER: "1", HRIS_TEST_WITH_STORAGE: "1" },
+      env: {
+        HRIS_TEST_WITH_WORKER: "1",
+        HRIS_TEST_WITH_STORAGE: "1",
+        HRIS_TEST_STORAGE_FAULTS: "1",
+      },
       wait: { stdout: /Browser API fixture ready;/u },
       reuseExistingServer: false,
       timeout: 120_000,

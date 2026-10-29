@@ -502,6 +502,44 @@ application JARs with JDK 21. Docker and Playwright Chromium are required. The
 optional storage fixture creates its own named container, ephemeral credentials,
 loopback-only port and bounded memory/tmpfs; no deployment bucket or data is used.
 CI runs this separately from the existing worker suite. This verifies local real
-S3 execution and access. Interrupted-provider recovery and physical expiry remain
-covered by the earlier controlled-storage/backend tests; production provider
+S3 execution and access. Real storage interruption is now covered below; physical
+expiry retains the earlier controlled-storage/backend tests. Production provider
 acceptance, reference-workload measurement and deployment are separate work.
+
+### Real storage response loss and resumed output
+
+The export fixture now owns an optional loopback proxy in front of its real Garage
+container. It forwards signed requests without changing their destination or
+payload. After arming, the first PUT succeeds normally and the second is consumed
+by Garage before its response is dropped. Further provider requests are refused
+until the test explicitly restores transport. Private command files and bounded
+safe counters expose no provider credential, request header or object path.
+
+The worker retained 500 accepted rows and the uncertain second upload while its
+existing bounded transient retries remained eligible. The owner cancelled that
+run through the browser and waited for `CANCELLED`/`STOPPED`; after transport
+restoration, Resume created attempt two. The test also dropped the committed
+resume response and retried the same operation/input, receiving the same receipt.
+The first accepted upload identity was unchanged, the original expiry remained,
+and the final three parts contained 500/500/201 rows and 399,053 bytes. All 1,201
+identities were unique, all part ranges/digests matched and later source withdrawal
+left the file unchanged. The uncertain provider object remains governed by the
+existing cleanup reservation; this experiment does not measure physical expiry.
+
+The complete actual API/PostgreSQL/worker/Garage/Chromium workflow passed in 20.4
+seconds (45.9 including setup). Nine storage-fixture/proxy regressions passed,
+including lost responses after real socket forwarding, explicit recovery, request/
+control bounds, four-connection capacity and interrupting/joining a blocked
+provider read on shutdown. Buffers are capped at 2 MiB per request/response and
+each handler has a 15-second total transfer deadline. The fixture closes owned
+sockets/threads before removing its provider and private files. All owned services
+and private connection/control files were verified removed after this run.
+
+Architecture, Biome, strict TypeScript and production build passed. No application
+JAR or runtime DI graph changed. Initial fixture runs incorrectly expected a
+transient error to become terminal immediately, then used an ambiguous status
+locator after a successful resume; both were corrected before the complete pass.
+Evidence: [sanitized report](measurements/report-export-storage-recovery-2026-10-28.json),
+`.work/storage-recovery-browser-3.log` and `.work/storage-fault-tool-final.log`.
+The stopped/export screenshots were inspected. CI now runs all nine tooling cases
+before this same export workflow; no hosted CI result is inferred from that change.

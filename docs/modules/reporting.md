@@ -17,9 +17,10 @@ saved filters are implemented. The export lifecycle includes reviewed admission,
 retained snapshots, bounded worker execution, private artifacts, owned history,
 authorized CSV downloads, cancellation/recovery and scheduled retention. Dashboard
 and real API/PostgreSQL/worker/Garage-S3/browser acceptance passed, including exact
-1,201-row multipart output and source/owner authorization. Provider interruption
-and physical expiry currently have controlled-provider backend coverage rather
-than the real S3/browser experiment. See [current export evidence](../report-exports.md#real-private-storage-browser-acceptance).
+1,201-row multipart output and source/owner authorization. Real Garage response
+loss now also passes owner cancellation/resume, retained first-part identity,
+unchanged expiry and exact final output after a lost resume response. Physical
+expiry retains controlled-provider backend coverage. See [current export evidence](../report-exports.md#real-storage-response-loss-and-resumed-output).
 
 ## Implementation and acceptance record
 
@@ -224,6 +225,7 @@ three private parts with exact hashes, unique identities and cross-object ranges
 The historical load is fictional database provisioning plus one API-created request;
 withdrawing that request leaves the file unchanged. Five storage-fixture cleanup
 tests, architecture checks, TypeScript, Biome and production build passed. Local
-services and configuration files were disposed. Provider interruption/physical
-expiry remain covered by controlled backend tests. See
+services and configuration files were disposed. The subsequent real provider
+interruption experiment is recorded in the current summary above; physical expiry
+retains controlled backend tests. See
 [real storage acceptance](../report-exports.md#real-private-storage-browser-acceptance).

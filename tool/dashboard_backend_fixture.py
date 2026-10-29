@@ -55,7 +55,8 @@ def main():
     if with_worker:
         mail = DashboardMailFixture(logs / "mail.json")
     if with_storage:
-        storage = DashboardStorageFixture(root, logs, docker)
+        storage = DashboardStorageFixture(root, logs, docker,
+                                          faults=os.environ.get("HRIS_TEST_STORAGE_FAULTS") == "1")
     database_password = secrets.token_urlsafe(24)
     environment_file.write_text(f"POSTGRES_PASSWORD={database_password}\n")
     initialization = logs / "runtime-role.sql"

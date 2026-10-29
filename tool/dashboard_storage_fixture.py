@@ -7,11 +7,14 @@ import secrets
 import subprocess
 import time
 
+from dashboard_storage_faults import StorageFaultProxy
+
 
 class DashboardStorageFixture:
-    def __init__(self, root: Path, directory: Path, docker: list[str]):
+    def __init__(self, root: Path, directory: Path, docker: list[str], *, faults=False):
         self.docker = docker
         self.container = None
+        self.faults = None
         self.environment_file = directory / "storage.env"
         self.metadata_file = directory / "storage.json"
         self.bucket = "hris-browser-exports"
@@ -54,6 +57,9 @@ class DashboardStorageFixture:
             if not re.fullmatch(r"127\.0\.0\.1:\d+", binding):
                 raise RuntimeError("Unexpected storage fixture binding")
             self.endpoint = f"http://{binding}"
+            if faults:
+                self.faults = StorageFaultProxy(self.endpoint, directory)
+                self.endpoint = self.faults.endpoint
             self.environment = {
                 "HRIS_STORAGE_ENABLED": "true", "HRIS_STORAGE_ENDPOINT": self.endpoint,
                 "HRIS_STORAGE_REGION": "garage", "HRIS_STORAGE_BUCKET": self.bucket,
@@ -71,6 +77,14 @@ class DashboardStorageFixture:
                               timeout=60, check=True).stdout.strip()
 
     def close(self):
+        try:
+            if self.faults is not None:
+                self.faults.close()
+                self.faults = None
+        finally:
+            self.close_storage()
+
+    def close_storage(self):
         try:
             if self.container is not None:
                 removed = subprocess.run(self.docker + ["rm", "-f", self.container],

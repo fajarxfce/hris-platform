@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { type BrowserContext, expect, type Page } from "@playwright/test";
 import { createLeaveScenario } from "../../integration/fixtures/leave-scenario";
 import { reportExportDto } from "../../src/features/reporting/data/models/report-export-dto";
+import { recoverStorageInterruptedExport, setStorageFault } from "./report-export-storage-recovery";
 
 /** One API-created source request plus bounded fictional cancelled history exercise real capture SQL. */
 export async function acceptMultipartReportExport(
@@ -57,6 +58,7 @@ export async function acceptMultipartReportExport(
   expect((await live.json()).totals).toEqual({ requests: 1201, employments: 1, days: "600.5" });
   await reader.getByRole("link", { name: "Export applied filters", exact: true }).click();
   await reader.getByLabel("Contents", { exact: true }).selectOption("DETAIL");
+  await setStorageFault("drop-second-put");
   await reader.getByRole("button", { name: "Create CSV export", exact: true }).click();
   const link = reader.getByRole("link", { name: "View export", exact: true });
   await expect(link).toBeVisible();
@@ -65,6 +67,7 @@ export async function acceptMultipartReportExport(
   if (!id) throw new Error("Missing detail export");
   await link.click();
   const resource = `${base}/reports/exports/${id}`;
+  const recovery = await recoverStorageInterruptedExport(reader, resource, company, id, sql);
   await expect
     .poll(
       async () => {
@@ -104,10 +107,11 @@ export async function acceptMultipartReportExport(
   expect(ids).toContain(source.request);
   const parts = JSON.parse(
     sql(
-      `SELECT json_agg(json_build_object('offset',u.byte_offset,'bytes',u.byte_count,'rows',u.row_count,'sha',u.sha256) ORDER BY p.part_number) FROM report_export_parts p JOIN report_export_uploads u ON (u.company_id,u.account_id,u.export_id,u.id)=(p.company_id,p.account_id,p.export_id,p.upload_id) WHERE p.company_id='${company}' AND p.export_id='${id}'`,
+      `SELECT json_agg(json_build_object('upload',p.upload_id,'offset',u.byte_offset,'bytes',u.byte_count,'rows',u.row_count,'sha',u.sha256) ORDER BY p.part_number) FROM report_export_parts p JOIN report_export_uploads u ON (u.company_id,u.account_id,u.export_id,u.id)=(p.company_id,p.account_id,p.export_id,p.upload_id) WHERE p.company_id='${company}' AND p.export_id='${id}'`,
     ),
-  ) as { offset: number; bytes: number; rows: number; sha: string }[];
+  ) as { upload: string; offset: number; bytes: number; rows: number; sha: string }[];
   expect(parts).toHaveLength(3);
+  expect(parts[0]?.upload).toBe(recovery.firstPart);
   expect(parts.map((part) => part.rows)).toEqual([500, 500, 201]);
   for (const part of parts)
     expect(
@@ -133,6 +137,23 @@ export async function acceptMultipartReportExport(
   const retained = await reader.request.get(`${resource}/content`);
   expect(retained.status()).toBe(200);
   expect(await retained.body()).toEqual(content);
-  await expect(reader.getByRole("status")).toContainText("The file has been sent to your browser.");
+  await expect(
+    reader.getByRole("status").filter({ hasText: "The file has been sent to your browser." }),
+  ).toBeVisible();
   await reader.screenshot({ path: "../../.work/report-export-real-multipart.png", fullPage: true });
+  await writeFile(
+    "../../.work/report-export-storage-recovery.json",
+    JSON.stringify({
+      droppedProviderResponses: recovery.droppedResponse,
+      resumedAttempt: recovery.resumedAttempt,
+      retainedFirstPart: true,
+      rows: ids.length,
+      uniqueRows: new Set(ids).size,
+      parts: parts.map(({ rows, bytes, sha }) => ({ rows, bytes, sha })),
+      bytes: content.length,
+      originalExpiryRetained: true,
+      resumeReceiptReplayed: true,
+    }),
+    { mode: 0o600 },
+  );
 }

@@ -11,11 +11,11 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
-| `hris-platform` | `feat/firebase-auth` | `e806caed` — worker reports; deployment runbook `d765f155`, document workload `ed7a760e` |
+| `hris-platform` | `feat/firebase-auth` | Real storage interruption below; worker reports `e806caed`, handoff reconciliation `bced70b6` |
 | `hris-mobile` | `feat/native-push` | `9dbaf730` — tracked handoff; acceptance `60456c48` |
 | `compose-fluent-starter` | `fix/push-token-lifecycle` | `1606765` — tracked handoff; validated foundation `a16325e` |
 
-The latest implementation contains actual worker reports and schema-98 acceptance.
+The latest acceptance contains actual storage response-loss recovery.
 Inspect `git status`, `git log` and
 the upstream before continuing. Mobile and Starter were clean at this update.
 
@@ -42,7 +42,40 @@ summaries distinguish completed authoring/export/worker work from historical
 implementation stages, so an old "planned" paragraph cannot silently become the
 next task. These documentation changes require no application test rerun.
 
-## Current checkpoint: running worker reports and schema-98 recovery
+## Current checkpoint: real export storage interruption
+
+The [export workflow](report-exports.md#real-storage-response-loss-and-resumed-output)
+now runs through an owned bounded loopback proxy in front of real Garage. The
+second successful PUT loses its response after provider storage; further traffic
+is refused until an explicit restoration. The worker retains the accepted first
+500 rows. Because transient errors retain bounded retries, the owner explicitly
+cancels and waits for a terminal job before resuming. Attempt two keeps the first
+upload and original expiry. Its committed resume response is also lost and the
+same operation/input recovers the same receipt. The final CSV contains precisely
+1,201 unique rows, three parts (500/500/201) and 399,053 bytes with matching digests.
+
+The full real API/PostgreSQL/worker/Garage/Chromium case passed in 20.4 seconds
+(45.9 including setup); nine storage-fixture/proxy tests, architecture, Biome,
+TypeScript and production build passed. The initial expectation that a transient
+failure immediately ends the job and an ambiguous browser status selector were
+corrected before success. All owned services and private connection/control files
+were removed; screenshots were inspected. No application JAR or DI graph changed.
+Evidence: [tracked report](measurements/report-export-storage-recovery-2026-10-28.json),
+`.work/storage-recovery-browser-3.log`, `.work/storage-fault-tool-final.log`.
+
+Run `npm run test:integration:exports` in `apps/dashboard` with JDK 21/Docker and
+both current JARs. Its config enables the optional fault boundary. CI runs the
+same case and all nine storage tooling tests. This does not claim physical expiry
+or a hosted CI result; uncertain objects retain their existing cleanup reservations.
+
+Next active work: native Pending actions acceptance for a command whose server
+write committed but response was lost, across offline process restoration and
+exact-operation recovery. The dedicated emulator and a loopback dev APK are being
+prepared; inspect `.work/pending-command-assembly.log` and emulator status before
+starting another fixture. This HRIS-specific acceptance requires no Starter port.
+Continue the PRD after each commit; the user's instruction is to keep running.
+
+## Previous checkpoint: running worker reports and schema-98 recovery — `e806caed`
 
 [Integration reports](integrations.md#running-worker-observations) now show four
 actual worker-bound flags (SMTP/FCM/storage/scanner), process UUID and first/last

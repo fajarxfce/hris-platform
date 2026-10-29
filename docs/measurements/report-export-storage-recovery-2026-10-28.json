@@ -1,0 +1,31 @@
+{
+  "droppedProviderResponses": 1,
+  "resumedAttempt": 2,
+  "retainedFirstPart": true,
+  "rows": 1201,
+  "uniqueRows": 1201,
+  "parts": [
+    {
+      "rows": 500,
+      "bytes": 166282,
+      "sha": "cdd2ed0cae4c41a079c5c81a038ff90636ea1e89c3e2b0f3c49218b6a7dfdbfb"
+    },
+    {
+      "rows": 500,
+      "bytes": 166015,
+      "sha": "4abde8855058460544f8af41a1eee00061b979d07ddf938a7169e8f8a73f954a"
+    },
+    {
+      "rows": 201,
+      "bytes": 66756,
+      "sha": "c3054005b98db72d44bb91b29564c1986bf8b08cb89320651875fb47255cd2d4"
+    }
+  ],
+  "bytes": 399053,
+  "originalExpiryRetained": true,
+  "resumeReceiptReplayed": true,
+  "fixture": "real API/PostgreSQL/worker/Garage with owned loopback response interruption",
+  "workflowSeconds": 20.4,
+  "includingSetupSeconds": 45.9,
+  "temporaryResourcesRemoved": true
+}

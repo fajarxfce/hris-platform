@@ -5,6 +5,18 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+The [real export storage interruption](report-exports.md#real-storage-response-loss-and-resumed-output)
+workflow now drops a response after Garage stores the second PUT, preserves the
+first 500 accepted rows, cancels the unavailable run and resumes attempt two.
+Losing and replaying the resume response retains the same receipt. Final output
+has exactly 1,201 unique rows, three parts and 399,053 bytes; the first upload and
+original expiry are retained. Actual API/PostgreSQL/worker/Garage/Chromium passed
+in 20.4 seconds (45.9 with setup), alongside nine bounded fixture/proxy tests,
+architecture, Biome, TypeScript and production build. Owned services and private
+connection/control files were removed. The sanitized report and corrected initial
+fixture assumptions are retained in the contract. Physical expiry remains separate
+controlled-provider coverage; application JARs and DI did not change.
+
 All three repositories now have a tracked `docs/agent-handoff.md` linked from
 `AGENTS.md` and `README.md`. Mobile `9dbaf730` and Starter `1606765` were pushed and
 remote heads verified; their notes identify accepted native work, completed

@@ -21,6 +21,39 @@ import tools.jackson.databind.ObjectMapper
 class PayrollConfiguration {
 
     @Bean
+    fun payrollComparisonDataSource(sql: DSLContext): PayrollComparisonDataSource =
+        PostgresPayrollComparisonDataSource(sql)
+
+    @Bean
+    fun payrollComparisonRepository(
+        source: PayrollComparisonDataSource
+    ): PayrollComparisonRepository = StoredPayrollComparisonRepository(source)
+
+    @Bean
+    fun getPayrollRunComparison(
+        runs: PayrollRunRepository,
+        comparisons: PayrollComparisonRepository,
+        policies: PayrollPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetPayrollRunComparison(
+            runs,
+            comparisons,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
     fun getPayrollPaymentRecoveryReview(
         payments: PayrollPaymentRepository,
         people: PeopleRepository,

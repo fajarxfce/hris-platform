@@ -42,7 +42,7 @@ summaries distinguish completed authoring/export/worker work from historical
 implementation stages, so an old "planned" paragraph cannot silently become the
 next task. These documentation changes require no application test rerun.
 
-## Active work: elapsed retention and next PRD gaps
+## Active work: elapsed retention and payroll comparison
 
 The [elapsed-time export acceptance](export-retention-acceptance.md) is running in
 the original `/home/fajar/hris/hris-platform` checkout at compiled commit
@@ -91,12 +91,45 @@ Commands and supplementary logs in the worktree:
 - `python3 tool/check_recovery_set.py` → `.work/push-delivery-recovery-real.log`.
 - [Tracked measurements](measurements/announcement-delivery-2026-10-29.json) retain sanitized results; local logs are supplementary.
 
-Next independent PRD reconciliation found **payroll period comparison** listed in
-`docs/modules/payroll.md`, but current comparison code appears limited to amendment
-before/after monthly amounts. Confirm whether run-to-run period comparison exists
-before implementing the missing read/dashboard; preserve decimal arithmetic and
-immutable payroll evidence. This is independent of the still-missing Firebase
-server credential and physical/iOS acceptance. Do not declare the PRD complete.
+[Payroll period comparison](payroll-period-comparison.md) is now implemented in
+this same worktree on `feat/payroll-period-comparison`, based on pushed
+`409abad4` (`feat/push-delivery-observations`). Merge this descendant branch after
+the original elapsed test ends so both features arrive together, preserving that
+test's final measured result. No migration beyond V101 or Mobile/Starter port is
+needed. Both company payroll runs must have complete successful original results.
+One bounded SQL snapshot returns exact whole-run totals, employment matching and
+cursor pages. Current/original permissions, policy/resource guards and pre/post
+MFA protect disclosure. The UI clears obsolete amounts and owns explicit reads.
+
+Dashboard full check passed 3,997 tests in 352 files (56.38s), TypeScript,
+architecture and Biome (two existing CSS specificity warnings). Production build
+and both inspected browser layouts passed. Exact outcomes are retained in
+[measurements](measurements/payroll-comparison-2026-10-29.json).
+
+Payroll validation: 119 API, 94 worker and 12 data tests passed in 3m52s; the elapsed
+manual worker case is separately running, not passed by that suite. Architecture
+and Kotlin formatting passed in 21s. Twenty-three distinct Chromium cases passed
+across runs, including 50/1 employee pagination and narrow Indonesian layout.
+Actual five-actor January approval/publication and February calculation/browser
+acceptance passed in 18.5s (42.3s including setup), proving retained tax continuity,
+exact deltas, no comparison writes and live grant withdrawal. Owned fixture
+sessions/services/database were removed. See the tracked
+[measurements](measurements/payroll-comparison-2026-10-29.json).
+
+Commands in the worktree:
+- `./gradlew --no-daemon format :modules:payroll:data:test :apps:server:test --tests '*PayrollRun*Test' --tests '*ApiContractHttpTest' :apps:worker:test :apps:server:bootJar :apps:worker:bootJar` → `.work/payroll-comparison-backend.log`.
+- `npm run check` in `apps/dashboard` → `.work/payroll-comparison-dashboard-final.log`.
+- `npx playwright test tests/payroll-comparison.spec.ts tests/payroll-calculations.spec.ts tests/payroll-reviews.spec.ts`; final comparison-only run → `.work/payroll-comparison-browser-complete.log`.
+- `npm run test:integration:worker -- payroll-comparison.spec.ts` → `.work/payroll-comparison-real-browser-visual.log`.
+- `./gradlew --no-daemon architectureCheck formatCheck` → `.work/payroll-comparison-architecture.log`.
+
+Continue independent PRD reconciliation after every push. Mobile's `local-first.md`
+"Next increments" still calls the shared pending-action summary and document feeds
+unfinished despite their later implementation/acceptance. Trace their actual
+registration and draft/read coverage, then update stale guidance before choosing
+another capability. Firebase server credentials, Google token exchange and
+physical/iOS cases remain separate; do not repeat the pending credential question.
+Do not declare the PRD complete.
 
 ## Current checkpoint: native upload and inspection review
 

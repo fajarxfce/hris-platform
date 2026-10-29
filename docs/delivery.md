@@ -5,6 +5,16 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+[Payroll period comparison](payroll-period-comparison.md) now compares two
+successful original runs with exact decimal totals, employment matching and
+bounded employee pages. Backend validation passed 119 API, 94 worker and 12 data
+tests; the separately running elapsed-retention case is the one skipped worker
+test. Twenty-three distinct Chromium scenarios passed across focused runs.
+Actual public January preparation, independent staged approval/publication and
+February worker calculation passed in 18.5s (42.3s including setup), including
+retained tax continuity, no comparison writes and live access withdrawal.
+This administrative capability requires no Mobile/Starter port.
+
 [Android upload/review recovery](native-upload-acceptance.md) now passes real
 API/PostgreSQL/worker/Garage acceptance. A committed one-MiB chunk response was lost;
 Android retained the upload through offline restart and replayed the exact command.

@@ -26,6 +26,7 @@ import type { LoadPayrollAmendmentReviewAction } from "../../domain/usecases/loa
 import type { LoadPayrollAmendmentReviewSubmission } from "../../domain/usecases/load-payroll-amendment-review-submission";
 import type { LoadPayrollAmendmentReviews } from "../../domain/usecases/load-payroll-amendment-reviews";
 import type { LoadPayrollCalculations } from "../../domain/usecases/load-payroll-calculations";
+import type { LoadPayrollComparisonContext } from "../../domain/usecases/load-payroll-comparison-context";
 import type { LoadPayrollFinalization } from "../../domain/usecases/load-payroll-finalization";
 import type { LoadPayrollFinalizations } from "../../domain/usecases/load-payroll-finalizations";
 import type { LoadPayrollInputReview } from "../../domain/usecases/load-payroll-input-review";
@@ -43,6 +44,7 @@ import type { LoadPayrollReviewAction } from "../../domain/usecases/load-payroll
 import type { LoadPayrollReviewSubmission } from "../../domain/usecases/load-payroll-review-submission";
 import type { LoadPayrollReviews } from "../../domain/usecases/load-payroll-reviews";
 import type { LoadPayrollRun } from "../../domain/usecases/load-payroll-run";
+import type { LoadPayrollRunComparison } from "../../domain/usecases/load-payroll-run-comparison";
 import type { LoadPayrollRunEmployee } from "../../domain/usecases/load-payroll-run-employee";
 import type { LoadTaxOpeningReview } from "../../domain/usecases/load-tax-opening-review";
 import type { LoadTaxOpeningRevision } from "../../domain/usecases/load-tax-opening-revision";
@@ -80,6 +82,8 @@ import type { WithdrawPayrollAmendmentReview } from "../../domain/usecases/withd
 import type { WithdrawPayrollReview } from "../../domain/usecases/withdraw-payroll-review";
 
 export type PayrollUseCases = Readonly<{
+  loadComparisonContext: Pick<LoadPayrollComparisonContext, "execute">;
+  loadComparison: Pick<LoadPayrollRunComparison, "execute">;
   loadAmendmentPublications: Pick<LoadPayrollAmendmentPublications, "execute">;
   loadAmendmentPublication: Pick<LoadPayrollAmendmentPublication, "execute">;
   reviewAmendmentPublication: Pick<ReviewPayrollAmendmentPublication, "execute">;

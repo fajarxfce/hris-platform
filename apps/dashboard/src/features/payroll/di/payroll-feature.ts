@@ -6,6 +6,7 @@ import { HttpPayrollAmendmentPublicationDataSource } from "../data/datasources/h
 import { HttpPayrollAmendmentReviewDataSource } from "../data/datasources/http-payroll-amendment-review-data-source";
 import { HttpPayrollAmendmentSourceDataSource } from "../data/datasources/http-payroll-amendment-source-data-source";
 import { HttpPayrollCalculationDataSource } from "../data/datasources/http-payroll-calculation-data-source";
+import { HttpPayrollComparisonDataSource } from "../data/datasources/http-payroll-comparison-data-source";
 import { HttpPayrollFinalizationDataSource } from "../data/datasources/http-payroll-finalization-data-source";
 import { HttpPayrollInputDataSource } from "../data/datasources/http-payroll-input-data-source";
 import { HttpPayrollPaymentDataSource } from "../data/datasources/http-payroll-payment-data-source";
@@ -21,6 +22,7 @@ import { RemotePayrollAmendmentRepository } from "../data/repositories/remote-pa
 import { RemotePayrollAmendmentReviewRepository } from "../data/repositories/remote-payroll-amendment-review-repository";
 import { RemotePayrollAmendmentSourceRepository } from "../data/repositories/remote-payroll-amendment-source-repository";
 import { RemotePayrollCalculationRepository } from "../data/repositories/remote-payroll-calculation-repository";
+import { RemotePayrollComparisonRepository } from "../data/repositories/remote-payroll-comparison-repository";
 import { RemotePayrollFinalizationRepository } from "../data/repositories/remote-payroll-finalization-repository";
 import { RemotePayrollInputRepository } from "../data/repositories/remote-payroll-input-repository";
 import { RemotePayrollPaymentRecoveryRepository } from "../data/repositories/remote-payroll-payment-recovery-repository";
@@ -61,6 +63,7 @@ import { LoadPayrollAmendmentReviewAction } from "../domain/usecases/load-payrol
 import { LoadPayrollAmendmentReviewSubmission } from "../domain/usecases/load-payroll-amendment-review-submission";
 import { LoadPayrollAmendmentReviews } from "../domain/usecases/load-payroll-amendment-reviews";
 import { LoadPayrollCalculations } from "../domain/usecases/load-payroll-calculations";
+import { LoadPayrollComparisonContext } from "../domain/usecases/load-payroll-comparison-context";
 import { LoadPayrollFinalization } from "../domain/usecases/load-payroll-finalization";
 import { LoadPayrollFinalizations } from "../domain/usecases/load-payroll-finalizations";
 import { LoadPayrollInputReview } from "../domain/usecases/load-payroll-input-review";
@@ -78,6 +81,7 @@ import { LoadPayrollReviewAction } from "../domain/usecases/load-payroll-review-
 import { LoadPayrollReviewSubmission } from "../domain/usecases/load-payroll-review-submission";
 import { LoadPayrollReviews } from "../domain/usecases/load-payroll-reviews";
 import { LoadPayrollRun } from "../domain/usecases/load-payroll-run";
+import { LoadPayrollRunComparison } from "../domain/usecases/load-payroll-run-comparison";
 import { LoadPayrollRunEmployee } from "../domain/usecases/load-payroll-run-employee";
 import { LoadTaxOpeningReview } from "../domain/usecases/load-tax-opening-review";
 import { LoadTaxOpeningRevision } from "../domain/usecases/load-tax-opening-revision";
@@ -210,6 +214,10 @@ export function createPayrollFeature(
 
     loadCalculations: new LoadPayrollCalculations(calculations),
     reviewCalculation: new ReviewPayrollCalculation(calculations),
+    loadComparisonContext: new LoadPayrollComparisonContext(calculations, periods),
+    loadComparison: new LoadPayrollRunComparison(
+      new RemotePayrollComparisonRepository(new HttpPayrollComparisonDataSource(http)),
+    ),
     loadRun: new LoadPayrollRun(calculations),
     loadRunEmployee: new LoadPayrollRunEmployee(calculations),
     reviewRunRecovery: new ReviewPayrollRunRecovery(calculations),

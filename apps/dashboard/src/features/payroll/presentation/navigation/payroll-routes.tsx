@@ -22,6 +22,7 @@ import { PayrollAmendmentSourcesScreen } from "../bindings/payroll-amendment-sou
 import { PayrollAmendmentsScreen } from "../bindings/payroll-amendments-screen";
 import { PayrollCalculationStartScreen } from "../bindings/payroll-calculation-start-screen";
 import { PayrollCalculationsScreen } from "../bindings/payroll-calculations-screen";
+import { PayrollComparisonScreen } from "../bindings/payroll-comparison-screen";
 import { PayrollFinalizationScreen } from "../bindings/payroll-finalization-screen";
 import { PayrollFinalizationStartScreen } from "../bindings/payroll-finalization-start-screen";
 import { PayrollFinalizationsScreen } from "../bindings/payroll-finalizations-screen";
@@ -174,6 +175,7 @@ export function PayrollRoutes(props: PayrollScreenProps) {
         path="periods/:periodId/calculate"
         element={<PayrollCalculationStartScreen {...props} />}
       />
+      <Route path="runs/:runId/comparison" element={<PayrollComparisonScreen {...props} />} />
       <Route path="runs/:runId" element={<PayrollRunScreen {...props} />} />
       <Route
         path="runs/:runId/employees/:employeeId"

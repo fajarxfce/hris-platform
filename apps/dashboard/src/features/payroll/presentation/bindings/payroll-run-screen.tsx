@@ -84,6 +84,14 @@ function PayrollRunBinding(
           ? `/administration/jobs?${new URLSearchParams({ company: access.companyId, job: state.details.job.jobId })}`
           : null
       }
+      comparisonTo={
+        state.details &&
+        ["CALCULATED", "FINALIZED"].includes(state.details.run.status) &&
+        state.details.run.succeeded === state.details.run.totalEmployees &&
+        state.details.run.failed === 0
+          ? `/payroll/runs/${encodeURIComponent(id)}/comparison?company=${access.companyId}`
+          : null
+      }
       finalizationsTo={state.details ? payrollFinalizationsPath(access.companyId, id) : null}
       reviewsTo={state.details ? payrollReviewsPath(access.companyId, id) : null}
       resumeTo={

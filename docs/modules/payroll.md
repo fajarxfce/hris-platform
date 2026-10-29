@@ -16,6 +16,14 @@ Sources: https://jdih.kemenkeu.go.id/dok/pp-58-tahun-2023 ; https://jdih.kemenke
 
 ## Implementation status
 
+[Period comparison](../payroll-period-comparison.md) now has a scoped API and
+localized dashboard for two successful original runs from different earnings
+months. It retains both employment labels, exact decimal totals/differences,
+added/removed employees, changed-only filtering and bounded cursor pages.
+Actual January publication and February calculation/browser acceptance preserve
+retained tax continuity and enforce live access removal. Later amendments and
+payment activity remain separately reviewable.
+
 Effective company payroll policy, independently managed compensation, immutable history, scoped reads, optimistic updates, and replay are implemented. The pure calculation library includes the reviewed TER tables, resident final-period reconciliation, domestic PPh 26, bounded gross-up/net treatment, separately configured social insurance contributions, standard monthly-wage overtime, explicit-unit proration, and THR service/amount rules. Optional reviewed pay-basis settings are retained in compensation history. Pure monthly composition combines those rules with reviewed workforce/leave inputs and retains line-level results. See [configuration and rules](../payroll-rules.md) for exact inputs, sources, rounding, access, and bounds.
 
 Versioned opening tax history, independent verification, immutable evidence, and bounded scoped reads are implemented.

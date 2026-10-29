@@ -6,16 +6,17 @@ release or proof that the remaining PRD acceptance has passed.
 
 ## Latest authorized Android delivery
 
-The normal dev APK from Mobile application `d36a1bc9`, built at `0fc16ce4`, was
-installed successfully on the connected phone using `--install-only`. It retains
-the private WireGuard API; binary inspection excluded the fixture loopback endpoint
-and fictional app-link host. The APK is 32,872,797 bytes, SHA-256
-`85ef887b4904107482354e9d0ab40b51e2fad7b786c3112f3a24334b078dbde4`.
-The first-install time was unchanged and no phone UI was driven. Prior actual
-Google → HRIS → Home acceptance below used `678783b3`; an install success is not
-a new sign-in observation. [Delivery evidence](measurements/android-update-2026-10-29.json)
-retains that distinction. The persistent API/dashboard still returned HTTP 200
-after cleaning the separate HTTPS acceptance fixture.
+The final dev APK from Mobile application `72341ef6` was installed successfully
+on the connected phone with `--install-only` after Linux/Android CI passed. It
+retains the private WireGuard API; binary inspection excluded the fixture endpoint
+and fictional app-link host from both runtime code and the Android manifest. The
+registered signing certificate matches. The APK is 32,872,857 bytes, SHA-256
+`5b3754d5097eb0a535d1a98cff5bc37e508ea12a008eec897895d9289797fe4d`.
+The first-install time was unchanged and no phone UI was driven. Actual Google →
+HRIS → Home acceptance below used `678783b3`; installation is not a new sign-in
+observation. [Delivery evidence](measurements/android-update-2026-10-29.json)
+retains that distinction and the preceding `d36a1bc9` update. The persistent API
+and dashboard still returned HTTP 200. Preserve this running private stack.
 
 ## Ownership and persistence
 

@@ -77,9 +77,16 @@ test("committed mutation loss, private frozen replay, concurrent admission and s
     assert.equal(writes, 15);
     assert.equal(proxy.snapshot().mutations.length, 15);
     await proxy.close();
+    proxy = await pushProxy(join(directory, "delivery"), false);
+    assert.equal(await save(), 200);
+    assert.equal(await save(), 200);
+    assert.equal(proxy.snapshot().interrupted, false);
+    assert.equal(proxy.snapshot().mutations.length, 2);
+    assert.equal(JSON.stringify(proxy.snapshot()).includes("PRIVATE_PROVIDER_TOKEN"), false);
+    await proxy.close();
     proxy = await pushProxy(join(directory, "bounds"));
     await assert.rejects(save("x".repeat(8193)));
-    assert.equal(writes, 15);
+    assert.equal(writes, 17);
     await proxy.close();
     proxy = await pushProxy(join(directory, "cleanup"));
     hold = true;

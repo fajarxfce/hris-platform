@@ -8,6 +8,21 @@ preserves earlier work; its old next-step statements are not the active queue.
 
 ## Current result and continuation
 
+The user supplied the Firebase service-account path. It is installed privately at
+`/home/fajar/.config/hris/fcm-service-account.json` (directory 700, file 600), outside
+Git. **The sender credential question is resolved; do not ask for it again.**
+[Actual FCM acceptance](native-fcm-acceptance.md) now passed on Android 35 with
+Mobile `678783b3` and Platform runtime `b7f42070` / schema 101: two real publications,
+two observed generic OS notifications (foreground/background), correct notification
+navigation, unchanged unread/unacknowledged version-zero Inbox rows and no native
+company mutation across 55 requests. Disable/logout removed the server token/hash.
+Fixture 6.2m/6.6m with setup; [measurements](measurements/native-fcm-2026-10-29.json)
+retain the two preceding orchestration/observer timeouts and exact proof. Five new
+configuration tests, 12 related fixture checks, seven proxy regressions, TypeScript,
+Biome, build and architecture passed locally. All owned resources are cleaned.
+This increment adds an opt-in fixture, not a deployment or application change;
+there is no new generic Starter port. Google exchange and iOS/physical cases remain.
+
 Corrected full Verify [40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608)
 passed all ten jobs at `9345c19bad4a219ecdb9ac247f944b2959c4642a`. All four backend and all
 four dashboard shards passed. Downloaded reports confirm 2,731 disjoint API tests,
@@ -33,8 +48,9 @@ its four local Chromium cases and the corrected full dashboard matrix passed.
 
 The final run used owned temporary ref `ci/closing-report-40820005213` so the
 previous recovery run could finish without cancellation. That ref was removed
-after verification; the tested commit remains on `feat/firebase-auth`. Newer commits
-change documentation only. No PR, release or live deployment was created.
+after verification; the tested commit remains on `feat/firebase-auth`. The newer
+FCM acceptance fixture has separate local proof above. No PR, release or live
+deployment was created.
 
 Mobile's original full CI passed Linux/Android, Web and Windows but Apple cold
 compilation exceeded its combined deadline. Workflow correction `451a2c4d` passed
@@ -51,7 +67,7 @@ Its hosted CI and previous native recovery used earlier application `02743a9f`.
 
 | Repository | Working branch | Accepted source boundary |
 | --- | --- | --- |
-| `hris-platform` | `feat/firebase-auth` | Runtime integration `b7f42070` / schema 101; later acceptance/CI corrections through `9345c19b` |
+| `hris-platform` | `feat/firebase-auth` | Runtime integration `b7f42070` / schema 101; full CI `9345c19b`; later real-FCM fixture accepted locally |
 | `hris-mobile` | `feat/native-push` | Application `678783b3`; Apple workflow `451a2c4d` |
 | `compose-fluent-starter` | `fix/push-token-lifecycle` | Application foundation `9a13791`; validated CI port `1817e45` |
 
@@ -104,7 +120,6 @@ and [PRD status](prd-status.md#external-acceptance-still-required) retain the sc
 
 | Work | Required input and acceptance |
 | --- | --- |
-| Real FCM message/scoped hint | Server credential for `cmp-fajar`; actual SDK registration/recovery/retirement already passed. The credential-path question is pending. Do not repeat it or rescan without new context. |
 | Google authentication exchange | Eligible real Google sign-in with correct Android OAuth/SHA setup. Email/password through Firebase and HRIS/MFA passed; Google chooser/Back is not token-exchange evidence. |
 | iOS provider and physical links | iOS Firebase config, APNs/device setup and deployed HTTPS association endpoints, then actual scoped push/auth/link acceptance. |
 | Physical location and deployment | Authorized device/target environment, real provider configuration and target-specific execution. Emulator/no-location review and isolated recovery are separate evidence. |
@@ -123,9 +138,11 @@ The public Google web client ID is
 
 Actual Firebase email/password → HRIS session/MFA/company/logout passed; the temporary
 provider user was removed. Actual SDK FCM token issuance and HRIS device registration
-also passed. Public Android configuration is not a server sender credential. The
-pending path-only request is for that server credential; no private key belongs
-in chat or Git. Provider/device results must be recorded only after actual execution.
+also passed. The supplied server credential now passed real foreground/background
+FCM delivery and notification navigation on the owned emulator. Public Android
+configuration remains separate from the sender credential; no private key belongs
+in chat or Git. Scope replacement/duplicate/revoked hints retain their separate
+automated coverage; this actual provider case used the correct selected account/company.
 
 ## Commands and environment
 

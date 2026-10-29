@@ -119,7 +119,10 @@ explicit retirement and sign-out. Mobile's expiry-precision and absent-family
 cleanup fixes passed 1,840 desktop/UI and 113 identity browser tests. The independent
 server verified one registration, two identical saves and final version 1 without
 stored token material across 51 requests. No company mutation occurred. FCM message
-sending and scoped provider hints remain separate from this registration proof.
+sending and scoped provider hints have [separate actual Android proof](../native-fcm-acceptance.md):
+two foreground/background notifications, correct selected-company navigation,
+unchanged Inbox read/ack state and complete retirement, using the supplied server
+credential. The source application required no change for this acceptance.
 
 ## Administrative push delivery
 

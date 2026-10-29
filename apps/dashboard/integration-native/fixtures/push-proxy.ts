@@ -7,8 +7,8 @@ export function pushFixtureJson(path: string, value: unknown) {
   renameSync(`${path}.tmp`, path);
 }
 
-/** Owns fixed loopback forwarding and one dropped committed registration response. */
-export async function pushProxy(prefix: string) {
+/** Owns fixed loopback forwarding; registration response loss defaults to enabled. */
+export async function pushProxy(prefix: string, dropFirstRegistration = true) {
   let count = 0;
   let admissions = 0;
   let interrupted = false;
@@ -87,7 +87,12 @@ export async function pushProxy(prefix: string) {
             body: digest,
             status: response.statusCode ?? 502,
           });
-          if (!interrupted && incoming.method === "PUT" && response.statusCode === 200) {
+          if (
+            dropFirstRegistration &&
+            !interrupted &&
+            incoming.method === "PUT" &&
+            response.statusCode === 200
+          ) {
             interrupted = true;
             publish();
             outgoing.destroy();

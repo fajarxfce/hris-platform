@@ -4,6 +4,12 @@
 
 ## Provider configuration
 
+[Actual Android acceptance](native-fcm-acceptance.md) now verifies real FCM
+foreground/background delivery and notification navigation for `cmp-fajar`. The
+supplied service account stays private outside Git; its location, opt-in fixture
+command, observed timing and cleanup are documented there. This does not enable
+the sender in a deployed environment.
+
 The transport is disabled by default. These settings belong to the process that sends notifications:
 
 | Variable | Meaning |

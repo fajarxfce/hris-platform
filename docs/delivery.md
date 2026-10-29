@@ -31,6 +31,15 @@ retain the original failures and successful artifact acceptance.
 
 ## Status
 
+[Actual Android FCM acceptance](native-fcm-acceptance.md) subsequently passed with
+the supplied server credential: two real messages, foreground/background OS
+notifications, correct notification navigation and unchanged unread/unacknowledged
+Inbox rows. There were 55 native requests and no company mutation; disable/logout
+removed the server token/hash. The owned fixture passed in 6.2m/6.6m with setup,
+and all resources were cleaned. Its local checks and two earlier timeouts are in
+[measurements](measurements/native-fcm-2026-10-29.json), separate from the full CI
+below. No production activation or Mobile/Starter application change was made.
+
 Corrected full [Verify 40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608)
 passed all ten jobs at `9345c19b`. Downloaded reports confirm 2,731 disjoint API
 cases, 686 shared module tests, 94 worker passes and one separately accepted manual

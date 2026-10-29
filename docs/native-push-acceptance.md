@@ -4,7 +4,8 @@ The [Mobile registration flow](https://github.com/fajarxfce/hris-mobile/blob/fea
 has actual Android/Firebase SDK/API/PostgreSQL acceptance for token issuance,
 registration, response loss, offline process restart and retirement. The worker's
 FCM sender is disabled in this fixture; message delivery and scoped hint behavior
-are separate acceptance, requiring the server credential. No Firebase Auth user
+have [separate actual acceptance](native-fcm-acceptance.md) using the supplied
+server credential. No Firebase Auth user
 or Google account login is created by this case.
 
 ## Owned fixture
@@ -125,6 +126,7 @@ not counted as a full pass. Supplementary logs retain it separately as
 `.work/push-native-initial-fixture.log`. Final evidence is
 `.work/push-native-fixture.log`, `.work/push-native-server-result.json`,
 `.work/push-native-proxy-tests-final.log`, and the Mobile validation/handoff logs.
-FCM sending/scoped provider hints, Google ID-token exchange, iOS/APNs and physical
-device acceptance remain open. The Firebase service-account path question is
-pending; this fixture does not require that credential.
+Actual foreground/background FCM hints and notification navigation subsequently
+passed in the [dedicated delivery case](native-fcm-acceptance.md). The service-account
+path question is resolved. Google ID-token exchange, iOS/APNs and physical-device
+acceptance remain separate; this registration fixture still requires no sender credential.

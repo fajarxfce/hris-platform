@@ -15,6 +15,7 @@ from urllib.error import URLError
 from urllib.request import urlopen
 from dashboard_mail_fixture import DashboardMailFixture
 from dashboard_storage_fixture import DashboardStorageFixture
+from dashboard_fcm_fixture import worker_fcm_environment
 
 
 root = Path(__file__).resolve().parents[1]
@@ -49,6 +50,7 @@ def main():
     if with_worker and not worker_jar.is_file():
         raise RuntimeError("Build the worker with ./gradlew :apps:worker:bootJar first")
     os.umask(0o077)
+    fcm_environment = worker_fcm_environment(os.environ)
     logs.mkdir(parents=True, exist_ok=True)
     for event in (signal.SIGINT, signal.SIGTERM):
         signal.signal(event, stop)
@@ -171,14 +173,14 @@ def main():
             } | {
                 "HRIS_WORKER_DATABASE_USER": "hris_worker_test",
                 "HRIS_WORKER_DATABASE_PASSWORD": "worker-fixture-only",
-            }
+            } | fcm_environment
             with (logs / "worker.log").open("w") as worker_output:
                 worker = subprocess.Popen(
                     ["java", "-jar", str(worker_jar)], env=worker_environment,
                     stdout=worker_output, stderr=subprocess.STDOUT,
                 )
         print(f"Browser API fixture ready; diagnostics: {logs.relative_to(root)}/backend.log", flush=True)
-        deadline = time.monotonic() + 600
+        deadline = time.monotonic() + (900 if fcm_environment else 600)
         while time.monotonic() < deadline:
             if api.poll() is not None:
                 raise RuntimeError("Fixture API exited; inspect its local diagnostics")

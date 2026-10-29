@@ -1,0 +1,114 @@
+{
+  "date": "2026-10-29",
+  "result": "passed",
+  "fixture": "apps/dashboard/integration-native/fcm-delivery.spec.ts",
+  "platformRuntimeCommit": "b7f42070",
+  "schema": 101,
+  "mobileApplicationCommit": "678783b3",
+  "device": {
+    "avd": "hris-mobile-dev",
+    "serial": "emulator-5560",
+    "androidApi": 35
+  },
+  "apk": {
+    "bytes": 32853122,
+    "sha256": "59494858f2da47b37307b7f911960c0f895929aa92e90bc8831a6f6b53fde715",
+    "api": "http://127.0.0.1:18082/api/v1/"
+  },
+  "provider": "FCM",
+  "project": "cmp-fajar",
+  "testMinutesReported": 6.2,
+  "totalMinutesReported": 6.6,
+  "providerAcceptedMessages": 2,
+  "ownedRegistrations": 1,
+  "nativeRequests": 55,
+  "nativeCompanyMutations": 0,
+  "cases": [
+    {
+      "mode": "foreground",
+      "version": 0,
+      "readAt": null,
+      "acknowledgedAt": null,
+      "state": "COMPLETE",
+      "processed": 1,
+      "accepted": 1,
+      "rejected": 0,
+      "failure": null,
+      "androidNotification": {
+        "present": true,
+        "genericTitle": true,
+        "genericBody": true
+      },
+      "driverReadyToObservedSeconds": 10.032
+    },
+    {
+      "mode": "background",
+      "version": 0,
+      "readAt": null,
+      "acknowledgedAt": null,
+      "state": "COMPLETE",
+      "processed": 1,
+      "accepted": 1,
+      "rejected": 0,
+      "failure": null,
+      "androidNotification": {
+        "present": true,
+        "genericTitle": true,
+        "genericBody": true
+      },
+      "driverReadyToObservedSeconds": 160.633
+    }
+  ],
+  "manualObservations": {
+    "notificationTapOpenedExpectedBackgroundItem": true,
+    "companyUnchanged": true,
+    "bothItemsUnread": true,
+    "notificationPreferenceDisabled": true,
+    "loggedOut": true
+  },
+  "retirement": {
+    "enabledRegistrations": 0,
+    "encryptedTokens": 0,
+    "tokenHashes": 0,
+    "retainedRegistrationRows": 1
+  },
+  "cleanup": {
+    "ownedServicesStopped": true,
+    "databaseRemoved": true,
+    "markersRemoved": true,
+    "adbForwardingRemoved": true,
+    "emulatorStopped": true,
+    "appDataRetained": true,
+    "diagnosticDatabaseCopiesRemoved": true
+  },
+  "checks": {
+    "pythonFixtureTests": 12,
+    "newFcmConfigurationTestsIncluded": 5,
+    "nativeProxyRegressions": 7,
+    "typescript": true,
+    "biome": true,
+    "productionDashboardBuild": true,
+    "architecture": true
+  },
+  "precedingAttempts": [
+    {
+      "result": "timeout",
+      "stage": "manual foreground-ready",
+      "seconds": 240,
+      "messagesSent": 0
+    },
+    {
+      "result": "timeout",
+      "stage": "Android notification observer",
+      "seconds": 120,
+      "providerAcceptedMessages": 1,
+      "observation": "Google transport received the message after reconnect at 08:14:11 UTC, after the observer had expired. This is not a passed device acceptance."
+    }
+  ],
+  "limitations": [
+    "Times include fixture polling and Android scheduling; this is not a delivery-latency guarantee.",
+    "Only the correct account and selected company were exercised with actual FCM; scope replacement/duplicate/revoked hints retain separate automated coverage.",
+    "No Google ID-token exchange, iOS/APNs or physical-device/provider acceptance.",
+    "No production deployment or release."
+  ]
+}

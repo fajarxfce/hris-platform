@@ -114,6 +114,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run test:integration
       - run: python3 ../../tool/test_dashboard_mail_fixture.py
+      - run: python3 -m unittest discover -s ../../tool -p 'test_dashboard_fcm_fixture.py'
       - run: npm run test:integration:worker
         timeout-minutes: 5
       - run: python3 -m unittest discover -s ../../tool -p 'test_dashboard_storage*.py'

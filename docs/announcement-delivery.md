@@ -77,4 +77,5 @@ SQL fixtures to display terminal failure and cleanup. Those fixtures do not prov
 elapsed seven-day retention or actual FCM delivery. Worker integration covers real
 claim/checkpoint/acknowledgement and cleanup through the configured test provider.
 [Native Firebase acceptance](native-push-acceptance.md) tracks actual SDK registration;
-external FCM sending still needs its server credential.
+[actual FCM delivery](native-fcm-acceptance.md) subsequently passed using the supplied
+server credential, with foreground/background Android notifications and unchanged Inbox state.

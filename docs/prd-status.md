@@ -24,7 +24,7 @@ and acceptance evidence; the current CI result must be assessed separately.
 | [Expenses](modules/expenses.md) | Categories, edited/versioned claims, evidence/duplicate review, correction/return, independent payment release and per-item reconciliation. External bank submission is manual in the initial scope. | [Authoring/review](../apps/dashboard/integration/expense-claims.spec.ts), [payments](../apps/dashboard/integration/expense-payments.spec.ts) |
 | [Payroll](modules/payroll.md) | Decimal rules, reviewed policy/compensation/tax inputs, durable calculations, original period comparison, independent finalization, payslips, payments and referenced amendments. | [Calculations](../apps/dashboard/integration-worker/payroll-calculations.spec.ts), [comparison](../apps/dashboard/integration-worker/payroll-comparison.spec.ts), [amendments](payroll-amendments.md) |
 | [Documents](modules/documents.md) | Scoped revisions, resumable transfer, bounded inspection, immutable evidence, retention/hold/retirement and private range downloads. | [Transfers](../apps/dashboard/integration/documents.spec.ts), [retention lifecycle](../apps/dashboard/integration/document-retention-lifecycle.spec.ts), [scanner workload](workload.md) |
-| [Communications](modules/communications.md) | Audiences, draft/scheduled publication, archive, owned inbox/acknowledgement, device registration and administrative delivery observations. Real FCM message/hint delivery remains external. | [Publication/worker](../apps/dashboard/integration-worker/communications.spec.ts), [delivery](announcement-delivery.md), [native SDK registration](native-push-acceptance.md) |
+| [Communications](modules/communications.md) | Audiences, draft/scheduled publication, archive, owned inbox/acknowledgement, device registration and administrative delivery observations. Actual FCM foreground/background delivery and notification navigation passed on the owned Android emulator. | [Publication/worker](../apps/dashboard/integration-worker/communications.spec.ts), [delivery](announcement-delivery.md), [native SDK registration](native-push-acceptance.md), [actual FCM](native-fcm-acceptance.md) |
 | [Reporting](modules/reporting.md) | Scoped reports/drill-down/catalogue, owner-bound saved filters, durable multipart export and retirement. The unmodified physical one-hour export grace passed. | [Saved filters](../apps/dashboard/integration/saved-report-filters.spec.ts), [export](../apps/dashboard/integration-worker/report-exports.spec.ts), [elapsed retirement](export-retention-acceptance.md) |
 | [Administration](modules/administration.md) | Effective settings/availability, integration observations, jobs, scoped/global audit and private encrypted recovery. | [Worker integration](../apps/dashboard/integration-worker/worker-integrations.spec.ts), [account audit](../apps/dashboard/integration-worker/platform-account-audit.spec.ts), [schema-101 recovery](recovery-set.md) |
 
@@ -68,9 +68,18 @@ workflow was invoked by these CI dispatches.
 
 ## External acceptance still required
 
+The supplied server credential resolved the FCM prerequisite. [Actual Android FCM](native-fcm-acceptance.md)
+passed two real publications and generic foreground/background notifications,
+correct selected account/company navigation and unchanged Inbox read/ack state.
+The fixture passed in 6.2m/6.6m including setup, with 55 requests, no native company
+mutation and complete token retirement/cleanup. Scope replacement/duplicate/revoked
+hints retain separate automated coverage; these results do not claim every device
+or scheduling state. [Measurements](measurements/native-fcm-2026-10-29.json) retain
+the two initial timeouts and final pass. The sender credential path is in the handoff;
+do not repeat the resolved question or commit its contents.
+
 | Work | Current evidence | Missing prerequisite |
 | --- | --- | --- |
-| Real FCM send and scoped invalidation hint | Actual Firebase SDK token, HRIS registration/response-loss recovery/retirement accepted; controlled worker/delivery observations accepted. | Server-side Firebase `cmp-fajar` credential. A path-only question is already pending; do not repeat it or put private keys in Git/chat. |
 | Google authentication exchange | Email/password through Firebase and HRIS accepted; Google chooser/Back accepted. | Actual eligible Google sign-in and Android OAuth/SHA configuration for a real token exchange. A public web client ID is already known. |
 | iOS push/auth and physical application links | Portable build/simulator checks and Android URL recovery are separate evidence. | iOS Firebase configuration, APNs/device setup and verified deployed association URLs. |
 | Physical location and target deployment | Explicit no-location review, emulator/API and constrained 5,000-employee/scanner workload measurements accepted. Deployment/recovery guidance is implemented. | Available authorized device/environment, real provider configuration and a target-specific execution. A Git push is not live release authorization. |

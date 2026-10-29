@@ -8,22 +8,24 @@ notes in Git. Read this file first, then the compact [PRD status](prd-status.md)
 
 ## Current result and continuation
 
-Current Verify run [40816036721](https://github.com/fajarxfce/hris-platform/actions/runs/40816036721)
+First Verify run [40816036721](https://github.com/fajarxfce/hris-platform/actions/runs/40816036721)
 passed all four backend and all four dashboard shards at `d7184e83`: 2,731 disjoint
 API tests, 94 worker passes (one separately accepted manual retention case skipped),
 686 module tests, 3,997 dashboard unit tests, seven native-proxy regressions and
 1,098 distinct Chromium scenarios. Repeated worker/module/unit suites are counted
-once. Dashboard integration is still running; inspect its final result before
-dispatching a replacement run, since branch concurrency cancels older work.
+once. Dashboard integration also passed: 40 API/browser cases, 14 worker cases,
+one real-storage export case, two mail and nine storage fixture checks.
 
 The actual schema-101 recovery step also passed (104 objects, 2,098,795 bytes,
 two encrypted identity records, old/current keys, exact audit/delivery projections
 and cleanup), but its artifact-upload step failed: upload-artifact excludes hidden
 paths by default. The workflow now opts in only for the exact sanitized
 `.work/recovery-set-result-*.json` glob, never the whole private directory. YAML
-and result assertions passed locally; hosted artifact upload still needs a new run.
-Do not describe this first full run as successful or repeat application tests just
-to replace a missing report without acknowledging this CI failure.
+and result assertions passed locally. The first run concluded failure solely at
+that upload. Replacement [40820005213](https://github.com/fajarxfce/hris-platform/actions/runs/40820005213)
+is running at pushed `70e5098d`; inspect every job and the downloaded recovery
+artifact before recording success. [Sanitized measurements](measurements/ci-2026-10-29.json)
+retain both runs and distinguish execution from artifact publication.
 
 [Android Attendance capture recovery](native-attendance-acceptance.md) passed
 actual API/PostgreSQL/worker acceptance. One capture without location survived
@@ -42,17 +44,16 @@ recovery example for all six feature observers, with separate workflow outcomes
 and limitations retained; this does not prove every combination or physical device.
 No application defect was found in these three newest native cases.
 
-Continue the current CI/PRD reconciliation. Mobile CI
+Continue the current CI/PRD reconciliation. Mobile full CI
 [40815794384](https://github.com/fajarxfce/hris-mobile/actions/runs/40815794384)
-was explicitly dispatched at `b0a95391`: prior cross-platform CI was at `d191c61d`,
-before the latest application fixes. Inspect its Linux/Android/Windows/Web and Apple
-simulator jobs, resolve failures and record the final commit/outcome. It is not a
-release/distribution workflow. Platform Verify
-[40816036721](https://github.com/fajarxfce/hris-platform/actions/runs/40816036721)
-is running at `d7184e83`, using the existing four backend/dashboard shards and
-downstream integration. Its new manual entry point preserves read-only repository
-permission and time bounds. Inspect every job and record the outcome; focused local
-runs do not substitute for the full matrix. All native-owned resources are cleaned.
+at `b0a95391` passed Linux/Android, Windows and Web but Apple cold compilation
+exceeded its combined 15-minute test limit. Mobile `451a2c4d` separates compilation,
+test execution and Xcode bounds. Its Apple-only follow-up
+[40817592306](https://github.com/fajarxfce/hris-mobile/actions/runs/40817592306)
+is running; port that generic CI correction to Starter only after it passes.
+Mobile `678783b3` separately corrects English Expense item-count copy, with local
+root checks and Android assembly passed. Hosted runs above predate this copy edit.
+All native-owned resources are cleaned. No release/distribution was invoked.
 
 The eleven module screen/acceptance lists were reread and source TODO/placeholder
 searches found no obvious stub. The [compact review](prd-status.md) maps all eleven

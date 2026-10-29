@@ -21,8 +21,11 @@ actual schema-101 recovery, but recovery report upload failed because the action
 excludes hidden paths by default. Recovery output is explicitly sanitized; the
 upload now permits the exact `.work/recovery-set-result-*.json` glob only, retaining
 `if-no-files-found: error` and seven-day retention. Private fixture files and keys
-are not included. A replacement hosted run must verify the corrected upload;
-the original run's downstream integration status is recorded in the handoff.
+are not included. The original downstream integration passed (40 API, 14 worker,
+one export case and the mail/storage fixture checks). Replacement
+[40820005213](https://github.com/fajarxfce/hris-platform/actions/runs/40820005213)
+is running at `70e5098d`; [tracked measurements](measurements/ci-2026-10-29.json)
+retain the original failed conclusion and the pending upload acceptance.
 
 ## Status
 

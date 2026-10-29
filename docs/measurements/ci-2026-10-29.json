@@ -1,0 +1,150 @@
+{
+  "reviewedAt": "2026-10-29",
+  "firstRun": {
+    "id": 40816036721,
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/40816036721",
+    "head": "d7184e83be9940fbc2f1955744b8abfff2989287",
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "name": "backend (4)",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard (1)",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard (2)",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard (4)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (3)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (1)",
+        "conclusion": "success"
+      },
+      {
+        "name": "backend (2)",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard (3)",
+        "conclusion": "success"
+      },
+      {
+        "name": "dashboard-integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "recovery-integration",
+        "conclusion": "failure"
+      }
+    ],
+    "backend": {
+      "apiShards": [
+        {
+          "shard": 1,
+          "apiTests": 833,
+          "failures": 0,
+          "skipped": 0,
+          "apiDuration": "23m37.21s"
+        },
+        {
+          "shard": 2,
+          "apiTests": 567,
+          "failures": 0,
+          "skipped": 0,
+          "apiDuration": "15m50.55s"
+        },
+        {
+          "shard": 3,
+          "apiTests": 614,
+          "failures": 0,
+          "skipped": 0,
+          "apiDuration": "14m4.05s"
+        },
+        {
+          "shard": 4,
+          "apiTests": 717,
+          "failures": 0,
+          "skipped": 0,
+          "apiDuration": "22m48.38s"
+        }
+      ],
+      "uniqueApiTests": 2731,
+      "sharedModuleTests": 686,
+      "worker": {
+        "total": 95,
+        "passed": 94,
+        "skipped": 1,
+        "skipReason": "Real elapsed retention is explicitly opt-in; separately passed on 2026-10-29."
+      },
+      "counting": "Disjoint API shards summed; repeated module and worker suites counted once."
+    },
+    "dashboard": {
+      "uniqueUnitTests": 3997,
+      "unitFiles": 352,
+      "nativeProxyTests": 7,
+      "browserShards": [
+        275,
+        275,
+        274,
+        274
+      ],
+      "uniqueBrowserTests": 1098,
+      "counting": "Repeated unit and proxy suites counted once."
+    },
+    "integration": {
+      "api": {
+        "passed": 40,
+        "duration": "4.7m"
+      },
+      "worker": {
+        "passed": 14,
+        "duration": "4.5m"
+      },
+      "exports": {
+        "passed": 1,
+        "duration": "47.8s"
+      },
+      "mailFixtureTests": 2,
+      "storageFixtureTests": 9
+    },
+    "recovery": {
+      "restorePassed": true,
+      "schema": "101",
+      "identityEnvelopesVerified": 2,
+      "objects": 104,
+      "bytes": 2098795,
+      "sourceUnchangedByRestore": true,
+      "wrongRetiredKeyRejected": true,
+      "separateKeyPack": true,
+      "temporaryResourcesRemoved": true,
+      "typedAccountAuditRestored": true,
+      "announcementDeliveryRestored": true,
+      "retainedIdentityKeyIds": [
+        "current",
+        "old"
+      ]
+    },
+    "failure": "Recovery execution passed; artifact upload excluded the hidden .work path."
+  },
+  "correction": {
+    "commit": "70e5098d",
+    "behavior": "Enable hidden-file upload only for the exact sanitized recovery-set-result-*.json glob; fail if absent.",
+    "applicationSourcesChanged": false
+  },
+  "followupRun": {
+    "id": 40820005213,
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/40820005213",
+    "head": "70e5098d540609bed43d05b93639fc2c88f48ca5",
+    "status": "running; inspect all jobs before calling verification passed"
+  }
+}

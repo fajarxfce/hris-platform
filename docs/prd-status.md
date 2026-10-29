@@ -48,16 +48,18 @@ These results do not imply every combination was exercised on every target.
 | Expenses | [Save response loss/offline cold start](native-expense-acceptance.md) | 30 → 30 before Save; 43 → 43 after loss | One draft/line/history entry, IDR 25,000.25 |
 | Documents | [Interrupted upload and failed-inspection review](native-upload-acceptance.md), [partial download](native-download-acceptance.md) | 32 → 32 / 42 → 42 for upload/review | One retained revision; original chunk/manifest and explicit retry/cancellation |
 
-These latest HRIS fixtures required no generic Starter code change. Mobile remains
-the proving ground for reusable foundation fixes. The unchanged Mobile application
-is `02743a9f`; Starter's validated application foundation is `9a13791`.
+These HRIS fixtures required no generic Starter code change and used Mobile
+application `02743a9f`. Later Mobile `678783b3` corrects only English Expense count
+copy; local root/Android checks passed. Mobile remains the proving ground for
+generic fixes, including its current Apple CI correction. Starter's validated
+application foundation remains `9a13791`.
 
 ## Current CI ownership
 
 | Repository | Current verification | Source/result boundary |
 | --- | --- | --- |
-| Platform | [40816036721](https://github.com/fajarxfce/hris-platform/actions/runs/40816036721), head `d7184e83` | Four backend shards, four dashboard shards, then API/worker integration; running at this update. Manual Verify is documented in [delivery](delivery.md#verify-a-development-branch). |
-| Mobile | [40815794384](https://github.com/fajarxfce/hris-mobile/actions/runs/40815794384), head `b0a95391` | Linux/Android/Web, Windows and Apple simulator; running at this update. Application sources match `02743a9f`; later commits change evidence only. |
+| Platform | Replacement [40820005213](https://github.com/fajarxfce/hris-platform/actions/runs/40820005213), head `70e5098d`, running | First [40816036721](https://github.com/fajarxfce/hris-platform/actions/runs/40816036721) passed all test suites and actual restore but failed hidden-path report upload. The exact sanitized upload is corrected; [measurements](measurements/ci-2026-10-29.json) retain its failed conclusion. |
+| Mobile | Full [40815794384](https://github.com/fajarxfce/hris-mobile/actions/runs/40815794384), head `b0a95391`; Apple follow-up [40817592306](https://github.com/fajarxfce/hris-mobile/actions/runs/40817592306), head `451a2c4d`, running | Linux/Android, Windows and Web passed. Apple hit a compilation deadline; separate compile/test/Xcode bounds are under verification before Starter port. Hosted application sources match `02743a9f`; the later copy-only edit has separate local root/Android evidence. |
 | Starter | [40648662419](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40648662419), head `9a13791` | Passed; application/build/tool sources remain unchanged, so no repeat run is required solely for handoff edits. |
 
 Inspect all jobs and record actual outcomes. Resolve failures before calling a run

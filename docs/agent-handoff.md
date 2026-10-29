@@ -39,7 +39,9 @@ also supplied matching public iOS configs for all three HRIS flavors. Mobile's
 iOS password/bundle loading and Google system-browser PKCE/code exchange passed
 full CI `40858176601` at `43cd8ec6`: all four jobs, 97 native cases and Xcode.
 Only then was the Google foundation ported to Starter `e0c6071`; its local checks
-passed and full run `40864341588` is in progress. The preceding password-only
+and all three jobs in full run `40864341588` passed. Downloaded Apple reports retain
+77 native cases in 22 suites, no failures/errors/skips and the complete Xcode app.
+The preceding password-only
 Starter port `8a75de5` independently passed 62 native cases/Xcode in `40861505322`.
 APNs/device acceptance remains. Leave
 this persistent stack running; statements below about cleaned fixtures refer to
@@ -73,7 +75,7 @@ sanitized summary verifies 104 objects, 2,098,795 bytes, two encrypted records,
 old/current keys, original-source preservation, typed audit/delivery projections
 and cleanup. Actual integration passed 40 API/browser cases (4.9m), 14 worker cases
 (4.5m), one storage export case (47.8s), two mail and nine storage fixture checks.
-Those Platform runs are complete; the newer Starter run is listed above. Logs and downloaded summaries
+Those Platform runs and the newer Starter run are complete. Logs and downloaded summaries
 were inspected; [tracked measurements](measurements/ci-2026-10-29.json) retain results.
 
 The two preceding failed runs remain in [measurements](measurements/ci-2026-10-29.json).
@@ -106,7 +108,7 @@ Its hosted CI and previous native recovery used earlier application `02743a9f`.
 | --- | --- | --- |
 | `hris-platform` | `feat/firebase-auth` | Runtime integration `b7f42070` / schema 101; full CI `9345c19b`; later real-FCM fixture accepted locally |
 | `hris-mobile` | `feat/native-push` | Full CI accepted at `43cd8ec6`, including 97 native cases/Xcode; phone remains on separately accepted `678783b3` |
-| `compose-fluent-starter` | `fix/push-token-lifecycle` | Password port `8a75de5` accepted including 62 native cases/Xcode; Google port `e0c6071` local checks passed, full CI `40864341588` in progress |
+| `compose-fluent-starter` | `fix/push-token-lifecycle` | Password port `8a75de5` accepted including 62 native cases/Xcode; Google port `e0c6071` passed local checks and all three full CI `40864341588` jobs including 77 native cases/Xcode |
 
 The repositories are siblings under `/home/fajar/hris`. Inspect Git status, history
 and upstream before editing; preserve unrelated work. Mobile was generated from
@@ -151,8 +153,8 @@ requirement. New behavior gaps still require implementation and relevant accepta
 
 ## Remaining delivery areas
 
-The latest Mobile iOS provider is accepted; its generic Starter port is completing
-the full hosted run listed above. Continue these actual external cases when their
+The latest Mobile iOS provider and generic Starter port are accepted, with all
+hosted verification complete. Continue these actual external cases when their
 input is available. [Remaining delivery](completion.md#remaining-delivery-sequence)
 and [PRD status](prd-status.md#external-acceptance-still-required) retain the scope.
 
@@ -160,6 +162,11 @@ and [PRD status](prd-status.md#external-acceptance-still-required) retain the sc
 | --- | --- |
 | iOS provider and physical links | Matching Firebase public configs are already installed. Obtain APNs/device setup and the controlled HTTPS domain, finish native association/HTTPS route configuration, then exercise actual scoped push/auth/link acceptance. Android Google/Home is already accepted. |
 | Physical location and deployment | Authorized device/target environment, real provider configuration and target-specific execution. Emulator/no-location review and isolated recovery are separate evidence. |
+
+Questions about an available iPhone and the controlled HTTPS domain are pending;
+do not repeat them while waiting. Mobile's [iOS procedure](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/ios-acceptance.md)
+records remaining setup and safe acceptance observations. Preserve the current
+Android Google binding/session and the running private development stack.
 
 Do not invent provider credentials, bank formats, tax rules or new scope to close
 these rows. The initial expense bank submission is manual. New workload corpora or

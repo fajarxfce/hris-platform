@@ -98,7 +98,8 @@ resolves the unavailable public iOS configuration prerequisite. Mobile's iOS
 password/bundle and owned Google PKCE adapters passed full CI `40858176601` at
 `43cd8ec6`: all four jobs, 97 native cases and the complete Xcode app. Generic
 Starter port `e0c6071` followed that proof, passed root/Android/Chromium checks
-and is completing full CI `40864341588`. Starter's preceding password port passed
+and all three jobs in full CI `40864341588`, including 77 native cases in 22
+downloaded suites and Xcode. Starter's preceding password port passed
 62 native cases/Xcode in `40861505322`; its own matching plists are locally ignored.
 APNs/device input and actual iOS provider acceptance remain separate. These new
 iOS sources do not change the installed Android APK or the accepted binding.

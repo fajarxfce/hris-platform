@@ -2,8 +2,7 @@
 
 Reviewed 29 October 2026. The overall PRD is **not declared complete**: actual
 provider/device/deployment acceptance still needs external inputs. Mobile's new
-iOS provider passed full CI; its generic Starter port is completing hosted
-verification. This page is the compact continuation map;
+iOS provider and its generic Starter port both passed full CI. This page is the compact continuation map;
 [completion](completion.md) and [delivery](delivery.md) retain the detailed history.
 Read [agent handoff](agent-handoff.md) for the latest active work before starting.
 
@@ -61,10 +60,10 @@ the generic Google port to Starter `e0c6071`; these sources have separate proof 
 | --- | --- | --- |
 | Platform | Corrected full [40820912608](https://github.com/fajarxfce/hris-platform/actions/runs/40820912608), head `9345c19b`, passed all ten jobs | First run passed tests/restore but failed hidden-path report upload. Run `40820005213` passed backend/recovery and uploaded its checked summary, but failed a browser locator. The correction passed all four backend/dashboard shards, actual API/worker/export integration and schema-101 restore with a downloaded sanitized report. The owned CI ref was removed after verification. [Measurements](measurements/ci-2026-10-29.json) retain each run and failure. |
 | Mobile | Full [40858176601](https://github.com/fajarxfce/hris-mobile/actions/runs/40858176601), head `43cd8ec6`, passed all four jobs | Linux/Android, Web, Windows and Apple passed; downloaded reports confirm 97 native cases in 26 suites, no failures/errors/skips and the complete Xcode app. Local root/Android and 82 identity/app Chromium cases also passed. Phone Google/Home acceptance uses the earlier installed `678783b3` APK. |
-| Starter | Password-only Apple [40861505322](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40861505322), port `8a75de5`, passed; full Google-port [40864341588](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40864341588), `e0c6071`, in progress | Password port independently passed 62 native cases in 18 suites and Xcode. Google port followed Mobile full CI and passed root/Android, 320 desktop and 46 identity/app Chromium cases locally; its final hosted result remains pending. |
+| Starter | Password-only Apple [40861505322](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40861505322), port `8a75de5`, passed; full Google-port [40864341588](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40864341588), `e0c6071`, passed all three jobs | Password port independently passed 62 native cases in 18 suites and Xcode. Google port followed Mobile full CI, then independently passed 77 native cases in 22 downloaded suites and Xcode. Local root/Android, 320 desktop and 46 identity/app Chromium cases also passed. |
 
-Accepted completed jobs and downloaded reports were inspected. The active Starter
-Google run is not yet claimed successful. Prior failures remain
+All final jobs and downloaded reports were inspected. No CI or owned local test
+remains active from this increment. Prior failures remain
 recorded separately from their successful corrections. No production distribution
 workflow was invoked by these CI dispatches.
 
@@ -88,12 +87,12 @@ contains no real email, UID, token or credential.
 
 | Work | Current evidence | Missing prerequisite |
 | --- | --- | --- |
-| iOS push/auth and physical application links | Matching public Firebase plists are installed; Mobile password/Google adapters passed full CI including 97 native cases/Xcode. Generic Starter port is completing full CI. | Finish Starter verification, then exercise actual iOS login/APNs and verified deployed association URLs with an available device/provider setup. |
+| iOS push/auth and physical application links | Matching public Firebase plists are installed; Mobile password/Google adapters passed full CI including 97 native cases/Xcode, and Starter independently passed all jobs with 77 native cases/Xcode. | Available iPhone/APNs setup and controlled HTTPS domain; implement native associations and HTTPS route admission, then exercise actual scoped login/push/link flows. |
 | Physical location and target deployment | Explicit no-location review, emulator/API and constrained 5,000-employee/scanner workload measurements accepted. Deployment/recovery guidance is implemented. | Available authorized device/environment, real provider configuration and a target-specific execution. A Git push is not live release authorization. |
 
 Earlier CI and generic ports are accepted. The discovered iOS Firebase adapter
-gap now has implementation and full Mobile proof; complete the port's own hosted
-verification. Continue the device/provider rows when their inputs
+gap now has implementation, full Mobile proof and independent Starter proof.
+Continue the device/provider rows when their inputs
 become available, and reopen other implementation for an observed failure or
 documented requirement gap. Mark rows complete only after actual acceptance. The repository should never
 claim that a fixture sent a real FCM message, completed Google sign-in, or verified

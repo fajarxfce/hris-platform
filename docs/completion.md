@@ -8,6 +8,16 @@ scenarios, real publication/browser acceptance and complete schema-101 recovery.
 History cleanup leaves Inbox facts intact and unavailable counts never imply
 success. Actual FCM message delivery remains dependent on server credentials.
 
+[Android Attendance capture recovery](native-attendance-acceptance.md) passed
+actual API/PostgreSQL/worker acceptance. One capture without location survived
+committed-response loss and offline cold start; summary reload stayed 21 → 21.
+Exact replay retained one version-zero event and its original capture time. All six
+local summary rows cleared while the server correctly retained pending independent
+review, OFFLINE/UNVERIFIED_CAPTURE flags and zero accepted minutes. Across 30 native
+requests there were two intended writes. Fixture 4.6m/5.2m with setup; proxy,
+TypeScript, Biome, build and architecture passed. All owned resources were cleaned;
+location was restored. No Mobile implementation or Starter port applies.
+
 [Android Leave submission recovery](native-leave-acceptance.md) passed actual
 API/PostgreSQL/worker acceptance. One frozen command survived offline process
 restart without a duplicate draft; stable summary reload stayed 33 → 33. Exact

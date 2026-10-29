@@ -5,32 +5,38 @@ asked to continue through the remaining PRD, push each commit, and keep continua
 notes in Git. Read this file first, then [completion](completion.md),
 [product](product.md), the relevant module contract and each repository's `AGENTS.md`.
 
-## Current result and next native case
+## Current result and continuation
 
-[Android Leave submission recovery](native-leave-acceptance.md) passed actual
-API/PostgreSQL/worker acceptance. One frozen command survived offline process
-restart without a duplicate draft; stable summary reload stayed 33 → 33. Exact
-replay left one version-zero request/history entry/approval, reserving 0.5 days
-once and leaving 1.5 available. Across 43 requests there were two intended writes
-and one read-only preview POST. Six summary rows cleared and logout passed.
-Fixture 2.8m/3.2m with setup; proxy, TypeScript, Biome, build and architecture checks
-passed. All owned resources were removed; no Mobile/Starter source change applies.
+[Android Attendance capture recovery](native-attendance-acceptance.md) passed
+actual API/PostgreSQL/worker acceptance. One capture without location survived
+committed-response loss and offline cold start; summary reload stayed 21 → 21.
+Exact replay retained one version-zero event and its original capture time. All six
+local summary rows cleared while the server correctly retained pending independent
+review, OFFLINE/UNVERIFIED_CAPTURE flags and zero accepted minutes. Across 30 native
+requests there were two intended writes. Fixture 4.6m/5.2m with setup; proxy,
+TypeScript, Biome, build and architecture passed. All owned resources were cleaned;
+location was restored. No Mobile implementation or Starter port applies.
 
-Application artifacts remain integrated `b7f42070` / schema 101; this fixture
-follows Expense `97e33310` and Overtime `578a5031`. Mobile `cf4bd6c9` records Expense
-acceptance. The first Leave fixture run incorrectly counted its read-only preview
-POST as a business write; the corrected exact three-POST assertion passed on a
-fresh run. UI driver counters wait for navigation/session admission to settle.
-Reproduction, initial limitations and measurements are tracked in
-[native Leave acceptance](native-leave-acceptance.md).
+Application artifacts remain integrated `b7f42070` / schema 101. This fixture
+follows Leave `ccae6f8f`, Expense `97e33310` and Overtime `578a5031`. Mobile `b0a95391`
+records Leave acceptance. Native pending-summary evidence now has an actual
+recovery example for all six feature observers, with separate workflow outcomes
+and limitations retained; this does not prove every combination or physical device.
+No application defect was found in these three newest native cases.
 
-Continue native Attendance capture pending-summary recovery next. Inspect existing
-capture/replica acceptance first. Exercise an explicit capture without location,
-committed response loss, offline process restoration and exact replay, preserving
-the server's independent-review requirement. Pending actions tracks local delivery;
-a server-side pending evidence review must not become a duplicate local command.
-All previous owned containers/services/markers/forwarding are cleaned; the dedicated
-emulator is stopped with app data retained. No uncommitted Mobile source was found.
+Continue the current CI/PRD reconciliation. Mobile CI
+[40815794384](https://github.com/fajarxfce/hris-mobile/actions/runs/40815794384)
+was explicitly dispatched at `b0a95391`: prior cross-platform CI was at `d191c61d`,
+before the latest application fixes. Inspect its Linux/Android/Windows/Web and Apple
+simulator jobs, resolve failures and record the final commit/outcome. It is not a
+release/distribution workflow. Platform's branch has no CI run; its Verify workflow
+currently only admits main pushes/PRs. Add an explicit manual verification entry
+point and run the current integrated branch rather than assuming focused local
+runs cover the full CI matrix. All native-owned local resources are now cleaned.
+
+The eleven module screen/acceptance lists were reread and source TODO/placeholder
+searches found no obvious stub. Finish mapping the remaining delivery ledger to
+actual routes/contracts. Do not call fixture-only acceptance the whole PRD complete.
 FCM credentials and Google/physical/iOS setup still need external inputs; do not
 repeat the pending Firebase credential question.
 

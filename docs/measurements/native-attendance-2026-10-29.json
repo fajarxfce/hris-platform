@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-29",
+  "platformApplicationCommit": "b7f42070e7da6aacb4af6e4357cab4c2dabb4a16",
+  "fixtureParentCommit": "ccae6f8f",
+  "schema": 101,
+  "mobileApplicationCommit": "02743a9f",
+  "device": "Owned Android 35 emulator-5560; no phone used",
+  "scenarioMinutes": 4.6,
+  "includingSetupMinutes": 5.2,
+  "server": {
+    "responseDropped": true,
+    "nativeCompanyWrites": 2,
+    "sameOperationAndInput": true,
+    "entries": 1,
+    "serverVersion": 0,
+    "offline": true,
+    "location": null,
+    "review": null,
+    "status": "PENDING",
+    "pendingCount": 1,
+    "acceptedMinutes": 0,
+    "originalCapturedAt": "2026-10-29T04:03:23.543Z",
+    "originalReceivedAt": "2026-10-29T04:03:24.204424Z",
+    "issues": [
+      "OFFLINE",
+      "UNVERIFIED_CAPTURE"
+    ],
+    "requests": 30
+  },
+  "nativeDriver": {
+    "summaryUnconfirmed": 1,
+    "beforeSummaryReloadRequests": 21,
+    "navigationCounterSamples": [
+      21,
+      21,
+      21,
+      21
+    ],
+    "locationServicesDisabled": true,
+    "afterSummaryReloadRequests": 21,
+    "offlineColdSummaryUnconfirmed": 1,
+    "afterOfflineSummaryReloadRequests": 21,
+    "offlineOriginalCaptureRestored": true,
+    "originalDisplayedTime": "11:03",
+    "finalEmptySummaryRows": 6,
+    "signedOut": true,
+    "finalRequests": 30,
+    "forwardedCaptureCommands": 2,
+    "sameOperationAndPayload": true,
+    "confirmedDisplayedTime": "11:03",
+    "confirmedHomeStatus": "Pending review",
+    "apkSha256": "2b603fff2e40e31ee9cf5a45e694ea6aae8c96ae6c72cd4168d920c2e239c0c9"
+  },
+  "checks": {
+    "proxyRegressions": 1,
+    "typeScript": true,
+    "biome": true,
+    "productionBuild": true,
+    "dashboardArchitecture": true,
+    "architectureRegressions": 4,
+    "screenshotsInspected": true
+  },
+  "cleanup": {
+    "ownedContainers": 0,
+    "forwardingRemoved": true,
+    "markersRemoved": true,
+    "locationServicesRestored": true,
+    "emulatorStoppedWithDataRetained": true
+  },
+  "limitations": [
+    "Explicit capture without location remains subject to independent review",
+    "Controlled committed response loss and removed API forwarding; Wi-Fi stayed enabled",
+    "Manual Android UI driver joins independent automated server observer",
+    "No physical GPS, FCM, Google exchange or iOS device acceptance"
+  ]
+}

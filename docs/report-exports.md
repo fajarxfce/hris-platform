@@ -551,3 +551,11 @@ is running against actual PostgreSQL/Garage. It preserves the one-hour physical
 grace and immutable deadlines, checks a live control, and recovers a lost delete
 result before releasing quota. Final acceptance remains pending until its bounded
 run completes; the existing controlled checks are not replaced by compilation.
+
+## Actual elapsed retirement acceptance
+
+The [elapsed PostgreSQL/Garage case](export-retention-acceptance.md) passed one
+unmodified physical grace hour on 29 October 2026, including a lost successful
+delete response, finite retry, one retirement audit and released expired quota.
+The live control export and inactive owners were preserved. JUnit recorded one
+pass in 3,860.892s at schema 100; public seven-day retention was unchanged.

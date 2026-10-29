@@ -46,13 +46,26 @@ Progress and final results are written atomically to
 only. The JUnit XML/report supplies the final test outcome. A waiting progress file
 or a passing compilation is not an acceptance pass.
 
-## Current run — 29 October 2026
+## Executed result — 29 October 2026
 
-Implementation compiled and formatting passed. The first attempted command used
-Mobile's `formatKotlin` task name and did not compile; Platform's correct `format`
-plus `:apps:worker:compileTestKotlin` passed in 17 seconds. The opt-in acceptance is
-currently running, with source expiry `2026-10-29T02:16:08.258929Z` and original
-physical grace end `2026-10-29T03:16:08.258929Z`. Local log:
-`.work/export-retention-elapsed.log`. Record final observations only after the test
-finishes. Existing controlled-provider and storage-boundary evidence remains in
-[report exports](report-exports.md) and [storage](storage.md).
+The opt-in acceptance passed at compiled Platform `ecb17627654a8e52555f9fa6542b29938254aad0`
+(schema 100). Source expiry was `2026-10-29T02:16:08.258929Z`; the unchanged physical
+grace ended at `2026-10-29T03:16:08.258929Z`. The final observation was
+`2026-10-29T03:17:16.390452Z`. JUnit records one test, zero failures/errors/skips,
+3,860.892 seconds; Gradle completed successfully in 1h4m32s.
+
+The entire real hour retained the quota and all three objects. After eligibility,
+two expired objects were deleted and a lost successful delete response recovered
+through the ordinary retry. The scheduled retirement then released the expired
+quota exactly once, with one retirement audit and the original immutable header.
+Two expired snapshot rows were removed; both live rows, exact live object bytes,
+live quota and deactivated account states remained unchanged. Final maintenance
+was a no-op. Testcontainers and the worker context closed their owned resources.
+
+[Tracked measurements](measurements/export-retention-elapsed-2026-10-29.json)
+contain the sanitized final progress and JUnit outcome. Local
+`.work/export-retention-elapsed.log` and the worker XML remain supplementary.
+No clock/deadline/trigger was rewritten after creation. The three-minute fixture
+lifetime does not change public seven-day retention, and the deliberate response
+loss is at the storage repository boundary. This validates physical expiry and
+retirement; other provider/device acceptance remains separate.

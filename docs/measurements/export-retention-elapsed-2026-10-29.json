@@ -1,0 +1,36 @@
+{
+  "compiledCommit": "ecb17627654a8e52555f9fa6542b29938254aad0",
+  "schema": 100,
+  "junit": {
+    "tests": 1,
+    "skipped": 0,
+    "failures": 0,
+    "errors": 0,
+    "durationSeconds": 3860.892
+  },
+  "gradleDurationSeconds": 3872,
+  "initialFixtureLifetimeSeconds": 180,
+  "unchangedDeletionGraceSeconds": 3600,
+  "publicLifetimeDays": 7,
+  "clockOrDeadlineRewritten": false,
+  "finalObservation": {
+    "phase": "passed",
+    "observedAt": "2026-10-29T03:17:16.390452Z",
+    "expiresAt": "2026-10-29T02:16:08.258929Z",
+    "eligibleAt": "2026-10-29T03:16:08.258929Z",
+    "elapsedMillis": 3854520,
+    "expiredObjects": 2,
+    "liveObjects": 1,
+    "deletedSnapshotRows": 2,
+    "retainedLiveRows": 2,
+    "lostDeletionReceiptRecovered": true,
+    "retiredQuota": 0,
+    "liveQuota": 1,
+    "retirementAudits": 1
+  },
+  "runtime": "actual PostgreSQL 18.6, Garage 2.4.1, worker application and non-bypass runtime role; owned timers disabled",
+  "limitations": [
+    "Delete success response loss is deliberately injected at the storage repository boundary",
+    "The opt-in case is separate from normal worker suites and compiled against schema 100"
+  ]
+}

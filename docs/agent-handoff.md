@@ -5,6 +5,24 @@ asked to continue through the remaining PRD, push each commit, and keep continua
 notes in Git. Read this file first, then [completion](completion.md),
 [product](product.md), the relevant module contract and each repository's `AGENTS.md`.
 
+## Latest result: real elapsed retention passed
+
+The original checkout's separately owned export-retention acceptance finished
+successfully at 03:17:16 UTC on 29 October. JUnit confirms one pass in 3,860.892s;
+Gradle completed in 1h4m32s. The real one-hour grace, retained quota/objects,
+two physical deletions, lost delete receipt retry and single audited retirement
+all passed; live export data and inactive owners were preserved. See
+[elapsed retention](export-retention-acceptance.md) and its tracked measurements.
+The test is no longer running, so this checkout may be rebuilt.
+
+Integrate pushed descendant `f757bffd` (`feat/payroll-period-comparison`) from the
+isolated worktree. It includes push delivery `409abad4` and both validated features,
+with schema-101 recovery, full API/worker checks and real browser workflows.
+Preserve this elapsed result when resolving the handoff. Mobile documentation
+reconciliation `42f5e04d` is also pushed. Continue native Overtime pending-command
+acceptance through a committed-response loss, offline restart and summary/retry;
+provider credentials and physical/iOS acceptance remain separate.
+
 ## Workspace and delivery policy
 
 The workspace is `/home/fajar/hris` with three sibling Git repositories:

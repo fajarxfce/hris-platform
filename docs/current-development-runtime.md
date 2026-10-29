@@ -95,9 +95,13 @@ Firebase Management also created the three HRIS iOS apps and returned matching
 ignored `apps/ios/Configuration/{dev,staging,prod}/GoogleService-Info.plist` files.
 Each has its exact bundle ID, project, OAuth client and reversed client. This
 resolves the unavailable public iOS configuration prerequisite. Mobile's iOS
-Firebase Auth adapter now has password/bundle and owned Google PKCE code changes,
-with local checks and Apple CI still in progress;
-APNs/device input and actual iOS provider acceptance remain separate.
+password/bundle and owned Google PKCE adapters passed full CI `40858176601` at
+`43cd8ec6`: all four jobs, 97 native cases and the complete Xcode app. Generic
+Starter port `e0c6071` followed that proof, passed root/Android/Chromium checks
+and is completing full CI `40864341588`. Starter's preceding password port passed
+62 native cases/Xcode in `40861505322`; its own matching plists are locally ignored.
+APNs/device input and actual iOS provider acceptance remain separate. These new
+iOS sources do not change the installed Android APK or the accepted binding.
 
 ## Usable fictional company and actual acceptance
 

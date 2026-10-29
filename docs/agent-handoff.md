@@ -36,9 +36,12 @@ isolated restoration; API/dashboard and the same Google session passed after res
 The initial Java-17 verifier failure and corrected JDK-21 run are retained in the
 current-runtime record. Firebase Management
 also supplied matching public iOS configs for all three HRIS flavors. Mobile's
-iOS Firebase Auth adapter has password/bundle loading and Google system-browser
-PKCE/code exchange under local and Apple verification; the generic Starter port
-waits for Mobile Apple proof. APNs/device acceptance remains. Leave
+iOS password/bundle loading and Google system-browser PKCE/code exchange passed
+full CI `40858176601` at `43cd8ec6`: all four jobs, 97 native cases and Xcode.
+Only then was the Google foundation ported to Starter `e0c6071`; its local checks
+passed and full run `40864341588` is in progress. The preceding password-only
+Starter port `8a75de5` independently passed 62 native cases/Xcode in `40861505322`.
+APNs/device acceptance remains. Leave
 this persistent stack running; statements below about cleaned fixtures refer to
 the earlier disposable acceptance runs, not this development environment.
 
@@ -70,7 +73,7 @@ sanitized summary verifies 104 objects, 2,098,795 bytes, two encrypted records,
 old/current keys, original-source preservation, typed audit/delivery projections
 and cleanup. Actual integration passed 40 API/browser cases (4.9m), 14 worker cases
 (4.5m), one storage export case (47.8s), two mail and nine storage fixture checks.
-**No CI or owned local test job remains active.** Logs and downloaded summaries
+Those Platform runs are complete; the newer Starter run is listed above. Logs and downloaded summaries
 were inspected; [tracked measurements](measurements/ci-2026-10-29.json) retain results.
 
 The two preceding failed runs remain in [measurements](measurements/ci-2026-10-29.json).
@@ -102,8 +105,8 @@ Its hosted CI and previous native recovery used earlier application `02743a9f`.
 | Repository | Working branch | Accepted source boundary |
 | --- | --- | --- |
 | `hris-platform` | `feat/firebase-auth` | Runtime integration `b7f42070` / schema 101; full CI `9345c19b`; later real-FCM fixture accepted locally |
-| `hris-mobile` | `feat/native-push` | Application `678783b3`; Apple workflow `451a2c4d` |
-| `compose-fluent-starter` | `fix/push-token-lifecycle` | Application foundation `9a13791`; validated CI port `1817e45` |
+| `hris-mobile` | `feat/native-push` | Full CI accepted at `43cd8ec6`, including 97 native cases/Xcode; phone remains on separately accepted `678783b3` |
+| `compose-fluent-starter` | `fix/push-token-lifecycle` | Password port `8a75de5` accepted including 62 native cases/Xcode; Google port `e0c6071` local checks passed, full CI `40864341588` in progress |
 
 The repositories are siblings under `/home/fajar/hris`. Inspect Git status, history
 and upstream before editing; preserve unrelated work. Mobile was generated from

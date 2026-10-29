@@ -667,22 +667,25 @@ Current full Platform verification [40820912608](https://github.com/fajarxfce/hr
 passed all ten jobs at `9345c19b`, including the corrected report upload, browser
 assertion and actual integration. Mobile and Starter Apple corrections also passed
 independently, closing the generic port. [CI measurements](measurements/ci-2026-10-29.json)
-retain original failures and final proof. No CI or local test job remains active.
+retain original failures and final proof. Those earlier runs are complete.
 
 Actual Android Google sign-in is now accepted: the user confirmed Home after the
 explicit Firebase UID binding, and the authorized account-session API returned a
 new native session. The existing installed APK required no update. See
 [the exact acceptance boundary](measurements/native-google-2026-10-29.json).
-The current Mobile iOS provider increment and its later Starter port have their
-own pending verification; earlier accepted CI above does not cover that new code.
+The newer Mobile iOS provider at `43cd8ec6` passed all four jobs in full run
+`40858176601`, including 97 native cases and Xcode. Generic Starter port `e0c6071`
+followed that proof and passed local root/Android/Chromium checks; full run
+`40864341588` is in progress. Its preceding password-only port independently
+passed 62 native cases/Xcode in `40861505322`.
 
 | Remaining work | Current state and required acceptance |
 | --- | --- |
-| iOS provider and physical application links | Matching Firebase public plists are now installed for all HRIS flavors. The newly implemented iOS password/Google adapter is under Mobile local/Apple verification before a generic Starter port. Complete APNs/device setup and deployed HTTPS association endpoints, then exercise actual scoped login/push/link flows; simulator tests do not prove them. |
+| iOS provider and physical application links | Matching Firebase public plists are installed for all HRIS flavors. Mobile password/Google adapters passed full CI; generic Starter port has passed local checks and is finishing full CI. Complete APNs/device setup and deployed HTTPS association endpoints, then exercise actual scoped login/push/link flows; simulator tests do not prove them. |
 | Physical location and target deployment | Emulator/no-location review and constrained workload/recovery evidence passed. Actual GPS and target-specific operation require the authorized device/environment and deployed provider configuration. Git push authorization does not authorize a production release. |
 
-Earlier CI and generic ports are accepted. Complete the new Mobile iOS provider
-verification and subsequent generic Starter port, then continue device/provider
+Earlier CI and generic ports are accepted. Complete the new Google port's Starter
+verification, then continue device/provider
 acceptance when its input is available. Reopen an
 accepted implementation only for a documented requirement gap or observed failure;
 do not recreate completed replicas, drafts, summary observers or administrative

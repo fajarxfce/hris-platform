@@ -6,6 +6,19 @@ external acceptance. Read `AGENTS.md`, this page and [PRD status](prd-status.md)
 then the affected module contract. The [archived history](agent-history-2026-10-29.md)
 preserves earlier work; its old next-step statements are not the active queue.
 
+## Current user direction — 29 October 2026
+
+The user explicitly waived physical iPhone testing for this completion pass
+("iphone gkpp gk ditest juga") and requested continued implementation through
+completion, with each atomic commit pushed. Do not ask for an iPhone again or
+keep that test as a completion blocker. Simulator/contract tests and Xcode builds
+remain required; do not claim actual iOS sign-in or APNs delivery from them.
+Current work completes configurable HTTPS app-link admission and native/domain
+association output in Mobile before porting the reusable foundation to Starter.
+The controlled domain remains a deployment setting, not a reason to leave the
+configurable implementation unfinished. Preserve the accepted Google binding,
+phone data and running private development stack.
+
 ## Current result and continuation
 
 The user subsequently requested a usable server for the installed phone and

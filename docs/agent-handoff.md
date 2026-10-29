@@ -151,14 +151,14 @@ requirement. New behavior gaps still require implementation and relevant accepta
 
 ## Remaining delivery areas
 
-Current CI and the generic Starter port are accepted. Continue these actual
-external cases when their input is available. [Remaining delivery](completion.md#remaining-delivery-sequence)
+The latest Mobile iOS provider is accepted; its generic Starter port is completing
+the full hosted run listed above. Continue these actual external cases when their
+input is available. [Remaining delivery](completion.md#remaining-delivery-sequence)
 and [PRD status](prd-status.md#external-acceptance-still-required) retain the scope.
 
 | Work | Required input and acceptance |
 | --- | --- |
-| Google authentication exchange | Eligible real Google sign-in with correct Android OAuth/SHA setup. Email/password through Firebase and HRIS/MFA passed; Google chooser/Back is not token-exchange evidence. |
-| iOS provider and physical links | iOS Firebase config, APNs/device setup and deployed HTTPS association endpoints, then actual scoped push/auth/link acceptance. |
+| iOS provider and physical links | Matching Firebase public configs are already installed. Obtain APNs/device setup and the controlled HTTPS domain, finish native association/HTTPS route configuration, then exercise actual scoped push/auth/link acceptance. Android Google/Home is already accepted. |
 | Physical location and deployment | Authorized device/target environment, real provider configuration and target-specific execution. Emulator/no-location review and isolated recovery are separate evidence. |
 
 Do not invent provider credentials, bank formats, tax rules or new scope to close

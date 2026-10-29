@@ -143,8 +143,10 @@ The final fixture observed 51 requests, one registration, two identical PUTs,
 one disable, final version 1 with no retained token, and no company mutation.
 It passed in 9.7m/10.3m including setup, alongside 1,840 Mobile desktop/UI tests,
 113 identity Chromium cases, Android assembly and bounded Platform proxy checks.
-Owned resources were cleaned. FCM sending/scoped hints still need server
-credentials; Google token exchange and iOS/physical acceptance remain separate.
+Owned resources were cleaned. This registration-only fixture did not send FCM.
+The later supplied credential and [actual Android delivery](native-fcm-acceptance.md)
+resolved that prerequisite. [Android Google/Home](measurements/native-google-2026-10-29.json)
+also subsequently passed; iOS/physical acceptance remains separate.
 
 [Saved account-access audit](account-access-audit.md) now discloses typed historical
 status, global permissions and reason through a separate V100 immutable projection.

@@ -94,8 +94,13 @@ enrolled and verified HRIS MFA, acknowledged recovery codes and reached company
 selection without assigned company access. The temporary Firebase account was
 deleted and the owned fixture stopped. No live HRIS database was changed.
 
-Google system account UI launch/dismissal passed on Android; actual Google token
-exchange, physical devices and iOS remain separate acceptance. Detailed evidence is
+That initial Android run covered Google system account UI launch/dismissal only.
+On 29 October the user completed Google → Firebase → HRIS → company/Home on the
+installed phone after explicit UID binding. Authorized server-session metadata
+independently confirmed a new native session. The existing employee grants and
+binding history were preserved; the owned fictional password binding was retired
+under the existing one-active-subject rule. See [sanitized Google acceptance](measurements/native-google-2026-10-29.json).
+iOS provider/device acceptance remains separate. Detailed Mobile evidence is
 in the [Mobile validation record](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/validation.md).
 
 Domain tests cover project/provider/tenant/time policy, rate limits, late expiry

@@ -73,6 +73,7 @@ jobs:
           cache: npm
           cache-dependency-path: apps/dashboard/package-lock.json
       - run: npm ci
+      - run: node --experimental-strip-types --test --test-timeout=10000 integration-native/fixtures/download-proxy.test.mjs
       - run: npm run check
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e -- --shard=${{ matrix.shard }}/4

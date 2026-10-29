@@ -1,5 +1,8 @@
 # Owned Android command acceptance
 
+The separate [document transfer case](native-download-acceptance.md) covers partial
+downloads, offline restart, Pending actions, retained offsets and native saved bytes.
+
 The native fixture uses the real API/PostgreSQL/worker and an independently
 authenticated server observer. It provisions fictional people, grants, a work
 calendar and one published Inbox message. A loopback proxy drops the first

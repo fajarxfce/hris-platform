@@ -3,6 +3,7 @@ import { defineConfig } from "@playwright/test";
 /** Manual native driver joins this bounded, fictional server/browser fixture. */
 export default defineConfig({
   testDir: "./integration-native",
+  testMatch: "inbox-recovery.spec.ts",
   timeout: 540_000,
   workers: 1,
   retries: 0,

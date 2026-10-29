@@ -5,6 +5,18 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+[Android partial-download recovery](native-download-acceptance.md) passed against
+actual API/PostgreSQL/worker/Garage with a fictional accepted document inspection.
+A one-MiB partial file and Pending actions transfer count survived offline process
+restart; summary open/reload made no request (31 → 31). Resume began at byte
+1,048,576 and the native saved copy matched all 3,145,841 source bytes/SHA-256.
+All six summary rows became empty and sign-out succeeded. The independent fixture
+observed 49 requests, four correct ranges and no native company mutation, passing
+in 9.7m (10.2 with setup). Proxy concurrency/disposal regression, Biome, TypeScript,
+production build and architecture/formatting passed. The unchanged loopback APK
+was reused; application source and Starter need no change. Owned resources and
+control files were removed, and the emulator stopped with app data retained.
+
 [Global platform audit](audit.md#platform-history) is implemented through a separate
 V99 metadata projection and explicit global `audit.read` grant. Account/MFA guards,
 source-bound append-only capture and unchanged journal RLS protect disclosure.

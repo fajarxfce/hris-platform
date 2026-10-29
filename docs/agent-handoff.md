@@ -11,11 +11,11 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
-| `hris-platform` | `feat/firebase-auth` | Global audit/schema 99 below; native fixture `cf2bb991`, storage interruption `3770b3ff` |
-| `hris-mobile` | `feat/native-push` | `c650e0d7` — unconfirmed Inbox command acceptance; prior handoff `9dbaf730` |
+| `hris-platform` | `feat/firebase-auth` | Native transfer fixture below; global audit/schema 99 `adfb7b32` |
+| `hris-mobile` | `feat/native-push` | See Mobile handoff for partial-download acceptance; prior Inbox `c650e0d7` |
 | `compose-fluent-starter` | `fix/push-token-lifecycle` | `1606765` — tracked handoff; validated foundation `a16325e` |
 
-The latest increment implements global platform audit with schema-99 recovery.
+The latest increment verifies Android partial-download recovery and saved bytes.
 Inspect `git status`, `git log` and
 the upstream before continuing. Mobile and Starter were clean at this update.
 
@@ -42,7 +42,42 @@ summaries distinguish completed authoring/export/worker work from historical
 implementation stages, so an old "planned" paragraph cannot silently become the
 next task. These documentation changes require no application test rerun.
 
-## Current checkpoint: global platform audit and schema-99 recovery
+## Current checkpoint: native partial-download acceptance
+
+[Android partial-download recovery](native-download-acceptance.md) passed against
+actual API/PostgreSQL/worker/Garage with a fictional accepted document inspection.
+A one-MiB partial file and Pending actions transfer count survived offline process
+restart; summary open/reload made no request (31 → 31). Resume began at byte
+1,048,576 and the native saved copy matched all 3,145,841 source bytes/SHA-256.
+All six summary rows became empty and sign-out succeeded. The independent fixture
+observed 49 requests, four correct ranges and no native company mutation, passing
+in 9.7m (10.2 with setup). Proxy concurrency/disposal regression, Biome, TypeScript,
+production build and architecture/formatting passed. The unchanged loopback APK
+was reused; application source and Starter need no change. Owned resources and
+control files were removed, and the emulator stopped with app data retained.
+
+Read the [tracked fixture/procedure](native-download-acceptance.md) for exact
+reproduction and source-publication limits. The source file was uploaded via API
+and Garage; its accepted inspection metadata was seeded under normal constraints.
+This case does not repeat antivirus acceptance. The proxy records only bounded
+sanitized metadata and range hashes; a Node regression covers competing admission
+and pending-stream cleanup. The sixteen-content-attempt bound is checked before
+forwarding. The standalone native-download config owns storage and selects one
+manual case; the Inbox config retains its original case selection.
+
+Local evidence is named in the contract. No native/server fixture is active.
+The APK was reused from the accepted loopback build, and no application source
+changed. Mobile's validation, pending-actions, document contract and handoff record
+these results; no Starter port is required.
+
+Next: continue remaining independent PRD work after pushing this increment. Global
+metadata audit is complete; detailed source-aware disclosure and provider-health
+observations remain separate contracts. Native Pending actions now has real draft,
+unconfirmed Inbox-command and partial-download recovery evidence; upload/review
+and other feature outcomes retain their own coverage. Recheck actual provider
+configuration before asking for missing external inputs already listed below.
+
+## Previous checkpoint: global platform audit and schema-99 recovery — `adfb7b32`
 
 [Global platform audit](audit.md#platform-history) is implemented through a separate
 V99 metadata projection and explicit global `audit.read` grant. Account/MFA guards,
@@ -76,10 +111,8 @@ final contract log for its successful result. The full dashboard run passed in
 corrected real run cleaned its owned services and connection metadata. No fixture
 or emulator is active at this checkpoint.
 
-Next: continue the PRD rather than ending after this commit. The next native
-acceptance gap to examine is document-transfer recovery and its Pending actions
-projection, including retained partial files across offline process restart.
-Read Mobile's document/validation contracts first and reuse the dedicated emulator.
+Next: continue the PRD rather than ending after this commit. The subsequent native
+partial-download recovery case is accepted in the current checkpoint above.
 Detailed source-aware audit disclosure, provider health and the external Google/
 FCM/iOS/device inputs remain their own contracts; no completion is inferred from
 this metadata explorer. Continue independent work, update these tracked notes,

@@ -8,6 +8,23 @@ notes in Git. Read this file first, then the compact [PRD status](prd-status.md)
 
 ## Current result and continuation
 
+Current Verify run [40816036721](https://github.com/fajarxfce/hris-platform/actions/runs/40816036721)
+passed all four backend and all four dashboard shards at `d7184e83`: 2,731 disjoint
+API tests, 94 worker passes (one separately accepted manual retention case skipped),
+686 module tests, 3,997 dashboard unit tests, seven native-proxy regressions and
+1,098 distinct Chromium scenarios. Repeated worker/module/unit suites are counted
+once. Dashboard integration is still running; inspect its final result before
+dispatching a replacement run, since branch concurrency cancels older work.
+
+The actual schema-101 recovery step also passed (104 objects, 2,098,795 bytes,
+two encrypted identity records, old/current keys, exact audit/delivery projections
+and cleanup), but its artifact-upload step failed: upload-artifact excludes hidden
+paths by default. The workflow now opts in only for the exact sanitized
+`.work/recovery-set-result-*.json` glob, never the whole private directory. YAML
+and result assertions passed locally; hosted artifact upload still needs a new run.
+Do not describe this first full run as successful or repeat application tests just
+to replace a missing report without acknowledging this CI failure.
+
 [Android Attendance capture recovery](native-attendance-acceptance.md) passed
 actual API/PostgreSQL/worker acceptance. One capture without location survived
 committed-response loss and offline cold start; summary reload stayed 21 → 21.

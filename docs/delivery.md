@@ -16,6 +16,14 @@ fixes in the handoff. Dispatch does not publish a release or deploy an applicati
 normal temporary test artifacts have their existing retention. Native emulator,
 real elapsed-retention and external-provider acceptance remain separately recorded.
 
+The 29 October run `40816036721` passed its four backend/dashboard shards and
+actual schema-101 recovery, but recovery report upload failed because the action
+excludes hidden paths by default. Recovery output is explicitly sanitized; the
+upload now permits the exact `.work/recovery-set-result-*.json` glob only, retaining
+`if-no-files-found: error` and seven-day retention. Private fixture files and keys
+are not included. A replacement hosted run must verify the corrected upload;
+the original run's downstream integration status is recorded in the handoff.
+
 ## Status
 
 End-to-end scope and remaining work are tracked in [completion](completion.md),

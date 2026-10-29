@@ -152,5 +152,7 @@ jobs:
         with:
           name: recovery-verification-summary
           path: .work/recovery-set-result-*.json
+          # Only these sanitized summaries; never upload the whole private .work tree.
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 7

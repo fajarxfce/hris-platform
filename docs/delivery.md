@@ -29,6 +29,14 @@ retain the original failed conclusion and the pending upload acceptance.
 
 ## Status
 
+Full CI `40820005213` found a closing-report browser assertion that intermittently
+matched both the page and section heading after returning from an original closing.
+The test now waits for the returned employee table and selects the level-one page
+heading. Its four Chromium scenarios passed locally in 10.4s, with strict TypeScript
+and Biome. This changes the acceptance locator, not the report or its navigation.
+The original trace and failed shard remain recorded; the corrected full matrix
+must be verified without cancelling the active recovery job.
+
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 

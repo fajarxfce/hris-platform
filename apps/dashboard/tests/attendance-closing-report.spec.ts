@@ -25,7 +25,10 @@ test("closing months compare original and current facts and open the exact revis
   await page.getByRole("link", { name: "Original closing", exact: true }).click();
   await expect(page.getByRole("table", { name: "Daily results", exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Back to report", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Closing employees", exact: true })).toBeVisible();
+  await expect(page.getByRole("table", { name: "Closing employees", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Closing employees", level: 1, exact: true }),
+  ).toBeVisible();
   await page.getByRole("link", { name: "Back to report", exact: true }).click();
   await expect(page.getByLabel("From month", { exact: true })).toHaveValue("2026-09");
   await expect(page.getByLabel("Until month", { exact: true })).toHaveValue("2026-10");

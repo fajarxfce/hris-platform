@@ -8,6 +8,19 @@ notes in Git. Read this file first, then the compact [PRD status](prd-status.md)
 
 ## Current result and continuation
 
+Replacement run `40820005213` exposed one intermittent browser-test ambiguity:
+the return-navigation assertion matched both the page `h1` and loaded-section
+`h2` named **Closing employees**. Dashboard shard 1 had 274 passes/one failure;
+the other three dashboard shards passed. Backend/recovery work is still running.
+The existing scenario now waits for the returned table and explicitly selects
+the level-one page heading. All four closing-report browser cases passed in 10.4s,
+with strict TypeScript and Biome; no application implementation changed.
+
+Push this correction and verify its exact head on an owned temporary CI ref so
+the active recovery run is not cancelled by branch concurrency. Record the new run
+URL here and retain the original failing trace. Do not call either earlier full
+run successful; inspect the corrected full matrix and sanitized restore artifact.
+
 First Verify run [40816036721](https://github.com/fajarxfce/hris-platform/actions/runs/40816036721)
 passed all four backend and all four dashboard shards at `d7184e83`: 2,731 disjoint
 API tests, 94 worker passes (one separately accepted manual retention case skipped),

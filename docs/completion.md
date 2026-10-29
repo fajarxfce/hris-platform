@@ -685,17 +685,22 @@ followed that proof and passed local root/Android/Chromium checks. Full run
 suites and the complete Xcode app. Its preceding password-only port independently
 passed 62 native cases/Xcode in `40861505322`.
 
-| Remaining work | Current state and required acceptance |
-| --- | --- |
-| iOS provider and physical application links | Matching Firebase public plists are installed for all HRIS flavors. Mobile password/Google adapters and the generic Starter port passed full CI independently. Complete APNs/device setup and the controlled HTTPS domain with native association/route admission, then exercise actual scoped login/push/link flows; simulator tests do not prove them. |
-| Physical location and target deployment | Emulator/no-location review and constrained workload/recovery evidence passed. Actual GPS and target-specific operation require the authorized device/environment and deployed provider configuration. Git push authorization does not authorize a production release. |
+The current implementation increment is configurable HTTPS association/admission
+and the public web handoff, with real Android scope/offline/archive acceptance.
+Mobile full run `40887772486` and the following Starter port remain active at this
+record. Their final results belong in [the current handoff](agent-handoff.md).
+The earlier provider runs above do not cover this new increment.
 
-CI and generic ports, including the new Apple Google foundation, are accepted.
-Continue device/provider
-acceptance when its input is available. Reopen an
-accepted implementation only for a documented requirement gap or observed failure;
-do not recreate completed replicas, drafts, summary observers or administrative
-screens based on a historical "next" paragraph.
+| Deployment observation | Current boundary |
+| --- | --- |
+| Public application links | Native association generation and HTTPS admission are implemented. A controlled domain and its actual DNS/TLS/association publication are deployment configuration; fictional-host intent tests do not prove OS domain verification. |
+| Apple device providers/APNs | Matching Firebase plists and simulator/Xcode proof exist. Physical iPhone testing is explicitly waived for this pass; later actual APNs delivery needs Apple signing/provider setup. |
+| Physical location and production | Emulator/no-location review and constrained workload/recovery evidence passed. Actual GPS and target-specific operation need an authorized device/environment. No production release was requested. |
+
+Reopen accepted implementation for a documented requirement gap or observed
+failure. Do not recreate completed replicas, drafts, summary observers or
+administrative screens from a historical "next" paragraph. Physical iPhone tests
+must not reappear as a completion gate after the user's waiver.
 
 ## Detailed delivery evidence by area
 

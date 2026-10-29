@@ -178,20 +178,23 @@ requirement. New behavior gaps still require implementation and relevant accepta
 
 ## Remaining delivery areas
 
-The latest Mobile iOS provider and generic Starter port are accepted, with all
-hosted verification complete. Continue these actual external cases when their
-input is available. [Remaining delivery](completion.md#remaining-delivery-sequence)
-and [PRD status](prd-status.md#external-acceptance-still-required) retain the scope.
+The preceding Apple provider ports are accepted. Configurable HTTPS admission and
+native associations are implemented in Mobile `d36a1bc9`; full CI `40887772486`
+and its upcoming Starter port are the current work. The public dashboard handoff
+and actual Android scoped/offline/archive case passed. The user waived physical
+iPhone testing for this completion pass. Deployment-specific evidence stays
+separate from these implementation results.
 
-| Work | Required input and acceptance |
+| Deployment observation | Configuration/execution still needed |
 | --- | --- |
-| iOS provider and physical links | Matching Firebase public configs are already installed. Obtain APNs/device setup and the controlled HTTPS domain, finish native association/HTTPS route configuration, then exercise actual scoped push/auth/link acceptance. Android Google/Home is already accepted. |
-| Physical location and deployment | Authorized device/target environment, real provider configuration and target-specific execution. Emulator/no-location review and isolated recovery are separate evidence. |
+| Public HTTPS association | A controlled domain, its DNS/TLS and generated public association files served without redirects. Configurable native implementation already exists; do not implement it again. |
+| Apple physical provider/push | Optional later device signing and APNs setup; actual device testing is waived for this completion pass. Simulator/Xcode proof is recorded independently. |
+| Physical location and production | Authorized device/target environment and target-specific execution. Emulator/no-location review and isolated recovery retain their measured boundaries. |
 
-Questions about an available iPhone and the controlled HTTPS domain are pending;
-do not repeat them while waiting. Mobile's [iOS procedure](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/ios-acceptance.md)
-records remaining setup and safe acceptance observations. Preserve the current
-Android Google binding/session and the running private development stack.
+Only the domain question remains pending; do not repeat it while waiting, and do
+not request an iPhone again. Mobile's [optional iOS procedure](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/ios-acceptance.md)
+is a future procedure, not an executed test. Preserve the accepted Android Google
+binding/session and the running private development stack.
 
 Do not invent provider credentials, bank formats, tax rules or new scope to close
 these rows. The initial expense bank submission is manual. New workload corpora or

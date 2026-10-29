@@ -1,8 +1,7 @@
 # Agent continuation — HRIS workspace
 
 Updated 29 October 2026 (UTC). The user authorized continuing the PRD, pushing every
-atomic commit and keeping handoffs in Git. The release-configuration audit below
-reopened delivery work after the previous checkpoint; physical/production observations remain separate. Read `AGENTS.md`, this page and [PRD status](prd-status.md),
+atomic commit and keeping handoffs in Git. The release-configuration audit and Starter port below passed; physical/production observations remain separate. Read `AGENTS.md`, this page and [PRD status](prd-status.md),
 then the affected module contract. The [archived history](agent-history-2026-10-29.md)
 preserves earlier work; its old next-step statements are not the active queue.
 
@@ -19,37 +18,55 @@ The controlled domain remains a deployment setting, not a reason to leave the
 configurable implementation unfinished. Preserve the accepted Google binding,
 phone data and running private development stack.
 
-## Native distribution audit — Starter CI active
+## Native distribution audit — accepted
 
-Mobile source `3dc81d00` passed all four jobs in full
-[CI 40909156570](https://github.com/fajarxfce/hris-mobile/actions/runs/40909156570).
-Downloaded Apple reports confirm 104 cases in 28 suites with zero failures/errors/
-skips; compilation/tests/Xcode took 791s/122s/1295s. Xcode's selected release API
-and remote backend were explicitly checked, along with native/domain artifacts.
-Its actual signed APK/AAB/SBOM fixture passed in 215.572s; all 1,860 desktop cases
-and 17 distribution regressions passed. Thirty-one missing POM hashes match the
-canonical HTTPS artifacts and preserve all prior hashes.
+The audit fixes selected release API precedence over per-environment project
+properties, optional app-link configuration through signing and packaging, and
+31 missing SBOM POM verification entries. The original artifact hashes remain
+unchanged. Android checks the normal test configuration before compiling the
+selected release; Xcode forwards the selected backend/API explicitly. The 15
+portable files retain Starter's application IDs, demo/remote choice and three-job
+CI. HRIS's remote-only policy, build-version UI fixtures and explicit dev-network
+XML attributes remain in Mobile.
 
-The audit fixes reproduced release API precedence, optional app-link input and
-signer/domain artifact matching, release SBOM verification, HRIS demo selection,
-build-version fixtures and explicit dev XML lint attributes. No API/schema or
-business policy changed. The 15 portable files retain Starter's demo choice and
-IDs; HRIS policy, UI fixtures and private dev network XML remain downstream.
+Mobile source `3dc81d00` passed all 4 jobs in full
+[CI 40909156570](https://github.com/fajarxfce/hris-mobile/actions/runs/40909156570). Downloaded Apple reports
+confirm 104 tests in 28 suites, zero failures/errors/skips;
+compilation/tests/Xcode took 791s/122s/1295s. The complete Xcode app, native/domain
+artifacts and explicit selected distribution API/backend assertions passed.
 
-Full [Starter CI 40916187442](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40916187442) is active at port `7706386`. All local
-checks passed: 326 desktop cases, 17 distribution and ten runner cases, actual
-signed APK/AAB/SBOM in 136.647s, and restored normal demo/dev plus production SBOM
-in 23s. Both packages retain the selected API/registration; actual signatures
-and packaged domain files/checksums passed. No upload or installation occurred.
-Final hosted jobs and downloaded Apple reports/Xcode markers remain required.
+Starter port `77063862` passed all 3 jobs in full
+[CI 40916187442](https://github.com/fajarxfce/compose-fluent-starter/actions/runs/40916187442). Downloaded Apple reports
+confirm 84 tests in 24 suites, zero failures/errors/skips;
+compilation/tests/Xcode took 724s/81s/744s. The complete Xcode app, native/domain
+artifacts and explicit selected distribution API/backend assertions passed.
 
-Preserve the installed phone, Google binding and private runtime. No distribution
-workflow was dispatched. Physical Apple signing, domain publication and production
-release remain distinct target operations. See the tracked
-[distribution evidence](measurements/distribution-2026-10-29.json) and the
-[Mobile handoff](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/agent-handoff.md).
+Actual local signed Android APK/AAB/SBOM exercises passed in 215.572s on Mobile
+and 136.647s on Starter. Both verify the selected release API and native manifest
+in APK and AAB, actual signatures, retained domain files and checksums. Mobile
+passed 1,860 desktop cases; Starter passed 326 desktop cases in 112 suites. Both
+passed 17 distribution regressions. Normal dev builds and production SBOMs were
+restored afterward (39s Mobile, 23s Starter), with fixture API/host values absent;
+Starter's normal backend remains demo. Every disposable signing key was removed.
 
-## Completed implementation and continuation
+A workflow-only follow-up at Mobile `d7e445a8` and Starter `4c794e7` retains
+`.well-known` files in the manual artifact upload. The pinned action's actual
+`@actions/glob` 0.5.0 selection reproduced five files with both domain statements
+missing on each signed fixture; the correction selects all seven and every
+checksum matches. Both workflows include hidden files only in the packaged
+artifact directory. This separate proof does not invoke upload; application/native
+code and ordinary CI definitions remain at the full-CI sources above.
+
+No CI, local check or reusable port remains pending for this audit. No distribution
+workflow, upload or phone installation was performed; the installed Mobile APK
+remains `72341ef6`. The private server and accepted Google binding are preserved.
+Real signed Apple IPA, APNs, public domain/DNS/TLS activation, physical GPS and
+production operation retain their separate target requirements. Physical iPhone testing was
+explicitly waived; simulator and unsigned Xcode proof does not imply device delivery.
+
+See [distribution evidence](measurements/distribution-2026-10-29.json).
+
+## Previous implementation checkpoint — HTTPS links
 
 The last implementation queue is closed: the [public HTTPS handoff](mobile-app-links.md)
 passed 4002 dashboard unit cases and 14 related Chromium cases at `d21a1346`.

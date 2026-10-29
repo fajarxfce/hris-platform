@@ -5,6 +5,17 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+[Android Firebase registration](native-push-acceptance.md) now passes actual SDK
+issuance, real API registration, committed-response loss, offline restart,
+original-command recovery, explicit token retirement and logout. Mobile `02743a9f`
+fixes submillisecond expiry rejection and cleanup of an absent prior session.
+The final fixture observed 51 requests, one registration, two identical PUTs,
+one disable, final version 1 with no retained token, and no company mutation.
+It passed in 9.7m/10.3m including setup, alongside 1,840 Mobile desktop/UI tests,
+113 identity Chromium cases, Android assembly and bounded Platform proxy checks.
+Owned resources were cleaned. FCM sending/scoped hints still need server
+credentials; Google token exchange and iOS/physical acceptance remain separate.
+
 [Saved account-access audit](account-access-audit.md) now discloses typed historical
 status, global permissions and reason through a separate V100 immutable projection.
 Reads require both global `audit.read` and `identity.manage`, current credentials

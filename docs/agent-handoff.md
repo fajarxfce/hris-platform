@@ -11,18 +11,18 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
-| `hris-platform` | `feat/firebase-auth` | Typed account-access audit/schema 100 below; native transfer `f23b73ba` |
-| `hris-mobile` | `feat/native-push` | `965c8d72` — partial-download acceptance; prior Inbox `c650e0d7` |
+| `hris-platform` | `feat/firebase-auth` | Native push fixture below; account audit/schema 100 `c282fa60` |
+| `hris-mobile` | `feat/native-push` | `02743a9f` — native registration recovery; transfer `965c8d72` |
 | `compose-fluent-starter` | `fix/push-token-lifecycle` | `1606765` — tracked handoff; validated foundation `a16325e` |
 
-The latest increment implements typed historical account-access audit disclosure.
+The latest increment verifies native Firebase registration and recovery.
 Inspect `git status`, `git log` and
 the upstream before continuing. Mobile and Starter were clean at this update.
 
 Mobile was generated from Starter and is the proving ground. Validate reusable
 foundation corrections in Mobile before porting them to Starter. HRIS business
-features stay in Mobile/Platform. The latest work changes HRIS administration and recovery acceptance; it requires
-no Mobile/Starter port.
+features stay in Mobile/Platform. The latest Platform fixture verifies Mobile
+registration fixes; no Starter port applies.
 
 The user has authorized continued implementation and a push after every atomic
 commit. Do not ask again for routine edits, tests, commits or pushes. Keep the
@@ -42,7 +42,47 @@ summaries distinguish completed authoring/export/worker work from historical
 implementation stages, so an old "planned" paragraph cannot silently become the
 next task. These documentation changes require no application test rerun.
 
-## Current checkpoint: typed account-access audit
+## Current checkpoint: actual Firebase native registration
+
+[Android Firebase registration](native-push-acceptance.md) now passes actual SDK
+issuance, real API registration, committed-response loss, offline restart,
+original-command recovery, explicit token retirement and logout. Mobile `02743a9f`
+fixes submillisecond expiry rejection and cleanup of an absent prior session.
+The final fixture observed 51 requests, one registration, two identical PUTs,
+one disable, final version 1 with no retained token, and no company mutation.
+It passed in 9.7m/10.3m including setup, alongside 1,840 Mobile desktop/UI tests,
+113 identity Chromium cases, Android assembly and bounded Platform proxy checks.
+Owned resources were cleaned. FCM sending/scoped hints still need server
+credentials; Google token exchange and iOS/physical acceptance remain separate.
+
+The tracked fixture/procedure is [native push acceptance](native-push-acceptance.md).
+It uses the real Firebase SDK and HRIS API/PostgreSQL/worker; it never injects a
+provider token. The manual first run found an 855-microsecond mismatch between
+server expiry and the client's millisecond family boundary; an upgrade recovered
+the existing operation. A fresh database also exposed a retained absent family;
+the second upgrade cleared only that exact prior-owner absence before new
+registration. The final full case passed, while the initial timed-out run is
+retained separately and not counted as a pass. API/worker JARs remain from
+`c282fa60`; this increment changes acceptance tooling/docs rather than server DI.
+
+Both native proxy regressions, TypeScript/Biome, production browser build and
+root architecture/format checks passed. The 512-event history is complete for the
+observed 51 calls; a larger fixture history fails verification. Request/response,
+connection/admission and execution bounds are explicit. Cancellation/error paths
+close upstream requests, including oversized input and pending streams. Both
+proxy files run serially in CI because they own fixed loopback ports. No hosted
+CI success is implied. All owned services/private connection files, markers and
+forwarding were removed; emulator data retained and connectivity restored. Only
+the dedicated emulator was connected, so no phone install is claimed.
+
+Continue independent remaining PRD acceptance after pushing. The question for the
+Firebase server credential path is still pending; do not repeat it or equate the
+public Android config with an FCM sender credential. Scoped message delivery,
+Google identity exchange, iOS/APNs/physical device work and other incomplete
+module acceptance remain. These two fixes are HRIS registration contracts, with
+no corresponding Starter policy or changed generic SDK source.
+
+## Previous checkpoint: typed account-access audit
 
 [Saved account-access audit](account-access-audit.md) adds
 `GET /api/v1/administration/audit-events/{eventId}/account-access` and an owned
@@ -513,7 +553,7 @@ order, not a claim that every module criterion has been exhaustively audited.
    cutover runbook do not establish those outcomes; isolated recovery does not
    establish a live cutover/RPO/RTO.
 3. Native/provider acceptance still includes actual Google identity exchange,
-   FCM registration/delivery and the remaining iOS/physical-device cases. Read the
+   FCM message delivery/scoped hints and the remaining iOS/physical-device cases. Read the
    current Mobile validation/native-push documents before choosing the next case.
 4. Reconcile the remaining module criteria in [completion](completion.md) with
    their individual contracts/evidence. Do not infer completion from routes,

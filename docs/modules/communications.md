@@ -110,3 +110,13 @@ The read uses the same company, account, inbox permission and live session/MFA
 checks as the inbox, after shared resource/access guards. One SQL aggregate uses
 the company/owner index without acquiring message content. Counts are advisory
 current reads; clients refresh after confirmed commands and foreground recovery.
+
+## Actual Android registration acceptance
+
+[Native Firebase registration](../native-push-acceptance.md) now verifies SDK token
+issuance, HRIS persistence, response-loss replay across offline process restart,
+explicit retirement and sign-out. Mobile's expiry-precision and absent-family
+cleanup fixes passed 1,840 desktop/UI and 113 identity browser tests. The independent
+server verified one registration, two identical saves and final version 1 without
+stored token material across 51 requests. No company mutation occurred. FCM message
+sending and scoped provider hints remain separate from this registration proof.

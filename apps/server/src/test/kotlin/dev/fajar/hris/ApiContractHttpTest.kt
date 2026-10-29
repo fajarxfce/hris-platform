@@ -25,6 +25,32 @@ class ApiContractHttpTest : PeopleApiFixture() {
     private lateinit var mappings: RequestMappingHandlerMapping
 
     @Test
+    fun openApiKeepsGlobalMetadataSeparateFromTheCompanyContract() {
+        val document = contract()
+        val path = "/api/v1/administration/audit-events"
+        val operation = document["paths"][path]["get"]
+        assertNotNull(operation)
+        val parameters =
+            operation["parameters"].iterator().asSequence().associateBy { it["name"].asString() }
+        assertEquals(200, parameters.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals("uuid", parameters.getValue("cursor")["schema"]["format"].asString())
+        assertEquals(
+            setOf(
+                "id",
+                "actorId",
+                "resourceType",
+                "resourceId",
+                "action",
+                "correlationId",
+                "recordedAt",
+            ),
+            document["components"]["schemas"]["PlatformAuditEventResponse"]["properties"]
+                .propertyNames()
+                .toSet(),
+        )
+    }
+
+    @Test
     fun reportExportsDescribeOwnedRecoveryAndAuthorizedCsvRanges() {
         val api = contract()
         val base = "/api/v1/companies/{companyId}/reports/exports"

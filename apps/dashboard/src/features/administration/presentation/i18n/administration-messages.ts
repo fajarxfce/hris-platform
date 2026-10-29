@@ -2,6 +2,8 @@ import type { Locale } from "../../../../core/presentation/i18n/messages";
 
 const en = {
   audit: "Audit log",
+  platformAudit: "Platform audit",
+  platform: "Platform",
   administration: "Administration",
   filters: "Audit filters",
   from: "From (UTC)",
@@ -33,6 +35,8 @@ const en = {
 
 const id: typeof en = {
   audit: "Log audit",
+  platformAudit: "Audit platform",
+  platform: "Platform",
   administration: "Administrasi",
   filters: "Filter audit",
   from: "Mulai (UTC)",

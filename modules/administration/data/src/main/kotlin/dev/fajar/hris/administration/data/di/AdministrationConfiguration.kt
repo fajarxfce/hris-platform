@@ -4,11 +4,13 @@ import dev.fajar.hris.administration.data.datasources.*
 import dev.fajar.hris.administration.data.repositories.ConfiguredIntegrationRepository
 import dev.fajar.hris.administration.data.repositories.StoredAuditRepository
 import dev.fajar.hris.administration.data.repositories.StoredCompanyClientPolicyRepository
+import dev.fajar.hris.administration.data.repositories.StoredPlatformAuditRepository
 import dev.fajar.hris.administration.data.repositories.StoredWorkerIntegrationRepository
 import dev.fajar.hris.administration.domain.entities.IntegrationKind
 import dev.fajar.hris.administration.domain.repositories.AuditRepository
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.administration.domain.repositories.IntegrationConfigurationRepository
+import dev.fajar.hris.administration.domain.repositories.PlatformAuditRepository
 import dev.fajar.hris.administration.domain.repositories.WorkerIntegrationRepository
 import dev.fajar.hris.administration.domain.usecases.*
 import dev.fajar.hris.core.domain.*
@@ -72,6 +74,23 @@ class AdministrationConfiguration {
         security: IdentitySecurityPolicy,
         clock: Clock,
     ) = GetWorkerIntegrationRegistry(registry, identities, transactions, security, clock)
+
+    @Bean
+    fun platformAuditSource(sql: DSLContext): PlatformAuditDataSource =
+        PostgresPlatformAuditDataSource(sql)
+
+    @Bean
+    fun platformAudits(source: PlatformAuditDataSource): PlatformAuditRepository =
+        StoredPlatformAuditRepository(source)
+
+    @Bean
+    fun searchPlatformAuditEvents(
+        audits: PlatformAuditRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = SearchPlatformAuditEvents(audits, identities, transactions, security, clock)
 
     @Bean fun auditSource(sql: DSLContext): AuditDataSource = PostgresAuditDataSource(sql)
 

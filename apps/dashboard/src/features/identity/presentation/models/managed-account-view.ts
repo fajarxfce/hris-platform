@@ -7,7 +7,9 @@ export function platformPermissionLabel(permission: string, locale: Locale): str
     ? text.manageAccounts
     : permission === "companies.create"
       ? text.createCompanies
-      : permission;
+      : permission === "audit.read"
+        ? text.readPlatformAudit
+        : permission;
 }
 export function managedAccountRows(accounts: readonly ManagedAccount[], locale: Locale) {
   const text = managedAccountMessages(locale);

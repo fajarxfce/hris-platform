@@ -1,9 +1,11 @@
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 import type { AuditEvent } from "../../domain/entities/audit-event";
 import type { AuditPage } from "../../domain/entities/audit-page";
+import type { PlatformAuditEvent } from "../../domain/entities/platform-audit-event";
+import type { PlatformAuditPage } from "../../domain/entities/platform-audit-page";
 import { administrationMessages } from "../i18n/administration-messages";
 
-export function auditPageView(page: AuditPage, locale: Locale) {
+export function auditPageView(page: AuditPage | PlatformAuditPage, locale: Locale) {
   const dates = new Intl.DateTimeFormat(locale, {
     dateStyle: "medium",
     timeStyle: "medium",
@@ -23,7 +25,7 @@ export function auditPageView(page: AuditPage, locale: Locale) {
   };
 }
 
-export function auditEventView(event: AuditEvent, locale: Locale) {
+export function auditEventView(event: AuditEvent | PlatformAuditEvent, locale: Locale) {
   const text = administrationMessages(locale);
   return [
     { label: text.id, value: event.id },
@@ -32,7 +34,7 @@ export function auditEventView(event: AuditEvent, locale: Locale) {
     { label: text.actor, value: event.actorId },
     { label: text.resourceType, value: event.resourceType },
     { label: text.resourceId, value: event.resourceId },
-    { label: text.company, value: event.companyId },
+    ...("companyId" in event ? [{ label: text.company, value: event.companyId }] : []),
     { label: text.correlation, value: event.correlationId },
   ];
 }

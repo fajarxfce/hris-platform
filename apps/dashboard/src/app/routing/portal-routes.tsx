@@ -26,6 +26,11 @@ import type { ReportingUseCases } from "../../features/reporting/presentation/co
 import type { WorkforceUseCases } from "../../features/workforce/presentation/contracts/workforce-use-cases";
 import { approvalResourceRoute } from "./approval-resource-route";
 
+const PlatformAuditScreen = lazy(() =>
+  import("../../features/administration/presentation/bindings/platform-audit-screen").then(
+    (module) => ({ default: module.PlatformAuditScreen }),
+  ),
+);
 const noPlatformPermissions: readonly string[] = Object.freeze([]);
 const IntegrationConfigurationScreen = lazy(() =>
   import(
@@ -571,12 +576,23 @@ export function PortalRoutes({
   nextIdentifier: () => string;
 }) {
   const platform = useMatch("/platform/*");
+  const platformAudit = useMatch("/platform/audit");
   const integrations = useMatch("/platform/integrations");
   const ownSessions = useMatch("/account/sessions");
   const platformAccess = useMemo(
     () => Object.freeze({ accountId, permissions: platformPermissions }),
     [accountId, platformPermissions],
   );
+  if (platformAudit)
+    return (
+      <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+        <PlatformAuditScreen
+          access={platformAccess}
+          search={administration.searchPlatformAudit}
+          locale={locale}
+        />
+      </Suspense>
+    );
   if (integrations)
     return (
       <Suspense fallback={<AppLoading label={messages(locale).loading} />}>

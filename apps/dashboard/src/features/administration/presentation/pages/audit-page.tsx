@@ -21,6 +21,7 @@ export function AuditPage({
   event,
   filters,
   companyName,
+  platform = false,
   locale,
   hasCursor,
   onRefresh,
@@ -30,11 +31,12 @@ export function AuditPage({
   onOpen,
   onClose,
 }: {
-  state: AuditState;
+  state: Pick<AuditState, "stage" | "failure"> & { page: { nextCursor: string | null } | null };
   view: AuditPageView | null;
   event: AuditEventView | null;
   filters: ReturnType<typeof useAuditFilters>;
   companyName: string;
+  platform?: boolean;
   locale: Locale;
   hasCursor: boolean;
   onRefresh: () => void;
@@ -49,7 +51,7 @@ export function AuditPage({
   return (
     <section aria-busy={state.stage === "loading"}>
       <AppPageHeader
-        title={text.audit}
+        title={platform ? text.platformAudit : text.audit}
         context={`${companyName} / ${text.administration}`}
         actions={
           <AppButton

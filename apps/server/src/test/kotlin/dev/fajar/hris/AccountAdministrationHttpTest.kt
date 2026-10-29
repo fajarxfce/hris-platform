@@ -42,7 +42,7 @@ class AccountAdministrationHttpTest : ApiIntegrationTest() {
         assertTrue(review["account"]["mfaConfigured"].asBoolean())
         assertEquals(0, review["account"]["version"].asLong())
         assertEquals(
-            setOf("identity.manage", "companies.create"),
+            setOf("identity.manage", "companies.create", "audit.read"),
             review["assignablePermissions"].iterator().asSequence().map { it.asString() }.toSet(),
         )
         assertFalse(response.body().contains("owned-fixture-only"))

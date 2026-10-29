@@ -8,8 +8,8 @@ It has no live restore destination and never stops or restarts the source servic
 Use Linux, Python 3.11+, Java 21, Docker and curl with SigV4 support. Build the
 current API JAR first; its offline key-verification entry point reuses the actual
 application cipher without starting Spring, an HTTP server, workers or providers.
-The checked-in Garage 2.4.1 single-node SQLite layout and database schemas 59–98
-are supported. V98 adds only ephemeral worker flags/timestamps and no encrypted
+The checked-in Garage 2.4.1 single-node SQLite layout and database schemas 59–99
+are supported. V99 adds only global audit metadata and no encrypted
 record family. New encryption contracts require reviewing the schema bound.
 
 ## Capture a checkpoint
@@ -142,3 +142,11 @@ schema 98, two encrypted records, 104 objects/2,098,795 bytes, retained old/curr
 keys, source independence and rejection of a wrong retired key. All owned
 resources and private fixture data were removed. Evidence:
 `.work/worker-recovery-set-checks.log`; the 20 recovery-tool regressions also pass.
+
+
+The V99 global-audit projection passed the complete exercise on 29 October 2026:
+schema 99, two encrypted records, 104 objects/2,098,795 bytes, retained old/current
+keys, independence from later source changes and rejection of a wrong retired
+key. All owned temporary resources were removed. No encrypted record family was
+added; the verifier ceiling now includes schema 99. Local evidence:
+`.work/platform-audit-recovery-set.log`.

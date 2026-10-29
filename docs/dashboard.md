@@ -951,6 +951,15 @@ The route is loaded on demand. Its controller owns one company-selection/date re
 
 ## Audit explorer
 
+`/platform/audit` uses the separate [global metadata API](audit.md#platform-history).
+It requires platform `audit.read`, works without company assignments and exposes
+no private reason/payload or company property. Account access review can assign
+this explicit grant. One cancellable page belongs to the account/permission
+snapshot; hidden workspace and account replacement discard it, and session
+revocation revalidates the shell. Explicit filters, fixed-window continuation,
+strict global response validation and English/Indonesian metadata panels are
+covered by unit, Chromium and real API/PostgreSQL/worker acceptance.
+
 `/administration/audit` uses the [company audit API](audit.md). The form supports explicit UTC start/end times, action/resource codes, and exact actor/resource IDs. Blank dates use the server's default window. A resource table shows metadata, and `AppDetailsPanel` shows full IDs and timestamps without another request or profile lookup. Action codes remain exact searchable identifiers; interface labels and failures are localized. The shared table and panel use Fluent's focus restoration attributes for keyboard navigation.
 
 The controller retains one page of at most 50 events. Older-page navigation writes the exact server-resolved window, filters, company scope, and cursor to the URL. Browser Back/Forward reloads the relevant page. First page retains that window; Reset filters returns to the default search. Form edits use UTC seconds, while pagination preserves server microseconds. Response mapping verifies scope, window, filter matches, ordering, uniqueness, size, and cursor progress. Clock instants with nanoseconds are compared at database precision.

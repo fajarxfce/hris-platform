@@ -11,5 +11,5 @@ data class AuditQuery(
     val resourceId: UUID?,
     val action: String?,
     val limit: Int,
-    val before: AuditEvent? = null,
+    val before: AuditMetadata? = null,
 )

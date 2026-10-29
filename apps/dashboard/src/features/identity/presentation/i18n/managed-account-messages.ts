@@ -52,6 +52,7 @@ export function managedAccountMessages(locale: Locale) {
         operation: "Referensi",
         manageAccounts: "Kelola akun platform",
         createCompanies: "Buat perusahaan",
+        readPlatformAudit: "Baca audit platform",
       }
     : {
         title: "Platform accounts",
@@ -104,5 +105,6 @@ export function managedAccountMessages(locale: Locale) {
         operation: "Reference",
         manageAccounts: "Manage platform accounts",
         createCompanies: "Create companies",
+        readPlatformAudit: "Read platform audit",
       };
 }

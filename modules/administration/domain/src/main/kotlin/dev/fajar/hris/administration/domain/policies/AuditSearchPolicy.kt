@@ -53,7 +53,7 @@ fun prepareAuditQuery(input: AuditSearch, now: Instant): Result<AuditQuery> {
 }
 
 /** An immutable cursor record must belong to the same window and filters as its continuation. */
-fun validateAuditCursor(query: AuditQuery, cursor: AuditEvent?): Result<AuditQuery> {
+fun validateAuditCursor(query: AuditQuery, cursor: AuditMetadata?): Result<AuditQuery> {
     if (
         cursor == null ||
             cursor.recordedAt < query.from ||

@@ -31,7 +31,7 @@ acceptance requirements.
 metadata/content and a separate private key pack. Success requires isolated
 restoration, exact object inventory and decryption of retained identity records
 with their original purposes; no application process runs against restored data.
-The real fictional API/worker/PostgreSQL/Garage exercise passed again at schema 98, two
+The real fictional API/worker/PostgreSQL/Garage exercise passed again at schema 99, two
 encrypted records under old/current keys and 104 objects (2,098,795 bytes), including
 multi-page and multi-block storage. It rejected a wrong retired key and proved
 independence from later source changes. All owned temporary resources were removed.
@@ -72,7 +72,7 @@ Settings reads return the configured head and effective policy in one guarded sn
 
 ## Audit search
 
-Company audit metadata search is implemented with current `audit.read`, original/live access and MFA checks, bounded time windows, exact filters, and timestamp/ID pagination. Reasons and change payloads are excluded from the SQL projection. The browser explorer includes UTC filters, bounded URL pagination, and metadata details with keyboard focus restoration. [Audit search](../audit.md) defines continuation, disclosure, and live-history consistency. Detailed audit disclosure and global audit queries remain subsequent work.
+Company audit metadata search is implemented with current `audit.read`, original/live access and MFA checks, bounded time windows, exact filters, and timestamp/ID pagination. Reasons and change payloads are excluded from the SQL projection. The browser explorer includes UTC filters, bounded URL pagination, and metadata details with keyboard focus restoration. [Audit search](../audit.md) defines continuation, disclosure, and live-history consistency. Global metadata queries are now implemented through a separate V99 projection and platform `audit.read` grant, with account/MFA guards, immutable source-bound capture, explicit search/pagination and per-account cancellation. The original journal RLS remains unchanged. Real API/worker/PostgreSQL/browser acceptance verified an independent grant, another actor's audit metadata, 52-row pagination, company-only denial and session revocation. Detailed source-aware audit disclosure remains separate work.
 
 ## Durable job foundation
 

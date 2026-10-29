@@ -1,7 +1,7 @@
 package dev.fajar.hris.identity.domain.policies
 
 object PermissionCatalog {
-    val platformAdministrator = setOf("companies.create", "identity.manage")
+    val platformAdministrator = setOf("companies.create", "identity.manage", "audit.read")
     val companyAdministrator =
         setOf(
             "company.read",

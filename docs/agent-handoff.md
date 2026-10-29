@@ -11,11 +11,11 @@ The workspace is `/home/fajar/hris` with three sibling Git repositories:
 
 | Repository | Branch | Last completed/pushed increment |
 | --- | --- | --- |
-| `hris-platform` | `feat/firebase-auth` | Native command fixture below; storage interruption `3770b3ff`, worker reports `e806caed` |
+| `hris-platform` | `feat/firebase-auth` | Global audit/schema 99 below; native fixture `cf2bb991`, storage interruption `3770b3ff` |
 | `hris-mobile` | `feat/native-push` | `c650e0d7` — unconfirmed Inbox command acceptance; prior handoff `9dbaf730` |
 | `compose-fluent-starter` | `fix/push-token-lifecycle` | `1606765` — tracked handoff; validated foundation `a16325e` |
 
-The latest acceptance contains native recovery after a committed response is lost.
+The latest increment implements global platform audit with schema-99 recovery.
 Inspect `git status`, `git log` and
 the upstream before continuing. Mobile and Starter were clean at this update.
 
@@ -42,7 +42,50 @@ summaries distinguish completed authoring/export/worker work from historical
 implementation stages, so an old "planned" paragraph cannot silently become the
 next task. These documentation changes require no application test rerun.
 
-## Current checkpoint: unconfirmed Inbox command on Android
+## Current checkpoint: global platform audit and schema-99 recovery
+
+[Global platform audit](audit.md#platform-history) is implemented through a separate
+V99 metadata projection and explicit global `audit.read` grant. Account/MFA guards,
+source-bound append-only capture and unchanged journal RLS protect disclosure.
+The dashboard supports auditors without companies, bounded search/pagination and
+per-account cancellation. Validation passed 250 distinct backend cases including
+all 94 worker tests, 3,949 dashboard tests, nine focused Chromium scenarios and a
+real API/PostgreSQL/worker/browser workflow (8.5 seconds; 53.9 with setup). The
+latter verified an independent grant, another actor's actual journal metadata,
+52-row pagination, company-only denial and revoked-session cleanup. Both JARs,
+architecture/formatting and twenty recovery-tool cases passed. Full isolated
+recovery passed at schema 99 with 104 objects/2,098,795 bytes and old/current keys.
+Owned resources were removed and screenshots inspected. Detailed source-aware
+audit disclosure and the remaining native/provider work remain separate; this
+increment needs no Mobile/Starter port or live deployment.
+
+Read [audit contract and validation](audit.md#global-audit-validation--29-october-2026)
+for the exact query, disclosure, permission, lifecycle and regression contracts.
+The V99 trigger captures existing/new global metadata atomically without widening
+private `audit_entries` reads. Existing accounts receive no implicit grant; global
+account access review now lists `audit.read`. New bootstrap administrators include it.
+The pure cursor policy shares only navigation fields between concrete global and
+company projections. Dashboard responses reject private/foreign scope fields.
+
+Local logs and the reproducible full matrix are linked in that contract. The
+first backend matrix passed in 4m3s; subsequent identity/catalogue and OpenAPI
+checks corrected fixture expectations without changing application behavior.
+The OpenAPI check now runs in the already-enabled API-contract fixture; use the
+final contract log for its successful result. The full dashboard run passed in
+73.66s. The failed raw Docker-group invocation started no accepted fixture; the
+corrected real run cleaned its owned services and connection metadata. No fixture
+or emulator is active at this checkpoint.
+
+Next: continue the PRD rather than ending after this commit. The next native
+acceptance gap to examine is document-transfer recovery and its Pending actions
+projection, including retained partial files across offline process restart.
+Read Mobile's document/validation contracts first and reuse the dedicated emulator.
+Detailed source-aware audit disclosure, provider health and the external Google/
+FCM/iOS/device inputs remain their own contracts; no completion is inferred from
+this metadata explorer. Continue independent work, update these tracked notes,
+and push each atomic commit as already authorized.
+
+## Previous checkpoint: unconfirmed Inbox command on Android — `cf2bb991`
 
 Mobile `c650e0d7` records a successful Android 35/API/PostgreSQL/worker command
 workflow. The new tracked [native fixture and protocol](native-acceptance.md)
@@ -68,10 +111,8 @@ Logs: `.work/inbox-native-fixture.log`, `inbox-native-server-result.json` and
 diagnostics stay ignored. There is no native fixture active. Application source
 and shared foundations did not change, so this requires no Starter port.
 
-Next active work: close the Administration gap for global audit navigation.
-Current audit search excludes global account events and detailed disclosure;
-review its bounded metadata/access contract before implementing cross-account
-visibility. Retained metadata must not expose reasons or arbitrary change payloads.
+The subsequent global-audit implementation and validation are recorded in the
+current checkpoint above. Detailed disclosure remains a separate contract.
 Continue the remaining PRD after each commit; do not end the long run at a checkpoint.
 
 ## Previous checkpoint: real export storage interruption — `3770b3ff`
@@ -360,8 +401,8 @@ hosted CI success is claimed for these branch pushes.
 
 Logs: `.work/recovery-set-integration-final.log`, `.work/recovery-final-checks.log`,
 `.work/recovery-key-verifier.log`. The schema ceiling in `tool/recovery_set.py` is
-now 98 after the repeat exercise recorded above. V98 adds no encrypted record
-family; review new persisted encryption contracts before raising the ceiling again.
+now 99 after the global-audit repeat exercise recorded above. V99 adds no encrypted
+record family; review new persisted encryption contracts before raising it again.
 
 ### Native acceptance and integrations
 

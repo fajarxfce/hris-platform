@@ -5,6 +5,21 @@
 End-to-end scope and remaining work are tracked in [completion](completion.md),
 including the separate [HRIS Mobile](https://github.com/fajarxfce/hris-mobile) repository.
 
+[Global platform audit](audit.md#platform-history) is implemented through a separate
+V99 metadata projection and explicit global `audit.read` grant. Account/MFA guards,
+source-bound append-only capture and unchanged journal RLS protect disclosure.
+The dashboard supports auditors without companies, bounded search/pagination and
+per-account cancellation. Validation passed 250 distinct backend cases including
+all 94 worker tests, 3,949 dashboard tests, nine focused Chromium scenarios and a
+real API/PostgreSQL/worker/browser workflow (8.5 seconds; 53.9 with setup). The
+latter verified an independent grant, another actor's actual journal metadata,
+52-row pagination, company-only denial and revoked-session cleanup. Both JARs,
+architecture/formatting and twenty recovery-tool cases passed. Full isolated
+recovery passed at schema 99 with 104 objects/2,098,795 bytes and old/current keys.
+Owned resources were removed and screenshots inspected. Detailed source-aware
+audit disclosure and the remaining native/provider work remain separate; this
+increment needs no Mobile/Starter port or live deployment.
+
 [Native Inbox response-loss acceptance](native-acceptance.md) now proves a retained
 command through offline Android process restart. The real API committed Mark as
 read before the proxy dropped its response. Pending actions retained one awaiting

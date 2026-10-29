@@ -3,6 +3,7 @@ import type { AppNavigationSection } from "../../core/presentation/components/ap
 import { type Locale, messages } from "../../core/presentation/i18n/messages";
 import { administrationNavigation } from "../../features/administration/presentation/navigation/administration-navigation";
 import { integrationConfigurationNavigation } from "../../features/administration/presentation/navigation/integration-configuration-navigation";
+import { platformAuditNavigation } from "../../features/administration/presentation/navigation/platform-audit-navigation";
 import { approvalsNavigation } from "../../features/approvals/presentation/navigation/approvals-navigation";
 import { communicationsNavigation } from "../../features/communications/presentation/navigation/communications-navigation";
 import {
@@ -79,6 +80,7 @@ export function portalNavigation(
       items: [
         ...platformAccountNavigation(platformPermissions, locale),
         ...integrationConfigurationNavigation(platformPermissions, locale),
+        ...platformAuditNavigation(platformPermissions, locale),
       ],
     },
     { id: "account", label: text.navigationAccount, items: deviceSessionNavigation(locale) },

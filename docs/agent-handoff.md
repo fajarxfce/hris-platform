@@ -179,10 +179,16 @@ Root checks pass 1,878 desktop and 131 Document Chromium cases; the APK builds.
 The new form also fixes validation feedback hidden above a long form. Mobile Git
 retains each earlier fixture failure, the reproduction and source/APK measurements.
 
-Next: Mobile definite initial server rejection recovery when no revision exists,
-owned metadata details/history and observed-version corrections with durable
-original-command recovery. Never release an earlier uncertain upload after a later
-rejection. Keep shared finance/leave evidence free of private identity numbers. Verify
+Mobile `e2690fd6` now recovers first definite upload rejections without reimporting
+file bytes. Two genuine failures now pass; uncertain/unknown commands stay pinned.
+Explicit reconfirmation uses an exact-file compare-and-set and new operation IDs.
+All 1,888 desktop and 140 Document Chromium cases, root checks and the dev APK pass
+(189.354s). Mobile Git retains cancellation/race/capability and actual encrypted
+storage evidence. No phone or live API change occurred.
+
+Next: Mobile owned metadata details/history and observed-version corrections with
+durable original-command recovery. Keep shared finance/leave evidence free of
+private identity numbers. Verify
 Android, Apple and owned emulator behavior before accepting `documents.02` or
 `people.03`; physical iPhone testing is waived. Finish the detailed People review,
 then remaining Platform modules and Mobile/Starter. This business capability has

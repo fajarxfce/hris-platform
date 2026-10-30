@@ -70,3 +70,10 @@ baseline snapshot. This isolation is recorded in the agent handoff.
 
 Continue the full module/Mobile review. Closing the email gap does not establish
 complete acceptance for the unreviewed inventory rows.
+
+## Next gap — shared approval history
+
+The [approval history audit](approval-history-audit-2026-10-30.md) confirms a missing
+reader/view for retained decisions and reassignments. Existing shared approval
+details show current assignments only. Its implementation and acceptance are now
+active; other requirement rows remain unverified.

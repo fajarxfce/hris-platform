@@ -15,8 +15,10 @@ The missing Communications email capability is now implemented and locally
 accepted: optional selection, immutable publication, atomic queue, owned SMTP
 worker, private administrative counts and dashboard authoring/review.
 Read [email delivery](announcement-email.md), its [measurements](measurements/announcement-email-2026-10-30.json)
-and the [full audit](feature-audit-2026-10-30.md). Observe branch CI, then continue
-all eleven module contracts and Mobile requirements. Do not narrow the objective
+and the [full audit](feature-audit-2026-10-30.md). Observe [CI 41005223374](https://github.com/fajarxfce/hris-platform/actions/runs/41005223374)
+for email source `8014d733`. The next confirmed missing feature is
+[shared approval decision/reassignment history](approval-history-audit-2026-10-30.md);
+implement and verify it, then continue all module and Mobile requirements. Do not narrow the objective
 to email or distribution; inventory rows remain unverified until reviewed.
 
 Local evidence: 132 API/OpenAPI tests, 104 worker tests, 13 communication domain

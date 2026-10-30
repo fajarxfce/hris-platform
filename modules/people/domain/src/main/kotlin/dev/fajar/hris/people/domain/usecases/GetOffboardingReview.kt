@@ -44,10 +44,11 @@ class GetOffboardingReview(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             if (!(checked as Result.Success).value.permissions.containsAll(required))
                 return@run Result.Failed(
@@ -78,12 +79,16 @@ class GetOffboardingReview(
                 (owner as Result.Success).value?.timezone
                     ?: return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "company_not_found"))
             Result.Success(
-                OffboardingReview(
-                    details,
-                    employmentVersion,
-                    LocalDate.now(clock.withZone(ZoneId.of(timezone))),
+                    OffboardingReview(
+                        details,
+                        employmentVersion,
+                        LocalDate.now(clock.withZone(ZoneId.of(timezone))),
+                    )
                 )
-            )
+                .flatMap { acquired ->
+                    validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
+                        .map { acquired }
+                }
         }
     }
 }

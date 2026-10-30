@@ -33,22 +33,29 @@ class GetPersonProfile(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
-            profiles.findForEmployee(company, employeeId).flatMap { profile ->
-                if (
-                    profile == null ||
-                        !("people.profile.read" in live.permissions ||
-                            ("people.self.read" in live.permissions &&
-                                profile.profile.accountId == live.accountId))
-                )
-                    Result.Failed(Failure(FailureKind.NOT_FOUND, "person_profile_not_found"))
-                else Result.Success(profile)
-            }
+            profiles
+                .findForEmployee(company, employeeId)
+                .flatMap { profile ->
+                    if (
+                        profile == null ||
+                            !("people.profile.read" in live.permissions ||
+                                ("people.self.read" in live.permissions &&
+                                    profile.profile.accountId == live.accountId))
+                    )
+                        Result.Failed(Failure(FailureKind.NOT_FOUND, "person_profile_not_found"))
+                    else Result.Success(profile)
+                }
+                .flatMap { acquired ->
+                    validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
+                        .map { acquired }
+                }
         }
     }
 }

@@ -39,34 +39,41 @@ class ListSelfEmployments(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             if (!canReadOwnEmployment(live.permissions))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
-            companies.find(company).flatMap { current ->
-                if (current == null)
-                    return@flatMap Result.Failed(
-                        Failure(FailureKind.NOT_FOUND, "company_not_found")
-                    )
-                val now = clock.instant()
-                val today = LocalDate.ofInstant(now, ZoneId.of(current.timezone))
-                people
-                    .list(
-                        company,
-                        live.accountId,
-                        EmployeeVisibility.SELF,
-                        today,
-                        now,
-                        "",
-                        after,
-                        limit,
-                    )
-                    .map { SelfEmploymentDirectory(today, current.timezone, it) }
-            }
+            companies
+                .find(company)
+                .flatMap { current ->
+                    if (current == null)
+                        return@flatMap Result.Failed(
+                            Failure(FailureKind.NOT_FOUND, "company_not_found")
+                        )
+                    val now = clock.instant()
+                    val today = LocalDate.ofInstant(now, ZoneId.of(current.timezone))
+                    people
+                        .list(
+                            company,
+                            live.accountId,
+                            EmployeeVisibility.SELF,
+                            today,
+                            now,
+                            "",
+                            after,
+                            limit,
+                        )
+                        .map { SelfEmploymentDirectory(today, current.timezone, it) }
+                }
+                .flatMap { acquired ->
+                    validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
+                        .map { acquired }
+                }
         }
     }
 }

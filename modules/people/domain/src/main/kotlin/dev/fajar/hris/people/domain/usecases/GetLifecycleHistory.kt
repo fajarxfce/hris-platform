@@ -40,10 +40,11 @@ class GetLifecycleHistory(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val permission = live.requirePermission("people.lifecycle.read")
@@ -52,7 +53,11 @@ class GetLifecycleHistory(
             if (found is Result.Failed) return@run found
             if ((found as Result.Success).value == null)
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "lifecycle_case_not_found"))
-            lifecycle.history(company, id, after, limit)
+            lifecycle.history(company, id, after, limit).flatMap { acquired ->
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security).map {
+                    acquired
+                }
+            }
         }
     }
 }

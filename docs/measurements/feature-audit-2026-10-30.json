@@ -869,6 +869,20 @@
         "docs/leave-feature-review-2026-10-30.md"
       ],
       "next": "Follow final-source CI and continue the remaining Platform/Mobile audit."
+    },
+    {
+      "id": "people.read-completion",
+      "status": "implemented-and-locally-accepted",
+      "baseline": "f95bdd12",
+      "requirement": "Current MFA and original/live scope through final People data acquisition, including independent cross-company review.",
+      "baselineEvidence": [
+        "Twenty-eight actual failed cases; prior fixture/compilation failures excluded."
+      ],
+      "evidence": [
+        "docs/people-read-assurance-2026-10-30.md",
+        "docs/measurements/people-read-assurance-2026-10-30.json"
+      ],
+      "next": "Keep all five People initial rows unverified until command/input, Organization and detailed evidence review complete."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

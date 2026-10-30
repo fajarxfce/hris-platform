@@ -37,10 +37,11 @@ class GetEmployeeImport(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val authorized =
-                identities.access(actor.accountId, company).flatMap {
-                    validateEmployeeImportSessionActor(actor, it, clock.instant(), security)
-                }
+                validateEmployeeImportSessionActor(actor, identityAccess, clock.instant(), security)
             if (authorized is Result.Failed) return@run authorized
             val found = imports.find(company, id)
             if (found is Result.Failed) return@run found
@@ -69,19 +70,28 @@ class GetEmployeeImport(
                 )
             val observedCounts = (counts as Result.Success).value
             Result.Success(
-                EmployeeImportSummary(
-                    batch,
-                    observedCounts,
-                    job.status,
-                    job.cancellationRequested,
-                    availableEmployeeImportActions(
-                        batch.status,
+                    EmployeeImportSummary(
+                        batch,
                         observedCounts,
                         job.status,
                         job.cancellationRequested,
-                    ),
+                        availableEmployeeImportActions(
+                            batch.status,
+                            observedCounts,
+                            job.status,
+                            job.cancellationRequested,
+                        ),
+                    )
                 )
-            )
+                .flatMap { acquired ->
+                    validateEmployeeImportSessionActor(
+                            actor,
+                            identityAccess,
+                            clock.instant(),
+                            security,
+                        )
+                        .map { acquired }
+                }
         }
     }
 }

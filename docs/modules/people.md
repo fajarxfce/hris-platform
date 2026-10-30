@@ -216,3 +216,11 @@ name/assignment changes and removals; private profile fields are excluded. See
 [synchronization](../synchronization.md#coworker-directory-projection) for worker
 ownership, publication and client replacement behavior. The live directory API
 and scheduled onboarding remain separate capabilities. Scheduled offboarding has its own [reviewed authorization](../offboarding-schedules.md).
+
+## Read completion assurance
+
+[People read completion](../people-read-assurance-2026-10-30.md) closes twenty-eight
+actual expiry cases across twenty-four readers, including both transfer-review
+company scopes. Retained guarded identity snapshots avoid additional queries;
+final assurance precedes successful data release. Command/input and Organization
+review remain separate outstanding work in the full feature audit.

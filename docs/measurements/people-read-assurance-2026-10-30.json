@@ -1,0 +1,1128 @@
+{
+  "date": "2026-10-30",
+  "baseline": "f95bdd12",
+  "status": "implemented-and-locally-accepted",
+  "useCasesChanged": 24,
+  "schemaChange": false,
+  "newDiDependencies": false,
+  "newQueries": 0,
+  "reproduction": {
+    "actualFailures": 28,
+    "firstReaderGroup": {
+      "tests": 26,
+      "durationSeconds": 55
+    },
+    "crossCompanyReview": {
+      "tests": 2,
+      "durationSeconds": 34
+    },
+    "cases": [
+      {
+        "suite": "dev.fajar.hris.EmployeeImportReadCompletionTest",
+        "name": "[1] mode = \"details\"",
+        "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.EmployeeImportReadCompletionTest",
+        "name": "[2] mode = \"list\"",
+        "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.EmployeeImportReadCompletionTest",
+        "name": "[3] mode = \"rows\"",
+        "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.EmployeeImportReadCompletionTest",
+        "name": "[4] mode = \"attempts\"",
+        "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[1] mode = \"employee\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[2] mode = \"self_employee\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[3] mode = \"employees\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[4] mode = \"details\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[5] mode = \"self_details\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[6] mode = \"history\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[7] mode = \"revision\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[8] mode = \"transfers\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[9] mode = \"self_employments\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[10] mode = \"profile\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[11] mode = \"self_profile\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[12] mode = \"profile_history\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[13] mode = \"directory\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[14] mode = \"departments\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[15] mode = \"case\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[16] mode = \"cases\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[17] mode = \"case_history\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[18] mode = \"template\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[19] mode = \"templates\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[20] mode = \"assigned\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[21] mode = \"assignees\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "suite": "dev.fajar.hris.PeopleReadCompletionTest",
+        "name": "[22] mode = \"offboarding\"",
+        "failure": "org.opentest4j.AssertionFailedError: Acquired data must not be released after proof expiry ==> expected: <mfa_required> but was: <null>"
+      },
+      {
+        "name": "[1] boundary = \"last_identity\"",
+        "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+      },
+      {
+        "name": "[2] boundary = \"employee\"",
+        "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+      }
+    ],
+    "excludedSetupAttempts": [
+      {
+        "tests": 22,
+        "actualFailures": 19,
+        "fixtureFailures": 3,
+        "reason": "SELF fixture lacked its explicit people.self.read grant; corrected before the 26-case reproduction.",
+        "durationSeconds": 44
+      },
+      {
+        "testsExecuted": 0,
+        "reason": "New job repository wrapper initially omitted the lock argument; signature corrected before reproduction.",
+        "durationSeconds": 13
+      }
+    ]
+  },
+  "focused": {
+    "api": 26,
+    "domain": 50,
+    "data": 14,
+    "durationSeconds": 69,
+    "failed": 0,
+    "note": "Focused run covers the first 23 readers; final broad acceptance includes the later two transfer-review regressions."
+  },
+  "acceptance": {
+    "api": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.AnnouncementAudiencePreviewHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementPublicationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementPublicationIntegrityTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApiContractHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalAccessRaceHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceClosingEmployeesAccessHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceClosingEmployeesHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceClosingReportHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceExceptionAccessHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceExceptionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceReportHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.CalendarSourceSyncHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.CompanyDirectoryHttpTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.CompensationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.CompensationReviewHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DirectoryRecordHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentEmployeesAdmissionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentEmployeesAssuranceTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentEmployeesHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeCalendarReviewHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeImportAccessHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeImportAssuranceHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeImportHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeImportReadCompletionTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeImportReviewHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentAccessHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentAssuranceHttpTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentCancellationHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentDetailsHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentRevisionHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentTransferAvailabilityHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentTransferHttpTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentTransferReadCompletionTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentTransferReviewHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseDraftHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseDraftingHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseReadScopeHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseReceiptHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseReportHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.GroupHeadcountAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.GroupHeadcountHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.HeadcountReportAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.HeadcountReportHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAccrualHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAccrualScheduleAssuranceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBalanceDirectoryHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBalanceSyncHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBatchAssuranceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBatchRecoveryHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBatchReviewHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBatchTransactionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCalendarHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCommandCompletionTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeavePreparationHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleAccessHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleAssigneeHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleAssuranceHttpTest",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleContextHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleHttpTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleSnapshotHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleTemplateHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.OffboardingReviewHttpTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.OffboardingScheduleAssuranceHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.OffboardingScheduleHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.OffboardingScheduleSecurityHttpTest",
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.OffboardingScheduleTransactionHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.OnboardingScheduleAssuranceHttpTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.OnboardingScheduleHttpTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.OnboardingScheduleSecurityHttpTest",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.OnboardingScheduleTransactionHttpTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeWorkflowHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentAttendanceHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentDiscoveryHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentPublicationAssuranceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentPublicationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentPublicationTransactionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAttendanceCalculationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAttendanceInputHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollCalculationReviewHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationPreparationHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationPublicationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationSecurityHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollInputHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollInputReviewHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPaymentAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPayslipHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPeriodHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPeriodReviewHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollReviewPreparationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunComparisonHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunCutoffHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunSnapshotHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunTransactionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxContinuityHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxOpeningHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxOpeningReviewHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PeopleHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PeopleReadCompletionTest",
+          "tests": 22,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PersonAccountBindingHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PersonProfileAssuranceHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PersonProfileHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.RosterBulkHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.SelfEmploymentHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.SelfExpenseHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.SelfLeaveHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.SelfLeavePreviewHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.SelfProfileRecordHttpTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.SelfWorkforceHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.WorkCalendarAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.WorkCalendarHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 427,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "domain": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.people.domain.DirectoryProjectionPolicyTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.people.domain.EmployeeImportPolicyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.people.domain.LifecyclePolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.people.domain.OffboardingSchedulePolicyTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.people.domain.OnboardingSchedulePolicyTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.people.domain.ReportingLinePolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.people.domain.SelfProfileProjectionPolicyTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 50,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "data": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.people.data.EmployeeCsvTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.people.data.SelfProfileRepositoryTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "durationSeconds": 1124,
+    "format": true,
+    "architecture": true,
+    "apiAndWorkerPackages": true,
+    "browser": {
+      "tests": 3,
+      "failed": 0,
+      "durationWithSetupMs": 36498.75,
+      "scenarios": [
+        {
+          "file": "employee-imports.spec.ts",
+          "title": "real API CSV preview and cancellation retain their original commands after lost responses",
+          "status": "expected",
+          "durationMs": 5423
+        },
+        {
+          "file": "employment-transfer.spec.ts",
+          "title": "real cross-company transfer recovers one commit, retains person identity and moves native employee access",
+          "status": "expected",
+          "durationMs": 5769
+        },
+        {
+          "file": "person-account-binding.spec.ts",
+          "title": "real account binding recovers one receipt and enables only the linked native employee profile",
+          "status": "expected",
+          "durationMs": 2800
+        }
+      ]
+    },
+    "workerBrowser": {
+      "tests": 2,
+      "failed": 0,
+      "durationWithSetupMs": 37273.547,
+      "scenarios": [
+        {
+          "file": "offboarding-schedules.spec.ts",
+          "title": "scheduled departure recovers lost admission and cancellation receipts through the real worker",
+          "status": "expected",
+          "durationMs": 7675
+        },
+        {
+          "file": "onboarding-schedules.spec.ts",
+          "title": "scheduled onboarding recovers committed responses and cancels future creation through the real worker",
+          "status": "expected",
+          "durationMs": 5234
+        }
+      ]
+    }
+  },
+  "behavior": {
+    "scope": "Retain guarded AccountAccess and original/live scope; check MFA after final acquisition/mapping before returning data.",
+    "crossCompany": "Each acquired identity is checked at its actual acquisition time; both captured company scopes are checked again at completion with company-specific error parameters.",
+    "admission": "Client availability remains an admission policy: already admitted operations may finish. Captured review dates share the existing evaluation instant; no new availability query is introduced.",
+    "resourceOwnership": "Existing bounded pages, immutable facts, byte/storage ownership, transaction locks and separate projection workers remain unchanged."
+  },
+  "packages": {
+    "api": "23c25055e3778a577f923d532b591e45742e459b6721910bf0d4bd0a16917c8f",
+    "worker": "40728ec427206a254abefc457a52832de178c3b946e3d0870667e95f3097d5a7"
+  },
+  "remaining": "People initial rows remain unverified pending command/input/Organization review, complete evidence mapping and final-source CI; full Platform/Mobile goal remains active.",
+  "runtime": "Private schema-101 API, accepted Google binding and phone unchanged. No live deployment or provider delivery."
+}

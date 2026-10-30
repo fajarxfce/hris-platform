@@ -37,10 +37,11 @@ class GetEmployeeImportRows(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val authorized =
-                identities.access(actor.accountId, company).flatMap {
-                    validateEmployeeImportSessionActor(actor, it, clock.instant(), security)
-                }
+                validateEmployeeImportSessionActor(actor, identityAccess, clock.instant(), security)
             if (authorized is Result.Failed) return@run authorized
             val found = imports.find(company, id)
             if (found is Result.Failed) return@run found
@@ -48,7 +49,10 @@ class GetEmployeeImportRows(
                 return@run Result.Failed(
                     Failure(FailureKind.NOT_FOUND, "employee_import_not_found")
                 )
-            imports.rows(company, id, after, limit)
+            imports.rows(company, id, after, limit).flatMap { acquired ->
+                validateEmployeeImportSessionActor(actor, identityAccess, clock.instant(), security)
+                    .map { acquired }
+            }
         }
     }
 }

@@ -40,10 +40,11 @@ class GetEmploymentDetails(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             if (!canReadOwnEmployment(live.permissions))
@@ -88,16 +89,20 @@ class GetEmploymentDetails(
                 } ?: Result.Success(null)
             if (manager is Result.Failed) return@run manager
             Result.Success(
-                EmploymentDetails(
-                    asOf,
-                    employee,
-                    references[employee.terms.branchId],
-                    references[employee.terms.departmentId],
-                    references[employee.terms.positionId],
-                    references[employee.terms.costCenterId],
-                    (manager as Result.Success).value,
+                    EmploymentDetails(
+                        asOf,
+                        employee,
+                        references[employee.terms.branchId],
+                        references[employee.terms.departmentId],
+                        references[employee.terms.positionId],
+                        references[employee.terms.costCenterId],
+                        (manager as Result.Success).value,
+                    )
                 )
-            )
+                .flatMap { acquired ->
+                    validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
+                        .map { acquired }
+                }
         }
     }
 }

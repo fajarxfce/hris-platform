@@ -120,6 +120,22 @@ full-feature goal active: thirty initial rows plus detailed/module/Mobile review
 remain. Next review People and the remaining Platform contracts, then Mobile and
 applicable Starter behavior. No generic client implementation port is due here.
 
+[People read completion](people-read-assurance-2026-10-30.md) passes twenty-eight
+actual reproductions across twenty-four readers, including both transfer-review
+company scopes. Final acceptance passed 427 API/OpenAPI, 50 domain and fourteen
+data cases, quality/packages (1124s), three actual browser workflows (36.5s)
+and two actual worker/browser workflows (37.3s), with setup. No new query, DI
+or schema change occurred. All five People initial rows remain unverified.
+
+Next reproduce older People command journal/replay completion (including recent
+authentication on account binding/imports/transfer), lifecycle task-list and initial
+assignee-map ownership, and Organization's company/unit readers and commands.
+CompleteOffboarding and explicit onboarding/offboarding schedules already have
+final checks; preserve their behavior. Client policy is admission-only: do not add
+final availability rejection for already admitted work. Complete full People
+requirements/evidence before accepting its rows; then continue the other modules
+and Mobile/Starter.
+
 Input copies are bounded before validation. Receipt reads retain scope/expiry and
 ordered actor/delegator guards; one additional identity acquisition per short
 receipt transaction is intentional. No DI/schema change or generic client port.

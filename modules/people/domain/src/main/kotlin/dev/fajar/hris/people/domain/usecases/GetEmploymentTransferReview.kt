@@ -4,6 +4,7 @@ import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.administration.domain.policies.*
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.AccountAccess
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
@@ -84,11 +85,13 @@ class GetEmploymentTransferReview(
             if (accountGuard is Result.Failed) return@run accountGuard
             val now = clock.instant()
             val scopes = linkedMapOf<UUID, Actor>()
+            val authorities = linkedMapOf<UUID, AccountAccess?>()
             for (company in ordered) {
                 val original = if (company == sourceCompany) actor else capturedTarget
                 val live =
                     identities.access(actor.accountId, company).flatMap {
-                        validateCompanySessionActor(original, it, now, security)
+                        authorities[company] = it
+                        validateCompanySessionActor(original, it, clock.instant(), security)
                     }
                 if (live is Result.Failed)
                     return@run Result.Failed(
@@ -141,17 +144,40 @@ class GetEmploymentTransferReview(
                     ?: return@run Result.Failed(
                         Failure(FailureKind.NOT_FOUND, "employee_not_found")
                     )
-            validateTransferSource(employee, sourceDate, targetDate).map {
-                EmploymentTransferReview(
-                    employee,
-                    first,
-                    second,
-                    sourceDate,
-                    targetDate,
-                    now,
-                    scopes.getValue(targetCompany).permissions.toSet(),
-                )
-            }
+            validateTransferSource(employee, sourceDate, targetDate)
+                .map {
+                    EmploymentTransferReview(
+                        employee,
+                        first,
+                        second,
+                        sourceDate,
+                        targetDate,
+                        now,
+                        scopes.getValue(targetCompany).permissions.toSet(),
+                    )
+                }
+                .flatMap { review ->
+                    val completedAt = clock.instant()
+                    for (company in ordered) {
+                        val original = if (company == sourceCompany) actor else capturedTarget
+                        val completed =
+                            validateCompanySessionActor(
+                                original,
+                                authorities[company],
+                                completedAt,
+                                security,
+                            )
+                        if (completed is Result.Failed)
+                            return@flatMap Result.Failed(
+                                completed.failure.copy(
+                                    parameters =
+                                        completed.failure.parameters +
+                                            ("companyId" to company.toString())
+                                )
+                            )
+                    }
+                    Result.Success(review)
+                }
         }
     }
 }

@@ -42,19 +42,26 @@ class GetPersonProfileHistory(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val permission = live.requirePermission("people.profile.read")
             if (permission is Result.Failed) return@run permission
-            profiles.findForEmployee(company, employeeId).flatMap { profile ->
-                if (profile == null)
-                    Result.Failed(Failure(FailureKind.NOT_FOUND, "person_profile_not_found"))
-                else profiles.history(profile.profile.id, after, limit)
-            }
+            profiles
+                .findForEmployee(company, employeeId)
+                .flatMap { profile ->
+                    if (profile == null)
+                        Result.Failed(Failure(FailureKind.NOT_FOUND, "person_profile_not_found"))
+                    else profiles.history(profile.profile.id, after, limit)
+                }
+                .flatMap { acquired ->
+                    validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
+                        .map { acquired }
+                }
         }
     }
 }

@@ -189,3 +189,12 @@ workflows and three actual API/worker/browser workflows. Retained matching-sourc
 CI includes 141 controlled-response browser scenarios, workers and migrations.
 Thirty-one initial rows are reviewed; thirty initial rows and full Mobile review
 remain open. Follow final-source CI and continue the full objective.
+
+## People readers — correction accepted, module review active
+
+[Read completion](people-read-assurance-2026-10-30.md) closes twenty-eight actual
+expiry cases in twenty-four readers, including cross-company transfer review.
+All 427 selected API/OpenAPI, 50 domain and fourteen repository cases, quality
+checks, packages and five actual browser/worker workflows passed. Command/input
+and Organization review remain open; all five People rows are still unverified.
+The inventory remains at 31 reviewed and 30 unverified initial rows.

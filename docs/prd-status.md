@@ -9,31 +9,32 @@ waived; deployment/provider observations retain their separate scope.
 [Completion](completion.md) preserves history and [handoff](agent-handoff.md)
 identifies current work and runtime ownership.
 
-## Active feature audit — 30 October
+## Implementation accepted — 30 October 2026
 
-The [requirement inventory](measurements/feature-audit-2026-10-30.json) retains
-53 accepted initial Platform rows and eight awaiting final source CI. Reporting,
-Payroll and Workforce now all pass their complete local API/worker/browser gates.
-Workforce's correction `2c2a59e3` passes 369 API, six worker, 61 domain and five
-actual browser workflows; Payroll passes 682 API and seven actual workflows.
-Reporting/Payroll CI `41087903927` passed all ten jobs with downloaded evidence;
-its twelve initial rows are accepted. Workforce CI `41094285531` now runs at
-`93438f99`. Do not cancel it or accept the eight remaining rows prematurely.
+All 61 initial Platform requirements and all eleven detailed module reviews are
+accepted. Mobile's fifteen-area review (`f4f101a1`) and Starter's applicable
+foundation review (`7605916`) are complete; no additional generic port is required.
+All ten jobs in [final Platform CI 41094285531](https://github.com/fajarxfce/hris-platform/actions/runs/41094285531) pass at
+`93438f99`, with downloaded backend/browser/recovery evidence in
+[measurements](measurements/workforce-full-ci-2026-10-30.json). There is no active
+CI or local test. Physical iPhone testing remains explicitly waived.
 
-Mobile's fifteen-area review and the applicable Starter foundation review are
-complete at `f4f101a1` and `7605916`, against independently accepted unchanged source.
-Their shared 657 files match; all 60 differences and shared dependency verification
-are reviewed. No additional generic port is established. The [Workforce review](workforce-feature-review-2026-10-30.md)
-explicitly distinguishes immutable approved overtime facts from implemented
-attendance adjustments and Payroll financial amendments.
+The goal stays active until the authorized private development update and final
+Git handoffs are complete. Runtime still serves earlier schema-103 metadata images;
+use `.work/final-development-rollout/checkpoint.py` after announcing the brief
+restart. It saves a quiesced data set with separate keys and restarts captured
+container IDs without dependencies. Then run the prepared `deploy.py`, which
+requires accepted CI, verifies preserved `2c2a59e3` JARs and built-image hashes,
+retains old images, uses `compose up -d --no-deps api worker`, and checks runtime
+health, restricted DB roles, full migration/binding/session/document integrity,
+unchanged dashboard bytes and disabled SMTP. Both helpers are prepared, not run.
 
-The private runtime remains on accepted metadata packages at schema 103 and
-dashboard snapshot `1e0522c0`, with SMTP disabled. The final combined API/worker
-update follows complete source CI and a fresh recovery checkpoint. Mobile's accepted
-metadata APK is already installed; actual Android Google/Home and FCM acceptance
-remain valid. Physical iPhone testing is waived; Apple simulator/Xcode builds pass.
-Use [the handoff](agent-handoff.md) for current ownership; older entries below are
-historical acceptance of their stated sources, not the active queue.
+The dashboard tree equals deployed `1e0522c0` and Mobile application `3c6db4eb`
+is already installed. No dashboard restage or phone installation is needed.
+The [Workforce review](workforce-feature-review-2026-10-30.md#approved-overtime-boundary)
+retains the explicit approved-overtime amendment boundary; no unspecified future
+extension is represented as implemented. Production release was not requested.
+Finish the update and all three handoffs, push each commit, then close the goal.
 
 ## Release-configuration audit — accepted
 

@@ -2,7 +2,7 @@
 
 The eight initial requirements and five detailed sections are mapped below.
 All 24 reproduced completion/input/delegation failures are corrected. Complete
-local acceptance passes; final full source CI remains the acceptance gate.
+local acceptance and full source CI pass; all eight initial rows are accepted.
 
 | Requirement | Implemented surface and matching evidence |
 | --- | --- |
@@ -67,7 +67,7 @@ architecture/format checks and both application packages in 622.192s.
 Four actual normal browser workflows passed in 66.494s; the real worker closing,
 recovery and closed-day adjustment scenario passed in 43.507s, including setup.
 All reports/package hashes are retained; both owned database containers, fixture
-metadata/environments and four listening ports were removed. Full source CI remains.
+metadata/environments and four listening ports were removed. Full source CI now passes.
 Mobile's fifteen-area review and the applicable Starter review are complete at
 `f4f101a1` and `7605916`; their unchanged implementations retain independent CI
 acceptance. No live deployment or new physical device test occurred.
@@ -83,3 +83,21 @@ This review accepts those stated workflows. The implemented closed-attendance
 adjustments and approved Payroll financial amendments do not rewrite an approved
 overtime request. A future overtime-fact amendment needs its own business contract;
 it is not represented here as an implemented feature.
+
+## Final complete source acceptance
+
+[CI 41094285531](https://github.com/fajarxfce/hris-platform/actions/runs/41094285531) passed all ten jobs at `93438f99`, whose
+application trees exactly match `2c2a59e3`. Downloaded reports verify
+3,090 API cases across disjoint shards, 104 active worker cases, 1,111
+mocked browser scenarios and 41 normal/14 worker/one export actual workflows.
+Schema-103 restoration passed with current/old keys, metadata/history and all 104
+objects. [The full measurement](measurements/workforce-full-ci-2026-10-30.json)
+retains every job/step, artifact/report hash and recovery result. The sole ordinary
+worker skip is the separately accepted elapsed one-hour retention case.
+
+GitHub returned stale step details even after the job/run completed successfully.
+The complete job log, all three source-matching browser reports and uploaded ZIP
+digest independently verify worker, storage, export, upload and cleanup completion.
+No cancellation or rerun occurred. [The observation](measurements/workforce-ci-reporting-lag-2026-10-30.json)
+retains raw inconsistent statuses and exact resolving evidence; they are not silently
+rewritten as completed metadata. The independent 41-case local diagnostic also passes.

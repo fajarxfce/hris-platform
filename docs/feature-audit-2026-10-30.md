@@ -14,18 +14,32 @@ Do not mark the goal complete until that review covers the full scope. Physical
 iPhone testing remains explicitly waived. Keep the accepted Google binding,
 installed phone, private keys and running development stack intact.
 
-## Current acceptance
+## Implementation accepted — 30 October 2026
 
-The inventory retains 53 accepted initial rows and eight awaiting final source CI.
-Reporting, Payroll and Workforce complete local acceptance now passes; their
-review pages and measurements record reproduced failures, fixes, actual workflows
-and source boundaries. Mobile's fifteen-area review and the applicable Starter
-review are complete (`f4f101a1`, `7605916`); no additional generic port is required.
-Reporting/Payroll CI `41087903927` passed all ten jobs; its twelve rows are
-accepted. Complete Workforce CI `41094285531` before accepting the final eight. Complete the combined private API/worker update with
-recovery/integrity evidence and final Git handoffs. See [current status](prd-status.md).
-No final-correction runtime update has occurred. Historical activity below records
-earlier states and does not override the active queue.
+All 61 initial Platform requirements and all eleven detailed module reviews are
+accepted. Mobile's fifteen-area review (`f4f101a1`) and Starter's applicable
+foundation review (`7605916`) are complete; no additional generic port is required.
+All ten jobs in [final Platform CI 41094285531](https://github.com/fajarxfce/hris-platform/actions/runs/41094285531) pass at
+`93438f99`, with downloaded backend/browser/recovery evidence in
+[measurements](measurements/workforce-full-ci-2026-10-30.json). There is no active
+CI or local test. Physical iPhone testing remains explicitly waived.
+
+The goal stays active until the authorized private development update and final
+Git handoffs are complete. Runtime still serves earlier schema-103 metadata images;
+use `.work/final-development-rollout/checkpoint.py` after announcing the brief
+restart. It saves a quiesced data set with separate keys and restarts captured
+container IDs without dependencies. Then run the prepared `deploy.py`, which
+requires accepted CI, verifies preserved `2c2a59e3` JARs and built-image hashes,
+retains old images, uses `compose up -d --no-deps api worker`, and checks runtime
+health, restricted DB roles, full migration/binding/session/document integrity,
+unchanged dashboard bytes and disabled SMTP. Both helpers are prepared, not run.
+
+The dashboard tree equals deployed `1e0522c0` and Mobile application `3c6db4eb`
+is already installed. No dashboard restage or phone installation is needed.
+The [Workforce review](workforce-feature-review-2026-10-30.md#approved-overtime-boundary)
+retains the explicit approved-overtime amendment boundary; no unspecified future
+extension is represented as implemented. Production release was not requested.
+Finish the update and all three handoffs, push each commit, then close the goal.
 
 ## Confirmed gap: announcement email
 

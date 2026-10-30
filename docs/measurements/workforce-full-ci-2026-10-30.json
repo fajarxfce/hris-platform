@@ -1,0 +1,2819 @@
+{
+  "date": "2026-10-30",
+  "status": "success",
+  "runId": 41094285531,
+  "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+  "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+  "startedAt": "2026-10-30T16:55:46Z",
+  "finishedAt": "2026-10-30T17:55:19Z",
+  "jobsObserved": [
+    {
+      "completedAt": "2026-10-30T17:03:03Z",
+      "conclusion": "success",
+      "databaseId": 124195890017,
+      "name": "dashboard (2)",
+      "startedAt": "2026-10-30T16:55:51Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T16:55:53Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-30T16:55:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:56Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-30T16:55:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:59Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "number": 3,
+          "startedAt": "2026-10-30T16:55:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:56:16Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-10-30T16:55:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:56:17Z",
+          "conclusion": "success",
+          "name": "Run node --experimental-strip-types --test --test-concurrency=1 --test-timeout=10000 integration-native/fixtures/*.test.mjs",
+          "number": 5,
+          "startedAt": "2026-10-30T16:56:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:58:28Z",
+          "conclusion": "success",
+          "name": "Run npm run check",
+          "number": 6,
+          "startedAt": "2026-10-30T16:56:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:58:48Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium",
+          "number": 7,
+          "startedAt": "2026-10-30T16:58:28Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:02:58Z",
+          "conclusion": "success",
+          "name": "Run npm run test:e2e -- --shard=2/4",
+          "number": 8,
+          "startedAt": "2026-10-30T16:58:48Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:03:00Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 9,
+          "startedAt": "2026-10-30T17:02:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:03:01Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "number": 17,
+          "startedAt": "2026-10-30T17:03:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:03:01Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 18,
+          "startedAt": "2026-10-30T17:03:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:03:01Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 19,
+          "startedAt": "2026-10-30T17:03:01Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531/job/124195890017"
+    },
+    {
+      "completedAt": "2026-10-30T17:04:07Z",
+      "conclusion": "success",
+      "databaseId": 124195890033,
+      "name": "dashboard (4)",
+      "startedAt": "2026-10-30T16:55:50Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T16:55:52Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-30T16:55:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:55Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-30T16:55:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:57Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "number": 3,
+          "startedAt": "2026-10-30T16:55:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:56:18Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-10-30T16:55:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:56:21Z",
+          "conclusion": "success",
+          "name": "Run node --experimental-strip-types --test --test-concurrency=1 --test-timeout=10000 integration-native/fixtures/*.test.mjs",
+          "number": 5,
+          "startedAt": "2026-10-30T16:56:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:58:56Z",
+          "conclusion": "success",
+          "name": "Run npm run check",
+          "number": 6,
+          "startedAt": "2026-10-30T16:56:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:59:15Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium",
+          "number": 7,
+          "startedAt": "2026-10-30T16:58:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:04:03Z",
+          "conclusion": "success",
+          "name": "Run npm run test:e2e -- --shard=4/4",
+          "number": 8,
+          "startedAt": "2026-10-30T16:59:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:04:05Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 9,
+          "startedAt": "2026-10-30T17:04:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:04:05Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "number": 17,
+          "startedAt": "2026-10-30T17:04:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:04:05Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 18,
+          "startedAt": "2026-10-30T17:04:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:04:05Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 19,
+          "startedAt": "2026-10-30T17:04:05Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531/job/124195890033"
+    },
+    {
+      "completedAt": "2026-10-30T17:20:15Z",
+      "conclusion": "success",
+      "databaseId": 124195890066,
+      "name": "backend (2)",
+      "startedAt": "2026-10-30T16:55:51Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T16:55:55Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-30T16:55:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:57Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-30T16:55:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:57Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 3,
+          "startedAt": "2026-10-30T16:55:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:56:00Z",
+          "conclusion": "success",
+          "name": "Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+          "number": 4,
+          "startedAt": "2026-10-30T16:55:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:06Z",
+          "conclusion": "success",
+          "name": "Run ./gradlew check :apps:server:bootJar :apps:worker:bootJar -PhrisApiTestShard=2 -PhrisApiTestShards=4 --no-daemon",
+          "number": 5,
+          "startedAt": "2026-10-30T16:56:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:08Z",
+          "conclusion": "success",
+          "name": "Run python3 tool/check_document_services.py",
+          "number": 6,
+          "startedAt": "2026-10-30T17:20:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:08Z",
+          "conclusion": "skipped",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 7,
+          "startedAt": "2026-10-30T17:20:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:08Z",
+          "conclusion": "skipped",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 8,
+          "startedAt": "2026-10-30T17:20:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:08Z",
+          "conclusion": "skipped",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 9,
+          "startedAt": "2026-10-30T17:20:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:11Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 10,
+          "startedAt": "2026-10-30T17:20:08Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:12Z",
+          "conclusion": "success",
+          "name": "Post Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+          "number": 18,
+          "startedAt": "2026-10-30T17:20:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:12Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 19,
+          "startedAt": "2026-10-30T17:20:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:12Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 20,
+          "startedAt": "2026-10-30T17:20:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:12Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-10-30T17:20:12Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531/job/124195890066"
+    },
+    {
+      "completedAt": "2026-10-30T17:04:01Z",
+      "conclusion": "success",
+      "databaseId": 124195890204,
+      "name": "dashboard (1)",
+      "startedAt": "2026-10-30T16:55:51Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T16:55:53Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-30T16:55:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:56Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-30T16:55:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:59Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "number": 3,
+          "startedAt": "2026-10-30T16:55:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:56:22Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-10-30T16:55:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:56:24Z",
+          "conclusion": "success",
+          "name": "Run node --experimental-strip-types --test --test-concurrency=1 --test-timeout=10000 integration-native/fixtures/*.test.mjs",
+          "number": 5,
+          "startedAt": "2026-10-30T16:56:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:59:06Z",
+          "conclusion": "success",
+          "name": "Run npm run check",
+          "number": 6,
+          "startedAt": "2026-10-30T16:56:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:59:26Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium",
+          "number": 7,
+          "startedAt": "2026-10-30T16:59:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:03:57Z",
+          "conclusion": "success",
+          "name": "Run npm run test:e2e -- --shard=1/4",
+          "number": 8,
+          "startedAt": "2026-10-30T16:59:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:03:59Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 9,
+          "startedAt": "2026-10-30T17:03:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:03:59Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "number": 17,
+          "startedAt": "2026-10-30T17:03:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:03:59Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 18,
+          "startedAt": "2026-10-30T17:03:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:03:59Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 19,
+          "startedAt": "2026-10-30T17:03:59Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531/job/124195890204"
+    },
+    {
+      "completedAt": "2026-10-30T17:02:47Z",
+      "conclusion": "success",
+      "databaseId": 124195890245,
+      "name": "dashboard (3)",
+      "startedAt": "2026-10-30T16:55:51Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T16:55:52Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-30T16:55:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:55Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-30T16:55:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:58Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "number": 3,
+          "startedAt": "2026-10-30T16:55:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:56:14Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-10-30T16:55:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:56:16Z",
+          "conclusion": "success",
+          "name": "Run node --experimental-strip-types --test --test-concurrency=1 --test-timeout=10000 integration-native/fixtures/*.test.mjs",
+          "number": 5,
+          "startedAt": "2026-10-30T16:56:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:58:22Z",
+          "conclusion": "success",
+          "name": "Run npm run check",
+          "number": 6,
+          "startedAt": "2026-10-30T16:56:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:58:41Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium",
+          "number": 7,
+          "startedAt": "2026-10-30T16:58:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:02:43Z",
+          "conclusion": "success",
+          "name": "Run npm run test:e2e -- --shard=3/4",
+          "number": 8,
+          "startedAt": "2026-10-30T16:58:41Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:02:45Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 9,
+          "startedAt": "2026-10-30T17:02:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:02:45Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "number": 17,
+          "startedAt": "2026-10-30T17:02:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:02:45Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 18,
+          "startedAt": "2026-10-30T17:02:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:02:45Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 19,
+          "startedAt": "2026-10-30T17:02:45Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531/job/124195890245"
+    },
+    {
+      "completedAt": "2026-10-30T17:14:59Z",
+      "conclusion": "success",
+      "databaseId": 124195890248,
+      "name": "backend (3)",
+      "startedAt": "2026-10-30T16:55:50Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T16:55:53Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-30T16:55:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:56Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-30T16:55:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:56Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 3,
+          "startedAt": "2026-10-30T16:55:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:59Z",
+          "conclusion": "success",
+          "name": "Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+          "number": 4,
+          "startedAt": "2026-10-30T16:55:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:14:51Z",
+          "conclusion": "success",
+          "name": "Run ./gradlew check :apps:server:bootJar :apps:worker:bootJar -PhrisApiTestShard=3 -PhrisApiTestShards=4 --no-daemon",
+          "number": 5,
+          "startedAt": "2026-10-30T16:55:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:14:53Z",
+          "conclusion": "success",
+          "name": "Run python3 tool/check_document_services.py",
+          "number": 6,
+          "startedAt": "2026-10-30T17:14:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:14:53Z",
+          "conclusion": "skipped",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 7,
+          "startedAt": "2026-10-30T17:14:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:14:53Z",
+          "conclusion": "skipped",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 8,
+          "startedAt": "2026-10-30T17:14:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:14:53Z",
+          "conclusion": "skipped",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 9,
+          "startedAt": "2026-10-30T17:14:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:14:56Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 10,
+          "startedAt": "2026-10-30T17:14:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:14:56Z",
+          "conclusion": "success",
+          "name": "Post Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+          "number": 18,
+          "startedAt": "2026-10-30T17:14:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:14:56Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 19,
+          "startedAt": "2026-10-30T17:14:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:14:56Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 20,
+          "startedAt": "2026-10-30T17:14:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:14:56Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-10-30T17:14:56Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531/job/124195890248"
+    },
+    {
+      "completedAt": "2026-10-30T17:30:09Z",
+      "conclusion": "success",
+      "databaseId": 124195890265,
+      "name": "backend (1)",
+      "startedAt": "2026-10-30T16:55:51Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T16:55:54Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-30T16:55:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:57Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-30T16:55:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:57Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 3,
+          "startedAt": "2026-10-30T16:55:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:56:00Z",
+          "conclusion": "success",
+          "name": "Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+          "number": 4,
+          "startedAt": "2026-10-30T16:55:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:29:55Z",
+          "conclusion": "success",
+          "name": "Run ./gradlew check :apps:server:bootJar :apps:worker:bootJar -PhrisApiTestShard=1 -PhrisApiTestShards=4 --no-daemon",
+          "number": 5,
+          "startedAt": "2026-10-30T16:56:00Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:29:56Z",
+          "conclusion": "success",
+          "name": "Run python3 tool/check_document_services.py",
+          "number": 6,
+          "startedAt": "2026-10-30T17:29:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:29:59Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 7,
+          "startedAt": "2026-10-30T17:29:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:01Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 8,
+          "startedAt": "2026-10-30T17:29:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:02Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 9,
+          "startedAt": "2026-10-30T17:30:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:06Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 10,
+          "startedAt": "2026-10-30T17:30:02Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:06Z",
+          "conclusion": "success",
+          "name": "Post Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+          "number": 18,
+          "startedAt": "2026-10-30T17:30:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:07Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 19,
+          "startedAt": "2026-10-30T17:30:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:07Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 20,
+          "startedAt": "2026-10-30T17:30:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:07Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-10-30T17:30:07Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531/job/124195890265"
+    },
+    {
+      "completedAt": "2026-10-30T17:20:52Z",
+      "conclusion": "success",
+      "databaseId": 124195890557,
+      "name": "backend (4)",
+      "startedAt": "2026-10-30T16:55:51Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T16:55:55Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-30T16:55:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:57Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-30T16:55:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:57Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 3,
+          "startedAt": "2026-10-30T16:55:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T16:55:59Z",
+          "conclusion": "success",
+          "name": "Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+          "number": 4,
+          "startedAt": "2026-10-30T16:55:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:43Z",
+          "conclusion": "success",
+          "name": "Run ./gradlew check :apps:server:bootJar :apps:worker:bootJar -PhrisApiTestShard=4 -PhrisApiTestShards=4 --no-daemon",
+          "number": 5,
+          "startedAt": "2026-10-30T16:55:59Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:46Z",
+          "conclusion": "success",
+          "name": "Run python3 tool/check_document_services.py",
+          "number": 6,
+          "startedAt": "2026-10-30T17:20:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:46Z",
+          "conclusion": "skipped",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 7,
+          "startedAt": "2026-10-30T17:20:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:46Z",
+          "conclusion": "skipped",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 8,
+          "startedAt": "2026-10-30T17:20:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:46Z",
+          "conclusion": "skipped",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 9,
+          "startedAt": "2026-10-30T17:20:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:49Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 10,
+          "startedAt": "2026-10-30T17:20:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:49Z",
+          "conclusion": "success",
+          "name": "Post Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+          "number": 18,
+          "startedAt": "2026-10-30T17:20:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:49Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 19,
+          "startedAt": "2026-10-30T17:20:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:50Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 20,
+          "startedAt": "2026-10-30T17:20:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:20:50Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 21,
+          "startedAt": "2026-10-30T17:20:50Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531/job/124195890557"
+    },
+    {
+      "completedAt": "2026-10-30T17:31:57Z",
+      "conclusion": "success",
+      "databaseId": 124213390144,
+      "name": "recovery-integration",
+      "startedAt": "2026-10-30T17:30:12Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T17:30:14Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-30T17:30:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:19Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-30T17:30:14Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:19Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 3,
+          "startedAt": "2026-10-30T17:30:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:21Z",
+          "conclusion": "success",
+          "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+          "number": 4,
+          "startedAt": "2026-10-30T17:30:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:24Z",
+          "conclusion": "success",
+          "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+          "number": 5,
+          "startedAt": "2026-10-30T17:30:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:24Z",
+          "conclusion": "success",
+          "name": "Run mkdir -p .work",
+          "number": 6,
+          "startedAt": "2026-10-30T17:30:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:31:53Z",
+          "conclusion": "success",
+          "name": "Run python3 tool/check_recovery_set.py",
+          "number": 7,
+          "startedAt": "2026-10-30T17:30:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:31:54Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 8,
+          "startedAt": "2026-10-30T17:31:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:31:54Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 15,
+          "startedAt": "2026-10-30T17:31:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:31:54Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 16,
+          "startedAt": "2026-10-30T17:31:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:31:55Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 17,
+          "startedAt": "2026-10-30T17:31:54Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531/job/124213390144"
+    },
+    {
+      "completedAt": "2026-10-30T17:42:23Z",
+      "conclusion": "success",
+      "databaseId": 124213390227,
+      "name": "dashboard-integration",
+      "startedAt": "2026-10-30T17:30:12Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T17:30:15Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-30T17:30:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:18Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "startedAt": "2026-10-30T17:30:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:20Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "number": 3,
+          "startedAt": "2026-10-30T17:30:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:21Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 4,
+          "startedAt": "2026-10-30T17:30:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:24Z",
+          "conclusion": "success",
+          "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+          "number": 5,
+          "startedAt": "2026-10-30T17:30:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:27Z",
+          "conclusion": "success",
+          "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+          "number": 6,
+          "startedAt": "2026-10-30T17:30:24Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:30:44Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 7,
+          "startedAt": "2026-10-30T17:30:27Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:31:03Z",
+          "conclusion": "success",
+          "name": "Run npx playwright install --with-deps chromium",
+          "number": 8,
+          "startedAt": "2026-10-30T17:30:44Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:36:19Z",
+          "conclusion": "success",
+          "name": "Run npm run test:integration",
+          "number": 9,
+          "startedAt": "2026-10-30T17:31:03Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:36:19Z",
+          "conclusion": "success",
+          "name": "Run python3 ../../tool/test_dashboard_mail_fixture.py",
+          "number": 10,
+          "startedAt": "2026-10-30T17:36:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T17:36:19Z",
+          "conclusion": "success",
+          "name": "Run python3 -m unittest discover -s ../../tool -p 'test_dashboard_fcm_fixture.py'",
+          "number": 11,
+          "startedAt": "2026-10-30T17:36:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Run npm run test:integration:worker",
+          "number": 12,
+          "startedAt": "2026-10-30T17:36:19Z",
+          "status": "in_progress"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Run python3 -m unittest discover -s ../../tool -p 'test_dashboard_storage*.py'",
+          "number": 13,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Run npm run test:integration:exports",
+          "number": 14,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "number": 15,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+          "number": 28,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+          "number": 29,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        },
+        {
+          "completedAt": "0001-01-01T00:00:00Z",
+          "conclusion": "",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 30,
+          "startedAt": "0001-01-01T00:00:00Z",
+          "status": "pending"
+        }
+      ],
+      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531/job/124213390227"
+    }
+  ],
+  "conditionalSkippedUploads": [
+    {
+      "job": "backend (2)",
+      "step": 7,
+      "reason": "Only shard 1 uploads API/worker JARs and OpenAPI."
+    },
+    {
+      "job": "backend (2)",
+      "step": 8,
+      "reason": "Only shard 1 uploads API/worker JARs and OpenAPI."
+    },
+    {
+      "job": "backend (2)",
+      "step": 9,
+      "reason": "Only shard 1 uploads API/worker JARs and OpenAPI."
+    },
+    {
+      "job": "backend (3)",
+      "step": 7,
+      "reason": "Only shard 1 uploads API/worker JARs and OpenAPI."
+    },
+    {
+      "job": "backend (3)",
+      "step": 8,
+      "reason": "Only shard 1 uploads API/worker JARs and OpenAPI."
+    },
+    {
+      "job": "backend (3)",
+      "step": 9,
+      "reason": "Only shard 1 uploads API/worker JARs and OpenAPI."
+    },
+    {
+      "job": "backend (4)",
+      "step": 7,
+      "reason": "Only shard 1 uploads API/worker JARs and OpenAPI."
+    },
+    {
+      "job": "backend (4)",
+      "step": 8,
+      "reason": "Only shard 1 uploads API/worker JARs and OpenAPI."
+    },
+    {
+      "job": "backend (4)",
+      "step": 9,
+      "reason": "Only shard 1 uploads API/worker JARs and OpenAPI."
+    }
+  ],
+  "reportIndex": [
+    {
+      "path": "backend-test-reports-1/apps/server/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 970,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "7fb8bb50d9522ade423289685952f9199449285200a1abb1840ba6f08786fe0d"
+    },
+    {
+      "path": "backend-test-reports-1/apps/worker/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 105,
+        "failures": 0,
+        "skipped": 1
+      },
+      "sha256": "0ca96f05b4887bf907003eb5279f4f6aed7e499acfe3d84aebeb9608b7b2c6b7"
+    },
+    {
+      "path": "backend-test-reports-1/core/database/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 27,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "1c785f9b20db074dbc59f5c11227f7b9c66e7fdf35e3d67a5b05db45c75c53d2"
+    },
+    {
+      "path": "backend-test-reports-1/core/http/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 11,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "301982ce11eb7b7cb8f8d28b99ae52a664026bbc540e85f26f11e62d54d8f4d6"
+    },
+    {
+      "path": "backend-test-reports-1/core/jobs/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "3ff558eb559392da82f9bae481a8d90a46f6270d9a3b63c892afe5f430fa8076"
+    },
+    {
+      "path": "backend-test-reports-1/core/mail/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 6,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "b73ded22711bd79ddaa1f6548ea2405305367a0f714808accc760357ab927b27"
+    },
+    {
+      "path": "backend-test-reports-1/core/push/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 12,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "c13c6c3e5214dc3e7881e9c2469823086c249c810bb263946eeaa4c9dd162300"
+    },
+    {
+      "path": "backend-test-reports-1/core/storage/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "ad1a0f9fb455d28b20a3bc8ba9d0ac815960ba8ea898ede08fde2d85220364b6"
+    },
+    {
+      "path": "backend-test-reports-1/modules/administration/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 14,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "b39c235866a242db334ba4fde59ed85d3d6834f3f2bb09e24d0337532ce45f72"
+    },
+    {
+      "path": "backend-test-reports-1/modules/administration/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 8,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "b63a170e5474d7c62ce9ec52cef924e21e612620412f21451860003dc28df423"
+    },
+    {
+      "path": "backend-test-reports-1/modules/approvals/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "4717faef75f4f7e5288059fa8eeec83059339c14f7e560ecec8ef7973b0c8614"
+    },
+    {
+      "path": "backend-test-reports-1/modules/communications/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "199b24e0f04a7ac8ce3dad218cb05bd98a6a3646fcf69ff84e573113e2b18109"
+    },
+    {
+      "path": "backend-test-reports-1/modules/communications/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "9b383dfc25e062c4306fe226fbc3411b0eb999778b3b6d678b70646418e07242"
+    },
+    {
+      "path": "backend-test-reports-1/modules/documents/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 9,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "47893c46f6068aa0d1a872837f6ad6271915a30f290c175be7605ddd9914d379"
+    },
+    {
+      "path": "backend-test-reports-1/modules/documents/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 18,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "61a463c26f3455599efb2c8f6b793a2db2312a0a3ecd04ae43ec2c1aa8cacb8a"
+    },
+    {
+      "path": "backend-test-reports-1/modules/expenses/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 20,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "f154c9ae45b17da5566abc6309a11a5e705e98a871c155b7899e759a6556b07c"
+    },
+    {
+      "path": "backend-test-reports-1/modules/identity/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 22,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "78a29fd20de700dfdd3dcfb2becb084b8b0bab86e44a60bb2f664df11fcea213"
+    },
+    {
+      "path": "backend-test-reports-1/modules/identity/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 35,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "f094d62248f14481e330839148fa2fd53ba8e13d6f53e3c00b130237b3e1d76a"
+    },
+    {
+      "path": "backend-test-reports-1/modules/leave/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 65,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "aa492887dbfb1a8283128b171e1add5caa68e51a49bdf356653ebbed2e0cd162"
+    },
+    {
+      "path": "backend-test-reports-1/modules/organization/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "4d254e0a397e06061526e8d5de7817b6740729b70ecf264465b0cb1da080725a"
+    },
+    {
+      "path": "backend-test-reports-1/modules/payroll/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 12,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "beea58a335c31ddddc9bddf3bf624de8e6a01848d6609f4b5c98a916e48e5501"
+    },
+    {
+      "path": "backend-test-reports-1/modules/payroll/delivery/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "2a8b38bac96fd783041632cbb57b3d189dcce6cf5fc215122af298332495e585"
+    },
+    {
+      "path": "backend-test-reports-1/modules/payroll/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 114,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "0a9a3bd0c6a6a0f7a2b93d0c36b345d50697933bced39f50d8e073670d8a1261"
+    },
+    {
+      "path": "backend-test-reports-1/modules/people/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 14,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "5e16a828c8a46066f0ef70c397d002c0f054aecd7f2e41427a8c6701bd4076b1"
+    },
+    {
+      "path": "backend-test-reports-1/modules/people/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 50,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "35cee9a571c7c8f55fe3d2f925fa0566974e2ace57e732ed767210a2908e1981"
+    },
+    {
+      "path": "backend-test-reports-1/modules/reporting/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 61,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "83adf63c1ac9e41faec5a034a55c8406582056baad0a6d54b76307e0e9655799"
+    },
+    {
+      "path": "backend-test-reports-1/modules/reporting/delivery/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "19179d38126d0c166740996254926a4ea3c2d1bae967d530a29186511c32a8c4"
+    },
+    {
+      "path": "backend-test-reports-1/modules/reporting/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 52,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "05101d06c59b88d27b737b695dfb694b9858b54774e97979a5be4bb2177620b0"
+    },
+    {
+      "path": "backend-test-reports-1/modules/sync/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "0ce79c51639fbe15da959930374f36b1c46cbf6b4e66ce9a5228def3fd52c844"
+    },
+    {
+      "path": "backend-test-reports-1/modules/sync/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 20,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "b4eed5cf39a3a71a1255e4777e2f19984dfd246410e297267a8b15110cf65775"
+    },
+    {
+      "path": "backend-test-reports-1/modules/workforce/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 61,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "710185834be9da768f660789d439e62f090a46b54dee263d3e08726823fa1ae0"
+    },
+    {
+      "path": "backend-test-reports-2/apps/server/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 653,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "484d04a4f0797b025fb749821b867f64ddddb1ff923077764f09e234ad7ed148"
+    },
+    {
+      "path": "backend-test-reports-2/apps/worker/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 105,
+        "failures": 0,
+        "skipped": 1
+      },
+      "sha256": "b51235b8e3e7d6211b8e3fa1b32ef041be10d72169f1862c8ef164f338b66e5f"
+    },
+    {
+      "path": "backend-test-reports-2/core/database/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 27,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "eadb8aa2a7f9399a9169c0d7fc13b71d3b8b834080c05725718899a2e94439f8"
+    },
+    {
+      "path": "backend-test-reports-2/core/http/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 11,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "f4c0b51de41c3c334874ed990076654620a8d40f9879483e491f45921690a95e"
+    },
+    {
+      "path": "backend-test-reports-2/core/jobs/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "ca81ecde93ae89bc9fd9cface6e4a05bf9d340e2a51a6a530f6b4ab60b8f1ed1"
+    },
+    {
+      "path": "backend-test-reports-2/core/mail/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 6,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "e40658370d8b73d9e8224b2f378427259e73097ad0d8d1d91fcea6f41e0c579f"
+    },
+    {
+      "path": "backend-test-reports-2/core/push/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 12,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "d1f747eb90e87fd134d65e12fe050bddc2ba7fc69287db4e0e0afedc5ce1779b"
+    },
+    {
+      "path": "backend-test-reports-2/core/storage/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "3357e1b09d2a1336b3f44bd75818192cc87086f45f918a36c39bfd1ad033bc96"
+    },
+    {
+      "path": "backend-test-reports-2/modules/administration/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 14,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "73d6ac866e72c5306d9f27769e313b194756f881bbc8018fad3daef29cb8964b"
+    },
+    {
+      "path": "backend-test-reports-2/modules/administration/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 8,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "7db7996e346de130508b5e40cd7dbce3e64f407fd24476fde8f6052046e5c68b"
+    },
+    {
+      "path": "backend-test-reports-2/modules/approvals/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "cb42f294f4c96ec29899553bab9e1dc3c04c09d9b656f0ea824f5f846c1e484e"
+    },
+    {
+      "path": "backend-test-reports-2/modules/communications/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "695921a2b2bf1ef5bbaded0e0733acd4bac3f9d186b5a5e82a019ce22869864d"
+    },
+    {
+      "path": "backend-test-reports-2/modules/communications/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "4893aebff7e186bb8516ce5faf5d1a43f09f4c290a8c675dc84c5d8cfc59db9a"
+    },
+    {
+      "path": "backend-test-reports-2/modules/documents/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 9,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "35682222a6c3c78cf0ba31dd6548bc881d8c45cfe1da0cd98157119c254d1ceb"
+    },
+    {
+      "path": "backend-test-reports-2/modules/documents/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 18,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "68e495b6f4d305b88ebfe8e34925321965feb5f57f10ecbe36c51e0e12e0dd0f"
+    },
+    {
+      "path": "backend-test-reports-2/modules/expenses/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 20,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "fa43d2184bc1c7dcaeeabb19b626de66a68b233cec8ee4b605b39be9c0032412"
+    },
+    {
+      "path": "backend-test-reports-2/modules/identity/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 22,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "00e4c6ca3cdbc52c62edb46bfe39231c574ebcea5a7daa6300114c779578268e"
+    },
+    {
+      "path": "backend-test-reports-2/modules/identity/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 35,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "33d8618fe620602c51827dd110829380da907155edcbf1cc0ca8009ef56c2aea"
+    },
+    {
+      "path": "backend-test-reports-2/modules/leave/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 65,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "4f17e297275dfc612276642136c6807914ae3cd9eb51a95be3af9626ce10826b"
+    },
+    {
+      "path": "backend-test-reports-2/modules/organization/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "20ea3e8dbc12e2311330de225b838fc336657ca7a1d2f1b5a4a920407709d718"
+    },
+    {
+      "path": "backend-test-reports-2/modules/payroll/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 12,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "699c53653330843289fa965dc83e035b6a7ea3af87235bd420bae1ca63896780"
+    },
+    {
+      "path": "backend-test-reports-2/modules/payroll/delivery/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "c2e47e12c2342c883455c53199f3012b4fc05e4568595a482a098691b8ad70da"
+    },
+    {
+      "path": "backend-test-reports-2/modules/payroll/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 114,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "252827e6ae58b03fbd355cafe9fd864192e56c734ca5227d5196627cf692c252"
+    },
+    {
+      "path": "backend-test-reports-2/modules/people/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 14,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "026478ac64ddf2d4c858a678a7cdbde602220f9d15ac3ce1c02b28974272863a"
+    },
+    {
+      "path": "backend-test-reports-2/modules/people/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 50,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "2f0bb5acce492fc86abea52b6981f15e680be0ae67c339a87f9f5a2fbc088450"
+    },
+    {
+      "path": "backend-test-reports-2/modules/reporting/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 61,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "0a25f4cd36d41b01f78c9ed5667ecb9dc4f935c7ba90bd6e1add2f298135cd4e"
+    },
+    {
+      "path": "backend-test-reports-2/modules/reporting/delivery/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "be291fc15c1c640f132ca10a733d3003d8e87112d14d82b951cbcf83ce9dec0d"
+    },
+    {
+      "path": "backend-test-reports-2/modules/reporting/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 52,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "127bd235bcd973c852d4232883e88aa30cf0e62236795ca0797dedac55584323"
+    },
+    {
+      "path": "backend-test-reports-2/modules/sync/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "342b89ac2c636f0d412d7190a33e6b60be99a954144660492d266b454751ef2a"
+    },
+    {
+      "path": "backend-test-reports-2/modules/sync/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 20,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "b750220fed2f7a292fe75173fe2204cad4889a8b15c592633d916b7e2192342c"
+    },
+    {
+      "path": "backend-test-reports-2/modules/workforce/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 61,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "f1a8f344e10956381fac32a18722fb705f24640f74c8878bb59f0bfedd95aed4"
+    },
+    {
+      "path": "backend-test-reports-3/apps/server/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 659,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "95265f05d1e51710cff0fb2edd756ab2965736f69e01c286000a1f5cf48fdfa7"
+    },
+    {
+      "path": "backend-test-reports-3/apps/worker/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 105,
+        "failures": 0,
+        "skipped": 1
+      },
+      "sha256": "5e7ffeebd61c96786837f2d7a37927c5b031df9799eef26fc2e242b99de4a07d"
+    },
+    {
+      "path": "backend-test-reports-3/core/database/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 27,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "730924436e19a2aa92430b5f7f1eadad043ff822c618b2ddf8de7622c404b99c"
+    },
+    {
+      "path": "backend-test-reports-3/core/http/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 11,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "a0f89c14186ced23e6f857a3a6b6f881511bd67958ac83aa936a58476e006a59"
+    },
+    {
+      "path": "backend-test-reports-3/core/jobs/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "c0fd094e412a246bb197aad911789b1476bd6a7c37bb9d335a505d42d994b506"
+    },
+    {
+      "path": "backend-test-reports-3/core/mail/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 6,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "469198c4f551602fac2f57b87005f5a95706c6733eb7e9c459437971f7f186a7"
+    },
+    {
+      "path": "backend-test-reports-3/core/push/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 12,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "fc681da1a5b0ce5c37153b53405d2ad594543d2dfd07f2de9889512247585294"
+    },
+    {
+      "path": "backend-test-reports-3/core/storage/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "93ac7ca5db3adc58ed54225a09bd9f7eef109431f93318ebbdce70bb83d5de0a"
+    },
+    {
+      "path": "backend-test-reports-3/modules/administration/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 14,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "0b1c61bcd4cea4fd5b3f3e0ca5b91b3708bdc4cd7b2278596c559b2fa30bf52d"
+    },
+    {
+      "path": "backend-test-reports-3/modules/administration/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 8,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "3056b34a92034638d25f830e1d7001995d4b4e09b4b3bb061118c58719843421"
+    },
+    {
+      "path": "backend-test-reports-3/modules/approvals/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "1a8d79c2fce5fe7ef1bd460295c3ae71d2b12f2db19e5631453f35521ce90684"
+    },
+    {
+      "path": "backend-test-reports-3/modules/communications/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "e3fb373c501a8b317c4fbf4fe4aadc76391f9a97389beffd40d5cc2d9eab4067"
+    },
+    {
+      "path": "backend-test-reports-3/modules/communications/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "2e7ff46c04d1615da0a8682871c57debd13685f199306fb2f6b4db4fc3896445"
+    },
+    {
+      "path": "backend-test-reports-3/modules/documents/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 9,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "69694d7cf20266d72e28811eab53d3f0de88f3e2a280889d43891ea14ff8462d"
+    },
+    {
+      "path": "backend-test-reports-3/modules/documents/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 18,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "915fa894445efe4bc660afd696ddc312434d454dd4815d84d0f768b65b614fb6"
+    },
+    {
+      "path": "backend-test-reports-3/modules/expenses/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 20,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "c190190024992bc456005e718f0f895b7799cdf41280a37cd316464b9408a7e2"
+    },
+    {
+      "path": "backend-test-reports-3/modules/identity/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 22,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "29c358af083791045197f0fc32692a6ffc2ce8cfa01fbafb2eba1b7e57e0eb06"
+    },
+    {
+      "path": "backend-test-reports-3/modules/identity/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 35,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "f41289970505d99aafe0da18238a5e45f3350255eb2e0ecd3b8fcbc7971b2508"
+    },
+    {
+      "path": "backend-test-reports-3/modules/leave/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 65,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "1c2a26c919e7e79e1851336c1018cda75a27372d89cf7a26d85a4926de04b20a"
+    },
+    {
+      "path": "backend-test-reports-3/modules/organization/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "dd0fef5ef7f7a6204b776bfe995552bc42381bdb9fb5d5568b6efd0f5b8ac8d6"
+    },
+    {
+      "path": "backend-test-reports-3/modules/payroll/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 12,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "bd7452835224c565ed9da1b8cca903e0d4702c7564e72517229e408926e0c7bc"
+    },
+    {
+      "path": "backend-test-reports-3/modules/payroll/delivery/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "d95b98b1b1d3ef707edbe51a896c24a5b2873112a3b6d5838e9ef45b7cdaec6f"
+    },
+    {
+      "path": "backend-test-reports-3/modules/payroll/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 114,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "a3a647f151e181415dd1cdd0def8fae4534a93767474ebb3469e2d2669a8b667"
+    },
+    {
+      "path": "backend-test-reports-3/modules/people/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 14,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "05941cce6bc7752ffd71f2702228d6db13c1275c3504953e1cf9df76cbc902d3"
+    },
+    {
+      "path": "backend-test-reports-3/modules/people/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 50,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "fbfd45c3df9fefec92ea1571d5dccf04c10576f51812d5ae36482e277016a3e7"
+    },
+    {
+      "path": "backend-test-reports-3/modules/reporting/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 61,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "c08ef6e826faac129dfbac4cc8615bc5e79a54feb039e93dffdafdbe53e374a8"
+    },
+    {
+      "path": "backend-test-reports-3/modules/reporting/delivery/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "715eecabbadf5a937ceb96fce9299e5af917406807a369e78ad348a376d0fd56"
+    },
+    {
+      "path": "backend-test-reports-3/modules/reporting/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 52,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "f97a3d45deb6468f0ce0e0e69a52fb6412aa1fd33ff42631ae81862d23734a50"
+    },
+    {
+      "path": "backend-test-reports-3/modules/sync/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "833563d9aaa379bedbd8725245c271433adeea41929d9b97c937793d6bf31171"
+    },
+    {
+      "path": "backend-test-reports-3/modules/sync/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 20,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "5f37f5b21f8f549d7561750a51c1da899254f41e656d69443403ab10e747effa"
+    },
+    {
+      "path": "backend-test-reports-3/modules/workforce/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 61,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "699c0deaf2bcbd2b71d4e5118c9a23b6471f76f569a3a3220f1b8828264cd114"
+    },
+    {
+      "path": "backend-test-reports-4/apps/server/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 808,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "666a4d7173b6cae94c9196884320a3d6693981c9440cccc21e12636e5ef0c10d"
+    },
+    {
+      "path": "backend-test-reports-4/apps/worker/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 105,
+        "failures": 0,
+        "skipped": 1
+      },
+      "sha256": "f65de9c3804bd31dcee0868d0af82d6b8a7d4787dfd053238b3c34cb215659c3"
+    },
+    {
+      "path": "backend-test-reports-4/core/database/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 27,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "398f1d56361e18bbf1226b4def0c5f8c4be10284d800071ebac5758786921b42"
+    },
+    {
+      "path": "backend-test-reports-4/core/http/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 11,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "67584a6944fb6ce70f3f311490474c988045b870933afdb1fa30b75783d32865"
+    },
+    {
+      "path": "backend-test-reports-4/core/jobs/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "4d739d5c4b2f75a2a6d38079ce8e3f7da3b00ef89d3525536de5355a7bb0f035"
+    },
+    {
+      "path": "backend-test-reports-4/core/mail/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 6,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "f479363eaba61d74bdc0c4a9747147244178d5c0d52b8c9c4e3e48e73b8c0b04"
+    },
+    {
+      "path": "backend-test-reports-4/core/push/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 12,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "191b849777ce9275b889b2bc3ce58138be6cc6016cf003370365ece884d43d6d"
+    },
+    {
+      "path": "backend-test-reports-4/core/storage/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "b698496261cffcc9b37f0668a329d22f1f58b91f24741e4c18364c58a35f3e0f"
+    },
+    {
+      "path": "backend-test-reports-4/modules/administration/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 14,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "b3a9395babf0a85870cde348c5ffa8dba9059417eab6b177c6f9c1e13dd2c236"
+    },
+    {
+      "path": "backend-test-reports-4/modules/administration/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 8,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "c35e7ee2ee1e8736831be7bb894400bf509e8c75e086dc11cd5715803a20074a"
+    },
+    {
+      "path": "backend-test-reports-4/modules/approvals/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "b45edd8a08f919ddf8c825c63234a7ad7d5b40685e9385b031bb50e9ebc77b78"
+    },
+    {
+      "path": "backend-test-reports-4/modules/communications/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "80a3c42299ef982ec3cf07cffba015c5fc915ea42c9066ee887cf2a4272f3ae5"
+    },
+    {
+      "path": "backend-test-reports-4/modules/communications/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 13,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "1128e6f5ee9d7b94b429c73b00770360d4df7d948656124a38d9eaed690cdf13"
+    },
+    {
+      "path": "backend-test-reports-4/modules/documents/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 9,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "9e6cc4d5b9a57adc42e385929394cbfb640528b71a952730112cc96575ce8049"
+    },
+    {
+      "path": "backend-test-reports-4/modules/documents/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 18,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "6ba6427ccd508b153f98c56a87f0235a8f1659e31a7660ea95ea281c9a09ad0f"
+    },
+    {
+      "path": "backend-test-reports-4/modules/expenses/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 20,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "ab89e43c208232006f47e4567b0ea2599db15e0811c75b248256b11ebc065c1e"
+    },
+    {
+      "path": "backend-test-reports-4/modules/identity/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 22,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "c5c008b9bff90e80ba9c867178eeff7e88a1866d79e26e7eec90c9c5d339675e"
+    },
+    {
+      "path": "backend-test-reports-4/modules/identity/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 35,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "596d52dc47c2f65cd6721dd13d5e9627358aa9e6c287e27fba7aedf67e98b2bb"
+    },
+    {
+      "path": "backend-test-reports-4/modules/leave/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 65,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "edc941eb1cf56faed592d8dc94e2353058bf6d6cfae61352f38cc648e6f326c6"
+    },
+    {
+      "path": "backend-test-reports-4/modules/organization/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "ecb46745378664215109f110a403920ed002abdac0a77d3519ad8f8c958afdbd"
+    },
+    {
+      "path": "backend-test-reports-4/modules/payroll/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 12,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "340078d817b2c176eb76551c74c9292989bba8e46a568999d4e2045518cc2a03"
+    },
+    {
+      "path": "backend-test-reports-4/modules/payroll/delivery/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "e2d8c88765fec508072586f29a3fd580ddfdc6ecb8343f6397cc8b8c0d27e3ec"
+    },
+    {
+      "path": "backend-test-reports-4/modules/payroll/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 114,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "95d2f0783d99941e198c1b003749b3d4c63f777439f881b81a7fbf21cede6876"
+    },
+    {
+      "path": "backend-test-reports-4/modules/people/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 14,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "c60953e3e9b02d8fab50bda4d80d7cae432b389461e117439e4e9e906bb664ac"
+    },
+    {
+      "path": "backend-test-reports-4/modules/people/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 50,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "a75a9cf90e9529c65150318a98b47a405c8e2bf7dcbb2badca321460d00c46be"
+    },
+    {
+      "path": "backend-test-reports-4/modules/reporting/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 61,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "ef91c047dd30f7d931cef86d5a8356bacd3735046c6adba0c189f807566584c3"
+    },
+    {
+      "path": "backend-test-reports-4/modules/reporting/delivery/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "5fbbba389664c10dde6dcb131dadf7d4f3e1dae36b4f60679b79e9538f4f337c"
+    },
+    {
+      "path": "backend-test-reports-4/modules/reporting/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 52,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "38e188214586d81af5cd2263162d1b81f190c0065d85cacccea8a0a1bc6a6f07"
+    },
+    {
+      "path": "backend-test-reports-4/modules/sync/data/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 5,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "aafce599c72a403f66d96ebb45f67ab2581a59c4d1ae97b2134ec19ff77d9c2c"
+    },
+    {
+      "path": "backend-test-reports-4/modules/sync/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 20,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "6e6c73a6d951cefadbff966dc2f6b332603015a3b7f2ec44fb65ca55fe104513"
+    },
+    {
+      "path": "backend-test-reports-4/modules/workforce/domain/build/reports/tests/test/index.html",
+      "counts": {
+        "tests": 61,
+        "failures": 0,
+        "skipped": 0
+      },
+      "sha256": "0621b71ee72fc67e0ea4cb7ed99e5da526679d961b9776eb8a34478ffa0d6cc8"
+    }
+  ],
+  "apiCasesAcrossDisjointShards": 3090,
+  "workerCasesPerShard": {
+    "tests": 105,
+    "failures": 0,
+    "skipped": 1
+  },
+  "workerCountingNote": "Worker/module suites repeat across four shards and must not be summed as distinct cases. The sole skipped worker case is the opt-in one-hour retention workflow, separately accepted on 29 October.",
+  "browser": [
+    {
+      "path": "dashboard-integration-test-reports/export-integration-report/index.html",
+      "sha256": "a836b97d019685f06d6ca249145554944bb3176cf8120eabda19eec9ffa79a1e",
+      "stats": {
+        "total": 1,
+        "expected": 1,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      },
+      "durationMs": 53040.294,
+      "files": 1
+    },
+    {
+      "path": "dashboard-integration-test-reports/integration-report/index.html",
+      "sha256": "bb4070a4f97839fc585661b35f2f678bbd2b4a2d6f968378a7874c035edf7df0",
+      "stats": {
+        "total": 41,
+        "expected": 41,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      },
+      "durationMs": 314345.364,
+      "files": 41
+    },
+    {
+      "path": "dashboard-integration-test-reports/worker-integration-report/index.html",
+      "sha256": "2c96f792ab853efb2166d8887d607a9724e28bf0f6172481a2452e65bc9d8837",
+      "stats": {
+        "total": 14,
+        "expected": 14,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      },
+      "durationMs": 274811.282,
+      "files": 14
+    },
+    {
+      "path": "dashboard-test-reports-1/index.html",
+      "sha256": "e1b0ee6c160173dfa6c3a354f49716dc3f221d353185aba0aa686681fce7f35c",
+      "stats": {
+        "total": 278,
+        "expected": 278,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      },
+      "durationMs": 270234.939,
+      "files": 37
+    },
+    {
+      "path": "dashboard-test-reports-2/index.html",
+      "sha256": "8b8348e06a27d868de583bb61785991803ca2cf86a0389ad13d5b62705afd741",
+      "stats": {
+        "total": 278,
+        "expected": 278,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      },
+      "durationMs": 249008.515,
+      "files": 31
+    },
+    {
+      "path": "dashboard-test-reports-3/index.html",
+      "sha256": "b8a9ee129aca2508055091594399ea66bec4fb92083817ef229bf94bb3be88ce",
+      "stats": {
+        "total": 278,
+        "expected": 278,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      },
+      "durationMs": 241861.623,
+      "files": 28
+    },
+    {
+      "path": "dashboard-test-reports-4/index.html",
+      "sha256": "48e1b0d40eadc270ce630bab02d2edfc43b17baf6b2e958c6e4e0fab1f140742",
+      "stats": {
+        "total": 277,
+        "expected": 277,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "ok": true
+      },
+      "durationMs": 287193.442,
+      "files": 33
+    }
+  ],
+  "recovery": {
+    "restorePassed": true,
+    "schema": "103",
+    "identityEnvelopesVerified": 2,
+    "objects": 104,
+    "bytes": 2098795,
+    "sourceUnchangedByRestore": true,
+    "wrongRetiredKeyRejected": true,
+    "separateKeyPack": true,
+    "temporaryResourcesRemoved": true,
+    "typedAccountAuditRestored": true,
+    "announcementDeliveryRestored": true,
+    "announcementEmailRestored": true,
+    "documentMetadataRestored": true,
+    "documentMetadataHistoryRestored": true,
+    "documentMetadataScopeAndConstraintsRestored": true,
+    "retainedIdentityKeyIds": [
+      "current",
+      "old"
+    ]
+  },
+  "recoveryReportSha256": "1a216c371c5f358ed190fe5d17d67e0a2f6540a2248831a62d560934bd9e69e8",
+  "artifacts": {
+    "total_count": 13,
+    "artifacts": [
+      {
+        "id": 12998766831,
+        "node_id": "MDg6QXJ0aWZhY3QxMjk5ODc2NjgzMQ==",
+        "name": "dashboard-integration-test-reports",
+        "size_in_bytes": 1103284,
+        "url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12998766831",
+        "archive_download_url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12998766831/zip",
+        "expired": false,
+        "digest": "sha256:b592374c084aafd016c1276a48098a760caa4f2b2294f279f29690140feee005",
+        "created_at": "2026-10-30T17:41:50Z",
+        "updated_at": "2026-10-30T17:41:50Z",
+        "expires_at": "2027-01-28T16:55:47Z",
+        "workflow_run": {
+          "id": 41094285531,
+          "repository_id": 1410114009,
+          "head_repository_id": 1410114009,
+          "head_branch": "feat/firebase-auth",
+          "head_sha": "93438f994c43b2bf15ee93120c90a1ea61745217"
+        }
+      },
+      {
+        "id": 12998740250,
+        "node_id": "MDg6QXJ0aWZhY3QxMjk5ODc0MDI1MA==",
+        "name": "hris-openapi-v1",
+        "size_in_bytes": 67344,
+        "url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12998740250",
+        "archive_download_url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12998740250/zip",
+        "expired": false,
+        "digest": "sha256:08e1a636844b5cc3116fa85040a921efabbcc01a55e48f2389ea7e86f064d487",
+        "created_at": "2026-10-30T17:30:02Z",
+        "updated_at": "2026-10-30T17:30:02Z",
+        "expires_at": "2027-01-28T16:55:47Z",
+        "workflow_run": {
+          "id": 41094285531,
+          "repository_id": 1410114009,
+          "head_repository_id": 1410114009,
+          "head_branch": "feat/firebase-auth",
+          "head_sha": "93438f994c43b2bf15ee93120c90a1ea61745217"
+        }
+      },
+      {
+        "id": 12998730330,
+        "node_id": "MDg6QXJ0aWZhY3QxMjk5ODczMDMzMA==",
+        "name": "backend-test-reports-1",
+        "size_in_bytes": 1602300,
+        "url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12998730330",
+        "archive_download_url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12998730330/zip",
+        "expired": false,
+        "digest": "sha256:472fdd91c475bd7ed99b8b55f60b1999516045dcb003035220f9bb7d0aefd4cb",
+        "created_at": "2026-10-30T17:30:06Z",
+        "updated_at": "2026-10-30T17:30:06Z",
+        "expires_at": "2027-01-28T16:55:47Z",
+        "workflow_run": {
+          "id": 41094285531,
+          "repository_id": 1410114009,
+          "head_repository_id": 1410114009,
+          "head_branch": "feat/firebase-auth",
+          "head_sha": "93438f994c43b2bf15ee93120c90a1ea61745217"
+        }
+      },
+      {
+        "id": 12998695307,
+        "node_id": "MDg6QXJ0aWZhY3QxMjk5ODY5NTMwNw==",
+        "name": "hris-worker-integration-jar",
+        "size_in_bytes": 77709816,
+        "url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12998695307",
+        "archive_download_url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12998695307/zip",
+        "expired": false,
+        "digest": "sha256:ac7c2b24b7ccf2e903f11c2a258573d72739fdcf5d65c78d37b341b4e59c563b",
+        "created_at": "2026-10-30T17:30:00Z",
+        "updated_at": "2026-10-30T17:30:00Z",
+        "expires_at": "2026-10-31T17:29:59Z",
+        "workflow_run": {
+          "id": 41094285531,
+          "repository_id": 1410114009,
+          "head_repository_id": 1410114009,
+          "head_branch": "feat/firebase-auth",
+          "head_sha": "93438f994c43b2bf15ee93120c90a1ea61745217"
+        }
+      },
+      {
+        "id": 12998490674,
+        "node_id": "MDg6QXJ0aWZhY3QxMjk5ODQ5MDY3NA==",
+        "name": "hris-api-integration-jar",
+        "size_in_bytes": 97522976,
+        "url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12998490674",
+        "archive_download_url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12998490674/zip",
+        "expired": false,
+        "digest": "sha256:84bac61d30cf3e94e0d2e8208206de307902c7a317229bfadd47755fb8f0b97d",
+        "created_at": "2026-10-30T17:29:58Z",
+        "updated_at": "2026-10-30T17:29:58Z",
+        "expires_at": "2026-10-31T17:29:57Z",
+        "workflow_run": {
+          "id": 41094285531,
+          "repository_id": 1410114009,
+          "head_repository_id": 1410114009,
+          "head_branch": "feat/firebase-auth",
+          "head_sha": "93438f994c43b2bf15ee93120c90a1ea61745217"
+        }
+      },
+      {
+        "id": 12997975964,
+        "node_id": "MDg6QXJ0aWZhY3QxMjk5Nzk3NTk2NA==",
+        "name": "recovery-verification-summary",
+        "size_in_bytes": 504,
+        "url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12997975964",
+        "archive_download_url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12997975964/zip",
+        "expired": false,
+        "digest": "sha256:d8b1320bda07e988518b596f45cb5b54d3d889974f40628b3df03b2821233f59",
+        "created_at": "2026-10-30T17:31:54Z",
+        "updated_at": "2026-10-30T17:31:54Z",
+        "expires_at": "2026-11-06T17:31:53Z",
+        "workflow_run": {
+          "id": 41094285531,
+          "repository_id": 1410114009,
+          "head_repository_id": 1410114009,
+          "head_branch": "feat/firebase-auth",
+          "head_sha": "93438f994c43b2bf15ee93120c90a1ea61745217"
+        }
+      },
+      {
+        "id": 12997162283,
+        "node_id": "MDg6QXJ0aWZhY3QxMjk5NzE2MjI4Mw==",
+        "name": "backend-test-reports-4",
+        "size_in_bytes": 1547785,
+        "url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12997162283",
+        "archive_download_url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12997162283/zip",
+        "expired": false,
+        "digest": "sha256:30aad345076929d39fac7751032f8d55eca663f9ac27af7a717421f74ac63e83",
+        "created_at": "2026-10-30T17:20:49Z",
+        "updated_at": "2026-10-30T17:20:49Z",
+        "expires_at": "2027-01-28T16:55:47Z",
+        "workflow_run": {
+          "id": 41094285531,
+          "repository_id": 1410114009,
+          "head_repository_id": 1410114009,
+          "head_branch": "feat/firebase-auth",
+          "head_sha": "93438f994c43b2bf15ee93120c90a1ea61745217"
+        }
+      },
+      {
+        "id": 12996996639,
+        "node_id": "MDg6QXJ0aWZhY3QxMjk5Njk5NjYzOQ==",
+        "name": "backend-test-reports-3",
+        "size_in_bytes": 1395477,
+        "url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12996996639",
+        "archive_download_url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12996996639/zip",
+        "expired": false,
+        "digest": "sha256:79aed79ef9d73893e946c8610a053633aab385772639514517926552675884e5",
+        "created_at": "2026-10-30T17:14:56Z",
+        "updated_at": "2026-10-30T17:14:56Z",
+        "expires_at": "2027-01-28T16:55:47Z",
+        "workflow_run": {
+          "id": 41094285531,
+          "repository_id": 1410114009,
+          "head_repository_id": 1410114009,
+          "head_branch": "feat/firebase-auth",
+          "head_sha": "93438f994c43b2bf15ee93120c90a1ea61745217"
+        }
+      },
+      {
+        "id": 12996987343,
+        "node_id": "MDg6QXJ0aWZhY3QxMjk5Njk4NzM0Mw==",
+        "name": "backend-test-reports-2",
+        "size_in_bytes": 1495176,
+        "url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12996987343",
+        "archive_download_url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12996987343/zip",
+        "expired": false,
+        "digest": "sha256:3ecd14a1a9364b462e863b8f616fd55d3fbb4e2073423a5c9aa16d8a7395269f",
+        "created_at": "2026-10-30T17:20:11Z",
+        "updated_at": "2026-10-30T17:20:11Z",
+        "expires_at": "2027-01-28T16:55:47Z",
+        "workflow_run": {
+          "id": 41094285531,
+          "repository_id": 1410114009,
+          "head_repository_id": 1410114009,
+          "head_branch": "feat/firebase-auth",
+          "head_sha": "93438f994c43b2bf15ee93120c90a1ea61745217"
+        }
+      },
+      {
+        "id": 12996620929,
+        "node_id": "MDg6QXJ0aWZhY3QxMjk5NjYyMDkyOQ==",
+        "name": "dashboard-test-reports-1",
+        "size_in_bytes": 533045,
+        "url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12996620929",
+        "archive_download_url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12996620929/zip",
+        "expired": false,
+        "digest": "sha256:7414a3925cab683064c0c05422946749fb5476ab0afb3323c436e302777119b7",
+        "created_at": "2026-10-30T17:03:58Z",
+        "updated_at": "2026-10-30T17:03:58Z",
+        "expires_at": "2027-01-28T16:55:47Z",
+        "workflow_run": {
+          "id": 41094285531,
+          "repository_id": 1410114009,
+          "head_repository_id": 1410114009,
+          "head_branch": "feat/firebase-auth",
+          "head_sha": "93438f994c43b2bf15ee93120c90a1ea61745217"
+        }
+      },
+      {
+        "id": 12996550867,
+        "node_id": "MDg6QXJ0aWZhY3QxMjk5NjU1MDg2Nw==",
+        "name": "dashboard-test-reports-3",
+        "size_in_bytes": 548957,
+        "url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12996550867",
+        "archive_download_url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12996550867/zip",
+        "expired": false,
+        "digest": "sha256:8ec2ac4707049b9b56d58415f808ceaae170d9b4f7a85993a4f7edffcaa90076",
+        "created_at": "2026-10-30T17:02:45Z",
+        "updated_at": "2026-10-30T17:02:45Z",
+        "expires_at": "2027-01-28T16:55:47Z",
+        "workflow_run": {
+          "id": 41094285531,
+          "repository_id": 1410114009,
+          "head_repository_id": 1410114009,
+          "head_branch": "feat/firebase-auth",
+          "head_sha": "93438f994c43b2bf15ee93120c90a1ea61745217"
+        }
+      },
+      {
+        "id": 12996520993,
+        "node_id": "MDg6QXJ0aWZhY3QxMjk5NjUyMDk5Mw==",
+        "name": "dashboard-test-reports-2",
+        "size_in_bytes": 562651,
+        "url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12996520993",
+        "archive_download_url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12996520993/zip",
+        "expired": false,
+        "digest": "sha256:78a0db1666399b8ef3cd519dfb2f94cce1834a1cd2dd07635fc81e896a450819",
+        "created_at": "2026-10-30T17:03:00Z",
+        "updated_at": "2026-10-30T17:03:00Z",
+        "expires_at": "2027-01-28T16:55:47Z",
+        "workflow_run": {
+          "id": 41094285531,
+          "repository_id": 1410114009,
+          "head_repository_id": 1410114009,
+          "head_branch": "feat/firebase-auth",
+          "head_sha": "93438f994c43b2bf15ee93120c90a1ea61745217"
+        }
+      },
+      {
+        "id": 12995352756,
+        "node_id": "MDg6QXJ0aWZhY3QxMjk5NTM1Mjc1Ng==",
+        "name": "dashboard-test-reports-4",
+        "size_in_bytes": 538694,
+        "url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12995352756",
+        "archive_download_url": "https://api.github.com/repos/fajarxfce/hris-platform/actions/artifacts/12995352756/zip",
+        "expired": false,
+        "digest": "sha256:8c3c49ae326443b55f38dd5a893427d713d727840dfa39cc3b165c89fa189b66",
+        "created_at": "2026-10-30T17:04:04Z",
+        "updated_at": "2026-10-30T17:04:04Z",
+        "expires_at": "2027-01-28T16:55:47Z",
+        "workflow_run": {
+          "id": 41094285531,
+          "repository_id": 1410114009,
+          "head_repository_id": 1410114009,
+          "head_branch": "feat/firebase-auth",
+          "head_sha": "93438f994c43b2bf15ee93120c90a1ea61745217"
+        }
+      }
+    ]
+  },
+  "deployment": "No deployment is implied by this CI record.",
+  "stepMetadataResolution": {
+    "runId": 41094285531,
+    "jobId": 124213390227,
+    "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+    "runAttempt": 1,
+    "jobStatus": "completed",
+    "jobConclusion": "success",
+    "jobCompletedAt": "2026-10-30T17:42:23Z",
+    "rawIncompleteSteps": [
+      {
+        "number": 12,
+        "name": "Run npm run test:integration:worker",
+        "reportedStatus": "in_progress",
+        "reportedConclusion": null
+      },
+      {
+        "number": 13,
+        "name": "Run python3 -m unittest discover -s ../../tool -p 'test_dashboard_storage*.py'",
+        "reportedStatus": "pending",
+        "reportedConclusion": null
+      },
+      {
+        "number": 14,
+        "name": "Run npm run test:integration:exports",
+        "reportedStatus": "pending",
+        "reportedConclusion": null
+      },
+      {
+        "number": 15,
+        "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+        "reportedStatus": "pending",
+        "reportedConclusion": null
+      },
+      {
+        "number": 28,
+        "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+        "reportedStatus": "pending",
+        "reportedConclusion": null
+      },
+      {
+        "number": 29,
+        "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+        "reportedStatus": "pending",
+        "reportedConclusion": null
+      },
+      {
+        "number": 30,
+        "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+        "reportedStatus": "pending",
+        "reportedConclusion": null
+      }
+    ],
+    "resolution": "Retain the inconsistent API step metadata unchanged. Verify these steps through the complete final job log, source-matching browser reports, uploaded artifact digest and terminal successful job/run conclusions.",
+    "verifiedLogMarkers": [
+      "2026-10-30T17:36:18.8688703Z   41 passed (5.2m)",
+      "2026-10-30T17:36:19.2499081Z Ran 2 tests in 0.108s",
+      "2026-10-30T17:36:19.3305115Z Ran 5 tests in 0.019s",
+      "2026-10-30T17:40:54.7374394Z   14 passed (4.6m)",
+      "2026-10-30T17:40:55.5277983Z Ran 9 tests in 0.569s",
+      "2026-10-30T17:41:49.1415325Z   1 passed (53.0s)",
+      "2026-10-30T17:41:50.3053931Z SHA256 digest of uploaded artifact zip is b592374c084aafd016c1276a48098a760caa4f2b2294f279f29690140feee005",
+      "2026-10-30T17:41:50.7682086Z Artifact dashboard-integration-test-reports has been successfully uploaded! Final size is 1103284 bytes. Artifact ID is 12998766831",
+      "2026-10-30T17:41:50.7895604Z Post job cleanup.",
+      "2026-10-30T17:41:50.9267849Z Post job cleanup.",
+      "2026-10-30T17:41:51.0441049Z Post job cleanup.",
+      "2026-10-30T17:41:51.2340237Z Cleaning up orphan processes"
+    ],
+    "rawLogSha256": "7d25417855663bf543ede85c5732ed703073c0ec6e8b6e2234784d28a164873a",
+    "cleanLogSha256": "a9c9f8e723d79a74cc12a5b3b1bbadc66854820433f989cc3a61e78d88cec1a8",
+    "artifactZipSha256": "b592374c084aafd016c1276a48098a760caa4f2b2294f279f29690140feee005",
+    "cancellationOrRerunPerformed": false,
+    "localDiagnostic": "docs/measurements/workforce-browser-diagnostic-2026-10-30.json",
+    "limits": "The observation proves delayed/inconsistent status reporting, not its upstream root cause. No application or CI workflow source changed."
+  }
+}

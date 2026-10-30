@@ -1,0 +1,74 @@
+{
+  "runId": 41094285531,
+  "jobId": 124213390227,
+  "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+  "runAttempt": 1,
+  "jobStatus": "completed",
+  "jobConclusion": "success",
+  "jobCompletedAt": "2026-10-30T17:42:23Z",
+  "rawIncompleteSteps": [
+    {
+      "number": 12,
+      "name": "Run npm run test:integration:worker",
+      "reportedStatus": "in_progress",
+      "reportedConclusion": null
+    },
+    {
+      "number": 13,
+      "name": "Run python3 -m unittest discover -s ../../tool -p 'test_dashboard_storage*.py'",
+      "reportedStatus": "pending",
+      "reportedConclusion": null
+    },
+    {
+      "number": 14,
+      "name": "Run npm run test:integration:exports",
+      "reportedStatus": "pending",
+      "reportedConclusion": null
+    },
+    {
+      "number": 15,
+      "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+      "reportedStatus": "pending",
+      "reportedConclusion": null
+    },
+    {
+      "number": 28,
+      "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+      "reportedStatus": "pending",
+      "reportedConclusion": null
+    },
+    {
+      "number": 29,
+      "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+      "reportedStatus": "pending",
+      "reportedConclusion": null
+    },
+    {
+      "number": 30,
+      "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+      "reportedStatus": "pending",
+      "reportedConclusion": null
+    }
+  ],
+  "resolution": "Retain the inconsistent API step metadata unchanged. Verify these steps through the complete final job log, source-matching browser reports, uploaded artifact digest and terminal successful job/run conclusions.",
+  "verifiedLogMarkers": [
+    "2026-10-30T17:36:18.8688703Z   41 passed (5.2m)",
+    "2026-10-30T17:36:19.2499081Z Ran 2 tests in 0.108s",
+    "2026-10-30T17:36:19.3305115Z Ran 5 tests in 0.019s",
+    "2026-10-30T17:40:54.7374394Z   14 passed (4.6m)",
+    "2026-10-30T17:40:55.5277983Z Ran 9 tests in 0.569s",
+    "2026-10-30T17:41:49.1415325Z   1 passed (53.0s)",
+    "2026-10-30T17:41:50.3053931Z SHA256 digest of uploaded artifact zip is b592374c084aafd016c1276a48098a760caa4f2b2294f279f29690140feee005",
+    "2026-10-30T17:41:50.7682086Z Artifact dashboard-integration-test-reports has been successfully uploaded! Final size is 1103284 bytes. Artifact ID is 12998766831",
+    "2026-10-30T17:41:50.7895604Z Post job cleanup.",
+    "2026-10-30T17:41:50.9267849Z Post job cleanup.",
+    "2026-10-30T17:41:51.0441049Z Post job cleanup.",
+    "2026-10-30T17:41:51.2340237Z Cleaning up orphan processes"
+  ],
+  "rawLogSha256": "7d25417855663bf543ede85c5732ed703073c0ec6e8b6e2234784d28a164873a",
+  "cleanLogSha256": "a9c9f8e723d79a74cc12a5b3b1bbadc66854820433f989cc3a61e78d88cec1a8",
+  "artifactZipSha256": "b592374c084aafd016c1276a48098a760caa4f2b2294f279f29690140feee005",
+  "cancellationOrRerunPerformed": false,
+  "localDiagnostic": "docs/measurements/workforce-browser-diagnostic-2026-10-30.json",
+  "limits": "The observation proves delayed/inconsistent status reporting, not its upstream root cause. No application or CI workflow source changed."
+}

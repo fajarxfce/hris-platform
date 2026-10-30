@@ -2,7 +2,7 @@
   "date": "2026-10-30",
   "baseline": "c7caf489a19b38148d0a4981eb82dc8dbab11ed1",
   "objective": "Verify every specified feature and implement unfinished requirements; prior green CI is not sufficient evidence for untested features.",
-  "status": "active",
+  "status": "implementation accepted; private development update and final handoffs pending",
   "scope": [
     "docs/product.md",
     "all eleven docs/modules contracts",
@@ -851,50 +851,90 @@
         {
           "id": "workforce.01",
           "text": "Own work calendars, holidays, shift templates, rosters, immutable attendance events, corrections, verification, overtime, and period closing.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/workforce-feature-review-2026-10-30.md",
+            "docs/measurements/workforce-assurance-2026-10-30.json",
+            "docs/measurements/workforce-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531"
+          ]
         },
         {
           "id": "workforce.02",
           "text": "Shift IDs and work dates anchor overnight events. Raw timestamps retain captured and server-received times and device evidence. Offline events remain pending verification. HR corrections require actor/reason and append an adjustment. Location evidence is evaluated against the applicable policy.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/workforce-feature-review-2026-10-30.md",
+            "docs/measurements/workforce-assurance-2026-10-30.json",
+            "docs/measurements/workforce-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531"
+          ]
         },
         {
           "id": "workforce.03",
           "text": "Overtime separates requested/actual/approved time. A payroll cutoff requires resolution of relevant exceptions. Workforce exposes factual time; leave remains separately owned and reporting/payroll combine through repository contracts.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/workforce-feature-review-2026-10-30.md",
+            "docs/measurements/workforce-assurance-2026-10-30.json",
+            "docs/measurements/workforce-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531"
+          ]
         },
         {
           "id": "workforce.04",
           "text": "Screens: roster, daily attendance, exceptions, offline verification, corrections, overtime, and closing.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/workforce-feature-review-2026-10-30.md",
+            "docs/measurements/workforce-assurance-2026-10-30.json",
+            "docs/measurements/workforce-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531"
+          ]
         },
         {
           "id": "workforce.05",
           "text": "`GET /workforce/me/employments` selects only employments linked to the current\naccount, under `attendance.self.record`, `workforce.read`, `overtime.self.manage`,\n`overtime.read` or `overtime.manage`. Its bounded directory\nreturns employee number, status, observed version, company date and timezone;\npersonal profiles are not included. The endpoint belongs to Workforce availability,\nso disabling People does not prevent employees from opening their work calendar\nor overtime. Discovery does not grant calendar, profile or other employees' access.\nCompany access, credential versions and current MFA are rechecked after waiting\nand after acquisition. Subsequent calendar and overtime reads authorize independently.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/workforce-feature-review-2026-10-30.md",
+            "docs/measurements/workforce-assurance-2026-10-30.json",
+            "docs/measurements/workforce-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531"
+          ]
         },
         {
           "id": "workforce.06",
           "text": "Administrative selection uses `GET /workforce/employees?asOf=yyyy-MM-dd`, under\n`workforce.read`, with at most 50 employee references per page and bounded search.\nIt returns only ID, employee number, legal name, employment status and version.\nThe People feature's availability and profile permissions remain independent.\nThe page separately advertises `bulkRosterSupported`; this API capability does\nnot grant management access. Clients treat its absence on an older API as false.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/workforce-feature-review-2026-10-30.md",
+            "docs/measurements/workforce-assurance-2026-10-30.json",
+            "docs/measurements/workforce-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531"
+          ]
         },
         {
           "id": "workforce.07",
           "text": "`GET /workforce/employees/{id}/calendar/review?from=...&until=...` returns that\nreference, the resolved calendar, and the weekly assignment effective at `from`.\nOne shared schedule/people/access transaction keeps its component queries coherent.\nThe global `scheduleVersion` includes future assignments; `assignmentAtStart`\nretains the applicable date, revision and original shift snapshots. A roster day's\norigin/version distinguishes an explicit day off from holiday or weekly time off.\nThe review requires `workforce.read`; self/team calendar readers retain their\nexisting endpoint and scope. Missing and foreign employment IDs share one error.\nAll reads recheck current session assurance after waiting and release their guards\non cancellation. These observations do not reserve a later write: commands still\nrequire current authority, selected shift versions and the observed schedule or\nroster version.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/workforce-feature-review-2026-10-30.md",
+            "docs/measurements/workforce-assurance-2026-10-30.json",
+            "docs/measurements/workforce-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531"
+          ]
         },
         {
           "id": "workforce.08",
           "text": "Acceptance: duplicate/offline events, checkout across midnight, timezone transitions, overlapping roster, immutable corrections, concurrent verification, and unverified records excluded from payroll.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/workforce-feature-review-2026-10-30.md",
+            "docs/measurements/workforce-assurance-2026-10-30.json",
+            "docs/measurements/workforce-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531"
+          ]
         }
       ],
       "detailedContractSections": [
@@ -905,10 +945,12 @@
         "Overtime requests"
       ],
       "detailedReview": {
-        "status": "complete local acceptance; full CI pending",
+        "status": "accepted",
         "evidence": [
           "docs/workforce-feature-review-2026-10-30.md",
-          "docs/measurements/workforce-assurance-2026-10-30.json"
+          "docs/measurements/workforce-assurance-2026-10-30.json",
+          "docs/measurements/workforce-full-ci-2026-10-30.json",
+          "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531"
         ],
         "overtimeAmendmentBoundary": "No post-approval overtime-fact amendment is specified by the original PRD or implemented. Attendance adjustments and financial Payroll amendments preserve the original overtime facts; see the explicit review boundary."
       }
@@ -919,7 +961,7 @@
       "id": "communications.email",
       "status": "accepted",
       "requirement": "Communications channel delivery: FCM/email failures do not erase inbox.",
-      "next": "Continue reviewing all module and Mobile requirements; this capability has local and full CI acceptance.",
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
       "baselineEvidence": [
         "modules/communications/domain/build.gradle.kts: includes core.push.domain but no core.mail.domain",
         "modules/communications/data/src/main/kotlin/dev/fajar/hris/communications/data/di/CommunicationsConfiguration.kt: push delivery bindings only",
@@ -930,13 +972,20 @@
         "docs/announcement-email.md",
         "docs/measurements/announcement-email-2026-10-30.json",
         "https://github.com/fajarxfce/hris-platform/actions/runs/41005223374"
-      ]
+      ],
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
+      }
     },
     {
       "id": "approvals.history",
       "status": "accepted",
       "requirement": "Approvals request timeline with retained decisions and reassignment facts.",
-      "next": "Continue all remaining Platform/Mobile requirements; final approval source passed all ten CI jobs.",
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
       "baselineEvidence": [
         "docs/approval-history-audit-2026-10-30.md",
         "modules/approvals/delivery/src/main/kotlin/dev/fajar/hris/approvals/delivery/responses/ApprovalResponse.kt",
@@ -947,7 +996,14 @@
         "docs/approval-history.md",
         "docs/measurements/approval-history-2026-10-30.json",
         "https://github.com/fajarxfce/hris-platform/actions/runs/41009137720"
-      ]
+      ],
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
+      }
     },
     {
       "id": "approvals.read-completion",
@@ -962,11 +1018,18 @@
         "docs/measurements/approval-read-assurance-2026-10-30.json",
         "https://github.com/fajarxfce/hris-platform/actions/runs/41009137720"
       ],
-      "next": "Continue all remaining Platform/Mobile requirements; final approval source passed all ten CI jobs."
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
+      }
     },
     {
       "id": "communications.read-completion",
-      "status": "implemented-and-locally-accepted",
+      "status": "accepted",
       "requirement": "Interactive communication content and metadata require current session assurance after acquisition.",
       "baseline": "3fd05b8e",
       "baselineEvidence": [
@@ -976,11 +1039,18 @@
         "docs/communications-read-assurance-2026-10-30.md",
         "docs/measurements/communications-read-assurance-2026-10-30.json"
       ],
-      "next": "Final source 8e5dd3db passed all ten CI jobs. Continue remaining Platform/Mobile review."
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
+      }
     },
     {
       "id": "documents.read-completion",
-      "status": "implemented-and-locally-accepted",
+      "status": "accepted",
       "requirement": "Document metadata, discovery and bytes require current session assurance through final acquisition.",
       "baseline": "a45d5a9b",
       "baselineEvidence": [
@@ -990,11 +1060,18 @@
         "docs/document-read-assurance-2026-10-30.md",
         "docs/measurements/document-read-assurance-2026-10-30.json"
       ],
-      "next": "Final source 8e5dd3db passed all ten CI jobs. Continue remaining Platform/Mobile review."
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
+      }
     },
     {
       "id": "documents.command-completion",
-      "status": "implemented-and-locally-accepted",
+      "status": "accepted",
       "requirement": "Document commands, replay and storage preparation require current enrollment and assurance through completion.",
       "baseline": "7a1c0251",
       "baselineEvidence": [
@@ -1004,11 +1081,18 @@
         "docs/document-command-assurance-2026-10-30.md",
         "docs/measurements/document-command-assurance-2026-10-30.json"
       ],
-      "next": "Final source 8e5dd3db passed all ten CI jobs. Continue remaining Platform/Mobile review."
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
+      }
     },
     {
       "id": "expenses.assurance-and-inputs",
-      "status": "implemented-and-locally-accepted",
+      "status": "accepted",
       "requirement": "Current enrollment, delegated receipt/decision scope and stable admitted inputs through waits and completion.",
       "baseline": "8e5dd3db",
       "baselineEvidence": [
@@ -1019,11 +1103,18 @@
         "docs/measurements/expense-assurance-2026-10-30.json",
         "docs/expenses-feature-review-2026-10-30.md"
       ],
-      "next": "Observe exact source 5b60aba3 in CI 41018107365; continue Leave and remaining Platform/Mobile requirements without cancelling it."
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
+      }
     },
     {
       "id": "leave.read-completion",
-      "status": "implemented-and-locally-accepted",
+      "status": "accepted",
       "requirement": "Leave metadata, request details, attachment preparation and post-storage completion require current session assurance.",
       "baseline": "5b60aba3",
       "baselineEvidence": [
@@ -1033,11 +1124,18 @@
         "docs/leave-read-assurance-2026-10-30.md",
         "docs/measurements/leave-read-assurance-2026-10-30.json"
       ],
-      "next": "Complete Leave command/delegation and full requirement review before accepting its five rows."
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
+      }
     },
     {
       "id": "leave.command-and-delegation-completion",
-      "status": "implemented-and-locally-accepted",
+      "status": "accepted",
       "requirement": "Current resource/delegation/session scope through command, receipt and read completion, stable policy input and original approval provenance.",
       "baseline": "c68b721a",
       "baselineEvidence": [
@@ -1048,11 +1146,18 @@
         "docs/measurements/leave-command-assurance-2026-10-30.json",
         "docs/leave-feature-review-2026-10-30.md"
       ],
-      "next": "Follow final-source CI and continue the remaining Platform/Mobile audit."
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
+      }
     },
     {
       "id": "people.read-completion",
-      "status": "implemented-and-accepted",
+      "status": "accepted",
       "baseline": "f95bdd12",
       "requirement": "Current MFA and original/live scope through final People data acquisition, including independent cross-company review.",
       "baselineEvidence": [
@@ -1062,7 +1167,7 @@
         "docs/people-read-assurance-2026-10-30.md",
         "docs/measurements/people-read-assurance-2026-10-30.json"
       ],
-      "next": "All five People rows reviewed and accepted; continue remaining modules.",
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
       "fullCi": {
         "status": "success",
         "runId": 41032184925,
@@ -1074,11 +1179,18 @@
           "previous accepted Expense/Leave source"
         ],
         "remaining": "None for recorded source; later metadata acceptance is recorded separately."
+      },
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
       }
     },
     {
       "id": "documents.identity-metadata",
-      "status": "implemented-and-accepted",
+      "status": "accepted",
       "baseline": "b0b7c21c9fb64e66a15b7ac4899c493e708c77a9",
       "requirements": [
         "documents.02",
@@ -1090,11 +1202,18 @@
         "docs/native-metadata-acceptance.md",
         "docs/measurements/document-metadata-final-ci-2026-10-30.json"
       ],
-      "next": "Complete Administration/Reporting source CI and remaining Payroll/Workforce/Mobile/Starter review."
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
+      }
     },
     {
       "id": "people.command-organization-completion",
-      "status": "implemented-and-accepted",
+      "status": "accepted",
       "baseline": "b0b7c21c",
       "actualFailures": 50,
       "priorControls": 4,
@@ -1102,7 +1221,7 @@
         "docs/people-command-assurance-2026-10-30.md",
         "docs/measurements/people-command-assurance-2026-10-30.json"
       ],
-      "next": "All five People rows reviewed and accepted; continue remaining modules.",
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
       "fullCi": {
         "status": "success",
         "runId": 41032184925,
@@ -1114,11 +1233,18 @@
           "previous accepted Expense/Leave source"
         ],
         "remaining": "None for recorded source; later metadata acceptance is recorded separately."
+      },
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
       }
     },
     {
       "id": "reporting.export-policy-completion",
-      "status": "implemented-and-accepted",
+      "status": "accepted",
       "baseline": "3c8fb15a",
       "actualFailures": 7,
       "evidence": [
@@ -1126,18 +1252,25 @@
         "docs/measurements/reporting-assurance-2026-10-30.json",
         "docs/reporting-feature-review-2026-10-30.md"
       ],
-      "next": "Complete final Workforce source CI and combined private runtime update.",
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
       "fullCi": {
         "runId": 41087903927,
         "source": "eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f",
         "status": "success",
         "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927",
         "evidence": "docs/measurements/reporting-payroll-full-ci-2026-10-30.json"
+      },
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
       }
     },
     {
       "id": "payroll.command-completion",
-      "status": "implemented-and-accepted",
+      "status": "accepted",
       "genuineFailures": 40,
       "existingControls": 1,
       "evidence": [
@@ -1145,13 +1278,20 @@
         "docs/payroll-feature-review-2026-10-30.md",
         "docs/measurements/payroll-assurance-2026-10-30.json"
       ],
-      "next": "Complete final Workforce source CI and combined private runtime update.",
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
       "fullCi": {
         "runId": 41087903927,
         "source": "eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f",
         "status": "success",
         "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927",
         "evidence": "docs/measurements/reporting-payroll-full-ci-2026-10-30.json"
+      },
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
       }
     },
     {
@@ -1162,11 +1302,18 @@
         "docs/administration-feature-review-2026-10-30.md",
         "docs/measurements/administration-full-ci-2026-10-30.json"
       ],
-      "next": "Complete final Reporting/Payroll source CI and remaining Workforce/Mobile/Starter audit."
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
+      }
     },
     {
       "id": "workforce.completion-assurance",
-      "status": "implemented-and-locally-accepted",
+      "status": "accepted",
       "actualFailures": 24,
       "priorControls": 3,
       "source": "2c2a59e3",
@@ -1175,7 +1322,14 @@
         "docs/workforce-feature-review-2026-10-30.md",
         "docs/measurements/workforce-assurance-2026-10-30.json"
       ],
-      "next": "Complete final source CI and combined private development update."
+      "next": "No implementation work remains for this finding; perform combined private runtime update and final handoff.",
+      "finalRegressionCi": {
+        "runId": 41094285531,
+        "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+        "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
+      }
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",
@@ -1204,5 +1358,12 @@
       "https://github.com/fajarxfce/compose-fluent-starter/blob/fix/push-token-lifecycle/docs/foundation-review-2026-10-30.md",
       "https://github.com/fajarxfce/compose-fluent-starter/blob/fix/push-token-lifecycle/docs/measurements/foundation-review-2026-10-30.json"
     ]
+  },
+  "finalPlatformCi": {
+    "runId": 41094285531,
+    "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+    "status": "success",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+    "evidence": "docs/measurements/workforce-full-ci-2026-10-30.json"
   }
 }

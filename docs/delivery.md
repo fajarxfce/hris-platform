@@ -6737,3 +6737,13 @@ identity keys. The [full record](measurements/reporting-payroll-full-ci-2026-10-
 preserves every terminal job/step, report hashes and recovery assertions. Reporting's
 five and Payroll's seven rows are accepted, bringing the inventory to 53/8.
 Final Workforce CI `41094285531` started afterward at `93438f99`; preserve it.
+
+## Final Workforce source CI — 30 October 2026
+
+All ten jobs in [CI 41094285531](https://github.com/fajarxfce/hris-platform/actions/runs/41094285531) pass for `93438f99`.
+[Downloaded evidence](measurements/workforce-full-ci-2026-10-30.json) verifies
+3,090 API cases, 104 active worker cases, 1,111 mocked browser scenarios,
+56 actual API/worker/export browser workflows and complete schema-103 restoration.
+All 61 initial Platform rows and their detailed reviews are now accepted. Mobile
+and applicable Starter review also pass. The authorized private update and final
+Git handoffs remain; no final-correction runtime update has occurred yet.

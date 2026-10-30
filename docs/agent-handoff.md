@@ -18,67 +18,40 @@ and [measurements](measurements/metadata-development-rollout-2026-10-30.json) be
 using older schema-101 status paragraphs below. Phone APK is now application `3c6db4eb`; Mobile
 CI `41077194465` passed all four jobs and its installed binary hash is verified. Administration source corrections are not deployed.
 
-## Active goal — final source CI and private update
+## Active goal — private runtime update and final handoffs
 
-Current CI observation at 17:51 UTC: all eight backend/dashboard shards and
-schema-103 recovery passed in `41094285531`. Its normal browser step has remained
-in progress since 17:31; no terminal test log is available yet (job `124213390227`).
-Occasional GitHub job-list calls return 502. Do not mark this final job accepted.
-A diagnostic reran all 41 actual normal browser workflows against identical source
-locally: all passed in 273.489s, with no failures/retries/skips and complete fixture
-cleanup. [Evidence](measurements/workforce-browser-diagnostic-2026-10-30.json)
-retains source continuity and report hashes. Wait for the current job's terminal
-log, diagnose its outcome and recover the affected CI job as appropriate. No
-application source was changed for this diagnostic and no deployment occurred.
+All 61 initial Platform requirements and all eleven detailed module reviews are
+accepted. Mobile's fifteen-area review (`f4f101a1`) and Starter's applicable
+foundation review (`7605916`) are complete; no additional generic port is required.
+All ten jobs in [final Platform CI 41094285531](https://github.com/fajarxfce/hris-platform/actions/runs/41094285531) pass at
+`93438f99`, with downloaded backend/browser/recovery evidence in
+[measurements](measurements/workforce-full-ci-2026-10-30.json). There is no active
+CI or local test. Physical iPhone testing remains explicitly waived.
+
+GitHub returned stale step details even after the job/run completed successfully.
+The complete job log, all three source-matching browser reports and uploaded ZIP
+digest independently verify worker, storage, export, upload and cleanup completion.
+No cancellation or rerun occurred. [The observation](measurements/workforce-ci-reporting-lag-2026-10-30.json)
+retains raw inconsistent statuses and exact resolving evidence; they are not silently
+rewritten as completed metadata. The independent 41-case local diagnostic also passes.
 
 
-All remaining source reviews and local workflows are complete. The inventory is
-now 53 accepted / 8 unverified: Reporting and Payroll are accepted; only
-Workforce awaits its complete source CI. Their detailed reviews map actual behaviors,
-including explicit scope boundaries, rather than treating a green build as proof.
+The goal stays active until the authorized private development update and final
+Git handoffs are complete. Runtime still serves earlier schema-103 metadata images;
+use `.work/final-development-rollout/checkpoint.py` after announcing the brief
+restart. It saves a quiesced data set with separate keys and restarts captured
+container IDs without dependencies. Then run the prepared `deploy.py`, which
+requires accepted CI, verifies preserved `2c2a59e3` JARs and built-image hashes,
+retains old images, uses `compose up -d --no-deps api worker`, and checks runtime
+health, restricted DB roles, full migration/binding/session/document integrity,
+unchanged dashboard bytes and disabled SMTP. Both helpers are prepared, not run.
 
-Workforce `2c2a59e3` corrects 24 reproduced failures plus three prior controls.
-Complete local acceptance passes 369 API, six worker and 61 domain cases,
-architecture/format checks and both packages (622.192s). Four normal actual browser
-workflows pass (66.494s), followed by the real closing/adjustment worker workflow
-(43.507s); all owned containers, ports and fixture files are removed. Read the
-[eight-row review](workforce-feature-review-2026-10-30.md) and
-[measurements](measurements/workforce-assurance-2026-10-30.json). Preserved final
-packages are `.work/workforce-audit-2026-10-30/packages`; do not substitute older
-Payroll/Reporting JARs. Preserve overtime's existing minimal-receipt contract.
-
-Reporting/Payroll [CI 41087903927](https://github.com/fajarxfce/hris-platform/actions/runs/41087903927)
-passed all ten jobs at exact `eec8a53a`. Downloaded reports confirm 3,063 API cases,
-104 active worker cases (plus one separately accepted manual retention skip),
-1,111 mocked browser scenarios, 41 normal/14 worker/one export actual workflows
-and successful schema-103 restore. [Full evidence](measurements/reporting-payroll-full-ci-2026-10-30.json)
-retains every job/step, report and artifact hash. The twelve initial rows are accepted.
-
-Final Workforce [CI 41094285531](https://github.com/fajarxfce/hris-platform/actions/runs/41094285531)
-is running at exact `93438f994c43b2bf15ee93120c90a1ea61745217`; its application
-source is `2c2a59e3`. [Dispatch record](measurements/workforce-ci-2026-10-30.json)
-identifies current ownership. Preserve this run; another same-branch dispatch
-cancels it. Inspect all ten jobs and download reports/recovery before accepting
-Workforce's eight rows. Do not repeat the already passed local broad/browser runs.
-
-Mobile's [fifteen-area review](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/feature-review-2026-10-30.md)
-is committed/pushed at `f4f101a1`; the [applicable Starter review](https://github.com/fajarxfce/compose-fluent-starter/blob/fix/push-token-lifecycle/docs/foundation-review-2026-10-30.md)
-is at `7605916`. All 657 identical shared files and 60 differences are classified;
-shared dependency digests match. No new generic port is required. Their application/
-test trees retain accepted full CI `d170810f` and `77063862`; do not repeat unchanged
-native tests. Historical Android Google/Home/FCM evidence remains accepted; physical
-iPhone testing is waived.
-
-After every final Workforce CI job passes, accept its eight rows and complete a
-fresh quiesced schema-103 recovery checkpoint, retaining separate private keys.
-Then update only API/worker from verified final packages, preserve old image IDs,
-and check health/schema/identity/native-session/document integrity and disabled SMTP.
-The dashboard tree exactly matches deployed `1e0522c0`; the phone app is unchanged.
-Private preparation is under `.work/final-development-rollout`; its checkpoint
-helper has not run. Use captured container IDs with `docker start` for checkpoint
-restart and `compose up -d --no-deps api worker` for the intended image update.
-Update all three Git handoffs and push each commit before closing the actual goal.
-No live changes have occurred for these final corrections.
+The dashboard tree equals deployed `1e0522c0` and Mobile application `3c6db4eb`
+is already installed. No dashboard restage or phone installation is needed.
+The [Workforce review](workforce-feature-review-2026-10-30.md#approved-overtime-boundary)
+retains the explicit approved-overtime amendment boundary; no unspecified future
+extension is represented as implemented. Production release was not requested.
+Finish the update and all three handoffs, push each commit, then close the goal.
 
 ## Retained acceptance history
 

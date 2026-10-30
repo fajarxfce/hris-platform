@@ -14,5 +14,6 @@ export type DocumentEmployeeDirectory = Readonly<{
   asOf: string;
   timezone: string;
   query: string;
+  metadataSupported?: boolean;
   employees: Readonly<{ items: readonly DocumentEmployee[]; nextCursor: string | null }>;
 }>;

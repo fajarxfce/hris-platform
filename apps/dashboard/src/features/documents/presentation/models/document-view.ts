@@ -6,6 +6,7 @@ import type { DocumentFolder } from "../../domain/entities/document-folder";
 import type { DocumentRevisionPage } from "../../domain/entities/document-revision";
 import type { DocumentRevisionReview } from "../../domain/entities/document-revision-review";
 import { documentMessages } from "../i18n/document-messages";
+import { documentMetadataProperties } from "./document-metadata-view";
 
 export function documentEmployeeRows(directory: DocumentEmployeeDirectory, locale: Locale) {
   const text = documentMessages(locale);
@@ -38,6 +39,7 @@ export function documentProperties(document: Document, locale: Locale, timezone:
     });
   return [
     { label: text.documentId, value: document.id },
+    ...documentMetadataProperties(document.metadata, locale),
     { label: text.classification, value: text[document.classification] },
     { label: text.created, value: `${date.format(new Date(document.createdAt))} (${timezone})` },
     { label: text.revisions, value: String(document.revisionCount) },

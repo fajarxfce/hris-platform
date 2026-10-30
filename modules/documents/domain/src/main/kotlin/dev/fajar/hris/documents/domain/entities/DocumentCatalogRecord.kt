@@ -11,4 +11,6 @@ data class DocumentCatalogRecord(
     val employmentId: UUID,
     val classification: DocumentClassification,
     val evidence: DocumentEvidence,
+    val metadata: DocumentBusinessMetadata = DocumentBusinessMetadata(),
+    val metadataVersion: Long = 0,
 )

@@ -39,9 +39,22 @@ class SelfDocumentRecordHttpTest : SelfDocumentApiFixture() {
         assertEquals(200, response.statusCode(), response.body())
         val record = json.readTree(response.body())
         assertEquals(
-            setOf("id", "version", "employmentId", "classification", "evidence"),
+            setOf(
+                "id",
+                "version",
+                "employmentId",
+                "classification",
+                "evidence",
+                "metadata",
+                "metadataVersion",
+                "metadataSupported",
+            ),
             record.properties().map { it.key }.toSet(),
         )
+        assertTrue(record["metadataSupported"].asBoolean())
+        assertEquals(0, record["metadataVersion"].asInt())
+        assertEquals("OTHER", record["metadata"]["category"].asString())
+        assertFalse(record["evidence"].has("metadata"))
         assertEquals(document.toString(), record["id"].asString())
         assertEquals(owner.employee.toString(), record["employmentId"].asString())
         assertEquals("PERSONAL", record["classification"].asString())

@@ -94,3 +94,13 @@ export function useDocumentRetentionPolicy(
     props.documents.retention.loadPolicy.execute(props.access, classification, after, signal),
   );
 }
+
+export function useDocumentMetadata(
+  props: DocumentsScreenProps,
+  documentId: string,
+  after: string | null,
+) {
+  return useDocumentRead(props, ["metadata-history", documentId, after], (signal) =>
+    props.documents.metadata.load.execute(props.access, documentId, after, signal),
+  );
+}

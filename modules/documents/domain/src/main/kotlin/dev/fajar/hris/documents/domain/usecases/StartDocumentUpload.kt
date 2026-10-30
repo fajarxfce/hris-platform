@@ -39,6 +39,11 @@ class StartDocumentUpload(
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
+        val selectedMetadata = input.metadata?.let(::normalizeDocumentMetadata)
+        if (selectedMetadata != null) {
+            val metadataValid = validateDocumentMetadata(selectedMetadata)
+            if (metadataValid is Result.Failed) return metadataValid
+        }
         val valid = validateDocumentInput(input)
         if (valid is Result.Failed) return valid
         val key =
@@ -57,7 +62,7 @@ class StartDocumentUpload(
                     input.size.toString(),
                     input.sha256,
                     input.reason,
-                ),
+                ) + documentMetadataKey(selectedMetadata),
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
@@ -104,6 +109,14 @@ class StartDocumentUpload(
             )
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "document_identity_mismatch")
+                )
+            if (
+                existing != null &&
+                    selectedMetadata != null &&
+                    existing.metadata != selectedMetadata
+            )
+                return@run Result.Failed(
+                    Failure(FailureKind.CONFLICT, "document_metadata_mismatch")
                 )
             if ((existing?.version ?: 0L) != input.expectedDocumentVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
@@ -196,6 +209,7 @@ class StartDocumentUpload(
                             0,
                             actor.accountId,
                             now,
+                            metadata = selectedMetadata ?: DocumentBusinessMetadata(),
                         ),
                     )
                 if (created is Result.Failed) return@run created

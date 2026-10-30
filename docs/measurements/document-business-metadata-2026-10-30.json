@@ -1,0 +1,6022 @@
+{
+  "date": "2026-10-30",
+  "status": "backend-dashboard-locally-validated-native-pending",
+  "baseHead": "9d0a267781d59d3fd2a55fb78f9480b31ed04151",
+  "requirements": [
+    "documents.02",
+    "people.03"
+  ],
+  "requirementsRemainUnverified": true,
+  "reproduction": {
+    "baseline": "158b81acce89f637dbf715bb573fffb7b99b92c9",
+    "durationSeconds": 32,
+    "tests": 2,
+    "failures": 2,
+    "cases": [
+      {
+        "suite": "dev.fajar.hris.DocumentBusinessMetadataHttpTest",
+        "name": "metadataCanBeCorrectedWithoutAnotherUploadWhileHistoryAndOriginalReceiptsRemainIntact()",
+        "failure": "org.opentest4j.AssertionFailedError: {\"instance\":\"/api/v1/companies/10b03d7c-bf4e-3de8-8095-9787beb246b9/documents/0fd5ba3a-1840-4d57-8bee-657a9c926110/metadata\",\"status\":404,\"title\":\"Not Found\",\"type\":\"urn:hris:problem:not_found\",\"code\":\"not_found\",\"fields\":{},\"parameters\":{},\"correlationId\":\"fa46bd73-bacd-4f80-832c-42b5f23b8503\"} ==> expected: <200> but was: <404>"
+      },
+      {
+        "suite": "dev.fajar.hris.DocumentBusinessMetadataHttpTest",
+        "name": "initialCategoryAndBusinessValidityRemainSeparateFromTheOperationalUploadDeadline()",
+        "failure": "org.opentest4j.AssertionFailedError: {\"instance\":\"/api/v1/companies/9cb8b1cc-e30f-3580-91f3-3d5090a3f1f8/documents/uploads\",\"status\":400,\"title\":\"Bad Request\",\"type\":\"urn:hris:problem:invalid_request\",\"code\":\"invalid_request\",\"fields\":{},\"parameters\":{},\"correlationId\":\"ed950583-9d75-4378-b3df-492e8b8f62ad\"} ==> expected: <200> but was: <400>"
+      }
+    ]
+  },
+  "focused": {
+    "apiPassed": 24,
+    "migrationPassed": 1,
+    "seconds": 75,
+    "note": "Migration reused its successful prior execution."
+  },
+  "broad": {
+    "status": "failed",
+    "seconds": 1180,
+    "modules": [
+      {
+        "module": "apps/server",
+        "totals": {
+          "tests": 688,
+          "failures": 3,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "module": "apps/worker",
+        "totals": {
+          "tests": 105,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1
+        }
+      },
+      {
+        "module": "core/database",
+        "totals": {
+          "tests": 27,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "module": "modules/documents/domain",
+        "totals": {
+          "tests": 18,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      {
+        "module": "modules/documents/data",
+        "totals": {
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    ],
+    "failures": [
+      "ApiContractHttpTest: old exact catalog response property set",
+      "SelfDocumentRecordHttpTest: old exact catalog response property set",
+      "ExpensePaymentSyncMigrationHttpTest: current document API on deliberately pre-V68 schema"
+    ],
+    "correction": "Only response expectations and the legacy expense fixture changed. One new OpenAPI contract test was added."
+  },
+  "finalBackend": {
+    "apiPassed": 78,
+    "seconds": 84,
+    "quality": [
+      "formatCheck",
+      "architectureCheck"
+    ],
+    "packages": [
+      "API",
+      "worker"
+    ],
+    "sameProductionAndPackagesAsBroad": true,
+    "selectedSuites": [
+      {
+        "suite": "dev.fajar.hris.ApiContractHttpTest",
+        "tests": 69,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "cases": [
+          {
+            "name": "payrollPaymentReviewKeepsBankInstructionsHistoryResultsAndActionHintsTogether()",
+            "time": "4.815",
+            "failed": false
+          },
+          {
+            "name": "scheduledOnboardingReviewsSelectedDatesAndKeepsQueueAuthorityPrivate()",
+            "time": "0.132",
+            "failed": false
+          },
+          {
+            "name": "payrollRecoveryReviewCarriesACompleteBalanceAndServerEligibilityWithoutACommand()",
+            "time": "0.106",
+            "failed": false
+          },
+          {
+            "name": "coworkerDirectoryDocumentsItsOwnBoundedPagesAndFilter()",
+            "time": "0.108",
+            "failed": false
+          },
+          {
+            "name": "payslipReadScopesAreExplicitAndPreserveTheAuthorizedDefault()",
+            "time": "0.104",
+            "failed": false
+          },
+          {
+            "name": "compensationReviewAndEmployeeLookupKeepPrivateProfilesOutOfTheirContract()",
+            "time": "0.1",
+            "failed": false
+          },
+          {
+            "name": "scheduledOffboardingPinsItsReviewedBasisAndKeepsCredentialsOutOfResponses()",
+            "time": "0.076",
+            "failed": false
+          },
+          {
+            "name": "leaveCalendarExposesBoundedDateViewsWithoutRequestReasonsOrAccountIds()",
+            "time": "0.078",
+            "failed": false
+          },
+          {
+            "name": "selfDocumentDiscoveryDocumentsBoundedOwnedReferencesAndPublishedEvidence()",
+            "time": "0.072",
+            "failed": false
+          },
+          {
+            "name": "closingOverviewDescribesMinimalProgressAndBoundedPublishedEmployees()",
+            "time": "0.072",
+            "failed": false
+          },
+          {
+            "name": "rosterResetRetainsTheCommandAndReviewVersionContracts()",
+            "time": "0.087",
+            "failed": false
+          },
+          {
+            "name": "managedAccountReviewIsGlobalAndContainsOnlyAdministrativeMetadata()",
+            "time": "0.076",
+            "failed": false
+          },
+          {
+            "name": "closedAttendanceAdjustmentsRetainSeparateReadReviewHistoryAndIdempotentWriteContracts()",
+            "time": "0.079",
+            "failed": false
+          },
+          {
+            "name": "leaveAccrualSchedulesExposeFiniteReviewsAndExistingPeriodJobs()",
+            "time": "0.084",
+            "failed": false
+          },
+          {
+            "name": "announcementDeliveryExposesOnlyCompanyScopedOperationalCounts()",
+            "time": "0.095",
+            "failed": false
+          },
+          {
+            "name": "expenseDraftReferenceLookupBoundsEverySetAndExposesOnlyDisplayMetadata()",
+            "time": "0.077",
+            "failed": false
+          },
+          {
+            "name": "bulkRosterSeparatesReadOnlyReviewFromTheIdempotentBoundedCommand()",
+            "time": "0.068",
+            "failed": false
+          },
+          {
+            "name": "overtimeReportsExposeScopeAndExactMinuteCountersWithMonthlyDrillDownBounds()",
+            "time": "0.074",
+            "failed": false
+          },
+          {
+            "name": "administrativeExpenseDraftingHasBoundedCompanyAdmittedMetadataRoutes()",
+            "time": "0.07",
+            "failed": false
+          },
+          {
+            "name": "attendanceExceptionsHaveABoundedCompanyAdmittedMetadataContract()",
+            "time": "0.068",
+            "failed": false
+          },
+          {
+            "name": "attendanceClosingEmployeesExposeScopedPagesAndExactRevisionReferences()",
+            "time": "0.083",
+            "failed": false
+          },
+          {
+            "name": "selfLeaveDiscoveryHasItsOwnMinimalCompanyAdmittedContract()",
+            "time": "0.066",
+            "failed": false
+          },
+          {
+            "name": "revisionDetailsAdvertiseBoundedCurrentActions()",
+            "time": "0.074",
+            "failed": false
+          },
+          {
+            "name": "expensePaymentProgressDefaultsToOwnedReadsWithABoundedVersionedResponse()",
+            "time": "0.078",
+            "failed": false
+          },
+          {
+            "name": "documentBusinessMetadataContractSeparatesEditHistoryAndOperationalEvidence()",
+            "time": "0.103",
+            "failed": false
+          },
+          {
+            "name": "payrollReviewPreparationAndActionsKeepVersionsAndAccountLabelsExplicit()",
+            "time": "0.087",
+            "failed": false
+          },
+          {
+            "name": "publishedPayrollCostReportsExposeBoundedMonthsAndExactDecimalStrings()",
+            "time": "0.075",
+            "failed": false
+          },
+          {
+            "name": "publicationReviewUsesCompanyAdmissionAndItsOwnResponseContract()",
+            "time": "0.065",
+            "failed": false
+          },
+          {
+            "name": "personalReportFiltersDocumentPrivateMetadataAndVersionedIdempotentCommands()",
+            "time": "0.07",
+            "failed": false
+          },
+          {
+            "name": "expenseCostCentersExposeOnlyBoundedEditingReferences()",
+            "time": "0.081",
+            "failed": false
+          },
+          {
+            "name": "selfExpenseDiscoveryHasItsOwnMinimalCompanyAdmittedContract()",
+            "time": "0.07",
+            "failed": false
+          },
+          {
+            "name": "retainedAmendmentDraftsExposeBoundedMetadataAndVersionedIdempotentCommands()",
+            "time": "0.067",
+            "failed": false
+          },
+          {
+            "name": "audienceReferenceSelectionsHaveExplicitBoundsAndCompanyAdmission()",
+            "time": "0.067",
+            "failed": false
+          },
+          {
+            "name": "carryExpiryReadsExposeBoundedHistoryAndOnlyExplicitRecovery()",
+            "time": "0.067",
+            "failed": false
+          },
+          {
+            "name": "taxOpeningReviewExposesBoundedReferencesAndExplicitRevisionSelection()",
+            "time": "0.07",
+            "failed": false
+          },
+          {
+            "name": "expenseReportAndItsScopedDrillDownExposeExactDecimalAmounts()",
+            "time": "0.088",
+            "failed": false
+          },
+          {
+            "name": "approvalHistoryDescribesBoundedVersionedReadAndOnlyRetainedFacts()",
+            "time": "0.096",
+            "failed": false
+          },
+          {
+            "name": "expenseRecordsDefaultToSelfAndExcludeLiveReviewAffordances()",
+            "time": "0.078",
+            "failed": false
+          },
+          {
+            "name": "membershipRoleRetentionIsAnOptionalExplicitSelection()",
+            "time": "0.065",
+            "failed": false
+          },
+          {
+            "name": "administrativeLeavePreparationHasBoundedCompanyMetadataRoutes()",
+            "time": "0.065",
+            "failed": false
+          },
+          {
+            "name": "accountAuditDetailHasAnExplicitTypedReadContract()",
+            "time": "0.067",
+            "failed": false
+          },
+          {
+            "name": "carryBalanceFactsHaveOneCompatibleShapeForAccountAndDirectoryReads()",
+            "time": "0.067",
+            "failed": false
+          },
+          {
+            "name": "reportCatalogueDocumentsCompanyAdmissionAndBoundedDefinitionIdentities()",
+            "time": "0.071",
+            "failed": false
+          },
+          {
+            "name": "leaveReportAndItsScopedDrillDownExposeExactDecimalDays()",
+            "time": "0.063",
+            "failed": false
+          },
+          {
+            "name": "amendmentPreparationAndPreviewExposeObservedVersionsAndServerCalculatedDifferences()",
+            "time": "0.064",
+            "failed": false
+          },
+          {
+            "name": "reportExportsDescribeOwnedRecoveryAndAuthorizedCsvRanges()",
+            "time": "0.063",
+            "failed": false
+          },
+          {
+            "name": "negotiatedDownloadsAndRawUploadsAreNotDocumentedAsJsonDtos()",
+            "time": "0.066",
+            "failed": false
+          },
+          {
+            "name": "payrollComparisonAdvertisesAnExplicitBaselineAndDecimalStrings()",
+            "time": "0.064",
+            "failed": false
+          },
+          {
+            "name": "leavePreparationDocumentsItsBoundedReadsWithoutAnIdempotencyRequirement()",
+            "time": "0.076",
+            "failed": false
+          },
+          {
+            "name": "payrollInputReviewDocumentsCurrentSourcesIndependentActionsAndBoundedDiscovery()",
+            "time": "0.08",
+            "failed": false
+          },
+          {
+            "name": "announcementEmailIsOptionalOnSaveAndHasNoRecipientMetadataInDelivery()",
+            "time": "0.089",
+            "failed": false
+          },
+          {
+            "name": "sharedProblemsRetainTheirTraceAndRetryHeadersWithoutDuplicatingEveryResponse()",
+            "time": "0.085",
+            "failed": false
+          },
+          {
+            "name": "payrollPeriodReferencesRemainMinimalAndCompanyAdmitted()",
+            "time": "0.061",
+            "failed": false
+          },
+          {
+            "name": "calculationPreparationAndRunRecoveryKeepSourceReferencesExplicit()",
+            "time": "0.064",
+            "failed": false
+          },
+          {
+            "name": "generatedContractCoversRegisteredRoutesAndHasValidLocalReferences()",
+            "time": "0.566",
+            "failed": false
+          },
+          {
+            "name": "mobileTransportDescribesTokensIdempotencySyncAndActualWireTypes()",
+            "time": "0.067",
+            "failed": false
+          },
+          {
+            "name": "openApiKeepsGlobalMetadataSeparateFromTheCompanyContract()",
+            "time": "0.065",
+            "failed": false
+          },
+          {
+            "name": "selfWorkforceDiscoveryHasItsOwnMinimalCompanyAdmittedContract()",
+            "time": "0.068",
+            "failed": false
+          },
+          {
+            "name": "documentationRequiresACurrentAuthenticatedAccount()",
+            "time": "0.178",
+            "failed": false
+          },
+          {
+            "name": "payrollPolicyReviewKeepsConfigurationAndDatedSelectionSeparate()",
+            "time": "0.087",
+            "failed": false
+          },
+          {
+            "name": "accountSessionAdministrationKeepsGlobalAuthenticationAndMetadataOnlyResponses()",
+            "time": "0.074",
+            "failed": false
+          },
+          {
+            "name": "attendanceClosingReportsExposeIndependentOriginalAndCurrentFactsWithPublishedReferences()",
+            "time": "0.074",
+            "failed": false
+          },
+          {
+            "name": "employeeCalendarReviewDescribesMinimalReferencesAndObservedAssignments()",
+            "time": "0.066",
+            "failed": false
+          },
+          {
+            "name": "expenseReadScopesAreExplicitAndPreserveTheAuthorizedDefault()",
+            "time": "0.073",
+            "failed": false
+          },
+          {
+            "name": "retirementReviewExposesDecisionMetadataWithoutContentAccess()",
+            "time": "0.063",
+            "failed": false
+          },
+          {
+            "name": "amendmentReviewsPinDraftCalculationAndApprovalReferencesWithIndependentReadRoutes()",
+            "time": "0.064",
+            "failed": false
+          },
+          {
+            "name": "finalizationPreparationAndDirectoryKeepApprovalVersionsAndProgressSeparate()",
+            "time": "0.068",
+            "failed": false
+          },
+          {
+            "name": "languageHeadersRetainOneCanonicalDescription()",
+            "time": "0.127",
+            "failed": false
+          },
+          {
+            "name": "shiftDetailsAdvertiseCompanyAdmissionAndTheirCurrentVersion()",
+            "time": "0.062",
+            "failed": false
+          }
+        ]
+      },
+      {
+        "suite": "dev.fajar.hris.ExpensePaymentSyncMigrationHttpTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "cases": [
+          {
+            "name": "backfillWaitsForAnExistingPaymentWriterAndRetainsEvidenceAndCompanyIsolation()",
+            "time": "3.107",
+            "failed": false
+          }
+        ]
+      },
+      {
+        "suite": "dev.fajar.hris.SelfDocumentRecordHttpTest",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "cases": [
+          {
+            "name": "unpublishedForeignRestrictedAndMissingDocumentsHaveTheSameAbsentResult()",
+            "time": "1.141",
+            "failed": false
+          },
+          {
+            "name": "cancellationReleasesReadGuardsWithoutBlockingTheNextUpload()",
+            "time": "0.42",
+            "failed": false
+          },
+          {
+            "name": "canonicalMetadataKeepsAcceptedEvidenceWhileReplacementIsPending()",
+            "time": "0.616",
+            "failed": false
+          },
+          {
+            "name": "[1] change = \"credentials\"",
+            "time": "0.396",
+            "failed": false
+          },
+          {
+            "name": "[2] change = \"membership\"",
+            "time": "0.39",
+            "failed": false
+          },
+          {
+            "name": "[3] change = \"permission\"",
+            "time": "0.397",
+            "failed": false
+          },
+          {
+            "name": "[4] change = \"replacement-grant\"",
+            "time": "0.414",
+            "failed": false
+          },
+          {
+            "name": "proofExpiryDuringAcquisitionCannotReleaseMetadataAndRenewalRecovers()",
+            "time": "0.427",
+            "failed": false
+          }
+        ]
+      }
+    ]
+  },
+  "acceptedBackendUnion": {
+    "apiPassed": 689,
+    "workerPassed": 104,
+    "workerManualSkipped": 1,
+    "databasePassed": 27,
+    "documentDomainPassed": 18,
+    "documentDataPassed": 9,
+    "method": "Replace the three corrected broad API suites with their final executions. Preserve parameterized testcase rows. This is not one all-green broad invocation."
+  },
+  "dashboard": {
+    "unitFiles": 357,
+    "unitPassed": 4054,
+    "seconds": 143.78,
+    "quality": [
+      "architecture",
+      "TypeScript",
+      "Biome",
+      "production build"
+    ],
+    "warnings": [
+      "Two pre-existing CSS specificity warnings",
+      "Existing large output chunk warning"
+    ],
+    "mockBrowser": {
+      "passed": 25,
+      "seconds": 46.7,
+      "priorFailure": "One incorrect navigation dialog button label; production unaffected. The later upload failure-classification correction is covered by final unit and actual browser acceptance."
+    },
+    "uploadRejectionReproduction": {
+      "tests": 12,
+      "failed": 1,
+      "correction": "An initial definitive metadata rejection remains editable. A retry after uncertain delivery retains the exact pending command."
+    },
+    "actualBrowser": {
+      "passedDistinct": 5,
+      "finalMetadataSeconds": 26.9,
+      "metadataScenarioSeconds": 4.6,
+      "otherFour": "All four existing document upload, retirement, retention and retention-lifecycle workflows passed in both earlier selections.",
+      "failedAttempts": [
+        "New account absent from owned disposable fixture",
+        "New test assumed in-memory Indonesian locale survived hard navigation"
+      ],
+      "correction": "Register independent fictional fixture account; explicitly select locale after hard navigation. No production change needed.",
+      "proof": "Actual API/PostgreSQL browser metadata upload, invalid country rejection without header, immutable history, lost-successful-response retry after later independent edit, unchanged binary revision.",
+      "limit": "This browser fixture has no object store. Expected chunk reservation failure occurs after actual metadata/header commit; it is not physical file validation."
+    }
+  },
+  "changedSourceSha256": {
+    "apps/dashboard/integration/document-metadata.spec.ts": "0b6d85c65c0126c62835c634c7a40d1c5d65df7642389d25077ef09d34c2defd",
+    "apps/dashboard/integration/documents.spec.ts": "ef1808c5ee38998701479b779c72c09d384080a1e0d262d88a93cbaa92561fcf",
+    "apps/dashboard/integration/fixtures/accounts.sql": "8fbe2926f6bbb7f427b5180004581531d684ea545b4759f4af3a8eff85cdeb05",
+    "apps/dashboard/src/core/presentation/i18n/failure-message.ts": "e286bbd784d7a45246fe6644a6bd492a743348b2b87360b6aee51840975ead3c",
+    "apps/dashboard/src/features/documents/data/datasources/document-metadata-data-source.ts": "04db7c01688ad36c95144724d46660f33be61fd5315ee4ca2270d3cde8a68e3d",
+    "apps/dashboard/src/features/documents/data/datasources/http-document-metadata-data-source.ts": "9e08652921ee2188910c88add1e3a6278a1f847de9f2696fdb1793ae3778ebbc",
+    "apps/dashboard/src/features/documents/data/mappers/document-employee-mapper.ts": "cf423828c4b99b8414a1d2626f73ad3677ac46c0a7be67dafd4e85298098f6b0",
+    "apps/dashboard/src/features/documents/data/mappers/document-mapper.ts": "3d1d62b0c903cde0645c13f8042cdc5c04f7c045ffbb16938e6965bbc5d064e1",
+    "apps/dashboard/src/features/documents/data/mappers/document-metadata-mapper.ts": "6d8f1e856a5b395be27bdd8f7ba10116d515f655e6e8f8d6ad4a6dd11907011d",
+    "apps/dashboard/src/features/documents/data/models/document-dto.ts": "7d4e188c980667e2d7db6ad312e7dcb5c3684ba7d90acb68781e54b58e5d9de0",
+    "apps/dashboard/src/features/documents/data/models/document-metadata-dto.ts": "5e7fad1ee4ceae9805bc5df5ec4086b3dc905b7aac21a339eca795ae7ea7e9f3",
+    "apps/dashboard/src/features/documents/data/models/document-upload-dto.ts": "cad35dbd2781c95f40fec01a7a0364297c54dacd1f41554b9df43029cb72d4b9",
+    "apps/dashboard/src/features/documents/data/repositories/remote-document-metadata-repository.ts": "cac0a4033c16fa3382b1b45050847f4651da143b89c46829707453d199bc9092",
+    "apps/dashboard/src/features/documents/di/document-metadata.test.ts": "b78c3386e70df48c6ac46fdd68e49d79b2c68f6523a68f19a3db77ac33e36052",
+    "apps/dashboard/src/features/documents/di/document-uploads.test.ts": "2beeea52b9a16213d15f98b62323a19824b1f3a44d722535673237defe91e8cc",
+    "apps/dashboard/src/features/documents/di/documents-feature.ts": "7ca3be5a6609af4e0d041dff8a6474b84afb590f9e67acbcafae9e4e33884ecb",
+    "apps/dashboard/src/features/documents/domain/entities/document-employee.ts": "1edfb790ac43c69a832c603743f96cc60da1e5d16699cadd8663992d53f55ba7",
+    "apps/dashboard/src/features/documents/domain/entities/document-metadata.ts": "89db9e7c1b9db0198722b1e509b7aca332cca047aa8ee8a4cb68217088410bf1",
+    "apps/dashboard/src/features/documents/domain/entities/document-upload.ts": "65874f8e07479a8f3317a0aafb8ab923e7152e38e4c3060636ab20153fc977be",
+    "apps/dashboard/src/features/documents/domain/entities/document.ts": "f00d689666bbf4525be328df82f35abf1b0757de6a29503aff35b74811e0c201",
+    "apps/dashboard/src/features/documents/domain/policies/document-business-metadata-policy.ts": "f50e0ea56b829e4c11c22e00c103f3f35e7db331bfb199dfef36306f166bcc79",
+    "apps/dashboard/src/features/documents/domain/policies/document-metadata-policy.ts": "25d4e8fa51ef0fbb32a28fd340c95cf6f3f3e594cf7a454bcdd91c4c0b387157",
+    "apps/dashboard/src/features/documents/domain/policies/document-upload-policy.ts": "bb26fe270b80350fb47c58ff8c2c941b34ef4aff4c63cb454d58403cfff9ad6f",
+    "apps/dashboard/src/features/documents/domain/repositories/document-metadata-repository.ts": "26912f1d51dfa41bc3276d98850f0fa2caaea1dcc9b99c1553968f3e0c05a5ea",
+    "apps/dashboard/src/features/documents/domain/usecases/load-document-metadata.ts": "b824bc763f965e4257a430c39b277260c7811020d192e6e33a206ab55595852b",
+    "apps/dashboard/src/features/documents/domain/usecases/review-document-metadata.ts": "f9f88d7905498c966158e9148b794c4a903707c3f1bf9736766d07b461ed7af6",
+    "apps/dashboard/src/features/documents/domain/usecases/review-document-upload.ts": "9dd4fc4e2dbb01edb8c0270637666230c213445cafda0d0e36bf3f7490239f5b",
+    "apps/dashboard/src/features/documents/domain/usecases/save-document-metadata.ts": "87618f7bf80bf86352050b71ee3cd56dbd0461478c999825998475db341442ad",
+    "apps/dashboard/src/features/documents/presentation/bindings/document-metadata-editor-screen.tsx": "73de46db07eca6c7c6d3c4ed248a76aae94c2b87b12c858fad517852fab07f5a",
+    "apps/dashboard/src/features/documents/presentation/bindings/document-metadata-history-screen.tsx": "1be2e05797acb5badcc0e4571816317036df86b6ccbc48e12b1dc268179425cc",
+    "apps/dashboard/src/features/documents/presentation/bindings/document-review-screen.tsx": "198efd111ff558fb53751f8ef8acf3cc00ce42a454b85c577373b2620ecb3e81",
+    "apps/dashboard/src/features/documents/presentation/contracts/document-metadata-use-cases.ts": "2d547c64b0ebd9162c9d8e3da2653133d8d8e055e34509dec574a36431cb38b9",
+    "apps/dashboard/src/features/documents/presentation/contracts/documents-use-cases.ts": "60231f39db6125696a22019a86baf9766a6a10f48896e2cc104a707449af9da5",
+    "apps/dashboard/src/features/documents/presentation/controllers/document-metadata-editor-controller.test.ts": "62667cc89e9e9b38ba0adc5757f2dad7b25a4727d9dec3c304d248a4830a7ec5",
+    "apps/dashboard/src/features/documents/presentation/controllers/document-metadata-editor-controller.ts": "ffe021cacf83b7f5d202256c5bb49e30180871acdb7152252a1304f0d4610ce9",
+    "apps/dashboard/src/features/documents/presentation/controllers/document-queries.test.tsx": "38968f4101940b834d6f04df214c9deb7d02c2668124c88cdf641d335e3f24a7",
+    "apps/dashboard/src/features/documents/presentation/controllers/document-upload-controller.test.ts": "b9c2e85f3143a97e50960f5810ee9a2e0d365c73ba3059fa19711ba2d1f4a84c",
+    "apps/dashboard/src/features/documents/presentation/controllers/document-upload-controller.ts": "a9d4821c2675d4d1c0bd1de37b1bef96fd130f0128074c1b243b46ba2bce0918",
+    "apps/dashboard/src/features/documents/presentation/controllers/use-document-metadata-form.ts": "11b89ffbf28425c57be834ab7cca301026517624f713bf80720ab409f3b32fc9",
+    "apps/dashboard/src/features/documents/presentation/controllers/use-document-reads.ts": "bd74ac5407ac7008865423fe719745aa84dbbc81e8dbfbdf0d45f994720df453",
+    "apps/dashboard/src/features/documents/presentation/controllers/use-document-upload-form.ts": "e7bde21cfe380967fbb9017fae8cbe5548cac2cf9077d5b1ae9895be67fc93ad",
+    "apps/dashboard/src/features/documents/presentation/i18n/document-metadata-messages.ts": "1b52cf93218d960002ef4ed3e16056d4a864689ca7079bc9f51d508ddabda8b9",
+    "apps/dashboard/src/features/documents/presentation/i18n/document-upload-messages.ts": "73ed35fe80f2b44536ac0ee4840e2ba627685ef5b7d8a7ab7f963e3afff47b5a",
+    "apps/dashboard/src/features/documents/presentation/models/document-metadata-editor-state.ts": "0ce7b97fd7b3f549685f7548aac1e9e8bb41ef84b0372931ac9208796fb33663",
+    "apps/dashboard/src/features/documents/presentation/models/document-metadata-view.ts": "dd303c214fec238984f2c6fba35684bb2ad3e166bc0d0949d9139047bdc79a32",
+    "apps/dashboard/src/features/documents/presentation/models/document-view.ts": "5ee0a4dd9a94e7101cc1fc5d5faf586a9ff346322b94c8e382e58c8b71efcede",
+    "apps/dashboard/src/features/documents/presentation/navigation/documents-routes.tsx": "ea1257d1703366150018cb128a133b8951e10f55dfb7e4320d325635e4e0e70f",
+    "apps/dashboard/src/features/documents/presentation/pages/document-metadata-editor-page.tsx": "e2ffe30aaff814980505985fe714dbde03740f77025e19c2cb76eba12a3c8c36",
+    "apps/dashboard/src/features/documents/presentation/pages/document-metadata-history-page.tsx": "bfc9712772ed77b73d4e027538d6a50c518ff5659fd5b80dd736ae70de526e8e",
+    "apps/dashboard/src/features/documents/presentation/pages/document-review-page.tsx": "58cea2a21bde820e172ddfc954fac13ed2e154e8f9526b3d5c1060fa7e4146df",
+    "apps/dashboard/src/features/documents/presentation/pages/document-upload-page.tsx": "e4cf6856e1ea2fe0fa36f9d1a5fac603433871b6b19bd662efe3398b08bac5b0",
+    "apps/dashboard/src/features/documents/presentation/widgets/document-metadata-fields.tsx": "2a319b637d82dcc9a552e4680ef83909df648ed9688a9c28ba33163321498046",
+    "apps/dashboard/tests/document-metadata-api.ts": "1ffd528d8a10f1a8855fdc0daa35f61b16d7fcc10aad65d53b74ae2e449bc59e",
+    "apps/dashboard/tests/document-metadata.spec.ts": "02cd2eb1b2cc5c6c036dec36a313561b6f1aa8ae4741c45e876fd04ff752fd58",
+    "apps/dashboard/tests/document-uploads.spec.ts": "404c3508d44c73a42447546a1510fe43697775c36cdff6b11c2e1b99087b9b2b",
+    "apps/dashboard/tests/fixtures/document-metadata.ts": "5f1d824641450bb6572e0fec9433f39172f7a7efff0786a8e79196518fe19aed",
+    "apps/dashboard/tests/fixtures/documents.ts": "82ef91a2131259b973acc66b9113e998101cf36a0d5bf5239dc0563b33acab56",
+    "apps/server/src/test/kotlin/dev/fajar/hris/ApiContractHttpTest.kt": "9d2f02f48ffc3b4a333546dff9fe0bcfb6bbbbcd687d98f52a659fdad4cbb06e",
+    "apps/server/src/test/kotlin/dev/fajar/hris/DocumentBusinessMetadataHttpTest.kt": "360328119c766ad62a9bab594d7a77d483d7c7bf17cfbeccacee5314d191e595",
+    "apps/server/src/test/kotlin/dev/fajar/hris/DocumentMetadataAssuranceTest.kt": "55ede9ff72c01d588f5ea9de085dbe439db69855c9faebb2946103b747b081fd",
+    "apps/server/src/test/kotlin/dev/fajar/hris/DocumentMetadataContractTest.kt": "57ce02717d58c7a4555a32e3c38468e9642265ee634e305413551ab6d8c0595a",
+    "apps/server/src/test/kotlin/dev/fajar/hris/DocumentMetadataSyncTest.kt": "5b3568b379011de047fe6d885c83ac2aba6d2603ac83a93f58047c76c4e401dd",
+    "apps/server/src/test/kotlin/dev/fajar/hris/ExpensePaymentSyncMigrationHttpTest.kt": "7894ce47cf0ede389db255d30aeb22a47e8a4d47792328d87e8680bd131bb811",
+    "apps/server/src/test/kotlin/dev/fajar/hris/SelfDocumentRecordHttpTest.kt": "3cba1238c6d8adf0daf95235ecd1d4f5732826f09a71e5de3d8440d9caab37ff",
+    "core/database/src/main/resources/db/migration/V103__document_business_metadata.sql": "f66db6feaea9359c95f2bf273f4c099369f02f177abc3f22cdaa8a25f0da86c0",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/DocumentMetadataMigrationTest.kt": "1b0828c56c404a0f6d2da579c3ab356cd72ed60156c293031ed903a4bacb85af",
+    "modules/documents/data/src/main/kotlin/dev/fajar/hris/documents/data/datasources/DocumentMetadataDataSource.kt": "888a2e5872d03a83c910eed048726b359e4ec81c8b8199a0a7ad5b60275ee00c",
+    "modules/documents/data/src/main/kotlin/dev/fajar/hris/documents/data/datasources/PostgresDocumentMetadataDataSource.kt": "5718325a237f1357b111d1c14076d5f07a475ba0dd291501faf166ad6260f600",
+    "modules/documents/data/src/main/kotlin/dev/fajar/hris/documents/data/di/DocumentsConfiguration.kt": "364ab08b5b08ae1c94d23f393f8de11413157decebe088c3a0b61017a76bc21b",
+    "modules/documents/data/src/main/kotlin/dev/fajar/hris/documents/data/mappers/DocumentMapper.kt": "25b253aeb41a6bc6246d2665be3feaa335b8e0bf1184b19203ea8dff6d911738",
+    "modules/documents/data/src/main/kotlin/dev/fajar/hris/documents/data/mappers/DocumentMetadataMapper.kt": "03c1a070ae67e4793986aab6332eb32588f834b586e47617a04a0d4a13713ce1",
+    "modules/documents/data/src/main/kotlin/dev/fajar/hris/documents/data/mappers/PublishedDocumentMapper.kt": "d20d2c1ab795ccd685bac53a70b1dbfcabf6e033fc2d07a63e55484f81d27a8e",
+    "modules/documents/data/src/main/kotlin/dev/fajar/hris/documents/data/repositories/StoredDocumentMetadataRepository.kt": "60daae7d83360b8115611842f37c14257228628dec24f8aaebcd67fba516c1b5",
+    "modules/documents/delivery/src/main/kotlin/dev/fajar/hris/documents/delivery/controllers/DocumentController.kt": "9d5d433f3b898b61931c610358301919b3cef85563e42dc513f94636e5c3af2c",
+    "modules/documents/delivery/src/main/kotlin/dev/fajar/hris/documents/delivery/requests/DocumentBusinessMetadataRequest.kt": "453d1bbae6c1a063ccb11f1a8ee380d12661b92fc87833cccead73f82fa936fa",
+    "modules/documents/delivery/src/main/kotlin/dev/fajar/hris/documents/delivery/requests/SaveDocumentMetadataRequest.kt": "845aa843beafe898a88236c6977ab407335e6879d80cb8f0b93204f35b78fd16",
+    "modules/documents/delivery/src/main/kotlin/dev/fajar/hris/documents/delivery/requests/StartDocumentUploadRequest.kt": "6a79abf416d618d22f0af5f12d15cf6bf822dc5133e2ed7b44a4cdd0d7ce7478",
+    "modules/documents/delivery/src/main/kotlin/dev/fajar/hris/documents/delivery/responses/DocumentBusinessMetadataResponse.kt": "6d0168968100aca67b061c84900cba9c1fcdc780c02fb8f2807875553c6905fe",
+    "modules/documents/delivery/src/main/kotlin/dev/fajar/hris/documents/delivery/responses/DocumentCatalogRecordResponse.kt": "9dba5c2bafa90a6b070903293d321541a79427d89bf6fd051b34b574b98ed640",
+    "modules/documents/delivery/src/main/kotlin/dev/fajar/hris/documents/delivery/responses/DocumentEmployeeDirectoryResponse.kt": "caae6d4ccb8ff07f82e085ac7ef7ef3c31856945901e4cd5101fde5f47f85f08",
+    "modules/documents/delivery/src/main/kotlin/dev/fajar/hris/documents/delivery/responses/DocumentMetadataRevisionResponse.kt": "71a59e8f2bb148603c9b83bbb0dcc49b8b29059770ab9dcd12171469abd4f223",
+    "modules/documents/delivery/src/main/kotlin/dev/fajar/hris/documents/delivery/responses/DocumentResponse.kt": "33c56c81641b545f59ada5dbfff13732283ba7bc3aafbea4c436ad5e6a6c78a7",
+    "modules/documents/delivery/src/main/kotlin/dev/fajar/hris/documents/delivery/responses/SelfDocumentDirectoryResponse.kt": "56dd0680e1945b29072666de08f7f8b8836af4bad678107da358682df445b46a",
+    "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/entities/Document.kt": "a6b4e9b57746d64e0ba616b48dc33d58969899e46175bd3a02fcd90fcb5691a2",
+    "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/entities/DocumentBusinessMetadata.kt": "8c4d304fad1dcdeca489e1be8a75d749b9e6564b80633aa21615d4a2a14bee5f",
+    "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/entities/DocumentCatalogRecord.kt": "df594636715b9544976919f0b700361dae9eed2175096efe11ee4cb9eebf2099",
+    "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/entities/DocumentCategory.kt": "9ba8af9d0eec9e4332dfa52d6b156cbc4eb33e406a270744c10592152299af9f",
+    "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/entities/DocumentMetadataRevision.kt": "903c7b86d1853a3671456c6386b1a3b5d525e34bbce95021bef84b9e3113cb68",
+    "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/entities/StartDocumentUploadCommand.kt": "3d443437cb896f6a841db731d1c53789bb4b7f83873eb3e11c368075a0bf2c07",
+    "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/policies/DocumentBusinessMetadataPolicy.kt": "5a079142a1940748c232ff75b4fff49723b091b1c41f5de0c2c45eddaa6bbdf8",
+    "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/repositories/DocumentMetadataRepository.kt": "d32f4c900353e7f2bc9c2df9928850d929080b7f73d21ef0c3925c3d310867ed",
+    "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/usecases/GetDocumentMetadataHistory.kt": "d22940cd9f4cf21d31f7ef3b5313f6aeffd8409e19a3800bc970681fc66c6c48",
+    "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/usecases/SaveDocumentMetadata.kt": "aa4ed07b71c1654cf77803d9d84447587e2c3f34c10e345dc37104418f0f973d",
+    "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/usecases/StartDocumentUpload.kt": "b909b8d190882e80dcfbce3692497040b99d6ec9603ed58a25e33907e91c2845"
+  },
+  "packageSha256": {
+    "apps/server/build/libs/apps-server.jar": "92b56ab0a2ad7d35013c9528bc421add046fe9461906a7698898dacbf11e637b",
+    "apps/worker/build/libs/apps-worker.jar": "4ff024779da49f78a463e5a763fa61bc22d71daa45df5f5537d3ab7043b7ed04"
+  },
+  "acceptedApiSuites": [
+    {
+      "suite": "dev.fajar.hris.ApiContractHttpTest",
+      "tests": 69,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "payrollPaymentReviewKeepsBankInstructionsHistoryResultsAndActionHintsTogether()",
+          "time": "4.815",
+          "failed": false
+        },
+        {
+          "name": "scheduledOnboardingReviewsSelectedDatesAndKeepsQueueAuthorityPrivate()",
+          "time": "0.132",
+          "failed": false
+        },
+        {
+          "name": "payrollRecoveryReviewCarriesACompleteBalanceAndServerEligibilityWithoutACommand()",
+          "time": "0.106",
+          "failed": false
+        },
+        {
+          "name": "coworkerDirectoryDocumentsItsOwnBoundedPagesAndFilter()",
+          "time": "0.108",
+          "failed": false
+        },
+        {
+          "name": "payslipReadScopesAreExplicitAndPreserveTheAuthorizedDefault()",
+          "time": "0.104",
+          "failed": false
+        },
+        {
+          "name": "compensationReviewAndEmployeeLookupKeepPrivateProfilesOutOfTheirContract()",
+          "time": "0.1",
+          "failed": false
+        },
+        {
+          "name": "scheduledOffboardingPinsItsReviewedBasisAndKeepsCredentialsOutOfResponses()",
+          "time": "0.076",
+          "failed": false
+        },
+        {
+          "name": "leaveCalendarExposesBoundedDateViewsWithoutRequestReasonsOrAccountIds()",
+          "time": "0.078",
+          "failed": false
+        },
+        {
+          "name": "selfDocumentDiscoveryDocumentsBoundedOwnedReferencesAndPublishedEvidence()",
+          "time": "0.072",
+          "failed": false
+        },
+        {
+          "name": "closingOverviewDescribesMinimalProgressAndBoundedPublishedEmployees()",
+          "time": "0.072",
+          "failed": false
+        },
+        {
+          "name": "rosterResetRetainsTheCommandAndReviewVersionContracts()",
+          "time": "0.087",
+          "failed": false
+        },
+        {
+          "name": "managedAccountReviewIsGlobalAndContainsOnlyAdministrativeMetadata()",
+          "time": "0.076",
+          "failed": false
+        },
+        {
+          "name": "closedAttendanceAdjustmentsRetainSeparateReadReviewHistoryAndIdempotentWriteContracts()",
+          "time": "0.079",
+          "failed": false
+        },
+        {
+          "name": "leaveAccrualSchedulesExposeFiniteReviewsAndExistingPeriodJobs()",
+          "time": "0.084",
+          "failed": false
+        },
+        {
+          "name": "announcementDeliveryExposesOnlyCompanyScopedOperationalCounts()",
+          "time": "0.095",
+          "failed": false
+        },
+        {
+          "name": "expenseDraftReferenceLookupBoundsEverySetAndExposesOnlyDisplayMetadata()",
+          "time": "0.077",
+          "failed": false
+        },
+        {
+          "name": "bulkRosterSeparatesReadOnlyReviewFromTheIdempotentBoundedCommand()",
+          "time": "0.068",
+          "failed": false
+        },
+        {
+          "name": "overtimeReportsExposeScopeAndExactMinuteCountersWithMonthlyDrillDownBounds()",
+          "time": "0.074",
+          "failed": false
+        },
+        {
+          "name": "administrativeExpenseDraftingHasBoundedCompanyAdmittedMetadataRoutes()",
+          "time": "0.07",
+          "failed": false
+        },
+        {
+          "name": "attendanceExceptionsHaveABoundedCompanyAdmittedMetadataContract()",
+          "time": "0.068",
+          "failed": false
+        },
+        {
+          "name": "attendanceClosingEmployeesExposeScopedPagesAndExactRevisionReferences()",
+          "time": "0.083",
+          "failed": false
+        },
+        {
+          "name": "selfLeaveDiscoveryHasItsOwnMinimalCompanyAdmittedContract()",
+          "time": "0.066",
+          "failed": false
+        },
+        {
+          "name": "revisionDetailsAdvertiseBoundedCurrentActions()",
+          "time": "0.074",
+          "failed": false
+        },
+        {
+          "name": "expensePaymentProgressDefaultsToOwnedReadsWithABoundedVersionedResponse()",
+          "time": "0.078",
+          "failed": false
+        },
+        {
+          "name": "documentBusinessMetadataContractSeparatesEditHistoryAndOperationalEvidence()",
+          "time": "0.103",
+          "failed": false
+        },
+        {
+          "name": "payrollReviewPreparationAndActionsKeepVersionsAndAccountLabelsExplicit()",
+          "time": "0.087",
+          "failed": false
+        },
+        {
+          "name": "publishedPayrollCostReportsExposeBoundedMonthsAndExactDecimalStrings()",
+          "time": "0.075",
+          "failed": false
+        },
+        {
+          "name": "publicationReviewUsesCompanyAdmissionAndItsOwnResponseContract()",
+          "time": "0.065",
+          "failed": false
+        },
+        {
+          "name": "personalReportFiltersDocumentPrivateMetadataAndVersionedIdempotentCommands()",
+          "time": "0.07",
+          "failed": false
+        },
+        {
+          "name": "expenseCostCentersExposeOnlyBoundedEditingReferences()",
+          "time": "0.081",
+          "failed": false
+        },
+        {
+          "name": "selfExpenseDiscoveryHasItsOwnMinimalCompanyAdmittedContract()",
+          "time": "0.07",
+          "failed": false
+        },
+        {
+          "name": "retainedAmendmentDraftsExposeBoundedMetadataAndVersionedIdempotentCommands()",
+          "time": "0.067",
+          "failed": false
+        },
+        {
+          "name": "audienceReferenceSelectionsHaveExplicitBoundsAndCompanyAdmission()",
+          "time": "0.067",
+          "failed": false
+        },
+        {
+          "name": "carryExpiryReadsExposeBoundedHistoryAndOnlyExplicitRecovery()",
+          "time": "0.067",
+          "failed": false
+        },
+        {
+          "name": "taxOpeningReviewExposesBoundedReferencesAndExplicitRevisionSelection()",
+          "time": "0.07",
+          "failed": false
+        },
+        {
+          "name": "expenseReportAndItsScopedDrillDownExposeExactDecimalAmounts()",
+          "time": "0.088",
+          "failed": false
+        },
+        {
+          "name": "approvalHistoryDescribesBoundedVersionedReadAndOnlyRetainedFacts()",
+          "time": "0.096",
+          "failed": false
+        },
+        {
+          "name": "expenseRecordsDefaultToSelfAndExcludeLiveReviewAffordances()",
+          "time": "0.078",
+          "failed": false
+        },
+        {
+          "name": "membershipRoleRetentionIsAnOptionalExplicitSelection()",
+          "time": "0.065",
+          "failed": false
+        },
+        {
+          "name": "administrativeLeavePreparationHasBoundedCompanyMetadataRoutes()",
+          "time": "0.065",
+          "failed": false
+        },
+        {
+          "name": "accountAuditDetailHasAnExplicitTypedReadContract()",
+          "time": "0.067",
+          "failed": false
+        },
+        {
+          "name": "carryBalanceFactsHaveOneCompatibleShapeForAccountAndDirectoryReads()",
+          "time": "0.067",
+          "failed": false
+        },
+        {
+          "name": "reportCatalogueDocumentsCompanyAdmissionAndBoundedDefinitionIdentities()",
+          "time": "0.071",
+          "failed": false
+        },
+        {
+          "name": "leaveReportAndItsScopedDrillDownExposeExactDecimalDays()",
+          "time": "0.063",
+          "failed": false
+        },
+        {
+          "name": "amendmentPreparationAndPreviewExposeObservedVersionsAndServerCalculatedDifferences()",
+          "time": "0.064",
+          "failed": false
+        },
+        {
+          "name": "reportExportsDescribeOwnedRecoveryAndAuthorizedCsvRanges()",
+          "time": "0.063",
+          "failed": false
+        },
+        {
+          "name": "negotiatedDownloadsAndRawUploadsAreNotDocumentedAsJsonDtos()",
+          "time": "0.066",
+          "failed": false
+        },
+        {
+          "name": "payrollComparisonAdvertisesAnExplicitBaselineAndDecimalStrings()",
+          "time": "0.064",
+          "failed": false
+        },
+        {
+          "name": "leavePreparationDocumentsItsBoundedReadsWithoutAnIdempotencyRequirement()",
+          "time": "0.076",
+          "failed": false
+        },
+        {
+          "name": "payrollInputReviewDocumentsCurrentSourcesIndependentActionsAndBoundedDiscovery()",
+          "time": "0.08",
+          "failed": false
+        },
+        {
+          "name": "announcementEmailIsOptionalOnSaveAndHasNoRecipientMetadataInDelivery()",
+          "time": "0.089",
+          "failed": false
+        },
+        {
+          "name": "sharedProblemsRetainTheirTraceAndRetryHeadersWithoutDuplicatingEveryResponse()",
+          "time": "0.085",
+          "failed": false
+        },
+        {
+          "name": "payrollPeriodReferencesRemainMinimalAndCompanyAdmitted()",
+          "time": "0.061",
+          "failed": false
+        },
+        {
+          "name": "calculationPreparationAndRunRecoveryKeepSourceReferencesExplicit()",
+          "time": "0.064",
+          "failed": false
+        },
+        {
+          "name": "generatedContractCoversRegisteredRoutesAndHasValidLocalReferences()",
+          "time": "0.566",
+          "failed": false
+        },
+        {
+          "name": "mobileTransportDescribesTokensIdempotencySyncAndActualWireTypes()",
+          "time": "0.067",
+          "failed": false
+        },
+        {
+          "name": "openApiKeepsGlobalMetadataSeparateFromTheCompanyContract()",
+          "time": "0.065",
+          "failed": false
+        },
+        {
+          "name": "selfWorkforceDiscoveryHasItsOwnMinimalCompanyAdmittedContract()",
+          "time": "0.068",
+          "failed": false
+        },
+        {
+          "name": "documentationRequiresACurrentAuthenticatedAccount()",
+          "time": "0.178",
+          "failed": false
+        },
+        {
+          "name": "payrollPolicyReviewKeepsConfigurationAndDatedSelectionSeparate()",
+          "time": "0.087",
+          "failed": false
+        },
+        {
+          "name": "accountSessionAdministrationKeepsGlobalAuthenticationAndMetadataOnlyResponses()",
+          "time": "0.074",
+          "failed": false
+        },
+        {
+          "name": "attendanceClosingReportsExposeIndependentOriginalAndCurrentFactsWithPublishedReferences()",
+          "time": "0.074",
+          "failed": false
+        },
+        {
+          "name": "employeeCalendarReviewDescribesMinimalReferencesAndObservedAssignments()",
+          "time": "0.066",
+          "failed": false
+        },
+        {
+          "name": "expenseReadScopesAreExplicitAndPreserveTheAuthorizedDefault()",
+          "time": "0.073",
+          "failed": false
+        },
+        {
+          "name": "retirementReviewExposesDecisionMetadataWithoutContentAccess()",
+          "time": "0.063",
+          "failed": false
+        },
+        {
+          "name": "amendmentReviewsPinDraftCalculationAndApprovalReferencesWithIndependentReadRoutes()",
+          "time": "0.064",
+          "failed": false
+        },
+        {
+          "name": "finalizationPreparationAndDirectoryKeepApprovalVersionsAndProgressSeparate()",
+          "time": "0.068",
+          "failed": false
+        },
+        {
+          "name": "languageHeadersRetainOneCanonicalDescription()",
+          "time": "0.127",
+          "failed": false
+        },
+        {
+          "name": "shiftDetailsAdvertiseCompanyAdmissionAndTheirCurrentVersion()",
+          "time": "0.062",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentAccessHttpTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "competingStartsAndCancellationUseVersionsAndReplayWithoutNewRows()",
+          "time": "0.64",
+          "failed": false
+        },
+        {
+          "name": "metadataValidatesTypeFilenameBoundsAndCompanyScope()",
+          "time": "0.464",
+          "failed": false
+        },
+        {
+          "name": "activeUploadAndByteReservationsAreBoundedAndRecoverAfterCancellation()",
+          "time": "0.724",
+          "failed": false
+        },
+        {
+          "name": "selfServiceCannotReadOtherEmployeesOrHrOnlyDocuments()",
+          "time": "0.429",
+          "failed": false
+        },
+        {
+          "name": "expiredUploadsRemainInspectableAndCanBeReplaced()",
+          "time": "0.413",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentAdministrationAssuranceTest",
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] operation = \"retention\"",
+          "time": "0.411",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"retention-history\"",
+          "time": "0.257",
+          "failed": false
+        },
+        {
+          "name": "[3] operation = \"policies\"",
+          "time": "0.351",
+          "failed": false
+        },
+        {
+          "name": "[4] operation = \"policy-history\"",
+          "time": "0.258",
+          "failed": false
+        },
+        {
+          "name": "[5] operation = \"inventory\"",
+          "time": "0.281",
+          "failed": false
+        },
+        {
+          "name": "[6] operation = \"inventories\"",
+          "time": "0.259",
+          "failed": false
+        },
+        {
+          "name": "[7] operation = \"attempts\"",
+          "time": "0.267",
+          "failed": false
+        },
+        {
+          "name": "[8] operation = \"pages\"",
+          "time": "0.264",
+          "failed": false
+        },
+        {
+          "name": "[1] operation = \"retention\"",
+          "time": "0.295",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"inventory\"",
+          "time": "0.277",
+          "failed": false
+        },
+        {
+          "name": "[1] operation = \"retention\", change = \"permission\"",
+          "time": "0.339",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"retention\", change = \"credentials\"",
+          "time": "0.347",
+          "failed": false
+        },
+        {
+          "name": "[3] operation = \"inventory\", change = \"permission\"",
+          "time": "0.312",
+          "failed": false
+        },
+        {
+          "name": "[4] operation = \"inventory\", change = \"credentials\"",
+          "time": "0.292",
+          "failed": false
+        },
+        {
+          "name": "[1] operation = \"retention\"",
+          "time": "0.29",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"retention-history\"",
+          "time": "0.308",
+          "failed": false
+        },
+        {
+          "name": "[3] operation = \"policies\"",
+          "time": "0.304",
+          "failed": false
+        },
+        {
+          "name": "[4] operation = \"policy-history\"",
+          "time": "0.322",
+          "failed": false
+        },
+        {
+          "name": "[5] operation = \"inventory\"",
+          "time": "0.368",
+          "failed": false
+        },
+        {
+          "name": "[6] operation = \"inventories\"",
+          "time": "0.343",
+          "failed": false
+        },
+        {
+          "name": "[7] operation = \"attempts\"",
+          "time": "0.315",
+          "failed": false
+        },
+        {
+          "name": "[8] operation = \"pages\"",
+          "time": "0.327",
+          "failed": false
+        },
+        {
+          "name": "interruptedReaderReleasesAccessGuardsForRecovery()",
+          "time": "0.288",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentBodyHttpTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "declaredAndChunkedBinaryBodiesAreRejectedBeforeStorage()",
+          "time": "0.484",
+          "failed": false
+        },
+        {
+          "name": "concurrentUploadsUseFourSlotsAndReleaseEverySlot()",
+          "time": "0.522",
+          "failed": false
+        },
+        {
+          "name": "stalledBodyTimesOutWithoutStartingStorageAndTheSlotCanBeReused()",
+          "time": "5.203",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentBusinessMetadataHttpTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "metadataCanBeCorrectedWithoutAnotherUploadWhileHistoryAndOriginalReceiptsRemainIntact()",
+          "time": "0.34",
+          "failed": false
+        },
+        {
+          "name": "initialCategoryAndBusinessValidityRemainSeparateFromTheOperationalUploadDeadline()",
+          "time": "0.168",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentCommandAssuranceTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "expiryDuringStorageDoesNotPublishProgressAndTheOriginalChunkCanBeRecovered()",
+          "time": "0.317",
+          "failed": false
+        },
+        {
+          "name": "[1] scenario = \"start\"",
+          "time": "0.229",
+          "failed": false
+        },
+        {
+          "name": "[2] scenario = \"chunk\"",
+          "time": "0.256",
+          "failed": false
+        },
+        {
+          "name": "[3] scenario = \"cancel\"",
+          "time": "0.237",
+          "failed": false
+        },
+        {
+          "name": "[4] scenario = \"validate\"",
+          "time": "0.286",
+          "failed": false
+        },
+        {
+          "name": "[5] scenario = \"start-replay\"",
+          "time": "0.257",
+          "failed": false
+        },
+        {
+          "name": "[6] scenario = \"chunk-replay\"",
+          "time": "0.263",
+          "failed": false
+        },
+        {
+          "name": "[7] scenario = \"cancel-replay\"",
+          "time": "0.235",
+          "failed": false
+        },
+        {
+          "name": "[8] scenario = \"validate-replay\"",
+          "time": "0.278",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentCommandCompletionTest",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "inventoryReceiptStillRequiresRecentProofAfterAccessAcquisition()",
+          "time": "0.242",
+          "failed": false
+        },
+        {
+          "name": "[1] mode = \"start\"",
+          "time": "0.178",
+          "failed": false
+        },
+        {
+          "name": "[2] mode = \"chunk\"",
+          "time": "0.22",
+          "failed": false
+        },
+        {
+          "name": "[3] mode = \"cancel\"",
+          "time": "0.19",
+          "failed": false
+        },
+        {
+          "name": "[4] mode = \"validate\"",
+          "time": "0.227",
+          "failed": false
+        },
+        {
+          "name": "expiredChunkPreparationRollsBackItsReservationWithoutWritingAnObject()",
+          "time": "0.187",
+          "failed": false
+        },
+        {
+          "name": "[1] mode = \"start\"",
+          "time": "0.357",
+          "failed": false
+        },
+        {
+          "name": "[2] mode = \"chunk\"",
+          "time": "0.409",
+          "failed": false
+        },
+        {
+          "name": "[3] mode = \"cancel\"",
+          "time": "0.388",
+          "failed": false
+        },
+        {
+          "name": "[4] mode = \"validate\"",
+          "time": "0.501",
+          "failed": false
+        },
+        {
+          "name": "[5] mode = \"inventory\"",
+          "time": "0.4",
+          "failed": false
+        },
+        {
+          "name": "[6] mode = \"policy\"",
+          "time": "0.458",
+          "failed": false
+        },
+        {
+          "name": "[7] mode = \"archive\"",
+          "time": "0.738",
+          "failed": false
+        },
+        {
+          "name": "[8] mode = \"restore\"",
+          "time": "0.722",
+          "failed": false
+        },
+        {
+          "name": "[9] mode = \"hold\"",
+          "time": "0.717",
+          "failed": false
+        },
+        {
+          "name": "[10] mode = \"release_hold\"",
+          "time": "0.727",
+          "failed": false
+        },
+        {
+          "name": "[11] mode = \"retire\"",
+          "time": "0.767",
+          "failed": false
+        },
+        {
+          "name": "[1] mode = \"policy\"",
+          "time": "0.571",
+          "failed": false
+        },
+        {
+          "name": "[2] mode = \"hold\"",
+          "time": "0.642",
+          "failed": false
+        },
+        {
+          "name": "[3] mode = \"retire\"",
+          "time": "0.734",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentDownloadHttpTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "malformedUnsatisfiableAndMultipartRangesReturnAnEmpty416()",
+          "time": "0.465",
+          "failed": false
+        },
+        {
+          "name": "revocationDuringAReadRejectsItsResultBeforeAnyResponseBytes()",
+          "time": "0.332",
+          "failed": false
+        },
+        {
+          "name": "fullAndCrossChunkRangesMatchTheImmutableRevisionExactly()",
+          "time": "0.528",
+          "failed": false
+        },
+        {
+          "name": "foreignUnreadyAndRejectedRevisionsCannotBeDownloaded()",
+          "time": "0.402",
+          "failed": false
+        },
+        {
+          "name": "corruptionStopsTheTransferWithoutReturningTheChangedBytes()",
+          "time": "0.292",
+          "failed": false
+        },
+        {
+          "name": "conditionalRequestsAndHeadAvoidStorageReadsAndRecheckAuthorization()",
+          "time": "0.415",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentEmployeesAdmissionHttpTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "employeeSelectionFollowsDocumentsAvailabilityIndependentlyOfPeople()",
+          "time": "0.4",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentEmployeesAssuranceTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] change = \"documents.read\"",
+          "time": "0.289",
+          "failed": false
+        },
+        {
+          "name": "[2] change = \"people.profile.read\"",
+          "time": "0.24",
+          "failed": false
+        },
+        {
+          "name": "[3] change = \"credentials\"",
+          "time": "0.199",
+          "failed": false
+        },
+        {
+          "name": "[4] change = \"membership\"",
+          "time": "0.184",
+          "failed": false
+        },
+        {
+          "name": "[1] exact = false",
+          "time": "0.217",
+          "failed": false
+        },
+        {
+          "name": "[2] exact = true",
+          "time": "0.213",
+          "failed": false
+        },
+        {
+          "name": "interruptedReadReleasesGuardsAndDoesNotPoisonTheNextAcquisition()",
+          "time": "0.216",
+          "failed": false
+        },
+        {
+          "name": "[1] original = \"documents.read\"",
+          "time": "0.202",
+          "failed": false
+        },
+        {
+          "name": "[2] original = \"people.profile.read\"",
+          "time": "0.215",
+          "failed": false
+        },
+        {
+          "name": "[3] original = \"documents.self.read\"",
+          "time": "0.218",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentEmployeesHttpTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "exactReferencesSupportDirectNavigationWithoutLeakingForeignEmployment()",
+          "time": "0.315",
+          "failed": false
+        },
+        {
+          "name": "directoryUsesDocumentGrantsAndReturnsOnlyScopedDisplayReferences()",
+          "time": "0.309",
+          "failed": false
+        },
+        {
+          "name": "searchIsLiteralBoundedAndRequiresBothAdministrativeReadGrants()",
+          "time": "1.014",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentEvidenceSyncHttpTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "documentModuleAndPermissionRevocationGateBothFeedAndCanonicalReads()",
+          "time": "0.664",
+          "failed": false
+        },
+        {
+          "name": "bootstrapAndChangesExposeOwnedPublishedMetadataWithIndependentSelection()",
+          "time": "1.029",
+          "failed": false
+        },
+        {
+          "name": "headerUpdatesAndRetirementPublishVersionedChangesWithAtomicRollback()",
+          "time": "1.195",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentInventoryBoundsHttpTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "inventoryTablesAndInvokerViewsRemainCompanyScopedForRuntimeCredentials()",
+          "time": "0.439",
+          "failed": false
+        },
+        {
+          "name": "aGrowingBucketStopsAtThePageCeilingWithAnExplicitIncompleteOutcome()",
+          "time": "5.471",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentInventoryHttpTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "acceptedHistoryActiveRecentUnknownAndAnomalousObjectsArePreserved()",
+          "time": "1.152",
+          "failed": false
+        },
+        {
+          "name": "inventoryRecoversAPutThatArrivedAfterCleanupAcknowledgement()",
+          "time": "0.463",
+          "failed": false
+        },
+        {
+          "name": "failedScansResumeTheirFiniteCursorAndKeepPageAndJobEvidence()",
+          "time": "0.413",
+          "failed": false
+        },
+        {
+          "name": "overlappingPageReadsCommitOnlyOneCleanupAndCheckpoint()",
+          "time": "0.334",
+          "failed": false
+        },
+        {
+          "name": "cancellationAndEightExplicitAttemptsPreserveTheOriginalCheckpoint()",
+          "time": "1.077",
+          "failed": false
+        },
+        {
+          "name": "cleanupRecoveryStopsAfterThreeAttemptsAndCannotResetFailedQueueEntries()",
+          "time": "0.692",
+          "failed": false
+        },
+        {
+          "name": "auditFailureRollsBackCleanupEvidenceProgressAndCompletion()",
+          "time": "0.379",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentInventorySecurityHttpTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "permissionCancellationCredentialAndLeaseChangesRejectPendingObservations()",
+          "time": "1.372",
+          "failed": false
+        },
+        {
+          "name": "competingStartsReplayAndCrossCompanyReadsRespectCurrentAccess()",
+          "time": "0.471",
+          "failed": false
+        },
+        {
+          "name": "inventoryReadersCannotResumeOrAcquireBroaderDocumentPermissions()",
+          "time": "0.266",
+          "failed": false
+        },
+        {
+          "name": "cancellationWhileListingIsInterruptedAndCanRecoverWithANewLease()",
+          "time": "0.398",
+          "failed": false
+        },
+        {
+          "name": "boundedRequestsAndRecentAuthenticationApplyBeforeQueueing()",
+          "time": "0.321",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentMetadataAssuranceTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] replay = false",
+          "time": "0.26",
+          "failed": false
+        },
+        {
+          "name": "[2] replay = true",
+          "time": "0.212",
+          "failed": false
+        },
+        {
+          "name": "expiryAfterActualJournalWriteRollsBackHeadHistoryOutboxReceiptAndSync()",
+          "time": "0.449",
+          "failed": false
+        },
+        {
+          "name": "currentEnrollmentIsRequiredEvenWhenTheRequestCarriesRecentMfaProof()",
+          "time": "0.176",
+          "failed": false
+        },
+        {
+          "name": "[1] mode = \"history\"",
+          "time": "0.263",
+          "failed": false
+        },
+        {
+          "name": "[2] mode = \"receipt\"",
+          "time": "0.274",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentMetadataContractTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "ownedHistoryRequiresReadGrantAndSelfManagementCannotReachHrOnlyOrAnotherEmployee()",
+          "time": "0.571",
+          "failed": false
+        },
+        {
+          "name": "archivalBlocksNewMetadataButOriginalReceiptAndHistoryRemainRecoverable()",
+          "time": "0.4",
+          "failed": false
+        },
+        {
+          "name": "[1] mode = \"country\"",
+          "time": "0.151",
+          "failed": false
+        },
+        {
+          "name": "[2] mode = \"number\"",
+          "time": "0.157",
+          "failed": false
+        },
+        {
+          "name": "[3] mode = \"control\"",
+          "time": "0.157",
+          "failed": false
+        },
+        {
+          "name": "[4] mode = \"inverse\"",
+          "time": "0.16",
+          "failed": false
+        },
+        {
+          "name": "[5] mode = \"early\"",
+          "time": "0.176",
+          "failed": false
+        },
+        {
+          "name": "[6] mode = \"late\"",
+          "time": "0.165",
+          "failed": false
+        },
+        {
+          "name": "[7] mode = \"reason\"",
+          "time": "0.175",
+          "failed": false
+        },
+        {
+          "name": "[8] mode = \"version\"",
+          "time": "0.175",
+          "failed": false
+        },
+        {
+          "name": "normalizationPinsTheSameReceiptAndDifferentValuesCannotReuseItsKey()",
+          "time": "0.21",
+          "failed": false
+        },
+        {
+          "name": "legacyReceiptAndReplacementOmissionPreserveTheMetadataAndOriginalUploadIdentity()",
+          "time": "0.276",
+          "failed": false
+        },
+        {
+          "name": "historyPagesAreBoundedAndInitialEntriesDoNotInventReviewReasons()",
+          "time": "0.298",
+          "failed": false
+        },
+        {
+          "name": "[1] sameKey = false",
+          "time": "0.218",
+          "failed": false
+        },
+        {
+          "name": "[2] sameKey = true",
+          "time": "0.198",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentMetadataSyncTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "publishedMetadataEditsInvalidateTheOwnedRecordWithoutLeakingFactsIntoTheChangeFeed()",
+          "time": "0.723",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentOriginalAccessTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] operation = \"header\"",
+          "time": "0.311",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"revision\"",
+          "time": "0.23",
+          "failed": false
+        },
+        {
+          "name": "[3] operation = \"directory\"",
+          "time": "0.235",
+          "failed": false
+        },
+        {
+          "name": "[4] operation = \"history\"",
+          "time": "0.243",
+          "failed": false
+        },
+        {
+          "name": "[5] operation = \"attempts\"",
+          "time": "0.245",
+          "failed": false
+        },
+        {
+          "name": "[6] operation = \"download\"",
+          "time": "0.245",
+          "failed": false
+        },
+        {
+          "name": "[7] operation = \"content\"",
+          "time": "0.25",
+          "failed": false
+        },
+        {
+          "name": "[1] operation = \"start\"",
+          "time": "0.18",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"chunk\"",
+          "time": "0.133",
+          "failed": false
+        },
+        {
+          "name": "[3] operation = \"cancel\"",
+          "time": "0.144",
+          "failed": false
+        },
+        {
+          "name": "[4] operation = \"validate\"",
+          "time": "0.167",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentQueueAssuranceTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] operation = \"validation\"",
+          "time": "0.272",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"inventory\"",
+          "time": "0.15",
+          "failed": false
+        },
+        {
+          "name": "uploadExpiryDuringQueueAdmissionDoesNotCreateAValidationJob()",
+          "time": "0.184",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentReadAssuranceTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "cancellationReleasesPendingReadGuardsForTheNextOperation()",
+          "time": "0.321",
+          "failed": false
+        },
+        {
+          "name": "[1] operation = \"header\"",
+          "time": "0.291",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"revision\"",
+          "time": "0.273",
+          "failed": false
+        },
+        {
+          "name": "[3] operation = \"directory\"",
+          "time": "0.273",
+          "failed": false
+        },
+        {
+          "name": "[4] operation = \"history\"",
+          "time": "0.276",
+          "failed": false
+        },
+        {
+          "name": "[5] operation = \"attempts\"",
+          "time": "0.28",
+          "failed": false
+        },
+        {
+          "name": "[6] operation = \"download\"",
+          "time": "0.295",
+          "failed": false
+        },
+        {
+          "name": "[7] operation = \"content\"",
+          "time": "0.319",
+          "failed": false
+        },
+        {
+          "name": "[8] operation = \"content-after-storage\"",
+          "time": "0.319",
+          "failed": false
+        },
+        {
+          "name": "[1] change = \"permission\"",
+          "time": "0.278",
+          "failed": false
+        },
+        {
+          "name": "[2] change = \"credentials\"",
+          "time": "0.344",
+          "failed": false
+        },
+        {
+          "name": "readersShareAggregateGuardsAndAWriterWaitsUntilTheSnapshotIsReleased()",
+          "time": "0.45",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentReadCompletionTest",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] mode = \"retention\"",
+          "time": "0.342",
+          "failed": false
+        },
+        {
+          "name": "[2] mode = \"retention_history\"",
+          "time": "0.289",
+          "failed": false
+        },
+        {
+          "name": "[3] mode = \"policies\"",
+          "time": "0.267",
+          "failed": false
+        },
+        {
+          "name": "[4] mode = \"policy_history\"",
+          "time": "0.267",
+          "failed": false
+        },
+        {
+          "name": "[5] mode = \"inventory\"",
+          "time": "0.268",
+          "failed": false
+        },
+        {
+          "name": "[6] mode = \"inventories\"",
+          "time": "0.272",
+          "failed": false
+        },
+        {
+          "name": "[7] mode = \"inventory_attempts\"",
+          "time": "0.281",
+          "failed": false
+        },
+        {
+          "name": "[8] mode = \"inventory_pages\"",
+          "time": "0.33",
+          "failed": false
+        },
+        {
+          "name": "[1] mode = \"employee_search\"",
+          "time": "0.479",
+          "failed": false
+        },
+        {
+          "name": "[2] mode = \"employee_selected\"",
+          "time": "0.473",
+          "failed": false
+        },
+        {
+          "name": "[3] mode = \"self_employments\"",
+          "time": "0.482",
+          "failed": false
+        },
+        {
+          "name": "[4] mode = \"self_evidence\"",
+          "time": "0.472",
+          "failed": false
+        },
+        {
+          "name": "[1] mode = \"header\"",
+          "time": "0.402",
+          "failed": false
+        },
+        {
+          "name": "[2] mode = \"directory\"",
+          "time": "0.416",
+          "failed": false
+        },
+        {
+          "name": "[3] mode = \"history\"",
+          "time": "0.409",
+          "failed": false
+        },
+        {
+          "name": "[4] mode = \"history_job\"",
+          "time": "0.41",
+          "failed": false
+        },
+        {
+          "name": "[5] mode = \"attempts\"",
+          "time": "0.432",
+          "failed": false
+        },
+        {
+          "name": "[6] mode = \"download\"",
+          "time": "0.436",
+          "failed": false
+        },
+        {
+          "name": "[7] mode = \"content_preparation\"",
+          "time": "0.494",
+          "failed": false
+        },
+        {
+          "name": "[8] mode = \"content_completion\"",
+          "time": "0.471",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentReferenceHttpTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "failedAuditRemovesTheReferenceAlongsideDraftAndReceiptRows()",
+          "time": "0.507",
+          "failed": false
+        },
+        {
+          "name": "aMissingReferenceRollsBackTheBusinessCommitAndLeavesItsOperationRetryable()",
+          "time": "0.37",
+          "failed": false
+        },
+        {
+          "name": "exactDraftEvidenceIsDeduplicatedRetainedAndCompanyScoped()",
+          "time": "0.661",
+          "failed": false
+        },
+        {
+          "name": "competingLostResponsesCreateOneReferenceForTheCommittedDraft()",
+          "time": "0.345",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentRetentionHttpTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "databaseRejectsAnArchiveThatSkipsActiveUploadsOrItsPolicySnapshot()",
+          "time": "0.289",
+          "failed": false
+        },
+        {
+          "name": "policyIdentityValidationAndFiniteHistoryCannotBeBypassed()",
+          "time": "0.318",
+          "failed": false
+        },
+        {
+          "name": "retentionReadsAreCompanyScopedAndDoNotGrantContentAccess()",
+          "time": "0.426",
+          "failed": false
+        },
+        {
+          "name": "archivalDefaultsToIndefiniteAndFreezesThePolicyChosenAtThatTime()",
+          "time": "0.4",
+          "failed": false
+        },
+        {
+          "name": "explicitIndefinitePoliciesRemainIndefiniteAfterLaterChanges()",
+          "time": "0.25",
+          "failed": false
+        },
+        {
+          "name": "holdsAllowNewEvidenceAndOriginalReceiptsReplayAfterLaterChanges()",
+          "time": "0.45",
+          "failed": false
+        },
+        {
+          "name": "competingArchiveAndUploadOrHoldCommandsHaveOneVersionWinner()",
+          "time": "0.438",
+          "failed": false
+        },
+        {
+          "name": "auditFailuresRollBackPolicyAndStateIncludingTheirOperationReceipts()",
+          "time": "0.299",
+          "failed": false
+        },
+        {
+          "name": "unfinishedExpiredAndValidatingRevisionsRequireExplicitCancellation()",
+          "time": "0.579",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentRetentionSecurityHttpTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "retentionRequiresAnIndependentSensitiveGrantAndDoesNotComeWithDocumentAdministration()",
+          "time": "0.319",
+          "failed": false
+        },
+        {
+          "name": "committedReceiptsDoNotBypassRevocationOrFreshAuthentication()",
+          "time": "0.187",
+          "failed": false
+        },
+        {
+          "name": "credentialChangesAndExpiredStepUpAreRejectedBeforeBothCommandsCommit()",
+          "time": "0.477",
+          "failed": false
+        },
+        {
+          "name": "interruptedCommandsReleaseTheirTransactionsAndCanUseTheSameOperationAgain()",
+          "time": "0.151",
+          "failed": false
+        },
+        {
+          "name": "everyMutationRechecksItsGrantAfterWaitingAndKeepsDeniedOperationsRetryable()",
+          "time": "0.953",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentRetirementHttpTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "historicalRetirementDoesNotClearANewerPublicationAndRestoreAllowsNewEvidence()",
+          "time": "0.816",
+          "failed": false
+        },
+        {
+          "name": "retirementDuringAPendingReadDiscardsTheBytesBeforeTheResponse()",
+          "time": "0.363",
+          "failed": false
+        },
+        {
+          "name": "indefinitePoliciesDeadlinesAndLegalHoldsPreventRetirement()",
+          "time": "0.509",
+          "failed": false
+        },
+        {
+          "name": "retirementMovesQuotaIntoCleanupAndKeepsProofAfterPhysicalDeletion()",
+          "time": "0.621",
+          "failed": false
+        },
+        {
+          "name": "aHundredPartManifestRetiresWithoutReadingContentOrLosingQuota()",
+          "time": "3.194",
+          "failed": false
+        },
+        {
+          "name": "retiredEvidenceIsImmutableCompanyScopedAndCannotAcquireNewBusinessReferences()",
+          "time": "0.499",
+          "failed": false
+        },
+        {
+          "name": "failedAuditOrMissingCleanupRegistrationRollsBackAllRetirementEffects()",
+          "time": "0.962",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentRetirementInventoryHttpTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "inventoryRecoversRetiredContentThatReappearsAfterAcknowledgedDeletion()",
+          "time": "0.616",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentRetirementReferenceHttpTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "expenseRegistrationAndRetirementSerializeInBothOrders()",
+          "time": "1.252",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentRetirementReviewAssuranceTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] change = \"permission\"",
+          "time": "0.351",
+          "failed": false
+        },
+        {
+          "name": "[2] change = \"credentials\"",
+          "time": "0.274",
+          "failed": false
+        },
+        {
+          "name": "[3] change = \"assurance\"",
+          "time": "0.269",
+          "failed": false
+        },
+        {
+          "name": "[1] operation = \"review\", resource = \"revision\", cancel = \"false\"",
+          "time": "0.316",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"review\", resource = \"revision\", cancel = \"true\"",
+          "time": "0.304",
+          "failed": false
+        },
+        {
+          "name": "[3] operation = \"review\", resource = \"retention\", cancel = \"false\"",
+          "time": "0.375",
+          "failed": false
+        },
+        {
+          "name": "[4] operation = \"review\", resource = \"retention\", cancel = \"true\"",
+          "time": "0.315",
+          "failed": false
+        },
+        {
+          "name": "[5] operation = \"review\", resource = \"reference\", cancel = \"false\"",
+          "time": "0.318",
+          "failed": false
+        },
+        {
+          "name": "[6] operation = \"review\", resource = \"reference\", cancel = \"true\"",
+          "time": "0.327",
+          "failed": false
+        },
+        {
+          "name": "[7] operation = \"retire\", resource = \"reference\", cancel = \"false\"",
+          "time": "0.396",
+          "failed": false
+        },
+        {
+          "name": "[8] operation = \"retire\", resource = \"reference\", cancel = \"true\"",
+          "time": "0.392",
+          "failed": false
+        },
+        {
+          "name": "[9] operation = \"retire\", resource = \"manifest\", cancel = \"false\"",
+          "time": "0.399",
+          "failed": false
+        },
+        {
+          "name": "[10] operation = \"retire\", resource = \"manifest\", cancel = \"true\"",
+          "time": "0.394",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentRetirementReviewHttpTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "aNewGrantCannotExpandTheOriginalReviewAuthority()",
+          "time": "0.506",
+          "failed": false
+        },
+        {
+          "name": "reviewUsesServerTimeAndFrozenArchivePolicyWithoutReservingRetirement()",
+          "time": "0.808",
+          "failed": false
+        },
+        {
+          "name": "unvalidatedAndHistoricalRevisionsKeepTheirOwnStatusAndPublication()",
+          "time": "0.697",
+          "failed": false
+        },
+        {
+          "name": "independentRetentionAccessExposesOnlyDecisionMetadataAndCannotReadContent()",
+          "time": "0.485",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentRetirementSecurityHttpTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "interruptedRetirementReleasesItsGuardWithoutConsumingTheOperation()",
+          "time": "0.438",
+          "failed": false
+        },
+        {
+          "name": "holdAndRestoreCompeteWithRetirementThroughTheSameRetentionVersion()",
+          "time": "0.782",
+          "failed": false
+        },
+        {
+          "name": "malformedVersionsAndReasonsDoNotChangeEligibilityOrRevealForeignContent()",
+          "time": "0.403",
+          "failed": false
+        },
+        {
+          "name": "competingRetirementsProduceOneEvidenceAndLostResponsesReplay()",
+          "time": "0.771",
+          "failed": false
+        },
+        {
+          "name": "permissionCredentialAndStepUpChangesDuringWaitPreventRetirement()",
+          "time": "1.438",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentRevisionActionsAssuranceTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] resource = \"job\", cancel = \"false\"",
+          "time": "0.295",
+          "failed": false
+        },
+        {
+          "name": "[2] resource = \"job\", cancel = \"true\"",
+          "time": "0.186",
+          "failed": false
+        },
+        {
+          "name": "[3] resource = \"upload\", cancel = \"false\"",
+          "time": "0.133",
+          "failed": false
+        },
+        {
+          "name": "[4] resource = \"upload\", cancel = \"true\"",
+          "time": "0.135",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentRevisionActionsHttpTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "interruptedUploadRecoversItsOriginalCommandOnlyForTheSameAuthorizedOperator()",
+          "time": "0.363",
+          "failed": false
+        },
+        {
+          "name": "expiredActiveUploadsRemainExplicitlyCancellable()",
+          "time": "0.11",
+          "failed": false
+        },
+        {
+          "name": "detailCapabilitiesNeverGainLaterOrMissingManagementGrants()",
+          "time": "0.14",
+          "failed": false
+        },
+        {
+          "name": "actionsFollowCommittedUploadAndInspectionState()",
+          "time": "0.304",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentUploadHttpTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "competingWritersHaveOneActiveLeaseAndOneCommit()",
+          "time": "0.202",
+          "failed": false
+        },
+        {
+          "name": "failedAuditRollsBackProgressButKeepsTheTemporaryKeyRecoverable()",
+          "time": "0.214",
+          "failed": false
+        },
+        {
+          "name": "cancellationAndAccessRevocationRejectPendingResults()",
+          "time": "0.332",
+          "failed": false
+        },
+        {
+          "name": "failedWritesStopAtEightAttemptsAndRequireAnExplicitNewRevision()",
+          "time": "0.385",
+          "failed": false
+        },
+        {
+          "name": "anExpiredWriterCannotReplaceTheAcceptedAttempt()",
+          "time": "0.17",
+          "failed": false
+        },
+        {
+          "name": "chunksResumeAtCommittedOffsetAndReplayTheOriginalVersion()",
+          "time": "0.27",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.DocumentValidationHttpTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "failedAuditRollsBackRetentionPublicationAndCheckpointTogether()",
+          "time": "0.385",
+          "failed": false
+        },
+        {
+          "name": "partialCleanupRetentionRollsBackWhenAnyAcceptedObjectHasExpired()",
+          "time": "0.275",
+          "failed": false
+        },
+        {
+          "name": "aReclaimedLeaseFencesTheOldInspectorEvenWhenTheVersionDidNotChange()",
+          "time": "0.324",
+          "failed": false
+        },
+        {
+          "name": "crashedJobExhaustionIsProjectedAndAnExplicitRetryCanPublish()",
+          "time": "0.419",
+          "failed": false
+        },
+        {
+          "name": "completeInspectionPublishesOnlyReadyContentAndRetainsImmutableEvidence()",
+          "time": "0.513",
+          "failed": false
+        },
+        {
+          "name": "readyRevisionsContinueConsumingQuotaAfterTemporaryKeysAreRetained()",
+          "time": "0.353",
+          "failed": false
+        },
+        {
+          "name": "cancellationRevocationAndExpiryDuringInspectionRejectLateResults()",
+          "time": "0.802",
+          "failed": false
+        },
+        {
+          "name": "rejectedVerdictsTypesAndWholeFileDigestsNeverPublish()",
+          "time": "1.001",
+          "failed": false
+        },
+        {
+          "name": "inspectionFailuresHaveBoundedExplicitRecoveryAndKeepEveryAttempt()",
+          "time": "1.447",
+          "failed": false
+        },
+        {
+          "name": "incompleteUploadsAndCompetingValidationRequestsCannotCreateDuplicateJobs()",
+          "time": "0.417",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseClaimRecordHttpTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "approvalReassignmentPublishesAnotherOwnedInvalidationAtTheSameClaimVersion()",
+          "time": "1.166",
+          "failed": false
+        },
+        {
+          "name": "aSharedRecordReadCannotMixClaimVersionsAcrossAConcurrentSave()",
+          "time": "0.47",
+          "failed": false
+        },
+        {
+          "name": "recordRetainsTheCurrentClaimAndLatestSubmissionWhilePagingActivity()",
+          "time": "0.811",
+          "failed": false
+        },
+        {
+          "name": "selfDefaultNeverExpandsWithFinanceGrantsOrSubmissionAssignments()",
+          "time": "0.729",
+          "failed": false
+        },
+        {
+          "name": "[1] change = \"permission\"",
+          "time": "0.281",
+          "failed": false
+        },
+        {
+          "name": "[2] change = \"credentials\"",
+          "time": "0.266",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseClaimReviewHttpTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "permissionRemovedDuringAccountAcquisitionCannotReleaseTheAggregate()",
+          "time": "0.46",
+          "failed": false
+        },
+        {
+          "name": "reviewIncludesPaymentProgressWithoutBankDestinationsOrReferences()",
+          "time": "0.88",
+          "failed": false
+        },
+        {
+          "name": "reviewPagesHistoryAndSubmissionsWithoutReplacingTheCurrentDraft()",
+          "time": "0.648",
+          "failed": false
+        },
+        {
+          "name": "assignedSubmissionReviewersCannotDiscoverUnsubmittedDraftsOrTheirVersions()",
+          "time": "0.675",
+          "failed": false
+        },
+        {
+          "name": "sharedReadersCannotMixDraftAndHistoryAcrossAConcurrentSave()",
+          "time": "0.505",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseCommandAssuranceTest",
+      "tests": 32,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] action = \"save\"",
+          "time": "0.794",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"edit\"",
+          "time": "0.757",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"cancel\"",
+          "time": "0.706",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"submit\"",
+          "time": "0.962",
+          "failed": false
+        },
+        {
+          "name": "[5] action = \"withdraw\"",
+          "time": "0.985",
+          "failed": false
+        },
+        {
+          "name": "[6] action = \"approve\"",
+          "time": "0.972",
+          "failed": false
+        },
+        {
+          "name": "[7] action = \"reject\"",
+          "time": "0.953",
+          "failed": false
+        },
+        {
+          "name": "[8] action = \"return\"",
+          "time": "0.966",
+          "failed": false
+        },
+        {
+          "name": "[1] action = \"save\"",
+          "time": "0.5",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"edit\"",
+          "time": "0.51",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"cancel\"",
+          "time": "0.502",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"submit\"",
+          "time": "0.793",
+          "failed": false
+        },
+        {
+          "name": "[5] action = \"withdraw\"",
+          "time": "0.772",
+          "failed": false
+        },
+        {
+          "name": "[6] action = \"approve\"",
+          "time": "0.791",
+          "failed": false
+        },
+        {
+          "name": "[7] action = \"reject\"",
+          "time": "0.835",
+          "failed": false
+        },
+        {
+          "name": "[8] action = \"return\"",
+          "time": "0.83",
+          "failed": false
+        },
+        {
+          "name": "[1] action = \"save\"",
+          "time": "0.865",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"edit\"",
+          "time": "0.904",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"cancel\"",
+          "time": "0.856",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"submit\"",
+          "time": "1.144",
+          "failed": false
+        },
+        {
+          "name": "[5] action = \"withdraw\"",
+          "time": "1.164",
+          "failed": false
+        },
+        {
+          "name": "[6] action = \"approve\"",
+          "time": "1.185",
+          "failed": false
+        },
+        {
+          "name": "[7] action = \"reject\"",
+          "time": "1.201",
+          "failed": false
+        },
+        {
+          "name": "[8] action = \"return\"",
+          "time": "1.212",
+          "failed": false
+        },
+        {
+          "name": "[1] action = \"save\"",
+          "time": "0.718",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"edit\"",
+          "time": "0.701",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"cancel\"",
+          "time": "0.663",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"submit\"",
+          "time": "0.979",
+          "failed": false
+        },
+        {
+          "name": "[5] action = \"withdraw\"",
+          "time": "0.841",
+          "failed": false
+        },
+        {
+          "name": "[6] action = \"approve\"",
+          "time": "0.842",
+          "failed": false
+        },
+        {
+          "name": "[7] action = \"reject\"",
+          "time": "0.848",
+          "failed": false
+        },
+        {
+          "name": "[8] action = \"return\"",
+          "time": "0.921",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseCostCenterHttpTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "assuranceExpiryAtTheAccountGuardCannotReleaseCostCenters()",
+          "time": "0.232",
+          "failed": false
+        },
+        {
+          "name": "cancellationReleasesReadGuardsBeforeExecutorReuse()",
+          "time": "0.133",
+          "failed": false
+        },
+        {
+          "name": "removedGrantsAndAStaleRequestCannotAcquireAnotherCapability()",
+          "time": "0.135",
+          "failed": false
+        },
+        {
+          "name": "referencesUseExpenseModuleAdmissionAndNativeBuildPolicy()",
+          "time": "0.232",
+          "failed": false
+        },
+        {
+          "name": "boundsAndEditingPermissionsApplyBeforeDataAcquisition()",
+          "time": "0.378",
+          "failed": false
+        },
+        {
+          "name": "assuranceExpiryAfterAcquisitionCannotPublishARead()",
+          "time": "0.137",
+          "failed": false
+        },
+        {
+          "name": "[1] permission = \"expenses.self.manage\"",
+          "time": "0.23",
+          "failed": false
+        },
+        {
+          "name": "[2] permission = \"expenses.manage\"",
+          "time": "0.224",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseDecisionDelegationCompletionTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] action = \"approve\", stage = \"evidence\"",
+          "time": "1.499",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"reject\", stage = \"evidence\"",
+          "time": "1.299",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"return\", stage = \"evidence\"",
+          "time": "1.216",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"approve\", stage = \"journal\"",
+          "time": "1.175",
+          "failed": false
+        },
+        {
+          "name": "[5] action = \"reject\", stage = \"journal\"",
+          "time": "1.132",
+          "failed": false
+        },
+        {
+          "name": "[6] action = \"return\", stage = \"journal\"",
+          "time": "1.139",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseDraftHttpTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "incompleteDraftsAreAllowedButPayloadsAndReadWindowsAreBounded()",
+          "time": "0.481",
+          "failed": false
+        },
+        {
+          "name": "auditFailureRollsBackHeaderDraftLinesReceiptsAndOperationReceipt()",
+          "time": "0.383",
+          "failed": false
+        },
+        {
+          "name": "revisionLimitPreservesEvidenceAndStillAllowsCancellation()",
+          "time": "1.507",
+          "failed": false
+        },
+        {
+          "name": "categoriesCostCentersAndReceiptsCannotReferenceAnotherCompanyOrEmployee()",
+          "time": "0.519",
+          "failed": false
+        },
+        {
+          "name": "newlyGrantedCapabilitiesRequireAFreshlyResolvedRequest()",
+          "time": "0.266",
+          "failed": false
+        },
+        {
+          "name": "cancellingAndSavingTheSameVersionCannotBothCommit()",
+          "time": "0.327",
+          "failed": false
+        },
+        {
+          "name": "draftRevisionsKeepTheirLinesReceiptsAndHistoricalTotals()",
+          "time": "0.389",
+          "failed": false
+        },
+        {
+          "name": "waitingCommandsRejectRevokedPermissionsAndCredentials()",
+          "time": "0.33",
+          "failed": false
+        },
+        {
+          "name": "lostResponsesAndCompetingSavesNeverCreateDuplicateDrafts()",
+          "time": "0.377",
+          "failed": false
+        },
+        {
+          "name": "claimReadsFollowCurrentTeamSelfAndCompanyScope()",
+          "time": "0.599",
+          "failed": false
+        },
+        {
+          "name": "actorCapacityIsSerializedAndCancellationReleasesItsReservation()",
+          "time": "0.952",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseDraftInputSnapshotTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] mode = \"lines\"",
+          "time": "0.606",
+          "failed": false
+        },
+        {
+          "name": "[2] mode = \"receipts\"",
+          "time": "0.497",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseDraftingAssuranceTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] kind = \"employees\", acquired = \"false\"",
+          "time": "0.646",
+          "failed": false
+        },
+        {
+          "name": "[2] kind = \"employees\", acquired = \"true\"",
+          "time": "0.624",
+          "failed": false
+        },
+        {
+          "name": "[3] kind = \"references\", acquired = \"false\"",
+          "time": "0.548",
+          "failed": false
+        },
+        {
+          "name": "[4] kind = \"references\", acquired = \"true\"",
+          "time": "0.614",
+          "failed": false
+        },
+        {
+          "name": "[5] kind = \"receipts\", acquired = \"false\"",
+          "time": "0.617",
+          "failed": false
+        },
+        {
+          "name": "[6] kind = \"receipts\", acquired = \"true\"",
+          "time": "0.657",
+          "failed": false
+        },
+        {
+          "name": "[1] kind = \"employees\"",
+          "time": "0.536",
+          "failed": false
+        },
+        {
+          "name": "[2] kind = \"references\"",
+          "time": "0.658",
+          "failed": false
+        },
+        {
+          "name": "[3] kind = \"receipts\"",
+          "time": "0.548",
+          "failed": false
+        },
+        {
+          "name": "[1] kind = \"employees\"",
+          "time": "0.652",
+          "failed": false
+        },
+        {
+          "name": "[2] kind = \"references\"",
+          "time": "0.663",
+          "failed": false
+        },
+        {
+          "name": "[3] kind = \"receipts\"",
+          "time": "0.646",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseDraftingHttpTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "viewingOrPayingExpensesDoesNotPermitAdministrativeDraftDiscovery()",
+          "time": "0.668",
+          "failed": false
+        },
+        {
+          "name": "managementDiscoveryHasBoundedCompanyReferencesWithoutGrantingPeopleAccess()",
+          "time": "0.573",
+          "failed": false
+        },
+        {
+          "name": "administrativeReferenceLookupDoesNotBroadenTheExistingSelfRoute()",
+          "time": "0.806",
+          "failed": false
+        },
+        {
+          "name": "receiptPickerReturnsOnlyPublishedReceiptMetadataForTheSelectedEmployment()",
+          "time": "1.57",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePaymentAssuranceTest",
+      "tests": 34,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] action = \"prepare\", mfa = \"true\"",
+          "time": "1.239",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"release\", mfa = \"true\"",
+          "time": "1.16",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"cancel\", mfa = \"true\"",
+          "time": "1.139",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"reconcile\", mfa = \"true\"",
+          "time": "1.212",
+          "failed": false
+        },
+        {
+          "name": "[5] action = \"prepare\", mfa = \"false\"",
+          "time": "1.128",
+          "failed": false
+        },
+        {
+          "name": "[6] action = \"release\", mfa = \"false\"",
+          "time": "1.156",
+          "failed": false
+        },
+        {
+          "name": "[7] action = \"cancel\", mfa = \"false\"",
+          "time": "1.174",
+          "failed": false
+        },
+        {
+          "name": "[8] action = \"reconcile\", mfa = \"false\"",
+          "time": "1.244",
+          "failed": false
+        },
+        {
+          "name": "[1] action = \"prepare\"",
+          "time": "0.802",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"release\"",
+          "time": "0.902",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"cancel\"",
+          "time": "0.889",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"reconcile\"",
+          "time": "0.914",
+          "failed": false
+        },
+        {
+          "name": "[1] mfa = true",
+          "time": "0.859",
+          "failed": false
+        },
+        {
+          "name": "[2] mfa = false",
+          "time": "0.799",
+          "failed": false
+        },
+        {
+          "name": "[1] action = \"batch\", mfa = \"true\"",
+          "time": "0.925",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"export\", mfa = \"true\"",
+          "time": "0.971",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"history\", mfa = \"true\"",
+          "time": "0.994",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"results\", mfa = \"true\"",
+          "time": "0.994",
+          "failed": false
+        },
+        {
+          "name": "[5] action = \"batches\", mfa = \"true\"",
+          "time": "0.972",
+          "failed": false
+        },
+        {
+          "name": "[6] action = \"payables\", mfa = \"true\"",
+          "time": "0.971",
+          "failed": false
+        },
+        {
+          "name": "[7] action = \"batch\", mfa = \"false\"",
+          "time": "0.982",
+          "failed": false
+        },
+        {
+          "name": "[8] action = \"export\", mfa = \"false\"",
+          "time": "1.042",
+          "failed": false
+        },
+        {
+          "name": "[9] action = \"history\", mfa = \"false\"",
+          "time": "0.986",
+          "failed": false
+        },
+        {
+          "name": "[10] action = \"results\", mfa = \"false\"",
+          "time": "0.879",
+          "failed": false
+        },
+        {
+          "name": "[11] action = \"batches\", mfa = \"false\"",
+          "time": "0.859",
+          "failed": false
+        },
+        {
+          "name": "[12] action = \"payables\", mfa = \"false\"",
+          "time": "0.87",
+          "failed": false
+        },
+        {
+          "name": "[1] action = \"prepare\", mfa = \"true\"",
+          "time": "0.953",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"release\", mfa = \"true\"",
+          "time": "1.057",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"cancel\", mfa = \"true\"",
+          "time": "0.997",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"reconcile\", mfa = \"true\"",
+          "time": "1.121",
+          "failed": false
+        },
+        {
+          "name": "[5] action = \"prepare\", mfa = \"false\"",
+          "time": "1.011",
+          "failed": false
+        },
+        {
+          "name": "[6] action = \"release\", mfa = \"false\"",
+          "time": "1.015",
+          "failed": false
+        },
+        {
+          "name": "[7] action = \"cancel\", mfa = \"false\"",
+          "time": "1.014",
+          "failed": false
+        },
+        {
+          "name": "[8] action = \"reconcile\", mfa = \"false\"",
+          "time": "1.04",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePaymentBoundsHttpTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "aMaximumSizeBatchSnapshotsExportsAndReconcilesOneHundredDistinctClaims()",
+          "time": "5.463",
+          "failed": false
+        },
+        {
+          "name": "databaseRejectsSettlementWithoutItsImmutableResultEvidence()",
+          "time": "0.746",
+          "failed": false
+        },
+        {
+          "name": "twentyCancelledPreparationsExhaustFurtherAttemptsWithoutHidingTheirHistory()",
+          "time": "1.127",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePaymentEnrollmentTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] action = \"batch\"",
+          "time": "1.175",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"review\"",
+          "time": "0.928",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"export\"",
+          "time": "1.102",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"history\"",
+          "time": "0.998",
+          "failed": false
+        },
+        {
+          "name": "[5] action = \"results\"",
+          "time": "1.124",
+          "failed": false
+        },
+        {
+          "name": "[6] action = \"batches\"",
+          "time": "0.969",
+          "failed": false
+        },
+        {
+          "name": "[7] action = \"payables\"",
+          "time": "1.025",
+          "failed": false
+        },
+        {
+          "name": "[1] action = \"prepare\", replay = \"false\"",
+          "time": "1.102",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"release\", replay = \"false\"",
+          "time": "1.083",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"cancel\", replay = \"false\"",
+          "time": "1.174",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"reconcile\", replay = \"false\"",
+          "time": "1.241",
+          "failed": false
+        },
+        {
+          "name": "[5] action = \"prepare\", replay = \"true\"",
+          "time": "1.162",
+          "failed": false
+        },
+        {
+          "name": "[6] action = \"release\", replay = \"true\"",
+          "time": "1.174",
+          "failed": false
+        },
+        {
+          "name": "[7] action = \"cancel\", replay = \"true\"",
+          "time": "1.195",
+          "failed": false
+        },
+        {
+          "name": "[8] action = \"reconcile\", replay = \"true\"",
+          "time": "1.234",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePaymentHttpTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "partialBankOutcomesReserveUnknownItemsAndAllowOnlyConfirmedFailuresToRetry()",
+          "time": "1.754",
+          "failed": false
+        },
+        {
+          "name": "preparedCancellationReleasesReservationsButReleasedPaymentsCannotBeCancelled()",
+          "time": "0.826",
+          "failed": false
+        },
+        {
+          "name": "paymentPreparationReleaseAndSettlementKeepOriginalEvidenceAndReceipts()",
+          "time": "1.034",
+          "failed": false
+        },
+        {
+          "name": "reconciliationRejectsDuplicateBankReferencesAndRollsBackEveryItem()",
+          "time": "1.548",
+          "failed": false
+        },
+        {
+          "name": "paymentInputAndPagesAreBoundedAndAvailableClaimsFollowReservations()",
+          "time": "0.786",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePaymentInputSnapshotTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] action = \"prepare\"",
+          "time": "1.012",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"reconcile\"",
+          "time": "1.048",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePaymentReadHttpTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "financeReadsRecheckMembershipCredentialsAndRecentAuthentication()",
+          "time": "1.15",
+          "failed": false
+        },
+        {
+          "name": "bindingAnAccountWithdrawsItsPreparationHintAndTheCommandStillRechecksIndependence()",
+          "time": "0.822",
+          "failed": false
+        },
+        {
+          "name": "financeReadsRecheckRevocationUnderSharedGuards()",
+          "time": "1.399",
+          "failed": false
+        },
+        {
+          "name": "payablePreparationHintsPreservePagingAndDoNotExposeInternalActorEvidence()",
+          "time": "1.154",
+          "failed": false
+        },
+        {
+          "name": "sharedReadDoesNotSerializeUnrelatedFinanceReaders()",
+          "time": "0.935",
+          "failed": false
+        },
+        {
+          "name": "[1] resource = \"payments\"",
+          "time": "0.799",
+          "failed": false
+        },
+        {
+          "name": "[2] resource = \"payment-progress\"",
+          "time": "0.797",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePaymentReferenceMigrationHttpTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "existingSettlementsAreBackfilledPerCompanyWithoutChangingTheirEvidence()",
+          "time": "1.58",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePaymentReviewHttpTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "interruptedReviewReleasesSharedGuardsAndCannotPreventAFreshRead()",
+          "time": "0.976",
+          "failed": false
+        },
+        {
+          "name": "independentReadersShareOneSnapshotWhileReleaseWaitsForItsCompletion()",
+          "time": "1.105",
+          "failed": false
+        },
+        {
+          "name": "[1] mode = \"permission\"",
+          "time": "0.77",
+          "failed": false
+        },
+        {
+          "name": "[2] mode = \"credential\"",
+          "time": "0.779",
+          "failed": false
+        },
+        {
+          "name": "[3] mode = \"membership\"",
+          "time": "0.763",
+          "failed": false
+        },
+        {
+          "name": "aBeneficiaryWithFinancePermissionCannotReleaseOrReconcileTheirOwnExpense()",
+          "time": "1.053",
+          "failed": false
+        },
+        {
+          "name": "[1] mfa = true",
+          "time": "0.839",
+          "failed": false
+        },
+        {
+          "name": "[2] mfa = false",
+          "time": "0.892",
+          "failed": false
+        },
+        {
+          "name": "aReviewKeepsInstructionsHistoryAndPartialReconciliationAtTheSameVersion()",
+          "time": "1.404",
+          "failed": false
+        },
+        {
+          "name": "reviewsRequireFinanceScopeAndValidateResourceCursorsAfterAuthorization()",
+          "time": "1.238",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePaymentSecurityHttpTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "everyPaymentCommandRechecksAuthorityAfterWaitingAndDoesNotConsumeFailedKeys()",
+          "time": "3.592",
+          "failed": false
+        },
+        {
+          "name": "cancellationAndReleaseCannotBothSucceedAndCompetingReconciliationsUseOneVersion()",
+          "time": "0.956",
+          "failed": false
+        },
+        {
+          "name": "bankDetailsRequireProtectedFinanceAccessAndCurrentCompanyScope()",
+          "time": "1.139",
+          "failed": false
+        },
+        {
+          "name": "makersBeneficiariesAndNewlyBoundAccountsCannotAuthorizeTheirOwnPayments()",
+          "time": "1.552",
+          "failed": false
+        },
+        {
+          "name": "auditFailureRollsBackPreparationReleaseAndSettlementWithoutConsumingReceipts()",
+          "time": "1.273",
+          "failed": false
+        },
+        {
+          "name": "releaseRechecksCredentialsAndRecentAuthenticationAfterWaiting()",
+          "time": "1.822",
+          "failed": false
+        },
+        {
+          "name": "competingBatchesCannotReserveTheSameApprovedClaim()",
+          "time": "1.026",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePaymentSyncHttpTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "paymentChangesRetainEveryAttemptWithoutRevisingTheApprovedClaim()",
+          "time": "1.532",
+          "failed": false
+        },
+        {
+          "name": "explicitFinanceReadStillSynchronizesOnlyOwnedClaimsAndRechecksRevocation()",
+          "time": "1.41",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePaymentSyncMigrationHttpTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "backfillWaitsForAnExistingPaymentWriterAndRetainsEvidenceAndCompanyIsolation()",
+          "time": "3.107",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePolicyAssuranceTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "admittedContractSelectionIsDetachedBeforeWaitingAndReceiptRecoveryRetainsIt()",
+          "time": "0.203",
+          "failed": false
+        },
+        {
+          "name": "[1] existing = false",
+          "time": "0.302",
+          "failed": false
+        },
+        {
+          "name": "[2] existing = true",
+          "time": "0.39",
+          "failed": false
+        },
+        {
+          "name": "[1] existing = false",
+          "time": "0.193",
+          "failed": false
+        },
+        {
+          "name": "[2] existing = true",
+          "time": "0.178",
+          "failed": false
+        },
+        {
+          "name": "[1] existing = false",
+          "time": "0.199",
+          "failed": false
+        },
+        {
+          "name": "[2] existing = true",
+          "time": "0.201",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePolicyHttpTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "policyWriteRechecksCredentialsAfterWaitingAndRollsBackAuditFailure()",
+          "time": "0.22",
+          "failed": false
+        },
+        {
+          "name": "receiptsReplayAfterLaterRevisionsWithoutGrantingRevokedAccess()",
+          "time": "0.121",
+          "failed": false
+        },
+        {
+          "name": "effectivePoliciesKeepImmutableHistoryStableCodesAndBoundedPages()",
+          "time": "0.221",
+          "failed": false
+        },
+        {
+          "name": "competingCategoryCodesAndVersionsProduceOneCommittedChange()",
+          "time": "0.133",
+          "failed": false
+        },
+        {
+          "name": "policyAccessIsScopedToCompanyAndHistoryRequiresAdministration()",
+          "time": "0.216",
+          "failed": false
+        },
+        {
+          "name": "categoryCapacityCannotBeOversubscribedByCompetingCreates()",
+          "time": "0.165",
+          "failed": false
+        },
+        {
+          "name": "invalidMoneyDatesAndDefinitionsNeverPersistPartialPolicies()",
+          "time": "0.189",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpensePolicyReviewHttpTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "catalogIncludesFutureAndArchivedHeadsWithoutChangingEffectiveSelection()",
+          "time": "0.205",
+          "failed": false
+        },
+        {
+          "name": "revocationDuringAccountAcquisitionRejectsBothAdministrativeReads()",
+          "time": "0.196",
+          "failed": false
+        },
+        {
+          "name": "policyReadersNeedAdministrationAndCannotDiscoverForeignResources()",
+          "time": "0.318",
+          "failed": false
+        },
+        {
+          "name": "concurrentReadersShareTheGuardAndReviewCannotMixHeadAndHistoryAcrossASave()",
+          "time": "0.273",
+          "failed": false
+        },
+        {
+          "name": "reviewKeepsTheSavedHeadWhilePagingAscendingImmutableRevisions()",
+          "time": "0.188",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseReadAssuranceTest",
+      "tests": 53,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "failedHistoryDoesNotPublishTheAcquiredClaimOrSubmission()",
+          "time": "0.589",
+          "failed": false
+        },
+        {
+          "name": "[1] action = \"list\"",
+          "time": "0.483",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"details\"",
+          "time": "0.476",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"drafts\"",
+          "time": "0.486",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"history\"",
+          "time": "0.49",
+          "failed": false
+        },
+        {
+          "name": "[5] action = \"submissions\"",
+          "time": "0.51",
+          "failed": false
+        },
+        {
+          "name": "[6] action = \"payments\"",
+          "time": "0.503",
+          "failed": false
+        },
+        {
+          "name": "[7] action = \"submission\"",
+          "time": "0.523",
+          "failed": false
+        },
+        {
+          "name": "[8] action = \"categories\"",
+          "time": "0.6",
+          "failed": false
+        },
+        {
+          "name": "[9] action = \"category-history\"",
+          "time": "0.585",
+          "failed": false
+        },
+        {
+          "name": "[10] action = \"policy-catalog\"",
+          "time": "0.535",
+          "failed": false
+        },
+        {
+          "name": "[11] action = \"policy-review\"",
+          "time": "0.536",
+          "failed": false
+        },
+        {
+          "name": "[12] action = \"claim-review\"",
+          "time": "0.58",
+          "failed": false
+        },
+        {
+          "name": "[13] action = \"record\"",
+          "time": "0.573",
+          "failed": false
+        },
+        {
+          "name": "[14] action = \"directory\"",
+          "time": "0.586",
+          "failed": false
+        },
+        {
+          "name": "[15] action = \"receipt-metadata\"",
+          "time": "0.585",
+          "failed": false
+        },
+        {
+          "name": "[16] action = \"receipt-content\"",
+          "time": "0.606",
+          "failed": false
+        },
+        {
+          "name": "[1] mode = \"success\"",
+          "time": "0.593",
+          "failed": false
+        },
+        {
+          "name": "[2] mode = \"mfa\"",
+          "time": "0.615",
+          "failed": false
+        },
+        {
+          "name": "[3] mode = \"corrupt\"",
+          "time": "0.617",
+          "failed": false
+        },
+        {
+          "name": "[1] action = \"list\"",
+          "time": "0.62",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"details\"",
+          "time": "0.638",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"drafts\"",
+          "time": "0.641",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"history\"",
+          "time": "0.655",
+          "failed": false
+        },
+        {
+          "name": "[5] action = \"submissions\"",
+          "time": "0.639",
+          "failed": false
+        },
+        {
+          "name": "[6] action = \"payments\"",
+          "time": "0.545",
+          "failed": false
+        },
+        {
+          "name": "[7] action = \"submission\"",
+          "time": "0.518",
+          "failed": false
+        },
+        {
+          "name": "[8] action = \"categories\"",
+          "time": "0.498",
+          "failed": false
+        },
+        {
+          "name": "[9] action = \"category-history\"",
+          "time": "0.495",
+          "failed": false
+        },
+        {
+          "name": "[10] action = \"policy-catalog\"",
+          "time": "0.498",
+          "failed": false
+        },
+        {
+          "name": "[11] action = \"policy-review\"",
+          "time": "0.507",
+          "failed": false
+        },
+        {
+          "name": "[12] action = \"claim-review\"",
+          "time": "0.51",
+          "failed": false
+        },
+        {
+          "name": "[13] action = \"record\"",
+          "time": "0.512",
+          "failed": false
+        },
+        {
+          "name": "[14] action = \"directory\"",
+          "time": "0.521",
+          "failed": false
+        },
+        {
+          "name": "[15] action = \"receipt-metadata\"",
+          "time": "0.525",
+          "failed": false
+        },
+        {
+          "name": "[16] action = \"receipt-content\"",
+          "time": "0.53",
+          "failed": false
+        },
+        {
+          "name": "failedPaymentAcquisitionPreservesItsFailureAndDoesNotReturnAPartialReview()",
+          "time": "0.529",
+          "failed": false
+        },
+        {
+          "name": "[1] action = \"list\"",
+          "time": "0.525",
+          "failed": false
+        },
+        {
+          "name": "[2] action = \"details\"",
+          "time": "0.514",
+          "failed": false
+        },
+        {
+          "name": "[3] action = \"drafts\"",
+          "time": "0.521",
+          "failed": false
+        },
+        {
+          "name": "[4] action = \"history\"",
+          "time": "0.532",
+          "failed": false
+        },
+        {
+          "name": "[5] action = \"submissions\"",
+          "time": "0.527",
+          "failed": false
+        },
+        {
+          "name": "[6] action = \"payments\"",
+          "time": "0.53",
+          "failed": false
+        },
+        {
+          "name": "[7] action = \"submission\"",
+          "time": "0.612",
+          "failed": false
+        },
+        {
+          "name": "[8] action = \"categories\"",
+          "time": "0.539",
+          "failed": false
+        },
+        {
+          "name": "[9] action = \"category-history\"",
+          "time": "0.536",
+          "failed": false
+        },
+        {
+          "name": "[10] action = \"policy-catalog\"",
+          "time": "0.534",
+          "failed": false
+        },
+        {
+          "name": "[11] action = \"policy-review\"",
+          "time": "0.536",
+          "failed": false
+        },
+        {
+          "name": "[12] action = \"claim-review\"",
+          "time": "0.548",
+          "failed": false
+        },
+        {
+          "name": "[13] action = \"record\"",
+          "time": "0.594",
+          "failed": false
+        },
+        {
+          "name": "[14] action = \"directory\"",
+          "time": "0.533",
+          "failed": false
+        },
+        {
+          "name": "[15] action = \"receipt-metadata\"",
+          "time": "0.549",
+          "failed": false
+        },
+        {
+          "name": "[16] action = \"receipt-content\"",
+          "time": "0.565",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseReadScopeHttpTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "assignedReviewersKeepAuthorizedSubmissionAccessButCannotBroadenSelfScope()",
+          "time": "0.825",
+          "failed": false
+        },
+        {
+          "name": "selfScopeCannotExpandWithCompanyWideGrantsOrAnotherEmploymentSelection()",
+          "time": "0.578",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseReceiptDelegationCompletionTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] mode = \"metadata\", ordinaryScope = \"false\"",
+          "time": "0.822",
+          "failed": false
+        },
+        {
+          "name": "[2] mode = \"preparation\", ordinaryScope = \"false\"",
+          "time": "0.79",
+          "failed": false
+        },
+        {
+          "name": "[3] mode = \"completion\", ordinaryScope = \"false\"",
+          "time": "0.699",
+          "failed": false
+        },
+        {
+          "name": "[4] mode = \"metadata\", ordinaryScope = \"true\"",
+          "time": "0.773",
+          "failed": false
+        },
+        {
+          "name": "[5] mode = \"preparation\", ordinaryScope = \"true\"",
+          "time": "0.67",
+          "failed": false
+        },
+        {
+          "name": "[6] mode = \"completion\", ordinaryScope = \"true\"",
+          "time": "0.892",
+          "failed": false
+        },
+        {
+          "name": "[1] mode = \"metadata\"",
+          "time": "0.612",
+          "failed": false
+        },
+        {
+          "name": "[2] mode = \"preparation\"",
+          "time": "0.725",
+          "failed": false
+        },
+        {
+          "name": "[3] mode = \"completion\"",
+          "time": "0.759",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseReceiptHttpTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "historicalReviewersCannotUseAnOldSubmissionToReadNewDraftAttachments()",
+          "time": "1.017",
+          "failed": false
+        },
+        {
+          "name": "corruptObjectBytesAreNeverDeliveredAsTheSubmittedReceipt()",
+          "time": "0.548",
+          "failed": false
+        },
+        {
+          "name": "aSubmissionCannotAuthorizeAnUnattachedOrCrossCompanyReceipt()",
+          "time": "0.783",
+          "failed": false
+        },
+        {
+          "name": "pendingReadsRejectRevokedPermissionsCredentialsAssignmentsAndExpiredDelegations()",
+          "time": "2.767",
+          "failed": false
+        },
+        {
+          "name": "reviewersAndClaimOwnersReadEvidenceWithoutBroadPersonalDocumentPermissions()",
+          "time": "0.735",
+          "failed": false
+        },
+        {
+          "name": "headAndConditionalResponsesAuthorizeFirstAndDoNotReadStorage()",
+          "time": "0.792",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseReportAccessHttpTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] rows = \"false\", mode = \"reports.read\"",
+          "time": "0.351",
+          "failed": false
+        },
+        {
+          "name": "[2] rows = \"true\", mode = \"reports.read\"",
+          "time": "0.331",
+          "failed": false
+        },
+        {
+          "name": "[3] rows = \"false\", mode = \"expenses.read\"",
+          "time": "0.362",
+          "failed": false
+        },
+        {
+          "name": "[4] rows = \"true\", mode = \"expenses.read\"",
+          "time": "0.324",
+          "failed": false
+        },
+        {
+          "name": "[5] rows = \"false\", mode = \"credentials\"",
+          "time": "0.325",
+          "failed": false
+        },
+        {
+          "name": "[6] rows = \"true\", mode = \"credentials\"",
+          "time": "0.333",
+          "failed": false
+        },
+        {
+          "name": "[1] rows = \"false\", acquired = \"false\"",
+          "time": "0.403",
+          "failed": false
+        },
+        {
+          "name": "[2] rows = \"true\", acquired = \"false\"",
+          "time": "0.361",
+          "failed": false
+        },
+        {
+          "name": "[3] rows = \"false\", acquired = \"true\"",
+          "time": "0.344",
+          "failed": false
+        },
+        {
+          "name": "[4] rows = \"true\", acquired = \"true\"",
+          "time": "0.341",
+          "failed": false
+        },
+        {
+          "name": "aConcurrentDecisionCannotMixAggregateAndStatusBuckets()",
+          "time": "0.601",
+          "failed": false
+        },
+        {
+          "name": "[1] rows = false",
+          "time": "0.413",
+          "failed": false
+        },
+        {
+          "name": "[2] rows = true",
+          "time": "0.437",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseReportHttpTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "allStatusesAndExactCentsReconcileWithScopedClaimsWithoutSummingDistinctEmployees()",
+          "time": "0.957",
+          "failed": false
+        },
+        {
+          "name": "onlyTheFinalIndependentStageMovesTheSubmittedAmountToApproved()",
+          "time": "0.44",
+          "failed": false
+        },
+        {
+          "name": "continuationsRetainTheirOrderingKeyAfterThePreviousClaimLeavesTheStatusFilter()",
+          "time": "0.423",
+          "failed": false
+        },
+        {
+          "name": "latestSubmittedLinesRetainTheirDatesAndAmountsUntilAnExplicitResubmissionReplacesThem()",
+          "time": "0.722",
+          "failed": false
+        },
+        {
+          "name": "submittedLineGapsAndEmptyAnnualWindowsRemainZeroAndMaximumClaimAmountsStayExact()",
+          "time": "0.406",
+          "failed": false
+        },
+        {
+          "name": "reportingAvailabilityCoversBothAggregateAndScopedClaims()",
+          "time": "0.299",
+          "failed": false
+        },
+        {
+          "name": "reportAndSourceGrantsCompanyIsolationAndDateBoundsProtectBothProjections()",
+          "time": "1.391",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseReportPaymentHttpTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "bankReservationsPartialSettlementFailureAndReceiptReplayDoNotRewriteSubmittedExpenseAmounts()",
+          "time": "1.201",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseReportSourceCaptureTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "captureKeepsLatestSubmittedRevisionWindowAmountsAndPriorDraftUntilResubmission()",
+          "time": "0.535",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseReviewHttpTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "withdrawnOtherClaimsDoNotForceAcknowledgementOfAStaleSignal()",
+          "time": "0.713",
+          "failed": false
+        },
+        {
+          "name": "concurrentReviewAndWithdrawalCommitOnlyOneBusinessOutcome()",
+          "time": "0.562",
+          "failed": false
+        },
+        {
+          "name": "failedReviewAuditRollsBackApprovalClaimEvidenceAndOperationReceipt()",
+          "time": "0.578",
+          "failed": false
+        },
+        {
+          "name": "returnRequiresAReasonAndNewDraftBeforeAnIndependentResubmission()",
+          "time": "0.633",
+          "failed": false
+        },
+        {
+          "name": "aHeaderTransitionCannotCommitWithoutMatchingReviewEvidence()",
+          "time": "0.494",
+          "failed": false
+        },
+        {
+          "name": "duplicateSignalsAreRecomputedAndAcknowledgementsAreImmutable()",
+          "time": "0.704",
+          "failed": false
+        },
+        {
+          "name": "stageDecisionsAndLostResponsesRetainIndependentImmutableReviewEvidence()",
+          "time": "0.689",
+          "failed": false
+        },
+        {
+          "name": "competingReviewersCannotDuplicateAnApprovalStep()",
+          "time": "0.617",
+          "failed": false
+        },
+        {
+          "name": "reassignmentInvalidatesTheApprovalVersionEvenWhenTheReviewerRemainsAssigned()",
+          "time": "0.589",
+          "failed": false
+        },
+        {
+          "name": "rejectedClaimsAreTerminalAndReturnedClaimsCanStillBeCancelled()",
+          "time": "0.88",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseReviewSecurityHttpTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "aDecisionAlreadyInsideItsGuardFinishesBeforeConcurrentDelegationRevocation()",
+          "time": "0.832",
+          "failed": false
+        },
+        {
+          "name": "anApprovalPermissionDoesNotGrantArbitraryClaimsOrCrossCompanyDecisions()",
+          "time": "0.61",
+          "failed": false
+        },
+        {
+          "name": "waitingDecisionsRecheckExpiryPermissionAndCredentialStateAfterAccountGuards()",
+          "time": "1.915",
+          "failed": false
+        },
+        {
+          "name": "delegationRevocationBeforeTheGuardRejectsBothDecisionAndLaterReceiptReplay()",
+          "time": "0.727",
+          "failed": false
+        },
+        {
+          "name": "anAccountLinkedAfterSubmissionCannotApproveItsOwnExpenseOrDelegateTheDecision()",
+          "time": "0.769",
+          "failed": false
+        },
+        {
+          "name": "reassigningAnEarlierMakerOrDelegatingForThemCannotBypassIndependentReview()",
+          "time": "0.817",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseSubmissionActionsHttpTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "reassignmentChangesAvailableActionsAndTheCommandStillRequiresBothObservedVersions()",
+          "time": "0.788",
+          "failed": false
+        },
+        {
+          "name": "onlyTheCurrentIndependentStageCanDecideWhileOtherReadersRetainTheirOwnScope()",
+          "time": "0.719",
+          "failed": false
+        },
+        {
+          "name": "submissionAcquisitionHoldsDelegatedAccountAuthorityUntilItsTransactionCompletes()",
+          "time": "0.749",
+          "failed": false
+        },
+        {
+          "name": "aDelegatorRevokedBeforeItsAccountGuardCannotAuthorizeSubmittedEvidence()",
+          "time": "0.603",
+          "failed": false
+        },
+        {
+          "name": "[1] companyRead = false",
+          "time": "0.609",
+          "failed": false
+        },
+        {
+          "name": "[2] companyRead = true",
+          "time": "0.644",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.ExpenseSubmissionHttpTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "pendingSubmissionRechecksRevocationBeforeChangingTheClaim()",
+          "time": "0.615",
+          "failed": false
+        },
+        {
+          "name": "competingSubmissionsAndLostResponsesKeepOneImmutableAttempt()",
+          "time": "0.677",
+          "failed": false
+        },
+        {
+          "name": "boundedResubmissionsPreserveTheirHistoryAndRemainCancellable()",
+          "time": "1.074",
+          "failed": false
+        },
+        {
+          "name": "candidateOverflowIsRejectedBeforeFilteringTheDraftMaker()",
+          "time": "0.492",
+          "failed": false
+        },
+        {
+          "name": "oldReviewersSeeOnlyTheExactSubmissionAndLoseAccessWhenTheirGrantIsRevoked()",
+          "time": "0.694",
+          "failed": false
+        },
+        {
+          "name": "savingAndSubmittingTheSameVersionCannotBothCommit()",
+          "time": "0.505",
+          "failed": false
+        },
+        {
+          "name": "incompleteInvalidAndUnreadyDraftsNeverCreateApprovalRequests()",
+          "time": "0.753",
+          "failed": false
+        },
+        {
+          "name": "submissionAndWithdrawalAuditFailureRollBackEveryBusinessConsequence()",
+          "time": "0.625",
+          "failed": false
+        },
+        {
+          "name": "aPendingSubmissionContinuesToConsumeOpenClaimCapacity()",
+          "time": "1.181",
+          "failed": false
+        },
+        {
+          "name": "contributorHistoryExcludesEarlierMakersEvenAfterAnotherEditorSaves()",
+          "time": "0.634",
+          "failed": false
+        },
+        {
+          "name": "duplicateDigestsSignalRelatedPendingClaimsWithoutLeakingTheirOwners()",
+          "time": "1.247",
+          "failed": false
+        },
+        {
+          "name": "submissionFreezesReadyEvidencePoliciesAndCostCenterLabels()",
+          "time": "1.477",
+          "failed": false
+        },
+        {
+          "name": "limitsUseEveryEffectiveRevisionAndMixedRoutingCannotSkipACategory()",
+          "time": "1.206",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.LeaveAttachmentAssuranceTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] operation = \"metadata\"",
+          "time": "0.896",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"content-before-storage\"",
+          "time": "0.643",
+          "failed": false
+        },
+        {
+          "name": "[3] operation = \"content-after-storage\"",
+          "time": "0.641",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.LeaveAttachmentDownloadHttpTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "cancellationReleasesPendingIoAndCorruptedStoredContentIsRejected()",
+          "time": "0.764",
+          "failed": false
+        },
+        {
+          "name": "ownersAndAssignedApproversReadExactEvidenceWithBoundedRangeAndConditionalResponses()",
+          "time": "0.868",
+          "failed": false
+        },
+        {
+          "name": "permissionOrCredentialRevocationDuringStorageReadPreventsReturningTheBytes()",
+          "time": "1.182",
+          "failed": false
+        },
+        {
+          "name": "reassignmentDuringAStorageReadRemovesTheFormerApproversContentAccess()",
+          "time": "0.729",
+          "failed": false
+        },
+        {
+          "name": "unattachedCrossCompanyAndInvalidRangeRequestsDoNotReadStorage()",
+          "time": "0.89",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.LeaveAttachmentHttpTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "livePolicyPermissionIsRecheckedAfterTheCommandWaitsForTheAccountGuard()",
+          "time": "0.47",
+          "failed": false
+        },
+        {
+          "name": "threeExactRevisionsAndRequiredPolicyRemainFrozenAcrossReplacementAndReplay()",
+          "time": "1.434",
+          "failed": false
+        },
+        {
+          "name": "requiredEvidenceFailsBeforeReservationAndRejectsDuplicateOversizedOrUnavailableInput()",
+          "time": "1.365",
+          "failed": false
+        },
+        {
+          "name": "competingReplaysProduceOneRequestReservationAndEvidenceRegistration()",
+          "time": "0.613",
+          "failed": false
+        },
+        {
+          "name": "auditFailureRollsBackAttachmentRowsReferencesLedgerCursorChangesAndTheOperationKey()",
+          "time": "0.714",
+          "failed": false
+        },
+        {
+          "name": "crossCompanyEvidenceIsRejectedEvenWhenTheCallerAdministersBothCompanies()",
+          "time": "0.975",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.LeaveAttachmentIntegrityHttpTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "committedSnapshotsAndRegistryRowsAreImmutableAndCompanyIsolated()",
+          "time": "1.103",
+          "failed": false
+        },
+        {
+          "name": "submittedEvidenceRemainsProtectedFromRetirementAfterTheLeaveIsWithdrawn()",
+          "time": "0.796",
+          "failed": false
+        },
+        {
+          "name": "anOmittedRegistryEntryCannotCommitARequestOrConsumeItsRetryKey()",
+          "time": "0.692",
+          "failed": false
+        },
+        {
+          "name": "declaredEvidenceCannotCommitWithoutItsImmutableSnapshotRows()",
+          "time": "0.703",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.SelfDocumentAdmissionHttpTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "documentDiscoveryHasIndependentModuleAdmissionAndNativeBuildRequirements()",
+          "time": "0.383",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.SelfDocumentAssuranceTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] operation = \"employments\"",
+          "time": "0.247",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"evidence\"",
+          "time": "0.188",
+          "failed": false
+        },
+        {
+          "name": "[1] operation = \"employments\"",
+          "time": "0.204",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"evidence\"",
+          "time": "0.221",
+          "failed": false
+        },
+        {
+          "name": "[1] operation = \"employments\"",
+          "time": "0.234",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"evidence\"",
+          "time": "0.226",
+          "failed": false
+        },
+        {
+          "name": "[1] operation = \"employments\", change = \"permission\"",
+          "time": "0.221",
+          "failed": false
+        },
+        {
+          "name": "[2] operation = \"evidence\", change = \"permission\"",
+          "time": "0.21",
+          "failed": false
+        },
+        {
+          "name": "[3] operation = \"employments\", change = \"credentials\"",
+          "time": "0.203",
+          "failed": false
+        },
+        {
+          "name": "[4] operation = \"evidence\", change = \"credentials\"",
+          "time": "0.213",
+          "failed": false
+        },
+        {
+          "name": "[5] operation = \"employments\", change = \"membership\"",
+          "time": "0.237",
+          "failed": false
+        },
+        {
+          "name": "[6] operation = \"evidence\", change = \"membership\"",
+          "time": "0.269",
+          "failed": false
+        },
+        {
+          "name": "[7] operation = \"employments\", change = \"replacement-grant\"",
+          "time": "0.221",
+          "failed": false
+        },
+        {
+          "name": "[8] operation = \"evidence\", change = \"replacement-grant\"",
+          "time": "0.235",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.SelfDocumentHttpTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "foreignScopesBroadHrGrantsAndInvalidPagesCannotReadSelfEvidence()",
+          "time": "0.993",
+          "failed": false
+        },
+        {
+          "name": "replacementStaysOnTheAcceptedRevisionUntilValidationPublishesIt()",
+          "time": "0.6",
+          "failed": false
+        },
+        {
+          "name": "evidencePagesExposeOnlyPublishedRevisionsOfTheSelectedClassification()",
+          "time": "1.187",
+          "failed": false
+        },
+        {
+          "name": "directoryExposesOnlyOwnedReferencesWithCompanyDateAndBoundedPages()",
+          "time": "0.3",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.SelfDocumentRecordHttpTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "unpublishedForeignRestrictedAndMissingDocumentsHaveTheSameAbsentResult()",
+          "time": "1.141",
+          "failed": false
+        },
+        {
+          "name": "cancellationReleasesReadGuardsWithoutBlockingTheNextUpload()",
+          "time": "0.42",
+          "failed": false
+        },
+        {
+          "name": "canonicalMetadataKeepsAcceptedEvidenceWhileReplacementIsPending()",
+          "time": "0.616",
+          "failed": false
+        },
+        {
+          "name": "[1] change = \"credentials\"",
+          "time": "0.396",
+          "failed": false
+        },
+        {
+          "name": "[2] change = \"membership\"",
+          "time": "0.39",
+          "failed": false
+        },
+        {
+          "name": "[3] change = \"permission\"",
+          "time": "0.397",
+          "failed": false
+        },
+        {
+          "name": "[4] change = \"replacement-grant\"",
+          "time": "0.414",
+          "failed": false
+        },
+        {
+          "name": "proofExpiryDuringAcquisitionCannotReleaseMetadataAndRenewalRecovers()",
+          "time": "0.427",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.SelfExpenseDraftReferencesHttpTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "archivedNamesAndReadyReceiptMetadataRemainAvailableForReviewWithoutReadingContent()",
+          "time": "0.633",
+          "failed": false
+        },
+        {
+          "name": "employeeReadsMinimalDraftNamesAndUploadStatusWithoutOrganizationOrDocumentBrowsing()",
+          "time": "0.344",
+          "failed": false
+        },
+        {
+          "name": "queryCardinalityAndEditingGrantsAreEnforcedBeforeReferenceAcquisition()",
+          "time": "0.535",
+          "failed": false
+        },
+        {
+          "name": "[1] metadata = false",
+          "time": "0.723",
+          "failed": false
+        },
+        {
+          "name": "[2] metadata = true",
+          "time": "0.589",
+          "failed": false
+        },
+        {
+          "name": "originalAndCurrentPermissionsBothConstrainTheMetadataRead()",
+          "time": "0.6",
+          "failed": false
+        },
+        {
+          "name": "interruptedGuardReleasesResourcesAndTheExecutorCanReadAgain()",
+          "time": "0.63",
+          "failed": false
+        },
+        {
+          "name": "unavailableAndForeignReferencesNeverDiscloseLabelsOrReceiptMetadata()",
+          "time": "0.707",
+          "failed": false
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.SelfExpenseHttpTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "mfaExpiryWhileWaitingForAccessCannotReleaseEmploymentReferences()",
+          "time": "0.225",
+          "failed": false
+        },
+        {
+          "name": "directoryUsesCompanyDateAndReturnsOnlyOwnedEmploymentReferences()",
+          "time": "0.344",
+          "failed": false
+        },
+        {
+          "name": "expensesHaveIndependentModuleAdmissionAndNativeBuildRequirements()",
+          "time": "0.28",
+          "failed": false
+        },
+        {
+          "name": "cancellingDiscoveryReleasesPeopleAndAccessGuardsForTheNextRequest()",
+          "time": "0.226",
+          "failed": false
+        },
+        {
+          "name": "[1] change = \"permission\"",
+          "time": "0.169",
+          "failed": false
+        },
+        {
+          "name": "[2] change = \"credential\"",
+          "time": "0.19",
+          "failed": false
+        },
+        {
+          "name": "[3] change = \"membership\"",
+          "time": "0.183",
+          "failed": false
+        },
+        {
+          "name": "[4] change = \"replacement-grant\"",
+          "time": "0.174",
+          "failed": false
+        }
+      ]
+    }
+  ],
+  "otherModules": [
+    {
+      "module": "apps/worker",
+      "suites": [
+        {
+          "suite": "dev.fajar.hris.worker.AnnouncementPublicationWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "credentialRevocationStopsExecutionAndCleanupDoesNotRequireRevokedPermission()",
+              "time": "2.197",
+              "failed": false
+            },
+            {
+              "name": "springBatchPublishesOneImmutableInboxUsingRestrictedWorkerCredentials()",
+              "time": "0.725",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.DirectoryProjectionWorkerTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "aPassIsBoundedAndTwoWorkersSkipEachOthersLockedRows()",
+              "time": "9.585",
+              "failed": false
+            },
+            {
+              "name": "stoppingDuringProjectionRollsBackRecordsEventsAndScheduleAndReleasesTheTimer()",
+              "time": "0.102",
+              "failed": false
+            },
+            {
+              "name": "currentCoworkersPublishWhileFutureAndSuspendedEmployeesRemainAbsent()",
+              "time": "0.196",
+              "failed": false
+            },
+            {
+              "name": "changingTheCompanyTimezoneReevaluatesAnAlreadyScheduledStart()",
+              "time": "0.105",
+              "failed": false
+            },
+            {
+              "name": "aWriteWaitingForProjectionCompletionIsStillDueAfterThatCompletion()",
+              "time": "0.15",
+              "failed": false
+            },
+            {
+              "name": "aPassDoesNotExpandItsCompanyScopeBeyondTheDiscoveryLimit()",
+              "time": "0.377",
+              "failed": false
+            },
+            {
+              "name": "anEndDatePublishesATombstoneAndRestoredEmploymentKeepsItsIdentity()",
+              "time": "0.166",
+              "failed": false
+            },
+            {
+              "name": "aCancelledFutureRevisionDoesNotRemoveTheCoworkerAndUnchangedContentDoesNotAdvanceVersion()",
+              "time": "0.162",
+              "failed": false
+            },
+            {
+              "name": "assignmentAndLabelChangesInvalidateOnlyTheirPublicRecords()",
+              "time": "0.226",
+              "failed": false
+            },
+            {
+              "name": "crossCompanyCaptureHasOnlyIdentityAndQueuePrivilegesWithoutABusinessRlsBypass()",
+              "time": "0.055",
+              "failed": false
+            },
+            {
+              "name": "aNameChangeReachesEveryCompanyButPrivateProfileChangesDoNotCreateDirectoryEvents()",
+              "time": "0.185",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.DocumentValidationWorkerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "interruptedInventoryBatchDiscardsThePageAndAnotherLeaseResumes()",
+              "time": "0.467",
+              "failed": false
+            },
+            {
+              "name": "realBatchInventoryFinishesAnUnknownTotalWithoutWeakeningFixedJobs()",
+              "time": "0.283",
+              "failed": false
+            },
+            {
+              "name": "realBatchTaskScansOutsideTransactionsAndPublishesWithRestrictedCredentials()",
+              "time": "0.268",
+              "failed": false
+            },
+            {
+              "name": "interruptedInspectionClosesTheSessionAndANewLeaseCanRecover()",
+              "time": "0.26",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.EmployeeImportWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "aNewBatchExecutionResumesAfterTheCommittedRowWithoutRepeatingItsSideEffects()",
+              "time": "0.444",
+              "failed": false
+            },
+            {
+              "name": "realBatchTasksPreviewThenCreateEmployeesWithRestrictedRuntimeCredentials()",
+              "time": "0.294",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.IdentityMailWorkerTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "workerDeadlineAndShutdownReleaseBlockedDeliveriesAndOwnedThreads()",
+              "time": "0.636",
+              "failed": false
+            },
+            {
+              "name": "expiredRevokedAndObsoleteLeasesNeverReachSmtp()",
+              "time": "0.108",
+              "failed": false
+            },
+            {
+              "name": "transientDeliveryIsDeferredButPermanentErrorsAndAttemptExhaustionAreTerminal()",
+              "time": "0.126",
+              "failed": false
+            },
+            {
+              "name": "sendsActualSmtpAfterCommitAndDiscardsCiphertextAfterFencedAcknowledgement()",
+              "time": "0.121",
+              "failed": false
+            },
+            {
+              "name": "lostAcknowledgementCanRepeatDeliveryWithOneStableMessageAndOneCommittedAudit()",
+              "time": "0.178",
+              "failed": false
+            },
+            {
+              "name": "completedTasksCancelTheirTimersAndLateCancellationDoesNotInterruptReusedThreads()",
+              "time": "0.003",
+              "failed": false
+            },
+            {
+              "name": "competingClaimsAndReclamationPreserveFencing()",
+              "time": "0.054",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.InboxEmailWorkerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "acceptedStateAndProjectionRollBackWithAuditFailureAndCrashedClaimsExhaust()",
+              "time": "0.719",
+              "failed": false
+            },
+            {
+              "name": "disabledDeliveryStillExpiresAndPurgesOperationalRowsWithoutDeletingInbox()",
+              "time": "0.46",
+              "failed": false
+            },
+            {
+              "name": "revokedAccessOrArchivedPublicationPreventsAnotherProviderCall()",
+              "time": "2.641",
+              "failed": false
+            },
+            {
+              "name": "deadlineInterruptsStalledDeliveryWithoutAcknowledgingIt()",
+              "time": "2.588",
+              "failed": false
+            },
+            {
+              "name": "acceptedMailUsesCurrentAddressStableIdentityAndOnlyAnAuthorizedInboxLink()",
+              "time": "0.476",
+              "failed": false
+            },
+            {
+              "name": "actualSmtpAcceptanceAndRejectionUpdateDurableEmailObservations()",
+              "time": "0.616",
+              "failed": false
+            },
+            {
+              "name": "competingWorkersRespectTheDeploymentCapacityAndUniqueLeases()",
+              "time": "1.216",
+              "failed": false
+            },
+            {
+              "name": "transientFailureWaitsAndUsesAFreshLeaseWhilePermanentFailureIsTerminal()",
+              "time": "0.465",
+              "failed": false
+            },
+            {
+              "name": "workerShutdownInterruptsDeliveryAndReleasesItsOwnedExecutors()",
+              "time": "0.498",
+              "failed": false
+            },
+            {
+              "name": "lostSmtpAcknowledgementRepeatsTheMessageIdButNeverAcceptsAnExpiredLease()",
+              "time": "0.53",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.InboxPushWorkerTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "revokedCredentialsOrWithdrawnInboxPreventNewProviderCalls()",
+              "time": "1.08",
+              "failed": false
+            },
+            {
+              "name": "publishedInboxCreatesDurableCheckpointsAndOnlyPreexistingDevicesReceiveHints()",
+              "time": "0.574",
+              "failed": false
+            },
+            {
+              "name": "unregisteredTokenRetirementCannotEraseANewerTokenAndRollsBackIfAcknowledgementFails()",
+              "time": "0.608",
+              "failed": false
+            },
+            {
+              "name": "disabledDeliveryStillExpiresAndPurgesOperationalRowsWithoutDeletingInbox()",
+              "time": "0.491",
+              "failed": false
+            },
+            {
+              "name": "terminalFailureRollbackAndCrashedLeaseExhaustionRemainRecoverableAndBounded()",
+              "time": "0.66",
+              "failed": false
+            },
+            {
+              "name": "retryUsesPersistedTargetBackoffAndANewFencedLease()",
+              "time": "0.549",
+              "failed": false
+            },
+            {
+              "name": "maintenanceCannotFailOrAuditAStaleCheckpointAfterDeliveryProgress()",
+              "time": "0.523",
+              "failed": false
+            },
+            {
+              "name": "workerShutdownInterruptsDeliveryAndReleasesItsOwnedExecutors()",
+              "time": "0.578",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.LeaveBatchWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "exhaustedProcessLeasesCanBeExplicitlyResumedWithoutRewindingCommittedWork()",
+              "time": "0.628",
+              "failed": false
+            },
+            {
+              "name": "aNewSpringBatchExecutionContinuesAfterACommittedEmployeeWithoutDuplicatingGrant()",
+              "time": "0.463",
+              "failed": false
+            },
+            {
+              "name": "realWorkerTasksAccrueAndCloseBalancesUsingRestrictedRuntimeCredentials()",
+              "time": "0.564",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.LeaveCarryExpiryWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "aClosingResumedAfterExpiryCannotIntroduceCreditForAnAlreadyProcessedTarget()",
+              "time": "0.733",
+              "failed": false
+            },
+            {
+              "name": "anotherAuthorizedOperatorRecoversOnlyTheUnfinishedPrefix()",
+              "time": "0.9",
+              "failed": false
+            },
+            {
+              "name": "restrictedWorkerSettlesTheOriginalCohortAfterItsCreatorLosesAccess()",
+              "time": "0.576",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.MobileSyncWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "stoppingDuringPublicationRollsBackTheBatchAndReleasesItsTimerAndDatabaseGuards()",
+              "time": "0.066",
+              "failed": false
+            },
+            {
+              "name": "eachPassHasAFiniteBatchAndTheWorkerDoesNotQueueATaskPerChange()",
+              "time": "0.124",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.NativeSessionCleanupWorkerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "eachIndependentQueueHasAFiniteLimitAndEventuallyDrains()",
+              "time": "0.205",
+              "failed": false
+            },
+            {
+              "name": "stoppingAPendingPassRollsBackAndReleasesTheThreadQueueAndRowGuards()",
+              "time": "0.035",
+              "failed": false
+            },
+            {
+              "name": "competingWorkersSkipOwnedRowsInsteadOfDuplicatingWork()",
+              "time": "0.096",
+              "failed": false
+            },
+            {
+              "name": "retentionPreservesActiveCredentialsQuotaEvidenceAndRefreshReuseDetection()",
+              "time": "0.195",
+              "failed": false
+            },
+            {
+              "name": "aHeldCredentialOrConsumedHashDoesNotBlockOtherEligibleWork()",
+              "time": "0.103",
+              "failed": false
+            },
+            {
+              "name": "aLateMappingFailureRollsBackAllThreeKindsOfCleanup()",
+              "time": "0.064",
+              "failed": false
+            },
+            {
+              "name": "fixedDelayKeepsOneTaskAndAppliesTheNextBatchOnlyAfterCommit()",
+              "time": "1.092",
+              "failed": false
+            },
+            {
+              "name": "disabledWorkerConfigurationAllocatesNoCleanupTaskAndSchedulingRejectionStopsTheOwner()",
+              "time": "0.008",
+              "failed": false
+            },
+            {
+              "name": "invalidOrFutureCutoffsAndMissingWorkerCapabilityCannotDeleteRows()",
+              "time": "0.122",
+              "failed": false
+            },
+            {
+              "name": "maximumRotationEvidenceCascadesOnlyWithItsExpiredParent()",
+              "time": "0.299",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.ObjectCleanupWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "stoppingPendingIoLeavesAFencedLeaseAndReleasesThePollingThread()",
+              "time": "0.077",
+              "failed": false
+            },
+            {
+              "name": "expiryCleanupDoesNotRequireTheFormerUploaderToKeepAccountAccess()",
+              "time": "0.049",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.OffboardingScheduleWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "revokedCredentialsCannotExecuteButScopedCleanupStillClosesTheSchedule()",
+              "time": "0.657",
+              "failed": false
+            },
+            {
+              "name": "cancellingBeforeTheExecutionDateWakesAndStopsTheFutureJob()",
+              "time": "0.489",
+              "failed": false
+            },
+            {
+              "name": "springBatchCompletesAnAdmittedScheduleAfterInteractiveMfaHasExpired()",
+              "time": "0.497",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.OnboardingScheduleWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "revokedCredentialsCannotExecuteButScopedCleanupStillClosesTheSchedule()",
+              "time": "0.521",
+              "failed": false
+            },
+            {
+              "name": "cancellingBeforeTheExecutionDateWakesAndStopsTheFutureJob()",
+              "time": "0.422",
+              "failed": false
+            },
+            {
+              "name": "springBatchCompletesAnAdmittedScheduleAfterInteractiveMfaHasExpired()",
+              "time": "0.448",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.PayrollCalculationWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "aNewBatchExecutionUsesTheCommittedCheckpointAfterProcessInterruption()",
+              "time": "0.754",
+              "failed": false
+            },
+            {
+              "name": "revocationStopsTheRunAndANewCredentialCanExplicitlyResumeIt()",
+              "time": "0.553",
+              "failed": false
+            },
+            {
+              "name": "aRealBatchExecutionRetainsPerEmployeeReadinessFailuresAndCompletesMetadata()",
+              "time": "0.506",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "cases": [
+            {
+              "name": "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()",
+              "time": "0.0",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.ReportExportRetentionWorkerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "stoppingScheduledCleanupInterruptsAndRollsBackTheOwnedTransaction()",
+              "time": "0.156",
+              "failed": false
+            },
+            {
+              "name": "progressingLargeExportsMoveBehindOlderDueWorkAndCompetingPassesDoNotDoubleRetire()",
+              "time": "1.764",
+              "failed": false
+            },
+            {
+              "name": "boundedCleanupRetiresUnknownFormatsAndReleasesQuotaWithoutRestoringRevokedAccess()",
+              "time": "1.209",
+              "failed": false
+            },
+            {
+              "name": "outstandingObjectCleanupBlocksRetirementWithoutStarvingAnotherDueExport()",
+              "time": "0.183",
+              "failed": false
+            },
+            {
+              "name": "discoveryDoesNotGrantGlobalFactsAndSchedulesCannotBeDeletedBeforePhysicalRetirement()",
+              "time": "0.117",
+              "failed": false
+            },
+            {
+              "name": "failedJournalRollsBackJobCancellationRowsRetirementAndTheSchedule()",
+              "time": "0.135",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.ReportExportWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "registeredTaskPublishesThroughRealBatchWithBackgroundAuthorityAndRetainedCleanup()",
+              "time": "0.346",
+              "failed": false
+            },
+            {
+              "name": "credentialChangeBeforeResolutionStillAllowsFencedAbortWithoutContentAccess()",
+              "time": "0.105",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.SelfProfileProjectionWorkerTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "managerEndAndEffectiveEmploymentChangesAreScheduledInCompanyTime()",
+              "time": "0.237",
+              "failed": false
+            },
+            {
+              "name": "assignmentLabelsAndArchiveStatusProduceOneNewRecord()",
+              "time": "0.161",
+              "failed": false
+            },
+            {
+              "name": "aSourceWriteWaitingOnProjectionCompletionStillSchedulesItsNewFacts()",
+              "time": "0.114",
+              "failed": false
+            },
+            {
+              "name": "cancellingAFutureRevisionRetainsCurrentFactsAndRemovesItsDueInstant()",
+              "time": "0.142",
+              "failed": false
+            },
+            {
+              "name": "changingTimezoneCanWithdrawAndRepublishAnEffectiveProfile()",
+              "time": "0.088",
+              "failed": false
+            },
+            {
+              "name": "futureAndUnlinkedEmployeesDoNotPublishPrivateFields()",
+              "time": "0.125",
+              "failed": false
+            },
+            {
+              "name": "captureAndRuntimeRolesCannotReadAnotherCompanyOrPrivatePersonFields()",
+              "time": "0.076",
+              "failed": false
+            },
+            {
+              "name": "stoppingTheWorkerRollsBackItsRecordAndKeepsDueWorkRecoverable()",
+              "time": "0.081",
+              "failed": false
+            },
+            {
+              "name": "concurrentWorkersSkipLockedRowsWithoutDuplicatePublication()",
+              "time": "0.142",
+              "failed": false
+            },
+            {
+              "name": "managerNamesInvalidateDependentsWithoutIncludingManagerPrivateFields()",
+              "time": "0.137",
+              "failed": false
+            },
+            {
+              "name": "eachPassBoundsCompanyDiscoveryAndResumesRemainingRows()",
+              "time": "8.471",
+              "failed": false
+            },
+            {
+              "name": "privateEditsInvalidateSharedPersonsInBothCompaniesWithoutChangingEmploymentVersions()",
+              "time": "0.122",
+              "failed": false
+            },
+            {
+              "name": "privateFieldsAndAssignmentReferencesComeFromOneOwnedProjection()",
+              "time": "0.12",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.WorkerIntegrationObservationTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "concurrentNewProcessesCannotExceedTheRegistryCapacity()",
+              "time": "0.054",
+              "failed": false
+            },
+            {
+              "name": "workerRolePublishesDatabaseTimeAndCannotRewriteItsStartupFlags()",
+              "time": "0.037",
+              "failed": false
+            },
+            {
+              "name": "stoppingTheReporterInterruptsPublicationAndJoinsItsTimerWithoutLateWrites()",
+              "time": "0.03",
+              "failed": false
+            },
+            {
+              "name": "expiredReportsAreReclaimedUsingDatabaseTimeAndFailureRollsBackTheirRemoval()",
+              "time": "0.036",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.worker.WorkerIntegrationTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "realBatchTaskCommitsTheCompanySnapshotAndPersistentBatchMetadata()",
+              "time": "0.154",
+              "failed": false
+            },
+            {
+              "name": "revokedOriginStopsBusinessWorkButFencedCleanupRemainsPossible()",
+              "time": "0.119",
+              "failed": false
+            },
+            {
+              "name": "shutdownInterruptsOwnedWorkAndReleasesEveryWorkerThread()",
+              "time": "0.089",
+              "failed": false
+            },
+            {
+              "name": "lateCancellationCannotInterruptAThreadThatHasMovedToAnotherJob()",
+              "time": "0.062",
+              "failed": false
+            },
+            {
+              "name": "nonProgressingAdapterTerminatesAfterOneStep()",
+              "time": "0.084",
+              "failed": false
+            },
+            {
+              "name": "reportSourcePortUsesTheWorkerTransactionOwner()",
+              "time": "0.002",
+              "failed": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "core/database",
+      "suites": [
+        {
+          "suite": "dev.fajar.hris.core.database.AttendanceSyncMigrationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "upgradeRetainsEvidenceAndConcurrentChangesShareOneTransactionalHead()",
+              "time": "5.065",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.core.database.CalendarSyncMigrationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "upgradeRetainsFrozenRulesAndSerializesBackfillWithExistingWriters()",
+              "time": "3.497",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.core.database.DatabaseFailureTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "mapperFailuresStayInsideTheBoundaryAndDiagnosticsExcludeRawValues()",
+              "time": "0.017",
+              "failed": false
+            },
+            {
+              "name": "cancellationAndLateInterruptionNeverBecomeSuccessfulResults()",
+              "time": "0.001",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.core.database.DocumentMetadataMigrationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "upgradeSerializesLegacyWritersAndEnforcesBoundedImmutableCompanyScopedHistory()",
+              "time": "4.918",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.core.database.LeaveAccountMigrationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "existingLedgerIsBackfilledWithoutRewritingFactsOrPublishingFakeChanges()",
+              "time": "1.904",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.core.database.LeaveCarryMigrationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "upgradePreservesHistoricCarryLedgerVersionsAndSynchronizationWithoutRetroactiveExpiry()",
+              "time": "4.04",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.core.database.PayrollAssessmentRevisionMigrationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "upgradeBackfillsHistoricalReferencesAfterAnExistingWriterWithoutRewritingEvidence()",
+              "time": "2.475",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.core.database.PayrollSettlementMigrationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "upgradeWaitsForPublicationAndPreservesOriginalPaymentsVersionsAndScopedBalances()",
+              "time": "2.871",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.core.database.PlatformAccountAuditMigrationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "upgradeCapturesOnlySupportedFieldsAndRequiresBothCurrentGlobalGrants()",
+              "time": "3.389",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.core.database.PlatformAuditMigrationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "upgradeCapturesOnlyGlobalMetadataAndRuntimeCannotExpandOrRewriteIt()",
+              "time": "3.036",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.core.database.PostgresIsolationTest",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "reportScopeClearsAfterFailureCancellationAndConnectionReuse()",
+              "time": "0.019",
+              "failed": false
+            },
+            {
+              "name": "auditRecordsCannotBeUpdatedOrDeletedByRuntime()",
+              "time": "0.027",
+              "failed": false
+            },
+            {
+              "name": "explicitSecondaryScopeIsLimitedToRequiredTablesAndClearsOnRollbackAndReuse()",
+              "time": "0.029",
+              "failed": false
+            },
+            {
+              "name": "rawJooqExceptionsRemainInsideTheDataBoundary()",
+              "time": "0.31",
+              "failed": false
+            },
+            {
+              "name": "invalidReportScopesNeverStartAnOperationAndDatabaseContextRejectsMalformedArrays()",
+              "time": "0.01",
+              "failed": false
+            },
+            {
+              "name": "domainFailureRollsBackEarlierWritesAndKeepsItsClassification()",
+              "time": "0.019",
+              "failed": false
+            },
+            {
+              "name": "interruptionRollsBackAndIsNotConvertedIntoBusinessFailure()",
+              "time": "0.009",
+              "failed": false
+            },
+            {
+              "name": "anchoredReportCaptureRollsBackOnFailureAndCancellationAndClearsReusedContext()",
+              "time": "0.033",
+              "failed": false
+            },
+            {
+              "name": "companyScopeDoesNotLeakThroughReusedConnection()",
+              "time": "0.005",
+              "failed": false
+            },
+            {
+              "name": "queryTimeoutRollsBackAndTransactionSettingsDoNotLeak()",
+              "time": "0.163",
+              "failed": false
+            },
+            {
+              "name": "anchoredReportSourcesPermitOwnedCaptureButNoSourceWritesOrPrivateProfiles()",
+              "time": "0.29",
+              "failed": false
+            },
+            {
+              "name": "writesOutsideTheCompanyScopeAreDenied()",
+              "time": "0.016",
+              "failed": false
+            },
+            {
+              "name": "anchoredReportSelectionIsExplicitBoundedDetachedAndCannotNestTransactions()",
+              "time": "0.008",
+              "failed": false
+            },
+            {
+              "name": "lateInterruptionRollsBackEvenWhenTheOperationReturnsSuccess()",
+              "time": "0.014",
+              "failed": false
+            },
+            {
+              "name": "reportReadScopeIsBoundedToSelectedEmploymentInputsAndNeverGrantsCompanyWrites()",
+              "time": "0.138",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.core.database.RosterResetMigrationTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "upgradeRetainsOverridesAndHistoryWhileResetAndReactivationPublishOrderedVersions()",
+              "time": "2.941",
+              "failed": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "modules/documents/domain",
+      "suites": [
+        {
+          "suite": "dev.fajar.hris.documents.domain.DocumentInventoryPolicyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "arbitraryProviderKeysNeverBecomeDatabaseAttemptReferences()",
+              "time": "0.096",
+              "failed": false
+            },
+            {
+              "name": "maintenanceCommandsRequireTheirOwnGrantAndRecentAuthenticationProof()",
+              "time": "0.042",
+              "failed": false
+            },
+            {
+              "name": "existingCleanupAndThreeRecoveriesAreNotSilentlyReset()",
+              "time": "0.004",
+              "failed": false
+            },
+            {
+              "name": "expiredCancelledAndSupersededAttemptsRequireAnOldMatchingObservation()",
+              "time": "0.001",
+              "failed": false
+            },
+            {
+              "name": "acceptedHistoricalContentIsNeverGarbageEvenAfterExpiry()",
+              "time": "0.001",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.documents.domain.DocumentRetentionPolicyTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "deadlinesUseElapsedDaysAndMissingPoliciesHaveNoDeadline()",
+              "time": "0.005",
+              "failed": false
+            },
+            {
+              "name": "destructiveLifecycleAuthorityRequiresItsOwnGrantAndRecentMfaWhenEnforced()",
+              "time": "0.001",
+              "failed": false
+            },
+            {
+              "name": "policyAndTransitionHistoriesAreFinite()",
+              "time": "0.024",
+              "failed": false
+            },
+            {
+              "name": "holdsAndRestoreDoNotSilentlyChangeTheFrozenPolicyOrClearAHold()",
+              "time": "0.009",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.documents.domain.DocumentRetirementPolicyTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "missingArchivesIndefiniteRetentionAndHoldsAreNotDeleteInstructions()",
+              "time": "0.001",
+              "failed": false
+            },
+            {
+              "name": "onlyAnUnreferencedEligibleAcceptedRevisionCanBeRetired()",
+              "time": "0.001",
+              "failed": false
+            },
+            {
+              "name": "retiredObjectsStillRequireConservativeInventoryEvidence()",
+              "time": "0.01",
+              "failed": false
+            },
+            {
+              "name": "genericLifecycleChangesCannotSkipTheRetirementUseCase()",
+              "time": "0.002",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.documents.domain.DocumentRevisionActionPolicyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "uploadResumptionRequiresCurrentOwnershipAndAnUnexpiredIncompleteRevision()",
+              "time": "0.01",
+              "failed": false
+            },
+            {
+              "name": "managementNeedsBothCompanyGrantsOrTheOwnedSelfGrant()",
+              "time": "0.005",
+              "failed": false
+            },
+            {
+              "name": "validationRecoveryRequiresAStoppedPriorJob()",
+              "time": "0.007",
+              "failed": false
+            },
+            {
+              "name": "incompleteOrExhaustedContentCannotStartValidation()",
+              "time": "0.004",
+              "failed": false
+            },
+            {
+              "name": "expiryPreservesExplicitCancellationOnlyForPersistedActiveUploads()",
+              "time": "0.001",
+              "failed": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module": "modules/documents/data",
+      "suites": [
+        {
+          "suite": "dev.fajar.hris.documents.data.ClamAvInspectionTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "aRealEngineScansBoundedPartsAndReportsTheirObservedDigestAndMediaType()",
+              "time": "0.205",
+              "failed": false
+            },
+            {
+              "name": "theHarmlessEicarFixtureIsReportedAsInfectedWithoutHidingTheVerdict()",
+              "time": "0.008",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.documents.data.ClamAvTransportTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "tricklingRepliesRespectTheWholeResponseDeadline()",
+              "time": "0.355",
+              "failed": false
+            },
+            {
+              "name": "connectionsHaveBoundedCapacityAndMalformedFramesDoNotLeakPermits()",
+              "time": "0.005",
+              "failed": false
+            },
+            {
+              "name": "cancelledReadsCloseTheirOwnedConnectionAndReleaseCapacity()",
+              "time": "0.003",
+              "failed": false
+            },
+            {
+              "name": "stalledWritesCannotHoldAWorkerIndefinitely()",
+              "time": "0.253",
+              "failed": false
+            }
+          ]
+        },
+        {
+          "suite": "dev.fajar.hris.documents.data.DocumentInspectionBoundaryTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "corruptPartsAndMissingScannerNeverProduceAValidInspection()",
+              "time": "0.009",
+              "failed": false
+            },
+            {
+              "name": "existingStorageFailureSurvivesScannerCleanupFailure()",
+              "time": "0.004",
+              "failed": false
+            },
+            {
+              "name": "cancellationAndLateInterruptionCloseAcquiredSessions()",
+              "time": "0.001",
+              "failed": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "remaining": [
+    "Native business metadata UI/commands and encrypted catalog format upgrade",
+    "Native rejected/uncertain upload and metadata command recovery",
+    "Affected Android/Apple builds and owned emulator acceptance",
+    "Full Verify for this increment, including schema-103 restore",
+    "Complete People review and remaining Platform/Mobile/Starter requirements"
+  ],
+  "runtime": "No live database migration, SMTP delivery, phone interaction or development rollout."
+}

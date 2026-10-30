@@ -46,7 +46,14 @@ export class ReviewDocumentUpload {
     if (!found.ok) return found;
     const employee = found.value.employees.items.find((item) => item.id === employment);
     if (!employee) return failed("employee_not_found");
-    if (target.kind === "new") return success(Object.freeze({ kind: "new", employee }));
+    if (target.kind === "new")
+      return success(
+        Object.freeze({
+          kind: "new",
+          employee,
+          metadataSupported: found.value.metadataSupported === true,
+        }),
+      );
     if (!document?.ok) return failed("document_not_found");
     if (target.kind === "replacement")
       return document.value.revisionCount >= 100

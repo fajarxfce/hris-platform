@@ -2,6 +2,7 @@ import type { BinaryFileReference } from "../../../../core/domain/files/binary-f
 import type { CompanyId, OperationId } from "../../../../core/domain/identifiers";
 import type { Document } from "./document";
 import type { DocumentEmployee } from "./document-employee";
+import type { DocumentBusinessMetadata, DocumentMetadataFields } from "./document-metadata";
 import type { DocumentRevision } from "./document-revision";
 
 export type DocumentUploadTarget =
@@ -10,7 +11,7 @@ export type DocumentUploadTarget =
   | Readonly<{ kind: "resume"; documentId: string; revisionId: string }>;
 
 export type DocumentUploadReview =
-  | Readonly<{ kind: "new"; employee: DocumentEmployee }>
+  | Readonly<{ kind: "new"; employee: DocumentEmployee; metadataSupported?: boolean }>
   | Readonly<{ kind: "replacement"; employee: DocumentEmployee; document: Document }>
   | Readonly<{
       kind: "resume";
@@ -28,6 +29,7 @@ export type DocumentUploadFields = Readonly<{
   title: string;
   classification: Document["classification"];
   reason: string;
+  metadata?: Omit<DocumentMetadataFields, "reason">;
 }>;
 export type DocumentUploadIdentifiers = Readonly<{
   documentId: string;
@@ -47,6 +49,7 @@ export type DocumentUploadStart = Readonly<{
   size: number;
   sha256: string;
   reason: string;
+  metadata?: DocumentBusinessMetadata;
 }>;
 
 /** Immutable command references survive explicit retry; file bytes remain owned by data. */

@@ -1408,7 +1408,16 @@ class ApiContractHttpTest : PeopleApiFixture() {
         val record = api["paths"]["$base/evidence/{documentId}"]["get"]
         assertTrue(record["x-hris-company-admission"].asBoolean())
         assertEquals(
-            setOf("id", "version", "employmentId", "classification", "evidence"),
+            setOf(
+                "id",
+                "version",
+                "employmentId",
+                "classification",
+                "evidence",
+                "metadata",
+                "metadataVersion",
+                "metadataSupported",
+            ),
             api["components"]["schemas"]["DocumentCatalogRecordResponse"]["properties"]
                 .properties()
                 .map { it.key }
@@ -2374,5 +2383,38 @@ class ApiContractHttpTest : PeopleApiFixture() {
             assertEquals(200, response.statusCode())
             assertEquals(original.body(), response.body())
         }
+    }
+
+    @Test
+    fun documentBusinessMetadataContractSeparatesEditHistoryAndOperationalEvidence() {
+        val api = contract()
+        val base = "/api/v1/companies/{companyId}/documents/{documentId}"
+        val edit = api["paths"]["$base/metadata"]["put"]
+        assertTrue(edit["x-hris-company-admission"].asBoolean())
+        val editParameters = edit["parameters"].associateBy { it["name"].asString() }
+        assertTrue(editParameters.getValue("Idempotency-Key")["required"].asBoolean())
+        val history = api["paths"]["$base/metadata-history"]["get"]
+        assertTrue(history["x-hris-company-admission"].asBoolean())
+        val parameters = history["parameters"].associateBy { it["name"].asString() }
+        assertEquals(1, parameters.getValue("limit")["schema"]["minimum"].asInt())
+        assertEquals(200, parameters.getValue("limit")["schema"]["maximum"].asInt())
+        assertEquals(20, parameters.getValue("limit")["schema"]["default"].asInt())
+        assertEquals(999, parameters.getValue("after")["schema"]["maximum"].asInt())
+        val schemas = api["components"]["schemas"]
+        val fields = setOf("category", "identityNumber", "issuingCountry", "issuedOn", "validUntil")
+        for (name in
+            listOf("DocumentBusinessMetadataRequest", "DocumentBusinessMetadataResponse")) {
+            val properties = schemas[name]["properties"]
+            assertEquals(fields, properties.properties().map { it.key }.toSet())
+            assertTrue(properties["issuedOn"].toString().contains("date"))
+            assertTrue(properties["validUntil"].toString().contains("date"))
+        }
+        assertEquals(
+            setOf("expectedVersion", "metadata", "reason"),
+            schemas["SaveDocumentMetadataRequest"]["properties"].properties().map { it.key }.toSet(),
+        )
+        assertFalse(schemas["DocumentEvidenceResponse"]["properties"].has("metadata"))
+        assertFalse(schemas["DocumentEvidenceResponse"]["properties"].has("identityNumber"))
+        assertTrue(schemas["StartDocumentUploadRequest"]["properties"].has("metadata"))
     }
 }

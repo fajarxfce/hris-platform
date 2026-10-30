@@ -122,9 +122,10 @@ work. Continue the full feature goal; accepted increments do not close it.
 is a newly confirmed implementation gap in `documents.02` and `people.03`. The
 earlier Documents review omitted category; that row is reopened. Upload expiry
 is not passport/permit validity, and Payroll tax residency is separate. The
-current inventory is thirty reviewed and thirty-one unverified rows. Finish
-People command/Organization acceptance, then implement the missing metadata and
-affected client flows before accepting the requirements.
+current inventory is thirty reviewed and thirty-one unverified rows. People
+command/Organization acceptance is complete. Backend/dashboard metadata is
+locally validated; finish native projection/flows and recovery before accepting
+the requirements.
 
 [People read completion](people-read-assurance-2026-10-30.md) passes twenty-eight
 actual reproductions across twenty-four readers, including both transfer-review
@@ -143,17 +144,31 @@ separately accepted manual test skipped; quality/packages passed in 226s.
 Production/package hashes match the broad API run. Final actual browser workflows
 passed in 36.1s (three normal) and 36.8s (two worker), including setup.
 Both API and worker contexts are validated. Correction `158b81ac` is committed and
-pushed. Exact source `158b81acce89f637dbf715bb573fffb7b99b92c9` is running in
+pushed. Exact source `158b81acce89f637dbf715bb573fffb7b99b92c9` passed all ten jobs in
 [CI 41032184925](https://github.com/fajarxfce/hris-platform/actions/runs/41032184925),
-including both People increments. Observe its terminal result without cancelling
-it with another same-branch dispatch.
+including both People increments, normal/worker browser, private exports and recovery.
+[Terminal evidence](measurements/people-full-ci-2026-10-30.json) retains every job and
+step. It excludes the later V103 document metadata implementation.
 
-Document category/identity-validity implementation is now active. The
-[working contract](document-business-metadata.md) separates business validity from
-upload deadlines and tax residency, preserves versioned history and legacy input/
-cache behavior. Reproduce the new HTTP capability first, implement/validate schema,
-backend and affected clients, then finish the People review. Do not mark its five
-rows accepted from assurance fixes alone. The full goal remains active.
+Document business metadata backend and dashboard are now implemented and locally
+validated; see the [contract and evidence](document-business-metadata.md). V103,
+24 focused API cases and migration acceptance pass. Broad plus final corrected
+suites cover 689 distinct API cases, 104 ordinary worker cases (one retained manual
+skip), 27 database, 18 domain and nine data cases, with unchanged production/package
+hashes. Dashboard passes 4,054 unit cases, 25 mocked and five distinct actual browser
+workflows. Exact failed attempts and fixture-only corrections are retained in
+[measurements](measurements/document-business-metadata-2026-10-30.json).
+
+Next: push this atomic increment, run full Verify without cancelling an active run,
+then implement HRIS Mobile metadata and its encrypted catalog upgrade. Older clients
+may already have consumed the same document version; the new client must explicitly
+refresh that projection while retaining owned old facts. Keep shared finance/leave
+DocumentEvidence free of private identity numbers. Add capability-aware initial
+upload, versioned corrections/history and durable original-command recovery. Verify
+Android, Apple and owned emulator behavior before accepting `documents.02` or
+`people.03`; physical iPhone testing is waived. Finish the detailed People review,
+then remaining Platform modules and Mobile/Starter. This business capability has
+no generic Starter port. The full goal remains active.
 
 CompleteOffboarding and explicit onboarding/offboarding schedules already have
 final checks; preserve their behavior. Client policy is admission-only: do not add

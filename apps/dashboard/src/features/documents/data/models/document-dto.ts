@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { documentBusinessMetadataDto } from "./document-metadata-dto";
 
 const version = z.number().int().min(0).max(Number.MAX_SAFE_INTEGER);
 const instant = z.iso.datetime({ offset: true }).max(40);
@@ -15,6 +16,7 @@ export const documentEmployeeDirectoryDto = z.object({
   asOf: z.string().regex(/^\d{4}-\d{2}-\d{2}$/u),
   timezone: z.string().min(1).max(100),
   query: z.string().max(120),
+  metadataSupported: z.boolean().default(false),
   employees: z.object({
     items: z.array(documentEmployeeDto).max(20),
     nextCursor: employeeNumber.nullable(),
@@ -30,6 +32,9 @@ export const documentDto = z.object({
   createdBy: z.uuid(),
   createdAt: instant,
   currentRevisionId: z.uuid().nullable(),
+  metadataSupported: z.boolean().default(false),
+  metadata: documentBusinessMetadataDto.nullable().default(null),
+  metadataVersion: z.number().int().min(0).max(999).nullable().default(null),
 });
 export const documentPageDto = z.object({
   items: z.array(documentDto).max(20),

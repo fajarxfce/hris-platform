@@ -31,6 +31,19 @@ retain the original failures and successful artifact acceptance.
 
 ## Status
 
+[Document business metadata](document-business-metadata.md) now has schema-103,
+backend and dashboard implementation with recorded local acceptance. Combined
+corrected selections cover 689 API cases, 104 ordinary worker cases, 27 database,
+18 domain and nine data cases, plus 4,054 dashboard unit cases, 25 mocked Chromium
+and five distinct actual API/browser workflows. Native projection/cache upgrade
+and recovery remain in progress; the requirements are not yet accepted. The
+[measurements](measurements/document-business-metadata-2026-10-30.json) distinguish
+initial fixture/contract failures from final selections and preserve package hashes.
+Previous People source `158b81ac` passed all ten jobs in
+[CI 41032184925](https://github.com/fajarxfce/hris-platform/actions/runs/41032184925);
+that run excludes this metadata increment and V103.
+
+
 [Actual Android FCM acceptance](native-fcm-acceptance.md) subsequently passed with
 the supplied server credential: two real messages, foreground/background OS
 notifications, correct notification navigation and unchanged unread/unacknowledged

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { DocumentBusinessMetadataDto } from "./document-metadata-dto";
 
 export type DocumentUploadStartDto = Readonly<{
   documentId: string;
@@ -12,6 +13,7 @@ export type DocumentUploadStartDto = Readonly<{
   size: number;
   sha256: string;
   reason: string;
+  metadata?: DocumentBusinessMetadataDto;
 }>;
 export const documentUploadReceiptDto = z.object({
   id: z.uuid(),

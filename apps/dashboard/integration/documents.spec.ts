@@ -46,7 +46,7 @@ test("real browser upload, reserved part review and cancellation remain company-
   const bytes = documentBytes();
   await page.getByRole("link", { name: "Upload dokumen", exact: true }).click();
   await page.getByLabel("Judul", { exact: true }).fill("Employment record");
-  await page.getByLabel("Kategori", { exact: true }).selectOption("HR_ONLY");
+  await page.getByLabel("Klasifikasi", { exact: true }).selectOption("HR_ONLY");
   await page.getByLabel("Alasan", { exact: true }).fill("Administrative record");
   const chooser = page.waitForEvent("filechooser");
   await page.getByRole("button", { name: "Pilih file", exact: true }).click();

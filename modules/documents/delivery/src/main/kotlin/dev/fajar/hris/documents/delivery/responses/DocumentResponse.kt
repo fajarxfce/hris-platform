@@ -14,6 +14,9 @@ data class DocumentResponse(
     val createdBy: UUID,
     val createdAt: Instant,
     val currentRevisionId: UUID?,
+    val metadata: DocumentBusinessMetadataResponse,
+    val metadataVersion: Long,
+    val metadataSupported: Boolean = true,
 )
 
 fun Document.toResponse() =
@@ -27,4 +30,6 @@ fun Document.toResponse() =
         createdBy,
         createdAt,
         currentRevisionId,
+        metadata.toResponse(),
+        metadataVersion,
     )

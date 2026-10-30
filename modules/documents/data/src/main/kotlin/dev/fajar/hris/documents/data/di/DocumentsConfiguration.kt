@@ -727,4 +727,66 @@ class DocumentsConfiguration {
             security,
             clock,
         )
+
+    @Bean
+    fun documentMetadataSource(sql: DSLContext): DocumentMetadataDataSource =
+        PostgresDocumentMetadataDataSource(sql)
+
+    @Bean
+    fun documentMetadata(source: DocumentMetadataDataSource): DocumentMetadataRepository =
+        StoredDocumentMetadataRepository(source)
+
+    @Bean
+    fun getDocumentMetadataHistory(
+        metadata: DocumentMetadataRepository,
+        documents: DocumentRepository,
+        profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        GetDocumentMetadataHistory(
+            metadata,
+            documents,
+            profiles,
+            people,
+            members,
+            identities,
+            transactions,
+            clock,
+            security,
+        )
+
+    @Bean
+    fun saveDocumentMetadata(
+        metadata: DocumentMetadataRepository,
+        documents: DocumentRepository,
+        retention: DocumentRetentionRepository,
+        profiles: PersonProfileRepository,
+        people: PeopleRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) =
+        SaveDocumentMetadata(
+            metadata,
+            documents,
+            retention,
+            profiles,
+            people,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            clock,
+            security,
+        )
 }

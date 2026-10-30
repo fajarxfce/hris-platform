@@ -25,7 +25,7 @@ class ExpensePaymentSyncMigrationHttpTest : ExpensePaymentApiFixture() {
     fun backfillWaitsForAnExistingPaymentWriterAndRetainsEvidenceAndCompanyIsolation() {
         val f = expenseFixture()
         expenseTemplate(f)
-        val submission = approvedExpense(f)
+        val submission = approvedLegacyExpense(f)
         val maker = payer(f)
         val checker = payer(f)
         val cancelled = UUID.randomUUID()
@@ -41,7 +41,7 @@ class ExpensePaymentSyncMigrationHttpTest : ExpensePaymentApiFixture() {
         )
         val other = expenseFixture()
         expenseTemplate(other)
-        val otherSubmission = approvedExpense(other)
+        val otherSubmission = approvedLegacyExpense(other)
         val otherMaker = payer(other)
         val otherChecker = payer(other)
         val otherBatch = UUID.randomUUID()
@@ -230,6 +230,15 @@ class ExpensePaymentSyncMigrationHttpTest : ExpensePaymentApiFixture() {
         assertEquals(f.claim, captured["resource_id"])
         assertEquals(f.employee, captured["employment_id"])
         assertEquals(5L, captured["resource_version"])
+    }
+
+    /** Keep this pre-V68 seed independent of later Document columns used by current APIs. */
+    private fun approvedLegacyExpense(f: ExpenseFixture): UUID {
+        expensePolicy(f, changes = mapOf("receiptRequired" to false))
+        val submission = pendingExpense(f, lines = listOf(expenseLine(f)))
+        val approved = reviewExpense(f, submission, reviewer(f))
+        assertEquals(200, approved.statusCode(), approved.body())
+        return submission
     }
 
     private fun facts(sql: JdbcTemplate) =

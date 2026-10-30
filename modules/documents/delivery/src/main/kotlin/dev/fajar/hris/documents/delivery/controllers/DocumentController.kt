@@ -24,6 +24,8 @@ class DocumentController(
     private val history: GetDocumentRevisions,
     private val validationHistory: GetDocumentValidationAttempts,
     private val employees: ListDocumentEmployees,
+    private val saveMetadata: SaveDocumentMetadata,
+    private val metadataHistory: GetDocumentMetadataHistory,
 ) {
     @GetMapping("/employees")
     fun employees(
@@ -75,6 +77,7 @@ class DocumentController(
                     input.size,
                     input.sha256,
                     input.reason,
+                    input.metadata?.toDomain(),
                 ),
             )
             .response()
@@ -149,6 +152,51 @@ class DocumentController(
         @RequestParam(defaultValue = "50") limit: Int,
     ): Page<DocumentRevisionResponse> {
         val page = history.execute(actor, documentId, after, limit).response()
+        return Page(page.items.map { it.toResponse() }, page.nextCursor)
+    }
+
+    @PutMapping("/{documentId}/metadata")
+    fun metadata(
+        actor: Actor,
+        @PathVariable documentId: UUID,
+        @RequestHeader("Idempotency-Key") operationId: UUID,
+        @RequestBody input: SaveDocumentMetadataRequest,
+    ): MutationResponse =
+        saveMetadata
+            .execute(
+                actor,
+                operationId,
+                documentId,
+                input.expectedVersion,
+                input.metadata.toDomain(),
+                input.reason,
+            )
+            .response()
+            .toResponse()
+
+    @GetMapping("/{documentId}/metadata-history")
+    fun metadataHistory(
+        actor: Actor,
+        @PathVariable documentId: UUID,
+        @Parameter(
+            schema = Schema(type = "integer", format = "int64", minimum = "0", maximum = "999")
+        )
+        @RequestParam(required = false)
+        after: Long?,
+        @Parameter(
+            schema =
+                Schema(
+                    type = "integer",
+                    format = "int32",
+                    minimum = "1",
+                    maximum = "200",
+                    defaultValue = "20",
+                )
+        )
+        @RequestParam(defaultValue = "20")
+        limit: Int,
+    ): Page<DocumentMetadataRevisionResponse> {
+        val page = metadataHistory.execute(actor, documentId, after, limit).response()
         return Page(page.items.map { it.toResponse() }, page.nextCursor)
     }
 }

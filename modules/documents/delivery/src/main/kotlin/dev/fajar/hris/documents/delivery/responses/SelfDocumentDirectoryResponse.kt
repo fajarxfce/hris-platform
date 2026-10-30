@@ -11,6 +11,7 @@ data class SelfDocumentDirectoryResponse(
     val asOf: LocalDate,
     val timezone: String,
     val employments: Page<DocumentEmploymentResponse>,
+    val metadataSupported: Boolean = true,
 )
 
 fun SelfDocumentDirectory.toResponse() =

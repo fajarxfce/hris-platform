@@ -13,6 +13,8 @@ fun PublishedDocumentData.toCatalogRecord(companyId: UUID, id: UUID): DocumentCa
         header.employmentId,
         header.classification,
         toEvidence(companyId, header.employmentId, header.classification),
+        header.metadata,
+        header.metadataVersion,
     )
 }
 

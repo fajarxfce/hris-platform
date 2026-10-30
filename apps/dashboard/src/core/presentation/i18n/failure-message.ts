@@ -1524,9 +1524,37 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "The upload deadline has passed. Cancel this upload before replacing it.",
     "Batas waktu upload telah lewat. Batalkan upload ini sebelum menggantinya.",
   ],
+  invalid_document_metadata: [
+    "Review the category, document number, country code and dates.",
+    "Periksa kategori, nomor dokumen, kode negara, dan tanggal.",
+  ],
+  invalid_document_metadata_change: [
+    "Review the document details and enter a reason for the change.",
+    "Periksa rincian dokumen dan isi alasan perubahan.",
+  ],
+  document_metadata_unsupported: [
+    "Document details cannot be edited here yet. Contact your administrator.",
+    "Rincian dokumen belum dapat diubah di sini. Hubungi administrator.",
+  ],
+  document_metadata_changed: [
+    "Document details changed during the review. Refresh to see the current record.",
+    "Rincian dokumen berubah saat ditinjau. Muat ulang untuk melihat catatan terkini.",
+  ],
+  document_metadata_unchanged: [
+    "No document details changed. Review the current record.",
+    "Rincian dokumen belum berubah. Tinjau catatan terkini.",
+  ],
+  document_metadata_limit: [
+    "This document has reached its limit of 1,000 details revisions. Its history remains available.",
+    "Dokumen ini telah mencapai batas 1.000 revisi rincian. Riwayatnya tetap tersedia.",
+  ],
+  document_metadata_mismatch: [
+    "Review the existing document details before uploading a replacement.",
+    "Tinjau rincian dokumen yang ada sebelum mengunggah berkas pengganti.",
+  ],
   document_archived: [
-    "This document is archived and cannot receive new content.",
-    "Dokumen sudah diarsipkan dan tidak dapat menerima konten baru.",
+    "This document is archived. Restore it before changing its content or details.",
+    "Dokumen sudah diarsipkan. Pulihkan sebelum mengubah konten atau rinciannya.",
   ],
   document_not_found: [
     "This document is unavailable in the current company.",

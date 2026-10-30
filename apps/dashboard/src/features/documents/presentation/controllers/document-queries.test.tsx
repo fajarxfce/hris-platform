@@ -58,6 +58,11 @@ function setup() {
     locale: "en",
     nextIdentifier: () => documentId(80),
     documents: {
+      metadata: {
+        load: { execute: vi.fn() },
+        review: { execute: vi.fn() },
+        save: { execute: vi.fn() },
+      },
       retention: {
         reviewRetirement: unused,
         retireRevision: unused,

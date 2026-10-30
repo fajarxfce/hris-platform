@@ -39,6 +39,18 @@ export function DocumentReviewScreen(props: DocumentsScreenProps) {
       {...props}
       {...view}
       state={state}
+      metadataTo={
+        state.data?.document.metadataSupported
+          ? documentHref(props.access.companyId, `${documentPath(documentId)}/metadata`)
+          : null
+      }
+      metadataEditTo={
+        state.data?.document.metadataSupported &&
+        (state.data.document.metadataVersion ?? 999) < 999 &&
+        canCreateCompanyDocument(props.access.permissions)
+          ? documentHref(props.access.companyId, `${documentPath(documentId)}/metadata/edit`)
+          : null
+      }
       retentionTo={
         state.data && canManageDocumentRetention(props.access.permissions)
           ? documentHref(props.access.companyId, documentRetentionPath(documentId))

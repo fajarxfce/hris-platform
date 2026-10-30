@@ -7,7 +7,9 @@ below covered classification, references and transport but omitted category.
 separate foreign identity/document-validity requirement. Existing assurance and
 transport evidence remains valid: 243 API, 18 domain, nine data, quality/packages
 and four actual browser workflows passed, as did the recorded full CI. That CI
-does not implement the missing metadata.
+does not implement the missing metadata. The later [business metadata increment](document-business-metadata.md)
+implements and locally validates backend/dashboard behavior; native upgrade and
+recovery remain pending, so `documents.02` stays unverified.
 
 | Requirement | Implementation and matching behavior |
 | --- | --- |

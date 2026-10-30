@@ -11,6 +11,7 @@ data class DocumentEmployeeDirectoryResponse(
     val timezone: String,
     val query: String,
     val employees: Page<DocumentEmployeeResponse>,
+    val metadataSupported: Boolean = true,
 )
 
 fun DocumentEmployeeDirectory.toResponse() =

@@ -2,6 +2,8 @@ import { Navigate, Route, Routes, useLocation, useSearchParams } from "react-rou
 import { DocumentActionScreen } from "../bindings/document-action-screen";
 import { DocumentEmployeesScreen } from "../bindings/document-employees-screen";
 import { DocumentFolderScreen } from "../bindings/document-folder-screen";
+import { DocumentMetadataEditorScreen } from "../bindings/document-metadata-editor-screen";
+import { DocumentMetadataHistoryScreen } from "../bindings/document-metadata-history-screen";
 import { DocumentRetentionChangeScreen } from "../bindings/document-retention-change-screen";
 import { DocumentRetentionEditorScreen } from "../bindings/document-retention-editor-screen";
 import { DocumentRetentionPoliciesScreen } from "../bindings/document-retention-policies-screen";
@@ -112,6 +114,11 @@ export function DocumentsRoutes(props: DocumentsScreenProps) {
         path=":documentId/revisions/:revisionId"
         element={<DocumentRevisionScreen {...props} />}
       />
+      <Route
+        path=":documentId/metadata/edit"
+        element={<DocumentMetadataEditorScreen {...props} />}
+      />
+      <Route path=":documentId/metadata" element={<DocumentMetadataHistoryScreen {...props} />} />
       <Route path=":documentId" element={<DocumentReviewScreen {...props} />} />
       <Route
         path="*"

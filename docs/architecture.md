@@ -526,6 +526,16 @@ audit and revocation share one transaction, and repeated DELETE requests do not
 create another journal entry. Datasources select metadata and perform scoped
 writes without owning administrative permission or session policy.
 
+Document business metadata is owned by Documents and separated from binary
+revisions and shared finance evidence. The command holds People, Documents and
+access guards, then stores the versioned head, immutable metadata history, journal
+and receipt in one transaction. The history reader shares resource guards and
+revalidates MFA after acquisition. V103 pairs each head with its retained snapshot,
+forces company RLS and preserves prior upload/publication/retirement transitions.
+Owned catalog changes use the existing document version and sync invalidations;
+initial upload omission retains the legacy operation hash. See
+[business metadata](document-business-metadata.md).
+
 ## Storage and jobs
 
 Native session retention has a separate identity repository/source contract that

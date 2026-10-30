@@ -11,6 +11,7 @@ import type {
   DocumentUploadReview,
 } from "../entities/document-upload";
 import { hasDocumentManagement } from "./document-action-policy";
+import { prepareDocumentBusinessMetadata } from "./document-business-metadata-policy";
 import { canBrowseDocuments } from "./document-read-policy";
 
 export const documentUploadChunkBytes = 1024 * 1024;
@@ -126,6 +127,10 @@ export function prepareDocumentUpload(
           (review.revision.documentId !== documentId || review.revision.id !== revisionId))))
   )
     return failed("invalid_document_upload");
+  if (fields.metadata && (review.kind !== "new" || !review.metadataSupported))
+    return failed("document_metadata_unsupported");
+  const metadata = fields.metadata ? prepareDocumentBusinessMetadata(fields.metadata) : null;
+  if (metadata && !metadata.ok) return metadata;
   const ownedFile = Object.freeze({ ...file, reference: Object.freeze({ ...file.reference }) });
   return success(
     Object.freeze({
@@ -151,6 +156,7 @@ export function prepareDocumentUpload(
                 size: file.reference.byteLength,
                 sha256: file.sha256,
                 reason,
+                ...(metadata?.ok ? { metadata: metadata.value } : {}),
               }),
             }),
     }),

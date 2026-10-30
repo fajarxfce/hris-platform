@@ -320,3 +320,31 @@ describe("upload page ownership", () => {
     f.controller.deactivate();
   });
 });
+
+describe("business metadata rejection recovery", () => {
+  it.each([false, true])(
+    "keeps uncertain=%s requests pinned while allowing correction after a definite initial rejection",
+    async (uncertain) => {
+      const f = await setup();
+      try {
+        await f.controller.selectFile();
+        if (uncertain) {
+          await f.controller.confirm(fields);
+          expect(f.controller.getSnapshot().stage).toBe("paused");
+        }
+        f.actions.uploadFile.execute.mockResolvedValueOnce(failed("invalid_document_metadata"));
+        if (uncertain) await f.controller.retry();
+        else await f.controller.confirm(fields);
+        expect(f.controller.getSnapshot().stage).toBe(uncertain ? "paused" : "editing");
+        const original = f.actions.uploadFile.execute.mock.calls[0]?.[1];
+        if (uncertain) expect(f.actions.uploadFile.execute.mock.calls[1]?.[1]).toBe(original);
+        else {
+          await f.controller.confirm({ ...fields, reason: "Corrected metadata" });
+          expect(f.actions.uploadFile.execute.mock.calls[1]?.[1]).not.toBe(original);
+        }
+      } finally {
+        f.controller.deactivate();
+      }
+    },
+  );
+});

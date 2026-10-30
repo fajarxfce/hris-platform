@@ -507,3 +507,85 @@ describe("bounded document delivery", () => {
     expect(new Uint8Array(required(f.parts[0])).every((byte) => byte === 0)).toBe(true);
   });
 });
+
+describe("initial upload business metadata compatibility", () => {
+  const identifiers = {
+    documentId: documentId(100),
+    revisionId: documentId(101),
+    startOperation: documentId(102),
+    chunkOperations: [documentId(103)],
+  };
+  it("retains the exact legacy body when metadata is omitted", () => {
+    const plan = value(prepareDocumentUpload(access, review, file(), fields, identifiers));
+    expect(plan.start?.input).not.toHaveProperty("metadata");
+    expect(Object.keys(plan.start?.input ?? {})).toEqual([
+      "documentId",
+      "revisionId",
+      "employmentId",
+      "title",
+      "classification",
+      "expectedDocumentVersion",
+      "fileName",
+      "mediaType",
+      "size",
+      "sha256",
+      "reason",
+    ]);
+  });
+  it("owns normalized optional metadata before any file or HTTP acquisition", () => {
+    const metadata = {
+      category: "PASSPORT" as const,
+      identityNumber: " P-123 ",
+      issuingCountry: " au ",
+      issuedOn: "2010-01-01",
+      validUntil: "2020-01-01",
+    };
+    const plan = value(
+      prepareDocumentUpload(
+        access,
+        { ...review, metadataSupported: true },
+        file(),
+        { ...fields, metadata },
+        identifiers,
+      ),
+    );
+    metadata.identityNumber = "Changed later";
+    expect(plan.start?.input.metadata).toEqual({
+      category: "PASSPORT",
+      identityNumber: "P-123",
+      issuingCountry: "AU",
+      issuedOn: "2010-01-01",
+      validUntil: "2020-01-01",
+    });
+    expect(Object.isFrozen(plan.start?.input.metadata)).toBe(true);
+  });
+  it("rejects an attempt to send new fields without advertised support", () => {
+    const metadata = {
+      category: "OTHER" as const,
+      identityNumber: "",
+      issuingCountry: "",
+      issuedOn: "",
+      validUntil: "",
+    };
+    expect(
+      prepareDocumentUpload(access, review, file(), { ...fields, metadata }, identifiers),
+    ).toMatchObject({ ok: false, failure: { code: "document_metadata_unsupported" } });
+  });
+  it("uses scoped employee discovery to advertise initial metadata support", async () => {
+    const request = vi
+      .fn<HttpClient["request"]>()
+      .mockResolvedValue({ ...documentEmployeeDirectory(), metadataSupported: true });
+    const feature = createDocumentsFeature(
+      { request },
+      { downloadBinary: vi.fn() },
+      documentFileInput(),
+    );
+    expect(
+      await feature.reviewUpload.execute(
+        access,
+        { kind: "new", employmentId: documentEmployeeId },
+        signal(),
+      ),
+    ).toMatchObject({ ok: true, value: { kind: "new", metadataSupported: true } });
+  });
+});

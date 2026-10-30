@@ -92,6 +92,35 @@ coherent publication; current session assurance is checked again after acquisiti
 Upload progress, retention policy, physical keys and content are excluded.
 See [synchronization](../synchronization.md) for replacement and withdrawal behavior.
 
+## Category, identity and business validity
+
+Document details and owned catalog records now include `metadata`,
+`metadataVersion` and `metadataSupported`. The value has a category (`PASSPORT`,
+`NATIONAL_ID`, `WORK_PERMIT`, `RESIDENCE_PERMIT`, `EMPLOYMENT_CONTRACT`,
+`CERTIFICATE`, `RECEIPT`, `OTHER`) and optional `identityNumber`, `issuingCountry`,
+`issuedOn` and `validUntil`. Classification still controls visibility and purpose.
+Country is an ISO alpha-2 code; dates use ISO calendar dates from 1900 through 2200.
+Expired historical evidence is valid input. This does not alter upload deadlines,
+content availability, employment status, nationality or verified tax residency.
+
+`PUT /{documentId}/metadata` takes `expectedVersion`, `metadata`, `reason` and an
+idempotency key. It changes business details without replacing file bytes and
+increments both document and metadata versions. Metadata is immutable once stored;
+`GET /{documentId}/metadata-history?after=...&limit=20` returns ascending versions,
+actor, recorded time and reason. At most 1,000 snapshots exist, with pages of at most
+200. Archived documents cannot receive a new edit, but a currently authorized
+original receipt may still be recovered. Reads/writes keep current company, owner,
+profile and MFA checks. Migrated initial metadata uses `OTHER` and empty optional
+fields; absent actor/reason is an existing record, never claimed human verification.
+
+A new upload may include optional `metadata`. Omission preserves old request hashes
+and existing metadata; replacement uploads cannot edit these facts. Discovery
+responses advertise `metadataSupported`. Clients hide new commands against an
+older API. Private identity numbers stay out of the shared `DocumentEvidence`
+projection used by finance and leave. Dashboard upload, details, versioned editor
+and bounded history implement this contract. Native projection/cache upgrade and
+recovery remain pending; see the [working contract](../document-business-metadata.md).
+
 ## Content inspection adapter
 
 The content inspection adapter combines private storage chunks, Apache Tika 4.1 type detection, and ClamAV's INSTREAM protocol. It reports observed size, whole-file SHA-256, media type, scanner version, and verdict. The domain workflow decides whether that evidence permits publication. A clean scanner response alone does not establish a matching document type or digest.

@@ -256,6 +256,8 @@ export class DocumentUploadController {
         (documentActionWasRejected(result.failure) ||
           [
             "invalid_document_upload",
+            "invalid_document_metadata",
+            "document_metadata_mismatch",
             "document_identity_mismatch",
             "document_revision_limit",
             "document_upload_active",
@@ -273,7 +275,8 @@ export class DocumentUploadController {
           : lost
             ? "unavailable"
             : documentActionReviewChanged(result.failure) ||
-                result.failure.code === "document_upload_active"
+                result.failure.code === "document_upload_active" ||
+                result.failure.code === "document_metadata_mismatch"
               ? "conflict"
               : "editing",
       });

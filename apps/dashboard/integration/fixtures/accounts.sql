@@ -125,7 +125,8 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000104', 'browser-comparison-preparer@example.invalid', 'Browser Comparison Preparer'),
   ('a0000000-0000-4000-8000-000000000105', 'browser-comparison-reviewer@example.invalid', 'Browser Comparison Reviewer'),
   ('a0000000-0000-4000-8000-000000000106', 'browser-comparison-second-reviewer@example.invalid', 'Browser Comparison Second-Reviewer'),
-  ('a0000000-0000-4000-8000-000000000107', 'browser-comparison-finalizer@example.invalid', 'Browser Comparison Finalizer')
+  ('a0000000-0000-4000-8000-000000000107', 'browser-comparison-finalizer@example.invalid', 'Browser Comparison Finalizer'),
+  ('a0000000-0000-4000-8000-000000000108', 'browser-metadata-admin@example.invalid', 'Browser Metadata Admin')
 ) AS fixture(id, email, name)
 WHERE bootstrap.email = 'browser-admin@example.invalid'
 ON CONFLICT DO NOTHING;
@@ -183,7 +184,8 @@ CROSS JOIN (VALUES
   ('a0000000-0000-4000-8000-000000000096'),
   ('a0000000-0000-4000-8000-000000000098'),
   ('a0000000-0000-4000-8000-000000000100'),
-  ('a0000000-0000-4000-8000-000000000103')
+  ('a0000000-0000-4000-8000-000000000103'),
+  ('a0000000-0000-4000-8000-000000000108')
 ) AS fixture(account_id)
 WHERE platform_permissions.account_id = (SELECT id FROM accounts WHERE email = 'browser-admin@example.invalid')
 ON CONFLICT DO NOTHING;

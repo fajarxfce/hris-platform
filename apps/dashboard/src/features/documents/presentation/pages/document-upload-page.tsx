@@ -16,6 +16,7 @@ import { documentMessages } from "../i18n/document-messages";
 import { documentUploadMessages } from "../i18n/document-upload-messages";
 import type { DocumentUploadState } from "../models/document-upload-state";
 import type { documentUploadView } from "../models/document-upload-view";
+import { DocumentMetadataFields } from "../widgets/document-metadata-fields";
 
 export function DocumentUploadPage(props: {
   state: DocumentUploadState;
@@ -101,6 +102,7 @@ export function DocumentUploadPage(props: {
                   </AppSelect>
                 </>
               )}
+              {form.metadataSupported && <DocumentMetadataFields {...form} locale={props.locale} />}
               {props.kind !== "resume" && (
                 <AppTextField
                   label={text.reason}

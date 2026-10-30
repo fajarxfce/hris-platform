@@ -15,4 +15,5 @@ data class StartDocumentUploadRequest(
     val size: Long,
     val sha256: String,
     val reason: String,
+    val metadata: DocumentBusinessMetadataRequest? = null,
 )

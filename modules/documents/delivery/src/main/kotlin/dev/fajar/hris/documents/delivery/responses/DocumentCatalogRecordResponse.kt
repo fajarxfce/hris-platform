@@ -10,7 +10,18 @@ data class DocumentCatalogRecordResponse(
     val employmentId: UUID,
     val classification: DocumentClassification,
     val evidence: DocumentEvidenceResponse,
+    val metadata: DocumentBusinessMetadataResponse,
+    val metadataVersion: Long,
+    val metadataSupported: Boolean = true,
 )
 
 fun DocumentCatalogRecord.toResponse() =
-    DocumentCatalogRecordResponse(id, version, employmentId, classification, evidence.toResponse())
+    DocumentCatalogRecordResponse(
+        id,
+        version,
+        employmentId,
+        classification,
+        evidence.toResponse(),
+        metadata.toResponse(),
+        metadataVersion,
+    )

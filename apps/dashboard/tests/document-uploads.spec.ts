@@ -14,7 +14,7 @@ async function choose(page: Page, bytes = smallFile, name = "record.pdf", button
 async function newUpload(page: Page, bytes = smallFile) {
   await page.goto(`${folder}/upload`);
   await page.getByLabel("Title", { exact: true }).fill("Signed employment record");
-  await page.getByLabel("Category", { exact: true }).selectOption("HR_ONLY");
+  await page.getByLabel("Classification", { exact: true }).selectOption("HR_ONLY");
   await page.getByLabel("Reason", { exact: true }).fill("Employee onboarding");
   await choose(page, bytes);
   await expect(page.getByRole("button", { name: "Change file", exact: true })).toBeEnabled();
@@ -28,7 +28,7 @@ test("employee folders upload a multipart file with its original checksum and a 
   await page.getByRole("link", { name: "Upload document", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Upload document", exact: true })).toBeVisible();
   await page.getByLabel("Title", { exact: true }).fill("Signed employment record");
-  await page.getByLabel("Category", { exact: true }).selectOption("HR_ONLY");
+  await page.getByLabel("Classification", { exact: true }).selectOption("HR_ONLY");
   await page.getByLabel("Reason", { exact: true }).fill("Employee onboarding");
   const bytes = Buffer.alloc(2 * 1024 * 1024 + 17, 11);
   await choose(page, bytes);

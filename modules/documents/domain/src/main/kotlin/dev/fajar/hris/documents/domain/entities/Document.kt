@@ -13,4 +13,6 @@ data class Document(
     val createdBy: UUID,
     val createdAt: Instant,
     val currentRevisionId: UUID? = null,
+    val metadata: DocumentBusinessMetadata = DocumentBusinessMetadata(),
+    val metadataVersion: Long = 0,
 )

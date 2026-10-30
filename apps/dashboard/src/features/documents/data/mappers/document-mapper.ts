@@ -4,9 +4,17 @@ import type { Document, DocumentPage } from "../../domain/entities/document";
 import type { DocumentDto, DocumentPageDto } from "../models/document-dto";
 
 export function toDocument(raw: DocumentDto, company: CompanyId): Document {
+  if (
+    raw.metadataSupported &&
+    (!raw.metadata || raw.metadataVersion === null || raw.metadataVersion > raw.version)
+  )
+    throw new InvalidHttpResponseError();
+  if (!raw.metadataSupported && (raw.metadata !== null || raw.metadataVersion !== null))
+    throw new InvalidHttpResponseError();
   return Object.freeze({
     ...raw,
     companyId: company,
+    metadata: raw.metadata ? Object.freeze({ ...raw.metadata }) : null,
     id: raw.id.toLowerCase(),
     employmentId: raw.employmentId.toLowerCase(),
     createdBy: raw.createdBy.toLowerCase(),

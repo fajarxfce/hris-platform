@@ -14,6 +14,7 @@ export const documentBytes = () => Uint8Array.from(new TextEncoder().encode("%PD
 export function documentEmployeeDirectory(): DocumentEmployeeDirectoryDto {
   return {
     companyId: documentCompanyId,
+    metadataSupported: false,
     asOf: "2026-10-12",
     timezone: "Asia/Jakarta",
     query: "",
@@ -41,6 +42,9 @@ export function documentHeader(): DocumentDto {
     version: 2,
     createdBy: documentId(51),
     createdAt: "2026-10-01T00:00:00Z",
+    metadataSupported: false,
+    metadata: null,
+    metadataVersion: null,
     currentRevisionId: documentRevisionId,
   };
 }

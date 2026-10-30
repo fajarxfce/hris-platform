@@ -46,6 +46,7 @@ export function toDocumentEmployees(
     asOf: raw.asOf,
     timezone: raw.timezone,
     query: raw.query,
+    metadataSupported: raw.metadataSupported,
     employees: Object.freeze({ items: Object.freeze(items), nextCursor: cursor }),
   });
 }

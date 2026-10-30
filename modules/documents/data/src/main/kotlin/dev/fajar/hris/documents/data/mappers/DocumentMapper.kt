@@ -16,6 +16,14 @@ fun DocumentsRecord.toDocument() =
         createdBy,
         createdAt.toInstant(),
         currentRevisionId,
+        DocumentBusinessMetadata(
+            DocumentCategory.valueOf(category),
+            identityNumber,
+            issuingCountry,
+            issuedOn,
+            validUntil,
+        ),
+        metadataVersion,
     )
 
 fun DocumentRevisionsRecord.toDocumentRevision() =
@@ -76,6 +84,12 @@ fun Document.toDocumentRow(company: UUID) =
         r.classification = classification.name
         r.revisionCount = revisionCount
         r.version = version
+        r.metadataVersion = metadataVersion
+        r.category = metadata.category.name
+        r.identityNumber = metadata.identityNumber
+        r.issuingCountry = metadata.issuingCountry
+        r.issuedOn = metadata.issuedOn
+        r.validUntil = metadata.validUntil
         r.createdBy = createdBy
         r.createdAt = createdAt.atOffset(ZoneOffset.UTC)
     }

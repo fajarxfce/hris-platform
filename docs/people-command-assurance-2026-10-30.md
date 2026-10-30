@@ -38,8 +38,10 @@ Three actual API/browser workflows passed in 36.1s with setup (CSV imports,
 employment transfer, account binding), and two API/worker/browser workflows passed
 in 36.8s (scheduled onboarding/offboarding). [Measurements](measurements/people-command-assurance-2026-10-30.json)
 retain exact reproductions, controls, suites, fixture correction and package hashes.
-The earlier full CI at `70b92e59` excludes this correction; dispatch/observe the
-final-source run after committing and pushing this increment.
+The earlier full CI at `70b92e59` excludes this correction. Correction `158b81ac`
+is committed/pushed and running in [CI 41032184925](https://github.com/fajarxfce/hris-platform/actions/runs/41032184925)
+for exact source `158b81acce89f637dbf715bb573fffb7b99b92c9`. Observe the terminal
+result while continuing the missing document metadata feature.
 
 All five People rows remain unverified. Implement the confirmed
 [document category and identity-validity gap](document-identity-metadata-gap-2026-10-30.md),

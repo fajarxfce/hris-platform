@@ -923,7 +923,19 @@
         "docs/people-read-assurance-2026-10-30.md",
         "docs/measurements/people-read-assurance-2026-10-30.json"
       ],
-      "next": "Keep all five People initial rows unverified until command/input, Organization and detailed evidence review complete."
+      "next": "Keep all five People initial rows unverified until command/input, Organization and detailed evidence review complete.",
+      "fullCi": {
+        "status": "running",
+        "runId": 41032184925,
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41032184925",
+        "source": "158b81acce89f637dbf715bb573fffb7b99b92c9",
+        "includes": [
+          "People read b0b7c21c",
+          "People command and Organization 158b81ac",
+          "previous accepted Expense/Leave source"
+        ],
+        "remaining": "Observe terminal result without cancelling this same-branch workflow. Continue implementing document category and business validity."
+      }
     },
     {
       "id": "documents.identity-metadata",
@@ -949,7 +961,19 @@
         "docs/people-command-assurance-2026-10-30.md",
         "docs/measurements/people-command-assurance-2026-10-30.json"
       ],
-      "next": "Dispatch final-source CI and implement the missing document category/identity-validity feature before finishing People review."
+      "next": "Dispatch final-source CI and implement the missing document category/identity-validity feature before finishing People review.",
+      "fullCi": {
+        "status": "running",
+        "runId": 41032184925,
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41032184925",
+        "source": "158b81acce89f637dbf715bb573fffb7b99b92c9",
+        "includes": [
+          "People read b0b7c21c",
+          "People command and Organization 158b81ac",
+          "previous accepted Expense/Leave source"
+        ],
+        "remaining": "Observe terminal result without cancelling this same-branch workflow. Continue implementing document category and business validity."
+      }
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

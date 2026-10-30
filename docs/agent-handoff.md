@@ -142,10 +142,18 @@ After fixing only that fixture, all 104 ordinary worker cases passed with one
 separately accepted manual test skipped; quality/packages passed in 226s.
 Production/package hashes match the broad API run. Final actual browser workflows
 passed in 36.1s (three normal) and 36.8s (two worker), including setup.
-Both API and worker contexts are validated. Commit/push the atomic correction and
-dispatch full CI for that exact source. Then implement the confirmed document
-category/identity-validity gap and finish People review; do not mark its five rows
-accepted from assurance fixes alone. The full goal remains active.
+Both API and worker contexts are validated. Correction `158b81ac` is committed and
+pushed. Exact source `158b81acce89f637dbf715bb573fffb7b99b92c9` is running in
+[CI 41032184925](https://github.com/fajarxfce/hris-platform/actions/runs/41032184925),
+including both People increments. Observe its terminal result without cancelling
+it with another same-branch dispatch.
+
+Document category/identity-validity implementation is now active. The
+[working contract](document-business-metadata.md) separates business validity from
+upload deadlines and tax residency, preserves versioned history and legacy input/
+cache behavior. Reproduce the new HTTP capability first, implement/validate schema,
+backend and affected clients, then finish the People review. Do not mark its five
+rows accepted from assurance fixes alone. The full goal remains active.
 
 CompleteOffboarding and explicit onboarding/offboarding schedules already have
 final checks; preserve their behavior. Client policy is admission-only: do not add

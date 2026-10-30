@@ -1124,5 +1124,17 @@
     "worker": "40728ec427206a254abefc457a52832de178c3b946e3d0870667e95f3097d5a7"
   },
   "remaining": "People initial rows remain unverified pending command/input/Organization review, complete evidence mapping and final-source CI; full Platform/Mobile goal remains active.",
-  "runtime": "Private schema-101 API, accepted Google binding and phone unchanged. No live deployment or provider delivery."
+  "runtime": "Private schema-101 API, accepted Google binding and phone unchanged. No live deployment or provider delivery.",
+  "fullCi": {
+    "status": "running",
+    "runId": 41032184925,
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41032184925",
+    "source": "158b81acce89f637dbf715bb573fffb7b99b92c9",
+    "includes": [
+      "People read b0b7c21c",
+      "People command and Organization 158b81ac",
+      "previous accepted Expense/Leave source"
+    ],
+    "remaining": "Observe terminal result without cancelling this same-branch workflow. Continue implementing document category and business validity."
+  }
 }

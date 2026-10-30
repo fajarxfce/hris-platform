@@ -3001,10 +3001,16 @@
     "Client availability remains admission-only. No final maintenance requery or new background MFA-age policy is introduced."
   ],
   "fullCi": {
-    "status": "pending-final-source-run",
-    "predecessor": "https://github.com/fajarxfce/hris-platform/actions/runs/41023645590",
-    "predecessorSource": "70b92e59e7b41bdafe9f9d1c4b9d5106412777f5",
-    "note": "The predecessor passed all ten jobs but excludes both People increments."
+    "status": "running",
+    "runId": 41032184925,
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41032184925",
+    "source": "158b81acce89f637dbf715bb573fffb7b99b92c9",
+    "includes": [
+      "People read b0b7c21c",
+      "People command and Organization 158b81ac",
+      "previous accepted Expense/Leave source"
+    ],
+    "remaining": "Observe terminal result without cancelling this same-branch workflow. Continue implementing document category and business validity."
   },
   "remaining": "All five People rows remain unverified until the document category/identity-validity implementation and complete detailed review. Inventory remains thirty reviewed, thirty-one unverified. Continue remaining Platform/Mobile/Starter scope.",
   "runtime": "No rollout, physical phone action or live provider delivery. Private schema-101 API and accepted Google binding remain unchanged.",

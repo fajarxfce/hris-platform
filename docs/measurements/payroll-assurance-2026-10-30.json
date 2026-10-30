@@ -1,7 +1,7 @@
 {
   "date": "2026-10-30",
   "baseline": "c159b1db",
-  "status": "Forty genuine baseline failures corrected; broad and full CI acceptance pending",
+  "status": "complete local acceptance; final full source CI running",
   "baselineRun": {
     "command": [
       "./gradlew",
@@ -971,23 +971,1364 @@
     }
   },
   "broadRun": {
-    "status": "running",
-    "source": "cca5e151",
-    "session": 78722,
-    "log": ".work/payroll-audit-2026-10-30/broad.log",
-    "scope": "All Payroll/Compensation/Payslip API tests, PayrollCalculationWorkerTest, domain/data, architecture/format and both packages",
-    "sourceNote": "Application and test source remain unchanged while this run executes; later documentation commits do not change its candidate."
+    "command": [
+      "./gradlew",
+      ":apps:server:test",
+      "--tests",
+      "dev.fajar.hris.*Payroll*",
+      "--tests",
+      "dev.fajar.hris.*Compensation*",
+      "--tests",
+      "dev.fajar.hris.*Payslip*",
+      ":apps:worker:test",
+      "--tests",
+      "dev.fajar.hris.worker.PayrollCalculationWorkerTest",
+      ":modules:payroll:domain:test",
+      ":modules:payroll:data:test",
+      "architectureCheck",
+      "formatCheck",
+      ":apps:server:bootJar",
+      ":apps:worker:bootJar",
+      "--no-daemon"
+    ],
+    "elapsed_seconds": 1464.11,
+    "exit_code": 0,
+    "completionHead": "b510fa4a01eef0c49a9a1347b1febd03a8dce91d",
+    "sourceAtInvocation": "cca5e151670110f42d4b915218162f60cd137908",
+    "sourceNote": "Intervening commits only changed documentation; application and test sources match the invocation snapshot."
   },
   "fullSourceCi": {
     "runId": 41087903927,
     "source": "eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f",
-    "status": "queued",
+    "status": "in_progress",
     "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927",
     "includes": [
       "Reporting correction c159b1db",
       "Payroll enrollment 8655f03e",
       "Payroll input/receipt/delegation correction cca5e151"
     ],
-    "note": "Administration CI 41081153648 terminated successfully before dispatch. Keep this run; a same-branch dispatch cancels it. Payroll broad local acceptance is still running."
+    "note": "All local Payroll API/domain/data/worker/package and seven actual browser scenarios passed. Preserve this complete source CI; Workforce remains the next audit."
+  },
+  "broadReports": {
+    "api": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.ApiContractHttpTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "26.527",
+          "sha256": "2f668f318a57184c0701586246d38a9c12e5fdfe257071c6f6e2e31a10d1dcf6",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.CompensationAssuranceTest",
+          "tests": "28",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "17.113",
+          "sha256": "f86d0af0c2a12fc8c6df1c6e1dafbd0a743692415bcd6962a88a282ecafdb476",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.CompensationHttpTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.922",
+          "sha256": "282379bff3a17aadbfef79b63089f093b95764a362760ca5285153eac0977acd",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.CompensationReviewHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.561",
+          "sha256": "aebfe19a34bd2db68e034de4ccc1caa154e2ba5d4d940bc2ce4b15935c171217",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAccessHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.783",
+          "sha256": "01b0dfec08663c2c8248f7ad7f3f450cfeb9045e2373b1a6248c0a5ff17b7e06",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentAssuranceTest",
+          "tests": "16",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "25.385",
+          "sha256": "0890abfb4c50e34f9dd0c783915f14a5a10b34599d47195c20a7540885a40b4b",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentAttendanceBoundaryTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.185",
+          "sha256": "ddf7f1e90580a3cc41ad02373797251d3467d2fd2fe147efa678b909138abf9f",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentAttendanceHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.228",
+          "sha256": "54d2475d20e54eff7060166af6134c6e716afba2baba7c0f8e41a42e0afa5ae5",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentAttendancePublicationTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.393",
+          "sha256": "eee91d4e64a8368b07f9a6612f317bc7d530e3c7d79cf28bddc21dbdc05268ed",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentConcurrencyTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.949",
+          "sha256": "0ca18c87bb72cb440c26bbe064cdb29d2a07f06898a1af697dcd08700f00ea8e",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentDelegationCompletionTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.31",
+          "sha256": "272bc0285bb2b4056a0244e218eec76a786c660c0ddff10a78439a0690a817e6",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentDiscoveryHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "14.445",
+          "sha256": "fb395454717d36a76fa15a9f303aaf102884ed69496970536e85d77687b1c8a4",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentDraftAccessHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.032",
+          "sha256": "32c3a34c60d211cd128d329e4eb5da5da606c8d15a251606168b159888ae03ff",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentDraftAssuranceTest",
+          "tests": "26",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "37.724",
+          "sha256": "372a1502e5a5dc687780968d89357f4ca3352d9b3dec61408c4e23449d6bf760",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentDraftConcurrencyHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.807",
+          "sha256": "dd9ab5bb2ad7a06f6867ce6fe67dbdaea3c51dc08493b145c294a7d8018b0b32",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentDraftHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "13.178",
+          "sha256": "99303b502a9cbf3aa5867d433925e731a915959044ee86397750743cd129988d",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentDraftLimitsHttpTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.902",
+          "sha256": "027d5fdcc257cb56611cff28450a1badd68f5bd03c108f5b6da085f26e0b0a20",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentDraftTransactionHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "13.633",
+          "sha256": "5c6ff770c2b96e9d9e11466224143f51cc82add13e416f6cd153dcec17bf4cdd",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentPreparationHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "13.335",
+          "sha256": "83d2709f4d4223fbe73cc31b4499069dafb9cd263b3aa74640d0a8b3710234e1",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentPublicationAssuranceTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "17.112",
+          "sha256": "8b306b2a9d8011f00e148c9b41b78808d0c6451e1bd1b0f16c20545f99f39683",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentPublicationContinuityHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "14.159",
+          "sha256": "710d2831067e6ff8be7b0f45af308fafa2ac2799f61188d0ea4eeefbeed962a8",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentPublicationHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "17.193",
+          "sha256": "e147c4c7797185cf3bff5ee76eb7f6627fa59ce4e7dcf3fb0ce2313983b5d4cd",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentPublicationSecurityHttpTest",
+          "tests": "11",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "25.124",
+          "sha256": "a8bcef9a3e25cc27122793a1353b738ebdfb093cbb0081cf6a051ba595c66cae",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentPublicationTransactionHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "18.051",
+          "sha256": "4faa0bf014db0e87d25abae3d0e11d22ae70a72c6d233e3390cb4f34fac1dfe4",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentReviewAccessHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "16.04",
+          "sha256": "3012a32e3b0b9a3fafce7d1a28c94748cf912b2cb20f27aba5e09b17bf11e8e1",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentReviewAssuranceTest",
+          "tests": "31",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "48.474",
+          "sha256": "28c0071303b66c11457128b5cea4fd453edf4b957510b1b3ebe4bd4559a2ad11",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentReviewConcurrencyHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.051",
+          "sha256": "dc5f5b49a6f39441b2a89a58d27268f902b9efe6ca8d9b161913c61f46472638",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentReviewHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "15.377",
+          "sha256": "748464318df9d8211d40d1fd5d339eeef9e336c2d3c1f0e858653a134a17582c",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentReviewTransactionHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "14.457",
+          "sha256": "2028b26f3e73b06ab0c3072938476978aa197b82c4c5581d82146a159da02731",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentSettlementHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "15.498",
+          "sha256": "9305cc57ab4ca667548f0b67fdfe296dde3a296bb05184e8a668e6c07fbe1013",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentSettlementTransactionHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "14.17",
+          "sha256": "f1cb4226c7345512767ed8078b82081b1fa46f13395f919403928e3e08b168bb",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentSourceHttpTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "14.917",
+          "sha256": "ba54e70c4621957d23373885fcee382bdb52f15321f20af4b1f8c2300bacfd28",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentTaxRevisionHttpTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.094",
+          "sha256": "19d1e04239eb992849146fc0d2041f49551651548b41152d21dd0abe02bfd554",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAssessmentRevisionHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.413",
+          "sha256": "f5b1c1be8c35cdca38d1960d57f120884dc516b4177d1dfa2c9d26f47ffc4445",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAttendanceCalculationHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.136",
+          "sha256": "b7f33ddcb0edb4aaf489b5ea00c8eae340463e41f9113aa21a0336d6854e2232",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAttendanceInputHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.498",
+          "sha256": "e040d30d6c2e1b7c666a0877030d06439da56730ba235e9d92c1ad0b4b1b30bf",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollCalculationReviewHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.777",
+          "sha256": "74a8c264e6d8ed52782df3b8636ba03c1c0a04155304d04b3e82305be5ccb8f5",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollCostReportAccessHttpTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.129",
+          "sha256": "5db129e34441e3a527711233aad358b3841549f0ae273c30b85c1f163099e235",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollCostReportHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "14.528",
+          "sha256": "db26352b5e3dcbbd0b0118fb852f50d7fc97525c6be0394114bf236e1a6e1aee",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationAssuranceTest",
+          "tests": "24",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "26.619",
+          "sha256": "1a5be8b3215e8cbdc749399056c6628f448e2fd84b777914d96b6704809d43b2",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.192",
+          "sha256": "d427b4f4a8adb41af3bfe2b6eb007306f9809a7a5845508c10d1e868bc06197d",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationPreparationHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.008",
+          "sha256": "2b05a1233aff15d3d1011b05a80ee1c12838d011f440b6f11c45db0297de313c",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationPublicationHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "17.911",
+          "sha256": "362caa70ecfaf0fc317afae95bc35edd9fc271d58f010e6ec9592f39c97c4e74",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationSecurityHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.777",
+          "sha256": "3415dbd86d97f0bb335404a923e82543daea79143793f483ea8cc5d4ad57fa46",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationTransactionHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.669",
+          "sha256": "05633b11c92a75e870b96e278f2e734f94e6e02aef84d27c73bad684f52fba4a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollInputAssuranceTest",
+          "tests": "33",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "23.133",
+          "sha256": "c5e57599bfb1f16c21be08a34a0d0475666634cadfacfaa1a741b67c00f0ee6c",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollInputHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.971",
+          "sha256": "9acf3018e8f429080412a685b5dc9224da031beb3394e647f1706bd7b9005a43",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollInputReviewHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.789",
+          "sha256": "e47b7a30033febe356158ce0a0460c59a1b8a0d11c4a84c7fb2ea64174de23d1",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollOwnedSyncHttpTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.724",
+          "sha256": "02220eccc4478ccee1a56cb0c363ea4d310959b9d342b6bfb424020973ea509f",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPayBasisHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.744",
+          "sha256": "f5531ea486f9400e996a8c089fcc6173039c2bfce9a9b7db71d11743581b3069",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPaymentAccessHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.595",
+          "sha256": "a557f1d3d74d539729b2c8abc1de7188c69af13c87baf37b3f19eaa8ca59f5ad",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPaymentAssuranceTest",
+          "tests": "42",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "59.275",
+          "sha256": "e2419612014b7b76a9af0500dd583bda82f7b5b502b13b143a2796cd8dc0651f",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPaymentBankReferenceHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.016",
+          "sha256": "3682fbea42620cd005b959363ce8eeab4c275a75c80c612ffac6721486286eed",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPaymentCapacityHttpTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.706",
+          "sha256": "314e11d7c0680c5142917f78029d71735692c644ec0d9a437d6d9820e7a709fa",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPaymentHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.773",
+          "sha256": "c0f880daf06ef1968ea986ac2ecc392b961a596ac24e4701c9bb732a82e4351a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPaymentInputSnapshotTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.29",
+          "sha256": "2ada32ab5320de4fbaf707e196fc905ae72cb4ab0b43ef3a932515e42c2030ee",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPaymentRecoveryReviewAssuranceTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "18.714",
+          "sha256": "cb8abfaea73bd050fee6d68d162eb033a6ef821283bf0a172b1198948882e7fa",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPaymentRecoveryReviewHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "13.92",
+          "sha256": "15cb424b96c39b1bbc83f4764859c3a77cddfe10d3e5ab4f42e682b23b7ee1b6",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPaymentReviewHttpTest",
+          "tests": "9",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "17.957",
+          "sha256": "886afd0be942b7fa7b61b805dc4e0c7d2ee32625ab862896caacd78302d18583",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPaymentSyncHttpTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.389",
+          "sha256": "54b33d97eaa309f183d184045db4a7aef24c9ecdf7f1d2af687b71f44f6828b7",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPaymentTransactionHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "13.929",
+          "sha256": "bcb7ede3c0434823029adb1b7094844957cf963c453a2ae5f83719e5b9557bf6",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPayslipAccessHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.26",
+          "sha256": "56c1f72fc0d68fe6c69340a8eea526edb242e41e6f7b5459c6c14635f2afc409",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPayslipHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.678",
+          "sha256": "084d25fc6fb04d39cc4c48f14a4a7116cafa8e98c6568a8c11531574a9b181a5",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPayslipPdfHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.949",
+          "sha256": "6a0dafd496d3620b70b528ec86bc94b060bc86c28ecb2a3aca3ee37c986a7473",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPayslipReadAssuranceTest",
+          "tests": "12",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "17.651",
+          "sha256": "72bb143cf62f42efea37dd3bc444b0ba1fc93fd0f2b169c0ead988868e8740c3",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPayslipScopeHttpTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.265",
+          "sha256": "d92c37a4343f305e3481c2f4f8f579bc3d8204816b6102de55676fad5babf9e5",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPayslipSearchHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.246",
+          "sha256": "5fb0b1bbf4269b737f9d72ad59e8c9fadc991e73cba3a852935287e83afdbf64",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPayslipSyncHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.074",
+          "sha256": "019b003e59f63ee67e3ada336f96bfdabbadf04455ade9ae9ea7acfb8f5c6589",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPeriodAccessHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.518",
+          "sha256": "660dde12568fe8aa9e6648b46d787f6a9cbe05861375453293bf5dd17e610700",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPeriodAssuranceTest",
+          "tests": "20",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "14.814",
+          "sha256": "ca792002a9e5f613cef00de6456f471313b527c70dd40e82b47f890811710bf3",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPeriodHttpTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.777",
+          "sha256": "70b516e63c0d94ce255b088b1585458efafabe0867627b49cf7c14ff0f03c0bd",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPeriodReviewHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.387",
+          "sha256": "f3957944f7bc705371da99821b3c03e5049fc7f0591ce0c158c7d51d2a3f58e0",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPolicyAssuranceTest",
+          "tests": "20",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.63",
+          "sha256": "22e54a8adc92530f73fd7f608732266d5db8f748e3f1642b9b1e9dddbdf32c03",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPolicyHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.415",
+          "sha256": "40ffdd6abbb0fcbce1eac74b9a2251d8b22bf90fabc8dec229a379c96b77eac8",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPolicyReviewHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.862",
+          "sha256": "670309de3f05ed43cf8081862ebd5abf4dd0902e10d1bec2b1316de6c1a38761",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollReviewAssuranceTest",
+          "tests": "27",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "27.92",
+          "sha256": "54afd1f19eb65f1c5b92a436a9a94a2d322cab224dcd5aed4143c4439ce7d542",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollReviewDelegationCompletionTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.997",
+          "sha256": "88af7f7bc6898aaceeb8cb926a7ed1b7ba44b8a22e908190699ec17d7a471d1f",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollReviewHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.568",
+          "sha256": "cf9da0d21f09afe4f10aa6c5a67c0a4e8b560ee998e5a67fd41eac1b61ccb337",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollReviewPreparationHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.917",
+          "sha256": "6c598817662f2823c04e55be22197e511bf95722c152fbc012581a47053d8f41",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollReviewSecurityHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "14.626",
+          "sha256": "0f72c4419725dfe805f76f70b2519d6e8c5cbf1ffd9d79ce780119f566461f77",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollReviewTransactionHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.849",
+          "sha256": "5f884337ec9f627ef30b55688837182696f3edd245524982ef287e82914693e4",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunAccessHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.374",
+          "sha256": "2e31cee0683d8c28a40dc7a443f42ffcbfce8f74c6ce51b37e00e39d0f783afe",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunAssuranceTest",
+          "tests": "30",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "26.452",
+          "sha256": "8ff78734fba86c767dde953ad626e277087e40a513bea9c3c8e530a1d9922d22",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunComparisonHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "13.88",
+          "sha256": "7125965635ac3ae6788efbd1a239d6411ddec69320003f186707f0449ddc535a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunCutoffHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.949",
+          "sha256": "419d2ffa0512acc0c59d1442f0f0b50f1340501d2b2beab9116c2fd992961ff1",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.359",
+          "sha256": "b8508e3200d5d4423ab89459eb90b2c7ccd8ae6abdf6e1b542bd0cce3a0ad7eb",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunRecoveryHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.922",
+          "sha256": "96bbd3e02ff8964617947118ce3b494212e9c68062dda3b13adabf37550db88a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunSnapshotHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.148",
+          "sha256": "80861bb706b355f0a38749b17f4e090742cf4274f96f5e6a7cede537b935b647",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunTransactionHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.744",
+          "sha256": "bcf104c5adf15fe5cf0e5a1a54a52c3d79a3ead3563785faef061c9b982bffc1",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxContinuityHttpTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "19.891",
+          "sha256": "241cd8bd1ad350c16bb9162f9d053e6eb8bb28841573c10b75adb92bc939b369",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxOpeningAccessHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.843",
+          "sha256": "de6cbab18327b10d777fe5a81971ff958b149ddd9607852857f9767ebb50db29",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxOpeningAssuranceTest",
+          "tests": "30",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "17.72",
+          "sha256": "18d970e9383fffe461488cfc8583708263c8d7cc22978efb1508eceab1422d06",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxOpeningCutoffHttpTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.609",
+          "sha256": "ed1bc50aa1d9ec2c80bd8553c77cd71800b85846fadf0204bf4460756901f065",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxOpeningHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.069",
+          "sha256": "7d0a0ea012ff9d24aa5646d8bd62443651624e233c15ab033bd4c2259de59af2",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxOpeningReviewHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.028",
+          "sha256": "fa6dbfecc3b2035fef0ca95e435f50eef76f9983dba53846b48e9120e730cdcc",
+          "failuresDetail": []
+        }
+      ],
+      "totals": {
+        "tests": 682,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "worker": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.worker.PayrollCalculationWorkerTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "22.665",
+          "sha256": "4a91aa1d9c451b674ffbfc75a5085591b74b70ad4972ca2a5db37396ec874c88",
+          "failuresDetail": []
+        }
+      ],
+      "totals": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "domain": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.payroll.domain.HolidayAllowancePolicyTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.22",
+          "sha256": "654fe623815433d0df3dd3bf37f90f8f2940c4062c85f9322343ea8c592e0a0f",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.IncomeTaxPolicyTest",
+          "tests": "12",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.107",
+          "sha256": "0fe4bb5df9994a382c30bb9811d2a348e09d90ce28865850dea235a31246bd4a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.InsuranceContributionPolicyTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.02",
+          "sha256": "72980d859bb20c8e54b122ae96d703d67cb093318d85c97734cc2c43b8b91ec4",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.MonthlyPayrollPolicyTest",
+          "tests": "11",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.228",
+          "sha256": "21eaa72da7b7a8926c36a5b07ee18d905892e0855f95568b36941fe016367b4a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.OvertimePayPolicyTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.02",
+          "sha256": "2fb4abbda10d07742281da814ed04eabd01e4d9f4ec1ddf33777bbd1373b2fa7",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayProrationPolicyTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.008",
+          "sha256": "ff85626caeb8f1cb29a043a1c70ba1a0956bbc8a15349109e79e01743c37a107",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentAttendancePolicyTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.078",
+          "sha256": "069c9b3619bbde8e492d458a27946beed100c155ae6e1398561337c47b12d67f",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentCalculationPolicyTest",
+          "tests": "14",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.319",
+          "sha256": "b8a0a9bcded850e7bedddc7bb5fa20ccf2c45aa7ec46b6d2c58e7c61b6b06f67",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentDraftPolicyTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.053",
+          "sha256": "ca5cdf243c16131a7305da9916408827b217c41f19f8c57df09796f03904179b",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentPreparationPolicyTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.066",
+          "sha256": "0af4897832ecefd5d55b391ee75532b4f82d7c45fa7b69a737cded601ddb5b66",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentPublicationPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.038",
+          "sha256": "7668a45e6c8e65892da8cead160cdd1e3d24e2624baaebfb292156bc61edd319",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentReviewPolicyTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.017",
+          "sha256": "88d131f653aaedf3e31276f0b77b5f7bb1d729afea7ac7f266d8972a8ef6a78b",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollCalculationReviewPolicyTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.021",
+          "sha256": "37eeb4abaff90272aab4f4863dcfe2c3c50a6ebe76f8d8ffd223b956122b48db",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollInputPolicyTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.026",
+          "sha256": "1a96620003b8b0af1f52e13f4813260dd2f4f4b6c53a2de2079a27be46c9d117",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollPayUnitsPolicyTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.01",
+          "sha256": "273e180850a5410c1a5dbcb4bd0819aa814450ece822e87b14a3755e8fbe2d96",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollPaymentRecoveryPolicyTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.01",
+          "sha256": "c184400aa2c2458bc0dff351091bcac850cec474564d682b1bffc34aef38a670",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollPaymentReviewPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.01",
+          "sha256": "5564c394cd8e49d9f6c7091ec4dc6d4dcd090acd6bf1fddb6aad876af2e7792a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollSettlementPolicyTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.001",
+          "sha256": "f875a87d203eb3a82f1a05b48741409be77756a55e95d0f01828729262846065",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollTaxContinuityPolicyTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.014",
+          "sha256": "694085fbae482f75b939051bfd77127037fc7abf176bdf28977f93bafb265493",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollTaxOpeningPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.002",
+          "sha256": "87086c2facb0a6a5da89833ce3471000ec4286c2f894814654f2010c0ceef85f",
+          "failuresDetail": []
+        }
+      ],
+      "totals": {
+        "tests": 114,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "data": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.payroll.data.PayrollComparisonRepositoryTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.131",
+          "sha256": "c45e3244dbb98a9259b1cec54c1d6d37dd5f4cd61058f13df6ecb11261cfdac1",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.data.PayrollPaymentMappingTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.066",
+          "sha256": "c8b6a15cf9b96eb8602d7978bf20224f4b1a2a06fcea22bccdd3711eeea4721c",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.payroll.data.PayrollSnapshotMappingTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.859",
+          "sha256": "7665be78e77f52f3132f3d97ce1d24d0e577a118048bd95ce9604d741260288f",
+          "failuresDetail": []
+        }
+      ],
+      "totals": {
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "packages": [
+    {
+      "path": ".work/payroll-audit-2026-10-30/packages/apps-server.jar",
+      "bytes": 97519935,
+      "sha256": "5dc62edfdd2a035e1ea0f9a686c715673a0c22ed988aa11980c6b6c62feb1972"
+    },
+    {
+      "path": ".work/payroll-audit-2026-10-30/packages/apps-worker.jar",
+      "bytes": 77706775,
+      "sha256": "1f15b5b2d525fe8090efdb7d599587514dddf43bd8c43e9e81c1a69ff096fa75"
+    }
+  ],
+  "actualBrowser": {
+    "normal": {
+      "run": {
+        "command": [
+          "npx",
+          "playwright",
+          "test",
+          "--config",
+          "playwright.integration.config.ts",
+          "compensations.spec.ts",
+          "payroll-policies.spec.ts",
+          "payroll-periods.spec.ts",
+          "tax-openings.spec.ts"
+        ],
+        "cwd": "/home/fajar/hris/hris-platform/apps/dashboard",
+        "sourceAtInvocation": "b510fa4a01eef0c49a9a1347b1febd03a8dce91d",
+        "startedAt": "2026-10-30T16:28:36.235569+00:00",
+        "elapsed_seconds": 47.453,
+        "exit_code": 0
+      },
+      "report": {
+        "sourceHtml": "apps/dashboard/integration-report/index.html",
+        "sha256": "232f65300e4c7f20f14a11800adb4c9be26663857276b8e6babfb6ba3673ca54",
+        "stats": {
+          "total": 4,
+          "expected": 4,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "duration": 46815.789
+      }
+    },
+    "worker": {
+      "run": {
+        "command": [
+          "npx",
+          "playwright",
+          "test",
+          "--config",
+          "playwright.worker-integration.config.ts",
+          "payroll-calculations.spec.ts",
+          "payroll-inputs.spec.ts",
+          "payroll-comparison.spec.ts"
+        ],
+        "cwd": "/home/fajar/hris/hris-platform/apps/dashboard",
+        "sourceAtInvocation": "b510fa4a01eef0c49a9a1347b1febd03a8dce91d",
+        "startedAt": "2026-10-30T16:29:37.394819+00:00",
+        "elapsed_seconds": 138.372,
+        "exit_code": 0
+      },
+      "report": {
+        "sourceHtml": "apps/dashboard/worker-integration-report/index.html",
+        "sha256": "fb3cbe27fad61474e69d725f4c5d6e3d353a5e25193e37be651da607ceb35c67",
+        "stats": {
+          "total": 3,
+          "expected": 3,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "duration": 137714.383
+      }
+    },
+    "cleanup": {
+      "workerFixtureContainerRemoved": true,
+      "workerMetadataRemoved": true,
+      "workerEnvironmentRemoved": true,
+      "normalMetadataRemoved": true,
+      "normalEnvironmentRemoved": true,
+      "port18080Closed": true,
+      "port4174Closed": true,
+      "port18081Closed": true,
+      "port4175Closed": true
+    }
   }
 }

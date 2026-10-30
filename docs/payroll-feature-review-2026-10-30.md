@@ -1,10 +1,10 @@
 # Payroll requirement review
 
-The seven initial requirements and the original implementation-status section map
-to the surfaces below. This review is still active: the new command corrections
-need broad final API/worker/browser acceptance and complete source CI before the
-seven inventory rows can close. [Assurance evidence](payroll-assurance-2026-10-30.md)
-records actual reproductions separately from pre-existing controls and fixture errors.
+The seven initial requirements and implementation-status section now have complete
+local acceptance. Forty genuine enrollment/input/receipt/delegation failures are
+corrected. Full source CI `41087903927` at `eec8a53a` is running; the seven inventory
+rows remain unverified until that gate passes. [Assurance evidence](payroll-assurance-2026-10-30.md)
+separates actual reproductions from existing controls and fixture errors.
 
 | Initial requirement | Implementation and evidence to retain |
 | --- | --- |
@@ -39,11 +39,21 @@ PDFs use the explicitly selected immutable revision. Earlier native evidence in
 process restoration and both revision-pinned digests; an install-only phone update
 does not establish fresh device UI acceptance.
 
-## Remaining acceptance
+## Local acceptance and remaining gate
 
-Complete the broad Payroll API and worker selection, domain/repository and quality
-checks, both application packages, four normal browser scenarios and three actual
-worker scenarios. Preserve suite counts, exact command/source and package hashes.
-Then pass full Platform CI, including dashboard integration and isolated recovery.
-Continue Workforce and full Mobile/Starter review; Payroll acceptance alone cannot
-complete the workspace goal.
+Source `cca5e151` passed all 682 API cases in 95 suites, three Payroll worker
+cases, 114 domain and twelve repository cases, architecture/format and both
+application packages in 1,464.110 seconds. Later local commits only changed docs;
+the measurement records the invocation source and completion HEAD separately.
+
+Four normal API/browser scenarios passed in 47.453 seconds with setup, then three
+actual worker/browser scenarios in 138.372 seconds. These cover preparation,
+calculation/recovery, independent review, publication, retained payslips/PDFs,
+payments/returns, amendment authoring/review/publication, monthly input and period
+comparison. Every scenario passed without retries/skips. The owned worker database,
+fixture metadata and all four listeners were removed. Both JARs and report hashes
+are preserved in [measurements](measurements/payroll-assurance-2026-10-30.json).
+
+Full Platform CI, including complete dashboard integration and isolated recovery,
+remains running. Continue Workforce and full Mobile/Starter review; Payroll local
+acceptance does not close the workspace objective. No live deployment occurred.

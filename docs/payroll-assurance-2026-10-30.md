@@ -61,3 +61,18 @@ The [seven-row review](payroll-feature-review-2026-10-30.md) remains active unti
 broad API/worker/browser acceptance and final source CI. No schema, transport,
 shared DI, statutory rule or runtime deployment changed. Continue Workforce and
 full Mobile/Starter review after completing Payroll acceptance.
+
+## Complete local acceptance
+
+The final broad run at application/test source `cca5e151` passed 682 API cases
+across 95 suites, three Payroll worker cases, 114 domain and twelve data cases,
+architecture/format and both packages in 1,464.110s. Four actual normal browser
+scenarios then passed in 47.453s and three worker/browser scenarios in 138.372s,
+including setup. This includes calculation/recovery, review/publication, retained
+slips/PDFs, payments/returns, amendments, input verification and comparison.
+
+The preserved packages and XML/browser hashes identify the tested candidate.
+All owned fixture listeners/metadata and the worker database were removed.
+[Measurements](measurements/payroll-assurance-2026-10-30.json) distinguish source at
+invocation from later documentation-only HEADs. Full source CI `41087903927` is
+still running; no final CI acceptance or deployment is claimed yet.

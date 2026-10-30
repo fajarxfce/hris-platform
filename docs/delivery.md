@@ -6695,3 +6695,12 @@ two key identifiers, metadata history/constraints and announcement email.
 job/step and the intentionally skipped shard-duplicate artifact uploads.
 All five Administration rows are accepted: inventory 41/20. Continue final
 Reporting/Payroll source CI, Workforce and Mobile/Starter review. No deployment.
+
+### 30 October 2026 — Payroll complete local acceptance
+
+Application/test source `cca5e151` passed 682 API cases, three Payroll worker cases,
+114 domain and twelve data cases, quality and both packages in 1,464.110s. Four
+actual normal browser scenarios passed in 47.453s and three worker scenarios in
+138.372s, including setup. Retained reports/package hashes and owned-fixture cleanup
+are in [measurements](measurements/payroll-assurance-2026-10-30.json). Full source CI
+`41087903927` remains running. Continue Workforce/Mobile/Starter; no rollout occurred.

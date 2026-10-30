@@ -20,56 +20,34 @@ CI `41077194465` passed all four jobs and its installed binary hash is verified.
 
 ## Active goal — full feature completion audit
 
+Payroll complete local acceptance now passes: 682 API cases in 95 suites, three
+worker, 114 domain and twelve data cases, quality and both packages (1,464.110s).
+Four normal actual browser scenarios passed in 47.453s; three worker/browser
+scenarios passed in 138.372s. Owned fixtures/ports are cleaned. Read the
+[seven-row review](payroll-feature-review-2026-10-30.md) and
+[measurements](measurements/payroll-assurance-2026-10-30.json); exact `cca5e151`
+packages are preserved under `.work/payroll-audit-2026-10-30/packages`.
+
 Final Reporting/Payroll source [CI 41087903927](https://github.com/fajarxfce/hris-platform/actions/runs/41087903927)
-is dispatched for exact `eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f`, after all ten
-Administration jobs terminated successfully. [Run record](measurements/reporting-payroll-ci-2026-10-30.json)
-identifies included implementation commits. Preserve this run; another dispatch
-on the same branch cancels it. Local Payroll broad PTY `78722` still runs against
-application/test source `cca5e151`; intervening commits only change documentation.
-Finish its actual browser acceptance, then Workforce and Mobile/Starter.
+uses exact `eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f`. Four dashboard shards passed;
+backend/downstream verification remains running. Preserve it: another dispatch
+on this branch cancels it. Accept Reporting's five and Payroll's seven rows only
+after every required job passes. No newer business correction is deployed.
 
+The inventory remains 41 accepted / 20 unverified. Administration's complete
+[ten-job evidence](measurements/administration-full-ci-2026-10-30.json) is accepted.
+Next run Workforce's prepared 27 regressions against unchanged production source,
+then fix confirmed failures and finish all eight rows. The
+[Workforce audit](workforce-audit-2026-10-30.md) preserves the intentionally distinct
+overtime receipt contract. Local draft files live in `.work/workforce-audit-2026-10-30`;
+none has been applied yet. Follow with full Mobile/Starter review. The read-only
+foundation comparison found 657 identical shared files and 60 differences awaiting
+classification; no unproved generic port is due merely because paths differ.
 
-Administration is fully accepted: all ten jobs passed in `41081153648` for exact
-source `3c8fb15a`, including 3,015 API cases, 104 active worker cases per shard,
-41 normal/14 worker/one export browser scenarios and schema-103 recovery.
-[Full downloaded evidence](measurements/administration-full-ci-2026-10-30.json)
-retains every job/step, 124 module report hashes and the recovery summary.
-The inventory is now 41 accepted / 20 unverified. That CI has terminated;
-the next complete Reporting/Payroll source CI is now dispatched above.
-Do not deploy a different local JAR using Administration-only CI.
+## Retained acceptance history
 
-
-Payroll source `cca5e151` is pushed. Its complete API/Payroll-worker/domain/data/
-quality/package run is active in PTY session `78722`, with logs and start-source
-metadata under `.work/payroll-audit-2026-10-30`. Keep application/test sources
-unchanged during the run. Then run the four normal browser scenarios and three
-actual worker scenarios listed in the [Payroll requirement review](payroll-feature-review-2026-10-30.md).
-Do not treat the fifteen focused regressions as complete module acceptance.
-[Workforce's read-only audit](workforce-audit-2026-10-30.md) identifies the next
-bounded reproductions and preserves its deliberately different overtime receipt
-contract. No Workforce implementation or tests have changed yet.
-
-
-Payroll's second correction passes all fifteen added SQL/API input/receipt/delegation
-cases, 114 domain and twelve repository cases plus quality checks (102.743s).
-Forty genuine baseline failures are now corrected across both increments; one
-amendment-source expiry case was already correct. See [the audit](payroll-assurance-2026-10-30.md),
-[measurements](measurements/payroll-assurance-2026-10-30.json) and
-[seven-row review](payroll-feature-review-2026-10-30.md). Run the complete Payroll/
-Compensation/Payslip API suite and Payroll worker tests, both packages, four normal
-and three worker browser workflows, then final full source CI. All ten
-Administration CI jobs have passed. The next Reporting/Payroll source run is
-41087903927; keep it running.
-
-
-Payroll now has [a committed local enrollment correction](payroll-assurance-2026-10-30.md):
-13 interactive commands and 26 genuine SQL reproductions, followed by all six
-API assurance suites plus domain/repository and quality checks (193.304s).
-[Measurements](measurements/payroll-assurance-2026-10-30.json) retain the counts.
-Input, receipt and multi-stage delegation corrections now pass focused acceptance;
-complete broad Payroll/Workforce and Mobile/Starter verification. Payroll remains unverified
-for full module acceptance, and the private runtime has not been changed.
-
+The following entries preserve earlier increments; the active queue above takes
+precedence over their historical pending statements.
 
 Metadata is fully accepted: [final CI and phone evidence](measurements/document-metadata-final-ci-2026-10-30.json)
 records four passed Mobile jobs, 1,994 desktop/1,676 browser/104 Apple cases, full

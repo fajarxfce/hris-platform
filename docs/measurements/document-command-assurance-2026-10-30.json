@@ -1,0 +1,390 @@
+{
+  "date": "2026-10-30",
+  "baseline": "7a1c0251",
+  "status": "implemented-and-locally-accepted",
+  "reproduction": {
+    "tests": 20,
+    "failures": 19,
+    "positiveControls": 1,
+    "firstBatch": {
+      "tests": 17,
+      "failures": 16,
+      "durationSeconds": 45
+    },
+    "enrollmentBatch": {
+      "tests": 3,
+      "failures": 3,
+      "durationSeconds": 40
+    },
+    "lateJournalVariants": 11,
+    "expiredOwnershipReceiptVariants": 4,
+    "expiredPreparationObjectWrites": 1,
+    "missingEnrollmentVariants": 3,
+    "positiveControl": "Inventory receipt replay already requires current recent proof."
+  },
+  "correctedFocused": {
+    "tests": 20,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "durationSeconds": 50
+  },
+  "commands": 8,
+  "boundary": {
+    "additionalQueries": 0,
+    "newDiDependencies": false,
+    "schemaChange": false,
+    "storageOutsideTransactions": true,
+    "failedResultRollsBackJournalAndReceipt": true,
+    "existingPhysicalAttemptRegistrationRetained": true
+  },
+  "acceptance": {
+    "api": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.DocumentAccessHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentAdministrationAssuranceTest",
+          "tests": 23,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentBodyHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentCommandAssuranceTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentCommandCompletionTest",
+          "tests": 20,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentDownloadHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentEmployeesAdmissionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentEmployeesAssuranceTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentEmployeesHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentEvidenceSyncHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentInventoryBoundsHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentInventoryHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentInventorySecurityHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentOriginalAccessTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentQueueAssuranceTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentReadAssuranceTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentReadCompletionTest",
+          "tests": 20,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentReferenceHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentRetentionHttpTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentRetentionSecurityHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentRetirementHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentRetirementInventoryHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentRetirementReferenceHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentRetirementReviewAssuranceTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentRetirementReviewHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentRetirementSecurityHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentRevisionActionsAssuranceTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentRevisionActionsHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentUploadHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentValidationHttpTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.SelfDocumentAdmissionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.SelfDocumentAssuranceTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.SelfDocumentHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.SelfDocumentRecordHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 243,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "domain": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.documents.domain.DocumentInventoryPolicyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.documents.domain.DocumentRetentionPolicyTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.documents.domain.DocumentRetirementPolicyTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.documents.domain.DocumentRevisionActionPolicyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "data": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.documents.data.ClamAvInspectionTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.documents.data.ClamAvTransportTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.documents.data.DocumentInspectionBoundaryTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "quality": {
+      "format": true,
+      "architecture": true,
+      "apiPackage": true,
+      "workerPackage": true,
+      "durationSeconds": 416
+    },
+    "apiJarSha256": "30faf560f4d0aff49a4a0db60281c0ec7ea3464e786f8c99b621207e7284438f",
+    "realApiBrowser": {
+      "tests": 4,
+      "failures": 0,
+      "durationWithSetupSeconds": 42.5,
+      "scenarioSeconds": [
+        7.9,
+        5.6,
+        3.6,
+        3.5
+      ],
+      "files": [
+        "document-retention-lifecycle.spec.ts",
+        "document-retention.spec.ts",
+        "document-retirement.spec.ts",
+        "documents.spec.ts"
+      ],
+      "scope": "Owned disposable API/PostgreSQL/browser fixture; no private runtime rollout."
+    }
+  },
+  "fullCi": {
+    "status": "pending-final-source-dispatch"
+  },
+  "runtime": "Private schema-101 API, isolated dashboard baseline, Google binding and installed phone unchanged."
+}

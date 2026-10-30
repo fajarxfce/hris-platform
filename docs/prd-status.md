@@ -22,11 +22,14 @@ The [final assurance correction](approval-read-assurance-2026-10-30.md) and
 [Approvals requirement review](approvals-feature-review-2026-10-30.md) locally accept
 its five initial rows and detailed sections. The [Communications review](communications-feature-review-2026-10-30.md)
 also accepts five rows after the read-completion correction. [Identity](identity-feature-review-2026-10-30.md)
-accepts five more against unchanged source and downloaded full-CI results; 46 initial
-rows and Mobile review are still active. [Document read completion](document-read-assurance-2026-10-30.md)
-passed its selected API/domain/data and actual browser acceptance; its command
-review continues before accepting that module. Email source `8014d733` passed all ten full-CI jobs;
-follow final branch CI for the approval increments and continue the remaining scope.
+accepts five more against unchanged source and downloaded full-CI results.
+[Documents](documents-feature-review-2026-10-30.md) now accepts its five rows and
+ten original sections after read/command completion fixes: 243 API, 18 domain,
+nine data, quality/packages and four actual browser workflows passed. Twenty rows
+are reviewed; 41 initial rows and the full Mobile review remain active. Email
+`8014d733` and approval `fcfdaf26` each passed all ten full-CI jobs. Follow the
+Communications/Documents final-source CI and continue Expenses and remaining scope.
+
 
 ## Release-configuration audit — accepted
 

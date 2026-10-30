@@ -210,3 +210,14 @@ acquisition. Content preparation checks before storage starts, and completion
 checks after its final profile read before returning bytes. Existing scope,
 Range/ETag, part, deadline and transaction boundaries remain. See the
 [correction and acceptance](../document-read-assurance-2026-10-30.md).
+
+## Interactive command completion
+
+Upload, cancellation, validation admission, inventory admission and retention
+commands retain current session assurance through journal and receipt completion.
+Inventory and retention also retain their recent-proof requirement. Retention
+administration requires current enrollment when MFA is enforced. Receipt recovery
+checks after any ownership acquisition; chunk reservation checks before object I/O.
+Late failure rolls back its transaction, while an already committed physical-attempt
+registration remains available to bounded cleanup/retry. See
+[command acceptance](../document-command-assurance-2026-10-30.md).

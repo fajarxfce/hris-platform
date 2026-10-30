@@ -3,7 +3,7 @@
 The five initial Approvals requirement rows and all six detailed contract sections
 have now been reviewed against implementation and matching behavior. Local
 acceptance is complete after the history addition and read-completion correction.
-Full branch CI for the final increment follows its commit. This covers the Platform
+Exact source `fcfdaf26` passed all ten jobs in [full CI](https://github.com/fajarxfce/hris-platform/actions/runs/41009137720). This covers the Platform
 approval capability; it does not mark another module or Mobile requirement complete.
 
 | Requirement | Implementation and matching behavior |

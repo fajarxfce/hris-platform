@@ -165,6 +165,10 @@ class StartDocumentInventory(
                                 ),
                             )
                         }
+                        .flatMap {
+                            validateCompanySessionActor(actor, identity, clock.instant(), security)
+                        }
+                        .flatMap { validateDocumentInventoryCommand(it, clock.instant(), security) }
                         .map { receipt }
                 }
         }

@@ -34,9 +34,11 @@ retain exact counts, baseline failures and package hash. The existing API/worker
 graph already has full context acceptance; this correction changes no DI.
 Final-source CI follows the command review without cancelling the approval run.
 
-Documents is not yet accepted as a whole. Review of older upload, validation,
+At the read increment, Documents was not yet accepted as a whole. Review of older upload, validation,
 inventory and retention commands also found missing assurance checks after their
 journal writes; reproduce their late-expiry behavior and preserve rollback,
 original receipts and bounded physical-attempt cleanup before closing the module.
-The [full audit](feature-audit-2026-10-30.md) still has 46 unverified initial rows,
-followed by the full Mobile review. The running private stack and phone are intact.
+The subsequent [command correction](document-command-assurance-2026-10-30.md)
+and [module review](documents-feature-review-2026-10-30.md) now have local acceptance.
+The full audit retains 41 unverified initial rows and the full Mobile review.
+The running private stack and phone are intact.

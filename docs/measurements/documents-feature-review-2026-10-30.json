@@ -1,0 +1,583 @@
+{
+  "date": "2026-10-30",
+  "status": "locally-accepted",
+  "requirements": [
+    "documents.01",
+    "documents.02",
+    "documents.03",
+    "documents.04",
+    "documents.05"
+  ],
+  "originalDetailedSections": 10,
+  "sourceReview": "docs/documents-feature-review-2026-10-30.md",
+  "corrections": [
+    "docs/measurements/document-read-assurance-2026-10-30.json",
+    "docs/measurements/document-command-assurance-2026-10-30.json"
+  ],
+  "retainedCi": {
+    "source": "8014d733",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41005223374",
+    "unchangedSources": [
+      {
+        "path": "core/storage",
+        "treeOrBlob": "1939d92c2ddbccb99135e43990ff377643b6113e"
+      },
+      {
+        "path": "modules/documents/data",
+        "treeOrBlob": "5dfd42bed1b309781a0118266971638c46377a7a"
+      },
+      {
+        "path": "modules/documents/delivery",
+        "treeOrBlob": "3c84b3ff746ada169e3f243be05916cbfe5ac6b0"
+      },
+      {
+        "path": "apps/dashboard/src/features/documents",
+        "treeOrBlob": "edaedc7e56326811a011d304456c7f699c430434"
+      },
+      {
+        "path": "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/usecases/AdvanceDocumentValidation.kt",
+        "treeOrBlob": "5267b282e82d12f8f442b8125e1d9e2f0c99af2a"
+      },
+      {
+        "path": "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/usecases/AdvanceDocumentInventory.kt",
+        "treeOrBlob": "431bb5f4b974833892979a1349bc4e1daa1790f7"
+      },
+      {
+        "path": "apps/worker/src/test/kotlin/dev/fajar/hris/worker/DocumentValidationWorkerTest.kt",
+        "treeOrBlob": "c95433c02951f8348a815d44e8cb10b45a94e5f9"
+      }
+    ],
+    "browser": [
+      {
+        "artifactPath": "dashboard-integration-test-reports/integration-report/index.html",
+        "file": "document-retention-lifecycle.spec.ts",
+        "title": "real archive, restore and legal hold retain policy snapshots and recover one committed transition",
+        "duration": 5908,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-integration-test-reports/integration-report/index.html",
+        "file": "document-retention.spec.ts",
+        "title": "independent retention administration recovers committed saves and rejects concurrent or cross-company review",
+        "duration": 4682,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-integration-test-reports/integration-report/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "real retirement recovers a committed result, preserves newer publication and rechecks a competing hold",
+        "duration": 3141,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-integration-test-reports/integration-report/index.html",
+        "file": "documents.spec.ts",
+        "title": "real browser upload, reserved part review and cancellation remain company-scoped",
+        "duration": 3379,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-actions.spec.ts",
+        "title": "current actions validate a completed file and explicitly cancel its pending validation",
+        "duration": 2357,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-actions.spec.ts",
+        "title": "an uncertain command survives MFA recovery and replays only its original payload",
+        "duration": 2101,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-actions.spec.ts",
+        "title": "invalid reasons do not send commands and a stale version requires explicit review",
+        "duration": 2378,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-actions.spec.ts",
+        "title": "company departure owns a pending command and hides its late completion",
+        "duration": 1809,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-actions.spec.ts",
+        "title": "a known denial stays gated during pending and failed review recovery",
+        "duration": 1844,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-actions.spec.ts",
+        "title": "fresh action review rejects a capability withdrawn since the detail read",
+        "duration": 1661,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-actions.spec.ts",
+        "title": "read-only grants cannot authorize actions even when cached transport suggests them",
+        "duration": 1942,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-actions.spec.ts",
+        "title": "expired active uploads remain explicitly cancellable in Indonesian and dark mode",
+        "duration": 1983,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-actions.spec.ts",
+        "title": "a failed inspection offers an explicit validation retry with its observed version",
+        "duration": 1684,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention-lifecycle.spec.ts",
+        "title": "retention-only lookup validates the document reference and acquires only lifecycle metadata",
+        "duration": 1756,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention-lifecycle.spec.ts",
+        "title": "archive snapshots stay fixed while legal hold survives restoration and explicit rearchiving",
+        "duration": 4425,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention-lifecycle.spec.ts",
+        "title": "lost lifecycle responses survive MFA and later conflict without duplicating a change",
+        "duration": 2350,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention-lifecycle.spec.ts",
+        "title": "unfinished uploads prevent archive and require a separate explicit review",
+        "duration": 1968,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention-lifecycle.spec.ts",
+        "title": "company departure cancels the pending owner and discards document references",
+        "duration": 1835,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention-lifecycle.spec.ts",
+        "title": "bounded history panels disappear before a failed access refresh",
+        "duration": 3051,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention-lifecycle.spec.ts",
+        "title": "document details link to retention only for the independent grant",
+        "duration": 1528,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention-lifecycle.spec.ts",
+        "title": "ordinary document management cannot review or change a document lifecycle",
+        "duration": 959,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention-lifecycle.spec.ts",
+        "title": "narrow dark history preserves archive details without horizontal page overflow",
+        "duration": 1351,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention.spec.ts",
+        "title": "retention-only access has its own navigation and does not acquire document contents",
+        "duration": 1426,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention.spec.ts",
+        "title": "legacy policy links retain company scope and resolve to the current administration route",
+        "duration": 1259,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention.spec.ts",
+        "title": "ordinary document management cannot read or edit retention",
+        "duration": 1167,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention.spec.ts",
+        "title": "configures an indefinite policy and then records a finite revision with immutable history",
+        "duration": 2343,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention.spec.ts",
+        "title": "a lost response remains pinned through MFA and later version rejection",
+        "duration": 1708,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention.spec.ts",
+        "title": "invalid values make no request and a definite conflict requires explicit current review",
+        "duration": 1672,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention.spec.ts",
+        "title": "history pages are bounded and stay in ascending version order",
+        "duration": 1820,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention.spec.ts",
+        "title": "company departure cancels a pending save and drops old policy references",
+        "duration": 1946,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention.spec.ts",
+        "title": "denied policy details stay hidden during a failed refresh",
+        "duration": 2005,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retention.spec.ts",
+        "title": "narrow dark Indonesian policy editing retains readable controls",
+        "duration": 1015,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "retention-only operators review a revision without reading file or employee data",
+        "duration": 1494,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "a server blocker prevents confirmation: document_retention_pending",
+        "duration": 1271,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "a server blocker prevents confirmation: document_retention_indefinite",
+        "duration": 1176,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "a server blocker prevents confirmation: document_legal_hold",
+        "duration": 1121,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "a server blocker prevents confirmation: document_evidence_referenced",
+        "duration": 1139,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "a server blocker prevents confirmation: document_future_blocker",
+        "duration": 1198,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "lost retirement responses retain the original command across MFA and later conflicts",
+        "duration": 2521,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "a new hold requires fresh review and cannot be bypassed by confirming again",
+        "duration": 1606,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "company departure disposes a pending retirement without restoring its late result",
+        "duration": 1975,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "a revoked grant removes the review before a failed reload",
+        "duration": 1168,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "normal revision details respect independent retirement access: true",
+        "duration": 1292,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "normal revision details respect independent retirement access: false",
+        "duration": 1969,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-retirement.spec.ts",
+        "title": "narrow retirement review supports both themes and Indonesian without page overflow",
+        "duration": 1451,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-uploads.spec.ts",
+        "title": "employee folders upload a multipart file with its original checksum and a separate validation action",
+        "duration": 4647,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-uploads.spec.ts",
+        "title": "replacement uploads retain document identity and its published revision",
+        "duration": 2321,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-uploads.spec.ts",
+        "title": "a lost chunk response resumes from the server offset without uploading committed bytes twice",
+        "duration": 3515,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-uploads.spec.ts",
+        "title": "a new page resumes a reserved part with the original operation after reselecting identical content",
+        "duration": 3346,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-uploads.spec.ts",
+        "title": "unknown metadata outcome stays pinned through MFA recovery and subsequent rejection",
+        "duration": 2086,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-uploads.spec.ts",
+        "title": "leaving a company cancels page ownership and hides a late upload result",
+        "duration": 2426,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-uploads.spec.ts",
+        "title": "read-only grants do not expose upload controls or permit direct upload routes",
+        "duration": 2322,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-uploads.spec.ts",
+        "title": "invalid fields stay editable and an obsolete document version requires a fresh review",
+        "duration": 2245,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "document-uploads.spec.ts",
+        "title": "upload form supports narrow layouts, both themes and Indonesian copy",
+        "duration": 2188,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "documents.spec.ts",
+        "title": "employee documents retain published revision identity and download authenticated content",
+        "duration": 3006,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "documents.spec.ts",
+        "title": "employee search has bounded pages and sends filters only on submission",
+        "duration": 1861,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "documents.spec.ts",
+        "title": "revision details support Indonesian, dark mode and a narrow viewport without enabling unfinished files",
+        "duration": 1651,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "documents.spec.ts",
+        "title": "known content denial stays hidden through a pending and failed refresh",
+        "duration": 2008,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "documents.spec.ts",
+        "title": "MFA recovery requires fresh metadata and never repeats the download",
+        "duration": 1540,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "documents.spec.ts",
+        "title": "company departure cancels an in-flight download and discards the previous resource route",
+        "duration": 1919,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "documents.spec.ts",
+        "title": "retired content cannot be downloaded from previously ready metadata",
+        "duration": 1104,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "documents.spec.ts",
+        "title": "foreign company deep links discard resource identifiers before acquisition",
+        "duration": 1676,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "documents.spec.ts",
+        "title": "the documents.read grant alone cannot open administrative documents",
+        "duration": 1057,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "documents.spec.ts",
+        "title": "the people.profile.read grant alone cannot open administrative documents",
+        "duration": 1039,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-1/index.html",
+        "file": "documents.spec.ts",
+        "title": "the documents.self.read grant alone cannot open administrative documents",
+        "duration": 1085,
+        "outcome": "expected",
+        "ok": true
+      }
+    ],
+    "documentValidationWorkerTests": 4,
+    "coreStorageTests": 8,
+    "scope": "Unchanged adapters, dashboard and worker execution retain existing full-CI acceptance; interactive use-case corrections have separate current acceptance."
+  },
+  "retainedWorkloads": [
+    "docs/measurements/documents-2026-10-28.json",
+    "docs/native-upload-acceptance.md"
+  ],
+  "scannerLimitBaseline": "docs/measurements/documents-2026-10-28-scan-limit.json is failed baseline, not acceptance.",
+  "physicalIphone": "explicitly waived",
+  "remaining": "Full-source CI and remaining Platform/Mobile requirements stay separately tracked."
+}

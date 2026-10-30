@@ -1,7 +1,7 @@
 {
   "date": "2026-10-30",
   "baseline": "925f693a5046da6504890167e7cefaaa3e6ea558",
-  "status": "implemented-and-locally-accepted",
+  "status": "accepted",
   "requirement": "Shared approval request timeline with retained decisions and assignment changes",
   "baselineProof": "GET history returned 404 before implementation; V4 retained facts had no reader or dashboard view.",
   "contract": {
@@ -364,5 +364,12 @@
     "Existing history tables and retention remain unchanged; no migration or new recovery secret family.",
     "No production deployment or live provider messages.",
     "Remaining full module and Mobile audit is active; this feature is not whole-PRD completion."
-  ]
+  ],
+  "fullCi": {
+    "source": "fcfdaf26a48718a80bc79468bdbdb3b4cbeae11c",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41009137720",
+    "status": "completed",
+    "conclusion": "success",
+    "successfulJobs": 10
+  }
 }

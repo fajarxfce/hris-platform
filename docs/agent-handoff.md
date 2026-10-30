@@ -11,10 +11,10 @@ preserves earlier work; its old next-step statements are not the active queue.
 
 Complete every specified Platform/Mobile feature and port demonstrated generic
 fixes to Starter. The [full audit](feature-audit-2026-10-30.md) remains active:
-Approvals, Communications and Identity now have fifteen reviewed initial
-requirement rows and their detailed sections; 46 initial rows still await review,
-followed by Mobile/Starter. Identity has accepted full-CI evidence; final CI for
-the approval/communication corrections remains separately tracked.
+Approvals, Communications, Identity and Documents now have twenty reviewed initial
+requirement rows and their detailed sections; 41 initial rows still await review,
+followed by Mobile/Starter. Identity and Approvals have accepted full-CI evidence;
+final CI for Communications and Document corrections remains separately tracked.
 Do not mark the goal complete from these increments or earlier green CI.
 
 Announcement email source `8014d733` passed all ten jobs in
@@ -38,8 +38,7 @@ uses current-stage eligibility; retained request/history scope remains distinct.
 See [correction](approval-read-assurance-2026-10-30.md) and
 [module requirement review](approvals-feature-review-2026-10-30.md).
 The correction is committed/pushed at `fcfdaf26`. [Full CI 41009137720](https://github.com/fajarxfce/hris-platform/actions/runs/41009137720)
-is running for exact source `fcfdaf26a48718a80bc79468bdbdb3b4cbeae11c`; observe its
-terminal result without cancelling it through another same-branch dispatch.
+passed all ten jobs for exact source `fcfdaf26a48718a80bc79468bdbdb3b4cbeae11c`.
 
 [Communications read completion](communications-read-assurance-2026-10-30.md)
 corrects thirteen reproduced MFA-expiry variants across ten older readers. All
@@ -47,8 +46,7 @@ corrects thirteen reproduced MFA-expiry variants across ten older readers. All
 checks and actual API/worker/browser/SMTP acceptance (37.1s; 1.0m including setup).
 The [Communications requirement review](communications-feature-review-2026-10-30.md)
 locally accepts all five rows and nine detailed sections, including optional email.
-The correction is committed/pushed at `737d39a7`. Final source CI must follow
-the running approval run without cancelling it.
+The correction is committed/pushed at `737d39a7`. Final source CI follows the Document command correction; the approval run has completed.
 
 [Identity](identity-feature-review-2026-10-30.md) accepts all five initial rows and
 eight detailed sections against unchanged source trees and full CI `8014d733`:
@@ -60,15 +58,22 @@ eight detailed sections against unchanged source trees and full CI `8014d733`:
 actual browser workflows (42.4s). Seventeen readers retain final MFA checks,
 including preparation and post-storage completion. No DI/schema change occurred.
 
-Continue **Document command completion**, then remaining module/Mobile contracts.
-An ignored draft at `.work/documents-assurance-2026-10-30/DocumentCommandCompletionTest.kt`
-prepares 17 late-journal, original-receipt and upload-reservation cases. Move it to
-the API test source after committing the read increment, compile/reproduce it,
-then correct the eight interactive commands and test rollback/recovery. It is not
-part of the accepted read suite and has not run yet. In particular, inventory
-receipt replay needs current recent proof, and chunk preparation must not begin
-object I/O after proof expiry. Preserve bounded failed-attempt cleanup. Do not
-accept Documents until the remaining detailed source/behavior review is complete.
+[Document command completion](document-command-assurance-2026-10-30.md) corrects
+eight commands. Nineteen actual baseline cases failed; inventory receipt replay
+was the twentieth, already-correct control. All twenty focused cases and final
+243 API, 18 domain, nine data, quality/packages and four actual browser workflows
+passed (42.5s). The [Documents requirement review](documents-feature-review-2026-10-30.md)
+locally accepts all five rows and ten original sections. Dispatch full CI for the
+committed final source, then observe its terminal outcome without cancelling it.
+
+Continue **Expenses**, then remaining module/Mobile contracts. Ignored drafts in
+`.work/expense-assurance-2026-10-30/` prepare fifteen payment-enrollment cases,
+six receipt-delegation completion variants (three ordinary-scope controls), and
+two mutable draft-input cases. They are not yet compiled or executed. Reproduce
+before correcting eleven finance use cases, two receipt readers and draft input
+ownership. Also review preparation/reconciliation uses of original lists after
+making ordered copies. Keep current approval account-lock ordering and bounded
+resource ownership. No generic client port is due from these server changes.
 
 Downloaded
 full-CI reports are supplementary local evidence in

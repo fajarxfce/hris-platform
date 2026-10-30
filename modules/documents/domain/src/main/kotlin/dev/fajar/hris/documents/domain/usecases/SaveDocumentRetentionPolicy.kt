@@ -5,7 +5,7 @@ import dev.fajar.hris.documents.domain.entities.*
 import dev.fajar.hris.documents.domain.policies.*
 import dev.fajar.hris.documents.domain.repositories.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import java.time.Clock
@@ -66,10 +66,10 @@ class SaveDocumentRetentionPolicy(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+            val accessProjection = identities.access(actor.accountId, company)
+            if (accessProjection is Result.Failed) return@run accessProjection
+            val identity = (accessProjection as Result.Success).value
+            val checked = validateCompanySessionActor(actor, identity, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val permission =
                 validateDocumentRetentionAccess(
@@ -131,6 +131,10 @@ class SaveDocumentRetentionPolicy(
                             ),
                         )
                     }
+                    .flatMap {
+                        validateCompanySessionActor(actor, identity, clock.instant(), security)
+                    }
+                    .flatMap { validateDocumentRetentionAccess(it, clock.instant(), security) }
                     .map { receipt }
             }
         }

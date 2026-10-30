@@ -134,3 +134,19 @@ commands also need late journal, receipt and reservation assurance review. A
 seventeen-case follow-up fixture is prepared; reproduce it before changing those
 commands. Do not mark the five Document rows accepted merely from the read fix.
 Fifteen initial rows remain reviewed; 46 and full Mobile review remain open.
+
+## Documents requirement review — local acceptance passed
+
+All five initial Document rows and ten original detailed sections now have
+[source/behavior review](documents-feature-review-2026-10-30.md). The subsequent
+[command correction](document-command-assurance-2026-10-30.md) closes nineteen
+reproduced failures, retaining the already-correct inventory replay as a positive
+control. All twenty focused cases, 243 selected API, 18 domain and nine data cases
+passed; quality/packages and four actual API/browser workflows passed (42.5s).
+
+Twenty initial rows are now reviewed; 41 initial rows, remaining detailed contracts
+and full Mobile review remain open. Approvals exact source `fcfdaf26` passed all ten
+[CI jobs](https://github.com/fajarxfce/hris-platform/actions/runs/41009137720).
+Final-source CI for Communications and Documents follows this commit. Continue
+Expenses, where payment enrollment, receipt delegation completion and mutable
+command inputs need reproduction; those findings are not yet accepted corrections.

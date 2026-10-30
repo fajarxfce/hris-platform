@@ -59,10 +59,10 @@ class CancelDocumentUpload(
             if (membershipLock is Result.Failed) return@run membershipLock
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
-            val current =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val access = identities.access(actor.accountId, company)
+            if (access is Result.Failed) return@run access
+            val identity = (access as Result.Success).value
+            val current = validateCompanySessionActor(actor, identity, clock.instant(), security)
             if (current is Result.Failed) return@run current
             val live = (current as Result.Success).value
 
@@ -89,6 +89,9 @@ class CancelDocumentUpload(
                     )
             if (!canManageDocument(live, document.classification, profile.profile.accountId))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "document_access_denied"))
+            val replayAssurance =
+                validateCompanySessionActor(actor, identity, clock.instant(), security)
+            if (replayAssurance is Result.Failed) return@run replayAssurance
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
@@ -137,6 +140,7 @@ class CancelDocumentUpload(
                         ),
                     )
                 }
+                .flatMap { validateCompanySessionActor(actor, identity, clock.instant(), security) }
                 .map { receipt }
         }
     }

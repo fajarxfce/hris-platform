@@ -36,3 +36,5 @@ approval workflows passed on the final package (42 seconds with fixture startup)
 baseline failures, final suite counts and practical scope.
 The [history increment](approval-history.md) already performs its final assurance
 check. Continue the other module and Mobile requirements after this correction.
+
+Exact source `fcfdaf26` passed all ten jobs in [full CI](https://github.com/fajarxfce/hris-platform/actions/runs/41009137720). The remaining module and Mobile audit stays active.

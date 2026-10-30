@@ -73,10 +73,11 @@ class UploadDocumentChunk(
                 if (membershipLock is Result.Failed) return@run membershipLock
                 val accountLock = identities.lockAccount(actor.accountId)
                 if (accountLock is Result.Failed) return@run accountLock
+                val access = identities.access(actor.accountId, company)
+                if (access is Result.Failed) return@run access
+                val identity = (access as Result.Success).value
                 val current =
-                    identities.access(actor.accountId, company).flatMap {
-                        validateCompanySessionActor(actor, it, clock.instant(), security)
-                    }
+                    validateCompanySessionActor(actor, identity, clock.instant(), security)
                 if (current is Result.Failed) return@run current
                 val live = (current as Result.Success).value
 
@@ -105,6 +106,9 @@ class UploadDocumentChunk(
                     return@run Result.Failed(
                         Failure(FailureKind.FORBIDDEN, "document_access_denied")
                     )
+                val replayAssurance =
+                    validateCompanySessionActor(actor, identity, clock.instant(), security)
+                if (replayAssurance is Result.Failed) return@run replayAssurance
                 (replay as Result.Success).value?.let {
                     return@run Result.Success(DocumentChunkPreparation.Replayed(it))
                 }
@@ -208,11 +212,11 @@ class UploadDocumentChunk(
                     return@run Result.Failed(
                         Failure(FailureKind.CONFLICT, "document_storage_quota")
                     )
-                Result.Success(
+                validateCompanySessionActor(actor, identity, clock.instant(), security).map {
                     DocumentChunkPreparation.Reserved(
                         DocumentUploadLease(revision, acquired, attempt, objectKey)
                     )
-                )
+                }
             }
         if (preparation is Result.Failed) return preparation
         val outcome = (preparation as Result.Success).value
@@ -239,10 +243,10 @@ class UploadDocumentChunk(
             if (membershipLock is Result.Failed) return@run membershipLock
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
-            val current =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val access = identities.access(actor.accountId, company)
+            if (access is Result.Failed) return@run access
+            val identity = (access as Result.Success).value
+            val current = validateCompanySessionActor(actor, identity, clock.instant(), security)
             if (current is Result.Failed) return@run current
             val live = (current as Result.Success).value
 
@@ -262,6 +266,9 @@ class UploadDocumentChunk(
                     )
             if (!canManageDocument(live, document.classification, profile.profile.accountId))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "document_access_denied"))
+            val replayAssurance =
+                validateCompanySessionActor(actor, identity, clock.instant(), security)
+            if (replayAssurance is Result.Failed) return@run replayAssurance
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
@@ -284,6 +291,7 @@ class UploadDocumentChunk(
                         ),
                     )
                 }
+                .flatMap { validateCompanySessionActor(actor, identity, clock.instant(), security) }
                 .map { receipt }
         }
     }

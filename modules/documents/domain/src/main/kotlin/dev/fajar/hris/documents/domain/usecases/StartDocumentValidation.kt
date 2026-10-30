@@ -86,6 +86,9 @@ class StartDocumentValidation(
                 )
             )
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "document_access_denied"))
+            val replayAssurance =
+                validateCompanySessionActor(actor, identity, clock.instant(), security)
+            if (replayAssurance is Result.Failed) return@run replayAssurance
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
@@ -170,6 +173,9 @@ class StartDocumentValidation(
                                     reason,
                                 ),
                             )
+                        }
+                        .flatMap {
+                            validateCompanySessionActor(actor, identity, clock.instant(), security)
                         }
                         .map { receipt }
                 }

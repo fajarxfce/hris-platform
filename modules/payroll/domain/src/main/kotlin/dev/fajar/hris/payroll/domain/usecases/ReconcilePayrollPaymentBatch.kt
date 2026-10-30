@@ -122,7 +122,7 @@ class ReconcilePayrollPaymentBatch(
                                 id,
                                 "payroll.payment_reconciled",
                                 mapOf(
-                                    "resultCount" to results.size.toString(),
+                                    "resultCount" to ordered.size.toString(),
                                     "status" to reconciliation.resultingStatus.name,
                                 ),
                                 reason,

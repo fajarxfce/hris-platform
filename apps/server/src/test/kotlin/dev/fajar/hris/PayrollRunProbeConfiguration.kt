@@ -60,6 +60,9 @@ class PayrollRunProbeConfiguration {
         probe: PayrollRunProbe,
     ): PayrollRunDataSource =
         object : PayrollRunDataSource by source {
+            override fun find(company: UUID, id: UUID, lock: Boolean): PayrollRunsRecord? =
+                source.find(company, id, lock).also { probe.afterRead?.invoke("find", company) }
+
             override fun list(
                 company: UUID,
                 period: UUID,

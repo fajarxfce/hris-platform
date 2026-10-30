@@ -20,12 +20,24 @@ CI `41077194465` passed all four jobs and its installed binary hash is verified.
 
 ## Active goal — full feature completion audit
 
+Payroll's second correction passes all fifteen added SQL/API input/receipt/delegation
+cases, 114 domain and twelve repository cases plus quality checks (102.743s).
+Forty genuine baseline failures are now corrected across both increments; one
+amendment-source expiry case was already correct. See [the audit](payroll-assurance-2026-10-30.md),
+[measurements](measurements/payroll-assurance-2026-10-30.json) and
+[seven-row review](payroll-feature-review-2026-10-30.md). Run the complete Payroll/
+Compensation/Payslip API suite and Payroll worker tests, both packages, four normal
+and three worker browser workflows, then final full source CI. All eight core
+Administration CI jobs and recovery have passed; dashboard integration is still
+running in41081153648. Do not cancel it with another branch dispatch.
+
+
 Payroll now has [a committed local enrollment correction](payroll-assurance-2026-10-30.md):
 13 interactive commands and 26 genuine SQL reproductions, followed by all six
 API assurance suites plus domain/repository and quality checks (193.304s).
 [Measurements](measurements/payroll-assurance-2026-10-30.json) retain the counts.
-Continue mutable-input, compensation-receipt and multi-stage delegation review;
-then complete Payroll/Workforce and Mobile/Starter. Payroll remains unverified
+Input, receipt and multi-stage delegation corrections now pass focused acceptance;
+complete broad Payroll/Workforce and Mobile/Starter verification. Payroll remains unverified
 for full module acceptance, and the private runtime has not been changed.
 
 

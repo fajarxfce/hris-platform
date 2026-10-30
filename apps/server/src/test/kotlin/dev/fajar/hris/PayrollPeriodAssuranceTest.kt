@@ -16,6 +16,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -313,6 +314,61 @@ class PayrollPeriodAssuranceTest : PayrollPeriodApiFixture() {
             Result.Success(recovered.value.copy(replayed = true)),
             mutate(action, scene, scene.actor, id, operation),
         )
+    }
+
+    @Test
+    fun admittedPeriodParticipantsRemainTheSameAcrossAWait() {
+        val scene = prepare()
+        assertTrue(
+            cancelPeriod.execute(scene.actor, UUID.randomUUID(), scene.id, 0, "Replace draft")
+                is Result.Success
+        )
+        val original = setOf(scene.fixture.payroll.employee)
+        val employees = original.toMutableSet()
+        val operation = UUID.randomUUID()
+        val id = UUID.randomUUID()
+        fun invoke(selected: Set<UUID>) =
+            createWithAssurance.execute(
+                scene.actor,
+                operation,
+                id,
+                YearMonth.of(2026, 9),
+                LocalDate.of(2026, 10, 2),
+                selected,
+                "Prepare payroll",
+            )
+        val barrier = AccountLockProbe.Barrier(scene.actor.accountId)
+        accountProbe.current.set(barrier)
+        Executors.newSingleThreadExecutor().use { pool ->
+            val pending = pool.submit<Result<MutationReceipt>> { invoke(employees) }
+            try {
+                assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                employees.clear()
+                employees.add(UUID.randomUUID())
+                barrier.release.countDown()
+                val saved = pending.get(10, TimeUnit.SECONDS)
+                assertTrue(saved is Result.Success, saved.toString())
+            } finally {
+                barrier.release.countDown()
+                accountProbe.current.set(null)
+            }
+        }
+        assertEquals(
+            original,
+            database()
+                .queryForList(
+                    "select employment_id from payroll_period_members where company_id=? and period_id=?",
+                    UUID::class.java,
+                    scene.actor.companyId,
+                    id,
+                )
+                .toSet(),
+        )
+        val beforeReplay = snapshot(scene.actor)
+        val replay = invoke(original)
+        assertTrue(replay is Result.Success, replay.toString())
+        assertTrue((replay as Result.Success).value.replayed)
+        assertEquals(beforeReplay, snapshot(scene.actor))
     }
 
     private fun prepare(): Scenario {

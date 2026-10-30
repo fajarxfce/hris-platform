@@ -224,6 +224,89 @@ class CompensationAssuranceTest : PayrollApiFixture() {
         )
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = ["earnings", "insurance"])
+    fun admittedCompensationTermsRemainTheSameAcrossAWait(collection: String) {
+        val original = prepare()
+        val expected = original.salary.terms
+        val earnings = expected.fixedEarnings.toMutableList()
+        val programs = expected.insurancePrograms.toMutableSet()
+        val scene =
+            original.copy(
+                salary =
+                    original.salary.copy(
+                        terms =
+                            expected.copy(fixedEarnings = earnings, insurancePrograms = programs)
+                    )
+            )
+        val operation = UUID.randomUUID()
+        val barrier = AccountLockProbe.Barrier(scene.actor.accountId)
+        accountProbe.current.set(barrier)
+        Executors.newSingleThreadExecutor().use { pool ->
+            val pending = pool.submit<Result<MutationReceipt>> { save(scene, operation) }
+            try {
+                assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                if (collection == "earnings") earnings.clear() else programs.clear()
+                barrier.release.countDown()
+                val saved = pending.get(10, TimeUnit.SECONDS)
+                assertTrue(saved is Result.Success, saved.toString())
+            } finally {
+                barrier.release.countDown()
+                accountProbe.current.set(null)
+            }
+        }
+        val stored =
+            transactions.run(scene.actor) {
+                compensations.current(
+                    requireNotNull(scene.actor.companyId),
+                    scene.salary.employeeId,
+                )
+            }
+        assertEquals(expected, requireNotNull((stored as Result.Success).value).terms)
+        val beforeReplay = snapshot(scene.actor)
+        val replay = save(original, operation)
+        assertTrue(replay is Result.Success, replay.toString())
+        assertTrue((replay as Result.Success).value.replayed)
+        assertEquals(beforeReplay, snapshot(scene.actor))
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [false, true])
+    fun receiptStillRequiresRecentProofAfterBeneficiaryAcquisition(mfa: Boolean) {
+        val scene = prepare()
+        val operation = UUID.randomUUID()
+        val first = save(scene, operation)
+        assertTrue(first is Result.Success, first.toString())
+        val proof = clock.instant().minus(security.recentAuthenticationAge).plusSeconds(1)
+        val actor =
+            if (mfa) scene.actor.copy(mfaVerifiedAt = proof)
+            else scene.actor.copy(authenticatedAt = proof)
+        var expire = true
+        val observed =
+            object : PeopleRepository by people {
+                override fun accountForEmployee(companyId: UUID, employeeId: UUID): Result<UUID?> =
+                    people.accountForEmployee(companyId, employeeId).also {
+                        if (expire && companyId == actor.companyId)
+                            clock.set(clock.instant().plusSeconds(2))
+                    }
+            }
+        val before = snapshot(scene.actor)
+        val rejected = save(scene, operation, actor, observed)
+        assertEquals(
+            "recent_authentication_required",
+            (rejected as? Result.Failed)?.failure?.code,
+            rejected.toString(),
+        )
+        assertEquals(before, snapshot(scene.actor))
+        expire = false
+        val renewed = actor.copy(authenticatedAt = clock.instant(), mfaVerifiedAt = clock.instant())
+        assertEquals(
+            Result.Success((first as Result.Success).value.copy(replayed = true)),
+            save(scene, operation, renewed, observed),
+        )
+        assertEquals(before, snapshot(scene.actor))
+    }
+
     private fun prepare(): Scenario {
         clock.set(Instant.now())
         val fixture = payrollFixture()
@@ -318,11 +401,12 @@ class CompensationAssuranceTest : PayrollApiFixture() {
         scene: Scenario,
         operation: UUID,
         actor: Actor = scene.actor,
+        peopleRepository: PeopleRepository = people,
     ): Result<MutationReceipt> =
         SaveEmployeeCompensation(
                 policies,
                 compensations,
-                people,
+                peopleRepository,
                 companies,
                 members,
                 identities,

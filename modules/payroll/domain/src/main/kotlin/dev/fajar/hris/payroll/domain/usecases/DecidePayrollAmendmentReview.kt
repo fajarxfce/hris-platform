@@ -235,6 +235,8 @@ class DecidePayrollAmendmentReview(
                             reason = reason,
                         )
                 )
+            // Receipt replay above retains history scope; a new decision requires its own stage.
+            val decisionScope = scoped.copy(stages = listOf(scoped.stages[scoped.currentStep]))
             approvals
                 .decide(
                     actor,
@@ -270,7 +272,7 @@ class DecidePayrollAmendmentReview(
                         .flatMap {
                             requirePayrollAmendmentDecisionActor(
                                     it,
-                                    scoped,
+                                    decisionScope,
                                     delegations,
                                     grants,
                                     clock.instant(),

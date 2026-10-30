@@ -112,14 +112,13 @@ class DecidePayrollReview(
             val foundMembers = members.candidates(company, parties, emptySet(), parties.size)
             if (foundMembers is Result.Failed) return@run foundMembers
             val grants = (foundMembers as Result.Success).value
-            val now = clock.instant()
             val authority =
                 requirePayrollReviewDecisionActor(
                     live,
                     approval,
                     delegations,
                     grants,
-                    now,
+                    clock.instant(),
                     security,
                 )
             if (authority is Result.Failed) return@run authority
@@ -149,6 +148,7 @@ class DecidePayrollReview(
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "payroll_review_not_current")
                 )
+            val now = clock.instant()
             val planned = decideApproval(approval, live, decision, reason, delegations, grants, now)
             if (planned is Result.Failed) return@run planned
             val transition = (planned as Result.Success).value
@@ -165,10 +165,13 @@ class DecidePayrollReview(
                     reason,
                     now,
                 )
+            // Completion retains authority for the stage this decision actually changes.
+            val decisionScope =
+                approval.copy(stages = listOf(approval.stages[approval.currentStep]))
             val current =
                 requirePayrollReviewDecisionActor(
                     live,
-                    approval,
+                    decisionScope,
                     delegations,
                     grants,
                     clock.instant(),
@@ -205,7 +208,7 @@ class DecidePayrollReview(
                         .flatMap {
                             requirePayrollReviewDecisionActor(
                                 live,
-                                approval,
+                                decisionScope,
                                 delegations,
                                 grants,
                                 clock.instant(),
@@ -216,7 +219,7 @@ class DecidePayrollReview(
                         .flatMap {
                             requirePayrollReviewDecisionActor(
                                     live,
-                                    approval,
+                                    decisionScope,
                                     delegations,
                                     grants,
                                     clock.instant(),

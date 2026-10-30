@@ -15,6 +15,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -204,6 +205,42 @@ class PayrollPolicyAssuranceTest : PayrollApiFixture() {
         val oldScope = scene.actor.copy(permissions = setOf("company.read"))
         assertEquals("access_denied", (read(action, oldScope) as Result.Failed).failure.code)
         assertTrue(read(action, scene.actor) is Result.Success)
+    }
+
+    @Test
+    fun admittedPolicyReferencesRemainTheSameAcrossAWait() {
+        val original = prepare()
+        val references = original.policy.reviewReferences.toMutableList()
+        val scene = original.copy(policy = original.policy.copy(reviewReferences = references))
+        val operation = UUID.randomUUID()
+        val barrier = AccountLockProbe.Barrier(scene.actor.accountId)
+        accountProbe.current.set(barrier)
+        Executors.newSingleThreadExecutor().use { pool ->
+            val pending = pool.submit<Result<MutationReceipt>> { save(scene, operation) }
+            try {
+                assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                references.clear()
+                barrier.release.countDown()
+                val saved = pending.get(10, TimeUnit.SECONDS)
+                assertTrue(saved is Result.Success, saved.toString())
+            } finally {
+                barrier.release.countDown()
+                accountProbe.current.set(null)
+            }
+        }
+        val stored =
+            transactions.run(scene.actor) {
+                policies.current(requireNotNull(scene.actor.companyId))
+            }
+        assertEquals(
+            original.policy.reviewReferences,
+            requireNotNull((stored as Result.Success).value).reviewReferences,
+        )
+        val beforeReplay = snapshot(scene.actor)
+        val replay = save(original, operation)
+        assertTrue(replay is Result.Success, replay.toString())
+        assertTrue((replay as Result.Success).value.replayed)
+        assertEquals(beforeReplay, snapshot(scene.actor))
     }
 
     private fun prepare(): Scenario {

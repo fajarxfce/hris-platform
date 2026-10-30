@@ -42,6 +42,7 @@ class CreatePayrollPeriod(
         val valid = validatePayrollPeriod(month, paymentDate, employeeIds, reason)
         if (valid is Result.Failed) return valid
         val employees = employeeIds.sortedBy(UUID::toString)
+        val selectedEmployees = employees.toSet()
         val key =
             OperationKey(
                 "payroll.period_create",
@@ -88,9 +89,9 @@ class CreatePayrollPeriod(
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "payroll_period_attempt_limit")
                 )
-            val available = people.existingEmployeeIds(company, employeeIds)
+            val available = people.existingEmployeeIds(company, selectedEmployees)
             if (available is Result.Failed) return@run available
-            if ((available as Result.Success).value != employeeIds)
+            if ((available as Result.Success).value != selectedEmployees)
                 return@run Result.Failed(
                     Failure(FailureKind.VALIDATION, "payroll_period_employee_unavailable")
                 )

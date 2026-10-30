@@ -44,6 +44,11 @@ class SaveEmployeeCompensation(
         if (access is Result.Failed) return access
         val valid = validateCompensation(terms, effectiveFrom, reason)
         if (valid is Result.Failed) return valid
+        val commandTerms =
+            terms.copy(
+                fixedEarnings = java.util.List.copyOf(terms.fixedEarnings),
+                insurancePrograms = java.util.Set.copyOf(terms.insurancePrograms),
+            )
         if (
             (expectedVersion != null && expectedVersion !in 0..999) || expectedEmploymentVersion < 0
         )
@@ -58,7 +63,7 @@ class SaveEmployeeCompensation(
                     expectedVersion?.toString(),
                     expectedEmploymentVersion.toString(),
                     reason,
-                ) + compensationOperationParts(terms),
+                ) + compensationOperationParts(commandTerms),
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
@@ -95,8 +100,14 @@ class SaveEmployeeCompensation(
                 return@run Result.Failed(
                     Failure(FailureKind.FORBIDDEN, "self_compensation_change_denied")
                 )
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                return@run requirePayrollMutation(
+                        live,
+                        "payroll.compensation.manage",
+                        clock.instant(),
+                        security,
+                    )
+                    .map { receipt }
             }
             val frozen = cutoffs.frozenFrom(company, employeeId, effectiveFrom)
             if (frozen is Result.Failed) return@run frozen
@@ -109,7 +120,7 @@ class SaveEmployeeCompensation(
                 (companyResult as Result.Success).value
                     ?: return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "company_not_found"))
             val today = clock.instant().atZone(ZoneId.of(settings.timezone)).toLocalDate()
-            if (terms.tax.verifiedOn > today)
+            if (commandTerms.tax.verifiedOn > today)
                 return@run Result.Failed(
                     Failure(
                         FailureKind.VALIDATION,
@@ -150,7 +161,7 @@ class SaveEmployeeCompensation(
                     expectedVersion ?: 0,
                     expectedVersion ?: 0,
                     effectiveFrom,
-                    terms,
+                    commandTerms,
                 )
             compensations.save(actor, compensation, expectedVersion, reason).flatMap { receipt ->
                 journal

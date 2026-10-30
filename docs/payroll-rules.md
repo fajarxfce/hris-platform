@@ -63,7 +63,7 @@ assurance after waiting for guards. Policy review also checks it after acquiring
 all results. Policy commands recheck recent authentication/MFA before transaction
 completion, so a late expiry cannot commit a new revision or consume its operation.
 
-Configuration, period/input preparation, and the pure calculation library are implemented. Durable calculation runs, approval, finalization, payslips, payments, amendments, and measured performance are subsequent implementation steps.
+Configuration, period/input preparation, durable calculation, staged approval, finalization, payslips, payments and referenced amendments are implemented. See [current workflows](payroll-workflows.md), [amendments](payroll-amendments.md) and the active [requirement review](payroll-feature-review-2026-10-30.md) for acceptance scope. Recorded workload measurements remain separate from source verification.
 
 Salary administration uses `GET /companies/{companyId}/payroll/compensation-employees`
 under `/api/v1` for a minimal, bounded employee lookup, including unconfigured and

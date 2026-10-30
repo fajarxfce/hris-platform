@@ -6671,3 +6671,15 @@ architecture and formatting checks passed in 193.304s. See
 [measurements](measurements/payroll-assurance-2026-10-30.json).
 Worker advancement and runtime deployment are unchanged. Complete the remaining
 Payroll review and final CI before accepting its seven initial requirements.
+
+
+### 30 October 2026 — Payroll input and delegation completion
+
+Seven leaf commands now preserve admitted collection inputs, recheck compensation
+receipt proof after beneficiary acquisition, and retain the original decision stage
+through Payroll/amendment completion. Eight input/receipt and six delegation failures
+were reproduced; one existing amendment control remains distinct. Fifteen targeted
+API cases, 114 domain and twelve repository cases plus quality checks passed in
+102.743s. [The audit](payroll-assurance-2026-10-30.md) records fixture errors and
+[the seven-row review](payroll-feature-review-2026-10-30.md) identifies broad/browser
+and final-CI gates. No runtime or phone deployment occurred.

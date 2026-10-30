@@ -16,6 +16,11 @@ Sources: https://jdih.kemenkeu.go.id/dok/pp-58-tahun-2023 ; https://jdih.kemenke
 
 ## Implementation status
 
+The active [requirement review](../payroll-feature-review-2026-10-30.md) maps all seven
+initial rows. [Command assurance](../payroll-assurance-2026-10-30.md) corrects forty
+reproduced enrollment, mutable-input, receipt-proof and stage-delegation failures.
+Focused acceptance passes; broad/browser and full source CI remain required.
+
 [Period comparison](../payroll-period-comparison.md) now has a scoped API and
 localized dashboard for two successful original runs from different earnings
 months. It retains both employment labels, exact decimal totals/differences,

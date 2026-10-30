@@ -1,7 +1,7 @@
 {
   "date": "2026-10-30",
   "baseline": "c159b1db",
-  "status": "enrollment-correction-locally-accepted; remaining Payroll review active",
+  "status": "All40genuinebaselinecasescorrected; broad/fullCIacceptancepending",
   "baselineRun": {
     "command": [
       "./gradlew",
@@ -474,10 +474,500 @@
     }
   },
   "remaining": [
-    "Mutable policy/compensation/period/payment inputs",
-    "Compensation receipt proof after beneficiary acquisition",
-    "Multi-stage Payroll/amendment delegation completion",
-    "Complete seven-row module review, broad API/worker/browser acceptance and final source CI"
+    "Broad Payroll/Compensation/Payslip API and Payroll worker acceptance",
+    "Four normal and three actual worker browser workflows",
+    "Complete final source CI and seven-row review acceptance",
+    "Workforce then full Mobile/applicable Starter review"
   ],
-  "deployment": "None; schema103 metadata images still active"
+  "deployment": "None; schema103 metadata images still active",
+  "additionalCorrection": {
+    "baseline": "8655f03e",
+    "inputBaseline": {
+      "command": [
+        "./gradlew",
+        ":apps:server:test",
+        "--tests",
+        "dev.fajar.hris.CompensationAssuranceTest.admittedCompensationTermsRemainTheSameAcrossAWait",
+        "--tests",
+        "dev.fajar.hris.CompensationAssuranceTest.receiptStillRequiresRecentProofAfterBeneficiaryAcquisition",
+        "--tests",
+        "dev.fajar.hris.PayrollPolicyAssuranceTest.admittedPolicyReferencesRemainTheSameAcrossAWait",
+        "--tests",
+        "dev.fajar.hris.PayrollPeriodAssuranceTest.admittedPeriodParticipantsRemainTheSameAcrossAWait",
+        "--tests",
+        "dev.fajar.hris.PayrollPaymentInputSnapshotTest",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 64.86,
+      "exit_code": 1
+    },
+    "inputBaselineReports": [
+      {
+        "suite": "dev.fajar.hris.CompensationAssuranceTest",
+        "tests": "4",
+        "failures": "4",
+        "errors": "0",
+        "skipped": "0",
+        "cases": [
+          {
+            "name": "[1] mfa = false",
+            "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=0f14aa9c-ff1b-461c-8d31-a2d33529c621, version=1, replayed=true)) ==> expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "name": "[2] mfa = true",
+            "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=62f8b6a7-ed17-4cf6-8b12-452c77a29771, version=1, replayed=true)) ==> expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "name": "[1] collection = \"earnings\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <CompensationTerms(basicSalary=10100000, fixedEarnings=[FixedEarning(code=ALLOWANCE, name=Fixed allowance, amount=500000, taxable=true)], treatment=GROSS, tax=TaxRegistration(residency=RESIDENT, ptkp=K0, residenceCountry=ID, subjectiveFrom=null, subjectiveUntil=null, verifiedOn=2026-09-30, verificationReference=Fixture verification), insuranceWage=10500000, insurancePrograms=[OLD_AGE, ACCIDENT, HEALTH, DEATH, PENSION], insuranceExemptionReason=null, accidentRisk=VERY_LOW, additionalHealthDependents=0, additionalRetirementContribution=0, qualifiedDonation=0, otherNetDeduction=0, payBasis=null)> but was: <CompensationTerms(basicSalary=10100000, fixedEarnings=[], treatment=GROSS, tax=TaxRegistration(residency=RESIDENT, ptkp=K0, residenceCountry=ID, subjectiveFrom=null, subjectiveUntil=null, verifiedOn=2026-09-30, verificationReference=Fixture verification), insuranceWage=10500000, insurancePrograms=[OLD_AGE, ACCIDENT, HEALTH, DEATH, PENSION], insuranceExemptionReason=null, accidentRisk=VERY_LOW, additionalHealthDependents=0, additionalRetirementContribution=0, qualifiedDonation=0, otherNetDeduction=0, payBasis=null)>"
+          },
+          {
+            "name": "[2] collection = \"insurance\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <CompensationTerms(basicSalary=10100000, fixedEarnings=[FixedEarning(code=ALLOWANCE, name=Fixed allowance, amount=500000, taxable=true)], treatment=GROSS, tax=TaxRegistration(residency=RESIDENT, ptkp=K0, residenceCountry=ID, subjectiveFrom=null, subjectiveUntil=null, verifiedOn=2026-09-30, verificationReference=Fixture verification), insuranceWage=10500000, insurancePrograms=[OLD_AGE, ACCIDENT, HEALTH, DEATH, PENSION], insuranceExemptionReason=null, accidentRisk=VERY_LOW, additionalHealthDependents=0, additionalRetirementContribution=0, qualifiedDonation=0, otherNetDeduction=0, payBasis=null)> but was: <CompensationTerms(basicSalary=10100000, fixedEarnings=[FixedEarning(code=ALLOWANCE, name=Fixed allowance, amount=500000, taxable=true)], treatment=GROSS, tax=TaxRegistration(residency=RESIDENT, ptkp=K0, residenceCountry=ID, subjectiveFrom=null, subjectiveUntil=null, verifiedOn=2026-09-30, verificationReference=Fixture verification), insuranceWage=10500000, insurancePrograms=[], insuranceExemptionReason=null, accidentRisk=VERY_LOW, additionalHealthDependents=0, additionalRetirementContribution=0, qualifiedDonation=0, otherNetDeduction=0, payBasis=null)>"
+          }
+        ]
+      },
+      {
+        "suite": "dev.fajar.hris.PayrollPaymentInputSnapshotTest",
+        "tests": "2",
+        "failures": "2",
+        "errors": "0",
+        "skipped": "0",
+        "cases": [
+          {
+            "name": "[1] action = \"prepare\"",
+            "failure": "java.util.concurrent.ExecutionException: java.util.NoSuchElementException: Key c52ef2e3-2720-4a98-8d8d-6987be3c8f36 is missing in the map."
+          },
+          {
+            "name": "[2] action = \"reconcile\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <1> but was: <0>"
+          }
+        ]
+      },
+      {
+        "suite": "dev.fajar.hris.PayrollPeriodAssuranceTest",
+        "tests": "1",
+        "failures": "1",
+        "errors": "0",
+        "skipped": "0",
+        "cases": [
+          {
+            "name": "admittedPeriodParticipantsRemainTheSameAcrossAWait()",
+            "failure": "org.opentest4j.AssertionFailedError: Failed(failure=Failure(kind=VALIDATION, code=payroll_period_employee_unavailable, fields={}, parameters={})) ==> expected: <true> but was: <false>"
+          }
+        ]
+      },
+      {
+        "suite": "dev.fajar.hris.PayrollPolicyAssuranceTest",
+        "tests": "1",
+        "failures": "1",
+        "errors": "0",
+        "skipped": "0",
+        "cases": [
+          {
+            "name": "admittedPolicyReferencesRemainTheSameAcrossAWait()",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <[https://example.test/fictional-2026-fixture]> but was: <[]>"
+          }
+        ]
+      }
+    ],
+    "genuineInputFailures": 8,
+    "delegationBaseline": {
+      "command": [
+        "./gradlew",
+        ":apps:server:test",
+        "--tests",
+        "dev.fajar.hris.PayrollReviewDelegationCompletionTest",
+        "--tests",
+        "dev.fajar.hris.PayrollAmendmentDelegationCompletionTest",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 51.519,
+      "exit_code": 1
+    },
+    "delegationBaselineReports": [
+      {
+        "suite": "dev.fajar.hris.PayrollAmendmentDelegationCompletionTest",
+        "tests": "3",
+        "failures": "2",
+        "errors": "0",
+        "skipped": "0",
+        "cases": [
+          {
+            "name": "[1] decision = \"APPROVE\", stage = \"journal\"",
+            "failure": "org.opentest4j.AssertionFailedError: {\"id\":\"12cada2c-7165-49a6-9f62-2732a1a98273\",\"version\":3} ==> expected: <403> but was: <200>"
+          },
+          {
+            "name": "[2] decision = \"REJECT\", stage = \"journal\"",
+            "failure": "org.opentest4j.AssertionFailedError: {\"id\":\"48ae6853-23d3-4ae3-b656-da5d1791d4a5\",\"version\":3} ==> expected: <403> but was: <200>"
+          },
+          {
+            "name": "[3] decision = \"APPROVE\", stage = \"evidence\"",
+            "failure": null
+          }
+        ]
+      },
+      {
+        "suite": "dev.fajar.hris.PayrollReviewDelegationCompletionTest",
+        "tests": "4",
+        "failures": "4",
+        "errors": "0",
+        "skipped": "0",
+        "cases": [
+          {
+            "name": "[1] decision = \"APPROVE\", stage = \"evidence\"",
+            "failure": "org.opentest4j.AssertionFailedError: {\"id\":\"c123593f-7d50-4242-a84e-12a8c846b59b\",\"version\":1} ==> expected: <403> but was: <200>"
+          },
+          {
+            "name": "[2] decision = \"REJECT\", stage = \"evidence\"",
+            "failure": "org.opentest4j.AssertionFailedError: {\"id\":\"1923b591-e215-4c33-9e9b-87c3b6ecf8ca\",\"version\":1} ==> expected: <403> but was: <200>"
+          },
+          {
+            "name": "[3] decision = \"APPROVE\", stage = \"journal\"",
+            "failure": "org.opentest4j.AssertionFailedError: {\"id\":\"eeb466a5-dac9-47af-a7cb-170f4b7f4092\",\"version\":1} ==> expected: <403> but was: <200>"
+          },
+          {
+            "name": "[4] decision = \"REJECT\", stage = \"journal\"",
+            "failure": "org.opentest4j.AssertionFailedError: {\"id\":\"fafa251c-4766-4127-ae3b-ee26d3cc74c1\",\"version\":1} ==> expected: <403> but was: <200>"
+          }
+        ]
+      }
+    ],
+    "genuineDelegationFailures": 6,
+    "existingDelegationControls": 1,
+    "fixtureCorrections": [
+      {
+        "run": {
+          "command": [
+            "./gradlew",
+            ":apps:server:test",
+            "--tests",
+            "dev.fajar.hris.PayrollReviewDelegationCompletionTest",
+            "--tests",
+            "dev.fajar.hris.PayrollAmendmentDelegationCompletionTest",
+            "--no-daemon"
+          ],
+          "elapsed_seconds": 54.265,
+          "exit_code": 1
+        },
+        "classification": "6actualbehaviorfailures;1controlreachedcorrectdenialbutJDBCarray/objectequalitybrokeitsstatesnapshot"
+      },
+      {
+        "run": {
+          "command": [
+            "./gradlew",
+            ":apps:server:test",
+            "--tests",
+            "dev.fajar.hris.PayrollReviewDelegationCompletionTest",
+            "--tests",
+            "dev.fajar.hris.PayrollAmendmentDelegationCompletionTest",
+            "--no-daemon"
+          ],
+          "elapsed_seconds": 50.668,
+          "exit_code": 1
+        },
+        "classification": "Wrongassumedstatuscolumninpayroll_amendmentsblocked3fixtures; excludedfromdefectcount. FinalsnapshotusescanonicalPostgresJSONtext."
+      }
+    ],
+    "format": {
+      "command": [
+        "./gradlew",
+        "format",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 16.818,
+      "exit_code": 0
+    },
+    "focused": {
+      "command": [
+        "./gradlew",
+        ":apps:server:test",
+        "--tests",
+        "dev.fajar.hris.CompensationAssuranceTest.admittedCompensationTermsRemainTheSameAcrossAWait",
+        "--tests",
+        "dev.fajar.hris.CompensationAssuranceTest.receiptStillRequiresRecentProofAfterBeneficiaryAcquisition",
+        "--tests",
+        "dev.fajar.hris.PayrollPolicyAssuranceTest.admittedPolicyReferencesRemainTheSameAcrossAWait",
+        "--tests",
+        "dev.fajar.hris.PayrollPeriodAssuranceTest.admittedPeriodParticipantsRemainTheSameAcrossAWait",
+        "--tests",
+        "dev.fajar.hris.PayrollPaymentInputSnapshotTest",
+        "--tests",
+        "dev.fajar.hris.PayrollReviewDelegationCompletionTest",
+        "--tests",
+        "dev.fajar.hris.PayrollAmendmentDelegationCompletionTest",
+        ":modules:payroll:domain:test",
+        ":modules:payroll:data:test",
+        "architectureCheck",
+        "formatCheck",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 102.743,
+      "exit_code": 0
+    },
+    "reports": {
+      "api": {
+        "suites": [
+          {
+            "name": "dev.fajar.hris.PayrollReviewDelegationCompletionTest",
+            "tests": "4",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "12.512"
+          },
+          {
+            "name": "dev.fajar.hris.PayrollAmendmentDelegationCompletionTest",
+            "tests": "3",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "22.906"
+          },
+          {
+            "name": "dev.fajar.hris.CompensationAssuranceTest",
+            "tests": "4",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "8.546"
+          },
+          {
+            "name": "dev.fajar.hris.PayrollPaymentInputSnapshotTest",
+            "tests": "2",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "10.169"
+          },
+          {
+            "name": "dev.fajar.hris.PayrollPeriodAssuranceTest",
+            "tests": "1",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "7.669"
+          },
+          {
+            "name": "dev.fajar.hris.PayrollPolicyAssuranceTest",
+            "tests": "1",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "7.461"
+          }
+        ],
+        "totals": {
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "domain": {
+        "suites": [
+          {
+            "name": "dev.fajar.hris.payroll.domain.HolidayAllowancePolicyTest",
+            "tests": "5",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.22"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.MonthlyPayrollPolicyTest",
+            "tests": "11",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.228"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.OvertimePayPolicyTest",
+            "tests": "4",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.02"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayProrationPolicyTest",
+            "tests": "2",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.008"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentAttendancePolicyTest",
+            "tests": "6",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.078"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentCalculationPolicyTest",
+            "tests": "14",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.319"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentDraftPolicyTest",
+            "tests": "7",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.053"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentPreparationPolicyTest",
+            "tests": "7",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.066"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentPublicationPolicyTest",
+            "tests": "3",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.038"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentReviewPolicyTest",
+            "tests": "5",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.017"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollCalculationReviewPolicyTest",
+            "tests": "5",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.021"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollInputPolicyTest",
+            "tests": "5",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.026"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollPayUnitsPolicyTest",
+            "tests": "6",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.01"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollPaymentRecoveryPolicyTest",
+            "tests": "4",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.01"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollPaymentReviewPolicyTest",
+            "tests": "3",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.01"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollSettlementPolicyTest",
+            "tests": "2",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.001"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollTaxContinuityPolicyTest",
+            "tests": "8",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.014"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.PayrollTaxOpeningPolicyTest",
+            "tests": "3",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.002"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.IncomeTaxPolicyTest",
+            "tests": "12",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.107"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.domain.InsuranceContributionPolicyTest",
+            "tests": "2",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.02"
+          }
+        ],
+        "totals": {
+          "tests": 114,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "data": {
+        "suites": [
+          {
+            "name": "dev.fajar.hris.payroll.data.PayrollPaymentMappingTest",
+            "tests": "4",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.066"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.data.PayrollComparisonRepositoryTest",
+            "tests": "5",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.131"
+          },
+          {
+            "name": "dev.fajar.hris.payroll.data.PayrollSnapshotMappingTest",
+            "tests": "3",
+            "failures": "0",
+            "errors": "0",
+            "skipped": "0",
+            "time": "0.859"
+          }
+        ],
+        "totals": {
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    }
+  }
 }

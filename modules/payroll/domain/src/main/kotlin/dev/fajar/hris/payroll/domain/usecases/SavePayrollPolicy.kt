@@ -38,6 +38,8 @@ class SavePayrollPolicy(
         if (access is Result.Failed) return access
         val valid = validatePayrollPolicy(policy, reason)
         if (valid is Result.Failed) return valid
+        val commandPolicy =
+            policy.copy(reviewReferences = java.util.List.copyOf(policy.reviewReferences))
         if (expectedVersion != null && expectedVersion !in 0..999)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_version"))
         val key =
@@ -46,16 +48,16 @@ class SavePayrollPolicy(
                 operationId,
                 listOf(
                     expectedVersion?.toString(),
-                    policy.effectiveFrom.toString(),
-                    policy.effectiveUntil.toString(),
-                    policy.incomeTaxRuleId,
-                    policy.insuranceRuleId,
-                    policy.minimumMonthlyWage.stripTrailingZeros().toPlainString(),
-                    policy.healthWageCap.stripTrailingZeros().toPlainString(),
-                    policy.pensionWageCap.stripTrailingZeros().toPlainString(),
-                    policy.contributionRounding.name,
+                    commandPolicy.effectiveFrom.toString(),
+                    commandPolicy.effectiveUntil.toString(),
+                    commandPolicy.incomeTaxRuleId,
+                    commandPolicy.insuranceRuleId,
+                    commandPolicy.minimumMonthlyWage.stripTrailingZeros().toPlainString(),
+                    commandPolicy.healthWageCap.stripTrailingZeros().toPlainString(),
+                    commandPolicy.pensionWageCap.stripTrailingZeros().toPlainString(),
+                    commandPolicy.contributionRounding.name,
                     reason,
-                ) + policy.reviewReferences.sorted(),
+                ) + commandPolicy.reviewReferences.sorted(),
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
@@ -82,7 +84,7 @@ class SavePayrollPolicy(
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
-            val frozen = cutoffs.frozenFrom(company, null, policy.effectiveFrom)
+            val frozen = cutoffs.frozenFrom(company, null, commandPolicy.effectiveFrom)
             if (frozen is Result.Failed) return@run frozen
             if ((frozen as Result.Success).value)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "payroll_period_frozen"))
@@ -96,7 +98,7 @@ class SavePayrollPolicy(
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "payroll_policy_revision_limit")
                 )
-            policies.save(actor, policy, expectedVersion, reason).flatMap { receipt ->
+            policies.save(actor, commandPolicy, expectedVersion, reason).flatMap { receipt ->
                 journal
                     .record(
                         actor,

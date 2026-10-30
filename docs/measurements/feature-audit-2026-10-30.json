@@ -1009,6 +1009,18 @@
         "docs/reporting-feature-review-2026-10-30.md"
       ],
       "next": "Wait for terminal Administration CI 41081153648, dispatch complete new source CI, then accept five Reporting rows; continue Payroll/Workforce/Mobile/Starter."
+    },
+    {
+      "id": "payroll.command-completion",
+      "status": "implemented-focused-acceptance",
+      "genuineFailures": 40,
+      "existingControls": 1,
+      "evidence": [
+        "docs/payroll-assurance-2026-10-30.md",
+        "docs/payroll-feature-review-2026-10-30.md",
+        "docs/measurements/payroll-assurance-2026-10-30.json"
+      ],
+      "next": "Complete broadAPIworkerbrowserandfullsourceCI; sevenPayrollrowsremainunverified."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

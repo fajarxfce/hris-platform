@@ -84,10 +84,10 @@ class PreparePayrollPaymentBatch(
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
-            val candidates = payments.candidates(company, items.map { it.assessmentId }.toSet())
+            val candidates = payments.candidates(company, ordered.map { it.assessmentId }.toSet())
             if (candidates is Result.Failed) return@run candidates
             val evidence = (candidates as Result.Success).value
-            if (evidence.size != items.size)
+            if (evidence.size != ordered.size)
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "payroll_assessment_not_payable")
                 )
@@ -173,7 +173,7 @@ class PreparePayrollPaymentBatch(
                                 "payroll_payment_batch",
                                 id,
                                 "payroll.payment_prepared",
-                                mapOf("itemCount" to items.size.toString()),
+                                mapOf("itemCount" to ordered.size.toString()),
                                 reason,
                             ),
                         )

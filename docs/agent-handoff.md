@@ -112,7 +112,10 @@ beneficiaries. Read grants are reacquired after sorted actor/delegator account
 locks. Request-management receipts retain current scope and final MFA. Do not
 remove these bounded acquisitions as a query-count optimization.
 
-Dispatch final-source CI with the revised integration time budget after commit. Keep the remaining
+Leave correction `70b92e59` is committed and pushed. Exact source `70b92e59e7b41bdafe9f9d1c4b9d5106412777f5`
+is running in [CI 41023645590](https://github.com/fajarxfce/hris-platform/actions/runs/41023645590). It includes the Expense correction and
+revised integration time budget. Observe the terminal result without cancelling
+it with another same-branch workflow. Keep the remaining
 full-feature goal active: thirty initial rows plus detailed/module/Mobile review
 remain. Next review People and the remaining Platform contracts, then Mobile and
 applicable Starter behavior. No generic client implementation port is due here.

@@ -34,7 +34,8 @@ are reviewed; 30 initial rows and the full Mobile review remain active. Email
 each passed all ten full-CI jobs. Expense [CI 41018107365](https://github.com/fajarxfce/hris-platform/actions/runs/41018107365)
 passed nine jobs and all fourteen worker scenarios, but exceeded the worker step
 time budget. The [recorded correction](measurements/ci-integration-timeout-2026-10-30.json)
-keeps finite limits; complete CI on final Leave source must still pass. Continue
+keeps finite limits. Final Leave source `70b92e59` is running in
+[CI 41023645590](https://github.com/fajarxfce/hris-platform/actions/runs/41023645590); complete CI must still pass. Continue
 People, the remaining Platform requirements and full Mobile review.
 
 

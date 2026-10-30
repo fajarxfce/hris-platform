@@ -1242,9 +1242,16 @@
     "worker": "f2303253e077d133c645947c75160e71164775d29755f3e6b07221eafc740973"
   },
   "fullCi": {
-    "status": "pending-final-source-dispatch",
-    "predecessor": "Expense CI 41018107365 failed a five-minute worker-step timeout after fourteen scenarios passed; final CI uses the corrected bounded workflow.",
-    "instruction": "Dispatch after this final source is committed; do not overlap same-branch runs."
+    "status": "running",
+    "runId": 41023645590,
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41023645590",
+    "source": "70b92e59e7b41bdafe9f9d1c4b9d5106412777f5",
+    "includes": [
+      "Expense correction 5b60aba3",
+      "integration time budget 84d37ad6",
+      "Leave read c68b721a and final command correction 70b92e59"
+    ],
+    "remaining": "Observe terminal result without cancelling with a same-branch run; continue People and the remaining full-feature audit."
   },
   "remaining": "Continue the full Platform/Mobile audit; accepting five Leave rows does not complete the goal.",
   "runtime": "Private schema-101 API, immutable dashboard assets, accepted Google binding and installed phone unchanged. No actual mail, FCM, bank or device action."

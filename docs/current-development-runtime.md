@@ -30,7 +30,7 @@ restart. The expected schema-101 post-check therefore failed. The checkpoint
 itself was verified as schema 101 and every other baseline field matched. The
 accepted API/worker images were then deployed with `up -d --no-deps`, and the staged
 dashboard was activated. The final schema-103 runtime and image checks passed.
-Use `start --no-deps` for future checkpoint restarts; a restart must not implicitly
+Restart each verified existing container with `docker start <container-id>`; a restart must not implicitly
 choose the migration window. Never rewind the live database automatically.
 
 [Sanitized rollout measurements](measurements/metadata-development-rollout-2026-10-30.json)

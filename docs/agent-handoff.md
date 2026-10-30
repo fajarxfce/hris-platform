@@ -11,7 +11,8 @@ Current runtime note: the private stack has now advanced to schema 103 and serve
 accepted API/worker packages plus dashboard snapshot `1e0522c0`. The checkpoint
 restart unexpectedly reran Compose's migration dependency; identity/session/binary
 fingerprints remained unchanged, and the accepted images were explicitly aligned.
-Use `start --no-deps` for future checkpoint restarts. Read
+Restart each verified existing container with `docker start <container-id>`;
+this installed Compose version has no `start --no-deps` option. Read
 [current runtime](current-development-runtime.md#current-metadata-rollout--30-october-2026)
 and [measurements](measurements/metadata-development-rollout-2026-10-30.json) before
 using older schema-101 status paragraphs below. Phone APK remains `72341ef6`; Mobile

@@ -53,5 +53,11 @@
   },
   "smtp_enabled": false,
   "phone_changed": false,
-  "original_sequence_deviation": "docker compose start api/worker also restarted their existing migrate dependency; schema advanced during checkpoint restart. Verified old checkpoint schema 101, compared preserved identity/session/binary facts and aligned accepted API/worker images plus dashboard immediately. Future restarts must use --no-deps."
+  "original_sequence_deviation": "docker compose start api/worker also restarted their existing migrate dependency; schema advanced during checkpoint restart. Verified old checkpoint schema 101, compared preserved identity/session/binary facts and aligned accepted API/worker images plus dashboard immediately. Future checkpoint restarts must target verified existing container IDs using docker start; installed Compose start does not support --no-deps.",
+  "restart_command_review": {
+    "checked": "docker compose start --help and docker compose up --help",
+    "finding": "start does not support --no-deps; up supports it",
+    "checkpoint_restart": "Capture/validate one existing ID per selected service before stopping, then docker start the same ID. Do not run Compose dependency startup.",
+    "runtime_action": "none; corrected documentation and local checkpoint helper only"
+  }
 }

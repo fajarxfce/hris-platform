@@ -19,7 +19,9 @@ CI `41077194465` is still active. Administration source corrections are not depl
 
 ## Active goal — full feature completion audit
 
-Administration correction is locally accepted and ready for full source CI. Three
+Administration correction `3c8fb15a` is committed/pushed and locally accepted.
+[Full CI 41081153648](https://github.com/fajarxfce/hris-platform/actions/runs/41081153648)
+is running for exact source `3c8fb15a6c2471eef226e5f5c20b0bd8b8ea450a`. Three
 private readers and policy saving now check final enrollment/proof assurance;
 eleven genuine reproductions pass with one prior ordinary control. Validation
 passed 81 API, 104 active worker, eight Administration domain, fourteen data and

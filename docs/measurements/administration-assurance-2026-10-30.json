@@ -1122,5 +1122,12 @@
     "Private schema-103 metadata API/worker images remain unchanged; new Administration packages are not yet deployed",
     "Physical phone application unchanged by this Platform correction",
     "Final full CI not yet accepted"
-  ]
+  ],
+  "source_commit": "3c8fb15a6c2471eef226e5f5c20b0bd8b8ea450a",
+  "full_ci": {
+    "run_id": 41081153648,
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41081153648",
+    "status": "in_progress",
+    "conclusion": ""
+  }
 }

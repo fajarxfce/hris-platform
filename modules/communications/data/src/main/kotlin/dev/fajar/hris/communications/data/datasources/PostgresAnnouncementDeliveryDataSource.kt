@@ -1,6 +1,6 @@
 package dev.fajar.hris.communications.data.datasources
 
-import dev.fajar.hris.communications.data.models.AnnouncementDeliveryRow
+import dev.fajar.hris.communications.data.models.*
 import java.util.UUID
 import org.jooq.DSLContext
 
@@ -31,6 +31,29 @@ class PostgresAnnouncementDeliveryDataSource(private val sql: DSLContext) :
             row.get("processed", Int::class.java)!!,
             row.get("accepted", Int::class.java)!!,
             row.get("rejected", Int::class.java)!!,
+        )
+    }
+
+    override fun emailCounts(companyId: UUID, announcementId: UUID): AnnouncementEmailDeliveryRow {
+        val row =
+            sql.fetchOne(
+                """WITH candidates AS MATERIALIZED (
+            SELECT state FROM announcement_email_delivery
+            WHERE company_id=? AND announcement_id=? ORDER BY inbox_id LIMIT 5001
+        ) SELECT count(*) FILTER (WHERE state='PENDING') AS pending,
+            count(*) FILTER (WHERE state='LEASED') AS processing,
+            count(*) FILTER (WHERE state='ACCEPTED') AS accepted,
+            count(*) FILTER (WHERE state='FAILED') AS failed,
+            count(*) FILTER (WHERE state='SUPERSEDED') AS superseded FROM candidates""",
+                companyId,
+                announcementId,
+            )!!
+        return AnnouncementEmailDeliveryRow(
+            row.get("pending", Int::class.java)!!,
+            row.get("processing", Int::class.java)!!,
+            row.get("accepted", Int::class.java)!!,
+            row.get("failed", Int::class.java)!!,
+            row.get("superseded", Int::class.java)!!,
         )
     }
 }

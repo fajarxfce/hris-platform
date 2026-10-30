@@ -122,6 +122,15 @@ export function AnnouncementEditorPage(props: {
               onBlur={form.acknowledgementRequired.onBlur}
               onChange={(_, data) => form.acknowledgementRequired.onChange(data.checked === true)}
             />
+            <AppCheckbox
+              label={text.emailNotification}
+              checked={form.emailNotification.value}
+              disabled={!form.editable}
+              ref={form.emailNotification.ref}
+              onBlur={form.emailNotification.onBlur}
+              onChange={(_, data) => form.emailNotification.onChange(data.checked === true)}
+            />
+            <p>{text.emailNotice}</p>
             <AppTextArea
               label={text.reason}
               {...form.reason}

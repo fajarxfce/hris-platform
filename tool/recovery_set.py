@@ -25,8 +25,9 @@ FILES = {"metadata.tar": MAX_METADATA, "content.tar": MAX_CONTENT,
 KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncActive", "syncKeys",
               "rpcSecret", "accessKey", "secretKey", "bucket"}
 # Review this bound when new migrations add another persisted encryption contract.
-# V99 adds global audit metadata only; no new encrypted payload family.
-MAX_SCHEMA = 101
+# V102 adds a boolean selection and nonsecret dispatch/projection metadata only.
+# Its restored queue, selection and RLS are checked by check_recovery_set.py.
+MAX_SCHEMA = 102
 ENVELOPES_SQL = """COPY (
 SELECT * FROM (
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope

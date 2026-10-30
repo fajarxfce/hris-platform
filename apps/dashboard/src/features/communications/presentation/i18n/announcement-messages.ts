@@ -1,6 +1,9 @@
 import type { Locale } from "../../../../core/presentation/i18n/messages";
 
 const en = {
+  emailNotification: "Email reminder",
+  emailEnabled: "Requested",
+  emailDisabled: "Not requested",
   title: "Announcements",
   history: "Revision history",
   details: "Announcement",
@@ -40,6 +43,9 @@ const en = {
   GROUP: "Groups",
 };
 const id: Record<keyof typeof en, string> = {
+  emailNotification: "Pengingat email",
+  emailEnabled: "Diminta",
+  emailDisabled: "Tidak diminta",
   title: "Pengumuman",
   history: "Riwayat revisi",
   details: "Pengumuman",

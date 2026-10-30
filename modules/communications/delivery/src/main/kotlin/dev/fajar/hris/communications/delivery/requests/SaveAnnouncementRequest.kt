@@ -7,4 +7,5 @@ data class SaveAnnouncementRequest(
     val acknowledgementRequired: Boolean = false,
     val expectedVersion: Long? = null,
     val reason: String,
+    val emailNotification: Boolean? = null,
 )

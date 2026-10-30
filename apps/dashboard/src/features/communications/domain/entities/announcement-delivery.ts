@@ -12,4 +12,14 @@ export type AnnouncementDelivery = Readonly<{
   acceptedDevices: number;
   rejectedDevices: number;
   observedAt: string;
+  email: AnnouncementEmailDelivery | null;
+}>;
+
+export type AnnouncementEmailDelivery = Readonly<{
+  pending: number;
+  processing: number;
+  accepted: number;
+  failed: number;
+  superseded: number;
+  unavailableRecipients: number;
 }>;

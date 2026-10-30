@@ -17,11 +17,11 @@ installed phone, private keys and running development stack intact.
 ## Confirmed gap: announcement email
 
 The Communications PRD owns channel delivery and explicitly mentions FCM/email.
-The current application publishes durable Inbox records and dispatches device FCM
-hints. Its domain dependencies and DI have no MailRepository integration; the
+At the start of this audit, the application published durable Inbox records and dispatched device FCM
+hints. Its domain dependencies and DI had no MailRepository integration; the
 existing SMTP sender/queue serves only identity invitations and recovery. No
 announcement email delivery, channel selection or email delivery observation is
-implemented. This is an implementation gap, not missing live SMTP credentials.
+implemented at that point. This was an implementation gap, not missing live SMTP credentials.
 
 Implement explicit per-announcement email selection, retain it in immutable
 publication evidence, and queue one stable recipient delivery in the same
@@ -36,3 +36,37 @@ owned fictional SMTP fixtures; do not activate real mail or send to real users.
 Continue the remaining module and Mobile audit after this gap; finding one missing
 feature does not prove all others complete. HRIS policy stays in Platform/Mobile.
 Port only reusable corrections after they are demonstrated downstream.
+
+
+## Email implementation — local acceptance passed
+
+[Email reminders](announcement-email.md) now implement V102, immutable channel
+selection, atomic capture, fenced delivery/maintenance, SMTP transport,
+administrative aggregates and the dashboard path. The initial request with
+`emailNotification=true` reproduced HTTP 400 before the change.
+
+Acceptance passed 65 announcement/Inbox API tests and 67 OpenAPI tests, 104 worker
+tests, 13 communication domain and three repository tests. The one-hour report
+retention test is explicitly excluded here and retains its earlier separate
+elapsed-time acceptance. All 4,006 dashboard tests, type and architecture checks
+passed. Fifteen distinct Chromium scenarios include editor/replay/publication,
+revocation, foreground recovery and Indonesian narrow layout. A duplicate
+retention notice was fixed before the final delivery run. Real API/PostgreSQL/
+worker/browser/SMTP acceptance passed in 44.1 seconds (1.3 minutes with setup).
+
+An independent schema-102 database/content/key recovery restored exact email
+selection, raw queue and minimal projection, forced RLS and revoked function
+entry, alongside the prior push/account audit records and 104 objects. Twenty-one
+recovery regressions passed. The recovery verifier bound was extended only after
+reviewing the new nonsecret fields. Full branch CI follows the implementation
+commit. The [measurement record](measurements/announcement-email-2026-10-30.json)
+retains suite counts, findings and practical limits.
+
+The private API remains at schema 101, SMTP disabled, with its accepted Google
+binding and installed phone intact. Its dashboard now serves baseline assets from
+an independent immutable directory: local test builds no longer change that live
+preview. Both endpoints returned HTTP 200 and the dashboard index matched the
+baseline snapshot. This isolation is recorded in the agent handoff.
+
+Continue the full module/Mobile review. Closing the email gap does not establish
+complete acceptance for the unreviewed inventory rows.

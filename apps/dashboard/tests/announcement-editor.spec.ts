@@ -50,10 +50,14 @@ test("draft creation uses bounded recipient lookup and retains its form through 
   ).toHaveCount(3);
   expect(api.writes).toHaveLength(0);
   await page.getByRole("checkbox", { name: "Require acknowledgement", exact: true }).check();
+  await page.getByRole("checkbox", { name: "Send an email reminder", exact: true }).check();
   await page.getByRole("combobox", { name: "Language", exact: true }).selectOption("id");
   await page.getByRole("button", { name: "Tema", exact: true }).click();
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.getByLabel("Judul", { exact: true })).toHaveValue("New office hours");
+  await expect(
+    page.getByRole("checkbox", { name: "Kirim pengingat email", exact: true }),
+  ).toBeChecked();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   await page.screenshot({
     path: "../../.work/dashboard-announcement-editor.png",
@@ -69,6 +73,7 @@ test("draft creation uses bounded recipient lookup and retains its form through 
       targetIds: ["51000000-0000-4000-8000-000000000001", "51000000-0000-4000-8000-000000000051"],
     },
     acknowledgementRequired: true,
+    emailNotification: true,
     expectedVersion: null,
   });
   await page.getByRole("link", { name: "Lihat pengumuman", exact: true }).click();
@@ -86,6 +91,7 @@ test("an uncertain save retains the original command through verification and a 
   await page.goto(`${directory}/${announcementId}/edit`);
   await page.getByLabel("Title", { exact: true }).fill("Retained office notice");
   await page.getByLabel("Reason", { exact: true }).fill("Hours review");
+  await page.getByRole("checkbox", { name: "Send an email reminder", exact: true }).check();
   api.dropNext();
   await page.getByRole("button", { name: "Save draft", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("The save result could not be confirmed");
@@ -112,6 +118,7 @@ test("an uncertain save retains the original command through verification and a 
   await expect(page.getByRole("status")).toContainText("Draft saved.");
   expect(api.writes).toHaveLength(4);
   expect(api.commits).toBe(1);
+  expect(api.writes[0]?.body.emailNotification).toBe(true);
   for (const write of api.writes) expect(write).toEqual(api.writes[0]);
   expect(api.identity.unhandled).toEqual([]);
 });

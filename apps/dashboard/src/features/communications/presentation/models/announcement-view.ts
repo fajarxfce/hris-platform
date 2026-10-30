@@ -45,6 +45,10 @@ export function announcementView(item: Announcement, locale: Locale, timezone: s
       label: text.acknowledgement,
       value: item.acknowledgementRequired ? text.required : text.optional,
     },
+    {
+      label: text.emailNotification,
+      value: item.emailNotification ? text.emailEnabled : text.emailDisabled,
+    },
     { label: text.recipients, value: number.format(item.recipientCount) },
     { label: text.recordedAt, value: date.format(new Date(item.recordedAt)) },
     {

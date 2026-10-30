@@ -10,13 +10,31 @@ preserves earlier work; its old next-step statements are not the active queue.
 ## Active goal — full feature completion audit
 
 On 30 October the user asked whether all features are complete and requested a
-long run for anything unfinished. The full requirement review is active; earlier
-completion paragraphs below describe their previous increments. A confirmed gap
-is Communications email delivery: Inbox/FCM exists, while SMTP currently serves
-identity only. Read the [feature audit](feature-audit-2026-10-30.md) and its tracked
-inventory. Implement and verify that capability, then continue reviewing every
-module and Mobile requirement. No live SMTP configuration or production deployment
-is needed to complete its implementation and owned fixture acceptance.
+long run for anything unfinished. The full requirement review remains active.
+The missing Communications email capability is now implemented and locally
+accepted: optional selection, immutable publication, atomic queue, owned SMTP
+worker, private administrative counts and dashboard authoring/review.
+Read [email delivery](announcement-email.md), its [measurements](measurements/announcement-email-2026-10-30.json)
+and the [full audit](feature-audit-2026-10-30.md). Observe branch CI, then continue
+all eleven module contracts and Mobile requirements. Do not narrow the objective
+to email or distribution; inventory rows remain unverified until reviewed.
+
+Local evidence: 132 API/OpenAPI tests, 104 worker tests, 13 communication domain
+and three repository tests passed; one manual elapsed-retention test remains
+covered by its earlier independent run. All 4,006 dashboard tests and 15 distinct
+Chromium scenarios passed. Real API/worker/SMTP/browser acceptance took 44.1s.
+Schema-102 independent recovery restored email selection/queue/projection and
+forced RLS alongside 104 objects, both identity keys and earlier audit/push facts.
+Twenty-one recovery regressions passed. No real SMTP or phone interaction occurred.
+
+The **private development API still uses schema 101**, SMTP disabled. Preserve its
+accepted Google binding and existing phone session. The dashboard service now has
+`~/.config/systemd/user/hris-dashboard-dev.service.d/20-static-assets.conf`, pointing
+Vite preview at `~/.local/share/hris-dashboard-dev/f91a9bca`. This baseline snapshot
+is compatible with that API and independent of `apps/dashboard/dist`, which tests
+rewrite. Both HTTP endpoints were healthy and its HTML matched the snapshot.
+Future controlled dev rollout must update both API and that explicit asset path;
+a normal local build must never silently replace the served dashboard again.
 
 ## Current user direction — 29 October 2026
 

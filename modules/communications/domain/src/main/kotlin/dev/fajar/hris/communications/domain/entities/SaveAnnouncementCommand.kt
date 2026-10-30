@@ -10,4 +10,5 @@ data class SaveAnnouncementCommand(
     val audience: AnnouncementAudience,
     val acknowledgementRequired: Boolean,
     val reason: String,
+    val emailNotification: Boolean? = null,
 )

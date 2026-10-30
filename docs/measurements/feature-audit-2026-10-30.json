@@ -558,15 +558,19 @@
   "findings": [
     {
       "id": "communications.email",
-      "status": "missing",
+      "status": "implemented-and-locally-accepted",
       "requirement": "Communications channel delivery: FCM/email failures do not erase inbox.",
-      "evidence": [
+      "next": "Observe full branch CI and continue reviewing all module and Mobile requirements; do not mark the full objective complete.",
+      "baselineEvidence": [
         "modules/communications/domain/build.gradle.kts: includes core.push.domain but no core.mail.domain",
         "modules/communications/data/src/main/kotlin/dev/fajar/hris/communications/data/di/CommunicationsConfiguration.kt: push delivery bindings only",
         "apps/worker/src/main/kotlin/dev/fajar/hris/worker/mail/IdentityMailWorker.kt: existing SMTP queue belongs to identity credentials",
         "modules/communications/domain/src/main/kotlin/dev/fajar/hris/communications/domain/usecases/DeliverInboxPush.kt: device push delivery only"
       ],
-      "next": "Implement explicit announcement email selection, atomic post-publication queue, bounded SMTP dispatch with live recipient access, administrative observations, and failure/replay coverage."
+      "evidence": [
+        "docs/announcement-email.md",
+        "docs/measurements/announcement-email-2026-10-30.json"
+      ]
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

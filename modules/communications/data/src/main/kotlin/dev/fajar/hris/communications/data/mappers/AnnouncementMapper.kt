@@ -28,6 +28,7 @@ fun AnnouncementRevisionsRecord.toAnnouncement(json: ObjectMapper) =
         publishedAt?.toInstant(),
         recipientCount,
         publicationAttempts,
+        emailNotification,
     )
 
 fun AnnouncementSummaryRow.toSummary() =
@@ -67,4 +68,5 @@ fun Announcement.toRecord(company: UUID, json: ObjectMapper) =
         it.publishedAt = publishedAt?.atOffset(ZoneOffset.UTC)
         it.recipientCount = recipientCount
         it.publicationAttempts = publicationAttempts
+        it.emailNotification = emailNotification
     }

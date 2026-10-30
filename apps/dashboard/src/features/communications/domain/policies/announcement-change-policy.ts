@@ -31,6 +31,7 @@ export function validateAnnouncementChange(input: AnnouncementChange): Failure |
     /\p{Cc}/u.test(input.body.replace(/[\n\t]/gu, ""))
   )
     fields.body = "invalid_text";
+  if (typeof input.emailNotification !== "boolean") fields.emailNotification = "invalid_value";
   if (!input.reason.length || input.reason.length > 1000) fields.reason = "invalid_text";
   if (!["COMPANY", "BRANCH", "DEPARTMENT", "GROUP"].includes(input.audienceKind))
     fields["audience.kind"] = "invalid_selection";

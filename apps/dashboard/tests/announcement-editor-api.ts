@@ -113,6 +113,7 @@ export async function installAnnouncementEditorApi(page: Page, allowed = true) {
           targetIds: [...body.audience.targetIds],
         },
         acknowledgementRequired: body.acknowledgementRequired,
+        emailNotification: body.emailNotification,
         reason: body.reason,
       };
       records.set(record.id, record);

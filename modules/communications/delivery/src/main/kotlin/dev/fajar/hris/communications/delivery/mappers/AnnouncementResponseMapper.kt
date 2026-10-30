@@ -20,6 +20,7 @@ fun Announcement.toResponse() =
         publishedAt?.toString(),
         recipientCount,
         publicationAttempts,
+        emailNotification,
     )
 
 fun AnnouncementSummary.toResponse() =

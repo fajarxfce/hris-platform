@@ -58,6 +58,7 @@ class AnnouncementDeliveryHttpTest : AnnouncementPublicationApiFixture() {
                 "acceptedDevices",
                 "rejectedDevices",
                 "observedAt",
+                "email",
             ),
             response.properties().map { it.key }.toSet(),
         )

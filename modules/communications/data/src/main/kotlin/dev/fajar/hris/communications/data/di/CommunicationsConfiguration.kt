@@ -562,4 +562,59 @@ class CommunicationsConfiguration {
             policy,
             clock,
         )
+
+    @Bean
+    fun inboxEmailSource(sql: DSLContext): InboxEmailDataSource = PostgresInboxEmailDataSource(sql)
+
+    @Bean
+    fun inboxEmail(source: InboxEmailDataSource): InboxEmailRepository =
+        StoredInboxEmailRepository(source)
+
+    @Bean
+    fun inboxEmailPolicy(
+        credentials: dev.fajar.hris.identity.domain.entities.CredentialChallengePolicy,
+        environment: org.springframework.core.env.Environment,
+    ) =
+        dev.fajar.hris.communications.domain.entities.InboxEmailPolicy(
+            credentials.enabled,
+            credentials.publicOrigin,
+            environment.getProperty("HRIS_EMAIL_APP_ENVIRONMENT", "prod"),
+        )
+
+    @Bean
+    fun leaseInboxEmail(
+        dispatches: InboxEmailRepository,
+        transactions: TransactionRunner,
+        journal: ChangeJournalRepository,
+        policy: dev.fajar.hris.communications.domain.entities.InboxEmailPolicy,
+        clock: Clock,
+    ) = LeaseInboxEmail(dispatches, transactions, journal, policy, clock)
+
+    @Bean
+    fun deliverInboxEmail(
+        dispatches: InboxEmailRepository,
+        inbox: InboxRepository,
+        announcements: AnnouncementRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        mail: dev.fajar.hris.mail.domain.repositories.MailRepository,
+        transactions: TransactionRunner,
+        journal: ChangeJournalRepository,
+        policy: dev.fajar.hris.communications.domain.entities.InboxEmailPolicy,
+        clock: Clock,
+    ) =
+        DeliverInboxEmail(
+            dispatches,
+            inbox,
+            announcements,
+            companies,
+            members,
+            identities,
+            mail,
+            transactions,
+            journal,
+            policy,
+            clock,
+        )
 }

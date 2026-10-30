@@ -72,6 +72,11 @@ abstract class CommunicationsWorkerFixture {
         for (company in companies) {
             database()
                 .update(
+                    "update inbox_email_dispatches set state='FAILED',finished_at=now(),failure_code='fixture_cleanup',lease_owner=null,lease_token=null,lease_until=null where company_id=? and state in ('PENDING','LEASED')",
+                    company,
+                )
+            database()
+                .update(
                     "update inbox_push_dispatches set state='FAILED',finished_at=now(),failure_code='fixture_cleanup',target_session_id=null,lease_owner=null,lease_token=null,lease_until=null where company_id=? and state in ('PENDING','LEASED')",
                     company,
                 )
@@ -169,7 +174,7 @@ abstract class CommunicationsWorkerFixture {
         return actor
     }
 
-    protected fun queue(actor: Actor): JobLease {
+    protected fun queue(actor: Actor, email: Boolean = false): JobLease {
         val id = UUID.randomUUID()
         val saved =
             save.execute(
@@ -183,6 +188,7 @@ abstract class CommunicationsWorkerFixture {
                     AnnouncementAudience(AudienceKind.COMPANY),
                     true,
                     "Worker publication",
+                    email,
                 ),
             )
         assertTrue(saved is Result.Success, saved.toString())

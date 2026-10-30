@@ -121,6 +121,7 @@ test("publication reaches the native inbox and sync preserves receipts, withdraw
   await page.getByLabel("Message", { exact: true }).fill("The office will be closed on Friday.");
   await page.getByLabel("Reason", { exact: true }).fill("Worker delivery fixture");
   await page.getByRole("checkbox", { name: "Require acknowledgement", exact: true }).check();
+  await page.getByRole("checkbox", { name: "Send an email reminder", exact: true }).check();
   await page.getByRole("combobox", { name: "Audience", exact: true }).selectOption("GROUP");
   await page.getByRole("button", { name: "Add: Inbox recipients", exact: true }).click();
   const draftWrites: { operation: string | undefined; body: unknown }[] = [];
@@ -251,6 +252,7 @@ test("publication reaches the native inbox and sync preserves receipts, withdraw
     recipientCount: 1,
     version: 4,
     publicationAttempts: 2,
+    emailNotification: true,
   });
   await page.getByRole("link", { name: "Announcement", exact: true }).click();
   await expect(

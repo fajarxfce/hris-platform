@@ -48,9 +48,20 @@ test("delivery review shows recipient and device counts, explicit refresh and In
   page,
 }) => {
   const api = await install(page);
+  api.set({
+    ...deliveryDetail(),
+    email: {
+      pending: 2,
+      processing: 1,
+      accepted: 2,
+      failed: 1,
+      superseded: 1,
+      unavailableRecipients: 1,
+    },
+  });
   await page.goto(path);
-  await page.getByRole("link", { name: "Push delivery", exact: true }).click();
-  const recipients = page.getByRole("region", { name: "Inbox recipients", exact: true });
+  await page.getByRole("link", { name: "Notification delivery", exact: true }).click();
+  const recipients = page.getByRole("region", { name: "Push recipients", exact: true });
   await expect(recipients).toBeVisible();
   await expect(recipients).toContainText("Failed1");
   await expect(page.getByRole("region", { name: "Device processing", exact: true })).toContainText(
@@ -62,17 +73,43 @@ test("delivery review shows recipient and device counts, explicit refresh and In
     }),
   ).toBeVisible();
   await expect(page.getByRole("status").filter({ hasText: "seven days" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Email reminders", exact: true })).toContainText(
+    "Accepted by mail server2",
+  );
+  await expect(
+    page.getByText(
+      "Mail server acceptance does not confirm delivery to a mailbox or that the message was read.",
+      { exact: true },
+    ),
+  ).toBeVisible();
   expect(api.requests).toHaveLength(1);
-  api.set({ ...deliveryDetail(), failed: 0, completed: 3 });
+  api.set({
+    ...deliveryDetail(),
+    failed: 0,
+    completed: 3,
+    email: {
+      pending: 2,
+      processing: 1,
+      accepted: 3,
+      failed: 0,
+      superseded: 1,
+      unavailableRecipients: 1,
+    },
+  });
   await page.getByRole("button", { name: "Refresh", exact: true }).click();
   await expect(recipients).toContainText("Completed3");
   expect(api.requests).toHaveLength(2);
   await page.getByRole("combobox", { name: "Language", exact: true }).selectOption("id");
   await page.getByRole("button", { name: "Tema", exact: true }).click();
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(page.getByRole("heading", { name: "Pengiriman push", exact: true })).toBeVisible();
-  await expect(page.getByRole("region", { name: "Penerima Inbox", exact: true })).toContainText(
+  await expect(
+    page.getByRole("heading", { name: "Pengiriman notifikasi", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("region", { name: "Penerima push", exact: true })).toContainText(
     "Selesai3",
+  );
+  await expect(page.getByRole("region", { name: "Pengingat email", exact: true })).toContainText(
+    "Diterima server email3",
   );
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   expect(api.requests).toHaveLength(2);
@@ -102,7 +139,7 @@ test("company replacement cannot publish a delayed observation from the previous
   );
   held.release();
   await expect(page.getByRole("heading", { name: "Announcements", exact: true })).toBeVisible();
-  await expect(page.getByRole("region", { name: "Inbox recipients", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Push recipients", exact: true })).toHaveCount(0);
   expect(api.requests).toHaveLength(1);
   expect(api.identity.unhandled).toEqual([]);
 });
@@ -111,23 +148,23 @@ test("backgrounding clears the observation and foreground recovery reads once", 
 }) => {
   const api = await install(page);
   await page.goto(`${path}/delivery`);
-  await expect(page.getByRole("region", { name: "Inbox recipients", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Push recipients", exact: true })).toBeVisible();
   await page.evaluate(() => {
     Object.defineProperty(document, "visibilityState", { value: "hidden", configurable: true });
     document.dispatchEvent(new Event("visibilitychange"));
   });
-  await expect(page.getByRole("region", { name: "Inbox recipients", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Push recipients", exact: true })).toHaveCount(0);
   expect(api.requests).toHaveLength(1);
   await page.evaluate(() => {
     Object.defineProperty(document, "visibilityState", { value: "visible", configurable: true });
     document.dispatchEvent(new Event("visibilitychange"));
   });
-  await expect(page.getByRole("region", { name: "Inbox recipients", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Push recipients", exact: true })).toBeVisible();
   expect(api.requests).toHaveLength(2);
   api.identity.setPermissions([]);
   api.fail("access_denied");
   await page.getByRole("button", { name: "Refresh", exact: true }).click();
-  await expect(page.getByRole("region", { name: "Inbox recipients", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Push recipients", exact: true })).toHaveCount(0);
   await expect(page.getByText("Accepted by push service", { exact: true })).toHaveCount(0);
   expect(api.requests).toHaveLength(3);
   expect(api.identity.unhandled).toEqual([]);

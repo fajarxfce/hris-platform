@@ -1,5 +1,6 @@
+import type { AnnouncementDeliveryDto } from "../data/models/announcement-delivery-dto";
 import { announcementId } from "./communications-fixture";
-export const deliveryDetail = () => ({
+export const deliveryDetail = (): AnnouncementDeliveryDto => ({
   announcementId,
   recipientCount: 8,
   pending: 1,
@@ -11,5 +12,6 @@ export const deliveryDetail = () => ({
   processedDevices: 7,
   acceptedDevices: 4,
   rejectedDevices: 2,
+  email: null,
   observedAt: "2026-10-29T02:00:00Z",
 });

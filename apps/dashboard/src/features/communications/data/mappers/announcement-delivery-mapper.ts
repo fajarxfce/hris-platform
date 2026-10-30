@@ -7,5 +7,9 @@ export function toAnnouncementDelivery(
   expected: AnnouncementId,
 ): AnnouncementDelivery {
   if (value.announcementId.toLowerCase() !== expected) throw new InvalidHttpResponseError();
-  return Object.freeze({ ...value, announcementId: expected });
+  return Object.freeze({
+    ...value,
+    announcementId: expected,
+    email: value.email === null ? null : Object.freeze({ ...value.email }),
+  });
 }

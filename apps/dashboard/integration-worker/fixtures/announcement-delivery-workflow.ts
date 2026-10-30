@@ -37,12 +37,40 @@ export async function acceptAnnouncementDelivery(
     ).trim();
   const resource = `/api/v1/companies/${company}/announcements/${announcement}/delivery`;
   const inboxQuery = `SELECT row_to_json(i)::text FROM inbox_items i WHERE company_id='${company}' AND announcement_id='${announcement}'`;
+  await expect
+    .poll(
+      async () => {
+        const result = await context.request.get(resource);
+        expect(result.status()).toBe(200);
+        return (await result.json()).email?.accepted;
+      },
+      { timeout: 25_000, intervals: [500] },
+    )
+    .toBe(1);
   const original = sql(inboxQuery);
+  const item = JSON.parse(original) as { id: string; owner_account_id: string };
+  const captured = JSON.parse(
+    await readFile("../../.work/worker-integration/mail.json", "utf8"),
+  ) as { recipient: string; subject: string; text: string }[];
+  const email = captured.filter(
+    (message) =>
+      message.subject === "New HRIS announcement" && message.text.includes(`/inbox/${item.id}`),
+  );
+  expect(email).toHaveLength(1);
+  expect(email[0]?.recipient).toBe("browser-binding-employee@example.invalid");
+  expect(email[0]?.text).toContain(
+    `http://127.0.0.1:4175/app/prod/accounts/${item.owner_account_id}/companies/${company}/inbox/${item.id}`,
+  );
+  expect(email[0]?.text).not.toContain("Office closure");
+  expect(email[0]?.text).not.toContain("Friday");
   const auditQuery = `SELECT count(*) FROM audit_entries WHERE company_id='${company}'`;
   const audits = sql(auditQuery);
-  await page.getByRole("link", { name: "Push delivery", exact: true }).click();
-  const recipients = page.getByRole("region", { name: "Inbox recipients", exact: true });
+  await page.getByRole("link", { name: "Notification delivery", exact: true }).click();
+  const recipients = page.getByRole("region", { name: "Push recipients", exact: true });
   await expect(recipients).toContainText("Queued1");
+  await expect(page.getByRole("region", { name: "Email reminders", exact: true })).toContainText(
+    "Accepted by mail server1",
+  );
   expect(await (await context.request.get(resource)).json()).toMatchObject({
     announcementId: announcement,
     recipientCount: 1,
@@ -51,6 +79,14 @@ export async function acceptAnnouncementDelivery(
     completed: 0,
     acceptedDevices: 0,
     unavailableRecipients: 0,
+    email: {
+      pending: 0,
+      processing: 0,
+      accepted: 1,
+      failed: 0,
+      superseded: 0,
+      unavailableRecipients: 0,
+    },
   });
   sql(
     `UPDATE inbox_push_dispatches SET state='FAILED',failure_code='push_delivery_expired',finished_at=clock_timestamp() WHERE company_id='${company}' AND inbox_id IN (SELECT id FROM inbox_items WHERE company_id='${company}' AND announcement_id='${announcement}')`,

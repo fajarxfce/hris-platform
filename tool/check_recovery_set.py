@@ -206,6 +206,7 @@ def main():
             api(endpoint, base + "/announcements/" + announcement, token=token, method="PUT", body={
                 "title": "Fictional recovery announcement", "body": "Owned recovery fixture only.",
                 "audience": {"kind": "COMPANY", "targetIds": []}, "acknowledgementRequired": False,
+                "emailNotification": True,
                 "reason": "Owned recovery publication"})
             api(endpoint, base + "/announcements/" + announcement + "/publish", token=token, post=True,
                 body={"expectedVersion": 0, "scheduledFor": None, "reason": "Owned recovery publication"})
@@ -258,6 +259,8 @@ def main():
             else:
                 raise RuntimeError("Owned announcement publication did not reach its delivery projection")
             delivery_query = "SELECT row_to_json(d)::text FROM announcement_push_delivery d WHERE announcement_id='" + announcement + "'"
+            email_query = "SELECT row_to_json(d)::text FROM announcement_email_delivery d WHERE announcement_id='" + announcement + "'"
+            email_queue_query = "SELECT row_to_json(d)::text FROM inbox_email_dispatches d WHERE inbox_id IN (SELECT inbox_id FROM announcement_email_delivery WHERE announcement_id='" + announcement + "')"
             storage_endpoint = binding(garage, "3900/tcp")
             objects = {f"page/{index:03}": f"owned fixture {index}".encode() for index in range(101)}
             objects["empty/"] = b""
@@ -269,6 +272,9 @@ def main():
                 database.command(["docker", "stop", "--time", str(timeout), container], log, timeout=timeout + 10)
             saved_delivery = json.loads(database.query(database_container, delivery_query, log))
             assert saved_delivery["state"] == "PENDING" and saved_delivery["processed_count"] == 0
+            saved_email = json.loads(database.query(database_container, email_query, log))
+            saved_email_queue = json.loads(database.query(database_container, email_queue_query, log))
+            assert saved_email["state"] == "PENDING" and saved_email_queue["attempts"] == 0
             retained_ids = database.query(database_container,
                 "SELECT DISTINCT split_part(envelope,'.',1) FROM (SELECT mfa_secret_encrypted AS envelope FROM accounts UNION ALL SELECT exchange_encrypted FROM native_sessions) retained WHERE envelope IS NOT NULL ORDER BY 1", log).splitlines()
             assert retained_ids == ['current', 'old']
@@ -298,6 +304,13 @@ def main():
                 database.restore_database_container(restored[0], database_directory, log)
                 assert json.loads(database.query(restored[0], audit_query, log)) == saved_audit
                 assert json.loads(database.query(restored[0], delivery_query, log)) == saved_delivery
+                assert json.loads(database.query(restored[0], email_query, log)) == saved_email
+                assert json.loads(database.query(restored[0], email_queue_query, log)) == saved_email_queue
+                for table in ("inbox_email_dispatches", "announcement_email_delivery"):
+                    assert database.query(restored[0], "SELECT relrowsecurity AND relforcerowsecurity FROM pg_class WHERE oid='public." + table + "'::regclass", log) == "t"
+                assert database.query(restored[0], "SELECT has_function_privilege('hris_app','capture_announcement_email_delivery()','EXECUTE')", log) == "f"
+                assert database.query(restored[0], "SELECT has_function_privilege('hris_app','claim_inbox_email(uuid,integer,integer,integer)','EXECUTE')", log) == "f"
+                assert database.query(restored[0], "SELECT bool_and(email_notification) FROM announcement_revisions WHERE id='" + announcement + "'", log) == "t"
                 assert database.query(restored[0], "SELECT relrowsecurity AND relforcerowsecurity FROM pg_class WHERE oid='public.announcement_push_delivery'::regclass", log) == "t"
                 assert database.query(restored[0], "SELECT has_function_privilege('hris_app','capture_announcement_push_delivery()','EXECUTE')", log) == "f"
 
@@ -324,7 +337,7 @@ def main():
                       "objects": len(objects), "bytes": sum(map(len, objects.values())),
                       "sourceUnchangedByRestore": True, "wrongRetiredKeyRejected": True,
                       "separateKeyPack": True, "temporaryResourcesRemoved": True,
-                      "typedAccountAuditRestored": True, "announcementDeliveryRestored": True}
+                      "typedAccountAuditRestored": True, "announcementDeliveryRestored": True, "announcementEmailRestored": True}
             result['retainedIdentityKeyIds'] = retained_ids
         except BaseException:
             for kind, name in resources:

@@ -16,12 +16,31 @@ export const announcementDeliveryDto = z
     acceptedDevices: devices,
     rejectedDevices: devices,
     observedAt: z.iso.datetime(),
+    email: z
+      .strictObject({
+        pending: recipients,
+        processing: recipients,
+        accepted: recipients,
+        failed: recipients,
+        superseded: recipients,
+        unavailableRecipients: recipients,
+      })
+      .nullable()
+      .default(null),
   })
   .refine(
     (v) =>
       v.pending + v.processing + v.completed + v.failed + v.superseded + v.unavailableRecipients ===
         v.recipientCount &&
       v.processedDevices <= (v.recipientCount - v.unavailableRecipients) * 500 &&
-      v.acceptedDevices + v.rejectedDevices <= v.processedDevices,
+      v.acceptedDevices + v.rejectedDevices <= v.processedDevices &&
+      (v.email === null ||
+        v.email.pending +
+          v.email.processing +
+          v.email.accepted +
+          v.email.failed +
+          v.email.superseded +
+          v.email.unavailableRecipients ===
+          v.recipientCount),
   );
 export type AnnouncementDeliveryDto = z.infer<typeof announcementDeliveryDto>;

@@ -23,6 +23,7 @@ export const detail = (version = 0): AnnouncementDto => {
   const { audienceKind, targetCount: _, ...item } = summary(version);
   return {
     ...item,
+    emailNotification: false,
     body: "The office will be closed on Friday.\nContact your manager.",
     audience: { kind: audienceKind, targetIds: [] },
     reason: "Review office availability",

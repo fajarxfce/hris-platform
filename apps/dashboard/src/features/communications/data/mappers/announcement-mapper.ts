@@ -59,6 +59,7 @@ export function toAnnouncement(
   );
   return Object.freeze({
     ...summary,
+    emailNotification: dto.emailNotification,
     body: dto.body,
     targetIds: Object.freeze(ids),
     recordedBy: dto.recordedBy.toLowerCase(),

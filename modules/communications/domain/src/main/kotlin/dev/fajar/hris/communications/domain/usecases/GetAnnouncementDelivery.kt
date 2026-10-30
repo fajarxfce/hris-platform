@@ -53,14 +53,24 @@ class GetAnnouncementDelivery(
             val result = delivery.counts(company, id)
             if (result is Result.Failed) return@run result
             val counts = (result as Result.Success).value
+            val emailResult =
+                if (announcement.emailNotification) delivery.emailCounts(company, id)
+                else Result.Success(null)
+            if (emailResult is Result.Failed) return@run emailResult
+            val email = (emailResult as Result.Success).value
             val now = clock.instant()
             val checked = validateCompanySessionActor(actor, resolved, now, security)
             if (checked is Result.Failed) return@run checked
-            if (counts.trackedRecipients > announcement.recipientCount)
+            if (
+                counts.trackedRecipients > announcement.recipientCount ||
+                    (email?.trackedRecipients ?: 0) > announcement.recipientCount
+            )
                 return@run Result.Failed(
                     Failure(FailureKind.UNEXPECTED, "announcement_delivery_unavailable")
                 )
-            Result.Success(AnnouncementDelivery(id, announcement.recipientCount, counts, now))
+            Result.Success(
+                AnnouncementDelivery(id, announcement.recipientCount, counts, now, email)
+            )
         }
     }
 }

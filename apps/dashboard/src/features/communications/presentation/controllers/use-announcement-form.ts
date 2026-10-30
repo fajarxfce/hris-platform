@@ -19,6 +19,7 @@ export function useAnnouncementForm(
       audienceKind: state.announcement?.audienceKind ?? "COMPANY",
       targetIds: state.announcement?.targetIds ?? [],
       acknowledgementRequired: state.announcement?.acknowledgementRequired ?? false,
+      emailNotification: state.announcement?.emailNotification ?? false,
       reason: "",
     }),
     [state.announcement],
@@ -32,6 +33,7 @@ export function useAnnouncementForm(
     name: "acknowledgementRequired",
     control: form.control,
   });
+  const emailNotification = useController({ name: "emailNotification", control: form.control });
   const reason = useController({ name: "reason", control: form.control });
   const depart = useNavigationProtection(
     state.stage === "saving"
@@ -48,6 +50,7 @@ export function useAnnouncementForm(
     audienceKind: audienceKind.field,
     targetIds: targetIds.field,
     acknowledgementRequired: acknowledgementRequired.field,
+    emailNotification: emailNotification.field,
     reason: reason.field,
     editable: state.stage === "editing",
     changeKind: (next: AudienceKind) => {

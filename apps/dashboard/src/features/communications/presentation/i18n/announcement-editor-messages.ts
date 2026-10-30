@@ -17,6 +17,9 @@ const en = {
   retry: "Check save result",
   operation: "Operation",
   acknowledgement: "Require acknowledgement",
+  emailNotification: "Send an email reminder",
+  emailNotice:
+    "Recipients receive a link to Inbox when the announcement is published. The message remains in Inbox if email is unavailable.",
   title: "Title",
   body: "Message",
   reason: "Reason",
@@ -61,6 +64,9 @@ const id: Record<keyof typeof en, string> = {
   retry: "Periksa hasil penyimpanan",
   operation: "Operasi",
   acknowledgement: "Wajibkan konfirmasi",
+  emailNotification: "Kirim pengingat email",
+  emailNotice:
+    "Penerima mendapat tautan ke Inbox saat pengumuman diterbitkan. Pesan tetap tersedia di Inbox jika email tidak tersedia.",
   title: "Judul",
   body: "Pesan",
   reason: "Alasan",

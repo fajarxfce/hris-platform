@@ -8,5 +8,6 @@ export type AnnouncementChange = Readonly<{
   audienceKind: AudienceKind;
   targetIds: readonly string[];
   acknowledgementRequired: boolean;
+  emailNotification: boolean;
   reason: string;
 }>;

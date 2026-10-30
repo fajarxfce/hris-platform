@@ -23,6 +23,7 @@ data class AnnouncementDelivery(
     val recipientCount: Int,
     val counts: AnnouncementDeliveryCounts,
     val observedAt: Instant,
+    val email: AnnouncementEmailDeliveryCounts? = null,
 ) {
     val unavailableRecipients: Int
         get() = recipientCount - counts.trackedRecipients

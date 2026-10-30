@@ -17,12 +17,21 @@ export function AnnouncementDeliveryPage(props: {
 }) {
   const text = announcementDeliveryMessages(props.locale),
     value = props.state.delivery;
+  const email = value?.email;
   const number = new Intl.NumberFormat(props.locale);
   const recipients = [
     "recipientCount",
     "pending",
     "processing",
     "completed",
+    "failed",
+    "superseded",
+    "unavailableRecipients",
+  ] as const;
+  const emailFields = [
+    "pending",
+    "processing",
+    "accepted",
     "failed",
     "superseded",
     "unavailableRecipients",
@@ -60,7 +69,23 @@ export function AnnouncementDeliveryPage(props: {
               items={devices.map((key) => ({ label: text[key], value: number.format(value[key]) }))}
             />
             <p>{text.acceptance}</p>
-            {value.unavailableRecipients > 0 && <p role="status">{text.retention}</p>}
+            {(value.unavailableRecipients > 0 || (email?.unavailableRecipients ?? 0) > 0) && (
+              <p role="status">{text.retention}</p>
+            )}
+            {email ? (
+              <>
+                <AppPropertyList
+                  title={text.email}
+                  items={emailFields.map((key) => ({
+                    label: text[key],
+                    value: number.format(email[key]),
+                  }))}
+                />
+                <p>{text.emailAcceptance}</p>
+              </>
+            ) : (
+              <p>{text.emailNotRequested}</p>
+            )}
             <AppPropertyList
               title={text.observedAt}
               items={[

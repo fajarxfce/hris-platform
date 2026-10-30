@@ -1,10 +1,12 @@
-# Announcement push delivery
+# Announcement notification delivery
 
-Administrators open **Push delivery** from the current announcement. The screen
+Administrators open **Notification delivery** from the current announcement. The screen
 shows its retained publication recipient total, current dispatch states and device
 processing counts. Refresh is explicit. Inbox correspondence remains available
 when push cannot be sent; this view does not retry, republish or acknowledge it.
 English and Indonesian copy use the selected company timezone.
+V102 adds optional [email observations](announcement-email.md) alongside the
+existing push counts; the earlier push acceptance below retains its original scope.
 
 `GET /api/v1/companies/{companyId}/announcements/{id}/delivery` requires both the
 original and current `announcements.manage` grant. Announcement, company,

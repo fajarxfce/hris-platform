@@ -1,7 +1,7 @@
 package dev.fajar.hris.communications.data.repositories
 
 import dev.fajar.hris.communications.data.datasources.AnnouncementDeliveryDataSource
-import dev.fajar.hris.communications.domain.entities.AnnouncementDeliveryCounts
+import dev.fajar.hris.communications.domain.entities.*
 import dev.fajar.hris.communications.domain.repositories.AnnouncementDeliveryRepository
 import dev.fajar.hris.core.database.safeDatabaseCall
 import java.util.UUID
@@ -28,6 +28,19 @@ class StoredAnnouncementDeliveryRepository(private val source: AnnouncementDeliv
             row.processed,
             row.accepted,
             row.rejected,
+        )
+    }
+
+    override fun emailCounts(companyId: UUID, announcementId: UUID) = safeDatabaseCall {
+        val row = source.emailCounts(companyId, announcementId)
+        val states = listOf(row.pending, row.processing, row.accepted, row.failed, row.superseded)
+        require(states.all { it in 0..5000 } && states.sum() <= 5000)
+        AnnouncementEmailDeliveryCounts(
+            row.pending,
+            row.processing,
+            row.accepted,
+            row.failed,
+            row.superseded,
         )
     }
 }

@@ -25,6 +25,33 @@ class ApiContractHttpTest : PeopleApiFixture() {
     private lateinit var mappings: RequestMappingHandlerMapping
 
     @Test
+    fun announcementEmailIsOptionalOnSaveAndHasNoRecipientMetadataInDelivery() {
+        val schemas = contract()["components"]["schemas"]
+        assertTrue(schemas["SaveAnnouncementRequest"]["properties"].has("emailNotification"))
+        assertFalse(
+            schemas["SaveAnnouncementRequest"].path("required").any {
+                it.asString() == "emailNotification"
+            }
+        )
+        assertEquals(
+            "boolean",
+            schemas["AnnouncementResponse"]["properties"]["emailNotification"]["type"].asString(),
+        )
+        assertTrue(schemas["AnnouncementDeliveryResponse"]["properties"].has("email"))
+        assertEquals(
+            setOf(
+                "pending",
+                "processing",
+                "accepted",
+                "failed",
+                "superseded",
+                "unavailableRecipients",
+            ),
+            schemas["AnnouncementEmailDeliveryResponse"]["properties"].propertyNames().toSet(),
+        )
+    }
+
+    @Test
     fun accountAuditDetailHasAnExplicitTypedReadContract() {
         val api = contract()
         val op = api["paths"]["/api/v1/administration/audit-events/{eventId}/account-access"]["get"]
@@ -1553,6 +1580,7 @@ class ApiContractHttpTest : PeopleApiFixture() {
                 "acceptedDevices",
                 "rejectedDevices",
                 "observedAt",
+                "email",
             ),
             schema.propertyNames().toSet(),
         )

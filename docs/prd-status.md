@@ -1,7 +1,7 @@
 # Current PRD review
 
 Review reopened 30 October 2026 against all eleven initial module contracts and
-Mobile features. Announcement email delivery is confirmed missing; the previous
+Mobile features. The confirmed announcement email gap is implemented and locally accepted; the previous
 module-level summary does not establish full feature completion. The requirement
 inventory and remaining review are active. The earlier distribution audit passed
 its local packaging and independent CI checks. Physical iPhone testing remains
@@ -12,10 +12,11 @@ identifies current work and runtime ownership.
 ## Reopened feature audit — 30 October
 
 The user requested proof that every feature is finished. The [full feature audit](feature-audit-2026-10-30.md)
-is active. Communications email notifications are confirmed missing: current
-announcement delivery implements Inbox/FCM, while the SMTP path serves identity
-only. Earlier module-level summaries below are not complete requirement-by-requirement
-acceptance. Implement the missing channel and continue auditing the remaining scope.
+is active. Communications email reminders now have optional authoring, atomic
+publication capture, bounded SMTP delivery and dashboard observations, with
+[local acceptance](measurements/announcement-email-2026-10-30.json). Earlier
+module-level summaries below do not replace requirement-by-requirement review.
+Continue auditing the remaining scope and follow full branch CI.
 
 ## Release-configuration audit — accepted
 

@@ -134,3 +134,14 @@ cancellation preserve account/company ownership. V101 maintains the minimal
 projection atomically while preserving raw dispatch RLS. Seven-day operational
 cleanup never removes Inbox evidence or invents delivery success. Provider
 acceptance does not confirm receipt on a device.
+
+
+## Optional announcement email
+
+[Email reminders](../announcement-email.md) retain an explicit draft selection,
+freeze it with publication evidence and atomically capture one recipient dispatch.
+The owned SMTP worker rechecks access, bounds claims/retries/deadlines, preserves
+Inbox on failure and reports minimal administrative email observations beside
+push. V102 defaults historical announcements to no email and never backfills
+already published Inbox records. The dashboard exposes selection, exact revision
+and delivery review in English and Indonesian.

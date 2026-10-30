@@ -17,6 +17,7 @@ const input: AnnouncementChange = {
   audienceKind: "BRANCH",
   targetIds: [target],
   acknowledgementRequired: true,
+  emailNotification: true,
   reason: " Schedule update ",
 };
 const search: AudienceReferenceSearch = { kind: "BRANCH", query: "", ids: [], after: null };
@@ -53,6 +54,7 @@ describe("announcement commands and reference discovery", () => {
         body: "New hours.\nPlease review.",
         audience: { kind: "BRANCH", targetIds: [target] },
         acknowledgementRequired: true,
+        emailNotification: true,
         reason: "Schedule update",
         expectedVersion: null,
       },

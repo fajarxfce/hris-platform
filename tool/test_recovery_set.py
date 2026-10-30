@@ -27,6 +27,13 @@ class RecoverySetTest(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.directory = Path(self.temporary.name)
 
+    def test_schema_gate_accepts_reviewed_email_metadata_and_rejects_unknown_future_schema(self):
+        for schema in (59, 101, 102):
+            recovery.validate_schema({'observedSchema': str(schema)})
+        for schema in (58, 103, None, 'invalid'):
+            with self.assertRaises(database.RecoveryError):
+                recovery.validate_schema({'observedSchema': schema})
+
     def test_keypack_requires_exact_fields_current_key_and_unique_bounded_old_keys(self):
         self.assertEqual(keys(), recovery.validate_keys(keys()))
         values = [keys() | {'format': True}, keys() | {'unknown': 'field'}, keys() | {'identityActive': 'missing'},

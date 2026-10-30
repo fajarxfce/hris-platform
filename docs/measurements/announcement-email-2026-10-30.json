@@ -1,0 +1,445 @@
+{
+  "date": "2026-10-30",
+  "parentCommit": "f91a9bca",
+  "scope": "Optional announcement email implementation and local acceptance; full PRD audit remains active.",
+  "status": "locally-accepted",
+  "schema": "102",
+  "baselineRegression": {
+    "emailNotificationTrue": "400 invalid_request before implementation",
+    "test": "AnnouncementEmailCaptureHttpTest"
+  },
+  "backend": {
+    "apps/server": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.AnnouncementAudiencePreviewHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "34.759"
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementAuthoringHttpTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "17.532"
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementDeliveryHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "15.861"
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementDeliveryMigrationHttpTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "16.09"
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementEmailCaptureHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.385"
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementEmailMigrationHttpTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.001"
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementInboxHttpTest",
+          "tests": "9",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "14.893"
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementPublicationCapacityTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "44.847"
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementPublicationHttpTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "13.168"
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementPublicationIntegrityTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.548"
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementReviewHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.322"
+        },
+        {
+          "name": "dev.fajar.hris.InboxPushCaptureHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.881"
+        },
+        {
+          "name": "dev.fajar.hris.InboxSyncHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "13.0"
+        }
+      ],
+      "totals": {
+        "tests": 65,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "apps/worker": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.worker.AnnouncementPublicationWorkerTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "26.986"
+        },
+        {
+          "name": "dev.fajar.hris.worker.DirectoryProjectionWorkerTest",
+          "tests": "11",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "27.868"
+        },
+        {
+          "name": "dev.fajar.hris.worker.DocumentValidationWorkerTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.451"
+        },
+        {
+          "name": "dev.fajar.hris.worker.EmployeeImportWorkerTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.907"
+        },
+        {
+          "name": "dev.fajar.hris.worker.IdentityMailWorkerTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.483"
+        },
+        {
+          "name": "dev.fajar.hris.worker.InboxEmailWorkerTest",
+          "tests": "10",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "19.484"
+        },
+        {
+          "name": "dev.fajar.hris.worker.InboxPushWorkerTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "16.556"
+        },
+        {
+          "name": "dev.fajar.hris.worker.LeaveBatchWorkerTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.971"
+        },
+        {
+          "name": "dev.fajar.hris.worker.LeaveCarryExpiryWorkerTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.391"
+        },
+        {
+          "name": "dev.fajar.hris.worker.MobileSyncWorkerTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.106"
+        },
+        {
+          "name": "dev.fajar.hris.worker.NativeSessionCleanupWorkerTest",
+          "tests": "10",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.895"
+        },
+        {
+          "name": "dev.fajar.hris.worker.ObjectCleanupWorkerTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.533"
+        },
+        {
+          "name": "dev.fajar.hris.worker.OffboardingScheduleWorkerTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.134"
+        },
+        {
+          "name": "dev.fajar.hris.worker.OnboardingScheduleWorkerTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.995"
+        },
+        {
+          "name": "dev.fajar.hris.worker.PayrollCalculationWorkerTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.037"
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "1",
+          "time": "0.001"
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportRetentionWorkerTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.626"
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportWorkerTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "6.478"
+        },
+        {
+          "name": "dev.fajar.hris.worker.SelfProfileProjectionWorkerTest",
+          "tests": "13",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "15.605"
+        },
+        {
+          "name": "dev.fajar.hris.worker.WorkerIntegrationObservationTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "6.525"
+        },
+        {
+          "name": "dev.fajar.hris.worker.WorkerIntegrationTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "6.571"
+        }
+      ],
+      "totals": {
+        "tests": 105,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      }
+    },
+    "modules/communications/domain": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.communications.domain.AnnouncementActionPolicyTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.147"
+        },
+        {
+          "name": "dev.fajar.hris.communications.domain.AnnouncementPolicyTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.024"
+        },
+        {
+          "name": "dev.fajar.hris.communications.domain.AnnouncementPublicationPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.005"
+        },
+        {
+          "name": "dev.fajar.hris.communications.domain.InboxPushPolicyTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.002"
+        }
+      ],
+      "totals": {
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "modules/communications/data": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.communications.data.AnnouncementDeliveryRepositoryTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.169"
+        }
+      ],
+      "totals": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "openapi": {
+    "name": "dev.fajar.hris.ApiContractHttpTest",
+    "tests": "67",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "24.572"
+  },
+  "checks": {
+    "architecture": "passed",
+    "format": "passed",
+    "changedDocumentationLinks": "passed",
+    "dashboardTypes": "passed",
+    "dashboardUnit": {
+      "tests": 4006,
+      "files": 353,
+      "seconds": 74.87
+    },
+    "dashboardBiome": "passed with two existing CSS specificity warnings",
+    "chromium": {
+      "distinctScenarios": 15,
+      "firstRun": "14 passed, duplicated retention notice failed; notice fixed",
+      "correctedDeliveryScenarios": 3,
+      "correctedDeliverySeconds": 9.2
+    },
+    "realApiWorkerSmtpBrowser": {
+      "scenarios": 1,
+      "scenarioSeconds": 44.1,
+      "totalMinutes": 1.3,
+      "fictionalRecipientOnly": true,
+      "publicationReplay": true,
+      "exactOneGenericEmailCaptured": true,
+      "inboxReadAndAckPreserved": true,
+      "noDeliveryReadWrites": true
+    }
+  },
+  "recovery": {
+    "restorePassed": true,
+    "schema": "102",
+    "identityEnvelopesVerified": 2,
+    "objects": 104,
+    "bytes": 2098795,
+    "sourceUnchangedByRestore": true,
+    "wrongRetiredKeyRejected": true,
+    "separateKeyPack": true,
+    "temporaryResourcesRemoved": true,
+    "typedAccountAuditRestored": true,
+    "announcementPushRestored": true,
+    "announcementEmailQueueAndProjectionRestored": true,
+    "emailSelectionRestored": true,
+    "forcedRlsAndRevokedFunctionEntryRestored": true,
+    "toolRegressions": 21
+  },
+  "findingsCorrected": [
+    "Legacy schema-100 migration fixture required a pre-email JOOQ adapter; old migration remained unmodified.",
+    "Existing HTTP/OpenAPI exact field lists extended for nullable email counters.",
+    "Account email is immutable; delivery reads the actual authorized account address without altering that contract.",
+    "One shared retention notice replaces duplicate push/email notices.",
+    "Recovery verifier reviewed and extended through schema 102; no new encrypted payload family.",
+    "Private dashboard preview read test build output; baseline assets moved to an independent immutable directory."
+  ],
+  "privateRuntime": {
+    "apiHealth": 200,
+    "dashboardHealth": 200,
+    "dashboardMatchesBaseline": true,
+    "apiSchema": 101,
+    "smtpEnabled": false,
+    "googleBindingPreserved": true,
+    "phoneUntouched": true,
+    "dashboardAssets": "/home/fajar/.local/share/hris-dashboard-dev/f91a9bca",
+    "dashboardOverride": "/home/fajar/.config/systemd/user/hris-dashboard-dev.service.d/20-static-assets.conf"
+  },
+  "limits": [
+    "No live SMTP delivery or production deployment.",
+    "SMTP acceptance is not proof of mailbox receipt or reading. Lost acknowledgement may duplicate stable Message-ID.",
+    "Physical iPhone explicitly waived; this change adds no Mobile or Starter code.",
+    "One-hour report retention worker test skipped here; previous elapsed-time acceptance remains separate.",
+    "Remaining 61 initial requirements and detailed module/Mobile contracts still require audit.",
+    "Full branch CI follows this commit."
+  ]
+}

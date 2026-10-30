@@ -8,12 +8,14 @@ import java.util.concurrent.TimeUnit
 import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.springframework.context.annotation.Import
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.datasource.DriverManagerDataSource
 import org.springframework.jdbc.datasource.SingleConnectionDataSource
 import org.springframework.test.context.TestPropertySource
 
 @TestPropertySource(properties = ["spring.flyway.target=100"])
+@Import(LegacyAnnouncementStorageConfiguration::class)
 class AnnouncementDeliveryMigrationHttpTest : AnnouncementPublicationApiFixture() {
     private fun publishFixture(f: Fixture): UUID {
         member(f)

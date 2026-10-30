@@ -16,6 +16,7 @@ const fields: AnnouncementFields = {
   audienceKind: "COMPANY",
   targetIds: [],
   acknowledgementRequired: true,
+  emailNotification: true,
   reason: "Updated hours",
 };
 const record = (version = 0) =>

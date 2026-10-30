@@ -22,7 +22,47 @@ describe("announcement delivery contract", () => {
       path: `/api/v1/companies/${companyId}/announcements/${announcementId}/delivery`,
     });
   });
+  it("accepts scoped email counts and freezes the nested observation", async () => {
+    const response = {
+      ...deliveryDetail(),
+      email: {
+        pending: 2,
+        processing: 1,
+        accepted: 2,
+        failed: 1,
+        superseded: 1,
+        unavailableRecipients: 1,
+      },
+    };
+    const result = await createCommunicationsFeature({
+      request: async () => response,
+    }).loadDelivery.execute(access, announcementId, signal());
+    expect(result).toEqual({ ok: true, value: response });
+    if (result.ok) expect(Object.isFrozen(result.value.email)).toBe(true);
+  });
   it.each([
+    { email: {} },
+    {
+      email: {
+        pending: 0,
+        processing: 0,
+        accepted: 9,
+        failed: 0,
+        superseded: 0,
+        unavailableRecipients: 0,
+      },
+    },
+    {
+      email: {
+        pending: 0,
+        processing: 0,
+        accepted: 8,
+        failed: 0,
+        superseded: 0,
+        unavailableRecipients: 0,
+        recipient: "must-not-be-exposed",
+      },
+    },
     { recipientCount: 5001 },
     { pending: -1 },
     { pending: 0.5 },

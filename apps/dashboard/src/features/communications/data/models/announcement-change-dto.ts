@@ -4,5 +4,6 @@ export type AnnouncementChangeDto = Readonly<{
   body: string;
   audience: Readonly<{ kind: string; targetIds: readonly string[] }>;
   acknowledgementRequired: boolean;
+  emailNotification: boolean;
   reason: string;
 }>;

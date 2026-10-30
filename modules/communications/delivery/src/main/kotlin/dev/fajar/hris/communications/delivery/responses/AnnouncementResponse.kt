@@ -18,4 +18,5 @@ data class AnnouncementResponse(
     val publishedAt: String?,
     val recipientCount: Int,
     val publicationAttempts: Int,
+    val emailNotification: Boolean,
 )

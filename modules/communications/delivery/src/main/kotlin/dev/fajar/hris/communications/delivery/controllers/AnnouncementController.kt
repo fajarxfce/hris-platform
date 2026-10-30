@@ -47,6 +47,7 @@ class AnnouncementController(
                     AnnouncementAudience(body.audience.kind, body.audience.targetIds),
                     body.acknowledgementRequired,
                     body.reason,
+                    body.emailNotification,
                 ),
             )
             .response()

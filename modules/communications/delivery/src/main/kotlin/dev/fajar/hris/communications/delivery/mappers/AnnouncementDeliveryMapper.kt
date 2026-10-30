@@ -1,6 +1,6 @@
 package dev.fajar.hris.communications.delivery.mappers
 
-import dev.fajar.hris.communications.delivery.responses.AnnouncementDeliveryResponse
+import dev.fajar.hris.communications.delivery.responses.*
 import dev.fajar.hris.communications.domain.entities.AnnouncementDelivery
 
 fun AnnouncementDelivery.toResponse() =
@@ -17,4 +17,14 @@ fun AnnouncementDelivery.toResponse() =
         counts.acceptedDevices,
         counts.rejectedDevices,
         observedAt,
+        email?.let {
+            AnnouncementEmailDeliveryResponse(
+                it.pending,
+                it.processing,
+                it.accepted,
+                it.failed,
+                it.superseded,
+                recipientCount - it.trackedRecipients,
+            )
+        },
     )

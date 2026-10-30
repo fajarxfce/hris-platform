@@ -66,6 +66,7 @@ export class RemoteAnnouncementRepository implements AnnouncementRepository {
           body: change.body,
           audience: { kind: change.audienceKind, targetIds: [...change.targetIds] },
           acknowledgementRequired: change.acknowledgementRequired,
+          emailNotification: change.emailNotification,
           reason: change.reason,
         },
         signal,

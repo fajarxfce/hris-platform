@@ -22,6 +22,7 @@ export const announcementSummaryDto = z.object({
   targetCount: z.number().int().min(0).max(32),
 });
 export const announcementDto = z.object({
+  emailNotification: z.boolean().default(false),
   ...common,
   body: z.string().min(1).max(16000),
   audience: z.object({ kind: audience, targetIds: z.array(z.uuid()).max(32) }),

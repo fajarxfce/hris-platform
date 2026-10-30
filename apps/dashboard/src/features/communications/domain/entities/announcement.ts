@@ -21,6 +21,7 @@ export type AnnouncementSummary = Readonly<{
 }>;
 export type Announcement = AnnouncementSummary &
   Readonly<{
+    emailNotification: boolean;
     body: string;
     targetIds: readonly string[];
     recordedBy: string;

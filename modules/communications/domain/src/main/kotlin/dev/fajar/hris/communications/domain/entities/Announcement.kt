@@ -19,4 +19,5 @@ data class Announcement(
     val publishedAt: Instant? = null,
     val recipientCount: Int = 0,
     val publicationAttempts: Int = 0,
+    val emailNotification: Boolean = false,
 )

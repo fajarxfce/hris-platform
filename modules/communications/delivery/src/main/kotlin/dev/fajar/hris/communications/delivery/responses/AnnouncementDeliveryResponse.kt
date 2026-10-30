@@ -16,4 +16,5 @@ data class AnnouncementDeliveryResponse(
     val acceptedDevices: Int,
     val rejectedDevices: Int,
     val observedAt: Instant,
+    val email: AnnouncementEmailDeliveryResponse?,
 )

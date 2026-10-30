@@ -13,6 +13,9 @@ class AnnouncementDeliveryRepositoryTest {
     private fun repository(load: () -> AnnouncementDeliveryRow) =
         StoredAnnouncementDeliveryRepository(
             object : AnnouncementDeliveryDataSource {
+                override fun emailCounts(companyId: UUID, announcementId: UUID) =
+                    error("Not exercised by push tests")
+
                 override fun counts(companyId: UUID, announcementId: UUID) = load()
             }
         )

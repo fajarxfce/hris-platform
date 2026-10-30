@@ -56,7 +56,10 @@ class SaveAnnouncement(
                     input.audience.kind.name,
                     input.acknowledgementRequired.toString(),
                     input.reason,
-                ) + input.audience.targetIds.map { it.toString() }.sorted(),
+                ) +
+                    input.audience.targetIds.map { it.toString() }.sorted() +
+                    (input.emailNotification?.let { listOf("emailNotification", it.toString()) }
+                        ?: emptyList()),
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
@@ -132,6 +135,8 @@ class SaveAnnouncement(
                     actor.accountId,
                     input.reason,
                     publicationAttempts = previous?.publicationAttempts ?: 0,
+                    emailNotification =
+                        input.emailNotification ?: previous?.emailNotification ?: false,
                 )
             announcements.save(company, snapshot, input.expectedVersion).flatMap { receipt ->
                 operations

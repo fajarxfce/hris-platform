@@ -1,9 +1,12 @@
 # Administration requirement review
 
-All five initial requirements and six original detailed sections have matching
-implementation and behavior evidence. The new [completion-assurance correction](administration-assurance-2026-10-30.md)
-is locally verified; final source CI remains pending before closing the five
-inventory rows. This review does not establish completion of other modules.
+All five initial requirements and six original detailed sections are accepted.
+Exact correction source `3c8fb15a` passed all ten jobs in
+[CI 41081153648](https://github.com/fajarxfce/hris-platform/actions/runs/41081153648).
+[Downloaded evidence](measurements/administration-full-ci-2026-10-30.json) verifies
+3,015 API cases, 104 active worker cases per shard, 41 normal/14 worker/one export
+browser scenarios and an independent schema-103 recovery. The private runtime
+has not been updated with this correction. Other module review remains active.
 
 | Initial requirement | Implementation and verification |
 | --- | --- |
@@ -24,7 +27,7 @@ inventory rows. This review does not establish completion of other modules.
 | Audit search | Company/global queries use bounded windows, exact filters and immutable cursor compatibility. Source projections do not acquire reason/change payloads. Current access and final MFA apply before releasing pages. Company/global/account audit tests verify row scope, redaction, stable pagination, cancellation, credential/grant changes and historical account values. |
 | Durable job foundation | Read/cancellation use cases preserve own-job cleanup versus company-wide authority and final assurance. Fixed-total/upper-bound progress, attempt/concurrency limits, immutable inputs, lease tokens and database-clock expiry are enforced. The actual policy/job scenario distinguishes cancellation requested from terminal cancellation. Worker suites verify execution, cleanup and feature-owned recovery without an arbitrary-job API. |
 
-## Evidence and remaining gate
+## Accepted evidence and remaining workspace scope
 
 [Correction measurements](measurements/administration-assurance-2026-10-30.json)
 retain baseline classification, exact local commands, per-suite cases and package
@@ -33,7 +36,11 @@ integration/global-audit/job controls. Both runtime application contexts pass,
 including all 104 ordinary worker cases; the separately accepted elapsed-retention
 case remains an explicit skip. Dashboard source is unchanged by the correction.
 
-The source commit must pass all ten Platform CI jobs, including full dashboard
-integration and isolated recovery. Until then the initial audit rows remain
-unverified for final-source acceptance. The next modules are Reporting, Payroll
-and Workforce, followed by the complete Mobile/applicable Starter review.
+All ten final-source CI jobs passed. The nine skipped artifact-upload steps are
+intentional: only backend shard 1 publishes integration packages and OpenAPI.
+All verification steps passed; the separately accepted one-hour retention worker
+case remains the sole worker test skip. Recovery restored 104 objects, both key
+identifiers, typed audit, announcement email and metadata constraints/history,
+rejected the wrong retired key and removed temporary resources. Reporting and
+Payroll corrections are later sources and require their own final CI. Continue
+Workforce and the complete Mobile/applicable Starter review.

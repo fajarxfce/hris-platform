@@ -9,37 +9,30 @@ waived; deployment/provider observations retain their separate scope.
 [Completion](completion.md) preserves history and [handoff](agent-handoff.md)
 identifies current work and runtime ownership.
 
-## Reopened feature audit — 30 October
+## Active feature audit — 30 October
 
-The user requested proof that every feature is finished. The [full feature audit](feature-audit-2026-10-30.md)
-is active. Communications email reminders now have optional authoring, atomic
-publication capture, bounded SMTP delivery and dashboard observations, with
-[local acceptance](measurements/announcement-email-2026-10-30.json). Earlier
-module-level summaries below do not replace requirement-by-requirement review.
-[Shared approval history](approval-history.md) closes the next confirmed missing
-reader/dashboard capability, with [local acceptance](measurements/approval-history-2026-10-30.json).
-The [final assurance correction](approval-read-assurance-2026-10-30.md) and
-[Approvals requirement review](approvals-feature-review-2026-10-30.md) locally accept
-its five initial rows and detailed sections. The [Communications review](communications-feature-review-2026-10-30.md)
-also accepts five rows after the read-completion correction. [Identity](identity-feature-review-2026-10-30.md)
-accepts five more against unchanged source and downloaded full-CI results.
-[Documents](documents-feature-review-2026-10-30.md) retains four accepted rows; its
-category subrequirement is [reopened](document-identity-metadata-gap-2026-10-30.md).
-Existing read/command acceptance remains valid: 243 API, 18 domain,
-nine data, quality/packages and four actual browser workflows passed. [Expenses](expenses-feature-review-2026-10-30.md) adds six locally accepted rows
-and nine sections, with 335 distinct API cases, 20 Expense domain, 115 Reporting
-cases, quality/packages and four actual browser workflows. [Leave](leave-feature-review-2026-10-30.md) adds five locally accepted rows and
-eleven original sections, with final API/worker/browser acceptance. Thirty rows
-are reviewed; 31 initial rows and the full Mobile review remain active. Email
-`8014d733`, approval `fcfdaf26` and final Communications/Documents `8e5dd3db`
-each passed all ten full-CI jobs. Expense [CI 41018107365](https://github.com/fajarxfce/hris-platform/actions/runs/41018107365)
-passed nine jobs and all fourteen worker scenarios, but exceeded the worker step
-time budget. The [recorded correction](measurements/ci-integration-timeout-2026-10-30.json)
-keeps finite limits. Final Leave source `70b92e59` passed all ten jobs in
-[CI 41023645590](https://github.com/fajarxfce/hris-platform/actions/runs/41023645590),
-including unchanged Expenses. People readers are committed at `b0b7c21c`; command
-and Organization acceptance remains active. Then implement the confirmed document
-category/identity-validity gap and continue the remaining Platform/Mobile review.
+The [requirement inventory](measurements/feature-audit-2026-10-30.json) now has
+41 accepted initial Platform rows and 20 awaiting completion/review. Approvals,
+Communications, Identity, Expenses, Leave, Documents, People and Administration
+have matching implementation, local acceptance and final-source CI evidence.
+The missing document category and separate identity-validity fields are implemented;
+Mobile final CI and the installed normal private APK are verified in the
+[metadata evidence](measurements/document-metadata-final-ci-2026-10-30.json).
+
+[Administration](administration-feature-review-2026-10-30.md) passed all ten CI
+jobs at exact source `3c8fb15a`, including 3,015 API cases and 56 actual browser
+scenarios across normal/worker/export configurations, plus isolated schema-103
+recovery. Reporting's five rows have full local acceptance and await later-source
+CI. Payroll's seven rows have forty corrected reproduction failures and focused
+acceptance; its broad API/worker/package run is active at `cca5e151`, followed by
+actual browser acceptance. [Workforce](workforce-audit-2026-10-30.md) has eight
+rows under review. The full Mobile and applicable Starter audit follows.
+
+The private runtime remains on accepted metadata packages at schema 103 with
+SMTP disabled; newer Administration/Reporting/Payroll corrections are not deployed.
+Physical iPhone testing is waived; the Apple simulator tests and complete Xcode
+application passed Mobile CI. Earlier history below does not replace this current
+queue or establish whole-product completion.
 
 
 ## Release-configuration audit — accepted

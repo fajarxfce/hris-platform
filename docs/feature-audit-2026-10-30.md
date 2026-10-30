@@ -14,6 +14,18 @@ Do not mark the goal complete until that review covers the full scope. Physical
 iPhone testing remains explicitly waived. Keep the accepted Google binding,
 installed phone, private keys and running development stack intact.
 
+## Current acceptance
+
+The inventory has 41 accepted initial rows and 20 still under review. Administration
+joins Approvals, Communications, Identity, Expenses, Leave, Documents and People
+with [complete source CI](measurements/administration-full-ci-2026-10-30.json).
+Reporting's five rows await final source CI; Payroll's seven rows have corrected
+forty genuine baseline failures and are in broad verification; Workforce's eight
+rows and full Mobile/applicable Starter review remain active. The private runtime
+is schema 103 and the metadata phone APK is installed. Historical activity below
+retains earlier states; use [current PRD status](prd-status.md) and the handoff for
+the active queue. No newer business correction has been deployed yet.
+
 ## Confirmed gap: announcement email
 
 The Communications PRD owns channel delivery and explicitly mentions FCM/email.

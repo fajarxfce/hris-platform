@@ -17,32 +17,57 @@
         {
           "id": "administration.01",
           "text": "Own effective company policy configuration, module flags, client availability, integration status, audit queries, and operational job controls.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/administration-feature-review-2026-10-30.md",
+            "docs/administration-assurance-2026-10-30.md",
+            "docs/measurements/administration-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41081153648"
+          ]
         },
         {
           "id": "administration.02",
           "text": "Flags affect capability availability but never grant permissions. Version gates and maintenance policy are explicit. Integration secrets live in deployment secrets, not ordinary settings or Git.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/administration-feature-review-2026-10-30.md",
+            "docs/administration-assurance-2026-10-30.md",
+            "docs/measurements/administration-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41081153648"
+          ]
         },
         {
           "id": "administration.03",
           "text": "Runtime audit is append-only with actor/reason/resource/correlation. Failed jobs expose safe categories and authorized retry. Backup/restore includes database, content, and encryption-key recovery.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/administration-feature-review-2026-10-30.md",
+            "docs/administration-assurance-2026-10-30.md",
+            "docs/measurements/administration-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41081153648"
+          ]
         },
         {
           "id": "administration.04",
           "text": "Screens: settings, flags, integration status, audit explorer, job monitor.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/administration-feature-review-2026-10-30.md",
+            "docs/administration-assurance-2026-10-30.md",
+            "docs/measurements/administration-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41081153648"
+          ]
         },
         {
           "id": "administration.05",
           "text": "Acceptance: policy effective dates, restricted settings/audit access, safe retry, stale client policy, secret redaction, and recovery from backup.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/administration-feature-review-2026-10-30.md",
+            "docs/administration-assurance-2026-10-30.md",
+            "docs/measurements/administration-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41081153648"
+          ]
         }
       ],
       "detailedContractSections": [
@@ -1021,6 +1046,16 @@
         "docs/measurements/payroll-assurance-2026-10-30.json"
       ],
       "next": "Complete broad API, worker, browser and full source CI; seven Payroll rows remain unverified."
+    },
+    {
+      "id": "administration.completion-assurance",
+      "status": "accepted",
+      "requirements": 5,
+      "evidence": [
+        "docs/administration-feature-review-2026-10-30.md",
+        "docs/measurements/administration-full-ci-2026-10-30.json"
+      ],
+      "next": "Complete final Reporting/Payroll source CI and remaining Workforce/Mobile/Starter audit."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

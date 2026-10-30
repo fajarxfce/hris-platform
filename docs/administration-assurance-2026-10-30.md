@@ -67,3 +67,17 @@ Actual API/browser and API/worker/browser results are recorded in
 requirements and six detailed sections. Full source CI remains a separate gate.
 The private stack currently serves the previously accepted metadata packages at
 schema 103; this source correction has not yet been deployed.
+
+
+## Full source acceptance
+
+Exact source `3c8fb15a6c2471eef226e5f5c20b0bd8b8ea450a` passed all ten jobs
+in [CI 41081153648](https://github.com/fajarxfce/hris-platform/actions/runs/41081153648).
+Downloaded reports verify 3,015 disjoint API cases, 104 active worker cases per
+shard, 41 normal/14 worker/one export browser scenarios, and schema-103 independent
+recovery of 104 objects and both encryption key identifiers. The 124 module
+reports contain no failures; repeated worker/domain suites are not distinct cases.
+[Full evidence](measurements/administration-full-ci-2026-10-30.json) retains every
+job/step, artifact identities, report hashes and sanitized recovery summary.
+All five Administration inventory rows are accepted. Reporting/Payroll corrections
+are later sources, and no live Administration deployment occurred.

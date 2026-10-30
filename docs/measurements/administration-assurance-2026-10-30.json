@@ -1,7 +1,7 @@
 {
   "date": "2026-10-30",
   "base_head": "44e306c61a30a68ef941cb5244de29e37b1115e6",
-  "status": "local acceptance passed; full source CI pending",
+  "status": "accepted with complete local and full CI evidence",
   "source_sha256": {
     "modules/administration/data/src/main/kotlin/dev/fajar/hris/administration/data/di/AdministrationConfiguration.kt": "c12e888911db364cc5b22ddbb25b5c6d5b8f14b653792aeabd30ef06d157907c",
     "modules/administration/domain/src/main/kotlin/dev/fajar/hris/administration/domain/usecases/GetCompanyClientPolicyRevision.kt": "6287f865b183fc2e55c0684e88a95940999372180970be4a4a58c3d9c43b8f14",
@@ -1125,9 +1125,10 @@
   ],
   "source_commit": "3c8fb15a6c2471eef226e5f5c20b0bd8b8ea450a",
   "full_ci": {
-    "run_id": 41081153648,
+    "status": "success",
+    "runId": 41081153648,
+    "source": "3c8fb15a6c2471eef226e5f5c20b0bd8b8ea450a",
     "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41081153648",
-    "status": "in_progress",
-    "conclusion": ""
+    "evidence": "docs/measurements/administration-full-ci-2026-10-30.json"
   }
 }

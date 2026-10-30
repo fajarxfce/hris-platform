@@ -20,6 +20,16 @@ CI `41077194465` passed all four jobs and its installed binary hash is verified.
 
 ## Active goal — full feature completion audit
 
+Administration is fully accepted: all ten jobs passed in `41081153648` for exact
+source `3c8fb15a`, including 3,015 API cases, 104 active worker cases per shard,
+41 normal/14 worker/one export browser scenarios and schema-103 recovery.
+[Full downloaded evidence](measurements/administration-full-ci-2026-10-30.json)
+retains every job/step, 124 module report hashes and the recovery summary.
+The inventory is now 41 accepted / 20 unverified. That CI has terminated, so
+start the next complete source CI for Reporting plus the pushed Payroll corrections.
+Do not deploy a different local JAR using Administration-only CI.
+
+
 Payroll source `cca5e151` is pushed. Its complete API/Payroll-worker/domain/data/
 quality/package run is active in PTY session `78722`, with logs and start-source
 metadata under `.work/payroll-audit-2026-10-30`. Keep application/test sources

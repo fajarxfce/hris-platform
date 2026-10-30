@@ -1,0 +1,1251 @@
+{
+  "date": "2026-10-30",
+  "baseline": "c68b721a",
+  "status": "implemented-and-locally-accepted",
+  "reproduction": {
+    "totalCases": 30,
+    "actualFailures": 25,
+    "alreadyCorrectControls": 5,
+    "groups": [
+      {
+        "tests": 22,
+        "failed": 19,
+        "durationSeconds": 68,
+        "cases": [
+          {
+            "suite": "dev.fajar.hris.LeaveCommandCompletionTest",
+            "test": "cancellationReceiptCannotBypassRevokedManagementOfAnotherEmployeeRequest()",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <leave_request_not_found> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveCommandCompletionTest",
+            "test": "[1] operation = \"policy\", boundary = \"journal\"",
+            "failure": "org.opentest4j.AssertionFailedError: Expired assurance must roll back the entire command or deny its receipt ==> expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveCommandCompletionTest",
+            "test": "[2] operation = \"accrual\", boundary = \"journal\"",
+            "failure": "org.opentest4j.AssertionFailedError: Expired assurance must roll back the entire command or deny its receipt ==> expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveCommandCompletionTest",
+            "test": "[3] operation = \"accrual\", boundary = \"receipt\"",
+            "failure": "org.opentest4j.AssertionFailedError: Expired assurance must roll back the entire command or deny its receipt ==> expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveCommandCompletionTest",
+            "test": "[4] operation = \"cancellation\", boundary = \"journal\"",
+            "failure": "org.opentest4j.AssertionFailedError: Expired assurance must roll back the entire command or deny its receipt ==> expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveCommandCompletionTest",
+            "test": "policyContractsAreCopiedBeforeAcquisitionAndKeepTheirOriginalOperationHash()",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <[PERMANENT]> but was: <[FIXED_TERM]>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+            "test": "[1] cancellation = \"false\", decision = \"APPROVE\", boundary = \"beneficiary\"",
+            "failure": "org.opentest4j.AssertionFailedError: Expired delegation must not commit a decision ==> expected: <not_assigned_approver> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+            "test": "[2] cancellation = \"false\", decision = \"REJECT\", boundary = \"beneficiary\"",
+            "failure": "org.opentest4j.AssertionFailedError: Expired delegation must not commit a decision ==> expected: <not_assigned_approver> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+            "test": "[3] cancellation = \"true\", decision = \"APPROVE\", boundary = \"beneficiary\"",
+            "failure": "org.opentest4j.AssertionFailedError: Expired delegation must not commit a decision ==> expected: <not_assigned_approver> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+            "test": "[4] cancellation = \"true\", decision = \"REJECT\", boundary = \"beneficiary\"",
+            "failure": "org.opentest4j.AssertionFailedError: Expired delegation must not commit a decision ==> expected: <not_assigned_approver> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+            "test": "[5] cancellation = \"false\", decision = \"APPROVE\", boundary = \"journal\"",
+            "failure": "org.opentest4j.AssertionFailedError: Expired delegation must not commit a decision ==> expected: <not_assigned_approver> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+            "test": "[6] cancellation = \"false\", decision = \"REJECT\", boundary = \"journal\"",
+            "failure": "org.opentest4j.AssertionFailedError: Expired delegation must not commit a decision ==> expected: <not_assigned_approver> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+            "test": "[7] cancellation = \"true\", decision = \"APPROVE\", boundary = \"journal\"",
+            "failure": "org.opentest4j.AssertionFailedError: Expired delegation must not commit a decision ==> expected: <not_assigned_approver> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+            "test": "[8] cancellation = \"true\", decision = \"REJECT\", boundary = \"journal\"",
+            "failure": "org.opentest4j.AssertionFailedError: Expired delegation must not commit a decision ==> expected: <not_assigned_approver> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+            "test": "[1] mode = \"details\", ordinary = \"false\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <leave_request_not_found> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+            "test": "[2] mode = \"download\", ordinary = \"false\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <leave_attachment_not_found> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+            "test": "[3] mode = \"preparation\", ordinary = \"false\"",
+            "failure": "org.opentest4j.AssertionFailedError: Expired preparation must not start storage ==> expected: <0> but was: <1>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+            "test": "[4] mode = \"completion\", ordinary = \"false\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <leave_attachment_not_found> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+            "test": "[5] mode = \"details\", ordinary = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: Ordinary read access must not retain an expired decision action ==> expected: <false> but was: <true>"
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+            "test": "[6] mode = \"download\", ordinary = \"true\"",
+            "failure": null
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+            "test": "[7] mode = \"preparation\", ordinary = \"true\"",
+            "failure": null
+          },
+          {
+            "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+            "test": "[8] mode = \"completion\", ordinary = \"true\"",
+            "failure": null
+          }
+        ]
+      },
+      {
+        "tests": 6,
+        "failed": 4,
+        "durationSeconds": 41,
+        "cases": [
+          {
+            "name": "[1] cancellation = \"false\", change = \"expiry\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <not_assigned_approver> but was: <null>"
+          },
+          {
+            "name": "[2] cancellation = \"true\", change = \"expiry\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <not_assigned_approver> but was: <null>"
+          },
+          {
+            "name": "[3] cancellation = \"false\", change = \"beneficiary\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <self_approval_denied> but was: <null>"
+          },
+          {
+            "name": "[4] cancellation = \"true\", change = \"beneficiary\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <self_approval_denied> but was: <null>"
+          },
+          {
+            "name": "[5] cancellation = \"false\", change = \"phase\"",
+            "failure": null
+          },
+          {
+            "name": "[6] cancellation = \"true\", change = \"phase\"",
+            "failure": null
+          }
+        ]
+      },
+      {
+        "tests": 2,
+        "failed": 2,
+        "durationSeconds": 37,
+        "cases": [
+          {
+            "name": "[1] operation = \"submit\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <leave_request_not_found> but was: <null>"
+          },
+          {
+            "name": "[2] operation = \"withdraw\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <leave_request_not_found> but was: <null>"
+          }
+        ]
+      }
+    ],
+    "clock": "Application clock advanced after actual repository/journal acquisition; database and storage fixtures were actual."
+  },
+  "compatibility": {
+    "reason": "Review found an overly strict capacity guard in the unpublished correction, not an additional pre-existing defect.",
+    "baselineCases": [
+      {
+        "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+        "name": "[1] mode = \"details\", scope = \"ordinary\"",
+        "failure": "org.opentest4j.AssertionFailedError: Failed(failure=Failure(kind=CONFLICT, code=approval_delegation_capacity, fields={}, parameters={})) ==> expected: <true> but was: <false>",
+        "classification": "compatibility-failure"
+      },
+      {
+        "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+        "name": "[2] mode = \"details\", scope = \"direct\"",
+        "failure": "org.opentest4j.AssertionFailedError: {\"instance\":\"/api/v1/companies/b5d00673-3de3-37fc-9d86-34bfbe6d0bb9/approvals/c60357d9-1d8e-49bb-a07b-68b665841194/reassign\",\"status\":403,\"title\":\"Forbidden\",\"type\":\"urn:hris:problem:access_denied\",\"code\":\"access_denied\",\"fields\":{},\"parameters\":{},\"correlationId\":\"4e687f8b-edad-45af-ac5d-9add688637e4\"} ==> expected: <200> but was: <403>",
+        "classification": "fixture-setup-failure"
+      },
+      {
+        "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+        "name": "[3] mode = \"details\", scope = \"indirect\"",
+        "failure": "org.opentest4j.AssertionFailedError: expected: <leave_request_not_found> but was: <approval_delegation_capacity>",
+        "classification": "compatibility-failure"
+      },
+      {
+        "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+        "name": "[4] mode = \"download\", scope = \"direct\"",
+        "failure": "org.opentest4j.AssertionFailedError: {\"instance\":\"/api/v1/companies/7dbfc200-3370-3bae-abe2-e0b8aba46e48/approvals/b96a58e1-8388-4171-bddc-f40f04928d89/reassign\",\"status\":403,\"title\":\"Forbidden\",\"type\":\"urn:hris:problem:access_denied\",\"code\":\"access_denied\",\"fields\":{},\"parameters\":{},\"correlationId\":\"1c77d08e-8b04-4f2b-8b25-53ec6bf756ab\"} ==> expected: <200> but was: <403>",
+        "classification": "fixture-setup-failure"
+      },
+      {
+        "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+        "name": "[5] mode = \"preparation\", scope = \"direct\"",
+        "failure": "org.opentest4j.AssertionFailedError: {\"instance\":\"/api/v1/companies/4123058c-7da8-327d-93f6-9e4138fd73e9/approvals/ff3bcdfe-9db2-4962-9062-babd6607cd67/reassign\",\"status\":403,\"title\":\"Forbidden\",\"type\":\"urn:hris:problem:access_denied\",\"code\":\"access_denied\",\"fields\":{},\"parameters\":{},\"correlationId\":\"14cdbfb5-4eb5-4828-b19e-48bfc90183e4\"} ==> expected: <200> but was: <403>",
+        "classification": "fixture-setup-failure"
+      },
+      {
+        "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+        "name": "[6] mode = \"completion\", scope = \"direct\"",
+        "failure": "org.opentest4j.AssertionFailedError: {\"instance\":\"/api/v1/companies/6c30d262-e831-365b-b0f7-5d5bdb47ee3c/approvals/778db53d-6d5b-4447-9b22-c4c8519b5202/reassign\",\"status\":403,\"title\":\"Forbidden\",\"type\":\"urn:hris:problem:access_denied\",\"code\":\"access_denied\",\"fields\":{},\"parameters\":{},\"correlationId\":\"e324c3ec-daf9-481b-9e3b-dac02c1f067b\"} ==> expected: <200> but was: <403>",
+        "classification": "fixture-setup-failure"
+      },
+      {
+        "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+        "name": "[1] cancellation = \"false\", change = \"expiry\"",
+        "failure": null,
+        "classification": "passed-control"
+      },
+      {
+        "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+        "name": "[2] cancellation = \"true\", change = \"expiry\"",
+        "failure": null,
+        "classification": "passed-control"
+      },
+      {
+        "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+        "name": "[3] cancellation = \"false\", change = \"beneficiary\"",
+        "failure": null,
+        "classification": "passed-control"
+      },
+      {
+        "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+        "name": "[4] cancellation = \"true\", change = \"beneficiary\"",
+        "failure": null,
+        "classification": "passed-control"
+      },
+      {
+        "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+        "name": "[5] cancellation = \"false\", change = \"phase\"",
+        "failure": null,
+        "classification": "passed-control"
+      },
+      {
+        "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+        "name": "[6] cancellation = \"true\", change = \"phase\"",
+        "failure": null,
+        "classification": "passed-control"
+      },
+      {
+        "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+        "name": "[7] cancellation = \"false\", change = \"overflow\"",
+        "failure": "org.opentest4j.AssertionFailedError: Original receipt retains its independent scope after later workflow or delegation changes ==> expected: <Success(value=MutationReceipt(id=fc9a0c69-9b4e-4f9b-aa79-799c98cfac32, version=1, replayed=true))> but was: <Failed(failure=Failure(kind=CONFLICT, code=approval_delegation_capacity, fields={}, parameters={}))>",
+        "classification": "compatibility-failure"
+      },
+      {
+        "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+        "name": "[8] cancellation = \"true\", change = \"overflow\"",
+        "failure": "org.opentest4j.AssertionFailedError: Original receipt retains its independent scope after later workflow or delegation changes ==> expected: <Success(value=MutationReceipt(id=7fd874c8-5c55-44ba-a817-570fe7ab9109, version=3, replayed=true))> but was: <Failed(failure=Failure(kind=CONFLICT, code=approval_delegation_capacity, fields={}, parameters={}))>",
+        "classification": "compatibility-failure"
+      }
+    ],
+    "actualReproducedFailures": 4,
+    "fixtureSetupFailuresExcluded": 4,
+    "directReadRegressionsAddedAfterFixtureCorrection": 4,
+    "initialCorrection": {
+      "apiCases": 58,
+      "fixtureSetupFailures": 4,
+      "durationSeconds": 118
+    },
+    "otherPassingControls": 6,
+    "corrected": true,
+    "scope": "201 incoming delegations preserve ordinary/direct reads and original direct receipts; indirect reads remain scoped 404 and new decisions remain capacity-limited."
+  },
+  "additionalDelegatorAccountWaitRegressions": 4,
+  "focused": {
+    "firstCorrection": {
+      "apiTests": 32,
+      "domainTests": 65,
+      "failed": 0,
+      "durationSeconds": 97
+    },
+    "receiptAndAccountGuardCorrection": {
+      "apiTests": 42,
+      "domainTests": 65,
+      "failed": 0,
+      "durationSeconds": 100
+    }
+  },
+  "boundary": {
+    "interactiveUseCases": 9,
+    "pureReadPoliciesAdded": 1,
+    "schemaChange": false,
+    "newDiDependencies": false,
+    "newTransport": false,
+    "newDecisionQueries": 0,
+    "receiptDecisionAdditionalQueries": 4,
+    "receiptDecisionHistoryPage": {
+      "items": 1,
+      "maximumRawRows": 2
+    },
+    "requestReceiptAdditionalQueries": 1,
+    "requestReceiptCommands": [
+      "submit",
+      "withdraw",
+      "cancellation"
+    ],
+    "delegatedReadAdditionalIdentityQueriesPerTransaction": 1,
+    "inputOwnership": "Capture allowed contract set before validation, operation hashing and acquisition.",
+    "decisions": "Check actual current-stage delegation after acquisition and through journal completion using the original locked approval snapshot.",
+    "receiptAuthorization": "Select the original approval from the immutable pre-decision history revision. Require current independent assignment, beneficiary exclusion and final MFA; later cancellation workflows never substitute their approval.",
+    "buffers": "Retain prior read correction: bounded object I/O outside transactions, copied results and finally-cleared owned bytes."
+  },
+  "acceptance": {
+    "broadApi": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.ApiContractHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalAccessRaceHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.CompanyHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.CompensationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.DocumentReferenceHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseReportHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.InboxSyncHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAccountingAccessHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAccountingTransactionHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAccrualHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAccrualScheduleAssuranceTest",
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAccrualScheduleHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAccrualScheduleTransactionTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAttachmentAssuranceTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAttachmentDownloadHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAttachmentHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAttachmentIntegrityHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBalanceActionHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBalanceAssuranceTest",
+          "tests": 24,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBalanceDirectoryHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBalanceSyncHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBatchAssuranceTest",
+          "tests": 29,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBatchHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBatchRecoveryHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBatchReviewHttpTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBatchTransactionHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCalendarAssuranceTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCalendarBoundaryTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCalendarHttpTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryAdjustmentHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryBalanceHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryBalanceMapperTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryClosingHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryCommandAssuranceTest",
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryExpiryAdmissionTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryExpiryAssuranceTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryExpiryExecutionTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryExpiryHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryExpiryReadAssuranceTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryMapperTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryPolicyHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryRequestHttpTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCarryStorageTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCommandCompletionTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveDelegationCompletionTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveLedgerHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeavePolicyAssuranceTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeavePolicyReviewHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeavePreparationAssuranceTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeavePreparationHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeavePreviewSubmissionHttpTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveReadCompletionTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveReportAccessHttpTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveReportHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveReportSourceCaptureTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveRequestAssuranceTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveRequestHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveRequestReadRaceHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveYearClosingHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.MobileLeaveSyncHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.NativeSessionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeTransactionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationAssuranceTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollInputHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPeriodHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunCutoffHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunTransactionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxOpeningHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PeopleHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.PersonAccountBindingHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.RosterBulkHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.SelfLeaveHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.SelfLeavePreviewHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.SelfLeaveRequestHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 471,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "finalTargetedApi": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.ApprovalCapacityHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCommandCompletionTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveDelegationCompletionTest",
+          "tests": 18,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.LeaveReadCompletionTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 58,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "distinctApiCasesAcrossBothSelections": 485,
+    "finalTargetedDurationSeconds": 115,
+    "broadDomain": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveAccrualSchedulePolicyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveAttachmentPolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveBalancePolicyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveCalendarAccessPolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveCarryAdjustmentPolicyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveCarryClosingPolicyTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveCarryExpiryPolicyTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveCarryFundingPolicyTest",
+          "tests": 20,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveEntitlementPolicyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeavePreviewRevisionTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveRequestPolicyTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 65,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "domain": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveAccrualSchedulePolicyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveAttachmentPolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveBalancePolicyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveCalendarAccessPolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveCarryAdjustmentPolicyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveCarryClosingPolicyTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveCarryExpiryPolicyTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveCarryFundingPolicyTest",
+          "tests": 20,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveEntitlementPolicyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeavePreviewRevisionTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.leave.domain.LeaveRequestPolicyTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 65,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "data": {
+      "suites": [],
+      "total": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "dataNote": "No isolated Leave data test sources; actual PostgreSQL API/mapper suites and retained migration tests cover repositories.",
+    "durationSeconds": 857,
+    "format": true,
+    "architecture": true,
+    "apiAndWorkerPackages": true,
+    "realBrowser": {
+      "tests": 6,
+      "failed": 0,
+      "durationWithSetupMs": 50418.544,
+      "scenarios": [
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "real API leave decisions recover receipts and preserve staged reservations, cancellation and withdrawal",
+          "outcome": "expected",
+          "durationMs": 11603
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "real API initial funding recovers one receipt and a competing correction requires a fresh balance version",
+          "outcome": "expected",
+          "durationMs": 3271
+        },
+        {
+          "file": "leave-calendar.spec.ts",
+          "title": "real calendar counts charged dates and preserves selection through withdrawal before refreshing occupancy",
+          "outcome": "expected",
+          "durationMs": 3286
+        },
+        {
+          "file": "leave-creation.spec.ts",
+          "title": "real API creation recalculates changed balances and replays a lost submission exactly once",
+          "outcome": "expected",
+          "durationMs": 4259
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "real API policy creation and future revisions retain history and replay a lost save",
+          "outcome": "expected",
+          "durationMs": 2807
+        },
+        {
+          "file": "leave-report.spec.ts",
+          "title": "real leave totals reconcile with scoped request drill-down after withdrawal and retained return navigation",
+          "outcome": "expected",
+          "durationMs": 3326
+        }
+      ]
+    },
+    "realWorkerBrowser": {
+      "tests": 3,
+      "failed": 0,
+      "durationWithSetupMs": 53398.129,
+      "scenarios": [
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "reviewed periods survive response loss and future cancellation keeps its due time through recovery",
+          "outcome": "expected",
+          "durationMs": 12531
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "reviewed accrual and year closing preserve one posting across response loss through the real worker",
+          "outcome": "expected",
+          "durationMs": 12817
+        },
+        {
+          "file": "leave-carry-expiry.spec.ts",
+          "title": "retained carry recovery survives response loss and the real worker debits it once",
+          "outcome": "expected",
+          "durationMs": 3655
+        }
+      ]
+    },
+    "coverageAccounting": {
+      "broadExecutions": 471,
+      "targetedExecutions": 58,
+      "targetedAdditionalCases": 14,
+      "note": "The broad report contains 61 repeated display labels across parameterized methods. Preserve their multiplicity; ordinary set deduplication would undercount. Final selection adds eight uniquely named compatibility cases and six ApprovalCapacity cases.",
+      "additionalCases": [
+        {
+          "suite": "dev.fajar.hris.ApprovalCapacityHttpTest",
+          "name": "concurrentTemplatesShareTheActiveLimitAndAdministrationRemainsPaged()",
+          "count": 1
+        },
+        {
+          "suite": "dev.fajar.hris.ApprovalCapacityHttpTest",
+          "name": "delegationCapacityIsSerializedAndRevocationOrExpiryReleasesTheRightCapacity()",
+          "count": 1
+        },
+        {
+          "suite": "dev.fajar.hris.ApprovalCapacityHttpTest",
+          "name": "inboxRequiresCurrentActionPermissionForBothDelegateAndDelegator()",
+          "count": 1
+        },
+        {
+          "suite": "dev.fajar.hris.ApprovalCapacityHttpTest",
+          "name": "overCapacityPolicySelectionFailsClosedAndArchivalAllowsRecovery()",
+          "count": 1
+        },
+        {
+          "suite": "dev.fajar.hris.ApprovalCapacityHttpTest",
+          "name": "oversizedDelegationSetsDoNotPermitTruncatedDecisionsAndCanBeRepaired()",
+          "count": 1
+        },
+        {
+          "suite": "dev.fajar.hris.ApprovalCapacityHttpTest",
+          "name": "totalTemplateLimitStillAllowsAnExistingDefinitionToBeRepaired()",
+          "count": 1
+        },
+        {
+          "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+          "name": "[7] cancellation = \"false\", change = \"overflow\"",
+          "count": 1
+        },
+        {
+          "suite": "dev.fajar.hris.LeaveDecisionDelegationCompletionTest",
+          "name": "[8] cancellation = \"true\", change = \"overflow\"",
+          "count": 1
+        },
+        {
+          "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+          "name": "[1] mode = \"details\", scope = \"ordinary\"",
+          "count": 1
+        },
+        {
+          "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+          "name": "[2] mode = \"details\", scope = \"direct\"",
+          "count": 1
+        },
+        {
+          "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+          "name": "[3] mode = \"details\", scope = \"indirect\"",
+          "count": 1
+        },
+        {
+          "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+          "name": "[4] mode = \"download\", scope = \"direct\"",
+          "count": 1
+        },
+        {
+          "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+          "name": "[5] mode = \"preparation\", scope = \"direct\"",
+          "count": 1
+        },
+        {
+          "suite": "dev.fajar.hris.LeaveDelegationCompletionTest",
+          "name": "[6] mode = \"completion\", scope = \"direct\"",
+          "count": 1
+        }
+      ]
+    }
+  },
+  "packages": {
+    "api": "35767b06829c08bcc2fe03f11f080a5558a60af9d2a7c2ef7a5ee17dc0cf1dfa",
+    "worker": "f2303253e077d133c645947c75160e71164775d29755f3e6b07221eafc740973"
+  },
+  "fullCi": {
+    "status": "pending-final-source-dispatch",
+    "predecessor": "Expense CI 41018107365 failed a five-minute worker-step timeout after fourteen scenarios passed; final CI uses the corrected bounded workflow.",
+    "instruction": "Dispatch after this final source is committed; do not overlap same-branch runs."
+  },
+  "remaining": "Continue the full Platform/Mobile audit; accepting five Leave rows does not complete the goal.",
+  "runtime": "Private schema-101 API, immutable dashboard assets, accepted Google binding and installed phone unchanged. No actual mail, FCM, bank or device action."
+}

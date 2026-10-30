@@ -74,17 +74,15 @@ class RequestLeaveCancellation(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val sessionAccess = (authority as Result.Success).value
             val checkedActor =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, sessionAccess, clock.instant(), security)
             if (checkedActor is Result.Failed) return@run checkedActor
             val live = (checkedActor as Result.Success).value
             if ("leave.manage" !in live.permissions && "leave.self.manage" !in live.permissions)
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
-            }
             val found = requests.find(company, id)
             if (found is Result.Failed) return@run found
             val request =
@@ -94,6 +92,15 @@ class RequestLeaveCancellation(
                     )
             if (!canManageLeave(live, request))
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "leave_request_not_found"))
+            (replay as Result.Success).value?.let { receipt ->
+                return@run validateCompanySessionActor(
+                        actor,
+                        sessionAccess,
+                        clock.instant(),
+                        security,
+                    )
+                    .map { receipt }
+            }
 
             val frozen =
                 cutoffs.frozenMonths(
@@ -186,7 +193,15 @@ class RequestLeaveCancellation(
                                 ),
                             )
                         }
-                        .map { receipt }
+                        .flatMap {
+                            validateCompanySessionActor(
+                                    actor,
+                                    sessionAccess,
+                                    clock.instant(),
+                                    security,
+                                )
+                                .map { receipt }
+                        }
                 }
         }
     }

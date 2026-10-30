@@ -460,32 +460,47 @@
         {
           "id": "leave.01",
           "text": "Own leave types, effective policy, accrual, carryover, expiry, requests, cancellations, and balance ledger.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/leave-feature-review-2026-10-30.md",
+            "docs/measurements/leave-command-assurance-2026-10-30.json"
+          ]
         },
         {
           "id": "leave.02",
           "text": "Ledger entries record grants, reservations, consumption, expiry, and reversal. Submit reserves; approval consumes; reject/cancel releases exactly once. Eligibility uses employment, working schedule, partial days, overlap, attachment, and available balance.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/leave-feature-review-2026-10-30.md",
+            "docs/measurements/leave-command-assurance-2026-10-30.json"
+          ]
         },
         {
           "id": "leave.03",
           "text": "Snapshot policy and duration on submission. Approved cancellation follows approval. HR can act on behalf with a reason. Closed-payroll changes become adjustments rather than rewriting snapshots.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/leave-feature-review-2026-10-30.md",
+            "docs/measurements/leave-command-assurance-2026-10-30.json"
+          ]
         },
         {
           "id": "leave.04",
           "text": "Screens: requests, balance ledger, team calendar, policies, balance adjustments, entitlement processing.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/leave-feature-review-2026-10-30.md",
+            "docs/measurements/leave-command-assurance-2026-10-30.json"
+          ]
         },
         {
           "id": "leave.05",
           "text": "Acceptance: simultaneous requests cannot overspend balance; replay and cancellation cannot double-release; holidays/partial days/overnight shifts and period cutoff behave correctly.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/leave-feature-review-2026-10-30.md",
+            "docs/measurements/leave-command-assurance-2026-10-30.json"
+          ]
         }
       ],
       "detailedContractSections": [
@@ -500,7 +515,15 @@
         "Employee request preparation",
         "Entitlement batch preparation",
         "Team and company calendar"
-      ]
+      ],
+      "detailedReview": {
+        "status": "locally-accepted",
+        "evidence": "docs/leave-feature-review-2026-10-30.md",
+        "linkedContracts": [
+          "docs/leave-carryover.md",
+          "docs/leave-accrual-schedules.md"
+        ]
+      }
     },
     {
       "module": "payroll",
@@ -831,6 +854,21 @@
         "docs/measurements/leave-read-assurance-2026-10-30.json"
       ],
       "next": "Complete Leave command/delegation and full requirement review before accepting its five rows."
+    },
+    {
+      "id": "leave.command-and-delegation-completion",
+      "status": "implemented-and-locally-accepted",
+      "requirement": "Current resource/delegation/session scope through command, receipt and read completion, stable policy input and original approval provenance.",
+      "baseline": "c68b721a",
+      "baselineEvidence": [
+        "Twenty-five actual failed cases across command assurance/input ownership, request/decision receipt scope and delegated read/action/decision completion. Five already-correct controls and four added account-wait regressions remain distinct."
+      ],
+      "evidence": [
+        "docs/leave-command-assurance-2026-10-30.md",
+        "docs/measurements/leave-command-assurance-2026-10-30.json",
+        "docs/leave-feature-review-2026-10-30.md"
+      ],
+      "next": "Follow final-source CI and continue the remaining Platform/Mobile audit."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

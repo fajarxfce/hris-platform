@@ -1,0 +1,1443 @@
+{
+  "date": "2026-10-30",
+  "status": "locally-accepted",
+  "requirements": [
+    "leave.01",
+    "leave.02",
+    "leave.03",
+    "leave.04",
+    "leave.05"
+  ],
+  "originalDetailedSections": 11,
+  "corrections": [
+    "docs/measurements/leave-read-assurance-2026-10-30.json",
+    "docs/measurements/leave-command-assurance-2026-10-30.json"
+  ],
+  "retainedCi": {
+    "source": "8e5dd3db49b2568917c44432574f58ce1eae6dae",
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41013958569",
+    "backendSuites": [
+      {
+        "task": "modules/reporting/domain",
+        "name": "dev.fajar.hris.reporting.domain.LeaveReportPolicyTest",
+        "tests": 4,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.012s"
+      },
+      {
+        "task": "modules/reporting/delivery",
+        "name": "dev.fajar.hris.reporting.delivery.LeaveReportResponseTest",
+        "tests": 1,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.023s"
+      },
+      {
+        "task": "modules/reporting/data",
+        "name": "dev.fajar.hris.reporting.data.LeaveReportRepositoryTest",
+        "tests": 5,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.060s"
+      },
+      {
+        "task": "modules/leave/domain",
+        "name": "dev.fajar.hris.leave.domain.LeaveAccrualSchedulePolicyTest",
+        "tests": 5,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.212s"
+      },
+      {
+        "task": "modules/leave/domain",
+        "name": "dev.fajar.hris.leave.domain.LeaveCalendarAccessPolicyTest",
+        "tests": 3,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.042s"
+      },
+      {
+        "task": "modules/leave/domain",
+        "name": "dev.fajar.hris.leave.domain.LeaveCarryExpiryPolicyTest",
+        "tests": 6,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.052s"
+      },
+      {
+        "task": "modules/leave/domain",
+        "name": "dev.fajar.hris.leave.domain.LeaveCarryFundingPolicyTest",
+        "tests": 20,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.193s"
+      },
+      {
+        "task": "modules/leave/domain",
+        "name": "dev.fajar.hris.leave.domain.LeaveEntitlementPolicyTest",
+        "tests": 5,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.040s"
+      },
+      {
+        "task": "modules/leave/domain",
+        "name": "dev.fajar.hris.leave.domain.LeaveBalancePolicyTest",
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.015s"
+      },
+      {
+        "task": "modules/leave/domain",
+        "name": "dev.fajar.hris.leave.domain.LeaveAttachmentPolicyTest",
+        "tests": 3,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.033s"
+      },
+      {
+        "task": "modules/leave/domain",
+        "name": "dev.fajar.hris.leave.domain.LeaveCarryAdjustmentPolicyTest",
+        "tests": 5,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.029s"
+      },
+      {
+        "task": "modules/leave/domain",
+        "name": "dev.fajar.hris.leave.domain.LeavePreviewRevisionTest",
+        "tests": 2,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.016s"
+      },
+      {
+        "task": "modules/leave/domain",
+        "name": "dev.fajar.hris.leave.domain.LeaveRequestPolicyTest",
+        "tests": 8,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.025s"
+      },
+      {
+        "task": "modules/leave/domain",
+        "name": "dev.fajar.hris.leave.domain.LeaveCarryClosingPolicyTest",
+        "tests": 6,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "0.034s"
+      },
+      {
+        "task": "core/database",
+        "name": "dev.fajar.hris.core.database.LeaveAccountMigrationTest",
+        "tests": 1,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "6.492s"
+      },
+      {
+        "task": "core/database",
+        "name": "dev.fajar.hris.core.database.LeaveCarryMigrationTest",
+        "tests": 1,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "10.501s"
+      },
+      {
+        "task": "apps/worker",
+        "name": "dev.fajar.hris.worker.LeaveBatchWorkerTest",
+        "tests": 3,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "13.746s"
+      },
+      {
+        "task": "apps/worker",
+        "name": "dev.fajar.hris.worker.LeaveCarryExpiryWorkerTest",
+        "tests": 3,
+        "failures": 0,
+        "skipped": 0,
+        "duration": "14.993s"
+      }
+    ],
+    "mockBrowser": {
+      "tests": 141,
+      "scenarios": [
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "reviewed schedule creates fixed periods and opens current worker outcomes",
+          "testId": "8649684a8aa5fbb151ad-5605565579d686819f41",
+          "outcome": "expected",
+          "durationMs": 3167
+        },
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "annual reviews retain the selected eligibility month across years",
+          "testId": "8649684a8aa5fbb151ad-fdb553dfc801abe11e27",
+          "outcome": "expected",
+          "durationMs": 1680
+        },
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "uncertain admission retains its original operation through MFA and later conflict",
+          "testId": "8649684a8aa5fbb151ad-aff83c6b6361021c4bac",
+          "outcome": "expected",
+          "durationMs": 2180
+        },
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "MFA during review reacquires review without silently submitting",
+          "testId": "8649684a8aa5fbb151ad-f361bd29421dbb409549",
+          "outcome": "expected",
+          "durationMs": 2583
+        },
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "MFA during command reacquires review without silently submitting",
+          "testId": "8649684a8aa5fbb151ad-fcc9f8335cf0a22b9dda",
+          "outcome": "expected",
+          "durationMs": 2389
+        },
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "policy conflicts require another explicit review with the new head",
+          "testId": "8649684a8aa5fbb151ad-f734f7e0221deb9d9c75",
+          "outcome": "expected",
+          "durationMs": 1992
+        },
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "company replacement discards a late committed result and its private review",
+          "testId": "8649684a8aa5fbb151ad-daa513202327dabc54d2",
+          "outcome": "expected",
+          "durationMs": 1942
+        },
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "denied read clears details, renewed assurance reloads, and late responses cannot cross companies",
+          "testId": "8649684a8aa5fbb151ad-4a86be72fbd8b60ac205",
+          "outcome": "expected",
+          "durationMs": 1910
+        },
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "bounded history retains its cursor through period recovery",
+          "testId": "8649684a8aa5fbb151ad-70dde787da6d180f7b84",
+          "outcome": "expected",
+          "durationMs": 2413
+        },
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "creation requires leave.read before acquiring data",
+          "testId": "8649684a8aa5fbb151ad-b9e327a67072d47d208d",
+          "outcome": "expected",
+          "durationMs": 987
+        },
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "creation requires leave.accrual.post before acquiring data",
+          "testId": "8649684a8aa5fbb151ad-7e11189bcbebb5da7adc",
+          "outcome": "expected",
+          "durationMs": 1071
+        },
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "read-only access opens schedule history without offering admission",
+          "testId": "8649684a8aa5fbb151ad-1ae60489f4e299de8465",
+          "outcome": "expected",
+          "durationMs": 1097
+        },
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "Indonesian narrow dark review retains its draft and contains wide tables at 200 percent text",
+          "testId": "8649684a8aa5fbb151ad-8414983d7db7f3501298",
+          "outcome": "expected",
+          "durationMs": 2187
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "Approve leave uses a fresh review and preserves directory context",
+          "testId": "36d2ba3f5e386022f031-21c8f2c47f3be60c2dfa",
+          "outcome": "expected",
+          "durationMs": 1723
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "Reject leave uses a fresh review and preserves directory context",
+          "testId": "36d2ba3f5e386022f031-6ff294499a823512a263",
+          "outcome": "expected",
+          "durationMs": 1335
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "Withdraw request uses a fresh review and preserves directory context",
+          "testId": "36d2ba3f5e386022f031-da55406a87f33567ee99",
+          "outcome": "expected",
+          "durationMs": 1784
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "Request cancellation uses a fresh review and preserves directory context",
+          "testId": "36d2ba3f5e386022f031-b4f850b88b5963c41d60",
+          "outcome": "expected",
+          "durationMs": 1682
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "cancellation rejection and withdrawal keep their distinct meaning",
+          "testId": "36d2ba3f5e386022f031-2b163ddd70077fe3e694",
+          "outcome": "expected",
+          "durationMs": 2075
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "an intermediate approval does not claim final leave approval",
+          "testId": "36d2ba3f5e386022f031-0d1bf1417cc427f5fadf",
+          "outcome": "expected",
+          "durationMs": 1402
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "rejection validates its reason before sending a command",
+          "testId": "36d2ba3f5e386022f031-4907f0bf27bcf6d927e4",
+          "outcome": "expected",
+          "durationMs": 1268
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "lost decisions retain their receipt key through MFA and an advanced leave state",
+          "testId": "36d2ba3f5e386022f031-fd748b36ccf76b274f94",
+          "outcome": "expected",
+          "durationMs": 1683
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "a stale version requires protected reload and a new reviewed command",
+          "testId": "36d2ba3f5e386022f031-4619c9d7d7a0c40e079b",
+          "outcome": "expected",
+          "durationMs": 1606
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "read permission alone cannot open a decision review",
+          "testId": "36d2ba3f5e386022f031-ad571011ebb2c1423f6a",
+          "outcome": "expected",
+          "durationMs": 1875
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "resource assignment is required even with the approval permission",
+          "testId": "36d2ba3f5e386022f031-ad4c3df497de7185d459",
+          "outcome": "expected",
+          "durationMs": 1126
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "company replacement discards a pending review and its previous filters",
+          "testId": "36d2ba3f5e386022f031-6d978ec73a30c28cd441",
+          "outcome": "expected",
+          "durationMs": 1201
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "departure during submission ignores its late receipt in the replacement company",
+          "testId": "36d2ba3f5e386022f031-c09001749da3e3bf6c81",
+          "outcome": "expected",
+          "durationMs": 1388
+        },
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "Indonesian dark mobile review keeps its draft without reacquiring data",
+          "testId": "36d2ba3f5e386022f031-48aed239eb5451866b82",
+          "outcome": "expected",
+          "durationMs": 1452
+        },
+        {
+          "file": "leave-balance-adjustment.spec.ts",
+          "title": "initial funding starts in an empty balance directory and records one immutable movement",
+          "testId": "152a26cdf9c0f956c5bf-9a17a5901a7817c92a85",
+          "outcome": "expected",
+          "durationMs": 1645
+        },
+        {
+          "file": "leave-balance-adjustment.spec.ts",
+          "title": "the type picker retains its bounded page and balance-year context",
+          "testId": "152a26cdf9c0f956c5bf-dba84538ce2a37a4fc91",
+          "outcome": "expected",
+          "durationMs": 2106
+        },
+        {
+          "file": "leave-balance-adjustment.spec.ts",
+          "title": "negative half-day corrections review current balances even when opened from older movements",
+          "testId": "152a26cdf9c0f956c5bf-d0eb6872dfd541145c40",
+          "outcome": "expected",
+          "durationMs": 1327
+        },
+        {
+          "file": "leave-balance-adjustment.spec.ts",
+          "title": "invalid precision, zero adjustments, and missing reasons never start an HTTP command",
+          "testId": "152a26cdf9c0f956c5bf-1b323f5af25ae59b75d0",
+          "outcome": "expected",
+          "durationMs": 1590
+        },
+        {
+          "file": "leave-balance-adjustment.spec.ts",
+          "title": "a competing balance change requires an explicit new review while retaining the draft",
+          "testId": "152a26cdf9c0f956c5bf-cc65f1baa59218052166",
+          "outcome": "expected",
+          "durationMs": 1384
+        },
+        {
+          "file": "leave-balance-adjustment.spec.ts",
+          "title": "a lost receipt stays bound to the original command through MFA and a later conflict",
+          "testId": "152a26cdf9c0f956c5bf-2dced0e91445a7c66631",
+          "outcome": "expected",
+          "durationMs": 1768
+        },
+        {
+          "file": "leave-balance-adjustment.spec.ts",
+          "title": "a definite MFA rejection requires re-review but preserves the amount and reason",
+          "testId": "152a26cdf9c0f956c5bf-04e094498f4ff6b33b59",
+          "outcome": "expected",
+          "durationMs": 1690
+        },
+        {
+          "file": "leave-balance-adjustment.spec.ts",
+          "title": "closed balance has no adjustment link and a direct form cannot be used",
+          "testId": "152a26cdf9c0f956c5bf-883ef6de75b035a8ed78",
+          "outcome": "expected",
+          "durationMs": 2009
+        },
+        {
+          "file": "leave-balance-adjustment.spec.ts",
+          "title": "unavailable balance has no adjustment link and a direct form cannot be used",
+          "testId": "152a26cdf9c0f956c5bf-29278d3437d77e58daa8",
+          "outcome": "expected",
+          "durationMs": 2074
+        },
+        {
+          "file": "leave-balance-adjustment.spec.ts",
+          "title": "read-only users cannot open a catalog or initiate an adjustment",
+          "testId": "152a26cdf9c0f956c5bf-7f834419641ba41bcdbc",
+          "outcome": "expected",
+          "durationMs": 2691
+        },
+        {
+          "file": "leave-balance-adjustment.spec.ts",
+          "title": "a pending review cannot restore the former employee after company selection changes",
+          "testId": "152a26cdf9c0f956c5bf-77714f9c0484d9c0aa09",
+          "outcome": "expected",
+          "durationMs": 1292
+        },
+        {
+          "file": "leave-balance-adjustment.spec.ts",
+          "title": "confirmed departure during a pending adjustment ignores a late receipt in the next company",
+          "testId": "152a26cdf9c0f956c5bf-1274b2dd7caae91ce0d2",
+          "outcome": "expected",
+          "durationMs": 1627
+        },
+        {
+          "file": "leave-balance-adjustment.spec.ts",
+          "title": "draft protection, language and theme changes preserve the adjustment in a narrow layout",
+          "testId": "152a26cdf9c0f956c5bf-649fcefc26899bdf5fb8",
+          "outcome": "expected",
+          "durationMs": 1281
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "balance pages retain employee, year and directory cursor across detail and browser navigation",
+          "testId": "441a4330b4d51b5c0825-45fe333f3b339071d3f6",
+          "outcome": "expected",
+          "durationMs": 2141
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "ledger selection shows original evidence while older pages retain the current balance",
+          "testId": "441a4330b4d51b5c0825-9e9e41707e9c613da63f",
+          "outcome": "expected",
+          "durationMs": 1727
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "a scoped reader reaches the charged year's ledger from a leave request without policy or people administration",
+          "testId": "441a4330b4d51b5c0825-bb68bff224eff9668654",
+          "outcome": "expected",
+          "durationMs": 1640
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "employee details expose balances for the selected employment year",
+          "testId": "441a4330b4d51b5c0825-cb55cb6f88c9c00724a7",
+          "outcome": "expected",
+          "durationMs": 1523
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "company replacement cancels pending list data and a late assurance failure",
+          "testId": "441a4330b4d51b5c0825-12812caf8c3952259249",
+          "outcome": "expected",
+          "durationMs": 1096
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "company replacement cancels pending ledger data and a late assurance failure",
+          "testId": "441a4330b4d51b5c0825-4e5b62f51712f910ac51",
+          "outcome": "expected",
+          "durationMs": 1240
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "invalid years and movement cursors remain local and balance permission is separate from policy management",
+          "testId": "441a4330b4d51b5c0825-7d0638c4ff1e92f6598d",
+          "outcome": "expected",
+          "durationMs": 2674
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "malformed balance context is never rendered at /leave/employees/b2000000-0000-4000-8000-000000000001/balances?company=10000000-0000-4000-8000-000000000001&year=2026",
+          "testId": "441a4330b4d51b5c0825-c1bc5ba9dcf5ce0b98f3",
+          "outcome": "expected",
+          "durationMs": 1051
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "malformed balance context is never rendered at /leave/employees/b2000000-0000-4000-8000-000000000001/balances/b3000000-0000-4000-8000-000000000001?company=10000000-0000-4000-8000-000000000001&year=2026",
+          "testId": "441a4330b4d51b5c0825-e5c33ed7e7807dd2a77b",
+          "outcome": "expected",
+          "durationMs": 1107
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "revoked ledger access clears the balance and selection before explicit recovery",
+          "testId": "441a4330b4d51b5c0825-e39c4de502092a1d2b1b",
+          "outcome": "expected",
+          "durationMs": 1843
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "MFA renewal retains the balance route without automatically rereading private evidence",
+          "testId": "441a4330b4d51b5c0825-98477ed85931e4a9d68c",
+          "outcome": "expected",
+          "durationMs": 1400
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "ledger evidence supports Indonesian dark mobile layout without restarting I/O",
+          "testId": "441a4330b4d51b5c0825-25b50ecf99a6d350df05",
+          "outcome": "expected",
+          "durationMs": 1907
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "carried balance retains its frozen validity and exact values in en",
+          "testId": "441a4330b4d51b5c0825-ac70244954d2e2bcd1c3",
+          "outcome": "expected",
+          "durationMs": 1355
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "carried balance retains its frozen validity and exact values in id",
+          "testId": "441a4330b4d51b5c0825-ab0c95d8211976317cc7",
+          "outcome": "expected",
+          "durationMs": 1477
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "reviewed accrual leads to employee outcomes and the scoped ledger",
+          "testId": "7aeb0d4be8b1f44a2948-5d4b2cf3a64f1423ce10",
+          "outcome": "expected",
+          "durationMs": 2337
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "year closing submits the reviewed year and explicit population",
+          "testId": "7aeb0d4be8b1f44a2948-1721e4d55e32fc3a7c5a",
+          "outcome": "expected",
+          "durationMs": 1704
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "type discovery is explicit and bounded rather than scanning every page",
+          "testId": "7aeb0d4be8b1f44a2948-fdc2d5c4b4b90dec3309",
+          "outcome": "expected",
+          "durationMs": 1591
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "accrual requires leave.read before any acquisition",
+          "testId": "7aeb0d4be8b1f44a2948-dbdd71df3378622ca7b2",
+          "outcome": "expected",
+          "durationMs": 1093
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "accrual requires leave.accrual.post before any acquisition",
+          "testId": "7aeb0d4be8b1f44a2948-d225dd2fb0f132162c2b",
+          "outcome": "expected",
+          "durationMs": 1084
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "read access offers history without either operation",
+          "testId": "7aeb0d4be8b1f44a2948-30796b2562f172f4db57",
+          "outcome": "expected",
+          "durationMs": 1190
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "a changed policy requires an explicit new review before another command",
+          "testId": "7aeb0d4be8b1f44a2948-dabe45fca92cf8a2a84b",
+          "outcome": "expected",
+          "durationMs": 1959
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "uncertain start recovers its original command through MFA and conflict",
+          "testId": "7aeb0d4be8b1f44a2948-c8f788d06bbefe8c3447",
+          "outcome": "expected",
+          "durationMs": 2828
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "uncertain resume recovers its original command through MFA and conflict",
+          "testId": "7aeb0d4be8b1f44a2948-6489229ff001b339f897",
+          "outcome": "expected",
+          "durationMs": 1880
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "server recovery availability gates the resume form",
+          "testId": "7aeb0d4be8b1f44a2948-a648b310c89b79300c44",
+          "outcome": "expected",
+          "durationMs": 1571
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "bounded result pages retain the originating directory cursor",
+          "testId": "7aeb0d4be8b1f44a2948-db91e4c0412cc7af2c27",
+          "outcome": "expected",
+          "durationMs": 1347
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "company departure discards a late committed response without crossing scope",
+          "testId": "7aeb0d4be8b1f44a2948-a1c1e6ecb33cb1ee65b5",
+          "outcome": "expected",
+          "durationMs": 1980
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "denied detail refresh erases retained results and replacement aborts late reads",
+          "testId": "7aeb0d4be8b1f44a2948-82d30313c129f7c8bf1d",
+          "outcome": "expected",
+          "durationMs": 1538
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "Indonesian narrow dark review retains input through theme and locale changes",
+          "testId": "7aeb0d4be8b1f44a2948-1fb16b556faa330ef44f",
+          "outcome": "expected",
+          "durationMs": 2118
+        },
+        {
+          "file": "leave-calendar.spec.ts",
+          "title": "date selection and bounded pages retain the month; detail and history return to the same calendar",
+          "testId": "fbeb6f0be08aa24b4b7e-c80dfe15f34737e6672d",
+          "outcome": "expected",
+          "durationMs": 2666
+        },
+        {
+          "file": "leave-calendar.spec.ts",
+          "title": "month controls use company time, support leap days and keep drafts through appearance changes",
+          "testId": "fbeb6f0be08aa24b4b7e-47f28d1c23b126fbb304",
+          "outcome": "expected",
+          "durationMs": 1869
+        },
+        {
+          "file": "leave-calendar.spec.ts",
+          "title": "team readers default to current reports without acquiring company scope",
+          "testId": "fbeb6f0be08aa24b4b7e-488c9fce8e24c8266b27",
+          "outcome": "expected",
+          "durationMs": 2567
+        },
+        {
+          "file": "leave-calendar.spec.ts",
+          "title": "calendar denies leave.self.read before I/O",
+          "testId": "fbeb6f0be08aa24b4b7e-9680af5f45be2dfb2413",
+          "outcome": "expected",
+          "durationMs": 979
+        },
+        {
+          "file": "leave-calendar.spec.ts",
+          "title": "calendar denies leave.approve,approvals.read before I/O",
+          "testId": "fbeb6f0be08aa24b4b7e-b6117bc4c3b3d78fb391",
+          "outcome": "expected",
+          "durationMs": 1109
+        },
+        {
+          "file": "leave-calendar.spec.ts",
+          "title": "company replacement discards a late month response and all old selections",
+          "testId": "fbeb6f0be08aa24b4b7e-76b6ac36a3ccddad1c59",
+          "outcome": "expected",
+          "durationMs": 1323
+        },
+        {
+          "file": "leave-calendar.spec.ts",
+          "title": "company replacement discards a late date response and all old selections",
+          "testId": "fbeb6f0be08aa24b4b7e-fa07100798b885def6e6",
+          "outcome": "expected",
+          "durationMs": 1332
+        },
+        {
+          "file": "leave-calendar.spec.ts",
+          "title": "replacing a pending date does not move the selection back when it finishes",
+          "testId": "fbeb6f0be08aa24b4b7e-cc5681528560ec3892b9",
+          "outcome": "expected",
+          "durationMs": 1884
+        },
+        {
+          "file": "leave-calendar.spec.ts",
+          "title": "a day access denial clears the entire calendar; MFA recovery reacquires authorized data",
+          "testId": "fbeb6f0be08aa24b4b7e-0a84ee10fe28e56c6b13",
+          "outcome": "expected",
+          "durationMs": 2174
+        },
+        {
+          "file": "leave-calendar.spec.ts",
+          "title": "transient date failures preserve the month; Indonesian dark layout stays within the viewport",
+          "testId": "fbeb6f0be08aa24b4b7e-11e7782a760d69613082",
+          "outcome": "expected",
+          "durationMs": 1479
+        },
+        {
+          "file": "leave-calendar.spec.ts",
+          "title": "Today renews company time after midnight even when only the selected date changed",
+          "testId": "fbeb6f0be08aa24b4b7e-2202b8a54b5407a7e6f6",
+          "outcome": "expected",
+          "durationMs": 1368
+        },
+        {
+          "file": "leave-carry-expiry.spec.ts",
+          "title": "expiry history opens retained employee results and their balance year",
+          "testId": "8d40e9a1b57a041aa0bb-6a8a15705abd568edf03",
+          "outcome": "expected",
+          "durationMs": 1759
+        },
+        {
+          "file": "leave-carry-expiry.spec.ts",
+          "title": "lost recovery response retains the original command through MFA and later conflict",
+          "testId": "8d40e9a1b57a041aa0bb-54e2d2ffe00451215071",
+          "outcome": "expected",
+          "durationMs": 2392
+        },
+        {
+          "file": "leave-carry-expiry.spec.ts",
+          "title": "expired assurance clears a review and reacquires it without submitting",
+          "testId": "8d40e9a1b57a041aa0bb-eac9ff673b114aab00d7",
+          "outcome": "expected",
+          "durationMs": 1313
+        },
+        {
+          "file": "leave-carry-expiry.spec.ts",
+          "title": "company replacement discards a late detail response and all prior cursors",
+          "testId": "8d40e9a1b57a041aa0bb-730c795d0e024cb4bac3",
+          "outcome": "expected",
+          "durationMs": 1253
+        },
+        {
+          "file": "leave-carry-expiry.spec.ts",
+          "title": "narrow Indonesian review retains its draft and protects company navigation",
+          "testId": "8d40e9a1b57a041aa0bb-26acd0ce22f020ca52ae",
+          "outcome": "expected",
+          "durationMs": 2062
+        },
+        {
+          "file": "leave-creation.spec.ts",
+          "title": "administrators select dated leave, review the server calculation and open the created request",
+          "testId": "d777d3c46cbc8b56f6a5-1333d29f99beb4639004",
+          "outcome": "expected",
+          "durationMs": 2438
+        },
+        {
+          "file": "leave-creation.spec.ts",
+          "title": "required employee evidence and a reason are checked before a submission reaches HTTP",
+          "testId": "d777d3c46cbc8b56f6a5-bd3a22ab857dc456b211",
+          "outcome": "expected",
+          "durationMs": 3507
+        },
+        {
+          "file": "leave-creation.spec.ts",
+          "title": "changing dates aborts a pending preview and requires another calculation",
+          "testId": "d777d3c46cbc8b56f6a5-f70f6228a1b02ed3a058",
+          "outcome": "expected",
+          "durationMs": 2825
+        },
+        {
+          "file": "leave-creation.spec.ts",
+          "title": "employee discovery pages and searches explicitly; changing employees removes old evidence",
+          "testId": "d777d3c46cbc8b56f6a5-ca1ac1d19b03bd754a78",
+          "outcome": "expected",
+          "durationMs": 3454
+        },
+        {
+          "file": "leave-creation.spec.ts",
+          "title": "lost submission survives MFA and a later conflict without changing the original command",
+          "testId": "d777d3c46cbc8b56f6a5-7356c530313e2daa34b4",
+          "outcome": "expected",
+          "durationMs": 2869
+        },
+        {
+          "file": "leave-creation.spec.ts",
+          "title": "a definitive preview conflict requires review again before issuing a new command",
+          "testId": "d777d3c46cbc8b56f6a5-4f2e1be111e8d6c26670",
+          "outcome": "expected",
+          "durationMs": 2601
+        },
+        {
+          "file": "leave-creation.spec.ts",
+          "title": "read-only access does not discover employees or prepare an administrative command",
+          "testId": "d777d3c46cbc8b56f6a5-2cc5a146f2781f625fd1",
+          "outcome": "expected",
+          "durationMs": 1944
+        },
+        {
+          "file": "leave-creation.spec.ts",
+          "title": "offline discovery finishes with an error and resumes only on explicit retry",
+          "testId": "d777d3c46cbc8b56f6a5-158c1d6eecd7b3aa2e7c",
+          "outcome": "expected",
+          "durationMs": 1792
+        },
+        {
+          "file": "leave-creation.spec.ts",
+          "title": "company replacement disposes the pending submission and ignores its late receipt",
+          "testId": "d777d3c46cbc8b56f6a5-c7e0f19b9ddf1550c371",
+          "outcome": "expected",
+          "durationMs": 2534
+        },
+        {
+          "file": "leave-creation.spec.ts",
+          "title": "Indonesian dark narrow layout preserves the reviewed selection without new requests",
+          "testId": "d777d3c46cbc8b56f6a5-3e75bc609e60aeeb9240",
+          "outcome": "expected",
+          "durationMs": 2947
+        },
+        {
+          "file": "leave-evidence.spec.ts",
+          "title": "detail downloads the selected immutable evidence only after an explicit click",
+          "testId": "ce15855071439d1acc8d-4f2406663ef581b2bedd",
+          "outcome": "expected",
+          "durationMs": 2341
+        },
+        {
+          "file": "leave-evidence.spec.ts",
+          "title": "review downloads preserve the decision draft across locale and theme changes",
+          "testId": "ce15855071439d1acc8d-b7859aa5b59568325cd4",
+          "outcome": "expected",
+          "durationMs": 2948
+        },
+        {
+          "file": "leave-evidence.spec.ts",
+          "title": "cancelling a pending download suppresses its late bytes and allows a new explicit download",
+          "testId": "ce15855071439d1acc8d-f23237261b9016e759dd",
+          "outcome": "expected",
+          "durationMs": 2890
+        },
+        {
+          "file": "leave-evidence.spec.ts",
+          "title": "a late revoked download cannot redact a refreshed request",
+          "testId": "ce15855071439d1acc8d-a2a96cc788ecbd4f80bd",
+          "outcome": "expected",
+          "durationMs": 1549
+        },
+        {
+          "file": "leave-evidence.spec.ts",
+          "title": "company replacement cancels evidence and ignores the previous company's response",
+          "testId": "ce15855071439d1acc8d-c9c3b8af75ac2c929989",
+          "outcome": "expected",
+          "durationMs": 1574
+        },
+        {
+          "file": "leave-evidence.spec.ts",
+          "title": "revoked evidence clears private review and requires a current reload",
+          "testId": "ce15855071439d1acc8d-602641910e255b777b59",
+          "outcome": "expected",
+          "durationMs": 1734
+        },
+        {
+          "file": "leave-evidence.spec.ts",
+          "title": "MFA renewal retains review input and requires an explicit new download",
+          "testId": "ce15855071439d1acc8d-9bbc6984c6d38ef044d0",
+          "outcome": "expected",
+          "durationMs": 1279
+        },
+        {
+          "file": "leave-evidence.spec.ts",
+          "title": "invalid etag fails without native file handoff",
+          "testId": "ce15855071439d1acc8d-e6c4e84c2f6bf7eea41d",
+          "outcome": "expected",
+          "durationMs": 1326
+        },
+        {
+          "file": "leave-evidence.spec.ts",
+          "title": "invalid body fails without native file handoff",
+          "testId": "ce15855071439d1acc8d-b9a1dd68cd4341c123f6",
+          "outcome": "expected",
+          "durationMs": 1310
+        },
+        {
+          "file": "leave-evidence.spec.ts",
+          "title": "submitting a decision cancels pending evidence without interfering with its receipt",
+          "testId": "ce15855071439d1acc8d-367b75956110919c357e",
+          "outcome": "expected",
+          "durationMs": 1270
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "policy catalog retains company, filters and cursor through detail and browser navigation",
+          "testId": "9587d4f2f6ebd588de0d-7810f3b9ac225e1a6821",
+          "outcome": "expected",
+          "durationMs": 1561
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "older policy selection shows immutable terms without replacing the current head or rereading",
+          "testId": "9587d4f2f6ebd588de0d-df093b4dbf625c5558f6",
+          "outcome": "expected",
+          "durationMs": 1434
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "company replacement cancels a pending policy list and drops its cursor",
+          "testId": "9587d4f2f6ebd588de0d-6f7bae1efa47ddc3f4dc",
+          "outcome": "expected",
+          "durationMs": 809
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "company replacement cancels a pending policy details and drops its cursor",
+          "testId": "9587d4f2f6ebd588de0d-39dc065e27800b7e9826",
+          "outcome": "expected",
+          "durationMs": 895
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "company replacement removes selected policy evidence",
+          "testId": "9587d4f2f6ebd588de0d-2a6ba29e8c6ffdad9e12",
+          "outcome": "expected",
+          "durationMs": 1378
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "leave readers cannot load administrative policy evidence or discover its navigation",
+          "testId": "9587d4f2f6ebd588de0d-5e8c0a74595135a43794",
+          "outcome": "expected",
+          "durationMs": 1308
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "invalid policy cursors stay local and a foreign identity remains unavailable",
+          "testId": "9587d4f2f6ebd588de0d-8c67ccd6ca61300e5ca3",
+          "outcome": "expected",
+          "durationMs": 2122
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "invalid policy data is not rendered at /leave/policies?company=10000000-0000-4000-8000-000000000001",
+          "testId": "9587d4f2f6ebd588de0d-a02005987f16f3193cbf",
+          "outcome": "expected",
+          "durationMs": 910
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "invalid policy data is not rendered at /leave/policies/d9000000-0000-4000-8000-000000000001?company=10000000-0000-4000-8000-000000000001",
+          "testId": "9587d4f2f6ebd588de0d-3b0b2db749b1fa028095",
+          "outcome": "expected",
+          "durationMs": 776
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "an access failure clears policy evidence and only an explicit refresh recovers it",
+          "testId": "9587d4f2f6ebd588de0d-d6678a4299bda8878c75",
+          "outcome": "expected",
+          "durationMs": 1444
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "MFA suspension removes policy evidence and renewal does not silently refetch it",
+          "testId": "9587d4f2f6ebd588de0d-ac2913c7896294b08342",
+          "outcome": "expected",
+          "durationMs": 1676
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "policy review supports localized dark mobile layout without restarting its read",
+          "testId": "9587d4f2f6ebd588de0d-99ae0efb98b60ddcd42b",
+          "outcome": "expected",
+          "durationMs": 1521
+        },
+        {
+          "file": "leave-policy-editor.spec.ts",
+          "title": "create policy saves normalized terms and opens its immutable first revision",
+          "testId": "61ae12583ab9ee807e8c-21d0d01b3d7454fe1bb0",
+          "outcome": "expected",
+          "durationMs": 1720
+        },
+        {
+          "file": "leave-policy-editor.spec.ts",
+          "title": "editing from old history uses the latest saved policy and keeps its code immutable",
+          "testId": "61ae12583ab9ee807e8c-1bf3e37e3a1bf59437c1",
+          "outcome": "expected",
+          "durationMs": 1561
+        },
+        {
+          "file": "leave-policy-editor.spec.ts",
+          "title": "field validation blocks invalid half days and missing eligible contracts before HTTP",
+          "testId": "61ae12583ab9ee807e8c-fcb6a06d01fe0b27bde1",
+          "outcome": "expected",
+          "durationMs": 1654
+        },
+        {
+          "file": "leave-policy-editor.spec.ts",
+          "title": "MANUAL entitlement excludes hidden periodic inputs from the saved command",
+          "testId": "61ae12583ab9ee807e8c-1b2a0331e99fe189b473",
+          "outcome": "expected",
+          "durationMs": 1273
+        },
+        {
+          "file": "leave-policy-editor.spec.ts",
+          "title": "NONE entitlement excludes hidden periodic inputs from the saved command",
+          "testId": "61ae12583ab9ee807e8c-1de0f13a785a857ab071",
+          "outcome": "expected",
+          "durationMs": 1262
+        },
+        {
+          "file": "leave-policy-editor.spec.ts",
+          "title": "lost save keeps its original command through verification and a later version conflict",
+          "testId": "61ae12583ab9ee807e8c-1c04b06d8525ec9e1ed3",
+          "outcome": "expected",
+          "durationMs": 1693
+        },
+        {
+          "file": "leave-policy-editor.spec.ts",
+          "title": "a definite policy conflict requires protected reload and a new reviewed version",
+          "testId": "61ae12583ab9ee807e8c-e51f9b522ea0b4d8613b",
+          "outcome": "expected",
+          "durationMs": 1481
+        },
+        {
+          "file": "leave-policy-editor.spec.ts",
+          "title": "pending editor read is cancelled when the selected company changes",
+          "testId": "61ae12583ab9ee807e8c-01cdd838d5769a2688a0",
+          "outcome": "expected",
+          "durationMs": 818
+        },
+        {
+          "file": "leave-policy-editor.spec.ts",
+          "title": "confirmed departure during a save ignores its late receipt in the next company",
+          "testId": "61ae12583ab9ee807e8c-cc094e22ccde227f1e59",
+          "outcome": "expected",
+          "durationMs": 1514
+        },
+        {
+          "file": "leave-policy-editor.spec.ts",
+          "title": "editor keeps its draft through locale and theme changes in a narrow layout",
+          "testId": "61ae12583ab9ee807e8c-07d23dba07ee33ba8b51",
+          "outcome": "expected",
+          "durationMs": 1591
+        },
+        {
+          "file": "leave-policy-editor.spec.ts",
+          "title": "finite carry validity requires a positive limit and can be cleared without rewriting history",
+          "testId": "61ae12583ab9ee807e8c-7e94064582da938b65eb",
+          "outcome": "expected",
+          "durationMs": 1460
+        },
+        {
+          "file": "leave-report.spec.ts",
+          "title": "annual leave totals preserve applied filters and localized half days, with narrow-screen status drill-down",
+          "testId": "f7febd07ad565c7eb764-5a6cccbf7fe5b3555d42",
+          "outcome": "expected",
+          "durationMs": 1615
+        },
+        {
+          "file": "leave-report.spec.ts",
+          "title": "failed refreshes clear both totals and private request rows until explicit retry succeeds",
+          "testId": "f7febd07ad565c7eb764-76031788b23a6ce5172a",
+          "outcome": "expected",
+          "durationMs": 1726
+        },
+        {
+          "file": "leave-report.spec.ts",
+          "title": "company replacement resets report filters and removes the preceding company's rows",
+          "testId": "f7febd07ad565c7eb764-98cd0af5ffa3089c7aaf",
+          "outcome": "expected",
+          "durationMs": 1313
+        },
+        {
+          "file": "leave-report.spec.ts",
+          "title": "source grants and invalid annual windows prevent report acquisition",
+          "testId": "f7febd07ad565c7eb764-e49b1a920f9844400b45",
+          "outcome": "expected",
+          "durationMs": 1608
+        },
+        {
+          "file": "leave-requests.spec.ts",
+          "title": "leave pages preserve their company, cursor and status filter through detail navigation",
+          "testId": "683b3532b1b4a886f028-e7e6b4264ac11159e09d",
+          "outcome": "expected",
+          "durationMs": 1788
+        },
+        {
+          "file": "leave-requests.spec.ts",
+          "title": "history pages retain current metadata and the original approval and cancellation snapshots",
+          "testId": "683b3532b1b4a886f028-a0fb6f16d48e4622b106",
+          "outcome": "expected",
+          "durationMs": 1618
+        },
+        {
+          "file": "leave-requests.spec.ts",
+          "title": "an assigned approver opens the source request without broad leave directory access",
+          "testId": "683b3532b1b4a886f028-0bb4a3d4dbb5566d9fe1",
+          "outcome": "expected",
+          "durationMs": 1536
+        },
+        {
+          "file": "leave-requests.spec.ts",
+          "title": "company replacement discards a pending leave list and its cursor",
+          "testId": "683b3532b1b4a886f028-e7a97194fd839a9b3e7b",
+          "outcome": "expected",
+          "durationMs": 897
+        },
+        {
+          "file": "leave-requests.spec.ts",
+          "title": "company replacement discards a pending leave details and its cursor",
+          "testId": "683b3532b1b4a886f028-b493f68ad90e9f3f0835",
+          "outcome": "expected",
+          "durationMs": 911
+        },
+        {
+          "file": "leave-requests.spec.ts",
+          "title": "invalid local filters do not issue requests and foreign-company identities remain unavailable",
+          "testId": "683b3532b1b4a886f028-a21964d8b523745e60e8",
+          "outcome": "expected",
+          "durationMs": 1364
+        },
+        {
+          "file": "leave-requests.spec.ts",
+          "title": "access failure clears the old leave evidence and can recover through explicit refresh",
+          "testId": "683b3532b1b4a886f028-26133214bbd9a29131d3",
+          "outcome": "expected",
+          "durationMs": 1414
+        },
+        {
+          "file": "leave-requests.spec.ts",
+          "title": "malformed leave data is not rendered at /leave/requests?company=10000000-0000-4000-8000-000000000001",
+          "testId": "683b3532b1b4a886f028-282c20f9eaa10e3febe0",
+          "outcome": "expected",
+          "durationMs": 796
+        },
+        {
+          "file": "leave-requests.spec.ts",
+          "title": "malformed leave data is not rendered at /leave/requests/b1000000-0000-4000-8000-000000000001?company=10000000-0000-4000-8000-000000000001",
+          "testId": "683b3532b1b4a886f028-280567a8bc7b17389897",
+          "outcome": "expected",
+          "durationMs": 764
+        },
+        {
+          "file": "leave-requests.spec.ts",
+          "title": "leave detail supports Indonesian and dark mobile layout without restarting its read",
+          "testId": "683b3532b1b4a886f028-4bd8c4e1d42f2d70ae43",
+          "outcome": "expected",
+          "durationMs": 1657
+        }
+      ]
+    },
+    "matchedTrees": [
+      {
+        "path": "apps/dashboard",
+        "baselineTree": "7ddf5d0326c08f9c181f7db2480a8f5608dfc645",
+        "headTree": "7ddf5d0326c08f9c181f7db2480a8f5608dfc645",
+        "workingTrackedDiff": false
+      },
+      {
+        "path": "modules/leave/data",
+        "baselineTree": "d6c8f85584971a68c896e467f5a873b2b13ee17b",
+        "headTree": "d6c8f85584971a68c896e467f5a873b2b13ee17b",
+        "workingTrackedDiff": false
+      },
+      {
+        "path": "modules/leave/delivery",
+        "baselineTree": "c19cfefec7f40dcb38dd32f9137e72f5be858751",
+        "headTree": "c19cfefec7f40dcb38dd32f9137e72f5be858751",
+        "workingTrackedDiff": false
+      },
+      {
+        "path": "modules/reporting",
+        "baselineTree": "d1bdc409034c91691e8b193da5391769d8b99f95",
+        "headTree": "d1bdc409034c91691e8b193da5391769d8b99f95",
+        "workingTrackedDiff": false
+      },
+      {
+        "path": "core/database",
+        "baselineTree": "641a66e40d4c89f5a52bce86782a5e94d0c6ed76",
+        "headTree": "641a66e40d4c89f5a52bce86782a5e94d0c6ed76",
+        "workingTrackedDiff": false
+      },
+      {
+        "path": "apps/worker/src/main/kotlin",
+        "baselineTree": "cff25253e8a4f5ffa9245a9349ba329e76716247",
+        "headTree": "cff25253e8a4f5ffa9245a9349ba329e76716247",
+        "workingTrackedDiff": false
+      },
+      {
+        "path": "apps/worker/src/test/kotlin",
+        "baselineTree": "373c458481c8f479bd182828a1af17bcbedb62ee",
+        "headTree": "373c458481c8f479bd182828a1af17bcbedb62ee",
+        "workingTrackedDiff": false
+      }
+    ],
+    "unchangedWorkerExecutionAndExistingPolicies": [
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/usecases/AbortLeaveBatch.kt",
+        "sha256": "d4f2e0313f80a8809270379b18eb7ff57294b429d25eaa908c073d7fbbd37271"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/usecases/AbortLeaveCarryExpiry.kt",
+        "sha256": "42356e178cb0c0c2725bf4f045c420d6bc76716aedc0ae7859713bbefbffee59"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/usecases/AdvanceLeaveAccrualBatch.kt",
+        "sha256": "84ac715a1d25ec5ce5379e4c548e64f14d60767a011ba020ee6246930273ba0e"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/usecases/AdvanceLeaveCarryExpiry.kt",
+        "sha256": "53455fdfa38e5cd92c645ee0fa3eec39bd8a1c1a5fe5161de7c00b934bf4c816"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/usecases/AdvanceLeaveYearCloseBatch.kt",
+        "sha256": "0bf93ad471c0bb74494aa162cd8216345cbbc5dcbc9a2a04de4c3523263fcc16"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveAccessPolicy.kt",
+        "sha256": "399eb787ac3e4b520ac40a12c43f53415cbdeb7a815dd7086fe2720996a9adc1"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveAccountAccessPolicy.kt",
+        "sha256": "773b68dbeec64e4ed4150bd6cace2efeb5a52b7bea5b18766e767ba15962b543"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveAccrualPeriodPolicy.kt",
+        "sha256": "22d2655bed98cc87d56ea011705e36b0897815821b860be1c9553d98de91b200"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveAccrualPolicy.kt",
+        "sha256": "ddda3a39fdb0bf0dab8f83f465d2c2d2d4b04ee89b7b0c564b24fb2209184f2c"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveAccrualPolicyValidation.kt",
+        "sha256": "3bba07bd5d4c13805aa23124ec7681f08de9dbe122e15fbb11f9fa183ee65b31"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveAccrualSchedulePolicy.kt",
+        "sha256": "3179b89b34c3c370eeb8b16241b7bdce572a48d38cb5d5dc5d0fda611e9590b8"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveActionPolicy.kt",
+        "sha256": "9ee8720129e5dc8cf830b7ac14e94b57a1530bc72597939370472c6219ed5f7c"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveAttachmentPolicy.kt",
+        "sha256": "cbee5628461aa58b0ddafe27596172f01918303a709ca6d8a459cd935c416a4d"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveBatchPolicy.kt",
+        "sha256": "01a493b5e5c4770c786cf71f2b5aab1160c0adf9e3e56bdc3278ce1d2bdda478"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveBatchReviewPolicy.kt",
+        "sha256": "a32d4ee2bb898318bac496bc231276cf47e89032551f7ef6ffa8c575f927a9bd"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveCalendarAccessPolicy.kt",
+        "sha256": "22c1156a0d5d0538345015bda793fd0b89632622765fbe3509dece68618dab74"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveCarryAdjustmentPolicy.kt",
+        "sha256": "853a0ac544d1109f786a7e7d5992e810bee902e1e6decd94daf95c1f08fcfa5c"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveCarryExpiryPolicy.kt",
+        "sha256": "d91c46316b41e62f5475eb3fb51bf9b8b124d54f37eb7bde17e7f1a7b28cf070"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveCarryFundingPolicy.kt",
+        "sha256": "926c60cb3281ed6c62ebc2b6f1144becdbda6eaa20700e784db4a6415526b18c"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveCarryValidityPolicy.kt",
+        "sha256": "42528392a12a3b77b8c317830719a400db8f68239ed9ff1e26f521724ecd6e4c"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveDayPolicy.kt",
+        "sha256": "b66e49baf32a94c3d4c7a99ccadd941f6f17b9faa63eb6606d7bcd67ce185ae9"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveDecisionPolicy.kt",
+        "sha256": "3551e754dd7308840892ca59de35f6d724e656b1661d3afbd503f22fbf762917"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveLedgerPolicy.kt",
+        "sha256": "16dcb50eb907341f2fa2de8cba86ee1bb8dd95a438023fcb5e9273714bd5b24b"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeavePolicyValidation.kt",
+        "sha256": "278b29af5ed2283f112ccb52d86392efbd64f6a02dc97b3224772025125bf750"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeavePreviewRevision.kt",
+        "sha256": "154bf801529faccd285887a38e162a4adc9ef6c7c48e12b0b1840332d3cda0d8"
+      },
+      {
+        "path": "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/policies/LeaveYearClosingPolicy.kt",
+        "sha256": "0ebac8c90bb97de9178b948b27cf525e824d27fa7370049c72e550df74c9fa92"
+      }
+    ],
+    "newPolicy": "LeaveRequestReadPolicy is an interactive read helper covered by new current-source API tests; worker execution does not call it."
+  },
+  "retainedIndependentBackendSuites": [
+    {
+      "task": "modules/reporting/domain",
+      "name": "dev.fajar.hris.reporting.domain.LeaveReportPolicyTest",
+      "tests": 4,
+      "failures": 0,
+      "skipped": 0,
+      "duration": "0.012s"
+    },
+    {
+      "task": "modules/reporting/delivery",
+      "name": "dev.fajar.hris.reporting.delivery.LeaveReportResponseTest",
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0,
+      "duration": "0.023s"
+    },
+    {
+      "task": "modules/reporting/data",
+      "name": "dev.fajar.hris.reporting.data.LeaveReportRepositoryTest",
+      "tests": 5,
+      "failures": 0,
+      "skipped": 0,
+      "duration": "0.060s"
+    },
+    {
+      "task": "core/database",
+      "name": "dev.fajar.hris.core.database.LeaveAccountMigrationTest",
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0,
+      "duration": "6.492s"
+    },
+    {
+      "task": "core/database",
+      "name": "dev.fajar.hris.core.database.LeaveCarryMigrationTest",
+      "tests": 1,
+      "failures": 0,
+      "skipped": 0,
+      "duration": "10.501s"
+    },
+    {
+      "task": "apps/worker",
+      "name": "dev.fajar.hris.worker.LeaveBatchWorkerTest",
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0,
+      "duration": "13.746s"
+    },
+    {
+      "task": "apps/worker",
+      "name": "dev.fajar.hris.worker.LeaveCarryExpiryWorkerTest",
+      "tests": 3,
+      "failures": 0,
+      "skipped": 0,
+      "duration": "14.993s"
+    }
+  ],
+  "freshBrowser": {
+    "api": {
+      "tests": 6,
+      "failed": 0,
+      "durationWithSetupMs": 50418.544,
+      "scenarios": [
+        {
+          "file": "leave-actions.spec.ts",
+          "title": "real API leave decisions recover receipts and preserve staged reservations, cancellation and withdrawal",
+          "outcome": "expected",
+          "durationMs": 11603
+        },
+        {
+          "file": "leave-balances.spec.ts",
+          "title": "real API initial funding recovers one receipt and a competing correction requires a fresh balance version",
+          "outcome": "expected",
+          "durationMs": 3271
+        },
+        {
+          "file": "leave-calendar.spec.ts",
+          "title": "real calendar counts charged dates and preserves selection through withdrawal before refreshing occupancy",
+          "outcome": "expected",
+          "durationMs": 3286
+        },
+        {
+          "file": "leave-creation.spec.ts",
+          "title": "real API creation recalculates changed balances and replays a lost submission exactly once",
+          "outcome": "expected",
+          "durationMs": 4259
+        },
+        {
+          "file": "leave-policies.spec.ts",
+          "title": "real API policy creation and future revisions retain history and replay a lost save",
+          "outcome": "expected",
+          "durationMs": 2807
+        },
+        {
+          "file": "leave-report.spec.ts",
+          "title": "real leave totals reconcile with scoped request drill-down after withdrawal and retained return navigation",
+          "outcome": "expected",
+          "durationMs": 3326
+        }
+      ]
+    },
+    "worker": {
+      "tests": 3,
+      "failed": 0,
+      "durationWithSetupMs": 53398.129,
+      "scenarios": [
+        {
+          "file": "leave-accrual-schedules.spec.ts",
+          "title": "reviewed periods survive response loss and future cancellation keeps its due time through recovery",
+          "outcome": "expected",
+          "durationMs": 12531
+        },
+        {
+          "file": "leave-batches.spec.ts",
+          "title": "reviewed accrual and year closing preserve one posting across response loss through the real worker",
+          "outcome": "expected",
+          "durationMs": 12817
+        },
+        {
+          "file": "leave-carry-expiry.spec.ts",
+          "title": "retained carry recovery survives response loss and the real worker debits it once",
+          "outcome": "expected",
+          "durationMs": 3655
+        }
+      ]
+    }
+  },
+  "nativeEvidence": [
+    "docs/native-leave-acceptance.md",
+    "https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/validation.md#android-carried-balance-upgrade-acceptance"
+  ],
+  "physicalIphone": "Waived by user; no physical Apple claim.",
+  "remaining": "Observe final-source CI and complete remaining Platform/Mobile requirements."
+}

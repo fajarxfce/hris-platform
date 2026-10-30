@@ -79,9 +79,6 @@ class WithdrawLeaveRequest(
             val live = (checkedActor as Result.Success).value
             if ("leave.manage" !in live.permissions && "leave.self.manage" !in live.permissions)
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
-            }
             val found = requests.find(company, id)
             if (found is Result.Failed) return@run found
             val request =
@@ -91,6 +88,10 @@ class WithdrawLeaveRequest(
                     )
             if (!canManageLeave(live, request))
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "leave_request_not_found"))
+            (replay as Result.Success).value?.let { receipt ->
+                return@run validateCompanySessionActor(actor, access, clock.instant(), security)
+                    .map { receipt }
+            }
 
             val frozen =
                 cutoffs.frozenMonths(

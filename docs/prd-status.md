@@ -27,12 +27,15 @@ accepts five more against unchanged source and downloaded full-CI results.
 ten original sections after read/command completion fixes: 243 API, 18 domain,
 nine data, quality/packages and four actual browser workflows passed. [Expenses](expenses-feature-review-2026-10-30.md) adds six locally accepted rows
 and nine sections, with 335 distinct API cases, 20 Expense domain, 115 Reporting
-cases, quality/packages and four actual browser workflows. Twenty-six rows are
-reviewed; 35 initial rows and the full Mobile review remain active. Email
+cases, quality/packages and four actual browser workflows. [Leave](leave-feature-review-2026-10-30.md) adds five locally accepted rows and
+eleven original sections, with final API/worker/browser acceptance. Thirty-one rows
+are reviewed; 30 initial rows and the full Mobile review remain active. Email
 `8014d733`, approval `fcfdaf26` and final Communications/Documents `8e5dd3db`
-each passed all ten full-CI jobs. Expense source `5b60aba3` is running in
-[CI 41018107365](https://github.com/fajarxfce/hris-platform/actions/runs/41018107365);
-continue Leave and the remaining scope without cancelling that run.
+each passed all ten full-CI jobs. Expense [CI 41018107365](https://github.com/fajarxfce/hris-platform/actions/runs/41018107365)
+passed nine jobs and all fourteen worker scenarios, but exceeded the worker step
+time budget. The [recorded correction](measurements/ci-integration-timeout-2026-10-30.json)
+keeps finite limits; complete CI on final Leave source must still pass. Continue
+People, the remaining Platform requirements and full Mobile review.
 
 
 ## Release-configuration audit — accepted

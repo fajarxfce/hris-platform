@@ -111,8 +111,16 @@ class SubmitLeaveRequest(
             val live = (checkedActor as Result.Success).value
             if ("leave.manage" !in live.permissions && "leave.self.manage" !in live.permissions)
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            (replay as Result.Success).value?.let { receipt ->
+                val found = requests.find(company, id)
+                if (found is Result.Failed) return@run found
+                val request = (found as Result.Success).value
+                if (request == null || !canManageLeave(live, request))
+                    return@run Result.Failed(
+                        Failure(FailureKind.NOT_FOUND, "leave_request_not_found")
+                    )
+                return@run validateCompanySessionActor(actor, access, clock.instant(), security)
+                    .map { receipt }
             }
             val now = clock.instant()
             val companyResult = companies.find(company)

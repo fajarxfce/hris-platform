@@ -80,10 +80,11 @@ class PostEmployeeLeaveAccrual(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId, shared = true)
             if (accountLock is Result.Failed) return@run accountLock
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val sessionAccess = (authority as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, sessionAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val allowed = live.requirePermission("leave.accrual.post")
@@ -93,7 +94,13 @@ class PostEmployeeLeaveAccrual(
             if ((accountResult as Result.Success).value == actor.accountId)
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "self_adjustment_denied"))
             (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+                return@run validateCompanySessionActor(
+                        actor,
+                        sessionAccess,
+                        clock.instant(),
+                        security,
+                    )
+                    .map { _ -> it }
             }
             val companyResult = companies.find(company)
             if (companyResult is Result.Failed) return@run companyResult
@@ -213,7 +220,10 @@ class PostEmployeeLeaveAccrual(
                     )
                 }
                 .flatMap { operations.record(actor, key, receipt) }
-                .map { receipt }
+                .flatMap {
+                    validateCompanySessionActor(actor, sessionAccess, clock.instant(), security)
+                        .map { receipt }
+                }
         }
     }
 }

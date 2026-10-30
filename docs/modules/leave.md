@@ -244,3 +244,11 @@ occupancy and company replacement.
 MFA after policy, employment and request acquisition, before attachment storage
 reads, and after post-storage metadata. Content owns and clears its bounded buffer.
 The full feature audit still tracks command and delegation completion separately.
+
+## Command and delegation completion
+
+[Command/delegation acceptance](../leave-command-assurance-2026-10-30.md) verifies
+final session and independent current assignment, stable admitted policy input,
+resource-scoped request receipts, original decision-approval provenance and sorted
+delegator guards. The [full requirement review](../leave-feature-review-2026-10-30.md)
+locally accepts all five initial rows and eleven original detailed sections.

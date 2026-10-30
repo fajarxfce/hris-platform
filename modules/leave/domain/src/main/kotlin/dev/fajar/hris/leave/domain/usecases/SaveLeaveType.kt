@@ -31,7 +31,11 @@ class SaveLeaveType(
     ): Result<MutationReceipt> {
         val access = actor.requirePermission("leave.manage")
         if (access is Result.Failed) return access
-        val valid = validateLeaveType(type, reason)
+        val command =
+            type.copy(
+                policy = type.policy.copy(allowedContracts = type.policy.allowedContracts.toSet())
+            )
+        val valid = validateLeaveType(command, reason)
         if (valid is Result.Failed) return valid
         if ((expectedVersion ?: 0) < 0)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_version"))
@@ -40,22 +44,22 @@ class SaveLeaveType(
                 "leave.type_save",
                 operationId,
                 listOf(
-                    type.id.toString(),
-                    type.code,
-                    type.effectiveFrom.toString(),
-                    type.policy.name,
-                    type.policy.paid.toString(),
-                    type.policy.allowPartialDays.toString(),
-                    type.policy.minServiceMonths.toString(),
-                    type.policy.allowedContracts.map { it.name }.sorted().joinToString(","),
-                    type.policy.maxRequestDays.toString(),
-                    type.active.toString(),
+                    command.id.toString(),
+                    command.code,
+                    command.effectiveFrom.toString(),
+                    command.policy.name,
+                    command.policy.paid.toString(),
+                    command.policy.allowPartialDays.toString(),
+                    command.policy.minServiceMonths.toString(),
+                    command.policy.allowedContracts.map { it.name }.sorted().joinToString(","),
+                    command.policy.maxRequestDays.toString(),
+                    command.active.toString(),
                     expectedVersion?.toString(),
                     reason,
                 ) +
-                    (if (type.policy.attachmentRequired) listOf("attachmentRequired", "true")
+                    (if (command.policy.attachmentRequired) listOf("attachmentRequired", "true")
                     else emptyList()) +
-                    (type.policy.accrual?.let {
+                    (command.policy.accrual?.let {
                         listOf(
                             "accrual",
                             it.frequency.name,
@@ -63,7 +67,7 @@ class SaveLeaveType(
                             it.carryLimitHalfDays.toString(),
                         )
                     } ?: emptyList()) +
-                    (type.policy.accrual?.carryValidityMonths?.let {
+                    (command.policy.accrual?.carryValidityMonths?.let {
                         listOf("carryValidityMonths", it.toString())
                     } ?: emptyList()),
             )
@@ -79,26 +83,27 @@ class SaveLeaveType(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val sessionAccess = (authority as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, sessionAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val allowed = (checked as Result.Success).value.requirePermission("leave.manage")
             if (allowed is Result.Failed) return@run allowed
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
-            val existing = policies.find(company, type.id)
+            val existing = policies.find(company, command.id)
             if (existing is Result.Failed) return@run existing
             val current = (existing as Result.Success).value
             if (current?.version != expectedVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
-            if (current != null && current.code != type.code)
+            if (current != null && current.code != command.code)
                 return@run Result.Failed(
                     Failure(FailureKind.VALIDATION, "leave_type_code_immutable")
                 )
-            policies.save(actor, type, expectedVersion, reason).flatMap { receipt ->
+            policies.save(actor, command, expectedVersion, reason).flatMap { receipt ->
                 operations
                     .record(actor, key, receipt)
                     .flatMap {
@@ -106,13 +111,16 @@ class SaveLeaveType(
                             actor,
                             ChangeRecord(
                                 "leave_type",
-                                type.id,
+                                command.id,
                                 "leave.policy_saved",
                                 reason = reason,
                             ),
                         )
                     }
-                    .map { receipt }
+                    .flatMap {
+                        validateCompanySessionActor(actor, sessionAccess, clock.instant(), security)
+                            .map { receipt }
+                    }
             }
         }
     }

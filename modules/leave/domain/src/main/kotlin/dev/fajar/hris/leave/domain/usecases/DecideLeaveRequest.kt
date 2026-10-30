@@ -81,8 +81,29 @@ class DecideLeaveRequest(
                     ?: return@run Result.Failed(
                         Failure(FailureKind.NOT_FOUND, "leave_request_not_found")
                     )
+            val replayedReceipt = (replay as Result.Success).value
+            val originalState =
+                if (replayedReceipt == null) null
+                else {
+                    // The original pre-decision revision identifies the approval even after
+                    // later cancellation requests. One bounded history page reads at most two rows.
+                    val history = requests.history(company, id, replayedReceipt.version, 1)
+                    if (history is Result.Failed) return@run history
+                    (history as Result.Success).value.items.singleOrNull()?.takeIf {
+                        it.version == version &&
+                            it.status in
+                                setOf(LeaveStatus.PENDING, LeaveStatus.CANCELLATION_PENDING)
+                    }
+                        ?: return@run Result.Failed(
+                            Failure(FailureKind.CONFLICT, "approval_unavailable")
+                        )
+                }
             val approvalId =
-                if (request.status == LeaveStatus.CANCELLATION_PENDING)
+                if (originalState != null) {
+                    if (originalState.status == LeaveStatus.CANCELLATION_PENDING)
+                        requireNotNull(originalState.cancellationApprovalId)
+                    else request.approvalId
+                } else if (request.status == LeaveStatus.CANCELLATION_PENDING)
                     requireNotNull(request.cancellationApprovalId)
                 else request.approvalId
             val approvalResult = approvals.find(company, approvalId)
@@ -92,7 +113,9 @@ class DecideLeaveRequest(
                     ?: return@run Result.Failed(
                         Failure(FailureKind.CONFLICT, "approval_unavailable")
                     )
-            val assignees = approval.stages[approval.currentStep].assignees
+            val assignees =
+                if (replayedReceipt == null) approval.stages[approval.currentStep].assignees
+                else approval.stages.flatMap { it.assignees }.toSet()
             for (accountId in (assignees + actor.accountId).sorted()) {
                 val locked = identities.lockAccount(accountId)
                 if (locked is Result.Failed) return@run locked
@@ -105,31 +128,48 @@ class DecideLeaveRequest(
             val live = (checkedActor as Result.Success).value
             if (live.permissions.none { it in approvalPermissions(ApprovalKind.LEAVE) })
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
-            (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+            val acquiredAt = clock.instant()
+            val accountResult = people.accountForEmployee(company, employeeId)
+            if (accountResult is Result.Failed) return@run accountResult
+            val beneficiary = (accountResult as Result.Success).value
+            val delegationResult = approvals.delegations(company, actor.accountId, acquiredAt)
+            if (delegationResult is Result.Failed) return@run delegationResult
+            val memberResult = members.candidates(company, assignees, emptySet(), assignees.size)
+            if (memberResult is Result.Failed) return@run memberResult
+            val delegations = (delegationResult as Result.Success).value
+            val grants = (memberResult as Result.Success).value
+            val now = clock.instant()
+            if (replayedReceipt != null) {
+                return@run validateCompanySessionActor(actor, access, now, security).flatMap {
+                    current ->
+                    if (beneficiary == actor.accountId)
+                        return@flatMap Result.Failed(
+                            Failure(FailureKind.FORBIDDEN, "self_approval_denied")
+                        )
+                    if (
+                        !isAssignedApprover(
+                            current,
+                            approval.copy(
+                                excludedAccountIds =
+                                    approval.excludedAccountIds + listOfNotNull(beneficiary)
+                            ),
+                            delegations,
+                            grants,
+                            now,
+                        )
+                    )
+                        return@flatMap Result.Failed(
+                            Failure(FailureKind.FORBIDDEN, "not_assigned_approver")
+                        )
+                    Result.Success(replayedReceipt)
+                }
             }
             if (request.version != version)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
             if (request.status !in setOf(LeaveStatus.PENDING, LeaveStatus.CANCELLATION_PENDING))
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "leave_not_pending"))
-            val now = clock.instant()
-            val accountResult = people.accountForEmployee(company, employeeId)
-            if (accountResult is Result.Failed) return@run accountResult
-            val beneficiary = (accountResult as Result.Success).value
-            val delegationResult = approvals.delegations(company, actor.accountId, now)
-            if (delegationResult is Result.Failed) return@run delegationResult
-            val memberResult = members.candidates(company, assignees, emptySet(), assignees.size)
-            if (memberResult is Result.Failed) return@run memberResult
             val transitionResult =
-                decideApproval(
-                    approval,
-                    live,
-                    decision,
-                    reason,
-                    (delegationResult as Result.Success).value,
-                    (memberResult as Result.Success).value,
-                    now,
-                )
+                decideApproval(approval, live, decision, reason, delegations, grants, now)
             if (transitionResult is Result.Failed) return@run transitionResult
             val transition = (transitionResult as Result.Success).value
             if (
@@ -290,7 +330,21 @@ class DecideLeaveRequest(
                             )
                         }
                         .flatMap {
-                            validateCompanySessionActor(actor, access, clock.instant(), security)
+                            val completedAt = clock.instant()
+                            validateCompanySessionActor(actor, access, completedAt, security)
+                                .flatMap { completed ->
+                                    // The immutable pre-decision snapshot identifies the stage
+                                    // actually authorized, even after the stored workflow advanced.
+                                    decideApproval(
+                                        approval,
+                                        completed,
+                                        decision,
+                                        reason,
+                                        delegations,
+                                        grants,
+                                        completedAt,
+                                    )
+                                }
                                 .map { receipt }
                         }
                 }

@@ -177,3 +177,15 @@ acceptance. Communications/Documents `8e5dd3db` passed all ten CI jobs; Expense
 `5b60aba3` is running in [CI 41018107365](https://github.com/fajarxfce/hris-platform/actions/runs/41018107365).
 Leave commands and delegated read/decision completion remain under review. All five
 Leave rows stay unverified: 26 initial rows reviewed, 35 and Mobile still open.
+
+## Leave requirement review — local acceptance passed
+
+[Leave](leave-feature-review-2026-10-30.md) now has all five initial rows and eleven
+original detailed sections reviewed. Its command/delegation correction closes
+twenty-five actual failures after the earlier ten reader failures. Five existing
+controls and four new account-wait regressions pass. Final acceptance passed
+424 API/OpenAPI and 65 domain cases, quality/packages, six actual API/browser
+workflows and three actual API/worker/browser workflows. Retained matching-source
+CI includes 141 controlled-response browser scenarios, workers and migrations.
+Thirty-one initial rows are reviewed; thirty initial rows and full Mobile review
+remain open. Follow final-source CI and continue the full objective.

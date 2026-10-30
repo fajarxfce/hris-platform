@@ -11,8 +11,8 @@ preserves earlier work; its old next-step statements are not the active queue.
 
 Complete every specified Platform/Mobile feature and port demonstrated generic
 fixes to Starter. The [full audit](feature-audit-2026-10-30.md) remains active:
-Approvals, Communications, Identity, Documents and Expenses now have 26 reviewed
-initial requirement rows and their detailed sections; 35 initial rows await review,
+Approvals, Communications, Identity, Documents, Expenses and Leave now have 31 reviewed
+initial requirement rows and their detailed sections; 30 initial rows await review,
 followed by Mobile/Starter. Identity, Approvals, Communications and Documents have accepted full-CI evidence;
 Expense final-source CI remains separately tracked.
 Do not mark the goal complete from these increments or earlier green CI.
@@ -96,16 +96,26 @@ Ten genuine reproduction failures now pass. Final acceptance passed 437 API/Open
 workflows (51.5s including setup). No DI/schema/additional query change occurred.
 Storage buffers are cleared and expired preparation starts no object read.
 
-**Leave remains active, with all five initial rows unverified.** Complete the
-remaining eleven detailed sections and linked accrual-schedule/carryover contracts.
-Next reproduce `SaveLeaveType`, `PostEmployeeLeaveAccrual` and
-`RequestLeaveCancellation`: final journal/receipt MFA, stable policy contract sets,
-and original cancellation receipt scope. Then correct delegated request/attachment
-read completion, refreshed available actions, ordered delegator account guards,
-and `DecideLeaveRequest` current-stage authorization through decision and original
-receipt completion. Read-only/command source reviews already identified these
-boundaries; no command or delegation correction is included in this read increment.
-Do not narrow the full audit to these defects or mark Leave accepted from this CI.
+[Leave command/delegation completion](leave-command-assurance-2026-10-30.md) now
+locally accepts all five rows and eleven original sections. Twenty-five actual
+failed cases were corrected; five prior controls and four new account-wait
+regressions remain distinct. Acceptance covers 485 distinct API/OpenAPI cases across a 471-case broad
+run (857s) and 58-case final targeted run (115s),
+plus 65 domain cases and quality/packages, six actual browser workflows (50.4s)
+and three actual worker/browser workflows (53.4s), including setup. Nine leaf
+use cases and one pure read policy changed; no schema/DI/transport change occurred.
+
+Decision receipts select their original immutable pre-decision revision with a
+one-item history page, preserving the correct approval through later cancellations.
+They still require current independent assignment and exclude newly bound
+beneficiaries. Read grants are reacquired after sorted actor/delegator account
+locks. Request-management receipts retain current scope and final MFA. Do not
+remove these bounded acquisitions as a query-count optimization.
+
+Dispatch final-source CI with the revised integration time budget after commit. Keep the remaining
+full-feature goal active: thirty initial rows plus detailed/module/Mobile review
+remain. Next review People and the remaining Platform contracts, then Mobile and
+applicable Starter behavior. No generic client implementation port is due here.
 
 Input copies are bounded before validation. Receipt reads retain scope/expiry and
 ordered actor/delegator guards; one additional identity acquisition per short

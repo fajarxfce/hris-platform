@@ -623,35 +623,54 @@
         {
           "id": "people.01",
           "text": "Own companies, branches, departments, positions, cost centers, people, employments, reporting lines, and effective-dated changes.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/people-feature-review-2026-10-30.md",
+            "docs/measurements/people-feature-review-2026-10-30.json",
+            "docs/measurements/people-full-ci-2026-10-30.json"
+          ]
         },
         {
           "id": "people.02",
           "text": "Separate global person/account identity from company employee number, contract, and salary. Support administrative onboarding, probation, contract extension, transfers, and offboarding. A cross-company transfer creates a new employment and preserves the old history.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/people-feature-review-2026-10-30.md",
+            "docs/measurements/people-feature-review-2026-10-30.json",
+            "docs/measurements/people-full-ci-2026-10-30.json"
+          ]
         },
         {
           "id": "people.03",
           "text": "Foreign identity/document expiry and tax residency are separate attributes. Import supports preview, field errors, duplicate detection, and row outcomes. Referenced historical data is archived rather than destroyed.",
           "status": "unverified",
           "evidence": [
-            "docs/document-identity-metadata-gap-2026-10-30.md"
+            "docs/people-feature-review-2026-10-30.md",
+            "docs/measurements/people-feature-review-2026-10-30.json",
+            "docs/measurements/people-full-ci-2026-10-30.json",
+            "docs/measurements/native-metadata-2026-10-30.json"
           ],
-          "remaining": "Implement separate foreign identity/document business-validity metadata; upload expiry is operational and tax residency already belongs to Payroll."
+          "remaining": "Document identity/category/business validity implemented and locally/native accepted; replacement Mobile full CI 41077194465 pending"
         },
         {
           "id": "people.04",
           "text": "Screens: company/employee directories, organization structure, employee tabs, import, scheduled changes.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/people-feature-review-2026-10-30.md",
+            "docs/measurements/people-feature-review-2026-10-30.json",
+            "docs/measurements/people-full-ci-2026-10-30.json"
+          ]
         },
         {
           "id": "people.05",
           "text": "Acceptance: concurrent employee number uniqueness, effective-dated history, company-reference constraints, safe import replay, and historical payroll unchanged.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/people-feature-review-2026-10-30.md",
+            "docs/measurements/people-feature-review-2026-10-30.json",
+            "docs/measurements/people-full-ci-2026-10-30.json"
+          ]
         }
       ],
       "detailedContractSections": [

@@ -219,3 +219,19 @@ actual browser/worker workflows pass. Two old import-worker enrollment fixtures
 were corrected; the combined failed run and separate successful worker acceptance
 remain explicit. All five People rows remain unverified pending the document
 metadata implementation and detailed review. Final-source CI must still pass.
+
+## People requirement review — four rows accepted
+
+[The detailed review](people-feature-review-2026-10-30.md) maps all five initial rows
+and fourteen original sections to unchanged implementation trees and completed
+source-matched tests. Four rows are accepted; `people.03` retains the implemented
+document metadata subrequirement until replacement Mobile CI completes. The new
+metadata already passes API/dashboard/schema-103 recovery and actual Android
+recovery across two offline restarts. Apple passed 104 tests and the complete
+simulator app; a browser capacity-test deadline caused the first full Mobile run
+to fail, and the corrected source is running in `41077194465`.
+
+The current inventory is **34 reviewed/accepted and 27 unverified initial rows**.
+Administration, Payroll, Reporting, Workforce and full Mobile/Starter review remain
+active. This review reruns no already accepted source checks and changes no product
+behavior. Preserve the original goal through these increments.

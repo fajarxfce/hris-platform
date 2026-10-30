@@ -11,8 +11,8 @@ preserves earlier work; its old next-step statements are not the active queue.
 
 Complete every specified Platform/Mobile feature and port demonstrated generic
 fixes to Starter. The [full audit](feature-audit-2026-10-30.md) remains active:
-Approvals, Communications, Identity, Expenses, Leave and four Document rows now
-have thirty reviewed initial rows; thirty-one initial rows await completion/review,
+Approvals, Communications, Identity, Expenses, Leave, four Document and four People rows now
+have thirty-four reviewed initial rows; twenty-seven initial rows await completion/review,
 followed by Mobile/Starter. Identity, Approvals, Communications, existing Document behavior, Expenses and Leave
 have accepted full-CI evidence. The explicit Document category subrequirement has
 been reopened; see the confirmed metadata gap below.
@@ -364,6 +364,29 @@ production operation retain their separate target requirements. Physical iPhone 
 explicitly waived; simulator and unsigned Xcode proof does not imply device delivery.
 
 See [distribution evidence](measurements/distribution-2026-10-29.json).
+
+
+[Detailed People review](people-feature-review-2026-10-30.md) now accepts four initial
+rows against source-matched completed CI and all fourteen original sections. The
+remaining `people.03` metadata condition awaits replacement Mobile CI `41077194465`
+at exact `d170810f03852f46a948f9f4d5dea9ca4104bdbd`. Its predecessor `41071828262`
+finished with Web/Windows/Apple success (104 Apple cases and complete Xcode app),
+but Linux failed the browser's two-second capacity deadline. The corrected local
+75-case browser run passed; do not relabel the original overall failure.
+
+Administration review has started. Older private settings readers check MFA before
+repository reads but not after; SaveCompanyClientPolicy similarly needs late
+journal/receipt/enrollment review. These are source candidates only: reproduce
+them before changing behavior. Public client-policy discovery has a distinct
+authentication/recovery contract; do not add sensitive-reader MFA policy blindly.
+
+The private pre-upgrade checkpoint `dev-before-metadata-20261030T150655` succeeded
+with isolated verification (19.389s including restart), preserving schema 101 and
+current Google/session state. API/dashboard are healthy again. New accepted
+API/worker images and dashboard snapshot `~/.local/share/hris-dashboard-dev/1e0522c0`
+are staged but not running. Older images have `before-metadata-20261030` tags.
+Local `.work/metadata-rollout` retains private checkpoint/build/baseline details.
+Continue controlled schema-103 rollout after Mobile CI; no phone installation yet.
 
 ## Previous implementation checkpoint — HTTPS links
 

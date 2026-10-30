@@ -16,15 +16,16 @@ installed phone, private keys and running development stack intact.
 
 ## Current acceptance
 
-The inventory has 41 accepted initial rows and 20 still under review. Administration
-joins Approvals, Communications, Identity, Expenses, Leave, Documents and People
-with [complete source CI](measurements/administration-full-ci-2026-10-30.json).
-Reporting's five rows await final source CI; Payroll's seven rows have corrected
-forty genuine baseline failures and are in broad verification; Workforce's eight
-rows and full Mobile/applicable Starter review remain active. The private runtime
-is schema 103 and the metadata phone APK is installed. Historical activity below
-retains earlier states; use [current PRD status](prd-status.md) and the handoff for
-the active queue. No newer business correction has been deployed yet.
+The inventory retains 41 accepted initial rows and 20 awaiting final source CI.
+Reporting, Payroll and Workforce complete local acceptance now passes; their
+review pages and measurements record reproduced failures, fixes, actual workflows
+and source boundaries. Mobile's fifteen-area review and the applicable Starter
+review are complete (`f4f101a1`, `7605916`); no additional generic port is required.
+Finish Reporting/Payroll CI `41087903927`, then full Workforce source CI, before
+accepting the remaining rows. Complete the combined private API/worker update with
+recovery/integrity evidence and final Git handoffs. See [current status](prd-status.md).
+No final-correction runtime update has occurred. Historical activity below records
+earlier states and does not override the active queue.
 
 ## Confirmed gap: announcement email
 

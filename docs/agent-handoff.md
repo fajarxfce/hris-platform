@@ -18,43 +18,50 @@ and [measurements](measurements/metadata-development-rollout-2026-10-30.json) be
 using older schema-101 status paragraphs below. Phone APK is now application `3c6db4eb`; Mobile
 CI `41077194465` passed all four jobs and its installed binary hash is verified. Administration source corrections are not deployed.
 
-## Active goal — full feature completion audit
+## Active goal — final source CI and private update
 
-Payroll complete local acceptance now passes: 682 API cases in 95 suites, three
-worker, 114 domain and twelve data cases, quality and both packages (1,464.110s).
-Four normal actual browser scenarios passed in 47.453s; three worker/browser
-scenarios passed in 138.372s. Owned fixtures/ports are cleaned. Read the
-[seven-row review](payroll-feature-review-2026-10-30.md) and
-[measurements](measurements/payroll-assurance-2026-10-30.json); exact `cca5e151`
-packages are preserved under `.work/payroll-audit-2026-10-30/packages`.
+All remaining source reviews and local workflows are complete. The inventory is
+still 41 accepted / 20 unverified until final CI passes: Reporting has five rows,
+Payroll seven and Workforce eight. Their detailed reviews map actual behaviors,
+including explicit scope boundaries, rather than treating a green build as proof.
 
-Final Reporting/Payroll source [CI 41087903927](https://github.com/fajarxfce/hris-platform/actions/runs/41087903927)
-uses exact `eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f`. Four dashboard shards passed;
-backend/downstream verification remains running. Preserve it: another dispatch
-on this branch cancels it. Accept Reporting's five and Payroll's seven rows only
-after every required job passes. No newer business correction is deployed.
-
-The inventory remains 41 accepted / 20 unverified. Administration's complete
-[ten-job evidence](measurements/administration-full-ci-2026-10-30.json) is accepted.
-Workforce's 27 actual SQL regressions reproduced 24 genuine failures plus three
-already-correct controls. The correction passes five focused API suites and pure
-domain tests in 100.808s, including atomic rollback and original-operation recovery.
-See [the audit](workforce-audit-2026-10-30.md),
+Workforce `2c2a59e3` corrects 24 reproduced failures plus three prior controls.
+Complete local acceptance passes 369 API, six worker and 61 domain cases,
+architecture/format checks and both packages (622.192s). Four normal actual browser
+workflows pass (66.494s), followed by the real closing/adjustment worker workflow
+(43.507s); all owned containers, ports and fixture files are removed. Read the
 [eight-row review](workforce-feature-review-2026-10-30.md) and
-[measurements](measurements/workforce-assurance-2026-10-30.json). Run the prepared
-broad command in `.work/workforce-audit-2026-10-30/broad-command.json`, then four
-normal actual browser workflows and `work-periods` with the real worker. Preserve
-the distinct overtime minimal-receipt contract. Complete source CI after the current
-Reporting/Payroll run terminates; do not cancel it.
+[measurements](measurements/workforce-assurance-2026-10-30.json). Preserved final
+packages are `.work/workforce-audit-2026-10-30/packages`; do not substitute older
+Payroll/Reporting JARs. Preserve overtime's existing minimal-receipt contract.
 
-Follow with full Mobile/Starter review. The read-only foundation comparison found
-657 identical shared files and 60 differences; examined implementation differences
-are HRIS session/feed/API policy, branding and configuration. Remaining test/catalog
-classification is retained under `.work/mobile-starter-audit-2026-10-30`. Mobile
-application/test sources match accepted CI `d170810f`; Starter implementation matches
-accepted `77063862`, with the separately proved hidden-artifact upload follow-up.
-No additional generic port is established. Some Mobile local-first provider status
-paragraphs are stale: actual Android FCM and Google acceptance are already recorded.
+Reporting's local acceptance passes 186 API/eight active worker/52 domain/61 data
+cases and actual private CSV recovery. Payroll passes 682 API/three worker/114
+domain/twelve data cases and seven actual browser workflows. Final Reporting/Payroll
+[CI 41087903927](https://github.com/fajarxfce/hris-platform/actions/runs/41087903927)
+is still running at exact `eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f`; all backend,
+dashboard and recovery jobs pass, with downstream worker/export integration remaining.
+Do not cancel it with a new dispatch. On terminal success, retain all reports and
+accept twelve rows, then dispatch complete Workforce source CI and record its SHA.
+
+Mobile's [fifteen-area review](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/feature-review-2026-10-30.md)
+is committed/pushed at `f4f101a1`; the [applicable Starter review](https://github.com/fajarxfce/compose-fluent-starter/blob/fix/push-token-lifecycle/docs/foundation-review-2026-10-30.md)
+is at `7605916`. All 657 identical shared files and 60 differences are classified;
+shared dependency digests match. No new generic port is required. Their application/
+test trees retain accepted full CI `d170810f` and `77063862`; do not repeat unchanged
+native tests. Historical Android Google/Home/FCM evidence remains accepted; physical
+iPhone testing is waived.
+
+After every final Workforce CI job passes, accept its eight rows and complete a
+fresh quiesced schema-103 recovery checkpoint, retaining separate private keys.
+Then update only API/worker from verified final packages, preserve old image IDs,
+and check health/schema/identity/native-session/document integrity and disabled SMTP.
+The dashboard tree exactly matches deployed `1e0522c0`; the phone app is unchanged.
+Private preparation is under `.work/final-development-rollout`; its checkpoint
+helper has not run. Use captured container IDs with `docker start` for checkpoint
+restart and `compose up -d --no-deps api worker` for the intended image update.
+Update all three Git handoffs and push each commit before closing the actual goal.
+No live changes have occurred for these final corrections.
 
 ## Retained acceptance history
 

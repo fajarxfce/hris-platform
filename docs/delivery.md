@@ -6715,3 +6715,14 @@ eligibility through commit. Original overtime receipt recovery and capture-windo
 policy remain unchanged. [Measurements](measurements/workforce-assurance-2026-10-30.json)
 and [requirement review](workforce-feature-review-2026-10-30.md) retain remaining
 broad/browser/full-CI gates. No live deployment occurred.
+
+## Workforce complete local acceptance — 30 October 2026
+
+Correction `2c2a59e3` passes 369 API, six worker and 61 domain cases plus quality
+and both application packages in 622.192s. Four actual API/browser scenarios pass
+in 66.494s and the worker closing/adjustment scenario in 43.507s. All owned fixture
+containers, metadata/environment files and ports are removed. [The review](workforce-feature-review-2026-10-30.md)
+and [measurements](measurements/workforce-assurance-2026-10-30.json) retain source,
+baseline/final evidence and package hashes. Final full source CI remains required.
+Mobile and applicable Starter reviews are complete at `f4f101a1` and `7605916`;
+no additional generic port is needed. Runtime and the installed phone are unchanged.

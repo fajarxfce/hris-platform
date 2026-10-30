@@ -60,3 +60,12 @@ Preserve their reports and source/package hashes, then run full source CI withou
 cancelling Reporting/Payroll CI `41087903927`. Finish Mobile/applicable Starter
 review before closing the full goal. Historical native evidence is identified in
 the requirement review; no fresh native execution is inferred from backend tests.
+
+## Complete local acceptance
+
+The committed correction `2c2a59e3` passes 369 API, six worker and 61 domain
+cases, architecture/format checks and both packages in 622.192s. Four actual
+normal browser workflows and the real worker closing/adjustment workflow pass;
+[measurements](measurements/workforce-assurance-2026-10-30.json) retain exact
+durations, report hashes, package hashes and complete owned-fixture cleanup.
+Final full source CI remains required before accepting all eight inventory rows.

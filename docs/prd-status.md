@@ -11,29 +11,28 @@ identifies current work and runtime ownership.
 
 ## Active feature audit — 30 October
 
-The [requirement inventory](measurements/feature-audit-2026-10-30.json) now has
-41 accepted initial Platform rows and 20 awaiting completion/review. Approvals,
-Communications, Identity, Expenses, Leave, Documents, People and Administration
-have matching implementation, local acceptance and final-source CI evidence.
-The missing document category and separate identity-validity fields are implemented;
-Mobile final CI and the installed normal private APK are verified in the
-[metadata evidence](measurements/document-metadata-final-ci-2026-10-30.json).
+The [requirement inventory](measurements/feature-audit-2026-10-30.json) retains
+41 accepted initial Platform rows and 20 awaiting final source CI. Reporting,
+Payroll and Workforce now all pass their complete local API/worker/browser gates.
+Workforce's correction `2c2a59e3` passes 369 API, six worker, 61 domain and five
+actual browser workflows; Payroll passes 682 API and seven actual workflows.
+Reporting/Payroll CI `41087903927` is completing downstream integration. Workforce
+full CI must follow it; do not cancel the preceding run or accept rows prematurely.
 
-[Administration](administration-feature-review-2026-10-30.md) passed all ten CI
-jobs at exact source `3c8fb15a`, including 3,015 API cases and 56 actual browser
-scenarios across normal/worker/export configurations, plus isolated schema-103
-recovery. Reporting's five rows have full local acceptance and await later-source
-CI. Payroll's seven rows have forty corrected reproduction failures and focused
-acceptance; its broad API/worker/package run is active at `cca5e151`, followed by
-actual browser acceptance. [Workforce](workforce-audit-2026-10-30.md) has eight
-rows under review. The full Mobile and applicable Starter audit follows.
+Mobile's fifteen-area review and the applicable Starter foundation review are
+complete at `f4f101a1` and `7605916`, against independently accepted unchanged source.
+Their shared 657 files match; all 60 differences and shared dependency verification
+are reviewed. No additional generic port is established. The [Workforce review](workforce-feature-review-2026-10-30.md)
+explicitly distinguishes immutable approved overtime facts from implemented
+attendance adjustments and Payroll financial amendments.
 
-The private runtime remains on accepted metadata packages at schema 103 with
-SMTP disabled; newer Administration/Reporting/Payroll corrections are not deployed.
-Physical iPhone testing is waived; the Apple simulator tests and complete Xcode
-application passed Mobile CI. Earlier history below does not replace this current
-queue or establish whole-product completion.
-
+The private runtime remains on accepted metadata packages at schema 103 and
+dashboard snapshot `1e0522c0`, with SMTP disabled. The final combined API/worker
+update follows complete source CI and a fresh recovery checkpoint. Mobile's accepted
+metadata APK is already installed; actual Android Google/Home and FCM acceptance
+remain valid. Physical iPhone testing is waived; Apple simulator/Xcode builds pass.
+Use [the handoff](agent-handoff.md) for current ownership; older entries below are
+historical acceptance of their stated sources, not the active queue.
 
 ## Release-configuration audit — accepted
 

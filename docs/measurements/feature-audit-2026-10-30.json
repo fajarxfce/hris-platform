@@ -77,7 +77,14 @@
         "Client availability and module flags",
         "Audit search",
         "Durable job foundation"
-      ]
+      ],
+      "detailedReview": {
+        "status": "accepted",
+        "evidence": [
+          "docs/administration-feature-review-2026-10-30.md",
+          "docs/measurements/administration-full-ci-2026-10-30.json"
+        ]
+      }
     },
     {
       "module": "approvals",
@@ -818,7 +825,15 @@
         "Monthly attendance closing",
         "Closed attendance adjustments",
         "Overtime requests"
-      ]
+      ],
+      "detailedReview": {
+        "status": "complete local acceptance; full CI pending",
+        "evidence": [
+          "docs/workforce-feature-review-2026-10-30.md",
+          "docs/measurements/workforce-assurance-2026-10-30.json"
+        ],
+        "overtimeAmendmentBoundary": "No post-approval overtime-fact amendment is specified by the original PRD or implemented. Attendance adjustments and financial Payroll amendments preserve the original overtime facts; see the explicit review boundary."
+      }
     }
   ],
   "findings": [
@@ -1056,9 +1071,46 @@
         "docs/measurements/administration-full-ci-2026-10-30.json"
       ],
       "next": "Complete final Reporting/Payroll source CI and remaining Workforce/Mobile/Starter audit."
+    },
+    {
+      "id": "workforce.completion-assurance",
+      "status": "implemented-and-locally-accepted",
+      "actualFailures": 24,
+      "priorControls": 3,
+      "source": "2c2a59e3",
+      "evidence": [
+        "docs/workforce-audit-2026-10-30.md",
+        "docs/workforce-feature-review-2026-10-30.md",
+        "docs/measurements/workforce-assurance-2026-10-30.json"
+      ],
+      "next": "Complete final source CI and combined private development update."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",
   "physicalIphone": "explicitly waived by user",
-  "productionDeployment": "not requested; configuration observations remain distinct from feature implementation"
+  "productionDeployment": "not requested; configuration observations remain distinct from feature implementation",
+  "mobileReview": {
+    "status": "accepted",
+    "areas": 15,
+    "reviewCommit": "f4f101a1",
+    "fullCiSource": "d170810f03852f46a948f9f4d5dea9ca4104bdbd",
+    "fullCiRun": 41077194465,
+    "evidence": [
+      "https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/feature-review-2026-10-30.md",
+      "https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/measurements/feature-review-2026-10-30.json"
+    ]
+  },
+  "starterReview": {
+    "status": "accepted",
+    "reviewCommit": "7605916",
+    "fullCiSource": "77063862",
+    "fullCiRun": 40916187442,
+    "identicalSharedFiles": 657,
+    "classifiedDifferences": 60,
+    "additionalGenericPortRequired": false,
+    "evidence": [
+      "https://github.com/fajarxfce/compose-fluent-starter/blob/fix/push-token-lifecycle/docs/foundation-review-2026-10-30.md",
+      "https://github.com/fajarxfce/compose-fluent-starter/blob/fix/push-token-lifecycle/docs/measurements/foundation-review-2026-10-30.json"
+    ]
+  }
 }

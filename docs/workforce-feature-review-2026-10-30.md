@@ -1,8 +1,8 @@
 # Workforce requirement review
 
-Review is active. The eight initial requirements and five detailed sections are
-mapped below; 24 completion/input/delegation failures are reproduced and corrected; broad
-validation and final source CI remain required before accepting these rows.
+The eight initial requirements and five detailed sections are mapped below.
+All 24 reproduced completion/input/delegation failures are corrected. Complete
+local acceptance passes; final full source CI remains the acceptance gate.
 
 | Requirement | Implemented surface and matching evidence |
 | --- | --- |
@@ -51,7 +51,7 @@ restarts. Native acceptance is historical and precisely source-scoped. The lates
 full Mobile CI `41077194465` passes all targets, including these maintained test
 suites. No new phone UI exercise or physical iPhone acceptance is claimed here.
 
-## Focused acceptance and remaining gates
+## Complete local acceptance and final CI
 
 The actual SQL baseline ran 27 cases in 60.302s: 24 real behavior failures and
 three already-correct controls, with no fixture errors. The corrected five API
@@ -62,7 +62,24 @@ commands, baseline messages, source hashes and formatting checks. Workforce data
 has no standalone tests; its actual repository behavior is covered by the SQL/API
 suites. No standalone data-test count is claimed.
 
-Run broad Workforce API/domain and worker checks, both packages, the four normal
-actual browser workflows and `work-periods` worker workflow, then final source CI.
-Audit the complete Mobile and applicable Starter contracts before closing the
-workspace objective. No live deployment or new physical device test occurred.
+The broad run at exact `2c2a59e3` passed 369 API, six worker and 61 domain cases,
+architecture/format checks and both application packages in 622.192s.
+Four actual normal browser workflows passed in 66.494s; the real worker closing,
+recovery and closed-day adjustment scenario passed in 43.507s, including setup.
+All reports/package hashes are retained; both owned database containers, fixture
+metadata/environments and four listening ports were removed. Full source CI remains.
+Mobile's fifteen-area review and the applicable Starter review are complete at
+`f4f101a1` and `7605916`; their unchanged implementations retain independent CI
+acceptance. No live deployment or new physical device test occurred.
+
+## Approved overtime boundary
+
+Approved overtime requests retain immutable actual/approved facts. There is no
+post-approval overtime-fact amendment command. The future adjustment note was
+introduced by implementation commit `1019b022`; the original product contract
+`d27c848d` specifies separate requested/actual/approved time, attendance corrections
+and resolution before cutoff, without defining an overtime amendment workflow.
+This review accepts those stated workflows. The implemented closed-attendance
+adjustments and approved Payroll financial amendments do not rewrite an approved
+overtime request. A future overtime-fact amendment needs its own business contract;
+it is not represented here as an implemented feature.

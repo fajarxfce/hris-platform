@@ -1,6 +1,6 @@
 {
   "date": "2026-10-30",
-  "status": "24 reproduced failures corrected; focused acceptance passed; broad/browser/full CI pending",
+  "status": "complete local acceptance; final full source CI pending",
   "baselineSource": "a5927e5d023f3921ebfd37e0d92d6451a84fe783",
   "baseline": {
     "command": [
@@ -480,5 +480,837 @@
       "path": "apps/server/src/test/kotlin/dev/fajar/hris/OvertimeDelegationCompletionTest.kt",
       "sha256": "c328252cdf827007abe2194c373c3b6a88d91b192962af8fda275d6eb75a257c"
     }
-  ]
+  ],
+  "committedSource": "2c2a59e3651e0e08023c40aff5ad9defb43642e2",
+  "broad": {
+    "command": [
+      "./gradlew",
+      ":apps:server:test",
+      "--tests",
+      "dev.fajar.hris.*WorkCalendar*",
+      "--tests",
+      "dev.fajar.hris.*CalendarSource*",
+      "--tests",
+      "dev.fajar.hris.*EmployeeCalendar*",
+      "--tests",
+      "dev.fajar.hris.*ShiftDetails*",
+      "--tests",
+      "dev.fajar.hris.*HolidayDetails*",
+      "--tests",
+      "dev.fajar.hris.*SelfWorkforce*",
+      "--tests",
+      "dev.fajar.hris.*Roster*",
+      "--tests",
+      "dev.fajar.hris.*Attendance*",
+      "--tests",
+      "dev.fajar.hris.*Overtime*",
+      "--tests",
+      "dev.fajar.hris.*WorkPeriod*",
+      ":apps:worker:test",
+      "--tests",
+      "dev.fajar.hris.worker.WorkerIntegrationTest",
+      ":modules:workforce:domain:test",
+      ":modules:workforce:data:test",
+      "architectureCheck",
+      "formatCheck",
+      ":apps:server:bootJar",
+      ":apps:worker:bootJar",
+      "--no-daemon"
+    ],
+    "cwd": "/home/fajar/hris/hris-platform",
+    "sourceAtInvocation": "2c2a59e3651e0e08023c40aff5ad9defb43642e2",
+    "startedAt": "2026-10-30T16:38:04.161324+00:00",
+    "elapsed_seconds": 622.192,
+    "exit_code": 0
+  },
+  "broadReports": {
+    "api": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.ApiContractHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "25.462",
+          "sha256": "ecc9fae5118fe31025600484909ed6efdb0c69d4024e7d49e4b6efebefd95c6f",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceAccessHttpTest",
+          "tests": "9",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.582",
+          "sha256": "f66ec39bd20c3e9962b607badc858c8fa99a3a7735bb6ac13f2bd81e65c4c7a3",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceAdjustmentCompletionTest",
+          "tests": "21",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "18.328",
+          "sha256": "4372f00c8b2154fa48974a3e998a41bb63a4eea89988020b70103c4a22184c5d",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceAdjustmentHttpTest",
+          "tests": "19",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "16.177",
+          "sha256": "1a4951daac4ac2e064956fac4fb022a8916bae67df7ce713194e2caa1fe30d33",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceAssuranceTest",
+          "tests": "16",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.409",
+          "sha256": "db883dfa53ce7fb81b516213000661fa85ada04d6d17d7f1f9535cbd23eff96f",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceClosingEmployeesAccessHttpTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.639",
+          "sha256": "4cd80b410ef01fa41a5add4d38543d2080e0503ad69f23ac09187f77a19b79dd",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceClosingEmployeesHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.47",
+          "sha256": "0004eaf5c0e14f1b152e2b450646bf715fd9b95936d70ecf8a9ee15965ab3542",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceClosingReportAccessHttpTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.339",
+          "sha256": "975b0af30a5d6ff62015ec737762a6f275bb2dab6c9a2b68082d1b7e30db58a4",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceClosingReportHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.883",
+          "sha256": "d49a49121d520aa5d7b921cacc4d024cedfd07f024b882ff60cdf35d3dd18176",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceClosingReportSourceCaptureTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.777",
+          "sha256": "a6596073fdbe5eb072b7131ae09f00bda1ed083daab2f7e090867f249218cd08",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceDayConsistencyTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.037",
+          "sha256": "ace9f8156672def8b9f406ad639942a9af0a6050ca1da8fb0129c907075961ea",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceExceptionAccessHttpTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.303",
+          "sha256": "3a99ea786743595f62eff40ec236a102a432eebe1f59ad3b82919060464f513a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceExceptionHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.18",
+          "sha256": "30b4446d1a6689c227126d7dc7445978ae73cfe82283a2f4c1ab33f41fe021ba",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.403",
+          "sha256": "b660481527a41f70ae5c5486bb39ebd6a6ca7e9d78b623a22a99dd4c0c2ff671",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceReportAccessHttpTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.396",
+          "sha256": "4e9ae4a4e1b4fcdf07dba250761efc394f0f9aaaad57571888d86fc0583d067d",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceReportHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.993",
+          "sha256": "1e1eec326f77433a6f9ef9114cf47056ded613f0a20aed8654bd25945bd03789",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceSyncHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.642",
+          "sha256": "9c671f863481aea8469a79b7595b616fbad5307f5e14f5a9f3b4a02ad7041f86",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.CalendarSourceConsistencyTest",
+          "tests": "9",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.989",
+          "sha256": "a12302baf8a12ab688a0b4bb2fa83f42a06e14ed2218e22bd76271cc2d227d88",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.CalendarSourceSyncHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.665",
+          "sha256": "f5d904ab6daddf9a3d8c91be2c31109fb549ad27a209169afa9337b810a6a1e2",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeCalendarReviewHttpTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.479",
+          "sha256": "704fafa6788c370c08d307f5a6d28103f64c799d5d7659bcc7056177c491cc04",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.HolidayDetailsHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.26",
+          "sha256": "f1809b7c7e4c398426f721319c26ef6198a800d39fc5b8691486523d68d29d26",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.LeaveRequestHttpTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.912",
+          "sha256": "d02c9db6d4b17be3e34b88d4f16764d7b4a33edb7b121c415de0f714ffc384d5",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeAccessHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.856",
+          "sha256": "b5c9ece435c960182c1a3f5f200a85ad48d0335da0de8fb5777ba38ba84f9b80",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeAssuranceTest",
+          "tests": "10",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.099",
+          "sha256": "ca894555c73115709d36b4eec8a7c3f9d0aed27d5e6cb878b91adcc2dbe21170",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeDelegationCompletionTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.465",
+          "sha256": "ac06fe390783178812e516a726b11f96c7136e0eae71e43721614149f7ad7986",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeDelegationHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.511",
+          "sha256": "cf3ace46606bd98ab18c97addfb7816c2cce01f16bacb85fea675329d230fc58",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeLimitsHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.733",
+          "sha256": "58b6f6e63ae36af75aa52db9e6d8ec68eb4b7c3bdc6b4c724485213699af7e1d",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimePlanningAssuranceTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.828",
+          "sha256": "7e092788935ed40e0e5e7dbb2d16db1f26cb8e4aa0cc1aaf8d61a92c9e597925",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimePlanningHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.032",
+          "sha256": "d5cfe9e9c6c7c2964c66c014b2f0aab0386e0e28e1545404734cda71eb563387",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimePlanningRevisionHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.96",
+          "sha256": "d4fef0a11a2d5c600935d7624930b8cf520612cde6d14d8095945daeda08ec3e",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeReadAssuranceTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.116",
+          "sha256": "11ac3716ef93213d37e1a2c78493e4b9fc60e0f2a697f890f82f0cd86427d255",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeReportAccessHttpTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.693",
+          "sha256": "f795b9cf8f5719b82d1ff3905a299160e824376bed44f2b3003e583444981c7f",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeReportHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.082",
+          "sha256": "2310ed1e7186c35e057e1682becb8952a7b3cbe2fcc4c0269dccdb2637f1b3ba",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeSyncHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.963",
+          "sha256": "445c4aa7d1d735882d0ce7659b079f4560866edc0c19ff817b50cd76fe818194",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeTransactionHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.661",
+          "sha256": "bfec9aebad22c3778c616c3e75cde5714223e944cb7c4e8d877aaf857c97383a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeWorkflowHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.998",
+          "sha256": "b697ecc129942454f53671d1d388e406346667dd56e4e3ca7db02ff4b6e81da8",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentAttendanceBoundaryTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.721",
+          "sha256": "8a05f9ed8a0bd4a7552d585637ac2d5ac5eb749a203685cfb6005ba11059b45a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentAttendanceHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.93",
+          "sha256": "f239c335e4924b1cd43e14c2e18e8c3b2176fc475453182edde7f50a4dd52ac5",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentAttendancePublicationTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.262",
+          "sha256": "95819b3cfade77538cd571c413946d3d2b1ebef9a7eccb1376191631ddafff67",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAttendanceCalculationHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "12.3",
+          "sha256": "5c874173e74ca608143c46ec1d5411b7dc3ac835b975177836c6e0309a614d55",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAttendanceInputHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.665",
+          "sha256": "192ec4256de1656319d53b1e4935fbd0cd4a9616bf7177f6f59fdafc56d222c9",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPeriodReviewHttpTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.284",
+          "sha256": "175f22a6ffb199f6e953faeb7532bf2532d792e9e53bad3d1484cd61d8b694c0",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.RosterBulkCompletionTest",
+          "tests": "15",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.235",
+          "sha256": "a21da9ac4dcf20a945d24895dd6a8d170f6e4b0b19591a6c3a4e93f67719b91c",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.RosterBulkHttpTest",
+          "tests": "11",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.815",
+          "sha256": "d4e78f08e54ab7f78207ba84be66a05213cb83e81e8756be0bd9800a6a5e3fa3",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.RosterResetCompletionTest",
+          "tests": "13",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.632",
+          "sha256": "758bbef4799af012ded61715a3aa2e825c007ad133915d0147ab7ea2255abe71",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.RosterResetHttpTest",
+          "tests": "9",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.744",
+          "sha256": "f4009d046a84b9ad4c48a0a4436b52351e3ce8fe33c9ed62a47a2fe799d20007",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.SelfWorkforceHttpTest",
+          "tests": "13",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.425",
+          "sha256": "1315a259c5fbc5fe2d84a6a534feff8c82410607c46c368c881f6720f2c1035e",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.ShiftDetailsHttpTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.848",
+          "sha256": "20228ced60b8c66dbccf9458b2efd0f7ab531b04881e9bbd0941812391507d3a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.WorkCalendarAccessHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.666",
+          "sha256": "91408874de3c246be6cbe7b4cbf32aa487038ffcddfd4fc9b9f6994d0622aa4e",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.WorkCalendarAssuranceTest",
+          "tests": "25",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "16.053",
+          "sha256": "bf7b54f938b9a42ad6a85af4dc690708cfd06a24afa50189b5689dce94010d25",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.WorkCalendarHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "7.426",
+          "sha256": "eb5b9ca0d5e1313c9c1e471de25b53bc6c8cd25e4a405e3c57f770c2e47db273",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.WorkPeriodAccessHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.856",
+          "sha256": "9bfe6c1f2f3dc12d6b28ce8476be2f2451d64050da79d69c12e46ecc55750de0",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.WorkPeriodAssuranceTest",
+          "tests": "18",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "13.844",
+          "sha256": "c3f4fa6e155aa3866046cbcfcc0de53b04f46dd632c340a47feed9a7da2c204d",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.WorkPeriodHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.381",
+          "sha256": "c8309b00bf61d5c041a0ce201877aa1f9e00fcdeac164bb78d1c6aa7da7bc240",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.WorkPeriodOverviewHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.851",
+          "sha256": "2ef2726806e5ecc8a25a192c3e841ff3230e08ec36f464172df70d5fd67f4e1e",
+          "failuresDetail": []
+        }
+      ],
+      "totals": {
+        "tests": 369,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "worker": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.worker.WorkerIntegrationTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "19.735",
+          "sha256": "868d11b94b86fd1435bb48c3e4f59ba75a0511af7eb21eb9d42fe1a4b45c7152",
+          "failuresDetail": []
+        }
+      ],
+      "totals": {
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "domain": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.workforce.domain.AttendanceAccessPolicyTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.055",
+          "sha256": "3f7053ec25458b9d86b62252e72d2568b26aa760dd3544808397efdcf20bef84",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.AttendanceAdjustmentPolicyTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.089",
+          "sha256": "6ff6375a36b828d25d0fa7844f4f4aa58f0bb5c27c76789e5763292d6f80b830",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.AttendanceExceptionPolicyTest",
+          "tests": "11",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.093",
+          "sha256": "4161d2ac707cb905e1f500744473ff53d2e85b5940fd477489c332f64109e00c",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.AttendancePolicyTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.024",
+          "sha256": "533aa3591fa56deee6150341bf83f52c48a0fbc1f5143e42a617866f6ccb9e85",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.CalendarPolicyTest",
+          "tests": "9",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.024",
+          "sha256": "b3a4b33dc73853c2961088d268384782437c767f1425fbc0a1e8a171a37adcf2",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.OvertimePlanningRevisionTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.006",
+          "sha256": "c3248bb6e956217297139ea9e86a34628c8f964867a4c72c4a89a789c9b7172b",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.OvertimePolicyTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.01",
+          "sha256": "ac9448cf0267f9fc5ab249fb2d42ba2a52d818280e95eaf256c11dc0eb38214a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.RosterBulkPolicyTest",
+          "tests": "11",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.02",
+          "sha256": "8565ec1a380cafa6d69b054ca71d9ed9f693742a009dbb610c64fe3750ac7c57",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.WorkPeriodActionsTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.003",
+          "sha256": "eebf0cbddfcb3b24a4cc4fe0fbd427a6f85af0380c8b25113aa3b1914254fc7a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.WorkPeriodPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.006",
+          "sha256": "c52b24a82d9c6349df07613d61d82694af2c8478d1a551b6ad63f215fbe72f4a",
+          "failuresDetail": []
+        }
+      ],
+      "totals": {
+        "tests": 61,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "data": {
+      "suites": [],
+      "totals": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "packages": [
+    {
+      "path": ".work/workforce-audit-2026-10-30/packages/apps-server.jar",
+      "bytes": 97522832,
+      "sha256": "554aca16c3a2631372ac66b25637a97a9845b22be36f08cd684318e4be227314"
+    },
+    {
+      "path": ".work/workforce-audit-2026-10-30/packages/apps-worker.jar",
+      "bytes": 77709672,
+      "sha256": "8ae77d2cc6672433b5b1299eb484e460b64512944793e902e222a0655aea9e93"
+    }
+  ],
+  "browser": {
+    "normal": {
+      "command": {
+        "command": [
+          "npx",
+          "playwright",
+          "test",
+          "--config",
+          "playwright.integration.config.ts",
+          "calendars.spec.ts",
+          "roster-bulk.spec.ts",
+          "attendance.spec.ts",
+          "overtime.spec.ts"
+        ],
+        "cwd": "/home/fajar/hris/hris-platform/apps/dashboard",
+        "sourceAtInvocation": "2c2a59e3651e0e08023c40aff5ad9defb43642e2",
+        "startedAt": "2026-10-30T16:51:28.798064+00:00",
+        "elapsed_seconds": 66.494,
+        "exit_code": 0
+      },
+      "report": {
+        "sourceHtml": "apps/dashboard/integration-report/index.html",
+        "sha256": "cdb5010edae4fe2bfc9295b4a07a8b983303202d513ebcfba3bc2ea7dcb9f9a8",
+        "stats": {
+          "total": 4,
+          "expected": 4,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "duration": 65858.72099999999
+      }
+    },
+    "worker": {
+      "command": {
+        "command": [
+          "npx",
+          "playwright",
+          "test",
+          "--config",
+          "playwright.worker-integration.config.ts",
+          "work-periods.spec.ts"
+        ],
+        "cwd": "/home/fajar/hris/hris-platform/apps/dashboard",
+        "sourceAtInvocation": "2c2a59e3651e0e08023c40aff5ad9defb43642e2",
+        "startedAt": "2026-10-30T16:53:05.441108+00:00",
+        "elapsed_seconds": 43.507,
+        "exit_code": 0
+      },
+      "report": {
+        "sourceHtml": "apps/dashboard/worker-integration-report/index.html",
+        "sha256": "366970d2073367dc6d1ae7b4845a9621359b499a13af0cbdd325f98677a79345",
+        "stats": {
+          "total": 1,
+          "expected": 1,
+          "unexpected": 0,
+          "flaky": 0,
+          "skipped": 0,
+          "ok": true
+        },
+        "duration": 42876.53
+      }
+    }
+  },
+  "fixtureCleanup": {
+    "normalFixtureContainerRemoved": true,
+    "normalMetadataRemoved": true,
+    "normalEnvironmentRemoved": true,
+    "workerFixtureContainerRemoved": true,
+    "workerMetadataRemoved": true,
+    "workerEnvironmentRemoved": true,
+    "port18080Closed": true,
+    "port4174Closed": true,
+    "port18081Closed": true,
+    "port4175Closed": true
+  }
 }

@@ -1,20 +1,18 @@
 # Documents requirement review — 30 October 2026
 
-Four initial rows remain accepted. `documents.02` is reopened after the People
-review found its explicit category subrequirement missing; the earlier review
-below covered classification, references and transport but omitted category.
-[The confirmed gap](document-identity-metadata-gap-2026-10-30.md) also records the
-separate foreign identity/document-validity requirement. Existing assurance and
-transport evidence remains valid: 243 API, 18 domain, nine data, quality/packages
-and four actual browser workflows passed, as did the recorded full CI. That CI
-does not implement the missing metadata. The later [business metadata increment](document-business-metadata.md)
-implements and locally validates backend/dashboard behavior; native upgrade and
-recovery remain pending, so `documents.02` stays unverified.
+All five initial rows and ten original detailed sections are accepted. The earlier
+review omitted the explicit category subrequirement; the subsequent metadata
+implementation adds category, separate identity/printed validity, immutable history
+and owner-authorized corrections. Backend/dashboard, schema-103 recovery, actual
+Android/API offline/replay acceptance and all four replacement Mobile CI jobs now
+pass. [Final evidence](measurements/document-metadata-final-ci-2026-10-30.json)
+retains the failed predecessor and complete build/test outcomes. Earlier assurance,
+resumable transport and full-signature scanner evidence remain independently valid.
 
 | Requirement | Implementation and matching behavior |
 | --- | --- |
 | `documents.01`: metadata, revisions, upload, validation, retention and private content | Document repository/use cases, forced company RLS, immutable revisions, guarded retention and private transports. API access, original-access, retention, retirement and current-assurance suites verify the distinct permissions and transaction boundaries. |
-| `documents.02`: ownership/classification/references, resumable validation and Range/ETag | Upload preparation registers each physical attempt before object I/O. Validation checks the complete manifest, hash, size, detected type and scanner evidence before atomic publication. Upload/validation/body/download suites cover replay and transport; the full-signature workload uploads, validates and downloads two 100 MiB documents and rejects EICAR. |
+| `documents.02`: ownership/category/classification/references, resumable validation and Range/ETag | Versioned business metadata retains separate category and immutable identity/validity corrections with independent native draft/command recovery. Upload preparation registers each physical attempt before object I/O. Validation checks the complete manifest, hash, size, detected type and scanner evidence before atomic publication. Upload/validation/body/download suites cover replay and transport; the full-signature workload uploads, validates and downloads two 100 MiB documents and rejects EICAR. |
 | `documents.03`: abandoned-content cleanup, retained evidence and inspectable failure | Registered cleanup and inventory classify exact known physical attempts conservatively. Business references and accepted revisions prevent deletion; validation failures retain inspection evidence and never replace accepted publication. Inventory bounds/security, reference, retirement/inventory and validation worker suites exercise these paths. Temporary reporting exports retain their separate Reporting ownership and elapsed-time acceptance. |
 | `documents.04`: employee documents, progress, revisions and processing | Dashboard document controllers/pages and native upload/catalog flows. Four actual API/browser workflows exercise resumable upload/cancellation, retention policy, archive/restore/hold and accepted retirement including a competing hold. Native interrupted-upload evidence covers process death, retry, rejected inspection and local cancellation. |
 | `documents.05`: offsets, lost responses, versions/ranges, revocation, scope, limits and interruption | API upload/body/download/original-access and command/read assurance tests exercise these boundaries, including expiry during actual I/O and journal completion. Native interrupted upload retains operation identity; full-signature storage measurements and existing bounded transport tests cover resource limits. |

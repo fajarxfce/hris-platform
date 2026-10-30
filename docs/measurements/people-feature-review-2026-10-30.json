@@ -1,16 +1,15 @@
 {
   "date": "2026-10-30",
-  "status": "four initial rows accepted; people.03 awaits complete replacement Mobile CI",
+  "status": "all five initial rows and fourteen original sections accepted",
   "reviewed_head": "1e0522c0929e324cfaebd3bae717f5caec0e6991",
   "accepted_rows": [
     "people.01",
     "people.02",
+    "people.03",
     "people.04",
     "people.05"
   ],
-  "pending_rows": {
-    "people.03": "Document identity/category/business validity implemented and locally/native accepted; replacement Mobile full CI 41077194465 pending"
-  },
+  "pending_rows": {},
   "source_continuity": {
     "modules/people": {
       "reviewed_tree": "a5a09a74920ed13399ca2b46db380e8fc560c8c2",
@@ -896,5 +895,6 @@
     "Does not complete full Platform/Mobile/Starter audit",
     "Metadata CI and development rollout remain separate",
     "No real provider or phone interaction in this review"
-  ]
+  ],
+  "metadata_final_ci": "docs/measurements/document-metadata-final-ci-2026-10-30.json"
 }

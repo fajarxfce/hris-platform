@@ -15,10 +15,19 @@ Restart each verified existing container with `docker start <container-id>`;
 this installed Compose version has no `start --no-deps` option. Read
 [current runtime](current-development-runtime.md#current-metadata-rollout--30-october-2026)
 and [measurements](measurements/metadata-development-rollout-2026-10-30.json) before
-using older schema-101 status paragraphs below. Phone APK remains `72341ef6`; Mobile
-CI `41077194465` is still active. Administration source corrections are not deployed.
+using older schema-101 status paragraphs below. Phone APK is now application `3c6db4eb`; Mobile
+CI `41077194465` passed all four jobs and its installed binary hash is verified. Administration source corrections are not deployed.
 
 ## Active goal — full feature completion audit
+
+Metadata is fully accepted: [final CI and phone evidence](measurements/document-metadata-final-ci-2026-10-30.json)
+records four passed Mobile jobs, 1,994 desktop/1,676 browser/104 Apple cases, full
+Xcode build and the normal WireGuard APK installed in 5.777s without launching UI.
+Installed hash `1a114fbc388c843b45749a8475296f506563493a38bccabd146323ceb87cf791`
+is verified directly. Both `documents.02` and `people.03` are closed. Reporting's
+seven export policy-completion reproductions now pass focused checks; broader
+verification is active in `.work/reporting-assurance-2026-10-30`. Its two leaf
+use-case corrections are not deployed. Continue remaining PRD scope.
 
 Administration correction `3c8fb15a` is committed/pushed and locally accepted.
 [Full CI 41081153648](https://github.com/fajarxfce/hris-platform/actions/runs/41081153648)
@@ -31,18 +40,18 @@ workflows passed in 65.484s and one actual worker/browser workflow in 60.248s,
 including setup. See [correction](administration-assurance-2026-10-30.md),
 [five-row/six-section review](administration-feature-review-2026-10-30.md) and
 [measurements](measurements/administration-assurance-2026-10-30.json). All five
-Administration inventory rows await terminal full CI; counts remain 34/27.
+Administration inventory rows await terminal full CI; current counts are 36/25.
 No Administration deployment occurred. Continue Reporting, Payroll and Workforce,
 then full Mobile/Starter review while CI runs; do not close the full goal.
 
 
 Complete every specified Platform/Mobile feature and port demonstrated generic
 fixes to Starter. The [full audit](feature-audit-2026-10-30.md) remains active:
-Approvals, Communications, Identity, Expenses, Leave, four Document and four People rows now
-have thirty-four reviewed initial rows; twenty-seven initial rows await completion/review,
+Approvals, Communications, Identity, Expenses, Leave, Documents and People now
+have thirty-six reviewed initial rows; twenty-five initial rows await completion/review,
 followed by Mobile/Starter. Identity, Approvals, Communications, existing Document behavior, Expenses and Leave
-have accepted full-CI evidence. The explicit Document category subrequirement has
-been reopened; see the confirmed metadata gap below.
+have accepted full-CI evidence. The formerly missing Document category and separate
+identity validity now pass complete native and replacement full-CI acceptance.
 Do not mark the goal complete from these increments or earlier green CI.
 
 Announcement email source `8014d733` passed all ten jobs in

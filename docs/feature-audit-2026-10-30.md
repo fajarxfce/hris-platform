@@ -245,3 +245,14 @@ control was already correct. Exact evidence and fixture exclusions are retained 
 [measurements](measurements/administration-assurance-2026-10-30.json). All five
 Administration rows remain unverified until final source CI passes. The current
 inventory remains 34 accepted and 27 unverified rows plus full Mobile/Starter review.
+
+## Metadata gap closed — complete native and full-CI acceptance
+
+Both `documents.02` and `people.03` are accepted. [Final evidence](measurements/document-metadata-final-ci-2026-10-30.json)
+records all four Mobile CI jobs and 1,994 desktop, 1,676 browser and 104 Apple
+simulator cases, with complete Xcode and Android/web/Windows builds. Actual native
+offline/replay/history acceptance remains separately recorded. The normal private
+APK is installed and its hash verified without opening the phone UI. The initial
+feature inventory is now 36 accepted and 25 unverified Platform rows; Administration
+and Reporting final-source checks, Payroll/Workforce and full Mobile/Starter review
+remain active. Physical iPhone testing is waived.

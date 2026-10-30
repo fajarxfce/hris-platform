@@ -251,13 +251,15 @@
         {
           "id": "documents.02",
           "text": "Documents identify owner, category, classification, business resource, and version. Use resumable uploads; validate size/type/content before ready. Authenticate every read and support bounded Range/ETag streaming.",
-          "status": "unverified",
+          "status": "accepted",
           "evidence": [
             "docs/documents-feature-review-2026-10-30.md",
             "docs/measurements/documents-feature-review-2026-10-30.json",
-            "docs/document-identity-metadata-gap-2026-10-30.md"
-          ],
-          "remaining": "Explicit category is absent. Retained upload/classification/content evidence does not establish that requirement."
+            "docs/document-identity-metadata-gap-2026-10-30.md",
+            "docs/native-metadata-acceptance.md",
+            "docs/measurements/document-metadata-final-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-mobile/actions/runs/41077194465"
+          ]
         },
         {
           "id": "documents.03",
@@ -302,14 +304,7 @@
       "detailedReview": {
         "status": "accepted",
         "evidence": "docs/documents-feature-review-2026-10-30.md",
-        "fullCi": {
-          "status": "success",
-          "source": "8e5dd3db49b2568917c44432574f58ce1eae6dae",
-          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41013958569",
-          "jobs": 10,
-          "failed": 0,
-          "scope": "Four backend shards, four dashboard shards, real dashboard integration and recovery integration."
-        }
+        "metadataEvidence": "docs/measurements/document-metadata-final-ci-2026-10-30.json"
       }
     },
     {
@@ -643,14 +638,16 @@
         {
           "id": "people.03",
           "text": "Foreign identity/document expiry and tax residency are separate attributes. Import supports preview, field errors, duplicate detection, and row outcomes. Referenced historical data is archived rather than destroyed.",
-          "status": "unverified",
+          "status": "accepted",
           "evidence": [
             "docs/people-feature-review-2026-10-30.md",
             "docs/measurements/people-feature-review-2026-10-30.json",
             "docs/measurements/people-full-ci-2026-10-30.json",
-            "docs/measurements/native-metadata-2026-10-30.json"
-          ],
-          "remaining": "Document identity/category/business validity implemented and locally/native accepted; replacement Mobile full CI 41077194465 pending"
+            "docs/measurements/native-metadata-2026-10-30.json",
+            "docs/native-metadata-acceptance.md",
+            "docs/measurements/document-metadata-final-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-mobile/actions/runs/41077194465"
+          ]
         },
         {
           "id": "people.04",
@@ -688,7 +685,12 @@
         "Mobile employment discovery",
         "Company employee directory",
         "Public coworker synchronization"
-      ]
+      ],
+      "detailedReview": {
+        "status": "accepted",
+        "evidence": "docs/people-feature-review-2026-10-30.md",
+        "metadataEvidence": "docs/measurements/document-metadata-final-ci-2026-10-30.json"
+      }
     },
     {
       "module": "reporting",
@@ -932,7 +934,7 @@
     },
     {
       "id": "people.read-completion",
-      "status": "implemented-and-locally-accepted",
+      "status": "implemented-and-accepted",
       "baseline": "f95bdd12",
       "requirement": "Current MFA and original/live scope through final People data acquisition, including independent cross-company review.",
       "baselineEvidence": [
@@ -942,9 +944,9 @@
         "docs/people-read-assurance-2026-10-30.md",
         "docs/measurements/people-read-assurance-2026-10-30.json"
       ],
-      "next": "Keep all five People initial rows unverified until command/input, Organization and detailed evidence review complete.",
+      "next": "All five People rows reviewed and accepted; continue remaining modules.",
       "fullCi": {
-        "status": "running",
+        "status": "success",
         "runId": 41032184925,
         "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41032184925",
         "source": "158b81acce89f637dbf715bb573fffb7b99b92c9",
@@ -953,12 +955,12 @@
           "People command and Organization 158b81ac",
           "previous accepted Expense/Leave source"
         ],
-        "remaining": "Observe terminal result without cancelling this same-branch workflow. Continue implementing document category and business validity."
+        "remaining": "None for recorded source; later metadata acceptance is recorded separately."
       }
     },
     {
       "id": "documents.identity-metadata",
-      "status": "confirmed-missing-implementation",
+      "status": "implemented-and-accepted",
       "baseline": "b0b7c21c9fb64e66a15b7ac4899c493e708c77a9",
       "requirements": [
         "documents.02",
@@ -966,13 +968,15 @@
       ],
       "evidence": [
         "docs/document-identity-metadata-gap-2026-10-30.md",
-        "docs/measurements/document-identity-metadata-gap-2026-10-30.json"
+        "docs/measurements/document-identity-metadata-gap-2026-10-30.json",
+        "docs/native-metadata-acceptance.md",
+        "docs/measurements/document-metadata-final-ci-2026-10-30.json"
       ],
-      "next": "Complete People command acceptance, then implement bounded versioned document category/identity/expiry metadata and clients; do not derive tax residency or delete expired evidence."
+      "next": "Complete Administration/Reporting source CI and remaining Payroll/Workforce/Mobile/Starter review."
     },
     {
       "id": "people.command-organization-completion",
-      "status": "implemented-and-locally-accepted",
+      "status": "implemented-and-accepted",
       "baseline": "b0b7c21c",
       "actualFailures": 50,
       "priorControls": 4,
@@ -980,9 +984,9 @@
         "docs/people-command-assurance-2026-10-30.md",
         "docs/measurements/people-command-assurance-2026-10-30.json"
       ],
-      "next": "Dispatch final-source CI and implement the missing document category/identity-validity feature before finishing People review.",
+      "next": "All five People rows reviewed and accepted; continue remaining modules.",
       "fullCi": {
-        "status": "running",
+        "status": "success",
         "runId": 41032184925,
         "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41032184925",
         "source": "158b81acce89f637dbf715bb573fffb7b99b92c9",
@@ -991,7 +995,7 @@
           "People command and Organization 158b81ac",
           "previous accepted Expense/Leave source"
         ],
-        "remaining": "Observe terminal result without cancelling this same-branch workflow. Continue implementing document category and business validity."
+        "remaining": "None for recorded source; later metadata acceptance is recorded separately."
       }
     }
   ],

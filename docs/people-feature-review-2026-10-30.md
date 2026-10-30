@@ -1,10 +1,9 @@
 # People requirement review — 30 October 2026
 
-Four of the five initial People rows are accepted against their implementation and
-matching completed tests. The identity-document part of `people.03` is implemented
-and passes backend/dashboard/local Mobile/native recovery; complete replacement
-Mobile CI remains outstanding. Keep that row unverified until the remaining result
-is checked. This review does not establish completion of the entire product.
+All five initial People rows and fourteen original detailed sections are accepted.
+The identity-document part of `people.03` now has backend/dashboard/local Mobile,
+actual Android/API recovery and complete replacement Mobile CI evidence. This
+review does not establish completion of the entire product.
 
 ## Initial requirements
 
@@ -12,7 +11,7 @@ is checked. This review does not establish completion of the entire product.
 | --- | --- | --- |
 | `people.01` | Organization owns companies and typed branch/department/position/cost-center units; People owns person/employment/reporting history. `PeopleHttpTest` proves append-only effective history, archived-reference replay, foreign-company rejection, concurrent employee-number uniqueness without orphan people, and reporting cycles. `OrganizationReadHttpTest` and the final Organization completion regressions preserve scoped structure and authority. | Accepted |
 | `people.02` | Global person/account identity remains separate from company employee number and employment terms. Payroll owns effective compensation separately. `EmploymentRevisionHttpTest`, `EmploymentCancellationHttpTest`, lifecycle and schedule suites cover probation, contract changes, future cancellation and explicit onboarding/offboarding. `EmploymentTransferHttpTest` and the actual browser transfer preserve person/history, create a distinct destination employment, retain other valid source memberships, serialize competing transfers and roll back both companies on failure. | Accepted |
-| `people.03` | Person nationality, Documents identity/category/printed validity and Payroll verified tax residency have independent models and authority. Import preview/apply/error/duplicate/row-outcome behavior passes actual API/worker tests; historical references are retained through inactive units and ended employment. The new metadata path passes schema-103 restore and actual Android/API recovery after a later admin edit. Complete replacement Mobile CI is still required for this newly implemented subrequirement. | Unverified pending CI |
+| `people.03` | Person nationality, Documents identity/category/printed validity and Payroll verified tax residency have independent models and authority. Import preview/apply/error/duplicate/row-outcome behavior passes actual API/worker tests; historical references are retained through inactive units and ended employment. The new metadata path passes schema-103 restore and actual Android/API recovery after a later admin edit. Replacement Mobile CI `41077194465` passes all four jobs, including the complete Xcode app. | Accepted |
 | `people.04` | Routed company/employee directories, organization catalog/editor, employment/history/profile/transfer tabs, CSV import/preview/results, lifecycle tasks/templates and scheduled changes exist. Their controlled-response browser suites cover original command recovery, scope replacement, hidden/disposed reads and navigation. Five actual API/browser/worker workflows pass for import, transfer, account binding and scheduled onboarding/offboarding. | Accepted |
 | `people.05` | Concurrent uniqueness, same-company references, immutable effective revisions, import lease/replay/rollback and original history are covered by the People/import/transfer suites. `PayrollRunCutoffHttpTest`, `PayrollFinalizationSecurityHttpTest` and immutable finalization evidence prevent changed employment from replacing approved historical payroll. A transfer cannot merge distinct employment identities into a second assessment of the same person. | Accepted |
 
@@ -66,6 +65,7 @@ two offline restarts, original replay, later header/history and binary identity.
 It does not establish antivirus scanning; that remains covered separately by the
 existing Document acceptance. Mobile CI `41071828262` passed 104 Apple cases and
 the complete Xcode simulator app, but Linux failed a browser test deadline.
-The corrected 75-case local browser run passes; replacement `41077194465` remains
-pending. Physical iPhone testing is waived. Deployment state and Google/FCM
+The corrected 75-case local browser run passes; replacement `41077194465` now
+passes all four jobs. [Final evidence](measurements/document-metadata-final-ci-2026-10-30.json)
+retains 1,994 desktop, 1,676 browser and 104 Apple cases plus all build outcomes. Physical iPhone testing is waived. Deployment state and Google/FCM
 acceptance are separate from this requirement review.

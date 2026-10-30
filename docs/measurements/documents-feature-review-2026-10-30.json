@@ -1,8 +1,9 @@
 {
   "date": "2026-10-30",
-  "status": "partially-accepted",
+  "status": "accepted",
   "requirements": [
     "documents.01",
+    "documents.02",
     "documents.03",
     "documents.04",
     "documents.05"
@@ -578,7 +579,7 @@
   ],
   "scannerLimitBaseline": "docs/measurements/documents-2026-10-28-scan-limit.json is failed baseline, not acceptance.",
   "physicalIphone": "explicitly waived",
-  "remaining": "Implement category and related foreign identity/document-validity metadata, then accept documents.02 and complete remaining Platform/Mobile review.",
+  "remaining": [],
   "fullCi": {
     "status": "success",
     "source": "8e5dd3db49b2568917c44432574f58ce1eae6dae",
@@ -590,5 +591,6 @@
   "reopenedRequirements": [
     "documents.02"
   ],
-  "reopeningEvidence": "docs/document-identity-metadata-gap-2026-10-30.md"
+  "reopeningEvidence": "docs/document-identity-metadata-gap-2026-10-30.md",
+  "metadata_final_ci": "docs/measurements/document-metadata-final-ci-2026-10-30.json"
 }

@@ -1,5 +1,13 @@
 # Document category and identity validity — confirmed gap
 
+Current status: `documents.02` and `people.03` are accepted. Backend/dashboard,
+schema-103 restore, actual Android/API offline/original-receipt recovery and final
+Mobile CI `41077194465` passed. [Final evidence](measurements/document-metadata-final-ci-2026-10-30.json)
+retains every terminal CI job/step and verified install-only phone delivery.
+The full inventory now has 36 accepted and 25 unverified Platform rows.
+
+## Original finding and implementation record
+
 Source review at `b0b7c21c` found two related missing requirements. `documents.02`
 requires a category distinct from classification. `people.03` requires separate
 foreign identity/document expiry and tax residency attributes. Document currently

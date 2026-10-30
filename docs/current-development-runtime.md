@@ -13,7 +13,7 @@ API health returned UP and the dashboard returned HTTP 200 with the exact staged
 index hash. SMTP remains disabled. Google binding/person linkage, both active
 native session IDs, document count and the exact binary revision fingerprint were
 unchanged across the update. This is installation/runtime integrity evidence, not
-a new Google sign-in or provider-delivery test. The phone remains on `72341ef6`.
+a new Google sign-in or provider-delivery test. The phone now has application `3c6db4eb`, installed after complete Mobile CI.
 
 A fresh pre-migration checkpoint is private at
 `~/.local/state/hris-platform/recovery-data/dev-before-metadata-20261030T150655`,
@@ -37,10 +37,22 @@ choose the migration window. Never rewind the live database automatically.
 retain exact package/image/checkpoint outcomes. Private `.work/metadata-rollout`
 contains supplementary local diagnostics; it is not required to identify the
 current runtime. Complete Mobile replacement CI and install-only phone delivery
-remain outstanding. The Administration assurance correction is separate work and
+now pass; see the verified installed hash below. The Administration assurance correction is separate work and
 is not included in these runtime images.
 
 ## Latest authorized Android delivery
+
+Mobile application `3c6db4eb` is installed on the authorized WireGuard phone after
+all four jobs in CI `41077194465` passed for `d170810f` (only test/docs changes
+followed that application source). The 34,211,725-byte APK uses the private API and
+registered signing certificate; binary inspection excludes the native fixture API.
+Install-only completed in 5.777s, and the installed `base.apk` SHA-256 is exactly
+`1a114fbc388c843b45749a8475296f506563493a38bccabd146323ceb87cf791`.
+No UI was launched/driven. [Final evidence](measurements/document-metadata-final-ci-2026-10-30.json)
+retains tests/builds, preflight and actual installation. This is not a new Google
+sign-in or FCM delivery observation.
+
+## Previous Android delivery — 29 October 2026
 
 The final dev APK from Mobile application `72341ef6` was installed successfully
 on the connected phone with `--install-only` after Linux/Android CI passed. It

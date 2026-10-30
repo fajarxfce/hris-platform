@@ -176,7 +176,18 @@ class AdministrationConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetCompanyClientPolicyRevision(policies, companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) =
+        GetCompanyClientPolicyRevision(
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            clock,
+        )
 
     @Bean
     fun getClientPolicy(

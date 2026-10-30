@@ -1,0 +1,1126 @@
+{
+  "date": "2026-10-30",
+  "base_head": "44e306c61a30a68ef941cb5244de29e37b1115e6",
+  "status": "local acceptance passed; full source CI pending",
+  "source_sha256": {
+    "modules/administration/data/src/main/kotlin/dev/fajar/hris/administration/data/di/AdministrationConfiguration.kt": "c12e888911db364cc5b22ddbb25b5c6d5b8f14b653792aeabd30ef06d157907c",
+    "modules/administration/domain/src/main/kotlin/dev/fajar/hris/administration/domain/usecases/GetCompanyClientPolicyRevision.kt": "6287f865b183fc2e55c0684e88a95940999372180970be4a4a58c3d9c43b8f14",
+    "modules/administration/domain/src/main/kotlin/dev/fajar/hris/administration/domain/usecases/GetCompanyClientPolicySettings.kt": "b8559e3512593fb133c36f2e33d31fce9b4ee2aef322215061a94e08d374d74f",
+    "modules/administration/domain/src/main/kotlin/dev/fajar/hris/administration/domain/usecases/SaveCompanyClientPolicy.kt": "079143002f4808f75f7655317825480757ff36d0076b56b3f4a4a60de7053a06",
+    "modules/administration/domain/src/main/kotlin/dev/fajar/hris/administration/domain/usecases/SearchAuditEvents.kt": "df76e0afab26ed65709fd5d489467b680280eff483e3d5b6c9206db6a8f00010"
+  },
+  "baseline_classification": {
+    "genuine_failed_cases": 11,
+    "positive_control_cases": 1,
+    "reader_failures": 8,
+    "command_failures": 3,
+    "reader_baseline": "reader-baseline.json",
+    "command_baseline": "corrected-baseline.json",
+    "setup_exclusions": [
+      "audit_cursor first two runs used application time before database audit timestamps; switched to a bounded current instant after seed",
+      "Initial expected MFA error names corrected to existing stable codes before final baseline",
+      "Incorrect formatter task spotlessApply executed no format/test; actual format task passed"
+    ]
+  },
+  "runs": {
+    "baseline": {
+      "command": [
+        "./gradlew",
+        ":apps:server:test",
+        "--tests",
+        "dev.fajar.hris.AdministrationReadCompletionTest",
+        "--tests",
+        "dev.fajar.hris.ClientPolicyCommandCompletionTest",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 46.047,
+      "exit_code": 1
+    },
+    "corrected-baseline": {
+      "command": [
+        "./gradlew",
+        ":apps:server:test",
+        "--tests",
+        "dev.fajar.hris.AdministrationReadCompletionTest",
+        "--tests",
+        "dev.fajar.hris.ClientPolicyCommandCompletionTest",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 42.527,
+      "exit_code": 1
+    },
+    "reader-baseline": {
+      "command": [
+        "./gradlew",
+        ":apps:server:test",
+        "--tests",
+        "dev.fajar.hris.AdministrationReadCompletionTest",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 34.071,
+      "exit_code": 1
+    },
+    "focused": {
+      "command": [
+        "./gradlew",
+        ":apps:server:test",
+        "--tests",
+        "dev.fajar.hris.AdministrationReadCompletionTest",
+        "--tests",
+        "dev.fajar.hris.ClientPolicyCommandCompletionTest",
+        ":modules:administration:domain:test",
+        ":modules:administration:data:test",
+        "architectureCheck",
+        "formatCheck",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 53.571,
+      "exit_code": 0
+    },
+    "broad": {
+      "command": [
+        "./gradlew",
+        ":apps:server:test",
+        "--tests",
+        "dev.fajar.hris.*ClientPolicy*Test",
+        "--tests",
+        "dev.fajar.hris.AdministrationReadCompletionTest",
+        "--tests",
+        "dev.fajar.hris.*Audit*Test",
+        "--tests",
+        "dev.fajar.hris.WorkerIntegrationHttpTest",
+        "--tests",
+        "dev.fajar.hris.IntegrationConfigurationHttpTest",
+        "--tests",
+        "dev.fajar.hris.*Job*Test",
+        ":apps:worker:test",
+        ":modules:administration:domain:test",
+        ":modules:administration:data:test",
+        ":core:jobs:domain:test",
+        ":core:jobs:data:test",
+        "architectureCheck",
+        "formatCheck",
+        ":apps:server:bootJar",
+        ":apps:worker:bootJar",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 242.548,
+      "exit_code": 0
+    },
+    "browser": {
+      "command": [
+        "npx",
+        "playwright",
+        "test",
+        "--config",
+        "playwright.integration.config.ts",
+        "client-policy-jobs.spec.ts",
+        "integration-configuration.spec.ts",
+        "identity.spec.ts"
+      ],
+      "elapsed_seconds": 65.484,
+      "exit_code": 0
+    },
+    "worker-browser": {
+      "command": [
+        "npx",
+        "playwright",
+        "test",
+        "--config",
+        "playwright.worker-integration.config.ts",
+        "worker-integrations.spec.ts"
+      ],
+      "elapsed_seconds": 60.248,
+      "exit_code": 0
+    }
+  },
+  "corrected_reader_baseline": [
+    {
+      "name": "dev.fajar.hris.AdministrationReadCompletionTest",
+      "tests": 8,
+      "failures": 8,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] mode = \"settings_head\"",
+          "result": "failed"
+        },
+        {
+          "name": "[2] mode = \"settings_effective\"",
+          "result": "failed"
+        },
+        {
+          "name": "[3] mode = \"revision_head\"",
+          "result": "failed"
+        },
+        {
+          "name": "[4] mode = \"revision_named\"",
+          "result": "failed"
+        },
+        {
+          "name": "[5] mode = \"audit_page\"",
+          "result": "failed"
+        },
+        {
+          "name": "[6] mode = \"audit_cursor\"",
+          "result": "failed"
+        },
+        {
+          "name": "[1] enrolled = true",
+          "result": "failed"
+        },
+        {
+          "name": "[2] enrolled = false",
+          "result": "failed"
+        }
+      ]
+    }
+  ],
+  "corrected_command_baseline": [
+    {
+      "name": "dev.fajar.hris.ClientPolicyCommandCompletionTest",
+      "tests": 4,
+      "failures": 3,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] enforceMfa = true",
+          "result": "failed"
+        },
+        {
+          "name": "[2] enforceMfa = false",
+          "result": "passed"
+        },
+        {
+          "name": "[1] mode = \"password\"",
+          "result": "failed"
+        },
+        {
+          "name": "[2] mode = \"mfa\"",
+          "result": "failed"
+        }
+      ]
+    }
+  ],
+  "focused_reports": [
+    {
+      "name": "dev.fajar.hris.AdministrationReadCompletionTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] mode = \"settings_head\"",
+          "result": "passed"
+        },
+        {
+          "name": "[2] mode = \"settings_effective\"",
+          "result": "passed"
+        },
+        {
+          "name": "[3] mode = \"revision_head\"",
+          "result": "passed"
+        },
+        {
+          "name": "[4] mode = \"revision_named\"",
+          "result": "passed"
+        },
+        {
+          "name": "[5] mode = \"audit_page\"",
+          "result": "passed"
+        },
+        {
+          "name": "[6] mode = \"audit_cursor\"",
+          "result": "passed"
+        },
+        {
+          "name": "[1] enrolled = true",
+          "result": "passed"
+        },
+        {
+          "name": "[2] enrolled = false",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.ClientPolicyCommandCompletionTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] enforceMfa = true",
+          "result": "passed"
+        },
+        {
+          "name": "[2] enforceMfa = false",
+          "result": "passed"
+        },
+        {
+          "name": "[1] mode = \"password\"",
+          "result": "passed"
+        },
+        {
+          "name": "[2] mode = \"mfa\"",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.administration.data.AuditRepositoryTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "overfetchYieldsABoundedImmutablePageAndAStableLastItemCursor()",
+          "result": "passed"
+        },
+        {
+          "name": "technicalCancellationPropagatesThroughBothReadPaths()",
+          "result": "passed"
+        },
+        {
+          "name": "unexpectedScopeOrOversizedBatchesFailInsideTheDataBoundary()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.administration.data.IntegrationConfigurationTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "startupFlagsAreDetachedAndPublishedAsAnImmutableCompleteSet()",
+          "result": "passed"
+        },
+        {
+          "name": "configurationBindingNeverAcquiresProviderLocationsOrCredentials()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.administration.data.PlatformAccountAccessAuditRepositoryTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "cancellationIsNeverConvertedIntoAReadResult()",
+          "result": "passed"
+        },
+        {
+          "name": "scopeOrShapeMismatchFailsInsideTheMappingBoundary()",
+          "result": "passed"
+        },
+        {
+          "name": "recordedGrantsAreDetachedAndImmutableWithoutReconstructingCurrentState()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.administration.data.PlatformAuditRepositoryTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "overfetchYieldsABoundedImmutablePageAndAStableLastItemCursor()",
+          "result": "passed"
+        },
+        {
+          "name": "oversizedBatchesAndAcquisitionFailuresAreSanitized()",
+          "result": "passed"
+        },
+        {
+          "name": "technicalCancellationPropagatesThroughBothReadPaths()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.administration.data.WorkerIntegrationRepositoryTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "cancellationIsNotTranslatedIntoAHealthyOrEmptyRegistry()",
+          "result": "passed"
+        },
+        {
+          "name": "emptyAndPopulatedSnapshotsKeepTheDatabaseObservationTimeAndImmutableRows()",
+          "result": "passed"
+        },
+        {
+          "name": "oversizedDuplicatedPartialOrMixedTimeSnapshotsNeverBecomeAReview()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.administration.domain.AuditSearchPolicyTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "defaultsAndExplicitBoundsUseFiniteUtcWindowsAndDatabasePrecision()",
+          "result": "passed"
+        },
+        {
+          "name": "paginationAndExactCodeFiltersRejectUnboundedOrMalformedInputs()",
+          "result": "passed"
+        },
+        {
+          "name": "cursorMustBeInsideItsOriginalWindowAndMatchEveryActiveFilter()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.administration.domain.ClientAvailabilityPolicyTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "configurationRejectsUnboundedVersionsWindowsAndTimestamps()",
+          "result": "passed"
+        },
+        {
+          "name": "maintenanceUsesAnExclusiveEndAndCacheFreshnessStopsAtTheNextBoundary()",
+          "result": "passed"
+        },
+        {
+          "name": "defaultPolicyIsFiniteAndTheDisabledSetCannotBeChangedAfterCapture()",
+          "result": "passed"
+        },
+        {
+          "name": "VersionRequirementsAreTransportSpecificAndRemainSeparateFromModuleAvailability()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.administration.domain.WorkerIntegrationPolicyTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "freshnessExpiresAtNinetySecondsAndFutureReportsNeverClaimRecent()",
+          "result": "passed"
+        }
+      ]
+    }
+  ],
+  "broad_reports": {
+    "apps/server": {
+      "totals": {
+        "tests": 81,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "dev.fajar.hris.AdministrationReadCompletionTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "[1] mode = \"settings_head\"",
+            "[2] mode = \"settings_effective\"",
+            "[3] mode = \"revision_head\"",
+            "[4] mode = \"revision_named\"",
+            "[5] mode = \"audit_page\"",
+            "[6] mode = \"audit_cursor\"",
+            "[1] enrolled = true",
+            "[2] enrolled = false"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AuditAccessHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "pendingAuditReadsRejectRevokedPermissionScopeAccountAndCredentialBeforeQuerying()",
+            "anAcquiredPageKeepsItsSnapshotWhileNewEventsCommit()",
+            "auditMfaAssuranceIsRecheckedAfterItsAccessGuardsWerePending()",
+            "cancellationReleasesAccessGuardsAndCannotPublishALateAuditPage()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ClientPolicyAccessHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "effectiveReadsHoldASharedSnapshotGuardUntilNextActivationHasBeenRead()",
+            "databaseRetainsCompanyIsolationImmutableRevisionsAndCompleteHeads()",
+            "pendingCommandsAndOriginalReceiptsLoseAccessAfterPermissionRevocation()",
+            "recentAuthenticationIsRecheckedAfterWaitingAndCancellationRollsBackTheReceipt()",
+            "policyReadsAndBusinessAdmissionRecheckCompanyAndCredentialStateAfterPendingGuards()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ClientPolicyCommandCompletionTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "[1] enforceMfa = true",
+            "[2] enforceMfa = false",
+            "[1] mode = \"password\"",
+            "[2] mode = \"mfa\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ClientPolicyHttpTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "defaultsScheduledActivationAndImmediateSupersessionRetainHistoryAndOriginalReceipts()",
+            "maintenanceHasAnExplicitEndAndDoesNotDisablePolicyOrIdentityRecovery()",
+            "concurrentWritesSerializeWithOneVersionAndFailuresDoNotConsumeReceipts()",
+            "failedAuditRollsBackPolicyHeadRevisionReceiptAndEvent()",
+            "disabledAdmissionPreservesAnOfflineOperationUntilTheCapabilityIsRestored()",
+            "nativeAndBrowserBuildGatesReturnLocalizableCodesAndKeepRecoveryAvailable()",
+            "aNewImmediateRevisionCancelsPreviouslyScheduledPolicyWithoutRewritingIt()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ClientPolicySettingsHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "settingsMfaAssuranceCannotExpireWhileWaitingForThePolicyGuard()",
+            "configuredAndEffectiveRevisionsRemainDistinctAcrossScheduledActivation()",
+            "concurrentChangesCannotMixTheConfiguredHeadWithANewerEffectivePolicy()",
+            "settingsRecheckPermissionMembershipCompanyAccountAndCredentialsBeforeAcquiringConfiguration()",
+            "cancellingASnapshotReadReleasesThePolicyAndAccessGuards()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ClientPolicySyncHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "disabledCapabilitiesCannotBeReadThroughSyncAndReenablingPreservesValidCursors()",
+            "explicitCollectionSelectionCanContinueAnEnabledCapabilityWithoutGrantingOthers()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.IntegrationConfigurationHttpTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "acquisitionFailuresAndCancellationNeverReturnOldConfiguration()",
+            "permissionRevocationWhileWaitingPreventsConfigurationAcquisition()",
+            "publicReviewDisclosesOnlyTheApiRoleTimeAndSixEnablementFlags()",
+            "companyScopeOrMissingOriginalGrantCannotReadConfiguration()",
+            "mfaIsRequiredBeforeAndAfterAcquisitionAndFreshProofAllowsRecovery()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.JobAccessHttpTest",
+          "tests": "12",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "anInflightRequestCannotGainNewJobPermissions()",
+            "[1] operation = \"get\"",
+            "[2] operation = \"list\"",
+            "[3] operation = \"cancel\"",
+            "ownerReadsRejectRevokedCredentialsAndDisabledCompaniesAfterWaiting()",
+            "ownerCleanupDoesNotRequireAFormerBusinessGrantButStillRequiresActiveMembership()",
+            "[1] operation = \"get\"",
+            "[2] operation = \"list\"",
+            "[3] operation = \"cancel\"",
+            "jobActionHintsUseTheOriginalAndCurrentGrantIntersection()",
+            "readsAndCancellationDiscardPermissionsRevokedWhileWaiting()",
+            "expiredAssuranceAfterWaitingCannotReadJobsOrRequestCancellation()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.JobQueueHttpTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "expiredLeasesRejectLateProgressAndBusinessWritesRollBackWithTheFailedFence()",
+            "cancellingAFutureJobWakesCleanupOnceAndDuplicateCancellationPreservesRetryBackoff()",
+            "onlyWorkerCredentialsCanLeaseAndCompetingWorkersRespectGlobalAndCompanyLimits()",
+            "repeatedCrashesStopAfterTheAttemptCeilingAndPreserveTheFailure()",
+            "cancellationIsVersionedAndStopsProgressBeforeTheWorkerAcknowledgesIt()",
+            "futureSchedulesAreNotLeasedAndImmediateJobsDoNotUseTheirCreationDateAsASchedule()",
+            "scheduleCannotBeRewrittenOrAdvancedAndFailedCancellationRollsBackItsWakeup()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PlatformAccountAuditHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "originalCompanyScopeAndEitherMissingGrantFailBeforeAcquisition()",
+            "otherActorDetailRequiresBothGlobalPermissionsAndKeepsSavedValues()",
+            "missingUnsupportedAndMalformedEventsHaveTheSameSafeNotFoundResponse()",
+            "mfaExpiryBeforeOrDuringReadDoesNotPublishHistoricalAccess()",
+            "failuresAndCancellationNeverBecomeASuccessfulDetail()",
+            "revokingEitherGrantDuringAccountWaitPreventsDetailAcquisition()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PlatformAuditHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "filtersAndCursorsCannotBroadenTheSelectedHistory()",
+            "revocationDuringAccountWaitPreventsAnyRead()",
+            "mfaExpiryDuringPageAcquisitionDoesNotPublishMetadata()",
+            "originalScopeGrantAndQueryBoundsAreCheckedBeforeAcquisition()",
+            "failuresAndCancellationDiscardThePage()",
+            "globalReadersSeeOnlyMetadataAcrossActorsWithStableTiedPagination()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.WorkerIntegrationHttpTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "apiDatabaseRoleCannotPublishOrReplaceWorkerReports()",
+            "revokedPermissionWhileWaitingPreventsWorkerObservationAcquisition()",
+            "reviewShowsOnlyBoundedWorkerFlagsAndDatabaseTimesWithExplicitEmptyAndStaleStates()",
+            "missingOriginalGrantCompanyScopeAndCredentialRevocationDenyBeforeAcquisition()",
+            "failuresAndCancellationNeverBecomeAnEmptyHealthyRegistry()",
+            "mfaExpiryDuringAcquisitionDoesNotReleaseAWorkerSnapshotAndFreshProofRecovers()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AuditHttpTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "technicalFailuresRemainSanitizedAndAuditRecoveryRemainsAvailableDuringMaintenance()",
+            "currentAuditAuthorityIsRequiredAndInvalidQueriesCannotReachTheSource()",
+            "exactFiltersAndCursorValidationCannotCrossCompanyOrWindowBoundaries()",
+            "metadataPagesUseTimestampAndUuidOrderWithoutReadingReasonsPayloadsOrGlobalEvents()"
+          ]
+        }
+      ]
+    },
+    "apps/worker": {
+      "totals": {
+        "tests": 105,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      "suites": [
+        {
+          "name": "dev.fajar.hris.worker.AnnouncementPublicationWorkerTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "credentialRevocationStopsExecutionAndCleanupDoesNotRequireRevokedPermission()",
+            "springBatchPublishesOneImmutableInboxUsingRestrictedWorkerCredentials()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.DirectoryProjectionWorkerTest",
+          "tests": "11",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "aPassIsBoundedAndTwoWorkersSkipEachOthersLockedRows()",
+            "stoppingDuringProjectionRollsBackRecordsEventsAndScheduleAndReleasesTheTimer()",
+            "currentCoworkersPublishWhileFutureAndSuspendedEmployeesRemainAbsent()",
+            "changingTheCompanyTimezoneReevaluatesAnAlreadyScheduledStart()",
+            "aWriteWaitingForProjectionCompletionIsStillDueAfterThatCompletion()",
+            "aPassDoesNotExpandItsCompanyScopeBeyondTheDiscoveryLimit()",
+            "anEndDatePublishesATombstoneAndRestoredEmploymentKeepsItsIdentity()",
+            "aCancelledFutureRevisionDoesNotRemoveTheCoworkerAndUnchangedContentDoesNotAdvanceVersion()",
+            "assignmentAndLabelChangesInvalidateOnlyTheirPublicRecords()",
+            "crossCompanyCaptureHasOnlyIdentityAndQueuePrivilegesWithoutABusinessRlsBypass()",
+            "aNameChangeReachesEveryCompanyButPrivateProfileChangesDoNotCreateDirectoryEvents()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.DocumentValidationWorkerTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "interruptedInventoryBatchDiscardsThePageAndAnotherLeaseResumes()",
+            "realBatchInventoryFinishesAnUnknownTotalWithoutWeakeningFixedJobs()",
+            "realBatchTaskScansOutsideTransactionsAndPublishesWithRestrictedCredentials()",
+            "interruptedInspectionClosesTheSessionAndANewLeaseCanRecover()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.EmployeeImportWorkerTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "aNewBatchExecutionResumesAfterTheCommittedRowWithoutRepeatingItsSideEffects()",
+            "realBatchTasksPreviewThenCreateEmployeesWithRestrictedRuntimeCredentials()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.IdentityMailWorkerTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "workerDeadlineAndShutdownReleaseBlockedDeliveriesAndOwnedThreads()",
+            "expiredRevokedAndObsoleteLeasesNeverReachSmtp()",
+            "transientDeliveryIsDeferredButPermanentErrorsAndAttemptExhaustionAreTerminal()",
+            "sendsActualSmtpAfterCommitAndDiscardsCiphertextAfterFencedAcknowledgement()",
+            "lostAcknowledgementCanRepeatDeliveryWithOneStableMessageAndOneCommittedAudit()",
+            "completedTasksCancelTheirTimersAndLateCancellationDoesNotInterruptReusedThreads()",
+            "competingClaimsAndReclamationPreserveFencing()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.InboxEmailWorkerTest",
+          "tests": "10",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "acceptedStateAndProjectionRollBackWithAuditFailureAndCrashedClaimsExhaust()",
+            "disabledDeliveryStillExpiresAndPurgesOperationalRowsWithoutDeletingInbox()",
+            "revokedAccessOrArchivedPublicationPreventsAnotherProviderCall()",
+            "deadlineInterruptsStalledDeliveryWithoutAcknowledgingIt()",
+            "acceptedMailUsesCurrentAddressStableIdentityAndOnlyAnAuthorizedInboxLink()",
+            "actualSmtpAcceptanceAndRejectionUpdateDurableEmailObservations()",
+            "competingWorkersRespectTheDeploymentCapacityAndUniqueLeases()",
+            "transientFailureWaitsAndUsesAFreshLeaseWhilePermanentFailureIsTerminal()",
+            "workerShutdownInterruptsDeliveryAndReleasesItsOwnedExecutors()",
+            "lostSmtpAcknowledgementRepeatsTheMessageIdButNeverAcceptsAnExpiredLease()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.InboxPushWorkerTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "revokedCredentialsOrWithdrawnInboxPreventNewProviderCalls()",
+            "publishedInboxCreatesDurableCheckpointsAndOnlyPreexistingDevicesReceiveHints()",
+            "unregisteredTokenRetirementCannotEraseANewerTokenAndRollsBackIfAcknowledgementFails()",
+            "disabledDeliveryStillExpiresAndPurgesOperationalRowsWithoutDeletingInbox()",
+            "terminalFailureRollbackAndCrashedLeaseExhaustionRemainRecoverableAndBounded()",
+            "retryUsesPersistedTargetBackoffAndANewFencedLease()",
+            "maintenanceCannotFailOrAuditAStaleCheckpointAfterDeliveryProgress()",
+            "workerShutdownInterruptsDeliveryAndReleasesItsOwnedExecutors()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.LeaveBatchWorkerTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "exhaustedProcessLeasesCanBeExplicitlyResumedWithoutRewindingCommittedWork()",
+            "aNewSpringBatchExecutionContinuesAfterACommittedEmployeeWithoutDuplicatingGrant()",
+            "realWorkerTasksAccrueAndCloseBalancesUsingRestrictedRuntimeCredentials()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.LeaveCarryExpiryWorkerTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "aClosingResumedAfterExpiryCannotIntroduceCreditForAnAlreadyProcessedTarget()",
+            "anotherAuthorizedOperatorRecoversOnlyTheUnfinishedPrefix()",
+            "restrictedWorkerSettlesTheOriginalCohortAfterItsCreatorLosesAccess()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.MobileSyncWorkerTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "stoppingDuringPublicationRollsBackTheBatchAndReleasesItsTimerAndDatabaseGuards()",
+            "eachPassHasAFiniteBatchAndTheWorkerDoesNotQueueATaskPerChange()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.NativeSessionCleanupWorkerTest",
+          "tests": "10",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "eachIndependentQueueHasAFiniteLimitAndEventuallyDrains()",
+            "stoppingAPendingPassRollsBackAndReleasesTheThreadQueueAndRowGuards()",
+            "competingWorkersSkipOwnedRowsInsteadOfDuplicatingWork()",
+            "retentionPreservesActiveCredentialsQuotaEvidenceAndRefreshReuseDetection()",
+            "aHeldCredentialOrConsumedHashDoesNotBlockOtherEligibleWork()",
+            "aLateMappingFailureRollsBackAllThreeKindsOfCleanup()",
+            "fixedDelayKeepsOneTaskAndAppliesTheNextBatchOnlyAfterCommit()",
+            "disabledWorkerConfigurationAllocatesNoCleanupTaskAndSchedulingRejectionStopsTheOwner()",
+            "invalidOrFutureCutoffsAndMissingWorkerCapabilityCannotDeleteRows()",
+            "maximumRotationEvidenceCascadesOnlyWithItsExpiredParent()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.ObjectCleanupWorkerTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "stoppingPendingIoLeavesAFencedLeaseAndReleasesThePollingThread()",
+            "expiryCleanupDoesNotRequireTheFormerUploaderToKeepAccountAccess()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.OffboardingScheduleWorkerTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "revokedCredentialsCannotExecuteButScopedCleanupStillClosesTheSchedule()",
+            "cancellingBeforeTheExecutionDateWakesAndStopsTheFutureJob()",
+            "springBatchCompletesAnAdmittedScheduleAfterInteractiveMfaHasExpired()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.OnboardingScheduleWorkerTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "revokedCredentialsCannotExecuteButScopedCleanupStillClosesTheSchedule()",
+            "cancellingBeforeTheExecutionDateWakesAndStopsTheFutureJob()",
+            "springBatchCompletesAnAdmittedScheduleAfterInteractiveMfaHasExpired()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.PayrollCalculationWorkerTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "aNewBatchExecutionUsesTheCommittedCheckpointAfterProcessInterruption()",
+            "revocationStopsTheRunAndANewCredentialCanExplicitlyResumeIt()",
+            "aRealBatchExecutionRetainsPerEmployeeReadinessFailuresAndCompletesMetadata()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "1",
+          "cases": [
+            "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportRetentionWorkerTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "stoppingScheduledCleanupInterruptsAndRollsBackTheOwnedTransaction()",
+            "progressingLargeExportsMoveBehindOlderDueWorkAndCompetingPassesDoNotDoubleRetire()",
+            "boundedCleanupRetiresUnknownFormatsAndReleasesQuotaWithoutRestoringRevokedAccess()",
+            "outstandingObjectCleanupBlocksRetirementWithoutStarvingAnotherDueExport()",
+            "discoveryDoesNotGrantGlobalFactsAndSchedulesCannotBeDeletedBeforePhysicalRetirement()",
+            "failedJournalRollsBackJobCancellationRowsRetirementAndTheSchedule()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportWorkerTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "registeredTaskPublishesThroughRealBatchWithBackgroundAuthorityAndRetainedCleanup()",
+            "credentialChangeBeforeResolutionStillAllowsFencedAbortWithoutContentAccess()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.SelfProfileProjectionWorkerTest",
+          "tests": "13",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "managerEndAndEffectiveEmploymentChangesAreScheduledInCompanyTime()",
+            "assignmentLabelsAndArchiveStatusProduceOneNewRecord()",
+            "aSourceWriteWaitingOnProjectionCompletionStillSchedulesItsNewFacts()",
+            "cancellingAFutureRevisionRetainsCurrentFactsAndRemovesItsDueInstant()",
+            "changingTimezoneCanWithdrawAndRepublishAnEffectiveProfile()",
+            "futureAndUnlinkedEmployeesDoNotPublishPrivateFields()",
+            "captureAndRuntimeRolesCannotReadAnotherCompanyOrPrivatePersonFields()",
+            "stoppingTheWorkerRollsBackItsRecordAndKeepsDueWorkRecoverable()",
+            "concurrentWorkersSkipLockedRowsWithoutDuplicatePublication()",
+            "managerNamesInvalidateDependentsWithoutIncludingManagerPrivateFields()",
+            "eachPassBoundsCompanyDiscoveryAndResumesRemainingRows()",
+            "privateEditsInvalidateSharedPersonsInBothCompaniesWithoutChangingEmploymentVersions()",
+            "privateFieldsAndAssignmentReferencesComeFromOneOwnedProjection()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.WorkerIntegrationObservationTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "concurrentNewProcessesCannotExceedTheRegistryCapacity()",
+            "workerRolePublishesDatabaseTimeAndCannotRewriteItsStartupFlags()",
+            "stoppingTheReporterInterruptsPublicationAndJoinsItsTimerWithoutLateWrites()",
+            "expiredReportsAreReclaimedUsingDatabaseTimeAndFailureRollsBackTheirRemoval()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.WorkerIntegrationTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "realBatchTaskCommitsTheCompanySnapshotAndPersistentBatchMetadata()",
+            "revokedOriginStopsBusinessWorkButFencedCleanupRemainsPossible()",
+            "shutdownInterruptsOwnedWorkAndReleasesEveryWorkerThread()",
+            "lateCancellationCannotInterruptAThreadThatHasMovedToAnotherJob()",
+            "nonProgressingAdapterTerminatesAfterOneStep()",
+            "reportSourcePortUsesTheWorkerTransactionOwner()"
+          ]
+        }
+      ]
+    },
+    "modules/administration/domain": {
+      "totals": {
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "dev.fajar.hris.administration.domain.WorkerIntegrationPolicyTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "freshnessExpiresAtNinetySecondsAndFutureReportsNeverClaimRecent()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.administration.domain.AuditSearchPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "defaultsAndExplicitBoundsUseFiniteUtcWindowsAndDatabasePrecision()",
+            "paginationAndExactCodeFiltersRejectUnboundedOrMalformedInputs()",
+            "cursorMustBeInsideItsOriginalWindowAndMatchEveryActiveFilter()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.administration.domain.ClientAvailabilityPolicyTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "configurationRejectsUnboundedVersionsWindowsAndTimestamps()",
+            "maintenanceUsesAnExclusiveEndAndCacheFreshnessStopsAtTheNextBoundary()",
+            "defaultPolicyIsFiniteAndTheDisabledSetCannotBeChangedAfterCapture()",
+            "VersionRequirementsAreTransportSpecificAndRemainSeparateFromModuleAvailability()"
+          ]
+        }
+      ]
+    },
+    "modules/administration/data": {
+      "totals": {
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "dev.fajar.hris.administration.data.AuditRepositoryTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "overfetchYieldsABoundedImmutablePageAndAStableLastItemCursor()",
+            "technicalCancellationPropagatesThroughBothReadPaths()",
+            "unexpectedScopeOrOversizedBatchesFailInsideTheDataBoundary()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.administration.data.IntegrationConfigurationTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "startupFlagsAreDetachedAndPublishedAsAnImmutableCompleteSet()",
+            "configurationBindingNeverAcquiresProviderLocationsOrCredentials()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.administration.data.PlatformAccountAccessAuditRepositoryTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "cancellationIsNeverConvertedIntoAReadResult()",
+            "scopeOrShapeMismatchFailsInsideTheMappingBoundary()",
+            "recordedGrantsAreDetachedAndImmutableWithoutReconstructingCurrentState()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.administration.data.WorkerIntegrationRepositoryTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "cancellationIsNotTranslatedIntoAHealthyOrEmptyRegistry()",
+            "emptyAndPopulatedSnapshotsKeepTheDatabaseObservationTimeAndImmutableRows()",
+            "oversizedDuplicatedPartialOrMixedTimeSnapshotsNeverBecomeAReview()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.administration.data.PlatformAuditRepositoryTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "overfetchYieldsABoundedImmutablePageAndAStableLastItemCursor()",
+            "oversizedBatchesAndAcquisitionFailuresAreSanitized()",
+            "technicalCancellationPropagatesThroughBothReadPaths()"
+          ]
+        }
+      ]
+    },
+    "core/jobs/domain": {
+      "totals": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "dev.fajar.hris.jobs.domain.JobProgressPolicyTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "cases": [
+            "finiteSourcesCanFinishBeforeTheirSafetyLimitWithoutChangingFixedTotals()",
+            "NeitherModeCanLoopWithoutProgressGoBackwardsOrExceedTheBound()"
+          ]
+        }
+      ]
+    },
+    "packages": {
+      "apps/server/build/libs/apps-server.jar": {
+        "bytes": 97518576,
+        "sha256": "5955ecb1ab4a5b139e743eff038d093b17d911309e10164b52aa172de33721cb"
+      },
+      "apps/worker/build/libs/apps-worker.jar": {
+        "bytes": 77705416,
+        "sha256": "4df993f7b7097b1330bb3f615200df76e8e4026c49b2bbea45a93d5a47fb75b6"
+      }
+    }
+  },
+  "actual_browser": {
+    "normal_cases": 3,
+    "normal_reported_seconds": "1.1m",
+    "normal_elapsed_with_setup_seconds": 65.484,
+    "worker_cases": 1,
+    "worker_reported_seconds": 59.6,
+    "worker_elapsed_with_setup_seconds": 60.248,
+    "retries": 0,
+    "results": "all passed",
+    "fixture_ports_closed": {
+      "18080": true,
+      "18081": true,
+      "4174": true,
+      "4175": true
+    },
+    "worker_database_metadata_removed": true
+  },
+  "limits": [
+    "One elapsed one-hour worker retention case skipped; retains independent accepted elapsed-time evidence",
+    "Private schema-103 metadata API/worker images remain unchanged; new Administration packages are not yet deployed",
+    "Physical phone application unchanged by this Platform correction",
+    "Final full CI not yet accepted"
+  ]
+}

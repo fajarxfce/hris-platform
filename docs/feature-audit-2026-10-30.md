@@ -235,3 +235,13 @@ The current inventory is **34 reviewed/accepted and 27 unverified initial rows**
 Administration, Payroll, Reporting, Workforce and full Mobile/Starter review remain
 active. This review reruns no already accepted source checks and changes no product
 behavior. Preserve the original goal through these increments.
+
+## Administration review — local correction accepted, CI pending
+
+The [five-row/six-section review](administration-feature-review-2026-10-30.md) found
+eleven assurance defects across three private readers and policy saving. All final
+reproductions and broader API/worker/browser checks pass; the ordinary disabled-MFA
+control was already correct. Exact evidence and fixture exclusions are retained in
+[measurements](measurements/administration-assurance-2026-10-30.json). All five
+Administration rows remain unverified until final source CI passes. The current
+inventory remains 34 accepted and 27 unverified rows plus full Mobile/Starter review.

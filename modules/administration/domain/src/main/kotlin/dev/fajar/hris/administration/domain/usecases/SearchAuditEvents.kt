@@ -58,8 +58,24 @@ class SearchAuditEvents(
                 if (input.cursor == null) Result.Success(query)
                 else audits.find(company, input.cursor).flatMap { validateAuditCursor(query, it) }
             if (scoped is Result.Failed) return@run scoped
-            audits.search(company, (scoped as Result.Success).value).map { page ->
-                AuditPage(company, query.from, query.until, now, page.items, page.nextCursor)
+            audits.search(company, (scoped as Result.Success).value).flatMap { page ->
+                validateSessionAssurance(
+                        current.account,
+                        current.securityPermissions,
+                        actor.mfaVerifiedAt,
+                        clock.instant(),
+                        security,
+                    )
+                    .map {
+                        AuditPage(
+                            company,
+                            query.from,
+                            query.until,
+                            now,
+                            page.items,
+                            page.nextCursor,
+                        )
+                    }
             }
         }
     }

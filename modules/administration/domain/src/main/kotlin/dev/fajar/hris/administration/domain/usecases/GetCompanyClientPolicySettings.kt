@@ -55,8 +55,17 @@ class GetCompanyClientPolicySettings(
                 )
             if (assurance is Result.Failed) return@run assurance
             policies.find(company).flatMap { latest ->
-                policies.effective(company, now).map { effective ->
-                    CompanyClientPolicySettings(latest, clientPolicyStatus(effective, now))
+                policies.effective(company, now).flatMap { effective ->
+                    validateSessionAssurance(
+                            current.account,
+                            current.securityPermissions,
+                            actor.mfaVerifiedAt,
+                            clock.instant(),
+                            security,
+                        )
+                        .map {
+                            CompanyClientPolicySettings(latest, clientPolicyStatus(effective, now))
+                        }
                 }
             }
         }

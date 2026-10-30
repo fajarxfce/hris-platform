@@ -77,29 +77,35 @@ class SaveCompanyClientPolicy(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val acquired = identities.access(actor.accountId, company)
+            if (acquired is Result.Failed) return@run acquired
+            val access = (acquired as Result.Success).value
             val authorized =
-                identities
-                    .access(actor.accountId, company)
-                    .flatMap { validateCompanyCommandActor(actor, it) }
-                    .flatMap { live ->
-                        live.requirePermission("settings.manage").flatMap {
-                            if (security.enforceMfa)
-                                requireRecentMfa(
-                                    live,
-                                    clock.instant(),
-                                    security.recentAuthenticationAge,
-                                )
-                            else
-                                requireRecentAuthentication(
-                                    live,
-                                    clock.instant(),
-                                    security.recentAuthenticationAge,
-                                )
-                        }
-                    }
+                validateCompanyCommandActor(actor, access).flatMap { live ->
+                    live.requirePermission("settings.manage").map { live }
+                }
             if (authorized is Result.Failed) return@run authorized
+            val live = (authorized as Result.Success).value
+            val current = requireNotNull(access)
+            fun assurance(): Result<Unit> {
+                val at = clock.instant()
+                return validateSessionAssurance(
+                        current.account,
+                        current.securityPermissions,
+                        actor.mfaVerifiedAt,
+                        at,
+                        security,
+                    )
+                    .flatMap {
+                        if (security.enforceMfa)
+                            requireRecentMfa(live, at, security.recentAuthenticationAge)
+                        else requireRecentAuthentication(live, at, security.recentAuthenticationAge)
+                    }
+            }
+            val checked = assurance()
+            if (checked is Result.Failed) return@run checked
             (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+                return@run assurance().map { _ -> it }
             }
             val found = policies.find(company)
             if (found is Result.Failed) return@run found
@@ -144,7 +150,7 @@ class SaveCompanyClientPolicy(
                             ),
                         )
                     }
-                    .map { receipt }
+                    .flatMap { assurance().map { receipt } }
             }
         }
     }

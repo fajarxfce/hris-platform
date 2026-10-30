@@ -37,9 +37,10 @@ class GetDocumentRetentionHistory(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            identities
-                .access(actor.accountId, company)
-                .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
+            val identity = identities.access(actor.accountId, company)
+            if (identity is Result.Failed) return@run identity
+            val resolved = (identity as Result.Success).value
+            validateCompanySessionActor(actor, resolved, clock.instant(), security)
                 .flatMap { it.requirePermission("documents.retention") }
                 .flatMap {
                     if ((after != null && after !in 0L..9999L) || limit !in 1..200)
@@ -50,6 +51,11 @@ class GetDocumentRetentionHistory(
                         if (document == null)
                             Result.Failed(Failure(FailureKind.NOT_FOUND, "document_not_found"))
                         else retention.history(company, id, after, limit)
+                    }
+                }
+                .flatMap { result ->
+                    validateCompanySessionActor(actor, resolved, clock.instant(), security).map {
+                        result
                     }
                 }
         }

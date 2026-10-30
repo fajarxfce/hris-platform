@@ -23,7 +23,9 @@ The [final assurance correction](approval-read-assurance-2026-10-30.md) and
 its five initial rows and detailed sections. The [Communications review](communications-feature-review-2026-10-30.md)
 also accepts five rows after the read-completion correction. [Identity](identity-feature-review-2026-10-30.md)
 accepts five more against unchanged source and downloaded full-CI results; 46 initial
-rows and Mobile review are still active. Email source `8014d733` passed all ten full-CI jobs;
+rows and Mobile review are still active. [Document read completion](document-read-assurance-2026-10-30.md)
+passed its selected API/domain/data and actual browser acceptance; its command
+review continues before accepting that module. Email source `8014d733` passed all ten full-CI jobs;
 follow final branch CI for the approval increments and continue the remaining scope.
 
 ## Release-configuration audit — accepted

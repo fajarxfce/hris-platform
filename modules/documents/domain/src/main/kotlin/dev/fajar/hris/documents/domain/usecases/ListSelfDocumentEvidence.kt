@@ -47,12 +47,13 @@ class ListSelfDocumentEvidence(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val identity = identities.access(actor.accountId, company)
+            if (identity is Result.Failed) return@run identity
+            val resolved = (identity as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security).flatMap { live
-                        ->
-                        live.requirePermission("documents.self.read").map { live }
-                    }
+                validateCompanySessionActor(actor, resolved, clock.instant(), security).flatMap {
+                    live ->
+                    live.requirePermission("documents.self.read").map { live }
                 }
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
@@ -61,9 +62,22 @@ class ListSelfDocumentEvidence(
             val profile = (found as Result.Success).value
             if (profile?.profile?.accountId != live.accountId)
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
-            documents.published(company, employmentId, classification, after, limit).map {
-                SelfDocumentEvidencePage(live.accountId, company, employmentId, classification, it)
-            }
+            documents
+                .published(company, employmentId, classification, after, limit)
+                .map {
+                    SelfDocumentEvidencePage(
+                        live.accountId,
+                        company,
+                        employmentId,
+                        classification,
+                        it,
+                    )
+                }
+                .flatMap { result ->
+                    validateCompanySessionActor(actor, resolved, clock.instant(), security).map {
+                        result
+                    }
+                }
         }
     }
 }

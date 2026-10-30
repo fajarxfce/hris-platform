@@ -43,10 +43,11 @@ class ReadDocumentContent(
                 if (memberGuard is Result.Failed) return@run memberGuard
                 val accountGuard = identities.lockAccount(actor.accountId, shared = true)
                 if (accountGuard is Result.Failed) return@run accountGuard
+                val identity = identities.access(actor.accountId, company)
+                if (identity is Result.Failed) return@run identity
+                val resolved = (identity as Result.Success).value
                 val current =
-                    identities.access(actor.accountId, company).flatMap {
-                        validateCompanySessionActor(actor, it, clock.instant(), security)
-                    }
+                    validateCompanySessionActor(actor, resolved, clock.instant(), security)
                 if (current is Result.Failed) return@run current
                 val live = (current as Result.Success).value
 
@@ -95,14 +96,18 @@ class ReadDocumentContent(
                         Failure(FailureKind.UNEXPECTED, "document_manifest_invalid")
                     )
                 Result.Success(
-                    DocumentContentPart(
-                        requireNotNull(part.key),
-                        part.offset,
-                        part.size,
-                        part.sha256,
-                        requireNotNull(part.etag),
+                        DocumentContentPart(
+                            requireNotNull(part.key),
+                            part.offset,
+                            part.size,
+                            part.sha256,
+                            requireNotNull(part.etag),
+                        )
                     )
-                )
+                    .flatMap { result ->
+                        validateCompanySessionActor(actor, resolved, clock.instant(), security)
+                            .map { result }
+                    }
             }
         if (prepared is Result.Failed) return prepared
         val part = (prepared as Result.Success).value
@@ -129,10 +134,10 @@ class ReadDocumentContent(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val current =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val identity = identities.access(actor.accountId, company)
+            if (identity is Result.Failed) return@run identity
+            val resolved = (identity as Result.Success).value
+            val current = validateCompanySessionActor(actor, resolved, clock.instant(), security)
             if (current is Result.Failed) return@run current
             val live = (current as Result.Success).value
 
@@ -164,9 +169,14 @@ class ReadDocumentContent(
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "document_not_ready"))
             val from = (offset - part.offset).toInt()
             Result.Success(
-                if (from == 0 && length == bytes.size) bytes
-                else bytes.copyOfRange(from, from + length)
-            )
+                    if (from == 0 && length == bytes.size) bytes
+                    else bytes.copyOfRange(from, from + length)
+                )
+                .flatMap { result ->
+                    validateCompanySessionActor(actor, resolved, clock.instant(), security).map {
+                        result
+                    }
+                }
         }
     }
 }

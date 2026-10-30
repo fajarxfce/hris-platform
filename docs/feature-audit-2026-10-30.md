@@ -120,3 +120,17 @@ Fifteen initial rows are now reviewed and accepted to their recorded local/full-
 scope; 46 remain unverified. Continue Documents and all remaining Platform/Mobile
 requirements. The Communications source `737d39a7` is pushed; its final-source CI
 still follows the running approval acceptance without cancelling it.
+
+## Document read completion — local acceptance passed
+
+The [document correction](document-read-assurance-2026-10-30.md) covers seventeen
+older readers. Twenty actual reproductions found nineteen acquired-data releases
+after MFA expiry and one unnecessary storage read after expired preparation.
+All twenty now pass. Broad acceptance passed 223 API, 18 domain and nine data
+cases, quality/packages, and four actual document browser workflows (42.4s).
+
+Documents remains under review: older upload/validation/inventory and retention
+commands also need late journal, receipt and reservation assurance review. A
+seventeen-case follow-up fixture is prepared; reproduce it before changing those
+commands. Do not mark the five Document rows accepted merely from the read fix.
+Fifteen initial rows remain reviewed; 46 and full Mobile review remain open.

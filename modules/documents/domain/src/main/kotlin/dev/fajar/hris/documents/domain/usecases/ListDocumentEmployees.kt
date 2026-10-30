@@ -53,58 +53,65 @@ class ListDocumentEmployees(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val identity = identities.access(actor.accountId, company)
+            if (identity is Result.Failed) return@run identity
+            val resolved = (identity as Result.Success).value
+            val checked = validateCompanySessionActor(actor, resolved, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             if (!canReadCompanyDocuments(live))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
-            companies.find(company).flatMap { current ->
-                if (current == null)
-                    return@flatMap Result.Failed(
-                        Failure(FailureKind.NOT_FOUND, "company_not_found")
-                    )
-                val now = clock.instant()
-                val today = LocalDate.ofInstant(now, ZoneId.of(current.timezone))
-                val selected =
-                    if (employmentId != null)
-                        people.find(company, employmentId, today).map {
-                            Page(listOfNotNull(it), null)
-                        }
-                    else
-                        people.list(
-                            company,
-                            live.accountId,
-                            EmployeeVisibility.ALL,
-                            today,
-                            now,
-                            search,
-                            after,
-                            limit,
+            companies
+                .find(company)
+                .flatMap { current ->
+                    if (current == null)
+                        return@flatMap Result.Failed(
+                            Failure(FailureKind.NOT_FOUND, "company_not_found")
                         )
-                selected.map { page ->
-                    DocumentEmployeeDirectory(
-                        company,
-                        today,
-                        current.timezone,
-                        search,
-                        Page(
-                            page.items.map { employee ->
-                                DocumentEmployee(
-                                    employee.id,
-                                    employee.employeeNumber,
-                                    employee.person.legalName,
-                                    employee.terms.status,
-                                    employee.version,
-                                )
-                            },
-                            page.nextCursor,
-                        ),
-                    )
+                    val now = clock.instant()
+                    val today = LocalDate.ofInstant(now, ZoneId.of(current.timezone))
+                    val selected =
+                        if (employmentId != null)
+                            people.find(company, employmentId, today).map {
+                                Page(listOfNotNull(it), null)
+                            }
+                        else
+                            people.list(
+                                company,
+                                live.accountId,
+                                EmployeeVisibility.ALL,
+                                today,
+                                now,
+                                search,
+                                after,
+                                limit,
+                            )
+                    selected.map { page ->
+                        DocumentEmployeeDirectory(
+                            company,
+                            today,
+                            current.timezone,
+                            search,
+                            Page(
+                                page.items.map { employee ->
+                                    DocumentEmployee(
+                                        employee.id,
+                                        employee.employeeNumber,
+                                        employee.person.legalName,
+                                        employee.terms.status,
+                                        employee.version,
+                                    )
+                                },
+                                page.nextCursor,
+                            ),
+                        )
+                    }
                 }
-            }
+                .flatMap { result ->
+                    validateCompanySessionActor(actor, resolved, clock.instant(), security).map {
+                        result
+                    }
+                }
         }
     }
 }

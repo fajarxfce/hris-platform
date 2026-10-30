@@ -45,10 +45,10 @@ class GetDocumentRevisions(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val current =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val identity = identities.access(actor.accountId, company)
+            if (identity is Result.Failed) return@run identity
+            val resolved = (identity as Result.Success).value
+            val current = validateCompanySessionActor(actor, resolved, clock.instant(), security)
             if (current is Result.Failed) return@run current
             val live = (current as Result.Success).value
 
@@ -81,13 +81,22 @@ class GetDocumentRevisions(
             val job = if (jobId != null) jobs.find(company, jobId) else Result.Success(null)
             if (job is Result.Failed) return@run job
             Result.Success(
-                Page(
-                    page.items.map {
-                        projectDocumentRevision(it, (job as Result.Success).value, clock.instant())
-                    },
-                    page.nextCursor,
+                    Page(
+                        page.items.map {
+                            projectDocumentRevision(
+                                it,
+                                (job as Result.Success).value,
+                                clock.instant(),
+                            )
+                        },
+                        page.nextCursor,
+                    )
                 )
-            )
+                .flatMap { result ->
+                    validateCompanySessionActor(actor, resolved, clock.instant(), security).map {
+                        result
+                    }
+                }
         }
     }
 }

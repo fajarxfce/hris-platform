@@ -710,6 +710,20 @@
         "docs/measurements/communications-read-assurance-2026-10-30.json"
       ],
       "next": "Follow final-source CI after the predecessor finishes; continue all remaining module and Mobile requirements."
+    },
+    {
+      "id": "documents.read-completion",
+      "status": "implemented-and-locally-accepted",
+      "requirement": "Document metadata, discovery and bytes require current session assurance through final acquisition.",
+      "baseline": "a45d5a9b",
+      "baselineEvidence": [
+        "Nineteen variants returned acquired data after MFA expiry; one started object I/O after expiry during preparation."
+      ],
+      "evidence": [
+        "docs/document-read-assurance-2026-10-30.md",
+        "docs/measurements/document-read-assurance-2026-10-30.json"
+      ],
+      "next": "Reproduce/correct late command assurance and receipt/preparation completion before accepting Documents; follow final-source CI."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

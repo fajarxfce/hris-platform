@@ -55,7 +55,22 @@ eight detailed sections against unchanged source trees and full CI `8014d733`:
 190 API, 35 domain, 22 data and 17 worker cases, plus 95 Chromium scenarios
 (including eight actual API/browser workflows). No new implementation was needed.
 
-Continue Documents, the other module contracts and Mobile behavior. Downloaded
+[Document read completion](document-read-assurance-2026-10-30.md) now passes all
+20 reproductions, 223 API, 18 domain and nine data cases, quality/packages and four
+actual browser workflows (42.4s). Seventeen readers retain final MFA checks,
+including preparation and post-storage completion. No DI/schema change occurred.
+
+Continue **Document command completion**, then remaining module/Mobile contracts.
+An ignored draft at `.work/documents-assurance-2026-10-30/DocumentCommandCompletionTest.kt`
+prepares 17 late-journal, original-receipt and upload-reservation cases. Move it to
+the API test source after committing the read increment, compile/reproduce it,
+then correct the eight interactive commands and test rollback/recovery. It is not
+part of the accepted read suite and has not run yet. In particular, inventory
+receipt replay needs current recent proof, and chunk preparation must not begin
+object I/O after proof expiry. Preserve bounded failed-attempt cleanup. Do not
+accept Documents until the remaining detailed source/behavior review is complete.
+
+Downloaded
 full-CI reports are supplementary local evidence in
 `.work/feature-audit-2026-10-30/ci-8014d733`; parsed backend and browser indexes
 are in `ci-suite-index.json` and `ci-browser-index.json` beside that directory.

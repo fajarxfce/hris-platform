@@ -200,3 +200,13 @@ explicit inspection retry/cancellation and local cleanup. One revision/four chun
 retained single physical attempts; no uninspected evidence was published. The
 scanner-disabled worker and normal administrator cancellation supply the failed
 processing state. Full-signature antivirus acceptance remains the separate workload.
+
+
+## Interactive read completion
+
+Metadata, inventory and retention projections, employee/evidence discovery,
+download metadata and bytes retain current session assurance through successful
+acquisition. Content preparation checks before storage starts, and completion
+checks after its final profile read before returning bytes. Existing scope,
+Range/ETag, part, deadline and transaction boundaries remain. See the
+[correction and acceptance](../document-read-assurance-2026-10-30.md).

@@ -28,11 +28,17 @@ class GetDocumentRetentionPolicies(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            identities
-                .access(actor.accountId, company)
-                .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
+            val identity = identities.access(actor.accountId, company)
+            if (identity is Result.Failed) return@run identity
+            val resolved = (identity as Result.Success).value
+            validateCompanySessionActor(actor, resolved, clock.instant(), security)
                 .flatMap { it.requirePermission("documents.retention") }
                 .flatMap { retention.policies(company) }
+                .flatMap { result ->
+                    validateCompanySessionActor(actor, resolved, clock.instant(), security).map {
+                        result
+                    }
+                }
         }
     }
 }

@@ -20,6 +20,18 @@ CI `41077194465` passed all four jobs and its installed binary hash is verified.
 
 ## Active goal — final source CI and private update
 
+Current CI observation at 17:51 UTC: all eight backend/dashboard shards and
+schema-103 recovery passed in `41094285531`. Its normal browser step has remained
+in progress since 17:31; no terminal test log is available yet (job `124213390227`).
+Occasional GitHub job-list calls return 502. Do not mark this final job accepted.
+A diagnostic reran all 41 actual normal browser workflows against identical source
+locally: all passed in 273.489s, with no failures/retries/skips and complete fixture
+cleanup. [Evidence](measurements/workforce-browser-diagnostic-2026-10-30.json)
+retains source continuity and report hashes. Wait for the current job's terminal
+log, diagnose its outcome and recover the affected CI job as appropriate. No
+application source was changed for this diagnostic and no deployment occurred.
+
+
 All remaining source reviews and local workflows are complete. The inventory is
 now 53 accepted / 8 unverified: Reporting and Payroll are accepted; only
 Workforce awaits its complete source CI. Their detailed reviews map actual behaviors,

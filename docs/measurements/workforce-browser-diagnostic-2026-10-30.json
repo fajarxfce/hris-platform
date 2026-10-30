@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-30",
+  "reason": "Final CI normal browser step remains in progress well beyond the previously observed duration; reproduce all 41 workflows locally without changing application source.",
+  "run": {
+    "command": [
+      "npx",
+      "playwright",
+      "test",
+      "--config",
+      "playwright.integration.config.ts"
+    ],
+    "cwd": "/home/fajar/hris/hris-platform/apps/dashboard",
+    "sourceAtInvocation": "e03fdb1ad13b0f98bb674710d01dd9b6ccbe12c7",
+    "startedAt": "2026-10-30T17:44:20.109359+00:00",
+    "elapsed_seconds": 273.489,
+    "exit_code": 0
+  },
+  "report": {
+    "sourceHtml": "apps/dashboard/integration-report/index.html",
+    "sha256": "9667caa7345385c737ccec8d56b0079519e155f03900065c844960da17c7a3e1",
+    "stats": {
+      "total": 41,
+      "expected": 41,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "ok": true
+    },
+    "duration": 272796.56
+  },
+  "cleanup": {
+    "ownedContainerRemoved": true,
+    "metadataRemoved": true,
+    "environmentRemoved": true,
+    "port18080Closed": true,
+    "port4174Closed": true
+  },
+  "applicationSource": "2c2a59e3651e0e08023c40aff5ad9defb43642e2",
+  "ciSource": "93438f994c43b2bf15ee93120c90a1ea61745217",
+  "sourceContinuity": {
+    "apps": "4179112782de963c2067109ff5e1e0d1d3478237",
+    "modules": "19987900cff7a1d26cf5777d516defde2584d060",
+    "core": "18b92ec2d379b0dc8b5628eeb3815b8b94e2eb5b",
+    "tool": "0854cdd15d26cf32fcc53e2c721b5a22c1e6b256"
+  }
+}

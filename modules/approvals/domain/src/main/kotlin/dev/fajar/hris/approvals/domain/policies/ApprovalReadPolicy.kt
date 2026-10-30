@@ -5,6 +5,23 @@ import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.identity.domain.entities.MemberAccount
 import java.time.Instant
 
+fun isApprovalInboxRecipient(
+    actor: Actor,
+    request: ApprovalRequest,
+    delegations: List<Delegation>,
+    members: List<MemberAccount>,
+    at: Instant,
+): Boolean =
+    (request.status == ApprovalStatus.BLOCKED && "approvals.manage" in actor.permissions) ||
+        (request.status in setOf(ApprovalStatus.PENDING, ApprovalStatus.BLOCKED) &&
+            isAssignedApprover(
+                actor,
+                request.copy(stages = listOf(request.stages[request.currentStep])),
+                delegations,
+                members,
+                at,
+            ))
+
 fun isAssignedApprover(
     actor: Actor,
     request: ApprovalRequest,

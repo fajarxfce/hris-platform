@@ -25,6 +25,13 @@ Commands revalidate account state, credential version, membership, session MFA a
 
 Interactive inbox, request, template, and delegation reads acquire the shared company approval guard before shared company, membership, and actor-account guards. They revalidate current session assurance after acquisition. The approval guard keeps request versions and separately loaded assignment overrides in one coherent observation while allowing concurrent readers. Commands retain their exclusive guard and cannot change assignments between those queries.
 
+All interactive readers now validate session assurance again after successful data
+acquisition, including exact template revisions and assignee lookup. Request and
+inbox readers evaluate delegation at completion. Inbox revalidation keeps the
+current-stage action scope distinct from retained request/history access; a
+changed delegation returns `approval_changed` so the client explicitly refreshes
+instead of receiving a partly authorized page. See [expiry acceptance](../approval-read-assurance-2026-10-30.md).
+
 ## Frozen maker exclusions
 
 Feature use cases can supply at most 200 additional maker account IDs when creating an approval snapshot. These IDs are retained in `excludedAccountIds`; they are not supplied or edited through an HTTP request. Initial assignment, reassignment, direct decisions, delegated decisions, and the actionable inbox all respect them. Exclusion never removes the existing author/requester checks or the consuming feature's current-beneficiary policy. A blocked request remains visible to approval administrators for repair.

@@ -1220,6 +1220,17 @@ Pages retain company-bound cursors and acquire at most twenty requests. Invalid 
 
 This view does not issue a generic approval decision. Leave, expense, overtime, and payroll workflows own their decisions and atomic business consequences. The displayed stages are the current assignment projection, not an invented decision history.
 
+## Approval history
+
+`/approvals/:approvalId/history` reads actual retained decisions and immutable
+approver changes under the same current request authorization. It retains the
+inbox return context and shows original actors, delegated account, reasons and
+company-local instants. Fifty-row reassignment pages pin the observed request
+version. Changed scope or request versions clear the retained observation and
+require explicit refresh. Hiding or replacing the workspace cancels reads; fresh
+foreground admission returns to the current first page. See [history](approval-history.md)
+and [measured acceptance](measurements/approval-history-2026-10-30.json).
+
 ## Approval template administration
 
 `/approvals/templates` requires `approvals.manage`. Its twenty-item pages retain company, approval kind, effective date, and cursor. Detail links expose exact rule revisions. Current name, active status, and editable version are distinguished from the selected rules revision; editing always fetches the latest configuration. Cross-company navigation discards the previous record and cursor.

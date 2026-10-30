@@ -18,8 +18,11 @@ publication capture, bounded SMTP delivery and dashboard observations, with
 module-level summaries below do not replace requirement-by-requirement review.
 [Shared approval history](approval-history.md) closes the next confirmed missing
 reader/dashboard capability, with [local acceptance](measurements/approval-history-2026-10-30.json).
-The older approval readers' final assurance review is next. Continue auditing the
-remaining scope and follow full branch CI.
+The [final assurance correction](approval-read-assurance-2026-10-30.md) and
+[Approvals requirement review](approvals-feature-review-2026-10-30.md) locally accept
+its five initial rows and detailed sections. The remaining 56 initial rows and
+Mobile review are still active. Email source `8014d733` passed all ten full-CI jobs;
+follow final branch CI for the approval increments and continue the remaining scope.
 
 ## Release-configuration audit — accepted
 

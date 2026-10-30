@@ -40,20 +40,22 @@ class ListApprovalAssignees(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val access = identities.access(actor.accountId, company)
+            if (access is Result.Failed) return@run access
+            val resolved = (access as Result.Success).value
+            val checked = validateCompanySessionActor(actor, resolved, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             if (!canSelectApprovalAssignees((checked as Result.Success).value, kind))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
             members
                 .activeReferences(company, approvalPermissions(kind), query.trim(), after, limit)
-                .map { page ->
-                    Page(
-                        page.items.map { ApprovalAssignee(it.id, it.displayName) },
-                        page.nextCursor,
-                    )
+                .flatMap { page ->
+                    validateCompanySessionActor(actor, resolved, clock.instant(), security).map {
+                        Page(
+                            page.items.map { ApprovalAssignee(it.id, it.displayName) },
+                            page.nextCursor,
+                        )
+                    }
                 }
         }
     }

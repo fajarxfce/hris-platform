@@ -33,10 +33,10 @@ class GetApprovalDelegation(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val access = identities.access(actor.accountId, company)
+            if (access is Result.Failed) return@run access
+            val resolved = (access as Result.Success).value
+            val checked = validateCompanySessionActor(actor, resolved, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val permission = live.requirePermission("approvals.read")
@@ -48,7 +48,10 @@ class GetApprovalDelegation(
                             live.accountId !in setOf(delegation.fromAccount, delegation.toAccount))
                 )
                     Result.Failed(Failure(FailureKind.NOT_FOUND, "approval_delegation_not_found"))
-                else Result.Success(delegation)
+                else
+                    validateCompanySessionActor(actor, resolved, clock.instant(), security).map {
+                        delegation
+                    }
             }
         }
     }

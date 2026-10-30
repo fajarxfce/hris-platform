@@ -441,5 +441,12 @@
     "One-hour report retention worker test skipped here; previous elapsed-time acceptance remains separate.",
     "Remaining 61 initial requirements and detailed module/Mobile contracts still require audit.",
     "Full branch CI follows this commit."
-  ]
+  ],
+  "fullCi": {
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41005223374",
+    "source": "8014d733baac391a357a487984174b94e62ffaa3",
+    "conclusion": "success",
+    "jobs": 10,
+    "scope": "four backend shards, four dashboard shards, dashboard integration and independent recovery"
+  }
 }

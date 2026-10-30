@@ -35,10 +35,10 @@ class GetApprovalTemplate(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val access = identities.access(actor.accountId, company)
+            if (access is Result.Failed) return@run access
+            val resolved = (access as Result.Success).value
+            val checked = validateCompanySessionActor(actor, resolved, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val permission = (checked as Result.Success).value.requirePermission("approvals.manage")
             if (permission is Result.Failed) return@run permission
@@ -46,8 +46,12 @@ class GetApprovalTemplate(
                 if (revision == null) approvals.findTemplate(company, id)
                 else approvals.findTemplateRevision(company, id, revision)
             found.flatMap { template ->
-                template?.let { Result.Success(it) }
-                    ?: Result.Failed(Failure(FailureKind.NOT_FOUND, "approval_template_not_found"))
+                if (template == null)
+                    Result.Failed(Failure(FailureKind.NOT_FOUND, "approval_template_not_found"))
+                else
+                    validateCompanySessionActor(actor, resolved, clock.instant(), security).map {
+                        template
+                    }
             }
         }
     }

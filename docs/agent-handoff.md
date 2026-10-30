@@ -9,54 +9,46 @@ preserves earlier work; its old next-step statements are not the active queue.
 
 ## Active goal — full feature completion audit
 
-On 30 October the user asked whether all features are complete and requested a
-long run for anything unfinished. The full requirement review remains active.
-The missing Communications email capability is now implemented and locally
-accepted: optional selection, immutable publication, atomic queue, owned SMTP
-worker, private administrative counts and dashboard authoring/review.
-Read [email delivery](announcement-email.md), its [measurements](measurements/announcement-email-2026-10-30.json)
-and the [full audit](feature-audit-2026-10-30.md). Observe [CI 41005223374](https://github.com/fajarxfce/hris-platform/actions/runs/41005223374)
-for email source `8014d733`; its nine completed jobs are green and the full dashboard
-integration is still running. Do not cancel that run by dispatching another run
-on this branch before it finishes.
+Complete every specified Platform/Mobile feature and port demonstrated generic
+fixes to Starter. The [full audit](feature-audit-2026-10-30.md) remains active:
+Approvals now has five locally accepted initial requirement rows plus all six
+detailed sections; 56 initial rows still await review, followed by Mobile/Starter.
+Do not mark the goal complete from these increments or earlier green CI.
 
-The second confirmed gap, [shared approval history](approval-history.md), is now
-implemented and locally accepted. It reads actual immutable decisions and a bounded
-reassignment page under current request scope, rechecks assurance/delegation after
-I/O, pins continuation to the request version, and provides a scoped EN/ID dashboard
-with owned cancellation and return context. See [measurements](measurements/approval-history-2026-10-30.json):
-118 API/OpenAPI cases, 104 worker cases, 11 approval domain cases, all 4,012 dashboard
-unit cases, 14 distinct Chromium cases and two actual API/browser workflows passed.
-One manual one-hour worker test is skipped and retains its earlier independent proof.
-The first combined acceptance was interrupted; final API and full worker runs were
-separate and passed. No migration, live mail, phone interaction or runtime rollout
-was performed for history.
+Announcement email source `8014d733` passed all ten jobs in
+[CI 41005223374](https://github.com/fajarxfce/hris-platform/actions/runs/41005223374):
+four backend, four dashboard, dashboard integration and recovery. Its optional
+selection, atomic queue, SMTP delivery, administrative observations and recovery
+have [recorded acceptance](measurements/announcement-email-2026-10-30.json).
 
-Continue the full audit. The next source finding is that the seven older approval
-read use cases validate MFA before acquisition but not at completion; request/inbox
-also retain pre-acquisition delegation time. Reproduce these expiry cases, correct
-those readers, and review every remaining module/Mobile requirement. The new history
-reader already has final checks. A local prepared reproduction is supplementary at
-`.work/approval-history-2026-10-30/ApprovalReadCompletionAssuranceTest.kt`; authoritative
-contracts and tests belong in Git with the correction. Do not mark the objective
-complete or mark unreviewed inventory rows accepted.
+[Approval history](approval-history.md) is committed/pushed at `bbb99b48`, with
+118 API/OpenAPI cases, 104 worker cases, 11 then-current domain cases, 4,012 dashboard
+unit cases, 14 distinct Chromium scenarios and two real API/browser workflows.
+One manual one-hour worker test remains covered by its earlier independent run.
+The interrupted combined execution was replaced by successful separate API/worker
+runs; [measurements](measurements/approval-history-2026-10-30.json) retain the details.
 
-Local evidence: 132 API/OpenAPI tests, 104 worker tests, 13 communication domain
-and three repository tests passed; one manual elapsed-retention test remains
-covered by its earlier independent run. All 4,006 dashboard tests and 15 distinct
-Chromium scenarios passed. Real API/worker/SMTP/browser acceptance took 44.1s.
-Schema-102 independent recovery restored email selection/queue/projection and
-forced RLS alongside 104 objects, both identity keys and earlier audit/push facts.
-Twenty-one recovery regressions passed. No real SMTP or phone interaction occurred.
+The next correction completes assurance on the seven older approval readers.
+Ten actual acquisition-expiry reproductions failed at `bbb99b48` and then passed.
+Final acceptance passed 60 approval API cases, 13 domain cases, architecture,
+formatting, both packages and two actual API/browser workflows. Inbox completion
+uses current-stage eligibility; retained request/history scope remains distinct.
+See [correction](approval-read-assurance-2026-10-30.md) and
+[module requirement review](approvals-feature-review-2026-10-30.md).
+Full CI for this final source is the next verification after its commit.
+
+Continue with the remaining Communications requirements, then the other module
+contracts and Mobile behavior. Keep each requirement's matching evidence in the
+inventory. No reusable client correction is due from these server/dashboard changes.
 
 The **private development API still uses schema 101**, SMTP disabled. Preserve its
-accepted Google binding and existing phone session. The dashboard service now has
+accepted Google binding and installed phone session. The dashboard service uses
 `~/.config/systemd/user/hris-dashboard-dev.service.d/20-static-assets.conf`, pointing
-Vite preview at `~/.local/share/hris-dashboard-dev/f91a9bca`. This baseline snapshot
-is compatible with that API and independent of `apps/dashboard/dist`, which tests
-rewrite. Both HTTP endpoints were healthy and its HTML matched the snapshot.
-Future controlled dev rollout must update both API and that explicit asset path;
-a normal local build must never silently replace the served dashboard again.
+Vite preview at `~/.local/share/hris-dashboard-dev/f91a9bca`. This baseline is compatible
+with that API and independent of `apps/dashboard/dist`, which tests rewrite. Both
+endpoints returned HTTP 200 and its index matched that snapshot. Future controlled
+dev rollout must update both API and the explicit static asset path. No live mail,
+phone interaction, production deployment or runtime rollout occurred in this audit.
 
 ## Current user direction — 29 October 2026
 

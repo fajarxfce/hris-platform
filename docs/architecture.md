@@ -27,6 +27,9 @@ Raw queries read only immutable decision/assignment evidence under the shared
 approval guard, followed by company/member/account guards. The use case combines
 that evidence with the current request version, bounds decisions to eight and
 reassignment pages to 200, and checks assurance/delegation expiry after acquisition.
+The older approval readers also validate assurance at completion. Inbox delegated
+admission uses bounded shared repository reads and current-stage policy; lost
+admission returns a conflict without mutating or silently filtering the page.
 Continuation pins the request version. Dashboard history owns one page and cancels
 observations on visibility or scope replacement. See [approval history](approval-history.md).
 

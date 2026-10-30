@@ -58,8 +58,7 @@ An independent schema-102 database/content/key recovery restored exact email
 selection, raw queue and minimal projection, forced RLS and revoked function
 entry, alongside the prior push/account audit records and 104 objects. Twenty-one
 recovery regressions passed. The recovery verifier bound was extended only after
-reviewing the new nonsecret fields. Full branch CI follows the implementation
-commit. The [measurement record](measurements/announcement-email-2026-10-30.json)
+reviewing the new nonsecret fields. Source `8014d733` passed all ten jobs in [full CI](https://github.com/fajarxfce/hris-platform/actions/runs/41005223374). The [measurement record](measurements/announcement-email-2026-10-30.json)
 retains suite counts, findings and practical limits.
 
 The private API remains at schema 101, SMTP disabled, with its accepted Google
@@ -82,7 +81,11 @@ API/OpenAPI tests, 104 worker tests, 11 domain tests and 4,012 dashboard tests p
 14 distinct Chromium scenarios and two actual API/browser workflows passed.
 The request return cursor issue found by the browser test was corrected.
 
-Continue the module review. The older approval readers still need post-acquisition
-MFA/delegation expiry reproduction and correction before their access contract can
-be accepted. Full initial requirement rows remain unverified until their source
-and behavior review is completed; these two gap closures do not close the audit.
+[Read completion](approval-read-assurance-2026-10-30.md) also corrects ten reproduced
+MFA/delegation expiry cases in the older readers. All 60 final approval API cases,
+13 domain cases, quality/package checks and two real browser workflows passed.
+The [Approvals requirement review](approvals-feature-review-2026-10-30.md) maps its
+five initial rows and all six detailed sections to source and matching behavior.
+Those rows are locally accepted; 56 initial rows remain unverified. Follow final
+branch CI and continue Communications, the other modules and Mobile. Closing these
+defects does not close the full objective.

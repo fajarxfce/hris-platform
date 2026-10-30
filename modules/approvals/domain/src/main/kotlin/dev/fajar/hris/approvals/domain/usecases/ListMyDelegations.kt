@@ -32,19 +32,23 @@ class ListMyDelegations(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            identities
-                .access(actor.accountId, company)
-                .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
-                .flatMap { it.requirePermission("approvals.read") }
-                .flatMap {
-                    approvals.delegationPage(
-                        company,
-                        actor.accountId,
-                        clock.instant(),
-                        after,
-                        limit,
-                    )
-                }
+            identities.access(actor.accountId, company).flatMap { resolved ->
+                validateCompanySessionActor(actor, resolved, clock.instant(), security)
+                    .flatMap { it.requirePermission("approvals.read") }
+                    .flatMap {
+                        approvals.delegationPage(
+                            company,
+                            actor.accountId,
+                            clock.instant(),
+                            after,
+                            limit,
+                        )
+                    }
+                    .flatMap { page ->
+                        validateCompanySessionActor(actor, resolved, clock.instant(), security)
+                            .map { page }
+                    }
+            }
         }
     }
 }

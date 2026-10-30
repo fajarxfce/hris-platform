@@ -32,10 +32,10 @@ class GetApprovalRequest(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val access = identities.access(actor.accountId, company)
+            if (access is Result.Failed) return@run access
+            val resolved = (access as Result.Success).value
+            val checked = validateCompanySessionActor(actor, resolved, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val found = approvals.find(company, id)
@@ -50,20 +50,24 @@ class GetApprovalRequest(
                     actor.accountId == request.authorId ||
                     actor.accountId == request.requesterId
             )
-                return@run Result.Success(request)
+                return@run validateCompanySessionActor(actor, resolved, clock.instant(), security)
+                    .map { request }
             val now = clock.instant()
             val delegated = approvals.delegations(company, actor.accountId, now)
             if (delegated is Result.Failed) return@run delegated
             val assigned = request.stages.flatMap { it.assignees }.toSet()
             val grants = members.candidates(company, assigned, emptySet(), assigned.size)
             if (grants is Result.Failed) return@run grants
+            val completedAt = clock.instant()
+            val finalAccess = validateCompanySessionActor(actor, resolved, completedAt, security)
+            if (finalAccess is Result.Failed) return@run finalAccess
             if (
                 isAssignedApprover(
-                    live,
+                    (finalAccess as Result.Success).value,
                     request,
                     (delegated as Result.Success).value,
                     (grants as Result.Success).value,
-                    now,
+                    completedAt,
                 )
             )
                 Result.Success(request)

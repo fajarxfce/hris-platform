@@ -1,6 +1,7 @@
 package dev.fajar.hris.approvals.domain
 
 import dev.fajar.hris.approvals.domain.entities.*
+import dev.fajar.hris.approvals.domain.policies.isApprovalInboxRecipient
 import dev.fajar.hris.approvals.domain.policies.isAssignedApprover
 import dev.fajar.hris.core.domain.Actor
 import dev.fajar.hris.identity.domain.entities.MemberAccount
@@ -52,6 +53,52 @@ class ApprovalReadPolicyTest {
             true,
             0,
         )
+
+    @Test
+    fun inboxEligibilityUsesTheCurrentStageWhileRequestHistoryRetainsPriorAssigneeScope() {
+        val advanced =
+            request.copy(
+                stages = listOf(ApprovalStage(setOf(source)), ApprovalStage(setOf(owner))),
+                currentStep = 1,
+            )
+        assertTrue(isAssignedApprover(actor, advanced, listOf(delegation), listOf(member), now))
+        assertFalse(
+            isApprovalInboxRecipient(actor, advanced, listOf(delegation), listOf(member), now)
+        )
+        assertTrue(
+            isApprovalInboxRecipient(actor, request, listOf(delegation), listOf(member), now)
+        )
+        assertFalse(
+            isApprovalInboxRecipient(
+                actor,
+                request,
+                listOf(delegation),
+                listOf(member),
+                delegation.validUntil,
+            )
+        )
+    }
+
+    @Test
+    fun administratorRepairScopeDoesNotInventPendingAssignmentsOrKeepTerminalRequestsInTheInbox() {
+        val admin = actor.copy(permissions = setOf("approvals.read", "approvals.manage"))
+        val blocked =
+            request.copy(
+                status = ApprovalStatus.BLOCKED,
+                stages = listOf(ApprovalStage(emptySet())),
+            )
+        assertTrue(isApprovalInboxRecipient(admin, blocked, emptyList(), emptyList(), now))
+        assertFalse(isApprovalInboxRecipient(admin, request, emptyList(), emptyList(), now))
+        assertFalse(
+            isApprovalInboxRecipient(
+                actor,
+                request.copy(status = ApprovalStatus.APPROVED),
+                listOf(delegation),
+                listOf(member),
+                now,
+            )
+        )
+    }
 
     @Test
     fun delegationReadAccessExpiresAndRequiresCurrentSourcePermissions() {

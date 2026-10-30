@@ -1,0 +1,163 @@
+{
+  "date": "2026-10-30",
+  "baseline": "bbb99b48",
+  "status": "implemented-and-locally-accepted",
+  "reproduction": {
+    "tests": 10,
+    "failed": 10,
+    "durationSeconds": 40,
+    "scope": [
+      "request review",
+      "current and retained template detail",
+      "template page",
+      "delegation detail/page",
+      "inbox",
+      "assignee lookup",
+      "delegation expiry during request and inbox acquisition"
+    ]
+  },
+  "correctedFocused": {
+    "tests": 10,
+    "failed": 0,
+    "durationSeconds": 41
+  },
+  "correctedFindings": [
+    "A nested template mapping lambda initially returned the validated Actor instead of the template; Kotlin rejected it before tests. Explicit projection corrected the mistake."
+  ],
+  "boundary": {
+    "readOnly": true,
+    "schemaChange": false,
+    "newDiDependencies": false,
+    "maximumDelegationRows": 201,
+    "maximumInboxRows": 200,
+    "noPerRequestQueries": true
+  },
+  "acceptance": {
+    "api": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.ApprovalAccessRaceHttpTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalAdministrationHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalAmountHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalAssuranceTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalCapacityHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalHistoryHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalInactiveScopeHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalReadCompletionAssuranceTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalReadRaceHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 60,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "domain": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.approvals.domain.ApprovalMakerPolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.approvals.domain.ApprovalPolicyTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.approvals.domain.ApprovalReadPolicyTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "durationSeconds": 157,
+    "architecture": true,
+    "format": true,
+    "apiAndWorkerPackages": true,
+    "realApiBrowser": {
+      "tests": 2,
+      "failed": 0,
+      "scenarioSeconds": [
+        10.0,
+        9.9
+      ],
+      "durationWithSetupSeconds": 42.0,
+      "apiJarSha256": "70f462f71f54a96e1452b9d4792d57468bc37ecdd8e6f85c05d0f484c86b3b79"
+    }
+  },
+  "runtime": "private schema-101 stack and phone unchanged; no provider message or deployment"
+}

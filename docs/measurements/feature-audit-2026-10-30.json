@@ -62,32 +62,64 @@
         {
           "id": "approvals.01",
           "text": "Own versioned templates, ordered stages, assignee snapshots, delegation periods, decisions, and inbox projections.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/approvals-feature-review-2026-10-30.md",
+            "modules/approvals/domain/src/main/kotlin/dev/fajar/hris/approvals/domain/policies/ApprovalPolicy.kt",
+            "apps/server/src/test/kotlin/dev/fajar/hris/ApprovalHttpTest.kt",
+            "apps/server/src/test/kotlin/dev/fajar/hris/ApprovalAdministrationHttpTest.kt"
+          ]
         },
         {
           "id": "approvals.02",
           "text": "Conditions can select stages by category/amount and assign manager/role/named users. A valid decision completes its stage. Authors cannot approve their own request. Missing assignees block the request until audited reassignment. Existing requests retain the submitted template.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/approvals-feature-review-2026-10-30.md",
+            "modules/approvals/domain/src/main/kotlin/dev/fajar/hris/approvals/domain/policies/TemplatePolicy.kt",
+            "apps/server/src/test/kotlin/dev/fajar/hris/ApprovalAmountHttpTest.kt",
+            "apps/server/src/test/kotlin/dev/fajar/hris/ApprovalCapacityHttpTest.kt",
+            "apps/dashboard/integration/approval-reassignment.ts"
+          ]
         },
         {
           "id": "approvals.03",
           "text": "Shared transitions are pure policies. Each business module's use case coordinates ApprovalRepository with its own repository inside a transaction; approval never imports feature implementations or invokes their use cases.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/approvals-feature-review-2026-10-30.md",
+            "modules/leave/domain/src/main/kotlin/dev/fajar/hris/leave/domain/usecases/DecideLeaveRequest.kt",
+            "modules/expenses/domain/src/main/kotlin/dev/fajar/hris/expenses/domain/usecases/ReviewExpenseSubmission.kt",
+            "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/DecideOvertimeRequest.kt",
+            "modules/payroll/domain/src/main/kotlin/dev/fajar/hris/payroll/domain/usecases/DecidePayrollReview.kt",
+            "tool/check_architecture.py"
+          ]
         },
         {
           "id": "approvals.04",
           "text": "Screens: inbox, request timeline, templates, delegation, blocked items.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/approvals-feature-review-2026-10-30.md",
+            "apps/dashboard/src/features/approvals/presentation/bindings",
+            "apps/dashboard/tests/approval-history.spec.ts",
+            "apps/dashboard/tests/approvals.spec.ts",
+            "apps/dashboard/integration/approval-delegations.spec.ts",
+            "apps/dashboard/integration/leave-actions.spec.ts"
+          ]
         },
         {
           "id": "approvals.05",
           "text": "Acceptance: competing decisions transition once, expiry/revocation are checked, self approval is denied, and policy edits never modify submitted requests.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/approvals-feature-review-2026-10-30.md",
+            "apps/server/src/test/kotlin/dev/fajar/hris/ApprovalAccessRaceHttpTest.kt",
+            "apps/server/src/test/kotlin/dev/fajar/hris/ApprovalReadRaceHttpTest.kt",
+            "apps/server/src/test/kotlin/dev/fajar/hris/ApprovalAssuranceTest.kt",
+            "apps/server/src/test/kotlin/dev/fajar/hris/ApprovalReadCompletionAssuranceTest.kt",
+            "apps/server/src/test/kotlin/dev/fajar/hris/ApprovalHistoryHttpTest.kt"
+          ]
         }
       ],
       "detailedContractSections": [
@@ -97,7 +129,23 @@
         "Bounded administration and selection",
         "Dashboard",
         "Administration detail and assignee lookup"
-      ]
+      ],
+      "detailedReview": {
+        "status": "locally-accepted",
+        "sections": [
+          "Implementation status",
+          "Access and concurrent changes",
+          "Frozen maker exclusions",
+          "Bounded administration and selection",
+          "Dashboard",
+          "Administration detail and assignee lookup"
+        ],
+        "evidence": [
+          "docs/approvals-feature-review-2026-10-30.md",
+          "docs/measurements/approval-history-2026-10-30.json",
+          "docs/measurements/approval-read-assurance-2026-10-30.json"
+        ]
+      }
     },
     {
       "module": "communications",
@@ -558,9 +606,9 @@
   "findings": [
     {
       "id": "communications.email",
-      "status": "implemented-and-locally-accepted",
+      "status": "accepted",
       "requirement": "Communications channel delivery: FCM/email failures do not erase inbox.",
-      "next": "Observe full branch CI and continue reviewing all module and Mobile requirements; do not mark the full objective complete.",
+      "next": "Continue reviewing all module and Mobile requirements; this capability has local and full CI acceptance.",
       "baselineEvidence": [
         "modules/communications/domain/build.gradle.kts: includes core.push.domain but no core.mail.domain",
         "modules/communications/data/src/main/kotlin/dev/fajar/hris/communications/data/di/CommunicationsConfiguration.kt: push delivery bindings only",
@@ -569,14 +617,15 @@
       ],
       "evidence": [
         "docs/announcement-email.md",
-        "docs/measurements/announcement-email-2026-10-30.json"
+        "docs/measurements/announcement-email-2026-10-30.json",
+        "https://github.com/fajarxfce/hris-platform/actions/runs/41005223374"
       ]
     },
     {
       "id": "approvals.history",
       "status": "implemented-and-locally-accepted",
       "requirement": "Approvals request timeline with retained decisions and reassignment facts.",
-      "next": "Reproduce final-assurance gaps in older approval readers, then continue full module/Mobile review and branch CI.",
+      "next": "Follow final branch CI and continue remaining module/Mobile requirements; approval read completion is now locally accepted.",
       "baselineEvidence": [
         "docs/approval-history-audit-2026-10-30.md",
         "modules/approvals/delivery/src/main/kotlin/dev/fajar/hris/approvals/delivery/responses/ApprovalResponse.kt",
@@ -587,6 +636,20 @@
         "docs/approval-history.md",
         "docs/measurements/approval-history-2026-10-30.json"
       ]
+    },
+    {
+      "id": "approvals.read-completion",
+      "status": "implemented-and-locally-accepted",
+      "requirement": "Read authority and delegation eligibility must remain valid after acquisition.",
+      "baseline": "bbb99b48",
+      "baselineEvidence": [
+        "Ten PostgreSQL-backed expiry tests returned acquired data after MFA/delegation expiry."
+      ],
+      "evidence": [
+        "docs/approval-read-assurance-2026-10-30.md",
+        "docs/measurements/approval-read-assurance-2026-10-30.json"
+      ],
+      "next": "Follow final branch CI and continue the remaining module and Mobile audit."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

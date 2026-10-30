@@ -159,8 +159,12 @@ hashes. Dashboard passes 4,054 unit cases, 25 mocked and five distinct actual br
 workflows. Exact failed attempts and fixture-only corrections are retained in
 [measurements](measurements/document-business-metadata-2026-10-30.json).
 
-Next: push this atomic increment, run full Verify without cancelling an active run,
-then implement HRIS Mobile metadata and its encrypted catalog upgrade. Older clients
+Metadata increment `27e7f77e` is committed/pushed. Exact source
+`27e7f77e722da9e8ac2bde47836353ef92dcc3b3` is running in
+[CI 41038369597](https://github.com/fajarxfce/hris-platform/actions/runs/41038369597).
+Observe its terminal result without cancelling it with a same-branch dispatch.
+
+Next: implement HRIS Mobile metadata and its encrypted catalog upgrade. Older clients
 may already have consumed the same document version; the new client must explicitly
 refresh that projection while retaining owned old facts. Keep shared finance/leave
 DocumentEvidence free of private identity numbers. Add capability-aware initial

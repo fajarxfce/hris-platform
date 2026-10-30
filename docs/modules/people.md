@@ -224,3 +224,14 @@ actual expiry cases across twenty-four readers, including both transfer-review
 company scopes. Retained guarded identity snapshots avoid additional queries;
 final assurance precedes successful data release. Command/input and Organization
 review remain separate outstanding work in the full feature audit.
+
+## Command and Organization completion
+
+[Completion assurance](../people-command-assurance-2026-10-30.md) retains current
+session/recent proof and enrollment through journals and original receipts.
+Lifecycle collection inputs are owned before waits. Immediate transfer and future
+revision cancellation retain company-date eligibility for new writes; old receipts
+remain recoverable after dates change. Organization company/unit operations use
+the same current assurance policy, with actual API and worker contexts validated.
+The missing [document identity metadata](../document-identity-metadata-gap-2026-10-30.md)
+remains separate outstanding feature work.

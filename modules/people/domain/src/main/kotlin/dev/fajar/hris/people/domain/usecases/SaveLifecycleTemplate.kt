@@ -31,11 +31,14 @@ class SaveLifecycleTemplate(
     ): Result<MutationReceipt> {
         val access = actor.requirePermission("people.lifecycle.manage")
         if (access is Result.Failed) return access
+        if (template.tasks.size > 64)
+            return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_lifecycle_template"))
         val normalized =
             template.copy(
                 code = template.code.trim().uppercase(),
                 name = template.name.trim(),
                 version = expectedVersion ?: 0,
+                tasks = template.tasks.toList(),
             )
         val valid = validateLifecycleTemplate(normalized, reason)
         if (valid is Result.Failed) return valid
@@ -55,7 +58,7 @@ class SaveLifecycleTemplate(
                     expectedVersion?.toString(),
                     reason,
                 ) +
-                    template.tasks.flatMap {
+                    normalized.tasks.flatMap {
                         listOf(it.key, it.title, it.required.toString(), it.dueDays.toString())
                     },
             )
@@ -70,10 +73,11 @@ class SaveLifecycleTemplate(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val permission = live.requirePermission("people.lifecycle.manage")
@@ -121,7 +125,15 @@ class SaveLifecycleTemplate(
                             ),
                         )
                     }
-                    .map { receipt }
+                    .flatMap {
+                        validateCompanySessionActor(
+                                actor,
+                                identityAccess,
+                                clock.instant(),
+                                security,
+                            )
+                            .map { receipt }
+                    }
             }
         }
     }

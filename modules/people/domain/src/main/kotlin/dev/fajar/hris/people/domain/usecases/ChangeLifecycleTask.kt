@@ -71,10 +71,11 @@ class ChangeLifecycleTask(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val manager = "people.lifecycle.manage" in live.permissions
@@ -99,7 +100,13 @@ class ChangeLifecycleTask(
                     Failure(FailureKind.FORBIDDEN, "lifecycle_task_not_assigned")
                 )
             (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+                return@run validateCompanySessionActor(
+                        actor,
+                        identityAccess,
+                        clock.instant(),
+                        security,
+                    )
+                    .map { _ -> it }
             }
             if (case.version != command.expectedVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
@@ -148,7 +155,15 @@ class ChangeLifecycleTask(
                             ),
                         )
                     }
-                    .map { receipt }
+                    .flatMap {
+                        validateCompanySessionActor(
+                                actor,
+                                identityAccess,
+                                clock.instant(),
+                                security,
+                            )
+                            .map { receipt }
+                    }
             }
         }
     }

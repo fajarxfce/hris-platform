@@ -54,10 +54,11 @@ class CancelEmploymentRevision(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val checked =
-                identities
-                    .access(actor.accountId, company)
-                    .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
                     .flatMap { it.requirePermission("people.manage") }
             if (checked is Result.Failed) return@run checked
             (replay as Result.Success).value?.let {
@@ -112,7 +113,22 @@ class CancelEmploymentRevision(
                             ),
                         )
                     }
-                    .map { receipt }
+                    .flatMap {
+                        val completedAt = clock.instant()
+                        validateCompanySessionActor(actor, identityAccess, completedAt, security)
+                            .flatMap {
+                                val completedDate =
+                                    LocalDate.ofInstant(completedAt, ZoneId.of(timezone))
+                                if (!current.terms.effectiveFrom.isAfter(completedDate))
+                                    Result.Failed(
+                                        Failure(
+                                            FailureKind.CONFLICT,
+                                            "effective_revision_cannot_be_cancelled",
+                                        )
+                                    )
+                                else Result.Success(receipt)
+                            }
+                    }
             }
         }
     }

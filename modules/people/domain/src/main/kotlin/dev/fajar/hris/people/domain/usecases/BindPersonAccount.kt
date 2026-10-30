@@ -4,6 +4,7 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.requireRecentAuthentication
 import dev.fajar.hris.identity.domain.policies.requireRecentMfa
+import dev.fajar.hris.identity.domain.policies.validateSessionAssurance
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.*
@@ -89,6 +90,15 @@ class BindPersonAccount(
                 return@run Result.Failed(
                     Failure(FailureKind.FORBIDDEN, "person_account_link_access_required")
                 )
+            val session =
+                validateSessionAssurance(
+                    access.account,
+                    access.securityPermissions,
+                    actor.mfaVerifiedAt,
+                    clock.instant(),
+                    security,
+                )
+            if (session is Result.Failed) return@run session
             val recent =
                 if (security.enforceMfa)
                     requireRecentMfa(actor, clock.instant(), security.recentAuthenticationAge)
@@ -144,7 +154,30 @@ class BindPersonAccount(
                                 ),
                             )
                         }
-                        .map { receipt }
+                        .flatMap {
+                            validateSessionAssurance(
+                                    access.account,
+                                    access.securityPermissions,
+                                    actor.mfaVerifiedAt,
+                                    clock.instant(),
+                                    security,
+                                )
+                                .flatMap {
+                                    if (security.enforceMfa)
+                                        requireRecentMfa(
+                                            actor,
+                                            clock.instant(),
+                                            security.recentAuthenticationAge,
+                                        )
+                                    else
+                                        requireRecentAuthentication(
+                                            actor,
+                                            clock.instant(),
+                                            security.recentAuthenticationAge,
+                                        )
+                                }
+                                .map { receipt }
+                        }
                 }
         }
     }

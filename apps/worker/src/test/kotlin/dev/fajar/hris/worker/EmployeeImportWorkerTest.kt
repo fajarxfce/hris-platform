@@ -76,7 +76,7 @@ class EmployeeImportWorkerTest {
             )
         database()
             .update(
-                "insert into accounts(id,email,display_name) values(?,?,'Import operator')",
+                "insert into accounts(id,email,display_name,mfa_secret_encrypted) values(?,?,'Import operator','fixture-enrolled')",
                 account,
                 "$account@example.test",
             )
@@ -106,10 +106,9 @@ class EmployeeImportWorkerTest {
         val id = UUID.randomUUID()
         val csv =
             "employee_number,legal_name,nationality,start_date,contract\nE01,Alya,ID,2026-01-01,PERMANENT\nE02,Raka,ID,2026-01-01,PERMANENT"
-        assertTrue(
+        val admitted =
             start.execute(actor, UUID.randomUUID(), id, "employees.csv", csv, "Worker import test")
-                is Result.Success
-        )
+        assertTrue(admitted is Result.Success, admitted.toString())
         return actor to id
     }
 

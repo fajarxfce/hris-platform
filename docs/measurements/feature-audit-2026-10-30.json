@@ -938,6 +938,18 @@
         "docs/measurements/document-identity-metadata-gap-2026-10-30.json"
       ],
       "next": "Complete People command acceptance, then implement bounded versioned document category/identity/expiry metadata and clients; do not derive tax residency or delete expired evidence."
+    },
+    {
+      "id": "people.command-organization-completion",
+      "status": "implemented-and-locally-accepted",
+      "baseline": "b0b7c21c",
+      "actualFailures": 50,
+      "priorControls": 4,
+      "evidence": [
+        "docs/people-command-assurance-2026-10-30.md",
+        "docs/measurements/people-command-assurance-2026-10-30.json"
+      ],
+      "next": "Dispatch final-source CI and implement the missing document category/identity-validity feature before finishing People review."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

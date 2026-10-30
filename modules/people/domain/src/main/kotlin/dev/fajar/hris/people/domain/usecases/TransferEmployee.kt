@@ -15,6 +15,7 @@ import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.policies.*
 import dev.fajar.hris.people.domain.repositories.*
 import java.time.Clock
+import java.time.Instant
 import java.time.ZoneId
 import java.util.UUID
 
@@ -128,11 +129,13 @@ class TransferEmployee(
             if (accountLock is Result.Failed) return@run accountLock
             val now = clock.instant()
             val liveScopes = linkedMapOf<UUID, Actor>()
+            val authorities = linkedMapOf<UUID, AccountAccess?>()
             for (company in scopes) {
                 val original = if (company == sourceCompany) actor else capturedTarget
                 val live =
                     identities.access(actor.accountId, company).flatMap {
-                        validateCompanySessionActor(original, it, now, security)
+                        authorities[company] = it
+                        validateCompanySessionActor(original, it, clock.instant(), security)
                     }
                 if (live is Result.Failed)
                     return@run Result.Failed(
@@ -164,10 +167,25 @@ class TransferEmployee(
             }
             val sourceActor = liveScopes.getValue(sourceCompany)
             val targetActor = liveScopes.getValue(command.targetCompanyId)
-            val recent =
-                if (security.enforceMfa)
-                    requireRecentMfa(sourceActor, now, security.recentAuthenticationAge)
-                else requireRecentAuthentication(sourceActor, now, security.recentAuthenticationAge)
+            fun validateAssurance(at: Instant): Result<Unit> {
+                for (company in scopes) {
+                    val original = if (company == sourceCompany) actor else capturedTarget
+                    val completed =
+                        validateCompanySessionActor(original, authorities[company], at, security)
+                    if (completed is Result.Failed)
+                        return Result.Failed(
+                            completed.failure.copy(
+                                parameters =
+                                    completed.failure.parameters +
+                                        ("companyId" to company.toString())
+                            )
+                        )
+                }
+                return if (security.enforceMfa)
+                    requireRecentMfa(sourceActor, at, security.recentAuthenticationAge)
+                else requireRecentAuthentication(sourceActor, at, security.recentAuthenticationAge)
+            }
+            val recent = validateAssurance(clock.instant())
             if (recent is Result.Failed) return@run recent
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
@@ -407,7 +425,19 @@ class TransferEmployee(
                         ),
                     )
                 }
-                .map { receipt }
+                .flatMap {
+                    val completedAt = clock.instant()
+                    validateAssurance(completedAt)
+                        .flatMap {
+                            validateImmediateTransfer(
+                                employee,
+                                command,
+                                completedAt.atZone(ZoneId.of(sourceZone)).toLocalDate(),
+                                completedAt.atZone(ZoneId.of(targetZone)).toLocalDate(),
+                            )
+                        }
+                        .map { receipt }
+                }
         }
     }
 }

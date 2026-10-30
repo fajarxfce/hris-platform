@@ -31,9 +31,12 @@ class StartLifecycleCase(
     ): Result<MutationReceipt> {
         val access = actor.requirePermission("people.lifecycle.manage")
         if (access is Result.Failed) return access
-        val valid = validateLifecycleDate(command.targetDate, command.reason)
+        if (command.assignees.size > 64)
+            return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_lifecycle_case"))
+        val selected = command.copy(assignees = command.assignees.toMap())
+        val valid = validateLifecycleDate(selected.targetDate, selected.reason)
         if (valid is Result.Failed) return valid
-        if (command.templateVersion < 0 || command.assignees.size > 64)
+        if (selected.templateVersion < 0 || selected.assignees.size > 64)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_lifecycle_case"))
         val company =
             actor.companyId
@@ -44,12 +47,12 @@ class StartLifecycleCase(
                 operationId,
                 listOf(
                     id.toString(),
-                    command.employmentId.toString(),
-                    command.templateId.toString(),
-                    command.templateVersion.toString(),
-                    command.targetDate.toString(),
-                    command.reason,
-                ) + command.assignees.toSortedMap().flatMap { listOf(it.key, it.value.toString()) },
+                    selected.employmentId.toString(),
+                    selected.templateId.toString(),
+                    selected.templateVersion.toString(),
+                    selected.targetDate.toString(),
+                    selected.reason,
+                ) + selected.assignees.toSortedMap().flatMap { listOf(it.key, it.value.toString()) },
             )
         return transactions.run(actor) {
             val replay = operations.lockAndReplay(actor, key)
@@ -62,14 +65,15 @@ class StartLifecycleCase(
             if (companyGuard is Result.Failed) return@run companyGuard
             val memberGuard = members.lock(company, shared = true)
             if (memberGuard is Result.Failed) return@run memberGuard
-            for (account in (command.assignees.values + actor.accountId).toSet().sorted()) {
+            for (account in (selected.assignees.values + actor.accountId).toSet().sorted()) {
                 val accountGuard = identities.lockAccount(account, shared = true)
                 if (accountGuard is Result.Failed) return@run accountGuard
             }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val permission = live.requirePermission("people.lifecycle.manage")
@@ -77,24 +81,24 @@ class StartLifecycleCase(
             (replay as Result.Success).value?.let {
                 return@run Result.Success(it)
             }
-            val previousClosure = lifecycle.completedOffboardingDate(company, command.employmentId)
+            val previousClosure = lifecycle.completedOffboardingDate(company, selected.employmentId)
             if (previousClosure is Result.Failed) return@run previousClosure
             if ((previousClosure as Result.Success).value != null)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "employment_offboarded"))
-            val found = lifecycle.template(company, command.templateId)
+            val found = lifecycle.template(company, selected.templateId)
             if (found is Result.Failed) return@run found
             val template = (found as Result.Success).value
             if (template == null || !template.active)
                 return@run Result.Failed(
                     Failure(FailureKind.VALIDATION, "lifecycle_template_unavailable")
                 )
-            if (template.version != command.templateVersion)
+            if (template.version != selected.templateVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_template_version"))
-            if (!template.tasks.map { it.key }.containsAll(command.assignees.keys))
+            if (!template.tasks.map { it.key }.containsAll(selected.assignees.keys))
                 return@run Result.Failed(
                     Failure(FailureKind.VALIDATION, "invalid_lifecycle_assignee")
                 )
-            val employment = people.find(company, command.employmentId, command.targetDate)
+            val employment = people.find(company, selected.employmentId, selected.targetDate)
             if (employment is Result.Failed) return@run employment
             val employee =
                 (employment as Result.Success).value
@@ -102,11 +106,11 @@ class StartLifecycleCase(
                         Failure(FailureKind.NOT_FOUND, "employee_not_found")
                     )
             if (
-                command.targetDate < employee.terms.startDate ||
+                selected.targetDate < employee.terms.startDate ||
                     employee.terms.status == EmploymentStatus.ENDED
             )
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "employment_unavailable"))
-            for (id in command.assignees.values.toSet()) {
+            for (id in selected.assignees.values.toSet()) {
                 val result = members.find(company, id)
                 if (result is Result.Failed) return@run result
                 val member = (result as Result.Success).value
@@ -125,9 +129,9 @@ class StartLifecycleCase(
             val case =
                 LifecycleCase(
                     id,
-                    command.employmentId,
+                    selected.employmentId,
                     template.kind,
-                    command.targetDate,
+                    selected.targetDate,
                     template.id,
                     template.version,
                     template.name,
@@ -140,15 +144,15 @@ class StartLifecycleCase(
                             it.key,
                             it.title,
                             it.required,
-                            command.targetDate.plusDays(it.dueDays.toLong()),
-                            command.assignees[it.key],
+                            selected.targetDate.plusDays(it.dueDays.toLong()),
+                            selected.assignees[it.key],
                             LifecycleTaskStatus.PENDING,
                             null,
                             null,
                         )
                     },
                 )
-            lifecycle.create(actor, case, command.reason).flatMap { receipt ->
+            lifecycle.create(actor, case, selected.reason).flatMap { receipt ->
                 operations
                     .record(actor, key, receipt)
                     .flatMap {
@@ -159,14 +163,22 @@ class StartLifecycleCase(
                                 id,
                                 "people.lifecycle_started",
                                 mapOf(
-                                    "employmentId" to command.employmentId.toString(),
+                                    "employmentId" to selected.employmentId.toString(),
                                     "kind" to template.kind.name,
                                 ),
-                                command.reason,
+                                selected.reason,
                             ),
                         )
                     }
-                    .map { receipt }
+                    .flatMap {
+                        validateCompanySessionActor(
+                                actor,
+                                identityAccess,
+                                clock.instant(),
+                                security,
+                            )
+                            .map { receipt }
+                    }
             }
         }
     }

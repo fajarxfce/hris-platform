@@ -33,10 +33,11 @@ class GetOrganizationUnit(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val checked =
-                identities
-                    .access(actor.accountId, company)
-                    .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
                     .flatMap { it.requirePermission("company.read") }
             if (checked is Result.Failed) return@run checked
             val found = units.find(company, id)
@@ -48,14 +49,26 @@ class GetOrganizationUnit(
                     )
             val parentId = unit.parentId
             if (parentId == null)
-                return@run Result.Success(OrganizationUnitDetails(company, unit, null))
-            units.find(company, parentId).flatMap { parent ->
-                if (parent == null)
-                    Result.Failed(
-                        Failure(FailureKind.UNEXPECTED, "organization_structure_unavailable")
+                return@run validateCompanySessionActor(
+                        actor,
+                        identityAccess,
+                        clock.instant(),
+                        security,
                     )
-                else Result.Success(OrganizationUnitDetails(company, unit, parent))
-            }
+                    .map { OrganizationUnitDetails(company, unit, null) }
+            units
+                .find(company, parentId)
+                .flatMap { parent ->
+                    if (parent == null)
+                        Result.Failed(
+                            Failure(FailureKind.UNEXPECTED, "organization_structure_unavailable")
+                        )
+                    else Result.Success(OrganizationUnitDetails(company, unit, parent))
+                }
+                .flatMap { acquired ->
+                    validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
+                        .map { acquired }
+                }
         }
     }
 }

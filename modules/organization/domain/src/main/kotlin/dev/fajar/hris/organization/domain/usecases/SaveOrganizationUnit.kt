@@ -56,10 +56,11 @@ class SaveOrganizationUnit(
             if (membersGuard is Result.Failed) return@run membersGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val checked =
-                identities
-                    .access(actor.accountId, company)
-                    .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
+                validateCompanySessionActor(actor, identityAccess, clock.instant(), security)
                     .flatMap { it.requirePermission("company.manage") }
             if (checked is Result.Failed) return@run checked
             (replay as Result.Success).value?.let {
@@ -85,7 +86,15 @@ class SaveOrganizationUnit(
                             ChangeRecord("organization_unit", receipt.id, "organization.unit_saved"),
                         )
                     }
-                    .map { receipt }
+                    .flatMap {
+                        validateCompanySessionActor(
+                                actor,
+                                identityAccess,
+                                clock.instant(),
+                                security,
+                            )
+                            .map { receipt }
+                    }
             }
         }
     }

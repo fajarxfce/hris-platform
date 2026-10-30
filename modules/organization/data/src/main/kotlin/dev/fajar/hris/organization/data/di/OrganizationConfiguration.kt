@@ -87,7 +87,9 @@ class OrganizationConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         journal: ChangeJournalRepository,
-    ) = CreateCompany(companies, identities, transactions, journal)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = CreateCompany(companies, identities, transactions, journal, security, clock)
 
     @Bean
     fun getCompany(
@@ -95,7 +97,9 @@ class OrganizationConfiguration {
         members: MembershipRepository,
         identities: IdentityRepository,
         transactions: TransactionRunner,
-    ) = GetCompany(companies, members, identities, transactions)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = GetCompany(companies, members, identities, transactions, security, clock)
 
     @Bean
     fun updateCompany(
@@ -104,5 +108,7 @@ class OrganizationConfiguration {
         identities: IdentityRepository,
         transactions: TransactionRunner,
         journal: ChangeJournalRepository,
-    ) = UpdateCompany(companies, members, identities, transactions, journal)
+        security: IdentitySecurityPolicy,
+        clock: Clock,
+    ) = UpdateCompany(companies, members, identities, transactions, journal, security, clock)
 }

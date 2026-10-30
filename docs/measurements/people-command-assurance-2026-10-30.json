@@ -1,0 +1,3025 @@
+{
+  "date": "2026-10-30",
+  "baseline": "b0b7c21c9fb64e66a15b7ac4899c493e708c77a9",
+  "status": "implemented-and-locally-accepted",
+  "scope": {
+    "peopleUseCases": 15,
+    "organizationUseCases": 6,
+    "sharedDiChanges": [
+      "OrganizationConfiguration adds existing IdentitySecurityPolicy and Clock dependencies to GetCompany/CreateCompany/UpdateCompany"
+    ],
+    "newSchema": false,
+    "additionalQueries": 0
+  },
+  "reproduction": {
+    "actualFailures": 50,
+    "alreadyCorrectControls": 4,
+    "runs": [
+      {
+        "tests": 40,
+        "failures": 39,
+        "durationSeconds": 92,
+        "cases": [
+          {
+            "suite": "dev.fajar.hris.EmployeeImportCommandCompletionTest",
+            "name": "[1] mode = \"start\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportCommandCompletionTest",
+            "name": "[2] mode = \"start\", mfa = \"false\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportCommandCompletionTest",
+            "name": "[3] mode = \"apply\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportCommandCompletionTest",
+            "name": "[4] mode = \"apply\", mfa = \"false\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportCommandCompletionTest",
+            "name": "[5] mode = \"resume\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportCommandCompletionTest",
+            "name": "[6] mode = \"resume\", mfa = \"false\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportCommandCompletionTest",
+            "name": "[7] mode = \"cancel\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportCommandCompletionTest",
+            "name": "[8] mode = \"cancel\", mfa = \"false\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmploymentTransferCommandCompletionTest",
+            "name": "[1] mode = \"mfa\", boundary = \"1\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmploymentTransferCommandCompletionTest",
+            "name": "[2] mode = \"mfa\", boundary = \"2\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmploymentTransferCommandCompletionTest",
+            "name": "[3] mode = \"password\", boundary = \"1\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmploymentTransferCommandCompletionTest",
+            "name": "[4] mode = \"password\", boundary = \"2\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmploymentTransferCommandCompletionTest",
+            "name": "[5] mode = \"midnight\", boundary = \"1\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <transfer_requires_current_company_date> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmploymentTransferCommandCompletionTest",
+            "name": "[6] mode = \"midnight\", boundary = \"2\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <transfer_requires_current_company_date> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmploymentTransferCommandCompletionTest",
+            "name": "[7] mode = \"receipt_mfa\", boundary = \"0\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmploymentTransferCommandCompletionTest",
+            "name": "[8] mode = \"receipt_password\", boundary = \"0\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmploymentTransferCommandCompletionTest",
+            "name": "[9] mode = \"receipt_date\", boundary = \"0\"",
+            "failure": null
+          },
+          {
+            "suite": "dev.fajar.hris.OrganizationCompletionTest",
+            "name": "[1] mode = \"company_read\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.OrganizationCompletionTest",
+            "name": "[2] mode = \"root_read\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.OrganizationCompletionTest",
+            "name": "[3] mode = \"parent_read\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.OrganizationCompletionTest",
+            "name": "[4] mode = \"list_read\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.OrganizationCompletionTest",
+            "name": "[5] mode = \"company_create\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.OrganizationCompletionTest",
+            "name": "[6] mode = \"company_update\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.OrganizationCompletionTest",
+            "name": "[7] mode = \"unit_save\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.OrganizationCompletionTest",
+            "name": "[8] mode = \"company_create_receipt\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.OrganizationCompletionTest",
+            "name": "[9] mode = \"company_update_receipt\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleCommandCompletionTest",
+            "name": "[1] mode = \"create\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleCommandCompletionTest",
+            "name": "[2] mode = \"revise\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleCommandCompletionTest",
+            "name": "[3] mode = \"cancel_revision\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleCommandCompletionTest",
+            "name": "[4] mode = \"profile\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleCommandCompletionTest",
+            "name": "[5] mode = \"template\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleCommandCompletionTest",
+            "name": "[6] mode = \"start\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleCommandCompletionTest",
+            "name": "[7] mode = \"assign\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleCommandCompletionTest",
+            "name": "[8] mode = \"task\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleCommandCompletionTest",
+            "name": "[9] mode = \"complete\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleCommandCompletionTest",
+            "name": "[10] mode = \"binding_mfa\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleCommandCompletionTest",
+            "name": "[11] mode = \"binding_password\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <recent_authentication_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleCommandCompletionTest",
+            "name": "[12] mode = \"task_receipt\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleInputOwnershipTest",
+            "name": "[1] mode = \"template\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <[LifecycleTaskDefinition(key=equipment, title=Reviewed equipment, required=true, dueDays=0)]> but was: <[LifecycleTaskDefinition(key=equipment, title=Unreviewed replacement, required=false, dueDays=0)]>"
+          },
+          {
+            "suite": "dev.fajar.hris.PeopleInputOwnershipTest",
+            "name": "[2] mode = \"assignees\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <2d0f6963-adaa-443e-89b5-e815c8ae1307> but was: <2f281d0a-a981-4aa9-9cb2-2358fac6f341>"
+          }
+        ]
+      },
+      {
+        "tests": 12,
+        "failures": 10,
+        "durationSeconds": 49,
+        "cases": [
+          {
+            "suite": "dev.fajar.hris.EmployeeImportEnrollmentTest",
+            "name": "[1] mode = \"start\", replay = \"false\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_setup_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportEnrollmentTest",
+            "name": "[2] mode = \"start\", replay = \"true\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_setup_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportEnrollmentTest",
+            "name": "[3] mode = \"apply\", replay = \"false\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_setup_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportEnrollmentTest",
+            "name": "[4] mode = \"apply\", replay = \"true\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_setup_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportEnrollmentTest",
+            "name": "[5] mode = \"resume\", replay = \"false\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_setup_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportEnrollmentTest",
+            "name": "[6] mode = \"resume\", replay = \"true\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_setup_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportEnrollmentTest",
+            "name": "[7] mode = \"cancel\", replay = \"false\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_setup_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportEnrollmentTest",
+            "name": "[8] mode = \"cancel\", replay = \"true\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_setup_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmployeeImportEnrollmentTest",
+            "name": "[9] mode = \"start\", replay = \"false\", mfa = \"false\"",
+            "failure": null
+          },
+          {
+            "suite": "dev.fajar.hris.PersonAccountBindingEnrollmentTest",
+            "name": "[1] replay = \"false\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_setup_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PersonAccountBindingEnrollmentTest",
+            "name": "[2] replay = \"true\", mfa = \"true\"",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <mfa_setup_required> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.PersonAccountBindingEnrollmentTest",
+            "name": "[3] replay = \"false\", mfa = \"false\"",
+            "failure": null
+          }
+        ]
+      },
+      {
+        "tests": 2,
+        "failures": 1,
+        "durationSeconds": 33,
+        "cases": [
+          {
+            "suite": "dev.fajar.hris.EmploymentRevisionCancellationDateTest",
+            "name": "[1] replay = false",
+            "failure": "org.opentest4j.AssertionFailedError: expected: <effective_revision_cannot_be_cancelled> but was: <null>"
+          },
+          {
+            "suite": "dev.fajar.hris.EmploymentRevisionCancellationDateTest",
+            "name": "[2] replay = true",
+            "failure": null
+          }
+        ]
+      }
+    ],
+    "clock": "Controlled application-clock advances after real PostgreSQL repository/journal acquisitions; no live account or wall-clock expiry claim."
+  },
+  "focused": {
+    "durationSeconds": 142,
+    "results": {
+      "api": {
+        "suites": [
+          {
+            "name": "dev.fajar.hris.EmployeeImportCommandCompletionTest",
+            "tests": 8,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "[1] mode = \"start\", mfa = \"true\"",
+              "[2] mode = \"start\", mfa = \"false\"",
+              "[3] mode = \"apply\", mfa = \"true\"",
+              "[4] mode = \"apply\", mfa = \"false\"",
+              "[5] mode = \"resume\", mfa = \"true\"",
+              "[6] mode = \"resume\", mfa = \"false\"",
+              "[7] mode = \"cancel\", mfa = \"true\"",
+              "[8] mode = \"cancel\", mfa = \"false\""
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.EmployeeImportEnrollmentTest",
+            "tests": 9,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "[1] mode = \"start\", replay = \"false\", mfa = \"true\"",
+              "[2] mode = \"start\", replay = \"true\", mfa = \"true\"",
+              "[3] mode = \"apply\", replay = \"false\", mfa = \"true\"",
+              "[4] mode = \"apply\", replay = \"true\", mfa = \"true\"",
+              "[5] mode = \"resume\", replay = \"false\", mfa = \"true\"",
+              "[6] mode = \"resume\", replay = \"true\", mfa = \"true\"",
+              "[7] mode = \"cancel\", replay = \"false\", mfa = \"true\"",
+              "[8] mode = \"cancel\", replay = \"true\", mfa = \"true\"",
+              "[9] mode = \"start\", replay = \"false\", mfa = \"false\""
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.EmploymentRevisionCancellationDateTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "[1] replay = false",
+              "[2] replay = true"
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.EmploymentTransferCommandCompletionTest",
+            "tests": 9,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "[1] mode = \"mfa\", boundary = \"1\"",
+              "[2] mode = \"mfa\", boundary = \"2\"",
+              "[3] mode = \"password\", boundary = \"1\"",
+              "[4] mode = \"password\", boundary = \"2\"",
+              "[5] mode = \"midnight\", boundary = \"1\"",
+              "[6] mode = \"midnight\", boundary = \"2\"",
+              "[7] mode = \"receipt_mfa\", boundary = \"0\"",
+              "[8] mode = \"receipt_password\", boundary = \"0\"",
+              "[9] mode = \"receipt_date\", boundary = \"0\""
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.OrganizationCompletionTest",
+            "tests": 9,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "[1] mode = \"company_read\"",
+              "[2] mode = \"root_read\"",
+              "[3] mode = \"parent_read\"",
+              "[4] mode = \"list_read\"",
+              "[5] mode = \"company_create\"",
+              "[6] mode = \"company_update\"",
+              "[7] mode = \"unit_save\"",
+              "[8] mode = \"company_create_receipt\"",
+              "[9] mode = \"company_update_receipt\""
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.PeopleCommandCompletionTest",
+            "tests": 12,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "[1] mode = \"create\"",
+              "[2] mode = \"revise\"",
+              "[3] mode = \"cancel_revision\"",
+              "[4] mode = \"profile\"",
+              "[5] mode = \"template\"",
+              "[6] mode = \"start\"",
+              "[7] mode = \"assign\"",
+              "[8] mode = \"task\"",
+              "[9] mode = \"complete\"",
+              "[10] mode = \"binding_mfa\"",
+              "[11] mode = \"binding_password\"",
+              "[12] mode = \"task_receipt\""
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.PeopleInputOwnershipTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "[1] mode = \"template\"",
+              "[2] mode = \"assignees\""
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.PersonAccountBindingEnrollmentTest",
+            "tests": 3,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "[1] replay = \"false\", mfa = \"true\"",
+              "[2] replay = \"true\", mfa = \"true\"",
+              "[3] replay = \"false\", mfa = \"false\""
+            ]
+          }
+        ],
+        "total": {
+          "tests": 54,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "peopleDomain": {
+        "suites": [
+          {
+            "name": "dev.fajar.hris.people.domain.DirectoryProjectionPolicyTest",
+            "tests": 8,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "identicalPublicContentDoesNotCreateNewVersionsButTheNextRevisionIsStillScheduled()",
+              "changedAssignmentLabelsAdvanceOnlyThisRecord()",
+              "aFutureEmployeeIsNotPublishedUntilTheirCompanyLocalStart()",
+              "suspendedAndEndedEmployeesDoNotDiscloseEvenTheirExistenceBeforeFirstPublication()",
+              "aReturnedCoworkerReusesIdentityAndAdvancesBeyondTheTombstone()",
+              "dateTransitionsUseCompanyTimezoneAcrossDaylightSaving()",
+              "anInclusiveEndDateRemovesThePreviouslyPublishedEmployeeOnTheFollowingDate()",
+              "exhaustedVersionsFailInsteadOfWrappingToAnOlderRevision()"
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.people.domain.EmployeeImportPolicyTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "checkpointParsingRejectsInvalidOrUnboundedPositions()",
+              "duplicateFileNumbersMarkEveryOccurrenceAndKeepParserIssues()"
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.people.domain.LifecyclePolicyTest",
+            "tests": 3,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "mandatoryTasksCannotBeWaivedAndOptionalTasksNeedAnExplicitOutcome()",
+              "definitionsHaveBoundedKeysTasksOffsetsAndReasons()",
+              "completionRejectsObsoleteVersionsClosedCasesAndTheWrongWorkflow()"
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.people.domain.OffboardingSchedulePolicyTest",
+            "tests": 14,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "readinessIncludesOptionalTaskOutcomesAndExcludesSelfOffboarding()",
+              "anExecutionOutsideItsWindowRequiresExplicitReview()",
+              "changedEmploymentTermsAndClosedCasesCannotBeCompleted()",
+              "schedulingIsBoundedAndATerminalJobNeedsItsPendingAuthorizationClosed()",
+              "cancellationAndRecoveryHintsFollowBothAuthorizationAndJobState()",
+              "reviewBindsAccountLinkageAppliedRevisionCompanyAndTimezoneWithoutNames()",
+              "repeatedMidnightMatchesTheStoredLaterOffset()",
+              "changedCaseEmploymentEffectiveRevisionOrTimezoneRejectsTheRetainedIntent()",
+              "aWorkerMustOwnTheAdmittedCompanyAccountCredentialAndJobKind()",
+              "aLateButAdmittedExecutionUsesTodayWithoutBackdatingEmployment()",
+              "executionStartsAfterTheInclusiveLastWorkingDayInTheCompanyTimezone()",
+              "newlyLinkedOrReplacedAccountsCannotInheritAnEarlierAuthorization()",
+              "aCommittedCancellationAllowsManualClosureWhileWorkerCleanupIsUnavailable()",
+              "daylightSavingBoundariesUseTheCompanyCalendarRatherThanAddingOneUtcDay()"
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.people.domain.OnboardingSchedulePolicyTest",
+            "tests": 11,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "jobAuthorityMustMatchItsCompanyActorCredentialAndFixedRequest()",
+              "preparationStartsAtTheChosenCompanyMidnightAndStopsAfterTheFirstWorkingDay()",
+              "reviewBindsSourceRevisionsAndDatesWithoutDependingOnDisplayNames()",
+              "initiationCreatesOnlyPendingTasksAndRetainsUnassignedTasks()",
+              "invalidDatesDoNotEnterRepositoryWork()",
+              "stoppedJobsNeedExplicitRecoveryAndAttemptsAreBounded()",
+              "leaseExecutionRequiresUnchangedSourceVersionsAndAnOpenWindow()",
+              "readingNeedsAllThreeGrantsAndTerminalHeadersHaveNoActions()",
+              "firstDayWindowRespectsBothDaylightSavingTransitions()",
+              "admissionRequiresFuturePreparationAndTheExactFirstDayWithAnActiveOnboardingTemplate()",
+              "repeatedMidnightUsesTheLaterOffsetWhileMissingMidnightUsesTheNextValidInstant()"
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.people.domain.ReportingLinePolicyTest",
+            "tests": 3,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "latestRevisionAtTheSameEffectiveDateWins()",
+              "anAssignmentBeforeTheChangeDoesNotCreateAFalseCycle()",
+              "futureBoundaryCannotIntroduceAReportingCycle()"
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.people.domain.SelfProfileProjectionPolicyTest",
+            "tests": 9,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "labelsAndTheirAvailabilityInvalidateTheOwnedProjection()",
+              "endedEmploymentStillHasItsOwnProfileAndMaximumManagerDateDoesNotOverflow()",
+              "privateProfileChangesAdvanceIndependentlyOfEmploymentRevisions()",
+              "aProfileContainsCoherentOwnedFieldsWithoutTheManagersPrivateAccount()",
+              "unlinkingWithdrawsTheRecordAndReappearanceAdvancesBeyondItsTombstone()",
+              "upcomingRevisionsScheduleTheirCompanyDateWithoutPublishingAnAbsentEmployment()",
+              "managerAvailabilityChangesAfterItsInclusiveEndInCompanyTime()",
+              "revisionExhaustionAndPartialReadGrantsCannotWidenTheProjection()",
+              "ordinaryDateChangesKeepTheVersionAndRecordedProvenance()"
+            ]
+          }
+        ],
+        "total": {
+          "tests": 50,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "peopleData": {
+        "suites": [
+          {
+            "name": "dev.fajar.hris.people.data.EmployeeCsvTest",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "rfc4180UnicodeBomAndQuotedNewlinesArePreservedBeforeBusinessNormalization()",
+              "invalidFieldTypesRemainRowIssuesWithoutInventingDatesOrIds()",
+              "parserRejectsAmbiguousHeadersMalformedRecordsAndBoundedInputViolations()",
+              "cancellationAndLateInterruptionArePropagatedAndUnexpectedMessagesStayOutOfFailures()"
+            ]
+          },
+          {
+            "name": "dev.fajar.hris.people.data.SelfProfileRepositoryTest",
+            "tests": 10,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "[1] \"id\"",
+              "[2] \"company\"",
+              "[3] \"account\"",
+              "[4] \"schema\"",
+              "[5] \"reference\"",
+              "[6] \"size\"",
+              "[7] \"format\"",
+              "storageRoundTripRetainsIndependentVersionsAndTombstonesWithoutLoggingPrivateValues()",
+              "cancellationDuringAcquisitionIsNotTurnedIntoAnOrdinaryFailure()",
+              "aDatasourceReturningAnotherPartitionCannotPassThroughTheBoundary()"
+            ]
+          }
+        ],
+        "total": {
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "organizationDomain": {
+        "suites": [
+          {
+            "name": "dev.fajar.hris.organization.domain.OrganizationSearchPolicyTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0,
+            "cases": [
+              "rejectsOversizedQueriesAndMalformedOrIncompatibleCursors()",
+              "normalizesSearchWithoutChangingLiteralCharactersOrTheContinuation()"
+            ]
+          }
+        ],
+        "total": {
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "organizationData": {
+        "suites": [],
+        "total": {
+          "tests": 0,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "format": true,
+    "architecture": true,
+    "packages": true
+  },
+  "broadApi": {
+    "results": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.AnnouncementAudiencePreviewHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "branchAndDepartmentPreviewsUseEffectiveEmploymentAssignments()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementPublicationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "overlappingEmploymentMatchesProduceOneInboxPerAccount()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementPublicationIntegrityTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "publicationCannotBindARecipientToAnotherAccountsEmployment()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ApiContractHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "scheduledOnboardingReviewsSelectedDatesAndKeepsQueueAuthorityPrivate()",
+            "coworkerDirectoryDocumentsItsOwnBoundedPagesAndFilter()",
+            "compensationReviewAndEmployeeLookupKeepPrivateProfilesOutOfTheirContract()",
+            "scheduledOffboardingPinsItsReviewedBasisAndKeepsCredentialsOutOfResponses()",
+            "closingOverviewDescribesMinimalProgressAndBoundedPublishedEmployees()",
+            "attendanceClosingEmployeesExposeScopedPagesAndExactRevisionReferences()",
+            "carryBalanceFactsHaveOneCompatibleShapeForAccountAndDirectoryReads()",
+            "finalizationPreparationAndDirectoryKeepApprovalVersionsAndProgressSeparate()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalAccessRaceHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "beneficiaryIdentityIsAvailableBeforeEmploymentStarts()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "pendingCaptureAndWindowIssuanceRecheckEmploymentStatus()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceClosingEmployeesAccessHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "cancellationAndDatabaseFailureReleaseOwnershipForAnExplicitRetry()",
+            "finalPublicationCannotMakeAnEarlierReadIncludePartialClosingRows()",
+            "[1] stage = \"account\"",
+            "[2] stage = \"projection\"",
+            "[1] mode = \"reports.read\"",
+            "[2] mode = \"workforce.read\"",
+            "[3] mode = \"credentials\"",
+            "aConcurrentCorrectionCannotMixTheEarlierOriginalAndAdjustedTotals()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceClosingEmployeesHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "exactSelectedRevisionRemainsReadableAfterANewerCorrection()",
+            "boundedPagesReconcileBothFactSetsAndKeepTheirOrderAcrossLaterCorrectionsAndHires()",
+            "currentReportAndSourceGrantsRlsAndScopedContinuationProtectPrivateRows()",
+            "futureHireCapturedByTheWorkerCannotEnterHistoricalTotalsOrDisplaceAPage()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceClosingReportHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "zeroEmployeeClosingRetainsItsPublishedIdentityAndCompleteAnnualBuckets()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceExceptionAccessHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "aCoherentDirectorySnapshotDoesNotBlockAnIndependentAttendanceReview()",
+            "originalGrantsCannotExpandToACompanyWideDirectory()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceExceptionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "committedEvidenceAndReviewDriveOneMinimalExceptionPerEmployeeDay()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceReportHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "countsReconcileWithExceptionRowsWithoutDoubleCountingOverlappingKindsOrEmployments()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.CalendarSourceSyncHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "employeeCalendarFeedIncludesSharedHolidaysWithoutExportingAnotherEmployee()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.CompanyDirectoryHttpTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] scenario = \"list:permission\"",
+            "[2] scenario = \"list:credential\"",
+            "[3] scenario = \"list:membership\"",
+            "[4] scenario = \"departments:permission\"",
+            "[5] scenario = \"departments:credential\"",
+            "[6] scenario = \"departments:membership\"",
+            "[1] departments = false",
+            "[2] departments = true",
+            "paginationAndLiteralSearchStayBoundedAndUseTheCompanyDate()",
+            "directoryReturnsMinimalCurrentColleaguesAndAssignmentLabelsWithoutProfileAccess()",
+            "departmentFilterAppliesBeforePaginationAndLookupOmitsUnusedUnits()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.CompanyHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "updatesRejectStaleVersionAndReplayOriginalOutcome()",
+            "concurrentCreationReplaysOneCompanyAndOneJournal()",
+            "invalidTimezoneAndDuplicateCodeLeaveNoPartialCompany()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.CompanyModuleRoutesTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "oversizedAndRepeatedSelectionsStillFailBeforeResolvingModules()",
+            "theWholeRegisteredSelectionFitsTheBoundWithoutGrantingUnownedModules()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.CompanyProfileAccessHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "profileScopeAndCompanyMembershipAreRecheckedAfterWaiting()",
+            "companyUnitAndProfileCommandsRecheckPermissionAndPreserveFailedOperationKeys()",
+            "companyCreationChecksPlatformPermissionAndCredentialsBeforeWriteOrReplay()",
+            "companyAndProfileReadsCannotReturnDataAfterPendingCredentialRevocation()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.CompensationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "companyPolicyManagersAndEmployeesDoNotGainSalaryAccess()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.CompensationReviewHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "companyAdministratorsPolicyManagersAndEmployeeScopeDoNotGainCompensationAccess()",
+            "reviewSeparatesEmploymentHeadCurrentSalaryAndTheSelectedMonth()",
+            "minimalLookupIncludesUnconfiguredAndFutureEmploymentWithLiteralSearch()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.DirectoryRecordHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "authorizedReadersReceiveOnlyPublicCoworkersAndTheirCommittedChangesWithoutOwningAnEmployment()",
+            "foreignResourcesAndMissingGrantsCannotReadTheProjectionOrItsPendingState()",
+            "[1] change = \"permission\"",
+            "[2] change = \"membership\"",
+            "[3] change = \"credential\"",
+            "[1] phase = \"record\"",
+            "[2] phase = \"bootstrap\"",
+            "[3] phase = \"changes\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.DocumentAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "selfServiceCannotReadOtherEmployeesOrHrOnlyDocuments()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.DocumentEmployeesAdmissionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "employeeSelectionFollowsDocumentsAvailabilityIndependentlyOfPeople()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.DocumentEmployeesAssuranceTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] change = \"documents.read\"",
+            "[2] change = \"people.profile.read\"",
+            "[3] change = \"credentials\"",
+            "[4] change = \"membership\"",
+            "[1] exact = false",
+            "[2] exact = true",
+            "interruptedReadReleasesGuardsAndDoesNotPoisonTheNextAcquisition()",
+            "[1] original = \"documents.read\"",
+            "[2] original = \"people.profile.read\"",
+            "[3] original = \"documents.self.read\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.DocumentEmployeesHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "exactReferencesSupportDirectNavigationWithoutLeakingForeignEmployment()",
+            "directoryUsesDocumentGrantsAndReturnsOnlyScopedDisplayReferences()",
+            "searchIsLiteralBoundedAndRequiresBothAdministrativeReadGrants()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeCalendarReviewHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "reviewKeepsEffectiveSnapshotsAndGlobalVersionsWithExplicitRosterOrigins()",
+            "reviewEnforcesCompanyScopePermissionsAndFiniteDates()",
+            "directoryIsBoundedAndDoesNotRequireOrDisclosePersonalProfileAccess()",
+            "[1] kind = \"directory\"",
+            "[2] kind = \"review\"",
+            "[1] kind = \"directory\"",
+            "[2] kind = \"review\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeImportAccessHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "cancellationAlsoRechecksAuthenticationAfterWaiting()",
+            "queueWaitCannotOutliveTheAuthenticationUsedToAuthorizeAJob()",
+            "detailReadsHoldTheBatchStableAcrossHeaderAndOutcomeQueries()",
+            "readsRevalidatePermissionsCredentialsMembershipAndCompanyState()",
+            "managementCommandsAndReplayRequireCurrentImportAuthority()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeImportAssuranceHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] operation = \"list\"",
+            "[2] operation = \"summary\"",
+            "[3] operation = \"rows\"",
+            "[4] operation = \"attempts\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeImportCommandCompletionTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] mode = \"start\", mfa = \"true\"",
+            "[2] mode = \"start\", mfa = \"false\"",
+            "[3] mode = \"apply\", mfa = \"true\"",
+            "[4] mode = \"apply\", mfa = \"false\"",
+            "[5] mode = \"resume\", mfa = \"true\"",
+            "[6] mode = \"resume\", mfa = \"false\"",
+            "[7] mode = \"cancel\", mfa = \"true\"",
+            "[8] mode = \"cancel\", mfa = \"false\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeImportEnrollmentTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] mode = \"start\", replay = \"false\", mfa = \"true\"",
+            "[2] mode = \"start\", replay = \"true\", mfa = \"true\"",
+            "[3] mode = \"apply\", replay = \"false\", mfa = \"true\"",
+            "[4] mode = \"apply\", replay = \"true\", mfa = \"true\"",
+            "[5] mode = \"resume\", replay = \"false\", mfa = \"true\"",
+            "[6] mode = \"resume\", replay = \"true\", mfa = \"true\"",
+            "[7] mode = \"cancel\", replay = \"false\", mfa = \"true\"",
+            "[8] mode = \"cancel\", replay = \"true\", mfa = \"true\"",
+            "[9] mode = \"start\", replay = \"false\", mfa = \"false\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeImportHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "malformedFilesAndUnauthorizedOrForeignReadsDoNotCreateOrRevealImports()",
+            "failedAuditRollsBackTheCreatedEmployeeRowOutcomeAndCheckpoint()",
+            "revocationDuringAPausedWorkerStepStopsMutationAndFreshAuthorizationCanResume()",
+            "applicationRevalidatesPreviewAndReportsNewConflictsWithoutOrphanPeople()",
+            "anExhaustedPreviewCanResumeFromItsPersistedRows()",
+            "cancellationAndResumeRetainAppliedRowsAndRejectLateLeaseWork()",
+            "previewKeepsEmployeesUntouchedAndPartialApplicationRequiresExplicitConfirmation()",
+            "twoApplyJobsCannotCreateTheSameCompanyEmployeeNumber()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeImportReadCompletionTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] mode = \"details\"",
+            "[2] mode = \"list\"",
+            "[3] mode = \"rows\"",
+            "[4] mode = \"attempts\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmployeeImportReviewHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "summaryDoesNotAcquireTheJobLockAfterHoldingTheImportGuard()",
+            "reviewTracksPreviewApplicationCancellationAndResumableJobState()",
+            "emptyReadySetAndTerminalHeaderCannotAdvertiseApplicationOrResume()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentAccessHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "directoryRecomputesVisibilityWhenCompanyReadIsRemovedButSelfAccessRemains()",
+            "employeeHistoryAndTransferReadsRecheckTheirCurrentScope()",
+            "creatingAnEmploymentLocksAndRechecksItsLinkedAccount()",
+            "employmentCommandsRejectPendingRevocationBeforeWriteAndReceiptReplay()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentAssuranceHttpTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] operation = \"get\"",
+            "[2] operation = \"list\"",
+            "[3] operation = \"self\"",
+            "[4] operation = \"history\"",
+            "[5] operation = \"transfers\"",
+            "[6] operation = \"transfer-review\"",
+            "[7] operation = \"details\"",
+            "[8] operation = \"revision\"",
+            "[9] operation = \"create\"",
+            "[10] operation = \"revise\"",
+            "[11] operation = \"cancel\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentCancellationHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "auditFailureRollsBackCancellationAndAllowsTheSameCommandToRetry()",
+            "cancellationRejectsCurrentRevisionsCompanyScopeAndCycleRestoration()",
+            "competingCancellationCannotAdvanceVersionTwiceOrConsumeAFailedOperation()",
+            "cancelledFutureChangesStayInHistoryButDoNotAffectEffectiveReadsOrReplayedOutcomes()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentDetailsHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] change = \"permission\"",
+            "[2] change = \"credential\"",
+            "cancellationBetweenReferenceReadsReleasesTheSharedStructureAndPeopleGuards()",
+            "detailsRetainEffectiveEmploymentAndCurrentReferenceLabelsWithoutSensitiveProfiles()",
+            "anUnlinkedSelfReaderCannotResolveOtherEmployeesOrForeignScopes()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentRevisionCancellationDateTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] replay = false",
+            "[2] replay = true"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentRevisionHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "fullReadAndCompanyScopeProtectDirectRevisionLinks()",
+            "cancellingAPendingRevisionReadReleasesItsGuardsBeforeAWriterContinues()",
+            "[1] change = \"read\"",
+            "[2] change = \"credential\"",
+            "[3] change = \"remove-management\"",
+            "[4] change = \"add-management\"",
+            "revisionDetailsShareTheCurrentVersionAndRetainCancellationEvidence()",
+            "cancellationAvailabilityUsesTheOwningCompanyDateAndDoesNotGrantManagementToReaders()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentTransferAvailabilityHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "destinationModuleAdmissionAppliesBeforeMutationAndReceiptReplay()",
+            "destinationPolicyReadScopeDoesNotPermitThirdCompanyReadsOrPolicyWrites()",
+            "destinationMaintenanceAndMinimumBuildsUseTheAuthenticatedClientMetadata()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentTransferCommandCompletionTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] mode = \"mfa\", boundary = \"1\"",
+            "[2] mode = \"mfa\", boundary = \"2\"",
+            "[3] mode = \"password\", boundary = \"1\"",
+            "[4] mode = \"password\", boundary = \"2\"",
+            "[5] mode = \"midnight\", boundary = \"1\"",
+            "[6] mode = \"midnight\", boundary = \"2\"",
+            "[7] mode = \"receipt_mfa\", boundary = \"0\"",
+            "[8] mode = \"receipt_password\", boundary = \"0\"",
+            "[9] mode = \"receipt_date\", boundary = \"0\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentTransferHttpTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "transferAndOrganizationChangesAcquireStructureBeforeCompanyGuards()",
+            "transferPreservesPersonAndHistoryWhileRevokingOnlySourceMembership()",
+            "selfAndLastAdministratorProtectionDoNotDependOnAPaginatedDirectory()",
+            "destinationEligibilityAndCompanyDatesAreValidatedBeforeAnyMutation()",
+            "simultaneousTransfersProduceOneDestinationEmploymentAndOneTransferRecord()",
+            "failureInTheDestinationAuditRollsBackBothEmploymentsAccessAndReceipt()",
+            "bothCompanyPermissionsAreRequiredAndLiveCredentialRevocationWinsDuringTheCommand()",
+            "pendingChangesAndReportingAssignmentsMustBeResolvedBeforeTransfer()",
+            "otherCurrentOrPlannedEmploymentKeepsSourceMembershipActive()",
+            "anOffboardingGrantAddedWhileTheTransferWaitsRequiresANewRequest()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentTransferReadCompletionTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] boundary = \"last_identity\"",
+            "[2] boundary = \"employee\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.EmploymentTransferReviewHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "aDestinationGrantAddedDuringReviewCannotExpandItsAssignmentChoices()",
+            "reviewRejectsForeignEmploymentSameCompanyAndIncompatibleDates()",
+            "cancellationAfterPolicyAcquisitionReleasesBothCompanyGuardsAndTheAccount()",
+            "reviewReturnsCurrentVersionCompanyDatesAndDirectoryFieldsWithoutMutation()",
+            "destinationModuleAvailabilityAlsoGatesReview()",
+            "removingDestinationTransferAuthorityWhileWaitingRejectsReview()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseDraftHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "categoriesCostCentersAndReceiptsCannotReferenceAnotherCompanyOrEmployee()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseDraftingHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "managementDiscoveryHasBoundedCompanyReferencesWithoutGrantingPeopleAccess()",
+            "receiptPickerReturnsOnlyPublishedReceiptMetadataForTheSelectedEmployment()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseReadScopeHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "selfScopeCannotExpandWithCompanyWideGrantsOrAnotherEmploymentSelection()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseReceiptHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "reviewersAndClaimOwnersReadEvidenceWithoutBroadPersonalDocumentPermissions()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseReportHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "allStatusesAndExactCentsReconcileWithScopedClaimsWithoutSummingDistinctEmployees()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.GroupHeadcountAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "sharedGroupReadsAllowOtherSnapshotsAndKeepConcurrentEmploymentChangesCoherent()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.GroupHeadcountHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "oneSnapshotReturnsCompanyBucketsAndDistinctPersonsAcrossEmploymentHistory()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.HeadcountReportAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "oneSqlSnapshotKeepsItsCountsWhileConcurrentEmploymentChangesCommit()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.HeadcountReportHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "aggregateSeparatesPersonsFromEmploymentsAndRlsCannotReadAnotherCompany()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAccrualHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "accrualRequiresCompletedMonthlyEligibilityAndObservedEmployment()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeaveAccrualScheduleAssuranceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "pendingSubmissionOwnsTheReviewedEmployeeSelectionAndReceiptHash()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBalanceDirectoryHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "closedAccountsAndUnfundedLedgerDetailsKeepExplicitIdentityAndYear()",
+            "directoryUsesCurrentSelfTeamAndCompanyScopeBeforeReturningEmployeeMetadata()",
+            "directoryPagesExistingAccountsWithCurrentLabelsAndNoAdministrativeHistory()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBalanceSyncHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "ownerRevocationInvalidatesThePartitionAndNeverExposesAnotherEmployeeBalance()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBatchAssuranceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "pendingSubmissionOwnsItsOriginalEmployeeSelectionAndReceiptHash()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBatchRecoveryHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "cancellationAndExplicitResumeRetainCompletedEmployeesAndStartANewAttempt()",
+            "concurrentStepsWithOneLeaseAreSerializedAndCannotRepeatAnEmployee()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBatchReviewHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "outcomeLabelsAreBoundToTheReturnedPageAndDoNotRequirePeopleAdministration()",
+            "reviewRequiresTheSpecificPostingGrantWithoutRequiringPeopleOrPolicyManagement()",
+            "completedBatchRetainsMixedEmployeeOutcomesWithoutOfferingRecovery()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeaveBatchTransactionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "finalAuditFailureRetainsFinishedEmployeesButDoesNotCompleteTheJob()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCalendarHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "independentLeaveModuleAdmissionDoesNotRequirePeopleOrWorkforceScreens()",
+            "twoHalfRequestsCountOneEmployeeAndCursorSurvivesWithdrawalOfItsAnchor()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeaveCommandCompletionTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "cancellationReceiptCannotBypassRevokedManagementOfAnotherEmployeeRequest()",
+            "[1] operation = \"submit\"",
+            "[2] operation = \"withdraw\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeavePreparationHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "evidenceSelectionIncludesOnlyPublishedPersonalMetadataForTheSelectedEmployee()",
+            "administrativePreviewCanReviewEligibleDatesBeforeEmploymentEnded()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleAccessHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "managementCommandsRecheckAuthorityBeforeChangesAndOriginalReceipts()",
+            "assigningAndStartingCasesGuardEveryReferencedAccount()",
+            "losingManagementAuthorityRetainsOnlyAssignedTaskActions()",
+            "everyReadRechecksItsRemainingScopeAfterWaiting()",
+            "taskReceiptCannotBypassRevokedTaskAccess()",
+            "newlyGrantedManagementDoesNotExpandAnAlreadyResolvedTaskRequest()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleAssigneeHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "readingCasesOrPerformingTasksDoesNotAuthorizeAssigneeDiscovery()",
+            "aSelectedCandidateMustStillBeEligibleWhenAssignmentIsSubmitted()",
+            "lookupMatchesLiteralNamesWithBoundedPagesAndDoesNotSearchEmail()",
+            "managementLookupReturnsOnlyActiveEligibleCompanyReferencesWithoutAdministrativeData()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleAssuranceHttpTest",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] operation = \"templates\"",
+            "[2] operation = \"template\"",
+            "[3] operation = \"get\"",
+            "[4] operation = \"list\"",
+            "[5] operation = \"history\"",
+            "[6] operation = \"assigned\"",
+            "[7] operation = \"assignees\"",
+            "[8] operation = \"save\"",
+            "[9] operation = \"start\"",
+            "[10] operation = \"change\"",
+            "[11] operation = \"assign\"",
+            "[12] operation = \"cancel\"",
+            "[13] operation = \"onboarding\"",
+            "[14] operation = \"offboarding\"",
+            "[15] operation = \"offboarding-review\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleContextHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "caseReferencesStayInsideTheSelectedCompanyAndEmployeeFilter()",
+            "assigneesReceiveOnlyTheirOwnPendingTaskContextAndLoseItAfterReassignmentOrCompletion()",
+            "lifecycleReadersReceiveCurrentEmployeeContextWithoutPrivateProfileAccess()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleHttpTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "offboardingPreservesOtherSourceEmploymentAndRejectsSelfOrLastAdminRemoval()",
+            "concurrentTaskReopeningAndFinalizationCannotCompleteAnUnresolvedCase()",
+            "offboardingRequiresOtherLifecycleCasesResolvedAndRechecksRevokedCredentials()",
+            "assigneesSeeOnlyTheirOwnQueueAndReassignmentOrRevocationRemovesAuthority()",
+            "failedOffboardingRollsBackEmploymentAccessHistoryAndReceiptBeforeRetry()",
+            "offboardingEndsOnlyTheEmploymentAndItsUnusedCompanyMembership()",
+            "templatesAreFrozenRequiredTasksBlockCompletionAndEveryChangeHasImmutableHistory()",
+            "openLifecycleCasesAndCompanyTransfersAreSerialized()",
+            "dateAccessAndScheduledWorkMustBeResolvedBeforeOffboarding()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleSnapshotHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "paginatedCasesRetainOneSnapshotWhileAnotherRequestChangesATask()",
+            "offboardingRechecksRecentAuthenticationAfterWaitingForTheCase()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LifecycleTemplateHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "directLinksRequireReadPermissionAndTheSelectedCompanyScope()",
+            "cancelledReadsReleaseTemplateAndAccessGuardsBeforeTheNextEdit()",
+            "[1] change = \"permission\"",
+            "[2] change = \"credential\"",
+            "[3] change = \"account\"",
+            "[4] change = \"membership\"",
+            "templateDetailsReturnTheCurrentDefinitionWithoutChangingExistingCases()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OffboardingReviewHttpTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "reviewRetainsCompanyDateAndBothVersionsWithoutAcquiringAPrivateProfile()",
+            "[1] missing = \"people.lifecycle.read\"",
+            "[2] missing = \"people.lifecycle.manage\"",
+            "[3] missing = \"people.manage\"",
+            "[4] missing = \"people.offboard\"",
+            "foreignOnboardingAndCancelledCasesCannotSupplyAnOffboardingReview()",
+            "[1] change = \"grant\"",
+            "[2] change = \"membership\"",
+            "[3] change = \"credentials\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OffboardingScheduleAssuranceHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] operation = \"schedule\", boundary = \"queue\"",
+            "[2] operation = \"schedule\", boundary = \"create\"",
+            "[3] operation = \"schedule\", boundary = \"journal\"",
+            "[4] operation = \"cancel\", boundary = \"journal\"",
+            "[5] operation = \"recover\", boundary = \"journal\"",
+            "[1] operation = \"review\"",
+            "[2] operation = \"list\"",
+            "[3] operation = \"detail\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OffboardingScheduleHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "dueExecutionAtomicallyEndsEmploymentAndOnlyItsUnusedCompanyMembership()",
+            "cancellationWakesAFutureJobAndRetainsItsOriginalJobAcknowledgement()",
+            "cancellingTheCaseRequiresItsActiveExecutionToBeCancelledFirst()",
+            "staleReviewAndLaterChecklistReopeningCannotRetargetTheAuthorization()",
+            "explicitRecoveryClosesAnExhaustedJobWithoutQueuingAnotherAttempt()",
+            "repeatedMidnightReviewMatchesTheExistingStoredScheduleConstraint()",
+            "reviewShowsReadinessAndCreationDoesNotChangeEmploymentOrCompanyAccess()",
+            "manualCompletionCanProceedAfterCancellationWithoutWaitingForAWorker()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OffboardingScheduleSecurityHttpTest",
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] action = \"review\"",
+            "[2] action = \"list\"",
+            "[3] action = \"detail\"",
+            "[4] action = \"schedule\"",
+            "[5] action = \"replay\"",
+            "[6] action = \"cancel\"",
+            "[7] action = \"recover\"",
+            "[1] change = \"credential\", code = \"session_revoked\"",
+            "[2] change = \"permission\", code = \"offboarding_access_required\"",
+            "[3] change = \"membership\", code = \"company_access_denied\"",
+            "[4] change = \"company\", code = \"company_access_denied\"",
+            "newlyAssignedReportsAndAnExpiredExecutionWindowRequireHumanReview()",
+            "anotherEmploymentPreservesTheAccountMembershipWhenThisEmploymentEnds()",
+            "[1] afterAdmission = false",
+            "[2] afterAdmission = true",
+            "aNewAccountLinkRequiresASeparateReviewAndCannotRetargetAScheduledDeparture()",
+            "replacingTheCapturedCredentialInAMemoryLeaseCannotReviveRevokedAuthorization()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OffboardingScheduleTransactionHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "competingRetriesKeepOneAuthorizationAndChangedPayloadCannotReplaceTheReceipt()",
+            "storageRejectsForgedObservedRevisionsAndRollsBackTheQueuedJob()",
+            "checkpointFailureRollsBackEmploymentAccessCaseAndAllEvidence()",
+            "lateLeaseExpiryRollsBackTheCheckpointAndOldOwnersCannotFinishAReplacement()",
+            "crossingCompanyMidnightDuringJournalingRollsBackTheEffectiveDateAndJobResult()",
+            "twoWorkersWithOneLeaseCannotCommitTwoDepartures()",
+            "retainedAuthorizationIsImmutableAndAnotherCompanyCannotReadIt()",
+            "interruptionAfterCheckpointReleasesResourcesAndCannotCommitALateDeparture()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OnboardingScheduleAssuranceHttpTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "callerOwnedAssigneesCannotChangeWhileAdmissionWaits()",
+            "[1] operation = \"schedule\", boundary = \"queue\"",
+            "[2] operation = \"schedule\", boundary = \"create\"",
+            "[3] operation = \"schedule\", boundary = \"journal\"",
+            "[4] operation = \"cancel\", boundary = \"journal\"",
+            "[5] operation = \"recover\", boundary = \"journal\"",
+            "[1] operation = \"review\"",
+            "[2] operation = \"list\"",
+            "[3] operation = \"detail\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OnboardingScheduleHttpTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "aManualCaseOpenedDuringTheWaitStopsScheduledCreation()",
+            "employmentChangesRejectAStaleReviewBeforeQueueAdmission()",
+            "reviewUsesTheFutureEmploymentAndRetainedChecklistWithoutCreatingACase()",
+            "cancellationWakesFutureCleanupAndReplaysTheOriginalJobReceipt()",
+            "dueExecutionCreatesOneOpenCaseWithPendingTasksAndNeverChangesEmploymentOrAccess()",
+            "theFiniteExecutionWindowCannotBeExtendedByARetry()",
+            "retainedAttemptsHaveABoundedLimitEvenAfterSuccessfulCancellation()",
+            "changedTemplateRetainsItsOriginalDefinitionsAndStopsExecution()",
+            "unknownAndForeignAssigneesCannotEnterTheQueue()",
+            "repeatedMidnightReviewCanBeAdmittedByPostgresAtBothWindowBoundaries()",
+            "explicitRecoveryClosesAnExhaustedAuthorizationWithoutStartingOrReplacingACase()",
+            "[1] afterAdmission = false",
+            "[2] afterAdmission = true"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OnboardingScheduleSecurityHttpTest",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] action = \"review\"",
+            "[2] action = \"list\"",
+            "[3] action = \"detail\"",
+            "[4] action = \"schedule\"",
+            "[5] action = \"replay\"",
+            "[6] action = \"cancel\"",
+            "[7] action = \"recover\"",
+            "[1] change = \"account\"",
+            "[2] change = \"membership\"",
+            "[3] change = \"permission\"",
+            "[1] change = \"credential\", code = \"session_revoked\"",
+            "[2] change = \"permission\", code = \"onboarding_access_required\"",
+            "[3] change = \"membership\", code = \"company_access_denied\"",
+            "[4] change = \"company\", code = \"company_access_denied\"",
+            "replacingTheCapturedCredentialInAMemoryLeaseCannotReviveRevokedAuthorization()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OnboardingScheduleTransactionHttpTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "competingRetriesKeepOneAuthorizationAndChangedPayloadCannotReplaceTheReceipt()",
+            "terminalJobCannotCommitAnIncompleteOrAlteredChecklist()",
+            "crossingTheFinalPreparationBoundaryDuringJournalingRollsBackAllCaseEvidence()",
+            "checkpointFailureRollsBackEmploymentAccessCaseAndAllEvidence()",
+            "storageRejectsForgedEmploymentTemplateAssigneesAndJobEvidence()",
+            "twoWorkersWithOneLeaseCannotCommitTwoInitiations()",
+            "lateLeaseExpiryRollsBackTheCheckpointAndOldOwnersCannotFinishAReplacement()",
+            "interruptionAfterCheckpointReleasesResourcesAndCannotCommitALateInitiation()",
+            "retainedAuthorizationIsImmutableAndAnotherCompanyCannotReadIt()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OrganizationCompletionTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] mode = \"company_read\"",
+            "[2] mode = \"root_read\"",
+            "[3] mode = \"parent_read\"",
+            "[4] mode = \"list_read\"",
+            "[5] mode = \"company_create\"",
+            "[6] mode = \"company_update\"",
+            "[7] mode = \"unit_save\"",
+            "[8] mode = \"company_create_receipt\"",
+            "[9] mode = \"company_update_receipt\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OrganizationReadHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "waitingReadsAndWritesRecheckCredentialsMembershipAndOriginalPermissions()",
+            "filtersMatchLiteralNamesAndCodesAndTuplePaginationStaysBounded()",
+            "invalidPagesAndSearchesUseStableErrorsWithoutEchoingInput()",
+            "aConcurrentParentEditCannotSplitTheUnitAndParentSnapshot()",
+            "cancellationDuringAReadReleasesTheStructureGuardAndCannotReturnLateData()",
+            "detailsIncludeTheScopedParentAndDoNotResolveForeignUnits()",
+            "naturalMfaExpiryWhileWaitingRejectsReadsAndMutationsUntilFreshAssurance()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "selfAndAssignedReadersCannotBrowseUnrelatedEmployeeRequests()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeWorkflowHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "staleEmploymentMissingPolicyAndInvalidScheduleRemainRecoverable()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentAttendanceHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "anotherCompanyEmployeeOrUnpublishedReferenceCannotBecomeTheAmendmentWorkSource()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentDiscoveryHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "discoveryUsesItsOwnAuthorityAndOnlyReturnsRetainedEmployeeMonthReferences()",
+            "annualDiscoveryHasStablePagesAndLiteralEmployeeNameOrNumberSearch()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentPublicationAssuranceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "lateMfaExpiryCannotCommitBankRecoveryOrAdvanceItsEmployeeProjection()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentPublicationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "publishedCorrectionRetainsOriginalEvidenceAndAdvancesEmployeeProjectionsTogether()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAmendmentPublicationTransactionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "incompletePublicationNeverChangesEmployeeFactsPaymentsOrJobProgress()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAttendanceCalculationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "exactSourceReadsNeverFallBackAcrossCompanyEmployeeOrClosingJob()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollAttendanceInputHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "anotherEmployeesOrCompanysAdjustmentCannotBeSelected()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollCalculationReviewHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "calculationReviewExposesOnlyNeededPolicyReferencesWithoutRequiringPolicyOrPeopleGrants()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationPreparationHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "publicationDirectoryFiltersCompletedRunsAndRemainsBoundedAndCompanyScoped()",
+            "finalizerCanReviewPublicationWithoutCalculationAdministrationOrEmployeeReads()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationPublicationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "twoEmploymentIdsCannotAssessTheSamePersonTwice()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationSecurityHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "changedEmploymentCannotReplaceApprovedEvidenceDuringPublication()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollInputHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "invalidComponentsAndStaleEmploymentLeaveNoPartialOrUnverifiedChanges()",
+            "inputsRequireAnExactClosedWorkforceSnapshotFromTheirEmployeeAndCompany()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollInputReviewHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "reviewCombinesCurrentSourcesHistoryAndIndependentActionsWithoutPrivatePeopleGrants()",
+            "employeeDiscoveryIncludesUnpreparedAndFutureEmploymentsWithMinimalBoundedRows()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPaymentAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "lateCredentialRevocationAlsoBlocksCommandReceiptReplayAndEmployeeProgress()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPayslipHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "selfScopeCannotReadAnotherEmploymentAndAdministrationDoesNotGrantFinancialAccess()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPeriodHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "aFiveThousandEmployeeSnapshotHasBoundedPagesAndNoMissingMembers()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPeriodReviewHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "discoveryUsesPayrollPeriodAuthorityWithoutPrivatePeopleOrCompensationGrants()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollReviewPreparationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "preparationReturnsRetainedTotalsWithoutCreatingAnApprovalOrLoadingEmployeePayloads()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunComparisonHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "incompleteAndFailedEmployeeResultsCannotProduceASuccessfulComparison()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunCutoffHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "changedEmploymentIsReportedForThatEmployeeWithoutMixingSourceRevisions()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunSnapshotHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "aFiveThousandEmployeeRunCapturesOnlyBoundedReferencesAtStart()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunTransactionHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "immutableRunEvidenceIsIsolatedByCompanyAndNotExposedToEmployeeAccounts()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxContinuityHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "missingAndOutOfOrderMonthsAreRetainedAsEmployeeFailures()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxOpeningHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "inputBoundsFutureFactsAndEmploymentVersionsLeaveRejectedOperationsReusable()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxOpeningReviewHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "discoveryIncludesMissingHistoryAndFutureEmployeesWithMinimalBoundedReferences()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PeopleCommandCompletionTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] mode = \"create\"",
+            "[2] mode = \"revise\"",
+            "[3] mode = \"cancel_revision\"",
+            "[4] mode = \"profile\"",
+            "[5] mode = \"template\"",
+            "[6] mode = \"start\"",
+            "[7] mode = \"assign\"",
+            "[8] mode = \"task\"",
+            "[9] mode = \"complete\"",
+            "[10] mode = \"binding_mfa\"",
+            "[11] mode = \"binding_password\"",
+            "[12] mode = \"task_receipt\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PeopleHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "effectiveHistoryIsAppendOnlyAndCreateReplaySurvivesArchivedReferences()",
+            "teamAndSelfPermissionsFilterBothDirectoriesAndDetailReads()",
+            "foreignCompanyAssignmentsAreRejectedBeforeAnyPersonIsInserted()",
+            "simultaneousEmployeeNumbersCannotLeaveAnOrphanPerson()",
+            "organizationReparentingCannotCreateACycle()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PeopleInputOwnershipTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] mode = \"template\"",
+            "[2] mode = \"assignees\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PeopleReadCompletionTest",
+          "tests": 22,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] mode = \"employee\"",
+            "[2] mode = \"self_employee\"",
+            "[3] mode = \"employees\"",
+            "[4] mode = \"details\"",
+            "[5] mode = \"self_details\"",
+            "[6] mode = \"history\"",
+            "[7] mode = \"revision\"",
+            "[8] mode = \"transfers\"",
+            "[9] mode = \"self_employments\"",
+            "[10] mode = \"profile\"",
+            "[11] mode = \"self_profile\"",
+            "[12] mode = \"profile_history\"",
+            "[13] mode = \"directory\"",
+            "[14] mode = \"departments\"",
+            "[15] mode = \"case\"",
+            "[16] mode = \"cases\"",
+            "[17] mode = \"case_history\"",
+            "[18] mode = \"template\"",
+            "[19] mode = \"templates\"",
+            "[20] mode = \"assigned\"",
+            "[21] mode = \"assignees\"",
+            "[22] mode = \"offboarding\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PersonAccountBindingEnrollmentTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] replay = \"false\", mfa = \"true\"",
+            "[2] replay = \"true\", mfa = \"true\"",
+            "[3] replay = \"false\", mfa = \"false\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PersonAccountBindingHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "failedAuditRollsBackAccountLinkProfileAndReceiptTogether()",
+            "competingPeopleCannotBindTheSameAccountOrLeaveAnOrphanAuthorization()",
+            "revokedOrStaleAuthenticationCannotPublishThePendingBinding()",
+            "bindingPublishesSelfAccessWithImmutableIdentityHistoryAndOriginalReplay()",
+            "aConcurrentProfileEditCannotBeOverwrittenByAccountBinding()",
+            "independentBindingRequiresAnActiveMemberAndTheOwningCompany()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PersonProfileAssuranceHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] operation = \"get\"",
+            "[2] operation = \"history\"",
+            "[3] operation = \"save\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PersonProfileHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "concurrentProfileSavesDoNotOverwriteEachOther()",
+            "failedAuditRollsBackTheProfileHistoryAndReceipt()",
+            "sensitiveProfilesRequireExplicitScopeAndAnOwningCompanyForChanges()",
+            "profileChangesKeepImmutableHistoryAndAnIndependentVersionWithReplay()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.RosterBulkHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "updatedEmploymentOrRestoredPatternRequiresAnotherReview()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.SelfEmploymentHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "selfReadIncludesAssignmentLabelsButDoesNotExpandOtherPeopleOrCompanyAccess()",
+            "[1] change = \"permission\"",
+            "[2] change = \"credential\"",
+            "[3] change = \"membership\"",
+            "discoveryUsesCompanyDateAndOnlyTheLinkedPersonEvenWithDirectoryAccess()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.SelfExpenseHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "mfaExpiryWhileWaitingForAccessCannotReleaseEmploymentReferences()",
+            "directoryUsesCompanyDateAndReturnsOnlyOwnedEmploymentReferences()",
+            "cancellingDiscoveryReleasesPeopleAndAccessGuardsForTheNextRequest()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.SelfLeaveHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "mfaExpiryWhileWaitingForAccessCannotReleaseEmploymentReferences()",
+            "directoryUsesCompanyDateAndReturnsOnlyOwnedEmploymentReferences()",
+            "cancellingDiscoveryReleasesPeopleAndAccessGuardsForTheNextRequest()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.SelfLeavePreviewHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "leavePreparationDoesNotRequireOtherEmployeeModulesToBeEnabled()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.SelfProfileRecordHttpTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "privateAndEmploymentChangesPublishOneCoherentSnapshotWithoutAnAgeBasedRewrite()",
+            "explicitFeedAndCanonicalRecordContainOnlyTheOwnersPublishedPrivateProfile()",
+            "[1] change = \"permission\"",
+            "[2] change = \"membership\"",
+            "[3] change = \"credential\"",
+            "foreignCompanyAndPartialReadGrantsCannotAcquirePrivateRecordsOrPendingState()",
+            "[1] phase = \"record\"",
+            "[2] phase = \"bootstrap\"",
+            "[3] phase = \"changes\"",
+            "broaderGrantsStillExportOnlyOwnEmploymentAndOldCursorsCannotCrossAccounts()",
+            "disablingPeopleGatesTheCanonicalRecordAndFeedWithoutDestroyingThePublishedProfile()",
+            "cancelledPrivateAcquisitionReleasesTheTransactionAndItsGuards()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.SelfWorkforceHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] cancel = false",
+            "[2] cancel = true",
+            "directoryUsesCompanyDateAndReturnsOnlyOwnedEmploymentReferences()",
+            "cancellingDiscoveryReleasesPeopleAndAccessGuardsForTheNextRequest()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.WorkCalendarAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "pendingScheduleChangesRecheckEmploymentEligibility()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.WorkCalendarHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "calendarRangeAndEmployeeScopeAreEnforced()"
+          ]
+        }
+      ],
+      "total": {
+        "tests": 497,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "combinedBuildDurationSeconds": 1329,
+    "combinedBuildStatus": "failed-worker-fixtures",
+    "note": "The selected API suite passed. The parallel worker suite had two legacy setup failures: import fixtures supplied recent proof with no stored enrollment when invoking interactive admission. Production code remains unchanged for final full worker acceptance."
+  },
+  "workerFixtureCorrection": {
+    "path": "apps/worker/src/test/kotlin/dev/fajar/hris/worker/EmployeeImportWorkerTest.kt",
+    "setupFailures": 2,
+    "change": "Declare the stored enrolled-MFA fixture used by its existing interactive operator; retain background execution policy and restricted worker credentials."
+  },
+  "finalWorker": {
+    "results": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.worker.AnnouncementPublicationWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "credentialRevocationStopsExecutionAndCleanupDoesNotRequireRevokedPermission()",
+              "skipped": false
+            },
+            {
+              "name": "springBatchPublishesOneImmutableInboxUsingRestrictedWorkerCredentials()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.DirectoryProjectionWorkerTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "aPassIsBoundedAndTwoWorkersSkipEachOthersLockedRows()",
+              "skipped": false
+            },
+            {
+              "name": "stoppingDuringProjectionRollsBackRecordsEventsAndScheduleAndReleasesTheTimer()",
+              "skipped": false
+            },
+            {
+              "name": "currentCoworkersPublishWhileFutureAndSuspendedEmployeesRemainAbsent()",
+              "skipped": false
+            },
+            {
+              "name": "changingTheCompanyTimezoneReevaluatesAnAlreadyScheduledStart()",
+              "skipped": false
+            },
+            {
+              "name": "aWriteWaitingForProjectionCompletionIsStillDueAfterThatCompletion()",
+              "skipped": false
+            },
+            {
+              "name": "aPassDoesNotExpandItsCompanyScopeBeyondTheDiscoveryLimit()",
+              "skipped": false
+            },
+            {
+              "name": "anEndDatePublishesATombstoneAndRestoredEmploymentKeepsItsIdentity()",
+              "skipped": false
+            },
+            {
+              "name": "aCancelledFutureRevisionDoesNotRemoveTheCoworkerAndUnchangedContentDoesNotAdvanceVersion()",
+              "skipped": false
+            },
+            {
+              "name": "assignmentAndLabelChangesInvalidateOnlyTheirPublicRecords()",
+              "skipped": false
+            },
+            {
+              "name": "crossCompanyCaptureHasOnlyIdentityAndQueuePrivilegesWithoutABusinessRlsBypass()",
+              "skipped": false
+            },
+            {
+              "name": "aNameChangeReachesEveryCompanyButPrivateProfileChangesDoNotCreateDirectoryEvents()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.DocumentValidationWorkerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "interruptedInventoryBatchDiscardsThePageAndAnotherLeaseResumes()",
+              "skipped": false
+            },
+            {
+              "name": "realBatchInventoryFinishesAnUnknownTotalWithoutWeakeningFixedJobs()",
+              "skipped": false
+            },
+            {
+              "name": "realBatchTaskScansOutsideTransactionsAndPublishesWithRestrictedCredentials()",
+              "skipped": false
+            },
+            {
+              "name": "interruptedInspectionClosesTheSessionAndANewLeaseCanRecover()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.EmployeeImportWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "aNewBatchExecutionResumesAfterTheCommittedRowWithoutRepeatingItsSideEffects()",
+              "skipped": false
+            },
+            {
+              "name": "realBatchTasksPreviewThenCreateEmployeesWithRestrictedRuntimeCredentials()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.IdentityMailWorkerTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "workerDeadlineAndShutdownReleaseBlockedDeliveriesAndOwnedThreads()",
+              "skipped": false
+            },
+            {
+              "name": "expiredRevokedAndObsoleteLeasesNeverReachSmtp()",
+              "skipped": false
+            },
+            {
+              "name": "transientDeliveryIsDeferredButPermanentErrorsAndAttemptExhaustionAreTerminal()",
+              "skipped": false
+            },
+            {
+              "name": "sendsActualSmtpAfterCommitAndDiscardsCiphertextAfterFencedAcknowledgement()",
+              "skipped": false
+            },
+            {
+              "name": "lostAcknowledgementCanRepeatDeliveryWithOneStableMessageAndOneCommittedAudit()",
+              "skipped": false
+            },
+            {
+              "name": "completedTasksCancelTheirTimersAndLateCancellationDoesNotInterruptReusedThreads()",
+              "skipped": false
+            },
+            {
+              "name": "competingClaimsAndReclamationPreserveFencing()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.InboxEmailWorkerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "acceptedStateAndProjectionRollBackWithAuditFailureAndCrashedClaimsExhaust()",
+              "skipped": false
+            },
+            {
+              "name": "disabledDeliveryStillExpiresAndPurgesOperationalRowsWithoutDeletingInbox()",
+              "skipped": false
+            },
+            {
+              "name": "revokedAccessOrArchivedPublicationPreventsAnotherProviderCall()",
+              "skipped": false
+            },
+            {
+              "name": "deadlineInterruptsStalledDeliveryWithoutAcknowledgingIt()",
+              "skipped": false
+            },
+            {
+              "name": "acceptedMailUsesCurrentAddressStableIdentityAndOnlyAnAuthorizedInboxLink()",
+              "skipped": false
+            },
+            {
+              "name": "actualSmtpAcceptanceAndRejectionUpdateDurableEmailObservations()",
+              "skipped": false
+            },
+            {
+              "name": "competingWorkersRespectTheDeploymentCapacityAndUniqueLeases()",
+              "skipped": false
+            },
+            {
+              "name": "transientFailureWaitsAndUsesAFreshLeaseWhilePermanentFailureIsTerminal()",
+              "skipped": false
+            },
+            {
+              "name": "workerShutdownInterruptsDeliveryAndReleasesItsOwnedExecutors()",
+              "skipped": false
+            },
+            {
+              "name": "lostSmtpAcknowledgementRepeatsTheMessageIdButNeverAcceptsAnExpiredLease()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.InboxPushWorkerTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "revokedCredentialsOrWithdrawnInboxPreventNewProviderCalls()",
+              "skipped": false
+            },
+            {
+              "name": "publishedInboxCreatesDurableCheckpointsAndOnlyPreexistingDevicesReceiveHints()",
+              "skipped": false
+            },
+            {
+              "name": "unregisteredTokenRetirementCannotEraseANewerTokenAndRollsBackIfAcknowledgementFails()",
+              "skipped": false
+            },
+            {
+              "name": "disabledDeliveryStillExpiresAndPurgesOperationalRowsWithoutDeletingInbox()",
+              "skipped": false
+            },
+            {
+              "name": "terminalFailureRollbackAndCrashedLeaseExhaustionRemainRecoverableAndBounded()",
+              "skipped": false
+            },
+            {
+              "name": "retryUsesPersistedTargetBackoffAndANewFencedLease()",
+              "skipped": false
+            },
+            {
+              "name": "maintenanceCannotFailOrAuditAStaleCheckpointAfterDeliveryProgress()",
+              "skipped": false
+            },
+            {
+              "name": "workerShutdownInterruptsDeliveryAndReleasesItsOwnedExecutors()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.LeaveBatchWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "exhaustedProcessLeasesCanBeExplicitlyResumedWithoutRewindingCommittedWork()",
+              "skipped": false
+            },
+            {
+              "name": "aNewSpringBatchExecutionContinuesAfterACommittedEmployeeWithoutDuplicatingGrant()",
+              "skipped": false
+            },
+            {
+              "name": "realWorkerTasksAccrueAndCloseBalancesUsingRestrictedRuntimeCredentials()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.LeaveCarryExpiryWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "aClosingResumedAfterExpiryCannotIntroduceCreditForAnAlreadyProcessedTarget()",
+              "skipped": false
+            },
+            {
+              "name": "anotherAuthorizedOperatorRecoversOnlyTheUnfinishedPrefix()",
+              "skipped": false
+            },
+            {
+              "name": "restrictedWorkerSettlesTheOriginalCohortAfterItsCreatorLosesAccess()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.MobileSyncWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "stoppingDuringPublicationRollsBackTheBatchAndReleasesItsTimerAndDatabaseGuards()",
+              "skipped": false
+            },
+            {
+              "name": "eachPassHasAFiniteBatchAndTheWorkerDoesNotQueueATaskPerChange()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.NativeSessionCleanupWorkerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "eachIndependentQueueHasAFiniteLimitAndEventuallyDrains()",
+              "skipped": false
+            },
+            {
+              "name": "stoppingAPendingPassRollsBackAndReleasesTheThreadQueueAndRowGuards()",
+              "skipped": false
+            },
+            {
+              "name": "competingWorkersSkipOwnedRowsInsteadOfDuplicatingWork()",
+              "skipped": false
+            },
+            {
+              "name": "retentionPreservesActiveCredentialsQuotaEvidenceAndRefreshReuseDetection()",
+              "skipped": false
+            },
+            {
+              "name": "aHeldCredentialOrConsumedHashDoesNotBlockOtherEligibleWork()",
+              "skipped": false
+            },
+            {
+              "name": "aLateMappingFailureRollsBackAllThreeKindsOfCleanup()",
+              "skipped": false
+            },
+            {
+              "name": "fixedDelayKeepsOneTaskAndAppliesTheNextBatchOnlyAfterCommit()",
+              "skipped": false
+            },
+            {
+              "name": "disabledWorkerConfigurationAllocatesNoCleanupTaskAndSchedulingRejectionStopsTheOwner()",
+              "skipped": false
+            },
+            {
+              "name": "invalidOrFutureCutoffsAndMissingWorkerCapabilityCannotDeleteRows()",
+              "skipped": false
+            },
+            {
+              "name": "maximumRotationEvidenceCascadesOnlyWithItsExpiredParent()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.ObjectCleanupWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "stoppingPendingIoLeavesAFencedLeaseAndReleasesThePollingThread()",
+              "skipped": false
+            },
+            {
+              "name": "expiryCleanupDoesNotRequireTheFormerUploaderToKeepAccountAccess()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.OffboardingScheduleWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "revokedCredentialsCannotExecuteButScopedCleanupStillClosesTheSchedule()",
+              "skipped": false
+            },
+            {
+              "name": "cancellingBeforeTheExecutionDateWakesAndStopsTheFutureJob()",
+              "skipped": false
+            },
+            {
+              "name": "springBatchCompletesAnAdmittedScheduleAfterInteractiveMfaHasExpired()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.OnboardingScheduleWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "revokedCredentialsCannotExecuteButScopedCleanupStillClosesTheSchedule()",
+              "skipped": false
+            },
+            {
+              "name": "cancellingBeforeTheExecutionDateWakesAndStopsTheFutureJob()",
+              "skipped": false
+            },
+            {
+              "name": "springBatchCompletesAnAdmittedScheduleAfterInteractiveMfaHasExpired()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.PayrollCalculationWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "aNewBatchExecutionUsesTheCommittedCheckpointAfterProcessInterruption()",
+              "skipped": false
+            },
+            {
+              "name": "revocationStopsTheRunAndANewCredentialCanExplicitlyResumeIt()",
+              "skipped": false
+            },
+            {
+              "name": "aRealBatchExecutionRetainsPerEmployeeReadinessFailuresAndCompletesMetadata()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "cases": [
+            {
+              "name": "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()",
+              "skipped": true
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportRetentionWorkerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "stoppingScheduledCleanupInterruptsAndRollsBackTheOwnedTransaction()",
+              "skipped": false
+            },
+            {
+              "name": "progressingLargeExportsMoveBehindOlderDueWorkAndCompetingPassesDoNotDoubleRetire()",
+              "skipped": false
+            },
+            {
+              "name": "boundedCleanupRetiresUnknownFormatsAndReleasesQuotaWithoutRestoringRevokedAccess()",
+              "skipped": false
+            },
+            {
+              "name": "outstandingObjectCleanupBlocksRetirementWithoutStarvingAnotherDueExport()",
+              "skipped": false
+            },
+            {
+              "name": "discoveryDoesNotGrantGlobalFactsAndSchedulesCannotBeDeletedBeforePhysicalRetirement()",
+              "skipped": false
+            },
+            {
+              "name": "failedJournalRollsBackJobCancellationRowsRetirementAndTheSchedule()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "registeredTaskPublishesThroughRealBatchWithBackgroundAuthorityAndRetainedCleanup()",
+              "skipped": false
+            },
+            {
+              "name": "credentialChangeBeforeResolutionStillAllowsFencedAbortWithoutContentAccess()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.SelfProfileProjectionWorkerTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "managerEndAndEffectiveEmploymentChangesAreScheduledInCompanyTime()",
+              "skipped": false
+            },
+            {
+              "name": "assignmentLabelsAndArchiveStatusProduceOneNewRecord()",
+              "skipped": false
+            },
+            {
+              "name": "aSourceWriteWaitingOnProjectionCompletionStillSchedulesItsNewFacts()",
+              "skipped": false
+            },
+            {
+              "name": "cancellingAFutureRevisionRetainsCurrentFactsAndRemovesItsDueInstant()",
+              "skipped": false
+            },
+            {
+              "name": "changingTimezoneCanWithdrawAndRepublishAnEffectiveProfile()",
+              "skipped": false
+            },
+            {
+              "name": "futureAndUnlinkedEmployeesDoNotPublishPrivateFields()",
+              "skipped": false
+            },
+            {
+              "name": "captureAndRuntimeRolesCannotReadAnotherCompanyOrPrivatePersonFields()",
+              "skipped": false
+            },
+            {
+              "name": "stoppingTheWorkerRollsBackItsRecordAndKeepsDueWorkRecoverable()",
+              "skipped": false
+            },
+            {
+              "name": "concurrentWorkersSkipLockedRowsWithoutDuplicatePublication()",
+              "skipped": false
+            },
+            {
+              "name": "managerNamesInvalidateDependentsWithoutIncludingManagerPrivateFields()",
+              "skipped": false
+            },
+            {
+              "name": "eachPassBoundsCompanyDiscoveryAndResumesRemainingRows()",
+              "skipped": false
+            },
+            {
+              "name": "privateEditsInvalidateSharedPersonsInBothCompaniesWithoutChangingEmploymentVersions()",
+              "skipped": false
+            },
+            {
+              "name": "privateFieldsAndAssignmentReferencesComeFromOneOwnedProjection()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.WorkerIntegrationObservationTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "concurrentNewProcessesCannotExceedTheRegistryCapacity()",
+              "skipped": false
+            },
+            {
+              "name": "workerRolePublishesDatabaseTimeAndCannotRewriteItsStartupFlags()",
+              "skipped": false
+            },
+            {
+              "name": "stoppingTheReporterInterruptsPublicationAndJoinsItsTimerWithoutLateWrites()",
+              "skipped": false
+            },
+            {
+              "name": "expiredReportsAreReclaimedUsingDatabaseTimeAndFailureRollsBackTheirRemoval()",
+              "skipped": false
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.WorkerIntegrationTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            {
+              "name": "realBatchTaskCommitsTheCompanySnapshotAndPersistentBatchMetadata()",
+              "skipped": false
+            },
+            {
+              "name": "revokedOriginStopsBusinessWorkButFencedCleanupRemainsPossible()",
+              "skipped": false
+            },
+            {
+              "name": "shutdownInterruptsOwnedWorkAndReleasesEveryWorkerThread()",
+              "skipped": false
+            },
+            {
+              "name": "lateCancellationCannotInterruptAThreadThatHasMovedToAnotherJob()",
+              "skipped": false
+            },
+            {
+              "name": "nonProgressingAdapterTerminatesAfterOneStep()",
+              "skipped": false
+            },
+            {
+              "name": "reportSourcePortUsesTheWorkerTransactionOwner()",
+              "skipped": false
+            }
+          ]
+        }
+      ],
+      "total": {
+        "tests": 105,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      }
+    },
+    "durationSeconds": 226,
+    "format": true,
+    "architecture": true,
+    "apiAndWorkerPackages": true,
+    "manualSkip": "ReportExportElapsedRetentionTest retains independent actual one-hour evidence; not counted as a passing test here."
+  },
+  "browser": {
+    "stats": {
+      "startTime": "2026-10-30T09:11:58.757Z",
+      "duration": 36124.915,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "scenarios": [
+      {
+        "file": "employee-imports.spec.ts",
+        "title": "real API CSV preview and cancellation retain their original commands after lost responses",
+        "status": "expected",
+        "durationMs": 5424
+      },
+      {
+        "file": "employment-transfer.spec.ts",
+        "title": "real cross-company transfer recovers one commit, retains person identity and moves native employee access",
+        "status": "expected",
+        "durationMs": 5831
+      },
+      {
+        "file": "person-account-binding.spec.ts",
+        "title": "real account binding recovers one receipt and enables only the linked native employee profile",
+        "status": "expected",
+        "durationMs": 2824
+      }
+    ]
+  },
+  "workerBrowser": {
+    "stats": {
+      "startTime": "2026-10-30T09:13:53.801Z",
+      "duration": 36809.114,
+      "expected": 2,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "scenarios": [
+      {
+        "file": "offboarding-schedules.spec.ts",
+        "title": "scheduled departure recovers lost admission and cancellation receipts through the real worker",
+        "status": "expected",
+        "durationMs": 7594
+      },
+      {
+        "file": "onboarding-schedules.spec.ts",
+        "title": "scheduled onboarding recovers committed responses and cancels future creation through the real worker",
+        "status": "expected",
+        "durationMs": 5348
+      }
+    ]
+  },
+  "packages": {
+    "api": "793f1704442cbd29785242778129efe81a852690ef7f9924998f93b1638ed9d4",
+    "worker": "812008a0e236164eb2974fc275236e4013ea58cece5a4664dca6e4454bcd7ad7"
+  },
+  "sourceContinuity": {
+    "head": "7dae1e2661f7f6a434835054e1ea83f64045572e",
+    "productionPaths": [
+      "modules",
+      "core",
+      "apps/server/src/main",
+      "apps/worker/src/main",
+      "build-logic",
+      "gradle"
+    ],
+    "productionPatchSha256": "4399c88b5e1238ccad842a5f6c76910833edd1165372f14f2f10731c3c5b3224",
+    "packages": {
+      "api": "793f1704442cbd29785242778129efe81a852690ef7f9924998f93b1638ed9d4",
+      "worker": "812008a0e236164eb2974fc275236e4013ea58cece5a4664dca6e4454bcd7ad7"
+    },
+    "note": "Snapshot after complete broad API acceptance. The only subsequent compiled-source edit may correct the worker test fixture; production and package hashes must stay identical."
+  },
+  "behavior": [
+    "Guarded identity snapshots retain current MFA through final journal/read completion with no added queries.",
+    "Binding and imports require current stored enrollment as well as their recent proof. Disabled-MFA controls preserve password authentication.",
+    "Mutable checklist task lists and initial assignee maps are bounded/detached before validation, operation hashing and account-guard selection.",
+    "Task receipt replay rechecks assurance after current case/task scope acquisition. Company create/update receipts validate after their real repository receipt acquisition.",
+    "Transfers validate both retained company scopes at actual identity acquisition and completion; recent proof survives neither policy waits nor either journal. New transfers retain current dates in both company zones; old receipts remain recoverable after the date changes.",
+    "Future employment cancellation rechecks the company date before completion; an already effective revision cannot be cancelled. Old cancellation receipts retain recovery after that date.",
+    "Client availability remains admission-only. No final maintenance requery or new background MFA-age policy is introduced."
+  ],
+  "fullCi": {
+    "status": "pending-final-source-run",
+    "predecessor": "https://github.com/fajarxfce/hris-platform/actions/runs/41023645590",
+    "predecessorSource": "70b92e59e7b41bdafe9f9d1c4b9d5106412777f5",
+    "note": "The predecessor passed all ten jobs but excludes both People increments."
+  },
+  "remaining": "All five People rows remain unverified until the document category/identity-validity implementation and complete detailed review. Inventory remains thirty reviewed, thirty-one unverified. Continue remaining Platform/Mobile/Starter scope.",
+  "runtime": "No rollout, physical phone action or live provider delivery. Private schema-101 API and accepted Google binding remain unchanged.",
+  "runtimeHealth": {
+    "checkedAt": "2026-10-30T09:09:24.620498+00:00",
+    "requests": "Read-only health/static index; no application mutation",
+    "endpoints": [
+      {
+        "url": "http://10.77.77.1:8088/actuator/health",
+        "status": 200
+      },
+      {
+        "url": "http://10.77.77.1:5173/",
+        "status": 200
+      }
+    ]
+  }
+}

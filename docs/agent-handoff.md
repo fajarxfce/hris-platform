@@ -133,16 +133,20 @@ data cases, quality/packages (1124s), three actual browser workflows (36.5s)
 and two actual worker/browser workflows (37.3s), with setup. No new query, DI
 or schema change occurred. All five People initial rows remain unverified.
 
-People reader correction `b0b7c21c` is committed/pushed. The active command review
-has reproduced fifty actual failures plus four already-correct controls. Current
-local source corrects journal/replay completion, current MFA enrollment on binding
-and imports, lifecycle input ownership, Organization completion and immediate
-company dates. All 54 focused API, 50 People domain, two Organization domain and
-fourteen People repository cases plus quality/packages passed (142s). Broad API
-and worker acceptance is still running. Two old EmployeeImportWorkerTest fixture
-setups omit enrolled MFA while invoking interactive admission; inspect/correct
-those fixtures and finish full worker/context acceptance before committing the
-command increment. These in-progress changes are not included in the green CI.
+People reader correction `b0b7c21c` is committed/pushed. The later
+[command/Organization correction](people-command-assurance-2026-10-30.md) now
+passes fifty reproduced failures and four prior controls. All 54 focused API,
+52 domain and fourteen data cases passed in 142s. The broad API selection passed
+497 cases; its parallel worker run had two old enrollment-fixture failures.
+After fixing only that fixture, all 104 ordinary worker cases passed with one
+separately accepted manual test skipped; quality/packages passed in 226s.
+Production/package hashes match the broad API run. Final actual browser workflows
+passed in 36.1s (three normal) and 36.8s (two worker), including setup.
+Both API and worker contexts are validated. Commit/push the atomic correction and
+dispatch full CI for that exact source. Then implement the confirmed document
+category/identity-validity gap and finish People review; do not mark its five rows
+accepted from assurance fixes alone. The full goal remains active.
+
 CompleteOffboarding and explicit onboarding/offboarding schedules already have
 final checks; preserve their behavior. Client policy is admission-only: do not add
 final availability rejection for already admitted work. Complete full People

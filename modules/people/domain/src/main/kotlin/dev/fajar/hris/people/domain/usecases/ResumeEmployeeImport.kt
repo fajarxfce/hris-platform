@@ -64,10 +64,11 @@ class ResumeEmployeeImport(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val identityAccess = (authority as Result.Success).value
             val authorized =
-                identities.access(actor.accountId, company).flatMap {
-                    validateEmployeeImportActor(actor, it)
-                }
+                validateEmployeeImportSessionActor(actor, identityAccess, clock.instant(), security)
             if (authorized is Result.Failed) return@run authorized
             val currentAssurance = requireEmployeeImportAssurance(actor, security, clock.instant())
             if (currentAssurance is Result.Failed) return@run currentAssurance
@@ -165,7 +166,18 @@ class ResumeEmployeeImport(
                                 ),
                             )
                         }
-                        .map { receipt }
+                        .flatMap {
+                            validateEmployeeImportSessionActor(
+                                    actor,
+                                    identityAccess,
+                                    clock.instant(),
+                                    security,
+                                )
+                                .flatMap {
+                                    requireEmployeeImportAssurance(actor, security, clock.instant())
+                                }
+                                .map { receipt }
+                        }
                 }
         }
     }

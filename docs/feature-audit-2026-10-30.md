@@ -209,3 +209,13 @@ Document review omitted category; `documents.02` is reopened and `people.03` rem
 unverified. [The source finding](document-identity-metadata-gap-2026-10-30.md)
 records the gap and next implementation. Current inventory: thirty reviewed and
 thirty-one unverified initial rows, with full Mobile/Starter review still active.
+
+## People commands — locally accepted, missing feature remains
+
+[Command/Organization completion](people-command-assurance-2026-10-30.md) closes
+fifty actual failures and preserves four prior controls. 497 broad API cases,
+104 ordinary worker cases, 52 domain, fourteen data, quality/packages and five
+actual browser/worker workflows pass. Two old import-worker enrollment fixtures
+were corrected; the combined failed run and separate successful worker acceptance
+remain explicit. All five People rows remain unverified pending the document
+metadata implementation and detailed review. Final-source CI must still pass.

@@ -263,6 +263,43 @@ class PayrollFinalizationAssuranceTest : PayrollFinalizationApiFixture() {
         assertEquals(0, count(scene.actor.companyId!!, "payroll_finalizations"))
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = ["start", "start-replay"])
+    fun currentEnrollmentIsRequiredForCommandsAndReceipts(action: String) {
+        val scene = prepare(started = false)
+        val operation = UUID.randomUUID()
+        val replay = action.endsWith("replay")
+        if (replay) assertTrue(mutate(scene, scene.actor, operation) is Result.Success)
+        database()
+            .update(
+                "update accounts set mfa_secret_encrypted=null where id=?",
+                scene.actor.accountId,
+            )
+        val before = snapshot(scene.actor)
+        try {
+            val rejected = mutate(scene, scene.actor, operation)
+            assertEquals(
+                "mfa_setup_required",
+                (rejected as? Result.Failed)?.failure?.code,
+                rejected.toString(),
+            )
+            assertEquals(before, snapshot(scene.actor))
+        } finally {
+            database()
+                .update(
+                    "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
+                    scene.actor.accountId,
+                )
+        }
+        val recovered = mutate(scene, scene.actor, operation)
+        assertTrue(recovered is Result.Success, recovered.toString())
+        assertEquals(replay, (recovered as Result.Success).value.replayed)
+        assertEquals(
+            Result.Success(recovered.value.copy(replayed = true)),
+            mutate(scene, scene.actor, operation),
+        )
+    }
+
     private fun prepare(started: Boolean = true): Scenario {
         clock.set(Instant.now())
         val f = approved()

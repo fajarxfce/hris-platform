@@ -588,9 +588,14 @@
     "failed": 0,
     "scope": "Four backend shards, four dashboard shards, real dashboard integration and recovery integration."
   },
-  "reopenedRequirements": [
-    "documents.02"
-  ],
+  "reopenedRequirements": [],
   "reopeningEvidence": "docs/document-identity-metadata-gap-2026-10-30.md",
-  "metadata_final_ci": "docs/measurements/document-metadata-final-ci-2026-10-30.json"
+  "metadata_final_ci": "docs/measurements/document-metadata-final-ci-2026-10-30.json",
+  "historicalReopening": {
+    "requirements": [
+      "documents.02"
+    ],
+    "evidence": "docs/document-identity-metadata-gap-2026-10-30.md",
+    "closedBy": "docs/measurements/document-metadata-final-ci-2026-10-30.json"
+  }
 }

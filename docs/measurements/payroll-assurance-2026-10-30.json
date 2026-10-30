@@ -1,0 +1,483 @@
+{
+  "date": "2026-10-30",
+  "baseline": "c159b1db",
+  "status": "enrollment-correction-locally-accepted; remaining Payroll review active",
+  "baselineRun": {
+    "command": [
+      "./gradlew",
+      ":apps:server:test",
+      "--tests",
+      "dev.fajar.hris.*AssuranceTest.currentEnrollmentIsRequiredForCommandsAndReceipts",
+      "--no-daemon"
+    ],
+    "elapsed_seconds": 95.618,
+    "exit_code": 1
+  },
+  "baselineSuites": [
+    {
+      "suite": "dev.fajar.hris.PayrollFinalizationAssuranceTest",
+      "tests": "2",
+      "failures": "2",
+      "errors": "0",
+      "skipped": "0",
+      "cases": [
+        {
+          "name": "[1] action = \"start\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=f9a575e4-318f-4933-b855-8040384e7a46, version=0, replayed=false)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[2] action = \"start-replay\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=825fda1b-69d7-44e4-b2f7-cff1dae6e324, version=0, replayed=true)) ==> expected: <mfa_setup_required> but was: <null>"
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.PayrollInputAssuranceTest",
+      "tests": "4",
+      "failures": "4",
+      "errors": "0",
+      "skipped": "0",
+      "cases": [
+        {
+          "name": "[1] action = \"save\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=b5827202-37f3-4fcb-a2e2-061e6941a735, version=0, replayed=false)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[2] action = \"verify\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=567f287f-304d-4120-908e-eed3bd2bdcf9, version=1, replayed=false)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[3] action = \"save-replay\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=79824303-ccc8-48b3-87f4-5fa81b411bcf, version=0, replayed=true)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[4] action = \"verify-replay\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=6244145e-9dc8-444e-a40a-3748efcea079, version=1, replayed=true)) ==> expected: <mfa_setup_required> but was: <null>"
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.PayrollPeriodAssuranceTest",
+      "tests": "4",
+      "failures": "4",
+      "errors": "0",
+      "skipped": "0",
+      "cases": [
+        {
+          "name": "[1] action = \"create\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=e90dd69e-5f67-41ed-a5e7-60b1d42ff8b0, version=0, replayed=false)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[2] action = \"cancel\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=c934edb5-d876-4b2c-92be-5d03f8d19e21, version=1, replayed=false)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[3] action = \"create-replay\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=c4c9ea0c-800a-4a4c-a5dc-ca6bac32e7c9, version=0, replayed=true)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[4] action = \"cancel-replay\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=84890bac-652e-470b-83fb-5b137b76ccec, version=1, replayed=true)) ==> expected: <mfa_setup_required> but was: <null>"
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.PayrollReviewAssuranceTest",
+      "tests": "6",
+      "failures": "6",
+      "errors": "0",
+      "skipped": "0",
+      "cases": [
+        {
+          "name": "[1] action = \"submit\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=312fc02d-5259-4333-a05c-d0d5ed9ef98e, version=0, replayed=false)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[2] action = \"decide\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=29155679-fb04-4bd7-ba14-0b368faac23a, version=1, replayed=false)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[3] action = \"withdraw\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=b5a5d7a9-c3af-4018-9c29-45180f0811ad, version=1, replayed=false)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[4] action = \"submit-replay\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=34f1fee3-6f16-46fd-aede-ce5b932cde62, version=0, replayed=true)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[5] action = \"decide-replay\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=9cf9672f-e947-4824-8273-4449e8adfa38, version=1, replayed=true)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[6] action = \"withdraw-replay\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=2c647f29-b347-4c68-aa4c-4e398e7071ae, version=1, replayed=true)) ==> expected: <mfa_setup_required> but was: <null>"
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.PayrollRunAssuranceTest",
+      "tests": "6",
+      "failures": "6",
+      "errors": "0",
+      "skipped": "0",
+      "cases": [
+        {
+          "name": "[1] action = \"start\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=c4838853-ed74-4ba2-af91-a7158b978643, version=0, replayed=false)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[2] action = \"resume\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=676cb095-6826-4d48-b6f9-20808925970f, version=2, replayed=false)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[3] action = \"abandon\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=98a0a0de-e5d9-4b3d-b50a-84f91676ae23, version=2, replayed=false)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[4] action = \"start-replay\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=9bfab2d8-f316-4635-a9fc-b9b620189c01, version=0, replayed=true)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[5] action = \"resume-replay\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=b2a53d37-1038-4f21-8490-067f2c4da422, version=2, replayed=true)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[6] action = \"abandon-replay\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=e75c7b76-d478-4a9a-a8b8-0057dd69dc5a, version=2, replayed=true)) ==> expected: <mfa_setup_required> but was: <null>"
+        }
+      ]
+    },
+    {
+      "suite": "dev.fajar.hris.PayrollTaxOpeningAssuranceTest",
+      "tests": "4",
+      "failures": "4",
+      "errors": "0",
+      "skipped": "0",
+      "cases": [
+        {
+          "name": "[1] action = \"save\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=27a7a882-57a0-4ec1-a98b-97c6b80a8e42, version=0, replayed=false)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[2] action = \"verify\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=50114b79-4bf3-40bc-88d2-666f289f793e, version=1, replayed=false)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[3] action = \"save-replay\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=6d096795-f934-422e-9a18-fba02a31e516, version=0, replayed=true)) ==> expected: <mfa_setup_required> but was: <null>"
+        },
+        {
+          "name": "[4] action = \"verify-replay\"",
+          "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=65ee0e10-05ec-4be9-be87-2c1cd0cfdca6, version=1, replayed=true)) ==> expected: <mfa_setup_required> but was: <null>"
+        }
+      ]
+    }
+  ],
+  "genuineBaselineFailures": 26,
+  "interactiveCommands": 13,
+  "format": {
+    "command": [
+      "./gradlew",
+      "format",
+      "--no-daemon"
+    ],
+    "elapsed_seconds": 16.584,
+    "exit_code": 0
+  },
+  "focused": {
+    "command": [
+      "./gradlew",
+      ":apps:server:test",
+      "--tests",
+      "dev.fajar.hris.PayrollPeriodAssuranceTest",
+      "--tests",
+      "dev.fajar.hris.PayrollInputAssuranceTest",
+      "--tests",
+      "dev.fajar.hris.PayrollTaxOpeningAssuranceTest",
+      "--tests",
+      "dev.fajar.hris.PayrollRunAssuranceTest",
+      "--tests",
+      "dev.fajar.hris.PayrollReviewAssuranceTest",
+      "--tests",
+      "dev.fajar.hris.PayrollFinalizationAssuranceTest",
+      ":modules:payroll:domain:test",
+      ":modules:payroll:data:test",
+      "architectureCheck",
+      "formatCheck",
+      "--no-daemon"
+    ],
+    "elapsed_seconds": 193.304,
+    "exit_code": 0
+  },
+  "reports": {
+    "api": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.PayrollFinalizationAssuranceTest",
+          "tests": "24",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "40.891"
+        },
+        {
+          "name": "dev.fajar.hris.PayrollInputAssuranceTest",
+          "tests": "33",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "25.694"
+        },
+        {
+          "name": "dev.fajar.hris.PayrollPeriodAssuranceTest",
+          "tests": "19",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "15.384"
+        },
+        {
+          "name": "dev.fajar.hris.PayrollReviewAssuranceTest",
+          "tests": "27",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "29.636"
+        },
+        {
+          "name": "dev.fajar.hris.PayrollRunAssuranceTest",
+          "tests": "30",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "27.66"
+        },
+        {
+          "name": "dev.fajar.hris.PayrollTaxOpeningAssuranceTest",
+          "tests": "30",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "18.451"
+        }
+      ],
+      "totals": {
+        "tests": 163,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "domain": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.payroll.domain.InsuranceContributionPolicyTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.014"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.MonthlyPayrollPolicyTest",
+          "tests": "11",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.145"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.OvertimePayPolicyTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.016"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayProrationPolicyTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.004"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentAttendancePolicyTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.055"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentCalculationPolicyTest",
+          "tests": "14",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.245"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentDraftPolicyTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.043"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentPreparationPolicyTest",
+          "tests": "7",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.06"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentPublicationPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.025"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollAmendmentReviewPolicyTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.027"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollCalculationReviewPolicyTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.022"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollInputPolicyTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.009"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollPayUnitsPolicyTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.015"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollPaymentRecoveryPolicyTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.012"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollPaymentReviewPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.011"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollSettlementPolicyTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.003"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollTaxContinuityPolicyTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.011"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.PayrollTaxOpeningPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.002"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.HolidayAllowancePolicyTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.145"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.domain.IncomeTaxPolicyTest",
+          "tests": "12",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.084"
+        }
+      ],
+      "totals": {
+        "tests": 114,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "data": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.payroll.data.PayrollComparisonRepositoryTest",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.215"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.data.PayrollSnapshotMappingTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.952"
+        },
+        {
+          "name": "dev.fajar.hris.payroll.data.PayrollPaymentMappingTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.069"
+        }
+      ],
+      "totals": {
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "remaining": [
+    "Mutable policy/compensation/period/payment inputs",
+    "Compensation receipt proof after beneficiary acquisition",
+    "Multi-stage Payroll/amendment delegation completion",
+    "Complete seven-row module review, broad API/worker/browser acceptance and final source CI"
+  ],
+  "deployment": "None; schema103 metadata images still active"
+}

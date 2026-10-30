@@ -5,7 +5,7 @@ import dev.fajar.hris.approvals.domain.policies.*
 import dev.fajar.hris.approvals.domain.repositories.ApprovalRepository
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.JobStatus
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
@@ -78,7 +78,7 @@ class WithdrawPayrollReview(
             if (accountGuard is Result.Failed) return@run accountGuard
             val checked =
                 identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value

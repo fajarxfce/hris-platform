@@ -20,6 +20,15 @@ CI `41077194465` passed all four jobs and its installed binary hash is verified.
 
 ## Active goal — full feature completion audit
 
+Payroll now has [a committed local enrollment correction](payroll-assurance-2026-10-30.md):
+13 interactive commands and 26 genuine SQL reproductions, followed by all six
+API assurance suites plus domain/repository and quality checks (193.304s).
+[Measurements](measurements/payroll-assurance-2026-10-30.json) retain the counts.
+Continue mutable-input, compensation-receipt and multi-stage delegation review;
+then complete Payroll/Workforce and Mobile/Starter. Payroll remains unverified
+for full module acceptance, and the private runtime has not been changed.
+
+
 Metadata is fully accepted: [final CI and phone evidence](measurements/document-metadata-final-ci-2026-10-30.json)
 records four passed Mobile jobs, 1,994 desktop/1,676 browser/104 Apple cases, full
 Xcode build and the normal WireGuard APK installed in 5.777s without launching UI.

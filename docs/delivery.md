@@ -6659,3 +6659,15 @@ passed 186 API, eight active export-worker, 52 domain and 61 repository cases,
 quality and both packages (349.481s). Actual API/worker/Garage/browser CSV recovery
 passed in 45.417s with setup. [Evidence](reporting-assurance-2026-10-30.md) retains
 exact scope, the excluded compilation setup error and pending final source CI.
+
+
+### 30 October 2026 — Payroll enrollment audit
+
+Thirteen interactive Payroll commands now check current MFA enrollment under their
+existing account guards. Twenty-six actual SQL command/receipt reproductions failed
+before the correction. The six full affected API suites and Payroll domain/data,
+architecture and formatting checks passed in 193.304s. See
+[the active audit](payroll-assurance-2026-10-30.md) and
+[measurements](measurements/payroll-assurance-2026-10-30.json).
+Worker advancement and runtime deployment are unchanged. Complete the remaining
+Payroll review and final CI before accepting its seven initial requirements.

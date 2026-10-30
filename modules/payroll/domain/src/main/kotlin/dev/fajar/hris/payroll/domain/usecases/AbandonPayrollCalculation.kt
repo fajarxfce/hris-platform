@@ -2,7 +2,7 @@ package dev.fajar.hris.payroll.domain.usecases
 
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.repositories.JobRepository
@@ -77,7 +77,7 @@ class AbandonPayrollCalculation(
             if (accountLock is Result.Failed) return@run accountLock
             val checked =
                 identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
+                    validateCompanySessionActor(actor, it, clock.instant(), security)
                 }
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value

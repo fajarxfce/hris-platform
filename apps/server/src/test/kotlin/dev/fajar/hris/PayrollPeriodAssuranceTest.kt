@@ -272,6 +272,49 @@ class PayrollPeriodAssuranceTest : PayrollPeriodApiFixture() {
         )
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = ["create", "cancel", "create-replay", "cancel-replay"])
+    fun currentEnrollmentIsRequiredForCommandsAndReceipts(action: String) {
+        val scene = prepare()
+        val id = if (action.startsWith("create")) UUID.randomUUID() else scene.id
+        if (action.startsWith("create"))
+            assertTrue(
+                cancelPeriod.execute(scene.actor, UUID.randomUUID(), scene.id, 0, "Replace draft")
+                    is Result.Success
+            )
+        val operation = UUID.randomUUID()
+        val replay = action.endsWith("replay")
+        if (replay) assertTrue(mutate(action, scene, scene.actor, id, operation) is Result.Success)
+        database()
+            .update(
+                "update accounts set mfa_secret_encrypted=null where id=?",
+                scene.actor.accountId,
+            )
+        val before = snapshot(scene.actor)
+        try {
+            val rejected = mutate(action, scene, scene.actor, id, operation)
+            assertEquals(
+                "mfa_setup_required",
+                (rejected as? Result.Failed)?.failure?.code,
+                rejected.toString(),
+            )
+            assertEquals(before, snapshot(scene.actor))
+        } finally {
+            database()
+                .update(
+                    "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
+                    scene.actor.accountId,
+                )
+        }
+        val recovered = mutate(action, scene, scene.actor, id, operation)
+        assertTrue(recovered is Result.Success, recovered.toString())
+        assertEquals(replay, (recovered as Result.Success).value.replayed)
+        assertEquals(
+            Result.Success(recovered.value.copy(replayed = true)),
+            mutate(action, scene, scene.actor, id, operation),
+        )
+    }
+
     private fun prepare(): Scenario {
         clock.set(Instant.now())
         val f = processingFixture()

@@ -218,8 +218,19 @@ flow failures were a read-only fixture; it was corrected with a separate denied 
 Both commits are pushed. Mobile Git retains exact cases, sources and APK hashes;
 no automatic delivery or current-header replacement is introduced.
 
-Next: Mobile mutable working copies and the versioned editor using the validated
-command orchestration. Keep shared finance/leave evidence free of
+Mobile `fbd6a717` and `36ddd5ed` complete encrypted mutable working copies and
+admitted open/save/discard/observation, including matching-draft cleanup after
+confirmed acknowledgement. Exact local acknowledgement recovery preserves concurrent
+edits and the original reviewed header. Full checks passed 1,968 desktop/218 browser
+cases and dev APK in 182.812s. `8ca77f19` then fixes a reproduced catalog exposure:
+Back from denied details previously showed cached title/file. Per-resource gating
+now redacts that record, preserves paging/other rows and permits neutral admitted
+recovery. Full checks passed 1,973 desktop/221 browser cases and dev APK in 183.001s;
+two screenshots were inspected. All commits are pushed with durable Mobile evidence.
+These are HRIS business changes; no generic Starter implementation port is due.
+
+Next: Mobile versioned editor and retained command/draft overview using the validated
+working-copy and command orchestration. Keep shared finance/leave evidence free of
 private identity numbers. Verify
 Android, Apple and owned emulator behavior before accepting `documents.02` or
 `people.03`; physical iPhone testing is waived. Finish the detailed People review,

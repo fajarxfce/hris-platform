@@ -1,7 +1,7 @@
 {
   "date": "2026-10-30",
   "baseline": "c159b1db",
-  "status": "complete local acceptance; final full source CI running",
+  "status": "accepted with complete local and full source CI evidence",
   "baselineRun": {
     "command": [
       "./gradlew",
@@ -473,12 +473,7 @@
       }
     }
   },
-  "remaining": [
-    "Broad Payroll/Compensation/Payslip API and Payroll worker acceptance",
-    "Four normal and three actual worker browser workflows",
-    "Complete final source CI and seven-row review acceptance",
-    "Workforce then full Mobile/applicable Starter review"
-  ],
+  "remaining": "None for this module; final Workforce source CI and combined private runtime update continue.",
   "deployment": "None; schema103 metadata images still active",
   "additionalCorrection": {
     "baseline": "8655f03e",
@@ -1000,14 +995,9 @@
   "fullSourceCi": {
     "runId": 41087903927,
     "source": "eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f",
-    "status": "in_progress",
+    "status": "success",
     "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927",
-    "includes": [
-      "Reporting correction c159b1db",
-      "Payroll enrollment 8655f03e",
-      "Payroll input/receipt/delegation correction cca5e151"
-    ],
-    "note": "All local Payroll API/domain/data/worker/package and seven actual browser scenarios passed. Preserve this complete source CI; Workforce remains the next audit."
+    "evidence": "docs/measurements/reporting-payroll-full-ci-2026-10-30.json"
   },
   "broadReports": {
     "api": {

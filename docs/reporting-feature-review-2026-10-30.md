@@ -4,8 +4,8 @@ The five initial Reporting requirements and both original detailed sections have
 implementation and behavior mappings below. Review found a seven-case export
 policy-completion defect, now corrected with [focused evidence](reporting-assurance-2026-10-30.md).
 Broader acceptance now passes 186 API, eight active worker, 52 domain and 61
-repository cases plus actual private-storage browser recovery. Keep the five
-inventory rows unverified until final source CI completes. This does not close the remaining PRD scope.
+repository cases plus actual private-storage browser recovery. All five inventory rows are accepted after complete source CI `41087903927`
+passed its ten jobs. Workforce remains separately gated.
 
 | Initial requirement | Implementation and verification |
 | --- | --- |
@@ -40,3 +40,9 @@ This review retains those boundaries and checks the newly changed export paths.
 provide the exact case selection and actual browser results. Matching full CI must
 cover the source correction before accepting all five rows. Payroll, Workforce
 and the full Mobile/applicable Starter review remain separate work.
+
+Final [CI evidence](measurements/reporting-payroll-full-ci-2026-10-30.json) confirms
+3,063 disjoint API cases, 104 active worker cases, 1,111 distinct mocked browser
+scenarios, 56 actual browser workflows and successful schema-103 restoration.
+Repeated worker/module suites across shards are counted once. No deployment is
+implied by this CI acceptance.

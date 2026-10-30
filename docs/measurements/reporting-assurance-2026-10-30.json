@@ -1,6 +1,6 @@
 {
   "date": "2026-10-30",
-  "status": "local acceptance passed; final source CI must follow running Administration CI",
+  "status": "accepted with complete local and full source CI evidence",
   "reviewed_base": "1a835bd9d475773c3cb490d2daf982a5750ff659",
   "production_source_sha256": {
     "modules/reporting/domain/src/main/kotlin/dev/fajar/hris/reporting/domain/usecases/ManageReportExports.kt": "5c12b0299eaa26fec3db00c14dfe8032de541e4ce0760cd50f69c554bacfa7ee",
@@ -1833,13 +1833,8 @@
   "fullSourceCi": {
     "runId": 41087903927,
     "source": "eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f",
-    "status": "queued",
+    "status": "success",
     "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927",
-    "includes": [
-      "Reporting correction c159b1db",
-      "Payroll enrollment 8655f03e",
-      "Payroll input/receipt/delegation correction cca5e151"
-    ],
-    "note": "Administration CI 41081153648 terminated successfully before dispatch. Keep this run; a same-branch dispatch cancels it. Payroll broad local acceptance is still running."
+    "evidence": "docs/measurements/reporting-payroll-full-ci-2026-10-30.json"
   }
 }

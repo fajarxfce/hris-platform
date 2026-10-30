@@ -598,49 +598,93 @@
         {
           "id": "payroll.01",
           "text": "Own effective compensation, component/tax classification, periods, rule packs, snapshots, calculation revisions, approval/finalization, payslips, payment export/reconciliation, and amendments.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/payroll-feature-review-2026-10-30.md",
+            "docs/measurements/payroll-assurance-2026-10-30.json",
+            "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+          ]
         },
         {
           "id": "payroll.02",
           "text": "Monthly permanent/fixed-term resident/nonresident employees, including WNA, are supported in IDR. Contract category does not determine tax status. Components include fixed/variable earnings, bonus, THR, overtime, approved unpaid leave, proration, deductions, and employer/employee contributions. Support gross/net/gross-up.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/payroll-feature-review-2026-10-30.md",
+            "docs/measurements/payroll-assurance-2026-10-30.json",
+            "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+          ]
         },
         {
           "id": "payroll.03",
           "text": "Versioned statutory policies cover PPh 21 TER/final-period reconciliation, domestic PPh 26, and applicable BPJS bases/caps/eligibility. Treat treaty/tax equalization/daily-piecework/sector incentives as separately supported rule packs. Missing required policy/input blocks calculation. Use BigDecimal with explicit statutory rounding points.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/payroll-feature-review-2026-10-30.md",
+            "docs/measurements/payroll-assurance-2026-10-30.json",
+            "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+          ]
         },
         {
           "id": "payroll.04",
           "text": "Run: draft -> calculated -> reviewed/approved -> finalized -> payment processing -> paid. Worker checkpoints per bounded batch. Freeze input versions and line-level results; input revisions invalidate approval. Finalized runs change only through referenced amendments. Payment references prevent duplicate accounting.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/payroll-feature-review-2026-10-30.md",
+            "docs/measurements/payroll-assurance-2026-10-30.json",
+            "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+          ]
         },
         {
           "id": "payroll.05",
           "text": "Screens: compensation, periods, run progress/errors, period comparison, employee detail, approval, payslips, payment batches, reconciliation.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/payroll-feature-review-2026-10-30.md",
+            "docs/measurements/payroll-assurance-2026-10-30.json",
+            "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+          ]
         },
         {
           "id": "payroll.06",
           "text": "Acceptance: official golden fixtures, resident/nonresident/year-end/start-exit cases, annualization where applicable, TER with THR/bonus, gross-up convergence, BPJS limits, rounding, cancellation/restart, parallel finalization, and historical immutability.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/payroll-feature-review-2026-10-30.md",
+            "docs/measurements/payroll-assurance-2026-10-30.json",
+            "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+          ]
         },
         {
           "id": "payroll.07",
           "text": "Sources: https://jdih.kemenkeu.go.id/dok/pp-58-tahun-2023 ; https://jdih.kemenkeu.go.id/dok/pmk-168-tahun-2023 ; https://www.pajak.go.id/id/pph-pasal-26 ; https://www.bpjsketenagakerjaan.go.id/penerima-upah.html . Verify effective regulations and derive reviewed fixtures during implementation.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/payroll-feature-review-2026-10-30.md",
+            "docs/measurements/payroll-assurance-2026-10-30.json",
+            "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+          ]
         }
       ],
       "detailedContractSections": [
         "Implementation status"
-      ]
+      ],
+      "detailedReview": {
+        "status": "accepted",
+        "evidence": [
+          "docs/payroll-feature-review-2026-10-30.md",
+          "docs/measurements/payroll-assurance-2026-10-30.json",
+          "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+          "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+        ]
+      }
     },
     {
       "module": "people",
@@ -732,38 +776,72 @@
         {
           "id": "reporting.01",
           "text": "Own read models, metric definitions, scoped queries, asynchronous exports, and export retention.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/reporting-feature-review-2026-10-30.md",
+            "docs/measurements/reporting-assurance-2026-10-30.json",
+            "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+          ]
         },
         {
           "id": "reporting.02",
           "text": "Reports cover headcount/employments, attendance exceptions, leave, overtime, expenses, and payroll costs. Group reports only aggregate authorized companies. Distinguish unique persons from employment count.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/reporting-feature-review-2026-10-30.md",
+            "docs/measurements/reporting-assurance-2026-10-30.json",
+            "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+          ]
         },
         {
           "id": "reporting.03",
           "text": "Historical reports use corresponding snapshots. Run large exports in bounded batches and recheck access on download. Saved filters never grant access. Reporting cannot mutate operational data.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/reporting-feature-review-2026-10-30.md",
+            "docs/measurements/reporting-assurance-2026-10-30.json",
+            "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+          ]
         },
         {
           "id": "reporting.04",
           "text": "Screens: role overview, report catalogue, filters, drill-down, export history.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/reporting-feature-review-2026-10-30.md",
+            "docs/measurements/reporting-assurance-2026-10-30.json",
+            "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+          ]
         },
         {
           "id": "reporting.05",
           "text": "Acceptance: totals reconcile, row/resource isolation, historical definitions, export interruption, bounded memory, and expired export access.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/reporting-feature-review-2026-10-30.md",
+            "docs/measurements/reporting-assurance-2026-10-30.json",
+            "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+            "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+          ]
         }
       ],
       "detailedContractSections": [
         "Current delivery",
         "Implementation and acceptance record"
-      ]
+      ],
+      "detailedReview": {
+        "status": "accepted",
+        "evidence": [
+          "docs/reporting-feature-review-2026-10-30.md",
+          "docs/measurements/reporting-assurance-2026-10-30.json",
+          "docs/measurements/reporting-payroll-full-ci-2026-10-30.json",
+          "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927"
+        ]
+      }
     },
     {
       "module": "workforce",
@@ -1040,7 +1118,7 @@
     },
     {
       "id": "reporting.export-policy-completion",
-      "status": "implemented-and-locally-accepted",
+      "status": "implemented-and-accepted",
       "baseline": "3c8fb15a",
       "actualFailures": 7,
       "evidence": [
@@ -1048,11 +1126,18 @@
         "docs/measurements/reporting-assurance-2026-10-30.json",
         "docs/reporting-feature-review-2026-10-30.md"
       ],
-      "next": "Wait for terminal Administration CI 41081153648, dispatch complete new source CI, then accept five Reporting rows; continue Payroll/Workforce/Mobile/Starter."
+      "next": "Complete final Workforce source CI and combined private runtime update.",
+      "fullCi": {
+        "runId": 41087903927,
+        "source": "eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927",
+        "evidence": "docs/measurements/reporting-payroll-full-ci-2026-10-30.json"
+      }
     },
     {
       "id": "payroll.command-completion",
-      "status": "implemented-focused-acceptance",
+      "status": "implemented-and-accepted",
       "genuineFailures": 40,
       "existingControls": 1,
       "evidence": [
@@ -1060,7 +1145,14 @@
         "docs/payroll-feature-review-2026-10-30.md",
         "docs/measurements/payroll-assurance-2026-10-30.json"
       ],
-      "next": "Complete broad API, worker, browser and full source CI; seven Payroll rows remain unverified."
+      "next": "Complete final Workforce source CI and combined private runtime update.",
+      "fullCi": {
+        "runId": 41087903927,
+        "source": "eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f",
+        "status": "success",
+        "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927",
+        "evidence": "docs/measurements/reporting-payroll-full-ci-2026-10-30.json"
+      }
     },
     {
       "id": "administration.completion-assurance",

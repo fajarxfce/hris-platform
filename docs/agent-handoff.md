@@ -21,8 +21,8 @@ CI `41077194465` passed all four jobs and its installed binary hash is verified.
 ## Active goal — final source CI and private update
 
 All remaining source reviews and local workflows are complete. The inventory is
-still 41 accepted / 20 unverified until final CI passes: Reporting has five rows,
-Payroll seven and Workforce eight. Their detailed reviews map actual behaviors,
+now 53 accepted / 8 unverified: Reporting and Payroll are accepted; only
+Workforce awaits its complete source CI. Their detailed reviews map actual behaviors,
 including explicit scope boundaries, rather than treating a green build as proof.
 
 Workforce `2c2a59e3` corrects 24 reproduced failures plus three prior controls.
@@ -35,14 +35,19 @@ workflows pass (66.494s), followed by the real closing/adjustment worker workflo
 packages are `.work/workforce-audit-2026-10-30/packages`; do not substitute older
 Payroll/Reporting JARs. Preserve overtime's existing minimal-receipt contract.
 
-Reporting's local acceptance passes 186 API/eight active worker/52 domain/61 data
-cases and actual private CSV recovery. Payroll passes 682 API/three worker/114
-domain/twelve data cases and seven actual browser workflows. Final Reporting/Payroll
-[CI 41087903927](https://github.com/fajarxfce/hris-platform/actions/runs/41087903927)
-is still running at exact `eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f`; all backend,
-dashboard and recovery jobs pass, with downstream worker/export integration remaining.
-Do not cancel it with a new dispatch. On terminal success, retain all reports and
-accept twelve rows, then dispatch complete Workforce source CI and record its SHA.
+Reporting/Payroll [CI 41087903927](https://github.com/fajarxfce/hris-platform/actions/runs/41087903927)
+passed all ten jobs at exact `eec8a53a`. Downloaded reports confirm 3,063 API cases,
+104 active worker cases (plus one separately accepted manual retention skip),
+1,111 mocked browser scenarios, 41 normal/14 worker/one export actual workflows
+and successful schema-103 restore. [Full evidence](measurements/reporting-payroll-full-ci-2026-10-30.json)
+retains every job/step, report and artifact hash. The twelve initial rows are accepted.
+
+Final Workforce [CI 41094285531](https://github.com/fajarxfce/hris-platform/actions/runs/41094285531)
+is running at exact `93438f994c43b2bf15ee93120c90a1ea61745217`; its application
+source is `2c2a59e3`. [Dispatch record](measurements/workforce-ci-2026-10-30.json)
+identifies current ownership. Preserve this run; another same-branch dispatch
+cancels it. Inspect all ten jobs and download reports/recovery before accepting
+Workforce's eight rows. Do not repeat the already passed local broad/browser runs.
 
 Mobile's [fifteen-area review](https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/feature-review-2026-10-30.md)
 is committed/pushed at `f4f101a1`; the [applicable Starter review](https://github.com/fajarxfce/compose-fluent-starter/blob/fix/push-token-lifecycle/docs/foundation-review-2026-10-30.md)

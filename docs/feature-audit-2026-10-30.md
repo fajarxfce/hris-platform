@@ -16,13 +16,13 @@ installed phone, private keys and running development stack intact.
 
 ## Current acceptance
 
-The inventory retains 41 accepted initial rows and 20 awaiting final source CI.
+The inventory retains 53 accepted initial rows and eight awaiting final source CI.
 Reporting, Payroll and Workforce complete local acceptance now passes; their
 review pages and measurements record reproduced failures, fixes, actual workflows
 and source boundaries. Mobile's fifteen-area review and the applicable Starter
 review are complete (`f4f101a1`, `7605916`); no additional generic port is required.
-Finish Reporting/Payroll CI `41087903927`, then full Workforce source CI, before
-accepting the remaining rows. Complete the combined private API/worker update with
+Reporting/Payroll CI `41087903927` passed all ten jobs; its twelve rows are
+accepted. Complete Workforce CI `41094285531` before accepting the final eight. Complete the combined private API/worker update with
 recovery/integrity evidence and final Git handoffs. See [current status](prd-status.md).
 No final-correction runtime update has occurred. Historical activity below records
 earlier states and does not override the active queue.

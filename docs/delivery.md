@@ -6726,3 +6726,14 @@ and [measurements](measurements/workforce-assurance-2026-10-30.json) retain sour
 baseline/final evidence and package hashes. Final full source CI remains required.
 Mobile and applicable Starter reviews are complete at `f4f101a1` and `7605916`;
 no additional generic port is needed. Runtime and the installed phone are unchanged.
+
+## Reporting/Payroll complete source CI — 30 October 2026
+
+All ten jobs in [41087903927](https://github.com/fajarxfce/hris-platform/actions/runs/41087903927)
+passed for `eec8a53a`. Downloaded reports confirm 3,063 API cases, 104 active
+worker cases, 1,111 mocked Chromium scenarios, 41 normal/14 worker/one export
+actual browser workflows and schema-103 restore with 104 objects and old/current
+identity keys. The [full record](measurements/reporting-payroll-full-ci-2026-10-30.json)
+preserves every terminal job/step, report hashes and recovery assertions. Reporting's
+five and Payroll's seven rows are accepted, bringing the inventory to 53/8.
+Final Workforce CI `41094285531` started afterward at `93438f99`; preserve it.

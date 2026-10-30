@@ -54,6 +54,9 @@ comparison. Every scenario passed without retries/skips. The owned worker databa
 fixture metadata and all four listeners were removed. Both JARs and report hashes
 are preserved in [measurements](measurements/payroll-assurance-2026-10-30.json).
 
-Full Platform CI, including complete dashboard integration and isolated recovery,
-remains running. Continue Workforce and full Mobile/Starter review; Payroll local
-acceptance does not close the workspace objective. No live deployment occurred.
+Full Platform CI `41087903927` passed all ten jobs, including complete dashboard
+integration and isolated schema-103 recovery. All seven Payroll rows are accepted.
+[Downloaded evidence](measurements/reporting-payroll-full-ci-2026-10-30.json) confirms
+3,063 API cases, 104 active worker cases, 1,111 mocked browser scenarios and 56
+actual browser workflows. Workforce final CI continues; Mobile/Starter review is
+complete. No live deployment occurred.

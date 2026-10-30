@@ -12,12 +12,13 @@ identifies current work and runtime ownership.
 ## Active feature audit — 30 October
 
 The [requirement inventory](measurements/feature-audit-2026-10-30.json) retains
-41 accepted initial Platform rows and 20 awaiting final source CI. Reporting,
+53 accepted initial Platform rows and eight awaiting final source CI. Reporting,
 Payroll and Workforce now all pass their complete local API/worker/browser gates.
 Workforce's correction `2c2a59e3` passes 369 API, six worker, 61 domain and five
 actual browser workflows; Payroll passes 682 API and seven actual workflows.
-Reporting/Payroll CI `41087903927` is completing downstream integration. Workforce
-full CI must follow it; do not cancel the preceding run or accept rows prematurely.
+Reporting/Payroll CI `41087903927` passed all ten jobs with downloaded evidence;
+its twelve initial rows are accepted. Workforce CI `41094285531` now runs at
+`93438f99`. Do not cancel it or accept the eight remaining rows prematurely.
 
 Mobile's fifteen-area review and the applicable Starter foundation review are
 complete at `f4f101a1` and `7605916`, against independently accepted unchanged source.

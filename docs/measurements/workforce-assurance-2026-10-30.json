@@ -1312,5 +1312,16 @@
     "port4174Closed": true,
     "port18081Closed": true,
     "port4175Closed": true
+  },
+  "fullSourceCi": {
+    "runId": 41094285531,
+    "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+    "status": "in_progress",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531",
+    "startedAt": "2026-10-30T16:55:46Z",
+    "applicationSource": "2c2a59e3651e0e08023c40aff5ad9defb43642e2",
+    "includes": "All current Platform corrections; both prior Administration and Reporting/Payroll runs completed before this dispatch.",
+    "next": "Inspect every final job and downloaded report, then accept Workforce and perform the authorized private runtime update.",
+    "concurrency": "Preserve this run; another dispatch on feat/firebase-auth cancels it."
   }
 }

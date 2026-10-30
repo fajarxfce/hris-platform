@@ -11,8 +11,9 @@ preserves earlier work; its old next-step statements are not the active queue.
 
 Complete every specified Platform/Mobile feature and port demonstrated generic
 fixes to Starter. The [full audit](feature-audit-2026-10-30.md) remains active:
-Approvals now has five locally accepted initial requirement rows plus all six
-detailed sections; 56 initial rows still await review, followed by Mobile/Starter.
+Approvals and Communications now have ten locally accepted initial requirement
+rows and their detailed sections; 51 initial rows still await review, followed by
+Mobile/Starter.
 Do not mark the goal complete from these increments or earlier green CI.
 
 Announcement email source `8014d733` passed all ten jobs in
@@ -39,9 +40,19 @@ The correction is committed/pushed at `fcfdaf26`. [Full CI 41009137720](https://
 is queued for exact source `fcfdaf26a48718a80bc79468bdbdb3b4cbeae11c`; observe its
 terminal result without cancelling it through another same-branch dispatch.
 
-Continue with the remaining Communications requirements, then the other module
-contracts and Mobile behavior. Keep each requirement's matching evidence in the
-inventory. No reusable client correction is due from these server/dashboard changes.
+[Communications read completion](communications-read-assurance-2026-10-30.md)
+corrects thirteen reproduced MFA-expiry variants across ten older readers. All
+106 API, 13 domain and three repository tests passed, along with quality/package
+checks and actual API/worker/browser/SMTP acceptance (37.1s; 1.0m including setup).
+The [Communications requirement review](communications-feature-review-2026-10-30.md)
+locally accepts all five rows and nine detailed sections, including optional email.
+Final source CI must follow the running approval run without cancelling it.
+
+Continue with Identity, the other module contracts and Mobile behavior. Downloaded
+full-CI reports for email source `8014d733` are supplementary local evidence in
+`.work/feature-audit-2026-10-30/ci-8014d733`; retain any reviewed results in Git.
+Keep each requirement's matching evidence in the inventory. No reusable client
+correction is due from these server/dashboard changes.
 
 The **private development API still uses schema 101**, SMTP disabled. Preserve its
 accepted Google binding and installed phone session. The dashboard service uses

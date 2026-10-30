@@ -44,13 +44,19 @@ class ListInbox(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val identity = identities.access(actor.accountId, company)
+            if (identity is Result.Failed) return@run identity
+            val resolved = (identity as Result.Success).value
             val checked =
-                identities
-                    .access(actor.accountId, company)
-                    .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
-                    .flatMap { it.requirePermission("announcements.read") }
+                validateCompanySessionActor(actor, resolved, clock.instant(), security).flatMap {
+                    it.requirePermission("announcements.read")
+                }
             if (checked is Result.Failed) return@run checked
-            inbox.list(company, actor.accountId, after, limit)
+            inbox.list(company, actor.accountId, after, limit).flatMap { result ->
+                validateCompanySessionActor(actor, resolved, clock.instant(), security).map {
+                    result
+                }
+            }
         }
     }
 }

@@ -89,3 +89,19 @@ five initial rows and all six detailed sections to source and matching behavior.
 Those rows are locally accepted; 56 initial rows remain unverified. Follow final
 branch CI and continue Communications, the other modules and Mobile. Closing these
 defects does not close the full objective.
+
+## Communications requirement review — local acceptance passed
+
+The [Communications review](communications-feature-review-2026-10-30.md) covers
+all five initial rows, the original eight detailed sections and optional email.
+It found an additional [read-completion defect](communications-read-assurance-2026-10-30.md):
+ten older readers returned acquired content or metadata after MFA expiry.
+All thirteen reproductions now pass; final acceptance passed 106 API cases,
+13 domain cases, three repository cases, quality/package checks and an actual
+API/worker/browser/SMTP workflow (37.1 seconds; one minute with setup).
+No DI, schema, additional query or read/ack mutation is introduced.
+
+Ten initial rows across Approvals and Communications are now locally accepted;
+51 remain unverified. Review continues with Identity and the remaining modules,
+then Mobile and applicable Starter behavior. Final source CI will follow the
+running approval acceptance without cancelling its same-branch workflow.

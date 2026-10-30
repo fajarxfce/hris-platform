@@ -54,11 +54,13 @@ class PreviewAnnouncementAudience(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val identity = identities.access(actor.accountId, company)
+            if (identity is Result.Failed) return@run identity
+            val resolved = (identity as Result.Success).value
             val access =
-                identities
-                    .access(actor.accountId, company)
-                    .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
-                    .flatMap { it.requirePermission("announcements.manage") }
+                validateCompanySessionActor(actor, resolved, clock.instant(), security).flatMap {
+                    it.requirePermission("announcements.manage")
+                }
             if (access is Result.Failed) return@run access
             val found = announcements.find(company, id)
             if (found is Result.Failed) return@run found
@@ -131,6 +133,11 @@ class PreviewAnnouncementAudience(
                                 versions.toMap(),
                             )
                         )
+                }
+                .flatMap { result ->
+                    validateCompanySessionActor(actor, resolved, clock.instant(), security).map {
+                        result
+                    }
                 }
         }
     }

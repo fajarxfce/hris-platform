@@ -20,7 +20,8 @@ module-level summaries below do not replace requirement-by-requirement review.
 reader/dashboard capability, with [local acceptance](measurements/approval-history-2026-10-30.json).
 The [final assurance correction](approval-read-assurance-2026-10-30.md) and
 [Approvals requirement review](approvals-feature-review-2026-10-30.md) locally accept
-its five initial rows and detailed sections. The remaining 56 initial rows and
+its five initial rows and detailed sections. The [Communications review](communications-feature-review-2026-10-30.md)
+also accepts five rows after the read-completion correction; 51 initial rows and
 Mobile review are still active. Email source `8014d733` passed all ten full-CI jobs;
 follow final branch CI for the approval increments and continue the remaining scope.
 

@@ -1,0 +1,227 @@
+{
+  "date": "2026-10-30",
+  "baseline": "3fd05b8e",
+  "status": "implemented-and-locally-accepted",
+  "reproduction": {
+    "tests": 13,
+    "failed": 13,
+    "durationSeconds": 38,
+    "scope": [
+      "announcement directory/current/revision/history",
+      "audience group directory/current/revision",
+      "recipient preview",
+      "Inbox directory/item/unread aggregate",
+      "audience reference search/selected lookup"
+    ]
+  },
+  "correctedFocused": {
+    "tests": 13,
+    "failed": 0,
+    "durationSeconds": 47
+  },
+  "boundary": {
+    "readOnly": true,
+    "schemaChange": false,
+    "newDiDependencies": false,
+    "additionalQueries": 0,
+    "retainsInitialAuthorization": true,
+    "retainsExistingPageAndAudienceBounds": true
+  },
+  "acceptance": {
+    "api": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.AnnouncementAudiencePreviewHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementAuthoringHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementDeliveryHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementDeliveryMigrationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementEmailCaptureHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementEmailMigrationHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementInboxHttpTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementPublicationCapacityTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementPublicationHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementPublicationIntegrityTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AnnouncementReviewHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.AudienceReferenceHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.CommunicationsAssuranceTest",
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.CommunicationsReadCompletionTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.InboxPushCaptureHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.InboxSyncHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 106,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "domain": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.communications.domain.AnnouncementActionPolicyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.communications.domain.AnnouncementPolicyTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.communications.domain.AnnouncementPublicationPolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.communications.domain.InboxPushPolicyTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "data": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.communications.data.AnnouncementDeliveryRepositoryTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "durationSeconds": 234,
+    "architecture": true,
+    "format": true,
+    "apiAndWorkerPackages": true,
+    "realApiWorkerBrowserSmtp": {
+      "tests": 1,
+      "failures": 0,
+      "scenarioSeconds": 37.1,
+      "durationWithSetupMinutes": 1.0,
+      "apiJarSha256": "ea05948772dc320f25613be396d99cb495ffc3769210ec3b62a5e87eeb4b3b7e",
+      "workerJarSha256": "f651fb2139cf57901263c7638341934562aad0d987add63ba964cf38bcce40e5"
+    }
+  },
+  "runtime": "Private schema-101 API, isolated dashboard baseline, accepted Google binding and installed phone unchanged; fixture SMTP only.",
+  "fullCi": {
+    "status": "pending-source-commit",
+    "predecessor": "https://github.com/fajarxfce/hris-platform/actions/runs/41009137720",
+    "instruction": "Wait for the predecessor to finish before dispatching final source; same-branch workflow concurrency cancels an earlier run."
+  }
+}

@@ -54,15 +54,21 @@ class ListAudienceReferences(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val identity = identities.access(actor.accountId, company)
+            if (identity is Result.Failed) return@run identity
+            val resolved = (identity as Result.Success).value
             val access =
-                identities
-                    .access(actor.accountId, company)
-                    .flatMap { validateCompanySessionActor(actor, it, clock.instant(), security) }
-                    .flatMap { it.requirePermission("announcements.manage") }
+                validateCompanySessionActor(actor, resolved, clock.instant(), security).flatMap {
+                    it.requirePermission("announcements.manage")
+                }
             if (access is Result.Failed) return@run access
             // A bounded lookup may label an inactive saved selection. Saves and publication
             // authorize and validate it again; reference discovery does not reserve access.
-            references.list(company, search, activeOnly = search.ids.isEmpty())
+            references.list(company, search, activeOnly = search.ids.isEmpty()).flatMap { result ->
+                validateCompanySessionActor(actor, resolved, clock.instant(), security).map {
+                    result
+                }
+            }
         }
     }
 }

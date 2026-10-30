@@ -155,32 +155,52 @@
         {
           "id": "communications.01",
           "text": "Own announcement drafts/schedules/publication/audience, acknowledgement, server inbox, channel delivery, and device registrations.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/communications-feature-review-2026-10-30.md",
+            "docs/measurements/announcement-email-2026-10-30.json",
+            "docs/measurements/communications-read-assurance-2026-10-30.json"
+          ]
         },
         {
           "id": "communications.02",
           "text": "Scope audiences by permitted company/branch/department/groups. Persist inbox before external delivery. Fan-out via transactional outbox; use stable notification and recipient IDs. FCM/email failures do not erase inbox.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/communications-feature-review-2026-10-30.md",
+            "docs/measurements/announcement-email-2026-10-30.json",
+            "docs/measurements/communications-read-assurance-2026-10-30.json"
+          ]
         },
         {
           "id": "communications.03",
           "text": "Notification deep links identify resources and require fresh authorization. Sensitive payroll amounts are not sent in push content. Revalidate recipient access when needed; unregister revoked devices.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/communications-feature-review-2026-10-30.md",
+            "docs/measurements/announcement-email-2026-10-30.json",
+            "docs/measurements/communications-read-assurance-2026-10-30.json"
+          ]
         },
         {
           "id": "communications.04",
           "text": "Screens: announcements, audience preview, scheduling, inbox, delivery failures.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/communications-feature-review-2026-10-30.md",
+            "docs/measurements/announcement-email-2026-10-30.json",
+            "docs/measurements/communications-read-assurance-2026-10-30.json"
+          ]
         },
         {
           "id": "communications.05",
           "text": "Acceptance: duplicate events, scheduled audience resolution, denied push permission, invalid token, access changes, and idempotent acknowledgement.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/communications-feature-review-2026-10-30.md",
+            "docs/measurements/announcement-email-2026-10-30.json",
+            "docs/measurements/communications-read-assurance-2026-10-30.json"
+          ]
         }
       ],
       "detailedContractSections": [
@@ -192,7 +212,14 @@
         "Unread inbox total",
         "Actual Android registration acceptance",
         "Administrative push delivery"
-      ]
+      ],
+      "detailedReview": {
+        "status": "locally-accepted",
+        "evidence": "docs/communications-feature-review-2026-10-30.md",
+        "additionalSections": [
+          "Optional announcement email"
+        ]
+      }
     },
     {
       "module": "documents",
@@ -650,6 +677,20 @@
         "docs/measurements/approval-read-assurance-2026-10-30.json"
       ],
       "next": "Follow final branch CI and continue the remaining module and Mobile audit."
+    },
+    {
+      "id": "communications.read-completion",
+      "status": "implemented-and-locally-accepted",
+      "requirement": "Interactive communication content and metadata require current session assurance after acquisition.",
+      "baseline": "3fd05b8e",
+      "baselineEvidence": [
+        "Thirteen PostgreSQL-backed read variants returned acquired results after MFA expiry."
+      ],
+      "evidence": [
+        "docs/communications-read-assurance-2026-10-30.md",
+        "docs/measurements/communications-read-assurance-2026-10-30.json"
+      ],
+      "next": "Follow final-source CI after the predecessor finishes; continue all remaining module and Mobile requirements."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

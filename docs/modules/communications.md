@@ -145,3 +145,13 @@ Inbox on failure and reports minimal administrative email observations beside
 push. V102 defaults historical announcements to no email and never backfills
 already published Inbox records. The dashboard exposes selection, exact revision
 and delivery review in English and Indonesian.
+
+
+## Interactive read completion
+
+Announcement, audience-group and Inbox reads, reference lookups, previews and
+unread totals recheck current session assurance after successful acquisition.
+An MFA proof expiring during acquisition requires verification before a fresh
+read can return content or metadata. Reads do not update correspondence state.
+See [requirement review](../communications-feature-review-2026-10-30.md) and
+[regression evidence](../communications-read-assurance-2026-10-30.md).

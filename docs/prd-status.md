@@ -16,7 +16,10 @@ is active. Communications email reminders now have optional authoring, atomic
 publication capture, bounded SMTP delivery and dashboard observations, with
 [local acceptance](measurements/announcement-email-2026-10-30.json). Earlier
 module-level summaries below do not replace requirement-by-requirement review.
-Continue auditing the remaining scope and follow full branch CI.
+[Shared approval history](approval-history.md) closes the next confirmed missing
+reader/dashboard capability, with [local acceptance](measurements/approval-history-2026-10-30.json).
+The older approval readers' final assurance review is next. Continue auditing the
+remaining scope and follow full branch CI.
 
 ## Release-configuration audit — accepted
 

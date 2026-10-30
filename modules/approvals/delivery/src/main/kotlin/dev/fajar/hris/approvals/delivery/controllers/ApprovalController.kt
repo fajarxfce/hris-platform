@@ -18,6 +18,7 @@ class ApprovalController(
     private val saveTemplate: SaveApprovalTemplate,
     private val inbox: ListApprovalInbox,
     private val get: GetApprovalRequest,
+    private val history: GetApprovalHistory,
     private val reassign: ReassignApproval,
     private val delegations: ListMyDelegations,
     private val saveDelegation: SaveApprovalDelegation,
@@ -103,6 +104,16 @@ class ApprovalController(
     @GetMapping("/{id}")
     fun get(actor: Actor, @PathVariable id: UUID): ApprovalResponse =
         get.execute(actor, id).response().toResponse()
+
+    @GetMapping("/{id}/history")
+    fun history(
+        actor: Actor,
+        @PathVariable id: UUID,
+        @RequestParam(required = false) after: Long?,
+        @RequestParam(defaultValue = "50") limit: Int,
+        @RequestParam(required = false) expectedVersion: Long?,
+    ): ApprovalHistoryResponse =
+        history.execute(actor, id, after, limit, expectedVersion).response().toResponse()
 
     @PostMapping("/{id}/reassign")
     fun reassign(

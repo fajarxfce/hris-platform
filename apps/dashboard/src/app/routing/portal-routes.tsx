@@ -238,6 +238,11 @@ const ApprovalInboxScreen = lazy(() =>
     default: module.ApprovalInboxScreen,
   })),
 );
+const ApprovalHistoryScreen = lazy(() =>
+  import("../../features/approvals/presentation/bindings/approval-history-screen").then(
+    (module) => ({ default: module.ApprovalHistoryScreen }),
+  ),
+);
 const ApprovalRequestScreen = lazy(() =>
   import("../../features/approvals/presentation/bindings/approval-request-screen").then(
     (module) => ({ default: module.ApprovalRequestScreen }),
@@ -1257,6 +1262,21 @@ export function PortalRoutes({
         element={
           <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
             <ApprovalInboxScreen
+              accountId={accountId}
+              access={access}
+              approvals={approvals}
+              companyName={company.name}
+              timezone={company.timezone}
+              locale={locale}
+            />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/approvals/:approvalId/history"
+        element={
+          <Suspense fallback={<AppLoading label={messages(locale).loading} />}>
+            <ApprovalHistoryScreen
               accountId={accountId}
               access={access}
               approvals={approvals}

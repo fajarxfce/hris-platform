@@ -7,6 +7,7 @@ import { AppPageHeader } from "../../../../core/presentation/components/app-page
 import { AppPropertyList } from "../../../../core/presentation/components/app-property-list";
 import { AppResourceTable } from "../../../../core/presentation/components/app-resource-table";
 import { type Locale, messages } from "../../../../core/presentation/i18n/messages";
+import { approvalHistoryMessages } from "../i18n/approval-history-messages";
 import { approvalMessages } from "../i18n/approval-messages";
 import { approvalReassignmentMessages } from "../i18n/approval-reassignment-messages";
 import type { ApprovalRequestState } from "../models/approval-request-state";
@@ -20,6 +21,7 @@ export function ApprovalRequestPage({
   backTo,
   reassignTo,
   resourceTo,
+  historyTo,
   onRefresh,
 }: {
   state: ApprovalRequestState;
@@ -29,6 +31,7 @@ export function ApprovalRequestPage({
   backTo: string;
   reassignTo: string | null;
   resourceTo: string | null;
+  historyTo?: string | null;
   onRefresh: () => void;
 }) {
   const text = approvalMessages(locale);
@@ -40,6 +43,7 @@ export function ApprovalRequestPage({
         actions={
           <>
             <Link to={backTo}>{text.back}</Link>
+            {historyTo && <Link to={historyTo}>{approvalHistoryMessages(locale).title}</Link>}
             {resourceTo && <Link to={resourceTo}>{text.sourceRequest}</Link>}
             {reassignTo && (
               <Link to={reassignTo}>{approvalReassignmentMessages(locale).action}</Link>

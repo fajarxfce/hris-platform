@@ -16,10 +16,30 @@ accepted: optional selection, immutable publication, atomic queue, owned SMTP
 worker, private administrative counts and dashboard authoring/review.
 Read [email delivery](announcement-email.md), its [measurements](measurements/announcement-email-2026-10-30.json)
 and the [full audit](feature-audit-2026-10-30.md). Observe [CI 41005223374](https://github.com/fajarxfce/hris-platform/actions/runs/41005223374)
-for email source `8014d733`. The next confirmed missing feature is
-[shared approval decision/reassignment history](approval-history-audit-2026-10-30.md);
-implement and verify it, then continue all module and Mobile requirements. Do not narrow the objective
-to email or distribution; inventory rows remain unverified until reviewed.
+for email source `8014d733`; its nine completed jobs are green and the full dashboard
+integration is still running. Do not cancel that run by dispatching another run
+on this branch before it finishes.
+
+The second confirmed gap, [shared approval history](approval-history.md), is now
+implemented and locally accepted. It reads actual immutable decisions and a bounded
+reassignment page under current request scope, rechecks assurance/delegation after
+I/O, pins continuation to the request version, and provides a scoped EN/ID dashboard
+with owned cancellation and return context. See [measurements](measurements/approval-history-2026-10-30.json):
+118 API/OpenAPI cases, 104 worker cases, 11 approval domain cases, all 4,012 dashboard
+unit cases, 14 distinct Chromium cases and two actual API/browser workflows passed.
+One manual one-hour worker test is skipped and retains its earlier independent proof.
+The first combined acceptance was interrupted; final API and full worker runs were
+separate and passed. No migration, live mail, phone interaction or runtime rollout
+was performed for history.
+
+Continue the full audit. The next source finding is that the seven older approval
+read use cases validate MFA before acquisition but not at completion; request/inbox
+also retain pre-acquisition delegation time. Reproduce these expiry cases, correct
+those readers, and review every remaining module/Mobile requirement. The new history
+reader already has final checks. A local prepared reproduction is supplementary at
+`.work/approval-history-2026-10-30/ApprovalReadCompletionAssuranceTest.kt`; authoritative
+contracts and tests belong in Git with the correction. Do not mark the objective
+complete or mark unreviewed inventory rows accepted.
 
 Local evidence: 132 API/OpenAPI tests, 104 worker tests, 13 communication domain
 and three repository tests passed; one manual elapsed-retention test remains

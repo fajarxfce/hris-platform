@@ -127,6 +127,46 @@ test("real API leave decisions recover receipts and preserve staged reservations
     });
 
     await page.getByRole("button", { name: "Refresh", exact: true }).click();
+    await page
+      .getByRole("button", { name: "View approval: Initial approval", exact: true })
+      .click();
+    const approval = new URL(page.url()).pathname.split("/").at(-1);
+    const historyPath = `${scenario.base}/approvals/${approval}/history`;
+    const retained = await context.request.get(historyPath);
+    expect(retained.status()).toBe(200);
+    expect(await retained.json()).toMatchObject({
+      request: { status: "APPROVED", version: 2 },
+      decisions: [
+        {
+          step: 0,
+          actorId: reviewer,
+          decidingFor: reviewer,
+          decision: "APPROVE",
+          reason: "First stage reviewed",
+        },
+        {
+          step: 1,
+          actorId: reviewer,
+          decidingFor: reviewer,
+          decision: "APPROVE",
+          reason: "Final stage reviewed",
+        },
+      ],
+      reassignments: { items: [], nextCursor: null },
+    });
+    await page.getByRole("link", { name: "Approval history", exact: true }).click();
+    const decisions = page.getByRole("table", {
+      name: "Recorded decisions · Asia/Jakarta",
+      exact: true,
+    });
+    await expect(decisions.getByRole("row")).toHaveCount(3);
+    await expect(decisions).toContainText("First stage reviewed");
+    await expect(decisions).toContainText("Final stage reviewed");
+    await page.getByRole("link", { name: "Back to request", exact: true }).click();
+    await page.getByRole("link", { name: "View source request", exact: true }).click();
+    expect(await (await context.request.get(historyPath)).json()).toEqual(await retained.json());
+
+    await page.getByRole("button", { name: "Refresh", exact: true }).click();
     await confirm(page, "Request cancellation", "Plans changed");
     await reviewPage.getByRole("button", { name: "Refresh", exact: true }).click();
     await confirm(reviewPage, "Reject cancellation", "Leave still required");

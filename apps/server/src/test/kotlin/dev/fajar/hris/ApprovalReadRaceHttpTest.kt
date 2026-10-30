@@ -15,13 +15,18 @@ class ApprovalReadRaceHttpTest : ApprovalApiFixture() {
     @Autowired private lateinit var writes: ApprovalFenceProbe
 
     @ParameterizedTest
-    @ValueSource(strings = ["inbox", "request"])
+    @ValueSource(strings = ["inbox", "request", "history"])
     fun assignmentChangesCannotMixWithAnOlderRequestVersion(operation: String) {
         val f = leaveFixture()
         val id = approvalId(f.company, pending(f))
         val next = reviewer(f.company)
         val path =
-            "/api/v1/companies/${f.company}/approvals" + if (operation == "request") "/$id" else ""
+            "/api/v1/companies/${f.company}/approvals" +
+                when (operation) {
+                    "request" -> "/$id"
+                    "history" -> "/$id/history"
+                    else -> ""
+                }
         val barrier = ApprovalReadProbe.Barrier(f.company)
         reads.current.set(barrier)
         try {
@@ -39,7 +44,14 @@ class ApprovalReadRaceHttpTest : ApprovalApiFixture() {
                     val response = reading.get(10, TimeUnit.SECONDS)
                     assertEquals(200, response.statusCode(), response.body())
                     val body = json.readTree(response.body())
-                    val request = if (operation == "request") body else body.get("items").single()
+                    val request =
+                        when (operation) {
+                            "request" -> body
+                            "history" -> body["request"]
+                            else -> body.get("items").single()
+                        }
+                    if (operation == "history")
+                        assertEquals(0, body["reassignments"]["items"].size())
                     assertEquals(0, request.get("version").asInt())
                     assertEquals(
                         f.managerAccount.toString(),

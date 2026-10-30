@@ -1,0 +1,368 @@
+{
+  "date": "2026-10-30",
+  "baseline": "925f693a5046da6504890167e7cefaaa3e6ea558",
+  "status": "implemented-and-locally-accepted",
+  "requirement": "Shared approval request timeline with retained decisions and assignment changes",
+  "baselineProof": "GET history returned 404 before implementation; V4 retained facts had no reader or dashboard view.",
+  "contract": {
+    "route": "GET /api/v1/companies/{companyId}/approvals/{id}/history",
+    "decisionsMaximum": 8,
+    "reassignmentDefault": 50,
+    "reassignmentMaximum": 200,
+    "cursor": "exclusive immutable reassignment revision",
+    "continuation": "requires expectedVersion; changed request returns 409 approval_changed",
+    "migration": null
+  },
+  "validation": {
+    "initialApi": {
+      "tests": 9,
+      "failed": 0,
+      "includes": "six history cases and three parameterized snapshot races"
+    },
+    "dashboard": {
+      "tests": 4012,
+      "files": 355,
+      "failed": 0,
+      "durationSeconds": 98.45,
+      "architecture": true,
+      "typescript": true,
+      "testOnlyWarningCleanup": {
+        "tests": 4,
+        "failed": 0,
+        "durationSeconds": 0.839
+      }
+    },
+    "chromium": {
+      "distinctScenarios": 14,
+      "initialPassed": 13,
+      "correctedHistoryScenarios": 5,
+      "correctedDurationSeconds": 11.2,
+      "sourceFinding": "History link initially dropped the inbox cursor. Binding now supplies the canonical return query; test passes."
+    },
+    "realApiBrowser": {
+      "scenarios": 2,
+      "failed": 0,
+      "scenarioSeconds": [
+        25.9,
+        14.0
+      ],
+      "totalWithSetupMinutes": 1.8,
+      "proof": [
+        "real blocked expense reassignment and lost-response receipt replay yield one immutable override",
+        "two real leave decisions retain actual actor, decidingFor, reasons and stage order",
+        "history reads preserve the exact response and source business state"
+      ],
+      "scope": "owned disposable PostgreSQL/API/browser fixture",
+      "apiJarSha256": "f68bf67969ad31d846aa9e27af854c7605d2cc374f626c88bd4fb484f9e163b7"
+    },
+    "api": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.ApiContractHttpTest",
+          "tests": 68,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalAccessRaceHttpTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalAdministrationHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalAmountHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalAssuranceTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalCapacityHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalHistoryHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalInactiveScopeHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ApprovalReadRaceHttpTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 118,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "durationSeconds": 152,
+      "command": ":apps:server:test --tests '*Approval*Test' --tests '*ApiContractHttpTest'",
+      "maximumPageProof": "201 real versioned reassignments; first 200 and final one traverse each revision once",
+      "scope": "50 approval HTTP/race/assurance cases plus 68 OpenAPI contracts"
+    },
+    "worker": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.worker.AnnouncementPublicationWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.DirectoryProjectionWorkerTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.DocumentValidationWorkerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.EmployeeImportWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.IdentityMailWorkerTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.InboxEmailWorkerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.InboxPushWorkerTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.LeaveBatchWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.LeaveCarryExpiryWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.MobileSyncWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.NativeSessionCleanupWorkerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.ObjectCleanupWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.OffboardingScheduleWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.OnboardingScheduleWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.PayrollCalculationWorkerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportRetentionWorkerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.SelfProfileProjectionWorkerTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.WorkerIntegrationObservationTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.worker.WorkerIntegrationTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 105,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      "skippedCases": [
+        {
+          "suite": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+          "test": "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()"
+        }
+      ]
+    },
+    "approvalDomain": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.approvals.domain.ApprovalMakerPolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.approvals.domain.ApprovalPolicyTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.approvals.domain.ApprovalReadPolicyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "skippedCases": []
+    },
+    "workerAndDomainDurationSeconds": 223,
+    "quality": {
+      "architecture": true,
+      "kotlinFormat": true,
+      "durationSeconds": 26,
+      "dashboardExistingWarnings": "two pre-existing CSS specificity warnings; new test warnings corrected"
+    }
+  },
+  "correctedFindings": [
+    "Initial HTTP test used a nonexistent fixture helper; corrected to leaveFixture before baseline reproduction.",
+    "Initial worker selector matched a fixture name, not a test; corrected to AnnouncementPublicationWorkerTest and its context passed.",
+    "Kotlin override parameter names must match the repository contract because warnings are errors.",
+    "Revocation fixture must remove leave.team.approve as well as leave.approve; either grant authorizes the current manager.",
+    "Repository uses root format task, not spotlessApply; the invalid task ran no acceptance.",
+    "Maximum-page assertion must iterate Jackson JsonNode as a sequence; its member map recursively transforms JSON and is not Kotlin list mapping.",
+    "Combined acceptance process ended with signal 143 after partial execution. No kernel OOM event was observed; rerun API and worker sequentially and do not infer full success."
+  ],
+  "runtime": {
+    "privateApiSchema": 101,
+    "smtpEnabled": false,
+    "apiHealth": 200,
+    "dashboardHealth": 200,
+    "dashboardMatchesIsolatedBaseline": true,
+    "phoneTouched": false,
+    "googleBindingPreserved": true
+  },
+  "limits": [
+    "Existing history tables and retention remain unchanged; no migration or new recovery secret family.",
+    "No production deployment or live provider messages.",
+    "Remaining full module and Mobile audit is active; this feature is not whole-PRD completion."
+  ]
+}

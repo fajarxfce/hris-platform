@@ -15,6 +15,7 @@ fun completeApiContract(api: OpenAPI) {
     // Springdoc removes unused definitions before invoking customizers. Add the
     // filter/problem schemas together with the operations that reference them.
     completeSavedFilterSchemaBounds(api)
+    completeApprovalHistoryContract(api)
     val shared = apiContractComponents()
     shared.schemas.forEach { (name, schema) -> api.components.addSchemas(name, schema) }
     shared.securitySchemes.forEach { (name, scheme) ->

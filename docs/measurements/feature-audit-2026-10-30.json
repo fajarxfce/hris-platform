@@ -574,15 +574,19 @@
     },
     {
       "id": "approvals.history",
-      "status": "missing",
+      "status": "implemented-and-locally-accepted",
       "requirement": "Approvals request timeline with retained decisions and reassignment facts.",
-      "evidence": [
+      "next": "Reproduce final-assurance gaps in older approval readers, then continue full module/Mobile review and branch CI.",
+      "baselineEvidence": [
         "docs/approval-history-audit-2026-10-30.md",
         "modules/approvals/delivery/src/main/kotlin/dev/fajar/hris/approvals/delivery/responses/ApprovalResponse.kt",
         "modules/approvals/domain/src/main/kotlin/dev/fajar/hris/approvals/domain/repositories/ApprovalRepository.kt",
         "apps/dashboard/src/features/approvals/presentation/pages/approval-request-page.tsx"
       ],
-      "next": "Implement scoped bounded history API/dashboard from existing immutable records; verify live authorization, races and real browser acceptance."
+      "evidence": [
+        "docs/approval-history.md",
+        "docs/measurements/approval-history-2026-10-30.json"
+      ]
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

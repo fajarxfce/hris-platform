@@ -42,3 +42,11 @@ Continue the remaining module and Mobile review after this increment. Physical
 iPhone remains waived, and the accepted private schema-101 runtime/phone stay
 separate from these owned tests. Announcement email source `8014d733` is undergoing
 [full CI](https://github.com/fajarxfce/hris-platform/actions/runs/41005223374).
+
+## Implemented reader and local acceptance
+
+[Approval history](approval-history.md) now implements this contract from existing
+immutable tables, with no migration. [Measurements](measurements/approval-history-2026-10-30.json)
+record baseline reproduction, corrected findings and final API/worker/domain/UI
+acceptance. Continue the broader module audit, including final assurance on legacy
+readers; this increment does not establish whole-PRD completion.

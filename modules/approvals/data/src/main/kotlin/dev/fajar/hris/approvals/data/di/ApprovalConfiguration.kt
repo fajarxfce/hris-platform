@@ -177,4 +177,25 @@ class ApprovalConfiguration {
         clock: Clock,
         security: IdentitySecurityPolicy,
     ) = ListMyDelegations(approvals, identities, members, transactions, clock, security)
+
+    @Bean
+    fun approvalHistorySource(sql: DSLContext): ApprovalHistoryDataSource =
+        PostgresApprovalHistoryDataSource(sql)
+
+    @Bean
+    fun approvalHistory(
+        source: ApprovalHistoryDataSource
+    ): dev.fajar.hris.approvals.domain.repositories.ApprovalHistoryRepository =
+        dev.fajar.hris.approvals.data.repositories.StoredApprovalHistoryRepository(source)
+
+    @Bean
+    fun getApprovalHistory(
+        approvals: ApprovalRepository,
+        history: dev.fajar.hris.approvals.domain.repositories.ApprovalHistoryRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        clock: Clock,
+        security: IdentitySecurityPolicy,
+    ) = GetApprovalHistory(approvals, history, members, identities, transactions, clock, security)
 }

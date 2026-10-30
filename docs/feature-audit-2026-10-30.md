@@ -71,9 +71,18 @@ baseline snapshot. This isolation is recorded in the agent handoff.
 Continue the full module/Mobile review. Closing the email gap does not establish
 complete acceptance for the unreviewed inventory rows.
 
-## Next gap — shared approval history
+## Shared approval history — local acceptance passed
 
 The [approval history audit](approval-history-audit-2026-10-30.md) confirms a missing
 reader/view for retained decisions and reassignments. Existing shared approval
-details show current assignments only. Its implementation and acceptance are now
-active; other requirement rows remain unverified.
+details show current assignments only. [Implementation](approval-history.md) and [local acceptance](measurements/approval-history-2026-10-30.json)
+now cover the guarded history reader, versioned pagination, actual immutable facts,
+localized dashboard, lifecycle and real approval workflows. All 118 selected
+API/OpenAPI tests, 104 worker tests, 11 domain tests and 4,012 dashboard tests passed;
+14 distinct Chromium scenarios and two actual API/browser workflows passed.
+The request return cursor issue found by the browser test was corrected.
+
+Continue the module review. The older approval readers still need post-acquisition
+MFA/delegation expiry reproduction and correction before their access contract can
+be accepted. Full initial requirement rows remain unverified until their source
+and behavior review is completed; these two gap closures do not close the audit.

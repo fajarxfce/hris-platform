@@ -40,6 +40,7 @@ export function ApprovalRequestScreen(props: Props) {
       id={approvalId}
       backTo={backTo}
       reassignTo={`/approvals/${encodeURIComponent(approvalId)}/reassign?${query}`}
+      historyTo={`/approvals/${encodeURIComponent(approvalId)}/history?${query}`}
     />
   );
 }
@@ -52,11 +53,13 @@ function ApprovalRequestBinding({
   id,
   backTo,
   reassignTo,
+  historyTo,
   resourceRoute,
 }: Props & {
   id: string;
   backTo: string;
   reassignTo: string;
+  historyTo: string;
 }) {
   const controller = useMemo(
     () => new ApprovalRequestController(approvals.loadRequest, access, id),
@@ -85,6 +88,7 @@ function ApprovalRequestBinding({
       backTo={backTo}
       reassignTo={state.request && canReassignApproval(access, state.request) ? reassignTo : null}
       resourceTo={state.request ? resourceRoute(state.request) : null}
+      historyTo={state.request ? historyTo : null}
       onRefresh={controller.refresh}
     />
   );

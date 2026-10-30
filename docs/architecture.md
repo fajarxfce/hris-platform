@@ -22,6 +22,14 @@ retains the month. Hidden workspace reads stop and reacquire after admission.
 Presentation owns validated return context, without adding navigation fields to
 the repository query or domain entities.
 
+Shared approval history owns its read transaction and separate history repository.
+Raw queries read only immutable decision/assignment evidence under the shared
+approval guard, followed by company/member/account guards. The use case combines
+that evidence with the current request version, bounds decisions to eight and
+reassignment pages to 200, and checks assurance/delegation expiry after acquisition.
+Continuation pins the request version. Dashboard history owns one page and cancels
+observations on visibility or scope replacement. See [approval history](approval-history.md).
+
 ## Runtime
 
 JDK 21, Spring Boot 4.1, Kotlin 2.3, Spring MVC, PostgreSQL 18, Flyway, and jOOQ. Gradle conventions own toolchain and quality configuration; the version catalog owns versions. jOOQ is generated from migrations against PostgreSQL. OpenAPI is reviewed and validated in CI.

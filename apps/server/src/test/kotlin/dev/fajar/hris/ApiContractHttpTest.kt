@@ -25,6 +25,38 @@ class ApiContractHttpTest : PeopleApiFixture() {
     private lateinit var mappings: RequestMappingHandlerMapping
 
     @Test
+    fun approvalHistoryDescribesBoundedVersionedReadAndOnlyRetainedFacts() {
+        val api = contract()
+        val operation = api["paths"]["/api/v1/companies/{companyId}/approvals/{id}/history"]["get"]
+        assertTrue(operation["x-hris-authentication-required"].asBoolean())
+        assertTrue(operation["x-hris-company-admission"].asBoolean())
+        assertTrue(operation["description"].asString().contains("approval_changed"))
+        val parameters = operation["parameters"].associateBy { it["name"].asString() }
+        assertEquals(200, parameters.getValue("limit")["schema"]["maximum"].asInt())
+        for (name in listOf("after", "expectedVersion")) {
+            assertFalse(parameters.getValue(name)["required"].asBoolean())
+            assertEquals(9007199254740991L, parameters.getValue(name)["schema"]["maximum"].asLong())
+        }
+        val schemas = api["components"]["schemas"]
+        assertEquals(
+            setOf("request", "decisions", "reassignments"),
+            schemas["ApprovalHistoryResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            8,
+            schemas["ApprovalHistoryResponse"]["properties"]["decisions"]["maxItems"].asInt(),
+        )
+        assertEquals(
+            setOf("step", "actorId", "decidingFor", "decision", "reason", "decidedAt"),
+            schemas["ApprovalDecisionEntryResponse"]["properties"].propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf("revision", "step", "assignees", "actorId", "reason", "recordedAt"),
+            schemas["ApprovalReassignmentEntryResponse"]["properties"].propertyNames().toSet(),
+        )
+    }
+
+    @Test
     fun announcementEmailIsOptionalOnSaveAndHasNoRecipientMetadataInDelivery() {
         val schemas = contract()["components"]["schemas"]
         assertTrue(schemas["SaveAnnouncementRequest"]["properties"].has("emailNotification"))

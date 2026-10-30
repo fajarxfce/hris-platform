@@ -2,6 +2,7 @@ import type { LoadApprovalAssignees } from "../../domain/usecases/load-approval-
 import type { LoadApprovalDelegation } from "../../domain/usecases/load-approval-delegation";
 import type { LoadApprovalDelegationForEdit } from "../../domain/usecases/load-approval-delegation-for-edit";
 import type { LoadApprovalDelegations } from "../../domain/usecases/load-approval-delegations";
+import type { LoadApprovalHistory } from "../../domain/usecases/load-approval-history";
 import type { LoadApprovalInbox } from "../../domain/usecases/load-approval-inbox";
 import type { LoadApprovalRequest } from "../../domain/usecases/load-approval-request";
 import type { LoadApprovalTemplate } from "../../domain/usecases/load-approval-template";
@@ -12,6 +13,7 @@ import type { SaveApprovalDelegation } from "../../domain/usecases/save-approval
 import type { SaveApprovalTemplate } from "../../domain/usecases/save-approval-template";
 
 export type ApprovalsUseCases = Readonly<{
+  loadHistory: Pick<LoadApprovalHistory, "execute">;
   reviewReassignment: Pick<ReviewApprovalReassignment, "execute">;
   reassign: Pick<ReassignApproval, "execute">;
   loadDelegations: Pick<LoadApprovalDelegations, "execute">;

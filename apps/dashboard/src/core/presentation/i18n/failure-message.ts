@@ -2728,6 +2728,14 @@ const errors: Readonly<Record<string, readonly [string, string]>> = {
     "Select 1–25 different approvers and enter a reason.",
     "Pilih 1–25 approver berbeda dan masukkan alasan.",
   ],
+  invalid_approval_history_query: [
+    "This history page is invalid. Refresh to read the current request.",
+    "Halaman riwayat tidak valid. Segarkan untuk membaca permintaan terkini.",
+  ],
+  approval_history_unavailable: [
+    "Approval history is unavailable. Refresh to try again.",
+    "Riwayat persetujuan tidak tersedia. Segarkan untuk mencoba lagi.",
+  ],
   invalid_leave_query: [
     "Choose a valid employee, status and page.",
     "Pilih karyawan, status, dan halaman yang valid.",

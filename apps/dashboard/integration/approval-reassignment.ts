@@ -151,4 +151,31 @@ export async function reviewApprovalReassignment(
   await expect(page.getByRole("table", { name: "Approval stages", exact: true })).toContainText(
     delegate,
   );
+  const historyPath = `${base}/approvals/${before.approval.id}/history`;
+  const retained = await context.request.get(historyPath);
+  expect(retained.status()).toBe(200);
+  expect(await retained.json()).toMatchObject({
+    request: { version: 1, status: "PENDING" },
+    decisions: [],
+    reassignments: {
+      items: [{ revision: 1, assignees: [delegate], reason: "Independent expense reviewer" }],
+      nextCursor: null,
+    },
+  });
+  const historyReads: string[] = [];
+  await page.route(`**${historyPath}**`, async (route) => {
+    expect(route.request().method()).toBe("GET");
+    historyReads.push(route.request().url());
+    await route.continue();
+  });
+  await page.getByRole("link", { name: "Approval history", exact: true }).click();
+  await expect(
+    page.getByRole("table", { name: "Approver changes · Asia/Jakarta", exact: true }),
+  ).toContainText("Independent expense reviewer");
+  await expect(page.getByText("No decisions have been recorded.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Next page", exact: true })).toBeDisabled();
+  expect(historyReads).toHaveLength(1);
+  await page.getByRole("link", { name: "Back to request", exact: true }).click();
+  await page.unroute(`**${historyPath}**`);
+  expect(await (await context.request.get(historyPath)).json()).toEqual(await retained.json());
 }

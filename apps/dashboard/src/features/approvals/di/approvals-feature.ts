@@ -2,14 +2,17 @@ import type { HttpClient } from "../../../core/data/http/http-client";
 import { HttpApprovalAdministrationDataSource } from "../data/datasources/http-approval-administration-data-source";
 import { HttpApprovalDataSource } from "../data/datasources/http-approval-data-source";
 import { HttpApprovalDelegationDataSource } from "../data/datasources/http-approval-delegation-data-source";
+import { HttpApprovalHistoryDataSource } from "../data/datasources/http-approval-history-data-source";
 import { RemoteApprovalAssigneeRepository } from "../data/repositories/remote-approval-assignee-repository";
 import { RemoteApprovalDelegationRepository } from "../data/repositories/remote-approval-delegation-repository";
+import { RemoteApprovalHistoryRepository } from "../data/repositories/remote-approval-history-repository";
 import { RemoteApprovalRepository } from "../data/repositories/remote-approval-repository";
 import { RemoteApprovalTemplateRepository } from "../data/repositories/remote-approval-template-repository";
 import { LoadApprovalAssignees } from "../domain/usecases/load-approval-assignees";
 import { LoadApprovalDelegation } from "../domain/usecases/load-approval-delegation";
 import { LoadApprovalDelegationForEdit } from "../domain/usecases/load-approval-delegation-for-edit";
 import { LoadApprovalDelegations } from "../domain/usecases/load-approval-delegations";
+import { LoadApprovalHistory } from "../domain/usecases/load-approval-history";
 import { LoadApprovalInbox } from "../domain/usecases/load-approval-inbox";
 import { LoadApprovalRequest } from "../domain/usecases/load-approval-request";
 import { LoadApprovalTemplate } from "../domain/usecases/load-approval-template";
@@ -28,6 +31,9 @@ export function createApprovalsFeature(http: HttpClient) {
     new HttpApprovalDelegationDataSource(http),
   );
   return {
+    loadHistory: new LoadApprovalHistory(
+      new RemoteApprovalHistoryRepository(new HttpApprovalHistoryDataSource(http)),
+    ),
     reviewReassignment: new ReviewApprovalReassignment(approvals),
     reassign: new ReassignApproval(approvals),
     loadDelegations: new LoadApprovalDelegations(delegations),

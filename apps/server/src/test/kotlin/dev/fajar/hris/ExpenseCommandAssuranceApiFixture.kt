@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 
 @Import(AccountLockProbeConfiguration::class, ExpenseCommandProbeConfiguration::class)
-abstract class ExpenseCommandAssuranceApiFixture : ExpenseSubmissionApiFixture() {
+abstract class ExpenseCommandAssuranceApiFixture : ExpenseReviewApiFixture() {
     @Autowired private lateinit var claims: ExpenseClaimRepository
     @Autowired private lateinit var policies: ExpensePolicyRepository
     @Autowired private lateinit var documents: DocumentRepository
@@ -127,7 +127,11 @@ abstract class ExpenseCommandAssuranceApiFixture : ExpenseSubmissionApiFixture()
         )
     }
 
-    protected fun invoke(scene: Scenario, actor: Actor = scene.actor): Result<MutationReceipt> {
+    protected fun invoke(
+        scene: Scenario,
+        actor: Actor = scene.actor,
+        claimRepository: ExpenseClaimRepository = claims,
+    ): Result<MutationReceipt> {
         val f = scene.fixture
         return when (scene.action) {
             "save",
@@ -207,7 +211,7 @@ abstract class ExpenseCommandAssuranceApiFixture : ExpenseSubmissionApiFixture()
             "reject",
             "return" ->
                 ReviewExpenseSubmission(
-                        claims,
+                        claimRepository,
                         approvals,
                         people,
                         companies,

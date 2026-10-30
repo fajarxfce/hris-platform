@@ -2,9 +2,11 @@ package dev.fajar.hris.expenses.domain.policies
 
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.expenses.domain.entities.*
+import dev.fajar.hris.identity.domain.entities.AccountAccess
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.requireRecentAuthentication
 import dev.fajar.hris.identity.domain.policies.requireRecentMfa
+import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import java.time.Instant
 import java.util.UUID
 
@@ -16,6 +18,17 @@ fun validateExpensePaymentAccess(
     actor.requirePermission("expenses.pay").flatMap {
         if (security.enforceMfa) requireRecentMfa(actor, now, security.recentAuthenticationAge)
         else requireRecentAuthentication(actor, now, security.recentAuthenticationAge)
+    }
+
+/** Current enrollment, original/live finance grants and both assurance ages are required. */
+fun validateExpensePaymentSessionActor(
+    actor: Actor,
+    access: AccountAccess?,
+    now: Instant,
+    security: IdentitySecurityPolicy,
+): Result<Actor> =
+    validateCompanySessionActor(actor, access, now, security).flatMap { current ->
+        validateExpensePaymentAccess(current, now, security).map { current }
     }
 
 fun validateExpensePaymentInstructions(

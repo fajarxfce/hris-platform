@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,6 +36,48 @@ class ExpensePolicyAssuranceTest : PeopleApiFixture() {
     @Autowired private lateinit var accountProbe: AccountLockProbe
     @Autowired private lateinit var commandProbe: ExpenseCommandProbe
     private val security = IdentitySecurityPolicy()
+
+    @Test
+    fun admittedContractSelectionIsDetachedBeforeWaitingAndReceiptRecoveryRetainsIt() {
+        val original = prepare(false)
+        val contracts = original.category.policy.allowedContracts.toMutableSet()
+        val scene =
+            original.copy(
+                category =
+                    original.category.copy(
+                        policy = original.category.policy.copy(allowedContracts = contracts)
+                    )
+            )
+        val barrier = AccountLockProbe.Barrier(scene.actor.accountId)
+        accountProbe.current.set(barrier)
+        Executors.newSingleThreadExecutor().use { pool ->
+            val pending = pool.submit<Result<MutationReceipt>> { invoke(scene) }
+            try {
+                assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                contracts.remove(ContractKind.FIXED_TERM)
+                barrier.release.countDown()
+                val result = pending.get(10, TimeUnit.SECONDS)
+                assertTrue(result is Result.Success, result.toString())
+            } finally {
+                barrier.release.countDown()
+                accountProbe.current.set(null)
+            }
+        }
+        val saved =
+            transactions.run(scene.actor) {
+                policies.find(requireNotNull(scene.actor.companyId), scene.category.id)
+            }
+        assertTrue(saved is Result.Success, saved.toString())
+        assertEquals(
+            original.category.policy.allowedContracts,
+            (saved as Result.Success).value?.policy?.allowedContracts,
+        )
+        val before = snapshot(scene)
+        val replay = invoke(original)
+        assertTrue(replay is Result.Success, replay.toString())
+        assertTrue((replay as Result.Success).value.replayed)
+        assertEquals(before, snapshot(scene))
+    }
 
     private data class Scenario(
         val actor: Actor,

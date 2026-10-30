@@ -36,25 +36,32 @@ class SaveExpenseDraft(
         operationId: UUID,
         input: SaveExpenseDraftCommand,
     ): Result<MutationReceipt> {
+        val command =
+            input.copy(
+                lines =
+                    input.lines.take(21).map { line ->
+                        line.copy(receiptRevisionIds = line.receiptRevisionIds.take(4))
+                    }
+            )
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
-        val valid = validateExpenseDraft(input)
+        val valid = validateExpenseDraft(command)
         if (valid is Result.Failed) return valid
-        val receiptIds = input.lines.flatMap { it.receiptRevisionIds }.toSet()
+        val receiptIds = command.lines.flatMap { it.receiptRevisionIds }.toSet()
         val key =
             OperationKey(
                 "expenses.draft_save",
                 operationId,
                 listOf(
-                    input.id.toString(),
-                    input.employmentId.toString(),
-                    input.expectedVersion?.toString(),
-                    input.title,
-                    input.description,
-                    input.reason,
+                    command.id.toString(),
+                    command.employmentId.toString(),
+                    command.expectedVersion?.toString(),
+                    command.title,
+                    command.description,
+                    command.reason,
                 ) +
-                    input.lines.flatMap { line ->
+                    command.lines.flatMap { line ->
                         listOf(
                             line.id.toString(),
                             line.categoryId.toString(),
@@ -102,7 +109,7 @@ class SaveExpenseDraft(
             val now = clock.instant()
             val today = now.atZone(ZoneId.of(settings.timezone)).toLocalDate()
 
-            val foundEmployee = people.find(company, input.employmentId, today)
+            val foundEmployee = people.find(company, command.employmentId, today)
             if (foundEmployee is Result.Failed) return@run foundEmployee
             val employee =
                 (foundEmployee as Result.Success).value
@@ -111,10 +118,10 @@ class SaveExpenseDraft(
                     )
             if (!canManageExpenseClaim(live, employee))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "expense_access_denied"))
-            val found = claims.find(company, input.id)
+            val found = claims.find(company, command.id)
             if (found is Result.Failed) return@run found
             val existing = (found as Result.Success).value
-            if (existing != null && existing.employmentId != input.employmentId)
+            if (existing != null && existing.employmentId != command.employmentId)
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "expense_identity_immutable")
                 )
@@ -122,7 +129,7 @@ class SaveExpenseDraft(
                 return@run validateCompanySessionActor(actor, access, clock.instant(), security)
                     .map { receipt }
             }
-            if (existing?.version != input.expectedVersion)
+            if (existing?.version != command.expectedVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
             if (
                 existing != null &&
@@ -142,7 +149,7 @@ class SaveExpenseDraft(
                         Failure(FailureKind.RATE_LIMITED, "expense_draft_capacity")
                     )
             }
-            for (categoryId in input.lines.map { it.categoryId }.toSet()) {
+            for (categoryId in command.lines.map { it.categoryId }.toSet()) {
                 val category = policies.find(company, categoryId)
                 if (category is Result.Failed) return@run category
                 if ((category as Result.Success).value == null)
@@ -150,7 +157,7 @@ class SaveExpenseDraft(
                         Failure(FailureKind.VALIDATION, "expense_category_unavailable")
                     )
             }
-            for (costCenterId in input.lines.mapNotNull { it.costCenterId }.toSet()) {
+            for (costCenterId in command.lines.mapNotNull { it.costCenterId }.toSet()) {
                 val costCenter = units.find(company, costCenterId)
                 if (costCenter is Result.Failed) return@run costCenter
                 if (
@@ -192,8 +199,8 @@ class SaveExpenseDraft(
                     status = ExpenseClaimStatus.DRAFT,
                 )
                     ?: ExpenseClaim(
-                        input.id,
-                        input.employmentId,
+                        command.id,
+                        command.employmentId,
                         actor.accountId,
                         now,
                         0,
@@ -202,22 +209,22 @@ class SaveExpenseDraft(
                     )
             val draft =
                 ExpenseDraft(
-                    input.id,
+                    command.id,
                     claim.draftRevision,
                     employee.employeeNumber,
                     employee.person.legalName,
-                    input.title,
-                    input.description,
-                    input.lines.fold(java.math.BigDecimal.ZERO) { total, line ->
+                    command.title,
+                    command.description,
+                    command.lines.fold(java.math.BigDecimal.ZERO) { total, line ->
                         total + line.amount
                     },
-                    input.lines,
+                    command.lines,
                     actor.accountId,
-                    input.reason,
+                    command.reason,
                     now,
                 )
             claims
-                .saveDraft(actor, claim, draft, input.expectedVersion)
+                .saveDraft(actor, claim, draft, command.expectedVersion)
                 .flatMap { receipt ->
                     references
                         .retain(
@@ -247,7 +254,7 @@ class SaveExpenseDraft(
                                         "employmentId" to employee.id.toString(),
                                         "revision" to draft.revision.toString(),
                                     ),
-                                    input.reason,
+                                    command.reason,
                                 ),
                             )
                         }

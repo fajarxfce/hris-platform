@@ -11,10 +11,10 @@ preserves earlier work; its old next-step statements are not the active queue.
 
 Complete every specified Platform/Mobile feature and port demonstrated generic
 fixes to Starter. The [full audit](feature-audit-2026-10-30.md) remains active:
-Approvals, Communications, Identity and Documents now have twenty reviewed initial
-requirement rows and their detailed sections; 41 initial rows still await review,
+Approvals, Communications, Identity, Documents and Expenses now have 26 reviewed
+initial requirement rows and their detailed sections; 35 initial rows await review,
 followed by Mobile/Starter. Identity and Approvals have accepted full-CI evidence;
-final CI for Communications and Document corrections remains separately tracked.
+final CI for Communications, Document and Expense corrections remains separately tracked.
 Do not mark the goal complete from these increments or earlier green CI.
 
 Announcement email source `8014d733` passed all ten jobs in
@@ -63,17 +63,36 @@ eight commands. Nineteen actual baseline cases failed; inventory receipt replay
 was the twentieth, already-correct control. All twenty focused cases and final
 243 API, 18 domain, nine data, quality/packages and four actual browser workflows
 passed (42.5s). The [Documents requirement review](documents-feature-review-2026-10-30.md)
-locally accepts all five rows and ten original sections. Dispatch full CI for the
-committed final source, then observe its terminal outcome without cancelling it.
+locally accepts all five rows and ten original sections. Exact source `8e5dd3db49b2568917c44432574f58ce1eae6dae` is running in
+[CI 41013958569](https://github.com/fajarxfce/hris-platform/actions/runs/41013958569).
+Observe its terminal outcome without cancelling it. This includes Communications
+and both Document increments; it does not include the later Expense correction.
 
-Continue **Expenses**, then remaining module/Mobile contracts. Ignored drafts in
-`.work/expense-assurance-2026-10-30/` prepare fifteen payment-enrollment cases,
-six receipt-delegation completion variants (three ordinary-scope controls), and
-two mutable draft-input cases. They are not yet compiled or executed. Reproduce
-before correcting eleven finance use cases, two receipt readers and draft input
-ownership. Also review preparation/reconciliation uses of original lists after
-making ordered copies. Keep current approval account-lock ordering and bounded
-resource ownership. No generic client port is due from these server changes.
+[Expenses](expenses-feature-review-2026-10-30.md) now locally accepts all six initial
+rows and nine detailed sections. Its correction closes 29 failed cases: fifteen
+payment-enrollment, three receipt-delegation, five mutable-input and six decision-
+delegation cases. Three ordinary receipt-scope controls already passed; three added
+delegator-account wait regressions now pass. Broad acceptance passed 329 API,
+20 Expense domain and 115 Reporting cases, quality/packages (590s). Final decision
+acceptance passed 62 API, 20 domain and quality/packages (145s), for 335 distinct
+API cases across both selections. Four final real browser workflows passed in
+1.2 minutes: claim authoring/review, payment preparation/release/reconciliation,
+category policy and reporting. The [measurements](measurements/expense-assurance-2026-10-30.json)
+retain both selections and package hashes. No runtime or phone update occurred.
+
+Observe the Document/Communications CI above, then dispatch the committed final
+Expense source and record its terminal result. Do not cancel the predecessor with
+another same-branch workflow. Keep the remaining full-feature goal active.
+
+Next, review **Leave** and remaining module/Mobile contracts. A preliminary read of
+`DecideLeaveRequest` likewise finds a captured delegation time before later ledger
+work and only MFA validation after journaling. Reproduce its current-stage expiry
+through decision/receipt boundaries during the Leave review; no Leave code changed.
+Do not narrow the remaining audit to that possible defect.
+
+Input copies are bounded before validation. Receipt reads retain scope/expiry and
+ordered actor/delegator guards; one additional identity acquisition per short
+receipt transaction is intentional. No DI/schema change or generic client port.
 
 Downloaded
 full-CI reports are supplementary local evidence in

@@ -302,38 +302,56 @@
         {
           "id": "expenses.01",
           "text": "Own expense categories, policies, claim lines/receipts, review, payment batches, and reconciliation.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/expenses-feature-review-2026-10-30.md",
+            "docs/measurements/expenses-feature-review-2026-10-30.json"
+          ]
         },
         {
           "id": "expenses.02",
           "text": "Claims store IDR amount, transaction date, cost center, and evidence. Snapshot limits on submit. Suspected duplicate receipts are review signals. Support return-for-correction/rejection with reasons and approval before payment.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/expenses-feature-review-2026-10-30.md",
+            "docs/measurements/expenses-feature-review-2026-10-30.json"
+          ]
         },
         {
           "id": "expenses.03",
           "text": "Payments have stable item references and per-item success/failure status. Paid claims cannot enter another batch. Reimbursements are independently paid in the first version. External bank submission remains manual.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/expenses-feature-review-2026-10-30.md",
+            "docs/measurements/expenses-feature-review-2026-10-30.json"
+          ]
         },
         {
           "id": "expenses.04",
           "text": "Screens: claims, review, policy setup, payment batches, reconciliation.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/expenses-feature-review-2026-10-30.md",
+            "docs/measurements/expenses-feature-review-2026-10-30.json"
+          ]
         },
         {
           "id": "expenses.05",
           "text": "The [claim dashboard](../dashboard.md#expense-claims) implements bounded directories,\ncoherent current claim/history review, immutable submission evidence, payment\nprogress and scoped receipt downloads. Independent reviewers can approve, reject\nor return submitted evidence with both observed versions and operation recovery.\nApproval source links use submission IDs. Finance preparation, release,\ncancellation/replacement and reconciliation are implemented separately. Dashboard\ndraft creation/editing, submitted actions and returned-claim correction are also\nimplemented and exercised in `apps/dashboard/integration/expense-claims.spec.ts`.\nSee [draft authoring](../dashboard.md#expense-draft-authoring) for the current contract.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/expenses-feature-review-2026-10-30.md",
+            "docs/measurements/expenses-feature-review-2026-10-30.json"
+          ]
         },
         {
           "id": "expenses.06",
           "text": "Acceptance: category limits, company attachment access, concurrent submission, payment replay, failed/partial batch reconciliation, and immutable paid records.",
-          "status": "unverified",
-          "evidence": []
+          "status": "locally-accepted",
+          "evidence": [
+            "docs/expenses-feature-review-2026-10-30.md",
+            "docs/measurements/expenses-feature-review-2026-10-30.json"
+          ]
         }
       ],
       "detailedContractSections": [
@@ -346,7 +364,11 @@
         "Review and correction",
         "Receipt content",
         "Payment batches"
-      ]
+      ],
+      "detailedReview": {
+        "status": "locally-accepted",
+        "evidence": "docs/expenses-feature-review-2026-10-30.md"
+      }
     },
     {
       "module": "identity",
@@ -764,6 +786,21 @@
         "docs/measurements/document-command-assurance-2026-10-30.json"
       ],
       "next": "Follow final-source CI and continue Expenses, remaining Platform modules and Mobile."
+    },
+    {
+      "id": "expenses.assurance-and-inputs",
+      "status": "implemented-and-locally-accepted",
+      "requirement": "Current enrollment, delegated receipt/decision scope and stable admitted inputs through waits and completion.",
+      "baseline": "8e5dd3db",
+      "baselineEvidence": [
+        "Twenty-nine actual failed cases: fifteen finance-enrollment, three receipt-delegation, five mutable-input and six current-stage decision-delegation cases. Three ordinary receipt-scope controls already passed."
+      ],
+      "evidence": [
+        "docs/expense-assurance-2026-10-30.md",
+        "docs/measurements/expense-assurance-2026-10-30.json",
+        "docs/expenses-feature-review-2026-10-30.md"
+      ],
+      "next": "Observe predecessor CI, dispatch final Expense source when it completes, and continue Leave/remaining Platform/Mobile requirements."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

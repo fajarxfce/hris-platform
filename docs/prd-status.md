@@ -25,10 +25,12 @@ also accepts five rows after the read-completion correction. [Identity](identity
 accepts five more against unchanged source and downloaded full-CI results.
 [Documents](documents-feature-review-2026-10-30.md) now accepts its five rows and
 ten original sections after read/command completion fixes: 243 API, 18 domain,
-nine data, quality/packages and four actual browser workflows passed. Twenty rows
-are reviewed; 41 initial rows and the full Mobile review remain active. Email
+nine data, quality/packages and four actual browser workflows passed. [Expenses](expenses-feature-review-2026-10-30.md) adds six locally accepted rows
+and nine sections, with 335 distinct API cases, 20 Expense domain, 115 Reporting
+cases, quality/packages and four actual browser workflows. Twenty-six rows are
+reviewed; 35 initial rows and the full Mobile review remain active. Email
 `8014d733` and approval `fcfdaf26` each passed all ten full-CI jobs. Follow the
-Communications/Documents final-source CI and continue Expenses and remaining scope.
+Communications/Documents/Expenses final-source CI and continue Leave and remaining scope.
 
 
 ## Release-configuration audit — accepted

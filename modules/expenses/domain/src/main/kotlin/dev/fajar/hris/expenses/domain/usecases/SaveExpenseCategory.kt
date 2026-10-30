@@ -29,23 +29,30 @@ class SaveExpenseCategory(
         expectedVersion: Long?,
         reason: String,
     ): Result<MutationReceipt> {
+        val captured =
+            category.copy(
+                policy =
+                    category.policy.copy(
+                        allowedContracts = category.policy.allowedContracts.toSet()
+                    )
+            )
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
-        val valid = validateExpenseCategory(category, reason)
+        val valid = validateExpenseCategory(captured, reason)
         if (valid is Result.Failed) return valid
         if (expectedVersion != null && expectedVersion !in 0..999)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_version"))
-        val policy = category.policy
+        val policy = captured.policy
         val key =
             OperationKey(
                 "expenses.category_save",
                 operationId,
                 listOf(
-                    category.id.toString(),
-                    category.code,
-                    category.effectiveFrom.toString(),
-                    category.active.toString(),
+                    captured.id.toString(),
+                    captured.code,
+                    captured.effectiveFrom.toString(),
+                    captured.active.toString(),
                     expectedVersion?.toString(),
                     reason,
                     policy.name,
@@ -80,12 +87,12 @@ class SaveExpenseCategory(
                 return@run validateCompanySessionActor(actor, access, clock.instant(), security)
                     .map { _ -> it }
             }
-            val found = policies.find(company, category.id)
+            val found = policies.find(company, captured.id)
             if (found is Result.Failed) return@run found
             val existing = (found as Result.Success).value
             if (existing?.version != expectedVersion)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
-            if (existing != null && existing.code != category.code)
+            if (existing != null && existing.code != captured.code)
                 return@run Result.Failed(
                     Failure(FailureKind.VALIDATION, "expense_category_code_immutable")
                 )
@@ -101,7 +108,7 @@ class SaveExpenseCategory(
                         Failure(FailureKind.CONFLICT, "expense_category_limit")
                     )
             }
-            policies.save(actor, category, expectedVersion, reason).flatMap { receipt ->
+            policies.save(actor, captured, expectedVersion, reason).flatMap { receipt ->
                 operations
                     .record(actor, key, receipt)
                     .flatMap {
@@ -109,7 +116,7 @@ class SaveExpenseCategory(
                             actor,
                             ChangeRecord(
                                 "expense_category",
-                                category.id,
+                                captured.id,
                                 "expenses.category_saved",
                                 reason = reason,
                             ),

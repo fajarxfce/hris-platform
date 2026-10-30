@@ -44,3 +44,29 @@ fun canReadExpenseClaim(
             ("expenses.team.read" in actor.permissions &&
                 employee.managerAccountId == actor.accountId &&
                 employee.terms.isWorkingOn(today)))
+
+/** Scope and delegation time are observations, not a reservation for later delivery. */
+fun validateExpenseReceiptRead(
+    actor: Actor,
+    employee: dev.fajar.hris.people.domain.entities.Employee?,
+    today: java.time.LocalDate,
+    scope: ExpenseClaimReadScope,
+    approval: dev.fajar.hris.approvals.domain.entities.ApprovalRequest?,
+    delegations: List<dev.fajar.hris.approvals.domain.entities.Delegation>,
+    grants: List<dev.fajar.hris.identity.domain.entities.MemberAccount>,
+    now: java.time.Instant,
+): Result<Unit> =
+    if (
+        (employee != null && canReadExpenseClaim(actor, employee, today, scope)) ||
+            (scope == ExpenseClaimReadScope.AUTHORIZED &&
+                approval != null &&
+                dev.fajar.hris.approvals.domain.policies.isAssignedApprover(
+                    actor,
+                    approval,
+                    delegations,
+                    grants,
+                    now,
+                ))
+    )
+        Result.Success(Unit)
+    else Result.Failed(Failure(FailureKind.NOT_FOUND, "expense_receipt_not_found"))

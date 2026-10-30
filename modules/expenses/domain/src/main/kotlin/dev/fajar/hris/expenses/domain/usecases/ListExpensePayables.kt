@@ -5,7 +5,6 @@ import dev.fajar.hris.expenses.domain.entities.*
 import dev.fajar.hris.expenses.domain.policies.*
 import dev.fajar.hris.expenses.domain.repositories.ExpensePaymentRepository
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -52,14 +51,13 @@ class ListExpensePayables(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val accessed = identities.access(actor.accountId, company)
+            if (accessed is Result.Failed) return@run accessed
+            val identity = (accessed as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+                validateExpensePaymentSessionActor(actor, identity, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
-            val recent = validateExpensePaymentAccess(live, clock.instant(), security)
-            if (recent is Result.Failed) return@run recent
             val found = companies.find(company)
             if (found is Result.Failed) return@run found
             val settings =
@@ -82,9 +80,8 @@ class ListExpensePayables(
                                 expensePayableAvailableActions(live.accountId, payable),
                             )
                         }
-                    validateExpensePaymentAccess(live, clock.instant(), security).map {
-                        Page(reviewed, page.nextCursor)
-                    }
+                    validateExpensePaymentSessionActor(actor, identity, clock.instant(), security)
+                        .map { Page(reviewed, page.nextCursor) }
                 }
         }
     }

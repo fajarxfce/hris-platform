@@ -5,7 +5,6 @@ import dev.fajar.hris.expenses.domain.entities.*
 import dev.fajar.hris.expenses.domain.policies.*
 import dev.fajar.hris.expenses.domain.repositories.ExpensePaymentRepository
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -37,9 +36,9 @@ class ReconcileExpensePaymentBatch(
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         val access = validateExpensePaymentAccess(actor, clock.instant(), security)
         if (access is Result.Failed) return access
-        if (version < 0 || reason.isBlank() || reason.length > 1000 || results.size !in 1..100)
+        val ordered = results.take(101).sortedBy { it.itemId }
+        if (version < 0 || reason.isBlank() || reason.length > 1000 || ordered.size !in 1..100)
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_expense_payment_action"))
-        val ordered = results.sortedBy { it.itemId }
         val key =
             OperationKey(
                 "expenses.payment_reconcile",
@@ -69,14 +68,12 @@ class ReconcileExpensePaymentBatch(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
+            val accessed = identities.access(actor.accountId, company)
+            if (accessed is Result.Failed) return@run accessed
+            val identity = (accessed as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+                validateExpensePaymentSessionActor(actor, identity, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
-            val live = (checked as Result.Success).value
-            val recent = validateExpensePaymentAccess(live, clock.instant(), security)
-            if (recent is Result.Failed) return@run recent
             val found = payments.find(company, id)
             if (found is Result.Failed) return@run found
             val batch =
@@ -95,9 +92,13 @@ class ReconcileExpensePaymentBatch(
             val independent = validateExpensePaymentIndependence(actor.accountId, evidence)
             if (independent is Result.Failed) return@run independent
             (replay as Result.Success).value?.let { receipt ->
-                return@run validateExpensePaymentAccess(live, clock.instant(), security).map {
-                    receipt
-                }
+                return@run validateExpensePaymentSessionActor(
+                        actor,
+                        identity,
+                        clock.instant(),
+                        security,
+                    )
+                    .map { receipt }
             }
             if (batch.version != version)
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "stale_version"))
@@ -127,14 +128,21 @@ class ReconcileExpensePaymentBatch(
                                 id,
                                 "expenses.payment_reconciled",
                                 mapOf(
-                                    "resultCount" to results.size.toString(),
+                                    "resultCount" to ordered.size.toString(),
                                     "status" to reconciliation.resultingStatus.name,
                                 ),
                                 reason,
                             ),
                         )
                     }
-                    .flatMap { validateExpensePaymentAccess(live, clock.instant(), security) }
+                    .flatMap {
+                        validateExpensePaymentSessionActor(
+                            actor,
+                            identity,
+                            clock.instant(),
+                            security,
+                        )
+                    }
                     .map { receipt }
             }
         }

@@ -5,7 +5,6 @@ import dev.fajar.hris.expenses.domain.entities.*
 import dev.fajar.hris.expenses.domain.policies.*
 import dev.fajar.hris.expenses.domain.repositories.ExpensePaymentRepository
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
-import dev.fajar.hris.identity.domain.policies.validateCompanyCommandActor
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
@@ -38,9 +37,9 @@ class PrepareExpensePaymentBatch(
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))
         val access = validateExpensePaymentAccess(actor, clock.instant(), security)
         if (access is Result.Failed) return access
-        val valid = validateExpensePaymentInstructions(title, items, reason)
+        val ordered = items.take(101).sortedBy { it.id }
+        val valid = validateExpensePaymentInstructions(title, ordered, reason)
         if (valid is Result.Failed) return valid
-        val ordered = items.sortedBy { it.id }
         val key =
             OperationKey(
                 "expenses.payment_prepare",
@@ -69,27 +68,29 @@ class PrepareExpensePaymentBatch(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId)
             if (accountLock is Result.Failed) return@run accountLock
+            val accessed = identities.access(actor.accountId, company)
+            if (accessed is Result.Failed) return@run accessed
+            val identity = (accessed as Result.Success).value
             val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanyCommandActor(actor, it)
-                }
+                validateExpensePaymentSessionActor(actor, identity, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
-            val live = (checked as Result.Success).value
-            val recent = validateExpensePaymentAccess(live, clock.instant(), security)
-            if (recent is Result.Failed) return@run recent
-            val candidates = payments.candidates(company, items.map { it.submissionId }.toSet())
+            val candidates = payments.candidates(company, ordered.map { it.submissionId }.toSet())
             if (candidates is Result.Failed) return@run candidates
             val evidence = (candidates as Result.Success).value
-            if (evidence.size != items.size)
+            if (evidence.size != ordered.size)
                 return@run Result.Failed(
                     Failure(FailureKind.CONFLICT, "expense_payment_requires_approved_claims")
                 )
             val independent = validateExpensePaymentIndependence(actor.accountId, evidence)
             if (independent is Result.Failed) return@run independent
             (replay as Result.Success).value?.let { receipt ->
-                return@run validateExpensePaymentAccess(live, clock.instant(), security).map {
-                    receipt
-                }
+                return@run validateExpensePaymentSessionActor(
+                        actor,
+                        identity,
+                        clock.instant(),
+                        security,
+                    )
+                    .map { receipt }
             }
             val found = payments.find(company, id)
             if (found is Result.Failed) return@run found
@@ -159,12 +160,19 @@ class PrepareExpensePaymentBatch(
                                 "expense_payment_batch",
                                 id,
                                 "expenses.payment_prepared",
-                                mapOf("itemCount" to items.size.toString()),
+                                mapOf("itemCount" to ordered.size.toString()),
                                 reason,
                             ),
                         )
                     }
-                    .flatMap { validateExpensePaymentAccess(live, clock.instant(), security) }
+                    .flatMap {
+                        validateExpensePaymentSessionActor(
+                            actor,
+                            identity,
+                            clock.instant(),
+                            security,
+                        )
+                    }
                     .map { receipt }
             }
         }

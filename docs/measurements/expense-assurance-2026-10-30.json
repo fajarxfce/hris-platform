@@ -1,0 +1,749 @@
+{
+  "date": "2026-10-30",
+  "baseline": "8e5dd3db",
+  "status": "implemented-and-locally-accepted",
+  "reproduction": {
+    "tests": 26,
+    "failures": 23,
+    "positiveControls": 3,
+    "paymentEnrollment": 15,
+    "receiptDelegationCompletion": 3,
+    "mutableInputs": 5,
+    "firstBatchSeconds": 77,
+    "secondBatchSeconds": 51
+  },
+  "fixtureCorrections": [
+    "The first compilation rejected the chunkAt override parameter name number under Werror; changed it to ordinal before reproduction.",
+    "The absent retained receipt caused a baseline null access; the final test explicitly checks the array count.",
+    "The decision fixture initially inherited the submission fixture without review helpers; its base now extends the stateless review fixture before genuine baseline reproduction."
+  ],
+  "focusedCorrected": {
+    "tests": 32,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "durationSeconds": 105,
+    "suites": [
+      {
+        "name": "dev.fajar.hris.ExpenseDraftInputSnapshotTest",
+        "tests": "2",
+        "skipped": "0",
+        "failures": "0",
+        "errors": "0",
+        "timestamp": "2026-10-30T06:31:17.744Z",
+        "hostname": "arch-jkt",
+        "time": "8.563"
+      },
+      {
+        "name": "dev.fajar.hris.ExpensePaymentEnrollmentTest",
+        "tests": "15",
+        "skipped": "0",
+        "failures": "0",
+        "errors": "0",
+        "timestamp": "2026-10-30T06:31:27.314Z",
+        "hostname": "arch-jkt",
+        "time": "24.334"
+      },
+      {
+        "name": "dev.fajar.hris.ExpensePaymentInputSnapshotTest",
+        "tests": "2",
+        "skipped": "0",
+        "failures": "0",
+        "errors": "0",
+        "timestamp": "2026-10-30T06:30:48.444Z",
+        "hostname": "arch-jkt",
+        "time": "18.007"
+      },
+      {
+        "name": "dev.fajar.hris.ExpensePolicyAssuranceTest",
+        "tests": "7",
+        "skipped": "0",
+        "failures": "0",
+        "errors": "0",
+        "timestamp": "2026-10-30T06:31:07.633Z",
+        "hostname": "arch-jkt",
+        "time": "9.189"
+      },
+      {
+        "name": "dev.fajar.hris.ExpenseReceiptDelegationCompletionTest",
+        "tests": "6",
+        "skipped": "0",
+        "failures": "0",
+        "errors": "0",
+        "timestamp": "2026-10-30T06:31:52.723Z",
+        "hostname": "arch-jkt",
+        "time": "11.711"
+      }
+    ],
+    "scope": "Includes six prior policy assurance cases; later bounded-copy limits and three account-wait regressions are in broad acceptance."
+  },
+  "boundary": {
+    "financeUseCases": 11,
+    "receiptUseCases": 2,
+    "inputCommands": 4,
+    "newDiDependencies": false,
+    "schemaChange": false,
+    "additionalFinanceQueries": 0,
+    "additionalIdentityQueryPerReceiptTransaction": 1,
+    "externalStorageOutsideTransactions": true,
+    "accountGuards": "Actor and relevant delegators sorted by ID; no separate worker authority changes."
+  },
+  "fullCi": {
+    "predecessorSource": "8e5dd3db49b2568917c44432574f58ce1eae6dae",
+    "predecessorUrl": "https://github.com/fajarxfce/hris-platform/actions/runs/41013958569",
+    "status": "pending-final-source-dispatch-after-predecessor"
+  },
+  "remaining": [
+    "Follow final-source CI after predecessor completes.",
+    "Continue remaining Platform/Mobile audit."
+  ],
+  "runtime": "Private schema-101 stack, Google binding and installed phone unchanged; no live bank or mail operation.",
+  "broadAcceptance": {
+    "suites": {
+      "apps/server": {
+        "suites": [
+          {
+            "name": "dev.fajar.hris.ExpenseClaimRecordHttpTest",
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseClaimReviewHttpTest",
+            "tests": 5,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseCommandAssuranceTest",
+            "tests": 32,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseCostCenterHttpTest",
+            "tests": 8,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseDraftHttpTest",
+            "tests": 11,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseDraftInputSnapshotTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseDraftingAssuranceTest",
+            "tests": 12,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseDraftingHttpTest",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePaymentAssuranceTest",
+            "tests": 34,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePaymentBoundsHttpTest",
+            "tests": 3,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePaymentEnrollmentTest",
+            "tests": 15,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePaymentHttpTest",
+            "tests": 5,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePaymentInputSnapshotTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePaymentReadHttpTest",
+            "tests": 7,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePaymentReferenceMigrationHttpTest",
+            "tests": 1,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePaymentReviewHttpTest",
+            "tests": 10,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePaymentSecurityHttpTest",
+            "tests": 7,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePaymentSyncHttpTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePaymentSyncMigrationHttpTest",
+            "tests": 1,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePolicyAssuranceTest",
+            "tests": 7,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePolicyHttpTest",
+            "tests": 7,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpensePolicyReviewHttpTest",
+            "tests": 5,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseReadAssuranceTest",
+            "tests": 53,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseReadScopeHttpTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseReceiptDelegationCompletionTest",
+            "tests": 9,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseReceiptHttpTest",
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseReportAccessHttpTest",
+            "tests": 13,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseReportHttpTest",
+            "tests": 7,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseReportPaymentHttpTest",
+            "tests": 1,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseReportSourceCaptureTest",
+            "tests": 1,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseReviewHttpTest",
+            "tests": 10,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseReviewSecurityHttpTest",
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseSubmissionActionsHttpTest",
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.ExpenseSubmissionHttpTest",
+            "tests": 13,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.SelfExpenseDraftReferencesHttpTest",
+            "tests": 8,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.SelfExpenseHttpTest",
+            "tests": 8,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        ],
+        "total": {
+          "tests": 329,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "modules/expenses/domain": {
+        "suites": [
+          {
+            "name": "dev.fajar.hris.expenses.domain.ExpensePaymentPolicyTest",
+            "tests": 9,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.expenses.domain.ExpenseReviewPolicyTest",
+            "tests": 8,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.expenses.domain.ExpenseSubmissionPolicyTest",
+            "tests": 3,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        ],
+        "total": {
+          "tests": 20,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "modules/expenses/data": {
+        "suites": [],
+        "total": {
+          "tests": 0,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "modules/reporting/domain": {
+        "suites": [
+          {
+            "name": "dev.fajar.hris.reporting.domain.AttendanceClosingReportPolicyTest",
+            "tests": 3,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.AttendanceReportPolicyTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.ExpenseReportPolicyTest",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.HeadcountPolicyTest",
+            "tests": 3,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.LeaveReportPolicyTest",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.OvertimeReportPolicyTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.PayrollCostReportPolicyTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.ReportCataloguePolicyTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.ReportCsvPolicyTest",
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.ReportExportExecutionPolicyTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.ReportExportPolicyTest",
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.ReportSelectionPolicyTest",
+            "tests": 2,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.ReportSnapshotPolicyTest",
+            "tests": 3,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.ReportSummaryExportPolicyTest",
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.domain.SavedReportFilterPolicyTest",
+            "tests": 5,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        ],
+        "total": {
+          "tests": 52,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "modules/reporting/data": {
+        "suites": [
+          {
+            "name": "dev.fajar.hris.reporting.data.AttendanceClosingEmployeeRepositoryTest",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.data.AttendanceClosingReportRepositoryTest",
+            "tests": 5,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.data.AttendanceExceptionReportRepositoryTest",
+            "tests": 3,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.data.ExpenseReportRepositoryTest",
+            "tests": 5,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.data.GroupHeadcountReportRepositoryTest",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.data.HeadcountReportRepositoryTest",
+            "tests": 3,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.data.LeaveReportRepositoryTest",
+            "tests": 5,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.data.OvertimeReportRepositoryTest",
+            "tests": 5,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.data.PayrollCostReportRepositoryTest",
+            "tests": 5,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.data.ReportExportExpiryRepositoryTest",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.data.ReportExportRepositoryTest",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.data.ReportSnapshotRepositoryTest",
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.data.ReportSnapshotSourceRepositoryTest",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.data.SavedReportFilterRepositoryTest",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        ],
+        "total": {
+          "tests": 61,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "modules/reporting/delivery": {
+        "suites": [
+          {
+            "name": "dev.fajar.hris.reporting.delivery.ExpenseReportResponseTest",
+            "tests": 1,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "name": "dev.fajar.hris.reporting.delivery.LeaveReportResponseTest",
+            "tests": 1,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        ],
+        "total": {
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      }
+    },
+    "durationSeconds": 590,
+    "format": true,
+    "architecture": true,
+    "apiPackage": true,
+    "workerPackage": true,
+    "apiJarSha256": "f804508697eeec3afff1b28c69cca78680c610e977e222ccce70b8e15233bbb8",
+    "scope": "Before later decision-delegation correction; includes final bounded copies and three account-wait regressions."
+  },
+  "decisionReproduction": {
+    "tests": 6,
+    "failures": 6,
+    "errors": 0,
+    "skipped": 0,
+    "durationSeconds": 47,
+    "scope": "Approve/reject/return after duplicate-evidence or journal acquisition; current-stage policy now rechecked at both completion boundaries."
+  },
+  "decisionAcceptance": {
+    "api": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.ExpenseCommandAssuranceTest",
+          "tests": 32,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseDecisionDelegationCompletionTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseDraftInputSnapshotTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseReviewHttpTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseReviewSecurityHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseSubmissionActionsHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 62,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "domainTests": 20,
+    "durationSeconds": 145,
+    "format": true,
+    "architecture": true,
+    "apiPackage": true,
+    "workerPackage": true,
+    "apiJarSha256": "ebd5985eb1b4c6e15414d2308fa2495a694a9d22366a0dc599092d5922f06387"
+  },
+  "distinctApiCases": 335,
+  "realApiBrowser": {
+    "tests": 4,
+    "failures": 0,
+    "durationWithSetup": "1.2m",
+    "scenarioSeconds": [
+      23.5,
+      14.6,
+      3.6,
+      5.7
+    ],
+    "files": [
+      "expense-claims.spec.ts",
+      "expense-payments.spec.ts",
+      "expense-policies.spec.ts",
+      "expense-report.spec.ts"
+    ],
+    "scope": "Owned disposable API/PostgreSQL/browser fixture; latest packaged use cases and real lost-response/review/payment/report workflows."
+  }
+}

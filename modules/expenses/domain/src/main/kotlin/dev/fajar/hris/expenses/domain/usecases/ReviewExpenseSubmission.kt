@@ -158,6 +158,7 @@ class ReviewExpenseSubmission(
                     submission.lines,
                     (foundDuplicates as Result.Success).value,
                 )
+            val decidingAt = clock.instant()
             val planned =
                 planExpenseReview(
                     claim,
@@ -171,7 +172,7 @@ class ReviewExpenseSubmission(
                     grants,
                     duplicates,
                     acknowledgeDuplicates,
-                    now,
+                    decidingAt,
                 )
             if (planned is Result.Failed) return@run planned
             val plan = (planned as Result.Success).value
@@ -183,7 +184,7 @@ class ReviewExpenseSubmission(
                     approval.currentStep,
                     plan.transition,
                     reason,
-                    now,
+                    decidingAt,
                 )
                 .flatMap { claims.review(actor, claim, plan.review) }
                 .flatMap { receipt ->
@@ -209,6 +210,22 @@ class ReviewExpenseSubmission(
                         }
                         .flatMap {
                             validateCompanySessionActor(actor, access, clock.instant(), security)
+                                .flatMap { current ->
+                                    planExpenseReview(
+                                        claim,
+                                        submission,
+                                        approval,
+                                        current,
+                                        beneficiary,
+                                        decision,
+                                        reason,
+                                        delegations,
+                                        grants,
+                                        duplicates,
+                                        acknowledgeDuplicates,
+                                        clock.instant(),
+                                    )
+                                }
                                 .map { receipt }
                         }
                 }

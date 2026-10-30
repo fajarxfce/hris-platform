@@ -57,7 +57,9 @@ Each company allows 500 categories and each category 1,000 revisions. Competing 
 Policy saves also revalidate current session assurance after waiting for their
 resource/access guards, before returning an original receipt and before transaction
 completion. Expired MFA rolls back the category revision, audit, outbox and receipt
-together. An explicit retry retains its original operation ID and body.
+together. An explicit retry retains its original operation ID and body. Contract selections
+are detached before validation and waits; saved policy and operation identity use
+the same admitted selection.
 
 The [administrative dashboard](../dashboard.md#expense-policies) provides category
 creation, versioned editing, status filters and revision review. Amount entry and
@@ -99,7 +101,7 @@ Interactive claim and category reads acquire shared resource/access guards in th
 
 ## Claim drafts
 
-Employee draft saves, cancellation, submission and withdrawal revalidate current session assurance after their guards, before returning an existing operation receipt, and before transaction completion. Late expiry rolls back the claim, immutable evidence, approval changes, journal and receipt together. An explicit retry retains its original input and observed version.
+Employee draft saves, cancellation, submission and withdrawal revalidate current session assurance after their guards, before returning an existing operation receipt, and before transaction completion. Draft input owns bounded copies of its lines and nested receipt identifiers before waits. Late expiry rolls back the claim, immutable evidence, approval changes, journal and receipt together. An explicit retry retains its original input and observed version.
 
 `PUT /expenses/claims/{id}/draft` saves a draft with an employment ID, title, description, lines, reason, and expected version (null on create). Every line has a stable UUID, category, transaction date, decimal IDR amount, description, optional cost center, and receipt revision IDs. Drafts allow up to twenty lines and three receipts per line. An empty draft is allowed; policy eligibility, mandatory evidence, and approval routing are checked when the claim is submitted.
 
@@ -219,19 +221,24 @@ Review uses the same company expense/approval guards as submission and withdrawa
 Current MFA assurance is checked after the ordered account guards, before returning
 a receipt and after journaling. An expired proof cannot authorize a decision or
 replay. Renewing assurance allows explicit recovery with the original operation
-and observed claim/approval versions.
+and observed claim/approval versions. Current-stage eligibility is evaluated at
+the decision time after duplicate-evidence acquisition and again after journaling.
+An expired delegation rolls back the decision, business state and immutable evidence;
+assignment to a different stage cannot authorize the current stage.
 
 ## Receipt content
 
 `GET/HEAD /expenses/submissions/{submissionId}/receipts/{revisionId}/content` serves a receipt attached to that exact immutable submission. Current claim owners, current managers with team read permission, company expense readers, and assigned reviewers with current approval access or valid delegation can use it. It does not grant general document/profile access, and an old submission cannot authorize a receipt added to a later draft.
 
-Metadata and each content read revalidate company/account/credential access and current resource scope. The referenced revision must remain ready with the submitted size and digest. The storage read occurs outside the database transaction; its bytes are checked against the manifest, and access is checked again before delivery. Revocation during a pending read prevents those bytes from being sent. Range, ETag, conditional GET, and HEAD use the shared bounded download transport; HEAD/unchanged responses still authorize the caller and do not read storage. Responses use private no-store caching, attachment disposition, and nosniff.
+Metadata and each content read revalidate company/account/credential access and current resource scope. Delegated reads acquire the actor and relevant delegator account guards in identifier order, then reacquire identity and grants. Scope and delegation expiry are checked after preparation and final acquisition; an independent ordinary claim scope remains valid. The referenced revision must remain ready with the submitted size and digest. The storage read occurs outside the database transaction; its bytes are checked against the manifest, and access is checked again before delivery. Revocation during a pending read prevents those bytes from being sent. Range, ETag, conditional GET, and HEAD use the shared bounded download transport; HEAD/unchanged responses still authorize the caller and do not read storage. Responses use private no-store caching, attachment disposition, and nosniff.
 
 ## Payment batches
 
 `expenses.pay` is a protected grant, separate from expense read/manage/approval. Company administrators do not receive it automatically. Payment queries, bank details, exports, and commands require current company/account/membership access and recent authentication (recent MFA when enforced). Commands recheck the original request's permission intersection after acquiring their resource/account guards and before receipt replay.
 
-Reads recheck recent assurance after acquiring the final result. Commands recheck
+Finance access requires current factor enrollment when MFA is enforced, along
+with session assurance and recent proof. Reads recheck both assurance bounds after
+acquiring the final result. Commands recheck
 before returning an original receipt and after journaling; expiry rolls back the
 batch/item transition, bank-reference reservation, history, audit/outbox and operation
 receipt together. An acquisition failure retains its original classification.
@@ -292,7 +299,9 @@ an unchanged result's timestamp precision. The API enforces its own upper time
 bound at commit.
 
 Results can be edited or removed locally before submission. The captured command
-freezes its outcomes, batch version, reason and operation ID. Response loss
+freezes its outcomes, batch version, reason and operation ID. Server commands also
+detach bounded instruction/outcome collections before waiting; candidate selection,
+stored facts and journal counts use that same admitted input. Response loss
 retains that original command across verification and later rejected retries.
 A definite initial conflict requires a fresh review and explicit result re-entry;
 input rejection permits correction. Access loss hides bank data, and disposal
@@ -345,3 +354,6 @@ do not create another version. The original `/payments` list contract remains
 available. Mobile clients explicitly select this collection alongside
 `EXPENSE_CLAIMS`; current read/manage grants never widen its account-owned audience.
 See [synchronization](../synchronization.md).
+
+The [30 October assurance review](../expense-assurance-2026-10-30.md) records actual
+expiry, current-enrollment and mutable-input reproductions, corrections and tests.

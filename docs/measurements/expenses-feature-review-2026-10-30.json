@@ -1,0 +1,827 @@
+{
+  "date": "2026-10-30",
+  "status": "locally-accepted",
+  "requirements": [
+    "expenses.01",
+    "expenses.02",
+    "expenses.03",
+    "expenses.04",
+    "expenses.05",
+    "expenses.06"
+  ],
+  "originalDetailedSections": 9,
+  "review": "docs/expenses-feature-review-2026-10-30.md",
+  "correction": "docs/measurements/expense-assurance-2026-10-30.json",
+  "retainedCi": {
+    "source": "8014d733",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41005223374",
+    "unchangedSources": [
+      {
+        "path": "apps/dashboard/src/features/expenses",
+        "tree": "aa59f404fc1e2210bf498b37ab0668b43b2b428d"
+      },
+      {
+        "path": "modules/expenses/data",
+        "tree": "e5c17dab6c85035b1c9b7f4a3777fcf3e8b8f569"
+      },
+      {
+        "path": "modules/expenses/delivery",
+        "tree": "a694735fdf3febf6a5a506c5f5e63566839857f4"
+      },
+      {
+        "path": "modules/reporting",
+        "tree": "d1bdc409034c91691e8b193da5391769d8b99f95"
+      }
+    ],
+    "browser": [
+      {
+        "artifactPath": "dashboard-integration-test-reports/integration-report/index.html",
+        "file": "expense-claims.spec.ts",
+        "title": "real expense authoring and actions replay lost responses, preserve evidence, and support returned-claim correction",
+        "duration": 21764,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-integration-test-reports/integration-report/index.html",
+        "file": "expense-payments.spec.ts",
+        "title": "real finance prepares, releases and reconciles payments with original-command recovery and current scope",
+        "duration": 15196,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-integration-test-reports/integration-report/index.html",
+        "file": "expense-policies.spec.ts",
+        "title": "real API expense policies keep scheduled definitions, immutable history and one recovered save",
+        "duration": 3460,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-integration-test-reports/integration-report/index.html",
+        "file": "expense-report.spec.ts",
+        "title": "real expense reporting clips submitted transactions, retains exact review return context and replaces only resubmitted facts",
+        "duration": 5129,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claim-actions.spec.ts",
+        "title": "reviews current item references, validates a reason and submits the reviewed claim once",
+        "duration": 3334,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claim-actions.spec.ts",
+        "title": "submit retains the original body and operation after a lost committed response",
+        "duration": 1239,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claim-actions.spec.ts",
+        "title": "cancel retains the original body and operation after a lost committed response",
+        "duration": 1661,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claim-actions.spec.ts",
+        "title": "withdraw retains the original body and operation after a lost committed response",
+        "duration": 1596,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claim-actions.spec.ts",
+        "title": "lost submission remains recoverable through MFA and a later version conflict",
+        "duration": 2069,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claim-actions.spec.ts",
+        "title": "a changed claim requires a protected reload and a new reviewed version",
+        "duration": 2246,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claim-actions.spec.ts",
+        "title": "unready evidence reports a policy failure and permits an explicit new confirmation",
+        "duration": 1757,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claim-actions.spec.ts",
+        "title": "an empty draft may be cancelled and cannot be submitted",
+        "duration": 1262,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claim-actions.spec.ts",
+        "title": "late submission references cannot cross a company change",
+        "duration": 1413,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claim-actions.spec.ts",
+        "title": "manager access is required before acquiring an action review",
+        "duration": 1132,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claim-actions.spec.ts",
+        "title": "review keeps its reason through item inspection, dark appearance and Indonesian layout",
+        "duration": 2798,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claims.spec.ts",
+        "title": "claim filters and paging keep the selected company and do not search on each input edit",
+        "duration": 2101,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claims.spec.ts",
+        "title": "claim tabs reuse one review and history has an independent descending cursor",
+        "duration": 2897,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claims.spec.ts",
+        "title": "approval source opens submitted expense evidence and downloads its exact receipt",
+        "duration": 3520,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claims.spec.ts",
+        "title": "receipt cancellation, retry and authorization loss leave no stale evidence visible",
+        "duration": 2922,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claims.spec.ts",
+        "title": "company replacement discards a held claim and its history cursor",
+        "duration": 1132,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claims.spec.ts",
+        "title": "invalid review responses stay hidden and a fresh read can recover",
+        "duration": 1097,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claims.spec.ts",
+        "title": "dark narrow submission details keep their place across locale changes without refetching",
+        "duration": 2486,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-claims.spec.ts",
+        "title": "policy administrators cannot fetch claim data through a direct route",
+        "duration": 1093,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-decisions.spec.ts",
+        "title": "read permission exposes evidence but neither decision commands nor their direct routes",
+        "duration": 1880,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-decisions.spec.ts",
+        "title": "server availability gates reviewers independently of their broad permission",
+        "duration": 1714,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-decisions.spec.ts",
+        "title": "intermediate approval records its stage without claiming that reimbursement is complete",
+        "duration": 1530,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-decisions.spec.ts",
+        "title": "reject requires a reason and records the observed claim and approval revisions",
+        "duration": 1331,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-decisions.spec.ts",
+        "title": "return requires a reason and records the observed claim and approval revisions",
+        "duration": 1228,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-decisions.spec.ts",
+        "title": "duplicate approval requires acknowledgement and permits evidence inspection without discarding the reason",
+        "duration": 2347,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-decisions.spec.ts",
+        "title": "lost-response recovery retains the original command across MFA and a later denial",
+        "duration": 1785,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-decisions.spec.ts",
+        "title": "approval reassignment requires explicit re-review before a new operation",
+        "duration": 1697,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-decisions.spec.ts",
+        "title": "revoked receipt access removes the reviewed evidence and blocks the decision",
+        "duration": 2603,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-decisions.spec.ts",
+        "title": "company replacement cannot restore an obsolete held review",
+        "duration": 1065,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-decisions.spec.ts",
+        "title": "dark narrow review retains form input and evidence selection across locale changes",
+        "duration": 1545,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-drafts.spec.ts",
+        "title": "selects an employee across bounded pages, stages references and saves exact reviewed items once",
+        "duration": 3293,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-drafts.spec.ts",
+        "title": "employee search is explicit and a draft can be saved before adding items",
+        "duration": 1847,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-drafts.spec.ts",
+        "title": "returned-claim corrections preserve employee, item and submission identity",
+        "duration": 1883,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-drafts.spec.ts",
+        "title": "unknown references remain visible and their IDs are retained until explicitly replaced",
+        "duration": 1923,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-drafts.spec.ts",
+        "title": "an unconfirmed save survives MFA and later rejection with the same command",
+        "duration": 2816,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-drafts.spec.ts",
+        "title": "competing edits require protected reload before saving at the new version",
+        "duration": 2591,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-drafts.spec.ts",
+        "title": "one navigation guard retains uncommitted item input and discards only after confirmation",
+        "duration": 1997,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-drafts.spec.ts",
+        "title": "denied reference discovery hides the employee and item panel",
+        "duration": 3440,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-drafts.spec.ts",
+        "title": "late discovery cannot cross a company change",
+        "duration": 1249,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-drafts.spec.ts",
+        "title": "authoring requires manager scope before employee metadata acquisition",
+        "duration": 1044,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-drafts.spec.ts",
+        "title": "item editing retains input through language, dark appearance and narrow layout",
+        "duration": 3121,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payment-transitions.spec.ts",
+        "title": "release reviews complete bank instructions and prevents repeated confirmation",
+        "duration": 3175,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payment-transitions.spec.ts",
+        "title": "a prepared batch can be cancelled after reason review",
+        "duration": 1744,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payment-transitions.spec.ts",
+        "title": "lost release response retains the original command across MFA verification and a later denial",
+        "duration": 2033,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payment-transitions.spec.ts",
+        "title": "a definite conflict protects edited input and requires an explicit new review",
+        "duration": 2394,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payment-transitions.spec.ts",
+        "title": "a definite finance rejection removes account data and confirmation controls",
+        "duration": 1099,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payment-transitions.spec.ts",
+        "title": "company replacement drops a pending transition review",
+        "duration": 1215,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payment-transitions.spec.ts",
+        "title": "restricted release availability cannot be bypassed through a direct route",
+        "duration": 1942,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payment-transitions.spec.ts",
+        "title": "narrow dark release review retains its reason and avoids refetch on locale changes",
+        "duration": 1939,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payments.spec.ts",
+        "title": "finance directory filters, paging and return preserve explicit search",
+        "duration": 2098,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payments.spec.ts",
+        "title": "payment tabs share one review and show partial settlement with independent activity paging",
+        "duration": 5233,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payments.spec.ts",
+        "title": "CSV download keeps the exact bytes, filename and leading zero account",
+        "duration": 1568,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payments.spec.ts",
+        "title": "cancelling an in-flight worksheet allows a fresh download without a duplicate artifact",
+        "duration": 1205,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payments.spec.ts",
+        "title": "worksheet access_denied removes bank details and requires explicit review",
+        "duration": 1683,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payments.spec.ts",
+        "title": "worksheet recent_authentication_required removes bank details and requires explicit review",
+        "duration": 1293,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payments.spec.ts",
+        "title": "worksheet expense_payment_instructions_unavailable removes bank details and requires explicit review",
+        "duration": 1342,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payments.spec.ts",
+        "title": "a company change discards a pending review and its activity cursor",
+        "duration": 1334,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payments.spec.ts",
+        "title": "a cancelled company-owned worksheet never produces a late download",
+        "duration": 1420,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payments.spec.ts",
+        "title": "malformed payment data remains hidden until a successful explicit refresh",
+        "duration": 1373,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payments.spec.ts",
+        "title": "finance read layout keeps data across theme and language changes at a narrow width",
+        "duration": 2154,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-payments.spec.ts",
+        "title": "expense administrators cannot acquire finance data through a direct route",
+        "duration": 970,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-policies.spec.ts",
+        "title": "catalog paging and status filters retain company scope through details",
+        "duration": 1996,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-policies.spec.ts",
+        "title": "history pages advance chronologically while editing always loads the latest saved policy",
+        "duration": 2043,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-policies.spec.ts",
+        "title": "category creation preserves exact IDR limits and evidence requirements",
+        "duration": 1947,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-policies.spec.ts",
+        "title": "validation keeps input and rejects invalid amounts and contracts before HTTP",
+        "duration": 1637,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-policies.spec.ts",
+        "title": "lost save keeps one operation through a later rejection and explicit recovery",
+        "duration": 1518,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-policies.spec.ts",
+        "title": "a definite conflict needs protected reload before saving a new revision",
+        "duration": 1637,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-policies.spec.ts",
+        "title": "company replacement cancels a pending review and drops its private content",
+        "duration": 1210,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-policies.spec.ts",
+        "title": "an unauthorized read cannot render historical reasons",
+        "duration": 1090,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-policies.spec.ts",
+        "title": "narrow dark layout keeps draft values across locale changes",
+        "duration": 1371,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-preparation.spec.ts",
+        "title": "prepares claims across discovery pages with explicit bank review and one creation",
+        "duration": 3521,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-preparation.spec.ts",
+        "title": "bank editing validates input, keeps leading zeroes and removes a selection locally",
+        "duration": 4182,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-preparation.spec.ts",
+        "title": "lost preparation response preserves the original batch and all item IDs across MFA and later conflict",
+        "duration": 3653,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-preparation.spec.ts",
+        "title": "known reservation rejection permits correction only after another explicit review",
+        "duration": 3602,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-preparation.spec.ts",
+        "title": "navigation protection belongs to the page while a bank panel is being edited",
+        "duration": 2501,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-preparation.spec.ts",
+        "title": "a denied payable refresh withdraws selected bank data and the picker",
+        "duration": 2775,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-preparation.spec.ts",
+        "title": "a denied initial preparation hides bank details without presenting a new create action",
+        "duration": 2952,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-preparation.spec.ts",
+        "title": "company replacement cancels discovery and hides its late results",
+        "duration": 2441,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-preparation.spec.ts",
+        "title": "preparation requires finance access before any payable acquisition",
+        "duration": 940,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-preparation.spec.ts",
+        "title": "retains form and bank destinations through theme and language changes in wide and narrow layouts",
+        "duration": 3168,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-reconciliation.spec.ts",
+        "title": "reconciles multiple confirmed results atomically and leaves unentered payments pending",
+        "duration": 2749,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-reconciliation.spec.ts",
+        "title": "edits and removes staged results without navigation prompts or refetch",
+        "duration": 3109,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-reconciliation.spec.ts",
+        "title": "the page owns departure protection for an unsaved result panel",
+        "duration": 2051,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-reconciliation.spec.ts",
+        "title": "lost result response retains the complete original reconciliation across MFA and later denial",
+        "duration": 2957,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-reconciliation.spec.ts",
+        "title": "definite conflicts require explicit reload and new result entry",
+        "duration": 3140,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-reconciliation.spec.ts",
+        "title": "finance rejection removes payment evidence and editing controls",
+        "duration": 1599,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-reconciliation.spec.ts",
+        "title": "company replacement cancels a pending reconciliation review",
+        "duration": 1242,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-reconciliation.spec.ts",
+        "title": "server-disabled reconciliation cannot be bypassed using its route",
+        "duration": 1941,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-reconciliation.spec.ts",
+        "title": "reconciliation layout preserves staged input across theme and language changes",
+        "duration": 2306,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-report.spec.ts",
+        "title": "annual expense totals preserve applied filters and exact localized money, with narrow-screen status drill-down",
+        "duration": 2217,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-report.spec.ts",
+        "title": "failed refreshes clear both totals and private request rows until explicit retry succeeds",
+        "duration": 1875,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-report.spec.ts",
+        "title": "company replacement resets report filters and removes the preceding company's rows",
+        "duration": 1374,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-report.spec.ts",
+        "title": "source grants and invalid annual windows prevent report acquisition",
+        "duration": 2096,
+        "outcome": "expected",
+        "ok": true
+      },
+      {
+        "artifactPath": "dashboard-test-reports-2/index.html",
+        "file": "expense-report.spec.ts",
+        "title": "an unavailable exact submission still returns to the selected report page and status",
+        "duration": 2201,
+        "outcome": "expected",
+        "ok": true
+      }
+    ],
+    "scope": "Unchanged dashboard/data/delivery/reporting components; current use-case acceptance is tracked separately."
+  },
+  "bankExecution": "Manual external submission by the initial contract; tests do not issue bank instructions.",
+  "mobile": "Owned claim/payment synchronization and receipt transport contracts unchanged; full Mobile inventory remains separate.",
+  "remaining": "Full-source CI and the remaining Platform/Mobile audit stay separately tracked."
+}

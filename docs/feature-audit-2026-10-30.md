@@ -150,3 +150,20 @@ and full Mobile review remain open. Approvals exact source `fcfdaf26` passed all
 Final-source CI for Communications and Documents follows this commit. Continue
 Expenses, where payment enrollment, receipt delegation completion and mutable
 command inputs need reproduction; those findings are not yet accepted corrections.
+
+## Expenses requirement review — local acceptance passed
+
+The [Expenses review](expenses-feature-review-2026-10-30.md) covers all six initial
+rows and nine detailed sections. The correction closes 29 actual failed cases in
+finance enrollment, delegated receipt/decision completion and admitted input
+ownership. Three ordinary receipt controls already passed; three added delegator
+account-wait regressions now pass. Broad acceptance passed 329 API cases; the final
+decision correction passed 62, for 335 distinct API cases across both selections.
+All 20 Expense domain and 115 Reporting cases, quality/packages and four actual
+API/browser workflows passed (1.2m including setup).
+
+Twenty-six initial rows are reviewed; 35 initial rows and full Mobile review
+remain open. Document/Communications exact source `8e5dd3db` is running in
+[CI 41013958569](https://github.com/fajarxfce/hris-platform/actions/runs/41013958569).
+Follow the Expense final-source run after it finishes. Continue Leave, all remaining
+Platform contracts and Mobile/Starter; this module acceptance does not close the goal.

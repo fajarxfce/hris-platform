@@ -997,6 +997,18 @@
         ],
         "remaining": "None for recorded source; later metadata acceptance is recorded separately."
       }
+    },
+    {
+      "id": "reporting.export-policy-completion",
+      "status": "implemented-and-locally-accepted",
+      "baseline": "3c8fb15a",
+      "actualFailures": 7,
+      "evidence": [
+        "docs/reporting-assurance-2026-10-30.md",
+        "docs/measurements/reporting-assurance-2026-10-30.json",
+        "docs/reporting-feature-review-2026-10-30.md"
+      ],
+      "next": "Wait for terminal Administration CI 41081153648, dispatch complete new source CI, then accept five Reporting rows; continue Payroll/Workforce/Mobile/Starter."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

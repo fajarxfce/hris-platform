@@ -4,6 +4,7 @@ import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.administration.domain.policies.*
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.AccountAccess
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.*
 import dev.fajar.hris.identity.domain.repositories.*
@@ -410,6 +411,7 @@ class ManageReportExports(
         client: ClientRequest,
     ): Result<Long> {
         var credentials: Long? = null
+        val guardedAccess = linkedMapOf<UUID, AccountAccess>()
         for ((company, permissions) in grants.toSortedMap()) {
             val loaded = identities.access(actor.accountId, company)
             if (loaded is Result.Failed) return loaded
@@ -423,6 +425,7 @@ class ManageReportExports(
                     )
                     .flatMap { validateReportKindAccess(it, kind) }
             if (checked is Result.Failed) return checked
+            guardedAccess[company] = requireNotNull(access)
             if (company == actor.companyId)
                 credentials = requireNotNull(access).account.securityVersion
             val at = clock.instant()
@@ -442,6 +445,17 @@ class ManageReportExports(
                             available.failure.parameters + ("companyId" to company.toString())
                     )
                 )
+        }
+        val completedAt = clock.instant()
+        for ((company, access) in guardedAccess) {
+            val assurance =
+                validateCompanySessionActor(
+                    reportExportScope(actor, company, grants.getValue(company)),
+                    access,
+                    completedAt,
+                    security,
+                )
+            if (assurance is Result.Failed) return assurance
         }
         return Result.Success(requireNotNull(credentials))
     }

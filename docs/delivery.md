@@ -6648,3 +6648,14 @@ workflow in 60.248s including setup. [Evidence](administration-assurance-2026-10
 records fixture exclusions, scope and pending full CI. Shared DI was exercised in
 both runtime contexts. Public availability recovery and schema remain unchanged.
 The private schema-103 runtime still serves the previously accepted metadata build.
+
+## Reporting source-policy completion — 30 October 2026
+
+Interactive export commands, receipt replay and content preparation/ranges now
+recheck all guarded source identities after effective-policy acquisition. Seven
+actual failures now pass, including zero object reads after expired preparation.
+The correction adds no query, schema, DI or worker MFA requirement. Broad checks
+passed 186 API, eight active export-worker, 52 domain and 61 repository cases,
+quality and both packages (349.481s). Actual API/worker/Garage/browser CSV recovery
+passed in 45.417s with setup. [Evidence](reporting-assurance-2026-10-30.md) retains
+exact scope, the excluded compilation setup error and pending final source CI.

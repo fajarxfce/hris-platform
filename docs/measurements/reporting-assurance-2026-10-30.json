@@ -1,0 +1,1833 @@
+{
+  "date": "2026-10-30",
+  "status": "local acceptance passed; final source CI must follow running Administration CI",
+  "reviewed_base": "1a835bd9d475773c3cb490d2daf982a5750ff659",
+  "production_source_sha256": {
+    "modules/reporting/domain/src/main/kotlin/dev/fajar/hris/reporting/domain/usecases/ManageReportExports.kt": "5c12b0299eaa26fec3db00c14dfe8032de541e4ce0760cd50f69c554bacfa7ee",
+    "modules/reporting/domain/src/main/kotlin/dev/fajar/hris/reporting/domain/usecases/ReadReportExports.kt": "f643102a70bb430646873b8744db724667f6bf562d98927e80d7b1bd1f02a75e"
+  },
+  "baseline": {
+    "genuine_failed_cases": 7,
+    "pre_fix_production_source": "3c8fb15a6c2471eef226e5f5c20b0bd8b8ea450a",
+    "classification": {
+      "command_accepted_after_expiry": 4,
+      "private_metadata_returned_after_expiry": 1,
+      "private_bytes_returned_after_expiry": 1,
+      "object_read_after_expired_preparation": 1
+    },
+    "excluded_setup": "First compilation failed -Werror because override parameter instant differed from interface at. It ran no tests; names were corrected before the seven-failure baseline.",
+    "reports": [
+      {
+        "name": "dev.fajar.hris.ReportExportPolicyCompletionTest",
+        "tests": 7,
+        "failures": 7,
+        "errors": 0,
+        "skipped": 0,
+        "cases": [
+          {
+            "name": "[1] mode = \"start\"",
+            "result": "failed"
+          },
+          {
+            "name": "[2] mode = \"start_replay\"",
+            "result": "failed"
+          },
+          {
+            "name": "[3] mode = \"resume\"",
+            "result": "failed"
+          },
+          {
+            "name": "[4] mode = \"resume_replay\"",
+            "result": "failed"
+          },
+          {
+            "name": "[1] mode = \"download\"",
+            "result": "failed"
+          },
+          {
+            "name": "[2] mode = \"before_storage\"",
+            "result": "failed"
+          },
+          {
+            "name": "[3] mode = \"after_storage\"",
+            "result": "failed"
+          }
+        ]
+      }
+    ]
+  },
+  "runs": {
+    "compile-setup": {
+      "command": [
+        "./gradlew",
+        ":apps:server:test",
+        "--tests",
+        "dev.fajar.hris.ReportExportPolicyCompletionTest",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 14.215,
+      "exit_code": 1
+    },
+    "baseline": {
+      "command": [
+        "./gradlew",
+        ":apps:server:test",
+        "--tests",
+        "dev.fajar.hris.ReportExportPolicyCompletionTest",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 34.233,
+      "exit_code": 1
+    },
+    "format": {
+      "command": [
+        "./gradlew",
+        "format",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 16.905,
+      "exit_code": 0
+    },
+    "focused": {
+      "command": [
+        "./gradlew",
+        ":apps:server:test",
+        "--tests",
+        "dev.fajar.hris.ReportExportPolicyCompletionTest",
+        ":modules:reporting:domain:test",
+        ":modules:reporting:data:test",
+        "architectureCheck",
+        "formatCheck",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 44.695,
+      "exit_code": 0
+    },
+    "broad": {
+      "command": [
+        "./gradlew",
+        ":apps:server:test",
+        "--tests",
+        "dev.fajar.hris.*Report*Test",
+        "--tests",
+        "dev.fajar.hris.*Headcount*Test",
+        ":apps:worker:test",
+        "--tests",
+        "dev.fajar.hris.worker.ReportExport*Test",
+        ":modules:reporting:domain:test",
+        ":modules:reporting:data:test",
+        "architectureCheck",
+        "formatCheck",
+        ":apps:server:bootJar",
+        ":apps:worker:bootJar",
+        "--no-daemon"
+      ],
+      "elapsed_seconds": 349.481,
+      "exit_code": 0
+    },
+    "browser": {
+      "command": [
+        "npx",
+        "playwright",
+        "test",
+        "--config",
+        "playwright.export-integration.config.ts"
+      ],
+      "elapsed_seconds": 45.417,
+      "exit_code": 0
+    }
+  },
+  "focused_reports": [
+    {
+      "name": "dev.fajar.hris.ReportExportPolicyCompletionTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "[1] mode = \"start\"",
+          "result": "passed"
+        },
+        {
+          "name": "[2] mode = \"start_replay\"",
+          "result": "passed"
+        },
+        {
+          "name": "[3] mode = \"resume\"",
+          "result": "passed"
+        },
+        {
+          "name": "[4] mode = \"resume_replay\"",
+          "result": "passed"
+        },
+        {
+          "name": "[1] mode = \"download\"",
+          "result": "passed"
+        },
+        {
+          "name": "[2] mode = \"before_storage\"",
+          "result": "passed"
+        },
+        {
+          "name": "[3] mode = \"after_storage\"",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.AttendanceClosingEmployeeRepositoryTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "boundedPageHasStableUnsignedUuidOrderAndDetachesItsItems()",
+          "result": "passed"
+        },
+        {
+          "name": "cancellationPropagatesAndAnExplicitRetryCanReadAnEmptyPage()",
+          "result": "passed"
+        },
+        {
+          "name": "currentCountsRetainTheExactSelectedAdjustmentAndOriginalClosing()",
+          "result": "passed"
+        },
+        {
+          "name": "malformedReferencesCountsAndLabelsAreSanitizedInsideTheAcquisitionBoundary()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.AttendanceClosingReportRepositoryTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "anEmptyClosedMonthIsDistinctFromAnUnclosedMonthAcrossATwelveMonthWindow()",
+          "result": "passed"
+        },
+        {
+          "name": "cancellationAndInterruptsRemainAvailableForOwnedCleanupAndRetry()",
+          "result": "passed"
+        },
+        {
+          "name": "scheduledMinutesRemainLongAtTheBoundedAnnualMaximumAndOriginalFactsStaySeparate()",
+          "result": "passed"
+        },
+        {
+          "name": "originalAndCurrentFactsReconcileWithCompleteMonthsAndDistinctEmploymentTotals()",
+          "result": "passed"
+        },
+        {
+          "name": "missingClosingReferencesMalformedSourceFactsAndNonReconcilingTotalsFailInsideTheBoundary()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.AttendanceExceptionReportRepositoryTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "interruptedOrCancelledAcquisitionCannotBecomeReportData()",
+          "result": "passed"
+        },
+        {
+          "name": "malformedOrIncoherentAggregatesFailWithoutPublishingPartialCounts()",
+          "result": "passed"
+        },
+        {
+          "name": "distinctEmploymentsAreNotSummedAcrossDaysAndEmptyDatesRemainVisible()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.ExpenseReportRepositoryTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "paginationUsesFiniteOverfetchAndPostgresUuidOrderWithExactClippedAmounts()",
+          "result": "passed"
+        },
+        {
+          "name": "oneEmployeeAcrossStatusesIsDistinctAndMissingStatusesAreZero()",
+          "result": "passed"
+        },
+        {
+          "name": "cancellationAndInterruptionPropagateFromBothProjections()",
+          "result": "passed"
+        },
+        {
+          "name": "invalidOverfetchRowsOrderOrScopeFailInsideTheMappingBoundary()",
+          "result": "passed"
+        },
+        {
+          "name": "malformedAggregatesCannotPublishPartialOrInconsistentTotals()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.GroupHeadcountReportRepositoryTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "cancellationIsNeverConvertedIntoAggregateData()",
+          "result": "passed"
+        },
+        {
+          "name": "emptySnapshotReturnsEverySelectedCompanyWithZeroCounts()",
+          "result": "passed"
+        },
+        {
+          "name": "foreignScopesInconsistentBucketsAndOverflowFailInsideTheRepository()",
+          "result": "passed"
+        },
+        {
+          "name": "distinctGroupPersonsAreNotSummedAndEmptyCompaniesRemainVisible()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.HeadcountReportRepositoryTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "cancellationAndInterruptionAreNeverConvertedIntoAReportFailure()",
+          "result": "passed"
+        },
+        {
+          "name": "missingBucketsAreZeroAndPersonCountsAreTakenFromTheDistinctAggregate()",
+          "result": "passed"
+        },
+        {
+          "name": "incompleteOrUnknownAggregatesFailInsideTheDataBoundary()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.LeaveReportRepositoryTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "oneEmployeeAcrossStatusesIsDistinctAndMissingStatusesAreZero()",
+          "result": "passed"
+        },
+        {
+          "name": "paginationUsesFiniteOverfetchAndPostgresUuidOrderWithExactClippedUnits()",
+          "result": "passed"
+        },
+        {
+          "name": "cancellationAndInterruptionPropagateFromBothProjections()",
+          "result": "passed"
+        },
+        {
+          "name": "invalidOverfetchRowsOrderOrScopeFailInsideTheMappingBoundary()",
+          "result": "passed"
+        },
+        {
+          "name": "malformedAggregatesCannotPublishPartialOrInconsistentTotals()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.OvertimeReportRepositoryTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "aBoundedAnnualWindowCanContainThirteenCalendarMonthsIncludingLeapFebruary()",
+          "result": "passed"
+        },
+        {
+          "name": "statusFilteredCountsDistinguishUnsubmittedPlansFromActualAndFinalApproval()",
+          "result": "passed"
+        },
+        {
+          "name": "cancellationAndInterruptionPreserveTerminationThroughTheReadBoundary()",
+          "result": "passed"
+        },
+        {
+          "name": "missingDuplicateOutOfRangeOrIncoherentDataCannotPublishPartialCounts()",
+          "result": "passed"
+        },
+        {
+          "name": "totalsRemainDistinctAndEachMonthRetainsItsClippedDrillDownDates()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.PayrollCostReportRepositoryTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "emptyCrossYearReportsHaveTwelveCompleteMonthsAndZeroDecimalAmounts()",
+          "result": "passed"
+        },
+        {
+          "name": "publishedCostsAndSignedRefundsReconcileAcrossMonthsWithoutSummingDistinctEmployments()",
+          "result": "passed"
+        },
+        {
+          "name": "failureMappingPreservesCancellationAndInterruptionForOwnedCleanup()",
+          "result": "passed"
+        },
+        {
+          "name": "missingOrIncoherentEvidenceCannotProducePlausiblePartialFinancialTotals()",
+          "result": "passed"
+        },
+        {
+          "name": "veryLargeTotalsAndSubRupiahRefundsRemainExact()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.ReportExportExpiryRepositoryTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "failuresPreserveCancellationAndDatabaseClassification()",
+          "result": "passed"
+        },
+        {
+          "name": "retirementMappingValidatesScopeAndStateWithoutBusinessPayloads()",
+          "result": "passed"
+        },
+        {
+          "name": "discoveryIsBoundedDetachedAndRejectsDuplicateOrFutureDescriptors()",
+          "result": "passed"
+        },
+        {
+          "name": "retryMatchesTheObservedScheduleAndRejectsImpossibleWriteCounts()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.ReportExportRepositoryTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "keysetPagesRejectWrongOrderOversizedSourcesAndRepeatedRows()",
+          "result": "passed"
+        },
+        {
+          "name": "invalidUploadShapesAndScopeNeverWriteAndLostAcquisitionPreservesCancellation()",
+          "result": "passed"
+        },
+        {
+          "name": "canonicalRequestAndLifecycleMetadataRoundTripWithoutRestoringExtraAuthority()",
+          "result": "passed"
+        },
+        {
+          "name": "acceptedPartsMustFormADetachedCompletePrefixInTheRequestedOwnerScope()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.ReportSnapshotRepositoryTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "appendValidatesTheEntireBoundedBatchBeforeAnySourceWrite()",
+          "result": "passed"
+        },
+        {
+          "name": "appendAdmitsExactlyOneMiBAndRejectsTheNextByteBeforeWriting()",
+          "result": "passed"
+        },
+        {
+          "name": "brokenSequencesMissingRowsAndMalformedCellsNeverBecomeAPartialPage()",
+          "result": "passed"
+        },
+        {
+          "name": "databaseFailureClassificationAndCancellationSurviveAcquisitionAndMapping()",
+          "result": "passed"
+        },
+        {
+          "name": "scopeDefinitionAndStoredTotalsAreValidatedAtAcquisition()",
+          "result": "passed"
+        },
+        {
+          "name": "numericCellsSurviveDefaultJsonSettingsAndDetachedPagesPreserveTheirTypes()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.ReportSnapshotSourceRepositoryTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "overflowInvalidSourcesAndPartialInsertionCannotBecomeUsableCaptures()",
+          "result": "passed"
+        },
+        {
+          "name": "acquisitionAndMappingPreserveFailureClassificationAndCancellation()",
+          "result": "passed"
+        },
+        {
+          "name": "changedMissingOrSealedDefinitionNeverAcquiresSourceRows()",
+          "result": "passed"
+        },
+        {
+          "name": "eachSourceReceivesCanonicalScopeWindowTypedPrefixAndHardLimits()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.data.SavedReportFilterRepositoryTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "mappingRetainsDetachedOwnerScopeAndKeepsDeletedDefinitionsErased()",
+          "result": "passed"
+        },
+        {
+          "name": "foreignScopeMalformedDefinitionsAndUnexpectedIdentityFailWithinTheMappingBoundary()",
+          "result": "passed"
+        },
+        {
+          "name": "cancellationAndInterruptionPropagateAndPrivateSourceFailuresRemainSanitized()",
+          "result": "passed"
+        },
+        {
+          "name": "overfetchAndCountBoundsCannotSilentlyDropSavedSelections()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.AttendanceClosingReportPolicyTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "companyWorkforceAndReportGrantsAreBothRequired()",
+          "result": "passed"
+        },
+        {
+          "name": "annualMonthBoundsUseClosingYearsAndPermitCrossYearWindows()",
+          "result": "passed"
+        },
+        {
+          "name": "employeeContinuationsAreCanonicalAndBoundToCompanyAndMonth()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.AttendanceReportPolicyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "sourceAndReportGrantsAreBothRequired()",
+          "result": "passed"
+        },
+        {
+          "name": "rangeHasAnInclusiveThirtyOneDayBoundAndExplicitCalendarBounds()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.ExpenseReportPolicyTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "malformedOrReusedContinuationsCannotChangeCompanyWindowOrStatus()",
+          "result": "passed"
+        },
+        {
+          "name": "reportAndCompanySourceGrantsAreRequiredTogether()",
+          "result": "passed"
+        },
+        {
+          "name": "fullLeapYearsAreBoundedAndReversedOrUnsupportedDatesFail()",
+          "result": "passed"
+        },
+        {
+          "name": "continuationsRoundTripTheirOrderingKeyWithoutRequiringTheEntryToRemainInTheResult()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.HeadcountPolicyTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "reportDatesHaveExplicitFiniteBoundsIncludingScheduledProjections()",
+          "result": "passed"
+        },
+        {
+          "name": "groupSelectionIsBoundedDistinctAndCopiedInStableOrder()",
+          "result": "passed"
+        },
+        {
+          "name": "reportAccessRequiresBothReportAndCompanyWideSourcePermission()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.LeaveReportPolicyTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "malformedOrReusedContinuationsCannotChangeCompanyWindowOrStatus()",
+          "result": "passed"
+        },
+        {
+          "name": "reportAndCompanySourceGrantsAreRequiredTogether()",
+          "result": "passed"
+        },
+        {
+          "name": "fullLeapYearsAreBoundedAndReversedOrUnsupportedDatesFail()",
+          "result": "passed"
+        },
+        {
+          "name": "continuationsRoundTripTheirOrderingKeyWithoutRequiringTheEntryToRemainInTheResult()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.OvertimeReportPolicyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "reportAdmissionRetainsCanonicalCompanyOvertimeGrantsWithoutExpandingSelfOrTeamScope()",
+          "result": "passed"
+        },
+        {
+          "name": "annualLeapWindowsHaveExplicitBoundsMatchingStoredOvertimeWorkDates()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.PayrollCostReportPolicyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "companyPayrollAndReportGrantsAreBothRequired()",
+          "result": "passed"
+        },
+        {
+          "name": "annualMonthBoundsUsePublishedPayrollYearsAndPermitCrossYearWindows()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.ReportCataloguePolicyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "selfTeamAndDecisionGrantsNeverBecomeCompanyReports()",
+          "result": "passed"
+        },
+        {
+          "name": "companySourceGrantsSelectOnlyTheirReportsAndNeverImplicitlySupplyReportingAccess()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.ReportCsvPolicyTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "exact one MiB ceiling consumes only complete rows while oversized input pages are rejected()",
+          "result": "passed"
+        },
+        {
+          "name": "independent parts concatenate with exactly one BOM and header and own their bytes()",
+          "result": "passed"
+        },
+        {
+          "name": "column and cell shape limits reject ambiguous unsupported or lossy values()",
+          "result": "passed"
+        },
+        {
+          "name": "textual formulas cannot become executable cells while numeric negatives remain numbers()",
+          "result": "passed"
+        },
+        {
+          "name": "golden CSV keeps unicode quotes record boundaries exact decimal scale and signed numbers()",
+          "result": "passed"
+        },
+        {
+          "name": "repeated bounded pages terminate without skipping duplicating or splitting records()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.ReportExportExecutionPolicyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "executionAcceptsOnlyItsImmutableIdentityAndBoundedProgressContract()",
+          "result": "passed"
+        },
+        {
+          "name": "sourceScopeCannotRestoreAnchorGrantsFromAStoredExport()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.ReportExportPolicyTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "sourceAuthorityIsNarrowDetachedAndIncludesTheAnchorWithoutChangingSelectedCompanies()",
+          "result": "passed"
+        },
+        {
+          "name": "onlyOriginalCanonicalCompanyWideAliasesAndCompatibleClientVersionsAreRetained()",
+          "result": "passed"
+        },
+        {
+          "name": "partialDuplicateForeignAndOutOfOrderManifestsCannotPublish()",
+          "result": "passed"
+        },
+        {
+          "name": "anEmptyExportHasOneHeaderPartAndEveryUploadRequiresFiniteProgressAndBytes()",
+          "result": "passed"
+        },
+        {
+          "name": "exactLifetimeVersionsStatesAndReservationBudgetsRemainBounded()",
+          "result": "passed"
+        },
+        {
+          "name": "manifestReconcilesOrderedRowsBytesAndProviderVersionsWithoutClaimingAFileHash()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.ReportSelectionPolicyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "shared selection policy applies the exact existing report contracts without a filter name()",
+          "result": "passed"
+        },
+        {
+          "name": "canonical companies are detached while a missing group defaults only to its anchor()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.ReportSnapshotPolicyTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "captureRetainsOnlySupportedDatasetAndEncodingDefinitions()",
+          "result": "passed"
+        },
+        {
+          "name": "captureDetachesItsSchemaAndSelectedCompaniesWithoutInventingSourceAuthority()",
+          "result": "passed"
+        },
+        {
+          "name": "timestampsMustRoundTripExactlyAndLifetimeCannotExceedSevenDays()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.ReportSummaryExportPolicyTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "attendanceLeaveAndExpenseRowsRetainUnitsStatusAndExactAmounts()",
+          "result": "passed"
+        },
+        {
+          "name": "closingRowsRetainPublicationIdentityAndBothOriginalAndLatestFacts()",
+          "result": "passed"
+        },
+        {
+          "name": "layoutsHaveStableOrderTypesAndOnlyTheSupportedDetails()",
+          "result": "passed"
+        },
+        {
+          "name": "wrongSourceUnsupportedVersionAndUnboundedBucketListsFailBeforeProducingRows()",
+          "result": "passed"
+        },
+        {
+          "name": "overtimeKeepsClippedDatesAndPayrollKeepsSignedDecimalWithholding()",
+          "result": "passed"
+        },
+        {
+          "name": "groupTotalKeepsDistinctPersonsAndExactSelectedCompaniesWithoutAddingTheAnchor()",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "dev.fajar.hris.reporting.domain.SavedReportFilterPolicyTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "everyKindReusesItsCanonicalMainReportSelectionAndNormalizesOnlyThePersonalName()",
+          "result": "passed"
+        },
+        {
+          "name": "irrelevantSelectionsStatusAndNonCanonicalDatesNeverBecomeStoredFilters()",
+          "result": "passed"
+        },
+        {
+          "name": "unsupportedDefinitionsAndEmptyOversizedOrControlNamesAreRejected()",
+          "result": "passed"
+        },
+        {
+          "name": "storedRangesHaveExactlyTheSameBoundsAsTheirReports()",
+          "result": "passed"
+        },
+        {
+          "name": "explicitGroupSelectionIsDetachedBoundedAndRetainedEvenWithoutTheAnchorCompany()",
+          "result": "passed"
+        }
+      ]
+    }
+  ],
+  "broad_reports": {
+    "apps/server": {
+      "totals": {
+        "tests": 186,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "dev.fajar.hris.AttendanceClosingReportAccessHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "cancellationAndDatabaseFailureReleaseOwnershipForAnExplicitRetry()",
+            "finalPublicationCannotMakeAnEarlierReadIncludePartialClosingRows()",
+            "[1] stage = \"account\"",
+            "[2] stage = \"projection\"",
+            "[1] mode = \"reports.read\"",
+            "[2] mode = \"workforce.read\"",
+            "[3] mode = \"credentials\"",
+            "aConcurrentCorrectionCannotMixTheEarlierOriginalAndAdjustedTotals()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceClosingReportHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "cancelledAttemptSnapshotsRemainExcludedAfterAReplacementClosingIsPublished()",
+            "lateCaptureAndSuccessiveCorrectionsRetainOriginalClosingAndSelectOnlyTheLastAdjustedSnapshot()",
+            "currentSourceAndReportGrantsAnnualBoundsRlsAndModuleAdmissionProtectBothSnapshots()",
+            "zeroEmployeeClosingRetainsItsPublishedIdentityAndCompleteAnnualBuckets()",
+            "partialClosingDoesNotCountUntilItsFinalPublicationAndLaterHiresCannotRewriteIt()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceClosingReportSourceCaptureTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "capturePinsPublishedReferencesAndLatestCorrectionsAcrossMonthsAndExcludesFutureHire()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceReportAccessHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "cancellationAndDatabaseFailureReleaseOwnershipForAnExplicitRetry()",
+            "aConcurrentReviewCannotMixTheEarlierTotalsAndDailySnapshot()",
+            "[1] stage = \"account\"",
+            "[2] stage = \"projection\"",
+            "[1] mode = \"reports.read\"",
+            "[2] mode = \"workforce.read\"",
+            "[3] mode = \"credentials\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.AttendanceReportHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "scopeBoundsAndOriginalGrantsCannotExposeAnotherCompany()",
+            "reportingAvailabilityAppliesToTheNewReadRoute()",
+            "countsReconcileWithExceptionRowsWithoutDoubleCountingOverlappingKindsOrEmployments()",
+            "correctionsResolveIncompletenessWhileSubsequentEvidenceStillNeedsReview()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseReportAccessHttpTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] rows = \"false\", mode = \"reports.read\"",
+            "[2] rows = \"true\", mode = \"reports.read\"",
+            "[3] rows = \"false\", mode = \"expenses.read\"",
+            "[4] rows = \"true\", mode = \"expenses.read\"",
+            "[5] rows = \"false\", mode = \"credentials\"",
+            "[6] rows = \"true\", mode = \"credentials\"",
+            "[1] rows = \"false\", acquired = \"false\"",
+            "[2] rows = \"true\", acquired = \"false\"",
+            "[3] rows = \"false\", acquired = \"true\"",
+            "[4] rows = \"true\", acquired = \"true\"",
+            "aConcurrentDecisionCannotMixAggregateAndStatusBuckets()",
+            "[1] rows = false",
+            "[2] rows = true"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseReportHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "allStatusesAndExactCentsReconcileWithScopedClaimsWithoutSummingDistinctEmployees()",
+            "onlyTheFinalIndependentStageMovesTheSubmittedAmountToApproved()",
+            "continuationsRetainTheirOrderingKeyAfterThePreviousClaimLeavesTheStatusFilter()",
+            "latestSubmittedLinesRetainTheirDatesAndAmountsUntilAnExplicitResubmissionReplacesThem()",
+            "submittedLineGapsAndEmptyAnnualWindowsRemainZeroAndMaximumClaimAmountsStayExact()",
+            "reportingAvailabilityCoversBothAggregateAndScopedClaims()",
+            "reportAndSourceGrantsCompanyIsolationAndDateBoundsProtectBothProjections()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseReportPaymentHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "bankReservationsPartialSettlementFailureAndReceiptReplayDoNotRewriteSubmittedExpenseAmounts()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ExpenseReportSourceCaptureTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "captureKeepsLatestSubmittedRevisionWindowAmountsAndPriorDraftUntilResubmission()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.GroupHeadcountAccessHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "mfaAssuranceMustStillBeValidAfterAGroupReadWaits()",
+            "pendingGroupReadsRecheckEveryCompanyGrantMembershipCredentialAndAccount()",
+            "cancelledGroupReadsReleaseAllGuardsAndDiscardTheirLateSnapshot()",
+            "mfaExpiryWhileAcquiringGroupCountsCannotPublishAnyCompany()",
+            "groupAvailabilityUsesThePolicyThatCommittedBeforeItsGuardsWereAcquired()",
+            "sharedGroupReadsAllowOtherSnapshotsAndKeepConcurrentEmploymentChangesCoherent()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.GroupHeadcountHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "oneSnapshotReturnsCompanyBucketsAndDistinctPersonsAcrossEmploymentHistory()",
+            "reportSourcePortUsesTheApplicationTransactionOwner()",
+            "everySelectionRequiresCurrentSourcePermissionAndInvalidScopesNeverReachTheQuery()",
+            "maintenanceAndDisabledReportingRejectTheWholeGroupWithSafeCompanyParameters()",
+            "globalReportsValidateBuildMetadataAgainstAuthenticatedTransportForEveryCompany()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.HeadcountReportAccessHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "pendingReadsRecheckCompanyMembershipAccountAndCredentialState()",
+            "oneSqlSnapshotKeepsItsCountsWhileConcurrentEmploymentChangesCommit()",
+            "interruptingAPendingReportReleasesItsTransactionAndDiscardsTheLateSnapshot()",
+            "permissionLossWhileWaitingPreventsReadingTheCompanyAggregate()",
+            "[1] stage = \"account\"",
+            "[2] stage = \"projection\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.HeadcountReportHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "headcountUsesEffectiveHistoryInclusiveContractEndsAndExplicitStatusDefinitions()",
+            "aggregateSeparatesPersonsFromEmploymentsAndRlsCannotReadAnotherCompany()",
+            "reportRequiresBothPermissionsAndFollowsCompanyAvailability()",
+            "invalidDatesAndTechnicalFailuresUseSafeCodesWhileCancellationPropagates()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeaveReportAccessHttpTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] rows = \"false\", mode = \"reports.read\"",
+            "[2] rows = \"true\", mode = \"reports.read\"",
+            "[3] rows = \"false\", mode = \"leave.read\"",
+            "[4] rows = \"true\", mode = \"leave.read\"",
+            "[5] rows = \"false\", mode = \"credentials\"",
+            "[6] rows = \"true\", mode = \"credentials\"",
+            "[1] rows = \"false\", acquired = \"false\"",
+            "[2] rows = \"true\", acquired = \"false\"",
+            "[3] rows = \"false\", acquired = \"true\"",
+            "[4] rows = \"true\", acquired = \"true\"",
+            "aConcurrentDecisionCannotMixAggregateAndStatusBuckets()",
+            "[1] rows = false",
+            "[2] rows = true"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeaveReportHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "datesBetweenRequestedDaysDoNotCountEvenWhenTheRequestEnvelopeOverlaps()",
+            "clippedFrozenDatesReconcileAcrossEveryStatusWithoutTreatingReleasedDaysAsActiveLeave()",
+            "reportingClientPolicyCoversAggregateAndDrillDown()",
+            "reportAndRowScopeRangesAndSourceGrantsFailClosed()",
+            "continuationSurvivesAStatusChangeInItsLastRowAndRejectsDifferentFilters()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.LeaveReportSourceCaptureTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "sqlOverflowNeverInsertsAPrefixAndFailedCaptureRollsBackItsHeader()",
+            "frozenClippedDaysAndStatusSurviveLaterWithdrawalAndNewRequests()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeReportAccessHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "cancellationAndSanitizedFailureReleaseTheReadForExplicitRetry()",
+            "concurrentApprovalCannotMixEarlierTotalsWithLaterMonthlyCounts()",
+            "[1] mode = \"reports.read\"",
+            "[2] mode = \"overtime.read\"",
+            "[3] mode = \"credentials\"",
+            "[1] acquired = false",
+            "[2] acquired = true"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeReportHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "reportsRetainRequestedActualAndApprovedMinutesAcrossStatusesAndOvernightWorkDates()",
+            "reportingAvailabilityProtectsTheNewEndpoint()",
+            "onlyTheLastApprovalStageProducesApprovedMinutesAndOriginalReceiptReplayDoesNotCountTwice()",
+            "companySourceGrantsDateBoundsAndRowIsolationAreEnforced()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollCostReportAccessHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "aConcurrentPublishedCorrectionCannotMixEarlierTotalsAndLaterMonthRevisions()",
+            "cancellationAndSanitizedFailureReleaseTheReadForExplicitRetry()",
+            "[1] mode = \"reports.read\"",
+            "[2] mode = \"payroll.read\"",
+            "[3] mode = \"credentials\"",
+            "[1] acquired = false",
+            "[2] acquired = true"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.PayrollCostReportHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "annualReportReconcilesFourPublishedMonthsAndPreservesAFinalTaxRefund()",
+            "onlyPublishedAssessmentsContributeAndLaterSalaryEditsDoNotRewriteTheirCosts()",
+            "eachPublishedAmendmentReplacesTheSelectedRevisionWhileBankResultsAndReplayDoNotChangeCosts()",
+            "sourceAuthorityAnnualBoundsCompanyIsolationAndReportingAvailabilityStayIndependent()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ReportCatalogueHttpTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "interruptedDiscoveryReleasesGuardsForTheNextRead()",
+            "discoveryContainsOnlyCurrentDefinitionsAndNeverAcquiresOperationalFacts()",
+            "[1] mode = \"report\"",
+            "[2] mode = \"company\"",
+            "[3] mode = \"membership\"",
+            "[4] mode = \"account\"",
+            "[5] mode = \"credential\"",
+            "expiredMfaDuringWaitRequiresRenewalBeforeDiscovery()",
+            "catalogueIntersectsOriginalAndLiveSourceGrantsAfterWaiting()",
+            "companyAndModuleAdmissionApplyToCatalogueWithoutSourceData()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ReportExportExecutionIntegrationTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "byteLimitedPartsResumeWithoutSkippingRowsOrRepeatingAcceptedUploads()",
+            "lostResponseReplaysSameServerIdentityAtQuotaAndConcurrentAdmissionDoesNotOverfill()",
+            "everySummaryAndSupportedEmptyDetailPublishesWithFinitePositiveProgress()",
+            "sourceScopeExcludesAnchorFromFactsButRequiresItsAuthorityAndRechecksAfterWait()",
+            "providerResponsesAndPostUploadRevocationExpiryAndLeaseLossCannotPublishParts()",
+            "journalFailureRollsBackAdmissionAndCaptureTogetherWithJobProgress()",
+            "interactiveAssuranceExpiryDuringJournalRollsBackStartCancelAndResume()",
+            "cancellationDuringProviderIoRetainsOrphanCleanupAndResumeReusesSnapshot()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ReportExportHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "runtimeCannotDiscoverOrDisableEvenItsOwnExpiredCleanupSchedule()",
+            "metadataAndContentRecheckMfaAfterAcquisition()",
+            "providerIntegrityRevocationPolicyAndExpiryAreCheckedBeforeReleasingContent()",
+            "admissionReplaysOwnerStatusAndCleanupRemainAvailableWithoutSourceOrModuleAccess()",
+            "metadataAndConditionalResponsesCannotReopenExpiredOrRevokedContent()",
+            "privateHistoryUsesStableKeysetsAndDoesNotShareAnExportWithAnotherMember()",
+            "csvRangesCrossSeveralPartsAndRetainStrongConditionalAndHeadSemantics()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ReportExportPolicyCompletionTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "[1] mode = \"start\"",
+            "[2] mode = \"start_replay\"",
+            "[3] mode = \"resume\"",
+            "[4] mode = \"resume_replay\"",
+            "[1] mode = \"download\"",
+            "[2] mode = \"before_storage\"",
+            "[3] mode = \"after_storage\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ReportExportStorageIntegrationTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "expiryRetiresOnlyAfterOwnedRowsAndCleanupEvidenceAreGoneAndKeepsOriginalMetadata()",
+            "immutablePartProgressAndSnapshotSurviveExplicitRecoveryBeforePublication()",
+            "cleanupReservationAndExactCapturedDefinitionAreRequiredBeforePartsCanAdvance()",
+            "ownerIsolationAndDatabaseQuotasBoundActiveAndUnretiredRequests()",
+            "rawReservationLimitsRejectTheNextAttemptAtomicallyWithoutLeakingCleanupRows()",
+            "competingReservationsAndLateAcknowledgementsCannotOverwriteProgress()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ReportSnapshotIntegrationTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "capturedRowsSurviveNewTransactionsWithExactValuesOrderedPagesAndOriginalSchema()",
+            "aSingleSqlSourceCaptureIsRetainedAfterTheSourceChanges()",
+            "expiredRowsRetireInFiniteBatchesWhileTheOriginalIdentityAndDeadlineRemain()",
+            "longUnicodeRowsUseAByteBoundedPrefixWithoutLosingTheRemainder()",
+            "publicationAndSnapshotIdentityCannotBeRewrittenAndLiveRowsCannotBeDeleted()",
+            "sevenElapsedDaysRemainExactAcrossDatabaseDaylightSavingTransitions()",
+            "unsealedGappedFailedAndInterruptedCapturesCannotCommitAnyRows()",
+            "competingCaptureAttemptsRetainExactlyOneOriginalResult()",
+            "rowAndByteQuotasRejectOversizeSqlCaptureWithoutLeavingAPartialSnapshot()",
+            "competingExpiryBatchesDeleteDisjointRowsAndTerminate()",
+            "companyAndAccountIsolationApplyToHeadersRowsAndCleanup()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.ReportingAccessHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "historicalFiltersDoNotRestoreFormerTeamAccessAndCombinedScopeIncludesSelf()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.SavedReportFilterAccessHttpTest",
+          "tests": 18,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "reportingClientAdmissionAppliesToEverySavedFilterEndpoint()",
+            "[1] mode = \"save\", stage = \"lock\"",
+            "[2] mode = \"save\", stage = \"find\"",
+            "[3] mode = \"save\", stage = \"count\"",
+            "[4] mode = \"save\", stage = \"save\"",
+            "[5] mode = \"save\", stage = \"journal\"",
+            "[6] mode = \"delete\", stage = \"lock\"",
+            "[7] mode = \"delete\", stage = \"find\"",
+            "[8] mode = \"delete\", stage = \"save\"",
+            "[9] mode = \"delete\", stage = \"journal\"",
+            "[10] mode = \"get\", stage = \"find\"",
+            "[11] mode = \"list\", stage = \"list\"",
+            "[1] mode = \"report\"",
+            "[2] mode = \"source\"",
+            "[3] mode = \"company\"",
+            "[4] mode = \"membership\"",
+            "[5] mode = \"account\"",
+            "[6] mode = \"credential\""
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.SavedReportFilterConcurrencyHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "competingCreatesShareTheOwnerLimitAndDeletionReleasesOnlyAnActiveSlot()",
+            "duplicateDeliveriesReturnOneReceiptAndCompetingObservedVersionsCannotOverwriteEachOther()",
+            "failureAfterWritingOrJournalingRollsBackTheFilterReceiptAuditAndOutboxTogether()",
+            "cancellationAfterTheWriteReleasesOwnershipAndAllowsTheOriginalOperationToBeRetried()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.SavedReportFilterHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "retainingASelectionNeverRestoresSourceAuthorityAndOwnersCanDeleteAfterSourceRevocation()",
+            "boundedTypedSelectionsRejectUnknownFieldsUnsupportedVersionsAndIrrelevantFilters()",
+            "ownerAndCompanyRlsKeepIdenticalFilterIdsIndependentAndGroupReadScopeDoesNotExposeSelections()",
+            "personalSelectionsSupportVersionedEditsReceiptReplayAndErasedDeletionWithoutResurrection()"
+          ]
+        }
+      ]
+    },
+    "apps/worker": {
+      "totals": {
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      "suites": [
+        {
+          "name": "dev.fajar.hris.worker.ReportExportWorkerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "registeredTaskPublishesThroughRealBatchWithBackgroundAuthorityAndRetainedCleanup()",
+            "credentialChangeBeforeResolutionStillAllowsFencedAbortWithoutContentAccess()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportElapsedRetentionTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1,
+          "cases": [
+            "elapsedExpiryPreservesGraceAndQuotaUntilRealObjectsAndTheirLostDeletionReceiptAreRetired()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.worker.ReportExportRetentionWorkerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "stoppingScheduledCleanupInterruptsAndRollsBackTheOwnedTransaction()",
+            "progressingLargeExportsMoveBehindOlderDueWorkAndCompetingPassesDoNotDoubleRetire()",
+            "boundedCleanupRetiresUnknownFormatsAndReleasesQuotaWithoutRestoringRevokedAccess()",
+            "outstandingObjectCleanupBlocksRetirementWithoutStarvingAnotherDueExport()",
+            "discoveryDoesNotGrantGlobalFactsAndSchedulesCannotBeDeletedBeforePhysicalRetirement()",
+            "failedJournalRollsBackJobCancellationRowsRetirementAndTheSchedule()"
+          ]
+        }
+      ]
+    },
+    "modules/reporting/domain": {
+      "totals": {
+        "tests": 52,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "dev.fajar.hris.reporting.domain.AttendanceClosingReportPolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "companyWorkforceAndReportGrantsAreBothRequired()",
+            "annualMonthBoundsUseClosingYearsAndPermitCrossYearWindows()",
+            "employeeContinuationsAreCanonicalAndBoundToCompanyAndMonth()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.HeadcountPolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "reportDatesHaveExplicitFiniteBoundsIncludingScheduledProjections()",
+            "groupSelectionIsBoundedDistinctAndCopiedInStableOrder()",
+            "reportAccessRequiresBothReportAndCompanyWideSourcePermission()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.LeaveReportPolicyTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "malformedOrReusedContinuationsCannotChangeCompanyWindowOrStatus()",
+            "reportAndCompanySourceGrantsAreRequiredTogether()",
+            "fullLeapYearsAreBoundedAndReversedOrUnsupportedDatesFail()",
+            "continuationsRoundTripTheirOrderingKeyWithoutRequiringTheEntryToRemainInTheResult()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.OvertimeReportPolicyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "reportAdmissionRetainsCanonicalCompanyOvertimeGrantsWithoutExpandingSelfOrTeamScope()",
+            "annualLeapWindowsHaveExplicitBoundsMatchingStoredOvertimeWorkDates()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.PayrollCostReportPolicyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "companyPayrollAndReportGrantsAreBothRequired()",
+            "annualMonthBoundsUsePublishedPayrollYearsAndPermitCrossYearWindows()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.ReportCataloguePolicyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "selfTeamAndDecisionGrantsNeverBecomeCompanyReports()",
+            "companySourceGrantsSelectOnlyTheirReportsAndNeverImplicitlySupplyReportingAccess()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.ReportCsvPolicyTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "exact one MiB ceiling consumes only complete rows while oversized input pages are rejected()",
+            "independent parts concatenate with exactly one BOM and header and own their bytes()",
+            "column and cell shape limits reject ambiguous unsupported or lossy values()",
+            "textual formulas cannot become executable cells while numeric negatives remain numbers()",
+            "golden CSV keeps unicode quotes record boundaries exact decimal scale and signed numbers()",
+            "repeated bounded pages terminate without skipping duplicating or splitting records()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.ReportExportExecutionPolicyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "executionAcceptsOnlyItsImmutableIdentityAndBoundedProgressContract()",
+            "sourceScopeCannotRestoreAnchorGrantsFromAStoredExport()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.ReportExportPolicyTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "sourceAuthorityIsNarrowDetachedAndIncludesTheAnchorWithoutChangingSelectedCompanies()",
+            "onlyOriginalCanonicalCompanyWideAliasesAndCompatibleClientVersionsAreRetained()",
+            "partialDuplicateForeignAndOutOfOrderManifestsCannotPublish()",
+            "anEmptyExportHasOneHeaderPartAndEveryUploadRequiresFiniteProgressAndBytes()",
+            "exactLifetimeVersionsStatesAndReservationBudgetsRemainBounded()",
+            "manifestReconcilesOrderedRowsBytesAndProviderVersionsWithoutClaimingAFileHash()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.ReportSelectionPolicyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "shared selection policy applies the exact existing report contracts without a filter name()",
+            "canonical companies are detached while a missing group defaults only to its anchor()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.ReportSnapshotPolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "captureRetainsOnlySupportedDatasetAndEncodingDefinitions()",
+            "captureDetachesItsSchemaAndSelectedCompaniesWithoutInventingSourceAuthority()",
+            "timestampsMustRoundTripExactlyAndLifetimeCannotExceedSevenDays()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.ReportSummaryExportPolicyTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "attendanceLeaveAndExpenseRowsRetainUnitsStatusAndExactAmounts()",
+            "closingRowsRetainPublicationIdentityAndBothOriginalAndLatestFacts()",
+            "layoutsHaveStableOrderTypesAndOnlyTheSupportedDetails()",
+            "wrongSourceUnsupportedVersionAndUnboundedBucketListsFailBeforeProducingRows()",
+            "overtimeKeepsClippedDatesAndPayrollKeepsSignedDecimalWithholding()",
+            "groupTotalKeepsDistinctPersonsAndExactSelectedCompaniesWithoutAddingTheAnchor()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.SavedReportFilterPolicyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "everyKindReusesItsCanonicalMainReportSelectionAndNormalizesOnlyThePersonalName()",
+            "irrelevantSelectionsStatusAndNonCanonicalDatesNeverBecomeStoredFilters()",
+            "unsupportedDefinitionsAndEmptyOversizedOrControlNamesAreRejected()",
+            "storedRangesHaveExactlyTheSameBoundsAsTheirReports()",
+            "explicitGroupSelectionIsDetachedBoundedAndRetainedEvenWithoutTheAnchorCompany()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.AttendanceReportPolicyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "sourceAndReportGrantsAreBothRequired()",
+            "rangeHasAnInclusiveThirtyOneDayBoundAndExplicitCalendarBounds()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.domain.ExpenseReportPolicyTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "malformedOrReusedContinuationsCannotChangeCompanyWindowOrStatus()",
+            "reportAndCompanySourceGrantsAreRequiredTogether()",
+            "fullLeapYearsAreBoundedAndReversedOrUnsupportedDatesFail()",
+            "continuationsRoundTripTheirOrderingKeyWithoutRequiringTheEntryToRemainInTheResult()"
+          ]
+        }
+      ]
+    },
+    "modules/reporting/data": {
+      "totals": {
+        "tests": 61,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "dev.fajar.hris.reporting.data.AttendanceClosingEmployeeRepositoryTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "boundedPageHasStableUnsignedUuidOrderAndDetachesItsItems()",
+            "cancellationPropagatesAndAnExplicitRetryCanReadAnEmptyPage()",
+            "currentCountsRetainTheExactSelectedAdjustmentAndOriginalClosing()",
+            "malformedReferencesCountsAndLabelsAreSanitizedInsideTheAcquisitionBoundary()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.data.AttendanceClosingReportRepositoryTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "anEmptyClosedMonthIsDistinctFromAnUnclosedMonthAcrossATwelveMonthWindow()",
+            "cancellationAndInterruptsRemainAvailableForOwnedCleanupAndRetry()",
+            "scheduledMinutesRemainLongAtTheBoundedAnnualMaximumAndOriginalFactsStaySeparate()",
+            "originalAndCurrentFactsReconcileWithCompleteMonthsAndDistinctEmploymentTotals()",
+            "missingClosingReferencesMalformedSourceFactsAndNonReconcilingTotalsFailInsideTheBoundary()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.data.ExpenseReportRepositoryTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "paginationUsesFiniteOverfetchAndPostgresUuidOrderWithExactClippedAmounts()",
+            "oneEmployeeAcrossStatusesIsDistinctAndMissingStatusesAreZero()",
+            "cancellationAndInterruptionPropagateFromBothProjections()",
+            "invalidOverfetchRowsOrderOrScopeFailInsideTheMappingBoundary()",
+            "malformedAggregatesCannotPublishPartialOrInconsistentTotals()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.data.GroupHeadcountReportRepositoryTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "cancellationIsNeverConvertedIntoAggregateData()",
+            "emptySnapshotReturnsEverySelectedCompanyWithZeroCounts()",
+            "foreignScopesInconsistentBucketsAndOverflowFailInsideTheRepository()",
+            "distinctGroupPersonsAreNotSummedAndEmptyCompaniesRemainVisible()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.data.HeadcountReportRepositoryTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "cancellationAndInterruptionAreNeverConvertedIntoAReportFailure()",
+            "missingBucketsAreZeroAndPersonCountsAreTakenFromTheDistinctAggregate()",
+            "incompleteOrUnknownAggregatesFailInsideTheDataBoundary()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.data.LeaveReportRepositoryTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "oneEmployeeAcrossStatusesIsDistinctAndMissingStatusesAreZero()",
+            "paginationUsesFiniteOverfetchAndPostgresUuidOrderWithExactClippedUnits()",
+            "cancellationAndInterruptionPropagateFromBothProjections()",
+            "invalidOverfetchRowsOrderOrScopeFailInsideTheMappingBoundary()",
+            "malformedAggregatesCannotPublishPartialOrInconsistentTotals()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.data.OvertimeReportRepositoryTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "aBoundedAnnualWindowCanContainThirteenCalendarMonthsIncludingLeapFebruary()",
+            "statusFilteredCountsDistinguishUnsubmittedPlansFromActualAndFinalApproval()",
+            "cancellationAndInterruptionPreserveTerminationThroughTheReadBoundary()",
+            "missingDuplicateOutOfRangeOrIncoherentDataCannotPublishPartialCounts()",
+            "totalsRemainDistinctAndEachMonthRetainsItsClippedDrillDownDates()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.data.PayrollCostReportRepositoryTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "emptyCrossYearReportsHaveTwelveCompleteMonthsAndZeroDecimalAmounts()",
+            "publishedCostsAndSignedRefundsReconcileAcrossMonthsWithoutSummingDistinctEmployments()",
+            "failureMappingPreservesCancellationAndInterruptionForOwnedCleanup()",
+            "missingOrIncoherentEvidenceCannotProducePlausiblePartialFinancialTotals()",
+            "veryLargeTotalsAndSubRupiahRefundsRemainExact()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.data.ReportExportExpiryRepositoryTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "failuresPreserveCancellationAndDatabaseClassification()",
+            "retirementMappingValidatesScopeAndStateWithoutBusinessPayloads()",
+            "discoveryIsBoundedDetachedAndRejectsDuplicateOrFutureDescriptors()",
+            "retryMatchesTheObservedScheduleAndRejectsImpossibleWriteCounts()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.data.ReportExportRepositoryTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "keysetPagesRejectWrongOrderOversizedSourcesAndRepeatedRows()",
+            "invalidUploadShapesAndScopeNeverWriteAndLostAcquisitionPreservesCancellation()",
+            "canonicalRequestAndLifecycleMetadataRoundTripWithoutRestoringExtraAuthority()",
+            "acceptedPartsMustFormADetachedCompletePrefixInTheRequestedOwnerScope()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.data.ReportSnapshotRepositoryTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "appendValidatesTheEntireBoundedBatchBeforeAnySourceWrite()",
+            "appendAdmitsExactlyOneMiBAndRejectsTheNextByteBeforeWriting()",
+            "brokenSequencesMissingRowsAndMalformedCellsNeverBecomeAPartialPage()",
+            "databaseFailureClassificationAndCancellationSurviveAcquisitionAndMapping()",
+            "scopeDefinitionAndStoredTotalsAreValidatedAtAcquisition()",
+            "numericCellsSurviveDefaultJsonSettingsAndDetachedPagesPreserveTheirTypes()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.data.ReportSnapshotSourceRepositoryTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "overflowInvalidSourcesAndPartialInsertionCannotBecomeUsableCaptures()",
+            "acquisitionAndMappingPreserveFailureClassificationAndCancellation()",
+            "changedMissingOrSealedDefinitionNeverAcquiresSourceRows()",
+            "eachSourceReceivesCanonicalScopeWindowTypedPrefixAndHardLimits()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.data.SavedReportFilterRepositoryTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "mappingRetainsDetachedOwnerScopeAndKeepsDeletedDefinitionsErased()",
+            "foreignScopeMalformedDefinitionsAndUnexpectedIdentityFailWithinTheMappingBoundary()",
+            "cancellationAndInterruptionPropagateAndPrivateSourceFailuresRemainSanitized()",
+            "overfetchAndCountBoundsCannotSilentlyDropSavedSelections()"
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.reporting.data.AttendanceExceptionReportRepositoryTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "cases": [
+            "interruptedOrCancelledAcquisitionCannotBecomeReportData()",
+            "malformedOrIncoherentAggregatesFailWithoutPublishingPartialCounts()",
+            "distinctEmploymentsAreNotSummedAcrossDaysAndEmptyDatesRemainVisible()"
+          ]
+        }
+      ]
+    },
+    "packages": {
+      "apps/server/build/libs/apps-server.jar": {
+        "sha256": "e8fe0717f9be687d1b9d5684d59477a26043306313b2dff8f635784847fad48a",
+        "bytes": 97519027,
+        "preserved": ".work/reporting-assurance-2026-10-30/packages/apps-server.jar"
+      },
+      "apps/worker/build/libs/apps-worker.jar": {
+        "sha256": "c7742b23f92071af678cfce1a36a98bdd8349e64a45d9a977ed3fd899053df4e",
+        "bytes": 77705867,
+        "preserved": ".work/reporting-assurance-2026-10-30/packages/apps-worker.jar"
+      }
+    }
+  },
+  "actual_browser": {
+    "cases": 1,
+    "scenario": "real private CSV execution recovers admission, retains captured facts and enforces owner/source access",
+    "elapsed_with_setup_seconds": 45.417,
+    "reported_seconds": 44.8,
+    "case_seconds": 18.8,
+    "result": "passed",
+    "retries": 0,
+    "fixture_ports_closed": {
+      "18081": true,
+      "4175": true
+    },
+    "database_metadata_removed": true
+  },
+  "limits": [
+    "One opt-in one-hour retention test skipped in ordinary worker selection; separate accepted elapsed-time measurement retained",
+    "No new schema, DI or endpoint; current schema-103 private metadata images unchanged",
+    "Preserved tested JARs include Administration and Reporting corrections; do not deploy them based only on Administration CI",
+    "Physical phone already has accepted metadata application 3c6db4eb; this server correction does not change that APK",
+    "Final full-source CI pending; do not cancel 41081153648 before its terminal result"
+  ]
+}

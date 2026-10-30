@@ -12,6 +12,12 @@ Acceptance: totals reconcile, row/resource isolation, historical definitions, ex
 
 ## Current delivery
 
+The [full requirement review](../reporting-feature-review-2026-10-30.md) maps all
+five initial rows. Seven export source-policy MFA reproductions are corrected;
+186 API, eight active worker, 52 domain and 61 repository cases and actual private
+CSV browser recovery pass. Final source CI is pending. The correction retains
+final assurance after policy acquisition without adding a query or worker MFA rule.
+
 The seven summary reports, three supported detail datasets, catalogue and personal
 saved filters are implemented. The export lifecycle includes reviewed admission,
 retained snapshots, bounded worker execution, private artifacts, owned history,

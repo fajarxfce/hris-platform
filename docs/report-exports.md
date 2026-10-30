@@ -1,6 +1,9 @@
 # Report exports
 
-Export delivery remains in progress. Reporting owns its selections, generated data,
+Export selection, capture, execution, recovery, downloads and retention are implemented.
+The [current requirement review](reporting-feature-review-2026-10-30.md) records
+the final-source acceptance gate and the new policy-completion correction.
+Reporting owns its selections, generated data,
 job progress and retention; it cannot mutate operational facts. Every export must
 retain its source definition, owner/company scope and execution snapshot. Downloads
 must recheck current source access and expiry. Catalogue/filter delivery is recorded
@@ -559,3 +562,12 @@ unmodified physical grace hour on 29 October 2026, including a lost successful
 delete response, finite retry, one retirement audit and released expired quota.
 The live control export and inactive owners were preserved. JUnit recorded one
 pass in 3,860.892s at schema 100; public seven-day retention was unchanged.
+
+## Assurance after final source policy acquisition
+
+Interactive start/resume, receipt replay and content preparation/ranges retain
+guarded access and recheck every source's MFA after the last policy read. Seven
+reproduced failures now pass; late command rejection rolls back, and rejected
+preparation reads no object. The correction adds no query or worker MFA rule.
+[Acceptance](reporting-assurance-2026-10-30.md) records all broad API/worker/module
+checks and actual private-storage browser recovery, with final CI still pending.

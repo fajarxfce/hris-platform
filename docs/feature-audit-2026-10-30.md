@@ -256,3 +256,12 @@ APK is installed and its hash verified without opening the phone UI. The initial
 feature inventory is now 36 accepted and 25 unverified Platform rows; Administration
 and Reporting final-source checks, Payroll/Workforce and full Mobile/Starter review
 remain active. Physical iPhone testing is waived.
+
+## Reporting review — local correction accepted, CI pending
+
+The [five-row review](reporting-feature-review-2026-10-30.md) covers seven summary
+reports, three supported details, catalogue/filters and complete export retention.
+It reproduced seven MFA failures after effective-policy acquisition in command,
+receipt and private content paths. All focused/broad tests and actual CSV recovery
+now pass. The five rows await final source CI; the inventory remains 36 accepted
+and 25 unverified, followed by full Mobile/Starter review. Payroll is next.

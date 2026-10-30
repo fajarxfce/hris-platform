@@ -25,9 +25,14 @@ records four passed Mobile jobs, 1,994 desktop/1,676 browser/104 Apple cases, fu
 Xcode build and the normal WireGuard APK installed in 5.777s without launching UI.
 Installed hash `1a114fbc388c843b45749a8475296f506563493a38bccabd146323ceb87cf791`
 is verified directly. Both `documents.02` and `people.03` are closed. Reporting's
-seven export policy-completion reproductions now pass focused checks; broader
-verification is active in `.work/reporting-assurance-2026-10-30`. Its two leaf
-use-case corrections are not deployed. Continue remaining PRD scope.
+seven export policy-completion reproductions now pass full local acceptance:
+186 API, eight active worker, 52 domain and 61 repository cases plus quality and
+packages (349.481s), then actual private CSV/browser recovery (45.417s with setup).
+[Evidence](reporting-assurance-2026-10-30.md) and preserved JARs in
+`.work/reporting-assurance-2026-10-30/packages` retain the exact candidate. Its two
+leaf corrections are not deployed. Dispatch final source CI only after
+Administration CI `41081153648` terminates; do not cancel that run. Those JARs
+contain both corrections and cannot be deployed using Administration-only CI. Continue remaining PRD scope.
 
 Administration correction `3c8fb15a` is committed/pushed and locally accepted.
 [Full CI 41081153648](https://github.com/fajarxfce/hris-platform/actions/runs/41081153648)

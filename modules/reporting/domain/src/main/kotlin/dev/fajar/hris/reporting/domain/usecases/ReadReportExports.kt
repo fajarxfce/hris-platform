@@ -4,6 +4,7 @@ import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.administration.domain.policies.*
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.core.domain.*
+import dev.fajar.hris.identity.domain.entities.AccountAccess
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.policies.validateCompanySessionActor
 import dev.fajar.hris.identity.domain.repositories.*
@@ -257,20 +258,21 @@ class ReadReportExports(
         grants: Map<UUID, Set<String>>,
         client: ClientRequest,
     ): Result<Unit> {
+        val guardedAccess = linkedMapOf<UUID, AccountAccess>()
         for ((company, permissions) in grants.toSortedMap()) {
+            val loaded = identities.access(actor.accountId, company)
+            if (loaded is Result.Failed) return loaded
+            val access = (loaded as Result.Success).value
             val allowed =
-                identities
-                    .access(actor.accountId, company)
-                    .flatMap {
-                        validateCompanySessionActor(
-                            reportExportScope(actor, company, permissions),
-                            it,
-                            clock.instant(),
-                            security,
-                        )
-                    }
+                validateCompanySessionActor(
+                        reportExportScope(actor, company, permissions),
+                        access,
+                        clock.instant(),
+                        security,
+                    )
                     .flatMap { validateReportKindAccess(it, current.request.selection.kind) }
             if (allowed is Result.Failed) return allowed
+            guardedAccess[company] = requireNotNull(access)
             val at = clock.instant()
             val available =
                 policies.effective(company, at).flatMap {
@@ -289,7 +291,18 @@ class ReadReportExports(
                     )
                 )
         }
-        val lifetime = validateReportExportLifetime(current, clock.instant())
+        val completedAt = clock.instant()
+        for ((company, access) in guardedAccess) {
+            val assurance =
+                validateCompanySessionActor(
+                    reportExportScope(actor, company, grants.getValue(company)),
+                    access,
+                    completedAt,
+                    security,
+                )
+            if (assurance is Result.Failed) return assurance
+        }
+        val lifetime = validateReportExportLifetime(current, completedAt)
         if (lifetime is Result.Failed) return lifetime
         return if (current.status == ReportExportStatus.READY) Result.Success(Unit)
         else exportExecutionFailure("report_export_not_ready")

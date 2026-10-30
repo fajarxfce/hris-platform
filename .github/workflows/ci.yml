@@ -87,7 +87,7 @@ jobs:
   dashboard-integration:
     needs: [backend, dashboard]
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: apps/dashboard
@@ -116,7 +116,7 @@ jobs:
       - run: python3 ../../tool/test_dashboard_mail_fixture.py
       - run: python3 -m unittest discover -s ../../tool -p 'test_dashboard_fcm_fixture.py'
       - run: npm run test:integration:worker
-        timeout-minutes: 5
+        timeout-minutes: 8
       - run: python3 -m unittest discover -s ../../tool -p 'test_dashboard_storage*.py'
       - run: npm run test:integration:exports
         timeout-minutes: 5

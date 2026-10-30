@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-30",
+  "runId": 41018107365,
+  "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41018107365",
+  "source": "5b60aba3fca4fe7ae388f57a08d6a9135b858739",
+  "conclusion": "failure",
+  "passedJobs": 9,
+  "failedJob": "dashboard-integration",
+  "normalIntegration": "passed",
+  "workerIntegration": {
+    "tests": 14,
+    "passed": 14,
+    "reportedDurationMinutes": 5.2,
+    "stepTimeoutMinutes": 5,
+    "stepConclusion": "failure-timeout",
+    "startedAt": "2026-10-30T07:45:54Z",
+    "completedAt": "2026-10-30T07:51:06Z"
+  },
+  "notExecuted": [
+    "storage fixture unit tests",
+    "export integration"
+  ],
+  "recoveryIntegration": "passed",
+  "correction": {
+    "workerStepTimeoutMinutes": 8,
+    "integrationJobTimeoutMinutes": 20,
+    "perTestTimeoutsAndRetries": "unchanged; finite timeout and zero retries retained"
+  },
+  "remaining": "Run complete CI on committed Leave source with revised workflow; no full-source acceptance claimed from this timeout."
+}

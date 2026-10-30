@@ -80,10 +80,15 @@ API cases across both selections. Four final real browser workflows passed in
 category policy and reporting. The [measurements](measurements/expense-assurance-2026-10-30.json)
 retain both selections and package hashes. No runtime or phone update occurred.
 
-Exact Expense source `5b60aba3fca4fe7ae388f57a08d6a9135b858739` is running in
-[CI 41018107365](https://github.com/fajarxfce/hris-platform/actions/runs/41018107365).
-Observe its terminal result without cancelling it with another same-branch run.
-It does not include the later Leave corrections. Keep the full-feature goal active.
+Exact Expense source `5b60aba3fca4fe7ae388f57a08d6a9135b858739` completed
+[CI 41018107365](https://github.com/fajarxfce/hris-platform/actions/runs/41018107365):
+nine jobs passed; dashboard integration failed its five-minute worker-step budget
+after all fourteen scenarios passed in 5.2 minutes. Later storage/export checks
+were skipped. [Timeout evidence](measurements/ci-integration-timeout-2026-10-30.json)
+records the outcome. The workflow now permits eight minutes for this step and
+twenty for the job, retaining bounded test timeouts and zero retries. Dispatch
+complete CI after the final Leave commit; it also covers unchanged Expense source.
+No full-source acceptance is claimed from this failed run.
 
 [Leave read completion](leave-read-assurance-2026-10-30.md) corrects eight readers.
 Ten genuine reproduction failures now pass. Final acceptance passed 437 API/OpenAPI,

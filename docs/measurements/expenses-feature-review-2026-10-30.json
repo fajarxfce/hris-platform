@@ -823,5 +823,10 @@
   },
   "bankExecution": "Manual external submission by the initial contract; tests do not issue bank instructions.",
   "mobile": "Owned claim/payment synchronization and receipt transport contracts unchanged; full Mobile inventory remains separate.",
-  "remaining": "Full-source CI and the remaining Platform/Mobile audit stay separately tracked."
+  "remaining": "Full-source CI and the remaining Platform/Mobile audit stay separately tracked.",
+  "finalSourceCi": {
+    "status": "failed-workflow-timeout",
+    "evidence": "docs/measurements/ci-integration-timeout-2026-10-30.json",
+    "remaining": "Final Leave-source CI includes unchanged Expense implementation and revised workflow budget."
+  }
 }

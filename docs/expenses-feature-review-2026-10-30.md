@@ -55,3 +55,11 @@ Detailed source review covers all nine sections:
 Existing source and downloaded CI reports support unchanged components; current
 correction acceptance is separately retained in the [measurement](measurements/expenses-feature-review-2026-10-30.json). No live transfer,
 mail, private-runtime update, phone interaction or generic Starter change occurred.
+
+Exact source `5b60aba3` completed [CI 41018107365](https://github.com/fajarxfce/hris-platform/actions/runs/41018107365)
+with nine jobs passing. Normal API/browser integration and all fourteen worker
+scenarios passed, but the worker step took 5.2 minutes against its five-minute
+budget. The job failed on that timeout and skipped subsequent storage/export
+checks. The revised workflow allows eight minutes for this step and twenty for
+the integration job, keeping per-test limits and zero retries. [Evidence](measurements/ci-integration-timeout-2026-10-30.json)
+retains this failure; complete final-source CI remains pending.

@@ -753,5 +753,10 @@
       "expense-report.spec.ts"
     ],
     "scope": "Owned disposable API/PostgreSQL/browser fixture; latest packaged use cases and real lost-response/review/payment/report workflows."
+  },
+  "finalSourceCi": {
+    "status": "failed-workflow-timeout",
+    "evidence": "docs/measurements/ci-integration-timeout-2026-10-30.json",
+    "remaining": "Final Leave-source CI includes unchanged Expense implementation and revised workflow budget."
   }
 }

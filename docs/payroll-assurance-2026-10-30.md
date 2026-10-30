@@ -1,5 +1,12 @@
 # Payroll assurance audit
 
+Current result: complete local and full source acceptance passed. All ten jobs in
+[CI 41087903927](https://github.com/fajarxfce/hris-platform/actions/runs/41087903927)
+passed at `eec8a53a`; [downloaded measurements](measurements/reporting-payroll-full-ci-2026-10-30.json)
+confirm backend, browser and schema-103 recovery. The Payroll inventory rows
+are accepted. Earlier pending statements below retain the incremental sequence;
+Workforce CI `41094285531` and the combined private runtime update remain active.
+
 The full Payroll review is active. Thirteen interactive commands previously checked
 recent proof without checking whether the account still had MFA enrolled. All 26
 actual SQL command/receipt reproductions returned success after enrollment was

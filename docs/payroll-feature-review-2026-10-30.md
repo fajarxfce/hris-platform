@@ -2,8 +2,8 @@
 
 The seven initial requirements and implementation-status section now have complete
 local acceptance. Forty genuine enrollment/input/receipt/delegation failures are
-corrected. Full source CI `41087903927` at `eec8a53a` is running; the seven inventory
-rows remain unverified until that gate passes. [Assurance evidence](payroll-assurance-2026-10-30.md)
+corrected. Full source CI `41087903927` at `eec8a53a` passed all ten jobs;
+all seven inventory rows are accepted. [Assurance evidence](payroll-assurance-2026-10-30.md)
 separates actual reproductions from existing controls and fixture errors.
 
 | Initial requirement | Implementation and evidence to retain |

@@ -37,9 +37,9 @@ entries saying a later-delivered surface was open are historical, not fresh gaps
 This review retains those boundaries and checks the newly changed export paths.
 
 [Final local measurements](measurements/reporting-assurance-2026-10-30.json)
-provide the exact case selection and actual browser results. Matching full CI must
-cover the source correction before accepting all five rows. Payroll, Workforce
-and the full Mobile/applicable Starter review remain separate work.
+provide the exact case selection and actual browser results. Matching full source
+CI now accepts all five Reporting rows. Final Workforce CI and the combined private
+runtime update remain the active workspace gates.
 
 Final [CI evidence](measurements/reporting-payroll-full-ci-2026-10-30.json) confirms
 3,063 disjoint API cases, 104 active worker cases, 1,111 distinct mocked browser

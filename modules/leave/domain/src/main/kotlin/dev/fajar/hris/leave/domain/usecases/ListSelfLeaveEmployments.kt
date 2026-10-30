@@ -39,10 +39,10 @@ class ListSelfLeaveEmployments(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             if (!canReadOwnLeave(live.permissions))
@@ -65,24 +65,26 @@ class ListSelfLeaveEmployments(
                         after,
                         limit,
                     )
-                    .map { page ->
-                        SelfLeaveDirectory(
-                            live.accountId,
-                            company,
-                            today,
-                            current.timezone,
-                            Page(
-                                page.items.map { employee ->
-                                    LeaveEmployment(
-                                        employee.id,
-                                        employee.employeeNumber,
-                                        employee.terms.status,
-                                        employee.version,
-                                    )
-                                },
-                                page.nextCursor,
-                            ),
-                        )
+                    .flatMap { page ->
+                        validateCompanySessionActor(actor, access, clock.instant(), security).map {
+                            SelfLeaveDirectory(
+                                live.accountId,
+                                company,
+                                today,
+                                current.timezone,
+                                Page(
+                                    page.items.map { employee ->
+                                        LeaveEmployment(
+                                            employee.id,
+                                            employee.employeeNumber,
+                                            employee.terms.status,
+                                            employee.version,
+                                        )
+                                    },
+                                    page.nextCursor,
+                                ),
+                            )
+                        }
                     }
             }
         }

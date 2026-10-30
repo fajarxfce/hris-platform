@@ -40,10 +40,10 @@ class GetLeavePolicy(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val permission = (checked as Result.Success).value.requirePermission("leave.manage")
             if (permission is Result.Failed) return@run permission
@@ -56,8 +56,10 @@ class GetLeavePolicy(
                     )
             if (historyAfter != null && historyAfter > current.version)
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "invalid_page"))
-            policies.history(company, id, historyAfter, historyLimit).map {
-                LeavePolicyReview(current, it)
+            policies.history(company, id, historyAfter, historyLimit).flatMap { history ->
+                validateCompanySessionActor(actor, access, clock.instant(), security).map {
+                    LeavePolicyReview(current, history)
+                }
             }
         }
     }

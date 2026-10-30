@@ -13,8 +13,8 @@ Complete every specified Platform/Mobile feature and port demonstrated generic
 fixes to Starter. The [full audit](feature-audit-2026-10-30.md) remains active:
 Approvals, Communications, Identity, Documents and Expenses now have 26 reviewed
 initial requirement rows and their detailed sections; 35 initial rows await review,
-followed by Mobile/Starter. Identity and Approvals have accepted full-CI evidence;
-final CI for Communications, Document and Expense corrections remains separately tracked.
+followed by Mobile/Starter. Identity, Approvals, Communications and Documents have accepted full-CI evidence;
+Expense final-source CI remains separately tracked.
 Do not mark the goal complete from these increments or earlier green CI.
 
 Announcement email source `8014d733` passed all ten jobs in
@@ -46,7 +46,7 @@ corrects thirteen reproduced MFA-expiry variants across ten older readers. All
 checks and actual API/worker/browser/SMTP acceptance (37.1s; 1.0m including setup).
 The [Communications requirement review](communications-feature-review-2026-10-30.md)
 locally accepts all five rows and nine detailed sections, including optional email.
-The correction is committed/pushed at `737d39a7`. Final source CI follows the Document command correction; the approval run has completed.
+The correction is committed/pushed at `737d39a7`. Final source `8e5dd3db` now passed all ten CI jobs, including the Document command correction.
 
 [Identity](identity-feature-review-2026-10-30.md) accepts all five initial rows and
 eight detailed sections against unchanged source trees and full CI `8014d733`:
@@ -63,10 +63,10 @@ eight commands. Nineteen actual baseline cases failed; inventory receipt replay
 was the twentieth, already-correct control. All twenty focused cases and final
 243 API, 18 domain, nine data, quality/packages and four actual browser workflows
 passed (42.5s). The [Documents requirement review](documents-feature-review-2026-10-30.md)
-locally accepts all five rows and ten original sections. Exact source `8e5dd3db49b2568917c44432574f58ce1eae6dae` is running in
+locally accepts all five rows and ten original sections. Exact source `8e5dd3db49b2568917c44432574f58ce1eae6dae` passed all ten jobs in
 [CI 41013958569](https://github.com/fajarxfce/hris-platform/actions/runs/41013958569).
-Observe its terminal outcome without cancelling it. This includes Communications
-and both Document increments; it does not include the later Expense correction.
+This includes Communications and both Document increments; it does not include
+the later Expense correction.
 
 [Expenses](expenses-feature-review-2026-10-30.md) now locally accepts all six initial
 rows and nine detailed sections. Its correction closes 29 failed cases: fifteen
@@ -80,15 +80,27 @@ API cases across both selections. Four final real browser workflows passed in
 category policy and reporting. The [measurements](measurements/expense-assurance-2026-10-30.json)
 retain both selections and package hashes. No runtime or phone update occurred.
 
-Observe the Document/Communications CI above, then dispatch the committed final
-Expense source and record its terminal result. Do not cancel the predecessor with
-another same-branch workflow. Keep the remaining full-feature goal active.
+Exact Expense source `5b60aba3fca4fe7ae388f57a08d6a9135b858739` is running in
+[CI 41018107365](https://github.com/fajarxfce/hris-platform/actions/runs/41018107365).
+Observe its terminal result without cancelling it with another same-branch run.
+It does not include the later Leave corrections. Keep the full-feature goal active.
 
-Next, review **Leave** and remaining module/Mobile contracts. A preliminary read of
-`DecideLeaveRequest` likewise finds a captured delegation time before later ledger
-work and only MFA validation after journaling. Reproduce its current-stage expiry
-through decision/receipt boundaries during the Leave review; no Leave code changed.
-Do not narrow the remaining audit to that possible defect.
+[Leave read completion](leave-read-assurance-2026-10-30.md) corrects eight readers.
+Ten genuine reproduction failures now pass. Final acceptance passed 437 API/OpenAPI,
+65 domain cases, quality/packages (822s), and six actual browser
+workflows (51.5s including setup). No DI/schema/additional query change occurred.
+Storage buffers are cleared and expired preparation starts no object read.
+
+**Leave remains active, with all five initial rows unverified.** Complete the
+remaining eleven detailed sections and linked accrual-schedule/carryover contracts.
+Next reproduce `SaveLeaveType`, `PostEmployeeLeaveAccrual` and
+`RequestLeaveCancellation`: final journal/receipt MFA, stable policy contract sets,
+and original cancellation receipt scope. Then correct delegated request/attachment
+read completion, refreshed available actions, ordered delegator account guards,
+and `DecideLeaveRequest` current-stage authorization through decision and original
+receipt completion. Read-only/command source reviews already identified these
+boundaries; no command or delegation correction is included in this read increment.
+Do not narrow the full audit to these defects or mark Leave accepted from this CI.
 
 Input copies are bounded before validation. Receipt reads retain scope/expiry and
 ordered actor/delegator guards; one additional identity acquisition per short

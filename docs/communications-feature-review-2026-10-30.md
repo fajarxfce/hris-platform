@@ -2,8 +2,8 @@
 
 The five initial requirements and eight original detailed sections, plus the new
 optional-email section, have been reviewed against source and matching behavior.
-Local acceptance is complete after adding email delivery and correcting read
-completion. This review covers Communications and its existing native evidence;
+Local and final-source CI acceptance are complete after adding email delivery
+and correcting read completion. This review covers Communications and its existing native evidence;
 the remaining Platform modules and full Mobile inventory remain open.
 
 | Requirement | Implementation and matching behavior |
@@ -30,6 +30,10 @@ Evidence: [email](measurements/announcement-email-2026-10-30.json),
 [HTTPS navigation](measurements/app-links-2026-10-29.json).
 The email source passed all ten full-CI jobs. Read completion adds 106 API,
 13 domain and three repository cases, package/quality checks and the actual
-API/worker/browser/SMTP workflow. Final-source CI remains separately tracked.
+API/worker/browser/SMTP workflow. Final source `8e5dd3db` passed all ten CI jobs.
 Physical iPhone testing stays explicitly waived; these observations do not claim
 actual APNs or an Apple device login.
+
+Final source `8e5dd3db49b2568917c44432574f58ce1eae6dae` passed all ten jobs in
+[CI 41013958569](https://github.com/fajarxfce/hris-platform/actions/runs/41013958569),
+including all backend/dashboard shards, real integration and recovery.

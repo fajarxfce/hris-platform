@@ -4,8 +4,7 @@ The five initial requirements and all ten original detailed sections have been
 reviewed against source and matching behavior. The review found and corrected
 [read completion](document-read-assurance-2026-10-30.md) and
 [command completion](document-command-assurance-2026-10-30.md). Local acceptance passed 243 API, 18 domain and nine data cases, quality/packages
-and four actual API/browser workflows (42.5s). All five rows are locally accepted;
-final-source CI remains separately tracked in the linked measurements and inventory.
+and four actual API/browser workflows (42.5s). All five rows are accepted, including the final-source CI recorded below.
 
 | Requirement | Implementation and matching behavior |
 | --- | --- |
@@ -52,3 +51,7 @@ Evidence: [read acceptance](measurements/document-read-assurance-2026-10-30.json
 [native recovery](native-upload-acceptance.md), and
 [bounded storage](storage.md). The earlier scanner-limit failure remains a failed
 baseline, not acceptance. No live runtime, storage object or phone was changed.
+
+Final source `8e5dd3db49b2568917c44432574f58ce1eae6dae` passed all ten jobs in
+[CI 41013958569](https://github.com/fajarxfce/hris-platform/actions/runs/41013958569),
+including all backend/dashboard shards, real integration and recovery.

@@ -160,7 +160,7 @@
         {
           "id": "communications.01",
           "text": "Own announcement drafts/schedules/publication/audience, acknowledgement, server inbox, channel delivery, and device registrations.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/communications-feature-review-2026-10-30.md",
             "docs/measurements/announcement-email-2026-10-30.json",
@@ -170,7 +170,7 @@
         {
           "id": "communications.02",
           "text": "Scope audiences by permitted company/branch/department/groups. Persist inbox before external delivery. Fan-out via transactional outbox; use stable notification and recipient IDs. FCM/email failures do not erase inbox.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/communications-feature-review-2026-10-30.md",
             "docs/measurements/announcement-email-2026-10-30.json",
@@ -180,7 +180,7 @@
         {
           "id": "communications.03",
           "text": "Notification deep links identify resources and require fresh authorization. Sensitive payroll amounts are not sent in push content. Revalidate recipient access when needed; unregister revoked devices.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/communications-feature-review-2026-10-30.md",
             "docs/measurements/announcement-email-2026-10-30.json",
@@ -190,7 +190,7 @@
         {
           "id": "communications.04",
           "text": "Screens: announcements, audience preview, scheduling, inbox, delivery failures.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/communications-feature-review-2026-10-30.md",
             "docs/measurements/announcement-email-2026-10-30.json",
@@ -200,7 +200,7 @@
         {
           "id": "communications.05",
           "text": "Acceptance: duplicate events, scheduled audience resolution, denied push permission, invalid token, access changes, and idempotent acknowledgement.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/communications-feature-review-2026-10-30.md",
             "docs/measurements/announcement-email-2026-10-30.json",
@@ -219,11 +219,19 @@
         "Administrative push delivery"
       ],
       "detailedReview": {
-        "status": "locally-accepted",
+        "status": "accepted",
         "evidence": "docs/communications-feature-review-2026-10-30.md",
         "additionalSections": [
           "Optional announcement email"
-        ]
+        ],
+        "fullCi": {
+          "status": "success",
+          "source": "8e5dd3db49b2568917c44432574f58ce1eae6dae",
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41013958569",
+          "jobs": 10,
+          "failed": 0,
+          "scope": "Four backend shards, four dashboard shards, real dashboard integration and recovery integration."
+        }
       }
     },
     {
@@ -234,7 +242,7 @@
         {
           "id": "documents.01",
           "text": "Own company-scoped metadata, document revisions, upload state, validation, retention, and private content access.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/documents-feature-review-2026-10-30.md",
             "docs/measurements/documents-feature-review-2026-10-30.json"
@@ -243,7 +251,7 @@
         {
           "id": "documents.02",
           "text": "Documents identify owner, category, classification, business resource, and version. Use resumable uploads; validate size/type/content before ready. Authenticate every read and support bounded Range/ETag streaming.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/documents-feature-review-2026-10-30.md",
             "docs/measurements/documents-feature-review-2026-10-30.json"
@@ -252,7 +260,7 @@
         {
           "id": "documents.03",
           "text": "Garbage collection expires abandoned uploads/temporary exports without deleting retained business evidence. Technical processing failure is inspectable and never silently publishes an unvalidated document.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/documents-feature-review-2026-10-30.md",
             "docs/measurements/documents-feature-review-2026-10-30.json"
@@ -261,7 +269,7 @@
         {
           "id": "documents.04",
           "text": "Screens: employee documents, upload progress, revision history, processing status.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/documents-feature-review-2026-10-30.md",
             "docs/measurements/documents-feature-review-2026-10-30.json"
@@ -270,7 +278,7 @@
         {
           "id": "documents.05",
           "text": "Acceptance: offset/lost-response recovery, wrong version/range, permission revocation, cross-company IDs, size limits, interrupted streaming, and finalization replay.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/documents-feature-review-2026-10-30.md",
             "docs/measurements/documents-feature-review-2026-10-30.json"
@@ -290,8 +298,16 @@
         "Native interrupted-upload acceptance"
       ],
       "detailedReview": {
-        "status": "locally-accepted",
-        "evidence": "docs/documents-feature-review-2026-10-30.md"
+        "status": "accepted",
+        "evidence": "docs/documents-feature-review-2026-10-30.md",
+        "fullCi": {
+          "status": "success",
+          "source": "8e5dd3db49b2568917c44432574f58ce1eae6dae",
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41013958569",
+          "jobs": 10,
+          "failed": 0,
+          "scope": "Four backend shards, four dashboard shards, real dashboard integration and recovery integration."
+        }
       }
     },
     {
@@ -757,7 +773,7 @@
         "docs/communications-read-assurance-2026-10-30.md",
         "docs/measurements/communications-read-assurance-2026-10-30.json"
       ],
-      "next": "Follow final-source CI after the predecessor finishes; continue all remaining module and Mobile requirements."
+      "next": "Final source 8e5dd3db passed all ten CI jobs. Continue remaining Platform/Mobile review."
     },
     {
       "id": "documents.read-completion",
@@ -771,7 +787,7 @@
         "docs/document-read-assurance-2026-10-30.md",
         "docs/measurements/document-read-assurance-2026-10-30.json"
       ],
-      "next": "Document command completion and detailed review now pass locally; follow final-source CI and continue remaining modules/Mobile."
+      "next": "Final source 8e5dd3db passed all ten CI jobs. Continue remaining Platform/Mobile review."
     },
     {
       "id": "documents.command-completion",
@@ -785,7 +801,7 @@
         "docs/document-command-assurance-2026-10-30.md",
         "docs/measurements/document-command-assurance-2026-10-30.json"
       ],
-      "next": "Follow final-source CI and continue Expenses, remaining Platform modules and Mobile."
+      "next": "Final source 8e5dd3db passed all ten CI jobs. Continue remaining Platform/Mobile review."
     },
     {
       "id": "expenses.assurance-and-inputs",
@@ -800,7 +816,21 @@
         "docs/measurements/expense-assurance-2026-10-30.json",
         "docs/expenses-feature-review-2026-10-30.md"
       ],
-      "next": "Observe predecessor CI, dispatch final Expense source when it completes, and continue Leave/remaining Platform/Mobile requirements."
+      "next": "Observe exact source 5b60aba3 in CI 41018107365; continue Leave and remaining Platform/Mobile requirements without cancelling it."
+    },
+    {
+      "id": "leave.read-completion",
+      "status": "implemented-and-locally-accepted",
+      "requirement": "Leave metadata, request details, attachment preparation and post-storage completion require current session assurance.",
+      "baseline": "5b60aba3",
+      "baselineEvidence": [
+        "Ten genuine failed cases: nine acquired-data releases and one object read after expired preparation."
+      ],
+      "evidence": [
+        "docs/leave-read-assurance-2026-10-30.md",
+        "docs/measurements/leave-read-assurance-2026-10-30.json"
+      ],
+      "next": "Complete Leave command/delegation and full requirement review before accepting its five rows."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

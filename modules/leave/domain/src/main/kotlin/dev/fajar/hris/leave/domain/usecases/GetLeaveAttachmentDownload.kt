@@ -44,10 +44,10 @@ class GetLeaveAttachmentDownload(
             if (memberLock is Result.Failed) return@run memberLock
             val accountLock = identities.lockAccount(actor.accountId, shared = true)
             if (accountLock is Result.Failed) return@run accountLock
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             val live = (checked as Result.Success).value
             val found = requests.find(company, requestId)
@@ -110,6 +110,8 @@ class GetLeaveAttachmentDownload(
                     Failure(FailureKind.CONFLICT, "leave_attachment_unavailable")
                 )
 
+            val completed = validateCompanySessionActor(actor, access, clock.instant(), security)
+            if (completed is Result.Failed) return@run completed
             Result.Success(
                 DocumentDownload(
                     attachment.revisionId,

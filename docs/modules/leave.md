@@ -237,3 +237,10 @@ Browser tests cover company replacement, read failures, keyboard navigation,
 company-local Today, dark/Indonesian layouts and bounded pages. An isolated real
 API/PostgreSQL scenario verified two half-day requests, withdrawal, updated
 occupancy and company replacement.
+
+## Read completion assurance
+
+[Read-completion acceptance](../leave-read-assurance-2026-10-30.md) verifies current
+MFA after policy, employment and request acquisition, before attachment storage
+reads, and after post-storage metadata. Content owns and clears its bounded buffer.
+The full feature audit still tracks command and delegation completion separately.

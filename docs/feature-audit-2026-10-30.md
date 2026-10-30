@@ -167,3 +167,13 @@ remain open. Document/Communications exact source `8e5dd3db` is running in
 [CI 41013958569](https://github.com/fajarxfce/hris-platform/actions/runs/41013958569).
 Follow the Expense final-source run after it finishes. Continue Leave, all remaining
 Platform contracts and Mobile/Starter; this module acceptance does not close the goal.
+
+## Leave read completion — local acceptance passed
+
+[Eight Leave readers](leave-read-assurance-2026-10-30.md) now recheck MFA after
+acquisition, including preparation and post-storage completion. Ten genuine
+baseline failures now pass; the measurement retains broad local and actual-browser
+acceptance. Communications/Documents `8e5dd3db` passed all ten CI jobs; Expense
+`5b60aba3` is running in [CI 41018107365](https://github.com/fajarxfce/hris-platform/actions/runs/41018107365).
+Leave commands and delegated read/decision completion remain under review. All five
+Leave rows stay unverified: 26 initial rows reviewed, 35 and Mobile still open.

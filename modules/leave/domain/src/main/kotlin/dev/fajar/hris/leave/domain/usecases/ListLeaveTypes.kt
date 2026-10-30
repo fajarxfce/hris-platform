@@ -41,14 +41,16 @@ class ListLeaveTypes(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
-            val checked =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val access = (authority as Result.Success).value
+            val checked = validateCompanySessionActor(actor, access, clock.instant(), security)
             if (checked is Result.Failed) return@run checked
             if (!canReadLeaveTypes((checked as Result.Success).value))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "access_denied"))
-            policies.list(company, asOf, after, limit)
+            policies.list(company, asOf, after, limit).flatMap { page ->
+                validateCompanySessionActor(actor, access, clock.instant(), security).map { page }
+            }
         }
     }
 }

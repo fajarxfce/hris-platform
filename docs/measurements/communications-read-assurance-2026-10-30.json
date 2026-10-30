@@ -220,8 +220,11 @@
   },
   "runtime": "Private schema-101 API, isolated dashboard baseline, accepted Google binding and installed phone unchanged; fixture SMTP only.",
   "fullCi": {
-    "status": "pending-source-commit",
-    "predecessor": "https://github.com/fajarxfce/hris-platform/actions/runs/41009137720",
-    "instruction": "Wait for the predecessor to finish before dispatching final source; same-branch workflow concurrency cancels an earlier run."
+    "status": "success",
+    "source": "8e5dd3db49b2568917c44432574f58ce1eae6dae",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41013958569",
+    "jobs": 10,
+    "failed": 0,
+    "scope": "Four backend shards, four dashboard shards, real dashboard integration and recovery integration."
   }
 }

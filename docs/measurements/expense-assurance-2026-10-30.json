@@ -89,13 +89,21 @@
     "accountGuards": "Actor and relevant delegators sorted by ID; no separate worker authority changes."
   },
   "fullCi": {
-    "predecessorSource": "8e5dd3db49b2568917c44432574f58ce1eae6dae",
-    "predecessorUrl": "https://github.com/fajarxfce/hris-platform/actions/runs/41013958569",
-    "status": "pending-final-source-dispatch-after-predecessor"
+    "status": "in_progress",
+    "source": "5b60aba3fca4fe7ae388f57a08d6a9135b858739",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41018107365",
+    "predecessor": {
+      "status": "success",
+      "source": "8e5dd3db49b2568917c44432574f58ce1eae6dae",
+      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41013958569",
+      "jobs": 10,
+      "failed": 0,
+      "scope": "Four backend shards, four dashboard shards, real dashboard integration and recovery integration."
+    }
   },
   "remaining": [
-    "Follow final-source CI after predecessor completes.",
-    "Continue remaining Platform/Mobile audit."
+    "Observe terminal result of final Expense source CI without cancelling it.",
+    "Continue Leave and the remaining Platform/Mobile audit."
   ],
   "runtime": "Private schema-101 stack, Google binding and installed phone unchanged; no live bank or mail operation.",
   "broadAcceptance": {

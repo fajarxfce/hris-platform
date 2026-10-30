@@ -29,8 +29,10 @@ nine data, quality/packages and four actual browser workflows passed. [Expenses]
 and nine sections, with 335 distinct API cases, 20 Expense domain, 115 Reporting
 cases, quality/packages and four actual browser workflows. Twenty-six rows are
 reviewed; 35 initial rows and the full Mobile review remain active. Email
-`8014d733` and approval `fcfdaf26` each passed all ten full-CI jobs. Follow the
-Communications/Documents/Expenses final-source CI and continue Leave and remaining scope.
+`8014d733`, approval `fcfdaf26` and final Communications/Documents `8e5dd3db`
+each passed all ten full-CI jobs. Expense source `5b60aba3` is running in
+[CI 41018107365](https://github.com/fajarxfce/hris-platform/actions/runs/41018107365);
+continue Leave and the remaining scope without cancelling that run.
 
 
 ## Release-configuration audit — accepted

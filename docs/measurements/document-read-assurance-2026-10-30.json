@@ -353,11 +353,14 @@
       "apiJarSha256": "f0630e11f6af30046b047e6f7177423a42e8db0d9532782b8b83f2157dc1ffc3"
     }
   },
-  "next": "Complete read acceptance, commit/push, then reproduce and correct late command assurance in upload/validation/inventory and retention before accepting Documents requirements.",
+  "next": "Document command correction and full source CI are now accepted. Continue the remaining Platform/Mobile audit.",
   "runtime": "Private schema-101 stack, accepted Google binding and installed phone unchanged.",
   "fullCi": {
-    "status": "pending-final-documents-source",
-    "predecessor": "https://github.com/fajarxfce/hris-platform/actions/runs/41009137720",
-    "instruction": "Finish command review and allow predecessor to complete before dispatching final branch source."
+    "status": "success",
+    "source": "8e5dd3db49b2568917c44432574f58ce1eae6dae",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41013958569",
+    "jobs": 10,
+    "failed": 0,
+    "scope": "Four backend shards, four dashboard shards, real dashboard integration and recovery integration."
   }
 }

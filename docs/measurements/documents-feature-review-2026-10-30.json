@@ -1,6 +1,6 @@
 {
   "date": "2026-10-30",
-  "status": "locally-accepted",
+  "status": "accepted",
   "requirements": [
     "documents.01",
     "documents.02",
@@ -579,5 +579,13 @@
   ],
   "scannerLimitBaseline": "docs/measurements/documents-2026-10-28-scan-limit.json is failed baseline, not acceptance.",
   "physicalIphone": "explicitly waived",
-  "remaining": "Full-source CI and remaining Platform/Mobile requirements stay separately tracked."
+  "remaining": "Continue remaining Platform/Mobile requirements; this module does not close the full goal.",
+  "fullCi": {
+    "status": "success",
+    "source": "8e5dd3db49b2568917c44432574f58ce1eae6dae",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41013958569",
+    "jobs": 10,
+    "failed": 0,
+    "scope": "Four backend shards, four dashboard shards, real dashboard integration and recovery integration."
+  }
 }

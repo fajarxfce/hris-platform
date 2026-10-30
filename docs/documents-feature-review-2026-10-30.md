@@ -1,10 +1,13 @@
 # Documents requirement review — 30 October 2026
 
-The five initial requirements and all ten original detailed sections have been
-reviewed against source and matching behavior. The review found and corrected
-[read completion](document-read-assurance-2026-10-30.md) and
-[command completion](document-command-assurance-2026-10-30.md). Local acceptance passed 243 API, 18 domain and nine data cases, quality/packages
-and four actual API/browser workflows (42.5s). All five rows are accepted, including the final-source CI recorded below.
+Four initial rows remain accepted. `documents.02` is reopened after the People
+review found its explicit category subrequirement missing; the earlier review
+below covered classification, references and transport but omitted category.
+[The confirmed gap](document-identity-metadata-gap-2026-10-30.md) also records the
+separate foreign identity/document-validity requirement. Existing assurance and
+transport evidence remains valid: 243 API, 18 domain, nine data, quality/packages
+and four actual browser workflows passed, as did the recorded full CI. That CI
+does not implement the missing metadata.
 
 | Requirement | Implementation and matching behavior |
 | --- | --- |

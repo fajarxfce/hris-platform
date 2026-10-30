@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-30",
+  "status": "confirmed-missing-implementation",
+  "baseline": "b0b7c21c9fb64e66a15b7ac4899c493e708c77a9",
+  "requirements": [
+    "documents.02",
+    "people.03"
+  ],
+  "sourceEvidence": [
+    {
+      "path": "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/entities/Document.kt",
+      "sha256": "2415534acb8a3baa429f8895b9336f8755683ff762c3ad73419253f421baab82"
+    },
+    {
+      "path": "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/entities/DocumentRevision.kt",
+      "sha256": "69c450e8e6253057c8a1c5a6b0d86571a4e27277842707aa95c8fae716bf46e6"
+    },
+    {
+      "path": "modules/documents/domain/src/main/kotlin/dev/fajar/hris/documents/domain/entities/StartDocumentUploadCommand.kt",
+      "sha256": "57df603343fb56e8ba15549a1be7e38ce679c8a8b3a991ecb6a83740da63ff63"
+    },
+    {
+      "path": "modules/people/domain/src/main/kotlin/dev/fajar/hris/people/domain/entities/PersonProfile.kt",
+      "sha256": "a1d0dff0800fc73aeefda1e323dd7d1aff53556eb646aabbc0085dc8ffaa1d2f"
+    },
+    {
+      "path": "modules/payroll/domain/src/main/kotlin/dev/fajar/hris/payroll/domain/entities/TaxRegistration.kt",
+      "sha256": "611b8d0b5aa3adceae549ad96d4e9899803744baf0aa28fbda32a2adc34962f9"
+    }
+  ],
+  "findings": [
+    "Document has title/classification/employment/version but no distinct category.",
+    "DocumentRevision.expiresAt is the temporary upload deadline, not the validity of the underlying identity/document.",
+    "PersonProfile has nationality but no foreign identity/document validity attributes.",
+    "Payroll TaxRegistration separately models verified residency/country/subjective dates; nationality/document validity must not determine those values."
+  ],
+  "reproduction": "Source/contract review only. No new HTTP failure or completed implementation is claimed.",
+  "priorReviewCorrection": "documents.02 reopened; the earlier review omitted its explicit category subrequirement. Four other Document rows retain their recorded acceptance.",
+  "inventory": {
+    "accepted": 30,
+    "locally-accepted": 0,
+    "unverified": 31
+  }
+}

@@ -825,8 +825,39 @@
   "mobile": "Owned claim/payment synchronization and receipt transport contracts unchanged; full Mobile inventory remains separate.",
   "remaining": "Full-source CI and the remaining Platform/Mobile audit stay separately tracked.",
   "finalSourceCi": {
-    "status": "failed-workflow-timeout",
-    "evidence": "docs/measurements/ci-integration-timeout-2026-10-30.json",
-    "remaining": "Final Leave-source CI includes unchanged Expense implementation and revised workflow budget."
+    "status": "success",
+    "runId": 41023645590,
+    "source": "70b92e59e7b41bdafe9f9d1c4b9d5106412777f5",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41023645590",
+    "jobs": 10,
+    "failed": 0,
+    "evidence": "docs/measurements/leave-full-ci-2026-10-30.json",
+    "includes": [
+      "Expense correction 5b60aba3",
+      "integration budget 84d37ad6",
+      "Leave read/command correction through 70b92e59"
+    ],
+    "excludes": [
+      "People reader b0b7c21c and subsequent command work",
+      "Unimplemented document category and identity-validity metadata"
+    ]
+  },
+  "fullCi": {
+    "status": "success",
+    "runId": 41023645590,
+    "source": "70b92e59e7b41bdafe9f9d1c4b9d5106412777f5",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41023645590",
+    "jobs": 10,
+    "failed": 0,
+    "evidence": "docs/measurements/leave-full-ci-2026-10-30.json",
+    "includes": [
+      "Expense correction 5b60aba3",
+      "integration budget 84d37ad6",
+      "Leave read/command correction through 70b92e59"
+    ],
+    "excludes": [
+      "People reader b0b7c21c and subsequent command work",
+      "Unimplemented document category and identity-validity metadata"
+    ]
   }
 }

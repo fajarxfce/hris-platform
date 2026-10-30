@@ -57,3 +57,13 @@ The private schema-101 runtime, accepted Google binding and installed phone are
 unchanged. The physical iPhone test remains waived. Thirty-one initial rows are
 now reviewed; thirty initial rows, remaining detailed contracts and full Mobile
 review remain open. This module acceptance does not close the full goal.
+
+## Full CI accepted
+
+Exact source `70b92e59e7b41bdafe9f9d1c4b9d5106412777f5` passed all ten jobs in
+[CI 41023645590](https://github.com/fajarxfce/hris-platform/actions/runs/41023645590), including normal browser, worker, private exports and
+recovery. Its Expense tree matches `5b60aba3`; the revised bounded workflow budget
+passed. [Evidence](measurements/leave-full-ci-2026-10-30.json) retains exact job
+outcomes and the failed predecessor. Later People changes are outside this run.
+The full feature goal remains active, including the newly confirmed
+[document metadata gap](document-identity-metadata-gap-2026-10-30.md).

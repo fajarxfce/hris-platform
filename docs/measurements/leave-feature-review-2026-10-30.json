@@ -1439,17 +1439,23 @@
     "https://github.com/fajarxfce/hris-mobile/blob/feat/native-push/docs/validation.md#android-carried-balance-upgrade-acceptance"
   ],
   "physicalIphone": "Waived by user; no physical Apple claim.",
-  "remaining": "Observe final-source CI and complete remaining Platform/Mobile requirements.",
+  "remaining": "Complete remaining Platform/Mobile requirements, including the newly confirmed document category/identity-validity gap.",
   "fullCi": {
-    "status": "running",
+    "status": "success",
     "runId": 41023645590,
-    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41023645590",
     "source": "70b92e59e7b41bdafe9f9d1c4b9d5106412777f5",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41023645590",
+    "jobs": 10,
+    "failed": 0,
+    "evidence": "docs/measurements/leave-full-ci-2026-10-30.json",
     "includes": [
       "Expense correction 5b60aba3",
-      "integration time budget 84d37ad6",
-      "Leave read c68b721a and final command correction 70b92e59"
+      "integration budget 84d37ad6",
+      "Leave read/command correction through 70b92e59"
     ],
-    "remaining": "Observe terminal result without cancelling with a same-branch run; continue People and the remaining full-feature audit."
+    "excludes": [
+      "People reader b0b7c21c and subsequent command work",
+      "Unimplemented document category and identity-validity metadata"
+    ]
   }
 }

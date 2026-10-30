@@ -23,20 +23,23 @@ The [final assurance correction](approval-read-assurance-2026-10-30.md) and
 its five initial rows and detailed sections. The [Communications review](communications-feature-review-2026-10-30.md)
 also accepts five rows after the read-completion correction. [Identity](identity-feature-review-2026-10-30.md)
 accepts five more against unchanged source and downloaded full-CI results.
-[Documents](documents-feature-review-2026-10-30.md) now accepts its five rows and
-ten original sections after read/command completion fixes: 243 API, 18 domain,
+[Documents](documents-feature-review-2026-10-30.md) retains four accepted rows; its
+category subrequirement is [reopened](document-identity-metadata-gap-2026-10-30.md).
+Existing read/command acceptance remains valid: 243 API, 18 domain,
 nine data, quality/packages and four actual browser workflows passed. [Expenses](expenses-feature-review-2026-10-30.md) adds six locally accepted rows
 and nine sections, with 335 distinct API cases, 20 Expense domain, 115 Reporting
 cases, quality/packages and four actual browser workflows. [Leave](leave-feature-review-2026-10-30.md) adds five locally accepted rows and
-eleven original sections, with final API/worker/browser acceptance. Thirty-one rows
-are reviewed; 30 initial rows and the full Mobile review remain active. Email
+eleven original sections, with final API/worker/browser acceptance. Thirty rows
+are reviewed; 31 initial rows and the full Mobile review remain active. Email
 `8014d733`, approval `fcfdaf26` and final Communications/Documents `8e5dd3db`
 each passed all ten full-CI jobs. Expense [CI 41018107365](https://github.com/fajarxfce/hris-platform/actions/runs/41018107365)
 passed nine jobs and all fourteen worker scenarios, but exceeded the worker step
 time budget. The [recorded correction](measurements/ci-integration-timeout-2026-10-30.json)
-keeps finite limits. Final Leave source `70b92e59` is running in
-[CI 41023645590](https://github.com/fajarxfce/hris-platform/actions/runs/41023645590); complete CI must still pass. Continue
-People, the remaining Platform requirements and full Mobile review.
+keeps finite limits. Final Leave source `70b92e59` passed all ten jobs in
+[CI 41023645590](https://github.com/fajarxfce/hris-platform/actions/runs/41023645590),
+including unchanged Expenses. People readers are committed at `b0b7c21c`; command
+and Organization acceptance remains active. Then implement the confirmed document
+category/identity-validity gap and continue the remaining Platform/Mobile review.
 
 
 ## Release-configuration audit — accepted

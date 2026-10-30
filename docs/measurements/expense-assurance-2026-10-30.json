@@ -89,17 +89,22 @@
     "accountGuards": "Actor and relevant delegators sorted by ID; no separate worker authority changes."
   },
   "fullCi": {
-    "status": "in_progress",
-    "source": "5b60aba3fca4fe7ae388f57a08d6a9135b858739",
-    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41018107365",
-    "predecessor": {
-      "status": "success",
-      "source": "8e5dd3db49b2568917c44432574f58ce1eae6dae",
-      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41013958569",
-      "jobs": 10,
-      "failed": 0,
-      "scope": "Four backend shards, four dashboard shards, real dashboard integration and recovery integration."
-    }
+    "status": "success",
+    "runId": 41023645590,
+    "source": "70b92e59e7b41bdafe9f9d1c4b9d5106412777f5",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41023645590",
+    "jobs": 10,
+    "failed": 0,
+    "evidence": "docs/measurements/leave-full-ci-2026-10-30.json",
+    "includes": [
+      "Expense correction 5b60aba3",
+      "integration budget 84d37ad6",
+      "Leave read/command correction through 70b92e59"
+    ],
+    "excludes": [
+      "People reader b0b7c21c and subsequent command work",
+      "Unimplemented document category and identity-validity metadata"
+    ]
   },
   "remaining": [
     "Observe terminal result of final Expense source CI without cancelling it.",
@@ -755,8 +760,21 @@
     "scope": "Owned disposable API/PostgreSQL/browser fixture; latest packaged use cases and real lost-response/review/payment/report workflows."
   },
   "finalSourceCi": {
-    "status": "failed-workflow-timeout",
-    "evidence": "docs/measurements/ci-integration-timeout-2026-10-30.json",
-    "remaining": "Final Leave-source CI includes unchanged Expense implementation and revised workflow budget."
+    "status": "success",
+    "runId": 41023645590,
+    "source": "70b92e59e7b41bdafe9f9d1c4b9d5106412777f5",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41023645590",
+    "jobs": 10,
+    "failed": 0,
+    "evidence": "docs/measurements/leave-full-ci-2026-10-30.json",
+    "includes": [
+      "Expense correction 5b60aba3",
+      "integration budget 84d37ad6",
+      "Leave read/command correction through 70b92e59"
+    ],
+    "excludes": [
+      "People reader b0b7c21c and subsequent command work",
+      "Unimplemented document category and identity-validity metadata"
+    ]
   }
 }

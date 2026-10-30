@@ -1,9 +1,8 @@
 {
   "date": "2026-10-30",
-  "status": "accepted",
+  "status": "partially-accepted",
   "requirements": [
     "documents.01",
-    "documents.02",
     "documents.03",
     "documents.04",
     "documents.05"
@@ -579,7 +578,7 @@
   ],
   "scannerLimitBaseline": "docs/measurements/documents-2026-10-28-scan-limit.json is failed baseline, not acceptance.",
   "physicalIphone": "explicitly waived",
-  "remaining": "Continue remaining Platform/Mobile requirements; this module does not close the full goal.",
+  "remaining": "Implement category and related foreign identity/document-validity metadata, then accept documents.02 and complete remaining Platform/Mobile review.",
   "fullCi": {
     "status": "success",
     "source": "8e5dd3db49b2568917c44432574f58ce1eae6dae",
@@ -587,5 +586,9 @@
     "jobs": 10,
     "failed": 0,
     "scope": "Four backend shards, four dashboard shards, real dashboard integration and recovery integration."
-  }
+  },
+  "reopenedRequirements": [
+    "documents.02"
+  ],
+  "reopeningEvidence": "docs/document-identity-metadata-gap-2026-10-30.md"
 }

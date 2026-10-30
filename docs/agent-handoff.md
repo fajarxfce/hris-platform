@@ -11,10 +11,11 @@ preserves earlier work; its old next-step statements are not the active queue.
 
 Complete every specified Platform/Mobile feature and port demonstrated generic
 fixes to Starter. The [full audit](feature-audit-2026-10-30.md) remains active:
-Approvals, Communications, Identity, Documents, Expenses and Leave now have 31 reviewed
-initial requirement rows and their detailed sections; 30 initial rows await review,
-followed by Mobile/Starter. Identity, Approvals, Communications and Documents have accepted full-CI evidence;
-Expense final-source CI remains separately tracked.
+Approvals, Communications, Identity, Expenses, Leave and four Document rows now
+have thirty reviewed initial rows; thirty-one initial rows await completion/review,
+followed by Mobile/Starter. Identity, Approvals, Communications, existing Document behavior, Expenses and Leave
+have accepted full-CI evidence. The explicit Document category subrequirement has
+been reopened; see the confirmed metadata gap below.
 Do not mark the goal complete from these increments or earlier green CI.
 
 Announcement email source `8014d733` passed all ten jobs in
@@ -86,8 +87,7 @@ nine jobs passed; dashboard integration failed its five-minute worker-step budge
 after all fourteen scenarios passed in 5.2 minutes. Later storage/export checks
 were skipped. [Timeout evidence](measurements/ci-integration-timeout-2026-10-30.json)
 records the outcome. The workflow now permits eight minutes for this step and
-twenty for the job, retaining bounded test timeouts and zero retries. Dispatch
-complete CI after the final Leave commit; it also covers unchanged Expense source.
+twenty for the job, retaining bounded test timeouts and zero retries. Replacement CI `41023645590` now passes all ten jobs, including unchanged Expenses.
 No full-source acceptance is claimed from this failed run.
 
 [Leave read completion](leave-read-assurance-2026-10-30.md) corrects eight readers.
@@ -112,13 +112,19 @@ beneficiaries. Read grants are reacquired after sorted actor/delegator account
 locks. Request-management receipts retain current scope and final MFA. Do not
 remove these bounded acquisitions as a query-count optimization.
 
-Leave correction `70b92e59` is committed and pushed. Exact source `70b92e59e7b41bdafe9f9d1c4b9d5106412777f5`
-is running in [CI 41023645590](https://github.com/fajarxfce/hris-platform/actions/runs/41023645590). It includes the Expense correction and
-revised integration time budget. Observe the terminal result without cancelling
-it with another same-branch workflow. Keep the remaining
-full-feature goal active: thirty initial rows plus detailed/module/Mobile review
-remain. Next review People and the remaining Platform contracts, then Mobile and
-applicable Starter behavior. No generic client implementation port is due here.
+Leave correction `70b92e59` is committed/pushed. Exact source `70b92e59e7b41bdafe9f9d1c4b9d5106412777f5`
+passed all ten jobs in [CI 41023645590](https://github.com/fajarxfce/hris-platform/actions/runs/41023645590), including normal browser, worker,
+private exports and recovery. [Evidence](measurements/leave-full-ci-2026-10-30.json)
+retains exact outcomes and matching Expense tree. This CI excludes later People
+work. Continue the full feature goal; accepted increments do not close it.
+
+[Document category/identity metadata](document-identity-metadata-gap-2026-10-30.md)
+is a newly confirmed implementation gap in `documents.02` and `people.03`. The
+earlier Documents review omitted category; that row is reopened. Upload expiry
+is not passport/permit validity, and Payroll tax residency is separate. The
+current inventory is thirty reviewed and thirty-one unverified rows. Finish
+People command/Organization acceptance, then implement the missing metadata and
+affected client flows before accepting the requirements.
 
 [People read completion](people-read-assurance-2026-10-30.md) passes twenty-eight
 actual reproductions across twenty-four readers, including both transfer-review
@@ -127,9 +133,16 @@ data cases, quality/packages (1124s), three actual browser workflows (36.5s)
 and two actual worker/browser workflows (37.3s), with setup. No new query, DI
 or schema change occurred. All five People initial rows remain unverified.
 
-Next reproduce older People command journal/replay completion (including recent
-authentication on account binding/imports/transfer), lifecycle task-list and initial
-assignee-map ownership, and Organization's company/unit readers and commands.
+People reader correction `b0b7c21c` is committed/pushed. The active command review
+has reproduced fifty actual failures plus four already-correct controls. Current
+local source corrects journal/replay completion, current MFA enrollment on binding
+and imports, lifecycle input ownership, Organization completion and immediate
+company dates. All 54 focused API, 50 People domain, two Organization domain and
+fourteen People repository cases plus quality/packages passed (142s). Broad API
+and worker acceptance is still running. Two old EmployeeImportWorkerTest fixture
+setups omit enrolled MFA while invoking interactive admission; inspect/correct
+those fixtures and finish full worker/context acceptance before committing the
+command increment. These in-progress changes are not included in the green CI.
 CompleteOffboarding and explicit onboarding/offboarding schedules already have
 final checks; preserve their behavior. Client policy is admission-only: do not add
 final availability rejection for already admitted work. Complete full People

@@ -251,11 +251,13 @@
         {
           "id": "documents.02",
           "text": "Documents identify owner, category, classification, business resource, and version. Use resumable uploads; validate size/type/content before ready. Authenticate every read and support bounded Range/ETag streaming.",
-          "status": "accepted",
+          "status": "unverified",
           "evidence": [
             "docs/documents-feature-review-2026-10-30.md",
-            "docs/measurements/documents-feature-review-2026-10-30.json"
-          ]
+            "docs/measurements/documents-feature-review-2026-10-30.json",
+            "docs/document-identity-metadata-gap-2026-10-30.md"
+          ],
+          "remaining": "Explicit category is absent. Retained upload/classification/content evidence does not establish that requirement."
         },
         {
           "id": "documents.03",
@@ -318,7 +320,7 @@
         {
           "id": "expenses.01",
           "text": "Own expense categories, policies, claim lines/receipts, review, payment batches, and reconciliation.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/expenses-feature-review-2026-10-30.md",
             "docs/measurements/expenses-feature-review-2026-10-30.json"
@@ -327,7 +329,7 @@
         {
           "id": "expenses.02",
           "text": "Claims store IDR amount, transaction date, cost center, and evidence. Snapshot limits on submit. Suspected duplicate receipts are review signals. Support return-for-correction/rejection with reasons and approval before payment.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/expenses-feature-review-2026-10-30.md",
             "docs/measurements/expenses-feature-review-2026-10-30.json"
@@ -336,7 +338,7 @@
         {
           "id": "expenses.03",
           "text": "Payments have stable item references and per-item success/failure status. Paid claims cannot enter another batch. Reimbursements are independently paid in the first version. External bank submission remains manual.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/expenses-feature-review-2026-10-30.md",
             "docs/measurements/expenses-feature-review-2026-10-30.json"
@@ -345,7 +347,7 @@
         {
           "id": "expenses.04",
           "text": "Screens: claims, review, policy setup, payment batches, reconciliation.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/expenses-feature-review-2026-10-30.md",
             "docs/measurements/expenses-feature-review-2026-10-30.json"
@@ -354,7 +356,7 @@
         {
           "id": "expenses.05",
           "text": "The [claim dashboard](../dashboard.md#expense-claims) implements bounded directories,\ncoherent current claim/history review, immutable submission evidence, payment\nprogress and scoped receipt downloads. Independent reviewers can approve, reject\nor return submitted evidence with both observed versions and operation recovery.\nApproval source links use submission IDs. Finance preparation, release,\ncancellation/replacement and reconciliation are implemented separately. Dashboard\ndraft creation/editing, submitted actions and returned-claim correction are also\nimplemented and exercised in `apps/dashboard/integration/expense-claims.spec.ts`.\nSee [draft authoring](../dashboard.md#expense-draft-authoring) for the current contract.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/expenses-feature-review-2026-10-30.md",
             "docs/measurements/expenses-feature-review-2026-10-30.json"
@@ -363,7 +365,7 @@
         {
           "id": "expenses.06",
           "text": "Acceptance: category limits, company attachment access, concurrent submission, payment replay, failed/partial batch reconciliation, and immutable paid records.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/expenses-feature-review-2026-10-30.md",
             "docs/measurements/expenses-feature-review-2026-10-30.json"
@@ -382,8 +384,26 @@
         "Payment batches"
       ],
       "detailedReview": {
-        "status": "locally-accepted",
-        "evidence": "docs/expenses-feature-review-2026-10-30.md"
+        "status": "accepted",
+        "evidence": "docs/expenses-feature-review-2026-10-30.md",
+        "fullCi": {
+          "status": "success",
+          "runId": 41023645590,
+          "source": "70b92e59e7b41bdafe9f9d1c4b9d5106412777f5",
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41023645590",
+          "jobs": 10,
+          "failed": 0,
+          "evidence": "docs/measurements/leave-full-ci-2026-10-30.json",
+          "includes": [
+            "Expense correction 5b60aba3",
+            "integration budget 84d37ad6",
+            "Leave read/command correction through 70b92e59"
+          ],
+          "excludes": [
+            "People reader b0b7c21c and subsequent command work",
+            "Unimplemented document category and identity-validity metadata"
+          ]
+        }
       }
     },
     {
@@ -460,7 +480,7 @@
         {
           "id": "leave.01",
           "text": "Own leave types, effective policy, accrual, carryover, expiry, requests, cancellations, and balance ledger.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/leave-feature-review-2026-10-30.md",
             "docs/measurements/leave-command-assurance-2026-10-30.json"
@@ -469,7 +489,7 @@
         {
           "id": "leave.02",
           "text": "Ledger entries record grants, reservations, consumption, expiry, and reversal. Submit reserves; approval consumes; reject/cancel releases exactly once. Eligibility uses employment, working schedule, partial days, overlap, attachment, and available balance.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/leave-feature-review-2026-10-30.md",
             "docs/measurements/leave-command-assurance-2026-10-30.json"
@@ -478,7 +498,7 @@
         {
           "id": "leave.03",
           "text": "Snapshot policy and duration on submission. Approved cancellation follows approval. HR can act on behalf with a reason. Closed-payroll changes become adjustments rather than rewriting snapshots.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/leave-feature-review-2026-10-30.md",
             "docs/measurements/leave-command-assurance-2026-10-30.json"
@@ -487,7 +507,7 @@
         {
           "id": "leave.04",
           "text": "Screens: requests, balance ledger, team calendar, policies, balance adjustments, entitlement processing.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/leave-feature-review-2026-10-30.md",
             "docs/measurements/leave-command-assurance-2026-10-30.json"
@@ -496,7 +516,7 @@
         {
           "id": "leave.05",
           "text": "Acceptance: simultaneous requests cannot overspend balance; replay and cancellation cannot double-release; holidays/partial days/overnight shifts and period cutoff behave correctly.",
-          "status": "locally-accepted",
+          "status": "accepted",
           "evidence": [
             "docs/leave-feature-review-2026-10-30.md",
             "docs/measurements/leave-command-assurance-2026-10-30.json"
@@ -517,12 +537,30 @@
         "Team and company calendar"
       ],
       "detailedReview": {
-        "status": "locally-accepted",
+        "status": "accepted",
         "evidence": "docs/leave-feature-review-2026-10-30.md",
         "linkedContracts": [
           "docs/leave-carryover.md",
           "docs/leave-accrual-schedules.md"
-        ]
+        ],
+        "fullCi": {
+          "status": "success",
+          "runId": 41023645590,
+          "source": "70b92e59e7b41bdafe9f9d1c4b9d5106412777f5",
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41023645590",
+          "jobs": 10,
+          "failed": 0,
+          "evidence": "docs/measurements/leave-full-ci-2026-10-30.json",
+          "includes": [
+            "Expense correction 5b60aba3",
+            "integration budget 84d37ad6",
+            "Leave read/command correction through 70b92e59"
+          ],
+          "excludes": [
+            "People reader b0b7c21c and subsequent command work",
+            "Unimplemented document category and identity-validity metadata"
+          ]
+        }
       }
     },
     {
@@ -598,7 +636,10 @@
           "id": "people.03",
           "text": "Foreign identity/document expiry and tax residency are separate attributes. Import supports preview, field errors, duplicate detection, and row outcomes. Referenced historical data is archived rather than destroyed.",
           "status": "unverified",
-          "evidence": []
+          "evidence": [
+            "docs/document-identity-metadata-gap-2026-10-30.md"
+          ],
+          "remaining": "Implement separate foreign identity/document business-validity metadata; upload expiry is operational and tax residency already belongs to Payroll."
         },
         {
           "id": "people.04",
@@ -883,6 +924,20 @@
         "docs/measurements/people-read-assurance-2026-10-30.json"
       ],
       "next": "Keep all five People initial rows unverified until command/input, Organization and detailed evidence review complete."
+    },
+    {
+      "id": "documents.identity-metadata",
+      "status": "confirmed-missing-implementation",
+      "baseline": "b0b7c21c9fb64e66a15b7ac4899c493e708c77a9",
+      "requirements": [
+        "documents.02",
+        "people.03"
+      ],
+      "evidence": [
+        "docs/document-identity-metadata-gap-2026-10-30.md",
+        "docs/measurements/document-identity-metadata-gap-2026-10-30.json"
+      ],
+      "next": "Complete People command acceptance, then implement bounded versioned document category/identity/expiry metadata and clients; do not derive tax residency or delete expired evidence."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

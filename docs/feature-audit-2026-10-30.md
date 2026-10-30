@@ -198,3 +198,14 @@ All 427 selected API/OpenAPI, 50 domain and fourteen repository cases, quality
 checks, packages and five actual browser/worker workflows passed. Command/input
 and Organization review remain open; all five People rows are still unverified.
 The inventory remains at 31 reviewed and 30 unverified initial rows.
+
+## Current acceptance and reopened metadata requirement
+
+Expense/Leave source `70b92e59e7b41bdafe9f9d1c4b9d5106412777f5` passed all ten jobs in
+[CI 41023645590](https://github.com/fajarxfce/hris-platform/actions/runs/41023645590), including worker, private export and recovery. Later
+People work is outside that run. The People review found missing distinct
+document category and foreign identity/document-validity metadata. The earlier
+Document review omitted category; `documents.02` is reopened and `people.03` remains
+unverified. [The source finding](document-identity-metadata-gap-2026-10-30.md)
+records the gap and next implementation. Current inventory: thirty reviewed and
+thirty-one unverified initial rows, with full Mobile/Starter review still active.

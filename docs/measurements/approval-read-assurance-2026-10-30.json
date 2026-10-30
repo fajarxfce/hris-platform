@@ -159,5 +159,10 @@
       "apiJarSha256": "70f462f71f54a96e1452b9d4792d57468bc37ecdd8e6f85c05d0f484c86b3b79"
     }
   },
-  "runtime": "private schema-101 stack and phone unchanged; no provider message or deployment"
+  "runtime": "private schema-101 stack and phone unchanged; no provider message or deployment",
+  "fullCi": {
+    "source": "fcfdaf26a48718a80bc79468bdbdb3b4cbeae11c",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41009137720",
+    "status": "queued"
+  }
 }

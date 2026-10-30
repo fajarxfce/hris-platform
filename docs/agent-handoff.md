@@ -35,7 +35,9 @@ formatting, both packages and two actual API/browser workflows. Inbox completion
 uses current-stage eligibility; retained request/history scope remains distinct.
 See [correction](approval-read-assurance-2026-10-30.md) and
 [module requirement review](approvals-feature-review-2026-10-30.md).
-Full CI for this final source is the next verification after its commit.
+The correction is committed/pushed at `fcfdaf26`. [Full CI 41009137720](https://github.com/fajarxfce/hris-platform/actions/runs/41009137720)
+is queued for exact source `fcfdaf26a48718a80bc79468bdbdb3b4cbeae11c`; observe its
+terminal result without cancelling it through another same-branch dispatch.
 
 Continue with the remaining Communications requirements, then the other module
 contracts and Mobile behavior. Keep each requirement's matching evidence in the

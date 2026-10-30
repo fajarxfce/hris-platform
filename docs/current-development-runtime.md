@@ -4,6 +4,42 @@ Started 29 October 2026 with the user's authorization to continue after installi
 the Android dev APK. This is a private development environment, not a production
 release or proof that the remaining PRD acceptance has passed.
 
+## Current metadata rollout — 30 October 2026
+
+The private API/worker now run the accepted schema-103 application packages; their
+implementation trees match full-CI source `292a30f1`. The dashboard service points
+to immutable `~/.local/share/hris-dashboard-dev/1e0522c0` (220 files, 3,939,162 bytes).
+API health returned UP and the dashboard returned HTTP 200 with the exact staged
+index hash. SMTP remains disabled. Google binding/person linkage, both active
+native session IDs, document count and the exact binary revision fingerprint were
+unchanged across the update. This is installation/runtime integrity evidence, not
+a new Google sign-in or provider-delivery test. The phone remains on `72341ef6`.
+
+A fresh pre-migration checkpoint is private at
+`~/.local/state/hris-platform/recovery-data/dev-before-metadata-20261030T150655`,
+with its separate key pack under the matching `recovery-keys` directory. Capture,
+isolated verification and source restart took 19.389s. The verified checkpoint
+contains schema 101, restricted runtime roles, zero failed migrations/invalid
+constraints, one decrypted envelope and the existing document object. Earlier
+Google checkpoints remain historical. Previous runtime images are retained as
+`hris-dev-api:before-metadata-20261030` and `hris-dev-worker:before-metadata-20261030`.
+
+The restart sequence exposed a Compose behavior: `start api` / `start worker`
+restarted their existing migration dependency, so V102/V103 ran during checkpoint
+restart. The expected schema-101 post-check therefore failed. The checkpoint
+itself was verified as schema 101 and every other baseline field matched. The
+accepted API/worker images were then deployed with `up -d --no-deps`, and the staged
+dashboard was activated. The final schema-103 runtime and image checks passed.
+Use `start --no-deps` for future checkpoint restarts; a restart must not implicitly
+choose the migration window. Never rewind the live database automatically.
+
+[Sanitized rollout measurements](measurements/metadata-development-rollout-2026-10-30.json)
+retain exact package/image/checkpoint outcomes. Private `.work/metadata-rollout`
+contains supplementary local diagnostics; it is not required to identify the
+current runtime. Complete Mobile replacement CI and install-only phone delivery
+remain outstanding. The Administration assurance correction is separate work and
+is not included in these runtime images.
+
 ## Latest authorized Android delivery
 
 The final dev APK from Mobile application `72341ef6` was installed successfully
@@ -45,7 +81,7 @@ Both files and all account access material stay outside Git.
 | --- | --- |
 | API | `http://10.77.77.1:8088/api/v1/`; loopback 8088 also retained |
 | Dashboard | `http://10.77.77.1:5173`, proxying the loopback API |
-| Database | Schema 101; host publication only on `127.0.0.1:55432` |
+| Database | Schema 103; host publication only on `127.0.0.1:55432` |
 | Worker | Separate `hris_worker` role, FCM/storage/scanner enabled |
 | Garage | Private `hris-dev-documents` bucket initialized |
 | ClamAV | Updater and scanner healthy after actual signature download |

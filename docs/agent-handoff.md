@@ -7,6 +7,16 @@ Earlier distribution/native acceptance remains valid for its recorded scope. Rea
 then the affected module contract. The [archived history](agent-history-2026-10-29.md)
 preserves earlier work; its old next-step statements are not the active queue.
 
+Current runtime note: the private stack has now advanced to schema 103 and serves
+accepted API/worker packages plus dashboard snapshot `1e0522c0`. The checkpoint
+restart unexpectedly reran Compose's migration dependency; identity/session/binary
+fingerprints remained unchanged, and the accepted images were explicitly aligned.
+Use `start --no-deps` for future checkpoint restarts. Read
+[current runtime](current-development-runtime.md#current-metadata-rollout--30-october-2026)
+and [measurements](measurements/metadata-development-rollout-2026-10-30.json) before
+using older schema-101 status paragraphs below. Phone APK remains `72341ef6`; Mobile
+CI `41077194465` is still active. Administration source corrections are not deployed.
+
 ## Active goal — full feature completion audit
 
 Complete every specified Platform/Mobile feature and port demonstrated generic

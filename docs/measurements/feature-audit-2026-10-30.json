@@ -1,0 +1,575 @@
+{
+  "date": "2026-10-30",
+  "baseline": "c7caf489a19b38148d0a4981eb82dc8dbab11ed1",
+  "objective": "Verify every specified feature and implement unfinished requirements; prior green CI is not sufficient evidence for untested features.",
+  "status": "active",
+  "scope": [
+    "docs/product.md",
+    "all eleven docs/modules contracts",
+    "HRIS Mobile feature contracts and applicable generic Starter ports"
+  ],
+  "modules": [
+    {
+      "module": "administration",
+      "source": "docs/modules/administration.md",
+      "sourceSha256": "8591a871da54986c4ac942f577b137e458e809d3b2b539831665865307c04e77",
+      "requirements": [
+        {
+          "id": "administration.01",
+          "text": "Own effective company policy configuration, module flags, client availability, integration status, audit queries, and operational job controls.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "administration.02",
+          "text": "Flags affect capability availability but never grant permissions. Version gates and maintenance policy are explicit. Integration secrets live in deployment secrets, not ordinary settings or Git.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "administration.03",
+          "text": "Runtime audit is append-only with actor/reason/resource/correlation. Failed jobs expose safe categories and authorized retry. Backup/restore includes database, content, and encryption-key recovery.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "administration.04",
+          "text": "Screens: settings, flags, integration status, audit explorer, job monitor.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "administration.05",
+          "text": "Acceptance: policy effective dates, restricted settings/audit access, safe retry, stale client policy, secret redaction, and recovery from backup.",
+          "status": "unverified",
+          "evidence": []
+        }
+      ],
+      "detailedContractSections": [
+        "Reference workload",
+        "Backup and recovery",
+        "Integration configuration",
+        "Client availability and module flags",
+        "Audit search",
+        "Durable job foundation"
+      ]
+    },
+    {
+      "module": "approvals",
+      "source": "docs/modules/approvals.md",
+      "sourceSha256": "5cb5eb4ca1f8ac48cb867af281023a5a1943059cac352e3f48958f21a9b16619",
+      "requirements": [
+        {
+          "id": "approvals.01",
+          "text": "Own versioned templates, ordered stages, assignee snapshots, delegation periods, decisions, and inbox projections.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "approvals.02",
+          "text": "Conditions can select stages by category/amount and assign manager/role/named users. A valid decision completes its stage. Authors cannot approve their own request. Missing assignees block the request until audited reassignment. Existing requests retain the submitted template.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "approvals.03",
+          "text": "Shared transitions are pure policies. Each business module's use case coordinates ApprovalRepository with its own repository inside a transaction; approval never imports feature implementations or invokes their use cases.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "approvals.04",
+          "text": "Screens: inbox, request timeline, templates, delegation, blocked items.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "approvals.05",
+          "text": "Acceptance: competing decisions transition once, expiry/revocation are checked, self approval is denied, and policy edits never modify submitted requests.",
+          "status": "unverified",
+          "evidence": []
+        }
+      ],
+      "detailedContractSections": [
+        "Implementation status",
+        "Access and concurrent changes",
+        "Frozen maker exclusions",
+        "Bounded administration and selection",
+        "Dashboard",
+        "Administration detail and assignee lookup"
+      ]
+    },
+    {
+      "module": "communications",
+      "source": "docs/modules/communications.md",
+      "sourceSha256": "b0261f20a3e00acd552f02f4b075ffde480df5175877d0b7f562cf897995eea7",
+      "requirements": [
+        {
+          "id": "communications.01",
+          "text": "Own announcement drafts/schedules/publication/audience, acknowledgement, server inbox, channel delivery, and device registrations.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "communications.02",
+          "text": "Scope audiences by permitted company/branch/department/groups. Persist inbox before external delivery. Fan-out via transactional outbox; use stable notification and recipient IDs. FCM/email failures do not erase inbox.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "communications.03",
+          "text": "Notification deep links identify resources and require fresh authorization. Sensitive payroll amounts are not sent in push content. Revalidate recipient access when needed; unregister revoked devices.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "communications.04",
+          "text": "Screens: announcements, audience preview, scheduling, inbox, delivery failures.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "communications.05",
+          "text": "Acceptance: duplicate events, scheduled audience resolution, denied push permission, invalid token, access changes, and idempotent acknowledgement.",
+          "status": "unverified",
+          "evidence": []
+        }
+      ],
+      "detailedContractSections": [
+        "Authoring and audience contract",
+        "Audience preview",
+        "Publication and retention policy",
+        "Dashboard review",
+        "Audience references",
+        "Unread inbox total",
+        "Actual Android registration acceptance",
+        "Administrative push delivery"
+      ]
+    },
+    {
+      "module": "documents",
+      "source": "docs/modules/documents.md",
+      "sourceSha256": "91dffdbeb10668b3817310ce7defcc0e71fe1f7a980d7c8ab94b5fd82de1fd75",
+      "requirements": [
+        {
+          "id": "documents.01",
+          "text": "Own company-scoped metadata, document revisions, upload state, validation, retention, and private content access.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "documents.02",
+          "text": "Documents identify owner, category, classification, business resource, and version. Use resumable uploads; validate size/type/content before ready. Authenticate every read and support bounded Range/ETag streaming.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "documents.03",
+          "text": "Garbage collection expires abandoned uploads/temporary exports without deleting retained business evidence. Technical processing failure is inspectable and never silently publishes an unvalidated document.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "documents.04",
+          "text": "Screens: employee documents, upload progress, revision history, processing status.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "documents.05",
+          "text": "Acceptance: offset/lost-response recovery, wrong version/range, permission revocation, cross-company IDs, size limits, interrupted streaming, and finalization replay.",
+          "status": "unverified",
+          "evidence": []
+        }
+      ],
+      "detailedContractSections": [
+        "Resumable upload API",
+        "Self-service evidence catalog",
+        "Content inspection adapter",
+        "Validation and publication",
+        "Authorized downloads",
+        "Storage inventory reconciliation",
+        "Business evidence references",
+        "Retention policies, archive, and legal hold",
+        "Accepted revision retirement",
+        "Native interrupted-upload acceptance"
+      ]
+    },
+    {
+      "module": "expenses",
+      "source": "docs/modules/expenses.md",
+      "sourceSha256": "f04e697a382347d052c029b11154e3a0ce0f6de15dc2d34e8747870a43bb3847",
+      "requirements": [
+        {
+          "id": "expenses.01",
+          "text": "Own expense categories, policies, claim lines/receipts, review, payment batches, and reconciliation.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "expenses.02",
+          "text": "Claims store IDR amount, transaction date, cost center, and evidence. Snapshot limits on submit. Suspected duplicate receipts are review signals. Support return-for-correction/rejection with reasons and approval before payment.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "expenses.03",
+          "text": "Payments have stable item references and per-item success/failure status. Paid claims cannot enter another batch. Reimbursements are independently paid in the first version. External bank submission remains manual.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "expenses.04",
+          "text": "Screens: claims, review, policy setup, payment batches, reconciliation.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "expenses.05",
+          "text": "The [claim dashboard](../dashboard.md#expense-claims) implements bounded directories,\ncoherent current claim/history review, immutable submission evidence, payment\nprogress and scoped receipt downloads. Independent reviewers can approve, reject\nor return submitted evidence with both observed versions and operation recovery.\nApproval source links use submission IDs. Finance preparation, release,\ncancellation/replacement and reconciliation are implemented separately. Dashboard\ndraft creation/editing, submitted actions and returned-claim correction are also\nimplemented and exercised in `apps/dashboard/integration/expense-claims.spec.ts`.\nSee [draft authoring](../dashboard.md#expense-draft-authoring) for the current contract.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "expenses.06",
+          "text": "Acceptance: category limits, company attachment access, concurrent submission, payment replay, failed/partial batch reconciliation, and immutable paid records.",
+          "status": "unverified",
+          "evidence": []
+        }
+      ],
+      "detailedContractSections": [
+        "Operational expense report",
+        "Category policies",
+        "Employee reads",
+        "Claim drafts",
+        "Draft reference lookup",
+        "Submission and withdrawal",
+        "Review and correction",
+        "Receipt content",
+        "Payment batches"
+      ]
+    },
+    {
+      "module": "identity",
+      "source": "docs/modules/identity.md",
+      "sourceSha256": "e40ee330209efbcbfeaa35e5f43af60e7770dc8dfbdd078c4d759394b0578244",
+      "requirements": [
+        {
+          "id": "identity.01",
+          "text": "Own accounts, sessions, invitations, OIDC links, MFA, memberships, roles, and permission assignments.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "identity.02",
+          "text": "Use verified issuer/subject for OIDC. Local invitations and recovery tokens are single-use. Web cookies use HttpOnly/Secure and CSRF; mobile refresh rotation detects reuse. Privileged accounts require MFA and sensitive actions recent authentication.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "identity.03",
+          "text": "Group/company administration, HR, manager, finance, auditor, and employee have explicit action/resource scopes. Disabling account or membership revokes that access without granting payroll access through administrative role names.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "identity.04",
+          "text": "Screens: users, roles, company assignments, SSO configuration, active sessions.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "identity.05",
+          "text": "Acceptance: cross-company/resource denial, refresh replay/revocation, invitation reuse, stale memberships, CSRF, and secret-free diagnostics.",
+          "status": "unverified",
+          "evidence": []
+        }
+      ],
+      "detailedContractSections": [
+        "Implementation status",
+        "Native sessions",
+        "Account session administration",
+        "Native session cleanup",
+        "OIDC",
+        "Company role templates",
+        "Global account administration",
+        "Invitations and password recovery"
+      ]
+    },
+    {
+      "module": "leave",
+      "source": "docs/modules/leave.md",
+      "sourceSha256": "367812f16776a1c1a168eaf53509f38632c6013d6187f6c63fce15da3a34db37",
+      "requirements": [
+        {
+          "id": "leave.01",
+          "text": "Own leave types, effective policy, accrual, carryover, expiry, requests, cancellations, and balance ledger.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "leave.02",
+          "text": "Ledger entries record grants, reservations, consumption, expiry, and reversal. Submit reserves; approval consumes; reject/cancel releases exactly once. Eligibility uses employment, working schedule, partial days, overlap, attachment, and available balance.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "leave.03",
+          "text": "Snapshot policy and duration on submission. Approved cancellation follows approval. HR can act on behalf with a reason. Closed-payroll changes become adjustments rather than rewriting snapshots.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "leave.04",
+          "text": "Screens: requests, balance ledger, team calendar, policies, balance adjustments, entitlement processing.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "leave.05",
+          "text": "Acceptance: simultaneous requests cannot overspend balance; replay and cancellation cannot double-release; holidays/partial days/overnight shifts and period cutoff behave correctly.",
+          "status": "unverified",
+          "evidence": []
+        }
+      ],
+      "detailedContractSections": [
+        "Implementation status",
+        "Administrative policy review",
+        "Attachments",
+        "Balance adjustment review",
+        "Entitlements and year closing",
+        "Company entitlement batches",
+        "Administrative request preparation",
+        "Employee application discovery",
+        "Employee request preparation",
+        "Entitlement batch preparation",
+        "Team and company calendar"
+      ]
+    },
+    {
+      "module": "payroll",
+      "source": "docs/modules/payroll.md",
+      "sourceSha256": "588c37e093bc8e51a4958bb0f7729937fd89447f19eef7d2d02ed10e47b9b072",
+      "requirements": [
+        {
+          "id": "payroll.01",
+          "text": "Own effective compensation, component/tax classification, periods, rule packs, snapshots, calculation revisions, approval/finalization, payslips, payment export/reconciliation, and amendments.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "payroll.02",
+          "text": "Monthly permanent/fixed-term resident/nonresident employees, including WNA, are supported in IDR. Contract category does not determine tax status. Components include fixed/variable earnings, bonus, THR, overtime, approved unpaid leave, proration, deductions, and employer/employee contributions. Support gross/net/gross-up.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "payroll.03",
+          "text": "Versioned statutory policies cover PPh 21 TER/final-period reconciliation, domestic PPh 26, and applicable BPJS bases/caps/eligibility. Treat treaty/tax equalization/daily-piecework/sector incentives as separately supported rule packs. Missing required policy/input blocks calculation. Use BigDecimal with explicit statutory rounding points.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "payroll.04",
+          "text": "Run: draft -> calculated -> reviewed/approved -> finalized -> payment processing -> paid. Worker checkpoints per bounded batch. Freeze input versions and line-level results; input revisions invalidate approval. Finalized runs change only through referenced amendments. Payment references prevent duplicate accounting.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "payroll.05",
+          "text": "Screens: compensation, periods, run progress/errors, period comparison, employee detail, approval, payslips, payment batches, reconciliation.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "payroll.06",
+          "text": "Acceptance: official golden fixtures, resident/nonresident/year-end/start-exit cases, annualization where applicable, TER with THR/bonus, gross-up convergence, BPJS limits, rounding, cancellation/restart, parallel finalization, and historical immutability.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "payroll.07",
+          "text": "Sources: https://jdih.kemenkeu.go.id/dok/pp-58-tahun-2023 ; https://jdih.kemenkeu.go.id/dok/pmk-168-tahun-2023 ; https://www.pajak.go.id/id/pph-pasal-26 ; https://www.bpjsketenagakerjaan.go.id/penerima-upah.html . Verify effective regulations and derive reviewed fixtures during implementation.",
+          "status": "unverified",
+          "evidence": []
+        }
+      ],
+      "detailedContractSections": [
+        "Implementation status"
+      ]
+    },
+    {
+      "module": "people",
+      "source": "docs/modules/people.md",
+      "sourceSha256": "36bf0045a90eab5251382370d01db6960fb9d5183b5ca35630516b4059d1d25e",
+      "requirements": [
+        {
+          "id": "people.01",
+          "text": "Own companies, branches, departments, positions, cost centers, people, employments, reporting lines, and effective-dated changes.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "people.02",
+          "text": "Separate global person/account identity from company employee number, contract, and salary. Support administrative onboarding, probation, contract extension, transfers, and offboarding. A cross-company transfer creates a new employment and preserves the old history.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "people.03",
+          "text": "Foreign identity/document expiry and tax residency are separate attributes. Import supports preview, field errors, duplicate detection, and row outcomes. Referenced historical data is archived rather than destroyed.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "people.04",
+          "text": "Screens: company/employee directories, organization structure, employee tabs, import, scheduled changes.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "people.05",
+          "text": "Acceptance: concurrent employee number uniqueness, effective-dated history, company-reference constraints, safe import replay, and historical payroll unchanged.",
+          "status": "unverified",
+          "evidence": []
+        }
+      ],
+      "detailedContractSections": [
+        "Owned profile synchronization",
+        "Implementation status",
+        "Personal profiles",
+        "Scheduled employment changes",
+        "Cross-company transfers",
+        "Lifecycle checklists",
+        "Employee imports",
+        "Account binding",
+        "Dashboard employee creation",
+        "Lifecycle template dashboard",
+        "Lifecycle case and task dashboard",
+        "Mobile employment discovery",
+        "Company employee directory",
+        "Public coworker synchronization"
+      ]
+    },
+    {
+      "module": "reporting",
+      "source": "docs/modules/reporting.md",
+      "sourceSha256": "7175d44bedebf83eea118c38eac5e4f319792b187249b48acd01225be8535b1f",
+      "requirements": [
+        {
+          "id": "reporting.01",
+          "text": "Own read models, metric definitions, scoped queries, asynchronous exports, and export retention.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "reporting.02",
+          "text": "Reports cover headcount/employments, attendance exceptions, leave, overtime, expenses, and payroll costs. Group reports only aggregate authorized companies. Distinguish unique persons from employment count.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "reporting.03",
+          "text": "Historical reports use corresponding snapshots. Run large exports in bounded batches and recheck access on download. Saved filters never grant access. Reporting cannot mutate operational data.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "reporting.04",
+          "text": "Screens: role overview, report catalogue, filters, drill-down, export history.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "reporting.05",
+          "text": "Acceptance: totals reconcile, row/resource isolation, historical definitions, export interruption, bounded memory, and expired export access.",
+          "status": "unverified",
+          "evidence": []
+        }
+      ],
+      "detailedContractSections": [
+        "Current delivery",
+        "Implementation and acceptance record"
+      ]
+    },
+    {
+      "module": "workforce",
+      "source": "docs/modules/workforce.md",
+      "sourceSha256": "14c9fc0e7ba4ef870a93656b19635ca91936c9fddad3e1fcfb4b9c7abcefaa4e",
+      "requirements": [
+        {
+          "id": "workforce.01",
+          "text": "Own work calendars, holidays, shift templates, rosters, immutable attendance events, corrections, verification, overtime, and period closing.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "workforce.02",
+          "text": "Shift IDs and work dates anchor overnight events. Raw timestamps retain captured and server-received times and device evidence. Offline events remain pending verification. HR corrections require actor/reason and append an adjustment. Location evidence is evaluated against the applicable policy.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "workforce.03",
+          "text": "Overtime separates requested/actual/approved time. A payroll cutoff requires resolution of relevant exceptions. Workforce exposes factual time; leave remains separately owned and reporting/payroll combine through repository contracts.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "workforce.04",
+          "text": "Screens: roster, daily attendance, exceptions, offline verification, corrections, overtime, and closing.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "workforce.05",
+          "text": "`GET /workforce/me/employments` selects only employments linked to the current\naccount, under `attendance.self.record`, `workforce.read`, `overtime.self.manage`,\n`overtime.read` or `overtime.manage`. Its bounded directory\nreturns employee number, status, observed version, company date and timezone;\npersonal profiles are not included. The endpoint belongs to Workforce availability,\nso disabling People does not prevent employees from opening their work calendar\nor overtime. Discovery does not grant calendar, profile or other employees' access.\nCompany access, credential versions and current MFA are rechecked after waiting\nand after acquisition. Subsequent calendar and overtime reads authorize independently.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "workforce.06",
+          "text": "Administrative selection uses `GET /workforce/employees?asOf=yyyy-MM-dd`, under\n`workforce.read`, with at most 50 employee references per page and bounded search.\nIt returns only ID, employee number, legal name, employment status and version.\nThe People feature's availability and profile permissions remain independent.\nThe page separately advertises `bulkRosterSupported`; this API capability does\nnot grant management access. Clients treat its absence on an older API as false.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "workforce.07",
+          "text": "`GET /workforce/employees/{id}/calendar/review?from=...&until=...` returns that\nreference, the resolved calendar, and the weekly assignment effective at `from`.\nOne shared schedule/people/access transaction keeps its component queries coherent.\nThe global `scheduleVersion` includes future assignments; `assignmentAtStart`\nretains the applicable date, revision and original shift snapshots. A roster day's\norigin/version distinguishes an explicit day off from holiday or weekly time off.\nThe review requires `workforce.read`; self/team calendar readers retain their\nexisting endpoint and scope. Missing and foreign employment IDs share one error.\nAll reads recheck current session assurance after waiting and release their guards\non cancellation. These observations do not reserve a later write: commands still\nrequire current authority, selected shift versions and the observed schedule or\nroster version.",
+          "status": "unverified",
+          "evidence": []
+        },
+        {
+          "id": "workforce.08",
+          "text": "Acceptance: duplicate/offline events, checkout across midnight, timezone transitions, overlapping roster, immutable corrections, concurrent verification, and unverified records excluded from payroll.",
+          "status": "unverified",
+          "evidence": []
+        }
+      ],
+      "detailedContractSections": [
+        "Implementation status",
+        "Roster reset contract",
+        "Monthly attendance closing",
+        "Closed attendance adjustments",
+        "Overtime requests"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "communications.email",
+      "status": "missing",
+      "requirement": "Communications channel delivery: FCM/email failures do not erase inbox.",
+      "evidence": [
+        "modules/communications/domain/build.gradle.kts: includes core.push.domain but no core.mail.domain",
+        "modules/communications/data/src/main/kotlin/dev/fajar/hris/communications/data/di/CommunicationsConfiguration.kt: push delivery bindings only",
+        "apps/worker/src/main/kotlin/dev/fajar/hris/worker/mail/IdentityMailWorker.kt: existing SMTP queue belongs to identity credentials",
+        "modules/communications/domain/src/main/kotlin/dev/fajar/hris/communications/domain/usecases/DeliverInboxPush.kt: device push delivery only"
+      ],
+      "next": "Implement explicit announcement email selection, atomic post-publication queue, bounded SMTP dispatch with live recipient access, administrative observations, and failure/replay coverage."
+    }
+  ],
+  "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",
+  "physicalIphone": "explicitly waived by user",
+  "productionDeployment": "not requested; configuration observations remain distinct from feature implementation"
+}

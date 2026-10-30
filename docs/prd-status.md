@@ -1,13 +1,21 @@
 # Current PRD review
 
-Reviewed 29 October 2026. The implementation queue for this development pass is
-reconciled for the eleven initial module areas, Mobile coverage and HTTPS links.
-The subsequent release-configuration audit below reproduced and corrected concrete
-build failures; its reusable port passed local packaging and independent full CI.
-The user waived physical iPhone tests. Actual domain activation, APNs, physical GPS and production operation
-remain separate target observations; this is not a production-release declaration.
-[Completion](completion.md) preserves detailed history; [handoff](agent-handoff.md)
-contains current sources, device delivery and runtime preservation instructions.
+Review reopened 30 October 2026 against all eleven initial module contracts and
+Mobile features. Announcement email delivery is confirmed missing; the previous
+module-level summary does not establish full feature completion. The requirement
+inventory and remaining review are active. The earlier distribution audit passed
+its local packaging and independent CI checks. Physical iPhone testing remains
+waived; deployment/provider observations retain their separate scope.
+[Completion](completion.md) preserves history and [handoff](agent-handoff.md)
+identifies current work and runtime ownership.
+
+## Reopened feature audit — 30 October
+
+The user requested proof that every feature is finished. The [full feature audit](feature-audit-2026-10-30.md)
+is active. Communications email notifications are confirmed missing: current
+announcement delivery implements Inbox/FCM, while the SMTP path serves identity
+only. Earlier module-level summaries below are not complete requirement-by-requirement
+acceptance. Implement the missing channel and continue auditing the remaining scope.
 
 ## Release-configuration audit — accepted
 

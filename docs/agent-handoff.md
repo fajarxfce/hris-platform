@@ -1,9 +1,22 @@
 # Agent continuation — HRIS workspace
 
-Updated 29 October 2026 (UTC). The user authorized continuing the PRD, pushing every
-atomic commit and keeping handoffs in Git. The release-configuration audit and Starter port below passed; physical/production observations remain separate. Read `AGENTS.md`, this page and [PRD status](prd-status.md),
+Updated 30 October 2026 (UTC). The user requested verification and completion of
+all specified features, with every atomic commit pushed and handoffs retained in
+Git. The full audit is active after finding missing announcement email delivery.
+Earlier distribution/native acceptance remains valid for its recorded scope. Read `AGENTS.md`, this page and [PRD status](prd-status.md),
 then the affected module contract. The [archived history](agent-history-2026-10-29.md)
 preserves earlier work; its old next-step statements are not the active queue.
+
+## Active goal — full feature completion audit
+
+On 30 October the user asked whether all features are complete and requested a
+long run for anything unfinished. The full requirement review is active; earlier
+completion paragraphs below describe their previous increments. A confirmed gap
+is Communications email delivery: Inbox/FCM exists, while SMTP currently serves
+identity only. Read the [feature audit](feature-audit-2026-10-30.md) and its tracked
+inventory. Implement and verify that capability, then continue reviewing every
+module and Mobile requirement. No live SMTP configuration or production deployment
+is needed to complete its implementation and owned fixture acceptance.
 
 ## Current user direction — 29 October 2026
 

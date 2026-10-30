@@ -89,9 +89,10 @@ visually inspected. Existing CSS specificity and bundle-size warnings remain.
 reproductions, suite indexes, counts and hashes. Mobile `7f352cfd` and `41fe79f9` implement the encrypted catalog upgrade and
 initial-upload metadata; `e2690fd6` adds first definitive rejection recovery.
 `3ce42fed` adds header/history/correction transport and `966e883c` adds encrypted
-metadata/history with per-resource read admission. Current root checks, dev APK,
-1,912 desktop and 164 Document Chromium cases pass. Native read orchestration,
-versioned correction/history UI, owned emulator/API/storage and final Apple/full
+metadata/history with per-resource read admission. `f282b027` adds admitted local reads,
+finite acquisition and the assembled detail/history screen. Root checks, dev APK,
+1,927 desktop and 177 Document Chromium cases pass in 197.437s. Versioned corrections
+with durable original-command recovery, owned emulator/API/storage and final Apple/full
 native checks remain next.
 Schema-103 restore now passes in 57.356 seconds with 42 recovery-tool tests;
 [recovery evidence](measurements/document-metadata-recovery-2026-10-30.json) retains

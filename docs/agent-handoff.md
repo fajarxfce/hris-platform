@@ -194,11 +194,19 @@ adds encrypted metadata/history and per-resource read admission. Both are pushed
 Current root checks, dev APK and Document browser suites pass in 184.621s: 1,912
 desktop and 164 browser cases. Actual SQLite/IndexedDB tests retain 1,000 immutable
 revisions and verify exact-page reads, restart, scope, lost keys, cancellation,
-competing writes and pending/failed admission storage. Native read orchestration,
-detail/history UI and durable correction commands remain next. These changes reuse
-existing database/credential contracts and require no Starter implementation port.
+competing writes and pending/failed admission storage. These changes reuse existing
+storage contracts and require no Starter implementation port.
 
-Next: Mobile owned metadata details/history and observed-version corrections with
+Mobile `f282b027` adds admitted reads and the assembled detail/history route. Thirteen
+domain and two UI cases cover ownership, finite paging, legacy support, cancellation,
+offline history and denial recovery. Two reproduced publication failures now retain
+an earlier denial when company policy expires during local storage. Root quality,
+dev APK and Document browser suites pass in 197.437s: 1,927 desktop and 177 browser
+cases, all without failures/errors/skips. Mobile Git retains exact cases, source/APK
+hashes and earlier compilation/method-length corrections. This commit is pushed;
+versioned corrections and durable original-command recovery remain in progress.
+
+Next: Mobile observed-version corrections with
 durable original-command recovery. Keep shared finance/leave evidence free of
 private identity numbers. Verify
 Android, Apple and owned emulator behavior before accepting `documents.02` or

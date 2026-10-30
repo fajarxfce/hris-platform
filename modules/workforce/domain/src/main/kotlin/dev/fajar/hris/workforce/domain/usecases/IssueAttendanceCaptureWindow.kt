@@ -54,10 +54,11 @@ class IssueAttendanceCaptureWindow(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val accountAccess = (authority as Result.Success).value
             val authorized =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, accountAccess, clock.instant(), security)
             if (authorized is Result.Failed) return@run authorized
             val live = (authorized as Result.Success).value
             val permission = live.requirePermission("attendance.self.record")
@@ -79,10 +80,12 @@ class IssueAttendanceCaptureWindow(
             if (employee.person.accountId != live.accountId)
                 return@run Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
             (replay as Result.Success).value?.let { receipt ->
-                return@run attendance.findWindow(company, receipt.id).flatMap {
-                    if (it == null)
+                return@run attendance.findWindow(company, receipt.id).flatMap { window ->
+                    if (window == null)
                         Result.Failed(Failure(FailureKind.CONFLICT, "capture_window_unavailable"))
-                    else Result.Success(it)
+                    else
+                        validateCompanySessionActor(actor, accountAccess, clock.instant(), security)
+                            .map { window }
                 }
             }
             if (!employee.terms.isWorkingOn(today))
@@ -103,7 +106,12 @@ class IssueAttendanceCaptureWindow(
                     now.plusSeconds(120),
                 )
             attendance.issueWindow(company, window).flatMap {
-                operations.record(actor, key, MutationReceipt(window.id, 0)).map { window }
+                operations
+                    .record(actor, key, MutationReceipt(window.id, 0))
+                    .flatMap {
+                        validateCompanySessionActor(actor, accountAccess, clock.instant(), security)
+                    }
+                    .map { window }
             }
         }
     }

@@ -36,13 +36,25 @@ after every required job passes. No newer business correction is deployed.
 
 The inventory remains 41 accepted / 20 unverified. Administration's complete
 [ten-job evidence](measurements/administration-full-ci-2026-10-30.json) is accepted.
-Next run Workforce's prepared 27 regressions against unchanged production source,
-then fix confirmed failures and finish all eight rows. The
-[Workforce audit](workforce-audit-2026-10-30.md) preserves the intentionally distinct
-overtime receipt contract. Local draft files live in `.work/workforce-audit-2026-10-30`;
-none has been applied yet. Follow with full Mobile/Starter review. The read-only
-foundation comparison found 657 identical shared files and 60 differences awaiting
-classification; no unproved generic port is due merely because paths differ.
+Workforce's 27 actual SQL regressions reproduced 24 genuine failures plus three
+already-correct controls. The correction passes five focused API suites and pure
+domain tests in 100.808s, including atomic rollback and original-operation recovery.
+See [the audit](workforce-audit-2026-10-30.md),
+[eight-row review](workforce-feature-review-2026-10-30.md) and
+[measurements](measurements/workforce-assurance-2026-10-30.json). Run the prepared
+broad command in `.work/workforce-audit-2026-10-30/broad-command.json`, then four
+normal actual browser workflows and `work-periods` with the real worker. Preserve
+the distinct overtime minimal-receipt contract. Complete source CI after the current
+Reporting/Payroll run terminates; do not cancel it.
+
+Follow with full Mobile/Starter review. The read-only foundation comparison found
+657 identical shared files and 60 differences; examined implementation differences
+are HRIS session/feed/API policy, branding and configuration. Remaining test/catalog
+classification is retained under `.work/mobile-starter-audit-2026-10-30`. Mobile
+application/test sources match accepted CI `d170810f`; Starter implementation matches
+accepted `77063862`, with the separately proved hidden-artifact upload follow-up.
+No additional generic port is established. Some Mobile local-first provider status
+paragraphs are stale: actual Android FCM and Google acceptance are already recorded.
 
 ## Retained acceptance history
 

@@ -65,14 +65,15 @@ use the corresponding schedule/roster version and recover explicitly after an
 unknown response. The daily editor also restores the underlying calendar through
 the reviewed reset command described below. The [bulk editing API](../roster-bulk.md)
 provides bounded before/after review and an atomic multi-employee/date command;
-its dashboard remains the next delivery step.
+its dashboard provides the same reviewed preview, atomic application and explicit
+receipt recovery.
 The mobile employee
 application provides its own [weekly calendar](https://github.com/fajarxfce/hris-mobile/blob/main/docs/workforce.md)
 with a bounded encrypted offline snapshot. Its attendance route also supports
 foreground location evidence, online capture windows, encrypted offline commands,
 process restoration and idempotent retry. Employee mobile screens distinguish a
-saved command, server receipt and pending/accepted attendance. Overtime commands
-remain a separate mobile increment.
+saved command, server receipt and pending/accepted attendance. Overtime planning, actual-time submission and withdrawal also retain encrypted
+working copies and original commands through offline restart and response loss.
 
 Calendar precedence is explicit roster, active holiday, then the effective weekly pattern. A null roster shift means an explicit day off. Calendars distinguish work, off, and unassigned dates. Overnight shifts retain their starting work date. Nonexistent DST local times return a dated validation failure; ambiguous local times use the earlier offset and elapsed UTC minutes. Calendar reads are bounded to 62 days and holiday queries to 366 days.
 
@@ -153,7 +154,8 @@ company-wide exception queue adds bounded date/status filters, paginated review
 and links to the independently authorized day view. Resolved pairs leave the
 queue; later pending evidence on a corrected day remains visible for review.
 
-Overtime requests, actual-time submission, independent staged review, withdrawal, and closed-period snapshots are implemented. Reviewed roster reset is implemented in the API, dashboard and mobile sync. Reviewed bulk editing is implemented and validated in the API and dashboard. Late payroll adjustments and lifecycle cleanup remain in progress. Accepted attendance totals are factual inputs; they are not a finalized payroll result.
+Overtime requests, actual-time submission, independent staged review, withdrawal, and closed-period snapshots are implemented. Reviewed roster reset is implemented in the API, dashboard and mobile sync. Reviewed bulk editing is implemented and validated in the API and dashboard. [Payroll amendments](../payroll-amendments.md) consume explicit retained source revisions;
+[scheduled offboarding](../offboarding-schedules.md) owns employment lifecycle cleanup. Accepted attendance totals are factual inputs; they are not a finalized payroll result.
 
 ## Monthly attendance closing
 
@@ -213,10 +215,10 @@ current company/team authority and MFA remain required through completion and
 receipt recovery. Exact revisions and bounded history retain the existing
 Workforce read scopes.
 
-Targeted API/PostgreSQL, domain, worker, contract and build checks passed. Explicit
-payroll source selection, the dashboard adjustment workflow and native acceptance
-remain in progress. Existing payroll calculations continue to use their original
-frozen sources.
+Explicit payroll source selection, dashboard adjustment and native offline
+synchronization have recorded acceptance in [adjustments](../attendance-adjustments.md)
+and [Payroll amendments](../payroll-amendments.md). Existing payroll calculations
+continue to use their original frozen sources.
 
 
 ## Overtime requests
@@ -299,3 +301,15 @@ employment version and calendar preconditions, without retaining display names o
 shift metadata. Repository mapping rejects inconsistent reviews and receipts that
 do not identify the new request at revision zero. Read acquisition and mapping
 share the HTTP failure boundary, including cancellation and late responses.
+
+## Completion audit — 30 October 2026
+
+The [assurance correction](../workforce-audit-2026-10-30.md) closes 24 reproduced
+reader/command/receipt, weekly-input and current-stage delegation failures. Private
+results and interactive commands require valid session proof after the last
+acquisition or write under their existing guards. Weekly input is detached before
+waits. New overtime decisions require valid current-stage eligibility through
+completion; original minimal receipt recovery remains independent of expired
+delegation and requires current session/permission. No worker MFA or capture-window
+time policy changes. [The requirement review](../workforce-feature-review-2026-10-30.md)
+tracks the remaining broad/browser/full-CI acceptance.

@@ -48,10 +48,11 @@ class ListWorkforceEmployees(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val accountAccess = (authority as Result.Success).value
             val authorized =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, accountAccess, clock.instant(), security)
             if (authorized is Result.Failed) return@run authorized
             val permission =
                 (authorized as Result.Success).value.requirePermission("workforce.read")
@@ -80,6 +81,10 @@ class ListWorkforceEmployees(
                         },
                         page.nextCursor,
                     )
+                }
+                .flatMap { value ->
+                    validateCompanySessionActor(actor, accountAccess, clock.instant(), security)
+                        .map { value }
                 }
         }
     }

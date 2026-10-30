@@ -6704,3 +6704,14 @@ actual normal browser scenarios passed in 47.453s and three worker scenarios in
 138.372s, including setup. Retained reports/package hashes and owned-fixture cleanup
 are in [measurements](measurements/payroll-assurance-2026-10-30.json). Full source CI
 `41087903927` remains running. Continue Workforce/Mobile/Starter; no rollout occurred.
+
+### 30 October 2026 — Workforce completion correction
+
+Twenty-seven actual SQL regressions produced 24 genuine failures and three
+already-correct controls in 60.302s. Corrected focused API/domain and quality checks
+pass in 100.808s. Eight readers/seven commands recheck completion proof; weekly
+input remains stable across waits; new overtime decisions retain original-stage
+eligibility through commit. Original overtime receipt recovery and capture-window
+policy remain unchanged. [Measurements](measurements/workforce-assurance-2026-10-30.json)
+and [requirement review](workforce-feature-review-2026-10-30.md) retain remaining
+broad/browser/full-CI gates. No live deployment occurred.

@@ -79,10 +79,11 @@ class ReviewAttendance(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val accountAccess = (authority as Result.Success).value
             val authorized =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, accountAccess, clock.instant(), security)
             if (authorized is Result.Failed) return@run authorized
             val live = (authorized as Result.Success).value
             if (
@@ -101,7 +102,13 @@ class ReviewAttendance(
             if (!canReviewAttendance(live, (current as Result.Success).value, original.accountId))
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "attendance_review_denied"))
             (replay as Result.Success).value?.let {
-                return@run Result.Success(it)
+                return@run validateCompanySessionActor(
+                        actor,
+                        accountAccess,
+                        clock.instant(),
+                        security,
+                    )
+                    .map { _ -> it }
             }
             val period = requireNotNull((periodResult as Result.Success).value)
             if (
@@ -153,6 +160,14 @@ class ReviewAttendance(
                                     mapOf("decision" to decision.name),
                                     reason,
                                 ),
+                            )
+                        }
+                        .flatMap {
+                            validateCompanySessionActor(
+                                actor,
+                                accountAccess,
+                                clock.instant(),
+                                security,
                             )
                         }
                         .map { receipt }

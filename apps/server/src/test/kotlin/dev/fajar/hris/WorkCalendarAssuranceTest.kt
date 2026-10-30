@@ -4,6 +4,7 @@ import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.*
 import dev.fajar.hris.organization.domain.repositories.CompanyRepository
+import dev.fajar.hris.people.domain.entities.*
 import dev.fajar.hris.people.domain.repositories.PeopleRepository
 import dev.fajar.hris.workforce.domain.entities.*
 import dev.fajar.hris.workforce.domain.repositories.*
@@ -46,7 +47,31 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                 "roster",
             ]
     )
-    fun expiryDuringAnAccountWaitCannotAuthorizeCalendarReadsWritesOrReceiptReplay(mode: String) {
+    fun expiryDuringAnAccountWaitCannotAuthorizeCalendarReadsWritesOrReceiptReplay(mode: String) =
+        exerciseCompletion(mode, false)
+
+    @ParameterizedTest
+    @ValueSource(
+        strings =
+            [
+                "shifts",
+                "shift-detail",
+                "self-directory",
+                "employee-directory",
+                "calendar-review",
+                "holidays",
+                "holiday-detail",
+                "calendar",
+                "save-shift",
+                "save-holiday",
+                "weekly",
+                "roster",
+            ]
+    )
+    fun expiryAfterAcquisitionCannotAuthorizeCalendarDataOrCommands(mode: String) =
+        exerciseCompletion(mode, true)
+
+    private fun exerciseCompletion(mode: String, completion: Boolean) {
         val f = isolatedFixture()
         val shift = createShift(f)
         val holiday = if (mode == "holiday-detail") createHoliday(f) else null
@@ -98,11 +123,88 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                 100.0,
                 null,
             )
+        var expire = completion
+        var advanced = false
+        fun advance() {
+            if (expire && !advanced) {
+                clock.set(clock.instant().plusSeconds(2))
+                advanced = true
+            }
+        }
+        fun advanceRead() {
+            if (mode !in setOf("save-shift", "save-holiday", "weekly", "roster")) advance()
+        }
+        val observedSchedules =
+            object : ScheduleRepository by schedules {
+                override fun findShift(companyId: UUID, id: UUID) =
+                    schedules.findShift(companyId, id).also { advanceRead() }
+
+                override fun findHoliday(companyId: UUID, id: UUID) =
+                    schedules.findHoliday(companyId, id).also { advanceRead() }
+
+                override fun shifts(companyId: UUID, query: String, after: String?, limit: Int) =
+                    schedules.shifts(companyId, query, after, limit).also { advanceRead() }
+
+                override fun holidays(companyId: UUID, from: LocalDate, until: LocalDate) =
+                    schedules.holidays(companyId, from, until).also { advanceRead() }
+
+                override fun calendar(
+                    companyId: UUID,
+                    employeeId: UUID,
+                    from: LocalDate,
+                    until: LocalDate,
+                ) = schedules.calendar(companyId, employeeId, from, until).also { advanceRead() }
+            }
+        val observedPeople =
+            object : PeopleRepository by people {
+                override fun list(
+                    companyId: UUID,
+                    accountId: UUID,
+                    visibility: EmployeeVisibility,
+                    asOf: LocalDate,
+                    accessAt: Instant,
+                    query: String,
+                    after: String?,
+                    limit: Int,
+                ): Result<Page<Employee>> =
+                    people
+                        .list(companyId, accountId, visibility, asOf, accessAt, query, after, limit)
+                        .also { advanceRead() }
+            }
+        val observedJournal =
+            object : ChangeJournalRepository by journal {
+                override fun record(actor: Actor, change: ChangeRecord) =
+                    journal.record(actor, change).also { advance() }
+            }
+        fun snapshot() =
+            listOf(
+                    "shift_templates",
+                    "shift_revisions",
+                    "schedule_versions",
+                    "schedule_assignments",
+                    "roster_days",
+                    "roster_revisions",
+                    "work_holidays",
+                    "holiday_revisions",
+                    "work_periods",
+                    "operation_receipts",
+                    "audit_entries",
+                    "outbox_events",
+                    "mobile_sync_changes",
+                )
+                .associateWith { table ->
+                    database()
+                        .queryForList(
+                            "select to_jsonb(t)::text from $table t where company_id=? order by 1",
+                            String::class.java,
+                            f.company,
+                        )
+                }
         fun invoke(current: Actor): Result<*> =
             when (mode) {
                 "employee-directory" ->
                     ListWorkforceEmployees(
-                            people,
+                            observedPeople,
                             companies,
                             members,
                             identities,
@@ -113,8 +215,8 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                         .execute(current, day, "", null, 50)
                 "calendar-review" ->
                     GetEmployeeCalendarReview(
-                            schedules,
-                            people,
+                            observedSchedules,
+                            observedPeople,
                             companies,
                             members,
                             identities,
@@ -125,7 +227,7 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                         .execute(current, f.employee, day, day)
                 "self-directory" ->
                     ListSelfWorkforceEmployments(
-                            people,
+                            observedPeople,
                             companies,
                             members,
                             identities,
@@ -136,7 +238,7 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                         .execute(current, null, 20)
                 "shifts" ->
                     ListShifts(
-                            schedules,
+                            observedSchedules,
                             companies,
                             members,
                             identities,
@@ -147,7 +249,7 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                         .execute(current, "", null, 50)
                 "shift-detail" ->
                     GetShift(
-                            schedules,
+                            observedSchedules,
                             companies,
                             members,
                             identities,
@@ -158,7 +260,7 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                         .execute(current, shift)
                 "holidays" ->
                     ListWorkHolidays(
-                            schedules,
+                            observedSchedules,
                             companies,
                             members,
                             identities,
@@ -169,7 +271,7 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                         .execute(current, day.minusMonths(1), day)
                 "holiday-detail" ->
                     GetWorkHoliday(
-                            schedules,
+                            observedSchedules,
                             companies,
                             members,
                             identities,
@@ -180,8 +282,8 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                         .execute(current, requireNotNull(holiday))
                 "calendar" ->
                     GetEmployeeCalendar(
-                            schedules,
-                            people,
+                            observedSchedules,
+                            observedPeople,
                             companies,
                             members,
                             identities,
@@ -192,9 +294,9 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                         .execute(current, f.employee, day, day)
                 "save-shift" ->
                     SaveShift(
-                            schedules,
+                            observedSchedules,
                             operations,
-                            journal,
+                            observedJournal,
                             companies,
                             members,
                             identities,
@@ -206,9 +308,9 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                 "save-holiday" ->
                     SaveWorkHoliday(
                             periods,
-                            schedules,
+                            observedSchedules,
                             operations,
-                            journal,
+                            observedJournal,
                             companies,
                             members,
                             identities,
@@ -226,10 +328,10 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                 "weekly" ->
                     AssignWeeklySchedule(
                             periods,
-                            schedules,
-                            people,
+                            observedSchedules,
+                            observedPeople,
                             operations,
-                            journal,
+                            observedJournal,
                             companies,
                             members,
                             identities,
@@ -249,10 +351,10 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                 else ->
                     SetRosterDay(
                             periods,
-                            schedules,
-                            people,
+                            observedSchedules,
+                            observedPeople,
                             operations,
-                            journal,
+                            observedJournal,
                             companies,
                             members,
                             identities,
@@ -270,22 +372,29 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                             "Calendar assurance",
                         )
             }
+        val before = snapshot()
         val barrier = AccountLockProbe.Barrier(account)
-        accountProbe.current.set(barrier)
+        if (!completion) accountProbe.current.set(barrier)
         val result =
             Executors.newSingleThreadExecutor().use { pool ->
                 val pending = pool.submit<Result<*>> { invoke(actor) }
                 try {
-                    assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
-                    clock.set(clock.instant().plusSeconds(2))
-                    barrier.release.countDown()
+                    if (!completion) {
+                        assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                        clock.set(clock.instant().plusSeconds(2))
+                        barrier.release.countDown()
+                    }
                     pending.get(10, TimeUnit.SECONDS)
                 } finally {
                     barrier.release.countDown()
                     accountProbe.current.set(null)
                 }
             }
+        expire = false
+        if (completion)
+            assertTrue(advanced, "The selected acquisition/completion boundary was not reached")
         assertEquals("mfa_required", (result as? Result.Failed)?.failure?.code, mode)
+        assertEquals(before, snapshot())
         assertEquals(
             0,
             database()
@@ -317,5 +426,84 @@ class WorkCalendarAssuranceTest : WorkforceAccessApiFixture() {
                     ),
             )
         }
+    }
+
+    @org.junit.jupiter.api.Test
+    fun admittedWeeklyDaysRemainTheSameAcrossAnAccountWait() {
+        val f = isolatedFixture()
+        val shift = createShift(f)
+        database()
+            .update(
+                "update accounts set mfa_secret_encrypted='fixture-enrolled' where id=?",
+                f.actor.accountId,
+            )
+        val actor = f.actor.copy(mfaVerifiedAt = clock.instant())
+        val day = LocalDate.parse("2026-10-01")
+        val admitted = mapOf(DayOfWeek.THURSDAY to ShiftReference(shift, 0))
+        val input = admitted.toMutableMap()
+        val key = UUID.randomUUID()
+        val command =
+            AssignWeeklySchedule(
+                periods,
+                schedules,
+                people,
+                operations,
+                journal,
+                companies,
+                members,
+                identities,
+                transactions,
+                IdentitySecurityPolicy(),
+                clock,
+            )
+        fun invoke(days: Map<DayOfWeek, ShiftReference>) =
+            command.execute(actor, key, f.employee, day, days, null, "Weekly assignment")
+        val barrier = AccountLockProbe.Barrier(actor.accountId)
+        accountProbe.current.set(barrier)
+        val accepted =
+            Executors.newSingleThreadExecutor().use { pool ->
+                val pending = pool.submit<Result<MutationReceipt>> { invoke(input) }
+                try {
+                    assertTrue(barrier.entered.await(5, TimeUnit.SECONDS))
+                    input.clear()
+                    barrier.release.countDown()
+                    pending.get(10, TimeUnit.SECONDS)
+                } finally {
+                    barrier.release.countDown()
+                    accountProbe.current.set(null)
+                }
+            }
+        assertTrue(accepted is Result.Success, accepted.toString())
+        val stored = transactions.run(actor) { schedules.calendar(f.company, f.employee, day, day) }
+        assertTrue(stored is Result.Success, stored.toString())
+        val assignment = (stored as Result.Success).value.assignments.single()
+        assertEquals(
+            admitted,
+            assignment.days.mapValues { ShiftReference(it.value.id, it.value.revision) },
+        )
+        val before =
+            database()
+                .queryForList(
+                    "select to_jsonb(t)::text from schedule_assignments t where company_id=? order by 1",
+                    String::class.java,
+                    f.company,
+                )
+        assertEquals(
+            (accepted as Result.Success).value.copy(replayed = true),
+            (invoke(admitted) as Result.Success).value,
+        )
+        assertEquals(
+            before,
+            database()
+                .queryForList(
+                    "select to_jsonb(t)::text from schedule_assignments t where company_id=? order by 1",
+                    String::class.java,
+                    f.company,
+                ),
+        )
+        assertEquals(
+            "operation_payload_mismatch",
+            (invoke(emptyMap()) as Result.Failed).failure.code,
+        )
     }
 }

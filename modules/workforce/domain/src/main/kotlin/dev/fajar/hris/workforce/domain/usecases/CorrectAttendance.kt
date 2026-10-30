@@ -91,10 +91,11 @@ class CorrectAttendance(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val accountAccess = (authority as Result.Success).value
             val authorized =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, accountAccess, clock.instant(), security)
             if (authorized is Result.Failed) return@run authorized
             val live = (authorized as Result.Success).value
             val permission = live.requirePermission("attendance.correct")
@@ -110,7 +111,13 @@ class CorrectAttendance(
             if (employee.person.accountId == actor.accountId)
                 return@run Result.Failed(Failure(FailureKind.FORBIDDEN, "self_correction_denied"))
             replay.value?.let {
-                return@run Result.Success(it)
+                return@run validateCompanySessionActor(
+                        actor,
+                        accountAccess,
+                        clock.instant(),
+                        security,
+                    )
+                    .map { _ -> it }
             }
             val valid =
                 validateAttendanceCorrection(date, clockIn, clockOut, breakMinutes, reason, now)
@@ -180,6 +187,9 @@ class CorrectAttendance(
                                 reason,
                             ),
                         )
+                    }
+                    .flatMap {
+                        validateCompanySessionActor(actor, accountAccess, clock.instant(), security)
                     }
                     .map { receipt }
             }

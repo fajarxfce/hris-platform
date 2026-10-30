@@ -55,41 +55,50 @@ class GetEmployeeAttendance(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val accountAccess = (authority as Result.Success).value
             val authorized =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, accountAccess, clock.instant(), security)
             if (authorized is Result.Failed) return@run authorized
             val live = (authorized as Result.Success).value
-            people.find(company, employeeId, until).flatMap { employee ->
-                if (employee == null)
-                    return@flatMap Result.Failed(
-                        Failure(FailureKind.NOT_FOUND, "employee_not_found")
-                    )
-                people.findAtInstant(company, employeeId, clock.instant()).flatMap { current ->
-                    if (
-                        !canReadWorkforce(live, employee, current) &&
-                            !canReviewAttendance(live, current, employee.person.accountId)
-                    )
-                        Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
-                    else
-                        attendance.entries(company, employeeId, from, until).flatMap { entries ->
-                            corrections.latest(company, employeeId, from, until).map { changes ->
-                                val byDate = entries.groupBy { it.capture.workDate }
-                                val correctedDates = changes.associateBy { it.workDate }
-                                (0..java.time.temporal.ChronoUnit.DAYS.between(from, until)).map {
-                                    day ->
-                                    val date = from.plusDays(day)
-                                    summarizeAttendance(
-                                        date,
-                                        byDate[date].orEmpty(),
-                                        correctedDates[date],
-                                    )
+            people
+                .find(company, employeeId, until)
+                .flatMap { employee ->
+                    if (employee == null)
+                        return@flatMap Result.Failed(
+                            Failure(FailureKind.NOT_FOUND, "employee_not_found")
+                        )
+                    people.findAtInstant(company, employeeId, clock.instant()).flatMap { current ->
+                        if (
+                            !canReadWorkforce(live, employee, current) &&
+                                !canReviewAttendance(live, current, employee.person.accountId)
+                        )
+                            Result.Failed(Failure(FailureKind.NOT_FOUND, "employee_not_found"))
+                        else
+                            attendance.entries(company, employeeId, from, until).flatMap { entries
+                                ->
+                                corrections.latest(company, employeeId, from, until).map { changes
+                                    ->
+                                    val byDate = entries.groupBy { it.capture.workDate }
+                                    val correctedDates = changes.associateBy { it.workDate }
+                                    (0..java.time.temporal.ChronoUnit.DAYS.between(from, until))
+                                        .map { day ->
+                                            val date = from.plusDays(day)
+                                            summarizeAttendance(
+                                                date,
+                                                byDate[date].orEmpty(),
+                                                correctedDates[date],
+                                            )
+                                        }
                                 }
                             }
-                        }
+                    }
                 }
-            }
+                .flatMap { value ->
+                    validateCompanySessionActor(actor, accountAccess, clock.instant(), security)
+                        .map { value }
+                }
         }
     }
 }

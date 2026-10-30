@@ -1,65 +1,62 @@
-# Workforce audit in progress
+# Workforce completion audit
 
-Read-only review began at Payroll source `cca5e151` while its broad suite runs.
-The eight Workforce inventory rows remain unverified. No Workforce test or
-implementation has changed in this audit yet. Findings below are source hypotheses
-until reproduced with actual SQL and existing fixtures.
+The 27 actual SQL regressions reproduced 24 behavior failures against unchanged
+production source at `a5927e5d` in 60.302 seconds. Three calendar controls were
+already correct. No compilation/setup/fixture failure is counted as a defect.
+The corrected five API suites and Workforce domain tests pass in 100.808s,
+alongside architecture/format checks. See [measurements](measurements/workforce-assurance-2026-10-30.json)
+and the [eight-row requirement review](workforce-feature-review-2026-10-30.md).
+Broad API/worker/browser and complete source CI remain pending.
 
-## Completion assurance to reproduce
+## Confirmed failures and correction
 
-The older shift/holiday list and detail readers, employee calendar, employee
-attendance, correction history and administrative employee directory check session
-assurance before acquisition but have no final proof check. Reuse
-`WorkCalendarAssuranceTest`, `AttendanceAssuranceTest` and their actual database
-fixtures to expire proof after the selected acquisition. Newer self-directory,
-calendar review, bulk/reset and adjustment readers already contain completion
-checks; preserve them as controls where applicable.
+Eight older readers released shifts, holidays, calendar/attendance/correction
+history or administrative employee references after proof expired during the
+last acquisition. Seven commands could commit after expiry during journal or
+receipt persistence. Four attendance receipt paths also acquired ownership or
+window data after their original proof check. The use cases now retain their
+already-guarded account access and validate session proof at completion. Failed
+results roll back the existing transaction; no second account query is added.
+Full SQL row snapshots verify unchanged business heads, histories, receipts,
+audit/outbox and mobile changes after rejection. Renewed proof recovers the same
+operation and its original receipt.
 
-Weekly assignment, shift/holiday save, ordinary attendance record/review/correction
-and capture-window issuance return after persistence or journal work without a
-final session check. Capture and window receipt paths also acquire ownership or
-stored window data after their initial assurance check. Reproduce these boundaries
-before changing them; immediate receipts with no intervening acquisition need no
-additional database query. Account locks already protect current enrollment.
+Weekly assignment could fingerprint a populated day map, then persist an empty
+schedule when the caller cleared that map during an account wait. It now detaches
+the bounded enum-keyed map before any wait and consistently uses the snapshot for
+identity, shift acquisition and persistence. The regression verifies actual
+persisted days, exact original replay and rejection of a changed payload.
 
-`AssignWeeklySchedule` fingerprints the input map before waiting, then iterates
-its original values and entries afterward. Reproduce mutation of that map during
-an account wait and verify exact persisted input and original-operation replay.
-Bulk selection and closed-adjustment decisions already use detached sorted input.
+Four overtime cases accepted APPROVE/REJECT after delegation expired during
+candidate acquisition or journal completion. Decisions now use the time after
+acquisition and revalidate the original stage at transaction completion. The
+regression intentionally assigns the delegate to a later stage as well: that
+future assignment cannot authorize this stage. Renewal recovers the original
+operation; rollback preserves every business/approval/history row.
 
-## Overtime decisions and receipt contract
+## Preserved contracts and controls
 
-New `DecideOvertimeRequest` decisions capture their time before beneficiary,
-delegation and candidate acquisition. Final completion rechecks MFA but does not
-recheck delegation eligibility. Reproduce expiry during those acquisitions and
-journal completion for approval/rejection, with transaction rollback and renewal.
-Current-stage candidate grants are acquired after the relevant account locks;
-there is no established account-grant race in this path yet.
+Self-employment discovery, calendar review and daily roster completion already
+rejected expiry; their three controls remain passing. Newer reset/bulk, closed-day
+adjustment and period closing/recovery retain their existing completion contracts.
 
-Preserve the explicit original-receipt behavior in
-`OvertimeDelegationHttpTest.aDelegateRequiresLiveSourceAuthorityButACompletedDecisionKeepsItsReceipt`:
-a completed actor's minimal original receipt remains recoverable after delegation
-expires, while private request detail becomes unavailable. Do not impose another
-module's receipt policy on this established recovery contract. Replaying a receipt
-does not apply another decision or grant private read access.
+The explicit overtime receipt behavior remains unchanged: a completed actor's
+minimal original receipt is recoverable after delegation expires while current
+session/permission still authorizes recovery. Private details authorize separately.
+Both the existing HTTP test and new multi-stage tests verify this behavior; receipt
+replay never makes another decision. Other modules' receipt rules are not imported.
 
-`AdvanceWorkPeriodClose` intentionally uses durable worker authority. Do not add
-interactive MFA to it. Attendance capture/window admission has its documented
-post-resource/access-wait decision time; do not change capture expiry or received
-at semantics merely because session proof must survive through completion.
+Attendance capture/window admission keeps its documented decision timestamp;
+this change does not alter captured/received time or extend a replayed window.
+`AdvanceWorkPeriodClose` remains durable worker work without interactive MFA.
+No schema, DI, transport or repository-query change is introduced.
 
-## Documentation and remaining coverage
+## Remaining acceptance
 
-The module's older paragraphs call bulk dashboard editing, Mobile overtime and
-closed-attendance/payroll-source selection unfinished. Bulk editing is already
-implemented later in the same contract and in [roster bulk](roster-bulk.md).
-Inspect the current adjustment, Payroll and Mobile source and retained native
-acceptance before classifying those historical statements as missing features.
-
-Finish the eight initial rows and all detailed sections: shifts/calendars/roster,
-raw offline evidence and independent corrections, exception queues, closed-period
-adjustments, overtime, durable closing/recovery and employee synchronization.
-Verify duplicate/offline events, overnight/DST schedules, overlapping rosters,
-immutable corrections, concurrent review and exclusion of unverified facts from
-payroll. Run final relevant API/domain/data/worker and actual browser acceptance,
-then complete source CI and the full Mobile/Starter review.
+Complete the broad API/domain and actual worker context, both application packages,
+four normal browser scenarios (`calendars`, `roster-bulk`, `attendance`, `overtime`)
+and the `work-periods` worker scenario, which includes closed-day adjustments.
+Preserve their reports and source/package hashes, then run full source CI without
+cancelling Reporting/Payroll CI `41087903927`. Finish Mobile/applicable Starter
+review before closing the full goal. Historical native evidence is identified in
+the requirement review; no fresh native execution is inferred from backend tests.

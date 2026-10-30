@@ -116,14 +116,14 @@ class DecideOvertimeRequest(
                 return@run Result.Failed(Failure(FailureKind.CONFLICT, "overtime_not_pending"))
             val mutable = requireMutablePeriod(period)
             if (mutable is Result.Failed) return@run mutable
-            val now = clock.instant()
             val beneficiaryResult = people.accountForEmployee(company, employeeId)
             if (beneficiaryResult is Result.Failed) return@run beneficiaryResult
             val beneficiary = (beneficiaryResult as Result.Success).value
-            val delegations = approvals.delegations(company, actor.accountId, now)
+            val delegations = approvals.delegations(company, actor.accountId, clock.instant())
             if (delegations is Result.Failed) return@run delegations
             val candidates = members.candidates(company, assignees, emptySet(), assignees.size)
             if (candidates is Result.Failed) return@run candidates
+            val now = clock.instant()
             val decided =
                 decideApproval(
                     approval,
@@ -191,6 +191,17 @@ class DecideOvertimeRequest(
                         .flatMap { operations.record(actor, key, receipt) }
                         .flatMap {
                             validateCompanySessionActor(actor, access, clock.instant(), security)
+                                .flatMap { current ->
+                                    decideApproval(
+                                        approval,
+                                        current,
+                                        decision,
+                                        reason,
+                                        delegations.value,
+                                        candidates.value,
+                                        clock.instant(),
+                                    )
+                                }
                         }
                         .map { receipt }
                 }

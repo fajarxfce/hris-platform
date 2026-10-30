@@ -46,6 +46,7 @@ class AssignWeeklySchedule(
                 reason.length > 1000
         )
             return Result.Failed(Failure(FailureKind.VALIDATION, "invalid_schedule_change"))
+        val commandDays = java.util.Map.copyOf(days)
         val key =
             OperationKey(
                 "workforce.schedule_assign",
@@ -55,9 +56,9 @@ class AssignWeeklySchedule(
                     effectiveFrom.toString(),
                     version?.toString(),
                     reason,
-                    days.size.toString(),
+                    commandDays.size.toString(),
                 ) +
-                    days.entries
+                    commandDays.entries
                         .sortedBy { it.key.value }
                         .flatMap {
                             listOf(it.key.name, it.value.id.toString(), it.value.version.toString())
@@ -84,10 +85,11 @@ class AssignWeeklySchedule(
             if (memberGuard is Result.Failed) return@run memberGuard
             val accountGuard = identities.lockAccount(actor.accountId, shared = true)
             if (accountGuard is Result.Failed) return@run accountGuard
+            val authority = identities.access(actor.accountId, company)
+            if (authority is Result.Failed) return@run authority
+            val accountAccess = (authority as Result.Success).value
             val authorized =
-                identities.access(actor.accountId, company).flatMap {
-                    validateCompanySessionActor(actor, it, clock.instant(), security)
-                }
+                validateCompanySessionActor(actor, accountAccess, clock.instant(), security)
             if (authorized is Result.Failed) return@run authorized
             val live = (authorized as Result.Success).value
             val permission = live.requirePermission("workforce.manage")
@@ -105,7 +107,7 @@ class AssignWeeklySchedule(
             if ((employee as Result.Success).value?.terms?.isWorkingOn(effectiveFrom) != true)
                 return@run Result.Failed(Failure(FailureKind.VALIDATION, "employee_unavailable"))
             val snapshots = mutableMapOf<ShiftReference, ShiftSnapshot>()
-            for (reference in days.values.distinct()) {
+            for (reference in commandDays.values.distinct()) {
                 val found = schedules.findShift(company, reference.id)
                 if (found is Result.Failed) return@run found
                 val shift =
@@ -124,7 +126,7 @@ class AssignWeeklySchedule(
                     actor,
                     employeeId,
                     effectiveFrom,
-                    days.mapValues { snapshots.getValue(it.value) },
+                    commandDays.mapValues { snapshots.getValue(it.value) },
                     version,
                     reason,
                 )
@@ -141,6 +143,14 @@ class AssignWeeklySchedule(
                                     mapOf("effectiveFrom" to effectiveFrom.toString()),
                                     reason,
                                 ),
+                            )
+                        }
+                        .flatMap {
+                            validateCompanySessionActor(
+                                actor,
+                                accountAccess,
+                                clock.instant(),
+                                security,
                             )
                         }
                         .map { receipt }

@@ -1,0 +1,484 @@
+{
+  "date": "2026-10-30",
+  "status": "24 reproduced failures corrected; focused acceptance passed; broad/browser/full CI pending",
+  "baselineSource": "a5927e5d023f3921ebfd37e0d92d6451a84fe783",
+  "baseline": {
+    "command": [
+      "./gradlew",
+      ":apps:server:test",
+      "--tests",
+      "dev.fajar.hris.WorkCalendarAssuranceTest.expiryAfterAcquisitionCannotAuthorizeCalendarDataOrCommands",
+      "--tests",
+      "dev.fajar.hris.WorkCalendarAssuranceTest.admittedWeeklyDaysRemainTheSameAcrossAnAccountWait",
+      "--tests",
+      "dev.fajar.hris.AttendanceAssuranceTest.expiryAfterAcquisitionCannotReleaseAttendanceDataOrCommands",
+      "--tests",
+      "dev.fajar.hris.AttendanceAssuranceTest.receiptCompletionStillRequiresProofAfterItsFinalAcquisition",
+      "--tests",
+      "dev.fajar.hris.OvertimeDelegationCompletionTest",
+      "--no-daemon"
+    ],
+    "cwd": "/home/fajar/hris/hris-platform",
+    "sourceAtInvocation": "a5927e5d023f3921ebfd37e0d92d6451a84fe783",
+    "startedAt": "2026-10-30T16:32:49.646873+00:00",
+    "elapsed_seconds": 60.302,
+    "exit_code": 1
+  },
+  "baselineReports": {
+    "api": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.AttendanceAssuranceTest",
+          "tests": "10",
+          "failures": "10",
+          "errors": "0",
+          "skipped": "0",
+          "time": "18.582",
+          "sha256": "c7b9c4d851e74533b5a6c523988765c20112e6cfe7794c5cdf38a5d5c6d1a3c1",
+          "failuresDetail": [
+            {
+              "name": "[1] mode = \"window\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=AttendanceCaptureWindow(id=5e776db8-3830-4e84-a0a2-defce8ba26b9, employeeId=10150d75-20b7-4682-8af2-e7d3f49ff297, accountId=1646ac95-319d-48f3-9ea2-b9c84a9bc908, deviceId=99d4c7d5-e310-452a-a4dd-356a5140cc28, issuedAt=2026-10-01T03:00:00Z, expiresAt=2026-10-01T03:02:00Z, consumedBy=null)) ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[2] mode = \"capture\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=6e2a2ba4-49ee-4740-ad69-d723f4b9129b, version=0, replayed=true)) ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[3] mode = \"review\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=6aff7505-8571-434f-84bc-30d732722d75, version=1, replayed=true)) ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[4] mode = \"correction\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=20aa9bcb-7b55-4824-8440-40c8a5833efe, version=0, replayed=true)) ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[1] mode = \"window\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=AttendanceCaptureWindow(id=47ffc989-c582-4126-b75f-ff9b848328bc, employeeId=d45c8525-c7f2-486a-bdd3-30023a933d6a, accountId=42ebfb89-2368-4491-97cb-e828583bfd71, deviceId=c8b86b8a-4199-454f-bf27-7d3acd64b424, issuedAt=2026-10-01T03:00:00Z, expiresAt=2026-10-01T03:02:00Z, consumedBy=null)) ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[2] mode = \"capture\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=f66d7147-3dc0-42eb-a78e-6f6c65365dfd, version=0, replayed=false)) ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[3] mode = \"review\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=9cfcd6d8-9bb5-493d-918a-4eca92c73204, version=1, replayed=false)) ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[4] mode = \"correction\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=518a3d5b-9875-4ad5-bb5f-67850faf8c56, version=0, replayed=false)) ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[5] mode = \"days\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=[AttendanceDay(workDate=2026-10-01, entries=[], acceptedMinutes=0, pendingCount=0, incomplete=false, correction=null)]) ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[6] mode = \"history\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=Page(items=[], nextCursor=null)) ==> expected: <mfa_required> but was: <null>"
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeDelegationCompletionTest",
+          "tests": "4",
+          "failures": "4",
+          "errors": "0",
+          "skipped": "0",
+          "time": "9.738",
+          "sha256": "460ca81cb2010fbc9121527add973a63abfc0979c03adfd3f139759644b231a7",
+          "failuresDetail": [
+            {
+              "name": "[1] decision = \"APPROVE\", boundary = \"candidates\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=f2419a9d-ffe2-4a05-a525-c106a95ad7e8, version=2, replayed=false)) ==> expected: <not_assigned_approver> but was: <null>"
+            },
+            {
+              "name": "[2] decision = \"REJECT\", boundary = \"candidates\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=2376735b-21e4-47b5-8c7f-7b53a5789887, version=2, replayed=false)) ==> expected: <not_assigned_approver> but was: <null>"
+            },
+            {
+              "name": "[3] decision = \"APPROVE\", boundary = \"journal\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=2a2a38a7-e3a0-41fe-b3c7-a8a19199c82d, version=2, replayed=false)) ==> expected: <not_assigned_approver> but was: <null>"
+            },
+            {
+              "name": "[4] decision = \"REJECT\", boundary = \"journal\"",
+              "failure": "org.opentest4j.AssertionFailedError: Success(value=MutationReceipt(id=112b34ba-4097-4c74-9933-1604604985df, version=2, replayed=false)) ==> expected: <not_assigned_approver> but was: <null>"
+            }
+          ]
+        },
+        {
+          "name": "dev.fajar.hris.WorkCalendarAssuranceTest",
+          "tests": "13",
+          "failures": "10",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.8",
+          "sha256": "0dfe749ef0afa1fe1ec235927c9bdb9d23981904c6cc1ab9978cdeea107c4ca2",
+          "failuresDetail": [
+            {
+              "name": "admittedWeeklyDaysRemainTheSameAcrossAnAccountWait()",
+              "failure": "org.opentest4j.AssertionFailedError: expected: <{THURSDAY=ShiftReference(id=ab94cfcd-b49d-43c7-8457-02fd99562bc6, version=0)}> but was: <{}>"
+            },
+            {
+              "name": "[1] mode = \"shifts\"",
+              "failure": "org.opentest4j.AssertionFailedError: shifts ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[2] mode = \"shift-detail\"",
+              "failure": "org.opentest4j.AssertionFailedError: shift-detail ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[4] mode = \"employee-directory\"",
+              "failure": "org.opentest4j.AssertionFailedError: employee-directory ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[6] mode = \"holidays\"",
+              "failure": "org.opentest4j.AssertionFailedError: holidays ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[7] mode = \"holiday-detail\"",
+              "failure": "org.opentest4j.AssertionFailedError: holiday-detail ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[8] mode = \"calendar\"",
+              "failure": "org.opentest4j.AssertionFailedError: calendar ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[9] mode = \"save-shift\"",
+              "failure": "org.opentest4j.AssertionFailedError: save-shift ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[10] mode = \"save-holiday\"",
+              "failure": "org.opentest4j.AssertionFailedError: save-holiday ==> expected: <mfa_required> but was: <null>"
+            },
+            {
+              "name": "[11] mode = \"weekly\"",
+              "failure": "org.opentest4j.AssertionFailedError: weekly ==> expected: <mfa_required> but was: <null>"
+            }
+          ]
+        }
+      ],
+      "totals": {
+        "tests": 27,
+        "failures": 24,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "genuineFailures": 24,
+  "existingControls": [
+    "self employment directory completion",
+    "employee calendar review completion",
+    "roster mutation completion"
+  ],
+  "fixtureErrors": 0,
+  "correction": [
+    "Retain the existing account access snapshot under guards and check session proof after the last acquisition/write",
+    "Check original attendance receipts after their final ownership/window acquisition",
+    "Detach weekly day-map input before any transaction wait and use it for fingerprint, queries and persistence",
+    "Decide overtime using the time after candidate acquisition and recheck original current-stage eligibility at transaction completion"
+  ],
+  "preservedContracts": [
+    "Minimal original overtime receipt remains recoverable after delegation expiry with current session/permission",
+    "Attendance capture-window admission/receivedAt semantics unchanged; replay never extends expiry",
+    "No new repository acquisition, schema, DI, transport or worker MFA requirement"
+  ],
+  "format": {
+    "command": [
+      "./gradlew",
+      "format",
+      "--no-daemon"
+    ],
+    "cwd": "/home/fajar/hris/hris-platform",
+    "sourceAtInvocation": "a5927e5d023f3921ebfd37e0d92d6451a84fe783",
+    "startedAt": "2026-10-30T16:34:24.725858+00:00",
+    "elapsed_seconds": 16.536,
+    "exit_code": 0
+  },
+  "focused": {
+    "command": [
+      "./gradlew",
+      ":apps:server:test",
+      "--tests",
+      "dev.fajar.hris.WorkCalendarAssuranceTest",
+      "--tests",
+      "dev.fajar.hris.AttendanceAssuranceTest",
+      "--tests",
+      "dev.fajar.hris.OvertimeDelegationCompletionTest",
+      "--tests",
+      "dev.fajar.hris.OvertimeDelegationHttpTest",
+      "--tests",
+      "dev.fajar.hris.OvertimeAssuranceTest",
+      ":modules:workforce:domain:test",
+      ":modules:workforce:data:test",
+      "architectureCheck",
+      "formatCheck",
+      "--no-daemon"
+    ],
+    "cwd": "/home/fajar/hris/hris-platform",
+    "sourceAtInvocation": "a5927e5d023f3921ebfd37e0d92d6451a84fe783",
+    "startedAt": "2026-10-30T16:35:01.410087+00:00",
+    "elapsed_seconds": 100.808,
+    "exit_code": 0,
+    "sourceNote": "Corrected working tree atop invocation HEAD, with tested file hashes below. Complete committed-source broad validation follows."
+  },
+  "focusedReports": {
+    "api": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.AttendanceAssuranceTest",
+          "tests": "16",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "22.191",
+          "sha256": "8bd67cc50652b6caacdc59a95edc66a788885ec366582fa66ea645f63759f54c",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeAssuranceTest",
+          "tests": "10",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.666",
+          "sha256": "58092cf8bac0222c5c41f15a26e214af5ac5807393d80c4bfb964ae4eda426f0",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeDelegationCompletionTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.544",
+          "sha256": "6b66b141e93dfefd1d0ab92fdb01a8cdd75693be65ff6958a814119a3655e221",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.OvertimeDelegationHttpTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "8.003",
+          "sha256": "801f795e0cd4f6ab64c9e1e3879a41b39bbae8ff8497ab457cfdd9cb671def96",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.WorkCalendarAssuranceTest",
+          "tests": "25",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "17.071",
+          "sha256": "9b298539b7795eb744ad24f1260dd6a250241b67649404b0af643710eb3925ca",
+          "failuresDetail": []
+        }
+      ],
+      "totals": {
+        "tests": 57,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "domain": {
+      "suites": [
+        {
+          "name": "dev.fajar.hris.workforce.domain.AttendanceAccessPolicyTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.055",
+          "sha256": "3f7053ec25458b9d86b62252e72d2568b26aa760dd3544808397efdcf20bef84",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.AttendanceAdjustmentPolicyTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.089",
+          "sha256": "6ff6375a36b828d25d0fa7844f4f4aa58f0bb5c27c76789e5763292d6f80b830",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.AttendanceExceptionPolicyTest",
+          "tests": "11",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.093",
+          "sha256": "4161d2ac707cb905e1f500744473ff53d2e85b5940fd477489c332f64109e00c",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.AttendancePolicyTest",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.024",
+          "sha256": "533aa3591fa56deee6150341bf83f52c48a0fbc1f5143e42a617866f6ccb9e85",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.CalendarPolicyTest",
+          "tests": "9",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.024",
+          "sha256": "b3a4b33dc73853c2961088d268384782437c767f1425fbc0a1e8a171a37adcf2",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.OvertimePlanningRevisionTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.006",
+          "sha256": "c3248bb6e956217297139ea9e86a34628c8f964867a4c72c4a89a789c9b7172b",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.OvertimePolicyTest",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.01",
+          "sha256": "ac9448cf0267f9fc5ab249fb2d42ba2a52d818280e95eaf256c11dc0eb38214a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.RosterBulkPolicyTest",
+          "tests": "11",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.02",
+          "sha256": "8565ec1a380cafa6d69b054ca71d9ed9f693742a009dbb610c64fe3750ac7c57",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.WorkPeriodActionsTest",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.003",
+          "sha256": "eebf0cbddfcb3b24a4cc4fe0fbd427a6f85af0380c8b25113aa3b1914254fc7a",
+          "failuresDetail": []
+        },
+        {
+          "name": "dev.fajar.hris.workforce.domain.WorkPeriodPolicyTest",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.006",
+          "sha256": "c52b24a82d9c6349df07613d61d82694af2c8478d1a551b6ad63f215fbe72f4a",
+          "failuresDetail": []
+        }
+      ],
+      "totals": {
+        "tests": 61,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "data": {
+      "suites": [],
+      "totals": {
+        "tests": 0,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "focusedSourceFiles": [
+    {
+      "path": "apps/server/src/test/kotlin/dev/fajar/hris/AttendanceAssuranceTest.kt",
+      "sha256": "9a035616dbd5ed44b2432bcba4621ac51c50679ceab67dd6af4b8b56154533c1"
+    },
+    {
+      "path": "apps/server/src/test/kotlin/dev/fajar/hris/WorkCalendarAssuranceTest.kt",
+      "sha256": "eaed1a8e5e13771782439448607e9d8dcb581f0cf248ebe3f084a5e370e93801"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/AssignWeeklySchedule.kt",
+      "sha256": "75600818552d901693df6ec80642db415db7accf10fd6b25661159a2f4488700"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/CorrectAttendance.kt",
+      "sha256": "c2cc69556181db384751e0717aad99a5f64573de60f05446b4414e5231c478ff"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/DecideOvertimeRequest.kt",
+      "sha256": "4cd46ccb17723c349e34d7b2cb29a38a32a5d0ecc6a0bef85d8b63e2892e1469"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/GetAttendanceCorrectionHistory.kt",
+      "sha256": "4b1f7da2648d773a1f24882ca4f4e4f1cfb211c15916cf82d86f39892da27ea7"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/GetEmployeeAttendance.kt",
+      "sha256": "219c1c740ee10155f717b2a33a51a712f707287bd5211e7545bde865c401fdfc"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/GetEmployeeCalendar.kt",
+      "sha256": "578d972dda421c782a96df750371348326d2cdc19aba5b683f526703a73a4fa6"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/GetShift.kt",
+      "sha256": "85cd94721c103528326b57c1b7a42f744f2c5d19d0c11c5ebc1ce89b7a74cca3"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/GetWorkHoliday.kt",
+      "sha256": "ceb6ab3c4db749f0d0a6a2caec05fedf6ea5d9b60a2cdfbc3f17075069958119"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/IssueAttendanceCaptureWindow.kt",
+      "sha256": "8ef107fe6518f214262176a841b941c44c37f359b20ec37c888fe78e32b8983f"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/ListShifts.kt",
+      "sha256": "7941d87d75ce858d3cc11c1231bdb3bf11e43c923b17ba6455bd2850c9b51181"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/ListWorkHolidays.kt",
+      "sha256": "a2f34c27ccdbc332545260381e65f776a4123944e29118e93ab016fde52d309e"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/ListWorkforceEmployees.kt",
+      "sha256": "ca9f9be5d8c279c12deb9ff45aac9d0ec341ff9bbbd82ee9d8c42f923af806f3"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/RecordAttendance.kt",
+      "sha256": "4949ffc7dceecffb30280348779ba08196a8abd2424f80e20a1639475d919f76"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/ReviewAttendance.kt",
+      "sha256": "1350808b1f45e3940327c94a16ea0bd00c64e295160e35bca12bcdb46cbfb079"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/SaveShift.kt",
+      "sha256": "e8652b7e525365708766f6f5ac1638004566947a5d9081e820c8fe1bc35a07ec"
+    },
+    {
+      "path": "modules/workforce/domain/src/main/kotlin/dev/fajar/hris/workforce/domain/usecases/SaveWorkHoliday.kt",
+      "sha256": "64980c594ea44d0640ad8307456bc87f3e1a28196e112bff1fb3fe3ef0bfe1aa"
+    },
+    {
+      "path": "apps/server/src/test/kotlin/dev/fajar/hris/OvertimeDelegationCompletionTest.kt",
+      "sha256": "c328252cdf827007abe2194c373c3b6a88d91b192962af8fda275d6eb75a257c"
+    }
+  ]
+}

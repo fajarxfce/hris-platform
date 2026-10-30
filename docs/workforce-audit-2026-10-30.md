@@ -1,5 +1,11 @@
 # Workforce completion audit
 
+Current result: all local broad/API/worker/browser checks and final source CI
+`41094285531` pass. The eight Workforce requirements are accepted, and the private
+API/worker update now serves verified `2c2a59e3`. Earlier pending statements below
+retain the audit sequence. See [final evidence](measurements/workforce-full-ci-2026-10-30.json)
+and [runtime acceptance](measurements/final-development-rollout-2026-10-30.json).
+
 The 27 actual SQL regressions reproduced 24 behavior failures against unchanged
 production source at `a5927e5d` in 60.302 seconds. Three calendar controls were
 already correct. No compilation/setup/fixture failure is counted as a defect.

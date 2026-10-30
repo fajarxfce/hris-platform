@@ -312,4 +312,5 @@ waits. New overtime decisions require valid current-stage eligibility through
 completion; original minimal receipt recovery remains independent of expired
 delegation and requires current session/permission. No worker MFA or capture-window
 time policy changes. [The requirement review](../workforce-feature-review-2026-10-30.md)
-tracks the remaining broad/browser/full-CI acceptance.
+records complete broad/browser acceptance and all ten passed jobs in final
+source CI `41094285531`; the eight initial requirements are accepted.

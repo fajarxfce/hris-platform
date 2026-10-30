@@ -1,8 +1,26 @@
 # Current private development runtime
 
-Started 29 October 2026 with the user's authorization to continue after installing
-the Android dev APK. This is a private development environment, not a production
-release or proof that the remaining PRD acceptance has passed.
+Started 29 October 2026 with the user's authorization after installing the Android
+dev APK. Current audited application and private runtime acceptance are recorded
+below; earlier rollout sections preserve their original sources and dates.
+
+## Final audit rollout — 30 October 2026
+
+The private API and worker now serve verified application `2c2a59e3`, covered by
+all ten jobs in final CI `41094285531` at `93438f99`. A fresh coordinated schema-103
+checkpoint verified database constraints/runtime roles, identity envelope recovery
+and actual storage objects before updating either image. The exact old API/worker
+images are retained. Captured existing containers were restarted directly; no
+migration dependency was invoked and the entire migration-history digest is unchanged.
+
+API/worker startup and API health pass. Existing dashboard `1e0522c0` returns HTTP
+200 with unchanged index bytes. Google/person bindings, active native session IDs,
+document revision fingerprint and person/document counts match the quiesced
+checkpoint. Runtime environments match and SMTP stays disabled. The installed
+Mobile application `3c6db4eb` remains unchanged; no phone UI or provider test was
+performed during this update. [Sanitized measurements](measurements/final-development-rollout-2026-10-30.json)
+record exact package/image hashes, retained rollback tags, checkpoint locations,
+verification results and elapsed time. Older rollout paragraphs below are historical.
 
 ## Current metadata rollout — 30 October 2026
 

@@ -2,56 +2,60 @@
 
 Updated 30 October 2026 (UTC). The user requested verification and completion of
 all specified features, with every atomic commit pushed and handoffs retained in
-Git. The full audit is active after finding missing announcement email delivery.
+Git. The full audit is complete after implementing the discovered gaps and validating every reviewed area.
 Earlier distribution/native acceptance remains valid for its recorded scope. Read `AGENTS.md`, this page and [PRD status](prd-status.md),
 then the affected module contract. The [archived history](agent-history-2026-10-29.md)
 preserves earlier work; its old next-step statements are not the active queue.
 
-Current runtime note: the private stack has now advanced to schema 103 and serves
-accepted API/worker packages plus dashboard snapshot `1e0522c0`. The checkpoint
-restart unexpectedly reran Compose's migration dependency; identity/session/binary
-fingerprints remained unchanged, and the accepted images were explicitly aligned.
-Restart each verified existing container with `docker start <container-id>`;
-this installed Compose version has no `start --no-deps` option. Read
-[current runtime](current-development-runtime.md#current-metadata-rollout--30-october-2026)
-and [measurements](measurements/metadata-development-rollout-2026-10-30.json) before
-using older schema-101 status paragraphs below. Phone APK is now application `3c6db4eb`; Mobile
-CI `41077194465` passed all four jobs and its installed binary hash is verified. Administration source corrections are not deployed.
+Current runtime: schema 103; API/worker application `2c2a59e3`, dashboard
+`1e0522c0`, installed Mobile application `3c6db4eb`. Read
+[current development runtime](current-development-runtime.md#final-audit-rollout--30-october-2026).
+Use captured container IDs with `docker start` for checkpoint restart; installed
+Compose has no `start --no-deps` and `compose start` can rerun migration dependencies.
+Earlier pending statements below are retained history, not a new queue.
 
-## Active goal — private runtime update and final handoffs
+## Completed feature audit — 30 October 2026
 
-All 61 initial Platform requirements and all eleven detailed module reviews are
-accepted. Mobile's fifteen-area review (`f4f101a1`) and Starter's applicable
-foundation review (`7605916`) are complete; no additional generic port is required.
-All ten jobs in [final Platform CI 41094285531](https://github.com/fajarxfce/hris-platform/actions/runs/41094285531) pass at
-`93438f99`, with downloaded backend/browser/recovery evidence in
-[measurements](measurements/workforce-full-ci-2026-10-30.json). There is no active
-CI or local test. Physical iPhone testing remains explicitly waived.
+All 61 initial Platform requirements and the eleven detailed module reviews are
+accepted, together with Mobile's fifteen-area review and the applicable Starter
+foundation. Every confirmed gap/correction has implementation and matching behavior
+evidence. [Final Platform CI 41094285531](https://github.com/fajarxfce/hris-platform/actions/runs/41094285531) passed all ten jobs at
+`93438f99`, with 3,090 API cases, 104 active worker cases, 1,111 mocked
+browser scenarios, 56 actual workflows and successful schema-103 recovery.
+[The inventory](measurements/feature-audit-2026-10-30.json) and
+[CI report](measurements/workforce-full-ci-2026-10-30.json) retain exact scope.
 
-GitHub returned stale step details even after the job/run completed successfully.
-The complete job log, all three source-matching browser reports and uploaded ZIP
-digest independently verify worker, storage, export, upload and cleanup completion.
-No cancellation or rerun occurred. [The observation](measurements/workforce-ci-reporting-lag-2026-10-30.json)
-retains raw inconsistent statuses and exact resolving evidence; they are not silently
-rewritten as completed metadata. The independent 41-case local diagnostic also passes.
+GitHub's step metadata lagged its successful terminal result. The final job log,
+source-matching browser reports and uploaded artifact digest independently verify
+all required steps, including cleanup. [The retained observation](measurements/workforce-ci-reporting-lag-2026-10-30.json)
+explains the raw pending step fields; no cancellation, rerun or source change was
+needed. The independent local 41-case diagnostic passed in 273.489s.
 
+The authorized private API/worker update is complete using verified application
+`2c2a59e3` packages after a fresh schema-103 recovery checkpoint. Both services
+started and API health returned UP; dashboard HTTP 200 and its exact index bytes
+are unchanged. Full migration history, restricted runtime roles, Google/person
+bindings, active native session IDs, document revision integrity and record counts
+are preserved. SMTP remains disabled. Old images and separate data/key checkpoints
+are retained; [rollout evidence](measurements/final-development-rollout-2026-10-30.json)
+records their locations and hashes. No production release was performed.
 
-The goal stays active until the authorized private development update and final
-Git handoffs are complete. Runtime still serves earlier schema-103 metadata images;
-use `.work/final-development-rollout/checkpoint.py` after announcing the brief
-restart. It saves a quiesced data set with separate keys and restarts captured
-container IDs without dependencies. Then run the prepared `deploy.py`, which
-requires accepted CI, verifies preserved `2c2a59e3` JARs and built-image hashes,
-retains old images, uses `compose up -d --no-deps api worker`, and checks runtime
-health, restricted DB roles, full migration/binding/session/document integrity,
-unchanged dashboard bytes and disabled SMTP. Both helpers are prepared, not run.
+Mobile review `f4f101a1` retains full CI `d170810f`/`41077194465`: 1,994 desktop,
+1,676 browser and 104 Apple cases plus complete Xcode/target builds. The normal
+private APK with application `3c6db4eb` is already installed; this backend update
+required no phone action. Starter review `7605916` retains accepted `77063862`/
+`40916187442` and the separately proved distribution upload correction. All 657
+identical shared files and 60 differences are reviewed; no generic port remains.
+Physical iPhone testing is waived, as requested. Actual Android Google/Home/FCM
+acceptance remains recorded; this rollout does not claim another provider test.
 
-The dashboard tree equals deployed `1e0522c0` and Mobile application `3c6db4eb`
-is already installed. No dashboard restage or phone installation is needed.
-The [Workforce review](workforce-feature-review-2026-10-30.md#approved-overtime-boundary)
-retains the explicit approved-overtime amendment boundary; no unspecified future
-extension is represented as implemented. Production release was not requested.
-Finish the update and all three handoffs, push each commit, then close the goal.
+The [approved-overtime boundary](workforce-feature-review-2026-10-30.md#approved-overtime-boundary)
+is explicit: the original PRD's immutable requested/actual/approved workflow,
+attendance adjustments and financial Payroll amendments are implemented. A future
+post-approval overtime-fact amendment has no defined product contract and is not
+represented as implemented. Public domain/DNS/TLS, signed Apple/APNs deployment,
+further tax/bank packs and production operation retain their documented separate
+scope. No specified implementation, source CI or owned local test remains pending.
 
 ## Retained acceptance history
 

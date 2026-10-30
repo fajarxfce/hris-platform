@@ -1,45 +1,53 @@
 # Feature completion audit — 30 October 2026
 
-The user asked whether **all features** are finished and instructed continued work
-where they are not. Completion is reopened against the product specification,
-each of its eleven module contracts, Mobile feature behavior and the applicable
-Starter foundation. Previous implementation and CI records are useful evidence,
-but do not prove an unreviewed or missing capability. The active goal is not
-limited to the distribution audit completed yesterday.
+The user's full feature audit is complete against the product specification,
+eleven module contracts, Mobile feature behavior and applicable Starter foundation.
+The inventory preserves original requirements, source hashes, discovered defects
+and their matching acceptance. Physical iPhone testing was explicitly waived;
+all three repositories retain their independently accepted implementation sources.
 
-The [inventory](measurements/feature-audit-2026-10-30.json) preserves exact initial
-module requirements and source hashes, plus detailed section names. Its unverified
-rows are not failed features; they await source and matching behavior review.
-Do not mark the goal complete until that review covers the full scope. Physical
-iPhone testing remains explicitly waived. Keep the accepted Google binding,
-installed phone, private keys and running development stack intact.
+## Completed feature audit — 30 October 2026
 
-## Implementation accepted — 30 October 2026
+All 61 initial Platform requirements and the eleven detailed module reviews are
+accepted, together with Mobile's fifteen-area review and the applicable Starter
+foundation. Every confirmed gap/correction has implementation and matching behavior
+evidence. [Final Platform CI 41094285531](https://github.com/fajarxfce/hris-platform/actions/runs/41094285531) passed all ten jobs at
+`93438f99`, with 3,090 API cases, 104 active worker cases, 1,111 mocked
+browser scenarios, 56 actual workflows and successful schema-103 recovery.
+[The inventory](measurements/feature-audit-2026-10-30.json) and
+[CI report](measurements/workforce-full-ci-2026-10-30.json) retain exact scope.
 
-All 61 initial Platform requirements and all eleven detailed module reviews are
-accepted. Mobile's fifteen-area review (`f4f101a1`) and Starter's applicable
-foundation review (`7605916`) are complete; no additional generic port is required.
-All ten jobs in [final Platform CI 41094285531](https://github.com/fajarxfce/hris-platform/actions/runs/41094285531) pass at
-`93438f99`, with downloaded backend/browser/recovery evidence in
-[measurements](measurements/workforce-full-ci-2026-10-30.json). There is no active
-CI or local test. Physical iPhone testing remains explicitly waived.
+GitHub's step metadata lagged its successful terminal result. The final job log,
+source-matching browser reports and uploaded artifact digest independently verify
+all required steps, including cleanup. [The retained observation](measurements/workforce-ci-reporting-lag-2026-10-30.json)
+explains the raw pending step fields; no cancellation, rerun or source change was
+needed. The independent local 41-case diagnostic passed in 273.489s.
 
-The goal stays active until the authorized private development update and final
-Git handoffs are complete. Runtime still serves earlier schema-103 metadata images;
-use `.work/final-development-rollout/checkpoint.py` after announcing the brief
-restart. It saves a quiesced data set with separate keys and restarts captured
-container IDs without dependencies. Then run the prepared `deploy.py`, which
-requires accepted CI, verifies preserved `2c2a59e3` JARs and built-image hashes,
-retains old images, uses `compose up -d --no-deps api worker`, and checks runtime
-health, restricted DB roles, full migration/binding/session/document integrity,
-unchanged dashboard bytes and disabled SMTP. Both helpers are prepared, not run.
+The authorized private API/worker update is complete using verified application
+`2c2a59e3` packages after a fresh schema-103 recovery checkpoint. Both services
+started and API health returned UP; dashboard HTTP 200 and its exact index bytes
+are unchanged. Full migration history, restricted runtime roles, Google/person
+bindings, active native session IDs, document revision integrity and record counts
+are preserved. SMTP remains disabled. Old images and separate data/key checkpoints
+are retained; [rollout evidence](measurements/final-development-rollout-2026-10-30.json)
+records their locations and hashes. No production release was performed.
 
-The dashboard tree equals deployed `1e0522c0` and Mobile application `3c6db4eb`
-is already installed. No dashboard restage or phone installation is needed.
-The [Workforce review](workforce-feature-review-2026-10-30.md#approved-overtime-boundary)
-retains the explicit approved-overtime amendment boundary; no unspecified future
-extension is represented as implemented. Production release was not requested.
-Finish the update and all three handoffs, push each commit, then close the goal.
+Mobile review `f4f101a1` retains full CI `d170810f`/`41077194465`: 1,994 desktop,
+1,676 browser and 104 Apple cases plus complete Xcode/target builds. The normal
+private APK with application `3c6db4eb` is already installed; this backend update
+required no phone action. Starter review `7605916` retains accepted `77063862`/
+`40916187442` and the separately proved distribution upload correction. All 657
+identical shared files and 60 differences are reviewed; no generic port remains.
+Physical iPhone testing is waived, as requested. Actual Android Google/Home/FCM
+acceptance remains recorded; this rollout does not claim another provider test.
+
+The [approved-overtime boundary](workforce-feature-review-2026-10-30.md#approved-overtime-boundary)
+is explicit: the original PRD's immutable requested/actual/approved workflow,
+attendance adjustments and financial Payroll amendments are implemented. A future
+post-approval overtime-fact amendment has no defined product contract and is not
+represented as implemented. Public domain/DNS/TLS, signed Apple/APNs deployment,
+further tax/bank packs and production operation retain their documented separate
+scope. No specified implementation, source CI or owned local test remains pending.
 
 ## Confirmed gap: announcement email
 

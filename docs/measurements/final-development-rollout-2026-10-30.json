@@ -1,0 +1,150 @@
+{
+  "date": "2026-10-30",
+  "status": "accepted",
+  "applicationSource": "2c2a59e3651e0e08023c40aff5ad9defb43642e2",
+  "fullCi": {
+    "runId": 41094285531,
+    "source": "93438f994c43b2bf15ee93120c90a1ea61745217",
+    "status": "success",
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41094285531"
+  },
+  "matchingSourceTrees": {
+    "apps": "4179112782de963c2067109ff5e1e0d1d3478237",
+    "core": "18b92ec2d379b0dc8b5628eeb3815b8b94e2eb5b",
+    "modules": "19987900cff7a1d26cf5777d516defde2584d060",
+    "build-logic": "0d5a7b212407442a05b1a8aecdbd324083013684",
+    "gradle": "848c7a4aedcf3e5cc24657b87cbc2c71272d6de8",
+    "tool": "0854cdd15d26cf32fcc53e2c721b5a22c1e6b256",
+    ".github": "db819d35e2f350b86e4b653abd7a66d0fa9a0610"
+  },
+  "runtime": {
+    "success": true,
+    "ciSource": "93438f994c43b2bf15ee93120c90a1ea61745217",
+    "applicationSource": "2c2a59e3651e0e08023c40aff5ad9defb43642e2",
+    "switched": true,
+    "images": {
+      "api": {
+        "image": "sha256:6b8baeceabfe581a95ebda35184c1680d535dc0efcad0bdbc5594e2b26aeb39e",
+        "packageSha256": "554aca16c3a2631372ac66b25637a97a9845b22be36f08cd684318e4be227314",
+        "packageBytes": 97522832
+      },
+      "worker": {
+        "image": "sha256:8fd602c5a9c23c716fffe86cd592d7fc1cfabbe722316515250acf5bed7f77d0",
+        "packageSha256": "8ae77d2cc6672433b5b1299eb484e460b64512944793e902e222a0655aea9e93",
+        "packageBytes": 77709672
+      }
+    },
+    "api": {
+      "container": "0de12fe59ecfef32ec5c0834fe60bcd8f28a484b982c31e3d0cb27a3d3379c4e",
+      "image": "sha256:6b8baeceabfe581a95ebda35184c1680d535dc0efcad0bdbc5594e2b26aeb39e",
+      "running": true,
+      "restartCount": 0,
+      "environmentPreserved": true,
+      "startupObserved": true,
+      "smtpDisabled": true
+    },
+    "worker": {
+      "container": "7e029c51b070e2440ebe6c05b30d3596002f8250cb8592c3bc2c4fc3e2f7da2f",
+      "image": "sha256:8fd602c5a9c23c716fffe86cd592d7fc1cfabbe722316515250acf5bed7f77d0",
+      "running": true,
+      "restartCount": 0,
+      "environmentPreserved": true,
+      "startupObserved": true,
+      "smtpDisabled": true
+    },
+    "apiHealthy": true,
+    "dashboardHealthy": true,
+    "dashboardIndexSha256": "e814551960cddc0eb0c523d35912c1f34bfedcba9591739acf969d3d98c053ee",
+    "schema": 103,
+    "integrityPreserved": true,
+    "garageContainerPreserved": true,
+    "elapsed_seconds": 58.863
+  },
+  "checkpoint": {
+    "success": true,
+    "backup_completed": true,
+    "failures": [],
+    "data_directory": "/home/fajar/.local/state/hris-platform/recovery-data/dev-before-final-audit-20261030T175925",
+    "keys_directory": "/home/fajar/.local/state/hris-platform/recovery-keys/dev-before-final-audit-20261030T175925",
+    "elapsed_seconds_including_restart": 8.559,
+    "databaseVerification": {
+      "schema": "103",
+      "failedMigrations": 0,
+      "publicRelations": 190,
+      "invalidConstraints": 0,
+      "runtimeRoles": [
+        "hris_app|f|f|f|f",
+        "hris_worker|f|f|f|f"
+      ],
+      "identityEnvelopesVerified": 1
+    },
+    "storageVerification": {
+      "objects": 1,
+      "bytes": 734,
+      "inventorySha256": "dd1f8498117412506134f705460504e5172e3b02067528eb1dde6c289fc309a5"
+    }
+  },
+  "retainedPreviousImages": {
+    "api": {
+      "container": "df4542a16dd0ac3ca37bb7b2f468463e42c3191eac255b2ed1ded97f9d613ce2",
+      "image": "sha256:a25f3a303095eb5ab8f0f1d1b9db2edbfd622c9d7989d1699012b35433e5c10b",
+      "retainedTag": "hris-dev-api:before-final-audit-20261030T180107",
+      "environmentFingerprint": "4fc94b4069b656997fc8ffdc2c74ab28c820a492770e6de46e81e27f0c1302c1"
+    },
+    "worker": {
+      "container": "3545658da6c6c44183d18d7e275833439beae9582ed776572a0b7e1869055a98",
+      "image": "sha256:9e77530e9222576b3053dfb0eff7e1d8c1f10232f097a3467d96ff4da694a0bc",
+      "retainedTag": "hris-dev-worker:before-final-audit-20261030T180107",
+      "environmentFingerprint": "c13757c33144151387fe0637ca5b62165b49957c66f3d742b215e9a3a6498fa5"
+    }
+  },
+  "packages": [
+    {
+      "path": ".work/workforce-audit-2026-10-30/packages/apps-server.jar",
+      "bytes": 97522832,
+      "sha256": "554aca16c3a2631372ac66b25637a97a9845b22be36f08cd684318e4be227314"
+    },
+    {
+      "path": ".work/workforce-audit-2026-10-30/packages/apps-worker.jar",
+      "bytes": 77709672,
+      "sha256": "8ae77d2cc6672433b5b1299eb484e460b64512944793e902e222a0655aea9e93"
+    }
+  ],
+  "integrityChecks": {
+    "schema103": true,
+    "noFailedMigrations": true,
+    "entireMigrationHistoryPreserved": true,
+    "restrictedRuntimeRolesPreserved": true,
+    "googleIdentityBindingsPreserved": true,
+    "employeeAccountBindingsPreserved": true,
+    "activeNativeSessionIdsPreserved": true,
+    "documentRevisionFingerprintPreserved": true,
+    "personAndDocumentCountsPreserved": true,
+    "runtimeEnvironmentPreserved": true,
+    "smtpDisabled": true
+  },
+  "dashboard": {
+    "source": "1e0522c0",
+    "action": "No restage: entire dashboard tree remains identical; HTTP 200 and before/after index SHA match."
+  },
+  "phone": {
+    "applicationSource": "3c6db4eb",
+    "action": "Unchanged accepted installed APK; no installation or UI interaction in this update.",
+    "earlierAcceptance": "docs/measurements/document-metadata-final-ci-2026-10-30.json"
+  },
+  "limits": [
+    "Private development update only; no production release.",
+    "No new Google sign-in or FCM delivery is claimed; their earlier actual acceptance remains source-scoped.",
+    "Physical iPhone testing explicitly waived; simulator and Xcode evidence remains in Mobile/Starter reviews."
+  ],
+  "preflightAddressCorrection": {
+    "initialCheck": "Dashboard loopback HTTP probe refused before any image build or service replacement.",
+    "cause": "The existing dashboard systemd unit explicitly binds 10.77.77.1:5173; API binds both loopback and WireGuard.",
+    "correction": "Use the existing WireGuard dashboard address for both before/after content checks.",
+    "verification": {
+      "dashboardHttpStatus": 200,
+      "apiHealthy": true,
+      "noImageBuildOrDeploymentBeforeCorrection": true
+    }
+  }
+}

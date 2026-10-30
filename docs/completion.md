@@ -1,5 +1,12 @@
 # End-to-end completion
 
+Current completion, 30 October 2026: all 61 initial Platform requirements and
+all detailed module/Mobile/applicable Starter reviews are accepted. Final CI and
+the private schema-103 API/worker update pass. Read [PRD status](prd-status.md),
+[the inventory](measurements/feature-audit-2026-10-30.json), and
+[the current handoff](agent-handoff.md); older pending statements in this ledger
+are historical and must not be treated as an active implementation queue.
+
 Use the [compact PRD status](prd-status.md) for the current module/acceptance map
 and active CI work. This document preserves the detailed implementation history.
 

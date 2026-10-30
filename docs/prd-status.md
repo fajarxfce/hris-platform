@@ -1,40 +1,53 @@
 # Current PRD review
 
-Review reopened 30 October 2026 against all eleven initial module contracts and
-Mobile features. The confirmed announcement email gap is implemented and locally accepted; the previous
-module-level summary does not establish full feature completion. The requirement
-inventory and remaining review are active. The earlier distribution audit passed
-its local packaging and independent CI checks. Physical iPhone testing remains
-waived; deployment/provider observations retain their separate scope.
-[Completion](completion.md) preserves history and [handoff](agent-handoff.md)
-identifies current work and runtime ownership.
+The review reopened on 30 October is complete for the specified current product
+and all eleven module contracts, Mobile features and applicable Starter foundation.
+The inventory retains exact requirements and source-scoped evidence. Physical
+iPhone testing remains waived; production release was not requested. Historical
+records below retain their dates/sources and do not override current completion.
 
-## Implementation accepted — 30 October 2026
+## Completed feature audit — 30 October 2026
 
-All 61 initial Platform requirements and all eleven detailed module reviews are
-accepted. Mobile's fifteen-area review (`f4f101a1`) and Starter's applicable
-foundation review (`7605916`) are complete; no additional generic port is required.
-All ten jobs in [final Platform CI 41094285531](https://github.com/fajarxfce/hris-platform/actions/runs/41094285531) pass at
-`93438f99`, with downloaded backend/browser/recovery evidence in
-[measurements](measurements/workforce-full-ci-2026-10-30.json). There is no active
-CI or local test. Physical iPhone testing remains explicitly waived.
+All 61 initial Platform requirements and the eleven detailed module reviews are
+accepted, together with Mobile's fifteen-area review and the applicable Starter
+foundation. Every confirmed gap/correction has implementation and matching behavior
+evidence. [Final Platform CI 41094285531](https://github.com/fajarxfce/hris-platform/actions/runs/41094285531) passed all ten jobs at
+`93438f99`, with 3,090 API cases, 104 active worker cases, 1,111 mocked
+browser scenarios, 56 actual workflows and successful schema-103 recovery.
+[The inventory](measurements/feature-audit-2026-10-30.json) and
+[CI report](measurements/workforce-full-ci-2026-10-30.json) retain exact scope.
 
-The goal stays active until the authorized private development update and final
-Git handoffs are complete. Runtime still serves earlier schema-103 metadata images;
-use `.work/final-development-rollout/checkpoint.py` after announcing the brief
-restart. It saves a quiesced data set with separate keys and restarts captured
-container IDs without dependencies. Then run the prepared `deploy.py`, which
-requires accepted CI, verifies preserved `2c2a59e3` JARs and built-image hashes,
-retains old images, uses `compose up -d --no-deps api worker`, and checks runtime
-health, restricted DB roles, full migration/binding/session/document integrity,
-unchanged dashboard bytes and disabled SMTP. Both helpers are prepared, not run.
+GitHub's step metadata lagged its successful terminal result. The final job log,
+source-matching browser reports and uploaded artifact digest independently verify
+all required steps, including cleanup. [The retained observation](measurements/workforce-ci-reporting-lag-2026-10-30.json)
+explains the raw pending step fields; no cancellation, rerun or source change was
+needed. The independent local 41-case diagnostic passed in 273.489s.
 
-The dashboard tree equals deployed `1e0522c0` and Mobile application `3c6db4eb`
-is already installed. No dashboard restage or phone installation is needed.
-The [Workforce review](workforce-feature-review-2026-10-30.md#approved-overtime-boundary)
-retains the explicit approved-overtime amendment boundary; no unspecified future
-extension is represented as implemented. Production release was not requested.
-Finish the update and all three handoffs, push each commit, then close the goal.
+The authorized private API/worker update is complete using verified application
+`2c2a59e3` packages after a fresh schema-103 recovery checkpoint. Both services
+started and API health returned UP; dashboard HTTP 200 and its exact index bytes
+are unchanged. Full migration history, restricted runtime roles, Google/person
+bindings, active native session IDs, document revision integrity and record counts
+are preserved. SMTP remains disabled. Old images and separate data/key checkpoints
+are retained; [rollout evidence](measurements/final-development-rollout-2026-10-30.json)
+records their locations and hashes. No production release was performed.
+
+Mobile review `f4f101a1` retains full CI `d170810f`/`41077194465`: 1,994 desktop,
+1,676 browser and 104 Apple cases plus complete Xcode/target builds. The normal
+private APK with application `3c6db4eb` is already installed; this backend update
+required no phone action. Starter review `7605916` retains accepted `77063862`/
+`40916187442` and the separately proved distribution upload correction. All 657
+identical shared files and 60 differences are reviewed; no generic port remains.
+Physical iPhone testing is waived, as requested. Actual Android Google/Home/FCM
+acceptance remains recorded; this rollout does not claim another provider test.
+
+The [approved-overtime boundary](workforce-feature-review-2026-10-30.md#approved-overtime-boundary)
+is explicit: the original PRD's immutable requested/actual/approved workflow,
+attendance adjustments and financial Payroll amendments are implemented. A future
+post-approval overtime-fact amendment has no defined product contract and is not
+represented as implemented. Public domain/DNS/TLS, signed Apple/APNs deployment,
+further tax/bank packs and production operation retain their documented separate
+scope. No specified implementation, source CI or owned local test remains pending.
 
 ## Release-configuration audit — accepted
 
@@ -114,7 +127,7 @@ configuration to close an acceptance checkbox.
 ## Native pending-action coverage
 
 Actual Android 35/API acceptance now has a recovery example for each of the six
-feature observers. Each row retains its own procedure, server assertions and limits.
+feature areas. Each row retains its own procedure, server assertions and limits.
 These results do not imply every combination was exercised on every target.
 
 | Feature | Accepted native recovery | Stable summary reload | Final server invariant |
@@ -132,7 +145,7 @@ copy; local root/Android checks passed. Mobile remains the proving ground for
 generic fixes. The later iOS provider at Mobile `43cd8ec6` passed full CI before
 the generic Google port to Starter `e0c6071`; these sources have separate proof below.
 
-## Current CI ownership
+## CI ownership retained from 29 October
 
 | Repository | Current verification | Source/result boundary |
 | --- | --- | --- |

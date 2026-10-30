@@ -1,0 +1,12 @@
+{
+  "runId": 41087903927,
+  "source": "eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f",
+  "status": "queued",
+  "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41087903927",
+  "includes": [
+    "Reporting correction c159b1db",
+    "Payroll enrollment 8655f03e",
+    "Payroll input/receipt/delegation correction cca5e151"
+  ],
+  "note": "Administration CI 41081153648 terminated successfully before dispatch. Keep this run; a same-branch dispatch cancels it. Payroll broad local acceptance is still running."
+}

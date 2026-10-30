@@ -20,13 +20,22 @@ CI `41077194465` passed all four jobs and its installed binary hash is verified.
 
 ## Active goal — full feature completion audit
 
+Final Reporting/Payroll source [CI 41087903927](https://github.com/fajarxfce/hris-platform/actions/runs/41087903927)
+is dispatched for exact `eec8a53aa6b1a6d6bc35cec5d2403ea4a9a3e39f`, after all ten
+Administration jobs terminated successfully. [Run record](measurements/reporting-payroll-ci-2026-10-30.json)
+identifies included implementation commits. Preserve this run; another dispatch
+on the same branch cancels it. Local Payroll broad PTY `78722` still runs against
+application/test source `cca5e151`; intervening commits only change documentation.
+Finish its actual browser acceptance, then Workforce and Mobile/Starter.
+
+
 Administration is fully accepted: all ten jobs passed in `41081153648` for exact
 source `3c8fb15a`, including 3,015 API cases, 104 active worker cases per shard,
 41 normal/14 worker/one export browser scenarios and schema-103 recovery.
 [Full downloaded evidence](measurements/administration-full-ci-2026-10-30.json)
 retains every job/step, 124 module report hashes and the recovery summary.
-The inventory is now 41 accepted / 20 unverified. That CI has terminated, so
-start the next complete source CI for Reporting plus the pushed Payroll corrections.
+The inventory is now 41 accepted / 20 unverified. That CI has terminated;
+the next complete Reporting/Payroll source CI is now dispatched above.
 Do not deploy a different local JAR using Administration-only CI.
 
 
@@ -48,9 +57,9 @@ amendment-source expiry case was already correct. See [the audit](payroll-assura
 [measurements](measurements/payroll-assurance-2026-10-30.json) and
 [seven-row review](payroll-feature-review-2026-10-30.md). Run the complete Payroll/
 Compensation/Payslip API suite and Payroll worker tests, both packages, four normal
-and three worker browser workflows, then final full source CI. All eight core
-Administration CI jobs and recovery have passed; dashboard integration is still
-running in 41081153648. Do not cancel it with another branch dispatch.
+and three worker browser workflows, then final full source CI. All ten
+Administration CI jobs have passed. The next Reporting/Payroll source run is
+41087903927; keep it running.
 
 
 Payroll now has [a committed local enrollment correction](payroll-assurance-2026-10-30.md):
@@ -72,13 +81,13 @@ seven export policy-completion reproductions now pass full local acceptance:
 packages (349.481s), then actual private CSV/browser recovery (45.417s with setup).
 [Evidence](reporting-assurance-2026-10-30.md) and preserved JARs in
 `.work/reporting-assurance-2026-10-30/packages` retain the exact candidate. Its two
-leaf corrections are not deployed. Dispatch final source CI only after
-Administration CI `41081153648` terminates; do not cancel that run. Those JARs
+leaf corrections are not deployed. Final source CI `41087903927` is now dispatched after
+Administration CI `41081153648` passed all ten jobs. Those JARs
 contain both corrections and cannot be deployed using Administration-only CI. Continue remaining PRD scope.
 
 Administration correction `3c8fb15a` is committed/pushed and locally accepted.
 [Full CI 41081153648](https://github.com/fajarxfce/hris-platform/actions/runs/41081153648)
-is running for exact source `3c8fb15a6c2471eef226e5f5c20b0bd8b8ea450a`. Three
+passed all ten jobs for exact source `3c8fb15a6c2471eef226e5f5c20b0bd8b8ea450a`. Three
 private readers and policy saving now check final enrollment/proof assurance;
 eleven genuine reproductions pass with one prior ordinary control. Validation
 passed 81 API, 104 active worker, eight Administration domain, fourteen data and
@@ -87,15 +96,15 @@ workflows passed in 65.484s and one actual worker/browser workflow in 60.248s,
 including setup. See [correction](administration-assurance-2026-10-30.md),
 [five-row/six-section review](administration-feature-review-2026-10-30.md) and
 [measurements](measurements/administration-assurance-2026-10-30.json). All five
-Administration inventory rows await terminal full CI; current counts are 36/25.
+Administration inventory rows are accepted; current counts are 41/20.
 No Administration deployment occurred. Continue Reporting, Payroll and Workforce,
 then full Mobile/Starter review while CI runs; do not close the full goal.
 
 
 Complete every specified Platform/Mobile feature and port demonstrated generic
 fixes to Starter. The [full audit](feature-audit-2026-10-30.md) remains active:
-Approvals, Communications, Identity, Expenses, Leave, Documents and People now
-have thirty-six reviewed initial rows; twenty-five initial rows await completion/review,
+Approvals, Communications, Identity, Expenses, Leave, Documents, People and Administration now
+have forty-one reviewed initial rows; twenty initial rows await completion/review,
 followed by Mobile/Starter. Identity, Approvals, Communications, existing Document behavior, Expenses and Leave
 have accepted full-CI evidence. The formerly missing Document category and separate
 identity validity now pass complete native and replacement full-CI acceptance.

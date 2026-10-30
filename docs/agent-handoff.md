@@ -229,9 +229,26 @@ recovery. Full checks passed 1,973 desktop/221 browser cases and dev APK in 183.
 two screenshots were inspected. All commits are pushed with durable Mobile evidence.
 These are HRIS business changes; no generic Starter implementation port is due.
 
-Next: Mobile versioned editor and retained command/draft overview using the validated
-working-copy and command orchestration. Keep shared finance/leave evidence free of
-private identity numbers. Verify
+Mobile `832bbc09` and `017aa506` now complete the locally validated metadata editor
+and independent retained overview. The editor preserves incomplete input and the
+reviewed header, coalesces local writes, freezes confirmed input and reuses original
+operations after response loss. Acquired current facts remain separate from old
+receipts. Two real command-admission failures and hidden stale-draft feedback were
+corrected; its full checks passed 1,980 desktop/223 browser cases plus the dev APK.
+
+The overview reopens local drafts/corrections after published binary rows disappear,
+with bounded 20-copy pages, original cursors and neutral resource recovery. Opening
+or reloading sends no HTTP or commands. Two reproduced presentation failures showed
+that one failed reader could leave another stale private projection visible; both
+readers must now be ready/admitted. Full root checks, dev APK and Document browsers
+passed in 190.845s: 1,987 desktop/224 browser, zero failures/errors/skips. The actual
+storage/controlled-HTTP UI cases pass offline draft recovery and original retry after
+later administrative edits; three overview screenshots were inspected. Both commits
+are pushed; Mobile Git retains exact cases, source/APK hashes and failed predecessors.
+No runtime/phone/provider change or reusable Starter implementation port occurred.
+
+Next: add a bounded local metadata summary and overview link to Mobile Account
+Pending actions. Keep shared finance/leave evidence free of private identity numbers. Verify
 Android, Apple and owned emulator behavior before accepting `documents.02` or
 `people.03`; physical iPhone testing is waived. Finish the detailed People review,
 then remaining Platform modules and Mobile/Starter. This business capability has

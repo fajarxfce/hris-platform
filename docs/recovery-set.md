@@ -8,9 +8,9 @@ It has no live restore destination and never stops or restarts the source servic
 Use Linux, Python 3.11+, Java 21, Docker and curl with SigV4 support. Build the
 current API JAR first; its offline key-verification entry point reuses the actual
 application cipher without starting Spring, an HTTP server, workers or providers.
-The checked-in Garage 2.4.1 single-node SQLite layout and database schemas 59–101
-are supported. V99 adds only global audit metadata and no encrypted
-record family. New encryption contracts require reviewing the schema bound.
+The checked-in Garage 2.4.1 single-node SQLite layout and database schemas 59–103
+are supported. V103 adds typed document metadata and immutable history, without
+a new encrypted record family. New encryption contracts require reviewing the schema bound.
 
 ## Capture a checkpoint
 
@@ -168,3 +168,20 @@ capture trigger, alongside the existing typed account audit. Source storage
 changes and an incorrect retired key remained detected. The reviewed schema
 ceiling is now 101; all owned resources were removed. This proves restoration,
 not external FCM delivery. See [delivery measurements](measurements/announcement-delivery-2026-10-29.json).
+
+The V103 metadata exercise passed on 30 October 2026 in 57.356 seconds. The actual
+API creates a fictional passport and two corrections before capture. An independent
+restore compares every typed header, history and original upload-revision column;
+the restored runtime role enforces company RLS and restored triggers reject history
+mutation or a head without matching history. This is metadata/upload-header proof;
+the separate 104 S3 objects retain the existing byte-integrity verification. Both
+identity key generations, prior account audit/email projections, source independence
+and wrong-retired-key rejection remain verified. All owned resources are removed.
+The 42 recovery-tool tests pass, including rejection of unknown future schema 104.
+
+The original full CI `41038369597` passed nine jobs, including all actual browser,
+worker and private-export steps, but its recovery job rejected schema 103 because
+the verifier ceiling was still 102. This correction adds the actual restoration
+exercise before raising that bound. [Evidence](measurements/document-metadata-recovery-2026-10-30.json)
+retains the original terminal job/step results and unchanged API/worker package
+hashes. Replacement full CI remains pending. The private deployment is unchanged.

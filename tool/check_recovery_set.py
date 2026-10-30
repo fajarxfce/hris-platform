@@ -20,6 +20,7 @@ import uuid
 
 import database_recovery as database
 import recovery_set as recovery
+from recovery_document_metadata import seed_metadata, verify_metadata
 from recovery_storage import GARAGE_IMAGE, container_endpoint, s3_get
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -202,6 +203,7 @@ def main():
                 "reason": "Owned delivery recovery fixture"})
             api(endpoint, base + "/employees/" + employee + "/account-link", token=token, post=True,
                 body={"accountId": owner, "expectedVersion": 0, "reason": "Owned recipient identity"})
+            metadata_fixture = seed_metadata(api, endpoint, company, employee, token, database_container, log)
             announcement = str(uuid.uuid4())
             api(endpoint, base + "/announcements/" + announcement, token=token, method="PUT", body={
                 "title": "Fictional recovery announcement", "body": "Owned recovery fixture only.",
@@ -302,6 +304,7 @@ def main():
             database_directory, database_manifest = database.load_backup(checkpoint / "database")
             with database.recovery_database(root, database_manifest["postgresImage"], log) as restored:
                 database.restore_database_container(restored[0], database_directory, log)
+                verify_metadata(restored[0], metadata_fixture, log)
                 assert json.loads(database.query(restored[0], audit_query, log)) == saved_audit
                 assert json.loads(database.query(restored[0], delivery_query, log)) == saved_delivery
                 assert json.loads(database.query(restored[0], email_query, log)) == saved_email
@@ -337,7 +340,9 @@ def main():
                       "objects": len(objects), "bytes": sum(map(len, objects.values())),
                       "sourceUnchangedByRestore": True, "wrongRetiredKeyRejected": True,
                       "separateKeyPack": True, "temporaryResourcesRemoved": True,
-                      "typedAccountAuditRestored": True, "announcementDeliveryRestored": True, "announcementEmailRestored": True}
+                      "typedAccountAuditRestored": True, "announcementDeliveryRestored": True, "announcementEmailRestored": True,
+                      "documentMetadataRestored": True, "documentMetadataHistoryRestored": True,
+                      "documentMetadataScopeAndConstraintsRestored": True}
             result['retainedIdentityKeyIds'] = retained_ids
         except BaseException:
             for kind, name in resources:

@@ -160,15 +160,28 @@ workflows. Exact failed attempts and fixture-only corrections are retained in
 [measurements](measurements/document-business-metadata-2026-10-30.json).
 
 Metadata increment `27e7f77e` is committed/pushed. Exact source
-`27e7f77e722da9e8ac2bde47836353ef92dcc3b3` is running in
-[CI 41038369597](https://github.com/fajarxfce/hris-platform/actions/runs/41038369597).
-Observe its terminal result without cancelling it with a same-branch dispatch.
+`27e7f77e722da9e8ac2bde47836353ef92dcc3b3` completed
+[CI 41038369597](https://github.com/fajarxfce/hris-platform/actions/runs/41038369597):
+nine jobs passed; recovery failed because its reviewed schema ceiling remained 102.
+The correction now seeds three metadata snapshots through the real API and verifies
+all restored typed values, company RLS, history immutability and deferred head/history
+consistency. Actual schema-103 recovery passes in 57.356s, with 104 objects and both
+identity key generations; 42 Python tool tests pass. API/worker JAR hashes match the
+accepted implementation. [Evidence](measurements/document-metadata-recovery-2026-10-30.json)
+retains every original CI job and step. Dispatch replacement full CI after pushing
+this correction, and retain its exact source/result without cancelling it.
 
-Next: implement HRIS Mobile metadata and its encrypted catalog upgrade. Older clients
-may already have consumed the same document version; the new client must explicitly
-refresh that projection while retaining owned old facts. Keep shared finance/leave
-DocumentEvidence free of private identity numbers. Add capability-aware initial
-upload, versioned corrections/history and durable original-command recovery. Verify
+Mobile `7f352cfd` and `41fe79f9` are pushed: owned metadata format-2 refresh retains
+old facts and admission gates; initial upload freezes category/identity/printed
+validity in the encrypted intent. Old omitted payloads keep their original operation.
+Root checks pass 1,878 desktop and 131 Document Chromium cases; the APK builds.
+The new form also fixes validation feedback hidden above a long form. Mobile Git
+retains each earlier fixture failure, the reproduction and source/APK measurements.
+
+Next: Mobile definite initial server rejection recovery when no revision exists,
+owned metadata details/history and observed-version corrections with durable
+original-command recovery. Never release an earlier uncertain upload after a later
+rejection. Keep shared finance/leave evidence free of private identity numbers. Verify
 Android, Apple and owned emulator behavior before accepting `documents.02` or
 `people.03`; physical iPhone testing is waived. Finish the detailed People review,
 then remaining Platform modules and Mobile/Starter. This business capability has

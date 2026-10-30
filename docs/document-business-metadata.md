@@ -86,8 +86,12 @@ unit and actual browser checks cover both cases. Dark/narrow editor layout was
 visually inspected. Existing CSS specificity and bundle-size warnings remain.
 
 [Measurements](measurements/document-business-metadata-2026-10-30.json) retain
-reproductions, suite indexes, counts and hashes. Native category/identity fields,
-versioned correction/history, unchanged-version encrypted cache upgrade, recovery
-and affected Android/Apple builds remain next. Full CI/schema-103 restore is also
-pending for this source. Neither requirement is accepted yet. The private schema-
+reproductions, suite indexes, counts and hashes. Mobile `7f352cfd` and `41fe79f9` implement the encrypted catalog upgrade and
+initial-upload metadata. All 1,878 desktop and 131 Document Chromium cases pass,
+and the dev APK builds. Native versioned correction/history, initial server-rejection
+recovery, owned emulator/API/storage and final Apple/full native checks remain next.
+Schema-103 restore now passes in 57.356 seconds with 42 recovery-tool tests;
+[recovery evidence](measurements/document-metadata-recovery-2026-10-30.json) retains
+the original CI ceiling failure and actual restored metadata/RLS/constraint proof.
+Replacement full CI remains pending. Neither requirement is accepted yet. The private schema-
 101 API, Google account binding, SMTP configuration and phone remain unchanged.

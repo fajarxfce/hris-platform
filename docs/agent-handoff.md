@@ -20,6 +20,17 @@ CI `41077194465` passed all four jobs and its installed binary hash is verified.
 
 ## Active goal — full feature completion audit
 
+Payroll source `cca5e151` is pushed. Its complete API/Payroll-worker/domain/data/
+quality/package run is active in PTY session `78722`, with logs and start-source
+metadata under `.work/payroll-audit-2026-10-30`. Keep application/test sources
+unchanged during the run. Then run the four normal browser scenarios and three
+actual worker scenarios listed in the [Payroll requirement review](payroll-feature-review-2026-10-30.md).
+Do not treat the fifteen focused regressions as complete module acceptance.
+[Workforce's read-only audit](workforce-audit-2026-10-30.md) identifies the next
+bounded reproductions and preserves its deliberately different overtime receipt
+contract. No Workforce implementation or tests have changed yet.
+
+
 Payroll's second correction passes all fifteen added SQL/API input/receipt/delegation
 cases, 114 domain and twelve repository cases plus quality checks (102.743s).
 Forty genuine baseline failures are now corrected across both increments; one
@@ -29,7 +40,7 @@ amendment-source expiry case was already correct. See [the audit](payroll-assura
 Compensation/Payslip API suite and Payroll worker tests, both packages, four normal
 and three worker browser workflows, then final full source CI. All eight core
 Administration CI jobs and recovery have passed; dashboard integration is still
-running in41081153648. Do not cancel it with another branch dispatch.
+running in 41081153648. Do not cancel it with another branch dispatch.
 
 
 Payroll now has [a committed local enrollment correction](payroll-assurance-2026-10-30.md):

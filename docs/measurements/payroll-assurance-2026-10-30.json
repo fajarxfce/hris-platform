@@ -1,7 +1,7 @@
 {
   "date": "2026-10-30",
   "baseline": "c159b1db",
-  "status": "All40genuinebaselinecasescorrected; broad/fullCIacceptancepending",
+  "status": "Forty genuine baseline failures corrected; broad and full CI acceptance pending",
   "baselineRun": {
     "command": [
       "./gradlew",
@@ -650,7 +650,7 @@
           "elapsed_seconds": 54.265,
           "exit_code": 1
         },
-        "classification": "6actualbehaviorfailures;1controlreachedcorrectdenialbutJDBCarray/objectequalitybrokeitsstatesnapshot"
+        "classification": "Six actual behavior failures; one control reached the correct denial but JDBC array/object equality broke its state snapshot."
       },
       {
         "run": {
@@ -666,7 +666,7 @@
           "elapsed_seconds": 50.668,
           "exit_code": 1
         },
-        "classification": "Wrongassumedstatuscolumninpayroll_amendmentsblocked3fixtures; excludedfromdefectcount. FinalsnapshotusescanonicalPostgresJSONtext."
+        "classification": "An assumed status column in payroll_amendments blocked three fixtures; excluded from defect counts. The final snapshot uses canonical PostgreSQL JSON text."
       }
     ],
     "format": {
@@ -969,5 +969,13 @@
         }
       }
     }
+  },
+  "broadRun": {
+    "status": "running",
+    "source": "cca5e151",
+    "session": 78722,
+    "log": ".work/payroll-audit-2026-10-30/broad.log",
+    "scope": "All Payroll/Compensation/Payslip API tests, PayrollCalculationWorkerTest, domain/data, architecture/format and both packages",
+    "sourceNote": "Application and test source remain unchanged while this run executes; later documentation commits do not change its candidate."
   }
 }

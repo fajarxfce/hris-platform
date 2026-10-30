@@ -1020,7 +1020,7 @@
         "docs/payroll-feature-review-2026-10-30.md",
         "docs/measurements/payroll-assurance-2026-10-30.json"
       ],
-      "next": "Complete broadAPIworkerbrowserandfullsourceCI; sevenPayrollrowsremainunverified."
+      "next": "Complete broad API, worker, browser and full source CI; seven Payroll rows remain unverified."
     }
   ],
   "completionRule": "Every reviewed requirement needs implementation and matching behavior evidence; unreviewed/uncertain rows remain unverified. Detailed contract sections also require review. Do not narrow scope to the first finding.",

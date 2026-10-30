@@ -169,8 +169,11 @@ consistency. Actual schema-103 recovery passes in 57.356s, with 104 objects and 
 identity key generations; 42 Python tool tests pass. API/worker JAR hashes match the
 accepted implementation. [Evidence](measurements/document-metadata-recovery-2026-10-30.json)
 retains every original CI job and step. Correction `292a30f1` is pushed. [Replacement CI 41043798660](https://github.com/fajarxfce/hris-platform/actions/runs/41043798660)
-is queued for exact `292a30f14498b2eee97a9255f22fe645639658e5`; observe every terminal job
-without a cancelling same-branch dispatch.
+passed all ten jobs for exact `292a30f14498b2eee97a9255f22fe645639658e5`, including
+normal/worker browser integration, private exports and schema-103 recovery. Platform Git
+retains every terminal job/step and the downloaded recovery summary: 104 objects,
+2,098,795 bytes, restored metadata/history/RLS/constraints and completed cleanup.
+The original run remains recorded as a failure; no CI run is pending for this source.
 
 Mobile `7f352cfd` and `41fe79f9` are pushed: owned metadata format-2 refresh retains
 old facts and admission gates; initial upload freezes category/identity/printed
@@ -185,6 +188,15 @@ Explicit reconfirmation uses an exact-file compare-and-set and new operation IDs
 All 1,888 desktop and 140 Document Chromium cases, root checks and the dev APK pass
 (189.354s). Mobile Git retains cancellation/race/capability and actual encrypted
 storage evidence. No phone or live API change occurred.
+
+Mobile `3ce42fed` adds validated header/history/correction transport; `966e883c`
+adds encrypted metadata/history and per-resource read admission. Both are pushed.
+Current root checks, dev APK and Document browser suites pass in 184.621s: 1,912
+desktop and 164 browser cases. Actual SQLite/IndexedDB tests retain 1,000 immutable
+revisions and verify exact-page reads, restart, scope, lost keys, cancellation,
+competing writes and pending/failed admission storage. Native read orchestration,
+detail/history UI and durable correction commands remain next. These changes reuse
+existing database/credential contracts and require no Starter implementation port.
 
 Next: Mobile owned metadata details/history and observed-version corrections with
 durable original-command recovery. Keep shared finance/leave evidence free of

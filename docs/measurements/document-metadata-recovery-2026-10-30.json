@@ -2,7 +2,7 @@
   "date": "2026-10-30",
   "baseHead": "06f8deded80e9d4257984c10a39e949e86f40bda",
   "implementationSource": "27e7f77e722da9e8ac2bde47836353ef92dcc3b3",
-  "status": "schema-103-recovery-locally-validated-full-ci-replacement-pending",
+  "status": "schema-103-recovery-locally-and-full-ci-validated",
   "initialFullCi": {
     "conclusion": "failure",
     "createdAt": "2026-10-30T10:07:06Z",
@@ -1251,7 +1251,1222 @@
     "runId": 41043798660,
     "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41043798660",
     "source": "292a30f14498b2eee97a9255f22fe645639658e5",
-    "observedStatus": "queued",
-    "observedAt": "2026-10-30T10:51:22Z"
+    "observedStatus": "completed",
+    "observedAt": "2026-10-30T11:36:13Z",
+    "conclusion": "success",
+    "terminal": {
+      "conclusion": "success",
+      "createdAt": "2026-10-30T10:51:22Z",
+      "headSha": "292a30f14498b2eee97a9255f22fe645639658e5",
+      "jobs": [
+        {
+          "completedAt": "2026-10-30T10:59:30Z",
+          "conclusion": "success",
+          "databaseId": 124022777229,
+          "name": "dashboard (3)",
+          "startedAt": "2026-10-30T10:51:27Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T10:51:28Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T10:51:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:32Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-10-30T10:51:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:35Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "number": 3,
+              "startedAt": "2026-10-30T10:51:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:55Z",
+              "conclusion": "success",
+              "name": "Run npm ci",
+              "number": 4,
+              "startedAt": "2026-10-30T10:51:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:57Z",
+              "conclusion": "success",
+              "name": "Run node --experimental-strip-types --test --test-concurrency=1 --test-timeout=10000 integration-native/fixtures/*.test.mjs",
+              "number": 5,
+              "startedAt": "2026-10-30T10:51:55Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:54:31Z",
+              "conclusion": "success",
+              "name": "Run npm run check",
+              "number": 6,
+              "startedAt": "2026-10-30T10:51:57Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:54:51Z",
+              "conclusion": "success",
+              "name": "Run npx playwright install --with-deps chromium",
+              "number": 7,
+              "startedAt": "2026-10-30T10:54:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:59:26Z",
+              "conclusion": "success",
+              "name": "Run npm run test:e2e -- --shard=3/4",
+              "number": 8,
+              "startedAt": "2026-10-30T10:54:51Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:59:27Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-10-30T10:59:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:59:27Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "number": 17,
+              "startedAt": "2026-10-30T10:59:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:59:28Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 18,
+              "startedAt": "2026-10-30T10:59:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:59:28Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 19,
+              "startedAt": "2026-10-30T10:59:28Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41043798660/job/124022777229"
+        },
+        {
+          "completedAt": "2026-10-30T10:58:38Z",
+          "conclusion": "success",
+          "databaseId": 124022777353,
+          "name": "dashboard (4)",
+          "startedAt": "2026-10-30T10:51:26Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T10:51:28Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T10:51:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:31Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-10-30T10:51:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:34Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "number": 3,
+              "startedAt": "2026-10-30T10:51:31Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:50Z",
+              "conclusion": "success",
+              "name": "Run npm ci",
+              "number": 4,
+              "startedAt": "2026-10-30T10:51:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:52Z",
+              "conclusion": "success",
+              "name": "Run node --experimental-strip-types --test --test-concurrency=1 --test-timeout=10000 integration-native/fixtures/*.test.mjs",
+              "number": 5,
+              "startedAt": "2026-10-30T10:51:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:54:00Z",
+              "conclusion": "success",
+              "name": "Run npm run check",
+              "number": 6,
+              "startedAt": "2026-10-30T10:51:52Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:54:18Z",
+              "conclusion": "success",
+              "name": "Run npx playwright install --with-deps chromium",
+              "number": 7,
+              "startedAt": "2026-10-30T10:54:00Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:58:33Z",
+              "conclusion": "success",
+              "name": "Run npm run test:e2e -- --shard=4/4",
+              "number": 8,
+              "startedAt": "2026-10-30T10:54:18Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:58:34Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-10-30T10:58:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:58:34Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "number": 17,
+              "startedAt": "2026-10-30T10:58:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:58:35Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 18,
+              "startedAt": "2026-10-30T10:58:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:58:35Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 19,
+              "startedAt": "2026-10-30T10:58:35Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41043798660/job/124022777353"
+        },
+        {
+          "completedAt": "2026-10-30T11:23:19Z",
+          "conclusion": "success",
+          "databaseId": 124022777356,
+          "name": "backend (4)",
+          "startedAt": "2026-10-30T10:51:26Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T10:51:29Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T10:51:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:34Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-10-30T10:51:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:34Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 3,
+              "startedAt": "2026-10-30T10:51:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:37Z",
+              "conclusion": "success",
+              "name": "Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+              "number": 4,
+              "startedAt": "2026-10-30T10:51:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:23:11Z",
+              "conclusion": "success",
+              "name": "Run ./gradlew check :apps:server:bootJar :apps:worker:bootJar -PhrisApiTestShard=4 -PhrisApiTestShards=4 --no-daemon",
+              "number": 5,
+              "startedAt": "2026-10-30T10:51:37Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:23:13Z",
+              "conclusion": "success",
+              "name": "Run python3 tool/check_document_services.py",
+              "number": 6,
+              "startedAt": "2026-10-30T11:23:11Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:23:13Z",
+              "conclusion": "skipped",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 7,
+              "startedAt": "2026-10-30T11:23:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:23:13Z",
+              "conclusion": "skipped",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 8,
+              "startedAt": "2026-10-30T11:23:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:23:13Z",
+              "conclusion": "skipped",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-10-30T11:23:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:23:17Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 10,
+              "startedAt": "2026-10-30T11:23:13Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:23:17Z",
+              "conclusion": "success",
+              "name": "Post Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+              "number": 18,
+              "startedAt": "2026-10-30T11:23:17Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:23:17Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 19,
+              "startedAt": "2026-10-30T11:23:17Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:23:18Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 20,
+              "startedAt": "2026-10-30T11:23:17Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:23:18Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 21,
+              "startedAt": "2026-10-30T11:23:18Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41043798660/job/124022777356"
+        },
+        {
+          "completedAt": "2026-10-30T11:11:03Z",
+          "conclusion": "success",
+          "databaseId": 124022777431,
+          "name": "backend (2)",
+          "startedAt": "2026-10-30T10:51:26Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T10:51:30Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T10:51:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:32Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-10-30T10:51:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:33Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 3,
+              "startedAt": "2026-10-30T10:51:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:34Z",
+              "conclusion": "success",
+              "name": "Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+              "number": 4,
+              "startedAt": "2026-10-30T10:51:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:10:54Z",
+              "conclusion": "success",
+              "name": "Run ./gradlew check :apps:server:bootJar :apps:worker:bootJar -PhrisApiTestShard=2 -PhrisApiTestShards=4 --no-daemon",
+              "number": 5,
+              "startedAt": "2026-10-30T10:51:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:10:56Z",
+              "conclusion": "success",
+              "name": "Run python3 tool/check_document_services.py",
+              "number": 6,
+              "startedAt": "2026-10-30T11:10:54Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:10:56Z",
+              "conclusion": "skipped",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 7,
+              "startedAt": "2026-10-30T11:10:56Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:10:56Z",
+              "conclusion": "skipped",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 8,
+              "startedAt": "2026-10-30T11:10:56Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:10:56Z",
+              "conclusion": "skipped",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-10-30T11:10:56Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:10:59Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 10,
+              "startedAt": "2026-10-30T11:10:56Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:10:59Z",
+              "conclusion": "success",
+              "name": "Post Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+              "number": 18,
+              "startedAt": "2026-10-30T11:10:59Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:10:59Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 19,
+              "startedAt": "2026-10-30T11:10:59Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:11:00Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 20,
+              "startedAt": "2026-10-30T11:10:59Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:11:00Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 21,
+              "startedAt": "2026-10-30T11:11:00Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41043798660/job/124022777431"
+        },
+        {
+          "completedAt": "2026-10-30T10:57:27Z",
+          "conclusion": "success",
+          "databaseId": 124022777446,
+          "name": "dashboard (1)",
+          "startedAt": "2026-10-30T10:51:26Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T10:51:28Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T10:51:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:30Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-10-30T10:51:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:33Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "number": 3,
+              "startedAt": "2026-10-30T10:51:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:45Z",
+              "conclusion": "success",
+              "name": "Run npm ci",
+              "number": 4,
+              "startedAt": "2026-10-30T10:51:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:47Z",
+              "conclusion": "success",
+              "name": "Run node --experimental-strip-types --test --test-concurrency=1 --test-timeout=10000 integration-native/fixtures/*.test.mjs",
+              "number": 5,
+              "startedAt": "2026-10-30T10:51:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:53:29Z",
+              "conclusion": "success",
+              "name": "Run npm run check",
+              "number": 6,
+              "startedAt": "2026-10-30T10:51:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:53:45Z",
+              "conclusion": "success",
+              "name": "Run npx playwright install --with-deps chromium",
+              "number": 7,
+              "startedAt": "2026-10-30T10:53:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:57:22Z",
+              "conclusion": "success",
+              "name": "Run npm run test:e2e -- --shard=1/4",
+              "number": 8,
+              "startedAt": "2026-10-30T10:53:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:57:24Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-10-30T10:57:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:57:24Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "number": 17,
+              "startedAt": "2026-10-30T10:57:24Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:57:24Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 18,
+              "startedAt": "2026-10-30T10:57:24Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:57:24Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 19,
+              "startedAt": "2026-10-30T10:57:24Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41043798660/job/124022777446"
+        },
+        {
+          "completedAt": "2026-10-30T11:13:26Z",
+          "conclusion": "success",
+          "databaseId": 124022777451,
+          "name": "backend (3)",
+          "startedAt": "2026-10-30T10:51:27Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T10:51:30Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T10:51:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:33Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-10-30T10:51:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:33Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 3,
+              "startedAt": "2026-10-30T10:51:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:35Z",
+              "conclusion": "success",
+              "name": "Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+              "number": 4,
+              "startedAt": "2026-10-30T10:51:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:13:16Z",
+              "conclusion": "success",
+              "name": "Run ./gradlew check :apps:server:bootJar :apps:worker:bootJar -PhrisApiTestShard=3 -PhrisApiTestShards=4 --no-daemon",
+              "number": 5,
+              "startedAt": "2026-10-30T10:51:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:13:19Z",
+              "conclusion": "success",
+              "name": "Run python3 tool/check_document_services.py",
+              "number": 6,
+              "startedAt": "2026-10-30T11:13:16Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:13:19Z",
+              "conclusion": "skipped",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 7,
+              "startedAt": "2026-10-30T11:13:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:13:19Z",
+              "conclusion": "skipped",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 8,
+              "startedAt": "2026-10-30T11:13:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:13:19Z",
+              "conclusion": "skipped",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-10-30T11:13:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:13:22Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 10,
+              "startedAt": "2026-10-30T11:13:19Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:13:22Z",
+              "conclusion": "success",
+              "name": "Post Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+              "number": 18,
+              "startedAt": "2026-10-30T11:13:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:13:22Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 19,
+              "startedAt": "2026-10-30T11:13:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:13:23Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 20,
+              "startedAt": "2026-10-30T11:13:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:13:23Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 21,
+              "startedAt": "2026-10-30T11:13:23Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41043798660/job/124022777451"
+        },
+        {
+          "completedAt": "2026-10-30T11:24:51Z",
+          "conclusion": "success",
+          "databaseId": 124022777457,
+          "name": "backend (1)",
+          "startedAt": "2026-10-30T10:51:27Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T10:51:30Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T10:51:27Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:34Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-10-30T10:51:30Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:34Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 3,
+              "startedAt": "2026-10-30T10:51:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:37Z",
+              "conclusion": "success",
+              "name": "Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+              "number": 4,
+              "startedAt": "2026-10-30T10:51:34Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:24:35Z",
+              "conclusion": "success",
+              "name": "Run ./gradlew check :apps:server:bootJar :apps:worker:bootJar -PhrisApiTestShard=1 -PhrisApiTestShards=4 --no-daemon",
+              "number": 5,
+              "startedAt": "2026-10-30T10:51:37Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:24:37Z",
+              "conclusion": "success",
+              "name": "Run python3 tool/check_document_services.py",
+              "number": 6,
+              "startedAt": "2026-10-30T11:24:35Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:24:40Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 7,
+              "startedAt": "2026-10-30T11:24:37Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:24:42Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 8,
+              "startedAt": "2026-10-30T11:24:40Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:24:43Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-10-30T11:24:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:24:47Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 10,
+              "startedAt": "2026-10-30T11:24:43Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:24:48Z",
+              "conclusion": "success",
+              "name": "Post Run gradle/actions/setup-gradle@0b6dd653ba04f4f93bf581ec31e66cbd7dcb644d",
+              "number": 18,
+              "startedAt": "2026-10-30T11:24:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:24:48Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 19,
+              "startedAt": "2026-10-30T11:24:48Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:24:48Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 20,
+              "startedAt": "2026-10-30T11:24:48Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:24:48Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 21,
+              "startedAt": "2026-10-30T11:24:48Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41043798660/job/124022777457"
+        },
+        {
+          "completedAt": "2026-10-30T11:00:29Z",
+          "conclusion": "success",
+          "databaseId": 124022777474,
+          "name": "dashboard (2)",
+          "startedAt": "2026-10-30T10:51:27Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T10:51:29Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T10:51:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:32Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-10-30T10:51:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:51:38Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "number": 3,
+              "startedAt": "2026-10-30T10:51:32Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:52:03Z",
+              "conclusion": "success",
+              "name": "Run npm ci",
+              "number": 4,
+              "startedAt": "2026-10-30T10:51:38Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:52:04Z",
+              "conclusion": "success",
+              "name": "Run node --experimental-strip-types --test --test-concurrency=1 --test-timeout=10000 integration-native/fixtures/*.test.mjs",
+              "number": 5,
+              "startedAt": "2026-10-30T10:52:03Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:54:50Z",
+              "conclusion": "success",
+              "name": "Run npm run check",
+              "number": 6,
+              "startedAt": "2026-10-30T10:52:04Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T10:55:33Z",
+              "conclusion": "success",
+              "name": "Run npx playwright install --with-deps chromium",
+              "number": 7,
+              "startedAt": "2026-10-30T10:54:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:00:24Z",
+              "conclusion": "success",
+              "name": "Run npm run test:e2e -- --shard=2/4",
+              "number": 8,
+              "startedAt": "2026-10-30T10:55:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:00:26Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 9,
+              "startedAt": "2026-10-30T11:00:24Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:00:26Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "number": 17,
+              "startedAt": "2026-10-30T11:00:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:00:26Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 18,
+              "startedAt": "2026-10-30T11:00:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:00:26Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 19,
+              "startedAt": "2026-10-30T11:00:26Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41043798660/job/124022777474"
+        },
+        {
+          "completedAt": "2026-10-30T11:26:48Z",
+          "conclusion": "success",
+          "databaseId": 124036442593,
+          "name": "recovery-integration",
+          "startedAt": "2026-10-30T11:24:54Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T11:24:57Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T11:24:55Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:25:00Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-10-30T11:24:57Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:25:00Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 3,
+              "startedAt": "2026-10-30T11:25:00Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:25:05Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+              "number": 4,
+              "startedAt": "2026-10-30T11:25:00Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:25:11Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+              "number": 5,
+              "startedAt": "2026-10-30T11:25:05Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:25:11Z",
+              "conclusion": "success",
+              "name": "Run mkdir -p .work",
+              "number": 6,
+              "startedAt": "2026-10-30T11:25:11Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:26:44Z",
+              "conclusion": "success",
+              "name": "Run python3 tool/check_recovery_set.py",
+              "number": 7,
+              "startedAt": "2026-10-30T11:25:11Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:26:45Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 8,
+              "startedAt": "2026-10-30T11:26:44Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:26:45Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 15,
+              "startedAt": "2026-10-30T11:26:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:26:46Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 16,
+              "startedAt": "2026-10-30T11:26:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:26:46Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 17,
+              "startedAt": "2026-10-30T11:26:46Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41043798660/job/124036442593"
+        },
+        {
+          "completedAt": "2026-10-30T11:36:12Z",
+          "conclusion": "success",
+          "databaseId": 124036442635,
+          "name": "dashboard-integration",
+          "startedAt": "2026-10-30T11:24:54Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-30T11:24:57Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-30T11:24:55Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:25:00Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 2,
+              "startedAt": "2026-10-30T11:24:57Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:25:03Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "number": 3,
+              "startedAt": "2026-10-30T11:25:00Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:25:03Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 4,
+              "startedAt": "2026-10-30T11:25:03Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:25:07Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+              "number": 5,
+              "startedAt": "2026-10-30T11:25:03Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:25:11Z",
+              "conclusion": "success",
+              "name": "Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333",
+              "number": 6,
+              "startedAt": "2026-10-30T11:25:07Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:25:28Z",
+              "conclusion": "success",
+              "name": "Run npm ci",
+              "number": 7,
+              "startedAt": "2026-10-30T11:25:11Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:25:46Z",
+              "conclusion": "success",
+              "name": "Run npx playwright install --with-deps chromium",
+              "number": 8,
+              "startedAt": "2026-10-30T11:25:28Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:30:40Z",
+              "conclusion": "success",
+              "name": "Run npm run test:integration",
+              "number": 9,
+              "startedAt": "2026-10-30T11:25:46Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:30:40Z",
+              "conclusion": "success",
+              "name": "Run python3 ../../tool/test_dashboard_mail_fixture.py",
+              "number": 10,
+              "startedAt": "2026-10-30T11:30:40Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:30:40Z",
+              "conclusion": "success",
+              "name": "Run python3 -m unittest discover -s ../../tool -p 'test_dashboard_fcm_fixture.py'",
+              "number": 11,
+              "startedAt": "2026-10-30T11:30:40Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:35:14Z",
+              "conclusion": "success",
+              "name": "Run npm run test:integration:worker",
+              "number": 12,
+              "startedAt": "2026-10-30T11:30:40Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:35:14Z",
+              "conclusion": "success",
+              "name": "Run python3 -m unittest discover -s ../../tool -p 'test_dashboard_storage*.py'",
+              "number": 13,
+              "startedAt": "2026-10-30T11:35:14Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:36:07Z",
+              "conclusion": "success",
+              "name": "Run npm run test:integration:exports",
+              "number": 14,
+              "startedAt": "2026-10-30T11:35:14Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:36:09Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "number": 15,
+              "startedAt": "2026-10-30T11:36:07Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:36:09Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+              "number": 28,
+              "startedAt": "2026-10-30T11:36:09Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:36:09Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38",
+              "number": 29,
+              "startedAt": "2026-10-30T11:36:09Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:36:09Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+              "number": 30,
+              "startedAt": "2026-10-30T11:36:09Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-30T11:36:09Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 31,
+              "startedAt": "2026-10-30T11:36:09Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41043798660/job/124036442635"
+        }
+      ],
+      "status": "completed",
+      "updatedAt": "2026-10-30T11:36:13Z",
+      "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41043798660"
+    },
+    "recoverySummary": {
+      "restorePassed": true,
+      "schema": "103",
+      "identityEnvelopesVerified": 2,
+      "objects": 104,
+      "bytes": 2098795,
+      "sourceUnchangedByRestore": true,
+      "wrongRetiredKeyRejected": true,
+      "separateKeyPack": true,
+      "temporaryResourcesRemoved": true,
+      "typedAccountAuditRestored": true,
+      "announcementDeliveryRestored": true,
+      "announcementEmailRestored": true,
+      "documentMetadataRestored": true,
+      "documentMetadataHistoryRestored": true,
+      "documentMetadataScopeAndConstraintsRestored": true,
+      "retainedIdentityKeyIds": [
+        "current",
+        "old"
+      ]
+    },
+    "recoverySummarySha256": "1a216c371c5f358ed190fe5d17d67e0a2f6540a2248831a62d560934bd9e69e8"
   }
 }

@@ -87,11 +87,16 @@ visually inspected. Existing CSS specificity and bundle-size warnings remain.
 
 [Measurements](measurements/document-business-metadata-2026-10-30.json) retain
 reproductions, suite indexes, counts and hashes. Mobile `7f352cfd` and `41fe79f9` implement the encrypted catalog upgrade and
-initial-upload metadata. All 1,878 desktop and 131 Document Chromium cases pass,
-and the dev APK builds. Native versioned correction/history, initial server-rejection
-recovery, owned emulator/API/storage and final Apple/full native checks remain next.
+initial-upload metadata; `e2690fd6` adds first definitive rejection recovery.
+`3ce42fed` adds header/history/correction transport and `966e883c` adds encrypted
+metadata/history with per-resource read admission. Current root checks, dev APK,
+1,912 desktop and 164 Document Chromium cases pass. Native read orchestration,
+versioned correction/history UI, owned emulator/API/storage and final Apple/full
+native checks remain next.
 Schema-103 restore now passes in 57.356 seconds with 42 recovery-tool tests;
 [recovery evidence](measurements/document-metadata-recovery-2026-10-30.json) retains
 the original CI ceiling failure and actual restored metadata/RLS/constraint proof.
-Replacement full CI remains pending. Neither requirement is accepted yet. The private schema-
+Replacement CI `41043798660` passed all ten jobs for exact `292a30f1`; the same evidence
+retains every terminal job/step and its actual schema-103 recovery artifact.
+Neither requirement is accepted yet. The private schema-
 101 API, Google account binding, SMTP configuration and phone remain unchanged.

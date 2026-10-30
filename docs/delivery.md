@@ -35,13 +35,17 @@ retain the original failures and successful artifact acceptance.
 backend and dashboard implementation with recorded local acceptance. Combined
 corrected selections cover 689 API cases, 104 ordinary worker cases, 27 database,
 18 domain and nine data cases, plus 4,054 dashboard unit cases, 25 mocked Chromium
-and five distinct actual API/browser workflows. Mobile projection/initial-upload
-metadata now passes 1,878 desktop and 131 browser tests. Schema-103 restoration passes
+and five distinct actual API/browser workflows. Mobile projection, initial-upload,
+rejected-upload recovery, metadata transport and encrypted history/admission now pass
+1,912 desktop and 164 browser tests, root checks and the dev APK. Schema-103 restoration passes
 in 57.356s after the original CI exposed its stale schema-102 ceiling; 42 recovery-tool
 tests and actual restored metadata/history/RLS/constraint checks pass. See
 [recovery evidence](measurements/document-metadata-recovery-2026-10-30.json).
-Native correction/history, final device/build validation and replacement full CI
-remain in progress; the requirements are not yet accepted. The
+Replacement CI `41043798660` passed all ten jobs for exact `292a30f1`, including
+normal/worker browser, private exports and metadata recovery; all terminal evidence
+and the downloaded recovery summary are retained. Native read orchestration,
+correction/history UI and final device/build validation remain in progress; the
+requirements are not yet accepted. The
 [measurements](measurements/document-business-metadata-2026-10-30.json) distinguish
 initial fixture/contract failures from final selections and preserve package hashes.
 Previous People source `158b81ac` passed all ten jobs in

@@ -184,4 +184,7 @@ worker and private-export steps, but its recovery job rejected schema 103 becaus
 the verifier ceiling was still 102. This correction adds the actual restoration
 exercise before raising that bound. [Evidence](measurements/document-metadata-recovery-2026-10-30.json)
 retains the original terminal job/step results and unchanged API/worker package
-hashes. Replacement full CI remains pending. The private deployment is unchanged.
+hashes. Replacement CI `41043798660` passed all ten jobs for exact source
+`292a30f14498b2eee97a9255f22fe645639658e5`. Every terminal job/step and its downloaded
+recovery summary are retained: schema 103, 104 objects, 2,098,795 bytes, restored
+metadata/history/RLS/constraints and completed cleanup. The private deployment is unchanged.

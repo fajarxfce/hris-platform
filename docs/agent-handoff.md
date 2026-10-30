@@ -204,10 +204,22 @@ an earlier denial when company policy expires during local storage. Root quality
 dev APK and Document browser suites pass in 197.437s: 1,927 desktop and 177 browser
 cases, all without failures/errors/skips. Mobile Git retains exact cases, source/APK
 hashes and earlier compilation/method-length corrections. This commit is pushed;
-versioned corrections and durable original-command recovery remain in progress.
+mutable working copies and the versioned correction editor remain in progress.
 
-Next: Mobile observed-version corrections with
-durable original-command recovery. Keep shared finance/leave evidence free of
+Mobile `b0f93d67` retains encrypted correction commands using the existing shared
+CommandStore/key and exact record/revision checks. Three domain and six actual
+SQLite/IndexedDB cases pass; full local checks covered 1,936 desktop and 186 browser
+cases in 193.331s. `82519a85` adds explicit intake, admitted local observation, bounded
+manual delivery and review. Fourteen new domain scenarios cover original retries,
+current ownership/MFA, uncertain outcomes, later headers, acknowledgement and resource
+subscriptions. Full root checks, dev APK and Document Chromium suites pass in 180.515s:
+1,950 desktop and 200 browser cases, without failures/errors/skips. The first twelve
+flow failures were a read-only fixture; it was corrected with a separate denied control.
+Both commits are pushed. Mobile Git retains exact cases, sources and APK hashes;
+no automatic delivery or current-header replacement is introduced.
+
+Next: Mobile mutable working copies and the versioned editor using the validated
+command orchestration. Keep shared finance/leave evidence free of
 private identity numbers. Verify
 Android, Apple and owned emulator behavior before accepting `documents.02` or
 `people.03`; physical iPhone testing is waived. Finish the detailed People review,

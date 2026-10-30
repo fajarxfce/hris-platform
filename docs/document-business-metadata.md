@@ -91,9 +91,11 @@ initial-upload metadata; `e2690fd6` adds first definitive rejection recovery.
 `3ce42fed` adds header/history/correction transport and `966e883c` adds encrypted
 metadata/history with per-resource read admission. `f282b027` adds admitted local reads,
 finite acquisition and the assembled detail/history screen. Root checks, dev APK,
-1,927 desktop and 177 Document Chromium cases pass in 197.437s. Versioned corrections
-with durable original-command recovery, owned emulator/API/storage and final Apple/full
-native checks remain next.
+1,927 desktop and 177 Document Chromium cases pass in 197.437s. `b0f93d67` adds
+bounded encrypted correction storage; `82519a85` adds intake, local observation,
+manual delivery and explicit recovery. Final full local checks pass in 180.515s:
+1,950 desktop and 200 Document Chromium cases. Mutable working copies, the editor,
+owned emulator/API/storage and final Apple/full native checks remain next.
 Schema-103 restore now passes in 57.356 seconds with 42 recovery-tool tests;
 [recovery evidence](measurements/document-metadata-recovery-2026-10-30.json) retains
 the original CI ceiling failure and actual restored metadata/RLS/constraint proof.

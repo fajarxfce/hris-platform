@@ -1246,5 +1246,12 @@
     "Prior typed account audit and announcement/email restoration remains checked."
   ],
   "runtimeChanged": false,
-  "requirementAcceptancePending": true
+  "requirementAcceptancePending": true,
+  "replacementCi": {
+    "runId": 41043798660,
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41043798660",
+    "source": "292a30f14498b2eee97a9255f22fe645639658e5",
+    "observedStatus": "queued",
+    "observedAt": "2026-10-30T10:51:22Z"
+  }
 }

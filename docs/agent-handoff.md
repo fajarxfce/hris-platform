@@ -168,8 +168,9 @@ all restored typed values, company RLS, history immutability and deferred head/h
 consistency. Actual schema-103 recovery passes in 57.356s, with 104 objects and both
 identity key generations; 42 Python tool tests pass. API/worker JAR hashes match the
 accepted implementation. [Evidence](measurements/document-metadata-recovery-2026-10-30.json)
-retains every original CI job and step. Dispatch replacement full CI after pushing
-this correction, and retain its exact source/result without cancelling it.
+retains every original CI job and step. Correction `292a30f1` is pushed. [Replacement CI 41043798660](https://github.com/fajarxfce/hris-platform/actions/runs/41043798660)
+is queued for exact `292a30f14498b2eee97a9255f22fe645639658e5`; observe every terminal job
+without a cancelling same-branch dispatch.
 
 Mobile `7f352cfd` and `41fe79f9` are pushed: owned metadata format-2 refresh retains
 old facts and admission gates; initial upload freezes category/identity/printed

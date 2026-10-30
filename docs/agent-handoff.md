@@ -247,12 +247,33 @@ later administrative edits; three overview screenshots were inspected. Both comm
 are pushed; Mobile Git retains exact cases, source/APK hashes and failed predecessors.
 No runtime/phone/provider change or reusable Starter implementation port occurred.
 
-Next: add a bounded local metadata summary and overview link to Mobile Account
-Pending actions. Keep shared finance/leave evidence free of private identity numbers. Verify
-Android, Apple and owned emulator behavior before accepting `documents.02` or
-`people.03`; physical iPhone testing is waived. Finish the detailed People review,
-then remaining Platform modules and Mobile/Starter. This business capability has
-no generic Starter port. The full goal remains active.
+Mobile `3c6db4eb` adds the bounded local metadata summary and direct overview link
+in Account Pending actions. Full local checks passed 1,994 desktop/230 Document
+browser cases and the dev APK (173.186s). Six domain regressions and the actual
+Account workflow retain original command/draft deduplication, scope and disposal.
+
+[Actual Android/API/storage acceptance](native-metadata-acceptance.md) now passes
+for that application: two offline process restarts retain an incomplete draft and
+then the read-only original uncertain command. Explicit retry confirms the same
+operation/input after a later administrative correction. Done clears the matching
+working copy and command; all seven pending groups empty. The independent observer
+confirms three history revisions, the later version-4 header and unchanged binary
+revision. Summary reloads stay 36→36 and 48→48; 78 native requests include exactly
+two successful company writes. The fixture passed in 432.451s with complete owned
+cleanup. Its earlier ten-minute backend lifetime failure is preserved separately.
+See [sanitized measurements](measurements/native-metadata-2026-10-30.json).
+
+Mobile full CI `41071828262` passed Windows/Web and iOS simulator compilation/tests,
+but its Linux browser capacity case exceeded Mocha's default two seconds. The
+1,000-revision assertions remain intact; a bounded twenty-second module test
+configuration passes all 75 Document data browser cases locally in 21.607s.
+The complete Apple app and replacement full CI still need terminal verification.
+
+Next: finish Mobile full/Apple CI before accepting `documents.02` or `people.03`,
+then the controlled schema-103 API/static-dashboard/Mobile rollout. Physical
+iPhone testing is waived. Finish detailed People review, remaining Platform modules
+and Mobile/Starter. Keep shared finance/leave evidence free of private identity
+numbers. This business capability has no generic Starter port. The full goal remains active.
 
 CompleteOffboarding and explicit onboarding/offboarding schedules already have
 final checks; preserve their behavior. Client policy is admission-only: do not add

@@ -51,6 +51,10 @@ def main():
         raise RuntimeError("Build the worker with ./gradlew :apps:worker:bootJar first")
     os.umask(0o077)
     fcm_environment = worker_fcm_environment(os.environ)
+    lifetime_value = os.environ.get("HRIS_TEST_FIXTURE_LIFETIME_SECONDS", "900" if fcm_environment else "600")
+    if not re.fullmatch(r"[0-9]{2,4}", lifetime_value) or not 60 <= int(lifetime_value) <= 1800:
+        raise RuntimeError("Fixture lifetime must be between 60 and 1800 seconds")
+    lifetime_seconds = int(lifetime_value)
     logs.mkdir(parents=True, exist_ok=True)
     for event in (signal.SIGINT, signal.SIGTERM):
         signal.signal(event, stop)
@@ -180,7 +184,7 @@ def main():
                     stdout=worker_output, stderr=subprocess.STDOUT,
                 )
         print(f"Browser API fixture ready; diagnostics: {logs.relative_to(root)}/backend.log", flush=True)
-        deadline = time.monotonic() + (900 if fcm_environment else 600)
+        deadline = time.monotonic() + lifetime_seconds
         while time.monotonic() < deadline:
             if api.poll() is not None:
                 raise RuntimeError("Fixture API exited; inspect its local diagnostics")

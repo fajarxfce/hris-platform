@@ -1,6 +1,6 @@
 # Document business metadata
 
-Status: backend and dashboard implemented; native upgrade and full acceptance remain in progress. The [source audit](document-identity-metadata-gap-2026-10-30.md)
+Status: backend, dashboard and Android metadata workflows are implemented and locally accepted; complete hosted Mobile/Apple verification remains in progress. The [source audit](document-identity-metadata-gap-2026-10-30.md)
 reopened `documents.02` and retained `people.03` as unverified. This working
 contract is not acceptance evidence. Finish all backend/client/migration/recovery
 checks before marking those requirements complete.
@@ -103,3 +103,14 @@ Replacement CI `41043798660` passed all ten jobs for exact `292a30f1`; the same 
 retains every terminal job/step and its actual schema-103 recovery artifact.
 Neither requirement is accepted yet. The private schema-
 101 API, Google account binding, SMTP configuration and phone remain unchanged.
+
+## Actual Android recovery acceptance
+
+Mobile `3c6db4eb` passed the [owned Android/API/private-storage workflow](native-metadata-acceptance.md),
+including incomplete draft and uncertain-command recovery across two offline process
+restarts, exact original replay after later administrative edits, matching-draft
+cleanup, empty pending summary and preserved current/history/binary facts. See
+[measurements](measurements/native-metadata-2026-10-30.json). Full Mobile CI found a
+browser test's two-second capacity deadline; corrected local checks pass without
+reducing the 1,000-revision assertion. Complete hosted Mobile/Apple verification
+and the controlled development rollout remain outstanding.

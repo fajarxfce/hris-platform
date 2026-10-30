@@ -105,3 +105,18 @@ Ten initial rows across Approvals and Communications are now locally accepted;
 51 remain unverified. Review continues with Identity and the remaining modules,
 then Mobile and applicable Starter behavior. Final source CI will follow the
 running approval acceptance without cancelling its same-branch workflow.
+
+## Identity requirement review — accepted
+
+[Identity](identity-feature-review-2026-10-30.md) now has all five initial rows and
+eight detailed sections reviewed against source and matching behavior. Its module
+and dashboard Git trees are unchanged from accepted `8014d733`. Downloaded full-CI
+reports verify 190 API, 35 domain, 22 data and 17 worker cases, plus 95 relevant
+Chromium scenarios, including eight actual API/browser workflows. No failure,
+skip or flaky result appears in that selection. The review made no account,
+credential, provider, runtime or phone change.
+
+Fifteen initial rows are now reviewed and accepted to their recorded local/full-CI
+scope; 46 remain unverified. Continue Documents and all remaining Platform/Mobile
+requirements. The Communications source `737d39a7` is pushed; its final-source CI
+still follows the running approval acceptance without cancelling it.

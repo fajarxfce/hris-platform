@@ -11,9 +11,10 @@ preserves earlier work; its old next-step statements are not the active queue.
 
 Complete every specified Platform/Mobile feature and port demonstrated generic
 fixes to Starter. The [full audit](feature-audit-2026-10-30.md) remains active:
-Approvals and Communications now have ten locally accepted initial requirement
-rows and their detailed sections; 51 initial rows still await review, followed by
-Mobile/Starter.
+Approvals, Communications and Identity now have fifteen reviewed initial
+requirement rows and their detailed sections; 46 initial rows still await review,
+followed by Mobile/Starter. Identity has accepted full-CI evidence; final CI for
+the approval/communication corrections remains separately tracked.
 Do not mark the goal complete from these increments or earlier green CI.
 
 Announcement email source `8014d733` passed all ten jobs in
@@ -29,7 +30,7 @@ One manual one-hour worker test remains covered by its earlier independent run.
 The interrupted combined execution was replaced by successful separate API/worker
 runs; [measurements](measurements/approval-history-2026-10-30.json) retain the details.
 
-The next correction completes assurance on the seven older approval readers.
+The approval correction completes assurance on seven older readers.
 Ten actual acquisition-expiry reproductions failed at `bbb99b48` and then passed.
 Final acceptance passed 60 approval API cases, 13 domain cases, architecture,
 formatting, both packages and two actual API/browser workflows. Inbox completion
@@ -37,7 +38,7 @@ uses current-stage eligibility; retained request/history scope remains distinct.
 See [correction](approval-read-assurance-2026-10-30.md) and
 [module requirement review](approvals-feature-review-2026-10-30.md).
 The correction is committed/pushed at `fcfdaf26`. [Full CI 41009137720](https://github.com/fajarxfce/hris-platform/actions/runs/41009137720)
-is queued for exact source `fcfdaf26a48718a80bc79468bdbdb3b4cbeae11c`; observe its
+is running for exact source `fcfdaf26a48718a80bc79468bdbdb3b4cbeae11c`; observe its
 terminal result without cancelling it through another same-branch dispatch.
 
 [Communications read completion](communications-read-assurance-2026-10-30.md)
@@ -46,11 +47,21 @@ corrects thirteen reproduced MFA-expiry variants across ten older readers. All
 checks and actual API/worker/browser/SMTP acceptance (37.1s; 1.0m including setup).
 The [Communications requirement review](communications-feature-review-2026-10-30.md)
 locally accepts all five rows and nine detailed sections, including optional email.
-Final source CI must follow the running approval run without cancelling it.
+The correction is committed/pushed at `737d39a7`. Final source CI must follow
+the running approval run without cancelling it.
 
-Continue with Identity, the other module contracts and Mobile behavior. Downloaded
-full-CI reports for email source `8014d733` are supplementary local evidence in
-`.work/feature-audit-2026-10-30/ci-8014d733`; retain any reviewed results in Git.
+[Identity](identity-feature-review-2026-10-30.md) accepts all five initial rows and
+eight detailed sections against unchanged source trees and full CI `8014d733`:
+190 API, 35 domain, 22 data and 17 worker cases, plus 95 Chromium scenarios
+(including eight actual API/browser workflows). No new implementation was needed.
+
+Continue Documents, the other module contracts and Mobile behavior. Downloaded
+full-CI reports are supplementary local evidence in
+`.work/feature-audit-2026-10-30/ci-8014d733`; parsed backend and browser indexes
+are in `ci-suite-index.json` and `ci-browser-index.json` beside that directory.
+The [Identity measurement](measurements/identity-feature-review-2026-10-30.json)
+retains its selected evidence in Git. Gradle artifacts contain HTML, not XML;
+Playwright HTML embeds the report ZIP with its verified source metadata.
 Keep each requirement's matching evidence in the inventory. No reusable client
 correction is due from these server/dashboard changes.
 

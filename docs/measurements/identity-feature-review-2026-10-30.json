@@ -1,0 +1,1147 @@
+{
+  "date": "2026-10-30",
+  "status": "accepted",
+  "reviewedAt": "737d39a7",
+  "source": "8014d733baac391a357a487984174b94e62ffaa3",
+  "fullCi": "https://github.com/fajarxfce/hris-platform/actions/runs/41005223374",
+  "evidenceMethod": "Downloaded Gradle HTML summary rows and embedded Playwright report JSON; verified source hash, zero failures and outcomes. Repeated shared suites across four shards are counted once.",
+  "unchangedSourceTrees": [
+    {
+      "path": "modules/identity",
+      "tree": "a33eafb4f9e16e0c70c16ac3fe618ff34116a0f9",
+      "unchangedSinceAcceptedSource": true
+    },
+    {
+      "path": "apps/dashboard/src/features/identity",
+      "tree": "8d99ddb93aca61d73c33a31a582835e69dd2874c",
+      "unchangedSinceAcceptedSource": true
+    }
+  ],
+  "backend": {
+    "api": {
+      "suites": [
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.CredentialChallengeHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "6.304s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.CredentialConfirmationCompletionTest",
+          "tests": 4,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "5.364s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.IdentityAdministrationAccessHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "7.306s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.InvitationCompletionAssuranceTest",
+          "tests": 12,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "5.890s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.MfaHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "6.391s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.MfaUnavailableHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "5.445s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.NativeFirebaseSessionHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "6.404s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.NativePasswordSessionHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "6.243s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.OidcTransportTest",
+          "tests": 3,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.014s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.RoleTemplateHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "5.079s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.RoleTemplateReviewHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "5.019s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.IdentityAdministrationAssuranceHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "4.721s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.MembershipRevisionHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "5.547s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.NativeSessionRevocationHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "4.870s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.OidcHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "6.544s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.RoleTemplateAssuranceTest",
+          "tests": 9,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "5.612s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.SignInLimitHttpTest",
+          "tests": 2,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "5.112s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.AccountNativeSessionCompletionTest",
+          "tests": 18,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "24.664s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.AccountNativeSessionHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "14.549s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.IdentityHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "5.331s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.MembershipAccessHttpTest",
+          "tests": 5,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "6.240s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.NativeFirebaseDisabledHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "4.600s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.NativePushRegistrationHttpTest",
+          "tests": 6,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "6.064s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.NativeSignInLimitHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "5.256s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.AccountAdministrationCompletionTest",
+          "tests": 8,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "29.275s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.AccountAdministrationHttpTest",
+          "tests": 7,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "14.017s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.CredentialDisabledHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "5.307s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.MembershipAssuranceHttpTest",
+          "tests": 4,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "6.151s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.MembershipCompletionAssuranceTest",
+          "tests": 8,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "6.708s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.NativeFirebaseEnabledHttpTest",
+          "tests": 1,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "5.182s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.NativeSessionHttpTest",
+          "tests": 8,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "6.791s"
+        },
+        {
+          "task": "apps/server",
+          "name": "dev.fajar.hris.OidcAdministrationCompletionTest",
+          "tests": 23,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "6.978s"
+        }
+      ],
+      "total": {
+        "tests": 190,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    "domain": {
+      "suites": [
+        {
+          "task": "modules/identity/domain",
+          "name": "dev.fajar.hris.identity.domain.CompanyCommandAccessPolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.119s"
+        },
+        {
+          "task": "modules/identity/domain",
+          "name": "dev.fajar.hris.identity.domain.CredentialPolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.066s"
+        },
+        {
+          "task": "modules/identity/domain",
+          "name": "dev.fajar.hris.identity.domain.FirebaseIdentityPolicyTest",
+          "tests": 4,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.014s"
+        },
+        {
+          "task": "modules/identity/domain",
+          "name": "dev.fajar.hris.identity.domain.IdentityPolicyTest",
+          "tests": 5,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.021s"
+        },
+        {
+          "task": "modules/identity/domain",
+          "name": "dev.fajar.hris.identity.domain.NativePushRegistrationPolicyTest",
+          "tests": 1,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.003s"
+        },
+        {
+          "task": "modules/identity/domain",
+          "name": "dev.fajar.hris.identity.domain.NativeSessionCleanupTest",
+          "tests": 9,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.097s"
+        },
+        {
+          "task": "modules/identity/domain",
+          "name": "dev.fajar.hris.identity.domain.PlatformCommandAccessPolicyTest",
+          "tests": 2,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.003s"
+        },
+        {
+          "task": "modules/identity/domain",
+          "name": "dev.fajar.hris.identity.domain.SessionAssurancePolicyTest",
+          "tests": 3,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.007s"
+        },
+        {
+          "task": "modules/identity/domain",
+          "name": "dev.fajar.hris.identity.domain.VerifyFirebaseSignInTest",
+          "tests": 5,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.021s"
+        }
+      ],
+      "total": {
+        "tests": 35,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    "data": {
+      "suites": [
+        {
+          "task": "modules/identity/data",
+          "name": "dev.fajar.hris.identity.data.CredentialPublicOriginTest",
+          "tests": 1,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.094s"
+        },
+        {
+          "task": "modules/identity/data",
+          "name": "dev.fajar.hris.identity.data.FirebaseKeyTransportTest",
+          "tests": 4,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "5.722s"
+        },
+        {
+          "task": "modules/identity/data",
+          "name": "dev.fajar.hris.identity.data.FirebaseTokenVerificationTest",
+          "tests": 4,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.328s"
+        },
+        {
+          "task": "modules/identity/data",
+          "name": "dev.fajar.hris.identity.data.MfaCryptographyTest",
+          "tests": 3,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.179s"
+        },
+        {
+          "task": "modules/identity/data",
+          "name": "dev.fajar.hris.identity.data.NativeSessionCleanupRepositoryTest",
+          "tests": 8,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.090s"
+        },
+        {
+          "task": "modules/identity/data",
+          "name": "dev.fajar.hris.identity.data.PasswordCapacityTest",
+          "tests": 2,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "0.012s"
+        }
+      ],
+      "total": {
+        "tests": 22,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    "worker": {
+      "suites": [
+        {
+          "task": "apps/worker",
+          "name": "dev.fajar.hris.worker.IdentityMailWorkerTest",
+          "tests": 7,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "8.937s"
+        },
+        {
+          "task": "apps/worker",
+          "name": "dev.fajar.hris.worker.NativeSessionCleanupWorkerTest",
+          "tests": 10,
+          "failures": 0,
+          "skipped": 0,
+          "duration": "10.885s"
+        }
+      ],
+      "total": {
+        "tests": 17,
+        "failures": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "browser": [
+    {
+      "artifactPath": "dashboard-integration-test-reports/integration-report/index.html",
+      "tests": [
+        {
+          "file": "account-device-sessions.spec.ts",
+          "title": "real administration ends one app family through response loss while independent sessions retain access",
+          "duration": 4806,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-creation.spec.ts",
+          "title": "new company assignment recovers its original receipt and enables only the selected company's native access",
+          "duration": 3472,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-memberships.spec.ts",
+          "title": "real API member editing retains archived evidence, recovers a lost save and explicitly reviews reactivation",
+          "duration": 3592,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "device-sessions.spec.ts",
+          "title": "real own-session management revokes only the selected native credentials through response loss and account replacement",
+          "duration": 3062,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "managed-accounts.spec.ts",
+          "title": "real API platform administration works without company access and preserves committed saves and session revocation",
+          "duration": 2997,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "oidc-bindings.spec.ts",
+          "title": "real SSO binding administration retains receipts, activation versions and credential revocation",
+          "duration": 4481,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "role-templates.spec.ts",
+          "title": "real API role revisions recover one lost save and leave applied member access unchanged",
+          "duration": 3256,
+          "outcome": "expected",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "artifactPath": "dashboard-integration-test-reports/worker-integration-report/index.html",
+      "tests": [
+        {
+          "file": "account-invitations.spec.ts",
+          "title": "real worker delivery, explicit resend and one-use recovery preserve account and session boundaries",
+          "duration": 11750,
+          "outcome": "expected",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "artifactPath": "dashboard-test-reports-1/index.html",
+      "tests": [
+        {
+          "file": "account-credentials.spec.ts",
+          "title": "captures and removes the token before interaction, without loading an existing session",
+          "duration": 1582,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-credentials.spec.ts",
+          "title": "a consumed link cannot set another password and diagnostics remain private",
+          "duration": 1126,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-credentials.spec.ts",
+          "title": "lost confirmation directs sign-in without replaying its one-use command",
+          "duration": 1037,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-credentials.spec.ts",
+          "title": "a reload cannot recover the discarded URL token from storage",
+          "duration": 1103,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-credentials.spec.ts",
+          "title": "recovery acknowledges an empty 202 without revealing account eligibility",
+          "duration": 1531,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-credentials.spec.ts",
+          "title": "public password entry retains input across theme and locale changes without session refresh",
+          "duration": 906,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-device-sessions.spec.ts",
+          "title": "account details lead to scoped sessions and retain the directory return context",
+          "duration": 1505,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-device-sessions.spec.ts",
+          "title": "an explicit retry after response loss ends the original family once",
+          "duration": 1494,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-device-sessions.spec.ts",
+          "title": "refresh reconciles an unknown end result without issuing another command",
+          "duration": 1459,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-device-sessions.spec.ts",
+          "title": "pending revocation protects the account return link and prevents duplicate actions",
+          "duration": 1669,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-device-sessions.spec.ts",
+          "title": "MFA recovery requires a fresh review and never resends a rejected action automatically",
+          "duration": 2016,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-device-sessions.spec.ts",
+          "title": "readmitting unchanged administration does not cause a failed-read loop",
+          "duration": 1249,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-device-sessions.spec.ts",
+          "title": "withdrawn platform authority removes account and device metadata",
+          "duration": 1408,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-device-sessions.spec.ts",
+          "title": "company grants alone cannot read account sessions",
+          "duration": 1085,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-device-sessions.spec.ts",
+          "title": "leaving a pending read aborts it before another account is displayed",
+          "duration": 1672,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-device-sessions.spec.ts",
+          "title": "confirmation supports Indonesian dark mode at narrow width with doubled text",
+          "duration": 1819,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-invitations.spec.ts",
+          "title": "creates an inactive invitation without granting company access",
+          "duration": 2369,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-invitations.spec.ts",
+          "title": "retains the original invitation through lost response, MFA and later version conflict",
+          "duration": 3217,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-invitations.spec.ts",
+          "title": "resend pins the recipient and requires review after a concurrent update",
+          "duration": 2310,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-invitations.spec.ts",
+          "title": "disabled mail is a definite rejection and does not claim delivery",
+          "duration": 1795,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-invitations.spec.ts",
+          "title": "pending invitation guards navigation and blocks duplicate clicks",
+          "duration": 1685,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "account-invitations.spec.ts",
+          "title": "invitation remains readable in dark mode at 390 pixels with doubled Indonesian text",
+          "duration": 1717,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-members.spec.ts",
+          "title": "company accounts keep bounded pages and show grant sources in localized responsive views",
+          "duration": 1707,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-members.spec.ts",
+          "title": "denied directory access performs no membership reads",
+          "duration": 1169,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-members.spec.ts",
+          "title": "refresh failures remove previously displayed account and role data",
+          "duration": 1710,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-members.spec.ts",
+          "title": "company changes abandon pending account reads and discard old cursors",
+          "duration": 1572,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-creation.spec.ts",
+          "title": "company account selection excludes unavailable accounts and grants reviewed current roles",
+          "duration": 2904,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-creation.spec.ts",
+          "title": "candidate pages stay bounded and changing selection retains the explicit search",
+          "duration": 1828,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-creation.spec.ts",
+          "title": "existing company membership opens its review without overwriting any grants",
+          "duration": 1218,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-creation.spec.ts",
+          "title": "a lost creation response retains the same operation through MFA and a later version rejection",
+          "duration": 2188,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-creation.spec.ts",
+          "title": "a concurrent assignment requires protected review of the existing membership",
+          "duration": 2054,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-creation.spec.ts",
+          "title": "account deactivation after review requires new preparation and clears the unusable form",
+          "duration": 1540,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-creation.spec.ts",
+          "title": "a revised role must be selected again before a new assignment can be saved",
+          "duration": 2780,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-creation.spec.ts",
+          "title": "changing company while a save is pending prevents its late result entering the new workspace",
+          "duration": 1461,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-creation.spec.ts",
+          "title": "leaving a pending preparation cancels it and ignores its late account result",
+          "duration": 1395,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-creation.spec.ts",
+          "title": "company-only administrators cannot discover outside accounts through direct routes",
+          "duration": 2779,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-creation.spec.ts",
+          "title": "company replacement in a direct link never acquires the old company's candidate",
+          "duration": 1198,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-creation.spec.ts",
+          "title": "new company access remains readable in Indonesian dark mode with doubled text",
+          "duration": 2072,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-editor.spec.ts",
+          "title": "member editing keeps applied role versions while direct permissions change",
+          "duration": 2353,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-editor.spec.ts",
+          "title": "role replacement explicitly selects the reviewed current version",
+          "duration": 1945,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-editor.spec.ts",
+          "title": "role picker pages remain bounded and closing restores the editor",
+          "duration": 2483,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-editor.spec.ts",
+          "title": "reactivation requires current role review while inactive accounts can be disabled",
+          "duration": 3046,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-editor.spec.ts",
+          "title": "unconfirmed membership saves preserve the original command through MFA and later conflicts",
+          "duration": 1975,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-editor.spec.ts",
+          "title": "definite membership conflicts require protected current review before another command",
+          "duration": 1821,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-editor.spec.ts",
+          "title": "pending membership saves disable edits and guard departure",
+          "duration": 1846,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-editor.spec.ts",
+          "title": "company replacement cancels pending editor reads and clears private grant data",
+          "duration": 1390,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-editor.spec.ts",
+          "title": "denied company administrators acquire neither member grants nor role catalogs",
+          "duration": 1051,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "company-membership-editor.spec.ts",
+          "title": "membership editing remains readable in Indonesian dark mode with doubled text",
+          "duration": 1560,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "device-sessions.spec.ts",
+          "title": "own app sessions remain available without company or administration grants",
+          "duration": 1784,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "device-sessions.spec.ts",
+          "title": "a dropped acknowledgement retains the exact session for an explicit idempotent retry",
+          "duration": 1506,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "device-sessions.spec.ts",
+          "title": "refresh resolves an unknown outcome without repeating its command",
+          "duration": 1402,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "device-sessions.spec.ts",
+          "title": "pending revocation protects navigation and completing it cancels an obsolete departure",
+          "duration": 1854,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "device-sessions.spec.ts",
+          "title": "leaving a held acquisition aborts it before a late response can update another page",
+          "duration": 1168,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "device-sessions.spec.ts",
+          "title": "an expired initiating credential ends the dashboard scope without a retry loop",
+          "duration": 1190,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "device-sessions.spec.ts",
+          "title": "readmitting an unchanged account does not silently repeat a rejected session read",
+          "duration": 1236,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "device-sessions.spec.ts",
+          "title": "an explicit departure aborts a pending revocation and a late server commit stays on its original account",
+          "duration": 1464,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "device-sessions.spec.ts",
+          "title": "transient list failures wait for user recovery and display an empty account accurately",
+          "duration": 1079,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "device-sessions.spec.ts",
+          "title": "session confirmation supports Indonesian dark mode at narrow width and doubled text",
+          "duration": 2003,
+          "outcome": "expected",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "artifactPath": "dashboard-test-reports-3/index.html",
+      "tests": [
+        {
+          "file": "managed-accounts.spec.ts",
+          "title": "platform administrators without a company can search explicit bounded account pages",
+          "duration": 1708,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "managed-accounts.spec.ts",
+          "title": "company-only administrators cannot acquire or navigate platform account data",
+          "duration": 1891,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "managed-accounts.spec.ts",
+          "title": "account editing displays session effects and saves an observed change",
+          "duration": 1450,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "managed-accounts.spec.ts",
+          "title": "lost account-save responses keep their original command through MFA and later conflicts",
+          "duration": 1825,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "managed-accounts.spec.ts",
+          "title": "a definite version conflict requires protected reloading before another command",
+          "duration": 1755,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "managed-accounts.spec.ts",
+          "title": "pending account saves disable editing and guard navigation",
+          "duration": 1551,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "managed-accounts.spec.ts",
+          "title": "self-access changes protect administrator status and revalidate the revoked session",
+          "duration": 1369,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "managed-accounts.spec.ts",
+          "title": "pending invitations cannot be activated and their cancellation is explicit",
+          "duration": 1245,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "managed-accounts.spec.ts",
+          "title": "revoked platform access clears private data and revalidates without a loop",
+          "duration": 1266,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "managed-accounts.spec.ts",
+          "title": "leaving an account review cancels the read and rejects a late response",
+          "duration": 1239,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "managed-accounts.spec.ts",
+          "title": "account editing remains readable in Indonesian dark appearance with doubled text",
+          "duration": 1402,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "oidc-bindings.spec.ts",
+          "title": "opens account-owned SSO pages and retains both directory cursors",
+          "duration": 1643,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "oidc-bindings.spec.ts",
+          "title": "creates an exact provider binding and makes issuer and subject immutable on review",
+          "duration": 1585,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "oidc-bindings.spec.ts",
+          "title": "keeps the original save through response loss, MFA and a later conflict",
+          "duration": 1715,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "oidc-bindings.spec.ts",
+          "title": "requires a new review after a concurrent binding change",
+          "duration": 1849,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "oidc-bindings.spec.ts",
+          "title": "guards pending edits and avoids duplicate submission",
+          "duration": 1409,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "oidc-bindings.spec.ts",
+          "title": "allows deactivation for an inactive account without offering new bindings",
+          "duration": 1396,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "oidc-bindings.spec.ts",
+          "title": "successful self changes revalidate the revoked session",
+          "duration": 1768,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "oidc-bindings.spec.ts",
+          "title": "leaving a pending binding directory aborts its acquisition before the response arrives",
+          "duration": 1102,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "oidc-bindings.spec.ts",
+          "title": "editor remains readable in Indonesian dark mode at 390 pixels and doubled text",
+          "duration": 1303,
+          "outcome": "expected",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "artifactPath": "dashboard-test-reports-4/index.html",
+      "tests": [
+        {
+          "file": "role-templates.spec.ts",
+          "title": "roles keep bounded directory and revision pages and offer readable localized layouts",
+          "duration": 1833,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "role-templates.spec.ts",
+          "title": "creation selects explicit module permissions and keeps the server's normalized code",
+          "duration": 1672,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "role-templates.spec.ts",
+          "title": "responsive dark editor retains selected permissions at 200 percent text",
+          "duration": 1169,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "role-templates.spec.ts",
+          "title": "unconfirmed saves retain the original command through MFA and a later version conflict",
+          "duration": 1835,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "role-templates.spec.ts",
+          "title": "confirmed version conflicts require a protected reload before a new command",
+          "duration": 1737,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "role-templates.spec.ts",
+          "title": "pending saves disable edits and protect navigation while their request is unresolved",
+          "duration": 1212,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "role-templates.spec.ts",
+          "title": "company changes cancel a held directory read and discard old cursors",
+          "duration": 1495,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "role-templates.spec.ts",
+          "title": "denied role administration makes no role requests and hides navigation",
+          "duration": 818,
+          "outcome": "expected",
+          "ok": true
+        },
+        {
+          "file": "role-templates.spec.ts",
+          "title": "a failed refresh clears the current definition, permissions and selected history",
+          "duration": 1095,
+          "outcome": "expected",
+          "ok": true
+        }
+      ]
+    }
+  ],
+  "nativeAcceptance": [
+    "docs/measurements/native-google-2026-10-29.json",
+    "docs/native-push-acceptance.md"
+  ],
+  "scope": "Five initial Identity rows and all eight detailed sections. No new code or live credential/session mutation."
+}

@@ -332,32 +332,47 @@
         {
           "id": "identity.01",
           "text": "Own accounts, sessions, invitations, OIDC links, MFA, memberships, roles, and permission assignments.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/identity-feature-review-2026-10-30.md",
+            "docs/measurements/identity-feature-review-2026-10-30.json"
+          ]
         },
         {
           "id": "identity.02",
           "text": "Use verified issuer/subject for OIDC. Local invitations and recovery tokens are single-use. Web cookies use HttpOnly/Secure and CSRF; mobile refresh rotation detects reuse. Privileged accounts require MFA and sensitive actions recent authentication.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/identity-feature-review-2026-10-30.md",
+            "docs/measurements/identity-feature-review-2026-10-30.json"
+          ]
         },
         {
           "id": "identity.03",
           "text": "Group/company administration, HR, manager, finance, auditor, and employee have explicit action/resource scopes. Disabling account or membership revokes that access without granting payroll access through administrative role names.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/identity-feature-review-2026-10-30.md",
+            "docs/measurements/identity-feature-review-2026-10-30.json"
+          ]
         },
         {
           "id": "identity.04",
           "text": "Screens: users, roles, company assignments, SSO configuration, active sessions.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/identity-feature-review-2026-10-30.md",
+            "docs/measurements/identity-feature-review-2026-10-30.json"
+          ]
         },
         {
           "id": "identity.05",
           "text": "Acceptance: cross-company/resource denial, refresh replay/revocation, invitation reuse, stale memberships, CSRF, and secret-free diagnostics.",
-          "status": "unverified",
-          "evidence": []
+          "status": "accepted",
+          "evidence": [
+            "docs/identity-feature-review-2026-10-30.md",
+            "docs/measurements/identity-feature-review-2026-10-30.json"
+          ]
         }
       ],
       "detailedContractSections": [
@@ -369,7 +384,11 @@
         "Company role templates",
         "Global account administration",
         "Invitations and password recovery"
-      ]
+      ],
+      "detailedReview": {
+        "status": "accepted",
+        "evidence": "docs/identity-feature-review-2026-10-30.md"
+      }
     },
     {
       "module": "leave",

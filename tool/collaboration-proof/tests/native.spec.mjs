@@ -66,9 +66,13 @@ if (fixture.nativeDevice) {
       await page.evaluate(() => window.probe.stop());
       await context.setOffline(true);
       execFileSync(adb, [...args, "shell", "run-as", application, "sh", "-c",
-        "'cat > files/protocol-proof/offline-ready.json'"], {
+        "'cat > files/protocol-proof/offline-ready.next'"], {
         input: JSON.stringify({ ready: true }), timeout: 15_000, stdio: ["pipe", "pipe", "pipe"],
       });
+      // Android observes existence before reading. Publish only the completed
+      // private file; creating the final name first exposes an empty signal.
+      command("shell", "run-as", application, "mv",
+        "files/protocol-proof/offline-ready.next", "files/protocol-proof/offline-ready.json");
       await expect.poll(() => ({ result: readResult("result"), instrumentation: readResult("instrumentation") }))
         .toMatchObject({ result: { receivedEncrypted: true, receivedEventId: sentId }, instrumentation: { complete: true } });
       const received = readResult("result");

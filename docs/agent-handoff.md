@@ -17,6 +17,16 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- **Provider fixture IPC race fixed and classic Android/web regression passes.**
+  Mobile `70bfbd21` run `41240634061` passed native but failed classic at
+  `ProofOfflineInvite.kt:28`: the reader saw the final signal name before its
+  producer finished writing. The producer now writes a private temporary file,
+  then publishes by rename. [Evidence](measurements/collaboration-offline-signal-2026-10-31.json)
+  retains both predecessor results/hashes and actual corrected classic proof
+  `bc5a0106`: 35.498s, two browser cases, zero unexpected/flaky/skipped, cleanup true.
+  Node syntax check passes. Mobile protocol CI must pin this Platform correction.
+  No product behavior, timeouts, live service or phone changes.
+
 - **An actual Android process death now preserves the pending SDK transaction.**
   [Evidence](measurements/collaboration-sdk-process-death-2026-10-31.json) binds
   15 Platform/71 Mobile sources to APK `a14d6bf1`. The owned proof process is

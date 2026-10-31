@@ -41,6 +41,7 @@ async function startMatrix(session) {
           roomId: room.roomId,
           eventId: event.getId(),
           encrypted: event.getWireType() === "m.room.encrypted",
+          ...(typeof content["org.hris.message_id"] === "string" ? { logicalId: content["org.hris.message_id"] } : {}),
         });
       }
     } catch {
@@ -74,7 +75,9 @@ async function lookup(body) {
     for (const event of room.getLiveTimeline().getEvents()) {
       try { await client.decryptEventIfNeeded(event); } catch { continue; }
       if (event.getType() === "m.room.message" && event.getContent().body === body) {
-        return { roomId: room.roomId, eventId: event.getId(), encrypted: event.getWireType() === "m.room.encrypted" };
+        const logicalId = event.getContent()["org.hris.message_id"];
+        return { roomId: room.roomId, eventId: event.getId(), encrypted: event.getWireType() === "m.room.encrypted",
+          ...(typeof logicalId === "string" ? { logicalId } : {}) };
       }
     }
   }
@@ -228,7 +231,10 @@ window.probe = {
     return result.room_id;
   },
   async join(roomId) { await client.joinRoom(roomId); return true; },
-  async send({ roomId, body }) { return (await client.sendTextMessage(roomId, body)).event_id; },
+  async send({ roomId, body, logicalId }) {
+    return (await client.sendEvent(roomId, "m.room.message", { msgtype: "m.text", body,
+      ...(logicalId ? { "org.hris.message_id": logicalId } : {}) })).event_id;
+  },
   lookup,
   async shareMediaKey(roomId) {
     mediaKey = Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, "0")).join("");

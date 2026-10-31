@@ -315,6 +315,7 @@ class ProviderProof:
         if self.native:
             self.record["checks"]["android_web_bidirectional_e2ee"] = True
             self.record["checks"]["android_sdk_refresh_preserves_device_key"] = True
+            self.record["checks"]["android_sdk_queue_encrypted_logical_ids"] = True
 
     def cleanup(self):
         successful = True

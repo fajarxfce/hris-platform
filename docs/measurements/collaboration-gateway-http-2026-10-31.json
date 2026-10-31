@@ -85,5 +85,11 @@
     "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/GetNativeCollaborationDeviceStatus.kt": "745b9e9d8a7b15c1caa7c3014e1813d3df63052b5545e01f60b7b747e275e28b",
     "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/MaintainCollaborationGatewayReplays.kt": "3f57c81a7feb41e443bd82dce3b2c6ee383a3ab530b96de32f09f37933a6e5fd",
     "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationGatewayPolicyTest.kt": "6402d6ea4af37e9d403ea342d071e076cb80ad4c7ebf7d9cb3075c1e3e4b3f61"
+  },
+  "hosted": {
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41196507714",
+    "commit": "c2e72935989524a2624d67a613fc322252efa66b",
+    "conclusion": "success",
+    "allJobsAndStepsSucceeded": true
   }
 }

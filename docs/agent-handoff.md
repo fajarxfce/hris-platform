@@ -70,8 +70,8 @@ Schema 109 now supplies [native gateway credential storage](collaboration/gatewa
 one retained head/device, opaque gateway-token hashes and one authenticated encrypted
 bootstrap/refresh response cache. Concurrent rotation, losing response replay,
 explicit bootstrap/build change, RLS lookup isolation, bounded SKIP LOCKED cache
-cleanup and real old/current-key restore pass nine PostgreSQL cases. This is not
-wired to public bootstrap/refresh or provider proxy yet. Cache cleanup retains its
+cleanup and real old/current-key restore pass nine PostgreSQL cases. Public bootstrap/refresh is
+wired as described below; the protected provider proxy remains pending. Cache cleanup retains its
 expired nonsecret deadline for PostgreSQL post-update RLS visibility. See
 [gateway evidence](measurements/collaboration-gateway-storage-2026-10-31.json) for
 validation (nine gateway, 29 database, 23 recovery cases; format/architecture;
@@ -123,6 +123,17 @@ the retained token-expiry/logout regression); the final peer extension passes in
 and queue listeners; the next native proof must establish encrypted logical-ID
 round trips/queue ownership before implementing durable recipient coalescing.
 
+Actual Android SDK queue/extra-content proof now passes with the existing browser
+scenario in 29.090s. Both directions preserve encrypted `org.hris.message_id`,
+paused SDK sending and local-to-remote transaction identity survive standard
+refresh with the same device key. [Evidence](measurements/collaboration-native-logical-queue-2026-10-31.json)
+retains source/APK hashes and two corrected synchronous room-queue binding failures.
+The asynchronous client-level queue API passes. Mobile full root/debug/lint checks
+pass in 52s (2,002 desktop cases, no lint errors). Durable process recovery and
+recipient logical-ID coalescing remain pending; no product group is accepted.
+Exact HTTP/worker source `c2e72935` passed every hosted job/step in
+[41196507714](https://github.com/fajarxfce/hris-platform/actions/runs/41196507714).
+
 Critical provider behavior: Synapse logout deletes the **whole device**, every
 bearer and its E2EE keys, even when called with an expired bearer. Never use it
 to clean up a losing/late login. Such credentials stay private/unpublished and
@@ -134,8 +145,9 @@ allow public login/admin/federation bypass.
 
 Next implementation:
 
-1. Inspect the HTTP/worker increment's exact hosted control after push. Its local
-   complete contexts pass; storage/admission hosted results are accepted above.
+1. Inspect transaction experiment `be810f1c` hosted control `41197100773`; its
+   database step passed and full contexts are still running. HTTP/worker, storage
+   and admission hosted results are accepted above.
 2. Protected Matrix request path with current admission before/after provider I/O,
    bounded/cancelled transport, internal credential renewal and room/context scope.
    Same-device transaction/aged retry behavior is proved; use the retained limit

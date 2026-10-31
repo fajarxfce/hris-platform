@@ -42,13 +42,20 @@ identical retries, reject conflicting reuse, and preserve aliases/tombstones for
 receipts, replies, edits and deletion. An ID copied from another sender must not
 hide that sender's message. Unknown/older clients retain event-ID behavior.
 
-The pinned native binding surfaces expose `Timeline.sendWithExtraContent` and
-send-queue listeners (Android 26.10.23, Swift 26.10.27). This is interface evidence,
-not yet a proved encrypted/persistent round trip. Next prove the extra ID through
-actual Android ↔ browser E2EE and SDK queue ownership, then implement persisted
-logical identities, reconciliation and receipt/redaction aliases. Do not replace
-the durable send queue with a second retry owner or blindly resend an old uncertain
-operation on an assumption of unlimited provider deduplication.
+The native experiment now proves this extra field through actual Android SDK
+26.10.23 ↔ browser E2EE in both directions. `Timeline.sendWithExtraContent` retains
+`org.hris.message_id`; neither the body nor ID appears in provider ciphertext.
+The SDK queue pauses, emits its local transaction, then resumes and reports the
+same transaction with its server event ID after ordinary credential refresh.
+[Queue evidence](../measurements/collaboration-native-logical-queue-2026-10-31.json)
+records both passing scenarios (29.090s), source/APK hashes and corrected failures.
+
+Synchronous `Room.enableSendQueue` failed with `InternalException` in this binding.
+Use the client owner's asynchronous `enableAllSendQueues` for connectivity gating;
+the corrected native run passes. Observers/handles and queues are stopped within
+owned cleanup. Swift 26.10.27 exposes related APIs, but has not run this scenario.
+Product durable logical identities, recipient coalescing, event aliases and
+restart reconciliation remain to implement. Do not add a second send retry owner.
 
 Remaining acceptance must cover restart before/after send/response/local ACK,
 long offline reconnect, repeated notification hints, conflicting identity reuse,

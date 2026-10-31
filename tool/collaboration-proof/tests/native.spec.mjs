@@ -8,7 +8,7 @@ const fixture = JSON.parse(readFileSync(process.env.HRIS_COLLAB_PROOF_FIXTURE, "
 // Register only when explicitly requested. Browser-only evidence never claims
 // the native gate; the driver's result records which experiment actually ran.
 if (fixture.nativeDevice) {
-  test("Android Rust SDK renews credentials without changing encrypted chat keys", async ({ browser, baseURL, request }) => {
+  test("Android SDK queue preserves encrypted logical message IDs through credential refresh", async ({ browser, baseURL, request }) => {
     const { adb, serial, package: application } = fixture.nativeDevice;
     if (serial !== "emulator-5560" || application !== "dev.fajar.hris.collaboration.proof") {
       throw new Error("Invalid native proof target");
@@ -31,10 +31,12 @@ if (fixture.nativeDevice) {
       const roomId = await page.evaluate(id => window.probe.createRoom(id), fixture.matrix.native.userId);
       const expectedBody = `fictional-native-web-${randomUUID()}`;
       const replyBody = `fictional-native-android-${randomUUID()}`;
+      const expectedLogicalId = randomUUID();
+      const replyLogicalId = randomUUID();
       // Credentials go through stdin into the app sandbox, never shell arguments.
       execFileSync(adb, [...args, "shell", "run-as", application, "sh", "-c",
         "'cat > files/protocol-proof/fixture.json'"], {
-        input: JSON.stringify({ ...fixture.matrix.native, roomId, expectedBody, replyBody }),
+        input: JSON.stringify({ ...fixture.matrix.native, roomId, expectedBody, replyBody, expectedLogicalId, replyLogicalId }),
         timeout: 15_000, stdio: ["pipe", "pipe", "pipe"],
       });
       instrument = spawn(adb, [...args, "shell", "am", "instrument", "-w",
@@ -52,7 +54,7 @@ if (fixture.nativeDevice) {
           return true;
         } catch { return false; }
       }).toBe(true);
-      const sentId = await page.evaluate(input => window.probe.send(input), { roomId, body: expectedBody });
+      const sentId = await page.evaluate(input => window.probe.send(input), { roomId, body: expectedBody, logicalId: expectedLogicalId });
       await expect.poll(() => ({ result: readResult("result"), instrumentation: readResult("instrumentation") }))
         .toMatchObject({ result: { receivedEncrypted: true, receivedEventId: sentId }, instrumentation: { complete: true } });
       const received = readResult("result");
@@ -60,8 +62,13 @@ if (fixture.nativeDevice) {
       expect(received.credentialsRotated).toBe(true);
       expect(received.persistedSessionCurrent).toBe(true);
       expect(received.deviceKeyUnchanged).toBe(true);
+      expect(received.queuedWhilePaused).toBe(true);
+      expect(received.queueTransactionId).toEqual(expect.any(String));
+      expect(received.queueTransactionId.length).toBeGreaterThan(0);
+      expect(received.receivedLogicalId).toBe(expectedLogicalId);
+      expect(received.sentLogicalId).toBe(replyLogicalId);
       await expect.poll(() => page.evaluate(body => window.probe.lookup(body), replyBody))
-        .toEqual({ roomId, eventId: received.sentEventId, encrypted: true });
+        .toEqual({ roomId, eventId: received.sentEventId, encrypted: true, logicalId: replyLogicalId });
       for (const eventId of [sentId, received.sentEventId]) {
         const wire = await request.get(`${fixture.matrix.baseUrl}/_matrix/client/v3/rooms/${encodeURIComponent(roomId)}/event/${encodeURIComponent(eventId)}`, {
           headers: { Authorization: `Bearer ${fixture.matrix.nativeweb.accessToken}` },
@@ -71,6 +78,8 @@ if (fixture.nativeDevice) {
         expect(ciphertext.type).toBe("m.room.encrypted");
         expect(JSON.stringify(ciphertext)).not.toContain(expectedBody);
         expect(JSON.stringify(ciphertext)).not.toContain(replyBody);
+        expect(JSON.stringify(ciphertext)).not.toContain(expectedLogicalId);
+        expect(JSON.stringify(ciphertext)).not.toContain(replyLogicalId);
       }
     } finally {
       instrument?.kill("SIGTERM");

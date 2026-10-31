@@ -25,7 +25,8 @@ class HttpMatrixClientDataSource(
     MatrixKeyDataSource,
     MatrixToDeviceDataSource,
     MatrixRoomAccessDataSource,
-    MatrixRoomHistoryDataSource {
+    MatrixRoomHistoryDataSource,
+    MatrixRoomMessageDataSource {
     private val exchanges = Semaphore(maximumConcurrent)
     private val json =
         JsonMapper.builder(
@@ -139,6 +140,26 @@ class HttpMatrixClientDataSource(
                 token,
                 deadline,
                 maximumRequestBytes = 1_048_576,
+            )
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
+    }
+
+    override fun sendRoomMessage(
+        roomId: String,
+        transactionId: String,
+        content: Map<String, Any>,
+        token: String,
+        deadline: Instant,
+    ): JsonNode {
+        require(transactionId.length in 1..128)
+        val response =
+            roomRequest(
+                roomPath(roomId) + "/send/m.room.encrypted/${segment(transactionId)}",
+                "PUT",
+                content,
+                token,
+                deadline,
             )
         if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
         return parse(response)

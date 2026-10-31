@@ -134,10 +134,9 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         return n.fixture.browser.send(request.build(), HttpResponse.BodyHandlers.ofString())
     }
 
-    private fun publishedRoom(n: Native, device: UUID): String {
+    private fun publishedRoom(n: Native, device: UUID, peer: UUID = UUID.randomUUID()): String {
         // Owned SQL/protocol fixture; the actual publication worker has separate coverage.
         val db = database()
-        val peer = UUID.randomUUID()
         val conversation = UUID.randomUUID()
         val job = UUID.randomUUID()
         val at = java.sql.Timestamp.from(clock.instant())
@@ -594,6 +593,146 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                     )
             )
         )
+    }
+
+    private fun enrolledRoomPeer(n: Native, peer: UUID): UUID {
+        val db = database()
+        val parent = UUID.randomUUID()
+        val device = UUID.randomUUID()
+        ownedParents.add(parent)
+        db.update(
+            "insert into company_memberships(company_id,account_id) values(?,?)",
+            n.fixture.company,
+            peer,
+        )
+        db.update(
+            "insert into membership_permissions(company_id,account_id,permission) values(?,?,'collaboration.chat')",
+            n.fixture.company,
+            peer,
+        )
+        db.update(
+            "insert into native_sessions(id,account_id,refresh_hash,authenticated_at,expires_at,access_expires_at,credential_version,created_at) values(?,?,?,now()-interval '1 minute',now()+interval '1 day',now()-interval '1 hour',0,now()-interval '1 minute')",
+            parent,
+            peer,
+            parent.toString().replace("-", "").repeat(2),
+        )
+        db.update(
+            "insert into collaboration_devices(company_id,id,account_id,platform,label,state,version,created_at,updated_at) values(?,?,?,'ANDROID','Fictional offline peer','PROVISIONING',0,now()-interval '1 minute',now()-interval '1 minute')",
+            n.fixture.company,
+            device,
+            peer,
+        )
+        db.update(
+            "update collaboration_devices set state='ACTIVE',version=1 where company_id=? and id=?",
+            n.fixture.company,
+            device,
+        )
+        db.update(
+            "insert into collaboration_device_sessions(company_id,device_id,account_id,native_session_id,bound_at) values(?,?,?,?,now())",
+            n.fixture.company,
+            device,
+            peer,
+            parent,
+        )
+        db.update(
+            "insert into collaboration_device_key_publications(company_id,device_id,account_id,fingerprint,version,reserved_at) values(?,?,?,?,0,now()-interval '1 minute')",
+            n.fixture.company,
+            device,
+            peer,
+            "a".repeat(64),
+        )
+        db.update(
+            "update collaboration_device_key_publications set version=1,published_at=now() where company_id=? and device_id=?",
+            n.fixture.company,
+            device,
+        )
+        return parent
+    }
+
+    @Test
+    fun encryptedRoomSendUsesCurrentPeerAndPinnedSenderAndStrictCiphertextFraming() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val key = fixtureKeys(n, device)
+        assertEquals(200, uploadKeys(n, token, json.writeValueAsString(key.body())).statusCode())
+        val peer = UUID.randomUUID()
+        val room = publishedRoom(n, device, peer)
+        val curve =
+            json
+                .readTree(json.writeValueAsString(key.body()))
+                .path("device_keys")
+                .path("keys")
+                .path("curve25519:${key.device}")
+                .asString()
+        val content =
+            mapOf(
+                "algorithm" to "m.megolm.v1.aes-sha2",
+                "ciphertext" to "Y2lwaGVydGV4dA",
+                "session_id" to curve,
+                "sender_key" to curve,
+                "device_id" to key.device,
+            )
+        val body = json.writeValueAsString(content)
+        fun send(
+            value: String = body,
+            auth: String? = token,
+            route: String = "rooms/$room/send/m.room.encrypted/fixture-txn",
+            duplicate: Boolean = false,
+            suffix: String = "",
+        ) =
+            uploadKeys(
+                n,
+                auth,
+                value,
+                route = route,
+                method = "PUT",
+                chunked = true,
+                duplicate = duplicate,
+                suffix = suffix,
+            )
+        val before = provider.roomSends.get()
+        assertEquals(403, send().statusCode())
+        val parent = enrolledRoomPeer(n, peer)
+        repeat(2) {
+            val response = send()
+            assertEquals(200, response.statusCode(), response.body())
+            assertEquals(
+                "\$fixture-sent",
+                json.readTree(response.body()).path("event_id").asString(),
+            )
+            assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+            assertEquals(json.readTree(body), provider.lastRoomCiphertext.get())
+        }
+        for (bad in
+            listOf(
+                "{}",
+                json.writeValueAsString(content + ("algorithm" to "plaintext")),
+                json.writeValueAsString(content + ("body" to "plaintext")),
+                json.writeValueAsString(content + ("ciphertext" to "bad!")),
+                body + " {}",
+                "{\"algorithm\":\"x\",\"algorithm\":\"y\"}",
+            )) assertEquals(400, send(bad).statusCode())
+        assertEquals(401, send(auth = n.access).statusCode())
+        assertEquals(401, send(duplicate = true).statusCode())
+        assertEquals(400, send(suffix = "?access_token=foreign").statusCode())
+        assertEquals(
+            404,
+            send(route = "rooms/!unknown/send/m.room.encrypted/fixture-txn").statusCode(),
+        )
+        assertEquals(403, send(route = "rooms/$room/send/m.room.message/fixture-txn").statusCode())
+        assertEquals(413, send("{\"ciphertext\":\"" + "A".repeat(70_000) + "\"}").statusCode())
+        assertEquals(before + 2, provider.roomSends.get())
+        provider.onRoomSend.set {
+            database()
+                .update(
+                    "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                    parent,
+                )
+        }
+        val late = send()
+        assertEquals(403, late.statusCode(), late.body())
+        assertFalse(late.body().contains("event_id"))
+        assertEquals(before + 3, provider.roomSends.get())
     }
 
     @Test
@@ -1081,6 +1220,9 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         val keyQueries = AtomicInteger()
         val keyClaims = AtomicInteger()
         val encryptedSends = AtomicInteger()
+        val roomSends = AtomicInteger()
+        val lastRoomCiphertext = AtomicReference<tools.jackson.databind.JsonNode>()
+        val onRoomSend = AtomicReference<(() -> Unit)?>(null)
         val onEncryptedSend = AtomicReference<(() -> Unit)?>(null)
         val lastEnvelope = AtomicReference<tools.jackson.databind.JsonNode>()
         val onKeyClaim = AtomicReference<(() -> Unit)?>(null)
@@ -1290,6 +1432,17 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                     val events = requireNotNull(roomStates[room])
                                     roomCalls.incrementAndGet()
                                     when (relative.substringAfter('/')) {
+                                        "send/m.room.encrypted/fixture-txn" -> {
+                                            assertEquals("PUT", request.requestMethod)
+                                            roomSends.incrementAndGet()
+                                            lastRoomCiphertext.set(
+                                                parser.readTree(
+                                                    request.requestBody.readNBytes(65537)
+                                                )
+                                            )
+                                            onRoomSend.getAndSet(null)?.invoke()
+                                            mapOf("event_id" to "\$fixture-sent")
+                                        }
                                         "join" -> mapOf("room_id" to room)
                                         "state" -> events
                                         "members" -> {

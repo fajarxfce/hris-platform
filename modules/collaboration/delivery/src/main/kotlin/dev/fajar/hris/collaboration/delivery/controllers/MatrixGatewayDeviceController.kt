@@ -4,6 +4,7 @@ import dev.fajar.hris.collaboration.delivery.matrix.matrixGatewayProblem
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyClaimRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyQueryRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyUploadRequest
+import dev.fajar.hris.collaboration.delivery.requests.matrixRoomMessageRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixToDeviceRequest
 import dev.fajar.hris.collaboration.domain.policies.collaborationGatewayAuthenticationRequired
 import dev.fajar.hris.collaboration.domain.usecases.AccessNativeCollaborationMatrixDevice
@@ -29,6 +30,22 @@ import tools.jackson.databind.json.JsonMapper
 class MatrixGatewayDeviceController(private val device: AccessNativeCollaborationMatrixDevice) {
     private val parser = parser(512)
     private val envelopeParser = parser(65536)
+
+    @PutMapping("/_matrix/client/v3/rooms/{roomId}/send/m.room.encrypted/{transactionId}")
+    fun roomMessage(
+        @PathVariable roomId: String,
+        @PathVariable transactionId: String,
+        request: HttpServletRequest,
+    ): ResponseEntity<Any> =
+        keyRequest(
+            request,
+            { matrixRoomMessageRequest(transactionId, it) },
+            reader = envelopeParser,
+        ) { token, correlation, message ->
+            device.sendRoomMessage(token, correlation, roomId, message).map {
+                mapOf("event_id" to it)
+            }
+        }
 
     @PostMapping("/_matrix/client/v3/rooms/{roomId}/join", "/_matrix/client/v3/join/{roomId}")
     fun join(@PathVariable roomId: String, request: HttpServletRequest): ResponseEntity<Any> =

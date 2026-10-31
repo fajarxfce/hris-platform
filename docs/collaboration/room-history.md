@@ -58,8 +58,8 @@ Control JSON now also bounds nesting to 64, strings to one MiB and numeric
 lexemes to 32 characters, in addition to duplicate/trailing-token rejection.
 Cancellation and acquisition errors release the permit; there is no wait queue.
 
-The next implementation is encrypted room sending and the actual pinned SDK
-through HRIS, followed by durable outbox and product UI. This does not accept
+[Encrypted room sending](room-messages.md) is implemented. Next connect the actual
+pinned SDK through HRIS, followed by durable outbox and product UI. This does not accept
 CHAT-01–15, call/meeting delivery, capacity or a platform rollout.
 
 [Validation](../measurements/collaboration-room-history-2026-10-31.json) retains

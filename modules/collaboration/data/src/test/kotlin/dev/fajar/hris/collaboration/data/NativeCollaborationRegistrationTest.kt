@@ -16,6 +16,7 @@ import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRoomSc
 import dev.fajar.hris.collaboration.data.matrix.HttpMatrixClientDataSource
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixKeyRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixRoomHistoryRepository
+import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixRoomMessageRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixSyncRepository
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixToDeviceRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationGatewaySessionRepository
@@ -43,6 +44,7 @@ import dev.fajar.hris.collaboration.domain.repositories.CollaborationGatewaySess
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixKeyRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomHistoryRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomMessageRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixSyncRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixToDeviceRepository
@@ -2301,6 +2303,87 @@ class NativeCollaborationRegistrationTest {
         assertEquals(0, q.sendCalls.get())
     }
 
+    @Test
+    fun encryptedRoomSendKeepsTransactionAndAcceptsAnOfflineEnrolledPeer() {
+        val q = KeyQueryFixture()
+        sql.update(
+            "update native_sessions set access_expires_at=now()-interval '1 hour',mfa_verified_at=null where id=?",
+            q.peerParent,
+        )
+        repeat(2) { assertEquals(Result.Success("\$fictional-event"), q.sendRoom()) }
+        assertEquals(2, q.roomSendCalls.get())
+        assertEquals(q.roomMessage(), q.roomMessageSeen)
+        q.ownedRoom = null
+        assertEquals("collaboration_room_not_found", failed(q.sendRoom()))
+        assertEquals(2, q.roomSendCalls.get())
+    }
+
+    @Test
+    fun encryptedRoomSendRequiresConfirmedPeerAndSenderAndRejectsForeignDeviceMetadata() {
+        val pendingPeer = KeyQueryFixture(published = false)
+        assertEquals("collaboration_recipient_unavailable", failed(pendingPeer.sendRoom()))
+        assertEquals(0, pendingPeer.roomSendCalls.get())
+        val pendingSender = KeyQueryFixture(publishedSender = false)
+        assertEquals("collaboration_device_keys_required", failed(pendingSender.sendRoom()))
+        assertEquals(0, pendingSender.roomSendCalls.get())
+        val q = KeyQueryFixture()
+        assertEquals(
+            "collaboration_encryption_keys_changed",
+            failed(q.sendRoom(q.roomMessage().copy(deviceId = q.peerKeys.deviceId))),
+        )
+        assertEquals(
+            "collaboration_encryption_keys_changed",
+            failed(q.sendRoom(q.roomMessage().copy(senderKey = q.envelope().recipientKey))),
+        )
+        assertEquals(0, q.roomSendCalls.get())
+    }
+
+    @Test
+    fun encryptedRoomSendFencesPeerRemovalDuringPreflightAndSuccessOrFailureAfterSend() {
+        for (stage in listOf("preflight", "success", "failure", "enrollment")) {
+            val q = KeyQueryFixture()
+            fun change() {
+                if (stage == "enrollment") q.enrollPeer()
+                else
+                    sql.update(
+                        "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                        q.peerParent,
+                    )
+            }
+            if (stage == "preflight")
+                q.upload.provider.onQuery = {
+                    change()
+                    Result.Success(q.upload.keys.device)
+                }
+            else
+                q.onRoomSend = {
+                    change()
+                    if (stage == "failure")
+                        Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_outage"))
+                    else Result.Success("\$fictional-event")
+                }
+            assertEquals(
+                if (stage == "enrollment") "collaboration_recipients_changed"
+                else "collaboration_recipient_unavailable",
+                failed(q.sendRoom()),
+            )
+            assertEquals(if (stage == "preflight") 0 else 1, q.roomSendCalls.get())
+        }
+    }
+
+    @Test
+    fun encryptedRoomSendChecksCallerEvenWhenResolvingGuardIdsFails() {
+        val q = KeyQueryFixture()
+        q.onRoomLookup = {
+            q.upload.g.f.clock.at = q.upload.tokens.accessExpiresAt
+            Result.Failed(Failure(FailureKind.NOT_FOUND, "fixture_lookup_failure"))
+        }
+        val result = q.sendRoom() as Result.Failed
+        assertNotEquals("fixture_lookup_failure", result.failure.code)
+        assertEquals(FailureKind.UNAUTHENTICATED, result.failure.kind)
+        assertEquals(0, q.roomSendCalls.get())
+    }
+
     private class KeyQueryFixture(
         published: Boolean = true,
         paired: Boolean = true,
@@ -2317,6 +2400,24 @@ class NativeCollaborationRegistrationTest {
         val calls = AtomicInteger()
         val claimCalls = AtomicInteger()
         val sendCalls = AtomicInteger()
+        val roomSendCalls = AtomicInteger()
+        var roomMessageSeen: CollaborationRoomMessage? = null
+        var onRoomSend: (() -> Result<String>)? = null
+        var onRoomLookup: (() -> Result<CollaborationOwnedRoom?>)? = null
+        val roomId = "!fictional-room"
+        private val conversationId = UUID.randomUUID()
+        var ownedRoom: CollaborationOwnedRoom? =
+            listOf(upload.g.f.account, peer).sortedBy(UUID::toString).let {
+                CollaborationOwnedRoom(
+                    company,
+                    conversationId,
+                    it[0],
+                    it[1],
+                    upload.g.f.account,
+                    "proof.invalid",
+                    roomId,
+                )
+            }
         var sent: CollaborationToDevice? = null
         var onSend: (() -> Result<Unit>)? = null
         var claimed: CollaborationMatrixKeyClaim? = null
@@ -2421,7 +2522,7 @@ class NativeCollaborationRegistrationTest {
                 sql.update(
                     "insert into collaboration_direct_conversations(company_id,id,first_account_id,second_account_id,created_by,created_at) values(?,?,?,?,?,now())",
                     company,
-                    UUID.randomUUID(),
+                    conversationId,
                     pair[0],
                     pair[1],
                     upload.g.f.account,
@@ -2475,6 +2576,66 @@ class NativeCollaborationRegistrationTest {
             keys[key.userId to key.deviceId] = key.device
             return parent to key
         }
+
+        fun roomMessage() =
+            CollaborationRoomMessage(
+                "fictional-transaction",
+                "Y2lwaGVydGV4dA",
+                envelope().senderKey,
+                envelope().senderKey,
+                upload.keys.deviceId,
+            )
+
+        fun sendRoom(message: CollaborationRoomMessage = roomMessage()) =
+            upload.g.f
+                .matrixIdentity(
+                    upload.matrix,
+                    providerKeys = provider,
+                    roomScopes =
+                        object : CollaborationRoomScopeRepository {
+                            override fun owned(
+                                companyId: UUID,
+                                accountId: UUID,
+                                limit: Int,
+                            ): Result<List<CollaborationOwnedRoom>> = error("Exact room only")
+
+                            override fun find(
+                                companyId: UUID,
+                                accountId: UUID,
+                                serverName: String,
+                                roomId: String,
+                            ): Result<CollaborationOwnedRoom?> =
+                                onRoomLookup?.invoke()
+                                    ?: Result.Success(
+                                        ownedRoom?.takeIf {
+                                            it.companyId == companyId &&
+                                                accountId == upload.g.f.account &&
+                                                it.serverName == serverName &&
+                                                it.roomId == roomId
+                                        }
+                                    )
+                        },
+                    providerRoomMessage =
+                        object : CollaborationMatrixRoomMessageRepository {
+                            override fun send(
+                                roomId: String,
+                                message: CollaborationRoomMessage,
+                                bearer: String,
+                                deadline: Instant,
+                            ): Result<String> {
+                                assertFalse(
+                                    org.springframework.transaction.support
+                                        .TransactionSynchronizationManager
+                                        .isActualTransactionActive()
+                                )
+                                assertEquals(this@KeyQueryFixture.roomId, roomId)
+                                roomSendCalls.incrementAndGet()
+                                roomMessageSeen = message
+                                return onRoomSend?.invoke() ?: Result.Success("\$fictional-event")
+                            }
+                        },
+                )
+                .sendRoomMessage(upload.tokens.accessToken, UUID.randomUUID(), roomId, message)
 
         fun envelope() =
             CollaborationOlmEnvelope(
@@ -5133,6 +5294,8 @@ class NativeCollaborationRegistrationTest {
                     .DisabledCollaborationMatrixRoomAccessRepository(),
             providerRoomHistory: CollaborationMatrixRoomHistoryRepository =
                 DisabledCollaborationMatrixRoomHistoryRepository(),
+            providerRoomMessage: CollaborationMatrixRoomMessageRepository =
+                DisabledCollaborationMatrixRoomMessageRepository(),
         ) =
             AccessNativeCollaborationMatrixDevice(
                 gateway,
@@ -5156,6 +5319,7 @@ class NativeCollaborationRegistrationTest {
                 providerSync,
                 providerRoomAccess,
                 providerRoomHistory,
+                providerRoomMessage,
                 sessions,
                 policies,
                 companies,

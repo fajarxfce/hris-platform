@@ -1,0 +1,129 @@
+{
+  "date": "2026-10-31",
+  "scope": "Native DIRECT encrypted room sends with current peer/device eligibility and pinned sender keys",
+  "schema": 113,
+  "validation": [
+    {
+      "durationSeconds": 52,
+      "result": "passed",
+      "counts": {
+        "domain": 36,
+        "data": 7,
+        "api": 18
+      },
+      "note": "Fixed wire framing and provider receipt, actual Synapse retry/bearer replacement, live SQL recipient and sender completion races, format/architecture."
+    },
+    {
+      "durationSeconds": 641,
+      "result": "failed",
+      "counts": {
+        "modules/collaboration/domain": {
+          "tests": 36,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modules/collaboration/data": {
+          "tests": 201,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server": {
+          "tests": 153,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/worker": {
+          "tests": 112,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1
+        }
+      },
+      "note": "All new send cases, including maximum ciphertext, passed. Existing MatrixKeyProviderInteropTest restart exceeded its deadline; NativeCollaborationMatrixConfigurationTest failed PostgreSQL container startup before eight cases. Memory pressure was observed during a concurrent owned Mobile proof build; its completed idle daemon was terminated. No unrelated process or live service was changed."
+    },
+    {
+      "durationSeconds": 68,
+      "result": "passed",
+      "counts": {
+        "modules/collaboration/data": {
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server": {
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "note": "Both failed classes rerun with --no-parallel --max-workers=1 and no source change; actual provider restart and all eight configuration/API cases pass."
+    }
+  ],
+  "combinedCoverage": {
+    "modules/collaboration/domain": {
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "modules/collaboration/data": {
+      "tests": 201,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "apps/server": {
+      "tests": 160,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "apps/worker": {
+      "tests": 112,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    }
+  },
+  "verified": [
+    "Fixed m.room.encrypted route accepts only bounded canonical ciphertext/session keys, optional sender fields match pinned own identity",
+    "Published retained DIRECT room and current peer eligibility; no sends for never-enrolled/unconfirmed peer, missing sender publication or wrong device metadata",
+    "Offline peer with expired short access/no fresh MFA remains eligible while its native hard lease and permissions remain current",
+    "Ordered caller/peer account guards, current caller checked even after failed lock-ID lookup, no SQL transaction held over provider I/O",
+    "Current room, publication and exact recipient set checked around preflight and send; peer revoke/added device/late failure withholds outcome",
+    "Actual Synapse retry and same-device bearer rotation map to one event visible once to peer; 60,000-character ciphertext accepted by provider",
+    "Strict auth/body/query/type framing, no-store, unpublished/unknown room and plaintext denial; bounded streamed body and escaped fixed path",
+    "Existing API/worker graphs, full domain/data and selected API coverage pass in combined unchanged-source runs"
+  ],
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt": "a5cdf1ec378094f2db1d1d6785aea0eaca80dc60fbac1c30067173735f5e70f5",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "d5ff6181823828779dd2624491d64756289667ee18e4a06498283727f8a92d94",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/HttpMatrixClientDataSource.kt": "7deae288901b35016c0f296ec42ab37960f8f65c1ea1a36b0e1c4f453fa30b2a",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixRoomMessageDataSource.kt": "6a85a1504872ebac4dad8f36671f3c8e937f90ed77248174b5390bd2eb73433c",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/DisabledCollaborationMatrixRoomMessageRepository.kt": "a0b4b5d778e32d709a154d7d4b167f21635590454631abaf1200561fa5c3ab8a",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixRoomMessageRepository.kt": "c3476923af8bb550ef3efd64e4f82348aed7d63a24c74ee0d53a75813b9498c8",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderTransportTest.kt": "b2ea2844ba699f4c24b408068272aa7936f866c280756f6703ef0e587af36018",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixRoomMessageInteropTest.kt": "12efc4dc3fc014fbb2755435def4baddcf4f7186afac2716cd4d3af95e696a0e",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixRoomMessageMappingTest.kt": "bcdc796964f80c3131afad970bf910a2bd69c1341637dc5c8021bb1431cd400e",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "644ae3ff7b78b37576de602cc10849e1de881c7dd3d8b73cf1bb8a91b434a934",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/MatrixGatewayDeviceController.kt": "8f3303dc9f8abec4476b10ad21be78267038b6d80a76b15eae1b6e35981d738c",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/di/CollaborationWebConfiguration.kt": "22f52935177596e321873535b1ccfa37a9df7a74e68cee204d3ab98fff33f25b",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/MatrixRoomMessageRequest.kt": "489a3e03b5bcc8a4ed2432f4516845e5de743ac880acfee31af655ce0804eba0",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationRoomMessage.kt": "7c343f01eca231f453b2ab938b8258e49a500b15dfbf11a5bb7ec1ddc2f11e98",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationRoomMessagePolicy.kt": "b46a3aac9f878c602c0e079c3fcc8bd18421e33b7e42f34eddcf94bc355c372a",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationMatrixRoomMessageRepository.kt": "a97d909bd8fca40a1f17350de7d82710d7df3ece70161d150d64020ad757b7ce",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AccessNativeCollaborationMatrixDevice.kt": "3737c5abf686caabb7e583b2ca3aeb3e010cf4bd8230c2206bb17b27874ae084",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationRoomMessagePolicyTest.kt": "9afbdb1fbbf8ffaf49ab89af99e9532bd6f5fe82b63aaf16525f0d420895199c"
+  },
+  "remaining": [
+    "Actual pinned SDK through HRIS and product integration; Mobile gateway probe compiles/lints but has not run against HRIS",
+    "Durable client logical IDs, receipt storage/outbox, process restart and provider mapping retention recovery",
+    "Scoped relation/edit/redaction contracts, verification, group/context membership, browser admission and product UI",
+    "All remaining P0-P8/54 feature groups; no feature acceptance, schema or live/phone change"
+  ]
+}

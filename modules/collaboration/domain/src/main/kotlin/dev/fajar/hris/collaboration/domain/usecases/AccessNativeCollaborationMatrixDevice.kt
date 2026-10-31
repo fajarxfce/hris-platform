@@ -30,6 +30,7 @@ class AccessNativeCollaborationMatrixDevice(
     private val providerSync: CollaborationMatrixSyncRepository,
     private val providerRoomAccess: CollaborationMatrixRoomAccessRepository,
     private val providerRoomHistory: CollaborationMatrixRoomHistoryRepository,
+    private val providerRoomMessage: CollaborationMatrixRoomMessageRepository,
     private val sessions: NativeSessionRepository,
     private val policies: CompanyClientPolicyRepository,
     private val companies: CompanyRepository,
@@ -311,6 +312,119 @@ class AccessNativeCollaborationMatrixDevice(
         val owner: CollaborationSyncOwner,
         val rooms: CollaborationRoomScope,
         val position: CollaborationSyncPosition?,
+    )
+
+    fun sendRoomMessage(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        message: CollaborationRoomMessage,
+    ): Result<String> {
+        val valid = validateCollaborationRoomMessage(message)
+        if (valid is Result.Failed) return valid
+        if (
+            roomId.length !in 2..255 ||
+                !roomId.startsWith('!') ||
+                roomId.any { it.code !in 33..126 }
+        )
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_collaboration_room_message")
+            )
+        return admitted(
+            token,
+            correlationId,
+            extraAccounts = { initial ->
+                // Resolve lock IDs only; no authority or provider access is granted here.
+                // Even a failed resolution is followed by current caller admission below.
+                val scope =
+                    Actor(
+                        initial.accountId,
+                        initial.companyId,
+                        emptySet(),
+                        Instant.EPOCH,
+                        correlationId,
+                    )
+                transactions.run(scope) {
+                    readOwnedRoom(initial, roomId).map {
+                        setOf(it.firstAccountId, it.secondAccountId)
+                    }
+                }
+            },
+            prepare = { initial, observation ->
+                prepareRoomMessage(initial, roomId, observation.relatedAccounts)
+            },
+            revalidate = { initial, original ->
+                prepareRoomMessage(
+                        initial,
+                        roomId,
+                        setOf(original.room.firstAccountId, original.room.secondAccountId),
+                    )
+                    .flatMap { current ->
+                        if (current == original) Result.Success(Unit) else recipientsChanged()
+                    }
+            },
+        ) { exchange, prepared ->
+            if (
+                message.deviceId != null &&
+                    message.deviceId != collaborationMatrixDeviceId(exchange.initial.deviceId)
+            )
+                return@admitted Result.Failed(
+                    Failure(FailureKind.CONFLICT, "collaboration_encryption_keys_changed")
+                )
+            val own = exchange.readKeys()
+            if (own is Result.Failed) return@admitted own
+            val identity = (own as Result.Success).value ?: return@admitted invalidProvider()
+            val verified = validatePublicKeys(exchange.initial, prepared.own, identity)
+            if (verified is Result.Failed) return@admitted verified
+            if (!collaborationRoomMessageMatchesDevice(message, identity))
+                return@admitted Result.Failed(
+                    Failure(FailureKind.CONFLICT, "collaboration_encryption_keys_changed")
+                )
+            exchange.exchange { bearer, deadline ->
+                providerRoomMessage.send(prepared.room.roomId, message, bearer, deadline)
+            }
+        }
+    }
+
+    private fun prepareRoomMessage(
+        initial: CollaborationGatewaySession,
+        roomId: String,
+        guardedAccounts: Set<UUID>,
+    ): Result<RoomMessagePreparation> {
+        val owned = readOwnedRoom(initial, roomId)
+        if (owned is Result.Failed) return owned
+        val room = (owned as Result.Success).value
+        if (setOf(room.firstAccountId, room.secondAccountId).any { it !in guardedAccounts })
+            return invalidProvider()
+        val peer =
+            if (room.firstAccountId == initial.accountId) room.secondAccountId
+            else room.firstAccountId
+        val peerUser =
+            "@${collaborationMatrixLocalpart(initial.companyId, peer)}:${provider.serverName}"
+        val resolved =
+            prepareQuery(initial, CollaborationMatrixKeyQuery(mapOf(peerUser to emptyList())))
+        if (resolved is Result.Failed) return resolved
+        val targets = (resolved as Result.Success).value
+        if (targets.devices.isEmpty())
+            return Result.Failed(
+                Failure(FailureKind.FORBIDDEN, "collaboration_recipient_unavailable")
+            )
+        return keys.find(initial.companyId, initial.accountId, initial.deviceId).flatMap { own ->
+            if (own == null || own.version != 1L || own.publishedAt == null) keysRequired()
+            else if (
+                own.companyId != initial.companyId ||
+                    own.accountId != initial.accountId ||
+                    own.deviceId != initial.deviceId
+            )
+                invalidProvider()
+            else Result.Success(RoomMessagePreparation(room, own, targets))
+        }
+    }
+
+    private data class RoomMessagePreparation(
+        val room: CollaborationOwnedRoom,
+        val own: CollaborationDeviceKeyPublication,
+        val recipients: QueryPreparation,
     )
 
     fun sendToDevice(
@@ -778,13 +892,14 @@ class AccessNativeCollaborationMatrixDevice(
             (resolved as Result.Success).value
                 ?: return collaborationGatewayAuthenticationRequired()
         val resolvedAccounts = extraAccounts(initial)
-        if (resolvedAccounts is Result.Failed) return resolvedAccounts
-        val relatedAccounts = (resolvedAccounts as Result.Success).value.toSet()
+        val relatedAccounts = (resolvedAccounts as? Result.Success)?.value?.toSet() ?: emptySet()
         val scope = lookup.copy(accountId = initial.accountId, companyId = initial.companyId)
         val captured =
             transactions.run(scope) {
                 observe(scope, initial, relatedAccounts).flatMap { observation ->
-                    val extra = prepare(initial, observation)
+                    val extra: Result<S> =
+                        if (resolvedAccounts is Result.Failed) resolvedAccounts
+                        else prepare(initial, observation)
                     validateObservation(observation.admission, observation.admission).flatMap {
                         extra.map { Preparation(observation, it) }
                     }
@@ -1064,7 +1179,9 @@ class AccessNativeCollaborationMatrixDevice(
                         val admission =
                             it.copy(expiresAt = minOf(it.expiresAt, deadline, head.accessExpiresAt))
                         validateCollaborationGatewaySession(head, admission, device.platform, at)
-                            .map { Observation(actor, admission, credential) }
+                            .map {
+                                Observation(actor, admission, credential, relatedAccounts.toSet())
+                            }
                     }
             }
     }
@@ -1097,5 +1214,6 @@ class AccessNativeCollaborationMatrixDevice(
         val actor: Actor,
         val admission: CollaborationAdmission,
         val credential: CollaborationProviderSession?,
+        val relatedAccounts: Set<UUID>,
     )
 }

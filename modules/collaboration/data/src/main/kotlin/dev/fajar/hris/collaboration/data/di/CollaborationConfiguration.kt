@@ -24,6 +24,13 @@ import org.springframework.core.env.Environment
 @Configuration(proxyBeanMethods = false)
 class CollaborationConfiguration {
     @Bean
+    fun collaborationMatrixRoomMessage(
+        source: ObjectProvider<MatrixRoomMessageDataSource>
+    ): CollaborationMatrixRoomMessageRepository =
+        source.ifAvailable?.let(::InternalCollaborationMatrixRoomMessageRepository)
+            ?: DisabledCollaborationMatrixRoomMessageRepository()
+
+    @Bean
     fun collaborationMatrixRoomHistory(
         source: ObjectProvider<MatrixRoomHistoryDataSource>,
         crypto: IdentityTokenDataSource,
@@ -461,6 +468,7 @@ class CollaborationConfiguration {
         providerSync: CollaborationMatrixSyncRepository,
         providerRoomAccess: CollaborationMatrixRoomAccessRepository,
         providerRoomHistory: CollaborationMatrixRoomHistoryRepository,
+        providerRoomMessage: CollaborationMatrixRoomMessageRepository,
         sessions: NativeSessionRepository,
         policies: CompanyClientPolicyRepository,
         companies: CompanyRepository,
@@ -488,6 +496,7 @@ class CollaborationConfiguration {
             providerSync,
             providerRoomAccess,
             providerRoomHistory,
+            providerRoomMessage,
             sessions,
             policies,
             companies,

@@ -6852,3 +6852,22 @@ and full 426s regression: 34 domain, 194 data, 159 selected API and 112 worker
 retained in the room-access measurement. Schema remains 113; no live or phone
 change. Continue encrypted sends, actual HRIS SDK integration, outbox/UI and all
 remaining collaboration phases; no product feature is accepted by this checkpoint.
+
+
+## Native collaboration encrypted room sends — 31 October 2026
+
+Fixed Megolm sending now checks the published owned room, pinned sender and live
+eligible peer devices around each external operation. Offline short-token expiry
+preserves eligibility; removals, hard expiry and changed recipient sets withhold
+outcomes. Actual Synapse retries and same-device bearer replacement deduplicate
+while its retained mapping exists; maximum 60,000-character ciphertext passes.
+
+[Evidence](measurements/collaboration-room-messages-2026-10-31.json) records 18
+source hashes and 52s focused coverage. Full 641s coverage encountered two existing
+provider/container lifecycle timeouts during observed memory pressure alongside
+an owned Mobile build. Only that completed idle Mobile daemon was terminated;
+serial 68s reruns passed unchanged source. Combined: 36 domain, 201 data, 160 API,
+112 worker (one opt-in skip), format/architecture and both DI graphs. History CI
+41227795949 at fabaa9a5 passed both jobs/all 23 steps with 24 verified hashes.
+No schema/live/phone change. Continue actual HRIS SDK integration, durable outbox,
+UI and every remaining collaboration phase; this does not accept product chat.

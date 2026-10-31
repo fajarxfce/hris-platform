@@ -17,6 +17,26 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- Native DIRECT encrypted sends now use exact owned-room scope, confirmed sender
+  publication and current eligible peer devices, preserving offline short-token
+  expiry behavior. Key preflight and send each revalidate room/recipient/admission;
+  late denial withholds the result. Actual Synapse retry/same-device bearer rotation
+  returns one event and accepts the 60,000-character ciphertext bound. [Contract](collaboration/room-messages.md)
+  and [evidence](measurements/collaboration-room-messages-2026-10-31.json) retain
+  18 source hashes and 52s focused coverage. Full 641s regression hit two existing
+  provider/container lifecycle timeouts while an owned Mobile build ran under
+  observed memory pressure. After stopping only its completed idle daemon, both
+  failed classes passed serially in 68s without source changes. Combined coverage:
+  36 domain, 201 data, 160 selected API, 112 worker (one opt-in skip), quality and
+  both DI graphs. No schema, live or phone update. History fabaa9a5 hosted
+  41227795949 passed both jobs/all 23 steps, all 24 source hashes verified.
+  **Continue actual pinned SDK through HRIS, then durable outbox/UI and P0–P8.**
+  Mobile has four in-progress proof files (`HrisNativeMatrixProbe`, `HrisProofClient`,
+  `HrisProofMessages`, instrumentation scenario `hris`): debug assembly/lint passed
+  in 274s; actual gateway execution and root checks are still pending. They are
+  uncommitted until the owned HRIS fixture/driver is connected and tested. Use only
+  the dedicated emulator. Run resource-heavy builds serially on this machine.
+
 - Native DIRECT history now exposes fixed messages/context/event reads with exact
   retained room ownership and current admission before/after I/O. Sync prev_batch
   and page/context positions are AES-GCM bound to company/account/device/server/
@@ -26,8 +46,8 @@ Current provider/client evidence:
   format/architecture and both DI graphs. [Contract](collaboration/room-history.md)
   and [measurement](measurements/collaboration-room-history-2026-10-31.json) retain
   the initial fixture burst-429 failure, corrected 59s checks and 24 source hashes.
-  **Next implement encrypted room sends, then actual pinned SDK through HRIS,
-  durable outbox and product UI. Continue the full P0–P8 plan.** No migration,
+  Encrypted sends are implemented above. Continue actual pinned SDK through HRIS,
+  durable outbox and product UI, then the full P0–P8 plan. No migration,
   live service, phone, Mobile or Starter change occurred. The prior room-access
   commit b82888b6 hosted 41225780266 passed both jobs/all 23 steps; all 23 matching
   source hashes and terminal metadata are retained in its measurement.

@@ -1141,6 +1141,52 @@ class MatrixProviderTransportTest {
         }
     }
 
+    @Test
+    fun encryptedRoomSendUsesOnlyTheFixedPathAndEscapedRoomTransactionWithinDeadline() {
+        Fixture().use { f ->
+            f.handler = {
+                assertEquals("PUT", it.requestMethod)
+                assertEquals(
+                    "/_matrix/client/v3/rooms/%21room%2F%3Fforeign/send/m.room.encrypted/txn%2F..%3Fother%23fragment",
+                    it.requestURI.rawPath,
+                )
+                assertNull(it.requestURI.rawQuery)
+                val body = f.json.readTree(it.requestBody.readNBytes(65537))
+                assertEquals("m.megolm.v1.aes-sha2", body.path("algorithm").asString())
+                f.respond(it, "{\"event_id\":\"\$fixture\"}")
+            }
+            val content =
+                mapOf<String, Any>(
+                    "algorithm" to "m.megolm.v1.aes-sha2",
+                    "ciphertext" to "Y2lwaGVydGV4dA",
+                    "session_id" to "A".repeat(43),
+                )
+            val result =
+                f.source.sendRoomMessage(
+                    "!room/?foreign",
+                    "txn/..?other#fragment",
+                    content,
+                    "fixture",
+                    f.clock.now.plusSeconds(5),
+                )
+            assertEquals("\$fixture", result.path("event_id").asString())
+            val calls = f.requests.get()
+            assertThrows(MatrixDeadlineException::class.java) {
+                f.source.sendRoomMessage("!room", "txn", content, "fixture", f.clock.now)
+            }
+            assertThrows(MatrixResponseException::class.java) {
+                f.source.sendRoomMessage(
+                    "!room",
+                    "txn",
+                    content + ("ciphertext" to "a".repeat(65536)),
+                    "fixture",
+                    f.clock.now.plusSeconds(5),
+                )
+            }
+            assertEquals(calls, f.requests.get())
+        }
+    }
+
     private class Fixture(timeout: Duration = Duration.ofSeconds(5), maximumConcurrent: Int = 32) :
         AutoCloseable {
         val json = JsonMapper.builder().build()

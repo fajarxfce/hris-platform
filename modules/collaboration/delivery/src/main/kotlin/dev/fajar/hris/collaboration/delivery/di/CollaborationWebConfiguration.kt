@@ -32,6 +32,8 @@ class CollaborationWebConfiguration {
             it.requestMatchers(HttpMethod.POST, "/_matrix/client/v3/keys/claim").permitAll()
             it.requestMatchers(HttpMethod.PUT, "/_matrix/client/v3/sendToDevice/m.room.encrypted/*")
                 .permitAll()
+            it.requestMatchers(HttpMethod.PUT, "/_matrix/client/v3/rooms/*/send/m.room.encrypted/*")
+                .permitAll()
             it.requestMatchers(HttpMethod.GET, "/_matrix/client/v3/account/whoami").permitAll()
             it.requestMatchers(HttpMethod.GET, "/_matrix/client/v3/sync").permitAll()
             it.requestMatchers(

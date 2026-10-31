@@ -17,6 +17,21 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- **Mobile durable setup commands are pushed at `fb1b1c13`.**
+  [Cross-repository checkpoint](collaboration/mobile-setup.md) links the exact
+  implementation, 39 source hashes, contract and SDK lifecycle audit. Native
+  registration/status/retry/bootstrap transport and encrypted command ownership
+  pass root/assembly/browser checks in 62s: 2,040 desktop cases; collaboration
+  domain 23/data 15, browser domain 23/data 7. Immutable operations survive lost
+  responses and process/store reopening; late scope changes cannot publish results.
+  Gateway tokens remain encrypted pending SDK installation; only observed confirmed
+  registration/new-job receipts retire. No app DI/routes or SDK message durability
+  yet. Hosted Apple/control checks remain pending after fixing SDK package selection
+  and the four local Wasm lock entries. **Continue protected SDK store/session,
+  queue restart, bootstrap recovery, UI and all P0–P8.** No product group accepted,
+  schema/live/phone/Starter change. Mobile also pushed deterministic October expense
+  fixture clock `d58ee287`; production date selection remains unchanged.
+
 - **Actual Android SDK through HRIS passes**: two fictional employees, separate
   encrypted stores, keys/claim/to-device, bidirectional Megolm messages and classic
   sync all use the real gateway. Server event reads verify ciphertext; decrypted
@@ -36,9 +51,8 @@ Current provider/client evidence:
   all steps: one real SDK case in 63.437s, APK `9900b041`, cleanup true; all
   twelve Mobile hashes and ten Platform hashes match their commits. Platform
   control 41231798310 passed both jobs/all steps. Results and trace are retained.
-  Mobile's product `features/collaboration/{domain,data}` setup adapter/use case
-  is now in progress: focused seven transport cases passed in 39s; full root and
-  new setup-ownership checks are running. This accepts no product feature.
+  Mobile's product setup adapters and durable commands are now pushed and validated
+  as described above. This accepts no product feature.
 
 - Native DIRECT encrypted sends now use exact owned-room scope, confirmed sender
   publication and current eligible peer devices, preserving offline short-token

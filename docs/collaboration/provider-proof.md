@@ -4,7 +4,46 @@ This exercises actual services and browser SDKs. It is one P0 proof, not deliver
 of HRIS chat/calling, native background calls, MatrixRTC interoperability or
 1,000-participant capacity. Follow [the full delivery ledger](delivery.json).
 
-## Run
+## Native Android interoperability
+
+The Mobile repository supplies a separate `:apps:collaboration-proof` debug-only
+APK, pinned to Matrix Rust Kotlin SDK **26.10.23**. On the dedicated Android 35
+AVD, the actual Rust SDK decrypted a browser message and the browser decrypted
+its reply. Both corresponding Synapse events contain `m.room.encrypted`, without
+either plaintext marker. The combined Android/browser/media run completed in
+24.590 seconds; [evidence](../measurements/collaboration-android-web-provider-2026-10-31.json)
+pins the APK and driver sources. Twelve driver tests protect target selection,
+preexisting data, fixture permissions and cleanup. This does not establish native
+offline queue recovery, device verification UX, native media or HRIS admission.
+
+Build the fixture from Mobile with JDK 21 and `ANDROID_HOME` configured:
+
+```sh
+./gradlew :apps:collaboration-proof:assembleDebug --no-daemon
+```
+
+Boot Mobile's existing `hris-mobile-dev` AVD on port 5560, then from Platform:
+
+```sh
+python3 tool/check_collaboration_providers.py --docker-sudo \
+  --android-serial emulator-5560 \
+  --android-apk ../hris-mobile/apps/collaboration-proof/build/outputs/apk/debug/collaboration-proof-debug.apk
+```
+
+`--android-sdk` defaults to `~/Android/Sdk`; build-tools 36.0.0 is used to verify
+the artifact's application ID and debuggable flag before installation. The driver
+rejects other serials/AVDs and any existing protocol package or conflicting reverse
+port. It holds an exclusive emulator lock. Credentials enter the fixture sandbox
+through stdin; they never enter ADB arguments. Cleanup stops/removes only this
+run's APK and reverse port. No real HRIS package or phone is touched. The fixture's
+local store passphrase is temporary lab material, not production key management.
+
+Without Android arguments, the native test is not registered and the sanitized
+result does not claim the native check. Native CI belongs to Mobile and pins
+this Platform driver. Browser-only CI passed at `9452af1e` in
+[41180880132](https://github.com/fajarxfce/hris-platform/actions/runs/41180880132).
+
+## Browser-only run
 
 Requires Node 24+, Docker, Python 3 and Playwright Chromium. Install the exact
 dependencies with `npm ci --ignore-scripts` in `tool/collaboration-proof`, followed

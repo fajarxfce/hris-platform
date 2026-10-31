@@ -23,6 +23,7 @@ import time
 import urllib.error
 import urllib.request
 import uuid
+from collaboration_native_device import NativeDevice
 
 ROOT = Path(__file__).resolve().parents[1]
 PROOF = ROOT / "tool/collaboration-proof"
@@ -84,20 +85,24 @@ def jwt(secret, *, subject, issuer="urn:hris:collaboration:proof", audience="mat
 
 
 class ProviderProof:
-    def __init__(self):
+    def __init__(self, native=None):
         self.run_id = uuid.uuid4().hex
         self.directory = ROOT / ".work/collaboration" / self.run_id
         self.directory.mkdir(parents=True, mode=0o700)
         self.images = json.loads((PROOF / "images.json").read_text())
         self.network = None
         self.containers = []
+        self.native = NativeDevice(*native, self.directory) if native else None
         self.record = {"schemaVersion": 1, "runId": self.run_id,
                        "kind": "isolated_provider_proof", "complete": False,
                        "productAcceptance": False, "capacityAcceptance": False,
                        "images": {}, "checks": {}, "cleanup": False}
         sources = [Path(__file__).resolve(), ROOT / "tool/test_collaboration_providers.py",
+                   ROOT / "tool/collaboration_native_device.py",
+                   ROOT / "tool/test_collaboration_native_device.py",
                    *[PROOF / name for name in ("package.json", "package-lock.json", "images.json",
-                     "index.html", "playwright.config.mjs", "src/probe.js", "tests/providers.spec.mjs")]]
+                     "index.html", "playwright.config.mjs", "src/probe.js", "tests/providers.spec.mjs",
+                     "tests/native.spec.mjs")]]
         self.record["sourceSha256"] = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
                                        for path in sources}
 
@@ -136,6 +141,8 @@ class ProviderProof:
         return int(bindings[0]["HostPort"])
 
     def start(self):
+        if self.native:
+            self.native.prepare()
         for role, reference in self.images.items():
             try:
                 metadata = json.loads(command("docker", "image", "inspect", reference))[0]
@@ -195,7 +202,7 @@ class ProviderProof:
         matrix_url = f"http://127.0.0.1:{self.port(synapse_id, 8008)}"
         self.wait(lambda: http(matrix_url + "/_matrix/client/versions")[0] == 200)
         users = {}
-        for name in ("alice", "bob"):
+        for name in (("alice", "bob", "native", "nativeweb") if self.native else ("alice", "bob")):
             _, nonce = http(matrix_url + "/_synapse/admin/v1/register")
             password = secrets.token_urlsafe(32)
             body = b"\x00".join(value.encode() for value in (nonce["nonce"], name, password, "notadmin"))
@@ -249,9 +256,12 @@ class ProviderProof:
         self.record["checks"]["loopback_only_http"] = True
         self.record["checks"]["isolated_dedicated_network"] = True
         fixture = self.directory / "fixture.json"
-        write_private(fixture, {"matrix": {"baseUrl": matrix_url, **users},
-                                "media": {"httpUrl": media_url, "wsUrl": media_url.replace("http:", "ws:"),
-                                          "apiKey": api_key, "apiSecret": api_secret}})
+        configuration = {"matrix": {"baseUrl": matrix_url, **users},
+                         "media": {"httpUrl": media_url, "wsUrl": media_url.replace("http:", "ws:"),
+                                   "apiKey": api_key, "apiSecret": api_secret}}
+        if self.native:
+            self.record["native"] = self.native.bind(configuration)
+        write_private(fixture, configuration)
         return fixture
 
     @staticmethod
@@ -294,9 +304,13 @@ class ProviderProof:
         if returncode:
             raise RuntimeError("Browser provider proof failed; inspect the owned private browser log")
         self.record["checks"]["browser_e2ee_restart_media"] = True
+        if self.native:
+            self.record["checks"]["android_web_bidirectional_e2ee"] = True
 
     def cleanup(self):
         successful = True
+        if getattr(self, "native", None):
+            successful = self.native.cleanup()
         for name in reversed(self.containers):
             try:
                 state = json.loads(command("docker", "inspect", name))[0]
@@ -332,11 +346,17 @@ def main():
     global DIAGNOSTICS, DOCKER_COMMAND
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--docker-sudo", action="store_true", help="Use existing noninteractive sudo authorization for Docker only")
+    parser.add_argument("--android-apk", type=Path, help="Separate debug protocol APK; never the HRIS app")
+    parser.add_argument("--android-serial", choices=["emulator-5560"], help="Booted hris-mobile-dev emulator")
+    parser.add_argument("--android-sdk", type=Path, default=Path.home() / "Android/Sdk")
     options = parser.parse_args()
+    if bool(options.android_apk) != bool(options.android_serial):
+        parser.error("Native proof requires both --android-apk and --android-serial")
     if options.docker_sudo:
         DOCKER_COMMAND = ["sudo", "-n", "docker"]
     os.umask(0o077)
-    proof = ProviderProof()
+    native = (options.android_apk, options.android_serial, options.android_sdk) if options.android_apk else None
+    proof = ProviderProof(native)
     DIAGNOSTICS = proof.directory / "command-errors.log"
     started = time.monotonic()
     error = None

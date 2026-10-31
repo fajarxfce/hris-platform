@@ -12,7 +12,8 @@
       "name": "Provider, protocol and native feasibility",
       "status": "in_progress",
       "evidence": [
-        "../measurements/collaboration-web-provider-2026-10-31.json"
+        "../measurements/collaboration-web-provider-2026-10-31.json",
+        "../measurements/collaboration-android-web-provider-2026-10-31.json"
       ]
     },
     {

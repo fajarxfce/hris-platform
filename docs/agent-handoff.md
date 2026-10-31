@@ -19,8 +19,16 @@ decoding. Owned containers/network were removed. The protocol experiment uses a
 custom encrypted key event; MatrixRTC/native/device/HRIS admission/capacity remain
 pending. Synapse accepts JWT expiry within its 120-second clock tolerance, so the
 production broker must enforce strict grant expiry before internal exchange.
-Next: native Android/web proof in the dedicated emulator and actual Apple binding
-verification, then protected HRIS integration. No real account or phone was used.
+Android/web proof now also passes using Matrix Rust Kotlin SDK 26.10.23 in a
+separate debug-only emulator APK: each endpoint decrypted the other endpoint’s
+message, while both server events remained ciphertext. The combined two-scenario
+run took 24.590s with full owned cleanup; 12 driver tests pass. See
+[the native evidence](measurements/collaboration-android-web-provider-2026-10-31.json).
+The previous browser-only source `9452af1e` also passed hosted CI
+[41180880132](https://github.com/fajarxfce/hris-platform/actions/runs/41180880132).
+Next: exact native CI, Apple binding verification and protected HRIS integration.
+MatrixRTC key distribution and native media remain unverified. No real account
+or phone was used.
 
 Continue through P0 provider/native protocol proof, then all P1–P8 gates. Use
 isolated fictional provider fixtures. Preserve the running schema-103 HRIS stack,

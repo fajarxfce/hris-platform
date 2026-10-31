@@ -30,7 +30,8 @@
         "sync-mode.md",
         "../measurements/collaboration-dual-sync-2026-10-31.json",
         "native-hris-sdk.md",
-        "../measurements/collaboration-native-hris-sdk-2026-10-31.json"
+        "../measurements/collaboration-native-hris-sdk-2026-10-31.json",
+        "../measurements/collaboration-protected-native-store-2026-10-31.json"
       ]
     },
     {
@@ -93,7 +94,8 @@
         "../measurements/collaboration-room-messages-2026-10-31.json",
         "native-hris-sdk.md",
         "../measurements/collaboration-native-hris-sdk-2026-10-31.json",
-        "mobile-setup.md"
+        "mobile-setup.md",
+        "../measurements/collaboration-protected-native-store-2026-10-31.json"
       ]
     },
     {
@@ -482,10 +484,10 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Implement product SDK store/session ownership and actual durable queue restart through the already-proven native HRIS gateway. Preserve the durable setup command and credential contracts in Mobile fb1b1c13.",
+    "Finish native runtime/abandoned-close and bootstrap recovery; prove SDK queue transaction recovery across actual Android process death, then app DI/UI. Protected Android Keystore reopening through HRIS now passes.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",
-    "Continue P1–P8 and all 54 groups; current provider/component proofs do not accept product features or capacity."
+    "Continue P1\u2013P8 and all 54 groups; current provider/component proofs do not accept product features or capacity."
   ]
 }

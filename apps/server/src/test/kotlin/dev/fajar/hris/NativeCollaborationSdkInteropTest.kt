@@ -147,6 +147,14 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
             val readyDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(310)
             while (true) {
                 if (!process.isAlive) fail<Nothing>(diagnostic(directory))
+                if (
+                    trace.snapshot().any {
+                        it["route"] == "/_matrix/client/v3/keys/upload" && it["status"] == 400
+                    }
+                )
+                    fail<Nothing>(
+                        "Owned SDK key upload was rejected; inspect bounded key-shape evidence"
+                    )
                 val keys =
                     database()
                         .queryForObject(
@@ -171,6 +179,15 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
             assertTrue(result.path("passed").asBoolean())
             assertTrue(result.path("cleanup").asBoolean())
             val proof = result.path("proof")
+            for (name in
+                listOf(
+                    "protectedStoreReopened",
+                    "missingRecordPreserved",
+                    "wrongPassphrasePreserved",
+                    "exclusiveOwner",
+                )) {
+                assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
+            }
             verifyCiphertext(
                 sender,
                 room,
@@ -190,6 +207,10 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "encryptedBothDirections" to true,
                     "logicalIdsPreserved" to true,
                     "cleanup" to true,
+                    "protectedStoreReopened" to true,
+                    "missingRecordPreserved" to true,
+                    "wrongPassphrasePreserved" to true,
+                    "exclusiveOwner" to true,
                     "artifact" to result.path("artifact"),
                 ),
             )

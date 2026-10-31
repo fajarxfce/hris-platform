@@ -25,7 +25,8 @@ fun snapshotCollaborationKeyUpload(
     for ((id, key) in request.fallbackKeys) {
         if (!signedId(id) || !signedShape(key) || key.fallback != true) return invalidKeys()
     }
-    if (request.oneTimeKeys.keys.any { it in request.fallbackKeys }) return invalidKeys()
+    // The SDK allocates IDs independently for one-time and fallback keys. Keep
+    // their two maps separate; the signed fallback marker distinguishes their use.
     return Result.Success(
         CollaborationMatrixKeyUpload(
             device?.copy(

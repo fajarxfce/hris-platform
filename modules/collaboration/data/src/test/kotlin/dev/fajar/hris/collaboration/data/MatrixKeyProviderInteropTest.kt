@@ -180,7 +180,8 @@ class MatrixKeyProviderInteropTest {
                         "signed_curve25519:1" to keys.signed(),
                         "signed_curve25519:2" to keys.signed(false),
                     ),
-                    mapOf("signed_curve25519:fallback" to keys.signed(true)),
+                    // Native SDK counters can overlap across these independent collections.
+                    mapOf("signed_curve25519:1" to keys.signed(true)),
                 )
             assertEquals(Result.Success(Unit), validateCollaborationSignedKeys(upload, keys.device))
             repeat(2) {

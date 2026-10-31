@@ -38,6 +38,10 @@ def proof_evidence(value):
     if not isinstance(value, dict) or value.get("encryptedBothDirections") is not True or value.get("logicalIdsPreserved") is not True or value.get("syncMode") != "classic":
         raise ValueError("Invalid owned exchange evidence")
     output = {"encryptedBothDirections": True, "logicalIdsPreserved": True, "syncMode": "classic"}
+    for name in ("protectedStoreReopened", "missingRecordPreserved", "wrongPassphrasePreserved", "exclusiveOwner"):
+        if value.get(name) is not True:
+            raise ValueError("Invalid owned protected store evidence")
+        output[name] = True
     for name in ("senderEventId", "recipientEventId", "senderTransaction", "recipientTransaction"):
         field = value.get(name)
         pattern = r"\$[!-~]{1,254}" if name.endswith("EventId") else r"[A-Za-z0-9._~-]{1,128}"

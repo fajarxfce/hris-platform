@@ -96,6 +96,7 @@ abstract class NativeGatewaySdkFixture : NativeCollaborationApiFixture() {
                 "update collaboration_devices set state='ACTIVE',version=version+1,updated_at=now() where id=?",
                 device,
             )
+        val operation = UUID.randomUUID()
         val response =
             native.fixture.browser.send(
                 HttpRequest.newBuilder(URI("http://127.0.0.1:$port${native.path}/bootstrap"))
@@ -104,7 +105,7 @@ abstract class NativeGatewaySdkFixture : NativeCollaborationApiFixture() {
                     .header("Content-Type", "application/json")
                     .header("X-HRIS-Client-Platform", "ANDROID")
                     .header("X-HRIS-Client-Build", "1")
-                    .header("Idempotency-Key", UUID.randomUUID().toString())
+                    .header("Idempotency-Key", operation.toString())
                     .POST(
                         HttpRequest.BodyPublishers.ofString(
                             json.writeValueAsString(
@@ -129,6 +130,16 @@ abstract class NativeGatewaySdkFixture : NativeCollaborationApiFixture() {
                 "deviceId" to value.path("matrixDeviceId").asString(),
                 "accessToken" to value.path("accessToken").asString(),
                 "refreshToken" to value.path("refreshToken").asString(),
+                "accountId" to native.fixture.account.toString(),
+                "companyId" to native.fixture.company.toString(),
+                "nativeSessionId" to native.session.toString(),
+                "hrisDeviceId" to device.toString(),
+                "bootstrapOperationId" to operation.toString(),
+                "gatewaySessionId" to value.path("sessionId").asString(),
+                "gatewayVersion" to value.path("version").asLong().toString(),
+                "accessExpiresAt" to value.path("accessExpiresAt").asString(),
+                "expiresAt" to value.path("expiresAt").asString(),
+                "clientBuild" to "1",
             ),
         )
     }

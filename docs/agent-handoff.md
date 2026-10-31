@@ -17,6 +17,25 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- **Protected Android store reopening through HRIS now passes.**
+  [Contract](collaboration/native-hris-sdk.md) and
+  [evidence](measurements/collaboration-protected-native-store-2026-10-31.json)
+  retain 15 Platform/70 Mobile hashes, APK `18b072bc`, actual SDK 22.732s and
+  successful cleanup. Real Keystore records/private SDK stores reject competing
+  opens, missing records and wrong passphrases; restoring the original record
+  preserves both device keys before bidirectional encrypted messages. A discovered
+  gateway bug rejected equal IDs across one-time/fallback maps; those independent
+  maps now preserve separate values while verifying every signature and fallback
+  marker. Two failed runs (74s/46s) and bounded diagnostic counts remain recorded.
+  Full 454s regression passes 37 domain, 201 data, 39 API and quality; 27 driver
+  cases pass. Mobile root/debug/lint/browser passes in 78s: 2,063 desktop/24 data
+  browser cases. SDK store shutdown now drains the native database pools before
+  unlock, with cancellation/retry tests. **Next: abandoned-close recovery, bootstrap
+  installation/recovery, actual Android queue process death, app DI/UI and P0–P8.**
+  Same-process store reopening does not accept message process death. No live,
+  schema, phone or Starter change; no product group accepted. Mobile's matching
+  proof commit/CI pin follows this Platform commit.
+
 - **Mobile durable setup commands are pushed at `fb1b1c13`.**
   [Cross-repository checkpoint](collaboration/mobile-setup.md) links the exact
   implementation, 39 source hashes, contract and SDK lifecycle audit. Native

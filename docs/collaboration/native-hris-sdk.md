@@ -16,6 +16,34 @@ does not accept product outbox persistence, multi-device verification, notificat
 Apple interoperability, calls or meetings. No production service or user phone
 is involved. No room/device cleanup calls Synapse logout.
 
+## Protected native store integration
+
+The proof now uses Mobile's actual `AndroidCredentialStore`, Keystore,
+backup-excluded directory and exclusive runtime lease. Each fictional owner checks
+competing opens, missing credential records and an incorrect store passphrase,
+then restores the original record and verifies unchanged Ed25519/Curve25519
+identity before exchanging messages. This revision still needs a separate Android
+process-death scenario for the SDK send queue.
+
+The first full exchange exposed an incorrect gateway constraint: after a failed
+initial upload, the pinned SDK sent 50 one-time keys plus one fallback key whose
+ID overlapped a one-time key ID. These are separate upload maps. A bounded test
+trace confirmed the two counts, one overlap and valid fallback markers without
+retaining public-key bytes, signatures, identities or bodies. The earlier rule
+rejected that shape before signature verification, so a peer never became ready.
+
+The corrected snapshot preserves both maps independently. Bounds, device identity,
+each Ed25519 signature and the signed fallback marker remain mandatory. Independent
+signature vectors include same-ID success and tampering failures; the real Synapse
+adapter test uploads and replays overlapping IDs without replacing either map.
+The original 74s timeout and 46s diagnostic failure remain in the
+[protected store measurement](../measurements/collaboration-protected-native-store-2026-10-31.json).
+The corrected Android exchange passes in 22.732s with cleanup complete. Full 454s
+regression passes 37 domain, 201 data and 39 API cases plus quality; the driver has
+27 passing cases. Mobile root/debug/lint/browser checks pass in 78s with 2,063
+desktop and 24 data browser cases. Fifteen Platform and seventy Mobile source
+hashes bind the APK and behavior to the checked code. No product group is accepted.
+
 ## Sync compatibility
 
 SDK 26.10.23 pins [Rust SDK 8de215a0](https://github.com/matrix-org/matrix-rust-sdk/blob/8de215a0aa0026afa5754ae5f05a6d168d1a1d60/crates/matrix-sdk/src/client/mod.rs),

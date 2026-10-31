@@ -135,6 +135,32 @@ class CollaborationMatrixKeyPolicyTest {
     }
 
     @Test
+    fun identicalIdsInSeparateKeyCollectionsStillRequireEachOriginalSignature() {
+        val upload =
+            CollaborationMatrixKeyUpload(
+                oneTimeKeys = mapOf("signed_curve25519:1" to key()),
+                fallbackKeys = mapOf("signed_curve25519:1" to key(fallback, true)),
+            )
+        assertEquals(Result.Success(Unit), validateCollaborationSignedKeys(upload, identity()))
+        val captured = (snapshotCollaborationKeyUpload(upload) as Result.Success).value
+        assertEquals(upload.oneTimeKeys, captured.oneTimeKeys)
+        assertEquals(upload.fallbackKeys, captured.fallbackKeys)
+        for (invalid in
+            listOf(
+                upload.copy(oneTimeKeys = mapOf("signed_curve25519:1" to key().copy(key = curve))),
+                upload.copy(
+                    fallbackKeys =
+                        mapOf("signed_curve25519:1" to key(fallback, true).copy(key = curve))
+                ),
+                upload.copy(fallbackKeys = upload.oneTimeKeys),
+                upload.copy(oneTimeKeys = upload.fallbackKeys),
+            )) assertInstanceOf(
+            Result.Failed::class.java,
+            validateCollaborationSignedKeys(invalid, identity()),
+        )
+    }
+
+    @Test
     fun boundsRejectAmbiguousIdsAndExcessiveCollectionsBeforeSignatureWork() {
         val valid = key()
         for (upload in
@@ -162,10 +188,6 @@ class CollaborationMatrixKeyPolicyTest {
                             "signed_curve25519:1" to
                                 valid.copy(signatures = mapOf(user to emptyMap()))
                         )
-                ),
-                CollaborationMatrixKeyUpload(
-                    oneTimeKeys = mapOf("signed_curve25519:1" to valid),
-                    fallbackKeys = mapOf("signed_curve25519:1" to key(fallback, true)),
                 ),
             )) assertInstanceOf(Result.Failed::class.java, snapshotCollaborationKeyUpload(upload))
         assertInstanceOf(

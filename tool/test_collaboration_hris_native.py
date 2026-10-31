@@ -12,6 +12,8 @@ from collaboration_hris_native import private_json, proof_evidence, read_json, r
 class HrisNativeDriverTest(unittest.TestCase):
     def evidence(self):
         return {"encryptedBothDirections": True, "logicalIdsPreserved": True, "syncMode": "classic",
+                "protectedStoreReopened": True, "missingRecordPreserved": True,
+                "wrongPassphrasePreserved": True, "exclusiveOwner": True,
                 "senderEventId": "$first", "recipientEventId": "$second",
                 "senderTransaction": "first-transaction", "recipientTransaction": "second-transaction"}
 
@@ -20,7 +22,9 @@ class HrisNativeDriverTest(unittest.TestCase):
         self.assertEqual(proof, proof_evidence(proof | {"body": "private-fixture", "token": "private-fixture"}))
         for name, value in (("senderEventId", "$bad\n"), ("senderEventId", "$" * 256),
                             ("senderTransaction", "raw body"), ("syncMode", "native"),
-                            ("recipientEventId", "$first"), ("logicalIdsPreserved", 1)):
+                            ("recipientEventId", "$first"), ("logicalIdsPreserved", 1),
+                            ("protectedStoreReopened", 1), ("missingRecordPreserved", False),
+                            ("wrongPassphrasePreserved", None), ("exclusiveOwner", "true")):
             with self.subTest(name=name, value=value), self.assertRaises(ValueError):
                 proof_evidence(proof | {name: value})
 

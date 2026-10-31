@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.web.filter.OncePerRequestFilter
+import org.springframework.web.util.ContentCachingRequestWrapper
 
 /** Bounded, code-only observations: never credentials, IDs, cursor/filter values or bodies. */
 class NativeSdkGatewayTrace : OncePerRequestFilter() {
@@ -16,8 +17,12 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
         response: HttpServletResponse,
         chain: FilterChain,
     ) {
+        val keyRequest =
+            if (request.requestURI == "/_matrix/client/v3/keys/upload")
+                ContentCachingRequestWrapper(request, 65_536)
+            else null
         try {
-            chain.doFilter(request, response)
+            chain.doFilter(keyRequest ?: request, response)
         } finally {
             if (request.requestURI.startsWith("/_matrix/"))
                 synchronized(observations) {
@@ -45,7 +50,10 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
                                         it.matches(Regex("[0-9]{1,9}"))
                                     } ?: "absent_or_invalid"),
                                 "errorCode" to (request.getAttribute("fixture.matrix.error") ?: ""),
-                            )
+                            ) +
+                                (keyRequest?.let {
+                                    mapOf("keyShape" to nativeSdkKeyShape(it.contentAsByteArray))
+                                } ?: emptyMap())
                         )
                 }
         }

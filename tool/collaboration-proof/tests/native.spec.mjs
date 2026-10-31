@@ -1,4 +1,5 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { execFileSync, spawn } from "node:child_process";
 import { test, expect } from "@playwright/test";
@@ -38,7 +39,7 @@ if (fixture.nativeDevice) {
       // Credentials go through stdin into the app sandbox, never shell arguments.
       execFileSync(adb, [...args, "shell", "run-as", application, "sh", "-c",
         "'cat > files/protocol-proof/fixture.json'"], {
-        input: JSON.stringify({ ...fixture.matrix.native, roomId, expectedBody, replyBody, expectedLogicalId, replyLogicalId, offlineBody, offlineLogicalId, offlinePeer: fixture.matrix.nativeweb.userId }),
+        input: JSON.stringify({ ...fixture.matrix.native, syncMode: fixture.nativeDevice.syncMode ?? "native", roomId, expectedBody, replyBody, expectedLogicalId, replyLogicalId, offlineBody, offlineLogicalId, offlinePeer: fixture.matrix.nativeweb.userId }),
         timeout: 15_000, stdio: ["pipe", "pipe", "pipe"],
       });
       instrument = spawn(adb, [...args, "shell", "am", "instrument", "-w",
@@ -71,6 +72,7 @@ if (fixture.nativeDevice) {
       await expect.poll(() => ({ result: readResult("result"), instrumentation: readResult("instrumentation") }))
         .toMatchObject({ result: { receivedEncrypted: true, receivedEventId: sentId }, instrumentation: { complete: true } });
       const received = readResult("result");
+      expect(received.syncMode).toBe(fixture.nativeDevice.syncMode ?? "native");
       expect(received.sessionRefreshes).toBeGreaterThanOrEqual(1);
       expect(received.credentialsRotated).toBe(true);
       expect(received.persistedSessionCurrent).toBe(true);
@@ -82,6 +84,7 @@ if (fixture.nativeDevice) {
       expect(received.sentLogicalId).toBe(replyLogicalId);
       expect(received.offlineHistory).toBe("invited");
       expect(received.offlineRoomVersion).toBe("12");
+      expect(received.offlineMembershipSource).toBe("sdk_members");
       expect(received.offlineLogicalId).toBe(offlineLogicalId);
       expect(received.offlineQueueTransactionId.length).toBeGreaterThan(0);
       // The instrumentation has already closed SDK resources. Force-stop only
@@ -118,6 +121,16 @@ if (fixture.nativeDevice) {
         expect(JSON.stringify(ciphertext)).not.toContain(replyLogicalId);
       }
     } finally {
+      // Instrumentation records categories/code frames only, never exception messages.
+      // Capture it before the owned package is stopped/uninstalled, including failures.
+      try {
+        writeFileSync(join(dirname(process.env.HRIS_COLLAB_PROOF_FIXTURE), "native-diagnostic.json"), JSON.stringify({
+          instrumentation: readResult("instrumentation"),
+          progress: readResult("progress"),
+          replyComplete: readResult("reply")?.receivedEncrypted === true,
+          resultComplete: readResult("result")?.receivedEncrypted === true,
+        }), { mode: 0o600 });
+      } catch { /* Diagnostics cannot prevent owned resource cleanup. */ }
       instrument?.kill("SIGTERM");
       try { command("shell", "am", "force-stop", application); } catch { /* driver retries owned cleanup */ }
       await page.evaluate(() => window.probe?.stop()).catch(() => {});

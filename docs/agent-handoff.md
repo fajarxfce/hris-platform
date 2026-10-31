@@ -17,6 +17,17 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- Both native SyncService and classic Client.syncV2 now pass the same actual
+  Android/browser proof with one APK `d835e1c1`: two cases each, 18.814s native /
+  19.219s classic; owned runs 33.649s / 38.121s, cleanup true. Classic omitted
+  optional room member summary counts; exact complete SDK membership now gates
+  offline sending in both modes. [Decision](collaboration/sync-mode.md) and
+  [evidence](measurements/collaboration-dual-sync-2026-10-31.json) retain failures,
+  18 Python checks, source hashes, final 23s root/debug/lint (2,002 desktop cases,
+  zero lint errors). Use classic for the first scoped HRIS Android/web transport;
+  native list/subscription/extension authorization remains a separate gate. No
+  public sync/content routes or product acceptance are implied.
+
 - Actual Matrix/LiveKit browser E2EE exchange/media and wrong-key rejection pass.
   The experiment's custom encrypted media-key event is **not MatrixRTC acceptance**.
 - Android SDK 26.10.23 ↔ browser encrypted text, standard credential refresh and
@@ -212,8 +223,9 @@ Current backend implementation:
   skip). Two additional readback/concurrent-same-key cases passed in 41s: 133 distinct
   data cases total. Earlier focused gateway 75s/HTTP 31s, format/architecture pass;
   the corrected JsonNode mapping compilation error remains recorded. The shared DI
-  graph was exercised in both runtimes. Inspect this commit's exact hosted control
-  after push; no product rollout or Mobile/Starter change. Public peer key/claim,
+  graph was exercised in both runtimes. Exact `05685bf2` hosted control
+  [41210683028](https://github.com/fajarxfce/hris-platform/actions/runs/41210683028)
+  passed every job and step; retained in the measurement. No product rollout. Public peer key/claim,
   to-device, room/history and classic/native sync remain closed.
 
 [Identity evidence](measurements/collaboration-gateway-identity-2026-10-31.json)
@@ -260,8 +272,8 @@ Next implementation:
    room proof `6139604c` likewise passed [41201965622](https://github.com/fajarxfce/hris-platform/actions/runs/41201965622).
    Participant `d50bb0ad` and identity `b0bf1326` hosted controls also passed.
 2. Schema-111 storage `71ad7c81` passed all jobs/steps in [41205061024](https://github.com/fajarxfce/hris-platform/actions/runs/41205061024).
-   Room setup/worker `f104f097` passed every job/step in `41206499276`. Inspect the
-   own-device key gateway commit after push; schema 112 `966dee38` passed all hosted
+   Room setup/worker `f104f097` passed every job/step in `41206499276`. Own-device
+   key gateway `05685bf2` passed every step in `41210683028`; schema 112 `966dee38` passed all hosted
    steps in `41208833880`. Implement scoped eligible peer key/query/claim and
    to-device traffic. Offline recipient eligibility must not require a fresh short
    access token; retain current device/company/security revocation checks. Continue

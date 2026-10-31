@@ -26,7 +26,9 @@
         "../measurements/collaboration-room-adapter-2026-10-31.json",
         "../measurements/collaboration-native-invited-2026-10-31.json",
         "sdk-protocol-surface.md",
-        "../measurements/collaboration-sdk-protocol-surface-2026-10-31.json"
+        "../measurements/collaboration-sdk-protocol-surface-2026-10-31.json",
+        "sync-mode.md",
+        "../measurements/collaboration-dual-sync-2026-10-31.json"
       ]
     },
     {

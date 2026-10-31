@@ -11,6 +11,13 @@ import check_collaboration_providers as proof
 
 
 class ProviderDriverTest(unittest.TestCase):
+    def test_unowned_or_unknown_native_sync_mode_is_rejected_before_any_fixture_allocation(self):
+        with patch.object(proof.Path, "mkdir") as mkdir:
+            for mode in ("classic", "unknown"):
+                with self.assertRaises(ValueError):
+                    proof.ProviderProof(native_sync_mode=mode)
+            mkdir.assert_not_called()
+
     def fixture(self, directory):
         run = object.__new__(proof.ProviderProof)
         run.run_id = "owned"

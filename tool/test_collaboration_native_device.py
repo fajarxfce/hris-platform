@@ -5,10 +5,32 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from collaboration_native_device import NativeDevice, PACKAGE
+from collaboration_native_device import NativeDevice, PACKAGE, native_diagnostic
 
 
 class NativeDeviceTest(unittest.TestCase):
+    def test_native_diagnostics_keep_only_bounded_categories_and_code_frames(self):
+        value = {"replyComplete": True, "resultComplete": False, "token": "private-fixture",
+                 "instrumentation": {"complete": False, "failureCategory": "IllegalStateException",
+                                     "failureFrames": ["dev.fajar.proof.Probe.run:12"], "message": "private-fixture"}}
+        output = native_diagnostic(value)
+        self.assertEqual({"replyComplete": True, "resultComplete": False, "instrumentationComplete": False,
+                          "failureCategory": "IllegalStateException", "failureFrames": ["dev.fajar.proof.Probe.run:12"]}, output)
+        self.assertNotIn("private-fixture", str(output))
+        for native in ({"failureCategory": "bad category"}, {"failureFrames": ["raw message"]},
+                       {"failureFrames": ["dev.fajar.proof.Probe.run:12"] * 13}):
+            with self.assertRaises(ValueError):
+                native_diagnostic({"instrumentation": native})
+
+    def test_native_progress_keeps_only_static_stages_and_boolean_readiness(self):
+        value = {"progress": {"stage": "waiting_for_offline_room_state", "encrypted": True,
+                              "expectedVersion": False, "body": "private-fixture"}}
+        self.assertEqual({"stage": "waiting_for_offline_room_state", "encrypted": True,
+                          "expectedVersion": False}, native_diagnostic(value)["progress"])
+        for progress in ({"stage": "private-fixture"}, {"stage": "creating_offline_room", "encrypted": 1}):
+            with self.assertRaises(ValueError):
+                native_diagnostic({"progress": progress})
+
     def fixture(self, root):
         apk = root / "proof.apk"
         apk.write_bytes(b"fixture")

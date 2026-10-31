@@ -23,7 +23,7 @@ import time
 import urllib.error
 import urllib.request
 import uuid
-from collaboration_native_device import NativeDevice
+from collaboration_native_device import NativeDevice, native_diagnostic
 from collaboration_protocol_metrics import collect_protocol_counts
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -86,7 +86,10 @@ def jwt(secret, *, subject, issuer="urn:hris:collaboration:proof", audience="mat
 
 
 class ProviderProof:
-    def __init__(self, native=None):
+    def __init__(self, native=None, native_sync_mode="native"):
+        if native_sync_mode not in {"native", "classic"} or (not native and native_sync_mode != "native"):
+            raise ValueError("A supported sync mode requires an owned native experiment")
+        self.native_sync_mode = native_sync_mode
         self.run_id = uuid.uuid4().hex
         self.directory = ROOT / ".work/collaboration" / self.run_id
         self.directory.mkdir(parents=True, mode=0o700)
@@ -273,6 +276,8 @@ class ProviderProof:
                                    "apiKey": api_key, "apiSecret": api_secret}}
         if self.native:
             self.record["native"] = self.native.bind(configuration)
+            configuration["nativeDevice"]["syncMode"] = self.native_sync_mode
+            self.record["native"]["syncMode"] = self.native_sync_mode
         write_private(fixture, configuration)
         return fixture
 
@@ -313,6 +318,11 @@ class ProviderProof:
         if report.exists():
             stats = json.loads(report.read_text())["stats"]
             self.record["browser"] = {key: stats.get(key) for key in ("expected", "unexpected", "flaky", "skipped", "duration")}
+        diagnostic = self.directory / "native-diagnostic.json"
+        if diagnostic.exists():
+            if diagnostic.stat().st_size > 8192:
+                raise RuntimeError("Native diagnostic exceeded its bound")
+            self.record["nativeDiagnostic"] = native_diagnostic(json.loads(diagnostic.read_text()))
         if returncode:
             raise RuntimeError("Browser provider proof failed; inspect the owned private browser log")
         configuration = json.loads(fixture.read_text())
@@ -324,6 +334,11 @@ class ProviderProof:
         self.record["checks"]["browser_e2ee_restart_media"] = True
         self.record["checks"]["browser_offline_invitee_first_message_sender_offline"] = True
         if self.native:
+            sliding = sum(value["count"] for value in self.record["protocolCounters"]["requests"]
+                          if value["servlet"] == "SlidingSyncRestServlet")
+            if (self.native_sync_mode == "classic" and sliding != 0) or (self.native_sync_mode == "native" and sliding == 0):
+                raise RuntimeError("Observed provider sync protocol did not match the requested native mode")
+            self.record["checks"]["android_requested_sync_protocol"] = True
             self.record["checks"]["android_web_bidirectional_e2ee"] = True
             self.record["checks"]["android_sdk_refresh_preserves_device_key"] = True
             self.record["checks"]["android_sdk_queue_encrypted_logical_ids"] = True
@@ -370,15 +385,18 @@ def main():
     parser.add_argument("--docker-sudo", action="store_true", help="Use existing noninteractive sudo authorization for Docker only")
     parser.add_argument("--android-apk", type=Path, help="Separate debug protocol APK; never the HRIS app")
     parser.add_argument("--android-serial", choices=["emulator-5560"], help="Booted hris-mobile-dev emulator")
+    parser.add_argument("--android-sync-mode", choices=["native", "classic"], default="native", help="Explicit isolated SDK sync implementation")
     parser.add_argument("--android-sdk", type=Path, default=Path.home() / "Android/Sdk")
     options = parser.parse_args()
     if bool(options.android_apk) != bool(options.android_serial):
         parser.error("Native proof requires both --android-apk and --android-serial")
+    if options.android_sync_mode != "native" and not options.android_apk:
+        parser.error("A non-default sync mode requires the native APK and owned emulator")
     if options.docker_sudo:
         DOCKER_COMMAND = ["sudo", "-n", "docker"]
     os.umask(0o077)
     native = (options.android_apk, options.android_serial, options.android_sdk) if options.android_apk else None
-    proof = ProviderProof(native)
+    proof = ProviderProof(native, options.android_sync_mode)
     DIAGNOSTICS = proof.directory / "command-errors.log"
     started = time.monotonic()
     error = None

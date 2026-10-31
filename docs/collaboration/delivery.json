@@ -79,7 +79,9 @@
         "to-device-envelopes.md",
         "../measurements/collaboration-to-device-2026-10-31.json",
         "sync-scope-recovery.md",
-        "../measurements/collaboration-sync-scope-2026-10-31.json"
+        "../measurements/collaboration-sync-scope-2026-10-31.json",
+        "sync-gateway.md",
+        "../measurements/collaboration-sync-foundation-2026-10-31.json"
       ]
     },
     {

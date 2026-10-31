@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-31",
+  "scope": "Native DIRECT retained room projection and encrypted sync cursor foundations; no public sync endpoint yet",
+  "schema": 113,
+  "validation": {
+    "result": "passed",
+    "durationSeconds": 22,
+    "checks": [
+      "formatCheck",
+      "architectureCheck",
+      ":modules:collaboration:domain:test",
+      ":modules:collaboration:data:test --tests *CollaborationSyncCursorTest --tests *CollaborationDirectRoomStorageTest"
+    ],
+    "suites": {
+      "domain": {
+        "tests": 34,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "data": {
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "verified": [
+    "Forced RLS ownership for both direct participants and exclusion of foreign account/company and unbound rooms",
+    "Retained historical room after peer deactivation and native-parent cleanup",
+    "Detached deterministic scope digest; malformed/foreign/duplicate projection and capacity rejected without truncation",
+    "AES-GCM cursor bound to company/account/device/server, fresh nonce and key rotation",
+    "Malformed/tampered and foreign-owner cursor rejection, bounded plaintext/ciphertext and interruption",
+    "Retired envelope key returns explicit reset-required without automatic store deletion"
+  ],
+  "sourceSha256": {
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationDirectRoomStorageTest.kt": "8282b3ca4ada2da6658c859e1a8fa3a7722efad86e6ecb414afed39c5e736139",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationRoomScopeDataSource.kt": "117dd5ebdcec7f9842efa4946bf3a8f7bb28e6310417f5262a1ca9b9b3d8ba15",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationRoomScopeDataSource.kt": "eb3bb5eaa959336a09fdb0676d4d217713f3f15a9cd8ad17687caa8d7886c4ac",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/EncryptedCollaborationSyncCursorRepository.kt": "6891f39857edeb1592bef48d3097438972b5e099aed797ea04af70889ae66b7f",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationRoomScopeRepository.kt": "9d8cdb970ea31a70c796973bd63443cb1fd4d2f52708af5f2aaf5c674d7205cb",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationSyncCursorTest.kt": "e4c22771bc1d30c5f9c256c2b02dc5506610427004009fc6615b4b4d3d060d51",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationRoomScope.kt": "bbb0aee06afd31afb472f55e7e782febcc7b2fcb7c3df4f02b03db128f4f412a",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationRoomScopePolicy.kt": "ddf38d626606698e27f894709a2d188ae4e016a6ec26bf907990911622b8d4c2",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationRoomScopeRepository.kt": "64c968e2b0d482cf4f8e582496fa942fbac84391f39f3b75f9106d0886dc2d72",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationSyncCursorRepository.kt": "e84a9754df8c8f6f00cca2cb30b23cab1f681c531ab50670d1291ed93f399776",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationRoomScopePolicyTest.kt": "3ce7ae8ff757e806a47cbd876ba874c285809b8ab30b8622f914c89fa4aad35e"
+  },
+  "remaining": [
+    "Admitted public sync, separately owned long polling and provider filtering/hydration",
+    "Actual native SDK through HRIS and durable offline outbox",
+    "Large-scope/capacity and provider restoration recovery acceptance"
+  ]
+}

@@ -1,7 +1,9 @@
 package dev.fajar.hris.collaboration.data
 
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationDirectRoomDataSource
+import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRoomScopeDataSource
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectRoomRepository
+import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationRoomScopeRepository
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.core.database.PostgresTransactionRunner
 import dev.fajar.hris.core.domain.*
@@ -64,6 +66,58 @@ class CollaborationDirectRoomStorageTest {
                 "grant select,insert,update,delete on all tables in schema public to direct_room_fixture"
             )
         }
+    }
+
+    @Test
+    fun ownedSyncProjectionRetainsHistoricalPeerAndExcludesUnboundOrForeignRooms() {
+        val f = Fixture()
+        assertEquals(
+            Result.Success(emptyList<CollaborationOwnedRoom>()),
+            f.run { f.roomScopes.owned(f.company, f.account, 10_001) },
+        )
+        val pointer = f.pointer()
+        assertEquals(Result.Success(Unit), f.run { f.repository.create(pointer) })
+        f.running(pointer.jobId)
+        val binding = f.binding(pointer)
+        assertEquals(Result.Success(Unit), f.run { f.repository.publish(binding) })
+        val captured =
+            (f.run { f.roomScopes.owned(f.company, f.account, 10_001) } as Result.Success).value
+        assertEquals(1, captured.size)
+        assertEquals(binding.matrixRoomId, captured.single().roomId)
+        assertEquals(f.account, captured.single().creatorAccountId)
+        assertEquals(
+            setOf(f.account, f.peer),
+            setOf(captured.single().firstAccountId, captured.single().secondAccountId),
+        )
+        assertEquals(
+            Result.Success(captured),
+            f.run(f.actor.copy(accountId = f.peer)) {
+                f.roomScopes.owned(f.company, f.peer, 10_001)
+            },
+        )
+        val foreign = UUID.randomUUID()
+        assertEquals(
+            Result.Success(emptyList<CollaborationOwnedRoom>()),
+            f.run { f.roomScopes.owned(f.company, foreign, 10_001) },
+        )
+        assertEquals(
+            Result.Success(emptyList<CollaborationOwnedRoom>()),
+            f.run(f.actor.copy(accountId = foreign)) {
+                f.roomScopes.owned(f.company, f.account, 10_001)
+            },
+        )
+        assertEquals(
+            Result.Success(emptyList<CollaborationOwnedRoom>()),
+            f.run(f.actor.copy(companyId = UUID.randomUUID())) {
+                f.roomScopes.owned(f.company, f.account, 10_001)
+            },
+        )
+        owner.update("update accounts set active=false,version=version+1 where id=?", f.peer)
+        owner.update("delete from native_sessions where id=?", f.parent)
+        assertEquals(
+            Result.Success(captured),
+            f.run { f.roomScopes.owned(f.company, f.account, 10_001) },
+        )
     }
 
     @Test
@@ -424,6 +478,12 @@ class CollaborationDirectRoomStorageTest {
                 "direct-room-fixture-only",
             )
         val runtime = JdbcTemplate(source)
+        val roomScopes =
+            StoredCollaborationRoomScopeRepository(
+                PostgresCollaborationRoomScopeDataSource(
+                    DSL.using(TransactionAwareDataSourceProxy(source), SQLDialect.POSTGRES)
+                )
+            )
         private val transactions =
             PostgresTransactionRunner(JdbcTransactionManager(source), runtime)
         val repository =

@@ -17,6 +17,17 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- Native DIRECT sync foundations now include one bounded forced-RLS room projection
+  and an AES-GCM cursor bound to company/account/device/Matrix server. Peer
+  offboarding does not delete retained history. Scope growth changes its digest;
+  invalid, ambiguous or oversized scope is rejected without truncation. Focused
+  domain/storage/crypto plus quality checks passed in 22s. [Contract](collaboration/sync-gateway.md)
+  and [evidence](measurements/collaboration-sync-foundation-2026-10-31.json) retain
+  bounds and key-rotation/reset behavior. Next wire the admitted sync endpoint and
+  separately owned long polling, then native SDK and durable outbox.
+  To-device `199d541f` hosted `41219599675` passed every job/step; its 17 source
+  hashes and raw terminal jobs are retained in the to-device measurement.
+
 - Actual classic sync scope expansion now passes for joined and invited rooms.
   Provider room filters still return out-of-filter invitations; full_state with
   since does not replay old invites. Initial reacquisition restores invitations,

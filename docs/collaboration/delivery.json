@@ -11,7 +11,9 @@
       "id": "P0",
       "name": "Provider, protocol and native feasibility",
       "status": "in_progress",
-      "evidence": []
+      "evidence": [
+        "../measurements/collaboration-web-provider-2026-10-31.json"
+      ]
     },
     {
       "id": "P1",
@@ -394,8 +396,10 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Create a bounded isolated Matrix/LiveKit provider lab with fictional users and owned cleanup.",
-    "Prove client E2EE and recovery using actual service transports before product UI integration.",
-    "Add collaboration admission/device/control contracts and test their failure boundaries."
+    "Prove native Android/web Matrix interoperability on the dedicated emulator.",
+    "Prove Apple bindings and retain the physical-device acceptance boundary.",
+    "Implement strict HRIS session/device admission before exposing provider logins.",
+    "Implement MatrixRTC participant/epoch/key rotation before accepting production encrypted calls.",
+    "Continue P1\u2013P8; browser provider proof does not accept a product feature or capacity."
   ]
 }

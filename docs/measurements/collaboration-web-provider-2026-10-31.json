@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "runId": "a971a63452144bf79e079ee768fa33f3",
+  "kind": "isolated_provider_proof",
+  "complete": true,
+  "productAcceptance": false,
+  "capacityAcceptance": false,
+  "images": {
+    "synapse": {
+      "reference": "ghcr.io/element-hq/synapse:v1.164.1@sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75",
+      "id": "sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75",
+      "digests": [
+        "ghcr.io/element-hq/synapse@sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75"
+      ]
+    },
+    "livekit": {
+      "reference": "livekit/livekit-server:v1.13.11@sha256:25cd902de7cacbd5f1f779f6a6ac1eae20ba8f56b0935934ce6b0ab80d1e3d20",
+      "id": "sha256:25cd902de7cacbd5f1f779f6a6ac1eae20ba8f56b0935934ce6b0ab80d1e3d20",
+      "digests": [
+        "livekit/livekit-server@sha256:25cd902de7cacbd5f1f779f6a6ac1eae20ba8f56b0935934ce6b0ab80d1e3d20"
+      ]
+    },
+    "postgres": {
+      "reference": "postgres:18.6-alpine@sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+      "id": "sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+      "digests": [
+        "postgres@sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5"
+      ]
+    }
+  },
+  "checks": {
+    "wrong_issuer": true,
+    "wrong_audience": true,
+    "expired_jwt_beyond_provider_leeway": true,
+    "public_registration_disabled": true,
+    "loopback_only_http": true,
+    "isolated_dedicated_network": true,
+    "browser_e2ee_restart_media": true
+  },
+  "cleanup": true,
+  "sourceSha256": {
+    "tool/check_collaboration_providers.py": "6f215feac25f171e4a1d6f343677b2c11b24f0156cde4ccf4e114a18ddf22e56",
+    "tool/test_collaboration_providers.py": "1ddf78841a84a9e0636542a62c661f4d8b07a15f145083d74f7d47449fa67f3a",
+    "tool/collaboration-proof/package.json": "f499358763283beb73dd76606dde7e28122b6787494529ad518fef5718062cad",
+    "tool/collaboration-proof/package-lock.json": "031dbd57065817fbe2e119d87bb3e9588e26d4814835219dc950c4dddff51c56",
+    "tool/collaboration-proof/images.json": "63aa4b37949053e6574f9f4ae7ff1d22c02a59d8955a141c6aae5b2257e89f50",
+    "tool/collaboration-proof/index.html": "e5cadc31789aa95d2b718905dd44201da49a29678b913db9a7563fdf907ba7d0",
+    "tool/collaboration-proof/playwright.config.mjs": "33b5dd2896bd6a602e54a9c8154c679ee31b473e7bc9a0ff9da8864ca429381c",
+    "tool/collaboration-proof/src/probe.js": "883a60282b97b4a742f4d44bf130370a8b4bcdaa3805d62d19438725603c16d2",
+    "tool/collaboration-proof/tests/providers.spec.mjs": "a57101427a84090f2ddbbb4f1b1b94a79394baa50a7574a51dc18f153f4207a5"
+  },
+  "observations": {
+    "recent_expired_jwt_accepted_by_provider": true,
+    "strict_hris_broker_expiry_required": true
+  },
+  "browser": {
+    "expected": 1,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0,
+    "duration": 5942.034
+  },
+  "elapsedSeconds": 15.135
+}

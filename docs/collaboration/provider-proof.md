@@ -1,0 +1,70 @@
+# Isolated Matrix and LiveKit provider proof
+
+This exercises actual services and browser SDKs. It is one P0 proof, not delivery
+of HRIS chat/calling, native background calls, MatrixRTC interoperability or
+1,000-participant capacity. Follow [the full delivery ledger](delivery.json).
+
+## Run
+
+Requires Node 24+, Docker, Python 3 and Playwright Chromium. Install the exact
+dependencies with `npm ci --ignore-scripts` in `tool/collaboration-proof`, followed
+by `npx playwright install chromium` where the browser is not already installed.
+
+```sh
+python3 -m unittest discover -s tool -p test_collaboration_providers.py
+python3 tool/check_collaboration_providers.py
+```
+
+This workspace permits `sudo -n docker` but not switching to the Docker group.
+Here, use `python3 tool/check_collaboration_providers.py --docker-sudo` to apply
+existing sudo authority to Docker commands only. npm and workspace writes stay
+under the ordinary user. No Docker socket permission changes are needed.
+
+The driver creates a unique labelled bridge, private temporary database and
+fictional Synapse users, with random credentials. Only HTTP/signaling ports are
+published, on loopback. Database/media sockets remain on the dedicated bridge.
+The bridge is not an egress firewall; Synapse federation, trusted key servers,
+public registration, previews and statistics reporting are disabled. Docker's
+internal-only bridge suppressed published loopback ports in the tested runtime,
+so the fixture uses a separate ordinary bridge with loopback publication.
+
+All private configuration, service logs and browser diagnostics stay in a mode
+700 `.work/collaboration/<run>` directory. The driver never reads actual HRIS or
+Firebase credentials. `finally` validates owner labels before removing its
+containers/network. Image caches and private diagnostic files remain. The six
+driver tests cover ownership mismatch, missing labels, log/removal failures,
+private file permissions and credential-safe command errors.
+
+`result.json` is sanitized: source hashes, image digests, named check outcomes,
+browser counts, duration and cleanup. The dedicated CI workflow uploads only
+these summaries, never fixture credentials, browser traces or provider logs.
+
+## Assertions and limits
+
+The browser proof verifies peer signing fingerprints out of band, creates an
+encrypted invite-only room, sends a message and reads it at the recipient. The
+server event has encrypted type/content and no plaintext marker. The recipient
+then stops while another message arrives and recovers after browser reload using
+its retained crypto store.
+
+A client generates a random media key and sends it through an encrypted Matrix
+test event. The receiving browser decrypts it and connects to LiveKit E2EE. A
+synthetic canvas and tone prove actual decoded video dimensions and audio energy.
+A third connected client with an unrelated key receives real RTP bytes but cannot
+decode frames/audio. This test event is intentionally a protocol experiment;
+production MatrixRTC recipient/epoch/rotation behavior remains a separate gate.
+
+The fixture attaches remote audio for Chromium playback before analysing it;
+constructing a Web Audio source alone did not cause the tested browser to render
+the remote stream. Server signaling success alone was never accepted as media
+proof. No microphone/camera from the developer or user is captured.
+
+Synapse rejects the wrong JWT issuer/audience and expiration beyond its 120-second
+clock tolerance. It accepts a token expired ten seconds earlier, matching
+`synapse/handlers/jwt.py`'s `claims.validate(leeway=120)` in v1.164.1. HRIS must
+enforce its own strict grant expiry before the internal exchange and keep the
+provider login inaccessible as a bypass. This observation is retained in results.
+
+Pending P0 work includes native Android/web and Apple binding verification,
+production HRIS admission, durable product queues, device verification UX,
+MatrixRTC key distribution, native incoming calls, and dedicated capacity tests.

@@ -10,6 +10,18 @@ evidence; no chat/call/meeting group has been accepted yet. Read the
 [architecture](collaboration/architecture.md) and
 [threat model](collaboration/threat-model.md) before implementation.
 
+P0 browser/provider checkpoint: six cleanup/diagnostic tests and the actual
+Matrix/LiveKit browser scenario pass. [Evidence](measurements/collaboration-web-provider-2026-10-31.json)
+pins source hashes and service digests; [the procedure](collaboration/provider-proof.md)
+records peer verification, ciphertext inspection, recipient restart, client-side
+media-key transfer, decoded audio/video and a wrong-key peer receiving RTP without
+decoding. Owned containers/network were removed. The protocol experiment uses a
+custom encrypted key event; MatrixRTC/native/device/HRIS admission/capacity remain
+pending. Synapse accepts JWT expiry within its 120-second clock tolerance, so the
+production broker must enforce strict grant expiry before internal exchange.
+Next: native Android/web proof in the dedicated emulator and actual Apple binding
+verification, then protected HRIS integration. No real account or phone was used.
+
 Continue through P0 provider/native protocol proof, then all P1–P8 gates. Use
 isolated fictional provider fixtures. Preserve the running schema-103 HRIS stack,
 real Firebase identity, and installed Mobile build 4. Public domains, Apple VoIP

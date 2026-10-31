@@ -1,0 +1,52 @@
+name: Collaboration provider proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, feat/communications]
+    paths:
+      - "tool/collaboration-proof/**"
+      - "tool/*collaboration_providers.py"
+      - ".github/workflows/collaboration-proof.yml"
+  pull_request:
+    paths:
+      - "tool/collaboration-proof/**"
+      - "tool/*collaboration_providers.py"
+      - ".github/workflows/collaboration-proof.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  providers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: tool/collaboration-proof/package-lock.json
+      - name: Check owned cleanup and diagnostics
+        run: python3 -m unittest discover -s tool -p test_collaboration_providers.py
+      - name: Install pinned browser dependencies
+        working-directory: tool/collaboration-proof
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Install browser
+        working-directory: tool/collaboration-proof
+        run: npx playwright install --with-deps chromium
+      - name: Build fixture
+        working-directory: tool/collaboration-proof
+        run: npm run build
+      - name: Exercise actual Matrix and LiveKit
+        run: python3 tool/check_collaboration_providers.py
+      - name: Upload sanitized evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: collaboration-provider-evidence
+          path: .work/collaboration/*/result.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7

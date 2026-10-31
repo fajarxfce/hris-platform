@@ -17,6 +17,11 @@ no HRIS password or Firebase credential is copied into Matrix. Bootstrap never
 creates participant private keys. Revocation admission must not depend solely
 on eventual provisioning cleanup.
 
+The [actual provider proof](provider-proof.md) found that Synapse 1.164.1 accepts
+JWTs within 120 seconds after expiration as clock tolerance. The HRIS broker
+must check its stricter grant deadline itself before internal exchange; provider
+JWT acceptance does not establish live HRIS admission.
+
 LiveKit owns WebRTC transport, signaling and active tracks. HRIS issues bounded,
 room/device/role-scoped grants after admission. A grant is not a substitute for
 the HRIS resource state. Redis supports provider routing/ephemeral coordination;

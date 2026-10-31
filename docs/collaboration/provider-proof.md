@@ -104,6 +104,26 @@ clock tolerance. It accepts a token expired ten seconds earlier, matching
 enforce its own strict grant expiry before the internal exchange and keep the
 provider login inaccessible as a bypass. This observation is retained in results.
 
-Pending P0 work includes native Android/web and Apple binding verification,
+Pending P0 work includes Apple provider interoperability,
 production HRIS admission, durable product queues, device verification UX,
 MatrixRTC key distribution, native incoming calls, and dedicated capacity tests.
+
+## Native token renewal
+
+The refresh extension gives only the fictional native session a four-second
+access lifetime and requests the standard Matrix refresh token. The native SDK
+waits beyond that lifetime, automatically refreshes, persists the new credential
+pair through its session delegate and sends an encrypted reply. The public device
+signing key must remain unchanged. Both real provider scenarios pass in 30.586s
+with cleanup; [evidence](../measurements/collaboration-native-refresh-2026-10-31.json)
+binds driver, native sources and APK. Browser sessions retain their ordinary
+nonrefreshable lifetime.
+
+Matrix Rust bindings 26.10.23 enable `handle_refresh_tokens` in their builder.
+Their pinned Rust source is `8de215a0aa0026afa5754ae5f05a6d168d1a1d60`. The
+standard Matrix refresh endpoint updates the live client and invokes the save
+delegate. Calling `restore_session` again on an authenticated client instead
+violates the SDK's one-time authentication initialization. Product integration
+will expose standard opaque gateway credentials; refresh must reauthorize the
+current HRIS parent without renewing that HRIS parent or recreating E2EE keys.
+The fixture file stores fictional tokens only and is not product key management.

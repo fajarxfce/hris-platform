@@ -8,7 +8,7 @@ const fixture = JSON.parse(readFileSync(process.env.HRIS_COLLAB_PROOF_FIXTURE, "
 // Register only when explicitly requested. Browser-only evidence never claims
 // the native gate; the driver's result records which experiment actually ran.
 if (fixture.nativeDevice) {
-  test("Android Rust SDK and web exchange actual encrypted messages", async ({ browser, baseURL, request }) => {
+  test("Android Rust SDK renews credentials without changing encrypted chat keys", async ({ browser, baseURL, request }) => {
     const { adb, serial, package: application } = fixture.nativeDevice;
     if (serial !== "emulator-5560" || application !== "dev.fajar.hris.collaboration.proof") {
       throw new Error("Invalid native proof target");
@@ -56,6 +56,10 @@ if (fixture.nativeDevice) {
       await expect.poll(() => ({ result: readResult("result"), instrumentation: readResult("instrumentation") }))
         .toMatchObject({ result: { receivedEncrypted: true, receivedEventId: sentId }, instrumentation: { complete: true } });
       const received = readResult("result");
+      expect(received.sessionRefreshes).toBeGreaterThanOrEqual(1);
+      expect(received.credentialsRotated).toBe(true);
+      expect(received.persistedSessionCurrent).toBe(true);
+      expect(received.deviceKeyUnchanged).toBe(true);
       await expect.poll(() => page.evaluate(body => window.probe.lookup(body), replyBody))
         .toEqual({ roomId, eventId: received.sentEventId, encrypted: true });
       for (const eventId of [sentId, received.sentEventId]) {

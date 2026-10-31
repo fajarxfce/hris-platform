@@ -15,7 +15,8 @@
         "../measurements/collaboration-web-provider-2026-10-31.json",
         "../measurements/collaboration-android-web-provider-2026-10-31.json",
         "https://github.com/fajarxfce/hris-mobile/blob/da43b35c/docs/measurements/collaboration-android-ci-2026-10-31.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/da43b35c/docs/measurements/collaboration-apple-binding-2026-10-31.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/da43b35c/docs/measurements/collaboration-apple-binding-2026-10-31.json",
+        "../measurements/collaboration-native-refresh-2026-10-31.json"
       ]
     },
     {

@@ -132,8 +132,8 @@ now pass, along with 69 existing OpenAPI contract cases, 22 collaboration cases,
 formatting, architecture and Compose validation. Shared worker context: 104 passes,
 one existing opt-in elapsed-retention skip. See [HTTP evidence](measurements/collaboration-native-http-2026-10-31.json),
 which retains the three corrected fixture failures. The earlier registration
-checkpoint `4d272499` passed hosted control run `41185015834`; check the expanded
-HTTP/worker control workflow after this push. Runtime schema 103 and phone build 4
+checkpoint `4d272499` passed hosted control run `41185015834`; the expanded
+HTTP/worker control workflow passed at `292d938c` in `41185906869`. Runtime schema 103 and phone build 4
 remain unchanged. Continue with provisioning/credentials/broker, not another
 round of already-passing registration checks unless subsequent changes need it.
 
@@ -147,14 +147,29 @@ and the revision boundary. All 29 core database, eleven registration/registry,
 eleven admission and 22 recovery-tool cases pass. See [storage evidence](measurements/collaboration-provider-storage-2026-10-31.json).
 Recovery ceiling 106 uses schema-sensitive SQL so current schema-103 backups do
 not query a nonexistent provider table. No new store bean/provisioner is wired yet;
-API/worker context evidence still refers to the registration graph above.
+Expanded control CI `41186737908` passed both jobs at exact `ef95326d`,
+including the API/worker contexts and schema-106 recovery checks.
 
 Next: bounded Matrix JWT login/transport, durable provisioning/reconciliation,
 protected gateway and native/browser client admission. Provider credentials are
 internal only. Gateway requests must recheck current HRIS authority; no public
-Synapse path may bypass it. Native SDK token replacement/refresh behavior still
-needs a protocol proof before choosing its gateway token lifecycle. MatrixRTC,
+Synapse path may bypass it. Standard native Matrix token refresh now passes the actual protocol proof below.
+The HRIS gateway must implement that protocol with its own live admission checks. MatrixRTC,
 Apple provider interoperability, native media and all product P0–P8 gates remain.
+
+Native SDK credential renewal now passes against actual Synapse and the browser.
+Only the fictional native session has a four-second access lifetime; after expiry,
+Matrix Rust SDK refreshes and persists both replacement tokens, retaining the
+same device signing key and bidirectional encrypted chat. Both provider scenarios
+pass in 30.586s with owned cleanup. [Refresh evidence](measurements/collaboration-native-refresh-2026-10-31.json)
+records source/APK hashes, twelve driver checks and Mobile's corrected full root
+check (2,002 desktop cases, zero lint errors). Initial Detekt method length failure
+is retained; the session callback store is now a separate fixture owner. SDK
+`restore_session` must only initialize a client once; use the supported standard
+refresh callback, not another restore on an already authenticated client.
+This proves the provider mechanism, not HRIS gateway enforcement or product
+Keystore storage. Update Mobile CI's fixed Platform ref to this driver before
+its refresh fixture runs. The emulator is stopped; the phone was untouched.
 
 The paragraphs below are retained prior-work history. Their old installed build
 2 reference is superseded by Mobile's validated release build 4; consult Mobile's

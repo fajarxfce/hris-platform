@@ -175,6 +175,9 @@ class ProviderProof:
             "password_config": {"enabled": False},
             "jwt_config": {"enabled": True, "secret": jwt_secret, "algorithm": "HS256",
                            "issuer": "urn:hris:collaboration:proof", "audiences": ["matrix:proof"]},
+            # Only the native fixture requests refreshable credentials. Its short
+            # lifetime forces the real SDK renewal path without expiring browser peers.
+            "refreshable_access_token_lifetime": "4s",
             "listeners": [{"port": 8008, "type": "http", "tls": False,
                            "bind_addresses": ["0.0.0.0"], "x_forwarded": False,
                            "resources": [{"names": ["client"], "compress": False}]}],
@@ -213,9 +216,14 @@ class ProviderProof:
             _, session = http(matrix_url + "/_matrix/client/v3/login", {
                 "type": "org.matrix.login.jwt", "token": jwt(jwt_secret, subject=name),
                 "device_id": f"PROOF_{name.upper()}", "initial_device_display_name": "Fictional provider fixture",
+                "refresh_token": name == "native",
             })
             users[name] = {"baseUrl": matrix_url, "userId": session["user_id"],
                            "deviceId": session["device_id"], "accessToken": session["access_token"]}
+            if name == "native":
+                if not session.get("refresh_token") or not 0 < session.get("expires_in_ms", 0) <= 4000:
+                    raise RuntimeError("Native refreshable credentials were not issued")
+                users[name]["refreshToken"] = session["refresh_token"]
         for name, options in (("wrong_issuer", {"issuer": "urn:wrong"}),
                               ("wrong_audience", {"audience": "wrong"}),
                               ("expired_jwt_beyond_provider_leeway", {"expiry": int(time.time()) - 300})):
@@ -306,6 +314,7 @@ class ProviderProof:
         self.record["checks"]["browser_e2ee_restart_media"] = True
         if self.native:
             self.record["checks"]["android_web_bidirectional_e2ee"] = True
+            self.record["checks"]["android_sdk_refresh_preserves_device_key"] = True
 
     def cleanup(self):
         successful = True

@@ -73,4 +73,26 @@ class PostgresCollaborationRegistryDataSource(private val sql: DSLContext) :
     override fun insertBinding(record: CollaborationDeviceSessionsRecord) {
         sql.insertInto(B).set(record).execute()
     }
+
+    override fun activate(
+        companyId: UUID,
+        accountId: UUID,
+        deviceId: UUID,
+        expectedVersion: Long,
+        at: Instant,
+    ): Boolean =
+        sql.update(D)
+            .set(D.STATE, "ACTIVE")
+            .set(D.VERSION, D.VERSION.plus(1))
+            .set(D.UPDATED_AT, at.atOffset(ZoneOffset.UTC))
+            .where(
+                D.COMPANY_ID.eq(companyId),
+                D.ACCOUNT_ID.eq(accountId),
+                D.ID.eq(deviceId),
+                D.VERSION.eq(expectedVersion),
+                D.VERSION.lt(999999),
+                D.STATE.eq("PROVISIONING"),
+                D.REVOKED_AT.isNull,
+            )
+            .execute() == 1
 }

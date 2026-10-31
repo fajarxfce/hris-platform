@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "kind": "fenced_native_collaboration_activation",
+  "schema": 108,
+  "productAcceptance": false,
+  "liveRuntimeModified": false,
+  "providerIO": "Controlled provider repository in real PostgreSQL transaction/race tests; actual Synapse transport remains separately verified.",
+  "workerTaskAndProviderDIWired": false,
+  "checks": {
+    "initialDataSelection": {
+      "registrationAndActivationCases": 18,
+      "registryRegressionCases": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "elapsedSeconds": 49
+    },
+    "finalPolicyBoundarySelection": {
+      "cases": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "elapsedSeconds": 35
+    },
+    "admissionPolicyCases": 11,
+    "format": true,
+    "architecture": true
+  },
+  "verifiedBehaviors": [
+    "A prepared job releases SQL locks before provider I/O and repeats live HRIS authority afterward.",
+    "Credential encryption, active device version, job progress/completion, audit and outbox publish atomically.",
+    "A late old lease cannot overwrite or log out a winning replacement credential.",
+    "Permission, MFA and company-module changes during provider I/O prevent publication.",
+    "Parent refresh rejects the old candidate; retry preserves the device identity.",
+    "Post-write expiry rolls back credential, device, job progress/completion and audit together.",
+    "Wrong provider identity, malformed job data and cancellation never activate the device.",
+    "Only obsolete policy observations become retryable; confirmed maintenance/access denials remain final."
+  ],
+  "limits": [
+    "Claim ownership is seeded in these fixtures to exercise lease fences; generic job claiming/attempt limits retain their existing independent coverage.",
+    "The final one-case selection follows the retry-observation refinement; the hosted workflow will rerun the complete selection.",
+    "No provider-enabled worker task, HTTP gateway or product SDK adapter is enabled yet."
+  ],
+  "sourceSha256": {
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationRegistryDataSource.kt": "eefa960cf71bdf189eb725f528974d5f484d8d2cb956b1ebb65ab0ab762b279c",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationRegistryDataSource.kt": "c63beb71ddd68e4d9d3d49557e10f6a2a3d2e66d1403c7b0ae2ceb34f24b06c7",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationRegistryRepository.kt": "5531242e9f725ed848f1713307a02237022d819c93ef98f51d741741922b9f91",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "f2b1c707be64ea0346a16aefddb39f71213c83b6ae7f1efc12e0986c879dec20",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationMatrixPolicy.kt": "3778f85fd72f7426895b0646964b4e5a5453bc9590f5542b29a646b8fd80a2b5",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationProvisioningRequest.kt": "740213ca6e3f3e6c02911a45b239d8c73c17158d699355e376fbb4b3aadb44df",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationRegistryRepository.kt": "c7bf3800bb54956d9710ce153868d7c1a2980ab5c90406eec8a16353212d57d0",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AbortCollaborationProvisioning.kt": "7f65197050e7630ad07398977a42367ff5717135bcab72cd605fa54bcad6efcf",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AdvanceNativeCollaborationProvisioning.kt": "4a472b3dca2966bc926466f4dedad430c39a4462796b08ee984968257eebb1e2"
+  }
+}

@@ -18,4 +18,12 @@ interface CollaborationRegistryDataSource {
     fun insertDevice(record: CollaborationDevicesRecord)
 
     fun insertBinding(record: CollaborationDeviceSessionsRecord)
+
+    fun activate(
+        companyId: UUID,
+        accountId: UUID,
+        deviceId: UUID,
+        expectedVersion: Long,
+        at: Instant,
+    ): Boolean
 }

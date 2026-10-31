@@ -241,6 +241,26 @@ correction also passed full control CI `41189071278` at `b2bc286a`, including re
 provider transport, storage, API and worker contexts. The earlier failed provider
 fixture run remains in its evidence. Check the new queue commit's CI after push.
 
+Native activation use cases now exist: `AdvanceNativeCollaborationProvisioning`
+and `AbortCollaborationProvisioning`, with generation-checked registry activation.
+Preparation and publication use separate guarded transactions around private
+provider I/O. Publication repeats parent/MFA/company/build/permission, lease,
+pointer, device version and provider-generation checks; credential/device/job/
+audit/outbox commit together. Late results never call logout. Only an obsolete
+observation is eligible for bounded job retry; a confirmed access denial is final.
+
+Real PostgreSQL scenarios exercise winning/losing workers, released SQL guards,
+permission/MFA/policy changes during I/O, native refresh, post-write rollback,
+wrong provider identities, cancellation and completed-job replay. Initial data
+selection: 18 registration/activation + one registry case, eleven admission cases,
+49s. The subsequent retry-observation refinement passed the new policy-boundary
+case in 35s. [Activation evidence](measurements/collaboration-provisioning-activation-2026-10-31.json)
+retains exact selections; do not describe this controlled provider as an actual
+Synapse worker run. The task adapter, provider configuration and their DI/context
+acceptance are next, followed by explicit bounded retry, gateway and SDK/chat.
+No service is enabled or deployed. Schema-108 queue CI `41190119482` passed all
+jobs at `5a1dc9a9`; record this new use-case commit's full CI after push.
+
 The paragraphs below are retained prior-work history. Their old installed build
 2 reference is superseded by Mobile's validated release build 4; consult Mobile's
 current handoff for its artifact/source and future versionCode >= 5.

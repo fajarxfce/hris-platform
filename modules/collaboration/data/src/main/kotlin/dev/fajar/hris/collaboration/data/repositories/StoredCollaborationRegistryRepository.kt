@@ -13,6 +13,16 @@ import java.util.UUID
 
 class StoredCollaborationRegistryRepository(private val store: CollaborationRegistryDataSource) :
     CollaborationRegistryRepository {
+    override fun activate(
+        companyId: UUID,
+        accountId: UUID,
+        deviceId: UUID,
+        expectedVersion: Long,
+        at: Instant,
+    ): Result<Boolean> = safeDatabaseCall {
+        store.activate(companyId, accountId, deviceId, expectedVersion, at)
+    }
+
     override fun findBound(
         companyId: UUID,
         accountId: UUID,

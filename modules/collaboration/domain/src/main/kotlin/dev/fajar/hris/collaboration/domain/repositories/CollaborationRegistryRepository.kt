@@ -20,4 +20,15 @@ interface CollaborationRegistryRepository {
     ): Result<Int>
 
     fun register(registration: CollaborationRegistration): Result<Unit>
+
+    /**
+     * Caller owns current admission and the transaction containing provider storage/job completion.
+     */
+    fun activate(
+        companyId: UUID,
+        accountId: UUID,
+        deviceId: UUID,
+        expectedVersion: Long,
+        at: Instant,
+    ): Result<Boolean>
 }

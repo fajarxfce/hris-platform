@@ -258,3 +258,35 @@ elapsed-retention skip) pass in 4m31s. The unchanged schema-108 selection passed
 all 29 database and two jobs-domain cases earlier (2m35s); 22 recovery cases and
 14 dashboard cases/type checking also pass. [Queue evidence](../measurements/collaboration-provisioning-registration-2026-10-31.json)
 retains the corrected fixture constructor failure and tested sources.
+
+## Fenced native activation
+
+`AdvanceNativeCollaborationProvisioning` prepares under the job lease, client
+policy, company/member/account, native-parent, device/pointer and credential
+guards. It reads current parent assurance and intersects the captured chat grant
+with live HRIS authority. The immutable job's parent/device/platform/build must
+match the bound identity. Provider I/O happens after that transaction releases
+its guards. The result then passes the same live checks, original grant deadline,
+lease token, pointer, device version and provider generation before publication.
+
+The final transaction encrypts the bounded internal credential, activates the
+device, completes job progress/status and records audit/outbox together. A late
+response cannot publish after another worker wins. No failure path calls Matrix
+logout; unpublished candidates expire behind the private provider network. A
+current stored credential may be reused; unknown/expired legacy credentials
+require bounded replacement. Native refresh or an obsolete scheduled-policy
+observation returns a retryable observation failure; actual permission, MFA or
+module denial stays final under the existing eight-attempt worker policy.
+
+`AbortCollaborationProvisioning` stops only the owned lease, recording failure or
+cancellation without deleting the device or its E2EE identity. Explicit retry
+and permanent device revocation remain separate forthcoming commands.
+
+Nineteen data cases (18 registration/activation and one registry regression) and
+eleven admission cases passed in 49s. The later retry-observation refinement
+passed its new policy-boundary case in 35s, with formatting and architecture.
+[Activation evidence](../measurements/collaboration-provisioning-activation-2026-10-31.json)
+records the two selections and their limits. These tests use real PostgreSQL and
+a controlled provider repository; actual provider transport is separately
+verified. Next wire provider configuration, the worker adapter and their actual
+application contexts; the use cases are not yet registered as a running task.

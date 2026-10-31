@@ -4,11 +4,16 @@ import dev.fajar.hris.administration.data.datasources.PostgresCompanyClientPolic
 import dev.fajar.hris.administration.data.repositories.StoredCompanyClientPolicyRepository
 import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
+import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProviderSessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProvisioningDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRegistryDataSource
+import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationProviderSessionRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationProvisioningRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationRegistryRepository
 import dev.fajar.hris.collaboration.domain.entities.*
+import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixDeviceId
+import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixLocalpart
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRepository
 import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.core.database.PostgresTransactionRunner
 import dev.fajar.hris.core.database.datasources.*
@@ -25,8 +30,10 @@ import dev.fajar.hris.organization.data.datasources.PostgresCompanyDataSource
 import dev.fajar.hris.organization.data.repositories.StoredCompanyRepository
 import java.time.*
 import java.time.temporal.ChronoUnit
+import java.util.Base64
 import java.util.UUID
 import java.util.concurrent.*
+import java.util.concurrent.atomic.AtomicInteger
 import org.flywaydb.core.Flyway
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -518,6 +525,281 @@ class NativeCollaborationRegistrationTest {
         assertEquals(0, second.rows("audit_entries"))
     }
 
+    @Test
+    fun provisioningPublishesEncryptedCredentialDeviceAndJobTogetherAndRetryCannotRepublish() {
+        val f = Fixture()
+        val parent = f.parent()
+        val device = success(f.register(parent)).id
+        val lease = f.claim(device)
+        val matrix = RecordingMatrix(f.clock)
+        assertEquals(JobStep(1, true), success(f.advance(matrix).execute(lease)))
+        assertEquals("ACTIVE", f.state(device))
+        val job = f.job(lease)
+        assertEquals(JobStatus.SUCCEEDED, job.status)
+        assertEquals(1, job.completedItems)
+        assertEquals(device.toString(), job.checkpoint["deviceId"])
+        val credential = requireNotNull(f.credential(device))
+        assertEquals(0L, credential.generation)
+        assertEquals(
+            "@${collaborationMatrixLocalpart(requireNotNull(f.actor.companyId), f.account)}:proof.invalid",
+            credential.matrixUserId,
+        )
+        assertEquals(collaborationMatrixDeviceId(device), credential.matrixDeviceId)
+        assertFalse(
+            requireNotNull(
+                    sql.queryForObject(
+                        "select token_encrypted from collaboration_provider_sessions where device_id=?",
+                        String::class.java,
+                        device,
+                    )
+                )
+                .contains(credential.accessToken)
+        )
+        assertEquals(2, f.rows("audit_entries"))
+        assertEquals(2, f.rows("outbox_events"))
+        assertEquals("job_lease_lost", failed(f.advance(matrix).execute(lease)))
+        assertEquals(1, matrix.logins.get())
+        assertEquals(0, matrix.logouts.get())
+        assertInstanceOf(Result.Success::class.java, f.acquire(parent))
+    }
+
+    @Test
+    fun providerCallReleasesSqlGuardsAndPermissionMfaAndPolicyChangesBlockPublication() {
+        for (mode in 0..2) {
+            val f = Fixture()
+            val device = success(f.register(f.parent())).id
+            val lease = f.claim(device)
+            val matrix = RecordingMatrix(f.clock)
+            matrix.onLogin = { request ->
+                // These independent transactions would time out if provider I/O held access guards.
+                when (mode) {
+                    0 ->
+                        sql.update(
+                            "delete from membership_permissions where account_id=?",
+                            f.account,
+                        )
+                    1 ->
+                        sql.update(
+                            "update accounts set mfa_secret_encrypted='fictional-configured-secret' where id=?",
+                            f.account,
+                        )
+                    else ->
+                        f.policy(ClientPolicy(disabledModules = setOf(CompanyModule.COLLABORATION)))
+                }
+                matrix.issue(request)
+            }
+            val result = f.advance(matrix).execute(lease)
+            assertInstanceOf(Result.Failed::class.java, result)
+            if (mode == 1) assertEquals("mfa_required", failed(result))
+            if (mode == 2) assertEquals("company_module_disabled", failed(result))
+            assertEquals("PROVISIONING", f.state(device))
+            assertNull(f.credential(device))
+            assertEquals(JobStatus.RUNNING, f.job(lease).status)
+            assertEquals(0, matrix.logouts.get())
+            assertEquals(
+                Result.Success(Unit),
+                f.abort().execute(lease, (result as Result.Failed).failure),
+            )
+            assertEquals(JobStatus.FAILED, f.job(lease).status)
+        }
+    }
+
+    @Test
+    fun scheduledPolicyBoundaryRetriesObservationButNeverRetriesAConfirmedDenial() {
+        val f = Fixture()
+        val device = success(f.register(f.parent())).id
+        val lease = f.claim(device)
+        val activation = f.clock.at.plusSeconds(1)
+        f.policy(ClientPolicy(disabledModules = setOf(CompanyModule.COLLABORATION)), activation)
+        val delayed =
+            object : CompanyClientPolicyRepository by f.policies {
+                override fun effective(
+                    companyId: UUID,
+                    at: Instant,
+                ): Result<EffectiveClientPolicy> =
+                    f.policies.effective(companyId, at).also { f.clock.at = activation }
+            }
+        val matrix = RecordingMatrix(f.clock)
+        val stale = f.advance(matrix, policies = delayed).execute(lease)
+        assertEquals("collaboration_admission_changed", failed(stale))
+        assertEquals(FailureKind.UNAVAILABLE, (stale as Result.Failed).failure.kind)
+        val denied = f.advance(matrix).execute(lease)
+        assertEquals("company_module_disabled", failed(denied))
+        assertNotEquals(FailureKind.UNAVAILABLE, (denied as Result.Failed).failure.kind)
+        assertEquals(0, matrix.logins.get())
+        assertNull(f.credential(device))
+        assertEquals("PROVISIONING", f.state(device))
+    }
+
+    @Test
+    fun nativeRefreshRejectsTheFirstCandidateAndBoundedRetryKeepsTheDeviceIdentity() {
+        val f = Fixture()
+        val parent = f.parent()
+        val device = success(f.register(parent)).id
+        val lease = f.claim(device)
+        val matrix = RecordingMatrix(f.clock)
+        matrix.onLogin = { request ->
+            sql.update("update native_sessions set version=version+1 where id=?", parent)
+            matrix.issue(request)
+        }
+        val result = f.advance(matrix).execute(lease)
+        assertEquals("collaboration_admission_changed", failed(result))
+        assertEquals(FailureKind.UNAVAILABLE, (result as Result.Failed).failure.kind)
+        assertNull(f.credential(device))
+        assertEquals("PROVISIONING", f.state(device))
+        matrix.onLogin = matrix::issue
+        assertEquals(JobStep(1, true), success(f.advance(matrix).execute(lease)))
+        assertEquals(1, f.rows("collaboration_devices"))
+        assertEquals(1, f.rows("background_jobs"))
+        assertEquals(2, matrix.logins.get())
+        assertEquals(0, matrix.logouts.get())
+    }
+
+    @Test
+    fun lateWorkerCannotOverwriteOrLogOutTheWinningProviderSession() {
+        val f = Fixture()
+        val device = success(f.register(f.parent())).id
+        val firstLease = f.claim(device)
+        val entered = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        val first = RecordingMatrix(f.clock)
+        first.onLogin = { request ->
+            entered.countDown()
+            check(release.await(10, TimeUnit.SECONDS))
+            first.issue(request)
+        }
+        val executor = Executors.newSingleThreadExecutor()
+        try {
+            val pending = executor.submit<Result<JobStep>> { f.advance(first).execute(firstLease) }
+            assertTrue(entered.await(5, TimeUnit.SECONDS))
+            // Seed replacement ownership as if the first worker's lease had expired/recovered.
+            val secondLease = f.claim(device)
+            val second = RecordingMatrix(f.clock)
+            assertEquals(JobStep(1, true), success(f.advance(second).execute(secondLease)))
+            val winning = requireNotNull(f.credential(device)).accessToken
+            release.countDown()
+            assertEquals("job_lease_lost", failed(pending.get(5, TimeUnit.SECONDS)))
+            assertEquals(winning, f.credential(device)?.accessToken)
+            assertEquals("ACTIVE", f.state(device))
+            assertEquals(1, f.rows("collaboration_provider_sessions"))
+            assertEquals(2, f.rows("audit_entries"))
+            assertEquals(0, first.logouts.get() + second.logouts.get())
+        } finally {
+            release.countDown()
+            executor.shutdown()
+            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) executor.shutdownNow()
+            assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS))
+        }
+    }
+
+    @Test
+    fun postWriteExpiryRollsBackCredentialActivationProgressCompletionAndAudit() {
+        val f = Fixture()
+        val device = success(f.register(f.parent())).id
+        val lease = f.claim(device)
+        val matrix = RecordingMatrix(f.clock)
+        val journal =
+            object : ChangeJournalRepository {
+                override fun record(actor: Actor, change: ChangeRecord): Result<Unit> =
+                    f.journal.record(actor, change).also {
+                        f.clock.at = f.clock.at.plusSeconds(3600)
+                    }
+            }
+        assertEquals(
+            "collaboration_admission_changed",
+            failed(f.advance(matrix, journal).execute(lease)),
+        )
+        assertNull(f.credential(device))
+        assertEquals("PROVISIONING", f.state(device))
+        assertEquals(JobStatus.RUNNING, f.job(lease).status)
+        assertEquals(0, f.job(lease).completedItems)
+        assertEquals(1, f.rows("audit_entries"))
+        assertEquals(1, f.rows("outbox_events"))
+        assertEquals(0, matrix.logouts.get())
+    }
+
+    @Test
+    fun malformedOrWrongProviderResultsAndCancellationNeverActivateADevice() {
+        for (mode in 0..2) {
+            val f = Fixture()
+            val device = success(f.register(f.parent())).id
+            val lease = f.claim(device)
+            val matrix = RecordingMatrix(f.clock)
+            if (mode == 0) {
+                val malformed =
+                    lease.copy(
+                        job = lease.job.copy(request = lease.job.request.copy(values = emptyMap()))
+                    )
+                assertEquals(
+                    "invalid_collaboration_provisioning",
+                    failed(f.advance(matrix).execute(malformed)),
+                )
+                assertEquals(0, matrix.logins.get())
+            } else {
+                matrix.onLogin = { request ->
+                    if (mode == 2)
+                        sql.update(
+                            "update background_jobs set cancellation_requested=true,version=version+1 where id=?",
+                            lease.job.request.id,
+                        )
+                    val issued = success(matrix.issue(request))
+                    Result.Success(
+                        CollaborationMatrixCredential(
+                            if (mode == 1) "@unrelated:proof.invalid" else issued.userId,
+                            issued.deviceId,
+                            issued.accessToken,
+                            issued.expiresAt,
+                        )
+                    )
+                }
+                val result = f.advance(matrix).execute(lease)
+                assertEquals(
+                    if (mode == 1) "collaboration_provider_invalid_response"
+                    else "job_cancellation_requested",
+                    failed(result),
+                )
+                if (mode == 2) {
+                    assertEquals(
+                        Result.Success(Unit),
+                        f.abort().execute(lease, (result as Result.Failed).failure),
+                    )
+                    assertEquals(JobStatus.CANCELLED, f.job(lease).status)
+                }
+            }
+            assertEquals("PROVISIONING", f.state(device))
+            assertNull(f.credential(device))
+            assertEquals(0, matrix.logouts.get())
+        }
+    }
+
+    private class RecordingMatrix(private val clock: Clock) : CollaborationMatrixRepository {
+        val logins = AtomicInteger()
+        val logouts = AtomicInteger()
+        var onLogin: (CollaborationMatrixLogin) -> Result<CollaborationMatrixCredential> = ::issue
+
+        fun issue(request: CollaborationMatrixLogin): Result<CollaborationMatrixCredential> =
+            Result.Success(
+                CollaborationMatrixCredential(
+                    "@${collaborationMatrixLocalpart(request.companyId, request.accountId)}:proof.invalid",
+                    collaborationMatrixDeviceId(request.deviceId),
+                    "fictional-provider-${UUID.randomUUID()}",
+                    clock.instant().plusSeconds(300),
+                )
+            )
+
+        override fun login(
+            request: CollaborationMatrixLogin
+        ): Result<CollaborationMatrixCredential> {
+            logins.incrementAndGet()
+            return onLogin(request)
+        }
+
+        override fun logoutDevice(accessToken: String): Result<Unit> {
+            logouts.incrementAndGet()
+            return Result.Success(Unit)
+        }
+    }
+
     private class Fixture {
         val clock = MutableClock(Instant.now().truncatedTo(ChronoUnit.MICROS))
         val account = UUID.randomUUID()
@@ -567,6 +849,16 @@ class NativeCollaborationRegistrationTest {
                 PostgresCollaborationProvisioningDataSource(dsl)
             )
         val jobs = PostgresJobRepository(PostgresJobDataSource(dsl), json)
+        val credentials =
+            EncryptedCollaborationProviderSessionRepository(
+                PostgresCollaborationProviderSessionDataSource(dsl),
+                JceIdentityTokenDataSource(
+                    dev.fajar.hris.identity.data.crypto.parseIdentityKeyring(
+                        "fixture",
+                        "fixture:" + Base64.getEncoder().encodeToString(ByteArray(32) { 17 }),
+                    )
+                ),
+            )
         private val operations = PostgresOperationRepository(receipts, json)
         val journal = PostgresChangeJournalRepository(PostgresChangeJournalDataSource(dsl, json))
         val actor: Actor
@@ -642,6 +934,93 @@ class NativeCollaborationRegistrationTest {
                 clock,
                 service,
             )
+
+        fun advance(
+            matrix: CollaborationMatrixRepository,
+            journal: ChangeJournalRepository = this.journal,
+            policies: CompanyClientPolicyRepository = this.policies,
+        ) =
+            AdvanceNativeCollaborationProvisioning(
+                registry,
+                provisioning,
+                credentials,
+                matrix,
+                jobs,
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                journal,
+                transactions,
+                IdentitySecurityPolicy(),
+                CollaborationServicePolicy(enabled = true),
+                CollaborationMatrixPolicy(true, "proof.invalid"),
+                clock,
+            )
+
+        fun abort() = AbortCollaborationProvisioning(jobs, journal, transactions)
+
+        fun claim(device: UUID): JobLease {
+            val pointer =
+                requireNotNull(
+                    success(
+                        transactions.run(actor) {
+                            provisioning.find(requireNotNull(actor.companyId), account, device)
+                        }
+                    )
+                )
+            val owner = UUID.randomUUID()
+            val token = UUID.randomUUID()
+            val deadline = Instant.now().plusSeconds(120).truncatedTo(ChronoUnit.MICROS)
+            assertEquals(
+                1,
+                sql.update(
+                    "update background_jobs set status='RUNNING',attempts=attempts+1,lease_owner=?,lease_token=?,lease_until=?,version=version+1 where id=? and status in ('QUEUED','RUNNING')",
+                    owner,
+                    token,
+                    deadline.atOffset(ZoneOffset.UTC),
+                    pointer.jobId,
+                ),
+            )
+            val job =
+                requireNotNull(
+                    success(
+                        transactions.run(actor) {
+                            jobs.find(requireNotNull(actor.companyId), pointer.jobId)
+                        }
+                    )
+                )
+            return JobLease(job, owner, token, deadline)
+        }
+
+        fun job(lease: JobLease) =
+            requireNotNull(
+                success(
+                    transactions.run(actor) {
+                        jobs.find(requireNotNull(actor.companyId), lease.job.request.id)
+                    }
+                )
+            )
+
+        fun credential(device: UUID) =
+            success(
+                transactions.run(actor) {
+                    credentials.find(requireNotNull(actor.companyId), account, device)
+                }
+            )
+
+        fun state(device: UUID) =
+            sql.queryForObject(
+                "select state from collaboration_devices where id=?",
+                String::class.java,
+                device,
+            )
+
+        private fun <T> success(value: Result<T>): T {
+            assertInstanceOf(Result.Success::class.java, value)
+            return (value as Result.Success).value
+        }
 
         fun register(
             parent: UUID,

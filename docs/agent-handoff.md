@@ -17,6 +17,20 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- **Mobile protected runtimes now own room/timeline observers at `0ef8018c`.**
+  [Cross-repository contract](collaboration/mobile-setup.md) and
+  [measurement](measurements/collaboration-owned-timeline-2026-10-31.json) cover
+  ordered primitive projections, partial/cancelled acquisition, sibling disposal
+  and retained failed cleanup before database unlock. Fifteen new common cases;
+  root/browser/Android/Wasm/lint passes in 245s (2,160 desktop, 64 data browser,
+  zero lint errors). Actual SDK run `5aea81cc` passes in 34.340s, cleanup complete,
+  all 15 Platform/120 Mobile hashes unchanged. One provider-busy key upload 503
+  precedes successful exchange. Conversation command control `41248280288` also
+  passes all 26 steps (143 desktop, 119 browser, 119 iOS simulator; all 26 source
+  hashes checked). Emulator stopped, no live/schema/phone change. **Continue
+  admitted content ports, app entry, product history windows, offline projections,
+  recovery/reconciliation, chat UI and all P0–P8. No group is accepted.**
+
 - **Mobile durable conversation control is pushed at `39217be2`.**
   [Cross-repository checkpoint](collaboration/mobile-setup.md) records encrypted
   per-peer/room commands, uncertainty before HTTP, immutable retries and exact

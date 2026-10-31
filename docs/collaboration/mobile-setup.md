@@ -1,5 +1,34 @@
 # Mobile native setup ownership
 
+## Owned room timelines
+
+Mobile [0ef8018c](https://github.com/fajarxfce/hris-mobile/commit/0ef8018c)
+adds bounded room/timeline children under the protected SDK lease, including
+partial acquisition, late cancellation, failed cleanup retention and parent drain
+ordering. The native listener applies ordered deltas atomically while retaining
+virtual positions and disposing every native callback value. Text, redaction,
+unavailable keys and send status are copied into typed domain snapshots.
+
+[Evidence](../measurements/collaboration-owned-timeline-2026-10-31.json) records 15
+new common cases; final root/browser/Android/Wasm/lint passes in 245s with 2,160
+desktop cases, 64 data browser cases and zero lint errors. Actual Android SDK case
+`5aea81cc` passes in 34.340s (53s Gradle, 32 driver cases), checking both timeline
+replies after process death, sibling survival and closed snapshots after parent
+cleanup. All 15 Platform/120 Mobile source hashes are unchanged. One provider-busy
+key upload returned 503 before successful completion; emulator is stopped.
+
+Conversation command hosted control `39217be2`/`41248280288` also passes all jobs
+and 26 steps: 143 desktop, 119 browser and 119 iOS simulator cases; Android/Wasm/
+Apple compilation succeeds. All 26 command source hashes match the immutable
+commit. [Retained command evidence](../measurements/collaboration-conversation-commands-2026-10-31.json)
+records it; the actual HRIS run remained in progress at this recording.
+
+**Next:** admitted common content ports and app entry, product history windows,
+owned offline projections, bootstrap/cross-family recovery, logical reconciliation
+and chat UI. The platform observer opens known rooms only and gates vectors above
+512 entries. Apple native chat remains pending. No product acceptance, live/schema
+change or phone installation is claimed; continue all P0–P8.
+
 ## Durable conversation commands
 
 Mobile [39217be2](https://github.com/fajarxfce/hris-mobile/commit/39217be2f63116dfe2752672a68f25b9479c514b)

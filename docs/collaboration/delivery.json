@@ -101,7 +101,8 @@
         "../measurements/collaboration-sdk-process-death-2026-10-31.json",
         "https://github.com/fajarxfce/hris-mobile/blob/9f83dcdc2f42e69441569f050c5428746ef38f8a/docs/measurements/collaboration-application-runtime-2026-10-31.json",
         "../measurements/collaboration-owned-sync-2026-10-31.json",
-        "https://github.com/fajarxfce/hris-mobile/blob/39217be2f63116dfe2752672a68f25b9479c514b/docs/measurements/collaboration-conversation-commands-2026-10-31.json"
+        "https://github.com/fajarxfce/hris-mobile/blob/39217be2f63116dfe2752672a68f25b9479c514b/docs/measurements/collaboration-conversation-commands-2026-10-31.json",
+        "../measurements/collaboration-owned-timeline-2026-10-31.json"
       ]
     },
     {
@@ -490,7 +491,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Complete admitted bootstrap installation/recovery, app session ownership, logical-message reconciliation and DI/UI. Protected Android store reopening and the original paused SDK transaction across actual process death now pass.",
+    "Connect admitted common content ports and app entry; complete product history windows, owned offline message projections, bootstrap/cross-family recovery and logical-message reconciliation. Android runtimes now own classic sync and ordered room/timeline observers, with actual process-death and disposal evidence.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

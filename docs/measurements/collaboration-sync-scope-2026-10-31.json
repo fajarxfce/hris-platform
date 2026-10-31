@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-31",
+  "scope": "Actual pinned classic sync room-filter/cursor expansion; no public sync endpoint",
+  "baseCommit": "199d541f808ceb926b02b3e06190a4e0c392333a",
+  "finalValidation": {
+    "seconds": 14,
+    "result": "passed",
+    "cases": 1,
+    "scenarios": [
+      "joined owner",
+      "invited peer"
+    ],
+    "command": "./gradlew formatCheck architectureCheck :modules:collaboration:data:test --tests *MatrixSyncScopeInteropTest",
+    "format": "passed",
+    "architecture": "passed"
+  },
+  "earlierRuns": [
+    {
+      "seconds": 15,
+      "result": "failed",
+      "reason": "Assumed all creation state was in state.events."
+    },
+    {
+      "seconds": 10,
+      "result": "compile_failed",
+      "reason": "Left an old JsonNode isArray assertion after converting state to a list; corrected."
+    },
+    {
+      "seconds": 14,
+      "result": "failed",
+      "reason": "Combining state and timeline still did not contain the creation event."
+    },
+    {
+      "seconds": 10,
+      "result": "failed",
+      "reason": "Safe type/field diagnostic confirmed creation was absent, unlike encryption and membership."
+    },
+    {
+      "seconds": 9,
+      "result": "failed",
+      "reason": "Repeated initial sync also omitted creation."
+    },
+    {
+      "seconds": 14,
+      "result": "failed",
+      "reason": "Explicit joined-room state acquisition passed; invited-room filtering returned both rooms rather than the one requested."
+    }
+  ],
+  "observed": [
+    "Provider room filter is insufficient for invitation authorization",
+    "Incremental expansion loses old room state/invitation",
+    "Full-state with since does not replay older invitations; initial acquisition does",
+    "Invited-history joined creator needs admitted explicit state acquisition for its actual m.room.create",
+    "Creation event version12, sender and room ID verified",
+    "No public credentials, real employees, phone or live runtime involved"
+  ],
+  "sourceSha256": {
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixSyncScopeInteropTest.kt": "7c673b71b7b520bc713c06ea77e3a98f3b1ec7200f6451bd02bedbd1167649d3"
+  },
+  "limits": [
+    "Provider control/cursor evidence only; not HRIS scoped sync or SDK acceptance",
+    "No throughput/capacity, encryption/decryption or store recovery claim",
+    "The two fixture rooms do not bypass the immutable native direct-pair constraint"
+  ],
+  "hosted": {
+    "status": "inspect exact commit after push"
+  }
+}

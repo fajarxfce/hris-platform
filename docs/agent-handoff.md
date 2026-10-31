@@ -17,6 +17,17 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- Actual classic sync scope expansion now passes for joined and invited rooms.
+  Provider room filters still return out-of-filter invitations; full_state with
+  since does not replay old invites. Initial reacquisition restores invitations,
+  while the invited-history creator needs an explicit state read for m.room.create
+  (even repeated initial sync omits it). [Contract](collaboration/sync-scope-recovery.md)
+  and [evidence](measurements/collaboration-sync-scope-2026-10-31.json) retain the
+  corrected assumptions, final 14s case, format/architecture and exact source.
+  Preserve state/timeline ordering and filter all room buckets in HRIS. Next
+  implement the current room projection, account/company/device-bound cursor and
+  separately owned long polling; no public sync/SDK acceptance is implied.
+
 - Both native SyncService and classic Client.syncV2 now pass the same actual
   Android/browser proof with one APK `d835e1c1`: two cases each, 18.814s native /
   19.219s classic; owned runs 33.649s / 38.121s, cleanup true. Classic omitted
@@ -132,7 +143,9 @@ Current backend implementation:
   format/architecture. The 5m19s full run had one existing token-expiry timing
   fixture failure; its corrected complete case passed in 20s. Production source
   stayed unchanged after that full run. Earlier 67s/66s focused runs retain the
-  corrected offline fixture column typo. Encrypted to-device is implemented above;
+  corrected offline fixture column typo. Exact `42dda378` hosted `41218262873`
+  passed every job/step; 17 source hashes match the retained measurement.
+  Encrypted to-device is implemented above;
   continue scoped classic sync/content and durable product UI/outbox.
 
 - Native `POST /_matrix/client/v3/keys/query` now uses the recipient projection,

@@ -77,7 +77,9 @@
         "device-key-claim.md",
         "../measurements/collaboration-device-key-claim-2026-10-31.json",
         "to-device-envelopes.md",
-        "../measurements/collaboration-to-device-2026-10-31.json"
+        "../measurements/collaboration-to-device-2026-10-31.json",
+        "sync-scope-recovery.md",
+        "../measurements/collaboration-sync-scope-2026-10-31.json"
       ]
     },
     {

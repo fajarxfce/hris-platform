@@ -31,7 +31,9 @@ needs current admission for every room and to-device envelope, bounded long-poll
 ownership separate from short-control permits, filtered account data/presence,
 device-list eligibility, and cursor recovery when an HRIS room binding becomes
 visible after its provider events. Blindly dropping room arrays from an old
-cursor would lose initial state. No public sync/content route is opened here.
+cursor would lose initial state. The [actual scope-recovery experiment](sync-scope-recovery.md)
+now confirms additional invitation-filter and creation-state behavior. No public
+sync/content route is opened here.
 
 Native sync is retained as a comparison and potential optimization. Its ordered
 list operations, counts, subscriptions and E2EE/to-device extensions need a

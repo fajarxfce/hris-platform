@@ -24,6 +24,7 @@ import urllib.error
 import urllib.request
 import uuid
 from collaboration_native_device import NativeDevice
+from collaboration_protocol_metrics import collect_protocol_counts
 
 ROOT = Path(__file__).resolve().parents[1]
 PROOF = ROOT / "tool/collaboration-proof"
@@ -100,6 +101,8 @@ class ProviderProof:
         sources = [Path(__file__).resolve(), ROOT / "tool/test_collaboration_providers.py",
                    ROOT / "tool/collaboration_native_device.py",
                    ROOT / "tool/test_collaboration_native_device.py",
+                   ROOT / "tool/collaboration_protocol_metrics.py",
+                   ROOT / "tool/test_collaboration_protocol_metrics.py",
                    *[PROOF / name for name in ("package.json", "package-lock.json", "images.json",
                      "index.html", "playwright.config.mjs", "src/probe.js", "tests/providers.spec.mjs",
                      "tests/native.spec.mjs")]]
@@ -181,7 +184,7 @@ class ProviderProof:
             "refreshable_access_token_lifetime": "4s",
             "listeners": [{"port": 8008, "type": "http", "tls": False,
                            "bind_addresses": ["0.0.0.0"], "x_forwarded": False,
-                           "resources": [{"names": ["client"], "compress": False}]}],
+                           "resources": [{"names": ["client", "metrics"], "compress": False}]}],
             "database": {"name": "psycopg2", "args": {"host": "postgres", "port": 5432,
                          "database": "matrix", "user": "matrix", "password": database_password,
                          "cp_min": 2, "cp_max": 5}},
@@ -190,7 +193,7 @@ class ProviderProof:
             "form_secret": secrets.token_urlsafe(32),
             "federation_domain_whitelist": [], "trusted_key_servers": [],
             "suppress_key_server_warning": True, "url_preview_enabled": False,
-            "enable_metrics": False, "max_upload_size": "10M",
+            "enable_metrics": True, "max_upload_size": "10M",
             "rc_message": {"per_second": 20, "burst_count": 100},
             "rc_login": {"address": {"per_second": 20, "burst_count": 100},
                          "account": {"per_second": 20, "burst_count": 100},
@@ -312,6 +315,12 @@ class ProviderProof:
             self.record["browser"] = {key: stats.get(key) for key in ("expected", "unexpected", "flaky", "skipped", "duration")}
         if returncode:
             raise RuntimeError("Browser provider proof failed; inspect the owned private browser log")
+        configuration = json.loads(fixture.read_text())
+        self.record["protocolCounters"] = {
+            "scope": "Composite SDK scenarios and explicit fixture control requests; not a gateway allowlist",
+            "requests": collect_protocol_counts(configuration["matrix"]["baseUrl"]),
+        }
+        self.record["checks"]["provider_protocol_counters"] = True
         self.record["checks"]["browser_e2ee_restart_media"] = True
         self.record["checks"]["browser_offline_invitee_first_message_sender_offline"] = True
         if self.native:

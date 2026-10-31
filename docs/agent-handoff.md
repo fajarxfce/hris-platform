@@ -70,6 +70,18 @@ Current provider/client evidence:
   hashes. Mobile `4f8233c2` retains its source-matched hosted APK evidence. The
   driver browser workflow [41204052403](https://github.com/fajarxfce/hris-platform/actions/runs/41204052403) also passed every job/step.
 
+- The [SDK protocol surface](collaboration/sdk-protocol-surface.md) now has actual
+  method/static-servlet/count evidence, without identifiers or payloads. Browser
+  baseline passed in 15.512s; Android/browser passed in 39.009s with cleanup and
+  unchanged source-matching APK `d3662eb9`. Fifteen parser/ownership checks pass.
+  The native fixture explicitly uses NATIVE SyncService; eighteen native Sliding
+  Sync requests occur only in the combined run. Pinned Synapse implements MSC4186.
+  Classic Kotlin syncV2 exists in the binding but is unproved. Do not open generic
+  provider routes from these aggregate counts: negative/setup requests are included.
+  Scope native lists/subscriptions/extensions and classic cursor/filter behavior;
+  withhold unverified rooms. Emulator is stopped and phone untouched. Pin Mobile CI
+  to this driver commit after push and inspect exact hosted results.
+
 Current backend implementation:
 
 - Schemas 104–108 retain company/account/device/native-parent identity, independent

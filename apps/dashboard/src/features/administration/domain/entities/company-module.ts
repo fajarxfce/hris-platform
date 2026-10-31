@@ -6,6 +6,7 @@ export const companyModules = [
   "PAYROLL",
   "DOCUMENTS",
   "COMMUNICATIONS",
+  "COLLABORATION",
   "REPORTING",
 ] as const;
 export type CompanyModule = (typeof companyModules)[number];

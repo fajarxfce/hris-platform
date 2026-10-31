@@ -7,7 +7,7 @@ export const clientPolicySettingsDto = z.object({
   effective: z.object({
     schemaVersion: z.literal(1),
     version: z.number().int().min(0).max(9999).nullable(),
-    enabledModules: z.array(clientModuleDto).max(8),
+    enabledModules: z.array(clientModuleDto).max(clientModuleDto.options.length),
     minimumBuilds: clientBuildsDto,
     maintenance: maintenanceWindowDto.nullable(),
     maintenanceActive: z.boolean(),

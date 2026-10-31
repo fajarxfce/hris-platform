@@ -31,7 +31,9 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V104 adds the company/account device registry without a new encryption envelope.
 # CollaborationDeviceMigrationTest exercises actual pg_dump/pg_restore, constraints
 # and account RLS for these records.
-MAX_SCHEMA = 104
+# V105 extends only the client-module vocabulary; its migration test restores
+# the function and preserves existing policy revisions through pg_dump/pg_restore.
+MAX_SCHEMA = 105
 ENVELOPES_SQL = """COPY (
 SELECT * FROM (
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope

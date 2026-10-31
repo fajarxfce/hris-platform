@@ -48,7 +48,7 @@ identify the remaining transaction, provisioning, broker, gateway and client
 integration. No new endpoint/provider grant is enabled yet.
 
 Platform browser-only CI also passed at `a9100ece` in `41181617114`. Mobile's
-Android implementation is `477f9c60`; its corrected hosted runner is pending at
+Android implementation is `477f9c60`; its corrected hosted runner is at
 `eefc4121` after an obsolete Android SDK `tools` package failure. Corrected run
 `41182128950` has now passed both actual-provider scenarios, including cleanup,
 in 66.016s; Mobile `da43b35c` records its independent APK and source evidence. Apple native
@@ -86,6 +86,27 @@ Next: transaction-owned registration/admission use cases with live company
 availability and the five-device quota; durable provisioning and credential
 storage; protected provider broker/gateway; native/web adapters and chat screens.
 Retain all P0–P8 gates and all 54 feature groups as outstanding until accepted.
+
+Company availability now has a separate `COLLABORATION` module, supported by
+schema 105 and the existing dashboard policy editor. Disabling it does not disable
+`COMMUNICATIONS` (the HRIS Inbox). Existing policy revisions are not rewritten.
+Nine module values remain bounded, unique and validated; the dashboard accepts
+all nine and shows a localized chat/call/meeting label. Mobile recognizes the key
+and retains its unknown-future-module behavior. No chat endpoint is enabled yet.
+
+Local acceptance: nine administration-domain cases, the registry integration case,
+82 dashboard cases/type checking and 13 Chromium policy/editor scenarios pass.
+The first 29-case database run passed 28 and exposed a fixture that committed a
+policy head before its deferred history FK. The fixture now creates both in one
+transaction; the corrected migration/actual-restore test and formatting pass.
+Combined passing coverage is 29 database cases; do not describe the initial full
+run as green. Twenty-one recovery-tool cases pass with reviewed ceiling 105.
+The expanded collaboration-control CI must supply a complete fresh hosted run.
+
+The schema-104 control checkpoint `959e74f9` passed hosted run `41183444363`.
+Mobile's policy mapping has 37 passing workspace cases and a successful dev-debug
+assembly (3m54s). That APK is a build check only; the phone remains on release
+build 4. No generic Starter port is due for this HRIS module identifier.
 
 The paragraphs below are retained prior-work history. Their old installed build
 2 reference is superseded by Mobile's validated release build 4; consult Mobile's

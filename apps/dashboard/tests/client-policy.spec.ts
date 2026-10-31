@@ -31,6 +31,7 @@ const settings = (company = companyIds[0] as string) => ({
       "PAYROLL",
       "DOCUMENTS",
       "COMMUNICATIONS",
+      "COLLABORATION",
       "REPORTING",
     ],
     minimumBuilds: { android: 2, ios: 1, web: 0 },
@@ -97,8 +98,11 @@ test("client policy separates configured and effective revisions in localized re
   const configuration = page.getByRole("region", { name: "Configuration revision", exact: true });
   await expect(configuration).toContainText("North revision 1");
   const modules = page.getByRole("table", { name: "Modules", exact: true });
-  await expect(modules.getByRole("row")).toHaveCount(9);
+  await expect(modules.getByRole("row")).toHaveCount(10);
   await expect(modules.getByRole("row").filter({ hasText: "Payroll" })).toContainText("Enabled");
+  await expect(
+    modules.getByRole("row").filter({ hasText: "Chat, calls and meetings" }),
+  ).toContainText("Enabled");
   await expect(modules.getByRole("row").filter({ hasText: "Expenses" })).toContainText("Disabled");
   await page.screenshot({
     path: "../../.work/dashboard-client-policy-light.png",

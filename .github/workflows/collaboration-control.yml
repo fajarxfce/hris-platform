@@ -7,6 +7,9 @@ on:
     paths:
       - modules/collaboration/**
       - modules/identity/domain/**
+      - modules/administration/domain/**
+      - apps/dashboard/src/features/administration/**
+      - apps/dashboard/tests/client-policy*.ts
       - core/database/**
       - tool/recovery_set.py
       - tool/test_recovery_set.py
@@ -15,6 +18,9 @@ on:
     paths:
       - modules/collaboration/**
       - modules/identity/domain/**
+      - modules/administration/domain/**
+      - apps/dashboard/src/features/administration/**
+      - apps/dashboard/tests/client-policy*.ts
       - core/database/**
       - tool/recovery_set.py
       - tool/test_recovery_set.py
@@ -39,7 +45,7 @@ jobs:
           python3 tool/check_architecture.py
           python3 -m unittest discover -s tool -p 'test_recovery*.py'
       - name: Verify policies, actual PostgreSQL isolation and backup recovery
-        run: ./gradlew formatCheck :core:database:test :modules:identity:domain:test :modules:collaboration:domain:test :modules:collaboration:data:test --no-daemon
+        run: ./gradlew formatCheck :core:database:test :modules:identity:domain:test :modules:administration:domain:test :modules:collaboration:domain:test :modules:collaboration:data:test --no-daemon
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -48,3 +54,22 @@ jobs:
             modules/collaboration/**/build/test-results/test/*.xml
             core/database/build/test-results/test/*.xml
           retention-days: 7
+
+  company-settings:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/dashboard
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: apps/dashboard/package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx tsc --noEmit
+      - run: npx vitest run src/features/administration
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test tests/client-policy.spec.ts tests/client-policy-editor.spec.ts

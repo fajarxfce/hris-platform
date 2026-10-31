@@ -38,6 +38,7 @@ const en = {
   PAYROLL: "Payroll",
   DOCUMENTS: "Documents",
   COMMUNICATIONS: "Communications",
+  COLLABORATION: "Chat, calls and meetings",
   REPORTING: "Reporting",
 };
 const id: typeof en = {
@@ -78,6 +79,7 @@ const id: typeof en = {
   PAYROLL: "Payroll",
   DOCUMENTS: "Dokumen",
   COMMUNICATIONS: "Komunikasi",
+  COLLABORATION: "Chat, panggilan, dan rapat",
   REPORTING: "Laporan",
 };
 export const clientPolicyMessages = (locale: Locale): typeof en => (locale === "id" ? id : en);

@@ -49,3 +49,19 @@ encrypted provider credentials, and deny direct provider login/admin/federation
 access. A live Matrix request cannot be admitted solely by an earlier bootstrap
 or by eventual cleanup. Native/browser session replacement must retain owned
 local facts while pausing denied network operations.
+
+## Company availability
+
+Schema 105 introduces the `COLLABORATION` policy key, independent of
+`COMMUNICATIONS`/Inbox. The dashboard's existing policy editor and read view show
+“Chat, calls and meetings” / “Chat, panggilan, dan rapat”. Current revisions keep
+their recorded values; administrators use a normal new revision to disable the
+new module. This availability switch does not enable an absent provider service
+or bypass chat permission, session or device admission.
+
+The module vocabulary permits at most nine unique, known, non-null values. Web
+parsing uses that vocabulary's length, while Mobile preserves its bounded handling
+of additive unknown keys. The migration's actual backup/restore test checks both
+the new function and unchanged historical revisions; recovery ceiling 105 adds no
+new encrypted-data contract. Settings behavior passes 82 unit and 13 browser
+cases; the native policy change passes 37 workspace cases and Android assembly.

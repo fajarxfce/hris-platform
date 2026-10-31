@@ -8,6 +8,7 @@ export const clientModuleDto = z.enum([
   "PAYROLL",
   "DOCUMENTS",
   "COMMUNICATIONS",
+  "COLLABORATION",
   "REPORTING",
 ]);
 export const clientBuildsDto = z.object({

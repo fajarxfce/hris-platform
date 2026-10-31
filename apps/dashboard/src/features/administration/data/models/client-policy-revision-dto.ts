@@ -4,7 +4,7 @@ import { clientBuildsDto, clientModuleDto, maintenanceWindowDto } from "./client
 export const clientPolicyRevisionDto = z.object({
   version: z.number().int().min(0).max(9999),
   activateAt: z.iso.datetime(),
-  disabledModules: z.array(clientModuleDto).max(8),
+  disabledModules: z.array(clientModuleDto).max(clientModuleDto.options.length),
   minimumBuilds: clientBuildsDto,
   maintenance: maintenanceWindowDto.nullable(),
   recordedAt: z.iso.datetime(),

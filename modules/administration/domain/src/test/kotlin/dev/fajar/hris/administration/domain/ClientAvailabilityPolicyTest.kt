@@ -9,6 +9,24 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class ClientAvailabilityPolicyTest {
+    @Test
+    fun collaborationAvailabilityIsIndependentFromTheEmployeeInbox() {
+        val policy = ClientPolicy(disabledModules = setOf(CompanyModule.COLLABORATION))
+        val at = Instant.parse("2026-10-31T00:00:00Z")
+        val status = ClientPolicyStatus(null, policy, false, at, at.plusSeconds(60))
+        assertEquals(
+            Result.Success(Unit),
+            validateClientAvailability(status, setOf(CompanyModule.COMMUNICATIONS), null, true),
+        )
+        assertEquals(
+            "company_module_disabled",
+            (validateClientAvailability(status, setOf(CompanyModule.COLLABORATION), null, true)
+                    as Result.Failed)
+                .failure
+                .code,
+        )
+    }
+
     private val now = Instant.parse("2026-10-01T00:00:00Z")
 
     private fun status(policy: ClientPolicy, at: Instant = now, next: Instant? = null) =

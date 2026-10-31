@@ -32,6 +32,7 @@ const settings = (): ClientPolicySettingsDto => ({
       "PAYROLL",
       "DOCUMENTS",
       "COMMUNICATIONS",
+      "COLLABORATION",
       "REPORTING",
     ],
     minimumBuilds: { android: 3, ios: 2, web: 1 },

@@ -38,7 +38,7 @@
   ],
   "limits": [
     "Claim ownership is seeded in these fixtures to exercise lease fences; generic job claiming/attempt limits retain their existing independent coverage.",
-    "The final one-case selection follows the retry-observation refinement; the hosted workflow will rerun the complete selection.",
+    "The later complete hosted selection passed at the exact source commit recorded in hostedControl.",
     "No provider-enabled worker task, HTTP gateway or product SDK adapter is enabled yet."
   ],
   "sourceSha256": {
@@ -51,5 +51,22 @@
     "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationRegistryRepository.kt": "c7bf3800bb54956d9710ce153868d7c1a2980ab5c90406eec8a16353212d57d0",
     "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AbortCollaborationProvisioning.kt": "7f65197050e7630ad07398977a42367ff5717135bcab72cd605fa54bcad6efcf",
     "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AdvanceNativeCollaborationProvisioning.kt": "4a472b3dca2966bc926466f4dedad430c39a4462796b08ee984968257eebb1e2"
+  },
+  "hostedControl": {
+    "runId": 41191206775,
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41191206775",
+    "headSha": "4600a2946cc3d7ce7a74c31869f319e2663b0aab",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "authority-and-storage",
+        "conclusion": "success"
+      },
+      {
+        "name": "company-settings",
+        "conclusion": "success"
+      }
+    ],
+    "scope": "Full collaboration domain/data including the final scheduled-policy case, core database/jobs/identity/administration, API contracts and full worker contexts, and dashboard company settings."
   }
 }

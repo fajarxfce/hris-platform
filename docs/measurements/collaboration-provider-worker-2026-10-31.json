@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "kind": "native_collaboration_actual_provider_worker",
+  "schema": 108,
+  "productAcceptance": false,
+  "liveRuntimeModified": false,
+  "phoneModified": false,
+  "provider": "Pinned Synapse 1.164.1, isolated SQLite container with loopback-only client port, owned network, fictional identities, federation/public registration disabled. Application RLS/queue/persistence use actual PostgreSQL 18.6.",
+  "checks": {
+    "combinedElapsedSeconds": 268,
+    "modules": {
+      "modules/collaboration/data": {
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": [
+          {
+            "name": "dev.fajar.hris.collaboration.data.MatrixProviderSettingsTest",
+            "tests": 4,
+            "failures": 0,
+            "seconds": 0.309
+          }
+        ]
+      },
+      "apps/server": {
+        "tests": 77,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "suites": [
+          {
+            "name": "dev.fajar.hris.NativeCollaborationHttpTest",
+            "tests": 6,
+            "failures": 0,
+            "seconds": 9.608
+          },
+          {
+            "name": "dev.fajar.hris.NativeCollaborationMatrixConfigurationTest",
+            "tests": 1,
+            "failures": 0,
+            "seconds": 8.516
+          },
+          {
+            "name": "dev.fajar.hris.NativeCollaborationDisabledHttpTest",
+            "tests": 1,
+            "failures": 0,
+            "seconds": 7.955
+          }
+        ]
+      },
+      "apps/worker": {
+        "tests": 109,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1,
+        "suites": [
+          {
+            "name": "dev.fajar.hris.worker.CollaborationProvisioningWorkerTest",
+            "tests": 3,
+            "failures": 0,
+            "seconds": 28.223
+          }
+        ]
+      }
+    },
+    "format": true,
+    "architecture": true,
+    "composeConfiguration": true
+  },
+  "verifiedBehaviors": [
+    "An enabled API context registers a pending device without waiting for an unreachable provider.",
+    "An enabled worker context claims through the actual queue, executes persistent Spring Batch, obtains a real bounded Matrix credential, stores it encrypted and activates exactly one deterministic device.",
+    "The stored credential passes actual Synapse whoami with the expected scoped user/device; completed-lease replay cannot rotate it.",
+    "Pausing the actual provider produces bounded failure/backoff; resumption and a fixture-only queue-deadline advance succeed with the same device and second queue attempt.",
+    "Revoked origins fail and requested cancellation cancels the owned job without credential publication. Cancellation preserves the interrupt signal; the fixture explicitly acknowledges it.",
+    "Disabled provider creates no Matrix HTTP client/configuration/task. Enabled provider requires the identity keyring and bounded signing file.",
+    "The client owner terminates on disposal, including repeated disposal; malformed/missing/oversized/non-ASCII/multiline signing files fail without exposing content."
+  ],
+  "correctedFailures": [
+    {
+      "stage": "Initial focused data/worker selection",
+      "elapsedSeconds": 52,
+      "result": "3 settings passes; 7 ordinary worker cases pass; 3 new worker cases cannot load context because the handwritten fictional Base64 key was malformed. Fixed by generating the 32-byte fixture key encoding."
+    },
+    {
+      "stage": "Corrected focused data/API/provider-worker selection",
+      "elapsedSeconds": 52,
+      "result": "4 settings and 1 enabled API case pass. Actual provider activation and outage cases pass; cancellation case fails its subsequent SQL assertion because the runtime correctly preserves interruption. Fixture now asserts and consumes that expected signal before the next assertion."
+    }
+  ],
+  "limitations": [
+    "These tests prove provisioning, queue ownership and bounded internal credentials, not product E2EE/chat or protected SDK gateway behavior.",
+    "The outage case advances only its fictional queue available_at to avoid a wall-clock backoff wait; production eight-attempt backoff remains unchanged.",
+    "The existing opt-in elapsed export-retention case remains skipped in the full worker suite; this change introduces no skipped test.",
+    "Operator-owned secret mounting, provider infrastructure, HRIS gateway, explicit manual retry, SDK/chat and later phases remain outstanding; both service switches remain false by default."
+  ],
+  "sourceSha256": {
+    ".env.example": "cc0aee8e7de90b3698cd147f2624200424ba583cba94894806e8d0812eb37eed",
+    ".github/workflows/collaboration-control.yml": "35a894c5e7fb94f42f4ae1cd6daa16436e2cf214e9a889b5ca3f068ccf8571a0",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixConfigurationTest.kt": "518f8f151ccca7d4671dbc10c2299c876f318da6391c8936e5d9cd3466966e77",
+    "apps/server/src/test/resources/matrix-signing.fixture": "d3593d4591f097579d6aba927ad2f6491a458f8cd832c1f5e6878ddc4c95fe68",
+    "apps/worker/src/main/kotlin/dev/fajar/hris/worker/di/WorkerConfiguration.kt": "ad7cc2b9620b1ac8b97ac9b1a74200da72b07fd154e21a45e574dd4a0a031f68",
+    "apps/worker/src/main/kotlin/dev/fajar/hris/worker/tasks/CollaborationProvisioningTask.kt": "f9a084cc9d894c3ddcb9920beadde9fbd017cf63288e5b117b09b78be754e1f0",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationProvisioningWorkerTest.kt": "e395fc06dcf9f64a56792436bebeab7ba654c79062a5179d88c0333e645d86a9",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/WorkerIntegrationTest.kt": "14f5e0fefec4e82ed73ad27f1e9d072a427194b8e918233a5acd7770db7d73d0",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/WorkerMatrixFixture.kt": "2e0bdfe1a0086b0b2745b627c976e71ab5af6c9a086abaf39f08b870f5b8aa50",
+    "compose.yml": "27b2668d1bb59d361f98d9dbc2a536df63a9639f014b28169a37b8c178c292e5",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "6c03a03d4e9267199012bec815b985990cd21912e05fd4aae5c9d5c694592fa0",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/MatrixProviderSettings.kt": "5371200c411d1f26dc119cda0920940098f98bd994426ec01aa95811215a946a",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixHttpClientOwner.kt": "6f0fde5bc7f255096079a869bbaab626a80496107f1472802d1f9fe6c95483a5",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/DisabledCollaborationMatrixRepository.kt": "1cb7995ed1353df45c764edc0edb4854e3e249aa73c8b341eed1a22a358838cb",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderSettingsTest.kt": "b3bcf4c3cb7168b00937ccffb4f1358ada772f74f0db07d70bc28eb399f9175a"
+  }
+}

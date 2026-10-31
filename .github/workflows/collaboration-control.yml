@@ -7,10 +7,16 @@ on:
     paths:
       - modules/collaboration/**
       - apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaboration*
+      - apps/server/src/test/resources/matrix-signing.fixture
       - apps/server/src/main/kotlin/dev/fajar/hris/availability/**
       - apps/server/build.gradle.kts
       - apps/worker/build.gradle.kts
       - apps/worker/src/main/kotlin/dev/fajar/hris/worker/WorkerApplication.kt
+      - apps/worker/src/main/kotlin/dev/fajar/hris/worker/di/**
+      - apps/worker/src/main/kotlin/dev/fajar/hris/worker/tasks/Collaboration*
+      - apps/worker/src/test/kotlin/dev/fajar/hris/worker/*Collaboration*
+      - apps/worker/src/test/kotlin/dev/fajar/hris/worker/WorkerMatrixFixture.kt
+      - apps/worker/src/test/kotlin/dev/fajar/hris/worker/WorkerIntegrationTest.kt
       - modules/identity/domain/**
       - modules/administration/domain/**
       - apps/dashboard/src/features/administration/**
@@ -25,10 +31,16 @@ on:
     paths:
       - modules/collaboration/**
       - apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaboration*
+      - apps/server/src/test/resources/matrix-signing.fixture
       - apps/server/src/main/kotlin/dev/fajar/hris/availability/**
       - apps/server/build.gradle.kts
       - apps/worker/build.gradle.kts
       - apps/worker/src/main/kotlin/dev/fajar/hris/worker/WorkerApplication.kt
+      - apps/worker/src/main/kotlin/dev/fajar/hris/worker/di/**
+      - apps/worker/src/main/kotlin/dev/fajar/hris/worker/tasks/Collaboration*
+      - apps/worker/src/test/kotlin/dev/fajar/hris/worker/*Collaboration*
+      - apps/worker/src/test/kotlin/dev/fajar/hris/worker/WorkerMatrixFixture.kt
+      - apps/worker/src/test/kotlin/dev/fajar/hris/worker/WorkerIntegrationTest.kt
       - modules/identity/domain/**
       - modules/administration/domain/**
       - apps/dashboard/src/features/administration/**

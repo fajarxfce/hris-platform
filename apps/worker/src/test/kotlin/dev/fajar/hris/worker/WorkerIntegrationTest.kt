@@ -63,7 +63,31 @@ class WorkerIntegrationTest {
     @Autowired private lateinit var jobs: JobRepository
     @Autowired private lateinit var transactions: TransactionRunner
     @Autowired private lateinit var reportSources: ReportSourceTransactionRunner
+    @Autowired private lateinit var context: org.springframework.context.ApplicationContext
     private val companies = mutableListOf<UUID>()
+
+    @Test
+    fun disabledProviderHasNoClientAndCannotBeClaimedByTheScheduler() {
+        assertTrue(
+            context
+                .getBeansOfType(
+                    dev.fajar.hris.collaboration.data.matrix.MatrixHttpClientOwner::class.java
+                )
+                .isEmpty()
+        )
+        assertTrue(
+            context
+                .getBeansOfType(
+                    dev.fajar.hris.collaboration.data.matrix.MatrixProviderConfiguration::class.java
+                )
+                .isEmpty()
+        )
+        assertFalse(
+            context.getBeansOfType(JobTask::class.java).values.any {
+                it.kind == JobKind.COLLABORATION_PROVISION
+            }
+        )
+    }
 
     @Test
     fun reportSourcePortUsesTheWorkerTransactionOwner() {

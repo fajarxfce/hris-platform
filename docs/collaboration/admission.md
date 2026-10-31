@@ -247,10 +247,10 @@ API and worker DI share the queue repository and registration dependencies.
 Actual tests cover concurrent enrollment/replay, queue capacity, seven-table
 rollback, legacy pending enrollment, platform mismatch and PostgreSQL dump/restore
 of the immutable request and pointer, including restored owner/company isolation
-and retained identity after parent purge. Worker execution, terminal activation,
-provider admission/gateway and product chat remain the next implementation. The
-current worker only leases its registered task kinds and does not yet execute the
-new provisioning kind. No provider or live runtime is enabled by this increment.
+and retained identity after parent purge. Worker activation and provider wiring are implemented in the following sections.
+The scheduler leases only registered task kinds; provisioning is registered only
+when both collaboration and provider switches are enabled. The live runtime is
+unchanged. Provider admission/gateway and product chat remain outstanding.
 
 Final admission/registration selection: 13 data cases, eleven domain cases, 76
 HTTP/contract cases, and the full worker context (104 pass, one existing opt-in
@@ -288,5 +288,52 @@ passed its new policy-boundary case in 35s, with formatting and architecture.
 [Activation evidence](../measurements/collaboration-provisioning-activation-2026-10-31.json)
 records the two selections and their limits. These tests use real PostgreSQL and
 a controlled provider repository; actual provider transport is separately
-verified. Next wire provider configuration, the worker adapter and their actual
-application contexts; the use cases are not yet registered as a running task.
+verified. Provider configuration and the task adapter are described below; the
+protected gateway and product SDK integration remain outstanding.
+
+## Application-owned provider and worker
+
+Both `HRIS_COLLABORATION_ENABLED=true` and `HRIS_MATRIX_ENABLED=true` are required
+for the provider transport and `CollaborationProvisioningTask`. Without them no
+Matrix HTTP client is allocated and the scheduler's registered kinds exclude
+provisioning. Registration may remain enabled while the provider is disabled;
+its durable requests wait in the existing queue. API registration never waits
+for a provider network call. The service switches do not grant chat permissions
+to existing memberships.
+
+Enabled contexts require an active identity encryption key and these operator
+settings: `HRIS_MATRIX_ORIGIN`, `HRIS_MATRIX_SERVER_NAME`,
+`HRIS_MATRIX_JWT_ISSUER`, `HRIS_MATRIX_JWT_AUDIENCE`, and
+`HRIS_MATRIX_JWT_SECRET_FILE`. The last value is a path inside each application
+container/process. Mount the same private signing file into API/worker and
+configure Synapse with its matching HS256 secret, issuer and audience. Use a
+cryptographically generated ASCII secret of 32–512 bytes and restrict file access
+to the service owner. An optional final LF/CRLF is accepted. Only a bounded
+regular file is read; credentials never enter ordinary environment values,
+responses or diagnostic messages. Compose forwards the configuration but does
+not mount a private file or start/expose a provider automatically. Operator-owned
+secret mounts belong in the deployment override.
+
+Synapse must have `nonrefreshable_access_token_lifetime: 10m` or a shorter positive
+lifetime; a missing, unbounded or longer login response is rejected. Its client,
+login and administrative ports must remain private with federation and public
+registration disabled. These switches enable background provisioning only;
+public chat traffic still requires the forthcoming HRIS gateway and client gates.
+
+One HTTP client belongs to each enabled application context, with five-second
+connect/exchange bounds, no redirects and bounded response buffers. Context
+shutdown cancels its exchanges and waits at most five seconds for termination.
+The worker invokes the activation/abort use cases through the existing persistent
+Spring Batch execution and fenced queue. Transient provider failures use the
+existing eight-attempt backoff; confirmed authority failures stop the job.
+Cancellation retains the caller's interrupt signal after bounded job cleanup.
+
+Final combined verification passed in 4m28s: four settings/ownership cases, 77
+API/contract cases and all 109 worker cases (108 pass, one unchanged opt-in
+elapsed-retention skip), formatting and architecture. Compose configuration
+parsing passes. [Worker evidence](../measurements/collaboration-provider-worker-2026-10-31.json)
+retains the initially malformed fictional key and cancellation-fixture correction.
+The real provider tests prove actual queue/batch/provisioning behavior, not product
+chat or E2EE key exchange. Activation source `4600a294` independently passed
+complete hosted control run `41191206775`. Continue explicit status/retry and the
+protected gateway/SDK integration; the live stack remains unchanged.

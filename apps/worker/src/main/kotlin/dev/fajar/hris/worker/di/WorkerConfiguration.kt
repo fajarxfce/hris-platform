@@ -1,5 +1,6 @@
 package dev.fajar.hris.worker.di
 
+import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.communications.domain.usecases.*
 import dev.fajar.hris.core.database.PostgresTransactionRunner
 import dev.fajar.hris.documents.domain.usecases.*
@@ -22,6 +23,16 @@ import org.springframework.transaction.PlatformTransactionManager
 
 @Configuration(proxyBeanMethods = false)
 class WorkerConfiguration {
+    @Bean
+    @ConditionalOnProperty(
+        name = ["HRIS_COLLABORATION_ENABLED", "HRIS_MATRIX_ENABLED"],
+        havingValue = "true",
+    )
+    fun collaborationProvisioningTask(
+        advance: AdvanceNativeCollaborationProvisioning,
+        abort: AbortCollaborationProvisioning,
+    ): JobTask = CollaborationProvisioningTask(advance, abort)
+
     @Bean
     @ConditionalOnProperty(
         name = ["hris.worker.enabled"],

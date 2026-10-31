@@ -194,6 +194,143 @@ class NativeCollaborationMatrixConfigurationTest : NativeCollaborationApiFixture
     }
 
     @Test
+    fun directRoomSetupAndStatusUseNativeObservedCommandsWithoutCallingProvider() {
+        val n = native()
+        val peer = UUID.randomUUID()
+        val db = database()
+        db.update(
+            "insert into accounts(id,email,display_name) values(?,?,'Fictional room HTTP peer')",
+            peer,
+            "$peer@example.test",
+        )
+        db.update(
+            "insert into company_memberships(company_id,account_id) values(?,?)",
+            n.fixture.company,
+            peer,
+        )
+        db.update(
+            "insert into membership_permissions(company_id,account_id,permission) values(?,?,'collaboration.chat')",
+            n.fixture.company,
+            peer,
+        )
+        val enrolled = register(n)
+        assertEquals(200, enrolled.statusCode(), enrolled.body())
+        val device = UUID.fromString(json.readTree(enrolled.body())["id"].asString())
+        val root = "${n.fixture.root}/collaboration/direct-conversations"
+        fun request(
+            path: String,
+            body: Map<String, Any?>? = null,
+            operation: UUID? = null,
+            build: String = "1",
+        ): HttpResponse<String> {
+            val builder =
+                HttpRequest.newBuilder(URI("http://127.0.0.1:$port$path"))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Authorization", "Bearer ${n.access}")
+                    .header("X-HRIS-Client-Platform", "ANDROID")
+                    .header("X-HRIS-Client-Build", build)
+            operation?.let { builder.header("Idempotency-Key", it.toString()) }
+            if (body == null) builder.GET()
+            else
+                builder
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(json.writeValueAsString(body)))
+            return n.fixture.browser.send(builder.build(), HttpResponse.BodyHandlers.ofString())
+        }
+        val opened = request(root, mapOf("peerAccountId" to peer), UUID.randomUUID())
+        assertEquals(200, opened.statusCode(), opened.body())
+        val id = json.readTree(opened.body())["id"].asString()
+        val path = "$root/$id/room"
+        val empty = request(path)
+        assertEquals(200, empty.statusCode(), empty.body())
+        assertEquals("NOT_REQUESTED", json.readTree(empty.body())["state"].asString())
+        val body =
+            mapOf(
+                "deviceId" to device,
+                "expectedDeviceVersion" to 1,
+                "expectedProvisioningVersion" to null,
+            )
+        val operation = UUID.randomUUID()
+        assertEquals(400, request(path, body).statusCode())
+        assertEquals(
+            400,
+            request(path, body + ("matrixRoomId" to "!injected"), operation).statusCode(),
+        )
+        failure(request(path, body, operation), 403, "collaboration_access_denied")
+        db.update(
+            "update collaboration_devices set state='ACTIVE',version=version+1,updated_at=? where id=?",
+            clock.instant().atOffset(java.time.ZoneOffset.UTC),
+            device,
+        )
+        failure(
+            request(path, body + ("expectedDeviceVersion" to 0), operation),
+            409,
+            "collaboration_room_provisioning_changed",
+        )
+        val queued = request(path, body, operation)
+        assertEquals(200, queued.statusCode(), queued.body())
+        assertEquals("no-store", queued.headers().firstValue("Cache-Control").orElse(""))
+        assertEquals(
+            json.readTree(queued.body()),
+            json.readTree(request(path, body, operation).body()),
+        )
+        val status = request(path)
+        assertEquals(200, status.statusCode(), status.body())
+        assertEquals("no-store", status.headers().firstValue("Cache-Control").orElse(""))
+        val value = json.readTree(status.body())
+        assertEquals(
+            setOf(
+                "conversationId",
+                "version",
+                "state",
+                "matrixRoomId",
+                "creatorAccountId",
+                "retryable",
+                "retryAt",
+            ),
+            value.propertyNames().toSet(),
+        )
+        assertEquals("QUEUED", value["state"].asString())
+        assertTrue(value["matrixRoomId"].isNull)
+        assertFalse(value["retryable"].asBoolean())
+        failure(get(n.fixture.browser, path), 403, "invalid_session_transport")
+        failure(
+            request("$root/${UUID.randomUUID()}/room"),
+            404,
+            "collaboration_conversation_not_found",
+        )
+        assertEquals(
+            2,
+            db.queryForObject(
+                "select count(*) from background_jobs where company_id=?",
+                Int::class.java,
+                n.fixture.company,
+            ),
+        )
+        assertEquals(
+            0,
+            db.queryForObject(
+                "select count(*) from collaboration_provider_sessions where company_id=?",
+                Int::class.java,
+                n.fixture.company,
+            ),
+        )
+        db.update(
+            "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+            n.fixture.company,
+            peer,
+        )
+        failure(request(path, body, operation), 403, "collaboration_peer_unavailable")
+        assertEquals(200, request(path).statusCode())
+        db.update(
+            "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+            n.fixture.company,
+            n.fixture.account,
+        )
+        assertEquals(403, request(path).statusCode())
+    }
+
+    @Test
     fun participantsAreNativeOnlyCompanyScopedPublicReferencesWithoutProviderCalls() {
         val n = native()
         val peer = UUID.randomUUID()

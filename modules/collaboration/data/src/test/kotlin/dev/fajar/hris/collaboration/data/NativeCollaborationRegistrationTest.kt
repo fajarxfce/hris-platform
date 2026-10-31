@@ -5,6 +5,7 @@ import dev.fajar.hris.administration.data.repositories.StoredCompanyClientPolicy
 import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationDirectDataSource
+import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationDirectRoomDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationGatewaySessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProviderSessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProvisioningDataSource
@@ -12,14 +13,18 @@ import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRegist
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationProviderSessionRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectRepository
+import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectRoomRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationProvisioningRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationRegistryRepository
 import dev.fajar.hris.collaboration.domain.entities.*
+import dev.fajar.hris.collaboration.domain.policies.collaborationDirectRoomPower
 import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixDeviceId
 import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixLocalpart
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRoomRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomRepository
 import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.core.database.PostgresTransactionRunner
 import dev.fajar.hris.core.database.datasources.*
@@ -2359,6 +2364,564 @@ class NativeCollaborationRegistrationTest {
         }
     }
 
+    @Test
+    fun directRoomRequestReplaysWithoutDuplicateJobAndRechecksPeer() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        assertEquals(CollaborationDirectRoomState.NOT_REQUESTED, success(room.status()).state)
+        val receipt = success(room.request())
+        assertEquals(MutationReceipt(room.conversation, 0), receipt)
+        assertEquals(receipt.copy(replayed = true), success(room.request()))
+        assertEquals(receipt, success(room.request(operation = UUID.randomUUID())))
+        assertEquals(2, f.rows("background_jobs"))
+        assertEquals(1, f.rows("collaboration_direct_room_provisioning"))
+        val status = success(room.status())
+        assertEquals(CollaborationDirectRoomState.QUEUED, status.state)
+        assertNull(status.matrixRoomId)
+        assertFalse(status.retryable)
+        sql.update(
+            "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+            f.actor.companyId,
+            room.peer,
+        )
+        assertEquals("collaboration_peer_unavailable", failed(room.request()))
+        assertEquals(CollaborationDirectRoomState.QUEUED, success(room.status()).state)
+        assertEquals(2, f.rows("background_jobs"))
+    }
+
+    @Test
+    fun directRoomRequestRejectsWrongDeviceVersionAndMissingAuthorityWithoutEnqueue() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        assertEquals("collaboration_room_provisioning_changed", failed(room.request(version = 0)))
+        assertEquals(
+            "collaboration_access_denied",
+            failed(room.request(device = UUID.randomUUID())),
+        )
+        assertEquals("invalid_client_version", failed(room.request(client = null)))
+        assertEquals(
+            "collaboration_conversation_not_found",
+            failed(room.request(conversation = UUID.randomUUID())),
+        )
+        assertEquals(
+            "collaboration_unavailable",
+            failed(
+                room.request(
+                    command = f.requestRoom(provider = CollaborationMatrixPolicy(false, ""))
+                )
+            ),
+        )
+        assertEquals(0, f.rows("collaboration_direct_room_provisioning"))
+        assertEquals(1, f.rows("background_jobs"))
+        sql.update("update native_sessions set revoked_at=now() where id=?", room.parent)
+        assertEquals("native_session_invalid", failed(room.request()))
+    }
+
+    @Test
+    fun directRoomCompetingRequestsUseOnePointerAndPeerCannotTakeOverRetry() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        val peerActor = f.actor.copy(accountId = room.peer)
+        val peerParent = f.parent(room.peer)
+        val peerDevice = success(f.register(peerParent, actor = peerActor)).id
+        f.activate(peerDevice)
+        val start = CountDownLatch(1)
+        val executor = Executors.newFixedThreadPool(2)
+        try {
+            val first =
+                executor.submit<Result<MutationReceipt>> {
+                    assertTrue(start.await(5, TimeUnit.SECONDS))
+                    room.request()
+                }
+            val second =
+                executor.submit<Result<MutationReceipt>> {
+                    assertTrue(start.await(5, TimeUnit.SECONDS))
+                    f.requestRoom()
+                        .execute(
+                            peerActor,
+                            peerParent,
+                            0,
+                            room.client,
+                            UUID.randomUUID(),
+                            room.conversation,
+                            peerDevice,
+                            1,
+                            null,
+                        )
+                }
+            start.countDown()
+            assertEquals(
+                success(first.get(15, TimeUnit.SECONDS)),
+                success(second.get(15, TimeUnit.SECONDS)),
+            )
+            assertEquals(3, f.rows("background_jobs"))
+            val pointer = room.pointer()
+            sql.update(
+                "update background_jobs set status='FAILED',finished_at=now() where id=?",
+                pointer.jobId,
+            )
+            f.clock.at = f.clock.at.plusSeconds(61)
+            val otherActor = if (pointer.accountId == f.account) peerActor else f.actor
+            val otherParent = if (otherActor == peerActor) peerParent else room.parent
+            val otherDevice = if (otherActor == peerActor) peerDevice else room.device
+            assertEquals(
+                "collaboration_room_creator_required",
+                failed(
+                    f.requestRoom()
+                        .execute(
+                            otherActor,
+                            otherParent,
+                            0,
+                            room.client,
+                            UUID.randomUUID(),
+                            room.conversation,
+                            otherDevice,
+                            1,
+                            0,
+                        )
+                ),
+            )
+        } finally {
+            start.countDown()
+            executor.shutdownNow()
+            assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS))
+        }
+    }
+
+    @Test
+    fun directRoomTerminalRetryIsBoundedAndCanResumeOnAnotherOwnedDevice() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        success(room.request())
+        assertEquals(
+            "collaboration_room_provisioning_changed",
+            failed(room.request(operation = UUID.randomUUID(), expected = 0)),
+        )
+        val old = room.pointer()
+        sql.update(
+            "update background_jobs set status='FAILED',finished_at=now() where id=?",
+            old.jobId,
+        )
+        assertTrue(success(room.status()).retryable)
+        assertEquals(old.updatedAt.plusSeconds(60), success(room.status()).retryAt)
+        assertEquals(
+            "collaboration_provisioning_retry_too_soon",
+            failed(room.request(operation = UUID.randomUUID(), expected = 0)),
+        )
+        val parent = f.parent()
+        val device = success(f.register(parent)).id
+        f.activate(device)
+        f.clock.at = f.clock.at.plusSeconds(61)
+        val op = UUID.randomUUID()
+        val receipt =
+            success(room.request(parent = parent, device = device, operation = op, expected = 0))
+        assertEquals(1, receipt.version)
+        assertEquals(device, room.pointer().deviceId)
+        assertEquals(old.createdAt, room.pointer().createdAt)
+        assertEquals(
+            receipt.copy(replayed = true),
+            success(room.request(parent = parent, device = device, operation = op, expected = 0)),
+        )
+        assertEquals(
+            "collaboration_room_provisioning_changed",
+            failed(
+                room.request(
+                    parent = parent,
+                    device = device,
+                    operation = UUID.randomUUID(),
+                    expected = 0,
+                )
+            ),
+        )
+    }
+
+    @Test
+    fun directRoomLateExpiryRollsBackJobPointerReceiptAuditAndOutbox() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        val tables =
+            listOf(
+                "background_jobs",
+                "collaboration_direct_room_provisioning",
+                "operation_receipts",
+                "audit_entries",
+                "outbox_events",
+            )
+        val before = tables.associateWith(f::rows)
+        val journal =
+            object : ChangeJournalRepository {
+                override fun record(actor: Actor, change: ChangeRecord): Result<Unit> =
+                    f.journal.record(actor, change).also {
+                        f.clock.at = f.clock.at.plusSeconds(901)
+                    }
+            }
+        assertEquals(
+            "native_session_invalid",
+            failed(room.request(command = f.requestRoom(journal = journal))),
+        )
+        assertEquals(before, tables.associateWith(f::rows))
+        assertEquals("native_session_invalid", failed(room.status()))
+    }
+
+    @Test
+    fun directRoomInterruptionRollsBackAndStatusCannotExposeLateAcquiredMetadata() {
+        val room = DirectRoomFixture()
+        val f = room.f
+        val before = f.rows("background_jobs")
+        val journal =
+            object : ChangeJournalRepository {
+                override fun record(actor: Actor, change: ChangeRecord): Result<Unit> {
+                    f.journal.record(actor, change)
+                    throw InterruptedException("fixture room cancellation")
+                }
+            }
+        try {
+            assertThrows(InterruptedException::class.java) {
+                room.request(command = f.requestRoom(journal = journal))
+            }
+        } finally {
+            Thread.interrupted()
+        }
+        assertEquals(before, f.rows("background_jobs"))
+        assertEquals(0, f.rows("collaboration_direct_room_provisioning"))
+        success(room.request())
+        val late =
+            object : CollaborationDirectRoomRepository by f.directRooms {
+                override fun provisioning(
+                    companyId: UUID,
+                    conversationId: UUID,
+                ): Result<CollaborationDirectRoomProvisioning?> =
+                    f.directRooms.provisioning(companyId, conversationId).also {
+                        f.clock.at = f.clock.at.plusSeconds(901)
+                    }
+            }
+        assertEquals(
+            "native_session_invalid",
+            failed(
+                f.roomStatus(late).execute(f.actor, room.parent, 0, room.client, room.conversation)
+            ),
+        )
+    }
+
+    @Test
+    fun directRoomWorkerRecoversLostCreateResponseWithoutDuplicateRoomOrLogout() {
+        val room = DirectRoomFixture()
+        success(room.request())
+        val lease = room.f.claimRoom(room.conversation)
+        val matrix = RecordingMatrix(room.f.clock)
+        val provider = RecordingRooms(room)
+        provider.loseCreateResponse = true
+        val worker = room.f.advanceRoom(matrix, provider)
+        assertEquals("collaboration_provider_unavailable", failed(worker.execute(lease)))
+        assertEquals(0, room.f.rows("collaboration_direct_room_bindings"))
+        provider.loseCreateResponse = false
+        assertEquals(JobStep(1, true), success(worker.execute(lease)))
+        assertEquals(1, provider.creates)
+        assertEquals(CollaborationDirectRoomState.READY, success(room.status()).state)
+        assertEquals(provider.id, success(room.status()).matrixRoomId)
+        assertEquals("SUCCEEDED", room.f.job(lease).status.name)
+        assertEquals(0, matrix.logouts.get())
+        assertEquals("job_lease_lost", failed(worker.execute(lease)))
+    }
+
+    @Test
+    fun directRoomWorkerRepairsOnlyMissingVerifiedStateAndRefusesForeignMarker() {
+        for (foreign in listOf(false, true)) {
+            val room = DirectRoomFixture()
+            success(room.request())
+            val lease = room.f.claimRoom(room.conversation)
+            val matrix = RecordingMatrix(room.f.clock)
+            val provider = RecordingRooms(room)
+            provider.existing = true
+            provider.value =
+                provider.value.copy(
+                    encryptionAlgorithm = null,
+                    historyVisibility = null,
+                    joinRule = null,
+                    guestAccess = null,
+                    power = null,
+                    members = mapOf(provider.creator to "join"),
+                    marker =
+                        if (foreign)
+                            CollaborationMatrixRoomMarker(
+                                UUID.randomUUID().toString(),
+                                room.conversation.toString(),
+                                "DIRECT",
+                            )
+                        else provider.value.marker,
+                )
+            val result = room.f.advanceRoom(matrix, provider).execute(lease)
+            if (foreign) {
+                assertEquals("collaboration_room_mismatch", failed(result))
+                assertEquals(0, room.f.rows("collaboration_direct_room_bindings"))
+                assertFalse(provider.calls.any { it.startsWith("setting:") || it == "invite" })
+            } else {
+                success(result)
+                assertEquals(5, provider.calls.count { it.startsWith("setting:") })
+                assertEquals(1, provider.calls.count { it == "invite" })
+                assertEquals(1, room.f.rows("collaboration_direct_room_bindings"))
+            }
+            assertEquals(0, provider.creates)
+            assertEquals(0, matrix.logouts.get())
+        }
+    }
+
+    @Test
+    fun directRoomWorkerRechecksRevokedPeerAfterProviderResponseAndAbortOwnsOnlyJob() {
+        val room = DirectRoomFixture()
+        success(room.request())
+        val lease = room.f.claimRoom(room.conversation)
+        val matrix = RecordingMatrix(room.f.clock)
+        val provider = RecordingRooms(room)
+        provider.onCall = { name ->
+            if (name == "observe")
+                sql.update(
+                    "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                    room.f.actor.companyId,
+                    room.peer,
+                )
+            Result.Success(Unit)
+        }
+        val result = room.f.advanceRoom(matrix, provider).execute(lease)
+        assertEquals("collaboration_peer_unavailable", failed(result))
+        assertEquals(0, room.f.rows("collaboration_direct_room_bindings"))
+        success(room.f.abort().execute(lease, (result as Result.Failed).failure))
+        assertEquals(JobStatus.FAILED, room.f.job(lease).status)
+        assertEquals(CollaborationDirectRoomState.FAILED, success(room.status()).state)
+        assertEquals(0, matrix.logouts.get())
+    }
+
+    @Test
+    fun directRoomWorkerTreatsChangedNativeObservationAsRetryableAndWithholdsBinding() {
+        val room = DirectRoomFixture()
+        success(room.request())
+        val lease = room.f.claimRoom(room.conversation)
+        val matrix = RecordingMatrix(room.f.clock)
+        val provider = RecordingRooms(room)
+        provider.onCall = { name ->
+            if (name == "create")
+                sql.update("update native_sessions set version=version+1 where id=?", room.parent)
+            Result.Success(Unit)
+        }
+        val worker = room.f.advanceRoom(matrix, provider)
+        val result = worker.execute(lease)
+        assertEquals("collaboration_admission_changed", failed(result))
+        assertEquals(FailureKind.UNAVAILABLE, (result as Result.Failed).failure.kind)
+        assertEquals(0, room.f.rows("collaboration_direct_room_bindings"))
+        provider.onCall = { Result.Success(Unit) }
+        success(worker.execute(lease))
+        assertEquals(1, provider.creates)
+        assertEquals(0, matrix.logouts.get())
+    }
+
+    @Test
+    fun directRoomWorkerDeadlineAndProviderFailureCannotOverrideCurrentDenial() {
+        for (revoke in listOf(false, true)) {
+            val room = DirectRoomFixture()
+            success(room.request())
+            val lease = room.f.claimRoom(room.conversation)
+            val matrix = RecordingMatrix(room.f.clock)
+            val provider = RecordingRooms(room)
+            provider.onCall = {
+                if (revoke)
+                    sql.update(
+                        "update native_sessions set revoked_at=now() where id=?",
+                        room.parent,
+                    )
+                else room.f.clock.at = room.f.clock.at.plusSeconds(61)
+                Result.Failed(
+                    Failure(FailureKind.UNAVAILABLE, "collaboration_provider_unavailable")
+                )
+            }
+            val result = room.f.advanceRoom(matrix, provider).execute(lease)
+            assertEquals(
+                if (revoke) "native_session_invalid" else "collaboration_admission_changed",
+                failed(result),
+            )
+            assertEquals(0, room.f.rows("collaboration_direct_room_bindings"))
+            assertEquals(0, matrix.logouts.get())
+        }
+    }
+
+    @Test
+    fun directRoomWorkerInterruptedPublicationRollsBackBindingJobAndJournalTogether() {
+        val room = DirectRoomFixture()
+        success(room.request())
+        val lease = room.f.claimRoom(room.conversation)
+        val matrix = RecordingMatrix(room.f.clock)
+        val provider = RecordingRooms(room)
+        val tables = listOf("audit_entries", "outbox_events", "collaboration_direct_room_bindings")
+        val before = tables.associateWith(room.f::rows)
+        val journal =
+            object : ChangeJournalRepository {
+                override fun record(actor: Actor, change: ChangeRecord): Result<Unit> {
+                    room.f.journal.record(actor, change)
+                    throw InterruptedException("fixture room publication")
+                }
+            }
+        try {
+            assertThrows(InterruptedException::class.java) {
+                room.f.advanceRoom(matrix, provider, journal).execute(lease)
+            }
+        } finally {
+            Thread.interrupted()
+        }
+        assertEquals(before, tables.associateWith(room.f::rows))
+        assertEquals(JobStatus.RUNNING, room.f.job(lease).status)
+        assertEquals(0, room.f.job(lease).completedItems)
+        success(room.f.advanceRoom(matrix, provider).execute(lease))
+        assertEquals(1, provider.creates)
+        assertEquals(0, matrix.logouts.get())
+    }
+
+    private class RecordingRooms(room: DirectRoomFixture) : CollaborationMatrixRoomRepository {
+        val id = "!fictional-${UUID.randomUUID()}"
+        val creator =
+            "@${collaborationMatrixLocalpart(requireNotNull(room.f.actor.companyId),room.f.account)}:proof.invalid"
+        val peer =
+            "@${collaborationMatrixLocalpart(requireNotNull(room.f.actor.companyId),room.peer)}:proof.invalid"
+        var value =
+            CollaborationMatrixRoomObservation(
+                creator,
+                "12",
+                false,
+                CollaborationMatrixRoomMarker(
+                    room.f.actor.companyId.toString(),
+                    room.conversation.toString(),
+                    "DIRECT",
+                ),
+                emptyList(),
+                false,
+                "m.megolm.v1.aes-sha2",
+                "invite",
+                "invited",
+                "forbidden",
+                collaborationDirectRoomPower(),
+                mapOf(creator to "join", peer to "invite"),
+            )
+        var existing = false
+        var creates = 0
+        var loseCreateResponse = false
+        val calls = mutableListOf<String>()
+        var onCall: (String) -> Result<Unit> = { Result.Success(Unit) }
+
+        private fun step(name: String): Result<Unit> {
+            assertFalse(
+                org.springframework.transaction.support.TransactionSynchronizationManager
+                    .isActualTransactionActive()
+            )
+            calls += name
+            return onCall(name)
+        }
+
+        override fun resolve(
+            request: CollaborationMatrixDirectRoom,
+            token: String,
+            deadline: Instant,
+        ): Result<String?> = step("resolve").map { if (existing) id else null }
+
+        override fun create(
+            request: CollaborationMatrixDirectRoom,
+            token: String,
+            deadline: Instant,
+        ): Result<CollaborationMatrixRoomCreation> {
+            existing = true
+            creates++
+            return step("create").flatMap {
+                if (loseCreateResponse)
+                    Result.Failed(
+                        Failure(FailureKind.UNAVAILABLE, "collaboration_provider_unavailable")
+                    )
+                else Result.Success(CollaborationMatrixRoomCreation.Created(id))
+            }
+        }
+
+        override fun observe(
+            roomId: String,
+            token: String,
+            deadline: Instant,
+        ): Result<CollaborationMatrixRoomObservation> = step("observe").map { value }
+
+        override fun putInitialSetting(
+            roomId: String,
+            setting: CollaborationMatrixRoomSetting,
+            token: String,
+            deadline: Instant,
+        ): Result<Unit> =
+            step("setting:$setting").map {
+                value =
+                    when (setting) {
+                        CollaborationMatrixRoomSetting.POWER_LEVELS ->
+                            value.copy(power = collaborationDirectRoomPower())
+                        CollaborationMatrixRoomSetting.ENCRYPTION ->
+                            value.copy(encryptionAlgorithm = "m.megolm.v1.aes-sha2")
+                        CollaborationMatrixRoomSetting.JOIN_RULES -> value.copy(joinRule = "invite")
+                        CollaborationMatrixRoomSetting.HISTORY_VISIBILITY ->
+                            value.copy(historyVisibility = "invited")
+                        CollaborationMatrixRoomSetting.GUEST_ACCESS ->
+                            value.copy(guestAccess = "forbidden")
+                    }
+            }
+
+        override fun invitePeer(
+            roomId: String,
+            request: CollaborationMatrixDirectRoom,
+            token: String,
+            deadline: Instant,
+        ): Result<Unit> =
+            step("invite").map { value = value.copy(members = value.members + (peer to "invite")) }
+    }
+
+    private class DirectRoomFixture {
+        val f = Fixture()
+        val client = ClientVersion(ClientPlatform.ANDROID, 1)
+        val peer = f.peer("Fictional room peer")
+        val parent = f.parent()
+        val device = (f.register(parent) as Result.Success).value.id
+        val conversation =
+            (f.openDirect().execute(f.actor, parent, 0, client, UUID.randomUUID(), peer)
+                    as Result.Success)
+                .value
+                .id
+        val operation = UUID.randomUUID()
+
+        init {
+            f.activate(device)
+        }
+
+        fun request(
+            operation: UUID = this.operation,
+            parent: UUID = this.parent,
+            device: UUID = this.device,
+            version: Long = 1,
+            expected: Long? = null,
+            client: ClientVersion? = this.client,
+            conversation: UUID = this.conversation,
+            command: RequestNativeCollaborationDirectRoom = f.requestRoom(),
+        ) =
+            command.execute(
+                f.actor,
+                parent,
+                0,
+                client,
+                operation,
+                conversation,
+                device,
+                version,
+                expected,
+            )
+
+        fun status() = f.roomStatus().execute(f.actor, parent, 0, client, conversation)
+
+        fun pointer() =
+            requireNotNull(
+                (f.transactions.run(f.actor) {
+                        f.directRooms.provisioning(requireNotNull(f.actor.companyId), conversation)
+                    } as Result.Success)
+                    .value
+            )
+    }
+
     private class GatewayFixture {
         val f = Fixture()
         val parent = f.parent()
@@ -2397,6 +2960,8 @@ class NativeCollaborationRegistrationTest {
         private val dsl = DSL.using(TransactionAwareDataSourceProxy(runtime), SQLDialect.POSTGRES)
         private val json = JsonMapper.builder().build()
         private val receipts = PostgresOperationReceiptDataSource(dsl)
+        val directRooms =
+            StoredCollaborationDirectRoomRepository(PostgresCollaborationDirectRoomDataSource(dsl))
         val direct = StoredCollaborationDirectRepository(PostgresCollaborationDirectDataSource(dsl))
         val registry =
             StoredCollaborationRegistryRepository(PostgresCollaborationRegistryDataSource(dsl))
@@ -2542,6 +3107,108 @@ class NativeCollaborationRegistrationTest {
                 )
             return id
         }
+
+        fun advanceRoom(
+            matrix: CollaborationMatrixRepository,
+            providerRooms: CollaborationMatrixRoomRepository,
+            journal: ChangeJournalRepository = this.journal,
+        ) =
+            AdvanceNativeCollaborationDirectRoom(
+                direct,
+                directRooms,
+                registry,
+                credentials,
+                matrix,
+                providerRooms,
+                jobs,
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                journal,
+                transactions,
+                IdentitySecurityPolicy(),
+                CollaborationServicePolicy(true),
+                CollaborationMatrixPolicy(true, "proof.invalid"),
+                clock,
+            )
+
+        fun claimRoom(conversation: UUID): JobLease {
+            val pointer =
+                requireNotNull(
+                    success(
+                        transactions.run(actor) {
+                            directRooms.provisioning(requireNotNull(actor.companyId), conversation)
+                        }
+                    )
+                )
+            val owner = UUID.randomUUID()
+            val token = UUID.randomUUID()
+            val deadline = Instant.now().plusSeconds(120).truncatedTo(ChronoUnit.MICROS)
+            assertEquals(
+                1,
+                sql.update(
+                    "update background_jobs set status='RUNNING',attempts=attempts+1,lease_owner=?,lease_token=?,lease_until=?,version=version+1 where id=? and status in ('QUEUED','RUNNING')",
+                    owner,
+                    token,
+                    deadline.atOffset(ZoneOffset.UTC),
+                    pointer.jobId,
+                ),
+            )
+            return JobLease(
+                requireNotNull(
+                    success(
+                        transactions.run(actor) {
+                            jobs.find(requireNotNull(actor.companyId), pointer.jobId)
+                        }
+                    )
+                ),
+                owner,
+                token,
+                deadline,
+            )
+        }
+
+        fun requestRoom(
+            journal: ChangeJournalRepository = this.journal,
+            provider: CollaborationMatrixPolicy = CollaborationMatrixPolicy(true, "proof.invalid"),
+        ) =
+            RequestNativeCollaborationDirectRoom(
+                direct,
+                directRooms,
+                registry,
+                jobs,
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                operations,
+                journal,
+                transactions,
+                IdentitySecurityPolicy(),
+                CollaborationServicePolicy(true),
+                provider,
+                clock,
+            )
+
+        fun roomStatus(rooms: CollaborationDirectRoomRepository = directRooms) =
+            GetNativeCollaborationDirectRoomStatus(
+                direct,
+                rooms,
+                jobs,
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                transactions,
+                IdentitySecurityPolicy(),
+                CollaborationServicePolicy(true),
+                CollaborationMatrixPolicy(true, "proof.invalid"),
+                clock,
+            )
 
         fun openDirect(
             conversations: CollaborationDirectRepository = direct,

@@ -43,8 +43,9 @@ Versions retire at 999999; requests and provider identity fields remain bounded.
 The existing queue owns finite attempts, company/global capacity and cancellation.
 The new job kind has its own dashboard label; adding its enum value does not start
 a worker handler. Recovery supports schema 111 without another secret envelope
-format. Public command/status routes, worker reconciliation and content admission
-are subsequent implementation steps, not inferred from storage acceptance.
+format. [Native command/status and worker reconciliation](direct-room-provisioning.md) now
+use these ports; their evidence is separate from storage. Content admission remains
+a subsequent implementation step.
 
 [Validation evidence](../measurements/collaboration-direct-room-storage-2026-10-31.json)
 retains the six PostgreSQL cases, actual 110-to-111 upgrade/dump/restore and complete

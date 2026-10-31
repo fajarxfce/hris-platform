@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-31",
+  "kind": "native_direct_room_setup_and_provider_reconciliation",
+  "complete": true,
+  "productAcceptance": false,
+  "capacityAcceptance": false,
+  "databaseSchema": 111,
+  "checks": {
+    "fullGradleElapsedSeconds": 312,
+    "format": true,
+    "architecture": true,
+    "fullSuiteResults": {
+      "modules/collaboration/domain": {
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/data": {
+        "tests": 114,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server": {
+        "tests": 145,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/worker": {
+        "tests": 112,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      }
+    },
+    "focusedCorrectedElapsedSeconds": 49,
+    "focusedDomainCases": 18,
+    "focusedDataCases": 12,
+    "focusedHttpCases": 8,
+    "focusedWorkerCases": 6,
+    "realSynapseVersion": "1.164.1",
+    "realSynapseDigest": "sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75",
+    "realWorkerScenarios": [
+      "lease/batch room setup with verified version-12 encrypted invited-history binding",
+      "paused provider defers without publication then same durable job succeeds on its second actual claim"
+    ],
+    "failureExercises": [
+      "lost create response resolves the same room",
+      "repair only missing initial settings; refuse foreign marker",
+      "current peer/session denial overrides provider response/error",
+      "native parent refresh invalidates the old observation without deleting provider devices",
+      "deadline withholding",
+      "interrupted publication rolls back binding, job and journal",
+      "opposite participant requests converge; creator-only terminal retry",
+      "new current device may resume same creator; ordinary expiry retains intent",
+      "late command expiry rolls back queue, pointer, receipt, audit and outbox",
+      "strict native HTTP shape, versions, no-store and lost response replay"
+    ]
+  },
+  "correctedFailures": [
+    {
+      "elapsedSeconds": 45,
+      "kind": "focused_command_checks",
+      "result": "Eight HTTP cases passed; two of six data assertions compared internal replayed=true receipts to initial replayed=false receipts. Corrected the internal expected receipt flag; HTTP id/version remains unchanged."
+    },
+    {
+      "elapsedSeconds": 56,
+      "kind": "focused_reconciliation_checks",
+      "result": "A missing space before the recording test callback initializer failed formatting and data test compilation. Production compilation and eight HTTP cases passed. Five of six worker cases passed including both new real room scenarios; an older device setup case received provider HTTP 429."
+    },
+    {
+      "kind": "fixture_rate_limit",
+      "result": "Pinned Synapse source confirms rc_login.address defaults to burst 5 with 0.003/s refill. Expanded fictional employees share one broker address. Bounded fixture address capacity is now burst 32 at 5/s; per-account/failed-attempt limits and production configuration are unchanged. Corrected 49-second selection and full regression pass."
+    }
+  ],
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixConfigurationTest.kt": "7466698bb91d310ed5402ca1c66bdd994b5aa3c77110471397e633c6c97f40bf",
+    "apps/worker/src/main/kotlin/dev/fajar/hris/worker/di/WorkerConfiguration.kt": "57b13dd62d76b082b17287030536d05ee97734ca679d16bfddb515707c80afe0",
+    "apps/worker/src/main/kotlin/dev/fajar/hris/worker/tasks/CollaborationDirectRoomTask.kt": "58a2680448b8aa5be0df7356579cb1fe2e8473d3362b1a43c5b7e763d00c6786",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/CollaborationProvisioningWorkerTest.kt": "e7dd6b92fcbb1708ce0050b88aa95b6f538c47a357a4022fae44647460b281cd",
+    "apps/worker/src/test/kotlin/dev/fajar/hris/worker/WorkerMatrixFixture.kt": "063defd16b57dd4c1bcd05299a7f5c5e71c9fe7c7c0a3b5ad4f382122f58be61",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "7971ee5c63ed4d00d1fb36c732c6c12c08bcc8a4c25b79bf8ce2d16ea8ed7321",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "fcf3c4b539c13f64e0c82cab68b7da68165bbd833212b398359ff4723274c983",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/NativeCollaborationDirectRoomController.kt": "07294d0ef34a2f37debcf6cd423bbc32a91719356fe6bc0d2956a8780016c4e7",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/RequestCollaborationDirectRoomRequest.kt": "a802e0f8106af6c742bcffb4f5a4b7f98562c9342511d5c7ea90f3fa62606b5c",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationDirectRoomStatus.kt": "e4c9631de99b30b30c90c2f498eb336c6beed39c87894937c6870ee0ad983636",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationDirectRoomRequest.kt": "b06842b5db9a6cc7b0fbb2d8daf00d8308a540b873364d04e9aee6964386cffe",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AbortCollaborationProvisioning.kt": "84017944e1fbfc840416dd561aecbe20ce56902a7f9b27c29048e93b6e44c933",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AdvanceNativeCollaborationDirectRoom.kt": "832abb1e68e36f716f0a5405929b8bb5cbce9d633cf4725df16f2ed38c1fc65e",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/GetNativeCollaborationDirectRoomStatus.kt": "aa9fd1a205f9516f2e6f68978323238b581d4352351f681af2455a60ddbba89a",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/RequestNativeCollaborationDirectRoom.kt": "6e6ce8639e7dfeb4b00a752833a6cc2f3bd99b7814819bab28ce0e8d15a2d214",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationDirectRoomRequestTest.kt": "c3a7bf481f5acd548a077dad6f6fe7f5982827eee506b242e79c8b661335285f"
+  },
+  "limits": [
+    "READY is provider-room setup, not encryption-device delivery or current content admission. Never-enrolled peers still require pending product outbox until eligible keys exist.",
+    "Public Matrix gateway still exposes WHOAMI/refresh only. SDK key/sync/content traffic, browser-parent admission and product UI remain pending.",
+    "No live HRIS service, phone, real employee message or Starter foundation changed. No product/capacity acceptance."
+  ]
+}

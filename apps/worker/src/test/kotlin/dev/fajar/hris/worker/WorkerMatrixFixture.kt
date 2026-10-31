@@ -58,6 +58,12 @@ class WorkerMatrixFixture :
                                 "report_stats" to false,
                                 "enable_registration" to false,
                                 "password_config" to mapOf("enabled" to false),
+                                // All fictional employees use one private broker address.
+                                // Keep a finite address bucket for this expanded worker suite.
+                                "rc_login" to
+                                    mapOf(
+                                        "address" to mapOf("per_second" to 5, "burst_count" to 32)
+                                    ),
                                 "jwt_config" to
                                     mapOf(
                                         "enabled" to true,

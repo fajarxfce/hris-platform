@@ -5,15 +5,21 @@ import dev.fajar.hris.administration.domain.entities.ClientVersion
 import dev.fajar.hris.collaboration.data.matrix.MatrixHttpClientOwner
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.policies.*
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRoomRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationGatewaySessionRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationProviderSessionRepository
+import dev.fajar.hris.collaboration.domain.usecases.GetNativeCollaborationDirectRoomStatus
 import dev.fajar.hris.collaboration.domain.usecases.MaintainCollaborationGatewayReplays
+import dev.fajar.hris.collaboration.domain.usecases.OpenNativeCollaborationDirect
 import dev.fajar.hris.collaboration.domain.usecases.RegisterNativeCollaborationDevice
+import dev.fajar.hris.collaboration.domain.usecases.RequestNativeCollaborationDirectRoom
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.jobs.domain.entities.*
 import dev.fajar.hris.jobs.domain.usecases.LeaseJobs
 import dev.fajar.hris.worker.collaboration.CollaborationGatewayCleanupWorker
 import dev.fajar.hris.worker.runtime.*
+import dev.fajar.hris.worker.tasks.CollaborationDirectRoomTask
 import dev.fajar.hris.worker.tasks.CollaborationProvisioningTask
 import java.net.URI
 import java.net.http.HttpRequest
@@ -80,6 +86,12 @@ class CollaborationProvisioningWorkerTest {
         }
     }
 
+    @Autowired private lateinit var openDirect: OpenNativeCollaborationDirect
+    @Autowired private lateinit var requestRoom: RequestNativeCollaborationDirectRoom
+    @Autowired private lateinit var roomStatus: GetNativeCollaborationDirectRoomStatus
+    @Autowired private lateinit var directRooms: CollaborationDirectRoomRepository
+    @Autowired private lateinit var providerRooms: CollaborationMatrixRoomRepository
+    @Autowired private lateinit var roomTask: CollaborationDirectRoomTask
     @Autowired private lateinit var register: RegisterNativeCollaborationDevice
     @Autowired private lateinit var lease: LeaseJobs
     @Autowired private lateinit var task: CollaborationProvisioningTask
@@ -306,6 +318,158 @@ class CollaborationProvisioningWorkerTest {
             collaborationMatrixDeviceId(f.device),
             requireNotNull(stored(f)).matrixDeviceId,
         )
+    }
+
+    @Test
+    fun realDirectRoomQueuePublishesVerifiedRoomAndRecoversProviderOutage() {
+        for (outage in listOf(false, true)) {
+            val f = fixture()
+            assertEquals(Result.Success(Unit), batch.execute(claim(f), task))
+            val company = requireNotNull(f.actor.companyId)
+            val peer = UUID.randomUUID()
+            val db = database()
+            db.update(
+                "insert into accounts(id,email,display_name) values(?,?,'Fictional room worker peer')",
+                peer,
+                "$peer@example.test",
+            )
+            db.update(
+                "insert into company_memberships(company_id,account_id) values(?,?)",
+                company,
+                peer,
+            )
+            db.update(
+                "insert into membership_permissions(company_id,account_id,permission) values(?,?,'collaboration.chat')",
+                company,
+                peer,
+            )
+            val client = ClientVersion(ClientPlatform.ANDROID, 1)
+            val conversation =
+                success(openDirect.execute(f.actor, f.parent, 0, client, UUID.randomUUID(), peer))
+                    .id
+            success(
+                requestRoom.execute(
+                    f.actor,
+                    f.parent,
+                    0,
+                    client,
+                    UUID.randomUUID(),
+                    conversation,
+                    f.device,
+                    1,
+                    null,
+                )
+            )
+            val pointer =
+                requireNotNull(
+                    success(
+                        transactions.run(f.actor) {
+                            directRooms.provisioning(company, conversation)
+                        }
+                    )
+                )
+            fun claimRoom(): JobLease {
+                val value =
+                    success(
+                            lease.execute(
+                                UUID.randomUUID(),
+                                1,
+                                60,
+                                setOf(JobKind.COLLABORATION_DIRECT_PROVISION),
+                            )
+                        )
+                        .single()
+                assertEquals(pointer.jobId, value.job.request.id)
+                return value
+            }
+            var claimed = claimRoom()
+            if (outage) {
+                matrix.dockerClient.pauseContainerCmd(matrix.containerId).exec()
+                try {
+                    runner.execute(RunningJob(claimed), roomTask)
+                    assertEquals(
+                        "QUEUED",
+                        db.queryForObject(
+                            "select status from background_jobs where id=?",
+                            String::class.java,
+                            pointer.jobId,
+                        ),
+                    )
+                    assertNull(
+                        success(
+                            transactions.run(f.actor) { directRooms.binding(company, conversation) }
+                        )
+                    )
+                } finally {
+                    matrix.dockerClient.unpauseContainerCmd(matrix.containerId).exec()
+                }
+                db.update(
+                    "update background_jobs set available_at=now()-interval '1 second' where id=?",
+                    pointer.jobId,
+                )
+                claimed = claimRoom()
+                assertEquals(2, claimed.job.attempts)
+            }
+            runner.execute(RunningJob(claimed), roomTask)
+            val status = success(roomStatus.execute(f.actor, f.parent, 0, client, conversation))
+            assertEquals(CollaborationDirectRoomState.READY, status.state)
+            assertFalse(status.retryable)
+            val binding =
+                requireNotNull(
+                    success(
+                        transactions.run(f.actor) { directRooms.binding(company, conversation) }
+                    )
+                )
+            assertEquals(binding.matrixRoomId, status.matrixRoomId)
+            assertEquals(pointer.jobId, binding.jobId)
+            assertEquals(
+                "SUCCEEDED",
+                db.queryForObject(
+                    "select status from background_jobs where id=?",
+                    String::class.java,
+                    pointer.jobId,
+                ),
+            )
+            val credential = requireNotNull(stored(f))
+            val observed =
+                success(
+                    providerRooms.observe(
+                        binding.matrixRoomId,
+                        credential.accessToken,
+                        Instant.now().plusSeconds(5),
+                    )
+                )
+            val repair =
+                success(
+                    assessCollaborationDirectRoom(
+                        CollaborationMatrixDirectRoom(
+                            company,
+                            conversation,
+                            f.actor.accountId,
+                            peer,
+                        ),
+                        observed,
+                        "matrix.example.test",
+                    )
+                )
+            assertTrue(repair.missingSettings.isEmpty())
+            assertFalse(repair.missingInvite)
+            assertEquals("invited", observed.historyVisibility)
+            assertEquals("12", observed.roomVersion)
+            assertEquals(0L, credential.generation)
+            assertEquals(
+                "job_lease_lost",
+                (roomTask.advance(claimed) as Result.Failed).failure.code,
+            )
+            assertEquals(
+                1,
+                db.queryForObject(
+                    "select count(*) from collaboration_direct_room_bindings where company_id=?",
+                    Int::class.java,
+                    company,
+                ),
+            )
+        }
     }
 
     @Test

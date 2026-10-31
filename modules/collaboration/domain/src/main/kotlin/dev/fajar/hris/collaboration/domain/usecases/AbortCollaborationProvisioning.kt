@@ -12,7 +12,10 @@ class AbortCollaborationProvisioning(
 ) {
     fun execute(lease: JobLease, failure: Failure): Result<Unit> {
         val request = lease.job.request
-        if (request.kind != JobKind.COLLABORATION_PROVISION)
+        if (
+            request.kind !in
+                setOf(JobKind.COLLABORATION_PROVISION, JobKind.COLLABORATION_DIRECT_PROVISION)
+        )
             return Result.Failed(
                 Failure(FailureKind.UNEXPECTED, "invalid_collaboration_provisioning")
             )

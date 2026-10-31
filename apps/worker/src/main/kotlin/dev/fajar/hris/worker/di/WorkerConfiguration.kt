@@ -28,6 +28,16 @@ class WorkerConfiguration {
         name = ["HRIS_COLLABORATION_ENABLED", "HRIS_MATRIX_ENABLED"],
         havingValue = "true",
     )
+    fun collaborationDirectRoomTask(
+        advance: AdvanceNativeCollaborationDirectRoom,
+        abort: AbortCollaborationProvisioning,
+    ): JobTask = CollaborationDirectRoomTask(advance, abort)
+
+    @Bean
+    @ConditionalOnProperty(
+        name = ["HRIS_COLLABORATION_ENABLED", "HRIS_MATRIX_ENABLED"],
+        havingValue = "true",
+    )
     fun collaborationProvisioningTask(
         advance: AdvanceNativeCollaborationProvisioning,
         abort: AbortCollaborationProvisioning,

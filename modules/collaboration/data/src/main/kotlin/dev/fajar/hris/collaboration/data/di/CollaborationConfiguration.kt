@@ -24,6 +24,127 @@ import org.springframework.core.env.Environment
 @Configuration(proxyBeanMethods = false)
 class CollaborationConfiguration {
     @Bean
+    fun collaborationDirectRoomSource(sql: DSLContext): CollaborationDirectRoomDataSource =
+        PostgresCollaborationDirectRoomDataSource(sql)
+
+    @Bean
+    fun collaborationDirectRooms(
+        source: CollaborationDirectRoomDataSource
+    ): CollaborationDirectRoomRepository = StoredCollaborationDirectRoomRepository(source)
+
+    @Bean
+    fun requestNativeCollaborationDirectRoom(
+        conversations: CollaborationDirectRepository,
+        rooms: CollaborationDirectRoomRepository,
+        registry: CollaborationRegistryRepository,
+        jobs: JobRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        RequestNativeCollaborationDirectRoom(
+            conversations,
+            rooms,
+            registry,
+            jobs,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
+    fun getNativeCollaborationDirectRoomStatus(
+        conversations: CollaborationDirectRepository,
+        rooms: CollaborationDirectRoomRepository,
+        jobs: JobRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        GetNativeCollaborationDirectRoomStatus(
+            conversations,
+            rooms,
+            jobs,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
+    fun advanceNativeCollaborationDirectRoom(
+        conversations: CollaborationDirectRepository,
+        rooms: CollaborationDirectRoomRepository,
+        registry: CollaborationRegistryRepository,
+        credentials: CollaborationProviderSessionRepository,
+        matrix: CollaborationMatrixRepository,
+        providerRooms: CollaborationMatrixRoomRepository,
+        jobs: JobRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        AdvanceNativeCollaborationDirectRoom(
+            conversations,
+            rooms,
+            registry,
+            credentials,
+            matrix,
+            providerRooms,
+            jobs,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            journal,
+            transactions,
+            security,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
     fun collaborationServicePolicy(environment: Environment) =
         CollaborationServicePolicy(
             environment.getProperty("HRIS_COLLABORATION_ENABLED", Boolean::class.java, false)

@@ -69,7 +69,9 @@
         "device-key-storage.md",
         "../measurements/collaboration-device-key-storage-2026-10-31.json",
         "device-key-upload.md",
-        "../measurements/collaboration-device-key-upload-2026-10-31.json"
+        "../measurements/collaboration-device-key-upload-2026-10-31.json",
+        "recipient-devices.md",
+        "../measurements/collaboration-recipient-devices-2026-10-31.json"
       ]
     },
     {

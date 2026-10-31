@@ -26,7 +26,11 @@ Current provider/client evidence:
   18 Python checks, source hashes, final 23s root/debug/lint (2,002 desktop cases,
   zero lint errors). Use classic for the first scoped HRIS Android/web transport;
   native list/subscription/extension authorization remains a separate gate. No
-  public sync/content routes or product acceptance are implied.
+  public sync/content routes or product acceptance are implied. Exact Mobile
+  `b061d390` hosted `41212817421` passed every job/step in both modes: classic
+  31.659s/72.695s and native 34.002s/81.267s, both cleanup true. Platform `d425e6d8`
+  browser `41212746123` also passed every step; all artifacts and matching source
+  hashes are retained in the dual-sync measurement. Mobile `9ecbd004` records them.
 
 - Actual Matrix/LiveKit browser E2EE exchange/media and wrong-key rejection pass.
   The experiment's custom encrypted media-key event is **not MatrixRTC acceptance**.
@@ -97,6 +101,24 @@ Current provider/client evidence:
   pins Platform `047897f9`; hosted APK hash is retained separately from the local build.
 
 Current backend implementation:
+
+- Schema **113** adds a read-only public recipient view owned by a restricted
+  non-login role. Application-role private device/binding/key RLS stays unchanged.
+  Only self/current direct peers with active company/account/membership/chat
+  permission and confirmed keys are eligible. Short access expiry and old MFA
+  preserve offline delivery eligibility; hard parent expiry/revocation, security
+  changes, device revocation and offboarding remove it. Parent cleanup retains
+  owned device/key facts. The view returns five fields and no labels/credentials;
+  its storage port has a 100-account/500-result bound and is not yet public/DI-bound.
+  [Contract](collaboration/recipient-devices.md) and
+  [evidence](measurements/collaboration-recipient-devices-2026-10-31.json) retain
+  seven actual storage cases, 112-to-113 upgrade, pg_dump/restore ownership/RLS,
+  final 6m43s checks (30 database, 140 collaboration data, 148 API, 112 worker with
+  one existing skip), domain suites, format/architecture and 23 recovery checks.
+  Initial 53s test corrected its expected Result.Failed mutation denial; final
+  focused 28s passes. Inspect the exact hosted control after push; next connect
+  this projection to typed peer key query/claim with current admission and
+  retained-fingerprint checks before/after every provider exchange.
 
 - The exact `f104f097` room-control workflow [41206499276](https://github.com/fajarxfce/hris-platform/actions/runs/41206499276) passed every job/step, including both runtime graphs and real storage/provider checks; retained in the room-provisioning measurement.
 

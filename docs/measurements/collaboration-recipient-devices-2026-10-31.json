@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-31",
+  "kind": "scoped_public_recipient_device_projection",
+  "complete": true,
+  "productAcceptance": false,
+  "capacityAcceptance": false,
+  "databaseSchema": 113,
+  "checks": {
+    "focusedCases": 7,
+    "focusedElapsedSeconds": 28,
+    "fullGradleElapsedSeconds": 403,
+    "fullSuiteResults": {
+      "core/database": {
+        "suites": 15,
+        "tests": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "core/jobs/domain": {
+        "suites": 1,
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/identity/domain": {
+        "suites": 9,
+        "tests": 35,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/administration/domain": {
+        "suites": 3,
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/domain": {
+        "suites": 5,
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/data": {
+        "suites": 13,
+        "tests": 140,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server": {
+        "suites": 13,
+        "tests": 148,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/worker": {
+        "suites": 22,
+        "tests": 112,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      }
+    },
+    "pythonRecoveryCases": 23,
+    "format": true,
+    "architecture": true,
+    "actualPostgresqlVersion": "18.6",
+    "upgrade": "112 to 113 preserves existing devices, bindings and confirmed fingerprints",
+    "recovery": "Actual pg_dump/pg_restore into a new database in the owned PostgreSQL fixture; restricted view owner, private table RLS and current eligibility preserved"
+  },
+  "correctedFailures": [
+    {
+      "elapsedSeconds": 53,
+      "cases": 6,
+      "failures": 1,
+      "reason": "The mutation-denial test expected a thrown SQL exception; the existing transaction runner correctly maps it to Result.Failed. The corrected assertion checks that failure and all seven cases pass; no production correction was needed."
+    }
+  ],
+  "exercises": [
+    "Only self and existing direct peers in the selected active company are visible",
+    "Private registry, binding and key-publication rows remain hidden from peers",
+    "View has only five projected columns; its non-login owner cannot read token hashes, device labels or account password hashes",
+    "Runtime cannot assume the view owner role or mutate the view",
+    "Actor and peer account, membership and chat permission are checked on every read",
+    "Expired short access and old MFA do not remove an otherwise enrolled offline recipient",
+    "Hard expiry, parent revocation, device revocation and changed account security remove eligibility",
+    "Pending key reservations are not public recipient identities",
+    "Parent deletion retains device/key facts while removing the binding and recipient eligibility",
+    "Multiple current parents produce one identity; revoked parents cannot extend its deadline",
+    "Failed transaction rolls back permission removal and restores the prior projection",
+    "Empty and over-100-account requests are rejected; output has a fixed 501-row read bound and a 500-row result cap"
+  ],
+  "sourceSha256": {
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationRecipientDataSource.kt": "38af2d39a0d73fdd03e3bc1f58bf874f4df601073755153e72ba7073bdfb4d55",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationRecipientDataSource.kt": "4354112e1e7cb06f13166e9f10d2b464432a6e3b26ad5d9ac8ce7a277e6cd5a1",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationRecipientRepository.kt": "36cbd9b15e269f2bae8ec2c7f948130e174e5b3a8354258e431ec0c9750c3df0",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationRecipientStorageTest.kt": "067b9100c8921a1fcc464368aafdaa137313f723f7508e22a572cdbde197a96f",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationRecipientDevice.kt": "d62557b3e61cfcebcddc23ab4edf181dcb1ec652e4bca9452d2c8623401bd522",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationRecipientRepository.kt": "c15546a6a0938a2fb2b10803ef7aae22c10cf7a21d81445c5409ce75f9349abd",
+    "core/database/src/main/resources/db/migration/V113__collaboration_recipient_devices.sql": "643c630c2f8193cb5df862abe80ea3bda3e7a37d77639edc6d4c59a6456e5473",
+    "tool/recovery_set.py": "9d996011d6e67fa0316f63d3868fb69804b06a2f310be93e2bba73e862edf6d9",
+    "tool/test_recovery_set.py": "5aac99027ce7a4db821ca664042eda5ff56273aaa73b7530dc0420fe73af6591"
+  },
+  "limits": [
+    "Storage projection only; its port is not yet bound to a public key-query endpoint.",
+    "Current sender admission, peer/conversation checks, per-account limits, device-set completeness, provider key fingerprint checks and pre/post-network fencing remain use-case responsibilities.",
+    "Only native-parent self/direct recipients are projected; browser-parent, group and resource-context policies are not inherited.",
+    "SQL current time and the caller cutoff establish a current snapshot, not an authorization lease across provider I/O.",
+    "The existing opt-in elapsed-retention worker case remains skipped.",
+    "Live schema stays 103; no deployment, phone action or Starter port."
+  ]
+}

@@ -42,8 +42,17 @@ class StoredMembershipRepository(private val source: MembershipDataSource) : Mem
         query: String,
         after: UUID?,
         limit: Int,
+        excludedAccountId: UUID?,
     ): Result<Page<MemberReference>> = safeDatabaseCall {
-        val rows = source.activeReferences(companyId, permissions, query, after, limit + 1)
+        val rows =
+            source.activeReferences(
+                companyId,
+                permissions,
+                query,
+                after,
+                limit + 1,
+                excludedAccountId,
+            )
         Page(
             rows.take(limit).map { it.toMemberReference() },
             if (rows.size > limit) rows[limit - 1].id.toString() else null,

@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-31",
+  "scope": "CHAT-01 native company participant discovery with bounded literal search and current parent/permission/MFA/build authority",
+  "productAcceptance": false,
+  "validation": {
+    "initialFocusedDataCases": 4,
+    "initialFocusedDataFailures": 3,
+    "initialFocusedApiCases": 38,
+    "initialFocusedApiFailures": 0,
+    "initialElapsedSeconds": 85,
+    "correctedFocusedDataCases": 4,
+    "correctedFocusedApiCases": 38,
+    "correctedFocusedFailures": 0,
+    "correctedElapsedSeconds": 76,
+    "finalElapsedSeconds": 316,
+    "formatCheck": "passed",
+    "architectureCheck": "passed",
+    "finalSuites": {
+      "modules/collaboration/domain": {
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/data": {
+        "tests": 81,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/identity/domain": {
+        "tests": 35,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/identity/data": {
+        "tests": 22,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server": {
+        "tests": 181,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/worker": {
+        "tests": 111,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      }
+    },
+    "skip": "One existing opt-in ReportExportElapsedRetentionTest; unrelated to collaboration."
+  },
+  "behaviors": [
+    "Current active company members/accounts with chat permission only; self exclusion occurs in SQL before limit and cursor generation.",
+    "Three one-item pages have no duplicate/omitted eligible peer. Foreign company, inactive account/membership and missing-permission peers are excluded.",
+    "Literal percent search remains literal, query/page bounds are enforced, and positive Android/iOS client metadata is required.",
+    "No provider login, device allocation or queued job is performed. Selector response contains accountId/displayName only, not email, private profile or permission sets.",
+    "Acquired pages are withheld after native access/MFA expiry or scheduled module disablement. Invalid or revoked/replaced native parents do not acquire peer names.",
+    "Native HTTP rejects browser-only transport and missing chat permission; malformed cursor/limit are rejected. The provider fixture is intentionally unavailable while discovery succeeds.",
+    "Approval and lifecycle selectors preserve their optional-exclusion default and their post-read assurance checks."
+  ],
+  "correctedFailures": [
+    {
+      "stage": "First focused run",
+      "elapsedSeconds": 85,
+      "result": "Two assertions used native_authentication_required instead of the existing stable native_session_invalid code. A third case exposed optional missing client metadata when no minimum build was configured; the new native selector now explicitly requires a positive Android/iOS build. Corrected selection passes all four data and 38 API cases."
+    }
+  ],
+  "limits": [
+    "This endpoint selects potential contacts, not conversation or room authority. Commands must reauthorize peers; browser parent, conversation storage/control, SDK sync and UI remain to implement.",
+    "Live keyset pages are not immutable snapshots. Client query/company/account replacement must reset pagination.",
+    "No new migration, production configuration, real employee message or phone action occurred. No Starter port is due for HRIS participant policy."
+  ]
+}

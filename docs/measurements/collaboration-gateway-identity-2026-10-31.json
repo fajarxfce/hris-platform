@@ -77,5 +77,11 @@
     "Provider credentials rejected before stored expiry are surfaced as unavailability, without automatic device deletion or hidden provider retry.",
     "No production schema/service configuration, phone installation or employee messaging occurred. Current schema is still 103; repository migration ceiling remains 109.",
     "No new Matrix dependencies, native product UI, reusable Starter port, capacity or offline-chat acceptance is claimed."
-  ]
+  ],
+  "hosted": {
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41199490597",
+    "commit": "b0bf1326148d0abc5e14e27eaf2fe898f3cb46a2",
+    "conclusion": "success",
+    "allJobsAndStepsSucceeded": true
+  }
 }

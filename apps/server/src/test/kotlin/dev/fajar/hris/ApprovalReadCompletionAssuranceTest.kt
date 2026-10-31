@@ -130,7 +130,18 @@ class ApprovalReadCompletionAssuranceTest : ApprovalApiFixture() {
                     query: String,
                     after: UUID?,
                     limit: Int,
-                ) = expire(members.activeReferences(companyId, permissions, query, after, limit))
+                    excludedAccountId: UUID?,
+                ) =
+                    expire(
+                        members.activeReferences(
+                            companyId,
+                            permissions,
+                            query,
+                            after,
+                            limit,
+                            excludedAccountId,
+                        )
+                    )
             }
         val result: Result<*> =
             when (operation) {

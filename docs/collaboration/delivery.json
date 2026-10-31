@@ -41,7 +41,9 @@
         "../measurements/collaboration-gateway-storage-2026-10-31.json",
         "../measurements/collaboration-gateway-admission-2026-10-31.json",
         "../measurements/collaboration-gateway-http-2026-10-31.json",
-        "../measurements/collaboration-gateway-identity-2026-10-31.json"
+        "../measurements/collaboration-gateway-identity-2026-10-31.json",
+        "participants.md",
+        "../measurements/collaboration-participants-2026-10-31.json"
       ]
     },
     {
@@ -91,8 +93,11 @@
     {
       "id": "CHAT-01",
       "requiredBehavior": "Company-scoped employee DM from directory, profile, search and work context; active HRIS identity and admission.",
-      "status": "planned",
-      "evidence": []
+      "status": "in_progress",
+      "evidence": [
+        "participants.md",
+        "../measurements/collaboration-participants-2026-10-31.json"
+      ]
     },
     {
       "id": "CHAT-02",

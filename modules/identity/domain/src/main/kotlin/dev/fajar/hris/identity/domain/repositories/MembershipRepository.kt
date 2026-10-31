@@ -18,12 +18,14 @@ interface MembershipRepository {
 
     fun list(companyId: UUID, after: UUID?, limit: Int): Result<Page<MemberAccount>>
 
+    /** Active account/member references only; optional account exclusion precedes pagination. */
     fun activeReferences(
         companyId: UUID,
         permissions: Set<String>,
         query: String,
         after: UUID?,
         limit: Int,
+        excludedAccountId: UUID? = null,
     ): Result<Page<MemberReference>>
 
     fun candidates(

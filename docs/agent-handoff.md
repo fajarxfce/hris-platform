@@ -72,6 +72,13 @@ Current backend implementation:
   All other Matrix/Synapse paths remain denied, including sync/key/room, login,
   logout, admin and federation. This is not a complete SDK content gateway.
 
+- Native company participant discovery now supports bounded literal name search and
+  UUID pagination. SQL excludes the caller before limiting, returns account/name
+  only, and requires current active chat-enabled membership. Ordered guards and
+  completion checks cover native parent, MFA, build and scheduled policy expiry.
+  No Matrix login or device allocation is needed. [Contract](collaboration/participants.md)
+  remains a selection hint: conversation commands must authorize selected peers again.
+
 [Identity evidence](measurements/collaboration-gateway-identity-2026-10-31.json)
 records 148 passing API cases, 77 data cases, fourteen domain cases and the full
 111-case worker suite (110 pass, one unchanged opt-in retention skip). Formatting
@@ -80,6 +87,13 @@ unchanged domain/data/worker results retained incrementally. Corrected failures
 include a fixture missing its explicit Synapse start and two legacy eight-module
 assertions; catalog tests now verify all nine names and run in collaboration CI.
 No new migration was added; repository recovery ceiling remains 109.
+
+[Participant evidence](measurements/collaboration-participants-2026-10-31.json)
+records 181 API, 81 collaboration data, 14 collaboration domain, 22 identity data,
+35 identity domain and 111 worker cases (one unchanged opt-in skip). Full relevant
+selection, format and architecture checks passed in 5m16s. Corrected focused failures
+retain the stable native error code and explicitly require positive native client
+metadata. Existing approval/lifecycle selector completion checks also pass.
 
 Critical provider behavior: Synapse logout deletes the **entire device**, all its
 bearers and E2EE keys even with an expired bearer. Never use it to clean up a late
@@ -90,14 +104,13 @@ Provider ports remain private; raw provider credentials never reach clients.
 
 Next implementation:
 
-1. Inspect the identity increment's exact hosted control after push. Its local
-   results are above. HTTP/worker `c2e72935` and provider transaction `be810f1c`
-   passed every hosted job/step in [41196507714](https://github.com/fajarxfce/hris-platform/actions/runs/41196507714)
-   and [41197100773](https://github.com/fajarxfce/hris-platform/actions/runs/41197100773).
-2. Company participant discovery and authoritative conversation/member/context
-   storage/control; provider reconciliation with current scope. Then expose bounded
-   SDK key/sync/content operations with per-conversation admission, cancellation
-   and response fencing. A WHOAMI/refresh endpoint does not authorize room contents.
+1. Inspect the participant increment's exact hosted control after push. Identity
+   `b0bf1326` passed every hosted job/step in [41199490597](https://github.com/fajarxfce/hris-platform/actions/runs/41199490597).
+   HTTP/worker `c2e72935` and provider transaction `be810f1c` also passed hosted controls.
+2. Authoritative conversation/member/context storage/control and provider
+   reconciliation with current scope. Then expose bounded SDK key/sync/content
+   operations with per-conversation admission, cancellation and response fencing.
+   Participant discovery and WHOAMI/refresh do not authorize room contents.
 3. Native/web SDK adapters, browser-parent admission, owned encrypted stores and
    durable chat UI/outbox/recipient reconciliation. Restore each SDK client only
    once; use standard refresh. Persist logical IDs before queueing, retain every

@@ -17,6 +17,7 @@ interface MembershipDataSource {
         query: String,
         after: UUID?,
         limit: Int,
+        excludedAccountId: UUID?,
     ): List<MemberReferenceRow>
 
     fun candidates(

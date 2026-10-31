@@ -75,6 +75,78 @@ class NativeCollaborationMatrixConfigurationTest : NativeCollaborationApiFixture
         )
     }
 
+    @Test
+    fun participantsAreNativeOnlyCompanyScopedPublicReferencesWithoutProviderCalls() {
+        val n = native()
+        val peer = UUID.randomUUID()
+        database()
+            .update(
+                "insert into accounts(id,email,display_name) values(?,?,'Fictional chat participant')",
+                peer,
+                "$peer@example.test",
+            )
+        database()
+            .update(
+                "insert into company_memberships(company_id,account_id) values(?,?)",
+                n.fixture.company,
+                peer,
+            )
+        database()
+            .update(
+                "insert into membership_permissions(company_id,account_id,permission) values(?,?,'collaboration.chat')",
+                n.fixture.company,
+                peer,
+            )
+        val path = "${n.fixture.root}/collaboration/participants"
+        fun read(suffix: String = "") =
+            n.fixture.browser.send(
+                HttpRequest.newBuilder(URI("http://127.0.0.1:$port$path$suffix"))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Authorization", "Bearer ${n.access}")
+                    .header("X-HRIS-Client-Platform", "ANDROID")
+                    .header("X-HRIS-Client-Build", "1")
+                    .GET()
+                    .build(),
+                HttpResponse.BodyHandlers.ofString(),
+            )
+        val response = read("?query=Fictional&limit=1")
+        assertEquals(200, response.statusCode(), response.body())
+        assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+        val result = json.readTree(response.body())
+        assertEquals(setOf("items", "nextCursor"), result.propertyNames().toSet())
+        assertEquals(1, result["items"].size())
+        assertEquals(setOf("accountId", "displayName"), result["items"][0].propertyNames().toSet())
+        assertEquals(peer.toString(), result["items"][0]["accountId"].asString())
+        assertTrue(result["nextCursor"].isNull)
+        assertFalse(response.body().contains("example.test"))
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_devices where company_id=?",
+                    Int::class.java,
+                    n.fixture.company,
+                ),
+        )
+        failure(get(n.fixture.browser, path), 403, "invalid_session_transport")
+        failure(read("?limit=51"), 422, "invalid_collaboration_participant_query")
+        assertEquals(400, read("?after=invalid").statusCode())
+        database()
+            .update(
+                "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                n.fixture.company,
+                peer,
+            )
+        assertEquals(0, json.readTree(read().body())["items"].size())
+        database()
+            .update(
+                "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                n.fixture.company,
+                n.fixture.account,
+            )
+        failure(read(), 403, "access_denied")
+    }
+
     private fun enroll(n: Native): UUID {
         val registered = register(n)
         assertEquals(200, registered.statusCode(), registered.body())

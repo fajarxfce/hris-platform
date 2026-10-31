@@ -261,7 +261,18 @@ class PeopleReadCompletionTest : LifecycleApiFixture() {
                     query: String,
                     after: UUID?,
                     limit: Int,
-                ) = acquired(members.activeReferences(companyId, permissions, query, after, limit))
+                    excludedAccountId: UUID?,
+                ) =
+                    acquired(
+                        members.activeReferences(
+                            companyId,
+                            permissions,
+                            query,
+                            after,
+                            limit,
+                            excludedAccountId,
+                        )
+                    )
             }
         fun read(selected: Actor): Result<*> =
             when (mode) {

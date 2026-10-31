@@ -141,6 +141,32 @@ class CollaborationConfiguration {
         )
 
     @Bean
+    fun listNativeCollaborationParticipants(
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        ListNativeCollaborationParticipants(
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
     fun getNativeCollaborationMatrixIdentity(
         gateway: CollaborationGatewaySessionRepository,
         registry: CollaborationRegistryRepository,

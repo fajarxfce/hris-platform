@@ -26,6 +26,7 @@ import dev.fajar.hris.identity.data.datasources.*
 import dev.fajar.hris.identity.data.repositories.*
 import dev.fajar.hris.identity.domain.entities.IdentitySecurityPolicy
 import dev.fajar.hris.identity.domain.repositories.IdentityRepository
+import dev.fajar.hris.identity.domain.repositories.MembershipRepository
 import dev.fajar.hris.jobs.data.datasources.PostgresJobDataSource
 import dev.fajar.hris.jobs.data.repositories.PostgresJobRepository
 import dev.fajar.hris.jobs.domain.entities.*
@@ -1683,6 +1684,204 @@ class NativeCollaborationRegistrationTest {
         assertEquals(0, matrix.queries.get())
     }
 
+    @Test
+    fun participantsAreOnlyEligibleCompanyPeersAndPaginationExcludesSelfBeforeLimiting() {
+        val f = Fixture()
+        val parent = f.parent()
+        val expected = List(3) { f.peer("Fictional peer $it") }.sortedBy(UUID::toString)
+        f.peer("Fictional no permission", grant = false)
+        f.peer("Fictional inactive account", active = false)
+        f.peer("Fictional inactive membership", memberActive = false)
+        f.peer("Fictional other company", company = f.company())
+        var after: UUID? = null
+        val seen = mutableListOf<UUID>()
+        repeat(3) { index ->
+            val page =
+                success(
+                    f.participants()
+                        .execute(
+                            f.actor,
+                            parent,
+                            0,
+                            ClientVersion(ClientPlatform.ANDROID, 1),
+                            " Fictional ",
+                            after,
+                            1,
+                        )
+                )
+            assertEquals(1, page.items.size)
+            seen.add(page.items.single().accountId)
+            assertEquals(expected[index], seen.last())
+            assertTrue(page.items.single().displayName.startsWith("Fictional peer"))
+            if (index == 2) assertNull(page.nextCursor)
+            else assertEquals(seen.last().toString(), page.nextCursor)
+            after = page.nextCursor?.let(UUID::fromString)
+        }
+        assertEquals(expected, seen)
+        assertFalse(f.account in seen)
+        assertEquals(0, f.rows("collaboration_devices"))
+        assertEquals(0, f.rows("background_jobs"))
+    }
+
+    @Test
+    fun participantSearchUsesLiteralTextAndBoundsWithoutRequiringProviderEnrollment() {
+        val f = Fixture()
+        val parent = f.parent()
+        val matching = f.peer("Fictional 100% peer")
+        f.peer("Fictional 100X peer")
+        val request = f.participants()
+        val client = ClientVersion(ClientPlatform.ANDROID, 1)
+        assertEquals(
+            listOf(matching),
+            success(request.execute(f.actor, parent, 0, client, "%", null, 50)).items.map {
+                it.accountId
+            },
+        )
+        for ((query, limit) in
+            listOf("" to 0, "" to 51, "a".repeat(81) to 30, "bad\nquery" to 30)) assertEquals(
+            "invalid_collaboration_participant_query",
+            failed(request.execute(f.actor, parent, 0, client, query, null, limit)),
+        )
+        for (invalid in
+            listOf(
+                null,
+                ClientVersion(ClientPlatform.WEB, 1),
+                ClientVersion(ClientPlatform.ANDROID, 0),
+            )) assertEquals(
+            "invalid_client_version",
+            failed(request.execute(f.actor, parent, 0, invalid, "", null, 30)),
+        )
+        assertEquals(
+            "collaboration_unavailable",
+            failed(
+                f.participants(provider = CollaborationMatrixPolicy(false, ""))
+                    .execute(f.actor, parent, 0, client, "", null, 30)
+            ),
+        )
+    }
+
+    @Test
+    fun participantReadWithholdsAcquiredPageWhenAccessMfaOrScheduledPolicyExpires() {
+        for (mode in listOf("access", "mfa", "policy")) {
+            val f = Fixture()
+            val parent = f.parent()
+            f.peer("Fictional peer")
+            val boundary = f.clock.at.plusSeconds(2)
+            val security =
+                IdentitySecurityPolicy(
+                    enforceMfa = mode == "mfa",
+                    maximumMfaAge = Duration.ofSeconds(2),
+                    recentAuthenticationAge = Duration.ofSeconds(1),
+                )
+            val actor = if (mode == "mfa") f.actor.copy(mfaVerifiedAt = f.clock.at) else f.actor
+            when (mode) {
+                "access" ->
+                    sql.update(
+                        "update native_sessions set access_expires_at=? where id=?",
+                        boundary.atOffset(ZoneOffset.UTC),
+                        parent,
+                    )
+                "policy" ->
+                    f.policy(
+                        ClientPolicy(disabledModules = setOf(CompanyModule.COLLABORATION)),
+                        boundary,
+                    )
+                "mfa" -> {
+                    sql.update(
+                        "update accounts set mfa_secret_encrypted='fictional-enrolled' where id=?",
+                        f.account,
+                    )
+                    sql.update(
+                        "update native_sessions set mfa_verified_at=? where id=?",
+                        f.clock.at.atOffset(ZoneOffset.UTC),
+                        parent,
+                    )
+                }
+            }
+            val members =
+                object : MembershipRepository by f.members {
+                    override fun activeReferences(
+                        companyId: UUID,
+                        permissions: Set<String>,
+                        query: String,
+                        after: UUID?,
+                        limit: Int,
+                        excludedAccountId: UUID?,
+                    ) =
+                        f.members
+                            .activeReferences(
+                                companyId,
+                                permissions,
+                                query,
+                                after,
+                                limit,
+                                excludedAccountId,
+                            )
+                            .also { f.clock.at = boundary }
+                }
+            val result =
+                f.participants(members, security)
+                    .execute(
+                        actor,
+                        parent,
+                        0,
+                        ClientVersion(ClientPlatform.ANDROID, 1),
+                        "",
+                        null,
+                        30,
+                    )
+            assertEquals(
+                when (mode) {
+                    "mfa" -> "mfa_required"
+                    "policy" -> "company_module_disabled"
+                    else -> "native_session_invalid"
+                },
+                failed(result),
+            )
+        }
+    }
+
+    @Test
+    fun participantDiscoveryRejectsRevokedOrReplacedNativeParentsBeforeReadingPeers() {
+        for (revoke in listOf(true, false)) {
+            val f = Fixture()
+            val parent = f.parent()
+            if (revoke)
+                sql.update(
+                    "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                    parent,
+                )
+            else sql.update("update native_sessions set version=version+1 where id=?", parent)
+            val members =
+                object : MembershipRepository by f.members {
+                    override fun activeReferences(
+                        companyId: UUID,
+                        permissions: Set<String>,
+                        query: String,
+                        after: UUID?,
+                        limit: Int,
+                        excludedAccountId: UUID?,
+                    ): Result<Page<dev.fajar.hris.identity.domain.entities.MemberReference>> =
+                        error("Denied parent must not acquire participant names")
+                }
+            assertEquals(
+                "native_session_invalid",
+                failed(
+                    f.participants(members)
+                        .execute(
+                            f.actor,
+                            parent,
+                            0,
+                            ClientVersion(ClientPlatform.ANDROID, 1),
+                            "",
+                            null,
+                            30,
+                        )
+                ),
+            )
+        }
+    }
+
     private class GatewayFixture {
         val f = Fixture()
         val parent = f.parent()
@@ -1757,7 +1956,7 @@ class NativeCollaborationRegistrationTest {
             )
         private val companies =
             StoredCompanyRepository(PostgresCompanyDataSource(dsl), receipts, json)
-        private val members = StoredMembershipRepository(PostgresMembershipDataSource(dsl))
+        val members = StoredMembershipRepository(PostgresMembershipDataSource(dsl))
         val provisioning =
             StoredCollaborationProvisioningRepository(
                 PostgresCollaborationProvisioningDataSource(dsl)
@@ -1836,6 +2035,54 @@ class NativeCollaborationRegistrationTest {
             )
             return id
         }
+
+        fun peer(
+            name: String,
+            company: UUID = requireNotNull(actor.companyId),
+            grant: Boolean = true,
+            active: Boolean = true,
+            memberActive: Boolean = true,
+        ): UUID {
+            val id = UUID.randomUUID()
+            sql.update(
+                "insert into accounts(id,email,display_name,active) values(?,?,?,?)",
+                id,
+                "$id@example.test",
+                name,
+                active,
+            )
+            sql.update(
+                "insert into company_memberships(company_id,account_id,active) values(?,?,?)",
+                company,
+                id,
+                memberActive,
+            )
+            if (grant)
+                sql.update(
+                    "insert into membership_permissions(company_id,account_id,permission) values(?,?,'collaboration.chat')",
+                    company,
+                    id,
+                )
+            return id
+        }
+
+        fun participants(
+            members: MembershipRepository = this.members,
+            security: IdentitySecurityPolicy = IdentitySecurityPolicy(),
+            provider: CollaborationMatrixPolicy = CollaborationMatrixPolicy(true, "proof.invalid"),
+        ) =
+            ListNativeCollaborationParticipants(
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                transactions,
+                security,
+                CollaborationServicePolicy(true),
+                provider,
+                clock,
+            )
 
         fun command(
             journal: ChangeJournalRepository = this.journal,

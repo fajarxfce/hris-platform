@@ -53,6 +53,7 @@ class PostgresMembershipDataSource(private val sql: DSLContext) : MembershipData
         query: String,
         after: UUID?,
         limit: Int,
+        excludedAccountId: UUID?,
     ): List<MemberReferenceRow> =
         sql.select(A.ID, A.DISPLAY_NAME)
             .from(M)
@@ -63,6 +64,7 @@ class PostgresMembershipDataSource(private val sql: DSLContext) : MembershipData
             .and(A.ACTIVE.isTrue)
             .and(A.DISPLAY_NAME.containsIgnoreCase(query))
             .and(after?.let { A.ID.gt(it) } ?: DSL.noCondition())
+            .and(excludedAccountId?.let { A.ID.ne(it) } ?: DSL.noCondition())
             .and(
                 DSL.exists(
                     sql.selectOne()

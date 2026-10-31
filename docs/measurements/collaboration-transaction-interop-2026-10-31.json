@@ -45,5 +45,11 @@
   "upstreamSource": {
     "url": "https://github.com/element-hq/synapse/blob/v1.164.1/synapse/storage/databases/main/events_worker.py",
     "sha256": "9d9e1b6dad5f3bf1fa112695d7283342a1a74a4afa08a90375b4822f558e0871"
+  },
+  "hosted": {
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41197100773",
+    "commit": "be810f1c736bfca9251e52321d8744031b21ed34",
+    "conclusion": "success",
+    "allJobsAndStepsSucceeded": true
   }
 }

@@ -6,6 +6,7 @@ on:
     branches: [main, feat/communications]
     paths:
       - modules/collaboration/**
+      - apps/server/src/test/kotlin/dev/fajar/hris/ClientPolicy*
       - apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaboration*
       - apps/server/src/test/resources/matrix-signing.fixture
       - apps/server/src/main/kotlin/dev/fajar/hris/availability/**
@@ -31,6 +32,7 @@ on:
   pull_request:
     paths:
       - modules/collaboration/**
+      - apps/server/src/test/kotlin/dev/fajar/hris/ClientPolicy*
       - apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaboration*
       - apps/server/src/test/resources/matrix-signing.fixture
       - apps/server/src/main/kotlin/dev/fajar/hris/availability/**
@@ -75,7 +77,7 @@ jobs:
       - name: Verify policies, actual PostgreSQL isolation and backup recovery
         run: ./gradlew formatCheck :core:database:test :core:jobs:domain:test :modules:identity:domain:test :modules:administration:domain:test :modules:collaboration:domain:test :modules:collaboration:data:test --no-daemon
       - name: Verify API contracts, native transport and shared worker context
-        run: ./gradlew :apps:server:test --tests '*NativeCollaboration*Test' --tests '*ApiContractHttpTest' :apps:worker:test --no-daemon
+        run: ./gradlew :apps:server:test --tests '*NativeCollaboration*Test' --tests '*ApiContractHttpTest' --tests '*ClientPolicy*Test' :apps:worker:test --no-daemon
       - uses: actions/upload-artifact@v4
         if: always()
         with:

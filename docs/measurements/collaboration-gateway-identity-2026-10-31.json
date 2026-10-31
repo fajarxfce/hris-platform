@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-31",
+  "scope": "P1 fixed Matrix identity gateway, fenced internal provider renewal, bounded transport and current HRIS admission",
+  "productAcceptance": false,
+  "validation": {
+    "firstFocusedCases": 18,
+    "firstFocusedFailures": 1,
+    "firstFocusedElapsedSeconds": 43,
+    "correctedFocusedDataCases": 18,
+    "correctedFocusedApiCases": 3,
+    "correctedFocusedFailures": 0,
+    "correctedFocusedElapsedSeconds": 48,
+    "finalSuites": {
+      "modules/collaboration/data": {
+        "tests": 77,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server": {
+        "tests": 148,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/worker": {
+        "tests": 111,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      "modules/collaboration/domain": {
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "finalSelectionElapsedSeconds": 219,
+    "format": true,
+    "architecture": true,
+    "incrementalChecks": "Final successful selection re-ran the 148 API cases after the two test-only catalog corrections. The 77 data, fourteen domain and complete worker graph had passed with the same production source in the preceding selection and were Gradle up-to-date."
+  },
+  "behaviors": [
+    "Opaque gateway access-token lookup only identifies the company/account/device/native-parent head; every request reacquires current HRIS permission, policy, MFA, client build, native and device authority.",
+    "The fixed provider WHOAMI route uses only an internal bearer and holds no SQL transaction; response publication reacquires all current authority and fences captured versions/deadlines.",
+    "Concurrent internal JWT logins publish one encrypted credential generation. Losing candidates expire without logging out the winning E2EE device.",
+    "Public refresh during internal login prevents stale publication. Native refresh during a query invalidates only the old observation; a new query using the retained gateway can succeed.",
+    "Late permission removal, parent revocation, access expiry and scheduled company disablement suppress provider results. Failed login/query responses also give current HRIS denial precedence.",
+    "Publication, safe generation-only audit and outbox roll back on final admission failure. Interrupted login never publishes its candidate.",
+    "Real pinned Synapse identity acquisition/reuse runs with actual PostgreSQL. HTTP/security tests separately use a private owned HTTP provider and a fixture-controlled activation transition.",
+    "Public identity requires one Authorization header, rejects cookies/native tokens as substitute authority, duplicate headers, query parameters and known/chunked bodies, and returns only no-store protocol identity.",
+    "All private HTTP exchanges share 32 immediate permits, no waiting queue, fixed origins, no redirects, a five-second maximum and bounded 64 KiB response. Interruption releases a saturated permit.",
+    "Two legacy client-policy HTTP assertions now check the explicit nine-module catalog including COLLABORATION; the collaboration CI includes these tests."
+  ],
+  "correctedFailures": [
+    {
+      "stage": "First focused selection",
+      "elapsedSeconds": 43,
+      "result": "One of eighteen cases failed because the owned Synapse fixture had not been started before reading its repository. Added its explicit start; the provider and HTTP selection then passed."
+    },
+    {
+      "stage": "Expanded API selection",
+      "elapsedSeconds": 284,
+      "result": "Two old client-policy tests expected eight enabled modules after schema 105 added the ninth. Other 77 API cases, 77 data cases, fourteen domain cases and 110 worker cases passed; one existing retention case skipped."
+    },
+    {
+      "stage": "Explicit catalog assertion",
+      "result": "Jackson 3 JsonNode.map applies to the node, not its array children. Switched the two assertions to iterator/asSequence before mapping strings.",
+      "elapsedSeconds": 291,
+      "otherSuites": "148 API cases: 146 pass, two assertion failures; 77 collaboration data and fourteen domain cases pass; worker has 110 passes and the one existing opt-in retention skip."
+    }
+  ],
+  "limits": [
+    "Only fixed identity GET and standard refresh POST are exposed. No Matrix sync, key API, room/content operation, public login/logout/admin/federation or browser-parent gateway is enabled.",
+    "The private fixture controls API activation; worker/Synapse provisioning is independently verified by existing worker integration tests.",
+    "Provider credentials rejected before stored expiry are surfaced as unavailability, without automatic device deletion or hidden provider retry.",
+    "No production schema/service configuration, phone installation or employee messaging occurred. Current schema is still 103; repository migration ceiling remains 109.",
+    "No new Matrix dependencies, native product UI, reusable Starter port, capacity or offline-chat acceptance is claimed."
+  ]
+}

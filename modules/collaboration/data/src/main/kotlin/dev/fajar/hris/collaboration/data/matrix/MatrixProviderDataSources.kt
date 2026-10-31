@@ -9,8 +9,12 @@ interface MatrixJwtDataSource {
 interface MatrixClientDataSource {
     fun login(jwt: String, deviceId: String, deadline: Instant): MatrixLoginData
 
+    fun whoAmI(accessToken: String, deadline: Instant): MatrixIdentityData
+
     fun logoutDevice(accessToken: String)
 }
+
+data class MatrixIdentityData(val userId: String, val deviceId: String, val isGuest: Boolean)
 
 class MatrixLoginData(
     val userId: String,

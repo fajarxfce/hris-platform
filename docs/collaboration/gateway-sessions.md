@@ -1,4 +1,4 @@
-# Native Matrix gateway credential storage
+# Native Matrix gateway
 
 Schema 109 stores one HRIS gateway credential head per company/account/device.
 The public access and refresh values are separate 256-bit opaque credentials;
@@ -46,10 +46,10 @@ role. The trigger forbids changing other facts during this cleanup and takes no
 reverse device lock. Application clock drift cannot clear a cache before the
 database clock says it has expired.
 
-This increment supplies storage and recovery, not a publicly usable Matrix
-endpoint. Bootstrap/refresh admission, the protected bounded provider gateway,
-maintenance scheduling, SDK wiring, product chat and browser parents still need
-implementation. No provider bearer is returned by these repositories.
+The original storage increment is now wired to bootstrap/refresh and bounded
+maintenance as described below. SDK content synchronization, product chat and
+browser parents still need implementation. Internal provider credentials remain
+separate from public gateway credentials.
 
 ## Native bootstrap and standard refresh admission
 
@@ -113,10 +113,9 @@ with `soft_logout`, permission failure uses `M_FORBIDDEN`, and rotation bounds u
 for caching/diagnostics: no-store and explicit redacted representations.
 
 An ordered stateless Matrix security chain bypasses native-bearer/cookie parsing.
-Only POST refresh is currently permitted. All other `/_matrix/**` and
-`/_synapse/**` routes, including login, logout, admin, federation and sync, are
-denied. This is not yet a usable SDK sync/content gateway. The private provider
-is not proxied by these endpoints.
+POST refresh and the fixed GET identity operation described below are permitted.
+All other `/_matrix/**` and `/_synapse/**` routes, including login, logout, admin,
+federation and sync, are denied. This is not yet a usable SDK sync/content gateway.
 
 The worker owns one fixed-delay cleanup task, one timer thread and at most one
 100-row transaction per pass. It defaults to five seconds and remains eligible
@@ -130,3 +129,56 @@ per-session jobs or unbounded draining loop are created.
 The [provider transaction-retention gate](provider-transaction-retention.md) is
 required before offline send acceptance. Gateway credential replay and Matrix
 message deduplication are separate contracts.
+
+## Protected provider identity request
+
+`GET /_matrix/client/v3/account/whoami` accepts exactly one Authorization bearer
+header containing the HRIS gateway access token. Native HRIS credentials and
+browser cookies cannot replace it. Duplicate headers, query parameters and
+request bodies (including chunked bodies) are rejected. Only the validated
+`user_id`, `device_id` and `is_guest=false` projection is returned, with no-store.
+No untrusted URL/path/header is forwarded to the provider.
+
+`GetNativeCollaborationMatrixIdentity` resolves the opaque hash in its own lookup
+transaction, then reacquires company policy, company, memberships, account,
+native parent, device, gateway head and internal provider credential in order.
+Both service flags must be enabled. It uses the head's platform/build and live
+parent credential/MFA facts, checks current permissions/expiry and requires the
+same head version. The initial admission deadline also clamps to public gateway
+access expiry. Neither the token lookup nor an earlier bootstrap grants access.
+
+The fixed private WHOAMI exchange holds no SQL locks. Afterwards every HRIS
+authority is reacquired and the captured device/parent/credential versions and
+deadlines are checked before returning either success or provider failure.
+Foreign identities or guest responses are rejected. A native refresh between
+requests preserves the gateway; one that races an in-flight request invalidates
+that request's earlier observation. The stale observation returns
+`collaboration_admission_changed` as temporary unavailability. Current permission,
+MFA and revocation failures keep their own denial classification; an ordinary
+refresh must not masquerade as permanent access removal.
+
+An absent or nearly expired internal credential (ten seconds or less remaining)
+is renewed through private JWT login outside SQL. Publication repeats live
+admission, head and provider-generation checks. Competing candidates publish
+one generation; a loser can use that current winner. Otherwise it returns a
+failure without overwriting or logging out the winner. Unused candidates expire
+privately. Credential publication and its generation-only audit/outbox record
+roll back together on final admission failure. No public gateway rotation is
+performed as a side effect, and no participant private key is generated here.
+
+The shared private HTTP adapter caps concurrent exchanges at 32 without a waiting
+queue. Capacity exhaustion returns a bounded retry hint. A permit covers the
+request and bounded response read, and is released on failure, timeout or
+interruption. Login, identity and irreversible device logout share that cap.
+The fixed origin, no-redirect policy, five-second maximum exchange and 64 KiB
+response cap remain in force. This is a resource bound, not a capacity result.
+
+Verification includes actual pinned Synapse identity acquisition/reuse and
+PostgreSQL authority/rotation races, plus an owned HTTP provider in the actual
+API graph. The HTTP fixture simulates the earlier activation transition; it does
+not replace the separate worker/Synapse provisioning proof. See the
+[identity evidence](../measurements/collaboration-gateway-identity-2026-10-31.json)
+for exact tests, failures corrected and scope. No sync, key API, room/content or
+browser-parent admission is exposed by this increment. A private provider token
+rejected before its stored expiry is reported as provider unavailability; it is
+not silently retried or used to delete/recreate a device.

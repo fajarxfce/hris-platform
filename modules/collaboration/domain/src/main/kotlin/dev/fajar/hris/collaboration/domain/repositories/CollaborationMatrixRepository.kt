@@ -2,6 +2,7 @@ package dev.fajar.hris.collaboration.domain.repositories
 
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.core.domain.Result
+import java.time.Instant
 
 /**
  * Internal provider I/O, outside SQL transactions. No retry or public credential publication. A
@@ -12,6 +13,8 @@ import dev.fajar.hris.core.domain.Result
  */
 interface CollaborationMatrixRepository {
     fun login(request: CollaborationMatrixLogin): Result<CollaborationMatrixCredential>
+
+    fun whoAmI(accessToken: String, deadline: Instant): Result<CollaborationMatrixIdentity>
 
     /** Only after irreversible HRIS device revocation. Deletes the provider device and its keys. */
     fun logoutDevice(accessToken: String): Result<Unit>

@@ -2,208 +2,115 @@
 
 ## Active collaboration implementation — 31 October 2026
 
-The user approved [the full collaboration plan](collaboration/prd.md) and requested
-implementation, atomic commits, a push after every commit, and continued work
-through completion. All three repositories use `feat/communications`. Platform
-started at `1363abee`, Mobile at `7e12251a`, Starter at `44d164c`.
-[Delivery](collaboration/delivery.json) tracks all 54 feature groups and P0–P8;
-**no product feature group is accepted yet**. Continue implementation; completing
-an infrastructure checkpoint does not complete chat/calls/meetings.
+The user approved [the full collaboration plan](collaboration/prd.md), atomic
+commits, a push after every commit and continued P0–P8 implementation. All three
+repositories use `feat/communications` (Platform base `1363abee`, Mobile base
+`7e12251a`, Starter base `44d164c`). [Delivery](collaboration/delivery.json) tracks
+54 feature groups; **none is accepted yet**. Infrastructure checkpoints do not
+complete chat/calls/meetings. Continue implementation without treating these
+checks as the end of the task.
 
-Read the [architecture](collaboration/architecture.md),
-[threat model](collaboration/threat-model.md), [admission contracts](collaboration/admission.md)
-and [checkpoint history](collaboration/implementation-history-2026-10-31.md).
-The latter retains earlier measurements and corrected failures without making
-its old next-step paragraphs the current queue.
+Read [architecture](collaboration/architecture.md), [threat model](collaboration/threat-model.md),
+[admission](collaboration/admission.md), [gateway contracts](collaboration/gateway-sessions.md)
+and the delivery evidence. Earlier detailed checkpoints remain in
+[implementation history](collaboration/implementation-history-2026-10-31.md) and Git.
 
-Current implementation:
+Current provider/client evidence:
 
-- P0: actual Matrix/LiveKit browser E2EE exchange/media and wrong-key rejection;
-  actual Matrix Rust Android ↔ browser encrypted exchange and standard SDK
-  refresh preserving the signing key. Mobile `d799e5cf` passed
-  hosted refresh run `41187875527`; `aeb0f6b5` records the artifact. Apple binding/
-  encrypted-store checks and iOS compilation passed, but actual Apple provider
-  interoperability and native media remain unverified. The media experiment's
-  custom encrypted key event is **not MatrixRTC protocol acceptance**.
-- P1 schemas 104–108: retained company/account/device identity plus native parent
-  binding, independent company availability, encrypted bounded provider credential
-  storage with authenticated expiry/generation, and an atomic durable provisioning
-  queue. `collaboration.chat` is an explicit membership permission; never rewrite
-  existing membership or role snapshots to grant it implicitly.
-- Native registration HTTP is `POST /api/v1/companies/{companyId}/collaboration/native-device`.
-  It requires native transport, client headers and idempotency, records a pending
-  device and queues work atomically. Five distinct live native parents count
-  across owned companies. Ordinary access expiry retains the device/owned history.
-- Activation prepares under current HRIS authority and its job lease, releases
-  SQL guards for private Matrix I/O, then repeats authority/version/deadline/fence
-  checks before committing credential, active device, progress, completion,
-  audit/outbox together. Stale workers cannot overwrite a winner. Abort stops
-  only the owned job. The exact activation source `4600a294` passed both hosted
-  control jobs in [41191206775](https://github.com/fajarxfce/hris-platform/actions/runs/41191206775),
-  including full API/worker contexts and final scheduled-policy case.
-- Provider settings, application-owned HTTP client, encrypted repository and
-  `CollaborationProvisioningTask` are now wired. Both `HRIS_COLLABORATION_ENABLED`
-  and `HRIS_MATRIX_ENABLED` must be true. Missing identity keyring/signing file or
-  invalid settings fail startup; disabled provider allocates no client/task.
-  The actual worker fixture exercises PostgreSQL claiming, persistent Spring
-  Batch, pinned Synapse and outage/recovery. The final combined check passed in
-  4m28s: four settings cases, 77 API cases and 109 worker cases (108 pass, one
-  unchanged opt-in retention skip), formatting and architecture. Compose syntax
-  also passes. [Worker evidence](measurements/collaboration-provider-worker-2026-10-31.json)
-  retains both corrected fixture failures and precise scope. Exact `d387ab67`
-  passed complete hosted control [41192185771](https://github.com/fajarxfce/hris-platform/actions/runs/41192185771).
-- Native setup status and explicit retry are implemented on the registration route
-  (GET and POST `/retry`). Status exposes only owned safe metadata. Retry checks
-  native/company/permission/MFA/client authority, observed device/pointer versions,
-  terminal failed/cancelled job, a one-minute enqueue bound and queue capacity.
-  It creates one new job and increments the pointer atomically with receipt/audit/
-  outbox; the device identity/version does not change. Receipt ID is the new job,
-  not a new device. Replay after native refresh returns the same job. Twenty-four
-  PostgreSQL data cases and three new HTTP cases pass (51s), including raced retry,
-  rollback and actual restore of the old failed/new queued job with pointer v1.
-  Full contexts pass in 4m22s: 80 API and 108 worker passes plus the one existing
-  opt-in retention skip; eleven unchanged admission cases, formatting/architecture
-  also pass. [Retry evidence](measurements/collaboration-native-retry-2026-10-31.json)
-  retains the corrected replay-flag fixture assertion.
+- Actual Matrix/LiveKit browser E2EE exchange/media and wrong-key rejection pass.
+  The experiment's custom encrypted media-key event is **not MatrixRTC acceptance**.
+- Android SDK 26.10.23 ↔ browser encrypted text, standard credential refresh and
+  unchanged signing key pass. The latest extra-content/paused SDK queue proof
+  preserves `org.hris.message_id` inside encryption and the SDK's local transaction
+  through its server receipt. Local two-scenario run: 29.090s with cleanup.
+  Mobile `e8a5ceb3` passed every hosted step in [41198048864](https://github.com/fajarxfce/hris-mobile/actions/runs/41198048864),
+  two scenarios in 84.382s; `6bc502a0` records source/APK hashes. Driver is Platform
+  `d0731afe`. Use asynchronous client-level queue control: synchronous room queue
+  control failed in this binding. Root/debug/lint checks pass with 2,002 desktop
+  cases and no lint errors. [Queue evidence](measurements/collaboration-native-logical-queue-2026-10-31.json)
+  retains corrected failures; durable process restart/recipient coalescing remain.
+- Swift SDK 26.10.27 native encrypted-store reopening/wrong-key checks and iOS
+  compilation passed; actual Apple provider interoperability/native media remain
+  unverified. Physical iPhone acceptance is waived, not inferred from compilation.
+- Pinned Synapse 1.164.1 deduplicates a transaction by room/user/device only while
+  its retained mapping exists. Actual same-device bearer replacement deduplicates;
+  fixture aging/cleanup/restart permits duplicates. A peer receives no transaction
+  ID. [Retention evidence](collaboration/provider-transaction-retention.md) requires
+  durable encrypted logical IDs, scoped recipient coalescing, event aliases and
+  tombstones. Never assume unlimited provider deduplication.
 
-Schema 109 now supplies [native gateway credential storage](collaboration/gateway-sessions.md):
-one retained head/device, opaque gateway-token hashes and one authenticated encrypted
-bootstrap/refresh response cache. Concurrent rotation, losing response replay,
-explicit bootstrap/build change, RLS lookup isolation, bounded SKIP LOCKED cache
-cleanup and real old/current-key restore pass nine PostgreSQL cases. Public bootstrap/refresh is
-wired as described below; the protected provider proxy remains pending. Cache cleanup retains its
-expired nonsecret deadline for PostgreSQL post-update RLS visibility. See
-[gateway evidence](measurements/collaboration-gateway-storage-2026-10-31.json) for
-validation (nine gateway, 29 database, 23 recovery cases; format/architecture;
-final JVM selection 2m35s) and the corrected timestamp-binding/RLS failures. The earlier status/
-retry source `b938d48c` passed every job/step in hosted control
-[41193061956](https://github.com/fajarxfce/hris-platform/actions/runs/41193061956).
+Current backend implementation:
 
-Native gateway bootstrap and standard refresh use cases now enforce current HRIS
-parent/company/chat/MFA/build authority, observed bootstrap versions and bounded
-idempotent replay. Gateway access lasts five minutes, replay 30 seconds, rotation
-at least ten seconds apart. A stale request cannot revoke the winner's device.
-Receipts contain no secrets; issuance/receipt/audit/outbox roll back on final
-admission failure. The initial selection passed 43 PostgreSQL and eleven domain
-cases in 79s. Final single-instant response validation passed 34 PostgreSQL and
-thirteen domain cases in 45s, formatting/architecture. [Admission evidence](measurements/collaboration-gateway-admission-2026-10-31.json)
-records scope. HTTP/DI/status/cache cleanup are now implemented as described below;
-protected provider requests and SDK integration remain next.
+- Schemas 104–108 retain company/account/device/native-parent identity, independent
+  COLLABORATION availability, authenticated encrypted internal provider credentials
+  with expiry/generation, and an atomic provisioning queue/pointer. Five distinct
+  live native parents count across companies. Ordinary access expiry retains owned
+  device/history facts. `collaboration.chat` is explicit; never rewrite historical
+  role/member snapshots to grant it.
+- Native registration `POST /api/v1/companies/{companyId}/collaboration/native-device`
+  requires native transport, client headers, idempotency and current HRIS authority.
+  GET exposes safe status; POST `/retry` requires observed device/pointer versions
+  and terminal failed/cancelled pending work, with a one-minute bound. Activation
+  locks/prepares, releases SQL for private Matrix login, then fences current
+  admission, job lease, pointer and credential before atomic publication/completion.
+  Actual worker/PostgreSQL/Synapse outage/recovery and owned shutdown are verified.
+- Schema 109 stores one public gateway head/device, opaque token hashes and one
+  bounded encrypted response cache. POST native `/bootstrap` requires observed
+  versions/idempotency; POST `/_matrix/client/v3/refresh` uses only the standard
+  JSON refresh token. Five-minute access, 30-second replay, ten-second rotation
+  minimum; native access/MFA/current policy remain required. Worker cleanup clears
+  at most 100 expired caches every five seconds, with cancellation/rollback and
+  retained generation. Storage, concurrent replay, RLS and real key-ring restore pass.
+- Fixed GET `/_matrix/client/v3/account/whoami` now checks current native/company/
+  permission/MFA/build/device/head authority before and after private provider I/O.
+  It exposes validated public identity only. Internal renewal fences generation,
+  head and admission; competing candidates retain one winner without logout.
+  SQL guards are not held across HTTP. Provider failure also rechecks current
+  denial. Ordinary native refresh invalidates a stale observation temporarily;
+  a subsequent admitted request can use the same gateway. Transport is fixed-origin,
+  no-redirect, at most five seconds/64 KiB, with 32 immediate permits and cancellation.
+  All other Matrix/Synapse paths remain denied, including sync/key/room, login,
+  logout, admin and federation. This is not a complete SDK content gateway.
 
-The gateway HTTP/worker increment now exposes native POST `/bootstrap` and
-GET setup gateway metadata, plus POST `/_matrix/client/v3/refresh` with standard
-Matrix reply/errors. The separate stateless security chain keeps native/cookie
-authority out of Matrix refresh and denies every other Matrix/Synapse route.
-JSON bodies are bounded to 2 KiB with strict duplicate/trailing/depth checks.
-The worker clears one batch of at most 100 expired response caches every five
-seconds, with owned timer, cancellation, rollback and shutdown. It can drain
-caches after collaboration is disabled. [HTTP/worker evidence](measurements/collaboration-gateway-http-2026-10-31.json)
-records eight focused API/five worker passes (62s), then 84 API, 34 data, fourteen
-domain and 111 worker cases (110 pass, one unchanged retention skip), quality
-checks (4m34s) and Compose syntax. No provider content proxy is exposed yet.
+[Identity evidence](measurements/collaboration-gateway-identity-2026-10-31.json)
+records 148 passing API cases, 77 data cases, fourteen domain cases and the full
+111-case worker suite (110 pass, one unchanged opt-in retention skip). Formatting
+and architecture pass. The final successful selection took 3m39s, with the
+unchanged domain/data/worker results retained incrementally. Corrected failures
+include a fixture missing its explicit Synapse start and two legacy eight-module
+assertions; catalog tests now verify all nine names and run in collaboration CI.
+No new migration was added; repository recovery ceiling remains 109.
 
-Exact storage `16ab4991` and admission `5a666758` passed every hosted control job/
-step in [41195040771](https://github.com/fajarxfce/hris-platform/actions/runs/41195040771)
-and [41195557470](https://github.com/fajarxfce/hris-platform/actions/runs/41195557470).
-The [transaction-retention gate](collaboration/provider-transaction-retention.md)
-records a pinned-source finding: Synapse deletes message transaction mappings
-older than 24 hours on a five-minute cleanup loop. Actual same-device bearer
-replacement and aged-mapping retry are now proved below; durable uncertain-send
-reconciliation remains required before offline messaging acceptance. Do not assume unlimited provider
-deduplication or change a local transaction ID on refresh/restart.
-
-The [actual transaction experiment](measurements/collaboration-transaction-interop-2026-10-31.json)
-now proves same-device bearer replacement returns the same event while the mapping
-exists. Fixture aging + exact cleanup predicate + Synapse restart permits a second
-event for the same transaction. Both appear in room history; the origin device
-sees their transaction IDs, an invited peer does not. No real 24-hour wait or
-scheduled-timer acceptance is claimed. Two provider cases pass in 40s (including
-the retained token-expiry/logout regression); the final peer extension passes in
-29s. Formatting/architecture pass. Native bindings expose `sendWithExtraContent`
-and queue listeners; the next native proof must establish encrypted logical-ID
-round trips/queue ownership before implementing durable recipient coalescing.
-
-Actual Android SDK queue/extra-content proof now passes with the existing browser
-scenario in 29.090s. Both directions preserve encrypted `org.hris.message_id`,
-paused SDK sending and local-to-remote transaction identity survive standard
-refresh with the same device key. [Evidence](measurements/collaboration-native-logical-queue-2026-10-31.json)
-retains source/APK hashes and two corrected synchronous room-queue binding failures.
-The asynchronous client-level queue API passes. Mobile full root/debug/lint checks
-pass in 52s (2,002 desktop cases, no lint errors). Durable process recovery and
-recipient logical-ID coalescing remain pending; no product group is accepted.
-Exact HTTP/worker source `c2e72935` passed every hosted job/step in
-[41196507714](https://github.com/fajarxfce/hris-platform/actions/runs/41196507714).
-
-Critical provider behavior: Synapse logout deletes the **whole device**, every
-bearer and its E2EE keys, even when called with an expired bearer. Never use it
-to clean up a losing/late login. Such credentials stay private/unpublished and
-expire within ten minutes. Logout is permitted only after irreversible HRIS
-device revocation. Synapse's JWT expiry tolerance is 120 seconds; HRIS must apply
-its own strict admission deadline before and after exchange. Provider ports stay
-private; a future client gateway must not expose raw provider credentials or
-allow public login/admin/federation bypass.
+Critical provider behavior: Synapse logout deletes the **entire device**, all its
+bearers and E2EE keys even with an expired bearer. Never use it to clean up a late
+or losing login; unpublished candidates expire privately within ten minutes.
+Only irreversible HRIS device revocation permits logout. Synapse JWT expiry has
+120 seconds of tolerance; HRIS must enforce its strict admission deadline itself.
+Provider ports remain private; raw provider credentials never reach clients.
 
 Next implementation:
 
-1. Inspect transaction experiment `be810f1c` hosted control `41197100773`; its
-   database step passed and full contexts are still running. HTTP/worker, storage
-   and admission hosted results are accepted above.
-2. Protected Matrix request path with current admission before/after provider I/O,
-   bounded/cancelled transport, internal credential renewal and room/context scope.
-   Same-device transaction/aged retry behavior is proved; use the retained limit
-   when implementing SDK outbox reconciliation.
-3. Browser-parent admission, native/web SDK adapters, owned crypto stores and
-   durable chat UI/outbox reconciliation. Restore an authenticated Matrix SDK
-   client only once; rotate through standard refresh. Retain owned offline facts
-   after ordinary expiry. A public refresh endpoint alone is not a usable SDK
-   content gateway.
-4. All remaining P0 native protocol gates and P1–P8 groups: rich/context messaging,
-   backup, native calls, web/mobile meetings, AI, recovery and measured capacity.
-   Do not mark the full plan complete after infrastructure checkpoints.
+1. Inspect the identity increment's exact hosted control after push. Its local
+   results are above. HTTP/worker `c2e72935` and provider transaction `be810f1c`
+   passed every hosted job/step in [41196507714](https://github.com/fajarxfce/hris-platform/actions/runs/41196507714)
+   and [41197100773](https://github.com/fajarxfce/hris-platform/actions/runs/41197100773).
+2. Company participant discovery and authoritative conversation/member/context
+   storage/control; provider reconciliation with current scope. Then expose bounded
+   SDK key/sync/content operations with per-conversation admission, cancellation
+   and response fencing. A WHOAMI/refresh endpoint does not authorize room contents.
+3. Native/web SDK adapters, browser-parent admission, owned encrypted stores and
+   durable chat UI/outbox/recipient reconciliation. Restore each SDK client only
+   once; use standard refresh. Persist logical IDs before queueing, retain every
+   provider event alias, handle conflicting reuse and redactions/recovery.
+4. Remaining P0 gates and all P1–P8 groups: rich/context messaging, backup, native
+   calls, web/mobile meetings, AI, recovery and measured capacity. Prove reusable
+   Mobile foundations before porting them to Starter; no lab/backend port is due.
 
-Keep the live stack at schema **103**, API/worker application **2c2a59e3**, dashboard
-**1e0522c0**, and phone release **build 4**. No deployment or phone action occurred
-in these collaboration checkpoints. Dedicated emulator `hris-mobile-dev` / 5560
-is stopped, with data retained. Use fictional owned provider fixtures; never
-real employee messages. Notify before any later phone installation, install only,
-do not drive phone UI, preserve signer/data and use versionCode >= 5.
-
-Physical iPhone testing is waived; simulator/compilation/provider proof remain
-separate gates. Public DNS/TLS, Apple VoIP credentials and dedicated capacity/GPU
-resources are later deployment inputs, not blockers for local implementation.
-Mobile proves reusable product foundations before Starter receives them. No
-Starter port is due for HRIS-specific backend modules or isolated proof fixtures.
-
-JDK 21 is `/usr/lib/jvm/java-21-openjdk`; use the Docker-authorized test wrapper
-in the commands section below. Shared DI changes require actual API and the full
-`:apps:worker:test`, not JAR assembly. Avoid overlapping heavy local builds.
-Secrets remain outside Git in private configuration. Update this handoff and
-measurements with exact results, then push every atomic commit.
-
-The paragraphs below are retained prior-work history. Their old installed build
-2 reference is superseded by Mobile's validated release build 4; consult Mobile's
-current handoff for its artifact/source and future versionCode >= 5.
-
-Updated 31 October 2026 (UTC). The user requested verification and completion of
-all specified features, with every atomic commit pushed and handoffs retained in
-Git. The full audit is complete after implementing the discovered gaps and validating every reviewed area.
-New work on 31 October: the user requested a full Mobile layout/component review
-and fictional sample data for the existing linked employee. [Sample setup](mobile-sample-data-2026-10-31.md)
-is verified through normal employee APIs; Mobile's layout review remains active.
-Earlier distribution/native acceptance remains valid for its recorded scope. Read `AGENTS.md`, this page and [PRD status](prd-status.md),
-then the affected module contract. The [archived history](agent-history-2026-10-29.md)
-preserves earlier work; its old next-step statements are not the active queue.
-
-Current runtime: schema 103; API/worker application `2c2a59e3`, dashboard
-`1e0522c0`, installed Mobile `devRelease` **1.0.0 / build 2**, built from latest
-Mobile source `5ffb7300` with unchanged accepted application trees. The authorized
-31 October WireGuard update preserved the signing identity and application data;
-the pulled installed APK matches the built release exactly. No UI was launched.
-Mobile handoff `bae07a27` records the evidence and the new versionCode floor of 2.
-Read [current development runtime](current-development-runtime.md#android-release-installation--31-october-2026).
-Use captured container IDs with `docker start` for checkpoint restart; installed
-Compose has no `start --no-deps` and `compose start` can rerun migration dependencies.
-Earlier pending statements below are retained history, not a new queue.
+Live state stays at schema **103**, API/worker **2c2a59e3**, dashboard **1e0522c0**,
+phone release **build 4**. No collaboration deployment or phone action occurred.
+Dedicated emulator `hris-mobile-dev` / 5560 is stopped with data retained. Use
+fictional owned provider fixtures and never real employee messages. Notify before
+later phone installation; install only, preserve signer/data, versionCode >= 5.
 
 ## Completed feature audit — 30 October 2026
 

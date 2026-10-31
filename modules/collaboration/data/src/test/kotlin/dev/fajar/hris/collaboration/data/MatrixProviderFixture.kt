@@ -18,7 +18,8 @@ import org.testcontainers.images.builder.Transferable
 import tools.jackson.databind.json.JsonMapper
 
 /** Owned pinned provider process; each test gets its own network, database and HTTP owner. */
-class MatrixProviderFixture(lifetime: String) : AutoCloseable {
+class MatrixProviderFixture(lifetime: String, val clock: Clock = Clock.systemUTC()) :
+    AutoCloseable {
     init {
         require(lifetime in setOf("5s", "10m"))
     }
@@ -104,7 +105,6 @@ class MatrixProviderFixture(lifetime: String) : AutoCloseable {
             .connectTimeout(Duration.ofSeconds(2))
             .followRedirects(HttpClient.Redirect.NEVER)
             .build()
-    val clock = Clock.systemUTC()
     lateinit var config: MatrixProviderConfiguration
         private set
 

@@ -1070,17 +1070,26 @@ class NativeCollaborationRegistrationTest {
     private class RecordingMatrix(private val clock: Clock) : CollaborationMatrixRepository {
         val logins = AtomicInteger()
         val logouts = AtomicInteger()
+        val queries = AtomicInteger()
+        val issued = ConcurrentHashMap<String, CollaborationMatrixIdentity>()
+        var onQuery: (String) -> Result<CollaborationMatrixIdentity> = {
+            Result.Success(requireNotNull(issued[it]))
+        }
         var onLogin: (CollaborationMatrixLogin) -> Result<CollaborationMatrixCredential> = ::issue
 
         fun issue(request: CollaborationMatrixLogin): Result<CollaborationMatrixCredential> =
             Result.Success(
-                CollaborationMatrixCredential(
-                    "@${collaborationMatrixLocalpart(request.companyId, request.accountId)}:proof.invalid",
-                    collaborationMatrixDeviceId(request.deviceId),
-                    "fictional-provider-${UUID.randomUUID()}",
-                    clock.instant().plusSeconds(300),
+                    CollaborationMatrixCredential(
+                        "@${collaborationMatrixLocalpart(request.companyId, request.accountId)}:proof.invalid",
+                        collaborationMatrixDeviceId(request.deviceId),
+                        "fictional-provider-${UUID.randomUUID()}",
+                        clock.instant().plusSeconds(300),
+                    )
                 )
-            )
+                .also {
+                    issued[it.value.accessToken] =
+                        CollaborationMatrixIdentity(it.value.userId, it.value.deviceId, false)
+                }
 
         override fun login(
             request: CollaborationMatrixLogin
@@ -1092,6 +1101,15 @@ class NativeCollaborationRegistrationTest {
         override fun logoutDevice(accessToken: String): Result<Unit> {
             logouts.incrementAndGet()
             return Result.Success(Unit)
+        }
+
+        override fun whoAmI(
+            accessToken: String,
+            deadline: Instant,
+        ): Result<CollaborationMatrixIdentity> {
+            assertTrue(clock.instant() < deadline)
+            queries.incrementAndGet()
+            return onQuery(accessToken)
         }
     }
 
@@ -1423,6 +1441,248 @@ class NativeCollaborationRegistrationTest {
         assertEquals(1, g.f.rows("operation_receipts"))
     }
 
+    @Test
+    fun gatewayIdentityReachesActualSynapseWithoutExposingItsBearer() {
+        val g = GatewayFixture()
+        MatrixProviderFixture("10m", g.f.clock).use { provider ->
+            provider.start()
+            val tokens = success(g.bootstrap())
+            val request =
+                g.f.matrixIdentity(provider.repository, serverName = "matrix.example.test")
+            val identity = success(request.execute(tokens.accessToken, UUID.randomUUID()))
+            assertEquals(
+                "@${collaborationMatrixLocalpart(requireNotNull(g.f.actor.companyId), g.f.account)}:matrix.example.test",
+                identity.userId,
+            )
+            assertEquals(collaborationMatrixDeviceId(g.device), identity.deviceId)
+            assertFalse(identity.isGuest)
+            val stored = requireNotNull(g.f.credential(g.device))
+            assertFalse(stored.accessToken == tokens.accessToken)
+            assertEquals(0L, stored.generation)
+            assertEquals(identity, success(request.execute(tokens.accessToken, UUID.randomUUID())))
+            assertEquals(stored.accessToken, g.f.credential(g.device)?.accessToken)
+        }
+    }
+
+    @Test
+    fun gatewayIdentityRenewsOnlyInternalProviderBearerAndKeepsDeviceAndPublicSession() {
+        val g = GatewayFixture()
+        val matrix = RecordingMatrix(g.f.clock)
+        val request = g.f.matrixIdentity(matrix)
+        val tokens = success(g.bootstrap())
+        val first = success(request.execute(tokens.accessToken, UUID.randomUUID()))
+        assertEquals(first, success(request.execute(tokens.accessToken, UUID.randomUUID())))
+        assertEquals(1, matrix.logins.get())
+        val prior = requireNotNull(g.f.credential(g.device))
+        g.f.clock.at = g.f.clock.at.plusSeconds(280)
+        val next = success(g.refresh(tokens.refreshToken))
+        g.f.clock.at = g.f.clock.at.plusSeconds(20)
+        assertEquals(first, success(request.execute(next.accessToken, UUID.randomUUID())))
+        val renewed = requireNotNull(g.f.credential(g.device))
+        assertEquals(prior.generation + 1, renewed.generation)
+        assertNotEquals(prior.accessToken, renewed.accessToken)
+        assertEquals(prior.createdAt, renewed.createdAt)
+        assertEquals(next.version, g.f.gatewayHead(g.device).version)
+        assertEquals(2, matrix.logins.get())
+        assertEquals(0, matrix.logouts.get())
+    }
+
+    @Test
+    fun gatewayIdentityRechecksPermissionAfterLoginAndNeverStoresTheLosingToken() {
+        val g = GatewayFixture()
+        val tokens = success(g.bootstrap())
+        val matrix = RecordingMatrix(g.f.clock)
+        matrix.onLogin = {
+            sql.update(
+                "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                g.f.actor.companyId,
+                g.f.account,
+            )
+            matrix.issue(it)
+        }
+        assertEquals(
+            "access_denied",
+            failed(g.f.matrixIdentity(matrix).execute(tokens.accessToken, UUID.randomUUID())),
+        )
+        assertNull(g.f.credential(g.device))
+        assertEquals(0, matrix.queries.get())
+        assertEquals(0, matrix.logouts.get())
+        assertEquals(0L, g.f.gatewayHead(g.device).version)
+    }
+
+    @Test
+    fun gatewayIdentityDoesNotPublishAcrossConcurrentPublicRefresh() {
+        val g = GatewayFixture()
+        val tokens = success(g.bootstrap())
+        g.f.clock.at = g.f.clock.at.plusSeconds(10)
+        val matrix = RecordingMatrix(g.f.clock)
+        matrix.onLogin = {
+            success(g.refresh(tokens.refreshToken))
+            matrix.issue(it)
+        }
+        assertEquals(
+            "collaboration_gateway_authentication_required",
+            failed(g.f.matrixIdentity(matrix).execute(tokens.accessToken, UUID.randomUUID())),
+        )
+        assertNull(g.f.credential(g.device))
+        assertEquals(1L, g.f.gatewayHead(g.device).version)
+        assertEquals(0, matrix.logouts.get())
+    }
+
+    @Test
+    fun gatewayIdentityCompetingRenewalsKeepOneGenerationWithoutLoggingOutWinner() {
+        val g = GatewayFixture()
+        val tokens = success(g.bootstrap())
+        val matrix = RecordingMatrix(g.f.clock)
+        val ready = CyclicBarrier(2)
+        matrix.onLogin = {
+            ready.await(10, TimeUnit.SECONDS)
+            matrix.issue(it)
+        }
+        val request = g.f.matrixIdentity(matrix)
+        val answers = race(List(2) { { request.execute(tokens.accessToken, UUID.randomUUID()) } })
+        assertEquals(success(answers[0]), success(answers[1]))
+        assertEquals(2, matrix.logins.get())
+        assertEquals(0L, g.f.credential(g.device)?.generation)
+        assertEquals(0, matrix.logouts.get())
+        assertEquals(2, matrix.queries.get())
+    }
+
+    @Test
+    fun gatewayIdentityWithholdsProviderResultAfterNativeRefreshOrRevocationAndPermissionLoss() {
+        for (change in listOf("refresh", "revoke", "permission", "expiry", "module")) {
+            val g = GatewayFixture()
+            val tokens = success(g.bootstrap())
+            val matrix = RecordingMatrix(g.f.clock)
+            matrix.onQuery = { token ->
+                when (change) {
+                    "refresh" ->
+                        sql.update(
+                            "update native_sessions set version=version+1,rotated_at=now() where id=?",
+                            g.parent,
+                        )
+                    "revoke" ->
+                        sql.update(
+                            "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                            g.parent,
+                        )
+                    "permission" ->
+                        sql.update(
+                            "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                            g.f.actor.companyId,
+                            g.f.account,
+                        )
+                    "expiry" -> g.f.clock.at = tokens.accessExpiresAt
+                    "module" ->
+                        g.f.policy(
+                            ClientPolicy(disabledModules = setOf(CompanyModule.COLLABORATION)),
+                            g.f.clock.at,
+                        )
+                }
+                Result.Success(requireNotNull(matrix.issued[token]))
+            }
+            val request = g.f.matrixIdentity(matrix)
+            val denied = request.execute(tokens.accessToken, UUID.randomUUID())
+            assertInstanceOf(Result.Failed::class.java, denied, change)
+            if (change == "refresh") {
+                assertEquals("collaboration_admission_changed", failed(denied))
+                assertEquals(FailureKind.UNAVAILABLE, (denied as Result.Failed).failure.kind)
+                matrix.onQuery = { Result.Success(requireNotNull(matrix.issued[it])) }
+                assertInstanceOf(
+                    Result.Success::class.java,
+                    request.execute(tokens.accessToken, UUID.randomUUID()),
+                )
+            }
+            assertNotNull(g.f.credential(g.device))
+            assertEquals(0, matrix.logouts.get())
+        }
+    }
+
+    @Test
+    fun gatewayIdentityRollsBackCredentialAndJournalOnLateScheduledPolicyBoundary() {
+        val g = GatewayFixture()
+        val tokens = success(g.bootstrap())
+        val matrix = RecordingMatrix(g.f.clock)
+        val boundary = g.f.clock.at.plusSeconds(10)
+        g.f.policy(ClientPolicy(disabledModules = setOf(CompanyModule.COLLABORATION)), boundary)
+        val journal =
+            object : ChangeJournalRepository {
+                override fun record(actor: Actor, change: ChangeRecord): Result<Unit> =
+                    g.f.journal.record(actor, change).also { g.f.clock.at = boundary }
+            }
+        val before = g.f.rows("audit_entries")
+        assertInstanceOf(
+            Result.Failed::class.java,
+            g.f.matrixIdentity(matrix, journal).execute(tokens.accessToken, UUID.randomUUID()),
+        )
+        assertNull(g.f.credential(g.device))
+        assertEquals(before, g.f.rows("audit_entries"))
+        assertEquals(0, matrix.queries.get())
+        assertEquals(0, matrix.logouts.get())
+    }
+
+    @Test
+    fun gatewayIdentityRejectsWrongProviderIdentityAndStaleOrWrongTransportTokens() {
+        val g = GatewayFixture()
+        val tokens = success(g.bootstrap())
+        val matrix = RecordingMatrix(g.f.clock)
+        val request = g.f.matrixIdentity(matrix)
+        for (token in
+            listOf("invalid", tokens.refreshToken, "hris_mx_a_" + "a".repeat(43))) assertEquals(
+            "collaboration_gateway_authentication_required",
+            failed(request.execute(token, UUID.randomUUID())),
+        )
+        assertEquals(0, matrix.logins.get())
+        matrix.onQuery = {
+            Result.Success(CollaborationMatrixIdentity("@foreign:proof.invalid", "foreign", false))
+        }
+        assertEquals(
+            "collaboration_provider_invalid_response",
+            failed(request.execute(tokens.accessToken, UUID.randomUUID())),
+        )
+        g.f.clock.at = tokens.accessExpiresAt
+        assertEquals(
+            "collaboration_gateway_authentication_required",
+            failed(request.execute(tokens.accessToken, UUID.randomUUID())),
+        )
+        assertEquals(1, matrix.queries.get())
+    }
+
+    @Test
+    fun gatewayIdentityReportsAdmissionRemovalBeforeProviderFailureAndPreservesCancellation() {
+        for (duringLogin in listOf(true, false)) {
+            val g = GatewayFixture()
+            val tokens = success(g.bootstrap())
+            val matrix = RecordingMatrix(g.f.clock)
+            val removed = {
+                sql.update(
+                    "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                    g.f.actor.companyId,
+                    g.f.account,
+                )
+                Result.Failed(
+                    Failure(FailureKind.UNAVAILABLE, "collaboration_provider_unavailable")
+                )
+            }
+            if (duringLogin) matrix.onLogin = { removed() } else matrix.onQuery = { removed() }
+            assertEquals(
+                "access_denied",
+                failed(g.f.matrixIdentity(matrix).execute(tokens.accessToken, UUID.randomUUID())),
+            )
+            assertEquals(if (duringLogin) 0 else 1, g.f.rows("collaboration_provider_sessions"))
+            assertEquals(0, matrix.logouts.get())
+        }
+        val g = GatewayFixture()
+        val tokens = success(g.bootstrap())
+        val matrix = RecordingMatrix(g.f.clock)
+        matrix.onLogin = { throw InterruptedException() }
+        assertThrows(InterruptedException::class.java) {
+            g.f.matrixIdentity(matrix).execute(tokens.accessToken, UUID.randomUUID())
+        }
+        assertNull(g.f.credential(g.device))
+        assertEquals(0, matrix.queries.get())
+    }
+
     private class GatewayFixture {
         val f = Fixture()
         val parent = f.parent()
@@ -1654,6 +1914,29 @@ class NativeCollaborationRegistrationTest {
                 IdentitySecurityPolicy(),
                 CollaborationServicePolicy(true),
                 CollaborationMatrixPolicy(true, "fixture.test"),
+                clock,
+            )
+
+        fun matrixIdentity(
+            matrix: CollaborationMatrixRepository,
+            journal: ChangeJournalRepository = this.journal,
+            serverName: String = "proof.invalid",
+        ) =
+            GetNativeCollaborationMatrixIdentity(
+                gateway,
+                registry,
+                credentials,
+                matrix,
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                journal,
+                transactions,
+                IdentitySecurityPolicy(),
+                CollaborationServicePolicy(true),
+                CollaborationMatrixPolicy(true, serverName),
                 clock,
             )
 

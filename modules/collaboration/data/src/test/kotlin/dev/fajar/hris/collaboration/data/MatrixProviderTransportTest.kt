@@ -290,7 +290,109 @@ class MatrixProviderTransportTest {
         override fun instant(): Instant = now
     }
 
-    private class Fixture(timeout: Duration = Duration.ofSeconds(5)) : AutoCloseable {
+    @Test
+    fun identityUsesOnlyFixedGetAndStrictBoundedResponseWithoutForwardingProviderFields() {
+        Fixture().use { f ->
+            f.handler = { exchange ->
+                assertEquals("/_matrix/client/v3/account/whoami", exchange.requestURI.path)
+                assertEquals("GET", exchange.requestMethod)
+                assertNull(exchange.requestURI.rawQuery)
+                assertEquals(
+                    "Bearer fictional-private-token",
+                    exchange.requestHeaders.getFirst("Authorization"),
+                )
+                assertEquals(0, exchange.requestBody.readNBytes(1).size)
+                f.respond(
+                    exchange,
+                    """{"user_id":"@fixture:matrix.example.test","device_id":"DEVICE","is_guest":false,"ignored":"private provider field"}""",
+                )
+            }
+            val result =
+                (f.repository.whoAmI("fictional-private-token", f.clock.now.plusSeconds(20))
+                        as Result.Success)
+                    .value
+            assertEquals("@fixture:matrix.example.test", result.userId)
+            assertEquals("DEVICE", result.deviceId)
+            assertFalse(result.isGuest)
+            assertFalse(result.toString().contains("private"))
+            for (body in
+                listOf(
+                    "{}",
+                    "[]",
+                    """{"user_id":"@x:test","device_id":"DEVICE","is_guest":"false"}""",
+                    """{"user_id":"@x:test","device_id":"DEVICE","is_guest":false,"is_guest":true}""",
+                )) {
+                f.handler = { f.respond(it, body) }
+                assertEquals(
+                    "collaboration_provider_invalid_response",
+                    (f.repository.whoAmI("fictional-private-token", f.clock.now.plusSeconds(20))
+                            as Result.Failed)
+                        .failure
+                        .code,
+                )
+            }
+            val count = f.requests.get()
+            assertEquals(
+                "collaboration_admission_changed",
+                (f.repository.whoAmI("fictional-private-token", f.clock.now) as Result.Failed)
+                    .failure
+                    .code,
+            )
+            assertEquals(count, f.requests.get())
+        }
+    }
+
+    @Test
+    fun boundedProviderCapacityRejectsWithoutQueueingAndInterruptionReleasesPermit() {
+        Fixture(maximumConcurrent = 1).use { f ->
+            val entered = CountDownLatch(1)
+            val release = CountDownLatch(1)
+            val stopped = CountDownLatch(1)
+            val caller = Executors.newSingleThreadExecutor()
+            f.handler = {
+                entered.countDown()
+                assertTrue(release.await(5, TimeUnit.SECONDS))
+                f.respond(
+                    it,
+                    """{"user_id":"@fixture:test","device_id":"DEVICE","is_guest":false}""",
+                )
+            }
+            try {
+                val running =
+                    caller.submit {
+                        try {
+                            f.repository.whoAmI("fictional-token", f.clock.now.plusSeconds(20))
+                        } finally {
+                            stopped.countDown()
+                        }
+                    }
+                assertTrue(entered.await(5, TimeUnit.SECONDS))
+                val refused =
+                    f.repository.whoAmI("fictional-token", f.clock.now.plusSeconds(20))
+                        as Result.Failed
+                assertEquals(
+                    dev.fajar.hris.core.domain.FailureKind.RATE_LIMITED,
+                    refused.failure.kind,
+                )
+                assertEquals(1, f.requests.get())
+                running.cancel(true)
+                assertTrue(stopped.await(5, TimeUnit.SECONDS))
+                release.countDown()
+                assertInstanceOf(
+                    Result.Success::class.java,
+                    f.repository.whoAmI("fictional-token", f.clock.now.plusSeconds(20)),
+                )
+                assertEquals(2, f.requests.get())
+            } finally {
+                release.countDown()
+                caller.shutdownNow()
+                assertTrue(caller.awaitTermination(5, TimeUnit.SECONDS))
+            }
+        }
+    }
+
+    private class Fixture(timeout: Duration = Duration.ofSeconds(5), maximumConcurrent: Int = 32) :
+        AutoCloseable {
         val json = JsonMapper.builder().build()
         val clock = MutableClock()
         val requests = AtomicInteger()
@@ -324,7 +426,7 @@ class MatrixProviderTransportTest {
         val repository =
             InternalCollaborationMatrixRepository(
                 HmacMatrixJwtDataSource(config),
-                HttpMatrixClientDataSource(client, config, clock),
+                HttpMatrixClientDataSource(client, config, clock, maximumConcurrent),
                 clock,
             )
         @Volatile var handler: (HttpExchange) -> Unit = { respond(it, success) }

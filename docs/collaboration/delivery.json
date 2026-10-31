@@ -18,7 +18,8 @@
         "https://github.com/fajarxfce/hris-mobile/blob/da43b35c/docs/measurements/collaboration-apple-binding-2026-10-31.json",
         "../measurements/collaboration-native-refresh-2026-10-31.json",
         "provider-transaction-retention.md",
-        "../measurements/collaboration-transaction-interop-2026-10-31.json"
+        "../measurements/collaboration-transaction-interop-2026-10-31.json",
+        "../measurements/collaboration-native-logical-queue-2026-10-31.json"
       ]
     },
     {
@@ -39,7 +40,8 @@
         "../measurements/collaboration-native-retry-2026-10-31.json",
         "../measurements/collaboration-gateway-storage-2026-10-31.json",
         "../measurements/collaboration-gateway-admission-2026-10-31.json",
-        "../measurements/collaboration-gateway-http-2026-10-31.json"
+        "../measurements/collaboration-gateway-http-2026-10-31.json",
+        "../measurements/collaboration-gateway-identity-2026-10-31.json"
       ]
     },
     {

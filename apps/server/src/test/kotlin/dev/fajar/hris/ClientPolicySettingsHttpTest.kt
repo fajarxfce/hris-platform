@@ -32,7 +32,24 @@ class ClientPolicySettingsHttpTest : ClientPolicyApiFixture() {
         val empty = json.readTree(initial.body())
         assertTrue(empty["latest"].isNull)
         assertTrue(empty["effective"]["version"].isNull)
-        assertEquals(8, empty["effective"]["enabledModules"].size())
+        assertEquals(
+            setOf(
+                "PEOPLE",
+                "WORKFORCE",
+                "LEAVE",
+                "EXPENSES",
+                "PAYROLL",
+                "DOCUMENTS",
+                "COMMUNICATIONS",
+                "COLLABORATION",
+                "REPORTING",
+            ),
+            empty["effective"]["enabledModules"]
+                .iterator()
+                .asSequence()
+                .map { it.asString() }
+                .toSet(),
+        )
         assertEquals(
             200,
             save(f, changes = mapOf("disabledModules" to listOf("PEOPLE"))).statusCode(),

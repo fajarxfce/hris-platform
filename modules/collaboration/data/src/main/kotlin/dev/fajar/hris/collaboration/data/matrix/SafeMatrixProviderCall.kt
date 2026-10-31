@@ -13,6 +13,8 @@ class MatrixResponseException : IOException("Invalid Matrix response")
 
 class MatrixStatusException(val status: Int) : IOException("Matrix request rejected")
 
+class MatrixCapacityException : RuntimeException("Matrix exchange capacity exhausted")
+
 /** Maps acquisition and parsing together; never logs provider messages, bodies or bearers. */
 fun <T> safeMatrixProviderCall(operation: () -> T): Result<T> =
     try {
@@ -32,6 +34,12 @@ fun <T> safeMatrixProviderCall(operation: () -> T): Result<T> =
         if (Thread.currentThread().isInterrupted) throw InterruptedException()
         Result.Failed(
             when (cause) {
+                is MatrixCapacityException ->
+                    Failure(
+                        FailureKind.RATE_LIMITED,
+                        "collaboration_provider_busy",
+                        parameters = mapOf("retryAfterSeconds" to "1"),
+                    )
                 is MatrixDeadlineException ->
                     Failure(FailureKind.CONFLICT, "collaboration_admission_changed")
                 is MatrixResponseException ->

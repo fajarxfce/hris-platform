@@ -141,6 +141,42 @@ class CollaborationConfiguration {
         )
 
     @Bean
+    fun getNativeCollaborationMatrixIdentity(
+        gateway: CollaborationGatewaySessionRepository,
+        registry: CollaborationRegistryRepository,
+        credentials: CollaborationProviderSessionRepository,
+        matrix: CollaborationMatrixRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        GetNativeCollaborationMatrixIdentity(
+            gateway,
+            registry,
+            credentials,
+            matrix,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            journal,
+            transactions,
+            security,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
     fun refreshNativeCollaborationGateway(
         gateway: CollaborationGatewaySessionRepository,
         registry: CollaborationRegistryRepository,

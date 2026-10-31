@@ -12,7 +12,20 @@ class ClientPolicyHttpTest : ClientPolicyApiFixture() {
         val other = company(f.browser, f.csrf)
         val initial = json.readTree(get(f.browser, "${f.root}/client-policy").body())
         assertTrue(initial["version"].isNull)
-        assertEquals(8, initial["enabledModules"].size())
+        assertEquals(
+            setOf(
+                "PEOPLE",
+                "WORKFORCE",
+                "LEAVE",
+                "EXPENSES",
+                "PAYROLL",
+                "DOCUMENTS",
+                "COMMUNICATIONS",
+                "COLLABORATION",
+                "REPORTING",
+            ),
+            initial["enabledModules"].iterator().asSequence().map { it.asString() }.toSet(),
+        )
         assertEquals(
             200,
             get(f.browser, "${f.root}/employees?asOf=2026-10-01&limit=1").statusCode(),

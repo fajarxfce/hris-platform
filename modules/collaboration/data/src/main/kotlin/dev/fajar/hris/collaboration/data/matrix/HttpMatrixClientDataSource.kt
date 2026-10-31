@@ -2,6 +2,7 @@ package dev.fajar.hris.collaboration.data.matrix
 
 import java.net.http.*
 import java.time.*
+import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import tools.jackson.core.StreamReadFeature
 import tools.jackson.databind.DeserializationFeature
@@ -13,7 +14,9 @@ class HttpMatrixClientDataSource(
     private val client: HttpClient,
     private val configuration: MatrixProviderConfiguration,
     private val clock: Clock,
+    maximumConcurrent: Int = 32,
 ) : MatrixClientDataSource {
+    private val exchanges = Semaphore(maximumConcurrent)
     private val json =
         JsonMapper.builder()
             .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
@@ -21,6 +24,7 @@ class HttpMatrixClientDataSource(
             .build()
 
     init {
+        require(maximumConcurrent in 1..128)
         require(client.followRedirects() == HttpClient.Redirect.NEVER)
         require(client.connectTimeout().orElse(Duration.ofSeconds(6)) <= Duration.ofSeconds(5))
     }
@@ -73,6 +77,33 @@ class HttpMatrixClientDataSource(
         parse(response)
     }
 
+    override fun whoAmI(accessToken: String, deadline: Instant): MatrixIdentityData {
+        require(accessToken.length in 1..2048 && accessToken.all { it.code in 33..126 })
+        val remaining = Duration.between(clock.instant(), deadline)
+        if (remaining <= Duration.ZERO) throw MatrixDeadlineException()
+        val timeout = minOf(configuration.requestTimeout, remaining)
+        val request =
+            HttpRequest.newBuilder(
+                    configuration.origin.resolve("/_matrix/client/v3/account/whoami")
+                )
+                .timeout(timeout)
+                .header("Accept", "application/json")
+                .header("Accept-Encoding", "identity")
+                .header("Authorization", "Bearer $accessToken")
+                .GET()
+                .build()
+        val response = exchange(request, timeout)
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        val body = parse(response)
+        val guest = body.path("is_guest")
+        if (!guest.isBoolean) throw MatrixResponseException()
+        return MatrixIdentityData(
+            text(body, "user_id", 255),
+            text(body, "device_id", 128),
+            guest.asBoolean(),
+        )
+    }
+
     private fun post(
         path: String,
         body: Map<String, Any>,
@@ -87,15 +118,24 @@ class HttpMatrixClientDataSource(
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofByteArray(json.writeValueAsBytes(body)))
         if (bearer != null) builder.header("Authorization", "Bearer $bearer")
-        val pending =
-            client.sendAsync(
-                builder.build(),
-                HttpResponse.BodyHandler { BoundedMatrixBodySubscriber() },
-            )
+        return exchange(builder.build(), timeout)
+    }
+
+    private fun exchange(request: HttpRequest, timeout: Duration): HttpResponse<ByteArray> {
+        if (!exchanges.tryAcquire()) throw MatrixCapacityException()
         return try {
-            pending.get(timeout.toNanos(), TimeUnit.NANOSECONDS)
+            val pending =
+                client.sendAsync(
+                    request,
+                    HttpResponse.BodyHandler { BoundedMatrixBodySubscriber() },
+                )
+            try {
+                pending.get(timeout.toNanos(), TimeUnit.NANOSECONDS)
+            } finally {
+                if (!pending.isDone) pending.cancel(true)
+            }
         } finally {
-            if (!pending.isDone) pending.cancel(true)
+            exchanges.release()
         }
     }
 

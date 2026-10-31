@@ -39,4 +39,12 @@ class InternalCollaborationMatrixRepository(
     override fun logoutDevice(accessToken: String): Result<Unit> = safeMatrixProviderCall {
         client.logoutDevice(accessToken)
     }
+
+    override fun whoAmI(
+        accessToken: String,
+        deadline: Instant,
+    ): Result<CollaborationMatrixIdentity> = safeMatrixProviderCall {
+        val response = client.whoAmI(accessToken, deadline)
+        CollaborationMatrixIdentity(response.userId, response.deviceId, response.isGuest)
+    }
 }

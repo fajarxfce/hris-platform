@@ -134,6 +134,175 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         return n.fixture.browser.send(request.build(), HttpResponse.BodyHandlers.ofString())
     }
 
+    private fun publishedRoom(n: Native, device: UUID): String {
+        // Owned SQL/protocol fixture; the actual publication worker has separate coverage.
+        val db = database()
+        val peer = UUID.randomUUID()
+        val conversation = UUID.randomUUID()
+        val job = UUID.randomUUID()
+        val at = java.sql.Timestamp.from(clock.instant())
+        db.update(
+            "insert into accounts(id,email,display_name) values(?,?,'Fictional room peer')",
+            peer,
+            "$peer@example.test",
+        )
+        val pair = listOf(n.fixture.account, peer).sortedBy(UUID::toString)
+        db.update(
+            "insert into collaboration_direct_conversations(company_id,id,first_account_id,second_account_id,created_by,created_at) values(?,?,?,?,?,?)",
+            n.fixture.company,
+            conversation,
+            pair[0],
+            pair[1],
+            n.fixture.account,
+            at,
+        )
+        db.update(
+            """insert into background_jobs(id,company_id,actor_id,kind,operation_id,request,authenticated_at,credential_version,correlation_id,created_at,total_items) values(?,?,?,'COLLABORATION_DIRECT_PROVISION',?,?::jsonb,?,0,?,?,1)""",
+            job,
+            n.fixture.company,
+            n.fixture.account,
+            UUID.randomUUID(),
+            json.writeValueAsString(
+                mapOf(
+                    "conversationId" to conversation,
+                    "deviceId" to device,
+                    "nativeSessionId" to n.session,
+                    "platform" to "ANDROID",
+                    "clientBuild" to "1",
+                )
+            ),
+            at,
+            UUID.randomUUID(),
+            at,
+        )
+        db.update(
+            "insert into collaboration_direct_room_provisioning(company_id,conversation_id,account_id,device_id,job_id,version,created_at,updated_at) values(?,?,?,?,?,0,?,?)",
+            n.fixture.company,
+            conversation,
+            n.fixture.account,
+            device,
+            job,
+            at,
+            at,
+        )
+        db.update(
+            "update background_jobs set status='RUNNING',attempts=1,lease_owner=gen_random_uuid(),lease_token=gen_random_uuid(),lease_until=now()+interval '1 minute' where id=?",
+            job,
+        )
+        val room = "!fixture-${UUID.randomUUID()}"
+        db.update(
+            "insert into collaboration_direct_room_bindings(company_id,conversation_id,account_id,job_id,provisioning_version,matrix_server_name,matrix_room_id,created_at) values(?,?,?,?,0,'matrix.example.test',?,?)",
+            n.fixture.company,
+            conversation,
+            n.fixture.account,
+            job,
+            room,
+            at,
+        )
+        db.update(
+            "update background_jobs set status='SUCCEEDED',completed_items=1,lease_owner=null,lease_token=null,lease_until=null,finished_at=now() where id=?",
+            job,
+        )
+        fun user(account: UUID) =
+            "@hris_${n.fixture.company.toString().replace("-", "")}_${account.toString().replace("-", "")}:matrix.example.test"
+        fun event(type: String, key: String, content: Map<String, Any>) =
+            mapOf(
+                "event_id" to "\$${UUID.randomUUID()}",
+                "room_id" to room,
+                "type" to type,
+                "state_key" to key,
+                "sender" to user(n.fixture.account),
+                "origin_server_ts" to 1,
+                "content" to content,
+            )
+        provider.roomStates[room] =
+            listOf(
+                event("m.room.create", "", mapOf("room_version" to "12", "m.federate" to false)),
+                event("m.room.encryption", "", mapOf("algorithm" to "m.megolm.v1.aes-sha2")),
+                event("m.room.member", user(n.fixture.account), mapOf("membership" to "join")),
+                event("m.room.member", user(peer), mapOf("membership" to "invite")),
+            )
+        return room
+    }
+
+    private fun matrixRoom(
+        n: Native,
+        token: String?,
+        route: String,
+        body: String? = null,
+    ): HttpResponse<String> {
+        val request =
+            HttpRequest.newBuilder(URI("http://127.0.0.1:$port/_matrix/client/$route"))
+                .timeout(Duration.ofSeconds(15))
+        token?.let { request.header("Authorization", "Bearer $it") }
+        if (body == null) request.GET()
+        else
+            request
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+        return n.fixture.browser.send(request.build(), HttpResponse.BodyHandlers.ofString())
+    }
+
+    @Test
+    fun roomReadsJoinAndDiscoveryUseCurrentNativeOwnershipAndBoundMemberPosition() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val room = publishedRoom(n, device)
+        val versions = matrixRoom(n, null, "versions")
+        assertEquals(200, versions.statusCode(), versions.body())
+        assertTrue(json.readTree(versions.body()).path("unstable_features").isEmpty)
+        val capabilities = matrixRoom(n, token, "v3/capabilities")
+        assertEquals(200, capabilities.statusCode(), capabilities.body())
+        assertEquals(
+            "12",
+            json
+                .readTree(capabilities.body())
+                .path("capabilities")
+                .path("m.room_versions")
+                .path("default")
+                .asString(),
+        )
+        for (route in listOf("v3/rooms/$room/join", "v3/join/$room")) {
+            val joined = matrixRoom(n, token, route, "{}")
+            assertEquals(200, joined.statusCode(), joined.body())
+            assertEquals(room, json.readTree(joined.body()).path("room_id").asString())
+        }
+        val state = matrixRoom(n, token, "v3/rooms/$room/state")
+        assertEquals(200, state.statusCode(), state.body())
+        assertEquals(4, json.readTree(state.body()).size())
+        val encryption = matrixRoom(n, token, "v3/rooms/$room/state/m.room.encryption")
+        assertEquals(200, encryption.statusCode(), encryption.body())
+        assertEquals(
+            "m.megolm.v1.aes-sha2",
+            json.readTree(encryption.body()).path("algorithm").asString(),
+        )
+        val synced = sync(n, token)
+        assertEquals(200, synced.statusCode(), synced.body())
+        val cursor =
+            java.net.URLEncoder.encode(
+                json.readTree(synced.body()).path("next_batch").asString(),
+                java.nio.charset.StandardCharsets.UTF_8,
+            )
+        val members = matrixRoom(n, token, "v3/rooms/$room/members?at=$cursor")
+        assertEquals(200, members.statusCode(), members.body())
+        assertEquals(2, json.readTree(members.body()).path("chunk").size())
+        assertEquals("at=fixture-private-since", provider.lastMemberQuery.get())
+        assertEquals("no-store", members.headers().firstValue("Cache-Control").orElse(""))
+        val before = provider.roomCalls.get()
+        assertEquals(401, matrixRoom(n, n.access, "v3/rooms/$room/state").statusCode())
+        assertEquals(401, matrixRoom(n, null, "v3/capabilities").statusCode())
+        assertEquals(404, matrixRoom(n, token, "v3/rooms/!unknown/state").statusCode())
+        assertEquals(
+            400,
+            matrixRoom(n, token, "v3/rooms/$room/join", "{\"third_party_signed\":{}}").statusCode(),
+        )
+        assertEquals(400, matrixRoom(n, token, "v3/rooms/$room/members?at=a&at=b").statusCode())
+        val other = native()
+        val (_, otherToken) = enroll(other)
+        assertEquals(404, matrixRoom(other, otherToken, "v3/rooms/$room/state").statusCode())
+        assertEquals(before, provider.roomCalls.get())
+    }
+
     private fun sync(
         n: Native,
         token: String? = null,
@@ -866,6 +1035,9 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         val queries = AtomicInteger()
         val syncs = AtomicInteger()
         val onSync = AtomicReference<(() -> Unit)?>(null)
+        val roomStates = ConcurrentHashMap<String, List<Map<String, Any>>>()
+        val roomCalls = AtomicInteger()
+        val lastMemberQuery = AtomicReference<String>()
         val onQuery = AtomicReference<(() -> Unit)?>(null)
         private val credentials = ConcurrentHashMap<String, Map<String, Any>>()
         private val executor = Executors.newFixedThreadPool(2)
@@ -1040,6 +1212,34 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                             }
                             else -> {
                                 if (
+                                    request.requestURI.path.startsWith("/_matrix/client/v3/rooms/")
+                                ) {
+                                    assertNotNull(
+                                        credentials[
+                                            request.requestHeaders
+                                                .getFirst("Authorization")
+                                                .removePrefix("Bearer ")]
+                                    )
+                                    val relative =
+                                        request.requestURI.path.removePrefix(
+                                            "/_matrix/client/v3/rooms/"
+                                        )
+                                    val room = relative.substringBefore('/')
+                                    val events = requireNotNull(roomStates[room])
+                                    roomCalls.incrementAndGet()
+                                    when (relative.substringAfter('/')) {
+                                        "join" -> mapOf("room_id" to room)
+                                        "state" -> events
+                                        "members" -> {
+                                            lastMemberQuery.set(request.requestURI.query)
+                                            mapOf(
+                                                "chunk" to
+                                                    events.filter { it["type"] == "m.room.member" }
+                                            )
+                                        }
+                                        else -> error("Unexpected room fixture route")
+                                    }
+                                } else if (
                                     request.requestURI.path.startsWith(
                                         "/_matrix/client/v3/user/"
                                     ) && request.requestURI.path.endsWith("/filter")

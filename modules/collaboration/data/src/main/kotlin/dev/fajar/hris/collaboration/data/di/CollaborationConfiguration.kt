@@ -24,6 +24,13 @@ import org.springframework.core.env.Environment
 @Configuration(proxyBeanMethods = false)
 class CollaborationConfiguration {
     @Bean
+    fun collaborationMatrixRoomAccess(
+        source: ObjectProvider<MatrixRoomAccessDataSource>
+    ): CollaborationMatrixRoomAccessRepository =
+        source.ifAvailable?.let(::InternalCollaborationMatrixRoomAccessRepository)
+            ?: DisabledCollaborationMatrixRoomAccessRepository()
+
+    @Bean
     fun collaborationRoomScopeSource(sql: DSLContext): CollaborationRoomScopeDataSource =
         PostgresCollaborationRoomScopeDataSource(sql)
 
@@ -443,6 +450,7 @@ class CollaborationConfiguration {
         roomScopes: CollaborationRoomScopeRepository,
         syncCursors: CollaborationSyncCursorRepository,
         providerSync: CollaborationMatrixSyncRepository,
+        providerRoomAccess: CollaborationMatrixRoomAccessRepository,
         sessions: NativeSessionRepository,
         policies: CompanyClientPolicyRepository,
         companies: CompanyRepository,
@@ -468,6 +476,7 @@ class CollaborationConfiguration {
             roomScopes,
             syncCursors,
             providerSync,
+            providerRoomAccess,
             sessions,
             policies,
             companies,

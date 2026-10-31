@@ -11,6 +11,7 @@ fun matrixGatewayProblem(failure: Failure): ResponseEntity<Any> {
         when (failure.kind) {
             FailureKind.UNAUTHENTICATED -> 401 to "M_UNKNOWN_TOKEN"
             FailureKind.FORBIDDEN -> 403 to "M_FORBIDDEN"
+            FailureKind.NOT_FOUND -> 404 to "M_NOT_FOUND"
             FailureKind.RATE_LIMITED -> 429 to "M_LIMIT_EXCEEDED"
             FailureKind.VALIDATION -> 400 to "M_BAD_JSON"
             FailureKind.CONFLICT -> 409 to "M_UNKNOWN"

@@ -30,6 +30,18 @@ class MatrixGatewayDeviceController(private val device: AccessNativeCollaboratio
     private val parser = parser(512)
     private val envelopeParser = parser(65536)
 
+    @PostMapping("/_matrix/client/v3/rooms/{roomId}/join", "/_matrix/client/v3/join/{roomId}")
+    fun join(@PathVariable roomId: String, request: HttpServletRequest): ResponseEntity<Any> =
+        keyRequest(
+            request,
+            { node ->
+                require(node.isObject && node.isEmpty)
+                Unit
+            },
+        ) { token, correlation, _ ->
+            device.joinRoom(token, correlation, roomId).map { mapOf("room_id" to it) }
+        }
+
     private fun parser(maximumStringLength: Int) =
         JsonMapper.builder(
                 JsonFactory.builder()

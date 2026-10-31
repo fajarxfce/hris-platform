@@ -1,0 +1,125 @@
+{
+  "date": "2026-10-31",
+  "scope": "Native Matrix discovery and scoped DIRECT join/state/member history through existing HRIS room bindings",
+  "schema": 113,
+  "validation": [
+    {
+      "durationSeconds": 10,
+      "result": "compile_failed",
+      "note": "New room-path helper duplicated the existing fixed helper; reused the original implementation."
+    },
+    {
+      "durationSeconds": 60,
+      "result": "passed",
+      "counts": {
+        "modules/collaboration/domain": {
+          "tests": 34,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modules/collaboration/data": {
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server": {
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "note": "Actual PostgreSQL ownership, native use-case/current-expiry, Synapse join/member history and HTTP contracts; existing sync mapper regression, format/architecture."
+    },
+    {
+      "durationSeconds": 26,
+      "result": "passed",
+      "counts": {
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "note": "Actual HRIS worker publication to Synapse followed by gateway join/state/sync/member history; wrong room/credential fields and malformed state/member responses; quality checks."
+    },
+    {
+      "durationSeconds": 379,
+      "result": "passed",
+      "counts": {
+        "modules/collaboration/domain": {
+          "tests": 34,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modules/collaboration/data": {
+          "tests": 187,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server": {
+          "tests": 158,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/worker": {
+          "tests": 112,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1
+        }
+      },
+      "note": "Full collaboration domain/data, selected API, complete worker, format/architecture and both shared DI graphs."
+    }
+  ],
+  "verified": [
+    "One bounded current account/company/server/room lookup through existing forced RLS, no new privilege or migration",
+    "No provider I/O for unknown/unpublished/foreign rooms and retained reads after peer offboarding",
+    "Current authority before and after provider I/O, revocation withholds a successful join response",
+    "Expired admission overrides failed resource preparation before any provider login",
+    "Fixed discovery with v1.12 wire metadata and v12 room capability; account mutations disabled",
+    "Strict empty-object join and bounded read query/credential framing",
+    "Actual idempotent Synapse join and membership at a pre-join sync position remains invite after current membership becomes join",
+    "Sealed same-device sync position translated to provider at position without exposing native credentials",
+    "Full client room context, shared full/stripped DIRECT event mapping, two-member bound and duplicate/foreign-state rejection",
+    "Actual HRIS job lease and room publication, then actual private-provider gateway reads and member position",
+    "Short control pool independent of long polling; existing control deadlines and response bounds",
+    "Both runtime DI contexts and successful exact-source sync CI retained separately"
+  ],
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt": "f4ddc264799a4aecb65e9c11114d1054af13709181c414a714fbb72b8e9e653f",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationRoomScopeDataSource.kt": "0135b6968255296a82a4d665afd9d295eae7b169ad380835d9605bd69d3ab3f6",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationRoomScopeDataSource.kt": "4c163aeaab1eb470bfb7bcb3390831d2a0911b690efa5507323e1488d0f1f87c",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "323a2f071899080e504b5d2d22aa6168ac4f5f5651a8c46fbb39962954d15a7f",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/HttpMatrixClientDataSource.kt": "f1edbbda388c50d9b1d04484f1b75b7e324d818c7c016098e69d07fc32b4b322",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixSyncRepository.kt": "86754a0ae1a137f0e28a38c9543221db7c5d00b61217ec43da9b701fca77cca7",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationRoomScopeRepository.kt": "cee41b585cd97627111ed69dab4f7a0cea1126fe56ca685abacf2004da709f1b",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationDirectRoomStorageTest.kt": "39db981857f5e5f46fb676e97927aec7a543d4202328a8b08c767cdc44a6d310",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "43a0d357bfd3cc495958fc2970c7bc2f7b086e711959528642290b904dd79fca",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/MatrixGatewayDeviceController.kt": "5b880f6271127fd224658d3b2d1b717c7f47f92b0620ebc226db5b122122c425",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/di/CollaborationWebConfiguration.kt": "30cfa4b135be377aa8b3262cb9f11aa6d4b16f9fef06ca821b5286fd182687c1",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/matrix/MatrixGatewayProblem.kt": "83608f7ae03531cbaed2339ed7f8a535d2149e34777d63a43ed50632d1a71b7b",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationRoomScopeRepository.kt": "eb240634c2013d6ad7ac606e30411332a026c70fffc99f5a7cf1bb2d91d64a16",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AccessNativeCollaborationMatrixDevice.kt": "09accc139486f93a979c9b7f05dafe898a37630d1e8df9cc58185fb19f4f1844",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/CollaborationDirectRoomEventMapping.kt": "484969ff5197ba342b80b14529370f00b077aca60a00f24b41848fa8d4cedfac",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixRoomAccessDataSource.kt": "5d9718f80f84c348bf3b5fc9d8311fd9072dd2176cc54685b66e410acfc663e4",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/DisabledCollaborationMatrixRoomAccessRepository.kt": "a41e28c1b71a2e91dd87a9a3ef8f344fa0af0cad3a47832bc517683cfc94c5ee",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixRoomAccessRepository.kt": "3b060fc830765a9d54118d1209da1e4358697af02e134afed1168c7da0858294",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixRoomAccessInteropTest.kt": "4118e616622f66ecf1dbd55c5ffdf7b743f54481c4dbae91545a598869a8e52d",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixRoomAccessMappingTest.kt": "93b054d751175662f3db8fd02a8a5e379c37aa5cfc1f1a64d61f7be6d460a160",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/MatrixGatewayReadController.kt": "0e72679f5d48e2c48b6caaa0717dcc32bcf999d0a4ef65039670e36b2a3ed4a8",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationRoomEvents.kt": "f40cd315058ec3833bc842133589f9f1a215879f9b06e774ac6521b4443ec1b7",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationMatrixRoomAccessRepository.kt": "6af5f8cce59d0bb9a2b710760ffdb37e5df586424d2ef517d59e029b01f7d904"
+  },
+  "remaining": [
+    "Owner/room-bound history pagination, context/event reads and encrypted room sends",
+    "Remaining fixed discovery needed by the actual pinned Android/web SDK",
+    "Actual HRIS SDK chat, durable offline outbox and logical-message reconciliation",
+    "UI and the remaining chat/call/meeting requirements",
+    "No live schema or phone update"
+  ]
+}

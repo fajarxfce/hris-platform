@@ -84,6 +84,37 @@ class CollaborationDirectRoomStorageTest {
             (f.run { f.roomScopes.owned(f.company, f.account, 10_001) } as Result.Success).value
         assertEquals(1, captured.size)
         assertEquals(binding.matrixRoomId, captured.single().roomId)
+        val selected = captured.single()
+        assertEquals(
+            Result.Success(selected),
+            f.run { f.roomScopes.find(f.company, f.account, selected.serverName, selected.roomId) },
+        )
+        assertEquals(
+            Result.Success(selected),
+            f.run(f.actor.copy(accountId = f.peer)) {
+                f.roomScopes.find(f.company, f.peer, selected.serverName, selected.roomId)
+            },
+        )
+        assertEquals(
+            Result.Success(null),
+            f.run { f.roomScopes.find(f.company, f.account, "other.invalid", selected.roomId) },
+        )
+        assertEquals(
+            Result.Success(null),
+            f.run { f.roomScopes.find(f.company, f.account, selected.serverName, "!unknown") },
+        )
+        assertEquals(
+            Result.Success(null),
+            f.run(f.actor.copy(accountId = UUID.randomUUID())) {
+                f.roomScopes.find(f.company, f.account, selected.serverName, selected.roomId)
+            },
+        )
+        assertEquals(
+            Result.Success(null),
+            f.run(f.actor.copy(companyId = UUID.randomUUID())) {
+                f.roomScopes.find(f.company, f.account, selected.serverName, selected.roomId)
+            },
+        )
         assertEquals(f.account, captured.single().creatorAccountId)
         assertEquals(
             setOf(f.account, f.peer),
@@ -117,6 +148,10 @@ class CollaborationDirectRoomStorageTest {
         assertEquals(
             Result.Success(captured),
             f.run { f.roomScopes.owned(f.company, f.account, 10_001) },
+        )
+        assertEquals(
+            Result.Success(selected),
+            f.run { f.roomScopes.find(f.company, f.account, selected.serverName, selected.roomId) },
         )
     }
 

@@ -97,7 +97,8 @@ mobile HTTP request. Provider work remains bounded by its deadline; direct
 interruption/shutdown cancellation is tested. Actual Android/web SDK owner
 cancellation, long-poll capacity, client scope-reset ingestion, durable outbox,
 provider rollback recovery and pagination remain acceptance gates. Discovery,
-room join/send/history and product UI must be connected before accepting chat.
+[room join/state/member reads](room-access.md) are now implemented. History
+pagination, encrypted sends and product UI must be connected before accepting chat.
 
 [Validation](../measurements/collaboration-sync-foundation-2026-10-31.json):
 domain, affected PostgreSQL storage and cursor crypto tests, format and architecture

@@ -2654,6 +2654,21 @@ class NativeCollaborationRegistrationTest {
         val rooms = mutableListOf<CollaborationOwnedRoom>()
         val scopes =
             object : CollaborationRoomScopeRepository {
+                override fun find(
+                    companyId: UUID,
+                    accountId: UUID,
+                    serverName: String,
+                    roomId: String,
+                ): Result<CollaborationOwnedRoom?> =
+                    Result.Success(
+                        rooms.singleOrNull {
+                            it.companyId == companyId &&
+                                it.serverName == serverName &&
+                                it.roomId == roomId &&
+                                accountId in setOf(it.firstAccountId, it.secondAccountId)
+                        }
+                    )
+
                 override fun owned(
                     companyId: UUID,
                     accountId: UUID,
@@ -2725,6 +2740,21 @@ class NativeCollaborationRegistrationTest {
             val rooms = mutableListOf<CollaborationOwnedRoom>()
             val scopes =
                 object : CollaborationRoomScopeRepository {
+                    override fun find(
+                        companyId: UUID,
+                        accountId: UUID,
+                        serverName: String,
+                        roomId: String,
+                    ): Result<CollaborationOwnedRoom?> =
+                        Result.Success(
+                            rooms.singleOrNull {
+                                it.companyId == companyId &&
+                                    it.serverName == serverName &&
+                                    it.roomId == roomId &&
+                                    accountId in setOf(it.firstAccountId, it.secondAccountId)
+                            }
+                        )
+
                     override fun owned(companyId: UUID, accountId: UUID, limit: Int) =
                         Result.Success(rooms.toList())
                 }
@@ -3744,6 +3774,301 @@ class NativeCollaborationRegistrationTest {
     }
 
     @Test
+    fun roomAccessUsesPublishedOwnershipAndDecodesOnlyTheCallingDevicesMemberPosition() {
+        val room = DirectRoomFixture()
+        val matrix = RecordingMatrix(room.f.clock)
+        val metadata = RecordingRooms(room)
+        val tokens =
+            success(
+                room.f
+                    .bootstrap()
+                    .execute(
+                        room.f.actor,
+                        room.parent,
+                        0,
+                        UUID.randomUUID(),
+                        room.device,
+                        1,
+                        null,
+                        room.client,
+                    )
+            )
+        val content = RecordingRoomAccess()
+        val request =
+            room.f.matrixIdentity(
+                matrix,
+                providerSync = RecordingSync(),
+                providerRoomAccess = content,
+            )
+        assertEquals(
+            "collaboration_room_not_found",
+            failed(request.roomState(tokens.accessToken, UUID.randomUUID(), metadata.id)),
+        )
+        assertTrue(content.calls.isEmpty())
+        success(room.request())
+        assertEquals(
+            JobStep(1, true),
+            success(
+                room.f.advanceRoom(matrix, metadata).execute(room.f.claimRoom(room.conversation))
+            ),
+        )
+        val sync =
+            success(
+                request.sync(
+                    tokens.accessToken,
+                    UUID.randomUUID(),
+                    CollaborationSyncRequest(null, 0),
+                )
+            )
+        assertEquals(
+            metadata.id,
+            success(request.joinRoom(tokens.accessToken, UUID.randomUUID(), metadata.id)),
+        )
+        success(request.roomState(tokens.accessToken, UUID.randomUUID(), metadata.id))
+        success(
+            request.roomMembers(tokens.accessToken, UUID.randomUUID(), metadata.id, sync.nextBatch)
+        )
+        assertEquals("private-position", content.memberAt)
+        val count = content.calls.size
+        assertEquals(
+            "collaboration_room_not_found",
+            failed(request.roomState(tokens.accessToken, UUID.randomUUID(), "!unknown")),
+        )
+        assertEquals(
+            "invalid_collaboration_room_request",
+            failed(request.joinRoom(tokens.accessToken, UUID.randomUUID(), "#alias:proof.invalid")),
+        )
+        assertEquals(
+            "invalid_collaboration_sync_cursor",
+            failed(
+                request.roomMembers(
+                    tokens.accessToken,
+                    UUID.randomUUID(),
+                    metadata.id,
+                    "not-a-cursor",
+                )
+            ),
+        )
+        assertEquals(count, content.calls.size)
+        sql.update(
+            "update company_memberships set active=false,version=version+1 where company_id=? and account_id=?",
+            room.f.actor.companyId,
+            room.peer,
+        )
+        success(request.roomState(tokens.accessToken, UUID.randomUUID(), metadata.id))
+        content.after = {
+            sql.update(
+                "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                room.parent,
+            )
+        }
+        assertInstanceOf(
+            Result.Failed::class.java,
+            request.joinRoom(tokens.accessToken, UUID.randomUUID(), metadata.id),
+        )
+        assertEquals(
+            2,
+            content.calls.count { it == "join" },
+        ) // Second provider join completed but its receipt was withheld.
+    }
+
+    @Test
+    fun expiredAdmissionOverridesAnOwnedRoomLookupFailureBeforeProviderLogin() {
+        val g = GatewayFixture()
+        val tokens = success(g.bootstrap())
+        val matrix = RecordingMatrix(g.f.clock)
+        val scope =
+            object : CollaborationRoomScopeRepository {
+                override fun owned(
+                    companyId: UUID,
+                    accountId: UUID,
+                    limit: Int,
+                ): Result<List<CollaborationOwnedRoom>> =
+                    error("Only the exact room lookup is expected")
+
+                override fun find(
+                    companyId: UUID,
+                    accountId: UUID,
+                    serverName: String,
+                    roomId: String,
+                ): Result<CollaborationOwnedRoom?> {
+                    g.f.clock.at = tokens.accessExpiresAt
+                    return Result.Failed(Failure(FailureKind.NOT_FOUND, "fixture_lookup_failure"))
+                }
+            }
+        val result =
+            g.f
+                .matrixIdentity(matrix, roomScopes = scope)
+                .roomState(tokens.accessToken, UUID.randomUUID(), "!owned")
+        assertEquals("collaboration_admission_changed", failed(result))
+        assertEquals(0, matrix.logins.get())
+    }
+
+    private class RecordingRoomAccess :
+        dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomAccessRepository {
+        val calls = mutableListOf<String>()
+        var memberAt: String? = null
+        var after: (() -> Unit)? = null
+
+        private fun called(kind: String) {
+            assertFalse(
+                org.springframework.transaction.support.TransactionSynchronizationManager
+                    .isActualTransactionActive()
+            )
+            calls += kind
+            after?.invoke()
+        }
+
+        override fun join(
+            room: CollaborationOwnedRoom,
+            bearer: String,
+            deadline: Instant,
+        ): Result<String> {
+            called("join")
+            return Result.Success(room.roomId)
+        }
+
+        override fun state(
+            owner: CollaborationSyncOwner,
+            room: CollaborationOwnedRoom,
+            bearer: String,
+            deadline: Instant,
+        ): Result<CollaborationRoomEvents> {
+            called("state")
+            return Result.Success(CollaborationRoomEvents(emptyList()))
+        }
+
+        override fun members(
+            owner: CollaborationSyncOwner,
+            room: CollaborationOwnedRoom,
+            at: String?,
+            bearer: String,
+            deadline: Instant,
+        ): Result<CollaborationRoomEvents> {
+            called("members")
+            memberAt = at
+            return Result.Success(CollaborationRoomEvents(emptyList()))
+        }
+    }
+
+    @Test
+    fun roomAccessReachesActualSynapseAfterFencedHrisWorkerPublication() {
+        val room = DirectRoomFixture()
+        MatrixProviderFixture("10m", room.f.clock).use { provider ->
+            provider.start()
+            val at = room.f.clock.instant()
+            success(
+                provider.repository.login(
+                    provider.request.copy(
+                        companyId = requireNotNull(room.f.actor.companyId),
+                        accountId = room.peer,
+                        deviceId = UUID.randomUUID(),
+                        issuedAt = at,
+                        expiresAt = at.plusSeconds(60),
+                    )
+                )
+            )
+            val source = HttpMatrixClientDataSource(provider.client, provider.config, room.f.clock)
+            val rooms =
+                dev.fajar.hris.collaboration.data.repositories
+                    .InternalCollaborationMatrixRoomRepository(source, provider.config.serverName)
+            success(room.request())
+            val lease = room.f.claimRoom(room.conversation)
+            assertEquals(
+                JobStep(1, true),
+                success(
+                    room.f
+                        .advanceRoom(
+                            provider.repository,
+                            rooms,
+                            serverName = provider.config.serverName,
+                        )
+                        .execute(lease)
+                ),
+            )
+            val binding =
+                requireNotNull(
+                    success(
+                        room.f.transactions.run(room.f.actor) {
+                            room.f.directRooms.binding(
+                                requireNotNull(room.f.actor.companyId),
+                                room.conversation,
+                            )
+                        }
+                    )
+                )
+            val tokens =
+                success(
+                    room.f
+                        .bootstrap()
+                        .execute(
+                            room.f.actor,
+                            room.parent,
+                            0,
+                            UUID.randomUUID(),
+                            room.device,
+                            1,
+                            null,
+                            room.client,
+                        )
+                )
+            dev.fajar.hris.collaboration.data.matrix
+                .HttpMatrixSyncDataSource(provider.client, provider.config, room.f.clock)
+                .use { sync ->
+                    val request =
+                        room.f.matrixIdentity(
+                            provider.repository,
+                            serverName = provider.config.serverName,
+                            providerSync =
+                                dev.fajar.hris.collaboration.data.repositories
+                                    .InternalCollaborationMatrixSyncRepository(sync),
+                            providerRoomAccess =
+                                dev.fajar.hris.collaboration.data.repositories
+                                    .InternalCollaborationMatrixRoomAccessRepository(source),
+                        )
+                    assertEquals(
+                        binding.matrixRoomId,
+                        success(
+                            request.joinRoom(
+                                tokens.accessToken,
+                                UUID.randomUUID(),
+                                binding.matrixRoomId,
+                            )
+                        ),
+                    )
+                    val state =
+                        success(
+                            request.roomState(
+                                tokens.accessToken,
+                                UUID.randomUUID(),
+                                binding.matrixRoomId,
+                            )
+                        )
+                    assertTrue(state.events.any { it["type"] == "m.room.create" })
+                    val batch =
+                        success(
+                            request.sync(
+                                tokens.accessToken,
+                                UUID.randomUUID(),
+                                CollaborationSyncRequest(null, 0),
+                            )
+                        )
+                    val members =
+                        success(
+                            request.roomMembers(
+                                tokens.accessToken,
+                                UUID.randomUUID(),
+                                binding.matrixRoomId,
+                                batch.nextBatch,
+                            )
+                        )
+                    assertEquals(2, members.events.size)
+                    assertTrue(members.events.all { it["room_id"] == binding.matrixRoomId })
+                }
+        }
+    }
+
+    @Test
     fun directRoomRequestRejectsWrongDeviceVersionAndMissingAuthorityWithoutEnqueue() {
         val room = DirectRoomFixture()
         val f = room.f
@@ -4470,6 +4795,7 @@ class NativeCollaborationRegistrationTest {
             matrix: CollaborationMatrixRepository,
             providerRooms: CollaborationMatrixRoomRepository,
             journal: ChangeJournalRepository = this.journal,
+            serverName: String = "proof.invalid",
         ) =
             AdvanceNativeCollaborationDirectRoom(
                 direct,
@@ -4488,7 +4814,7 @@ class NativeCollaborationRegistrationTest {
                 transactions,
                 IdentitySecurityPolicy(),
                 CollaborationServicePolicy(true),
-                CollaborationMatrixPolicy(true, "proof.invalid"),
+                CollaborationMatrixPolicy(true, serverName),
                 clock,
             )
 
@@ -4721,6 +5047,10 @@ class NativeCollaborationRegistrationTest {
                 ),
             providerSync: CollaborationMatrixSyncRepository =
                 DisabledCollaborationMatrixSyncRepository(),
+            providerRoomAccess:
+                dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomAccessRepository =
+                dev.fajar.hris.collaboration.data.repositories
+                    .DisabledCollaborationMatrixRoomAccessRepository(),
         ) =
             AccessNativeCollaborationMatrixDevice(
                 gateway,
@@ -4742,6 +5072,7 @@ class NativeCollaborationRegistrationTest {
                     )
                 ),
                 providerSync,
+                providerRoomAccess,
                 sessions,
                 policies,
                 companies,

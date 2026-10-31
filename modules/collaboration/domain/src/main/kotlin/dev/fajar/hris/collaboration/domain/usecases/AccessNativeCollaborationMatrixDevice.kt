@@ -28,6 +28,7 @@ class AccessNativeCollaborationMatrixDevice(
     private val roomScopes: CollaborationRoomScopeRepository,
     private val syncCursors: CollaborationSyncCursorRepository,
     private val providerSync: CollaborationMatrixSyncRepository,
+    private val providerRoomAccess: CollaborationMatrixRoomAccessRepository,
     private val sessions: NativeSessionRepository,
     private val policies: CompanyClientPolicyRepository,
     private val companies: CompanyRepository,
@@ -40,6 +41,110 @@ class AccessNativeCollaborationMatrixDevice(
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
 ) {
+    fun capabilities(token: String, correlationId: UUID): Result<Unit> =
+        admitted(token, correlationId, prepare = { _, _ -> Result.Success(Unit) }) { exchange, _ ->
+            exchange.confirm()
+        }
+
+    fun joinRoom(token: String, correlationId: UUID, roomId: String): Result<String> =
+        roomOperation(token, correlationId, roomId) { exchange, prepared ->
+            exchange.exchange { bearer, deadline ->
+                providerRoomAccess.join(prepared.room, bearer, deadline)
+            }
+        }
+
+    fun roomState(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+    ): Result<CollaborationRoomEvents> =
+        roomOperation(token, correlationId, roomId) { exchange, prepared ->
+            exchange.exchange { bearer, deadline ->
+                providerRoomAccess.state(prepared.owner, prepared.room, bearer, deadline)
+            }
+        }
+
+    fun roomMembers(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        at: String?,
+    ): Result<CollaborationRoomEvents> =
+        roomOperation(token, correlationId, roomId, at) { exchange, prepared ->
+            exchange.exchange { bearer, deadline ->
+                providerRoomAccess.members(
+                    prepared.owner,
+                    prepared.room,
+                    prepared.at,
+                    bearer,
+                    deadline,
+                )
+            }
+        }
+
+    private fun <T> roomOperation(
+        token: String,
+        correlationId: UUID,
+        roomId: String,
+        at: String? = null,
+        operation: (Exchange, RoomPreparation) -> Result<T>,
+    ): Result<T> {
+        if (
+            roomId.length !in 2..255 ||
+                !roomId.startsWith('!') ||
+                roomId.any { it.code !in 33..126 } ||
+                at?.let { it.length !in 1..4096 || it.any { char -> char.code !in 33..126 } } ==
+                    true
+        )
+            return Result.Failed(
+                Failure(FailureKind.VALIDATION, "invalid_collaboration_room_request")
+            )
+        return admitted(
+            token,
+            correlationId,
+            prepare = { initial, _ ->
+                readOwnedRoom(initial, roomId).flatMap { room ->
+                    val owner = syncOwner(initial)
+                    val position = at?.let { syncCursors.open(owner, it) } ?: Result.Success(null)
+                    position.map { RoomPreparation(owner, room, it?.providerSince) }
+                }
+            },
+            revalidate = { initial, original ->
+                readOwnedRoom(initial, roomId).flatMap { current ->
+                    if (current == original.room) Result.Success(Unit)
+                    else Result.Failed(Failure(FailureKind.CONFLICT, "collaboration_room_changed"))
+                }
+            },
+            operation = operation,
+        )
+    }
+
+    private fun readOwnedRoom(
+        initial: CollaborationGatewaySession,
+        roomId: String,
+    ): Result<CollaborationOwnedRoom> =
+        roomScopes
+            .find(initial.companyId, initial.accountId, provider.serverName, roomId)
+            .flatMap { room ->
+                if (room == null)
+                    Result.Failed(Failure(FailureKind.NOT_FOUND, "collaboration_room_not_found"))
+                else if (room.roomId != roomId) invalidProvider()
+                else
+                    snapshotCollaborationRoomScope(
+                            initial.companyId,
+                            initial.accountId,
+                            provider.serverName,
+                            listOf(room),
+                        )
+                        .map { it.rooms.single() }
+            }
+
+    private data class RoomPreparation(
+        val owner: CollaborationSyncOwner,
+        val room: CollaborationOwnedRoom,
+        val at: String?,
+    )
+
     fun sync(
         token: String,
         correlationId: UUID,
@@ -609,10 +714,9 @@ class AccessNativeCollaborationMatrixDevice(
         val captured =
             transactions.run(scope) {
                 observe(scope, initial, relatedAccounts).flatMap { observation ->
-                    prepare(initial, observation).flatMap { extra ->
-                        validateObservation(observation.admission, observation.admission).map {
-                            Preparation(observation, extra)
-                        }
+                    val extra = prepare(initial, observation)
+                    validateObservation(observation.admission, observation.admission).flatMap {
+                        extra.map { Preparation(observation, it) }
                     }
                 }
             }

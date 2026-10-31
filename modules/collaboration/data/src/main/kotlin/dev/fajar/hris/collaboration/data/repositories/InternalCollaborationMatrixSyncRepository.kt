@@ -17,19 +17,6 @@ import tools.jackson.databind.json.JsonMapper
 class InternalCollaborationMatrixSyncRepository(private val source: MatrixSyncDataSource) :
     CollaborationMatrixSyncRepository {
     private val json = JsonMapper.builder().build()
-    private val states =
-        setOf(
-            "m.room.create",
-            "m.room.member",
-            "m.room.encryption",
-            "m.room.join_rules",
-            "m.room.history_visibility",
-            "m.room.guest_access",
-            "m.room.power_levels",
-            "m.room.server_acl",
-            "m.room.canonical_alias",
-            "org.hris.conversation",
-        )
 
     override fun sync(
         owner: CollaborationSyncOwner,
@@ -85,18 +72,27 @@ class InternalCollaborationMatrixSyncRepository(private val source: MatrixSyncDa
                     if (bucket == "invite") {
                         val invited =
                             events(value, "invite_state").mapNotNull {
-                                event(it, pair, ownUser, id, creator, stripped = true)
+                                mapCollaborationDirectRoomEvent(
+                                    it,
+                                    pair,
+                                    ownUser,
+                                    id,
+                                    creator,
+                                    stripped = true,
+                                )
                             }
                         output[id] = mapOf("invite_state" to mapOf("events" to invited))
                     } else {
                         val state =
                             events(value, "state")
-                                .mapNotNull { event(it, pair, ownUser, id, creator) }
+                                .mapNotNull {
+                                    mapCollaborationDirectRoomEvent(it, pair, ownUser, id, creator)
+                                }
                                 .toMutableList()
                         val timelineNode = optionalObject(value, "timeline")
                         val timeline =
                             eventArray(timelineNode).mapNotNull {
-                                event(it, pair, ownUser, id, creator)
+                                mapCollaborationDirectRoomEvent(it, pair, ownUser, id, creator)
                             }
                         if (
                             (position == null || fullState) &&
@@ -114,8 +110,13 @@ class InternalCollaborationMatrixSyncRepository(private val source: MatrixSyncDa
                             if (creates.size != 1) throw MatrixResponseException()
                             state.add(
                                 0,
-                                event(creates.single(), pair, ownUser, id, creator)
-                                    ?: throw MatrixResponseException(),
+                                mapCollaborationDirectRoomEvent(
+                                    creates.single(),
+                                    pair,
+                                    ownUser,
+                                    id,
+                                    creator,
+                                ) ?: throw MatrixResponseException(),
                             )
                         }
                         val timelineOut = linkedMapOf<String, Any>("events" to timeline)
@@ -220,72 +221,6 @@ class InternalCollaborationMatrixSyncRepository(private val source: MatrixSyncDa
                 ),
             )
         }
-    }
-
-    private fun event(
-        value: JsonNode,
-        pair: Set<String>,
-        ownUser: String,
-        roomId: String,
-        creator: String,
-        stripped: Boolean = false,
-    ): Map<String, Any>? {
-        objectNode(value)
-        val type = text(value, "type", 128)
-        val sender = text(value, "sender", 255)
-        if (sender !in pair || (value.has("room_id") && value.path("room_id").asString() != roomId))
-            throw MatrixResponseException()
-        if (type == "m.room.message") throw MatrixResponseException()
-        if (type !in states && type != "m.room.encrypted" && type != "m.room.redaction") return null
-        if (stripped && type !in states) throw MatrixResponseException()
-        val content = value.path("content")
-        objectNode(content)
-        if (type in states) {
-            if (!value.path("state_key").isString) throw MatrixResponseException()
-            if (type == "m.room.member") {
-                if (value.path("state_key").asString() !in pair) throw MatrixResponseException()
-            } else if (value.path("state_key").asString() != "") throw MatrixResponseException()
-        }
-        if (
-            type == "m.room.create" &&
-                (sender != creator ||
-                    content.path("room_version").asString() != "12" ||
-                    content.path("m.federate").asBoolean(true) ||
-                    (content.has("additional_creators") &&
-                        (!content.path("additional_creators").isArray ||
-                            !content.path("additional_creators").isEmpty)))
-        )
-            throw MatrixResponseException()
-        if (
-            type == "m.room.encryption" &&
-                content.path("algorithm").asString() != "m.megolm.v1.aes-sha2"
-        )
-            throw MatrixResponseException()
-        if (
-            type == "m.room.encrypted" &&
-                (content.path("algorithm").asString() != "m.megolm.v1.aes-sha2" ||
-                    !content.path("ciphertext").isString ||
-                    content.path("ciphertext").asString().length !in 1..1_048_576)
-        )
-            throw MatrixResponseException()
-        val result =
-            linkedMapOf<String, Any>("type" to type, "sender" to sender, "content" to map(content))
-        if (value.has("state_key")) result["state_key"] = value.path("state_key").asString()
-        if (!stripped) {
-            result["event_id"] =
-                text(value, "event_id", 255).also {
-                    if (!it.startsWith('$')) throw MatrixResponseException()
-                }
-            val time = value.path("origin_server_ts")
-            if (!time.isIntegralNumber || !time.canConvertToLong() || time.asLong() < 0)
-                throw MatrixResponseException()
-            result["origin_server_ts"] = time.asLong()
-            val unsigned = optionalObject(value, "unsigned")
-            val txn = unsigned.path("transaction_id")
-            if (sender == ownUser && txn.isString && txn.asString().length in 1..128)
-                result["unsigned"] = mapOf("transaction_id" to txn.asString())
-        }
-        return result
     }
 
     private fun map(node: JsonNode): Map<String, Any> =

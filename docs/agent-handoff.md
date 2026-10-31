@@ -17,6 +17,25 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- Native Matrix discovery and DIRECT join/state/member reads now use exact owned
+  room lookup through existing RLS. `members?at=` opens only the calling device's
+  sealed sync position; actual Synapse preserves historical invite state after a
+  later join. Read/join use control capacity while sync owns its separate pool.
+  Preparation rechecks admission even after a failed resource lookup. Full checks
+  passed in 379s: 34 domain, 187 data, 158 selected API, 112 worker (one existing
+  opt-in skip), format/architecture and both DI contexts. Actual HRIS worker
+  publication → Synapse → gateway join/state/sync/member reads passes; all HTTP
+  routes, strict framing, foreign/unpublished room denial and late revocation are
+  covered. [Contract](collaboration/room-access.md) and
+  [evidence](measurements/collaboration-room-access-2026-10-31.json) retain source
+  hashes and the corrected duplicate-helper compilation failure. **Next implement
+  owner/room-bound pagination, context/event reads and encrypted room sends, then
+  the actual pinned SDK through HRIS, durable outbox and UI.** Client filters,
+  additional fixed discovery, browser admission, group/context scope and the rest
+  of the full plan remain. No schema migration, live update or phone action.
+  Sync `43391884` hosted `41223350867` passed all jobs/steps; its 18 exact source
+  hashes and raw terminal metadata are retained in the sync-gateway measurement.
+
 - Native `GET /_matrix/client/v3/sync` now has current admission and immutable
   DIRECT scope fences, owner-bound encrypted positions, initial reacquisition on
   scope growth and fixed own-user provider filters. Every room bucket is filtered
@@ -45,8 +64,8 @@ Current provider/client evidence:
   invalid, ambiguous or oversized scope is rejected without truncation. Focused
   domain/storage/crypto plus quality checks passed in 22s. [Contract](collaboration/sync-gateway.md)
   and [evidence](measurements/collaboration-sync-foundation-2026-10-31.json) retain
-  bounds and key-rotation/reset behavior. Next wire the admitted sync endpoint and
-  separately owned long polling, then native SDK and durable outbox.
+  bounds and key-rotation/reset behavior. The admitted sync implementation above
+  now consumes this foundation; native SDK and durable outbox remain.
   To-device `199d541f` hosted `41219599675` passed every job/step; its 17 source
   hashes and raw terminal jobs are retained in the to-device measurement.
 
@@ -57,9 +76,9 @@ Current provider/client evidence:
   (even repeated initial sync omits it). [Contract](collaboration/sync-scope-recovery.md)
   and [evidence](measurements/collaboration-sync-scope-2026-10-31.json) retain the
   corrected assumptions, final 14s case, format/architecture and exact source.
-  Preserve state/timeline ordering and filter all room buckets in HRIS. Next
-  implement the current room projection, account/company/device-bound cursor and
-  separately owned long polling; no public sync/SDK acceptance is implied.
+  The admitted sync implementation above now preserves state/timeline ordering
+  and filters every room bucket. The provider experiment alone does not establish
+  native SDK acceptance.
 
 - Both native SyncService and classic Client.syncV2 now pass the same actual
   Android/browser proof with one APK `d835e1c1`: two cases each, 18.814s native /
@@ -69,8 +88,9 @@ Current provider/client evidence:
   [evidence](measurements/collaboration-dual-sync-2026-10-31.json) retain failures,
   18 Python checks, source hashes, final 23s root/debug/lint (2,002 desktop cases,
   zero lint errors). Use classic for the first scoped HRIS Android/web transport;
-  native list/subscription/extension authorization remains a separate gate. No
-  public sync/content routes or product acceptance are implied. Exact Mobile
+  native list/subscription/extension authorization remains a separate gate. This
+  fixture targets the provider directly; actual HRIS SDK integration and product
+  acceptance remain. Exact Mobile
   `b061d390` hosted `41212817421` passed every job/step in both modes: classic
   31.659s/72.695s and native 34.002s/81.267s, both cleanup true. Platform `d425e6d8`
   browser `41212746123` also passed every step; all artifacts and matching source

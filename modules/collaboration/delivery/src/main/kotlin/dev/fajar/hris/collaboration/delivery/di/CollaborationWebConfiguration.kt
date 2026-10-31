@@ -34,6 +34,22 @@ class CollaborationWebConfiguration {
                 .permitAll()
             it.requestMatchers(HttpMethod.GET, "/_matrix/client/v3/account/whoami").permitAll()
             it.requestMatchers(HttpMethod.GET, "/_matrix/client/v3/sync").permitAll()
+            it.requestMatchers(
+                    HttpMethod.GET,
+                    "/_matrix/client/versions",
+                    "/_matrix/client/v3/capabilities",
+                    "/_matrix/client/v3/rooms/*/state",
+                    "/_matrix/client/v3/rooms/*/state/*",
+                    "/_matrix/client/v3/rooms/*/state/*/",
+                    "/_matrix/client/v3/rooms/*/members",
+                )
+                .permitAll()
+            it.requestMatchers(
+                    HttpMethod.POST,
+                    "/_matrix/client/v3/rooms/*/join",
+                    "/_matrix/client/v3/join/*",
+                )
+                .permitAll()
             it.anyRequest().denyAll()
         }
         http.exceptionHandling {

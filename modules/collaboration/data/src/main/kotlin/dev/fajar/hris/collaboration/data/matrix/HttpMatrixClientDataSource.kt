@@ -17,7 +17,12 @@ class HttpMatrixClientDataSource(
     private val configuration: MatrixProviderConfiguration,
     private val clock: Clock,
     maximumConcurrent: Int = 32,
-) : MatrixClientDataSource, MatrixRoomDataSource, MatrixKeyDataSource, MatrixToDeviceDataSource {
+) :
+    MatrixClientDataSource,
+    MatrixRoomDataSource,
+    MatrixKeyDataSource,
+    MatrixToDeviceDataSource,
+    MatrixRoomAccessDataSource {
     private val exchanges = Semaphore(maximumConcurrent)
     private val json =
         JsonMapper.builder()
@@ -121,6 +126,46 @@ class HttpMatrixClientDataSource(
                 token,
                 deadline,
                 maximumRequestBytes = 1_048_576,
+            )
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
+    }
+
+    override fun join(roomId: String, token: String, deadline: Instant): JsonNode {
+        val response = roomRequest(roomPath(roomId) + "/join", "POST", emptyMap(), token, deadline)
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
+    }
+
+    override fun stateEvents(roomId: String, token: String, deadline: Instant): JsonNode {
+        val response =
+            roomRequest(
+                roomPath(roomId) + "/state",
+                "GET",
+                null,
+                token,
+                deadline,
+                maximumResponseBytes = 1_048_576,
+            )
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parseJson(response)
+    }
+
+    override fun memberEvents(
+        roomId: String,
+        at: String?,
+        token: String,
+        deadline: Instant,
+    ): JsonNode {
+        require(at == null || (at.length in 1..1024 && at.all { it.code in 33..126 }))
+        val response =
+            roomRequest(
+                roomPath(roomId) + "/members" + (at?.let { "?at=${segment(it)}" } ?: ""),
+                "GET",
+                null,
+                token,
+                deadline,
+                maximumResponseBytes = 1_048_576,
             )
         if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
         return parse(response)

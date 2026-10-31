@@ -7,4 +7,11 @@ import java.util.UUID
 interface CollaborationRoomScopeRepository {
     /** One bounded statement under the caller's company/participant RLS transaction. */
     fun owned(companyId: UUID, accountId: UUID, limit: Int): Result<List<CollaborationOwnedRoom>>
+
+    fun find(
+        companyId: UUID,
+        accountId: UUID,
+        serverName: String,
+        roomId: String,
+    ): Result<CollaborationOwnedRoom?>
 }

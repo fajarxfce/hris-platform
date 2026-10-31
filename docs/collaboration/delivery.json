@@ -82,7 +82,9 @@
         "../measurements/collaboration-sync-scope-2026-10-31.json",
         "sync-gateway.md",
         "../measurements/collaboration-sync-foundation-2026-10-31.json",
-        "../measurements/collaboration-sync-gateway-2026-10-31.json"
+        "../measurements/collaboration-sync-gateway-2026-10-31.json",
+        "room-access.md",
+        "../measurements/collaboration-room-access-2026-10-31.json"
       ]
     },
     {

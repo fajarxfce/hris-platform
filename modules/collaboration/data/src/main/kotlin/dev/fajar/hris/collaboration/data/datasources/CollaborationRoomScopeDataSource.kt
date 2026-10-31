@@ -14,4 +14,11 @@ data class CollaborationOwnedRoomData(
 
 interface CollaborationRoomScopeDataSource {
     fun owned(companyId: UUID, accountId: UUID, limit: Int): List<CollaborationOwnedRoomData>
+
+    fun find(
+        companyId: UUID,
+        accountId: UUID,
+        serverName: String,
+        roomId: String,
+    ): CollaborationOwnedRoomData?
 }

@@ -28,6 +28,7 @@ class PostgresCollaborationProviderSessionDataSource(private val sql: DSLContext
     ): Boolean =
         sql.update(S)
             .set(S.TOKEN_ENCRYPTED, record.tokenEncrypted)
+            .set(S.TOKEN_EXPIRES_AT, record.tokenExpiresAt)
             .set(S.GENERATION, record.generation)
             .set(S.UPDATED_AT, record.updatedAt)
             .where(

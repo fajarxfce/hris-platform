@@ -36,13 +36,18 @@ class RecoverySetTest(unittest.TestCase):
         self.assertIn("'hris:matrix:'||company_id||':'||account_id||':'||device_id||':'||generation", sql)
         self.assertIn("FROM collaboration_provider_sessions WHERE token_encrypted IS NOT NULL", sql)
         self.assertIn("LIMIT 100001", sql)
+        self.assertNotIn("token_expires_at", sql)
+        expiring = recovery.envelope_query(107)
+        self.assertIn("CASE WHEN token_expires_at IS NULL THEN ''", expiring)
+        self.assertIn("extract(epoch FROM token_expires_at)*1000000", expiring)
+        self.assertIn(":expires:", expiring)
         with self.assertRaises(recovery.RecoveryError):
-            recovery.envelope_query(107)
+            recovery.envelope_query(108)
 
     def test_schema_gate_accepts_reviewed_device_registry_and_rejects_unknown_future_schema(self):
-        for schema in (59, 101, 102, 103, 104, 105, 106):
+        for schema in (59, 101, 102, 103, 104, 105, 106, 107):
             recovery.validate_schema({'observedSchema': str(schema)})
-        for schema in (58, 107, None, 'invalid'):
+        for schema in (58, 108, None, 'invalid'):
             with self.assertRaises(database.RecoveryError):
                 recovery.validate_schema({'observedSchema': schema})
 

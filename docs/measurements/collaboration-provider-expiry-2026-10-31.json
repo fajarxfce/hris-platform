@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "kind": "collaboration_provider_expiry_storage",
+  "schema": 107,
+  "productAcceptance": false,
+  "liveRuntimeModified": false,
+  "checks": {
+    "core/database": {
+      "tests": 29,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "modules/collaboration/domain": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "modules/collaboration/data": {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "recoveryToolCases": 22,
+    "format": true,
+    "architecture": true,
+    "elapsedSeconds": 147,
+    "actualPostgresMigrationAndRestore": true,
+    "completeRestoredEnvelopeProjectionVerified": true,
+    "legacyEnvelopeRetained": true,
+    "deadlineTamperingRejected": true
+  },
+  "verifiedBehaviors": [
+    "Legacy schema-106 ciphertext migrates with unknown deadline and remains ineligible for live use until rotation.",
+    "New or rotated credentials require a finite lifetime no longer than ten minutes.",
+    "Credential freshness rejects unknown deadlines, future observations and the exact expiry without deleting owned metadata.",
+    "Deadline microseconds are authenticated alongside company/account/device/generation; corrupting the deadline alone fails decryption.",
+    "Actual restore verifies all three Matrix envelopes across legacy/current AAD and old/current encryption keys.",
+    "Terminal retirement preserves the deadline while clearing the encrypted bearer."
+  ],
+  "sourceSha256": {
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/crypto/CollaborationProviderPurpose.kt": "f162632dd3ca3cf850340a100a54d532d929be96af3bfc934277ef0b05b9ab27",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationProviderSessionDataSource.kt": "6c681948b376a1bf2cd4029e7eebbea8f2ddbc8777ab2ab51dcac0d686a1cace",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/EncryptedCollaborationProviderSessionRepository.kt": "f4536c3d4364039a4483ab73bff36e33f658e38c7496b7739d410ba00bb632fd",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationProviderCredentialTest.kt": "9b0f83e9c2c35cc23effa17cc73bee2edca6bbbbe15b3d04744ecf1f4113df75",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationProviderSession.kt": "220fdb372a384d3ccb14c8a081a36c07b59388a58e094cdedce48ffddc0a415c",
+    "tool/recovery_set.py": "6135dda8ec1cf1cf660032f48e54f696669c9a278878af0be4ab72c05cd74850",
+    "tool/test_recovery_set.py": "d2a1336d448311de6ced394bd1f63f9bece0fff6dd4b0597f16e20bda0d192f4",
+    "core/database/src/main/resources/db/migration/V107__collaboration_provider_expiry.sql": "83f2b6345ef2a4a0f741b38a9f7f756693e5ebdb0de09ee64a14d240b51c5ff9",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationProviderLifetime.kt": "0b1d8e142d6a3acc0949aa31aaf9422e337d62f6bb0f495b47ac9ff736325ef0"
+  },
+  "remaining": [
+    "Durable provider provisioning and fencing",
+    "Protected native/browser Matrix gateway",
+    "Product SDK adapters and chat screens"
+  ]
+}

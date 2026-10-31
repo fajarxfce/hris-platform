@@ -29,7 +29,8 @@
         "../measurements/collaboration-native-registration-2026-10-31.json",
         "../measurements/collaboration-native-http-2026-10-31.json",
         "../measurements/collaboration-provider-storage-2026-10-31.json",
-        "../measurements/collaboration-matrix-transport-2026-10-31.json"
+        "../measurements/collaboration-matrix-transport-2026-10-31.json",
+        "../measurements/collaboration-provider-expiry-2026-10-31.json"
       ]
     },
     {

@@ -190,6 +190,23 @@ Mobile native refresh CI `41187875527` passed at `d799e5cf`, using Platform
 `1db0f9fe`: both scenarios in 54.657s with cleanup; Mobile `aeb0f6b5` retains the
 independent source/APK result. All product P0–P8 gates still apply.
 
+Schema 107 now persists bounded provider expiry and includes its Unix microseconds
+in the encrypted AAD. Legacy schema-106 NULL deadlines preserve their original
+AAD and remain readable for cleanup/recovery but cannot authorize live provider
+use. New inserts/rotations require a finite deadline after the write and within
+ten minutes. Terminal retirement preserves the deadline. Use the named lifetime
+policy only for freshness; it never replaces HRIS admission or deletes local facts.
+
+Eight provider-storage scenarios, eleven admission cases, 29 core database cases,
+formatting and architecture pass in 2m27s; 22 recovery-tool cases pass. The actual
+106→107 migration carries a legacy ciphertext, and dump/restore verifies the full
+three-envelope projection with old/current encryption keys. Independent deadline
+tampering fails authentication. [Expiry evidence](measurements/collaboration-provider-expiry-2026-10-31.json)
+records source and limits. No DI/live deployment occurred; runtime stays schema 103.
+Continue durable provisioning/fenced activation and gateway integration next.
+The new provider transport's control CI is `41188537446` at exact `d78f285d`;
+record its final status after completion.
+
 The paragraphs below are retained prior-work history. Their old installed build
 2 reference is superseded by Mobile's validated release build 4; consult Mobile's
 current handoff for its artifact/source and future versionCode >= 5.

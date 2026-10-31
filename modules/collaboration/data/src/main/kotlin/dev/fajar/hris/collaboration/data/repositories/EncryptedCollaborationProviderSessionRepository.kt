@@ -10,6 +10,7 @@ import dev.fajar.hris.identity.data.datasources.IdentityTokenDataSource
 import dev.fajar.hris.schema.tables.records.CollaborationProviderSessionsRecord
 import java.time.Instant
 import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class EncryptedCollaborationProviderSessionRepository(
@@ -36,11 +37,13 @@ class EncryptedCollaborationProviderSessionRepository(
                         row.accountId,
                         row.deviceId,
                         row.generation,
+                        row.tokenExpiresAt?.toInstant(),
                     ),
                     encrypted,
                 ),
                 row.createdAt.toInstant(),
                 row.updatedAt.toInstant(),
+                row.tokenExpiresAt?.toInstant(),
             )
         }
     }
@@ -80,6 +83,8 @@ class EncryptedCollaborationProviderSessionRepository(
         require(
             session.accessToken.length in 1..2048 && session.accessToken.all { it.code in 33..126 }
         )
+        val expiry = requireNotNull(session.expiresAt).truncatedTo(ChronoUnit.MICROS)
+        require(expiry > session.updatedAt && expiry <= session.updatedAt.plusSeconds(600))
         return CollaborationProviderSessionsRecord().apply {
             companyId = session.companyId
             accountId = session.accountId
@@ -87,9 +92,16 @@ class EncryptedCollaborationProviderSessionRepository(
             matrixUserId = session.matrixUserId
             matrixDeviceId = session.matrixDeviceId
             generation = session.generation
+            tokenExpiresAt = expiry.atOffset(ZoneOffset.UTC)
             tokenEncrypted =
                 crypto.encrypt(
-                    collaborationProviderPurpose(companyId, accountId, deviceId, generation),
+                    collaborationProviderPurpose(
+                        companyId,
+                        accountId,
+                        deviceId,
+                        generation,
+                        expiry,
+                    ),
                     session.accessToken,
                 )
             createdAt = session.createdAt.atOffset(ZoneOffset.UTC)

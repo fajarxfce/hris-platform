@@ -4,6 +4,7 @@ import dev.fajar.hris.collaboration.data.crypto.collaborationProviderPurpose
 import dev.fajar.hris.collaboration.data.datasources.*
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationProviderSessionRepository
 import dev.fajar.hris.collaboration.domain.entities.CollaborationProviderSession
+import dev.fajar.hris.collaboration.domain.policies.collaborationProviderCredentialIsCurrent
 import dev.fajar.hris.core.database.PostgresTransactionRunner
 import dev.fajar.hris.core.domain.*
 import dev.fajar.hris.identity.data.crypto.*
@@ -55,6 +56,8 @@ class CollaborationProviderCredentialTest {
         }
     }
 
+    private lateinit var legacy: Fixture
+
     @BeforeEach
     fun prepareDatabase() {
         // Corruption/revocation scenarios cannot contaminate the complete recovery projection.
@@ -69,6 +72,26 @@ class CollaborationProviderCredentialTest {
         sql = JdbcTemplate(admin)
         Flyway.configure().dataSource(admin).target("105").load().migrate()
         Flyway.configure().dataSource(admin).target("106").load().migrate()
+        legacy = Fixture()
+        val previous = legacy.session()
+        val oldEnvelope =
+            JceIdentityTokenDataSource(oldKeys)
+                .encrypt(
+                    collaborationProviderPurpose(legacy.company, legacy.account, legacy.device, 0),
+                    "fictional-legacy-unknown-expiry",
+                )
+        sql.update(
+            "insert into collaboration_provider_sessions(company_id,account_id,device_id,matrix_user_id,matrix_device_id,generation,token_encrypted,created_at,updated_at) values(?,?,?,?,?,0,?,?,?)",
+            legacy.company,
+            legacy.account,
+            legacy.device,
+            previous.matrixUserId,
+            previous.matrixDeviceId,
+            oldEnvelope,
+            previous.createdAt.atOffset(java.time.ZoneOffset.UTC),
+            previous.updatedAt.atOffset(java.time.ZoneOffset.UTC),
+        )
+        Flyway.configure().dataSource(admin).target("107").load().migrate()
         sql.execute("grant usage on schema public to provider_fixture")
         sql.execute(
             "grant select,insert,update,delete on all tables in schema public to provider_fixture"
@@ -146,6 +169,18 @@ class CollaborationProviderCredentialTest {
             success(transactions.run(f.actor) { store.find(f.company, f.account, f.device) })
         assertEquals(next.accessToken, found?.accessToken)
         assertEquals(next.generation, found?.generation)
+        assertEquals(next.expiresAt, found?.expiresAt)
+        val restoredLegacy =
+            success(
+                transactions.run(legacy.actor) {
+                    store.find(legacy.company, legacy.account, legacy.device)
+                }
+            )
+        assertNotNull(restoredLegacy)
+        assertNull(restoredLegacy?.expiresAt)
+        assertFalse(
+            collaborationProviderCredentialIsCurrent(requireNotNull(restoredLegacy), Instant.now())
+        )
         assertEquals(
             Result.Success(null),
             transactions.run(f.actor.copy(accountId = UUID.randomUUID())) {
@@ -163,7 +198,7 @@ class CollaborationProviderCredentialTest {
             ProcessBuilder(
                     "python3",
                     "-c",
-                    "import sys; sys.path.insert(0, 'tool'); import recovery_set; print(recovery_set.envelope_query(106))",
+                    "import sys; sys.path.insert(0, 'tool'); import recovery_set; print(recovery_set.envelope_query(107))",
                 )
                 .directory(root.toFile())
                 .start()
@@ -196,7 +231,7 @@ class CollaborationProviderCredentialTest {
                 query,
             )
         assertEquals(0, projection.exitCode, projection.stderr)
-        val target = collaborationProviderPurpose(f.company, f.account, f.device, 1)
+        val target = collaborationProviderPurpose(f.company, f.account, f.device, 1, next.expiresAt)
         val row =
             projection.stdout.lineSequence().map { it.split('\t') }.single { it.first() == target }
         assertEquals(next.accessToken, decryptIdentityEnvelope(currentKeys, row[0], row[1]))
@@ -206,10 +241,95 @@ class CollaborationProviderCredentialTest {
                 .filter { it.isNotBlank() }
                 .map { it.split('\t') }
                 .toList()
-        assertEquals(2, all.size)
+        assertEquals(3, all.size)
         assertEquals(
-            setOf(next.accessToken, "fictional-retained-old-key-token"),
+            setOf(
+                next.accessToken,
+                "fictional-retained-old-key-token",
+                "fictional-legacy-unknown-expiry",
+            ),
             all.map { decryptIdentityEnvelope(currentKeys, it[0], it[1]) }.toSet(),
+        )
+    }
+
+    @Test
+    fun legacyExpiryStaysUnknownUntilRotationAndNewWritesRequireBoundedDeadlines() {
+        val previous =
+            success(
+                legacy.transaction {
+                    legacy.current.find(legacy.company, legacy.account, legacy.device)
+                }
+            )
+        assertEquals("fictional-legacy-unknown-expiry", previous?.accessToken)
+        assertNull(previous?.expiresAt)
+        assertFalse(collaborationProviderCredentialIsCurrent(requireNotNull(previous), legacy.at))
+        assertEquals(
+            Result.Success(Unit),
+            legacy.transaction { legacy.current.rotate(legacy.session(generation = 1), 0) },
+        )
+        val rotated =
+            success(
+                legacy.transaction {
+                    legacy.current.find(legacy.company, legacy.account, legacy.device)
+                }
+            )
+        assertTrue(
+            collaborationProviderCredentialIsCurrent(requireNotNull(rotated), rotated.updatedAt)
+        )
+        assertFalse(
+            collaborationProviderCredentialIsCurrent(rotated, requireNotNull(rotated.expiresAt))
+        )
+        assertFalse(
+            collaborationProviderCredentialIsCurrent(rotated, rotated.updatedAt.minusNanos(1))
+        )
+
+        val f = Fixture()
+        for (expiry in listOf(null, f.at, f.at.plusSeconds(601))) {
+            assertInstanceOf(
+                Result.Failed::class.java,
+                f.transaction { f.current.create(f.session(expiresAt = expiry)) },
+            )
+        }
+        assertEquals(
+            Result.Success(null),
+            f.transaction { f.current.find(f.company, f.account, f.device) },
+        )
+        assertEquals(Result.Success(Unit), f.transaction { f.current.create(f.session()) })
+        assertThrows(org.springframework.dao.DataAccessException::class.java) {
+            sql.update(
+                "update collaboration_provider_sessions set generation=1,token_expires_at=null where device_id=?",
+                f.device,
+            )
+        }
+        assertThrows(org.springframework.dao.DataAccessException::class.java) {
+            sql.update(
+                "update collaboration_provider_sessions set generation=1,token_expires_at=updated_at+interval '10 minutes 1 microsecond' where device_id=?",
+                f.device,
+            )
+        }
+    }
+
+    @Test
+    fun changingOnlyPersistedExpiryFailsEnvelopeAuthentication() {
+        val f = Fixture()
+        assertEquals(Result.Success(Unit), f.transaction { f.current.create(f.session()) })
+        // A corrupt restore bypassing application guards must not extend or substitute the
+        // deadline.
+        TransactionTemplate(JdbcTransactionManager(admin)).executeWithoutResult {
+            sql.execute(
+                "alter table collaboration_provider_sessions disable trigger protect_collaboration_provider_session"
+            )
+            sql.update(
+                "update collaboration_provider_sessions set token_expires_at=token_expires_at-interval '1 microsecond' where device_id=?",
+                f.device,
+            )
+            sql.execute(
+                "alter table collaboration_provider_sessions enable trigger protect_collaboration_provider_session"
+            )
+        }
+        assertEquals(
+            "identity_credential_failed",
+            failure(f.transaction { f.current.find(f.company, f.account, f.device) }),
         )
     }
 
@@ -299,6 +419,7 @@ class CollaborationProviderCredentialTest {
                         values.accessToken,
                         values.createdAt,
                         values.updatedAt,
+                        values.expiresAt,
                     )
                 )
             },
@@ -459,7 +580,11 @@ class CollaborationProviderCredentialTest {
             )
         }
 
-        fun session(generation: Long = 0, token: String = "fictional-provider-token") =
+        fun session(
+            generation: Long = 0,
+            token: String = "fictional-provider-token",
+            expiresAt: Instant? = at.plusSeconds(generation + 600),
+        ) =
             CollaborationProviderSession(
                 company,
                 account,
@@ -470,6 +595,7 @@ class CollaborationProviderCredentialTest {
                 token,
                 at,
                 at.plusSeconds(generation),
+                expiresAt,
             )
 
         fun <T> transaction(action: () -> Result<T>): Result<T> = transactions.run(actor, action)

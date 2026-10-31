@@ -35,7 +35,8 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # the function and preserves existing policy revisions through pg_dump/pg_restore.
 # V106 binds internal Matrix token envelopes to company/account/device/generation.
 # Query selection preserves restoration of earlier schemas without the new table.
-MAX_SCHEMA = 106
+# V107 authenticates known token deadlines; NULL retains the legacy V106 AAD.
+MAX_SCHEMA = 107
 BASE_ENVELOPES_SQL = """
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope
  FROM accounts WHERE mfa_secret_encrypted IS NOT NULL
@@ -59,6 +60,12 @@ def envelope_query(schema):
  UNION ALL SELECT 'hris:matrix:'||company_id||':'||account_id||':'||device_id||':'||generation, token_encrypted
  FROM collaboration_provider_sessions WHERE token_encrypted IS NOT NULL
 """
+    if int(schema) >= 107:
+        collaboration = collaboration.replace(
+            "||generation, token_encrypted",
+            "||generation||CASE WHEN token_expires_at IS NULL THEN '' ELSE ':expires:'||"
+            "((extract(epoch FROM token_expires_at)*1000000)::bigint)::text END, token_encrypted",
+        )
     return ("COPY (SELECT * FROM (" + BASE_ENVELOPES_SQL + collaboration +
             ") envelopes LIMIT 100001) TO STDOUT WITH (FORMAT text, DELIMITER E'\\t');")
 

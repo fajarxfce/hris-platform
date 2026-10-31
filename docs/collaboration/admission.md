@@ -169,8 +169,8 @@ Internal login asks for nonrefreshable provider credentials and requires an
 Synapse `nonrefreshable_access_token_lifetime: 10m`. The candidate expiry is
 conservatively measured from request start, and its bearer is never a public
 response. A later use case must recheck HRIS authority, expected provider identity
-and its job/generation fence before storing it. Schema 106 still needs an expiry
-column before this transport is connected to storage/provisioning.
+and its job/generation fence before storing it. Schema 107 now persists that expiry as described below; transport still awaits
+provisioning/gateway wiring.
 
 **Synapse logout is device deletion.** The pinned provider's
 [`LogoutRestServlet`](https://github.com/element-hq/synapse/blob/v1.164.1/synapse/rest/client/logout.py)
@@ -188,3 +188,34 @@ logout. It verifies both retained keys on ordinary expiry and removed keys on
 logout. [Transport evidence](../measurements/collaboration-matrix-transport-2026-10-31.json)
 records the source/image and corrected compiler/formatting failures. The transport
 is not yet wired to API/worker DI; live runtime and phone remain unchanged.
+
+## Persisted provider deadlines
+
+Schema 107 adds `token_expires_at`. A legacy schema-106 bearer retains its unknown
+NULL deadline for recovery or terminal retirement. It cannot satisfy
+`collaborationProviderCredentialIsCurrent`; a successful bounded rotation is
+required before live use. Reads retain expired/legacy metadata so cleanup does
+not confuse freshness with ownership. New inserts/rotations require a finite
+deadline after the write and at most ten minutes later. Retirement preserves
+that recorded deadline while clearing the bearer.
+
+For known deadlines the encryption purpose appends
+`:expires:{unixMicroseconds}` to the schema-106 identity/generation AAD. The
+repository normalizes to PostgreSQL microsecond precision before encryption and
+storage. Changing the deadline independently of the ciphertext fails
+authentication. NULL deadlines preserve the original AAD, so schema-106 backups
+remain readable. The recovery tool selects the matching SQL projection by
+schema; schemas 59–105 never reference Matrix tables and 106 never references the
+new column.
+
+The expiry storage fixture migrates a real legacy ciphertext through 106→107,
+then exercises bounded writes, rotation, unknown/expired/future freshness,
+expiry tampering, concurrency, rollback and terminal retirement. Actual dump/
+restore verifies the complete three-envelope projection: one legacy deadline
+and two known deadlines, across old/current encryption keys. Provisioning and
+public gateway integration remain the next work.
+
+All eight credential scenarios, eleven admission cases, 29 core database cases,
+formatting and architecture passed in 2m27s. Twenty-two recovery-tool cases pass.
+[Expiry evidence](../measurements/collaboration-provider-expiry-2026-10-31.json)
+records the tested source and schema-107 restore. The live database remains 103.

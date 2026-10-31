@@ -14,6 +14,8 @@ class CollaborationProviderSession(
     val accessToken: String,
     val createdAt: Instant,
     val updatedAt: Instant,
+    /** Null only for legacy stored credentials; never eligible for live provider use. */
+    val expiresAt: Instant?,
 ) {
     override fun toString() = "CollaborationProviderSession(<redacted>)"
 }

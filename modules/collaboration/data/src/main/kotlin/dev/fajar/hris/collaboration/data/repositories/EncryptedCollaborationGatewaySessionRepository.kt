@@ -202,6 +202,7 @@ class EncryptedCollaborationGatewaySessionRepository(
             refresh,
             record.accessExpiresAt.toInstant(),
             record.expiresAt.toInstant(),
+            requireNotNull(record.replayUntil).toInstant(),
         )
 
     private fun changed() =

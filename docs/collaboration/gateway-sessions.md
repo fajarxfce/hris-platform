@@ -50,3 +50,43 @@ This increment supplies storage and recovery, not a publicly usable Matrix
 endpoint. Bootstrap/refresh admission, the protected bounded provider gateway,
 maintenance scheduling, SDK wiring, product chat and browser parents still need
 implementation. No provider bearer is returned by these repositories.
+
+## Native bootstrap and standard refresh admission
+
+`BootstrapNativeCollaborationGateway` now owns native issuance under operation →
+company policy → company → membership → account → native parent → device → gateway
+head guards. It requires both service/provider enablement, native Android/iOS build
+metadata, the observed active device version and the observed gateway version
+(null for the initial head). The idempotency fingerprint omits parent version so
+ordinary native refresh can recover a lost response, but includes platform/build
+and the observed gateway/device versions. Receipts hold only head ID/version.
+A replay can return only the currently winning encrypted pair within 30 seconds;
+an expired/superseded receipt never starts another generation.
+
+`RefreshNativeCollaborationGateway` accepts the standard refresh token without a
+client operation UUID. An isolated transaction-local token lookup identifies the
+owner; a new scoped transaction locks current HRIS authority before the head.
+After serialization it can recover the latest encrypted response, including when
+another request rotated between lookup and lock. Older requests are rejected;
+none revokes a device, calls Synapse logout, or erases an owned store.
+
+Operational access lifetime is five minutes, response replay 30 seconds and the
+minimum rotation interval ten seconds. A current refresh token can renew expired
+gateway access while its native HRIS access remains live. It cannot extend native
+HRIS access, MFA, company availability or permission. After an ordinary native
+refresh, the same gateway/device identity can continue. The hard gateway deadline
+is the earlier of the parent deadline and 31 days; a custom native lifetime beyond
+31 days requires a new HRIS parent after that gateway deadline. The normal native
+session lifetime is 30 days.
+
+Both new issuance and replay reacquire current company policy/admission at
+completion. The final response policy checks the same instant against admission,
+head identity/version, access expiry and the authenticated replay deadline.
+Credential writes, bootstrap receipt and audit/outbox roll back together on final
+authority failure. Refresh records a safe version-only journal entry; it does not
+create operation receipts or unbounded consumed-token history.
+
+These use cases remain unwired in this checkpoint. HTTP Matrix error mapping,
+protected provider gateway, status metadata, runtime DI, cache-maintenance worker,
+SDK ownership and browser admission are the next implementation work. They are
+not claimed as delivered by these transaction tests.

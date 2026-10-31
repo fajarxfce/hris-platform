@@ -4,15 +4,18 @@ import dev.fajar.hris.administration.data.datasources.PostgresCompanyClientPolic
 import dev.fajar.hris.administration.data.repositories.StoredCompanyClientPolicyRepository
 import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
+import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationGatewaySessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProviderSessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProvisioningDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRegistryDataSource
+import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationProviderSessionRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationProvisioningRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationRegistryRepository
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixDeviceId
 import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixLocalpart
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRepository
 import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.core.database.PostgresTransactionRunner
@@ -1092,6 +1095,365 @@ class NativeCollaborationRegistrationTest {
         }
     }
 
+    @Test
+    fun gatewayBootstrapReplaysTheSameSecretAfterNativeRefreshAndNeverWritesSecretsToReceipts() {
+        val g = GatewayFixture()
+        val f = g.f
+        val tokens = success(g.bootstrap())
+        sql.update("update native_sessions set version=version+1 where id=?", g.parent)
+        val replay = success(g.bootstrap(parentVersion = 1))
+        assertEquals(tokens.accessToken, replay.accessToken)
+        assertEquals(tokens.refreshToken, replay.refreshToken)
+        assertEquals(0L, replay.version)
+        assertEquals(1, f.rows("collaboration_gateway_sessions"))
+        assertEquals(1, f.rows("collaboration_devices"))
+        val receipts =
+            sql.queryForList(
+                    "select row_to_json(r)::text from operation_receipts r where company_id=?",
+                    String::class.java,
+                    f.actor.companyId,
+                )
+                .joinToString()
+        assertFalse(receipts.contains(tokens.accessToken))
+        assertFalse(receipts.contains(tokens.refreshToken))
+        assertEquals(tokens.sessionId, f.gatewayHead(g.device).id)
+        assertEquals(1L, f.gatewayHead(g.device).clientBuild.toLong())
+    }
+
+    @Test
+    fun concurrentGatewayBootstrapsPublishOneHeadAndExpiredOperationsCannotReplaceIt() {
+        val g = GatewayFixture()
+        val responses = race(List(4) { { g.bootstrap() } }).map(::success)
+        assertEquals(1, responses.map { it.accessToken }.distinct().size)
+        assertEquals(1, responses.map { it.refreshToken }.distinct().size)
+        assertEquals(2, g.f.rows("operation_receipts")) // registration and bootstrap
+        g.f.clock.at = g.f.clock.at.plusSeconds(31)
+        assertEquals("collaboration_gateway_authentication_required", failed(g.bootstrap()))
+        assertEquals(0L, g.f.gatewayHead(g.device).version)
+        val next = success(g.bootstrap(operation = UUID.randomUUID(), expected = 0, build = 2))
+        assertEquals(1L, next.version)
+        assertEquals(2, g.f.gatewayHead(g.device).clientBuild)
+        assertEquals("collaboration_gateway_changed", failed(g.bootstrap()))
+        assertEquals(
+            "collaboration_gateway_authentication_required",
+            failed(g.refresh(responses.first().refreshToken)),
+        )
+        assertEquals(1, g.f.rows("collaboration_devices"))
+    }
+
+    @Test
+    fun competingDifferentBootstrapOperationsRequireTheObservedGatewayVersion() {
+        val g = GatewayFixture()
+        val responses = race(List(4) { { g.bootstrap(operation = UUID.randomUUID()) } })
+        assertEquals(1, responses.count { it is Result.Success })
+        assertTrue(
+            responses.filterIsInstance<Result.Failed>().all {
+                it.failure.code == "collaboration_gateway_changed"
+            }
+        )
+        assertEquals(2, g.f.rows("operation_receipts"))
+        assertEquals(1, g.f.rows("collaboration_gateway_sessions"))
+    }
+
+    @Test
+    fun gatewayRefreshRaceAndLostResponseReturnOnePairWithoutReplacingTheNativeOrMatrixDevice() {
+        val g = GatewayFixture()
+        val first = success(g.bootstrap())
+        assertEquals(
+            "collaboration_gateway_rotation_too_soon",
+            failed(g.refresh(first.refreshToken)),
+        )
+        g.f.clock.at = g.f.clock.at.plusSeconds(11)
+        val results = race(List(4) { { g.refresh(first.refreshToken) } }).map(::success)
+        assertEquals(1, results.map { it.accessToken }.distinct().size)
+        assertEquals(1, results.map { it.refreshToken }.distinct().size)
+        assertTrue(results.all { it.version == 1L && it.sessionId == first.sessionId })
+        assertEquals(3, g.f.rows("audit_entries")) // registration, bootstrap, refresh
+        assertEquals(2, g.f.rows("operation_receipts"))
+        assertEquals(
+            0L,
+            sql.queryForObject(
+                "select version from native_sessions where id=?",
+                Long::class.java,
+                g.parent,
+            ),
+        )
+        assertEquals("ACTIVE", g.f.state(g.device))
+        assertEquals(1, g.f.rows("collaboration_devices"))
+    }
+
+    @Test
+    fun gatewayAccessExpiryAllowsRefreshButAnExpiredPreviousRefreshCannotRevokeTheWinner() {
+        val g = GatewayFixture()
+        val first = success(g.bootstrap())
+        g.f.clock.at = g.f.clock.at.plusSeconds(301)
+        val next = success(g.refresh(first.refreshToken))
+        g.f.clock.at = g.f.clock.at.plusSeconds(30)
+        assertEquals(
+            "collaboration_gateway_authentication_required",
+            failed(g.refresh(first.refreshToken)),
+        )
+        assertEquals(1L, g.f.gatewayHead(g.device).version)
+        val latest = success(g.refresh(next.refreshToken))
+        assertEquals(2L, latest.version)
+        assertEquals(
+            "collaboration_gateway_authentication_required",
+            failed(g.refresh(first.refreshToken)),
+        )
+        assertEquals("ACTIVE", g.f.state(g.device))
+        assertNull(g.f.gatewayHead(g.device).revokedAt)
+    }
+
+    @Test
+    fun gatewayCannotRefreshAnExpiredHrisAccessSessionButResumesAfterItsOrdinaryNativeRefresh() {
+        val g = GatewayFixture()
+        val first = success(g.bootstrap())
+        g.f.clock.at = g.f.clock.at.plusSeconds(901)
+        assertEquals("native_session_invalid", failed(g.refresh(first.refreshToken)))
+        assertEquals(0L, g.f.gatewayHead(g.device).version)
+        sql.update(
+            "update native_sessions set version=version+1,access_expires_at=? where id=?",
+            g.f.clock.at.plusSeconds(900).atOffset(ZoneOffset.UTC),
+            g.parent,
+        )
+        val next = success(g.refresh(first.refreshToken))
+        assertEquals(1L, next.version)
+        assertEquals(first.sessionId, next.sessionId)
+        assertEquals("ACTIVE", g.f.state(g.device))
+    }
+
+    @Test
+    fun gatewayRechecksPermissionMfaBuildCompanyAndDeviceForBothBootstrapReplayAndRefresh() {
+        for (mode in 0..5) {
+            val g = GatewayFixture()
+            val first = success(g.bootstrap())
+            g.f.clock.at = g.f.clock.at.plusSeconds(11)
+            val expected =
+                when (mode) {
+                    0 -> {
+                        sql.update(
+                            "delete from membership_permissions where company_id=? and account_id=?",
+                            g.f.actor.companyId,
+                            g.f.account,
+                        )
+                        "access_denied"
+                    }
+                    1 -> {
+                        sql.update(
+                            "update accounts set mfa_secret_encrypted='fictional-configured-secret' where id=?",
+                            g.f.account,
+                        )
+                        "mfa_required"
+                    }
+                    2 -> {
+                        g.f.policy(ClientPolicy(minimumBuilds = MinimumClientBuilds(android = 2)))
+                        "client_update_required"
+                    }
+                    3 -> {
+                        g.f.policy(
+                            ClientPolicy(disabledModules = setOf(CompanyModule.COLLABORATION))
+                        )
+                        "company_module_disabled"
+                    }
+                    4 -> {
+                        sql.update(
+                            "update collaboration_devices set state='REVOKED',version=version+1,revoked_at=?,updated_at=? where id=?",
+                            g.f.clock.at.atOffset(ZoneOffset.UTC),
+                            g.f.clock.at.atOffset(ZoneOffset.UTC),
+                            g.device,
+                        )
+                        "collaboration_access_denied"
+                    }
+                    else -> {
+                        sql.update(
+                            "update accounts set security_version=security_version+1 where id=?",
+                            g.f.account,
+                        )
+                        "session_revoked"
+                    }
+                }
+            assertEquals(expected, failed(g.bootstrap()), "bootstrap mode $mode")
+            assertEquals(expected, failed(g.refresh(first.refreshToken)), "refresh mode $mode")
+            assertEquals(0L, g.f.gatewayHead(g.device).version)
+        }
+    }
+
+    @Test
+    fun gatewayRevocationBetweenUnscopedTokenLookupAndGuardedRefreshIsRejected() {
+        val g = GatewayFixture()
+        val first = success(g.bootstrap())
+        g.f.clock.at = g.f.clock.at.plusSeconds(11)
+        val store =
+            object : CollaborationGatewaySessionRepository by g.f.gateway {
+                override fun findRefresh(token: String): Result<CollaborationGatewayRefresh?> =
+                    g.f.gateway.findRefresh(token).also {
+                        sql.update(
+                            "update native_sessions set revoked_at=? where id=?",
+                            g.f.clock.at.atOffset(ZoneOffset.UTC),
+                            g.parent,
+                        )
+                    }
+            }
+        assertEquals(
+            "native_session_invalid",
+            failed(
+                g.f.gatewayRefresh(gateway = store).execute(first.refreshToken, UUID.randomUUID())
+            ),
+        )
+        assertEquals(0L, g.f.gatewayHead(g.device).version)
+        assertEquals("ACTIVE", g.f.state(g.device))
+    }
+
+    @Test
+    fun gatewayIssuanceRollsBackTokensReceiptsAndJournalsWhenAuthorityExpiresAfterWrites() {
+        for (refresh in listOf(false, true)) {
+            val g = GatewayFixture()
+            val first = if (refresh) success(g.bootstrap()) else null
+            val tables =
+                listOf(
+                    "operation_receipts",
+                    "audit_entries",
+                    "outbox_events",
+                    "collaboration_gateway_sessions",
+                )
+            val before = tables.associateWith { g.f.rows(it) }
+            g.f.clock.at = g.f.clock.at.plusSeconds(11)
+            val journal =
+                object : ChangeJournalRepository {
+                    override fun record(actor: Actor, change: ChangeRecord): Result<Unit> =
+                        g.f.journal.record(actor, change).also {
+                            g.f.clock.at = g.f.clock.at.plusSeconds(3600)
+                        }
+                }
+            val result =
+                if (refresh)
+                    g.f
+                        .gatewayRefresh(journal = journal)
+                        .execute(requireNotNull(first).refreshToken, UUID.randomUUID())
+                else
+                    g.f
+                        .bootstrap(journal = journal)
+                        .execute(
+                            g.f.actor,
+                            g.parent,
+                            0,
+                            g.operation,
+                            g.device,
+                            1,
+                            null,
+                            ClientVersion(ClientPlatform.ANDROID, 1),
+                        )
+            assertEquals("native_session_invalid", failed(result))
+            assertEquals(before, tables.associateWith { g.f.rows(it) })
+            if (refresh) assertEquals(0L, g.f.gatewayHead(g.device).version)
+        }
+    }
+
+    @Test
+    fun scheduledCompanyPolicyAtGatewayPublicationRollsBackAndBootstrapRejectsForeignDevices() {
+        val g = GatewayFixture()
+        val second = GatewayFixture()
+        assertEquals(
+            "collaboration_access_denied",
+            failed(
+                g.f
+                    .bootstrap()
+                    .execute(
+                        g.f.actor,
+                        g.parent,
+                        0,
+                        UUID.randomUUID(),
+                        second.device,
+                        1,
+                        null,
+                        ClientVersion(ClientPlatform.ANDROID, 1),
+                    )
+            ),
+        )
+        assertEquals(
+            "invalid_client_version",
+            failed(
+                g.f
+                    .bootstrap()
+                    .execute(g.f.actor, g.parent, 0, UUID.randomUUID(), g.device, 1, null, null)
+            ),
+        )
+        assertEquals(
+            "collaboration_unavailable",
+            failed(
+                g.f
+                    .bootstrap(provider = CollaborationMatrixPolicy(false, ""))
+                    .execute(
+                        g.f.actor,
+                        g.parent,
+                        0,
+                        UUID.randomUUID(),
+                        g.device,
+                        1,
+                        null,
+                        ClientVersion(ClientPlatform.ANDROID, 1),
+                    )
+            ),
+        )
+        val boundary = g.f.clock.at.plusSeconds(10)
+        g.f.policy(ClientPolicy(disabledModules = setOf(CompanyModule.COLLABORATION)), boundary)
+        val journal =
+            object : ChangeJournalRepository {
+                override fun record(actor: Actor, change: ChangeRecord): Result<Unit> =
+                    g.f.journal.record(actor, change).also { g.f.clock.at = boundary }
+            }
+        assertEquals(
+            "company_module_disabled",
+            failed(
+                g.f
+                    .bootstrap(journal = journal)
+                    .execute(
+                        g.f.actor,
+                        g.parent,
+                        0,
+                        g.operation,
+                        g.device,
+                        1,
+                        null,
+                        ClientVersion(ClientPlatform.ANDROID, 1),
+                    )
+            ),
+        )
+        assertEquals(0, g.f.rows("collaboration_gateway_sessions"))
+        assertEquals(1, g.f.rows("operation_receipts"))
+    }
+
+    private class GatewayFixture {
+        val f = Fixture()
+        val parent = f.parent()
+        val device = (f.register(parent) as Result.Success).value.id
+        val operation = UUID.randomUUID()
+
+        init {
+            f.activate(device)
+        }
+
+        fun bootstrap(
+            parentVersion: Long = 0,
+            operation: UUID = this.operation,
+            expected: Long? = null,
+            build: Int = 1,
+        ) =
+            f.bootstrap()
+                .execute(
+                    f.actor,
+                    parent,
+                    parentVersion,
+                    operation,
+                    device,
+                    1,
+                    expected,
+                    ClientVersion(ClientPlatform.ANDROID, build),
+                )
+
+        fun refresh(token: String) = f.gatewayRefresh().execute(token, UUID.randomUUID())
+    }
+
     private class Fixture {
         val clock = MutableClock(Instant.now().truncatedTo(ChronoUnit.MICROS))
         val account = UUID.randomUUID()
@@ -1144,6 +1506,16 @@ class NativeCollaborationRegistrationTest {
         val credentials =
             EncryptedCollaborationProviderSessionRepository(
                 PostgresCollaborationProviderSessionDataSource(dsl),
+                JceIdentityTokenDataSource(
+                    dev.fajar.hris.identity.data.crypto.parseIdentityKeyring(
+                        "fixture",
+                        "fixture:" + Base64.getEncoder().encodeToString(ByteArray(32) { 17 }),
+                    )
+                ),
+            )
+        val gateway =
+            EncryptedCollaborationGatewaySessionRepository(
+                PostgresCollaborationGatewaySessionDataSource(dsl),
                 JceIdentityTokenDataSource(
                     dev.fajar.hris.identity.data.crypto.parseIdentityKeyring(
                         "fixture",
@@ -1241,6 +1613,56 @@ class NativeCollaborationRegistrationTest {
                 IdentitySecurityPolicy(),
                 clock,
                 CollaborationServicePolicy(true),
+            )
+
+        fun bootstrap(
+            journal: ChangeJournalRepository = this.journal,
+            provider: CollaborationMatrixPolicy = CollaborationMatrixPolicy(true, "fixture.test"),
+        ) =
+            BootstrapNativeCollaborationGateway(
+                gateway,
+                registry,
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                operations,
+                journal,
+                transactions,
+                IdentitySecurityPolicy(),
+                CollaborationServicePolicy(true),
+                provider,
+                clock,
+            )
+
+        fun gatewayRefresh(
+            gateway: CollaborationGatewaySessionRepository = this.gateway,
+            journal: ChangeJournalRepository = this.journal,
+        ) =
+            RefreshNativeCollaborationGateway(
+                gateway,
+                registry,
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                journal,
+                transactions,
+                IdentitySecurityPolicy(),
+                CollaborationServicePolicy(true),
+                CollaborationMatrixPolicy(true, "fixture.test"),
+                clock,
+            )
+
+        fun gatewayHead(device: UUID) =
+            requireNotNull(
+                success(
+                    transactions.run(actor) {
+                        gateway.find(requireNotNull(actor.companyId), account, device)
+                    }
+                )
             )
 
         fun retry(journal: ChangeJournalRepository = this.journal) =

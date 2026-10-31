@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-31",
+  "scope": "P1 native gateway bootstrap/standard-refresh use cases, not yet HTTP/DI or provider gateway",
+  "validation": {
+    "initialSelection": {
+      "dataCases": 43,
+      "domainCases": 11,
+      "failures": 0,
+      "elapsedSeconds": 79
+    },
+    "finalResponsePolicySelection": {
+      "dataCases": 34,
+      "domainCases": 13,
+      "failures": 0,
+      "elapsedSeconds": 45
+    },
+    "format": true,
+    "architecture": true,
+    "compileElapsedSeconds": 13
+  },
+  "behaviors": [
+    "Lost bootstrap response recovers the same encrypted pair after native refresh; operation receipts contain only head ID/version.",
+    "Four identical bootstraps recover one pair; four distinct initial operations produce one winner and three observed-version conflicts.",
+    "Expired/superseded bootstrap operation cannot create or replace a head; a new observed operation updates client build without replacing the device.",
+    "Four standard refresh requests serialize into one rotation and recover the same winning pair; the native session and device remain unchanged.",
+    "Expired gateway access can refresh with current native authority; expired previous refresh cannot revoke the winner.",
+    "Expired native HRIS access denies gateway refresh; ordinary native refresh permits the retained gateway/device to continue.",
+    "Both bootstrap replay and refresh recheck permission, voluntary MFA, minimum build, disabled module, revoked device and account security version.",
+    "Revocation after the unscoped token lookup but before guarded admission is rejected.",
+    "Failure after writes rolls back tokens, receipt, audit and outbox; a scheduled company-policy boundary also rolls back issuance.",
+    "Final response validation uses one instant for current admission and authenticated response lifetime; a live access token cannot extend an expired admission or replay."
+  ],
+  "limits": [
+    "No HTTP endpoint/Matrix error mapper, status metadata, public provider proxy, DI or maintenance worker was added in this increment.",
+    "No Synapse bearer is issued to clients or Matrix E2EE key created by these use cases.",
+    "Provider tests from prior checkpoints remain distinct; these tests use real PostgreSQL with fictional HRIS identities and controlled activation.",
+    "No live stack, phone, Mobile or Starter change occurred."
+  ],
+  "sourceSha256": {
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/EncryptedCollaborationGatewaySessionRepository.kt": "5ee16f2b221bfcb3cf2ecef9129623af6171b0dadea1ed68597f7eac5234319f",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "615cbf194ec195b2deb825d0bd9b61900671de9e07998184beca9328fef4e03a",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationGatewaySession.kt": "1658e130e0e0e8aec6b891995589c040eab7083dd4c737da9df2181d5a4ab6f2",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationGatewayPolicy.kt": "a08cdd2b6e3778a92984edafe796a841d3827e2d575f82e2481a56bfe549de51",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/BootstrapNativeCollaborationGateway.kt": "17a917c6e393770d98e9fc1b49f157a976a717f6d7dc09a9afbdcbea9b2c1a8b",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/RefreshNativeCollaborationGateway.kt": "77ed3f55b7dcfba26aa67a68568ea5661a0b8c4da08b6011aa03f39c835c53f8",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationGatewayPolicyTest.kt": "006629179d556cd1471732e18b481f27fe0bed9aa84ea6a4e35905bb94c657c7"
+  }
+}

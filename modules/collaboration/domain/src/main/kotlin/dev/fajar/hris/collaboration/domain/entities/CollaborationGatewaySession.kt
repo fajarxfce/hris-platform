@@ -33,6 +33,7 @@ class CollaborationGatewayTokens(
     val refreshToken: String,
     val accessExpiresAt: Instant,
     val expiresAt: Instant,
+    val replayUntil: Instant,
 ) {
     override fun toString() = "CollaborationGatewayTokens(<redacted>)"
 }

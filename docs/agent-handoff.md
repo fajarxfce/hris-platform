@@ -79,6 +79,17 @@ final JVM selection 2m35s) and the corrected timestamp-binding/RLS failures. The
 retry source `b938d48c` passed every job/step in hosted control
 [41193061956](https://github.com/fajarxfce/hris-platform/actions/runs/41193061956).
 
+Native gateway bootstrap and standard refresh use cases now enforce current HRIS
+parent/company/chat/MFA/build authority, observed bootstrap versions and bounded
+idempotent replay. Gateway access lasts five minutes, replay 30 seconds, rotation
+at least ten seconds apart. A stale request cannot revoke the winner's device.
+Receipts contain no secrets; issuance/receipt/audit/outbox roll back on final
+admission failure. The initial selection passed 43 PostgreSQL and eleven domain
+cases in 79s. Final single-instant response validation passed 34 PostgreSQL and
+thirteen domain cases in 45s, formatting/architecture. [Admission evidence](measurements/collaboration-gateway-admission-2026-10-31.json)
+records scope. HTTP/DI, status metadata, cleanup worker and protected provider
+proxy remain next; these use cases are not exposed to clients yet.
+
 Critical provider behavior: Synapse logout deletes the **whole device**, every
 bearer and its E2EE keys, even when called with an expired bearer. Never use it
 to clean up a losing/late login. Such credentials stay private/unpublished and
@@ -91,8 +102,9 @@ allow public login/admin/federation bypass.
 Next implementation:
 
 1. Inspect the schema-109 gateway storage increment's exact hosted control result
-   after push; prior status/retry CI is accepted above. Finish live-admission
-   bootstrap/refresh use cases and bounded replay-cache maintenance scheduling.
+   after push; prior status/retry CI is accepted above. Live-admission bootstrap/
+   refresh use cases are locally accepted; wire status, HTTP/DI, bounded cache
+   maintenance and the protected Matrix request path next.
 2. Protected HRIS Matrix bootstrap/gateway and standard access/refresh protocol,
    browser-parent admission, native/web SDK adapters and durable chat UI. Restore
    an authenticated Matrix SDK client only once; rotate tokens through its

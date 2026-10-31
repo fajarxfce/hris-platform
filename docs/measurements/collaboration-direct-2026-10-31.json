@@ -86,5 +86,10 @@
     "Immutable direct-conversation control only. No provider room is provisioned yet; this does not accept CHAT-01, SDK encrypted messaging, group/context rooms or offline sync.",
     "No mutable existing resource version is consumed by pair creation. Future provisioning and membership changes require independent observed versions.",
     "All data is fictional. No deployment, real employee message, phone action, Mobile or Starter port occurred. Live schema remains 103."
-  ]
+  ],
+  "hosted": {
+    "headSha": "031c3714db4ca785ca5616416b49fa8da0bd9d71",
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41201832706",
+    "everyJobAndStep": "success"
+  }
 }

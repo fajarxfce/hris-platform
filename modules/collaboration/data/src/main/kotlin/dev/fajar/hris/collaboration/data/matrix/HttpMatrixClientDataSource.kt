@@ -1,6 +1,8 @@
 package dev.fajar.hris.collaboration.data.matrix
 
+import java.net.URLEncoder
 import java.net.http.*
+import java.nio.charset.StandardCharsets
 import java.time.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
@@ -15,7 +17,7 @@ class HttpMatrixClientDataSource(
     private val configuration: MatrixProviderConfiguration,
     private val clock: Clock,
     maximumConcurrent: Int = 32,
-) : MatrixClientDataSource {
+) : MatrixClientDataSource, MatrixRoomDataSource {
     private val exchanges = Semaphore(maximumConcurrent)
     private val json =
         JsonMapper.builder()
@@ -104,6 +106,160 @@ class HttpMatrixClientDataSource(
         )
     }
 
+    override fun resolveAlias(alias: String, token: String, deadline: Instant): String? {
+        require(alias.startsWith("#") && alias.length in 2..255)
+        val response =
+            roomRequest(
+                "/_matrix/client/v3/directory/room/${segment(alias)}",
+                "GET",
+                null,
+                token,
+                deadline,
+            )
+        val body = parse(response)
+        if (response.statusCode() == 404 && body.path("errcode").asString() == "M_NOT_FOUND")
+            return null
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return roomId(body)
+    }
+
+    override fun createRoom(
+        body: Map<String, Any>,
+        token: String,
+        deadline: Instant,
+    ): MatrixRoomCreateData {
+        val response = roomRequest("/_matrix/client/v3/createRoom", "POST", body, token, deadline)
+        val value = parse(response)
+        if (response.statusCode() == 400 && value.path("errcode").asString() == "M_ROOM_IN_USE")
+            return MatrixRoomCreateData.AliasInUse
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return MatrixRoomCreateData.Created(roomId(value))
+    }
+
+    override fun roomState(
+        roomId: String,
+        token: String,
+        deadline: Instant,
+    ): List<MatrixRoomStateEventData> {
+        val response = roomRequest("${roomPath(roomId)}/state", "GET", null, token, deadline)
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        val value = parseJson(response)
+        if (!value.isArray || value.size() > 256) throw MatrixResponseException()
+        val events =
+            value
+                .iterator()
+                .asSequence()
+                .map { event ->
+                    if (!event.isObject) throw MatrixResponseException()
+                    val type = text(event, "type", 255)
+                    val key = event.path("state_key")
+                    val content = event.path("content")
+                    if (
+                        !key.isString ||
+                            key.asString().length > 255 ||
+                            key.asString().any(Char::isISOControl) ||
+                            !content.isObject
+                    )
+                        throw MatrixResponseException()
+                    MatrixRoomStateEventData(
+                        type,
+                        key.asString(),
+                        text(event, "sender", 255),
+                        content,
+                    )
+                }
+                .toList()
+        if (events.distinctBy { it.type to it.stateKey }.size != events.size)
+            throw MatrixResponseException()
+        return events
+    }
+
+    override fun putRoomState(
+        roomId: String,
+        type: MatrixRoomStateType,
+        content: Map<String, Any>,
+        token: String,
+        deadline: Instant,
+    ) {
+        val response =
+            roomRequest(
+                "${roomPath(roomId)}/state/${type.eventType}",
+                "PUT",
+                content,
+                token,
+                deadline,
+            )
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        val event = text(parse(response), "event_id", 255)
+        if (!event.startsWith("$")) throw MatrixResponseException()
+    }
+
+    override fun invite(roomId: String, userId: String, token: String, deadline: Instant) {
+        require(
+            userId.startsWith("@") && userId.length in 2..255 && userId.all { it.code in 33..126 }
+        )
+        val response =
+            roomRequest(
+                "${roomPath(roomId)}/invite",
+                "POST",
+                mapOf("user_id" to userId),
+                token,
+                deadline,
+            )
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        parse(response)
+    }
+
+    private fun roomPath(roomId: String): String {
+        require(roomId.startsWith("!") && roomId.length in 2..255)
+        return "/_matrix/client/v3/rooms/${segment(roomId)}"
+    }
+
+    private fun roomId(body: JsonNode): String =
+        text(body, "room_id", 255).also {
+            // Room version 12 uses hash-based IDs; do not require a server suffix.
+            if (!it.startsWith("!")) throw MatrixResponseException()
+        }
+
+    private fun segment(value: String): String {
+        require(value.all { it.code in 33..126 })
+        return URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20")
+    }
+
+    private fun roomRequest(
+        path: String,
+        method: String,
+        body: Map<String, Any>?,
+        token: String,
+        deadline: Instant,
+    ): HttpResponse<ByteArray> {
+        require(token.length in 1..2048 && token.all { it.code in 33..126 })
+        val remaining = Duration.between(clock.instant(), deadline)
+        if (remaining <= Duration.ZERO) throw MatrixDeadlineException()
+        val bytes = body?.let(json::writeValueAsBytes)
+        if (bytes != null && bytes.size > 65536) throw MatrixResponseException()
+        val afterSerialization = Duration.between(clock.instant(), deadline)
+        if (afterSerialization <= Duration.ZERO) throw MatrixDeadlineException()
+        val timeout = minOf(configuration.requestTimeout, remaining, afterSerialization)
+        val builder =
+            HttpRequest.newBuilder(configuration.origin.resolve(path))
+                .timeout(timeout)
+                .header("Accept", "application/json")
+                .header("Accept-Encoding", "identity")
+                .header("Authorization", "Bearer $token")
+        if (bytes != null) builder.header("Content-Type", "application/json")
+        return exchange(
+            builder
+                .method(
+                    method,
+                    if (bytes == null) HttpRequest.BodyPublishers.noBody()
+                    else HttpRequest.BodyPublishers.ofByteArray(bytes),
+                )
+                .build(),
+            timeout,
+        )
+    }
+
     private fun post(
         path: String,
         body: Map<String, Any>,
@@ -139,7 +295,10 @@ class HttpMatrixClientDataSource(
         }
     }
 
-    private fun parse(response: HttpResponse<ByteArray>): JsonNode {
+    private fun parse(response: HttpResponse<ByteArray>): JsonNode =
+        parseJson(response).also { if (!it.isObject) throw MatrixResponseException() }
+
+    private fun parseJson(response: HttpResponse<ByteArray>): JsonNode {
         if (
             !response
                 .headers()
@@ -161,8 +320,7 @@ class HttpMatrixClientDataSource(
             } catch (_: tools.jackson.core.JacksonException) {
                 throw MatrixResponseException()
             }
-        if (body?.isObject != true) throw MatrixResponseException()
-        return body
+        return body ?: throw MatrixResponseException()
     }
 
     private fun text(body: JsonNode, key: String, limit: Int): String {

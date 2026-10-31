@@ -312,6 +312,7 @@ class ProviderProof:
         if returncode:
             raise RuntimeError("Browser provider proof failed; inspect the owned private browser log")
         self.record["checks"]["browser_e2ee_restart_media"] = True
+        self.record["checks"]["browser_offline_invitee_first_message_sender_offline"] = True
         if self.native:
             self.record["checks"]["android_web_bidirectional_e2ee"] = True
             self.record["checks"]["android_sdk_refresh_preserves_device_key"] = True

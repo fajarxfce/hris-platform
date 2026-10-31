@@ -1,0 +1,211 @@
+{
+  "date": "2026-10-31",
+  "scope": "Typed internal Matrix direct-room adapter, fail-closed initial-state policy and offline-invitee browser E2EE proof",
+  "productAcceptance": false,
+  "validation": {
+    "initialCompileElapsedSeconds": 22,
+    "initialCompileFailure": "Warnings-as-errors rejected redundant non-null assertions in the new policy test. Bound non-null fixture values once; corrected compilation passes.",
+    "correctedFocusedElapsedSeconds": 50,
+    "correctedFocusedDomainCases": 17,
+    "correctedFocusedDataCases": 17,
+    "correctedFocusedFailures": 0,
+    "finalElapsedSeconds": 295,
+    "formatCheck": "passed",
+    "architectureCheck": "passed",
+    "pythonProofCases": 12,
+    "nodeSyntax": "passed",
+    "viteBuild": "passed",
+    "finalSuites": {
+      "modules/collaboration/domain": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/data": {
+        "tests": 96,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server": {
+        "tests": 182,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/worker": {
+        "tests": 111,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      }
+    },
+    "workerSkip": "One unchanged opt-in elapsed-retention scenario."
+  },
+  "behaviors": [
+    "One shared 32-permit fixed-origin datasource now implements both identity and typed room I/O; no queue, redirect, new public route or direct provider bearer exposure.",
+    "Room requests/responses are bounded to 64 KiB and five seconds; state has at most 256 unique entries. Encoded IDs cannot inject URLs/queries, and hash-based room-version-12 IDs are accepted.",
+    "Only exact alias-not-found/alias-in-use outcomes receive special mapping. Invalid acknowledgement, duplicate JSON/state, missing typed field, oversize response, expiry and capacity are exercised. Existing cancellation and identity transport checks still pass.",
+    "Actual Synapse verifies production repository create/resolve/observe and repair of a deliberately partial room. Strict policy checks immutable creator/company/conversation/kind, federation, room version, additional creators, tombstones and exact members/settings.",
+    "Only missing initial settings/invitation are repairable. Existing incompatible encryption/history/power, left participants or foreign identities reject adoption.",
+    "Direct history uses invited so already enrolled offline invitees are encryption targets before joining. Clients wait for encrypted SDK room state and load invitation history beyond the initial incremental live window."
+  ],
+  "limits": [
+    "These are private provider repository ports and a pure repair policy. Durable HRIS provisioning ownership/publication and content-route admission are not implemented by this increment.",
+    "New offline-first-invitation evidence is browser matrix-js-sdk 45.0.0 with Rust crypto. Native Kotlin/Swift equivalents still require explicit proof; existing native queue/refresh results do not establish this new behavior.",
+    "Never-enrolled peers have no encryption device key. Product outbox must retain the pending message until eligible keys exist, without server-generated private keys or a false delivered state.",
+    "No live deployment, real employee message, phone action or Starter port occurred."
+  ],
+  "browserProof": {
+    "schemaVersion": 1,
+    "runId": "6c2e74fd6c3049a6851fa0d6bf85bbb5",
+    "kind": "isolated_provider_proof",
+    "complete": true,
+    "productAcceptance": false,
+    "capacityAcceptance": false,
+    "images": {
+      "synapse": {
+        "reference": "ghcr.io/element-hq/synapse:v1.164.1@sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75",
+        "id": "sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75",
+        "digests": [
+          "ghcr.io/element-hq/synapse@sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75"
+        ]
+      },
+      "livekit": {
+        "reference": "livekit/livekit-server:v1.13.11@sha256:25cd902de7cacbd5f1f779f6a6ac1eae20ba8f56b0935934ce6b0ab80d1e3d20",
+        "id": "sha256:25cd902de7cacbd5f1f779f6a6ac1eae20ba8f56b0935934ce6b0ab80d1e3d20",
+        "digests": [
+          "livekit/livekit-server@sha256:25cd902de7cacbd5f1f779f6a6ac1eae20ba8f56b0935934ce6b0ab80d1e3d20"
+        ]
+      },
+      "postgres": {
+        "reference": "postgres:18.6-alpine@sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+        "id": "sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5",
+        "digests": [
+          "postgres@sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5"
+        ]
+      }
+    },
+    "checks": {
+      "wrong_issuer": true,
+      "wrong_audience": true,
+      "expired_jwt_beyond_provider_leeway": true,
+      "public_registration_disabled": true,
+      "loopback_only_http": true,
+      "isolated_dedicated_network": true,
+      "browser_e2ee_restart_media": true,
+      "browser_offline_invitee_first_message_sender_offline": true
+    },
+    "cleanup": true,
+    "sourceSha256": {
+      "tool/check_collaboration_providers.py": "15c0b433bae8858234eabc54a3e29958bbb53a04a57d80a86886ac054b738255",
+      "tool/test_collaboration_providers.py": "1ddf78841a84a9e0636542a62c661f4d8b07a15f145083d74f7d47449fa67f3a",
+      "tool/collaboration_native_device.py": "d65344ef89e327d5365c2ba657e152d5beacd14c9459d2a6afd3177eadbccf7c",
+      "tool/test_collaboration_native_device.py": "5fd304f28d583682606cb729abdf241d2d1c40dcb730c5481357eb063d03b867",
+      "tool/collaboration-proof/package.json": "f499358763283beb73dd76606dde7e28122b6787494529ad518fef5718062cad",
+      "tool/collaboration-proof/package-lock.json": "031dbd57065817fbe2e119d87bb3e9588e26d4814835219dc950c4dddff51c56",
+      "tool/collaboration-proof/images.json": "63aa4b37949053e6574f9f4ae7ff1d22c02a59d8955a141c6aae5b2257e89f50",
+      "tool/collaboration-proof/index.html": "e5cadc31789aa95d2b718905dd44201da49a29678b913db9a7563fdf907ba7d0",
+      "tool/collaboration-proof/playwright.config.mjs": "33b5dd2896bd6a602e54a9c8154c679ee31b473e7bc9a0ff9da8864ca429381c",
+      "tool/collaboration-proof/src/probe.js": "b452de9882c7f121e811bde62bca92eaf678ce785030d4c715b99b316cb9a5f6",
+      "tool/collaboration-proof/tests/providers.spec.mjs": "1d498852844d41f350fd5ef295484acafb18bc8b90d9eb7daf3d05825c6ca3c2",
+      "tool/collaboration-proof/tests/native.spec.mjs": "b2110c9ba51a608ce205cbb50314fb03de69b77f0aef8b6f3f67f9e6ed433a81"
+    },
+    "observations": {
+      "recent_expired_jwt_accepted_by_provider": true,
+      "strict_hris_broker_expiry_required": true
+    },
+    "browser": {
+      "expected": 1,
+      "unexpected": 0,
+      "flaky": 0,
+      "skipped": 0,
+      "duration": 6780.028
+    },
+    "elapsedSeconds": 17.755
+  },
+  "correctedBrowserFailures": [
+    {
+      "runId": "cba49d85c9544fc9bbe5296bd0346d77",
+      "elapsedSeconds": 46.985,
+      "browser": {
+        "expected": 0,
+        "unexpected": 1,
+        "flaky": 0,
+        "skipped": 0,
+        "duration": 35007.858
+      },
+      "cleanup": true,
+      "result": "First invitation-message lookup timed out. Added explicit encrypted SDK room readiness before send, a wire-encryption assertion and bounded invitation-history acquisition after join.",
+      "sourceSha256": {
+        "tool/check_collaboration_providers.py": "15c0b433bae8858234eabc54a3e29958bbb53a04a57d80a86886ac054b738255",
+        "tool/test_collaboration_providers.py": "1ddf78841a84a9e0636542a62c661f4d8b07a15f145083d74f7d47449fa67f3a",
+        "tool/collaboration_native_device.py": "d65344ef89e327d5365c2ba657e152d5beacd14c9459d2a6afd3177eadbccf7c",
+        "tool/test_collaboration_native_device.py": "5fd304f28d583682606cb729abdf241d2d1c40dcb730c5481357eb063d03b867",
+        "tool/collaboration-proof/package.json": "f499358763283beb73dd76606dde7e28122b6787494529ad518fef5718062cad",
+        "tool/collaboration-proof/package-lock.json": "031dbd57065817fbe2e119d87bb3e9588e26d4814835219dc950c4dddff51c56",
+        "tool/collaboration-proof/images.json": "63aa4b37949053e6574f9f4ae7ff1d22c02a59d8955a141c6aae5b2257e89f50",
+        "tool/collaboration-proof/index.html": "e5cadc31789aa95d2b718905dd44201da49a29678b913db9a7563fdf907ba7d0",
+        "tool/collaboration-proof/playwright.config.mjs": "33b5dd2896bd6a602e54a9c8154c679ee31b473e7bc9a0ff9da8864ca429381c",
+        "tool/collaboration-proof/src/probe.js": "ff1fb757cdc37794c44bf8bdb0fe605d86e83b8c75259340f2961309a8399b8e",
+        "tool/collaboration-proof/tests/providers.spec.mjs": "60c8947f9ab4e57999c8030df8157061fb746d0f6fe52d8662896710197f3c52",
+        "tool/collaboration-proof/tests/native.spec.mjs": "b2110c9ba51a608ce205cbb50314fb03de69b77f0aef8b6f3f67f9e6ed433a81"
+      }
+    },
+    {
+      "runId": "dbe963dd969e4685ae7e63f016722270",
+      "elapsedSeconds": 49.551,
+      "browser": {
+        "expected": 0,
+        "unexpected": 1,
+        "flaky": 0,
+        "skipped": 0,
+        "duration": 34205.806000000004
+      },
+      "cleanup": true,
+      "result": "Offline-invitee E2EE passed, but the later media-key event was unavailable through the live-timeline-only lookup after sender restart. Added SDK event-timeline acquisition and safe event-type/decryption-code diagnostics.",
+      "sourceSha256": {
+        "tool/check_collaboration_providers.py": "15c0b433bae8858234eabc54a3e29958bbb53a04a57d80a86886ac054b738255",
+        "tool/test_collaboration_providers.py": "1ddf78841a84a9e0636542a62c661f4d8b07a15f145083d74f7d47449fa67f3a",
+        "tool/collaboration_native_device.py": "d65344ef89e327d5365c2ba657e152d5beacd14c9459d2a6afd3177eadbccf7c",
+        "tool/test_collaboration_native_device.py": "5fd304f28d583682606cb729abdf241d2d1c40dcb730c5481357eb063d03b867",
+        "tool/collaboration-proof/package.json": "f499358763283beb73dd76606dde7e28122b6787494529ad518fef5718062cad",
+        "tool/collaboration-proof/package-lock.json": "031dbd57065817fbe2e119d87bb3e9588e26d4814835219dc950c4dddff51c56",
+        "tool/collaboration-proof/images.json": "63aa4b37949053e6574f9f4ae7ff1d22c02a59d8955a141c6aae5b2257e89f50",
+        "tool/collaboration-proof/index.html": "e5cadc31789aa95d2b718905dd44201da49a29678b913db9a7563fdf907ba7d0",
+        "tool/collaboration-proof/playwright.config.mjs": "33b5dd2896bd6a602e54a9c8154c679ee31b473e7bc9a0ff9da8864ca429381c",
+        "tool/collaboration-proof/src/probe.js": "b312ca9e7c591680331c0578b767b9cdaf880864e140ef462190055216c8adc2",
+        "tool/collaboration-proof/tests/providers.spec.mjs": "950ddd860e0b81f60895b92ba5c591ce92d54681e379ee78ce274982302e9335",
+        "tool/collaboration-proof/tests/native.spec.mjs": "b2110c9ba51a608ce205cbb50314fb03de69b77f0aef8b6f3f67f9e6ed433a81"
+      }
+    },
+    {
+      "runId": "d1f63109ed3e4813aa52eded150b3980",
+      "elapsedSeconds": 18.723,
+      "browser": {
+        "expected": 0,
+        "unexpected": 1,
+        "flaky": 0,
+        "skipped": 0,
+        "duration": 4339.823
+      },
+      "cleanup": true,
+      "result": "SDK event-timeline acquisition requires timelineSupport=true. Enabled the SDK feature explicitly; complete fourth run passes both the new invitation scenario and prior media checks.",
+      "sourceSha256": {
+        "tool/check_collaboration_providers.py": "15c0b433bae8858234eabc54a3e29958bbb53a04a57d80a86886ac054b738255",
+        "tool/test_collaboration_providers.py": "1ddf78841a84a9e0636542a62c661f4d8b07a15f145083d74f7d47449fa67f3a",
+        "tool/collaboration_native_device.py": "d65344ef89e327d5365c2ba657e152d5beacd14c9459d2a6afd3177eadbccf7c",
+        "tool/test_collaboration_native_device.py": "5fd304f28d583682606cb729abdf241d2d1c40dcb730c5481357eb063d03b867",
+        "tool/collaboration-proof/package.json": "f499358763283beb73dd76606dde7e28122b6787494529ad518fef5718062cad",
+        "tool/collaboration-proof/package-lock.json": "031dbd57065817fbe2e119d87bb3e9588e26d4814835219dc950c4dddff51c56",
+        "tool/collaboration-proof/images.json": "63aa4b37949053e6574f9f4ae7ff1d22c02a59d8955a141c6aae5b2257e89f50",
+        "tool/collaboration-proof/index.html": "e5cadc31789aa95d2b718905dd44201da49a29678b913db9a7563fdf907ba7d0",
+        "tool/collaboration-proof/playwright.config.mjs": "33b5dd2896bd6a602e54a9c8154c679ee31b473e7bc9a0ff9da8864ca429381c",
+        "tool/collaboration-proof/src/probe.js": "42ffd25cebee8cc7318c1b16ff72e44068521b3afbe9893529e5a6999590af1f",
+        "tool/collaboration-proof/tests/providers.spec.mjs": "1d498852844d41f350fd5ef295484acafb18bc8b90d9eb7daf3d05825c6ca3c2",
+        "tool/collaboration-proof/tests/native.spec.mjs": "b2110c9ba51a608ce205cbb50314fb03de69b77f0aef8b6f3f67f9e6ed433a81"
+      }
+    }
+  ]
+}

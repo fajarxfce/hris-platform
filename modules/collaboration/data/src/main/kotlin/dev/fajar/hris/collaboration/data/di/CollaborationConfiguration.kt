@@ -69,7 +69,7 @@ class CollaborationConfiguration {
         owner: MatrixHttpClientOwner,
         configuration: MatrixProviderConfiguration,
         clock: Clock,
-    ): MatrixClientDataSource = HttpMatrixClientDataSource(owner.client, configuration, clock)
+    ): HttpMatrixClientDataSource = HttpMatrixClientDataSource(owner.client, configuration, clock)
 
     @Bean
     fun collaborationMatrixPolicy(
@@ -87,6 +87,15 @@ class CollaborationConfiguration {
         clients.getIfAvailable()?.let {
             InternalCollaborationMatrixRepository(signing.getObject(), it, clock)
         } ?: DisabledCollaborationMatrixRepository()
+
+    @Bean
+    fun collaborationMatrixRooms(
+        clients: ObjectProvider<MatrixRoomDataSource>,
+        provider: CollaborationMatrixPolicy,
+    ): CollaborationMatrixRoomRepository =
+        clients.getIfAvailable()?.let {
+            InternalCollaborationMatrixRoomRepository(it, provider.serverName)
+        } ?: DisabledCollaborationMatrixRoomRepository()
 
     @Bean
     fun collaborationGatewaySource(sql: DSLContext): CollaborationGatewaySessionDataSource =

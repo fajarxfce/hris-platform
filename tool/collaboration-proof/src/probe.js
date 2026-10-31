@@ -29,7 +29,7 @@ const mutedLogger = {
 
 async function startMatrix(session) {
   await stopMatrix();
-  client = createClient({ ...session, logger: mutedLogger });
+  client = createClient({ ...session, timelineSupport: true, logger: mutedLogger });
   await client.initRustCrypto({ cryptoDatabasePrefix: `hris-proof-${session.deviceId}` });
   eventListener = async (event, room) => {
     if (!room) return;
@@ -219,16 +219,27 @@ window.probe = {
     if (device.getFingerprint() !== signingKey) throw new Error("Device fingerprint mismatch");
     await client.getCrypto().setDeviceVerified(userId, deviceId, true);
   },
-  async createRoom(invitee) {
+  async createRoom(invitee, historyVisibility = "joined") {
+    if (!["joined", "invited"].includes(historyVisibility)) throw new Error("Invalid fixture history policy");
     const result = await client.createRoom({
       preset: "private_chat",
       invite: [invitee],
       initial_state: [
         { type: "m.room.encryption", state_key: "", content: { algorithm: "m.megolm.v1.aes-sha2" } },
-        { type: "m.room.history_visibility", state_key: "", content: { history_visibility: "joined" } },
+        { type: "m.room.history_visibility", state_key: "", content: { history_visibility: historyVisibility } },
       ],
     });
     return result.room_id;
+  },
+  roomReadiness(roomId) {
+    const room = client.getRoom(roomId);
+    return room ? { history: room.getHistoryVisibility(), encrypted: Boolean(room.currentState.getStateEvents("m.room.encryption", "")), joined: room.getJoinedMemberCount(), invited: room.getInvitedMemberCount() } : null;
+  },
+  async history(roomId) {
+    const room = client.getRoom(roomId);
+    if (!room) return false;
+    await client.scrollback(room, 50);
+    return true;
   },
   async join(roomId) { await client.joinRoom(roomId); return true; },
   async send({ roomId, body, logicalId }) {
@@ -241,8 +252,20 @@ window.probe = {
     const result = await client.sendEvent(roomId, "dev.hris.proof.media_key", { key: mediaKey, purpose: "isolated-e2ee-proof" });
     return result.event_id;
   },
-  async receiveMediaKey({ roomId, eventId }) {
+  async eventStatus({ roomId, eventId }) {
     const event = client.getRoom(roomId)?.findEventById(eventId);
+    if (!event) return { present: false };
+    try { await client.decryptEventIfNeeded(event); } catch { /* Only safe enum diagnostics below. */ }
+    return { present: true, wireType: event.getWireType(), type: event.getType(), failure: event.decryptionFailureReason };
+  },
+  async receiveMediaKey({ roomId, eventId }) {
+    const room = client.getRoom(roomId);
+    if (!room) return false;
+    let event = room.findEventById(eventId);
+    if (!event) {
+      const timeline = await client.getEventTimeline(room.getUnfilteredTimelineSet(), eventId);
+      event = timeline?.getEvents().find(item => item.getId() === eventId);
+    }
     if (!event) return false;
     try { await client.decryptEventIfNeeded(event); } catch { return false; }
     if (event.getType() !== "dev.hris.proof.media_key" || event.getWireType() !== "m.room.encrypted") return false;

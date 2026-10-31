@@ -4,7 +4,11 @@ import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import dev.fajar.hris.collaboration.data.matrix.*
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRepository
+import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRoomRepository
+import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixDirectRoom
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixLogin
+import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixRoomCreation
+import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixRoomSetting
 import dev.fajar.hris.collaboration.domain.policies.*
 import dev.fajar.hris.core.domain.Result
 import java.net.InetSocketAddress
@@ -374,6 +378,13 @@ class MatrixProviderTransportTest {
                     dev.fajar.hris.core.domain.FailureKind.RATE_LIMITED,
                     refused.failure.kind,
                 )
+                val refusedRoom =
+                    f.rooms.resolve(f.roomRequest, "fictional-token", f.clock.now.plusSeconds(20))
+                        as Result.Failed
+                assertEquals(
+                    dev.fajar.hris.core.domain.FailureKind.RATE_LIMITED,
+                    refusedRoom.failure.kind,
+                )
                 assertEquals(1, f.requests.get())
                 running.cancel(true)
                 assertTrue(stopped.await(5, TimeUnit.SECONDS))
@@ -388,6 +399,167 @@ class MatrixProviderTransportTest {
                 caller.shutdownNow()
                 assertTrue(caller.awaitTermination(5, TimeUnit.SECONDS))
             }
+        }
+    }
+
+    @Test
+    fun roomAliasResolutionUsesOnlyEncodedFixedOriginAndRecognizesExactProviderOutcomes() {
+        Fixture().use { f ->
+            f.handler = { exchange ->
+                assertEquals("GET", exchange.requestMethod)
+                assertTrue(
+                    exchange.requestURI.rawPath.startsWith(
+                        "/_matrix/client/v3/directory/room/%23hris_"
+                    )
+                )
+                assertNull(exchange.requestURI.rawQuery)
+                assertEquals(
+                    "Bearer fictional-room-token",
+                    exchange.requestHeaders.getFirst("Authorization"),
+                )
+                f.respond(exchange, """{"errcode":"M_NOT_FOUND"}""", 404)
+            }
+            assertEquals(
+                Result.Success(null),
+                f.rooms.resolve(f.roomRequest, "fictional-room-token", f.clock.now.plusSeconds(20)),
+            )
+            for ((status, body) in
+                listOf(
+                    404 to """{"errcode":"OTHER"}""",
+                    403 to """{"errcode":"M_NOT_FOUND"}""",
+                    200 to """{"room_id":"not-a-room"}""",
+                )) {
+                f.handler = { f.respond(it, body, status) }
+                assertInstanceOf(
+                    Result.Failed::class.java,
+                    f.rooms.resolve(
+                        f.roomRequest,
+                        "fictional-room-token",
+                        f.clock.now.plusSeconds(20),
+                    ),
+                )
+            }
+            f.handler = { f.respond(it, """{"errcode":"M_ROOM_IN_USE"}""", 400) }
+            assertEquals(
+                Result.Success(CollaborationMatrixRoomCreation.AliasInUse),
+                f.rooms.create(f.roomRequest, "fictional-room-token", f.clock.now.plusSeconds(20)),
+            )
+            f.handler = { f.respond(it, """{"room_id":"!hash-without-server"}""") }
+            assertEquals(
+                Result.Success(CollaborationMatrixRoomCreation.Created("!hash-without-server")),
+                f.rooms.create(f.roomRequest, "fictional-room-token", f.clock.now.plusSeconds(20)),
+            )
+        }
+    }
+
+    @Test
+    fun roomStateCannotSelectAUrlAndRejectsAmbiguousOrOversizedProviderArrays() {
+        Fixture().use { f ->
+            f.handler = { exchange ->
+                assertEquals("GET", exchange.requestMethod)
+                assertNull(exchange.requestURI.rawQuery)
+                assertNull(exchange.requestURI.rawFragment)
+                assertEquals(
+                    "/_matrix/client/v3/rooms/%21room%2F..%2F%3Ftoken%3Dforeign%23fragment/state",
+                    exchange.requestURI.rawPath,
+                )
+                f.respond(exchange, "[]")
+            }
+            assertInstanceOf(
+                Result.Success::class.java,
+                f.rooms.observe(
+                    "!room/../?token=foreign#fragment",
+                    "fictional-room-token",
+                    f.clock.now.plusSeconds(20),
+                ),
+            )
+            val event =
+                """{"type":"m.room.encryption","state_key":"","sender":"@creator:test","content":{"algorithm":"m.megolm.v1.aes-sha2"}}"""
+            val malformed =
+                listOf(
+                    "{}",
+                    "[{}]",
+                    "[$event,$event]",
+                    "[] {}",
+                    """[{"type":"m.room.encryption","type":"m.room.create","state_key":"","sender":"@creator:test","content":{}}]""",
+                    """[{"type":"m.room.encryption","state_key":"","sender":"@creator:test","content":{}}]""",
+                    "[" + List(257) { event }.joinToString(",") + "]",
+                    "[" + " ".repeat(65537) + "]",
+                )
+            for (body in malformed) {
+                f.handler = { f.respond(it, body) }
+                assertEquals(
+                    "collaboration_provider_invalid_response",
+                    (f.rooms.observe("!room", "fictional-room-token", f.clock.now.plusSeconds(20))
+                            as Result.Failed)
+                        .failure
+                        .code,
+                )
+            }
+            val count = f.requests.get()
+            assertEquals(
+                "collaboration_admission_changed",
+                (f.rooms.observe("!room", "fictional-room-token", f.clock.now) as Result.Failed)
+                    .failure
+                    .code,
+            )
+            assertEquals(count, f.requests.get())
+        }
+    }
+
+    @Test
+    fun roomMutationsHaveBoundedTypedPathsAndStrictAcknowledgements() {
+        Fixture().use { f ->
+            f.handler = { exchange ->
+                assertEquals("PUT", exchange.requestMethod)
+                assertEquals(
+                    "/_matrix/client/v3/rooms/%21room/state/m.room.encryption",
+                    exchange.requestURI.rawPath,
+                )
+                assertEquals(
+                    "m.megolm.v1.aes-sha2",
+                    f.json.readTree(exchange.requestBody.readNBytes(4096))["algorithm"].asString(),
+                )
+                f.respond(
+                    exchange,
+                    f.json.writeValueAsString(mapOf("event_id" to "\$fixture-event")),
+                )
+            }
+            assertEquals(
+                Result.Success(Unit),
+                f.rooms.putInitialSetting(
+                    "!room",
+                    CollaborationMatrixRoomSetting.ENCRYPTION,
+                    "fictional-room-token",
+                    f.clock.now.plusSeconds(20),
+                ),
+            )
+            f.handler = { f.respond(it, """{"event_id":"invalid"}""") }
+            assertInstanceOf(
+                Result.Failed::class.java,
+                f.rooms.putInitialSetting(
+                    "!room",
+                    CollaborationMatrixRoomSetting.ENCRYPTION,
+                    "fictional-room-token",
+                    f.clock.now.plusSeconds(20),
+                ),
+            )
+            f.handler = { exchange ->
+                assertEquals("POST", exchange.requestMethod)
+                assertEquals("/_matrix/client/v3/rooms/%21room/invite", exchange.requestURI.rawPath)
+                val body = f.json.readTree(exchange.requestBody.readNBytes(4096))
+                assertEquals(setOf("user_id"), body.propertyNames().toSet())
+                f.respond(exchange, "{}")
+            }
+            assertEquals(
+                Result.Success(Unit),
+                f.rooms.invitePeer(
+                    "!room",
+                    f.roomRequest,
+                    "fictional-room-token",
+                    f.clock.now.plusSeconds(20),
+                ),
+            )
         }
     }
 
@@ -423,12 +595,17 @@ class MatrixProviderTransportTest {
                 .followRedirects(HttpClient.Redirect.NEVER)
                 .build()
         val config = configuration(URI("http://127.0.0.1:${server.address.port}"), timeout)
-        val repository =
-            InternalCollaborationMatrixRepository(
-                HmacMatrixJwtDataSource(config),
-                HttpMatrixClientDataSource(client, config, clock, maximumConcurrent),
-                clock,
+        val source = HttpMatrixClientDataSource(client, config, clock, maximumConcurrent)
+        val rooms = InternalCollaborationMatrixRoomRepository(source, config.serverName)
+        val roomRequest =
+            CollaborationMatrixDirectRoom(
+                login.companyId,
+                UUID.randomUUID(),
+                login.accountId,
+                UUID.randomUUID(),
             )
+        val repository =
+            InternalCollaborationMatrixRepository(HmacMatrixJwtDataSource(config), source, clock)
         @Volatile var handler: (HttpExchange) -> Unit = { respond(it, success) }
         private val serverErrors = ConcurrentLinkedQueue<Throwable>()
 

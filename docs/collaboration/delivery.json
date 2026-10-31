@@ -21,7 +21,9 @@
         "../measurements/collaboration-transaction-interop-2026-10-31.json",
         "../measurements/collaboration-native-logical-queue-2026-10-31.json",
         "provider-room-provisioning.md",
-        "../measurements/collaboration-room-interop-2026-10-31.json"
+        "../measurements/collaboration-room-interop-2026-10-31.json",
+        "matrix-room-adapter.md",
+        "../measurements/collaboration-room-adapter-2026-10-31.json"
       ]
     },
     {
@@ -49,7 +51,9 @@
         "direct-conversations.md",
         "../measurements/collaboration-direct-2026-10-31.json",
         "provider-room-provisioning.md",
-        "../measurements/collaboration-room-interop-2026-10-31.json"
+        "../measurements/collaboration-room-interop-2026-10-31.json",
+        "matrix-room-adapter.md",
+        "../measurements/collaboration-room-adapter-2026-10-31.json"
       ]
     },
     {
@@ -104,7 +108,9 @@
         "participants.md",
         "../measurements/collaboration-participants-2026-10-31.json",
         "direct-conversations.md",
-        "../measurements/collaboration-direct-2026-10-31.json"
+        "../measurements/collaboration-direct-2026-10-31.json",
+        "matrix-room-adapter.md",
+        "../measurements/collaboration-room-adapter-2026-10-31.json"
       ]
     },
     {

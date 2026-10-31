@@ -1,7 +1,10 @@
 package dev.fajar.hris.collaboration.data
 
 import dev.fajar.hris.collaboration.data.matrix.BoundedMatrixBodySubscriber
-import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixLocalpart
+import dev.fajar.hris.collaboration.data.matrix.HttpMatrixClientDataSource
+import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRoomRepository
+import dev.fajar.hris.collaboration.domain.entities.*
+import dev.fajar.hris.collaboration.domain.policies.*
 import dev.fajar.hris.core.domain.Result
 import java.net.URLEncoder
 import java.net.http.*
@@ -266,6 +269,116 @@ class MatrixRoomProvisioningInteropTest {
                     .asString(),
             )
         }
+    }
+
+    @Test
+    fun productionAdapterCreatesInspectsAndResolvesExactlyTheExpectedDirectRoom() {
+        MatrixProviderFixture("10m").use { f ->
+            f.start()
+            val owner = f.login()
+            val client = HttpMatrixClientDataSource(f.client, f.config, f.clock)
+            val rooms = InternalCollaborationMatrixRoomRepository(client, f.config.serverName)
+            val request =
+                CollaborationMatrixDirectRoom(
+                    f.request.companyId,
+                    UUID.randomUUID(),
+                    f.request.accountId,
+                    UUID.randomUUID(),
+                )
+            val deadline = f.clock.instant().plusSeconds(45)
+            assertNull(success(rooms.resolve(request, owner.accessToken, deadline)))
+            val created =
+                success(rooms.create(request, owner.accessToken, deadline))
+                    as CollaborationMatrixRoomCreation.Created
+            assertEquals(
+                created.roomId,
+                success(rooms.resolve(request, owner.accessToken, deadline)),
+            )
+            assertEquals(
+                CollaborationMatrixRoomCreation.AliasInUse,
+                success(rooms.create(request, owner.accessToken, deadline)),
+            )
+            val observed = success(rooms.observe(created.roomId, owner.accessToken, deadline))
+            assertEquals(
+                Result.Success(CollaborationMatrixRoomRepair(emptySet(), false)),
+                assessCollaborationDirectRoom(request, observed, f.config.serverName),
+            )
+        }
+    }
+
+    @Test
+    fun productionAdapterRepairsOnlyMissingStateFromAnOwnedPartialCreation() {
+        MatrixProviderFixture("10m").use { f ->
+            f.start()
+            val owner = f.login()
+            val client = HttpMatrixClientDataSource(f.client, f.config, f.clock)
+            val rooms = InternalCollaborationMatrixRoomRepository(client, f.config.serverName)
+            val request =
+                CollaborationMatrixDirectRoom(
+                    f.request.companyId,
+                    UUID.randomUUID(),
+                    f.request.accountId,
+                    UUID.randomUUID(),
+                )
+            val deadline = f.clock.instant().plusSeconds(45)
+            val broken =
+                mapOf(
+                    "room_version" to "12",
+                    "visibility" to "private",
+                    "preset" to "private_chat",
+                    "room_alias_name" to collaborationMatrixRoomAliasLocalpart(request),
+                    "creation_content" to
+                        mapOf(
+                            "m.federate" to false,
+                            "org.hris.conversation" to
+                                mapOf(
+                                    "company_id" to request.companyId.toString(),
+                                    "conversation_id" to request.conversationId.toString(),
+                                    "kind" to "DIRECT",
+                                ),
+                        ),
+                    "initial_state" to
+                        listOf(
+                            mapOf(
+                                "type" to "m.room.power_levels",
+                                "state_key" to "",
+                                "content" to mapOf("users_default" to "invalid-number"),
+                            )
+                        ),
+                )
+            assertEquals(
+                400,
+                exchange(f, "/_matrix/client/v3/createRoom", owner.accessToken, broken).statusCode(),
+            )
+            val roomId =
+                requireNotNull(success(rooms.resolve(request, owner.accessToken, deadline)))
+            val partial = success(rooms.observe(roomId, owner.accessToken, deadline))
+            val plan = success(assessCollaborationDirectRoom(request, partial, f.config.serverName))
+            assertEquals(CollaborationMatrixRoomSetting.entries.toSet(), plan.missingSettings)
+            assertTrue(plan.missingInvite)
+            for (setting in CollaborationMatrixRoomSetting.entries) success(
+                rooms.putInitialSetting(roomId, setting, owner.accessToken, deadline)
+            )
+            success(rooms.invitePeer(roomId, request, owner.accessToken, deadline))
+            val complete = success(rooms.observe(roomId, owner.accessToken, deadline))
+            assertEquals(
+                Result.Success(CollaborationMatrixRoomRepair(emptySet(), false)),
+                assessCollaborationDirectRoom(request, complete, f.config.serverName),
+            )
+            assertInstanceOf(
+                Result.Failed::class.java,
+                assessCollaborationDirectRoom(
+                    request.copy(conversationId = UUID.randomUUID()),
+                    complete,
+                    f.config.serverName,
+                ),
+            )
+        }
+    }
+
+    private fun <T> success(result: Result<T>): T {
+        assertInstanceOf(Result.Success::class.java, result)
+        return (result as Result.Success).value
     }
 
     private fun segment(value: String): String =

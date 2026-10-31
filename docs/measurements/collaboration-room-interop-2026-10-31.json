@@ -29,5 +29,10 @@
     "Provider control semantics, not cryptographic message/media acceptance; no SDK encrypted payload or HRIS room-publication worker is exercised here.",
     "Alias lookup alone is not admission or proof of complete creation. Production must verify immutable creator/marker, reject alien/mismatching state, reconcile exact membership and recheck HRIS authority before publishing its room binding.",
     "No generic Matrix proxy, new public route, deployment, phone action, real employee message or Starter port. Fixtures own and close their provider process/network and HTTP client."
-  ]
+  ],
+  "hosted": {
+    "headSha": "6139604cdd0eb5fd00ee82b5fdfd976bae349d06",
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41201965622",
+    "everyJobAndStep": "success"
+  }
 }

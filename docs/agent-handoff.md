@@ -47,6 +47,15 @@ Current provider/client evidence:
   records two cases (36s Gradle), format/architecture and owned cleanup. No HRIS
   binding/publication or SDK E2EE is implied by this control proof.
 
+- The latest browser Rust-crypto proof now sends the first message while the enrolled
+  invitee is offline, then decrypts after joining with the sender offline. **Direct
+  rooms need invited history**; joined excludes invitees from encryption targets.
+  Wait for SDK encryption/member state, load invitation history, and use enabled
+  timelineSupport/event-timeline acquisition after restart. Corrected initial lookup
+  and media-event acquisition failures remain in [adapter evidence](measurements/collaboration-room-adapter-2026-10-31.json).
+  Full final browser case passed in 6.780s (17.755s owned run, cleanup true), including
+  prior restart/media/wrong-key assertions. Native equivalents still need proof.
+
 Current backend implementation:
 
 - Schemas 104–108 retain company/account/device/native-parent identity, independent
@@ -96,6 +105,14 @@ Current backend implementation:
   peer offboarding. [Contract](collaboration/direct-conversations.md) is durable
   intent only: it does not provision a Matrix room or authorize content.
 
+- Internal typed Matrix room ports now resolve/create/inspect, set one of five
+  initial states and invite the peer. They share the identity HTTP owner/32 permits,
+  five-second/64-KiB bounds and cancellation. URI segments are encoded, state arrays
+  are bounded/unique, and a pure policy refuses foreign creator/marker/membership,
+  additional creators, tombstones or incompatible existing security state. Only
+  missing initial state is repairable. Actual Synapse exercises the production
+  adapter; no HRIS room binding/content route is published yet.
+
 [Identity evidence](measurements/collaboration-gateway-identity-2026-10-31.json)
 records 148 passing API cases, 77 data cases, fourteen domain cases and the full
 111-case worker suite (110 pass, one unchanged opt-in retention skip). Formatting
@@ -120,6 +137,11 @@ records 30 database, 14 domain, 89 collaboration data, 182 API and 111 worker ca
 preserve immutable identity, uniqueness and participant RLS. Corrected API test
 uses the existing id/version response rather than inventing a replay flag.
 
+[Room-adapter evidence](measurements/collaboration-room-adapter-2026-10-31.json)
+records 17 domain, 96 data, 182 API and 111 worker cases (one existing skip); full
+selection, formatting and architecture passed in 4m55s. Twelve Python ownership
+checks, JS syntax and Vite build pass. No additional migration; ceiling stays 110.
+
 Critical provider behavior: Synapse logout deletes the **entire device**, all its
 bearers and E2EE keys even with an expired bearer. Never use it to clean up a late
 or losing login; unpublished candidates expire privately within ten minutes.
@@ -129,16 +151,17 @@ Provider ports remain private; raw provider credentials never reach clients.
 
 Next implementation:
 
-1. Inspect direct-conversation `031c3714` hosted control [41201832706](https://github.com/fajarxfce/hris-platform/actions/runs/41201832706)
-   and the subsequent room-proof commit's control after push.
-   Participant `d50bb0ad` passed every hosted job/step in
-   [41200742892](https://github.com/fajarxfce/hris-platform/actions/runs/41200742892).
-   Identity `b0bf1326` passed every hosted job/step in [41199490597](https://github.com/fajarxfce/hris-platform/actions/runs/41199490597).
+1. Inspect the room-adapter commit's exact control and browser-provider workflows
+   after push. Direct `031c3714` passed all jobs/steps in [41201832706](https://github.com/fajarxfce/hris-platform/actions/runs/41201832706);
+   room proof `6139604c` likewise passed [41201965622](https://github.com/fajarxfce/hris-platform/actions/runs/41201965622).
+   Participant `d50bb0ad` and identity `b0bf1326` hosted controls also passed.
 2. Implement durable provider-room reconciliation for retained DM intent using the
-   [actual room-control proof](collaboration/provider-room-provisioning.md);
+   [typed adapter and invited-history policy](collaboration/matrix-room-adapter.md);
    Synapse createRoom/alias reservation is not atomic. Verify immutable creation
    marker, creator and complete encryption/membership state before publication,
-   including partial creation, peer first login and response loss. Then group and
+   including partial creation, peer first login and response loss. Never-enrolled
+   peers have no encryption key: retain pending outbox until an eligible device
+   exists. Prove Kotlin/Swift offline-invitee encryption separately. Then group and
    resource-context membership control and bounded SDK key/sync/content operations
    with current per-conversation admission, cancellation and response fencing.
    Participant/DM metadata and WHOAMI/refresh do not authorize room contents.

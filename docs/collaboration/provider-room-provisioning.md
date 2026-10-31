@@ -6,6 +6,11 @@ pass against pinned Synapse 1.164.1, using explicit room version 12. These tests
 establish provider control behavior. They do not accept HRIS room publication,
 SDK E2EE delivery, groups or context-room membership.
 
+The original control fixture below uses joined history. The current
+[direct-room adapter](matrix-room-adapter.md) uses **invited** history for first-message
+delivery to an already enrolled offline invitee; do not infer client encryption
+behavior from the earlier control-only fixture.
+
 ## First login and canonical identity
 
 A private, non-federated room can invite a deterministic local HRIS Matrix user

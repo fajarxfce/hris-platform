@@ -69,8 +69,43 @@ test("real Matrix E2EE survives receiver restart and carries a client-owned key 
     await bob.page.evaluate(session => window.probe.startMatrix(session), bob.session);
     await expect.poll(() => bob.page.evaluate(body => window.probe.lookup(body), delayed)).toEqual({ roomId, eventId: delayedId, encrypted: true });
 
+    // First message to an offline invitee must remain decryptable when the sender
+    // is no longer online to answer key requests. Preserve Bob's already verified
+    // encrypted store, but stop him before this second room exists.
+    await bob.page.evaluate(() => window.probe.stop());
+    await bob.context.setOffline(true);
+    const invitedRoom = await alice.page.evaluate(id => window.probe.createRoom(id, "invited"), bob.session.userId);
+    await expect.poll(() => alice.page.evaluate(id => window.probe.roomReadiness(id), invitedRoom)).toMatchObject({ history: "invited", encrypted: true, joined: 1, invited: 1 });
+    const firstMessage = `${marker}-before-recipient-join`;
+    const logicalId = randomUUID();
+    const firstId = await alice.page.evaluate(input => window.probe.send(input), { roomId: invitedRoom, body: firstMessage, logicalId });
+    const acceptedFirst = await request.get(`${fixture.matrix.baseUrl}/_matrix/client/v3/rooms/${encodeURIComponent(invitedRoom)}/event/${encodeURIComponent(firstId)}`, { headers: { Authorization: `Bearer ${alice.session.accessToken}` } });
+    expect(acceptedFirst.ok()).toBe(true);
+    expect((await acceptedFirst.json()).type).toBe("m.room.encrypted");
+    await alice.page.evaluate(() => window.probe.stop());
+    await alice.context.setOffline(true);
+    await bob.context.setOffline(false);
+    await bob.page.reload();
+    await bob.page.waitForFunction(() => Boolean(window.probe));
+    await bob.page.evaluate(session => window.probe.startMatrix(session), bob.session);
+    await bob.page.evaluate(id => window.probe.join(id), invitedRoom);
+    await expect.poll(() => bob.page.evaluate(id => window.probe.roomReadiness(id), invitedRoom)).toMatchObject({ history: "invited", encrypted: true });
+    await bob.page.evaluate(id => window.probe.history(id), invitedRoom);
+    await expect.poll(() => bob.page.evaluate(body => window.probe.lookup(body), firstMessage)).toEqual({ roomId: invitedRoom, eventId: firstId, encrypted: true, logicalId });
+    const invitedWire = await request.get(`${fixture.matrix.baseUrl}/_matrix/client/v3/rooms/${encodeURIComponent(invitedRoom)}/event/${encodeURIComponent(firstId)}`, { headers: { Authorization: `Bearer ${bob.session.accessToken}` } });
+    expect(invitedWire.ok()).toBe(true);
+    const invitedCiphertext = await invitedWire.json();
+    expect(invitedCiphertext.type).toBe("m.room.encrypted");
+    expect(JSON.stringify(invitedCiphertext)).not.toContain(firstMessage);
+    expect(JSON.stringify(invitedCiphertext)).not.toContain(logicalId);
+    await alice.context.setOffline(false);
+    await alice.page.reload();
+    await alice.page.waitForFunction(() => Boolean(window.probe));
+    await alice.page.evaluate(session => window.probe.startMatrix(session), alice.session);
+
+    await expect.poll(() => alice.page.evaluate(id => window.probe.roomReadiness(id), roomId)).toMatchObject({ history: "joined", encrypted: true, joined: 2 });
     const keyEvent = await alice.page.evaluate(room => window.probe.shareMediaKey(room), roomId);
-    await expect.poll(() => bob.page.evaluate(input => window.probe.receiveMediaKey(input), { roomId, eventId: keyEvent })).toBe(true);
+    await expect.poll(() => bob.page.evaluate(async input => ({ ready: await window.probe.receiveMediaKey(input), event: await window.probe.eventStatus(input) }), { roomId, eventId: keyEvent })).toMatchObject({ ready: true });
     const keyWire = await request.get(`${fixture.matrix.baseUrl}/_matrix/client/v3/rooms/${encodeURIComponent(roomId)}/event/${encodeURIComponent(keyEvent)}`, { headers: { Authorization: `Bearer ${alice.session.accessToken}` } });
     const keyCiphertext = await keyWire.json();
     expect(keyCiphertext.type).toBe("m.room.encrypted");

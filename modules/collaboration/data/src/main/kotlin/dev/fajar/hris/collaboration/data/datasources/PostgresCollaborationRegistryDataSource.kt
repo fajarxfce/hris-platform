@@ -42,7 +42,7 @@ class PostgresCollaborationRegistryDataSource(private val sql: DSLContext) :
                 )
             }
 
-    override fun countActiveParentSessions(accountId: UUID, at: Instant): Int {
+    override fun countActiveParentSessions(accountId: UUID, at: Instant, excluding: UUID?): Int {
         val time = at.atOffset(ZoneOffset.UTC)
         return sql.select(DSL.countDistinct(B.NATIVE_SESSION_ID))
             .from(B)
@@ -54,6 +54,7 @@ class PostgresCollaborationRegistryDataSource(private val sql: DSLContext) :
             .on(A.ID.eq(B.ACCOUNT_ID))
             .where(
                 B.ACCOUNT_ID.eq(accountId),
+                excluding?.let { B.NATIVE_SESSION_ID.ne(it) } ?: DSL.noCondition(),
                 D.STATE.ne("REVOKED"),
                 D.REVOKED_AT.isNull,
                 S.REVOKED_AT.isNull,

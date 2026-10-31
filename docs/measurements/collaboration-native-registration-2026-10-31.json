@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "kind": "collaboration_native_registration",
+  "productAcceptance": false,
+  "liveRuntimeModified": false,
+  "schema": 105,
+  "checks": {
+    "newPostgresScenarios": 10,
+    "registryRegressionScenarios": 1,
+    "admissionPolicyScenarios": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "architecture": true,
+    "format": true,
+    "elapsedSeconds": 53
+  },
+  "verifiedBehaviors": [
+    "competing registrations share one five-parent quota across companies",
+    "same parent in two companies retains separate device identities without using another slot",
+    "concurrent duplicate and lost-response replay after native refresh do not duplicate audit or outbox",
+    "revocation committed while waiting is observed before registration",
+    "failed post-write admission rolls back device, binding, receipt, audit and outbox",
+    "pending devices cannot obtain admission; active grant stops at scheduled policy boundary",
+    "policy activation during lookup cannot issue a stale grant",
+    "expired native access pauses admission while its refreshable parent still occupies a slot"
+  ],
+  "previousControlCI": {
+    "head": "120c6d6bfce976e1d4ed9afb6a7758accea450a0",
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41184251989",
+    "conclusion": "success"
+  },
+  "sourceSha256": {
+    "modules/collaboration/data/build.gradle.kts": "63de6677d7c3fe45cfe4bb8a40cc0edbb3294d74bbaddb102209980a6b31bb2c",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationRegistryDataSource.kt": "60bdecc7776d27360353a6d6cdc6d8ac189faa6e03fc9b4a6f5b6553a5a23ded",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationRegistryDataSource.kt": "563baea41df9b7b9f975f9df37c7456a75e532a7d764fdaab1a7340caba5863e",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/models/BoundCollaborationDeviceData.kt": "c74b9fd4f8ff9d3867d55f4908cf66c7db08778eefb663679fa95b918835f369",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationRegistryRepository.kt": "de20e9e94c57507ed5b38d01c0e03abdee64a1a2d92b74fe1aa5221a4d0747e1",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationRegistryTest.kt": "1af9ded14ba611fbbe174f3bf0f4e40e7ee0e6abed1fe2f39c7c45efb3fb743a",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "219daae3e2ccdf383d3fef6b838f32530d1d81856db6fb001d03ec8e1ceb173f",
+    "modules/collaboration/domain/build.gradle.kts": "b2776425e76e24912084d92d437d107e30cf8f6e5e6146b699a54bdbec272068",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationAdmission.kt": "bd898d90f102f1a66f9e4172719dab928c3e0618114beba1724c517059745728",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationDevice.kt": "c1a4939e1f62d98c0d3a5356e2437ee469b5b26943d1e916086a8d54164527d7",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationRegistration.kt": "cdf6866ec6411547f5081741115133ab468d657adf7a9118e726f4b9ce03e224",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationAdmissionPolicy.kt": "ed7358a89be16b49c8619d22e06bfa20db9e1f34e507338688617c020dbcf88c",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationAvailabilityPolicy.kt": "9652a5ae6d00f13d8da55874ac316a7524bb25f532bd3b68c2e41c51086301c8",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationRegistryRepository.kt": "f65e86b14974d31d75e0a57d6a253b85c38d0afb0b92e33c297e4996cc66fe8d",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AcquireNativeCollaborationAdmission.kt": "33396cc3dca9245f00898e39fbb74636a5a1e4be5d0ebd5cb185f40e818f6d56",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/RegisterNativeCollaborationDevice.kt": "3cd94a5714b1a14b03cf5e6b10051788184017a268465650a34cf9bf6cb29100",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationAdmissionPolicyTest.kt": "841fe4ccdcd6df4656c0159ef4aa7b795d8fe44101bce4cdb11580c2be33a2e4"
+  }
+}

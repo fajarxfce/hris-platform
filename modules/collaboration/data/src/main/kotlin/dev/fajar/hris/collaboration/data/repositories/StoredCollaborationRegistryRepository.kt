@@ -33,10 +33,11 @@ class StoredCollaborationRegistryRepository(private val store: CollaborationRegi
         }
     }
 
-    override fun countActiveParentSessions(accountId: UUID, at: Instant): Result<Int> =
-        safeDatabaseCall {
-            store.countActiveParentSessions(accountId, at)
-        }
+    override fun countActiveParentSessions(
+        accountId: UUID,
+        at: Instant,
+        excluding: UUID?,
+    ): Result<Int> = safeDatabaseCall { store.countActiveParentSessions(accountId, at, excluding) }
 
     override fun register(registration: CollaborationRegistration): Result<Unit> =
         safeDatabaseCall {

@@ -13,7 +13,11 @@ interface CollaborationRegistryRepository {
         nativeSessionId: UUID,
     ): Result<CollaborationDevice?>
 
-    fun countActiveParentSessions(accountId: UUID, at: Instant): Result<Int>
+    fun countActiveParentSessions(
+        accountId: UUID,
+        at: Instant,
+        excluding: UUID? = null,
+    ): Result<Int>
 
     fun register(registration: CollaborationRegistration): Result<Unit>
 }

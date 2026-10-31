@@ -13,7 +13,7 @@ interface CollaborationRegistryDataSource {
         nativeSessionId: UUID,
     ): BoundCollaborationDeviceData?
 
-    fun countActiveParentSessions(accountId: UUID, at: Instant): Int
+    fun countActiveParentSessions(accountId: UUID, at: Instant, excluding: UUID? = null): Int
 
     fun insertDevice(record: CollaborationDevicesRecord)
 

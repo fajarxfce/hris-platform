@@ -82,9 +82,10 @@ PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin ./gradlew ...
 --no-daemon` works without changing socket permissions; the older `sudo -u ...
 -g docker` form is not permitted by this host's run-as-group rule.
 
-Next: transaction-owned registration/admission use cases with live company
-availability and the five-device quota; durable provisioning and credential
-storage; protected provider broker/gateway; native/web adapters and chat screens.
+Next: API wiring, durable provisioning and encrypted provider credential storage;
+protected provider broker/gateway; browser-parent admission, native/web adapters
+and chat screens. Native registration/admission transactions are now implemented
+and tested as recorded below.
 Retain all P0–P8 gates and all 54 feature groups as outstanding until accepted.
 
 Company availability now has a separate `COLLABORATION` module, supported by
@@ -101,12 +102,25 @@ policy head before its deferred history FK. The fixture now creates both in one
 transaction; the corrected migration/actual-restore test and formatting pass.
 Combined passing coverage is 29 database cases; do not describe the initial full
 run as green. Twenty-one recovery-tool cases pass with reviewed ceiling 105.
-The expanded collaboration-control CI must supply a complete fresh hosted run.
+The expanded collaboration-control CI subsequently passed both jobs at exact
+`120c6d6b` in `41184251989`, including the full schema-105 database rerun.
 
 The schema-104 control checkpoint `959e74f9` passed hosted run `41183444363`.
 Mobile's policy mapping has 37 passing workspace cases and a successful dev-debug
 assembly (3m54s). That APK is a build check only; the phone remains on release
 build 4. No generic Starter port is due for this HRIS module identifier.
+
+Native registration/admission now owns transaction boundaries and lock order.
+The five-parent quota is serialized across companies; retry after native refresh
+replays without another device/audit/outbox. A parent is locked before its device
+binding; registration rechecks admission after writes, and active grants stop at
+scheduled policy boundaries. Ten new real PostgreSQL scenarios, one registry
+regression, eleven policy cases, formatting and architecture pass (53s). See
+[registration evidence](measurements/collaboration-native-registration-2026-10-31.json).
+No DI/HTTP/provider credential wiring exists yet, so no API/worker context claim is
+made for these new use cases. Native transport must supply the authenticated parent
+ID/version. Browser parent bindings and provider provisioning remain unfinished.
+Continue into the protected broker/gateway and actual chat; all P0–P8 gates remain.
 
 The paragraphs below are retained prior-work history. Their old installed build
 2 reference is superseded by Mobile's validated release build 4; consult Mobile's

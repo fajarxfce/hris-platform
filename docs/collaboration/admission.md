@@ -41,8 +41,8 @@ credential rotation and rollback. All 28 database cases pass, including actual
 The recovery schema ceiling is 104; no new encryption envelope exists yet. See
 [recorded evidence](../measurements/collaboration-device-registry-2026-10-31.json).
 
-Next implementation work is the registration/admission use cases, provisioning
-intent/outbox, protected session broker and provider gateway. The adapter must
+Next implementation work is durable provider provisioning, encrypted provider
+credentials, API wiring, protected session broker and provider gateway. The adapter must
 read current company/member/account/session/device authority under the established
 lock order. It must apply company maintenance/module/build admission, protect
 encrypted provider credentials, and deny direct provider login/admin/federation
@@ -65,3 +65,35 @@ of additive unknown keys. The migration's actual backup/restore test checks both
 the new function and unchanged historical revisions; recovery ceiling 105 adds no
 new encrypted-data contract. Settings behavior passes 82 unit and 13 browser
 cases; the native policy change passes 37 workspace cases and Android assembly.
+
+## Native registration and admission transactions
+
+`RegisterNativeCollaborationDevice` now owns idempotent registration. Its lock
+order is operation → client policy → company → members → account → native parent
+→ device. The exclusive account guard serializes a global five-parent quota with
+native creation/refresh/revocation. Registering the same parent in another company
+keeps a separate company identity without consuming a sixth slot. Provisioning
+rows count; expired access does not release a still-refreshable parent's slot.
+
+A duplicate operation returns the original receipt after fresh authorization.
+Its fingerprint excludes the parent version, allowing a lost-response retry after
+a legitimate token refresh. A new operation on an existing binding records only
+a receipt. Device creation, binding, receipt, audit and outbox commit together;
+permission, access expiry and company availability are checked again after writes.
+Revoked devices cannot be reactivated through registration.
+
+`AcquireNativeCollaborationAdmission` locks the native parent before reading its
+binding, rechecks live company/session/permission/MFA/device authority, and clamps
+the deadline to the next company policy/maintenance boundary. If a scheduled
+successor becomes effective during lookup, the observation is rejected for retry.
+Native identity/version come from authenticated transport; neither is accepted as
+client authority. Browser metadata cannot bypass native build policy.
+
+Ten actual PostgreSQL scenarios plus the registry regression and eleven domain
+cases pass, including competing registrations, concurrent replay, account-wide
+quota, revocation during waiting, post-write rollback and policy timing. See
+[registration evidence](../measurements/collaboration-native-registration-2026-10-31.json).
+The schema-105 control CI also passed both jobs in
+[41184251989](https://github.com/fajarxfce/hris-platform/actions/runs/41184251989).
+These use cases are not wired into HTTP or worker DI yet. Browser-parent admission,
+provider credentials, provisioning and actual chat delivery remain required.

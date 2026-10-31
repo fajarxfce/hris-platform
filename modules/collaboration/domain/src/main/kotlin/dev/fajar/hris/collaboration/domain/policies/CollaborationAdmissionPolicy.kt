@@ -22,6 +22,47 @@ fun admitCollaborationDevice(
     security: IdentitySecurityPolicy,
 ): Result<CollaborationAdmission> {
     val company = actor.companyId ?: return collaborationDenied()
+    val deadline =
+        collaborationParentDeadline(actor, access, session, expectedSessionVersion, now, security)
+    if (deadline is Result.Failed) return deadline
+    val parent = requireNotNull(session)
+    if (
+        device == null ||
+            device.accountId != actor.accountId ||
+            device.companyId != company ||
+            device.nativeSessionId != parent.id ||
+            device.state != CollaborationDeviceState.ACTIVE ||
+            device.revokedAt != null ||
+            device.version < 0 ||
+            device.createdAt.isAfter(now)
+    )
+        return collaborationDenied()
+
+    return Result.Success(
+        CollaborationAdmission(
+            company,
+            actor.accountId,
+            device.id,
+            device.version,
+            parent.id,
+            parent.version,
+            parent.credentialVersion,
+            now,
+            (deadline as Result.Success).value,
+        )
+    )
+}
+
+/** Shared parent admission for registration and transport-grant acquisition. */
+internal fun collaborationParentDeadline(
+    actor: Actor,
+    access: AccountAccess?,
+    session: NativeSession?,
+    expectedSessionVersion: Long,
+    now: Instant,
+    security: IdentitySecurityPolicy,
+): Result<Instant> {
+    if (actor.companyId == null) return collaborationDenied()
     val authorized =
         validateCompanySessionActor(actor, access, now, security).flatMap {
             it.requirePermission(COLLABORATION_CHAT_PERMISSION)
@@ -37,18 +78,6 @@ fun admitCollaborationDevice(
             !session.accessExpiresAt.isAfter(now)
     )
         return nativeAuthenticationRequired()
-    if (
-        device == null ||
-            device.accountId != actor.accountId ||
-            device.companyId != company ||
-            device.nativeSessionId != session.id ||
-            device.state != CollaborationDeviceState.ACTIVE ||
-            device.revokedAt != null ||
-            device.version < 0 ||
-            device.createdAt.isAfter(now)
-    )
-        return collaborationDenied()
-
     val live = requireNotNull(access)
     val mfaDeadline =
         if (
@@ -58,16 +87,11 @@ fun admitCollaborationDevice(
             requireNotNull(actor.mfaVerifiedAt).plus(security.maximumMfaAge)
         else Instant.MAX
     return Result.Success(
-        CollaborationAdmission(
-            company,
-            actor.accountId,
-            device.id,
-            device.version,
-            session.id,
-            session.version,
-            session.credentialVersion,
-            now,
-            minOf(now.plusSeconds(60), session.expiresAt, session.accessExpiresAt, mfaDeadline),
+        minOf(
+            now.plusSeconds(60),
+            requireNotNull(session).expiresAt,
+            session.accessExpiresAt,
+            mfaDeadline,
         )
     )
 }

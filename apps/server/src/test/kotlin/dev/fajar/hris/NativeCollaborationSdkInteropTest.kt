@@ -170,6 +170,20 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                 Thread.sleep(100)
             }
             writePrivate(directory.resolve("send.json"), mapOf("ready" to true))
+            val restoredDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(90)
+            while (!Files.exists(directory.resolve("native-restored.json"))) {
+                if (!process.isAlive) fail<Nothing>(diagnostic(directory))
+                if (System.nanoTime() >= restoredDeadline)
+                    fail<Nothing>("Owned SDK queue restoration exceeded its deadline")
+                Thread.sleep(100)
+            }
+            assertEquals(
+                0,
+                trace.earlyEncryptedSendCount(),
+                "SDK sent before explicit queue admission",
+            )
+            trace.allowEncryptedSends()
+            writePrivate(directory.resolve("resume.json"), mapOf("ready" to true))
             assertTrue(
                 process.waitFor(120, TimeUnit.SECONDS),
                 "Owned native driver exceeded its deadline",
@@ -185,9 +199,18 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "missingRecordPreserved",
                     "wrongPassphrasePreserved",
                     "exclusiveOwner",
+                    "processRestarted",
+                    "queueRestored",
+                    "transactionReused",
+                    "identityAfterRestart",
                 )) {
                 assertTrue(proof.path(name).isBoolean && proof.path(name).asBoolean())
             }
+            assertEquals(
+                0,
+                trace.earlyEncryptedSendCount(),
+                "An early send completed after queue admission",
+            )
             verifyCiphertext(
                 sender,
                 room,
@@ -211,6 +234,11 @@ class NativeCollaborationSdkInteropTest : NativeGatewaySdkFixture() {
                     "missingRecordPreserved" to true,
                     "wrongPassphrasePreserved" to true,
                     "exclusiveOwner" to true,
+                    "processRestarted" to true,
+                    "queueRestored" to true,
+                    "transactionReused" to true,
+                    "identityAfterRestart" to true,
+                    "pausedAcrossRestart" to true,
                     "artifact" to result.path("artifact"),
                 ),
             )

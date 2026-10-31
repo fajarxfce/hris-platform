@@ -31,7 +31,8 @@
         "../measurements/collaboration-dual-sync-2026-10-31.json",
         "native-hris-sdk.md",
         "../measurements/collaboration-native-hris-sdk-2026-10-31.json",
-        "../measurements/collaboration-protected-native-store-2026-10-31.json"
+        "../measurements/collaboration-protected-native-store-2026-10-31.json",
+        "../measurements/collaboration-sdk-process-death-2026-10-31.json"
       ]
     },
     {
@@ -95,7 +96,8 @@
         "native-hris-sdk.md",
         "../measurements/collaboration-native-hris-sdk-2026-10-31.json",
         "mobile-setup.md",
-        "../measurements/collaboration-protected-native-store-2026-10-31.json"
+        "../measurements/collaboration-protected-native-store-2026-10-31.json",
+        "../measurements/collaboration-sdk-process-death-2026-10-31.json"
       ]
     },
     {
@@ -484,10 +486,10 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Finish native runtime/abandoned-close and bootstrap recovery; prove SDK queue transaction recovery across actual Android process death, then app DI/UI. Protected Android Keystore reopening through HRIS now passes.",
+    "Complete admitted bootstrap installation/recovery, app session ownership, logical-message reconciliation and DI/UI. Protected Android store reopening and the original paused SDK transaction across actual process death now pass.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",
-    "Continue P1\u2013P8 and all 54 groups; current provider/component proofs do not accept product features or capacity."
+    "Continue P1–P8 and all 54 groups; current provider/component proofs do not accept product features or capacity."
   ]
 }

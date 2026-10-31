@@ -22,8 +22,8 @@ The proof now uses Mobile's actual `AndroidCredentialStore`, Keystore,
 backup-excluded directory and exclusive runtime lease. Each fictional owner checks
 competing opens, missing credential records and an incorrect store passphrase,
 then restores the original record and verifies unchanged Ed25519/Curve25519
-identity before exchanging messages. This revision still needs a separate Android
-process-death scenario for the SDK send queue.
+identity before exchanging messages. The separate process-death scenario below
+also verifies the pending SDK send queue.
 
 The first full exchange exposed an incorrect gateway constraint: after a failed
 initial upload, the pinned SDK sent 50 one-time keys plus one fallback key whose
@@ -43,6 +43,28 @@ regression passes 37 domain, 201 data and 39 API cases plus quality; the driver 
 27 passing cases. Mobile root/debug/lint/browser checks pass in 78s with 2,063
 desktop and 24 data browser cases. Fifteen Platform and seventy Mobile source
 hashes bind the APK and behavior to the checked code. No product group is accepted.
+
+## Pending queue across process death
+
+The stage process pauses queues before restore/subscription, enqueues exactly one
+message and waits for the SDK's durable local transaction receipt. The driver then
+force-stops only the proof package, verifies that PID is gone and starts a second
+instrumentation process without reinstalling or clearing data. That process restores
+the existing protected records, compares both device-key fingerprints and observes
+the same replayed transaction. It does not bootstrap or enqueue a replacement.
+
+Before releasing the retained queue, the fixture confirms no encrypted room-send
+request reached the gateway. The observation happens at filter entry and cannot
+hide an early request that finishes later. After release, both clients decrypt the
+expected bodies/logical IDs; the server verifies encrypted events. Driver checks
+reject unchanged PIDs, changed transactions and completion before restoration.
+
+[Process-death evidence](../measurements/collaboration-sdk-process-death-2026-10-31.json)
+retains APK `a14d6bf1`, 15 Platform/71 Mobile source hashes, actual SDK 33.512s and
+successful cleanup. The complete fixture/quality run passes in 62s: four API cases;
+32 driver cases also pass. This establishes SDK persistence for the original pending
+transaction. App outbox reconciliation after provider transaction expiry, push,
+OS wakeup and Apple runtime remain separate acceptance work.
 
 ## Sync compatibility
 
@@ -96,5 +118,5 @@ values and raw resource identifiers are excluded. Trace counters are diagnostic,
 not a gateway allowlist. Tests exercise invalid endpoints/evidence, private IPC,
 partial results, cancellation, failed installation/mapping and cleanup failures.
 
-Continue product session/store ownership, durable SDK queue restart and encrypted
-logical-ID reconciliation, then UI and all remaining P0–P8 work.
+Continue admitted bootstrap installation/recovery, application session ownership
+and encrypted logical-ID reconciliation, then UI and all remaining P0–P8 work.

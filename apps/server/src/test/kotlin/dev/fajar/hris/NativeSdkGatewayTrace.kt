@@ -3,6 +3,8 @@ package dev.fajar.hris
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.web.filter.OncePerRequestFilter
@@ -11,12 +13,27 @@ import org.springframework.web.util.ContentCachingRequestWrapper
 /** Bounded, code-only observations: never credentials, IDs, cursor/filter values or bodies. */
 class NativeSdkGatewayTrace : OncePerRequestFilter() {
     private val observations = mutableListOf<Map<String, Any>>()
+    private val encryptedSendAllowed = AtomicBoolean()
+    private val earlyEncryptedSends = AtomicInteger()
+
+    fun allowEncryptedSends() {
+        encryptedSendAllowed.set(true)
+    }
+
+    fun earlyEncryptedSendCount() = earlyEncryptedSends.get()
 
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         chain: FilterChain,
     ) {
+        if (
+            request.method == "PUT" &&
+                request.requestURI.matches(encryptedSendRoute) &&
+                !encryptedSendAllowed.get()
+        ) {
+            earlyEncryptedSends.updateAndGet { minOf(it + 1, 512) }
+        }
         val keyRequest =
             if (request.requestURI == "/_matrix/client/v3/keys/upload")
                 ContentCachingRequestWrapper(request, 65_536)
@@ -62,6 +79,8 @@ class NativeSdkGatewayTrace : OncePerRequestFilter() {
     fun snapshot(): List<Map<String, Any>> = synchronized(observations) { observations.toList() }
 
     companion object {
+        private val encryptedSendRoute =
+            Regex("/_matrix/client/v3/rooms/[^/]+/send/m\\.room\\.encrypted/[^/]+")
         private val segments =
             setOf(
                 "",

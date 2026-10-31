@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
 
-from collaboration_hris_native import private_json, proof_evidence, read_json, run, stop_process
+from collaboration_hris_native import checkpoint_evidence, private_json, proof_evidence, read_json, run, stop_process
 
 
 class HrisNativeDriverTest(unittest.TestCase):
@@ -14,6 +14,7 @@ class HrisNativeDriverTest(unittest.TestCase):
         return {"encryptedBothDirections": True, "logicalIdsPreserved": True, "syncMode": "classic",
                 "protectedStoreReopened": True, "missingRecordPreserved": True,
                 "wrongPassphrasePreserved": True, "exclusiveOwner": True,
+                "queueRestored": True, "transactionReused": True, "identityAfterRestart": True,
                 "senderEventId": "$first", "recipientEventId": "$second",
                 "senderTransaction": "first-transaction", "recipientTransaction": "second-transaction"}
 
@@ -55,11 +56,82 @@ class HrisNativeDriverTest(unittest.TestCase):
                 patch("collaboration_hris_native.subprocess.Popen", return_value=process), \
                 patch("collaboration_hris_native.subprocess.run", return_value=subprocess.CompletedProcess([], 0)), \
                 patch("collaboration_hris_native.time.sleep"), \
-                patch("collaboration_hris_native.time.monotonic", side_effect=patches.get("clock", [0, 1, 116])):
+                patch("collaboration_hris_native.time.monotonic", side_effect=patches.get("clock", [0, 1, 2, 231])):
             value = run("owned.apk", "sdk", root)
             factory.assert_called_once_with("owned.apk", "emulator-5560", "sdk", root)
             native.cleanup.assert_called_once()
             return value, read_json(root / "result.json")
+
+    def handshake(self, root, native, restored=None):
+        private_json(root / "send.json", {"ready": True})
+        private_json(root / "resume.json", {"ready": True})
+        native.process_id.side_effect = [101, None, 202]
+        reads = 0
+        def command(*arguments):
+            nonlocal reads
+            if arguments[:3] == ("shell", "am", "force-stop"):
+                return ""
+            name = Path(arguments[-1]).stem
+            if name == "instrumentation":
+                reads += 1
+                if reads == 1:
+                    raise RuntimeError("No checkpoint yet")
+                return json.dumps({"complete": True})
+            if name == "gateway-ready":
+                return json.dumps({"ready": True})
+            if name == "gateway-staged":
+                return json.dumps(self.evidence() | {"transactionId": "first-transaction", "processId": 101,
+                    "senderKeyFingerprint": "a" * 64, "recipientKeyFingerprint": "b" * 64})
+            if name == "gateway-restored":
+                return json.dumps(restored or {"transactionId": "first-transaction", "processId": 202})
+            if name == "gateway-result":
+                return json.dumps(self.evidence() | {"processId": 202})
+            raise AssertionError("Unexpected owned IPC read")
+        native.command.side_effect = command
+
+    def test_queue_checkpoints_reject_ambiguous_processes_and_discard_unknown_payloads(self):
+        value = self.evidence() | {"transactionId": "retained", "processId": 123,
+                                  "senderKeyFingerprint": "a" * 64, "recipientKeyFingerprint": "b" * 64}
+        self.assertEqual({"transactionId": "retained", "processId": 123},
+                         checkpoint_evidence(value | {"token": "private-fixture"}, staged=True))
+        for name, wrong in (("processId", True), ("processId", 0), ("processId", 2147483648),
+                            ("transactionId", "x" * 129), ("protectedStoreReopened", 1),
+                            ("senderKeyFingerprint", "private-fixture")):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                checkpoint_evidence(value | {name: wrong}, staged=True)
+
+    def test_reused_process_or_changed_transaction_cannot_release_delivery(self):
+        for restored in ({"transactionId": "first-transaction", "processId": 101},
+                         {"transactionId": "replacement-transaction", "processId": 202}):
+            with self.subTest(restored=restored), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                native, process = self.fixture(root)
+                self.handshake(root, native, restored=restored)
+                value, result = self.execute(root, native, process)
+                self.assertFalse(value)
+                self.assertTrue(result["cleanup"])
+                self.assertFalse((root / "native-restored.json").exists())
+
+    def test_early_completion_cannot_claim_a_process_restart(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            native, process = self.fixture(root)
+            native.command.return_value = json.dumps({"complete": True})
+            value, result = self.execute(root, native, process)
+            self.assertFalse(value)
+            self.assertTrue(result["cleanup"])
+            native.process_id.assert_not_called()
+
+    def test_a_still_running_old_process_cannot_be_replaced_by_a_second_instrumentation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            native, process = self.fixture(root)
+            self.handshake(root, native)
+            native.process_id.side_effect = [101, 101]
+            value, result = self.execute(root, native, process)
+            self.assertFalse(value)
+            self.assertTrue(result["cleanup"])
+            self.assertFalse((root / "native-staged.json").exists())
 
     def test_non_loopback_servers_are_rejected_before_emulator_access(self):
         for base in ("https://127.0.0.1:43210", "http://10.77.77.3:5555", "http://127.0.0.1:80",
@@ -91,13 +163,14 @@ class HrisNativeDriverTest(unittest.TestCase):
                 root = Path(tmp)
                 native, process = self.fixture(root)
                 native.cleanup.return_value = cleaned
-                native.command.side_effect = [json.dumps({"complete": True}), json.dumps(self.evidence())]
+                self.handshake(root, native)
                 value, result = self.execute(root, native, process)
                 self.assertEqual(cleaned, value)
                 self.assertEqual(cleaned, result["cleanup"])
                 self.assertTrue(result["passed"])
-                self.assertEqual(self.evidence(), result["proof"])
-                process.terminate.assert_called_once()
+                self.assertEqual(self.evidence() | {"processRestarted": True}, result["proof"])
+                self.assertEqual(3, native.process_id.call_count)
+                self.assertEqual(2, process.terminate.call_count)
 
     def test_instrumentation_failure_and_cancellation_preserve_safe_evidence(self):
         for replies in ([json.dumps({"complete": False, "failureCategory": "IllegalStateException", "message": "private-fixture"})],
@@ -117,7 +190,7 @@ class HrisNativeDriverTest(unittest.TestCase):
             root = Path(tmp)
             native, process = self.fixture(root)
             native.command.return_value = "{"
-            value, result = self.execute(root, native, process)
+            value, result = self.execute(root, native, process, clock=[0, 1, 231])
             self.assertFalse(value)
             self.assertEqual("TimeoutError", result["failureCategory"])
             self.assertTrue(result["cleanup"])
@@ -127,13 +200,12 @@ class HrisNativeDriverTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             native, process = self.fixture(root)
-            native.command.side_effect = [json.dumps({"complete": True}), json.dumps(self.evidence())]
+            self.handshake(root, native)
             process.wait.side_effect = subprocess.TimeoutExpired("owned-adb", 5)
             value, result = self.execute(root, native, process)
             self.assertFalse(value)
             self.assertFalse(result["cleanup"])
-            process.kill.assert_called_once()
-            self.assertEqual(2, process.wait.call_count)
+            process.kill.assert_called()
 
     def test_stop_without_child_is_complete(self):
         self.assertTrue(stop_process(None))

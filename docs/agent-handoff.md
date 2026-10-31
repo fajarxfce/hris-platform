@@ -17,6 +17,20 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- **An actual Android process death now preserves the pending SDK transaction.**
+  [Evidence](measurements/collaboration-sdk-process-death-2026-10-31.json) binds
+  15 Platform/71 Mobile sources to APK `a14d6bf1`. The owned proof process is
+  force-stopped after durable enqueue, then a different PID restores both protected
+  identities and the original transaction. Gateway observation confirms zero
+  encrypted sends before explicit release; both directions decrypt and server
+  reads confirm ciphertext. Actual SDK case 33.512s; full fixture/quality run 62s,
+  four API cases and 32 Python cases pass. Mobile root/debug/lint/browser passes
+  in 66s, 2,063 desktop/24 data browser cases. Cleanup completed and the owned
+  emulator was stopped. **Next: admitted bootstrap installation/recovery, app
+  session ownership, logical-message reconciliation and DI/UI; continue all P0–P8.**
+  This proves SDK queue persistence, not the full product outbox/notification or
+  Apple runtime. No live/schema/phone/Starter change and no product group accepted.
+
 - **Protected Android store reopening through HRIS now passes.**
   [Contract](collaboration/native-hris-sdk.md) and
   [evidence](measurements/collaboration-protected-native-store-2026-10-31.json)
@@ -30,9 +44,8 @@ Current provider/client evidence:
   Full 454s regression passes 37 domain, 201 data, 39 API and quality; 27 driver
   cases pass. Mobile root/debug/lint/browser passes in 78s: 2,063 desktop/24 data
   browser cases. SDK store shutdown now drains the native database pools before
-  unlock, with cancellation/retry tests. **Next: abandoned-close recovery, bootstrap
-  installation/recovery, actual Android queue process death, app DI/UI and P0–P8.**
-  Same-process store reopening does not accept message process death. No live,
+  unlock, with cancellation/retry tests. The newer checkpoint above adds abandoned
+  close recovery and actual Android queue process death. No live,
   schema, phone or Starter change; no product group accepted. Mobile's matching
   proof commit/CI pin follows this Platform commit.
 

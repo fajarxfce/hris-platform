@@ -42,6 +42,20 @@ class NativeDeviceTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             NativeDevice("missing.apk", "10.77.77.3:5555", "sdk", "work")
 
+    def test_process_identity_distinguishes_absence_from_adb_failure(self):
+        with tempfile.TemporaryDirectory() as directory:
+            device = self.fixture(Path(directory))
+            for response, expected in ((subprocess.CompletedProcess([], 0, "1234\n", ""), 1234),
+                                       (subprocess.CompletedProcess([], 1, "", ""), None)):
+                with patch("collaboration_native_device.subprocess.run", return_value=response) as command:
+                    self.assertEqual(expected, device.process_id())
+                    self.assertEqual([device.adb, "-s", "emulator-5560", "shell", "pidof", PACKAGE], command.call_args.args[0])
+            for response in (subprocess.CompletedProcess([], 1, "", "offline"),
+                             subprocess.CompletedProcess([], 0, "1234 5678", ""),
+                             subprocess.CompletedProcess([], 0, "2147483648", "")):
+                with patch("collaboration_native_device.subprocess.run", return_value=response), self.assertRaises(RuntimeError):
+                    device.process_id()
+
     def test_existing_package_is_preserved_and_never_uninstalled(self):
         with tempfile.TemporaryDirectory() as directory:
             device = self.fixture(Path(directory))

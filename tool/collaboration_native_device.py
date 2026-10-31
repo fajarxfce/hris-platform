@@ -50,6 +50,16 @@ class NativeDevice:
             raise RuntimeError("Protocol APK installation was not confirmed")
         self.command("shell", "run-as", PACKAGE, "mkdir", "-p", "files/protocol-proof")
 
+    def process_id(self):
+        result = subprocess.run([self.adb, "-s", self.serial, "shell", "pidof", PACKAGE],
+                                capture_output=True, text=True, timeout=15)
+        value = result.stdout.strip()
+        if result.returncode == 1 and not value and not result.stderr.strip():
+            return None
+        if result.returncode or not re.fullmatch(r"[1-9][0-9]{0,9}", value) or int(value) > 2147483647:
+            raise RuntimeError("Could not identify the owned proof process")
+        return int(value)
+
     def bind(self, fixture):
         from urllib.parse import urlparse
         port = urlparse(fixture["matrix"]["baseUrl"]).port

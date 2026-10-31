@@ -3,8 +3,26 @@ package dev.fajar.hris
 import java.util.Base64
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.springframework.mock.web.MockHttpServletRequest
+import org.springframework.mock.web.MockHttpServletResponse
 
 class NativeSdkKeyShapeTest {
+    @Test
+    fun earlyEncryptedRequestsAreCountedAtArrivalAndRemainVisibleAfterAdmission() {
+        val trace = NativeSdkGatewayTrace()
+        val request =
+            MockHttpServletRequest(
+                "PUT",
+                "/_matrix/client/v3/rooms/fictional/send/m.room.encrypted/transaction",
+            )
+        trace.doFilter(request, MockHttpServletResponse()) { _, _ ->
+            assertEquals(1, trace.earlyEncryptedSendCount())
+        }
+        trace.allowEncryptedSends()
+        trace.doFilter(request, MockHttpServletResponse()) { _, _ -> Unit }
+        assertEquals(1, trace.earlyEncryptedSendCount())
+    }
+
     @Test
     fun keyDiagnosticReportsOnlyBoundedShapeFacts() {
         val key = Base64.getEncoder().withoutPadding().encodeToString(ByteArray(32))

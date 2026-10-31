@@ -65,7 +65,9 @@
         "sdk-protocol-surface.md",
         "../measurements/collaboration-sdk-protocol-surface-2026-10-31.json",
         "device-key-storage.md",
-        "../measurements/collaboration-device-key-storage-2026-10-31.json"
+        "../measurements/collaboration-device-key-storage-2026-10-31.json",
+        "device-key-upload.md",
+        "../measurements/collaboration-device-key-upload-2026-10-31.json"
       ]
     },
     {

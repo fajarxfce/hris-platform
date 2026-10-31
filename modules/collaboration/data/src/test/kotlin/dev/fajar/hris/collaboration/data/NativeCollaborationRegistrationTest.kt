@@ -4,14 +4,19 @@ import dev.fajar.hris.administration.data.datasources.PostgresCompanyClientPolic
 import dev.fajar.hris.administration.data.repositories.StoredCompanyClientPolicyRepository
 import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
+import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationDeviceKeyDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationDirectDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationDirectRoomDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationGatewaySessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProviderSessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProvisioningDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRegistryDataSource
+import dev.fajar.hris.collaboration.data.matrix.HttpMatrixClientDataSource
+import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixKeyRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationProviderSessionRepository
+import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixKeyRepository
+import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDeviceKeyRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectRoomRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationProvisioningRepository
@@ -20,9 +25,11 @@ import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.policies.collaborationDirectRoomPower
 import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixDeviceId
 import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixLocalpart
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationDeviceKeyRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRoomRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationGatewaySessionRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixKeyRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomRepository
 import dev.fajar.hris.collaboration.domain.usecases.*
@@ -1451,6 +1458,406 @@ class NativeCollaborationRegistrationTest {
     }
 
     @Test
+    fun gatewayKeyReadbackCannotConfirmMissingChangedLateOrUnavailableProviderIdentity() {
+        for (mode in listOf("missing", "changed", "expired", "unavailable")) {
+            val k = KeyUploadFixture()
+            val replacement = MatrixKeyFixture(k.keys.userId, k.keys.deviceId).device
+            k.provider.onQuery = {
+                if (k.provider.queries.get() != 2) Result.Success(k.provider.stored)
+                else
+                    when (mode) {
+                        "missing" -> Result.Success(null)
+                        "changed" -> Result.Success(replacement)
+                        "expired" -> {
+                            k.g.f.clock.at = k.g.f.clock.instant().plusSeconds(60)
+                            Result.Success(k.provider.stored)
+                        }
+                        else ->
+                            Result.Failed(
+                                Failure(FailureKind.UNAVAILABLE, "fixture_readback_unavailable")
+                            )
+                    }
+            }
+            val result = k.upload()
+            assertEquals(
+                when (mode) {
+                    "missing" -> "collaboration_provider_invalid_response"
+                    "changed" -> "collaboration_device_key_recovery_required"
+                    "expired" -> "collaboration_admission_changed"
+                    else -> "fixture_readback_unavailable"
+                },
+                failed(result),
+                mode,
+            )
+            assertEquals(0L, k.publication()?.version, mode)
+            assertEquals(1, k.provider.uploads.get())
+            assertEquals(0, k.matrix.logouts.get())
+            k.provider.onQuery = null
+            assertInstanceOf(Result.Success::class.java, k.upload(), mode)
+            assertEquals(1L, k.publication()?.version)
+        }
+    }
+
+    @Test
+    fun gatewayRepeatedSameIdentityUploadsShareOnePublicationAndCredentialGeneration() {
+        val k = KeyUploadFixture()
+        val before = k.g.f.rows("audit_entries")
+        val ready = CyclicBarrier(2)
+        k.matrix.onLogin = { request ->
+            ready.await(10, TimeUnit.SECONDS)
+            k.matrix.issue(request)
+        }
+        val outcomes = race(listOf({ k.upload() }, { k.upload() }))
+        assertTrue(outcomes.all { it is Result.Success }, outcomes.toString())
+        assertEquals(1L, k.publication()?.version)
+        assertEquals(k.keys.device, k.provider.stored)
+        assertEquals(before + 3, k.g.f.rows("audit_entries"))
+        assertEquals(2, k.matrix.logins.get())
+        assertEquals(0L, k.g.f.credential(k.g.device)?.generation)
+        assertEquals(0, k.matrix.logouts.get())
+    }
+
+    @Test
+    fun gatewayKeyCountsAndRepeatedUploadPublishExactlyOneRetainedIdentity() {
+        val k = KeyUploadFixture()
+        assertInstanceOf(Result.Success::class.java, k.upload(CollaborationMatrixKeyUpload()))
+        assertNull(k.publication())
+        assertEquals(0, k.provider.queries.get())
+        val before = k.g.f.rows("audit_entries")
+        val first = success(k.upload())
+        assertEquals(1, first.oneTimeKeyCounts["signed_curve25519"])
+        val published = requireNotNull(k.publication())
+        assertEquals(1L, published.version)
+        assertNotNull(published.publishedAt)
+        assertEquals(first, success(k.upload()))
+        assertEquals(published, k.publication())
+        assertEquals(before + 2, k.g.f.rows("audit_entries"))
+        assertEquals(1, k.matrix.logins.get())
+        assertEquals(0, k.matrix.logouts.get())
+        assertInstanceOf(
+            Result.Success::class.java,
+            k.upload(
+                CollaborationMatrixKeyUpload(
+                    oneTimeKeys = mapOf("signed_curve25519:2" to k.keys.signed())
+                )
+            ),
+        )
+        assertEquals(published, k.publication())
+    }
+
+    @Test
+    fun gatewayKeysRejectWrongOwnerDeviceSignatureAndUnenrolledOneTimeKeysBeforeProviderWrites() {
+        val k = KeyUploadFixture()
+        for (device in
+            listOf(
+                MatrixKeyFixture("@foreign:proof.invalid", k.keys.deviceId).device,
+                MatrixKeyFixture(k.keys.userId, "HRIS_" + "f".repeat(32)).device,
+                k.keys.device.copy(
+                    keys =
+                        k.keys.device.keys +
+                            ("curve25519:${k.keys.deviceId}" to k.keys.signed().key)
+                ),
+            )) {
+            assertEquals(
+                "collaboration_device_keys_invalid",
+                failed(k.upload(CollaborationMatrixKeyUpload(device))),
+            )
+        }
+        assertEquals(
+            "collaboration_device_keys_required",
+            failed(k.upload(CollaborationMatrixKeyUpload(oneTimeKeys = k.request.oneTimeKeys))),
+        )
+        assertNull(k.publication())
+        assertEquals(0, k.matrix.logins.get())
+        assertEquals(0, k.provider.uploads.get())
+        val signed = k.keys.signed()
+        assertEquals(
+            "collaboration_device_keys_invalid",
+            failed(
+                k.upload(
+                    k.request.copy(
+                        oneTimeKeys =
+                            mapOf("signed_curve25519:bad" to signed.copy(key = k.keys.signed().key))
+                    )
+                )
+            ),
+        )
+        assertEquals(0, k.provider.uploads.get())
+        assertEquals(0L, k.publication()?.version)
+    }
+
+    @Test
+    fun gatewayKeyResponseLossRetainsReservationAndRefusesReplacementBeforeReplay() {
+        val k = KeyUploadFixture()
+        k.provider.onUpload = { request ->
+            k.provider.accept(request)
+            Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_lost_upload"))
+        }
+        assertEquals("fixture_lost_upload", failed(k.upload()))
+        val pending = requireNotNull(k.publication())
+        assertEquals(0L, pending.version)
+        assertEquals(k.keys.device, k.provider.stored)
+        val replacement = MatrixKeyFixture(k.keys.userId, k.keys.deviceId)
+        assertEquals(
+            "collaboration_device_key_recovery_required",
+            failed(k.upload(CollaborationMatrixKeyUpload(replacement.device))),
+        )
+        assertEquals(1, k.provider.uploads.get())
+        k.provider.onUpload = null
+        assertInstanceOf(Result.Success::class.java, k.upload())
+        assertEquals(
+            pending.copy(version = 1, publishedAt = k.g.f.clock.instant()),
+            k.publication(),
+        )
+        assertEquals(k.keys.device, k.provider.stored)
+        assertEquals(2, k.provider.uploads.get())
+        assertEquals(0, k.matrix.logouts.get())
+    }
+
+    @Test
+    fun gatewayKeysNeverOverwriteConflictingPreexistingProviderIdentity() {
+        val k = KeyUploadFixture()
+        val prior = MatrixKeyFixture(k.keys.userId, k.keys.deviceId).device
+        k.provider.stored = prior
+        assertEquals("collaboration_device_key_recovery_required", failed(k.upload()))
+        assertEquals(prior, k.provider.stored)
+        assertEquals(0, k.provider.uploads.get())
+        assertEquals(0L, k.publication()?.version)
+    }
+
+    @Test
+    fun gatewayKeysWithholdProviderFailuresAndSuccessAfterPermissionOrParentChanges() {
+        for (stage in listOf("query", "upload")) {
+            val k = KeyUploadFixture()
+            fun deny(): Result.Failed {
+                sql.update(
+                    "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                    k.g.f.actor.companyId,
+                    k.g.f.account,
+                )
+                return Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_provider_failed"))
+            }
+            if (stage == "query") k.provider.onQuery = { deny() }
+            else
+                k.provider.onUpload = { request ->
+                    k.provider.accept(request)
+                    deny()
+                }
+            assertEquals("access_denied", failed(k.upload()))
+            assertEquals(0L, k.publication()?.version)
+            assertEquals(if (stage == "query") 0 else 1, k.provider.uploads.get())
+            assertEquals(0, k.matrix.logouts.get())
+        }
+        val k = KeyUploadFixture()
+        k.provider.onUpload = { request ->
+            val response = k.provider.accept(request)
+            sql.update(
+                "update native_sessions set version=version+1,rotated_at=now() where id=?",
+                k.g.parent,
+            )
+            response
+        }
+        val changed = k.upload()
+        assertEquals("collaboration_admission_changed", failed(changed))
+        assertEquals(FailureKind.UNAVAILABLE, (changed as Result.Failed).failure.kind)
+        assertEquals(0L, k.publication()?.version)
+        k.provider.onUpload = null
+        assertInstanceOf(Result.Success::class.java, k.upload())
+        assertEquals(1L, k.publication()?.version)
+        assertEquals(0, k.matrix.logouts.get())
+    }
+
+    @Test
+    fun gatewayKeyLateReservationAndInterruptedPublicationRollBackTheirOwnJournal() {
+        val late = KeyUploadFixture()
+        val before = late.g.f.rows("audit_entries")
+        val deadline = late.g.f.clock.instant().plusSeconds(5)
+        late.g.f.policy(
+            ClientPolicy(disabledModules = setOf(CompanyModule.COLLABORATION)),
+            deadline,
+        )
+        val lateJournal =
+            object : ChangeJournalRepository {
+                override fun record(actor: Actor, change: ChangeRecord): Result<Unit> =
+                    late.g.f.journal.record(actor, change).also { late.g.f.clock.at = deadline }
+            }
+        val lateCase =
+            late.g.f.matrixIdentity(
+                late.matrix,
+                journal = lateJournal,
+                providerKeys = late.provider,
+            )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            lateCase.uploadKeys(late.tokens.accessToken, UUID.randomUUID(), late.request),
+        )
+        assertNull(late.publication())
+        assertEquals(before, late.g.f.rows("audit_entries"))
+        assertEquals(0, late.matrix.logins.get())
+        val k = KeyUploadFixture()
+        val journal =
+            object : ChangeJournalRepository {
+                override fun record(actor: Actor, change: ChangeRecord): Result<Unit> =
+                    k.g.f.journal.record(actor, change).also {
+                        if (change.action == "collaboration.device_keys_published")
+                            throw InterruptedException("fixture cancellation")
+                    }
+            }
+        val command = k.g.f.matrixIdentity(k.matrix, journal = journal, providerKeys = k.provider)
+        try {
+            assertThrows(InterruptedException::class.java) {
+                command.uploadKeys(k.tokens.accessToken, UUID.randomUUID(), k.request)
+            }
+        } finally {
+            Thread.interrupted()
+        }
+        assertEquals(0L, k.publication()?.version)
+        assertEquals(k.keys.device, k.provider.stored)
+        val pendingAudit = k.g.f.rows("audit_entries")
+        assertInstanceOf(Result.Success::class.java, k.upload())
+        assertEquals(1L, k.publication()?.version)
+        assertEquals(pendingAudit + 1, k.g.f.rows("audit_entries"))
+    }
+
+    @Test
+    fun gatewayCompetingFirstKeyUploadsCannotReplaceWinningFingerprint() {
+        val k = KeyUploadFixture()
+        val other = MatrixKeyFixture(k.keys.userId, k.keys.deviceId)
+        val outcomes =
+            race(listOf({ k.upload() }, { k.upload(CollaborationMatrixKeyUpload(other.device)) }))
+        assertEquals(1, outcomes.count { it is Result.Success })
+        assertEquals(
+            listOf("collaboration_device_key_recovery_required"),
+            outcomes.filterIsInstance<Result.Failed>().map { it.failure.code },
+        )
+        assertEquals(1, k.provider.uploads.get())
+        assertEquals(1L, k.publication()?.version)
+        assertTrue(k.provider.stored == k.keys.device || k.provider.stored == other.device)
+    }
+
+    @Test
+    fun gatewayKeyPublicationUsesActualSynapseAndPrivateCredentialWithFencedReadback() {
+        val g = GatewayFixture()
+        MatrixProviderFixture("10m", g.f.clock).use { provider ->
+            provider.start()
+            val tokens = success(g.bootstrap())
+            val keys =
+                MatrixKeyFixture(
+                    "@${collaborationMatrixLocalpart(requireNotNull(g.f.actor.companyId), g.f.account)}:matrix.example.test",
+                    collaborationMatrixDeviceId(g.device),
+                )
+            val repo =
+                InternalCollaborationMatrixKeyRepository(
+                    HttpMatrixClientDataSource(provider.client, provider.config, g.f.clock)
+                )
+            val command =
+                g.f.matrixIdentity(
+                    provider.repository,
+                    serverName = "matrix.example.test",
+                    providerKeys = repo,
+                )
+            val upload =
+                CollaborationMatrixKeyUpload(
+                    keys.device,
+                    mapOf("signed_curve25519:first" to keys.signed()),
+                    mapOf("signed_curve25519:fallback" to keys.signed(true)),
+                )
+            repeat(2) {
+                val response =
+                    success(command.uploadKeys(tokens.accessToken, UUID.randomUUID(), upload))
+                assertEquals(1, response.oneTimeKeyCounts["signed_curve25519"])
+            }
+            val retained =
+                success(
+                    g.f.transactions.run(g.f.actor) {
+                        g.f.deviceKeys.find(
+                            requireNotNull(g.f.actor.companyId),
+                            g.f.account,
+                            g.device,
+                        )
+                    }
+                )
+            assertEquals(1L, retained?.version)
+            assertNotEquals(tokens.accessToken, g.f.credential(g.device)?.accessToken)
+            assertEquals(0L, g.f.credential(g.device)?.generation)
+        }
+    }
+
+    private class KeyUploadFixture {
+        val g = GatewayFixture()
+        val keys =
+            MatrixKeyFixture(
+                "@${collaborationMatrixLocalpart(requireNotNull(g.f.actor.companyId), g.f.account)}:proof.invalid",
+                collaborationMatrixDeviceId(g.device),
+            )
+        val matrix = RecordingMatrix(g.f.clock)
+        val provider = RecordingKeys()
+        val tokens = (g.bootstrap() as Result.Success).value
+        val command = g.f.matrixIdentity(matrix, providerKeys = provider)
+        val request =
+            CollaborationMatrixKeyUpload(
+                keys.device,
+                mapOf("signed_curve25519:first" to keys.signed()),
+                mapOf("signed_curve25519:fallback" to keys.signed(true)),
+            )
+
+        fun upload(value: CollaborationMatrixKeyUpload = request) =
+            command.uploadKeys(tokens.accessToken, UUID.randomUUID(), value)
+
+        fun publication() =
+            (g.f.transactions.run(g.f.actor) {
+                    g.f.deviceKeys.find(requireNotNull(g.f.actor.companyId), g.f.account, g.device)
+                } as Result.Success)
+                .value
+    }
+
+    private class RecordingKeys : CollaborationMatrixKeyRepository {
+        val queries = AtomicInteger()
+        val uploads = AtomicInteger()
+        @Volatile var stored: CollaborationMatrixDeviceKeys? = null
+        @Volatile var onQuery: (() -> Result<CollaborationMatrixDeviceKeys?>)? = null
+        @Volatile
+        var onUpload: ((CollaborationMatrixKeyUpload) -> Result<CollaborationMatrixKeyCounts>)? =
+            null
+        private val ids = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+
+        override fun ownDeviceKeys(
+            userId: String,
+            deviceId: String,
+            token: String,
+            deadline: Instant,
+        ): Result<CollaborationMatrixDeviceKeys?> {
+            assertFalse(
+                org.springframework.transaction.support.TransactionSynchronizationManager
+                    .isActualTransactionActive()
+            )
+            queries.incrementAndGet()
+            return onQuery?.invoke() ?: Result.Success(stored)
+        }
+
+        override fun upload(
+            request: CollaborationMatrixKeyUpload,
+            token: String,
+            deadline: Instant,
+        ): Result<CollaborationMatrixKeyCounts> {
+            assertFalse(
+                org.springframework.transaction.support.TransactionSynchronizationManager
+                    .isActualTransactionActive()
+            )
+            uploads.incrementAndGet()
+            return onUpload?.invoke(request) ?: accept(request)
+        }
+
+        fun accept(request: CollaborationMatrixKeyUpload): Result<CollaborationMatrixKeyCounts> {
+            request.deviceKeys?.let { stored = it }
+            ids.addAll(request.oneTimeKeys.keys)
+            return Result.Success(
+                CollaborationMatrixKeyCounts(mapOf("signed_curve25519" to ids.size))
+            )
+        }
+    }
+
+    @Test
     fun gatewayIdentityReachesActualSynapseWithoutExposingItsBearer() {
         val g = GatewayFixture()
         MatrixProviderFixture("10m", g.f.clock).use { provider ->
@@ -1458,7 +1865,7 @@ class NativeCollaborationRegistrationTest {
             val tokens = success(g.bootstrap())
             val request =
                 g.f.matrixIdentity(provider.repository, serverName = "matrix.example.test")
-            val identity = success(request.execute(tokens.accessToken, UUID.randomUUID()))
+            val identity = success(request.identity(tokens.accessToken, UUID.randomUUID()))
             assertEquals(
                 "@${collaborationMatrixLocalpart(requireNotNull(g.f.actor.companyId), g.f.account)}:matrix.example.test",
                 identity.userId,
@@ -1468,7 +1875,7 @@ class NativeCollaborationRegistrationTest {
             val stored = requireNotNull(g.f.credential(g.device))
             assertFalse(stored.accessToken == tokens.accessToken)
             assertEquals(0L, stored.generation)
-            assertEquals(identity, success(request.execute(tokens.accessToken, UUID.randomUUID())))
+            assertEquals(identity, success(request.identity(tokens.accessToken, UUID.randomUUID())))
             assertEquals(stored.accessToken, g.f.credential(g.device)?.accessToken)
         }
     }
@@ -1479,14 +1886,14 @@ class NativeCollaborationRegistrationTest {
         val matrix = RecordingMatrix(g.f.clock)
         val request = g.f.matrixIdentity(matrix)
         val tokens = success(g.bootstrap())
-        val first = success(request.execute(tokens.accessToken, UUID.randomUUID()))
-        assertEquals(first, success(request.execute(tokens.accessToken, UUID.randomUUID())))
+        val first = success(request.identity(tokens.accessToken, UUID.randomUUID()))
+        assertEquals(first, success(request.identity(tokens.accessToken, UUID.randomUUID())))
         assertEquals(1, matrix.logins.get())
         val prior = requireNotNull(g.f.credential(g.device))
         g.f.clock.at = g.f.clock.at.plusSeconds(280)
         val next = success(g.refresh(tokens.refreshToken))
         g.f.clock.at = g.f.clock.at.plusSeconds(20)
-        assertEquals(first, success(request.execute(next.accessToken, UUID.randomUUID())))
+        assertEquals(first, success(request.identity(next.accessToken, UUID.randomUUID())))
         val renewed = requireNotNull(g.f.credential(g.device))
         assertEquals(prior.generation + 1, renewed.generation)
         assertNotEquals(prior.accessToken, renewed.accessToken)
@@ -1511,7 +1918,7 @@ class NativeCollaborationRegistrationTest {
         }
         assertEquals(
             "access_denied",
-            failed(g.f.matrixIdentity(matrix).execute(tokens.accessToken, UUID.randomUUID())),
+            failed(g.f.matrixIdentity(matrix).identity(tokens.accessToken, UUID.randomUUID())),
         )
         assertNull(g.f.credential(g.device))
         assertEquals(0, matrix.queries.get())
@@ -1531,7 +1938,7 @@ class NativeCollaborationRegistrationTest {
         }
         assertEquals(
             "collaboration_gateway_authentication_required",
-            failed(g.f.matrixIdentity(matrix).execute(tokens.accessToken, UUID.randomUUID())),
+            failed(g.f.matrixIdentity(matrix).identity(tokens.accessToken, UUID.randomUUID())),
         )
         assertNull(g.f.credential(g.device))
         assertEquals(1L, g.f.gatewayHead(g.device).version)
@@ -1549,7 +1956,7 @@ class NativeCollaborationRegistrationTest {
             matrix.issue(it)
         }
         val request = g.f.matrixIdentity(matrix)
-        val answers = race(List(2) { { request.execute(tokens.accessToken, UUID.randomUUID()) } })
+        val answers = race(List(2) { { request.identity(tokens.accessToken, UUID.randomUUID()) } })
         assertEquals(success(answers[0]), success(answers[1]))
         assertEquals(2, matrix.logins.get())
         assertEquals(0L, g.f.credential(g.device)?.generation)
@@ -1591,7 +1998,7 @@ class NativeCollaborationRegistrationTest {
                 Result.Success(requireNotNull(matrix.issued[token]))
             }
             val request = g.f.matrixIdentity(matrix)
-            val denied = request.execute(tokens.accessToken, UUID.randomUUID())
+            val denied = request.identity(tokens.accessToken, UUID.randomUUID())
             assertInstanceOf(Result.Failed::class.java, denied, change)
             if (change == "refresh") {
                 assertEquals("collaboration_admission_changed", failed(denied))
@@ -1599,7 +2006,7 @@ class NativeCollaborationRegistrationTest {
                 matrix.onQuery = { Result.Success(requireNotNull(matrix.issued[it])) }
                 assertInstanceOf(
                     Result.Success::class.java,
-                    request.execute(tokens.accessToken, UUID.randomUUID()),
+                    request.identity(tokens.accessToken, UUID.randomUUID()),
                 )
             }
             assertNotNull(g.f.credential(g.device))
@@ -1622,7 +2029,7 @@ class NativeCollaborationRegistrationTest {
         val before = g.f.rows("audit_entries")
         assertInstanceOf(
             Result.Failed::class.java,
-            g.f.matrixIdentity(matrix, journal).execute(tokens.accessToken, UUID.randomUUID()),
+            g.f.matrixIdentity(matrix, journal).identity(tokens.accessToken, UUID.randomUUID()),
         )
         assertNull(g.f.credential(g.device))
         assertEquals(before, g.f.rows("audit_entries"))
@@ -1639,7 +2046,7 @@ class NativeCollaborationRegistrationTest {
         for (token in
             listOf("invalid", tokens.refreshToken, "hris_mx_a_" + "a".repeat(43))) assertEquals(
             "collaboration_gateway_authentication_required",
-            failed(request.execute(token, UUID.randomUUID())),
+            failed(request.identity(token, UUID.randomUUID())),
         )
         assertEquals(0, matrix.logins.get())
         matrix.onQuery = {
@@ -1647,12 +2054,12 @@ class NativeCollaborationRegistrationTest {
         }
         assertEquals(
             "collaboration_provider_invalid_response",
-            failed(request.execute(tokens.accessToken, UUID.randomUUID())),
+            failed(request.identity(tokens.accessToken, UUID.randomUUID())),
         )
         g.f.clock.at = tokens.accessExpiresAt
         assertEquals(
             "collaboration_gateway_authentication_required",
-            failed(request.execute(tokens.accessToken, UUID.randomUUID())),
+            failed(request.identity(tokens.accessToken, UUID.randomUUID())),
         )
         assertEquals(1, matrix.queries.get())
     }
@@ -1676,7 +2083,7 @@ class NativeCollaborationRegistrationTest {
             if (duringLogin) matrix.onLogin = { removed() } else matrix.onQuery = { removed() }
             assertEquals(
                 "access_denied",
-                failed(g.f.matrixIdentity(matrix).execute(tokens.accessToken, UUID.randomUUID())),
+                failed(g.f.matrixIdentity(matrix).identity(tokens.accessToken, UUID.randomUUID())),
             )
             assertEquals(if (duringLogin) 0 else 1, g.f.rows("collaboration_provider_sessions"))
             assertEquals(0, matrix.logouts.get())
@@ -1686,7 +2093,7 @@ class NativeCollaborationRegistrationTest {
         val matrix = RecordingMatrix(g.f.clock)
         matrix.onLogin = { throw InterruptedException() }
         assertThrows(InterruptedException::class.java) {
-            g.f.matrixIdentity(matrix).execute(tokens.accessToken, UUID.randomUUID())
+            g.f.matrixIdentity(matrix).identity(tokens.accessToken, UUID.randomUUID())
         }
         assertNull(g.f.credential(g.device))
         assertEquals(0, matrix.queries.get())
@@ -2960,6 +3367,8 @@ class NativeCollaborationRegistrationTest {
         private val dsl = DSL.using(TransactionAwareDataSourceProxy(runtime), SQLDialect.POSTGRES)
         private val json = JsonMapper.builder().build()
         private val receipts = PostgresOperationReceiptDataSource(dsl)
+        val deviceKeys =
+            StoredCollaborationDeviceKeyRepository(PostgresCollaborationDeviceKeyDataSource(dsl))
         val directRooms =
             StoredCollaborationDirectRoomRepository(PostgresCollaborationDirectRoomDataSource(dsl))
         val direct = StoredCollaborationDirectRepository(PostgresCollaborationDirectDataSource(dsl))
@@ -3352,12 +3761,17 @@ class NativeCollaborationRegistrationTest {
             matrix: CollaborationMatrixRepository,
             journal: ChangeJournalRepository = this.journal,
             serverName: String = "proof.invalid",
+            providerKeys: CollaborationMatrixKeyRepository =
+                DisabledCollaborationMatrixKeyRepository(),
+            keyStore: CollaborationDeviceKeyRepository = deviceKeys,
         ) =
-            GetNativeCollaborationMatrixIdentity(
+            AccessNativeCollaborationMatrixDevice(
                 gateway,
                 registry,
                 credentials,
                 matrix,
+                keyStore,
+                providerKeys,
                 sessions,
                 policies,
                 companies,

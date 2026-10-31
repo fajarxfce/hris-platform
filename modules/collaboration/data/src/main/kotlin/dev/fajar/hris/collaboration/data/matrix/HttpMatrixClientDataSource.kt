@@ -17,7 +17,7 @@ class HttpMatrixClientDataSource(
     private val configuration: MatrixProviderConfiguration,
     private val clock: Clock,
     maximumConcurrent: Int = 32,
-) : MatrixClientDataSource, MatrixRoomDataSource {
+) : MatrixClientDataSource, MatrixRoomDataSource, MatrixKeyDataSource {
     private val exchanges = Semaphore(maximumConcurrent)
     private val json =
         JsonMapper.builder()
@@ -104,6 +104,32 @@ class HttpMatrixClientDataSource(
             text(body, "device_id", 128),
             guest.asBoolean(),
         )
+    }
+
+    override fun queryDeviceKeys(
+        userId: String,
+        deviceId: String,
+        token: String,
+        deadline: Instant,
+    ): JsonNode {
+        require(userId.length in 1..255 && userId.all { it.code in 33..126 })
+        require(deviceId.length in 1..128 && deviceId.all { it.code in 33..126 })
+        val response =
+            roomRequest(
+                "/_matrix/client/v3/keys/query",
+                "POST",
+                mapOf("device_keys" to mapOf(userId to listOf(deviceId)), "timeout" to 1000),
+                token,
+                deadline,
+            )
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
+    }
+
+    override fun uploadKeys(body: Map<String, Any>, token: String, deadline: Instant): JsonNode {
+        val response = roomRequest("/_matrix/client/v3/keys/upload", "POST", body, token, deadline)
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
     }
 
     override fun resolveAlias(alias: String, token: String, deadline: Instant): String? {

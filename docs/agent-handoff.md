@@ -117,8 +117,8 @@ Current backend implementation:
   denial. Ordinary native refresh invalidates a stale observation temporarily;
   a subsequent admitted request can use the same gateway. Transport is fixed-origin,
   no-redirect, at most five seconds/64 KiB, with 32 immediate permits and cancellation.
-  All other Matrix/Synapse paths remain denied, including sync/key/room, login,
-  logout, admin and federation. This is not a complete SDK content gateway.
+  The own-device upload below extends this boundary; peer key/sync/room, login,
+  logout, admin and federation remain denied. This is not a complete SDK content gateway.
 
 - Native company participant discovery now supports bounded literal name search and
   UUID pagination. SQL excludes the caller before limiting, returns account/name
@@ -189,8 +189,32 @@ Current backend implementation:
   119 collaboration data, 145 selected API and 112 worker cases (one existing skip),
   format/architecture and 23 Python recovery cases. No public route or DI change;
   the gateway must still validate signed keys, reject replacement identities,
-  check current authority around provider I/O and confirm readback. Inspect exact
-  hosted control after push. No product acceptance, rollout or Starter port.
+  check current authority around provider I/O and confirm readback (implemented below).
+  Exact `966dee38` hosted [41208833880](https://github.com/fajarxfce/hris-platform/actions/runs/41208833880)
+  passed every job/step. No product acceptance, rollout or Starter port.
+
+- Native Matrix `POST /_matrix/client/v3/keys/upload` now uses the opaque gateway
+  bearer and typed signed-key payload. `AccessNativeCollaborationMatrixDevice`
+  owns WHOAMI and key upload through a private admission/renewal runner, without
+  use-case chaining or generic proxy callbacks. Own user/device, exact public-key
+  shape, Ed25519 canonical-JSON signatures, bounded collections and retained
+  fingerprint are checked. Preflight refuses existing replacement keys; query,
+  upload and readback run outside SQL with current authority before/after even
+  errors. Version-one publication/journal is fenced and atomic; lost responses
+  retain version zero for same-key retry. Counts-only requests create no identity.
+  Input is 64 KiB, 100 one-time keys, one fallback key; missing/false fallback stay
+  distinct signed objects. No private participant key enters server storage.
+  [Contract](collaboration/device-key-upload.md) and [measurement](measurements/collaboration-device-key-upload-2026-10-31.json)
+  retain independent OpenSSL signature vectors, real Synapse repeat/rotation/restart,
+  and actual HRIS publication. Synapse accepts device-key replacement through the
+  same bearer: the HRIS immutable reservation is required. Full checks passed in
+  4m44s: 23 domain, 131 data, 148 selected API and all 112 worker cases (one existing
+  skip). Two additional readback/concurrent-same-key cases passed in 41s: 133 distinct
+  data cases total. Earlier focused gateway 75s/HTTP 31s, format/architecture pass;
+  the corrected JsonNode mapping compilation error remains recorded. The shared DI
+  graph was exercised in both runtimes. Inspect this commit's exact hosted control
+  after push; no product rollout or Mobile/Starter change. Public peer key/claim,
+  to-device, room/history and classic/native sync remain closed.
 
 [Identity evidence](measurements/collaboration-gateway-identity-2026-10-31.json)
 records 148 passing API cases, 77 data cases, fourteen domain cases and the full
@@ -237,9 +261,11 @@ Next implementation:
    Participant `d50bb0ad` and identity `b0bf1326` hosted controls also passed.
 2. Schema-111 storage `71ad7c81` passed all jobs/steps in [41205061024](https://github.com/fajarxfce/hris-platform/actions/runs/41205061024).
    Room setup/worker `f104f097` passed every job/step in `41206499276`. Inspect the
-   schema-112 key storage commit after push. Implement bounded own-device signed
-   key upload with the retained reservation, then scoped peer key/query/claim and
-   to-device traffic. Continue native/classic sync and content integration using the
+   own-device key gateway commit after push; schema 112 `966dee38` passed all hosted
+   steps in `41208833880`. Implement scoped eligible peer key/query/claim and
+   to-device traffic. Offline recipient eligibility must not require a fresh short
+   access token; retain current device/company/security revocation checks. Continue
+   native/classic sync and content integration using the
    [typed adapter and invited-history policy](collaboration/matrix-room-adapter.md);
    Synapse createRoom/alias reservation is not atomic. Verify immutable creation
    marker, creator and complete encryption/membership state before publication

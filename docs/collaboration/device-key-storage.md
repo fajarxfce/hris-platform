@@ -37,6 +37,6 @@ and real dump/restore of both pending and published rows. The fixture upgrades
 schema 112 and rejects future schema 113; there is no new secret envelope format.
 See [measurement](../measurements/collaboration-device-key-storage-2026-10-31.json).
 
-The public content gateway and SDK integration follow this storage. Existing
-Matrix routes stay closed; a reservation or publication row alone never grants
-room access or establishes recipient delivery.
+The [own-device key gateway](device-key-upload.md) now applies these fences.
+Remaining content and SDK integration follow separately; a reservation or
+publication row alone never grants room access or establishes recipient delivery.

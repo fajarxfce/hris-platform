@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-31",
+  "kind": "native_matrix_signed_device_key_gateway",
+  "complete": true,
+  "productAcceptance": false,
+  "capacityAcceptance": false,
+  "databaseSchema": 112,
+  "checks": {
+    "independentSignatureCases": 5,
+    "independentSignatureElapsedSeconds": 29,
+    "signatureVectorGenerator": "OpenSSL 3.6.5; Python sorted compact JSON; ephemeral anonymous memory key descriptors; only public vectors retained",
+    "correctedTransportElapsedSeconds": 31,
+    "focusedGatewayElapsedSeconds": 75,
+    "focusedGatewayDataCases": 17,
+    "focusedGatewayHttpCases": 3,
+    "focusedGatewayWorkerCases": 6,
+    "focusedHttpElapsedSeconds": 31,
+    "focusedHttpCases": 6,
+    "fullGradleElapsedSeconds": 284,
+    "fullSuiteResults": {
+      "modules/collaboration/domain": {
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/data": {
+        "tests": 131,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server": {
+        "tests": 148,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/worker": {
+        "tests": 112,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      }
+    },
+    "additionalReadbackAndSameIdentityRaceCases": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "additionalFocusedElapsedSeconds": 41,
+    "totalDistinctCollaborationDataCases": 133,
+    "format": true,
+    "architecture": true,
+    "actualSynapseVersion": "1.164.1",
+    "actualSynapseDigest": "sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75",
+    "actualProviderScenarios": [
+      "typed signed-key upload/counts/readback; identical retry; private bearer rotation and provider restart preserve public identity",
+      "provider accepts same-device replacement identity, demonstrating the HRIS reservation fence is required",
+      "actual native HRIS gateway use case publishes after strict own-device readback with a private credential"
+    ]
+  },
+  "correctedFailures": [
+    {
+      "elapsedSeconds": 11,
+      "kind": "transport_compile",
+      "result": "Jackson 3 JsonNode.map selected its member transform instead of Kotlin collection mapping. Explicit iterator/asSequence/toList fixes typed algorithm lists and matching HTTP assertions; corrected selection passed in 31s."
+    }
+  ],
+  "setupObservations": [
+    "Python cryptography was not installed during independent vector generation; used installed OpenSSL in anonymous memory descriptors instead, without adding a runtime dependency."
+  ],
+  "failureExercises": [
+    "wrong owner/device and invalid signatures rejected",
+    "unknown fields, ambiguous headers, URL tokens, duplicate/trailing JSON and explicit null rejected",
+    "oversize fixed and chunked request bodies rejected",
+    "pre-existing provider identity conflict is not overwritten",
+    "lost upload response retains reservation; same-identity replay publishes",
+    "different first identities race to one immutable reservation",
+    "same-identity concurrent uploads share one credential generation and publication journal",
+    "provider failure never overrides current HRIS denial",
+    "native refresh invalidates captured upload but allows a newly admitted retry",
+    "late reservation rolls back its journal",
+    "interrupted publication rolls back publication and journal, retaining the uncertain reservation",
+    "missing, changed, expired or unavailable final readback cannot confirm publication",
+    "provider transport retains cancellation, fixed origin and bounded exchange ownership"
+  ],
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt": "888275d0510db71b11f6952f80fe28dc196f16b8324cfe07f612c43846efd8f5",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "268b271d95f8bdb6a680dc07ae441c67bbf77446112a650a2c2547036531841d",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/HttpMatrixClientDataSource.kt": "d33652e742cffa2a9c8f313a75ef9375394eac0c5b9b182aa556f553880d5d0f",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixKeyDataSource.kt": "33ddf154a69893897ef76f1e56691cfb2e1a65dacf71a44ea27f9a7d119d785e",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/DisabledCollaborationMatrixKeyRepository.kt": "b42c9fbf70fa57318033413f0b4045ae918509f6adcbccccd5f70cea818ea712",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixKeyRepository.kt": "3358106b1cb4857628c65e4b4616d9476cff73c1a3874adc8cf179ce7de9cec3",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixKeyFixture.kt": "c192c633e73d5b72fcb4197eca29faafa1bda2d050005489864ea31c38cd6fda",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixKeyProviderInteropTest.kt": "1846f49bf8998f9d1581d569c9affbdee117fffe79df0dd1104e354baad14e30",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderTransportTest.kt": "ba741e80ad1512cddae8ad31118ceb4dbbb79154650ebc309f0ae31b69b2f59c",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "bab0ab18e6f26cfe23e456cc15e6f3d5cd74366598dfdf755f6eb25c62d69f41",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/MatrixGatewayIdentityController.kt": "f9d6e8c3c74a16394bfada45dd0dc31d359539a687dfc6df35346e7099c0c46d",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/MatrixGatewayKeyUploadController.kt": "c0aba46b31e296ca3435c9bfb4114919d24265f4b70c0dc1d45ef0fa8f97f8a2",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/di/CollaborationWebConfiguration.kt": "76c431c97f4186a0575b0dcaf563e2be9386055e16121bb73c854bd503aa81cc",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/MatrixKeyUploadRequest.kt": "fbc60ce8d0acc4260c120501e114b942fac5ed558b3aea5424505d7dfc3e2632",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationMatrixKeys.kt": "a28f00c3b972701586c75d8f2bbb9e8b3e587de771d173fdb7e5fd1e7ece2e79",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationMatrixKeyPolicy.kt": "11f5ac76c02e2d829ef84bd2bed350d7671966af36eea6678fff750db60c5f8d",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationMatrixKeyRepository.kt": "6ecd748dbb5c0ef5cac689150c665f7a02735716b38e6eb7c5fee19dda4e7108",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AccessNativeCollaborationMatrixDevice.kt": "0e06caa7dc48af39e2eabaecbaf8edb3b95e1644c741553e10d0b3b72e98d3f7",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationMatrixKeyPolicyTest.kt": "ff1d067f3dc6a93f78a365080af884b11499817585ba188e40238aa826e11f89"
+  },
+  "limits": [
+    "Own-device upload only; no peer key query/claim, to-device messages, classic/native sync, room/content relay or browser-parent admission yet.",
+    "The two additional data cases ran after the full suite; no executable production change followed the full checks.",
+    "Publication records verified readback, not an atomic transaction with Synapse, recipient delivery, cross-signing trust or resistance to all bearer replay.",
+    "The existing opt-in elapsed-retention worker case remains skipped.",
+    "No new database migration, deployment, phone action, Mobile source change or Starter port."
+  ]
+}

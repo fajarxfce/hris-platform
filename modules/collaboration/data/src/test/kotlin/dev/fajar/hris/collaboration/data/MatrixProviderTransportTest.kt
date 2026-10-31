@@ -3,9 +3,11 @@ package dev.fajar.hris.collaboration.data
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import dev.fajar.hris.collaboration.data.matrix.*
+import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixKeyRepository
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRepository
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRoomRepository
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixDirectRoom
+import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyUpload
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixLogin
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixRoomCreation
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixRoomSetting
@@ -27,6 +29,218 @@ import org.junit.jupiter.api.Test
 import tools.jackson.databind.json.JsonMapper
 
 class MatrixProviderTransportTest {
+    @Test
+    fun fixedKeyUploadPreservesSignedFieldsAndOwnQueryUsesOnlyOneExactDevice() {
+        Fixture().use { f ->
+            val keys = MatrixKeyFixture(f.userId, collaborationMatrixDeviceId(f.login.deviceId))
+            val ordinary = keys.signed()
+            val explicit = keys.signed(false)
+            val fallback = keys.signed(true)
+            val upload =
+                CollaborationMatrixKeyUpload(
+                    keys.device,
+                    mapOf("signed_curve25519:1" to ordinary, "signed_curve25519:2" to explicit),
+                    mapOf("signed_curve25519:3" to fallback),
+                )
+            val repo = InternalCollaborationMatrixKeyRepository(f.source)
+            f.handler = { exchange ->
+                assertEquals("POST", exchange.requestMethod)
+                assertEquals("/_matrix/client/v3/keys/upload", exchange.requestURI.path)
+                assertNull(exchange.requestURI.rawQuery)
+                assertEquals(
+                    "Bearer fictional-access-token",
+                    exchange.requestHeaders.getFirst("Authorization"),
+                )
+                val body = f.json.readTree(exchange.requestBody.readNBytes(65537))
+                assertEquals(
+                    setOf("device_keys", "one_time_keys", "fallback_keys"),
+                    body.propertyNames().toSet(),
+                )
+                assertEquals(
+                    f.json.valueToTree<tools.jackson.databind.JsonNode>(keys.body()),
+                    body.path("device_keys"),
+                )
+                assertTrue(
+                    body
+                        .path("one_time_keys")
+                        .path("signed_curve25519:1")
+                        .path("fallback")
+                        .isMissingNode
+                )
+                assertEquals(
+                    false,
+                    body
+                        .path("one_time_keys")
+                        .path("signed_curve25519:2")
+                        .path("fallback")
+                        .asBoolean(),
+                )
+                assertEquals(
+                    true,
+                    body
+                        .path("fallback_keys")
+                        .path("signed_curve25519:3")
+                        .path("fallback")
+                        .asBoolean(),
+                )
+                assertEquals(
+                    ordinary.signatures[f.userId]?.values?.single(),
+                    body
+                        .path("one_time_keys")
+                        .path("signed_curve25519:1")
+                        .path("signatures")
+                        .path(f.userId)
+                        .path("ed25519:${keys.deviceId}")
+                        .asString(),
+                )
+                f.respond(exchange, """{"one_time_key_counts":{"signed_curve25519":2}}""")
+            }
+            val result = repo.upload(upload, "fictional-access-token", f.login.expiresAt)
+            assertInstanceOf(Result.Success::class.java, result)
+            assertEquals(
+                mapOf("signed_curve25519" to 2),
+                (result as Result.Success).value.oneTimeKeyCounts,
+            )
+            f.handler = { exchange ->
+                assertEquals("/_matrix/client/v3/keys/query", exchange.requestURI.path)
+                assertEquals("POST", exchange.requestMethod)
+                val body = f.json.readTree(exchange.requestBody.readNBytes(2048))
+                assertEquals(1000, body.path("timeout").asInt())
+                assertEquals(setOf(f.userId), body.path("device_keys").propertyNames().toSet())
+                assertEquals(
+                    listOf(keys.deviceId),
+                    body
+                        .path("device_keys")
+                        .path(f.userId)
+                        .iterator()
+                        .asSequence()
+                        .map { it.asString() }
+                        .toList(),
+                )
+                f.respond(
+                    exchange,
+                    f.json.writeValueAsString(
+                        mapOf(
+                            "device_keys" to
+                                mapOf(
+                                    f.userId to
+                                        mapOf(
+                                            keys.deviceId to
+                                                (keys.body() +
+                                                    ("unsigned" to
+                                                        mapOf(
+                                                            "device_display_name" to
+                                                                "ignored fixture label"
+                                                        )))
+                                        )
+                                )
+                        )
+                    ),
+                )
+            }
+            assertEquals(
+                Result.Success(keys.device),
+                repo.ownDeviceKeys(
+                    f.userId,
+                    keys.deviceId,
+                    "fictional-access-token",
+                    f.login.expiresAt,
+                ),
+            )
+            assertEquals(2, f.requests.get())
+        }
+    }
+
+    @Test
+    fun malformedKeyResponsesAndForeignDevicesAreRejectedWithoutAutomaticRetry() {
+        Fixture().use { f ->
+            val repo = InternalCollaborationMatrixKeyRepository(f.source)
+            val device = collaborationMatrixDeviceId(f.login.deviceId)
+            for (body in
+                listOf(
+                    "{}",
+                    "[]",
+                    """{"one_time_key_counts":{"signed_curve25519":-1}}""",
+                    """{"one_time_key_counts":{"signed_curve25519":1000001}}""",
+                    """{"one_time_key_counts":{"signed_curve25519":true}}""",
+                    """{"one_time_key_counts":{"unknown":1}}""",
+                    """{"one_time_key_counts":{},"one_time_key_counts":{}}""",
+                )) {
+                f.handler = { f.respond(it, body) }
+                assertEquals(
+                    "collaboration_provider_invalid_response",
+                    (repo.upload(
+                            CollaborationMatrixKeyUpload(),
+                            "fictional-access-token",
+                            f.login.expiresAt,
+                        ) as Result.Failed)
+                        .failure
+                        .code,
+                )
+            }
+            for (body in
+                listOf(
+                    mapOf(
+                        "device_keys" to mapOf("@foreign:proof.invalid" to emptyMap<String, Any>())
+                    ),
+                    mapOf(
+                        "device_keys" to
+                            mapOf(f.userId to mapOf("FOREIGN" to emptyMap<String, Any>()))
+                    ),
+                    mapOf(
+                        "device_keys" to emptyMap<String, Any>(),
+                        "failures" to mapOf("foreign.invalid" to emptyMap<String, Any>()),
+                    ),
+                    mapOf(
+                        "device_keys" to mapOf(f.userId to mapOf(device to emptyMap<String, Any>()))
+                    ),
+                )) {
+                f.handler = { f.respond(it, f.json.writeValueAsString(body)) }
+                assertEquals(
+                    "collaboration_provider_invalid_response",
+                    (repo.ownDeviceKeys(
+                            f.userId,
+                            device,
+                            "fictional-access-token",
+                            f.login.expiresAt,
+                        ) as Result.Failed)
+                        .failure
+                        .code,
+                )
+            }
+            f.handler = { f.respond(it, """{"device_keys":{}}""") }
+            assertEquals(
+                Result.Success(null),
+                repo.ownDeviceKeys(f.userId, device, "fictional-access-token", f.login.expiresAt),
+            )
+            val count = f.requests.get()
+            f.handler = { f.respond(it, """{"error":"private fixture failure"}""", 503) }
+            val failure =
+                repo.upload(
+                    CollaborationMatrixKeyUpload(),
+                    "fictional-access-token",
+                    f.login.expiresAt,
+                ) as Result.Failed
+            assertEquals("collaboration_provider_rejected", failure.failure.code)
+            assertFalse(failure.toString().contains("private fixture failure"))
+            assertEquals(count + 1, f.requests.get())
+            val invalid =
+                CollaborationMatrixKeyUpload(
+                    oneTimeKeys =
+                        (0..100).associate {
+                            "signed_curve25519:$it" to MatrixKeyFixture(f.userId, device).signed()
+                        }
+                )
+            assertEquals(
+                "collaboration_provider_invalid_response",
+                (repo.upload(invalid, "fictional-access-token", f.login.expiresAt) as Result.Failed)
+                    .failure
+                    .code,
+            )
+            assertEquals(count + 1, f.requests.get())
+        }
+    }
+
     @Test
     fun loginSignsBoundedIdentityAndKeepsBearerOnlyInInternalResult() {
         Fixture().use { f ->

@@ -204,8 +204,227 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         }
     }
 
+    private fun uploadKeys(
+        n: Native,
+        token: String?,
+        body: String = "{}",
+        suffix: String = "",
+        duplicate: Boolean = false,
+        contentType: String = "application/json",
+        chunked: Boolean = false,
+    ): HttpResponse<String> {
+        val builder =
+            HttpRequest.newBuilder(
+                    URI("http://127.0.0.1:$port/_matrix/client/v3/keys/upload$suffix")
+                )
+                .timeout(Duration.ofSeconds(15))
+                .header("Content-Type", contentType)
+        token?.let { builder.header("Authorization", "Bearer $it") }
+        if (duplicate) builder.header("Authorization", "Bearer fictional-duplicate")
+        val bytes = body.toByteArray()
+        val publisher =
+            if (chunked)
+                HttpRequest.BodyPublishers.ofInputStream { java.io.ByteArrayInputStream(bytes) }
+            else HttpRequest.BodyPublishers.ofByteArray(bytes)
+        return n.fixture.browser.send(
+            builder.POST(publisher).build(),
+            HttpResponse.BodyHandlers.ofString(),
+        )
+    }
+
+    private fun fixtureKeys(n: Native, device: UUID) =
+        KeyPayload(
+            "@hris_${n.fixture.company.toString().replace("-", "")}_${n.fixture.account.toString().replace("-", "")}:matrix.example.test",
+            "HRIS_${device.toString().replace("-", "")}",
+        )
+
+    @Test
+    fun keyUploadUsesOpaqueAuthorityPreservesSignedFieldsAndRetainsPublicationOnReplay() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val before = provider.keyUploads.get()
+        for (invalid in listOf(null, n.access, "fictional-provider-token")) assertEquals(
+            401,
+            uploadKeys(n, invalid).statusCode(),
+        )
+        assertEquals(before, provider.keyUploads.get())
+        val empty = uploadKeys(n, token)
+        assertEquals(200, empty.statusCode(), empty.body())
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_device_key_publications where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+        val payload = fixtureKeys(n, device)
+        val body = json.writeValueAsString(payload.body())
+        repeat(2) { attempt ->
+            val result = uploadKeys(n, token, body, chunked = attempt == 1)
+            assertEquals(200, result.statusCode(), result.body())
+            assertEquals("no-store", result.headers().firstValue("Cache-Control").orElse(""))
+            val value = json.readTree(result.body())
+            assertEquals(setOf("one_time_key_counts"), value.propertyNames().toSet())
+            assertEquals(1, value.path("one_time_key_counts").path("signed_curve25519").asInt())
+            assertFalse(result.body().contains(token))
+        }
+        assertEquals(
+            1L,
+            database()
+                .queryForObject(
+                    "select version from collaboration_device_key_publications where device_id=?",
+                    Long::class.java,
+                    device,
+                ),
+        )
+        val replacement = fixtureKeys(n, device)
+        val prior = provider.keyUploads.get()
+        val changed = uploadKeys(n, token, json.writeValueAsString(replacement.body()))
+        assertEquals(409, changed.statusCode(), changed.body())
+        assertEquals(
+            "collaboration_device_key_recovery_required",
+            json.readTree(changed.body()).path("org.hris.error_code").asString(),
+        )
+        assertEquals(prior, provider.keyUploads.get())
+    }
+
+    @Test
+    fun keyUploadRejectsAmbiguousHeadersUnknownFieldsAndOversizeStreamsBeforeProvider() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val before = provider.keyUploads.get()
+        assertEquals(401, uploadKeys(n, token, duplicate = true).statusCode())
+        assertEquals(400, uploadKeys(n, token, suffix = "?access_token=not-a-token").statusCode())
+        assertEquals(415, uploadKeys(n, token, contentType = "text/plain").statusCode())
+        for (body in
+            listOf(
+                "null",
+                "[]",
+                "{}{}",
+                """{"private_key":"forbidden"}""",
+                """{"device_keys":null}""",
+                """{"one_time_keys":null}""",
+                """{"one_time_keys":{},"one_time_keys":{}}""",
+                """{"one_time_keys":{"signed_curve25519:1":{"key":"x","signatures":{},"fallback":null}}}""",
+            )) {
+            val response = uploadKeys(n, token, body)
+            assertEquals(400, response.statusCode(), response.body())
+            assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+        }
+        for (chunked in listOf(false, true)) assertEquals(
+            413,
+            uploadKeys(n, token, " ".repeat(65537), chunked = chunked).statusCode(),
+        )
+        val wrong =
+            KeyPayload("@foreign:matrix.example.test", "HRIS_${device.toString().replace("-", "")}")
+        assertEquals(400, uploadKeys(n, token, json.writeValueAsString(wrong.body())).statusCode())
+        assertEquals(before, provider.keyUploads.get())
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_device_key_publications where device_id=?",
+                    Int::class.java,
+                    device,
+                ),
+        )
+    }
+
+    @Test
+    fun keyUploadWithholdsLateProviderSuccessAfterNativeRevocationAndKeepsPendingIdentity() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val body = json.writeValueAsString(fixtureKeys(n, device).body())
+        provider.onKeyUpload.set {
+            database()
+                .update(
+                    "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                    n.session,
+                )
+        }
+        try {
+            val response = uploadKeys(n, token, body)
+            assertEquals(401, response.statusCode(), response.body())
+            assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+            assertEquals(
+                0L,
+                database()
+                    .queryForObject(
+                        "select version from collaboration_device_key_publications where device_id=?",
+                        Long::class.java,
+                        device,
+                    ),
+            )
+            val count = provider.keyUploads.get()
+            assertEquals(401, uploadKeys(n, token, body).statusCode())
+            assertEquals(count, provider.keyUploads.get())
+        } finally {
+            provider.onKeyUpload.set(null)
+        }
+    }
+
+    private class KeyPayload(val user: String, val device: String) {
+        private val json = JsonMapper.builder().build()
+        private val signing =
+            java.security.KeyPairGenerator.getInstance("Ed25519").generateKeyPair()
+        private val encoder = Base64.getEncoder().withoutPadding()
+
+        private fun publicCurve() =
+            encoder.encodeToString(
+                java.security.KeyPairGenerator.getInstance("X25519")
+                    .generateKeyPair()
+                    .public
+                    .encoded
+                    .takeLast(32)
+                    .toByteArray()
+            )
+
+        private fun signed(body: Map<String, Any>): Map<String, Any> {
+            val proof =
+                java.security.Signature.getInstance("Ed25519").run {
+                    initSign(signing.private)
+                    update(json.writeValueAsBytes(body.toSortedMap()))
+                    encoder.encodeToString(sign())
+                }
+            return body + ("signatures" to mapOf(user to mapOf("ed25519:$device" to proof)))
+        }
+
+        private val deviceKeys =
+            signed(
+                mapOf(
+                    "user_id" to user,
+                    "device_id" to device,
+                    "algorithms" to listOf("m.olm.v1.curve25519-aes-sha2", "m.megolm.v1.aes-sha2"),
+                    "keys" to
+                        sortedMapOf(
+                            "ed25519:$device" to
+                                encoder.encodeToString(
+                                    signing.public.encoded.takeLast(32).toByteArray()
+                                ),
+                            "curve25519:$device" to publicCurve(),
+                        ),
+                )
+            )
+        private val oneTime = signed(mapOf("key" to publicCurve(), "fallback" to false))
+        private val fallback = signed(mapOf("key" to publicCurve(), "fallback" to true))
+
+        fun body() =
+            mapOf(
+                "device_keys" to deviceKeys,
+                "one_time_keys" to mapOf("signed_curve25519:first" to oneTime),
+                "fallback_keys" to mapOf("signed_curve25519:fallback" to fallback),
+            )
+    }
+
     private class Provider : AutoCloseable {
         val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
+        val keyUploads = AtomicInteger()
+        val onKeyUpload = AtomicReference<(() -> Unit)?>(null)
+        private val keys =
+            ConcurrentHashMap<Pair<String, String>, tools.jackson.databind.JsonNode>()
+        private val keyIds = ConcurrentHashMap<Pair<String, String>, MutableSet<String>>()
         val logins = AtomicInteger()
         val queries = AtomicInteger()
         val onQuery = AtomicReference<(() -> Unit)?>(null)
@@ -238,6 +457,63 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                     )
                                 credentials[token] = identity
                                 identity + mapOf("access_token" to token, "expires_in_ms" to 600000)
+                            }
+                            "/_matrix/client/v3/keys/query" -> {
+                                val identity =
+                                    requireNotNull(
+                                        credentials[
+                                            request.requestHeaders
+                                                .getFirst("Authorization")
+                                                .removePrefix("Bearer ")]
+                                    )
+                                val user = identity["user_id"] as String
+                                val device = identity["device_id"] as String
+                                val body = parser.readTree(request.requestBody.readNBytes(65537))
+                                assertEquals(
+                                    setOf(user),
+                                    body.path("device_keys").propertyNames().toSet(),
+                                )
+                                assertEquals(
+                                    listOf(device),
+                                    body
+                                        .path("device_keys")
+                                        .path(user)
+                                        .iterator()
+                                        .asSequence()
+                                        .map { it.asString() }
+                                        .toList(),
+                                )
+                                mapOf(
+                                    "device_keys" to
+                                        mapOf(
+                                            user to
+                                                (keys[user to device]?.let { mapOf(device to it) }
+                                                    ?: emptyMap())
+                                        )
+                                )
+                            }
+                            "/_matrix/client/v3/keys/upload" -> {
+                                keyUploads.incrementAndGet()
+                                val identity =
+                                    requireNotNull(
+                                        credentials[
+                                            request.requestHeaders
+                                                .getFirst("Authorization")
+                                                .removePrefix("Bearer ")]
+                                    )
+                                val user = identity["user_id"] as String
+                                val device = identity["device_id"] as String
+                                val body = parser.readTree(request.requestBody.readNBytes(65537))
+                                body.get("device_keys")?.let { keys[user to device] = it }
+                                val ids =
+                                    keyIds.getOrPut(user to device) {
+                                        ConcurrentHashMap.newKeySet()
+                                    }
+                                body.get("one_time_keys")?.let { ids.addAll(it.propertyNames()) }
+                                onKeyUpload.getAndSet(null)?.invoke()
+                                mapOf(
+                                    "one_time_key_counts" to mapOf("signed_curve25519" to ids.size)
+                                )
                             }
                             "/_matrix/client/v3/account/whoami" -> {
                                 queries.incrementAndGet()

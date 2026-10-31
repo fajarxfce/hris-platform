@@ -24,6 +24,22 @@ import org.springframework.core.env.Environment
 @Configuration(proxyBeanMethods = false)
 class CollaborationConfiguration {
     @Bean
+    fun collaborationDeviceKeySource(sql: DSLContext): CollaborationDeviceKeyDataSource =
+        PostgresCollaborationDeviceKeyDataSource(sql)
+
+    @Bean
+    fun collaborationDeviceKeys(
+        source: CollaborationDeviceKeyDataSource
+    ): CollaborationDeviceKeyRepository = StoredCollaborationDeviceKeyRepository(source)
+
+    @Bean
+    fun collaborationMatrixKeys(
+        source: ObjectProvider<MatrixKeyDataSource>
+    ): CollaborationMatrixKeyRepository =
+        source.ifAvailable?.let(::InternalCollaborationMatrixKeyRepository)
+            ?: DisabledCollaborationMatrixKeyRepository()
+
+    @Bean
     fun collaborationDirectRoomSource(sql: DSLContext): CollaborationDirectRoomDataSource =
         PostgresCollaborationDirectRoomDataSource(sql)
 
@@ -366,11 +382,13 @@ class CollaborationConfiguration {
         )
 
     @Bean
-    fun getNativeCollaborationMatrixIdentity(
+    fun accessNativeCollaborationMatrixDevice(
         gateway: CollaborationGatewaySessionRepository,
         registry: CollaborationRegistryRepository,
         credentials: CollaborationProviderSessionRepository,
         matrix: CollaborationMatrixRepository,
+        keys: CollaborationDeviceKeyRepository,
+        providerKeys: CollaborationMatrixKeyRepository,
         sessions: NativeSessionRepository,
         policies: CompanyClientPolicyRepository,
         companies: CompanyRepository,
@@ -383,11 +401,13 @@ class CollaborationConfiguration {
         provider: CollaborationMatrixPolicy,
         clock: Clock,
     ) =
-        GetNativeCollaborationMatrixIdentity(
+        AccessNativeCollaborationMatrixDevice(
             gateway,
             registry,
             credentials,
             matrix,
+            keys,
+            providerKeys,
             sessions,
             policies,
             companies,

@@ -1,0 +1,50 @@
+name: Collaboration control
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, feat/communications]
+    paths:
+      - modules/collaboration/**
+      - modules/identity/domain/**
+      - core/database/**
+      - tool/recovery_set.py
+      - tool/test_recovery_set.py
+      - .github/workflows/collaboration-control.yml
+  pull_request:
+    paths:
+      - modules/collaboration/**
+      - modules/identity/domain/**
+      - core/database/**
+      - tool/recovery_set.py
+      - tool/test_recovery_set.py
+      - .github/workflows/collaboration-control.yml
+
+permissions:
+  contents: read
+
+jobs:
+  authority-and-storage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Check boundaries and recovery schema gate
+        run: |
+          python3 tool/check_architecture.py
+          python3 -m unittest discover -s tool -p 'test_recovery*.py'
+      - name: Verify policies, actual PostgreSQL isolation and backup recovery
+        run: ./gradlew formatCheck :core:database:test :modules:identity:domain:test :modules:collaboration:domain:test :modules:collaboration:data:test --no-daemon
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: collaboration-control-tests
+          path: |
+            modules/collaboration/**/build/test-results/test/*.xml
+            core/database/build/test-results/test/*.xml
+          retention-days: 7

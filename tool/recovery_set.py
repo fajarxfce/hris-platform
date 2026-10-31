@@ -28,7 +28,10 @@ KEY_FIELDS = {"format", "checkpoint", "identityActive", "identityKeys", "syncAct
 # V103 adds typed document business facts/history, with no new encryption envelope.
 # check_recovery_set.py verifies exact restored values, history, content identity, RLS
 # and the live immutability/head-history triggers, alongside V102 email evidence.
-MAX_SCHEMA = 103
+# V104 adds the company/account device registry without a new encryption envelope.
+# CollaborationDeviceMigrationTest exercises actual pg_dump/pg_restore, constraints
+# and account RLS for these records.
+MAX_SCHEMA = 104
 ENVELOPES_SQL = """COPY (
 SELECT * FROM (
  SELECT 'hris:totp:'||id AS purpose, mfa_secret_encrypted AS envelope

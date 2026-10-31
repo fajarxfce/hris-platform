@@ -49,10 +49,43 @@ integration. No new endpoint/provider grant is enabled yet.
 
 Platform browser-only CI also passed at `a9100ece` in `41181617114`. Mobile's
 Android implementation is `477f9c60`; its corrected hosted runner is pending at
-`eefc4121` after an obsolete Android SDK `tools` package failure. Apple native
+`eefc4121` after an obsolete Android SDK `tools` package failure. Corrected run
+`41182128950` has now passed both actual-provider scenarios, including cleanup,
+in 66.016s; Mobile `da43b35c` records its independent APK and source evidence. Apple native
 store tests and iOS device-slice compilation passed at Mobile `e210508a` in
 `41182072489` (Xcode 16.4 / Swift 6.1.2). Apple proof does not cover provider
 interoperability or native media; its SDK requires iOS 16 for later integration.
+
+Schema-104 collaboration registry/data checkpoint: two tables separate retained
+company/account device identity from deletable parent-session bindings. Composite
+foreign keys prevent account/company substitution; row policies admit only the
+owner and restrict writes to the selected company. The repository counts distinct
+live parent sessions across owned companies, including provisioning devices, and
+excludes revoked/expired/credential-stale parents. Registration and binding roll
+back together on failure. No endpoint, provisioning job or broker is enabled yet.
+
+All 28 core database cases, the actual registry integration case, 11 admission
+cases, formatting and architecture pass; 21 recovery-tool tests pass. Actual
+PostgreSQL dump/restore retains registry facts, constraints and account RLS, so
+the reviewed recovery ceiling advances to 104 without a new encryption envelope.
+See [registry evidence](measurements/collaboration-device-registry-2026-10-31.json).
+The existing live schema-103 stack remains untouched. The new collaboration
+control workflow must be checked after push.
+
+A PostgreSQL detail caught by integration tests: `FOR SHARE OF` the immutable
+binding table also applies its absent UPDATE row policy and hides readable rows.
+The read now locks only the device; the upcoming admission use case must lock the
+parent session first to protect bindings against parent cleanup. Keep that order.
+For local Docker/JDK checks, `sudo -n runuser -u fajar -g docker -- env
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk
+PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin ./gradlew ...
+--no-daemon` works without changing socket permissions; the older `sudo -u ...
+-g docker` form is not permitted by this host's run-as-group rule.
+
+Next: transaction-owned registration/admission use cases with live company
+availability and the five-device quota; durable provisioning and credential
+storage; protected provider broker/gateway; native/web adapters and chat screens.
+Retain all P0–P8 gates and all 54 feature groups as outstanding until accepted.
 
 The paragraphs below are retained prior-work history. Their old installed build
 2 reference is superseded by Mobile's validated release build 4; consult Mobile's

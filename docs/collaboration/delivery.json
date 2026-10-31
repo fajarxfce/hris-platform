@@ -13,7 +13,9 @@
       "status": "in_progress",
       "evidence": [
         "../measurements/collaboration-web-provider-2026-10-31.json",
-        "../measurements/collaboration-android-web-provider-2026-10-31.json"
+        "../measurements/collaboration-android-web-provider-2026-10-31.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/da43b35c/docs/measurements/collaboration-android-ci-2026-10-31.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/da43b35c/docs/measurements/collaboration-apple-binding-2026-10-31.json"
       ]
     },
     {
@@ -21,7 +23,8 @@
       "name": "Durable encrypted chat",
       "status": "in_progress",
       "evidence": [
-        "admission.md"
+        "admission.md",
+        "../measurements/collaboration-device-registry-2026-10-31.json"
       ]
     },
     {

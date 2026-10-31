@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "kind": "collaboration_device_registry",
+  "productAcceptance": false,
+  "liveRuntimeModified": false,
+  "schema": 104,
+  "checks": {
+    "databaseTests": 28,
+    "registryIntegrationTests": 1,
+    "admissionTests": 11,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "recoveryToolTests": 21,
+    "actualPostgresDumpRestore": true,
+    "architecture": true,
+    "format": true,
+    "databaseAndRegistryElapsedSeconds": 125
+  },
+  "sourceSha256": {
+    "core/database/src/main/resources/db/migration/V104__collaboration_device_registry.sql": "73d666b9e7618f5f57e588d5b43a3fd457fd426fe34f673a431e9f399de95dbc",
+    "core/database/src/test/kotlin/dev/fajar/hris/core/database/CollaborationDeviceMigrationTest.kt": "f4acff8e5a79c4a80d6deacfe95d49cf27c7ded5890e2aa0090d91efa9324f61",
+    "modules/collaboration/data/build.gradle.kts": "1cbc5057375ade774a300aaa1caffba05734e9b306d79aaee3b16bf53f45744e",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationRegistryDataSource.kt": "c56bd4ca090a627c061e33c225d7aef135a89e2c01ee588a830b8fbb3adb258a",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationRegistryDataSource.kt": "607163ed9967131e7fd1a10df5e21015a2915c3e46781c210ce256e9a8d0bec9",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/models/BoundCollaborationDeviceData.kt": "c74b9fd4f8ff9d3867d55f4908cf66c7db08778eefb663679fa95b918835f369",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationRegistryRepository.kt": "bb2f35bae8248f8e3a3c7ce4c859dabd97fafe98be1ecc6ef3ca6ec40045383f",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationRegistryTest.kt": "1af9ded14ba611fbbe174f3bf0f4e40e7ee0e6abed1fe2f39c7c45efb3fb743a",
+    "modules/collaboration/domain/build.gradle.kts": "d7acb99ae780df1f10865824b9d7d7c34105902484e0d94dd078af4f4f2765b5",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationAdmission.kt": "bd898d90f102f1a66f9e4172719dab928c3e0618114beba1724c517059745728",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationDevice.kt": "c1a4939e1f62d98c0d3a5356e2437ee469b5b26943d1e916086a8d54164527d7",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationRegistration.kt": "cdf6866ec6411547f5081741115133ab468d657adf7a9118e726f4b9ce03e224",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationAdmissionPolicy.kt": "231016c8825e086912f90f98b924f874c1267bc56386a8e6490ba746a11e81b8",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationRegistryRepository.kt": "b36cf4ae674284f10714608c028569f801be33c6a2fb78a5012ea172fb7f9080",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationAdmissionPolicyTest.kt": "841fe4ccdcd6df4656c0159ef4aa7b795d8fe44101bce4cdb11580c2be33a2e4",
+    "tool/recovery_set.py": "f7cfd0d27886003f0f9f3def3e5cf0033d73763d013240d9f129a6b8abd80dc1",
+    "tool/test_recovery_set.py": "00c95c7b75e98a8a6fccef378874b40d1f12c82f3a85cd232f5f30e6b2da28b3"
+  }
+}

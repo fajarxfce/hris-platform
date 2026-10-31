@@ -65,4 +65,4 @@ include(
 
 include(":modules:reporting:domain", ":modules:reporting:data", ":modules:reporting:delivery")
 
-include(":modules:collaboration:domain")
+include(":modules:collaboration:domain", ":modules:collaboration:data")

@@ -27,10 +27,10 @@ class RecoverySetTest(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.directory = Path(self.temporary.name)
 
-    def test_schema_gate_accepts_reviewed_document_metadata_and_rejects_unknown_future_schema(self):
-        for schema in (59, 101, 102, 103):
+    def test_schema_gate_accepts_reviewed_device_registry_and_rejects_unknown_future_schema(self):
+        for schema in (59, 101, 102, 103, 104):
             recovery.validate_schema({'observedSchema': str(schema)})
-        for schema in (58, 104, None, 'invalid'):
+        for schema in (58, 105, None, 'invalid'):
             with self.assertRaises(database.RecoveryError):
                 recovery.validate_schema({'observedSchema': schema})
 

@@ -26,7 +26,22 @@ tolerance and late results from replaced devices. All 35 identity-domain tests
 also pass; architecture checks pass. These checks establish the policy boundary,
 not the delivery of a usable chat feature.
 
-Next implementation work is the transaction-backed repository, provisioning
+Schema 104 and the transaction-backed registry repository now retain device
+identity independently from parent-session bindings. Composite foreign keys
+protect company/account ownership. Session purge removes the binding while
+retaining device identity; a missing live parent can never admit a provider
+request. Only the owner reads these records, with writes additionally restricted
+to the current company. Owned cross-company metadata supports a global count of
+distinct live parent sessions. A failed binding insert rolls back device creation.
+
+Actual integration tests cover the distinct-parent count, pending devices,
+cross-account rejection, revoked parents, refresh expiry versus parent expiry,
+credential rotation and rollback. All 28 database cases pass, including actual
+`pg_dump`/`pg_restore` with restored facts, row policies and immutable transitions.
+The recovery schema ceiling is 104; no new encryption envelope exists yet. See
+[recorded evidence](../measurements/collaboration-device-registry-2026-10-31.json).
+
+Next implementation work is the registration/admission use cases, provisioning
 intent/outbox, protected session broker and provider gateway. The adapter must
 read current company/member/account/session/device authority under the established
 lock order. It must apply company maintenance/module/build admission, protect

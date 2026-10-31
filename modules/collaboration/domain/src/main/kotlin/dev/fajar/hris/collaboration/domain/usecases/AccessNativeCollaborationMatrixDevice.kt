@@ -44,21 +44,7 @@ class AccessNativeCollaborationMatrixDevice(
         val captured = snapshotCollaborationKeyQuery(request)
         if (captured is Result.Failed) return captured
         val query = (captured as Result.Success).value
-        return admitted(
-            token,
-            correlationId,
-            prepare = { initial, _ -> prepareQuery(initial, query) },
-            extraAccounts = { initial ->
-                collaborationKeyQueryAccounts(query, initial.companyId, provider.serverName).map {
-                    it.values.toSet()
-                }
-            },
-            revalidate = { initial, original ->
-                prepareQuery(initial, query).flatMap { current ->
-                    if (original != current) recipientsChanged() else Result.Success(Unit)
-                }
-            },
-        ) { exchange, prepared ->
+        return recipientOperation(token, correlationId, query) { exchange, prepared ->
             val expanded = prepared.providerRequest()
             if (expanded.devices.isEmpty()) {
                 exchange.confirm().map {
@@ -73,6 +59,100 @@ class AccessNativeCollaborationMatrixDevice(
             }
         }
     }
+
+    fun claimKeys(
+        token: String,
+        correlationId: UUID,
+        request: CollaborationMatrixKeyClaim,
+    ): Result<CollaborationMatrixKeyClaimResult> {
+        val captured = snapshotCollaborationKeyClaim(request)
+        if (captured is Result.Failed) return captured
+        val claim = (captured as Result.Success).value
+        val query =
+            CollaborationMatrixKeyQuery(claim.oneTimeKeys.mapValues { it.value.keys.toList() })
+        return recipientOperation(token, correlationId, query) { exchange, prepared ->
+            val expanded = prepared.providerRequest()
+            if (expanded.devices.isEmpty())
+                return@recipientOperation exchange.confirm().map {
+                    CollaborationMatrixKeyClaimResult(prepared.accounts.mapValues { emptyMap() })
+                }
+            // Verify pinned identity before consuming keys. Every provider exchange separately
+            // rechecks current caller authority and the selected recipient set.
+            val identities =
+                exchange.exchange { bearer, deadline ->
+                    providerKeys.deviceKeys(expanded, bearer, deadline).flatMap {
+                        verifyQuery(prepared, it)
+                    }
+                }
+            if (identities is Result.Failed) return@recipientOperation identities
+            val selected =
+                CollaborationMatrixKeyClaim(
+                    expanded.devices.mapValues { (_, ids) ->
+                        ids.associateWith { "signed_curve25519" }
+                    }
+                )
+            exchange.exchange { bearer, deadline ->
+                providerKeys.claimKeys(selected, bearer, deadline).flatMap {
+                    verifyClaim(prepared, (identities as Result.Success).value, it)
+                }
+            }
+        }
+    }
+
+    private fun verifyClaim(
+        prepared: QueryPreparation,
+        identities: CollaborationMatrixKeyQueryResult,
+        response: CollaborationMatrixKeyClaimResult,
+    ): Result<CollaborationMatrixKeyClaimResult> {
+        val expected = prepared.providerRequest().devices
+        if (response.oneTimeKeys.keys.any { it !in expected }) return invalidProvider()
+        val output = linkedMapOf<String, Map<String, Map<String, CollaborationMatrixSignedKey>>>()
+        for (user in prepared.accounts.keys) {
+            val devices = response.oneTimeKeys[user] ?: emptyMap()
+            if (devices.keys.any { it !in expected[user].orEmpty() }) return invalidProvider()
+            for ((device, keys) in devices) {
+                if (keys.size > 1) return invalidProvider()
+                if (keys.isEmpty()) continue
+                val identity = identities.deviceKeys[user]?.get(device) ?: return invalidProvider()
+                val upload =
+                    if (keys.values.single().fallback == true)
+                        CollaborationMatrixKeyUpload(fallbackKeys = keys)
+                    else CollaborationMatrixKeyUpload(oneTimeKeys = keys)
+                if (validateCollaborationSignedKeys(upload, identity) is Result.Failed)
+                    return invalidProvider()
+            }
+            output[user] =
+                devices.mapValues { (_, keys) ->
+                    keys.mapValues { (_, key) ->
+                        key.copy(signatures = key.signatures.mapValues { it.value.toMap() })
+                    }
+                }
+        }
+        return Result.Success(CollaborationMatrixKeyClaimResult(output))
+    }
+
+    private fun <T> recipientOperation(
+        token: String,
+        correlationId: UUID,
+        query: CollaborationMatrixKeyQuery,
+        operation: (Exchange, QueryPreparation) -> Result<T>,
+    ): Result<T> =
+        admitted(
+            token,
+            correlationId,
+            prepare = { initial, _ -> prepareQuery(initial, query) },
+            extraAccounts = { initial ->
+                collaborationKeyQueryAccounts(query, initial.companyId, provider.serverName).map {
+                    it.values.toSet()
+                }
+            },
+            revalidate = { initial, original ->
+                prepareQuery(initial, query).flatMap { current ->
+                    if (original != current) recipientsChanged() else Result.Success(Unit)
+                }
+            },
+            operation = operation,
+        )
 
     private fun prepareQuery(
         initial: CollaborationGatewaySession,

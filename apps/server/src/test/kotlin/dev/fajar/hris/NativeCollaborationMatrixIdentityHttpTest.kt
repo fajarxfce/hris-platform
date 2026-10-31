@@ -263,6 +263,91 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         )
 
     @Test
+    fun keyClaimRequiresOpaqueAuthorityAndPreservesSignedFieldsAcrossChunkedHttp() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val key = fixtureKeys(n, device)
+        val body =
+            json.writeValueAsString(
+                mapOf(
+                    "one_time_keys" to mapOf(key.user to mapOf(key.device to "signed_curve25519")),
+                    "timeout" to 10000,
+                )
+            )
+        for (invalid in listOf(null, n.access, "fictional-provider-token")) assertEquals(
+            401,
+            uploadKeys(n, invalid, body, path = "claim").statusCode(),
+        )
+        val pending = uploadKeys(n, token, body, path = "claim")
+        assertEquals(200, pending.statusCode(), pending.body())
+        assertTrue(json.readTree(pending.body()).path("one_time_keys").path(key.user).isEmpty)
+        assertEquals(200, uploadKeys(n, token, json.writeValueAsString(key.body())).statusCode())
+        val response = uploadKeys(n, token, body, chunked = true, path = "claim")
+        assertEquals(200, response.statusCode(), response.body())
+        assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+        val result =
+            json.readTree(response.body()).path("one_time_keys").path(key.user).path(key.device)
+        assertEquals(json.valueToTree(key.body()["one_time_keys"]), result)
+        val exhausted = uploadKeys(n, token, body, path = "claim")
+        assertEquals(200, exhausted.statusCode(), exhausted.body())
+        assertTrue(json.readTree(exhausted.body()).path("one_time_keys").path(key.user).isEmpty)
+    }
+
+    @Test
+    fun keyClaimRejectsMalformedScopeAndWithholdsKeysAfterCallerRevocation() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val key = fixtureKeys(n, device)
+        val body =
+            json.writeValueAsString(
+                mapOf(
+                    "one_time_keys" to mapOf(key.user to mapOf(key.device to "signed_curve25519"))
+                )
+            )
+        val before = provider.keyClaims.get()
+        for (invalid in
+            listOf(
+                "{}",
+                "{\"one_time_keys\":null}",
+                "{\"one_time_keys\":{},\"one_time_keys\":{}}",
+                body.replace("signed_curve25519", "curve25519"),
+                body.replace(key.device, "*"),
+                body.replace("matrix.example.test", "foreign.example.test"),
+                body.dropLast(1) + ",\"timeout\":null}",
+                body + "{}",
+            )) {
+            assertEquals(400, uploadKeys(n, token, invalid, path = "claim").statusCode())
+        }
+        assertEquals(
+            400,
+            uploadKeys(n, token, body, suffix = "?access_token=fixture", path = "claim")
+                .statusCode(),
+        )
+        assertEquals(401, uploadKeys(n, token, body, duplicate = true, path = "claim").statusCode())
+        assertEquals(
+            413,
+            uploadKeys(n, token, " ".repeat(65537), chunked = true, path = "claim").statusCode(),
+        )
+        assertEquals(before, provider.keyClaims.get())
+        assertEquals(200, uploadKeys(n, token, json.writeValueAsString(key.body())).statusCode())
+        provider.onKeyClaim.set {
+            database()
+                .update(
+                    "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                    n.session,
+                )
+        }
+        try {
+            val response = uploadKeys(n, token, body, path = "claim")
+            assertEquals(401, response.statusCode(), response.body())
+            assertFalse(json.readTree(response.body()).has("one_time_keys"))
+            assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+        } finally {
+            provider.onKeyClaim.set(null)
+        }
+    }
+
+    @Test
     fun keyQueryUsesOpaqueAuthorityAndReturnsOnlyConfirmedExplicitDeviceKeys() {
         val n = native()
         val (device, token) = enroll(n)
@@ -580,6 +665,10 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
         val keyUploads = AtomicInteger()
         val keyQueries = AtomicInteger()
+        val keyClaims = AtomicInteger()
+        val onKeyClaim = AtomicReference<(() -> Unit)?>(null)
+        private val claimable =
+            ConcurrentHashMap<Pair<String, String>, tools.jackson.databind.JsonNode>()
         val onKeyQuery = AtomicReference<(() -> Unit)?>(null)
         val onKeyUpload = AtomicReference<(() -> Unit)?>(null)
         private val keys =
@@ -654,6 +743,41 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                         )
                                 )
                             }
+                            "/_matrix/client/v3/keys/claim" -> {
+                                keyClaims.incrementAndGet()
+                                val identity =
+                                    requireNotNull(
+                                        credentials[
+                                            request.requestHeaders
+                                                .getFirst("Authorization")
+                                                .removePrefix("Bearer ")]
+                                    )
+                                val user = identity["user_id"] as String
+                                val device = identity["device_id"] as String
+                                val body = parser.readTree(request.requestBody.readNBytes(65537))
+                                assertEquals(
+                                    setOf(user),
+                                    body.path("one_time_keys").propertyNames().toSet(),
+                                )
+                                assertEquals(
+                                    setOf(device),
+                                    body.path("one_time_keys").path(user).propertyNames().toSet(),
+                                )
+                                assertEquals(
+                                    "signed_curve25519",
+                                    body.path("one_time_keys").path(user).path(device).asString(),
+                                )
+                                val selected = claimable.remove(user to device)
+                                onKeyClaim.getAndSet(null)?.invoke()
+                                mapOf(
+                                    "one_time_keys" to
+                                        mapOf(
+                                            user to
+                                                (selected?.let { mapOf(device to it) }
+                                                    ?: emptyMap())
+                                        )
+                                )
+                            }
                             "/_matrix/client/v3/keys/upload" -> {
                                 keyUploads.incrementAndGet()
                                 val identity =
@@ -671,7 +795,10 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                     keyIds.getOrPut(user to device) {
                                         ConcurrentHashMap.newKeySet()
                                     }
-                                body.get("one_time_keys")?.let { ids.addAll(it.propertyNames()) }
+                                body.get("one_time_keys")?.let {
+                                    ids.addAll(it.propertyNames())
+                                    claimable[user to device] = it
+                                }
                                 onKeyUpload.getAndSet(null)?.invoke()
                                 mapOf(
                                     "one_time_key_counts" to mapOf("signed_curve25519" to ids.size)

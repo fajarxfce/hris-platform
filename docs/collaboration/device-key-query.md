@@ -51,7 +51,8 @@ there is no unbounded wait queue. Input remains 64 KiB. Bounds are not a capacit
 claim for a 5,000-employee directory or large group.
 
 Only validated public keys and an empty `failures` object are returned. This is
-native self/direct key discovery. Key claim, to-device envelopes, scoped sync,
+native self/direct key discovery. [Signed key claim](device-key-claim.md) uses the
+same current recipient boundary. To-device envelopes, scoped sync,
 room contents, browser-parent admission, group/context membership, cross-signing
 and backup retain their own gates. Actual SDK traffic through the complete HRIS
 gateway is not established by the component-level provider/HTTP tests. A client

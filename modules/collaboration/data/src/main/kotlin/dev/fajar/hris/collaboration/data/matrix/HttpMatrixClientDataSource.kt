@@ -106,6 +106,37 @@ class HttpMatrixClientDataSource(
         )
     }
 
+    override fun claimKeys(
+        keys: Map<String, Map<String, String>>,
+        token: String,
+        deadline: Instant,
+    ): JsonNode {
+        require(keys.size in 1..100)
+        require(
+            keys.all { (user, devices) ->
+                user.length in 1..255 &&
+                    user.all { it.code in 33..126 } &&
+                    devices.size in 1..5 &&
+                    devices.all { (device, algorithm) ->
+                        device.length in 1..128 &&
+                            device.all { it.code in 33..126 } &&
+                            algorithm == "signed_curve25519"
+                    }
+            }
+        )
+        val response =
+            roomRequest(
+                "/_matrix/client/v3/keys/claim",
+                "POST",
+                mapOf("one_time_keys" to keys, "timeout" to 1000),
+                token,
+                deadline,
+                maximumResponseBytes = 1_048_576,
+            )
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
+    }
+
     override fun queryDevices(
         devices: Map<String, List<String>>,
         token: String,

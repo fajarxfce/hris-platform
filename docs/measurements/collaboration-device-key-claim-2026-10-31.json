@@ -1,0 +1,145 @@
+{
+  "date": "2026-10-31",
+  "scope": "Fixed native self/direct signed one-time key claim; schema remains 113",
+  "baseCommit": "a33e5a630f66ee060a8ad551cd70074dfecbf49b",
+  "validation": [
+    {
+      "seconds": 67,
+      "result": "failed",
+      "tests": {
+        "modules/collaboration/domain": {
+          "tests": 28,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modules/collaboration/data": {
+          "tests": 29,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server": {
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "reason": "One new offline-recipient fixture used nonexistent mfa_at column; corrected to mfa_verified_at. All HTTP and provider/transport cases passed."
+    },
+    {
+      "seconds": 66,
+      "result": "passed",
+      "tests": {
+        "modules/collaboration/domain": {
+          "tests": 28,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modules/collaboration/data": {
+          "tests": 30,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server": {
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "scope": "Added actual HRIS use-case to Synapse claim/exhaustion assertion; corrected fixture. Unchanged domain and HTTP tasks up-to-date."
+    },
+    {
+      "seconds": 319,
+      "result": "one_existing_test_failed",
+      "tests": {
+        "modules/collaboration/domain": {
+          "tests": 28,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modules/collaboration/data": {
+          "tests": 160,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server": {
+          "tests": 153,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/worker": {
+          "tests": 112,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1
+        }
+      },
+      "command": "./gradlew formatCheck architectureCheck :modules:collaboration:domain:test :modules:collaboration:data:test :apps:server:test --tests *NativeCollaboration*Test --tests *ApiContractHttpTest --tests *ClientPolicy*Test --tests *ApprovalReadCompletionAssuranceTest --tests *PeopleReadCompletionTest :apps:worker:test",
+      "reason": "Existing five-second provider token test waited from the conservative client request-start expiry and observed HTTP 200 instead of 401. All new claim cases and remaining suites passed."
+    },
+    {
+      "seconds": 20,
+      "result": "passed",
+      "scope": "Complete affected MatrixProviderInteropTest (one actual provider case), formatCheck and architectureCheck. Test now waits past the maximum fixture TTL from monotonic response receipt. No production change after the full run."
+    }
+  ],
+  "combinedCoverage": {
+    "domain": 28,
+    "collaborationData": 160,
+    "selectedApi": 153,
+    "worker": 112,
+    "workerSkipped": 1,
+    "failuresRemaining": 0,
+    "note": "Full run plus targeted correction; not a claim that the original full invocation succeeded."
+  },
+  "verified": [
+    "Strict explicit canonical native self/direct request and signed_curve25519 algorithm only",
+    "Pinned device key preflight before consuming one-time keys",
+    "Each provider exchange separately fences current authority and recipient set outside SQL",
+    "Unknown/unpublished/inaccessible devices make no claim request",
+    "Offline peers remain eligible beyond short access/MFA freshness",
+    "Signed fallback absent/false/true distinction and signature substitution rejection",
+    "Real Synapse distinct one-time key exhaustion, repeated fallback and restart",
+    "Actual HRIS use-case through real PostgreSQL/private gateway credential to Synapse",
+    "Strict HTTP framing, opaque bearer only, no-store and post-consumption native revocation",
+    "Foreign provider users/devices, multiple keys, malformed fallback, nonempty failures and oversized response rejection",
+    "No automatic consumption retry, logout compensation or client key-store reset"
+  ],
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt": "d842aba532b34988c25aa8860774c28f5f0aed30c0ac32a9396d17fd236343eb",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/HttpMatrixClientDataSource.kt": "a5e3246ebb38be0227808f8a4bc1ea480c552d95b898711af42fa67c2685faa0",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixKeyDataSource.kt": "43da26130188386a09561f0c65d5d2d6e8baf3456e624640b5629d26236008c2",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/DisabledCollaborationMatrixKeyRepository.kt": "970a0edb17effa979fa9805acbe17df2a7a635febea1b450855db540d82a52f8",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixKeyRepository.kt": "2de87238c2ccebe2c4163a2b3fa63275b3e7d7e9f80b7d304ec1eef63c06a7aa",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixKeyProviderInteropTest.kt": "7a441e6f1f4e7587a249247752b28489274cc48cfa998a1fe359240bbe66d480",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderInteropTest.kt": "b9975ba6cc86445dd89ac2ab460fa4f71ba4c580079047805aec8dc6a98c3e32",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderTransportTest.kt": "07cd4fc7f8a731715a7fd432b82a4e340b19eaba099e9faa934d660fe01b6557",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "a65bad299d27fe66b53a26fc7d9485f27516501399e5b2f68c3fd8ed062ba65b",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/MatrixGatewayKeyController.kt": "40dc0de2242ae1f47b10b0f5268a72d170216489d4f395be20ce618f9e094b9c",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/di/CollaborationWebConfiguration.kt": "e4e50e58f2a9033c1da037958fd0882d45510e326ef29d83a9d95fd626485496",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/MatrixKeyClaimRequest.kt": "b49559f02e7173334d259d3ff4ce059d6d5f3f93fb8c2048d496927632469475",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationMatrixKeyClaim.kt": "166943a9c97d649c56ccbc17a59dd152d29cd9aed093b36545bf38344bf621bb",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationMatrixKeyClaimPolicy.kt": "039b4cce910d6476269656a23c04c7cfb33ff7a8c8cc0d9db76cb2bc198a1de0",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationMatrixKeyRepository.kt": "27269fc7c432482bfacd6ea8078f28d5560ad4ea1c20d14c9ba5c99a7f74a555",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AccessNativeCollaborationMatrixDevice.kt": "e1c6221bcd09f6f08c469c1fa55434b96d93148a2bb02b337820aff401c3a87c",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationMatrixKeyClaimPolicyTest.kt": "37c2f584d86ae1003f021e1b066514f7bffd4aa15f2f3c7c266a89ba457b6825"
+  },
+  "limitations": [
+    "Native self/direct only; no browser parent, group/context authority or cross-signing",
+    "Public key claim success is not recipient delivery/decryption/read acknowledgement",
+    "To-device envelopes, scoped sync/content and durable product UI/outbox remain to implement",
+    "No capacity claim, live deployment, phone action or Starter port",
+    "Existing opt-in elapsed retention worker test remains skipped"
+  ],
+  "hosted": {
+    "status": "inspect exact commit after push"
+  }
+}

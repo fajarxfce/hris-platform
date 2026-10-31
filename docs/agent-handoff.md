@@ -102,6 +102,20 @@ Current provider/client evidence:
 
 Current backend implementation:
 
+- Native `POST /_matrix/client/v3/keys/claim` now performs pinned device-key
+  preflight, then validates signed one-time/fallback keys for explicit eligible
+  self/direct devices. Every exchange fences current caller and recipient scope;
+  unavailable targets return empty entries without consumption. No automatic
+  replay or logout compensates for a consumed/lost response. [Contract](collaboration/device-key-claim.md)
+  and [evidence](measurements/collaboration-device-key-claim-2026-10-31.json) retain
+  actual Synapse distinct-key exhaustion/fallback/restart and HRIS-to-provider
+  checks. Combined coverage: 28 domain, 160 data, 153 API, 112 worker (one skip),
+  format/architecture. The 5m19s full run had one existing token-expiry timing
+  fixture failure; its corrected complete case passed in 20s. Production source
+  stayed unchanged after that full run. Earlier 67s/66s focused runs retain the
+  corrected offline fixture column typo. Next implement encrypted to-device
+  envelopes, scoped classic sync/content and durable product UI/outbox.
+
 - Native `POST /_matrix/client/v3/keys/query` now uses the recipient projection,
   current caller/self/direct authority and immutable self-signed fingerprints.
   Unknown/unavailable peers return empty entries without blocking current devices
@@ -113,8 +127,8 @@ Current backend implementation:
   format/architecture and both DI contexts, plus corrected fixture failures.
   Transport has a one-MiB bound for bulk keys, other responses stay 64 KiB.
   Actual Synapse readback/restart and HTTP framing/auth denial pass; this is not
-  yet complete SDK content traffic. Next implement signed one-time key claim,
-  then scoped to-device/classic sync/content and durable product UI/outbox.
+  yet complete SDK content traffic. Signed key claim is now implemented above;
+  continue scoped to-device/classic sync/content and durable product UI/outbox.
 
 - Schema **113** adds a read-only public recipient view owned by a restricted
   non-login role. Application-role private device/binding/key RLS stays unchanged.
@@ -261,7 +275,7 @@ Current backend implementation:
   the corrected JsonNode mapping compilation error remains recorded. The shared DI
   graph was exercised in both runtimes. Exact `05685bf2` hosted control
   [41210683028](https://github.com/fajarxfce/hris-platform/actions/runs/41210683028)
-  passed every job and step; retained in the measurement. No product rollout. Public key claim,
+  passed every job and step; retained in the measurement. No product rollout. Query and claim are implemented above;
   to-device, room/history and classic/native sync remain closed.
 
 [Identity evidence](measurements/collaboration-gateway-identity-2026-10-31.json)
@@ -310,7 +324,7 @@ Next implementation:
 2. Schema-111 storage `71ad7c81` passed all jobs/steps in [41205061024](https://github.com/fajarxfce/hris-platform/actions/runs/41205061024).
    Room setup/worker `f104f097` passed every job/step in `41206499276`. Own-device
    key gateway `05685bf2` passed every step in `41210683028`; schema 112 `966dee38` passed all hosted
-   steps in `41208833880`. Scoped peer key query is implemented above; continue key claim and
+   steps in `41208833880`. Scoped peer key query/claim are implemented above; continue encrypted
    to-device traffic. Offline recipient eligibility must not require a fresh short
    access token; retain current device/company/security revocation checks. Continue
    native/classic sync and content integration using the

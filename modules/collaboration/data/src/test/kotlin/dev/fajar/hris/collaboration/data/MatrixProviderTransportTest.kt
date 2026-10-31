@@ -7,6 +7,7 @@ import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatri
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRepository
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRoomRepository
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixDirectRoom
+import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyClaim
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyQuery
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyUpload
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixLogin
@@ -30,6 +31,103 @@ import org.junit.jupiter.api.Test
 import tools.jackson.databind.json.JsonMapper
 
 class MatrixProviderTransportTest {
+    @Test
+    fun claimUsesFixedSignedExplicitTransportAndRejectsForeignOrMalformedResponses() {
+        Fixture().use { f ->
+            val device = collaborationMatrixDeviceId(f.login.deviceId)
+            val key = MatrixKeyFixture(f.userId, device).signed(true)
+            val signed = mapOf("key" to key.key, "signatures" to key.signatures, "fallback" to true)
+            fun body(
+                user: String = f.userId,
+                id: String = device,
+                value: Any = mapOf("signed_curve25519:1" to signed),
+            ) = mapOf("one_time_keys" to mapOf(user to mapOf(id to value)))
+            val request =
+                CollaborationMatrixKeyClaim(mapOf(f.userId to mapOf(device to "signed_curve25519")))
+            val repo = InternalCollaborationMatrixKeyRepository(f.source)
+            fun claim() =
+                repo.claimKeys(request, "fictional-access-token", Instant.now().plusSeconds(10))
+            var response: Any = body()
+            f.handler = { exchange ->
+                assertEquals("POST", exchange.requestMethod)
+                assertEquals("/_matrix/client/v3/keys/claim", exchange.requestURI.path)
+                assertNull(exchange.requestURI.rawQuery)
+                assertEquals(
+                    "Bearer fictional-access-token",
+                    exchange.requestHeaders.getFirst("Authorization"),
+                )
+                val received = f.json.readTree(exchange.requestBody.readNBytes(65537))
+                assertEquals(
+                    "signed_curve25519",
+                    received.path("one_time_keys").path(f.userId).path(device).asString(),
+                )
+                assertEquals(1000, received.path("timeout").asInt())
+                f.respond(exchange, f.json.writeValueAsString(response))
+            }
+            assertEquals(
+                key,
+                (claim() as Result.Success)
+                    .value
+                    .oneTimeKeys
+                    .getValue(f.userId)
+                    .getValue(device)
+                    .getValue("signed_curve25519:1"),
+            )
+            for (invalid in
+                listOf(
+                    body(user = "@foreign:elsewhere.test"),
+                    body(id = "FOREIGN"),
+                    body(
+                        value =
+                            mapOf("signed_curve25519:1" to signed, "signed_curve25519:2" to signed)
+                    ),
+                    body(value = mapOf("curve25519:1" to key.key)),
+                    body(value = mapOf("signed_curve25519:1" to (signed + ("fallback" to "true")))),
+                    body() + ("failures" to mapOf("foreign" to emptyMap<String, Any>())),
+                )) {
+                response = invalid
+                assertInstanceOf(Result.Failed::class.java, claim())
+            }
+            response = mapOf("one_time_keys" to emptyMap<String, Any>())
+            assertTrue((claim() as Result.Success).value.oneTimeKeys.getValue(f.userId).isEmpty())
+            f.handler = { exchange -> f.respond(exchange, "x".repeat(1_048_577)) }
+            assertInstanceOf(Result.Failed::class.java, claim())
+            f.handler = { exchange -> f.respond(exchange, f.json.writeValueAsString(body())) }
+            assertInstanceOf(Result.Success::class.java, claim())
+        }
+    }
+
+    @Test
+    fun claimRejectsWildcardUnsignedAndOversizedRequestsBeforeTransport() {
+        Fixture().use { f ->
+            val calls = AtomicInteger()
+            f.handler = { exchange ->
+                calls.incrementAndGet()
+                f.respond(exchange, "{}")
+            }
+            val repo = InternalCollaborationMatrixKeyRepository(f.source)
+            val device = collaborationMatrixDeviceId(f.login.deviceId)
+            val selections =
+                listOf(
+                    emptyMap(),
+                    mapOf(f.userId to emptyMap()),
+                    mapOf(f.userId to mapOf(device to "curve25519")),
+                    (0..100).associate {
+                        "@user$it:example.test" to mapOf(device to "signed_curve25519")
+                    },
+                )
+            for (selection in selections) assertInstanceOf(
+                Result.Failed::class.java,
+                repo.claimKeys(
+                    CollaborationMatrixKeyClaim(selection),
+                    "fictional-access-token",
+                    Instant.now().plusSeconds(10),
+                ),
+            )
+            assertEquals(0, calls.get())
+        }
+    }
+
     @Test
     fun explicitRecipientQueryHasItsOwnBoundAndNeverRequestsAllProviderDevices() {
         Fixture().use { f ->

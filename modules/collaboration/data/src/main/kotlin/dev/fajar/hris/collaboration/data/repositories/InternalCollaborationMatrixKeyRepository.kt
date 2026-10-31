@@ -9,6 +9,76 @@ import tools.jackson.databind.JsonNode
 
 class InternalCollaborationMatrixKeyRepository(private val source: MatrixKeyDataSource) :
     CollaborationMatrixKeyRepository {
+    override fun claimKeys(
+        request: CollaborationMatrixKeyClaim,
+        token: String,
+        deadline: Instant,
+    ): Result<CollaborationMatrixKeyClaimResult> = safeMatrixProviderCall {
+        if (request.oneTimeKeys.size !in 1..100) invalid()
+        for ((user, devices) in request.oneTimeKeys) {
+            if (
+                user.length !in 1..255 ||
+                    devices.size !in 1..5 ||
+                    devices.any { (id, algorithm) ->
+                        id.length !in 1..128 || algorithm != "signed_curve25519"
+                    }
+            )
+                invalid()
+        }
+        val captured = request.oneTimeKeys.mapValues { it.value.toMap() }
+        val body = source.claimKeys(captured, token, deadline)
+        val failures = body.path("failures")
+        if (!failures.isMissingNode && (!failures.isObject || !failures.isEmpty)) invalid()
+        val users = body.path("one_time_keys")
+        if (!users.isObject || users.propertyNames().any { it !in captured }) invalid()
+        CollaborationMatrixKeyClaimResult(
+            captured.mapValues { (user, requested) ->
+                val devices = users.path(user)
+                if (devices.isMissingNode) emptyMap()
+                else {
+                    if (!devices.isObject || devices.propertyNames().any { it !in requested })
+                        invalid()
+                    devices.properties().associate { (device, keys) ->
+                        if (!keys.isObject || keys.size() > 1) invalid()
+                        device to
+                            keys.properties().associate { (id, value) ->
+                                if (
+                                    id.length !in 1..146 ||
+                                        !id.startsWith("signed_curve25519:") ||
+                                        id.any { it.code !in 33..126 }
+                                )
+                                    invalid()
+                                id to readSignedKey(value, user)
+                            }
+                    }
+                }
+            }
+        )
+    }
+
+    private fun readSignedKey(value: JsonNode, user: String): CollaborationMatrixSignedKey {
+        if (
+            !value.isObject ||
+                !value.propertyNames().containsAll(setOf("key", "signatures")) ||
+                value.propertyNames().any {
+                    it !in setOf("key", "signatures", "fallback", "unsigned")
+                }
+        )
+            invalid()
+        val signatures = value.path("signatures")
+        if (!signatures.isObject || signatures.size() !in 1..8) invalid()
+        val fallback =
+            value.get("fallback")?.let {
+                if (!it.isBoolean) invalid()
+                it.asBoolean()
+            }
+        return CollaborationMatrixSignedKey(
+            text(value.path("key"), 44),
+            mapOf(user to stringMap(signatures.path(user), 8, 136, 88)),
+            fallback,
+        )
+    }
+
     override fun deviceKeys(
         request: CollaborationMatrixKeyQuery,
         token: String,

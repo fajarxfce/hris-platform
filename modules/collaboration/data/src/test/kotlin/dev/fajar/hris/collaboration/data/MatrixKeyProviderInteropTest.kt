@@ -2,6 +2,7 @@ package dev.fajar.hris.collaboration.data
 
 import dev.fajar.hris.collaboration.data.matrix.HttpMatrixClientDataSource
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixKeyRepository
+import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyClaim
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyQuery
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyUpload
 import dev.fajar.hris.collaboration.domain.policies.*
@@ -11,6 +12,88 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class MatrixKeyProviderInteropTest {
+    @Test
+    fun actualProviderConsumesDistinctOneTimeKeysThenReusesSignedFallbackAcrossRestart() {
+        MatrixProviderFixture("10m").use { f ->
+            f.start()
+            val sender = f.login()
+            val at = f.clock.instant()
+            val peer =
+                (f.repository.login(
+                        f.request.copy(
+                            accountId = UUID.randomUUID(),
+                            deviceId = UUID.randomUUID(),
+                            issuedAt = at,
+                            expiresAt = at.plusSeconds(60),
+                        )
+                    ) as Result.Success)
+                    .value
+            val keys = MatrixKeyFixture(peer.userId, peer.deviceId)
+            val first = keys.signed()
+            val second = keys.signed(false)
+            val fallback = keys.signed(true)
+            fun repo() =
+                InternalCollaborationMatrixKeyRepository(
+                    HttpMatrixClientDataSource(f.client, f.config, f.clock)
+                )
+            fun deadline() = f.clock.instant().plusSeconds(20)
+            assertInstanceOf(
+                Result.Success::class.java,
+                repo()
+                    .upload(
+                        CollaborationMatrixKeyUpload(
+                            keys.device,
+                            mapOf("signed_curve25519:1" to first, "signed_curve25519:2" to second),
+                            mapOf("signed_curve25519:fallback" to fallback),
+                        ),
+                        peer.accessToken,
+                        deadline(),
+                    ),
+            )
+            val absent = collaborationMatrixDeviceId(UUID.randomUUID())
+            val request =
+                CollaborationMatrixKeyClaim(
+                    mapOf(
+                        peer.userId to
+                            mapOf(
+                                peer.deviceId to "signed_curve25519",
+                                absent to "signed_curve25519",
+                            )
+                    )
+                )
+            fun claim() =
+                (repo().claimKeys(request, sender.accessToken, deadline()) as Result.Success)
+                    .value
+                    .oneTimeKeys
+                    .getValue(peer.userId)
+                    .also { assertTrue(it[absent].isNullOrEmpty()) }
+                    .getValue(peer.deviceId)
+            val consumed = claim() + claim()
+            assertEquals(
+                mapOf("signed_curve25519:1" to first, "signed_curve25519:2" to second),
+                consumed,
+            )
+            repeat(2) { assertEquals(mapOf("signed_curve25519:fallback" to fallback), claim()) }
+            f.restart()
+            assertEquals(mapOf("signed_curve25519:fallback" to fallback), claim())
+            assertEquals(
+                Result.Success(Unit),
+                validateCollaborationSignedKeys(
+                    CollaborationMatrixKeyUpload(fallbackKeys = claim()),
+                    keys.device,
+                ),
+            )
+            // Claims have no retry receipt: a lost response consumed its one-time key already.
+            assertEquals(
+                0,
+                (repo().upload(CollaborationMatrixKeyUpload(), peer.accessToken, deadline())
+                        as Result.Success)
+                    .value
+                    .oneTimeKeyCounts["signed_curve25519"] ?: 0,
+            )
+        }
+    }
+
     @Test
     fun actualProviderReturnsOnlyExplicitPeerDevicesAndRetainsTheirKeysAfterRestart() {
         MatrixProviderFixture("10m").use { f ->

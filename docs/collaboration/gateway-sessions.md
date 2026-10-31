@@ -113,8 +113,9 @@ with `soft_logout`, permission failure uses `M_FORBIDDEN`, and rotation bounds u
 for caching/diagnostics: no-store and explicit redacted representations.
 
 An ordered stateless Matrix security chain bypasses native-bearer/cookie parsing.
-POST refresh and the fixed GET identity operation described below are permitted.
-All other `/_matrix/**` and `/_synapse/**` routes, including login, logout, admin,
+POST refresh, the fixed GET identity operation described below and the typed
+[key upload](device-key-upload.md), [query](device-key-query.md) and
+[claim](device-key-claim.md) routes are permitted. All other `/_matrix/**` and `/_synapse/**` routes, including login, logout, admin,
 federation and sync, are denied. This is not yet a usable SDK sync/content gateway.
 
 The worker owns one fixed-delay cleanup task, one timer thread and at most one
@@ -139,7 +140,7 @@ request bodies (including chunked bodies) are rejected. Only the validated
 `user_id`, `device_id` and `is_guest=false` projection is returned, with no-store.
 No untrusted URL/path/header is forwarded to the provider.
 
-`GetNativeCollaborationMatrixIdentity` resolves the opaque hash in its own lookup
+`AccessNativeCollaborationMatrixDevice` resolves the opaque hash in its own lookup
 transaction, then reacquires company policy, company, memberships, account,
 native parent, device, gateway head and internal provider credential in order.
 Both service flags must be enabled. It uses the head's platform/build and live
@@ -171,14 +172,17 @@ queue. Capacity exhaustion returns a bounded retry hint. A permit covers the
 request and bounded response read, and is released on failure, timeout or
 interruption. Login, identity and irreversible device logout share that cap.
 The fixed origin, no-redirect policy, five-second maximum exchange and 64 KiB
-response cap remain in force. This is a resource bound, not a capacity result.
+response cap remain in force for those operations. Bulk key query/claim use a
+one-MiB response cap through the same owner. These are resource bounds, not
+capacity results.
 
 Verification includes actual pinned Synapse identity acquisition/reuse and
 PostgreSQL authority/rotation races, plus an owned HTTP provider in the actual
 API graph. The HTTP fixture simulates the earlier activation transition; it does
 not replace the separate worker/Synapse provisioning proof. See the
 [identity evidence](../measurements/collaboration-gateway-identity-2026-10-31.json)
-for exact tests, failures corrected and scope. No sync, key API, room/content or
-browser-parent admission is exposed by this increment. A private provider token
+for exact tests, failures corrected and scope. The later typed key routes have
+their own evidence above; sync, room/content and browser-parent admission remain
+separate gates. A private provider token
 rejected before its stored expiry is reported as provider unavailability; it is
 not silently retried or used to delete/recreate a device.

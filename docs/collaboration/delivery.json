@@ -73,7 +73,9 @@
         "recipient-devices.md",
         "../measurements/collaboration-recipient-devices-2026-10-31.json",
         "device-key-query.md",
-        "../measurements/collaboration-device-key-query-2026-10-31.json"
+        "../measurements/collaboration-device-key-query-2026-10-31.json",
+        "device-key-claim.md",
+        "../measurements/collaboration-device-key-claim-2026-10-31.json"
       ]
     },
     {
@@ -462,7 +464,7 @@
     "providerProofIsProductAcceptance": false
   },
   "next": [
-    "Implement signed one-time key claim and scoped to-device/classic sync/content on current native self/direct authority.",
+    "Implement scoped encrypted to-device and classic sync/content on current native self/direct authority; typed key upload/query/claim are implemented.",
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",

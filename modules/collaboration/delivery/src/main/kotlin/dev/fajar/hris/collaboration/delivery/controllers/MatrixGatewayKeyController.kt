@@ -1,6 +1,7 @@
 package dev.fajar.hris.collaboration.delivery.controllers
 
 import dev.fajar.hris.collaboration.delivery.matrix.matrixGatewayProblem
+import dev.fajar.hris.collaboration.delivery.requests.matrixKeyClaimRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyQueryRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyUploadRequest
 import dev.fajar.hris.collaboration.domain.policies.collaborationGatewayAuthenticationRequired
@@ -63,6 +64,28 @@ class MatrixGatewayKeyController(private val device: AccessNativeCollaborationMa
                                     "keys" to key.keys,
                                     "signatures" to key.signatures,
                                 )
+                            }
+                        },
+                )
+            }
+        }
+
+    @PostMapping("/_matrix/client/v3/keys/claim")
+    fun claim(request: HttpServletRequest): ResponseEntity<Any> =
+        keyRequest(request, ::matrixKeyClaimRequest) { token, correlation, claim ->
+            device.claimKeys(token, correlation, claim).map { result ->
+                mapOf(
+                    "failures" to emptyMap<String, Any>(),
+                    "one_time_keys" to
+                        result.oneTimeKeys.mapValues { (_, devices) ->
+                            devices.mapValues { (_, keys) ->
+                                keys.mapValues { (_, key) ->
+                                    buildMap<String, Any> {
+                                        put("key", key.key)
+                                        put("signatures", key.signatures)
+                                        key.fallback?.let { put("fallback", it) }
+                                    }
+                                }
                             }
                         },
                 )

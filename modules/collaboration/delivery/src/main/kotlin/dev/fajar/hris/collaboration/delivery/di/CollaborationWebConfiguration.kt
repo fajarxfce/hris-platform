@@ -29,6 +29,7 @@ class CollaborationWebConfiguration {
             it.requestMatchers(HttpMethod.POST, "/_matrix/client/v3/refresh").permitAll()
             it.requestMatchers(HttpMethod.POST, "/_matrix/client/v3/keys/upload").permitAll()
             it.requestMatchers(HttpMethod.POST, "/_matrix/client/v3/keys/query").permitAll()
+            it.requestMatchers(HttpMethod.POST, "/_matrix/client/v3/keys/claim").permitAll()
             it.requestMatchers(HttpMethod.GET, "/_matrix/client/v3/account/whoami").permitAll()
             it.anyRequest().denyAll()
         }

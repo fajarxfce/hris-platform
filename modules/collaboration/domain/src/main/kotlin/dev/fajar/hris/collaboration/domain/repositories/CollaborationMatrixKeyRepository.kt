@@ -6,6 +6,13 @@ import java.time.Instant
 
 /** Fixed internal key operations; the use case owns scope and completion admission. */
 interface CollaborationMatrixKeyRepository {
+    /** Consumes provider one-time keys; there is no application-level replay guarantee. */
+    fun claimKeys(
+        request: CollaborationMatrixKeyClaim,
+        token: String,
+        deadline: Instant,
+    ): Result<CollaborationMatrixKeyClaimResult>
+
     /** Only explicit eligible devices; empty/all-provider-device lists are never forwarded. */
     fun deviceKeys(
         request: CollaborationMatrixKeyQuery,

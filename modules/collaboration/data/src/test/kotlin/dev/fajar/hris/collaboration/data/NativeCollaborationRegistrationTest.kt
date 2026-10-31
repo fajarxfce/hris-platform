@@ -1795,6 +1795,21 @@ class NativeCollaborationRegistrationTest {
                 mapOf(keys.userId to mapOf(keys.deviceId to keys.device)),
                 queried.deviceKeys,
             )
+            fun claim() =
+                success(
+                        command.claimKeys(
+                            tokens.accessToken,
+                            UUID.randomUUID(),
+                            CollaborationMatrixKeyClaim(
+                                mapOf(keys.userId to mapOf(keys.deviceId to "signed_curve25519"))
+                            ),
+                        )
+                    )
+                    .oneTimeKeys
+                    .getValue(keys.userId)
+                    .getValue(keys.deviceId)
+            assertEquals(upload.oneTimeKeys, claim())
+            assertEquals(upload.fallbackKeys, claim())
         }
     }
 
@@ -1979,6 +1994,160 @@ class NativeCollaborationRegistrationTest {
         }
     }
 
+    @Test
+    fun keyClaimUsesPinnedEligibleOfflinePeerIdentityAndRetainsSignedFallbackSemantics() {
+        val q = KeyQueryFixture()
+        sql.update(
+            "update native_sessions set access_expires_at=now()-interval '1 minute',mfa_verified_at=null where id=?",
+            q.peerParent,
+        )
+        for (fallback in listOf(null, false, true)) {
+            q.claimedKeys = mapOf("signed_curve25519:key" to q.peerKeys.signed(fallback))
+            val result = (q.claim() as Result.Success).value
+            assertEquals(
+                q.claimedKeys,
+                result.oneTimeKeys.getValue(q.peerKeys.userId).getValue(q.peerKeys.deviceId),
+            )
+            assertEquals(
+                mapOf(q.peerKeys.userId to listOf(q.peerKeys.deviceId)),
+                q.request?.devices,
+            )
+        }
+        assertEquals(3, q.claimCalls.get())
+        q.claimedKeys = emptyMap()
+        assertTrue(
+            (q.claim() as Result.Success)
+                .value
+                .oneTimeKeys
+                .getValue(q.peerKeys.userId)
+                .getValue(q.peerKeys.deviceId)
+                .isEmpty()
+        )
+    }
+
+    @Test
+    fun keyClaimDoesNotConsumeUnpublishedUnrelatedUnknownOrReplacedDeviceKeys() {
+        for (q in listOf(KeyQueryFixture(published = false), KeyQueryFixture(paired = false))) {
+            assertTrue(
+                (q.claim() as Result.Success)
+                    .value
+                    .oneTimeKeys
+                    .getValue(q.peerKeys.userId)
+                    .isEmpty()
+            )
+            assertEquals(0, q.calls.get())
+            assertEquals(0, q.claimCalls.get())
+        }
+        val q = KeyQueryFixture()
+        val replacement = MatrixKeyFixture(q.peerKeys.userId, q.peerKeys.deviceId)
+        q.keys[q.peerKeys.userId to q.peerKeys.deviceId] = replacement.device
+        assertEquals(
+            "collaboration_device_key_recovery_required",
+            (q.claim() as Result.Failed).failure.code,
+        )
+        assertEquals(0, q.claimCalls.get())
+        q.keys[q.peerKeys.userId to q.peerKeys.deviceId] = q.peerKeys.device
+        val unknown = collaborationMatrixDeviceId(UUID.randomUUID())
+        val result =
+            q.claim(
+                CollaborationMatrixKeyClaim(
+                    mapOf(q.peerKeys.userId to mapOf(unknown to "signed_curve25519"))
+                )
+            )
+        assertTrue(
+            (result as Result.Success).value.oneTimeKeys.getValue(q.peerKeys.userId).isEmpty()
+        )
+        assertEquals(0, q.claimCalls.get())
+    }
+
+    @Test
+    fun keyClaimRejectsSubstitutedSignaturesAlteredFallbackAndForeignDeviceResults() {
+        val q = KeyQueryFixture()
+        val other = MatrixKeyFixture(q.peerKeys.userId, q.peerKeys.deviceId)
+        for (key in
+            listOf(
+                other.signed(),
+                q.peerKeys.signed(true).copy(fallback = null),
+                q.peerKeys.signed().copy(fallback = true),
+            )) {
+            q.claimedKeys = mapOf("signed_curve25519:first" to key)
+            assertEquals(
+                "collaboration_provider_invalid_response",
+                (q.claim() as Result.Failed).failure.code,
+            )
+        }
+        q.onClaim = {
+            Result.Success(
+                CollaborationMatrixKeyClaimResult(
+                    mapOf(q.peerKeys.userId to mapOf("FOREIGN" to q.claimedKeys))
+                )
+            )
+        }
+        assertEquals(
+            "collaboration_provider_invalid_response",
+            (q.claim() as Result.Failed).failure.code,
+        )
+    }
+
+    @Test
+    fun keyClaimFencesRecipientRevocationAfterPreflightAndAfterConsumedResponseOrFailure() {
+        for (stage in listOf("preflight", "claim", "failure")) {
+            val q = KeyQueryFixture()
+            fun revoke() {
+                sql.update(
+                    "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                    q.peerParent,
+                )
+            }
+            if (stage == "preflight")
+                q.onQuery = {
+                    revoke()
+                    Result.Success(it)
+                }
+            else
+                q.onClaim = {
+                    revoke()
+                    if (stage == "failure")
+                        Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_outage"))
+                    else Result.Success(it)
+                }
+            assertEquals(
+                "collaboration_recipients_changed",
+                (q.claim() as Result.Failed).failure.code,
+            )
+            assertEquals(if (stage == "preflight") 0 else 1, q.claimCalls.get())
+            assertEquals(
+                1,
+                sql.queryForObject(
+                    "select count(*) from collaboration_device_key_publications where device_id=? and version=1",
+                    Int::class.java,
+                    q.peerDevice,
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun keyClaimRejectsLateCallerRefreshAndCapturedAdmissionExpiryWithoutClearingKeys() {
+        for (refresh in listOf(true, false)) {
+            val q = KeyQueryFixture()
+            q.onClaim = {
+                if (refresh)
+                    sql.update(
+                        "update native_sessions set version=version+1 where id=?",
+                        q.upload.g.parent,
+                    )
+                else q.upload.g.f.clock.at = q.upload.g.f.clock.at.plusSeconds(61)
+                Result.Success(it)
+            }
+            assertEquals(
+                "collaboration_admission_changed",
+                (q.claim() as Result.Failed).failure.code,
+            )
+            assertEquals(1, q.claimCalls.get())
+        }
+    }
+
     private class KeyQueryFixture(published: Boolean = true, paired: Boolean = true) {
         val upload = KeyUploadFixture()
         val company = requireNotNull(upload.g.f.actor.companyId)
@@ -1989,6 +2158,12 @@ class NativeCollaborationRegistrationTest {
                 CollaborationMatrixDeviceKeys,
             >()
         val calls = AtomicInteger()
+        val claimCalls = AtomicInteger()
+        var claimed: CollaborationMatrixKeyClaim? = null
+        var onClaim:
+            ((CollaborationMatrixKeyClaimResult) -> Result<CollaborationMatrixKeyClaimResult>)? =
+            null
+        var claimedKeys: Map<String, CollaborationMatrixSignedKey> = emptyMap()
         var request: CollaborationMatrixKeyQuery? = null
         var onQuery:
             ((CollaborationMatrixKeyQueryResult) -> Result<CollaborationMatrixKeyQueryResult>)? =
@@ -1998,6 +2173,30 @@ class NativeCollaborationRegistrationTest {
         val peerKeys: MatrixKeyFixture
         private val provider =
             object : CollaborationMatrixKeyRepository by upload.provider {
+                override fun claimKeys(
+                    request: CollaborationMatrixKeyClaim,
+                    token: String,
+                    deadline: Instant,
+                ): Result<CollaborationMatrixKeyClaimResult> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    claimCalls.incrementAndGet()
+                    claimed = request
+                    val result =
+                        CollaborationMatrixKeyClaimResult(
+                            request.oneTimeKeys.mapValues { (user, devices) ->
+                                devices.mapValues { (device, _) ->
+                                    if (user == peerKeys.userId && device == peerKeys.deviceId)
+                                        claimedKeys
+                                    else emptyMap()
+                                }
+                            }
+                        )
+                    return onClaim?.invoke(result) ?: Result.Success(result)
+                }
+
                 override fun deviceKeys(
                     request: CollaborationMatrixKeyQuery,
                     token: String,
@@ -2029,6 +2228,7 @@ class NativeCollaborationRegistrationTest {
             val enrolled = enrollPeer(published)
             peerParent = enrolled.first
             peerKeys = enrolled.second
+            claimedKeys = mapOf("signed_curve25519:first" to peerKeys.signed())
             peerDevice =
                 UUID.fromString(
                     peerKeys.deviceId.removePrefix("HRIS_").let {
@@ -2095,6 +2295,13 @@ class NativeCollaborationRegistrationTest {
             return parent to key
         }
 
+        fun claim(
+            input: CollaborationMatrixKeyClaim =
+                CollaborationMatrixKeyClaim(
+                    mapOf(peerKeys.userId to mapOf(peerKeys.deviceId to "signed_curve25519"))
+                )
+        ) = command.claimKeys(upload.tokens.accessToken, UUID.randomUUID(), input)
+
         fun read(
             input: CollaborationMatrixKeyQuery =
                 CollaborationMatrixKeyQuery(
@@ -2132,6 +2339,12 @@ class NativeCollaborationRegistrationTest {
     }
 
     private class RecordingKeys : CollaborationMatrixKeyRepository {
+        override fun claimKeys(
+            request: CollaborationMatrixKeyClaim,
+            token: String,
+            deadline: Instant,
+        ): Result<CollaborationMatrixKeyClaimResult> = error("Own-device publication fixture")
+
         override fun deviceKeys(
             request: CollaborationMatrixKeyQuery,
             token: String,

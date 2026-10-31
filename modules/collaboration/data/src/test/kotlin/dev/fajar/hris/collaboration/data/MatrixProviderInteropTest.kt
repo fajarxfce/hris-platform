@@ -30,6 +30,7 @@ class MatrixProviderInteropTest {
             val request = fixture.request
             fun login() = fixture.login()
             val first = login()
+            val firstReceivedAt = System.nanoTime()
             assertEquals(
                 "@${collaborationMatrixLocalpart(request.companyId, request.accountId)}:${config.serverName}",
                 first.userId,
@@ -52,9 +53,11 @@ class MatrixProviderInteropTest {
             Thread.sleep(3000)
             val second = login()
             assertNotEquals(first.accessToken, second.accessToken)
-            val waitMillis =
-                Duration.between(clock.instant(), first.expiresAt.plusMillis(350)).toMillis()
-            if (waitMillis > 0) Thread.sleep(waitMillis.coerceAtMost(6000))
+            // The adapter deliberately starts its conservative lifetime before HTTP I/O.
+            // The provider creates its token later; a slow login can exceed a 350-ms margin.
+            // Wait past the fixture's maximum five-second TTL measured AFTER receipt instead.
+            val waitNanos = firstReceivedAt + Duration.ofMillis(5350).toNanos() - System.nanoTime()
+            if (waitNanos > 0) TimeUnit.NANOSECONDS.sleep(waitNanos)
             assertEquals(
                 401,
                 exchange(client, origin, "/_matrix/client/v3/account/whoami", first.accessToken)

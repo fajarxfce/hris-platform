@@ -372,9 +372,15 @@ class MatrixProviderTransportTest {
         override fun close() {
             client.shutdownNow()
             server.stop(0)
-            executor.shutdownNow()
-            assertTrue(client.awaitTermination(Duration.ofSeconds(5)))
-            assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS))
+            // The test has released every handler latch. Let those handlers observe release
+            // before interrupting anything, or cleanup itself fabricates a server assertion.
+            executor.shutdown()
+            try {
+                assertTrue(client.awaitTermination(Duration.ofSeconds(5)))
+                assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS))
+            } finally {
+                if (!executor.isTerminated) executor.shutdownNow()
+            }
             serverErrors.firstOrNull()?.let {
                 throw AssertionError("Fixture server assertion failed", it)
             }

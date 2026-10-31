@@ -204,8 +204,13 @@ three-envelope projection with old/current encryption keys. Independent deadline
 tampering fails authentication. [Expiry evidence](measurements/collaboration-provider-expiry-2026-10-31.json)
 records source and limits. No DI/live deployment occurred; runtime stays schema 103.
 Continue durable provisioning/fenced activation and gateway integration next.
-The new provider transport's control CI is `41188537446` at exact `d78f285d`;
-record its final status after completion.
+Provider transport CI `41188537446` at `d78f285d` failed a fixture cleanup
+race: shutdown interrupted a handler just as its released latch woke, causing
+a false server assertion. The fixture now drains its executor with a five-second
+bound, keeping cancellation/timeout assertions intact. All eight transport cases
+and formatting pass locally (21s); the measurement retains the failed hosted run.
+Check the corrected control CI after push. The schema-107 run `41188884369` at
+`3a0135d2` also predates this cleanup correction; retain its eventual outcome.
 
 The paragraphs below are retained prior-work history. Their old installed build
 2 reference is superseded by Mobile's validated release build 4; consult Mobile's

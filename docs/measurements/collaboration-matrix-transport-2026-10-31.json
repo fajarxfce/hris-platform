@@ -49,5 +49,20 @@
     "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationMatrixIdentity.kt": "c172848367f0408c0baa0237f160875b36acb210ef3f52a9a957b74e306ea5d1",
     "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationMatrixRepository.kt": "9f1feb7a5676d99f8b0c84d69f117abb56d24b4999fd0e422e3708df4a4d3555",
     "modules/collaboration/data/build.gradle.kts": "738f87812e0b1a12eca067cf076e31edfd8baa2adfd80f3500fbaaa4c7f4f423"
+  },
+  "hostedFailure": {
+    "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41188537446",
+    "commit": "d78f285dd9bcabf4fc1eb0fea3008bb2652e1b68",
+    "reason": "The fixture interrupted its HTTP executor immediately after releasing handler latches; a waking handler could report cleanup-induced InterruptedException as a server assertion.",
+    "correction": "After release, shut the fixture executor down gracefully, await at most five seconds, and reserve interruption for failed termination. No timeout/cancellation assertion was removed.",
+    "localVerification": {
+      "transportScenarios": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "format": true,
+      "elapsedSeconds": 21
+    },
+    "correctedTestSha256": "845f4a387dccbc7f52ed9c210bbda13ae1c47bc9b48eb7d442758c5a18cbe132"
   }
 }

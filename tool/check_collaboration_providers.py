@@ -170,6 +170,7 @@ class ProviderProof:
         synapse_data.mkdir(mode=0o700)
         config = {
             "server_name": "proof.invalid", "public_baseurl": "http://localhost/",
+            "default_room_version": "12",
             "report_stats": False, "enable_registration": False,
             "registration_shared_secret": shared_secret,
             "password_config": {"enabled": False},
@@ -317,6 +318,7 @@ class ProviderProof:
             self.record["checks"]["android_web_bidirectional_e2ee"] = True
             self.record["checks"]["android_sdk_refresh_preserves_device_key"] = True
             self.record["checks"]["android_sdk_queue_encrypted_logical_ids"] = True
+            self.record["checks"]["android_encrypts_for_offline_invitee_before_join"] = True
 
     def cleanup(self):
         successful = True

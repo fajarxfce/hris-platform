@@ -66,3 +66,9 @@ acceptance evidence.
 
 See [adapter evidence](../measurements/collaboration-room-adapter-2026-10-31.json)
 for exact checks and corrected failures. No product delivery acceptance is implied.
+
+The Android sender variant now passes with the same invited history and explicit
+version 12: create while the enrolled browser peer is offline, observe SDK state,
+queue/send, shut down Android, then join/load/decrypt on the peer. See
+[native evidence](../measurements/collaboration-native-invited-2026-10-31.json).
+This does not cover a native recipient before joining or a never-enrolled peer.

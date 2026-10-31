@@ -33,10 +33,12 @@ if (fixture.nativeDevice) {
       const replyBody = `fictional-native-android-${randomUUID()}`;
       const expectedLogicalId = randomUUID();
       const replyLogicalId = randomUUID();
+      const offlineBody = `fictional-native-offline-invite-${randomUUID()}`;
+      const offlineLogicalId = randomUUID();
       // Credentials go through stdin into the app sandbox, never shell arguments.
       execFileSync(adb, [...args, "shell", "run-as", application, "sh", "-c",
         "'cat > files/protocol-proof/fixture.json'"], {
-        input: JSON.stringify({ ...fixture.matrix.native, roomId, expectedBody, replyBody, expectedLogicalId, replyLogicalId }),
+        input: JSON.stringify({ ...fixture.matrix.native, roomId, expectedBody, replyBody, expectedLogicalId, replyLogicalId, offlineBody, offlineLogicalId, offlinePeer: fixture.matrix.nativeweb.userId }),
         timeout: 15_000, stdio: ["pipe", "pipe", "pipe"],
       });
       instrument = spawn(adb, [...args, "shell", "am", "instrument", "-w",
@@ -55,6 +57,17 @@ if (fixture.nativeDevice) {
         } catch { return false; }
       }).toBe(true);
       const sentId = await page.evaluate(input => window.probe.send(input), { roomId, body: expectedBody, logicalId: expectedLogicalId });
+      await expect.poll(() => ({ reply: readResult("reply"), instrumentation: readResult("instrumentation") }))
+        .toMatchObject({ reply: { receivedEncrypted: true, receivedEventId: sentId } });
+      const interim = readResult("reply");
+      await expect.poll(() => page.evaluate(body => window.probe.lookup(body), replyBody))
+        .toEqual({ roomId, eventId: interim.sentEventId, encrypted: true, logicalId: replyLogicalId });
+      await page.evaluate(() => window.probe.stop());
+      await context.setOffline(true);
+      execFileSync(adb, [...args, "shell", "run-as", application, "sh", "-c",
+        "'cat > files/protocol-proof/offline-ready.json'"], {
+        input: JSON.stringify({ ready: true }), timeout: 15_000, stdio: ["pipe", "pipe", "pipe"],
+      });
       await expect.poll(() => ({ result: readResult("result"), instrumentation: readResult("instrumentation") }))
         .toMatchObject({ result: { receivedEncrypted: true, receivedEventId: sentId }, instrumentation: { complete: true } });
       const received = readResult("result");
@@ -67,8 +80,31 @@ if (fixture.nativeDevice) {
       expect(received.queueTransactionId.length).toBeGreaterThan(0);
       expect(received.receivedLogicalId).toBe(expectedLogicalId);
       expect(received.sentLogicalId).toBe(replyLogicalId);
-      await expect.poll(() => page.evaluate(body => window.probe.lookup(body), replyBody))
-        .toEqual({ roomId, eventId: received.sentEventId, encrypted: true, logicalId: replyLogicalId });
+      expect(received.offlineHistory).toBe("invited");
+      expect(received.offlineRoomVersion).toBe("12");
+      expect(received.offlineLogicalId).toBe(offlineLogicalId);
+      expect(received.offlineQueueTransactionId.length).toBeGreaterThan(0);
+      // The instrumentation has already closed SDK resources. Force-stop only
+      // the isolated proof application before the recipient returns and joins.
+      command("shell", "am", "force-stop", application);
+      await context.setOffline(false);
+      await page.reload();
+      await page.waitForFunction(() => Boolean(window.probe));
+      await page.evaluate(session => window.probe.startMatrix(session), fixture.matrix.nativeweb);
+      await page.evaluate(id => window.probe.join(id), received.offlineRoomId);
+      await expect.poll(() => page.evaluate(id => window.probe.roomReadiness(id), received.offlineRoomId))
+        .toMatchObject({ history: "invited", encrypted: true });
+      await page.evaluate(id => window.probe.history(id), received.offlineRoomId);
+      await expect.poll(() => page.evaluate(body => window.probe.lookup(body), offlineBody))
+        .toEqual({ roomId: received.offlineRoomId, eventId: received.offlineSentEventId, encrypted: true, logicalId: offlineLogicalId });
+      const offlineWire = await request.get(`${fixture.matrix.baseUrl}/_matrix/client/v3/rooms/${encodeURIComponent(received.offlineRoomId)}/event/${encodeURIComponent(received.offlineSentEventId)}`, {
+        headers: { Authorization: `Bearer ${fixture.matrix.nativeweb.accessToken}` },
+      });
+      expect(offlineWire.ok()).toBe(true);
+      const offlineCiphertext = await offlineWire.json();
+      expect(offlineCiphertext.type).toBe("m.room.encrypted");
+      expect(JSON.stringify(offlineCiphertext)).not.toContain(offlineBody);
+      expect(JSON.stringify(offlineCiphertext)).not.toContain(offlineLogicalId);
       for (const eventId of [sentId, received.sentEventId]) {
         const wire = await request.get(`${fixture.matrix.baseUrl}/_matrix/client/v3/rooms/${encodeURIComponent(roomId)}/event/${encodeURIComponent(eventId)}`, {
           headers: { Authorization: `Bearer ${fixture.matrix.nativeweb.accessToken}` },

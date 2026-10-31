@@ -54,7 +54,18 @@ Current provider/client evidence:
   timelineSupport/event-timeline acquisition after restart. Corrected initial lookup
   and media-event acquisition failures remain in [adapter evidence](measurements/collaboration-room-adapter-2026-10-31.json).
   Full final browser case passed in 6.780s (17.755s owned run, cleanup true), including
-  prior restart/media/wrong-key assertions. Native equivalents still need proof.
+  prior restart/media/wrong-key assertions. Android-sender evidence follows below; native recipient-before-join and Swift remain.
+
+- Android SDK now creates an encrypted room with invited history, sends through its
+  paused/resumed queue while the enrolled browser invitee is offline, then closes.
+  The browser joins and decrypts after the Android process is stopped. Explicit
+  room version 12, encrypted logical ID, standard refresh/signing-key stability and
+  prior web/media assertions pass. [Native invitation evidence](measurements/collaboration-native-invited-2026-10-31.json)
+  retains two scenarios in 18.486s (33.494s owned run), cleanup true; full Mobile
+  root/debug/lint checks passed in 48s, 2,002 desktop cases and zero lint errors.
+  Native recipient-before-join and never-enrolled-device delivery remain separate.
+  Emulator stopped with data retained; no phone action. Pin Mobile CI to this driver
+  commit, push its fixture and inspect exact hosted evidence while continuing.
 
 Current backend implementation:
 
@@ -151,8 +162,9 @@ Provider ports remain private; raw provider credentials never reach clients.
 
 Next implementation:
 
-1. Inspect the room-adapter commit's exact control and browser-provider workflows
-   after push. Direct `031c3714` passed all jobs/steps in [41201832706](https://github.com/fajarxfce/hris-platform/actions/runs/41201832706);
+1. Room adapter `13a8d4bf` passed every job/step in control [41203190380](https://github.com/fajarxfce/hris-platform/actions/runs/41203190380)
+   and browser provider [41203190384](https://github.com/fajarxfce/hris-platform/actions/runs/41203190384);
+   hosted browser case passed in 9.897s (30.626s owned run), cleanup true. Direct `031c3714` passed all jobs/steps in [41201832706](https://github.com/fajarxfce/hris-platform/actions/runs/41201832706);
    room proof `6139604c` likewise passed [41201965622](https://github.com/fajarxfce/hris-platform/actions/runs/41201965622).
    Participant `d50bb0ad` and identity `b0bf1326` hosted controls also passed.
 2. Implement durable provider-room reconciliation for retained DM intent using the
@@ -161,7 +173,7 @@ Next implementation:
    marker, creator and complete encryption/membership state before publication,
    including partial creation, peer first login and response loss. Never-enrolled
    peers have no encryption key: retain pending outbox until an eligible device
-   exists. Prove Kotlin/Swift offline-invitee encryption separately. Then group and
+   exists. Kotlin sender-to-offline-browser now passes; prove native recipient and Swift separately. Then group and
    resource-context membership control and bounded SDK key/sync/content operations
    with current per-conversation admission, cancellation and response fencing.
    Participant/DM metadata and WHOAMI/refresh do not authorize room contents.

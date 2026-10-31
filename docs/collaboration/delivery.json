@@ -23,7 +23,8 @@
         "provider-room-provisioning.md",
         "../measurements/collaboration-room-interop-2026-10-31.json",
         "matrix-room-adapter.md",
-        "../measurements/collaboration-room-adapter-2026-10-31.json"
+        "../measurements/collaboration-room-adapter-2026-10-31.json",
+        "../measurements/collaboration-native-invited-2026-10-31.json"
       ]
     },
     {
@@ -53,7 +54,8 @@
         "provider-room-provisioning.md",
         "../measurements/collaboration-room-interop-2026-10-31.json",
         "matrix-room-adapter.md",
-        "../measurements/collaboration-room-adapter-2026-10-31.json"
+        "../measurements/collaboration-room-adapter-2026-10-31.json",
+        "../measurements/collaboration-native-invited-2026-10-31.json"
       ]
     },
     {

@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Import
 
 @SpringBootApplication
 @Import(
+    dev.fajar.hris.collaboration.data.di.CollaborationConfiguration::class,
     dev.fajar.hris.push.data.di.PushConfiguration::class,
     DatabaseConfiguration::class,
     AdministrationConfiguration::class,

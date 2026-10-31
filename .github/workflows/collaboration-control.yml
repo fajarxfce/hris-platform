@@ -6,6 +6,11 @@ on:
     branches: [main, feat/communications]
     paths:
       - modules/collaboration/**
+      - apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaboration*
+      - apps/server/src/main/kotlin/dev/fajar/hris/availability/**
+      - apps/server/build.gradle.kts
+      - apps/worker/build.gradle.kts
+      - apps/worker/src/main/kotlin/dev/fajar/hris/worker/WorkerApplication.kt
       - modules/identity/domain/**
       - modules/administration/domain/**
       - apps/dashboard/src/features/administration/**
@@ -17,6 +22,11 @@ on:
   pull_request:
     paths:
       - modules/collaboration/**
+      - apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaboration*
+      - apps/server/src/main/kotlin/dev/fajar/hris/availability/**
+      - apps/server/build.gradle.kts
+      - apps/worker/build.gradle.kts
+      - apps/worker/src/main/kotlin/dev/fajar/hris/worker/WorkerApplication.kt
       - modules/identity/domain/**
       - modules/administration/domain/**
       - apps/dashboard/src/features/administration/**
@@ -46,6 +56,8 @@ jobs:
           python3 -m unittest discover -s tool -p 'test_recovery*.py'
       - name: Verify policies, actual PostgreSQL isolation and backup recovery
         run: ./gradlew formatCheck :core:database:test :modules:identity:domain:test :modules:administration:domain:test :modules:collaboration:domain:test :modules:collaboration:data:test --no-daemon
+      - name: Verify API contracts, native transport and shared worker context
+        run: ./gradlew :apps:server:test --tests '*NativeCollaboration*Test' --tests '*ApiContractHttpTest' :apps:worker:test --no-daemon
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -53,6 +65,8 @@ jobs:
           path: |
             modules/collaboration/**/build/test-results/test/*.xml
             core/database/build/test-results/test/*.xml
+            apps/server/build/test-results/test/*.xml
+            apps/worker/build/test-results/test/*.xml
           retention-days: 7
 
   company-settings:

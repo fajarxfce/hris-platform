@@ -3,6 +3,7 @@ package dev.fajar.hris.collaboration.domain.usecases
 import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
 import dev.fajar.hris.collaboration.domain.entities.CollaborationAdmission
+import dev.fajar.hris.collaboration.domain.entities.CollaborationServicePolicy
 import dev.fajar.hris.collaboration.domain.policies.*
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationRegistryRepository
 import dev.fajar.hris.core.domain.*
@@ -24,6 +25,7 @@ class AcquireNativeCollaborationAdmission(
     private val transactions: TransactionRunner,
     private val security: IdentitySecurityPolicy,
     private val clock: Clock,
+    private val service: CollaborationServicePolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -33,6 +35,8 @@ class AcquireNativeCollaborationAdmission(
     ): Result<CollaborationAdmission> {
         val permission = actor.requirePermission(COLLABORATION_CHAT_PERMISSION)
         if (permission is Result.Failed) return permission
+        if (!service.enabled)
+            return Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_unavailable"))
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))

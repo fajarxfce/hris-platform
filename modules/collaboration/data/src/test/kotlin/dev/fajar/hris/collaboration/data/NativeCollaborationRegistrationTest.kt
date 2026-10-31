@@ -422,6 +422,7 @@ class NativeCollaborationRegistrationTest {
         fun command(
             journal: ChangeJournalRepository = this.journal,
             identities: IdentityRepository = this.identities,
+            service: CollaborationServicePolicy = CollaborationServicePolicy(enabled = true),
         ) =
             RegisterNativeCollaborationDevice(
                 registry,
@@ -435,6 +436,7 @@ class NativeCollaborationRegistrationTest {
                 transactions,
                 IdentitySecurityPolicy(),
                 clock,
+                service,
             )
 
         fun register(
@@ -467,6 +469,7 @@ class NativeCollaborationRegistrationTest {
                     transactions,
                     IdentitySecurityPolicy(),
                     clock,
+                    CollaborationServicePolicy(enabled = true),
                 )
                 .execute(actor, parent, 0, ClientVersion(ClientPlatform.ANDROID, 1))
 

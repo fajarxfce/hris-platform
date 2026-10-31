@@ -19,6 +19,7 @@ val companyModulePackages: Map<String, CompanyModule> =
         "payroll" to CompanyModule.PAYROLL,
         "documents" to CompanyModule.DOCUMENTS,
         "communications" to CompanyModule.COMMUNICATIONS,
+        "collaboration" to CompanyModule.COLLABORATION,
         "reporting" to CompanyModule.REPORTING,
     )
 

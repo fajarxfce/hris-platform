@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "kind": "collaboration_native_http_control",
+  "productAcceptance": false,
+  "liveRuntimeModified": false,
+  "schema": 105,
+  "checks": {
+    "nativeHttpScenarios": 7,
+    "nativeHttpElapsedSeconds": 50,
+    "apiContractScenarios": 69,
+    "worker": {
+      "suites": 21,
+      "tests": 105,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "durationSeconds": 211.249
+    },
+    "collaborationPolicyAndRegistryScenarios": 22,
+    "format": true,
+    "architecture": true,
+    "composeConfiguration": true
+  },
+  "workerSkip": "Existing opt-in physical one-hour export retention case; no new skip added. Shared API and worker contexts were exercised.",
+  "initialFixtureFailures": [
+    {
+      "scope": "initial API check before explicit fixture membership grant",
+      "checks": {
+        "tests": 75,
+        "failures": 5,
+        "errors": 0,
+        "skipped": 0
+      },
+      "cause": "Five HTTP expectations used an existing owner role snapshot without collaboration.chat. Fixture now grants through the membership API; production permission checks retained."
+    },
+    {
+      "scope": "fixture permission grant JSON mapping",
+      "checks": {
+        "tests": 7,
+        "failures": 6,
+        "errors": 0,
+        "skipped": 0
+      },
+      "cause": "Jackson 3 JsonNode.map shadows Iterable.map; explicit iterator is required for array elements."
+    },
+    {
+      "scope": "HTTP fixture expected validation status",
+      "checks": {
+        "tests": 7,
+        "failures": 2,
+        "errors": 0,
+        "skipped": 0
+      },
+      "cause": "Two fixture expectations used 400 for domain validation; existing public FailureKind.VALIDATION mapping is 422 and is preserved."
+    }
+  ],
+  "previousControlCI": {
+    "head": "4d272499118ccb3ab30a7763da5aa998186d0219",
+    "run": "https://github.com/fajarxfce/hris-platform/actions/runs/41185015834",
+    "conclusion": "success"
+  },
+  "sourceSha256": {
+    ".env.example": "6127cfcd2a02a131500e8d05c02848471d46dfd282bf36d264f8293ca10ccd67",
+    ".github/workflows/collaboration-control.yml": "433d4287086c287304400e85f0507c0bcae2c5dee268a3b2fa6ecc0a9bd76951",
+    "apps/server/build.gradle.kts": "d73ba469ddad0e4f6b8f12ae8ad2b68d64256184e6da3595f78f7fac2d32c271",
+    "apps/server/src/main/kotlin/dev/fajar/hris/availability/CompanyModuleRoutes.kt": "86998cfb2eb0a6b75355b61b7e704c7114394e93ff14fde1da362bab86f6009b",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationApiFixture.kt": "e37240c3f52f4d4107e861b3915aa9392cce2d79e8749fcc07cf6df415e2daab",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationDisabledHttpTest.kt": "d50c8f3b94e0b081fbb6467d60eedc406653f0fcfb234ab8e7967d13b79e5a54",
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationHttpTest.kt": "554071766b63c151121bf63b4c41a2419f227d9f0a8cb814b80e6c239270c47b",
+    "apps/worker/build.gradle.kts": "d64e57f19ac49581c7f86bb252950ee84f2c9947b7473fe3ddc966e3cac1c4f9",
+    "apps/worker/src/main/kotlin/dev/fajar/hris/worker/WorkerApplication.kt": "980ab45117f73885d939e5ac1db8770ee051350ee77beebb4d97082a60e6e967",
+    "compose.yml": "c2931cafae09c249a2aa4e1dbd31b742963be95a521e01fa8017a5d822cfc4d7",
+    "modules/collaboration/data/build.gradle.kts": "122f72048b109e1587015fcf079a76a22a3b273e4f3cec6af694716884fbb4ee",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "372271db92d9b5307b2f593d7a2eba77ec6d74eb8af31e18105d08e319d9d859",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "4f68c4bf746c44d16af83cb98dd58e50e63719035467870d8bf540f3c86925c4",
+    "modules/collaboration/delivery/build.gradle.kts": "e608a87f7b7ccd220208a9c49586798cccccc5887c71da3915b667b5d7c96130",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/NativeCollaborationDeviceController.kt": "0d4d40f19df9050b95e35d0e989f6fe7021e3f30516d00f1b6d3f7abf14d6639",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/RegisterCollaborationDeviceRequest.kt": "03b8f7352318d7dda9a4e6b5f2d5e29a823a8603d89ddbeb8348c907c03545f2",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationServicePolicy.kt": "8c5e0e81df774a1e0df68611b0121788dd80107b2d96e1573e4f00c686729507",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AcquireNativeCollaborationAdmission.kt": "d482a956139f60bf3a57f31aaee7748c6eeb6afcdfef9476b67757a0b93e9a5c",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/RegisterNativeCollaborationDevice.kt": "6585ba9e91d74b427ef9eeb02d74ad04d7abbbf0e5b25121898f046a23347fa4",
+    "settings.gradle.kts": "6dcaaf58673c7894e14f52b6211c69a10732ee11bf5fe44a1680567b15ea4837"
+  }
+}

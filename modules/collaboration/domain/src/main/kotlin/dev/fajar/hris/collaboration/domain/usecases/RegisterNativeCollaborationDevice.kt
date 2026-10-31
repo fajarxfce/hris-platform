@@ -27,6 +27,7 @@ class RegisterNativeCollaborationDevice(
     private val transactions: TransactionRunner,
     private val security: IdentitySecurityPolicy,
     private val clock: Clock,
+    private val service: CollaborationServicePolicy,
 ) {
     fun execute(
         actor: Actor,
@@ -39,6 +40,8 @@ class RegisterNativeCollaborationDevice(
     ): Result<MutationReceipt> {
         val permission = actor.requirePermission(COLLABORATION_CHAT_PERMISSION)
         if (permission is Result.Failed) return permission
+        if (!service.enabled)
+            return Result.Failed(Failure(FailureKind.UNAVAILABLE, "collaboration_unavailable"))
         val company =
             actor.companyId
                 ?: return Result.Failed(Failure(FailureKind.FORBIDDEN, "company_required"))

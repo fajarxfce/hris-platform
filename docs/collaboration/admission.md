@@ -95,5 +95,34 @@ quota, revocation during waiting, post-write rollback and policy timing. See
 [registration evidence](../measurements/collaboration-native-registration-2026-10-31.json).
 The schema-105 control CI also passed both jobs in
 [41184251989](https://github.com/fajarxfce/hris-platform/actions/runs/41184251989).
-These use cases are not wired into HTTP or worker DI yet. Browser-parent admission,
-provider credentials, provisioning and actual chat delivery remain required.
+Browser-parent admission, provider credentials, provisioning and actual chat
+delivery remain required.
+
+## Native HTTP control
+
+`POST /api/v1/companies/{companyId}/collaboration/native-device` accepts an
+`Idempotency-Key` UUID and `{ "platform": "ANDROID", "label": "My phone" }`.
+The authenticated native bearer supplies parent identity/version. Cookie sessions
+cannot use this route, and unknown body fields cannot replace server authority.
+The company path, current `collaboration.chat` permission, client-build headers and
+company availability are independently checked. A successful receipt contains
+only device `id` and `version`; it is neither a Matrix credential nor evidence that
+asynchronous provisioning has completed.
+
+The collaboration configuration now composes the same domain/data use cases in
+the API and worker. `HRIS_COLLABORATION_ENABLED` defaults to false, producing
+`collaboration_unavailable` before registration writes. The current HTTP fixture
+enables it only for isolated control-path acceptance. Enabling this switch alone
+does not configure Matrix or deliver chat. Existing membership grants still need
+an explicit normal permission update; the switch never assigns access.
+
+Seven HTTP scenarios pass with real bearer/cookie middleware and PostgreSQL. They
+cover explicit membership grant, cookie/malformed-token rejection, immutable
+parent selection, unknown fields/idempotency, replay, revocation, independent
+Inbox/collaboration availability, minimum builds and disabled deployment. All 69
+existing OpenAPI contract cases pass. The shared worker context passes 104 cases;
+its existing opt-in one-hour retention case is skipped. Formatting, architecture
+and Compose configuration pass. [HTTP evidence](../measurements/collaboration-native-http-2026-10-31.json)
+retains the initial fixture permission, Jackson-array mapping and HTTP-status
+expectation failures; production permission checks and 422 validation status were
+preserved. No live stack or phone was changed.

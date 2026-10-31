@@ -25,7 +25,8 @@
       "evidence": [
         "admission.md",
         "../measurements/collaboration-device-registry-2026-10-31.json",
-        "../measurements/collaboration-native-registration-2026-10-31.json"
+        "../measurements/collaboration-native-registration-2026-10-31.json",
+        "../measurements/collaboration-native-http-2026-10-31.json"
       ]
     },
     {

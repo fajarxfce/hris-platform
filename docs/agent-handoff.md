@@ -82,7 +82,7 @@ PATH=/usr/lib/jvm/java-21-openjdk/bin:/usr/local/bin:/usr/bin ./gradlew ...
 --no-daemon` works without changing socket permissions; the older `sudo -u ...
 -g docker` form is not permitted by this host's run-as-group rule.
 
-Next: API wiring, durable provisioning and encrypted provider credential storage;
+Next: durable provisioning and encrypted provider credential storage;
 protected provider broker/gateway; browser-parent admission, native/web adapters
 and chat screens. Native registration/admission transactions are now implemented
 and tested as recorded below.
@@ -117,10 +117,25 @@ binding; registration rechecks admission after writes, and active grants stop at
 scheduled policy boundaries. Ten new real PostgreSQL scenarios, one registry
 regression, eleven policy cases, formatting and architecture pass (53s). See
 [registration evidence](measurements/collaboration-native-registration-2026-10-31.json).
-No DI/HTTP/provider credential wiring exists yet, so no API/worker context claim is
-made for these new use cases. Native transport must supply the authenticated parent
-ID/version. Browser parent bindings and provider provisioning remain unfinished.
+API and worker DI plus the native registration route are now wired, as recorded
+below. Native transport supplies the authenticated parent ID/version. Browser
+parent bindings and provider provisioning remain unfinished.
 Continue into the protected broker/gateway and actual chat; all P0–P8 gates remain.
+
+The native route `POST /api/v1/companies/{companyId}/collaboration/native-device`
+now uses verified `NativeIdentity`, company policy and idempotency. The separate
+`HRIS_COLLABORATION_ENABLED` switch defaults false in API, worker and Compose;
+current acceptance enables it only in fixtures. Registration acknowledges a
+provisioning identity, never a usable provider credential. Existing memberships
+need an explicit chat grant through normal administration. All seven HTTP cases
+now pass, along with 69 existing OpenAPI contract cases, 22 collaboration cases,
+formatting, architecture and Compose validation. Shared worker context: 104 passes,
+one existing opt-in elapsed-retention skip. See [HTTP evidence](measurements/collaboration-native-http-2026-10-31.json),
+which retains the three corrected fixture failures. The earlier registration
+checkpoint `4d272499` passed hosted control run `41185015834`; check the expanded
+HTTP/worker control workflow after this push. Runtime schema 103 and phone build 4
+remain unchanged. Continue with provisioning/credentials/broker, not another
+round of already-passing registration checks unless subsequent changes need it.
 
 The paragraphs below are retained prior-work history. Their old installed build
 2 reference is superseded by Mobile's validated release build 4; consult Mobile's

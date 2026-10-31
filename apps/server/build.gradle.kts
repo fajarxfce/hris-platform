@@ -4,6 +4,9 @@ plugins {
 }
 
 dependencies {
+    implementation(projects.modules.collaboration.domain)
+    implementation(projects.modules.collaboration.data)
+    implementation(projects.modules.collaboration.delivery)
     implementation(projects.modules.reporting.domain)
     implementation(projects.modules.reporting.data)
     implementation(projects.modules.reporting.delivery)

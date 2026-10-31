@@ -17,7 +17,7 @@ class HttpMatrixClientDataSource(
     private val configuration: MatrixProviderConfiguration,
     private val clock: Clock,
     maximumConcurrent: Int = 32,
-) : MatrixClientDataSource, MatrixRoomDataSource, MatrixKeyDataSource {
+) : MatrixClientDataSource, MatrixRoomDataSource, MatrixKeyDataSource, MatrixToDeviceDataSource {
     private val exchanges = Semaphore(maximumConcurrent)
     private val json =
         JsonMapper.builder()
@@ -104,6 +104,26 @@ class HttpMatrixClientDataSource(
             text(body, "device_id", 128),
             guest.asBoolean(),
         )
+    }
+
+    override fun sendEncrypted(
+        transactionId: String,
+        body: Map<String, Any>,
+        token: String,
+        deadline: Instant,
+    ): JsonNode {
+        require(transactionId.length in 1..128 && transactionId.all { it.code in 33..126 })
+        val response =
+            roomRequest(
+                "/_matrix/client/v3/sendToDevice/m.room.encrypted/${segment(transactionId)}",
+                "PUT",
+                body,
+                token,
+                deadline,
+                maximumRequestBytes = 1_048_576,
+            )
+        if (response.statusCode() != 200) throw MatrixStatusException(response.statusCode())
+        return parse(response)
     }
 
     override fun claimKeys(
@@ -317,12 +337,13 @@ class HttpMatrixClientDataSource(
         token: String,
         deadline: Instant,
         maximumResponseBytes: Int = 65536,
+        maximumRequestBytes: Int = 65536,
     ): HttpResponse<ByteArray> {
         require(token.length in 1..2048 && token.all { it.code in 33..126 })
         val remaining = Duration.between(clock.instant(), deadline)
         if (remaining <= Duration.ZERO) throw MatrixDeadlineException()
         val bytes = body?.let(json::writeValueAsBytes)
-        if (bytes != null && bytes.size > 65536) throw MatrixResponseException()
+        if (bytes != null && bytes.size > maximumRequestBytes) throw MatrixResponseException()
         val afterSerialization = Duration.between(clock.instant(), deadline)
         if (afterSerialization <= Duration.ZERO) throw MatrixDeadlineException()
         val timeout = minOf(configuration.requestTimeout, remaining, afterSerialization)

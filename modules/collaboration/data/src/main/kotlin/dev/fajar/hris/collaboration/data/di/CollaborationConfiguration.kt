@@ -49,6 +49,13 @@ class CollaborationConfiguration {
             ?: DisabledCollaborationMatrixKeyRepository()
 
     @Bean
+    fun collaborationMatrixToDevice(
+        source: ObjectProvider<MatrixToDeviceDataSource>
+    ): CollaborationMatrixToDeviceRepository =
+        source.ifAvailable?.let(::InternalCollaborationMatrixToDeviceRepository)
+            ?: DisabledCollaborationMatrixToDeviceRepository()
+
+    @Bean
     fun collaborationDirectRoomSource(sql: DSLContext): CollaborationDirectRoomDataSource =
         PostgresCollaborationDirectRoomDataSource(sql)
 
@@ -398,6 +405,7 @@ class CollaborationConfiguration {
         matrix: CollaborationMatrixRepository,
         keys: CollaborationDeviceKeyRepository,
         providerKeys: CollaborationMatrixKeyRepository,
+        providerToDevice: CollaborationMatrixToDeviceRepository,
         recipients: CollaborationRecipientRepository,
         conversations: CollaborationDirectRepository,
         sessions: NativeSessionRepository,
@@ -419,6 +427,7 @@ class CollaborationConfiguration {
             matrix,
             keys,
             providerKeys,
+            providerToDevice,
             recipients,
             conversations,
             sessions,

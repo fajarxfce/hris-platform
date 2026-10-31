@@ -22,6 +22,7 @@ class AccessNativeCollaborationMatrixDevice(
     private val matrix: CollaborationMatrixRepository,
     private val keys: CollaborationDeviceKeyRepository,
     private val providerKeys: CollaborationMatrixKeyRepository,
+    private val providerToDevice: CollaborationMatrixToDeviceRepository,
     private val recipients: CollaborationRecipientRepository,
     private val conversations: CollaborationDirectRepository,
     private val sessions: NativeSessionRepository,
@@ -36,6 +37,83 @@ class AccessNativeCollaborationMatrixDevice(
     private val provider: CollaborationMatrixPolicy,
     private val clock: Clock,
 ) {
+    fun sendToDevice(
+        token: String,
+        correlationId: UUID,
+        request: CollaborationToDevice,
+    ): Result<Unit> {
+        val captured = snapshotCollaborationToDevice(request)
+        if (captured is Result.Failed) return captured
+        val send = (captured as Result.Success).value
+        val query = CollaborationMatrixKeyQuery(send.messages.mapValues { it.value.keys.toList() })
+        return admitted(
+            token,
+            correlationId,
+            prepare = { initial, _ -> prepareToDevice(initial, query) },
+            extraAccounts = { initial ->
+                collaborationKeyQueryAccounts(query, initial.companyId, provider.serverName).map {
+                    it.values.toSet()
+                }
+            },
+            revalidate = { initial, original ->
+                prepareToDevice(initial, query).flatMap { current ->
+                    if (current == original) Result.Success(Unit) else recipientsChanged()
+                }
+            },
+        ) { exchange, prepared ->
+            val own = exchange.readKeys()
+            if (own is Result.Failed) return@admitted own
+            val sender = (own as Result.Success).value ?: return@admitted invalidProvider()
+            val verified = validatePublicKeys(exchange.initial, prepared.own, sender)
+            if (verified is Result.Failed) return@admitted verified
+            val peers =
+                exchange.exchange { bearer, deadline ->
+                    providerKeys
+                        .deviceKeys(prepared.recipients.providerRequest(), bearer, deadline)
+                        .flatMap { verifyQuery(prepared.recipients, it) }
+                }
+            if (peers is Result.Failed) return@admitted peers
+            val identities = (peers as Result.Success).value.deviceKeys
+            for ((user, devices) in send.messages) for ((device, envelope) in devices) {
+                val recipient = identities[user]?.get(device) ?: return@admitted recipientsChanged()
+                if (!collaborationEnvelopeMatchesKeys(envelope, sender, recipient))
+                    return@admitted Result.Failed(
+                        Failure(FailureKind.CONFLICT, "collaboration_encryption_keys_changed")
+                    )
+            }
+            exchange.exchange { bearer, deadline -> providerToDevice.send(send, bearer, deadline) }
+        }
+    }
+
+    private fun prepareToDevice(
+        initial: CollaborationGatewaySession,
+        query: CollaborationMatrixKeyQuery,
+    ): Result<ToDevicePreparation> {
+        val prepared = prepareQuery(initial, query)
+        if (prepared is Result.Failed) return prepared
+        val recipients = (prepared as Result.Success).value
+        val eligible = recipients.providerRequest().devices.mapValues { it.value.toSet() }
+        if (eligible != query.devices.mapValues { it.value.toSet() })
+            return Result.Failed(
+                Failure(FailureKind.FORBIDDEN, "collaboration_recipient_unavailable")
+            )
+        return keys.find(initial.companyId, initial.accountId, initial.deviceId).flatMap { own ->
+            if (own == null || own.version != 1L || own.publishedAt == null) keysRequired()
+            else if (
+                own.companyId != initial.companyId ||
+                    own.accountId != initial.accountId ||
+                    own.deviceId != initial.deviceId
+            )
+                invalidProvider()
+            else Result.Success(ToDevicePreparation(recipients, own))
+        }
+    }
+
+    private data class ToDevicePreparation(
+        val recipients: QueryPreparation,
+        val own: CollaborationDeviceKeyPublication,
+    )
+
     fun queryKeys(
         token: String,
         correlationId: UUID,

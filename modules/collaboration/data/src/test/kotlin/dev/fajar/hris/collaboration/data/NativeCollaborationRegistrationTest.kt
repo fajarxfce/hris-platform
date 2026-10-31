@@ -14,9 +14,11 @@ import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRecipi
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRegistryDataSource
 import dev.fajar.hris.collaboration.data.matrix.HttpMatrixClientDataSource
 import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixKeyRepository
+import dev.fajar.hris.collaboration.data.repositories.DisabledCollaborationMatrixToDeviceRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationProviderSessionRepository
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixKeyRepository
+import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixToDeviceRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDeviceKeyRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectRoomRepository
@@ -35,6 +37,7 @@ import dev.fajar.hris.collaboration.domain.repositories.CollaborationGatewaySess
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixKeyRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRoomRepository
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixToDeviceRepository
 import dev.fajar.hris.collaboration.domain.usecases.*
 import dev.fajar.hris.core.database.PostgresTransactionRunner
 import dev.fajar.hris.core.database.datasources.*
@@ -1758,6 +1761,10 @@ class NativeCollaborationRegistrationTest {
                     provider.repository,
                     serverName = "matrix.example.test",
                     providerKeys = repo,
+                    providerToDevice =
+                        InternalCollaborationMatrixToDeviceRepository(
+                            HttpMatrixClientDataSource(provider.client, provider.config, g.f.clock)
+                        ),
                 )
             val upload =
                 CollaborationMatrixKeyUpload(
@@ -1810,6 +1817,30 @@ class NativeCollaborationRegistrationTest {
                     .getValue(keys.deviceId)
             assertEquals(upload.oneTimeKeys, claim())
             assertEquals(upload.fallbackKeys, claim())
+            val curve = keys.device.keys.getValue("curve25519:${keys.deviceId}")
+            assertEquals(
+                Result.Success(Unit),
+                command.sendToDevice(
+                    tokens.accessToken,
+                    UUID.randomUUID(),
+                    CollaborationToDevice(
+                        "fixture-actual-send",
+                        mapOf(
+                            keys.userId to
+                                mapOf(
+                                    keys.deviceId to
+                                        CollaborationOlmEnvelope(
+                                            curve,
+                                            curve,
+                                            "ZmljdGlvbmFs",
+                                            0,
+                                            "fixture-olm-message",
+                                        )
+                                )
+                        ),
+                    ),
+                ),
+            )
         }
     }
 
@@ -2148,7 +2179,124 @@ class NativeCollaborationRegistrationTest {
         }
     }
 
-    private class KeyQueryFixture(published: Boolean = true, paired: Boolean = true) {
+    @Test
+    fun encryptedToDeviceRetainsCiphertextAndTransactionForAnEligibleOfflinePeer() {
+        val q = KeyQueryFixture()
+        sql.update(
+            "update native_sessions set access_expires_at=now()-interval '1 hour',mfa_verified_at=null where id=?",
+            q.peerParent,
+        )
+        repeat(2) { assertEquals(Result.Success(Unit), q.send()) }
+        assertEquals(2, q.sendCalls.get())
+        assertEquals("fictional-transaction", q.sent?.transactionId)
+        assertEquals(
+            q.envelope(),
+            q.sent?.messages?.get(q.peerKeys.userId)?.get(q.peerKeys.deviceId),
+        )
+    }
+
+    @Test
+    fun encryptedToDeviceRejectsMissingTargetsAndMismatchedCurveKeysBeforeSending() {
+        for (q in listOf(KeyQueryFixture(published = false), KeyQueryFixture(paired = false))) {
+            assertEquals(
+                "collaboration_recipient_unavailable",
+                (q.send() as Result.Failed).failure.code,
+            )
+            assertEquals(0, q.sendCalls.get())
+        }
+        val q = KeyQueryFixture()
+        val other =
+            MatrixKeyFixture(q.peerKeys.userId, q.peerKeys.deviceId)
+                .device
+                .keys
+                .getValue("curve25519:${q.peerKeys.deviceId}")
+        for (envelope in
+            listOf(q.envelope().copy(senderKey = other), q.envelope().copy(recipientKey = other))) {
+            assertEquals(
+                "collaboration_encryption_keys_changed",
+                (q.send(
+                        CollaborationToDevice(
+                            "fictional-transaction",
+                            mapOf(q.peerKeys.userId to mapOf(q.peerKeys.deviceId to envelope)),
+                        )
+                    ) as Result.Failed)
+                    .failure
+                    .code,
+            )
+        }
+        assertEquals(0, q.sendCalls.get())
+    }
+
+    @Test
+    fun encryptedToDeviceWithholdsLateProviderSuccessOrFailureAfterRecipientRemoval() {
+        for (failed in listOf(false, true)) {
+            val q = KeyQueryFixture()
+            q.onSend = {
+                sql.update(
+                    "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                    q.peerParent,
+                )
+                if (failed) Result.Failed(Failure(FailureKind.UNAVAILABLE, "fixture_outage"))
+                else Result.Success(Unit)
+            }
+            assertEquals(
+                "collaboration_recipient_unavailable",
+                (q.send() as Result.Failed).failure.code,
+            )
+            assertEquals(1, q.sendCalls.get())
+        }
+    }
+
+    @Test
+    fun encryptedToDeviceNeverSendsAfterRecipientRevocationDuringIdentityPreflight() {
+        val q = KeyQueryFixture()
+        q.onQuery = {
+            sql.update(
+                "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                q.peerParent,
+            )
+            Result.Success(it)
+        }
+        assertEquals(
+            "collaboration_recipient_unavailable",
+            (q.send() as Result.Failed).failure.code,
+        )
+        assertEquals(0, q.sendCalls.get())
+    }
+
+    @Test
+    fun encryptedToDeviceRequiresOwnPublicationAndRejectsPartialRecipientBatches() {
+        val pending = KeyQueryFixture(publishedSender = false)
+        assertEquals(
+            "collaboration_device_keys_required",
+            (pending.send() as Result.Failed).failure.code,
+        )
+        assertEquals(0, pending.sendCalls.get())
+        val q = KeyQueryFixture()
+        val input =
+            CollaborationToDevice(
+                "fixture-mixed",
+                mapOf(
+                    q.peerKeys.userId to
+                        mapOf(
+                            q.peerKeys.deviceId to q.envelope(),
+                            collaborationMatrixDeviceId(UUID.randomUUID()) to q.envelope(),
+                        )
+                ),
+            )
+        assertEquals(
+            "collaboration_recipient_unavailable",
+            (q.send(input) as Result.Failed).failure.code,
+        )
+        assertEquals(0, q.calls.get())
+        assertEquals(0, q.sendCalls.get())
+    }
+
+    private class KeyQueryFixture(
+        published: Boolean = true,
+        paired: Boolean = true,
+        publishedSender: Boolean = true,
+    ) {
         val upload = KeyUploadFixture()
         val company = requireNotNull(upload.g.f.actor.companyId)
         val peer = upload.g.f.peer("Fictional key recipient")
@@ -2159,6 +2307,9 @@ class NativeCollaborationRegistrationTest {
             >()
         val calls = AtomicInteger()
         val claimCalls = AtomicInteger()
+        val sendCalls = AtomicInteger()
+        var sent: CollaborationToDevice? = null
+        var onSend: (() -> Result<Unit>)? = null
         var claimed: CollaborationMatrixKeyClaim? = null
         var onClaim:
             ((CollaborationMatrixKeyClaimResult) -> Result<CollaborationMatrixKeyClaimResult>)? =
@@ -2220,10 +2371,31 @@ class NativeCollaborationRegistrationTest {
                     return onQuery?.invoke(result) ?: Result.Success(result)
                 }
             }
-        private val command = upload.g.f.matrixIdentity(upload.matrix, providerKeys = provider)
+        private val sender =
+            object : CollaborationMatrixToDeviceRepository {
+                override fun send(
+                    request: CollaborationToDevice,
+                    token: String,
+                    deadline: Instant,
+                ): Result<Unit> {
+                    assertFalse(
+                        org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()
+                    )
+                    sendCalls.incrementAndGet()
+                    sent = request
+                    return onSend?.invoke() ?: Result.Success(Unit)
+                }
+            }
+        private val command =
+            upload.g.f.matrixIdentity(
+                upload.matrix,
+                providerKeys = provider,
+                providerToDevice = sender,
+            )
 
         init {
-            assertInstanceOf(Result.Success::class.java, upload.upload())
+            if (publishedSender) assertInstanceOf(Result.Success::class.java, upload.upload())
             keys[upload.keys.userId to upload.keys.deviceId] = upload.keys.device
             val enrolled = enrollPeer(published)
             peerParent = enrolled.first
@@ -2294,6 +2466,23 @@ class NativeCollaborationRegistrationTest {
             keys[key.userId to key.deviceId] = key.device
             return parent to key
         }
+
+        fun envelope() =
+            CollaborationOlmEnvelope(
+                upload.keys.device.keys.getValue("curve25519:${upload.keys.deviceId}"),
+                peerKeys.device.keys.getValue("curve25519:${peerKeys.deviceId}"),
+                "ZmljdGlvbmFsLW9wYXF1ZS1jaXBoZXJ0ZXh0",
+                0,
+                "fictional-olm-message",
+            )
+
+        fun send(
+            input: CollaborationToDevice =
+                CollaborationToDevice(
+                    "fictional-transaction",
+                    mapOf(peerKeys.userId to mapOf(peerKeys.deviceId to envelope())),
+                )
+        ) = command.sendToDevice(upload.tokens.accessToken, UUID.randomUUID(), input)
 
         fun claim(
             input: CollaborationMatrixKeyClaim =
@@ -4304,6 +4493,8 @@ class NativeCollaborationRegistrationTest {
             serverName: String = "proof.invalid",
             providerKeys: CollaborationMatrixKeyRepository =
                 DisabledCollaborationMatrixKeyRepository(),
+            providerToDevice: CollaborationMatrixToDeviceRepository =
+                DisabledCollaborationMatrixToDeviceRepository(),
             keyStore: CollaborationDeviceKeyRepository = deviceKeys,
         ) =
             AccessNativeCollaborationMatrixDevice(
@@ -4313,6 +4504,7 @@ class NativeCollaborationRegistrationTest {
                 matrix,
                 keyStore,
                 providerKeys,
+                providerToDevice,
                 recipients,
                 direct,
                 sessions,

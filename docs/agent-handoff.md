@@ -102,6 +102,25 @@ Current provider/client evidence:
 
 Current backend implementation:
 
+- Fixed native `PUT /_matrix/client/v3/sendToDevice/m.room.encrypted/{txn}`
+  now validates confirmed sender publication, pinned identities and exact current
+  self/direct device targets. It retains opaque ciphertext, optional Olm message
+  ID and transaction ID; missing/inaccessible targets reject the whole request.
+  Every provider exchange fences current scope outside SQL. [Contract](collaboration/to-device-envelopes.md)
+  and [evidence](measurements/collaboration-to-device-2026-10-31.json) retain final
+  5m37s checks: 31 domain, 167 data, 155 API, 112 worker (one existing skip),
+  format/architecture and both DI graphs. Focused 39s passed after a corrected
+  Int/Long reader compilation error. Actual HRIS-to-Synapse and offline queue
+  routing pass; opaque fixture bytes do not prove Olm decryption. Same-device
+  token rotation deduplicates, but provider restart re-enqueues the same envelope.
+  Its process-local cache retains entries 30–60 minutes, unlike room transaction
+  storage. Prove SDK replay/store recovery through complete HRIS integration.
+  Next implement scoped classic sync/cursor state reacquisition and room content.
+  Pinned Synapse full_state bypasses long polling: never force it on every poll.
+  First verify previously filtered joined/invited rooms when scope expands after
+  an old provider cursor. Sync needs its own bounded long-poll owner and current
+  response admission, independent of short-control permits.
+
 - Native `POST /_matrix/client/v3/keys/claim` now performs pinned device-key
   preflight, then validates signed one-time/fallback keys for explicit eligible
   self/direct devices. Every exchange fences current caller and recipient scope;
@@ -113,8 +132,8 @@ Current backend implementation:
   format/architecture. The 5m19s full run had one existing token-expiry timing
   fixture failure; its corrected complete case passed in 20s. Production source
   stayed unchanged after that full run. Earlier 67s/66s focused runs retain the
-  corrected offline fixture column typo. Next implement encrypted to-device
-  envelopes, scoped classic sync/content and durable product UI/outbox.
+  corrected offline fixture column typo. Encrypted to-device is implemented above;
+  continue scoped classic sync/content and durable product UI/outbox.
 
 - Native `POST /_matrix/client/v3/keys/query` now uses the recipient projection,
   current caller/self/direct authority and immutable self-signed fingerprints.
@@ -128,7 +147,9 @@ Current backend implementation:
   Transport has a one-MiB bound for bulk keys, other responses stay 64 KiB.
   Actual Synapse readback/restart and HTTP framing/auth denial pass; this is not
   yet complete SDK content traffic. Signed key claim is now implemented above;
-  continue scoped to-device/classic sync/content and durable product UI/outbox.
+  continue scoped classic sync/content and durable product UI/outbox. Exact
+  `a33e5a63` hosted `41217138590` passed every job/step; 18 source hashes match
+  the retained evidence.
 
 - Schema **113** adds a read-only public recipient view owned by a restricted
   non-login role. Application-role private device/binding/key RLS stays unchanged.
@@ -276,7 +297,7 @@ Current backend implementation:
   graph was exercised in both runtimes. Exact `05685bf2` hosted control
   [41210683028](https://github.com/fajarxfce/hris-platform/actions/runs/41210683028)
   passed every job and step; retained in the measurement. No product rollout. Query and claim are implemented above;
-  to-device, room/history and classic/native sync remain closed.
+  encrypted to-device is implemented above; room/history and classic/native sync remain closed.
 
 [Identity evidence](measurements/collaboration-gateway-identity-2026-10-31.json)
 records 148 passing API cases, 77 data cases, fourteen domain cases and the full
@@ -324,8 +345,8 @@ Next implementation:
 2. Schema-111 storage `71ad7c81` passed all jobs/steps in [41205061024](https://github.com/fajarxfce/hris-platform/actions/runs/41205061024).
    Room setup/worker `f104f097` passed every job/step in `41206499276`. Own-device
    key gateway `05685bf2` passed every step in `41210683028`; schema 112 `966dee38` passed all hosted
-   steps in `41208833880`. Scoped peer key query/claim are implemented above; continue encrypted
-   to-device traffic. Offline recipient eligibility must not require a fresh short
+   steps in `41208833880`. Scoped peer key query/claim and encrypted to-device are implemented above; continue
+   classic sync and content. Offline recipient eligibility must not require a fresh short
    access token; retain current device/company/security revocation checks. Continue
    native/classic sync and content integration using the
    [typed adapter and invited-history policy](collaboration/matrix-room-adapter.md);

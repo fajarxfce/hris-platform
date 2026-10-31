@@ -6,6 +6,7 @@ import dev.fajar.hris.collaboration.data.matrix.*
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixKeyRepository
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRepository
 import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRoomRepository
+import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixToDeviceRepository
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixDirectRoom
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyClaim
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyQuery
@@ -13,6 +14,8 @@ import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixKeyUpload
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixLogin
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixRoomCreation
 import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixRoomSetting
+import dev.fajar.hris.collaboration.domain.entities.CollaborationOlmEnvelope
+import dev.fajar.hris.collaboration.domain.entities.CollaborationToDevice
 import dev.fajar.hris.collaboration.domain.policies.*
 import dev.fajar.hris.core.domain.Result
 import java.net.InetSocketAddress
@@ -31,6 +34,50 @@ import org.junit.jupiter.api.Test
 import tools.jackson.databind.json.JsonMapper
 
 class MatrixProviderTransportTest {
+    @Test
+    fun encryptedToDevicePreservesFixedRouteAndEnvelopeBeyondKeyRequestSizeBound() {
+        Fixture().use { f ->
+            val key = MatrixKeyFixture(f.userId, collaborationMatrixDeviceId(f.login.deviceId))
+            val curve = key.device.keys.getValue("curve25519:${key.deviceId}")
+            val content =
+                CollaborationOlmEnvelope(curve, curve, "A".repeat(65536), 0, "fixture-message")
+            val send =
+                CollaborationToDevice(
+                    "fixture~transaction",
+                    mapOf(key.userId to mapOf(key.deviceId to content)),
+                )
+            var response = "{}"
+            f.handler = { exchange ->
+                assertEquals("PUT", exchange.requestMethod)
+                assertEquals(
+                    "/_matrix/client/v3/sendToDevice/m.room.encrypted/fixture~transaction",
+                    exchange.requestURI.path,
+                )
+                assertNull(exchange.requestURI.rawQuery)
+                val bytes = exchange.requestBody.readNBytes(1_048_577)
+                assertTrue(bytes.size > 65536)
+                val body =
+                    f.json.readTree(bytes).path("messages").path(key.userId).path(key.deviceId)
+                assertEquals("m.olm.v1.curve25519-aes-sha2", body.path("algorithm").asString())
+                assertEquals(
+                    content.body,
+                    body.path("ciphertext").path(curve).path("body").asString(),
+                )
+                assertEquals("fixture-message", body.path("org.matrix.msgid").asString())
+                f.respond(exchange, response)
+            }
+            val repo = InternalCollaborationMatrixToDeviceRepository(f.source)
+            fun deliver() = repo.send(send, "fictional-access-token", Instant.now().plusSeconds(10))
+            assertEquals(Result.Success(Unit), deliver())
+            for (bad in listOf("[]", "{\"unexpected\":true}", "x".repeat(65537))) {
+                response = bad
+                assertInstanceOf(Result.Failed::class.java, deliver())
+            }
+            response = "{}"
+            assertEquals(Result.Success(Unit), deliver())
+        }
+    }
+
     @Test
     fun claimUsesFixedSignedExplicitTransportAndRejectsForeignOrMalformedResponses() {
         Fixture().use { f ->

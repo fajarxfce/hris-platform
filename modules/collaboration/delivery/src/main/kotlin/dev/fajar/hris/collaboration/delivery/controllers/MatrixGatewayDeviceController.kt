@@ -4,6 +4,7 @@ import dev.fajar.hris.collaboration.delivery.matrix.matrixGatewayProblem
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyClaimRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyQueryRequest
 import dev.fajar.hris.collaboration.delivery.requests.matrixKeyUploadRequest
+import dev.fajar.hris.collaboration.delivery.requests.matrixToDeviceRequest
 import dev.fajar.hris.collaboration.domain.policies.collaborationGatewayAuthenticationRequired
 import dev.fajar.hris.collaboration.domain.usecases.AccessNativeCollaborationMatrixDevice
 import dev.fajar.hris.core.domain.Result
@@ -13,7 +14,9 @@ import jakarta.servlet.http.HttpServletRequest
 import java.time.Duration
 import java.util.UUID
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RestController
 import tools.jackson.core.StreamReadConstraints
 import tools.jackson.core.StreamReadFeature
@@ -23,14 +26,17 @@ import tools.jackson.databind.JsonNode
 import tools.jackson.databind.json.JsonMapper
 
 @RestController
-class MatrixGatewayKeyController(private val device: AccessNativeCollaborationMatrixDevice) {
-    private val parser =
+class MatrixGatewayDeviceController(private val device: AccessNativeCollaborationMatrixDevice) {
+    private val parser = parser(512)
+    private val envelopeParser = parser(65536)
+
+    private fun parser(maximumStringLength: Int) =
         JsonMapper.builder(
                 JsonFactory.builder()
                     .streamReadConstraints(
                         StreamReadConstraints.builder()
                             .maxNestingDepth(8)
-                            .maxStringLength(512)
+                            .maxStringLength(maximumStringLength)
                             .maxNumberLength(16)
                             .build()
                     )
@@ -92,9 +98,25 @@ class MatrixGatewayKeyController(private val device: AccessNativeCollaborationMa
             }
         }
 
+    @PutMapping("/_matrix/client/v3/sendToDevice/m.room.encrypted/{transactionId}")
+    fun send(
+        @PathVariable transactionId: String,
+        request: HttpServletRequest,
+    ): ResponseEntity<Any> =
+        keyRequest(
+            request,
+            { matrixToDeviceRequest(transactionId, it) },
+            1_048_576,
+            envelopeParser,
+        ) { token, correlation, envelope ->
+            device.sendToDevice(token, correlation, envelope).map { emptyMap<String, Any>() }
+        }
+
     private fun <T> keyRequest(
         request: HttpServletRequest,
         decode: (JsonNode) -> T,
+        maximumBytes: Int = 65536,
+        reader: JsonMapper = parser,
         operation: (String, UUID, T) -> Result<Map<String, Any>>,
     ): ResponseEntity<Any> {
         if (request.queryString != null) return problem(400, "M_INVALID_PARAM")
@@ -108,14 +130,17 @@ class MatrixGatewayKeyController(private val device: AccessNativeCollaborationMa
                     false
         )
             return problem(415, "M_NOT_JSON")
-        if (request.contentLengthLong > 65536) return problem(413, "M_TOO_LARGE")
+        if (request.contentLengthLong > maximumBytes) return problem(413, "M_TOO_LARGE")
         val input =
             try {
                 val bytes =
-                    BoundedRequestStream(request.inputStream, 65536, Duration.ofSeconds(2)).use {
-                        it.readNBytes(65537)
-                    }
-                decode(requireNotNull(parser.readTree(bytes)))
+                    BoundedRequestStream(
+                            request.inputStream,
+                            maximumBytes.toLong(),
+                            Duration.ofSeconds(2),
+                        )
+                        .use { it.readNBytes(maximumBytes + 1) }
+                decode(requireNotNull(reader.readTree(bytes)))
             } catch (_: RequestBodyTooLargeException) {
                 return problem(413, "M_TOO_LARGE")
             } catch (_: RequestBodyTimeoutException) {
@@ -147,5 +172,5 @@ class MatrixGatewayKeyController(private val device: AccessNativeCollaborationMa
     private fun problem(status: Int, code: String): ResponseEntity<Any> =
         ResponseEntity.status(status)
             .header("Cache-Control", "no-store")
-            .body(mapOf("errcode" to code, "error" to "Invalid Matrix key request."))
+            .body(mapOf("errcode" to code, "error" to "Invalid Matrix device request."))
 }

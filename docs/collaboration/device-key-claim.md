@@ -43,5 +43,7 @@ timeout is 1,000 ms. These limits are not a large-group throughput guarantee.
 
 Responses expose only validated public `one_time_keys` and empty `failures` with
 `Cache-Control: no-store`. Participant private keys remain in SDK stores. Claim
-and device discovery do not establish to-device delivery, scoped sync/history,
-durable outbox, recipient decryption or product chat acceptance.
+and device discovery do not establish recipient delivery. The fixed
+[encrypted envelope route](to-device-envelopes.md) provides provider queue acceptance.
+Scoped sync/history, durable product outbox and recipient decryption/acknowledgement
+still need integration before product chat acceptance.

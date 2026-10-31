@@ -236,11 +236,11 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         contentType: String = "application/json",
         chunked: Boolean = false,
         path: String = "upload",
+        route: String = "keys/$path",
+        method: String = "POST",
     ): HttpResponse<String> {
         val builder =
-            HttpRequest.newBuilder(
-                    URI("http://127.0.0.1:$port/_matrix/client/v3/keys/$path$suffix")
-                )
+            HttpRequest.newBuilder(URI("http://127.0.0.1:$port/_matrix/client/v3/$route$suffix"))
                 .timeout(Duration.ofSeconds(15))
                 .header("Content-Type", contentType)
         token?.let { builder.header("Authorization", "Bearer $it") }
@@ -251,7 +251,7 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                 HttpRequest.BodyPublishers.ofInputStream { java.io.ByteArrayInputStream(bytes) }
             else HttpRequest.BodyPublishers.ofByteArray(bytes)
         return n.fixture.browser.send(
-            builder.POST(publisher).build(),
+            builder.method(method, publisher).build(),
             HttpResponse.BodyHandlers.ofString(),
         )
     }
@@ -261,6 +261,116 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
             "@hris_${n.fixture.company.toString().replace("-", "")}_${n.fixture.account.toString().replace("-", "")}:matrix.example.test",
             "HRIS_${device.toString().replace("-", "")}",
         )
+
+    private fun encryptedBody(key: KeyPayload): String {
+        val own =
+            json
+                .valueToTree<tools.jackson.databind.JsonNode>(key.body())
+                .path("device_keys")
+                .path("keys")
+                .path("curve25519:${key.device}")
+                .asString()
+        return json.writeValueAsString(
+            mapOf(
+                "messages" to
+                    mapOf(
+                        key.user to
+                            mapOf(
+                                key.device to
+                                    mapOf(
+                                        "algorithm" to "m.olm.v1.curve25519-aes-sha2",
+                                        "sender_key" to own,
+                                        "ciphertext" to
+                                            mapOf(
+                                                own to mapOf("type" to 0, "body" to "ZmljdGlvbmFs")
+                                            ),
+                                        "org.matrix.msgid" to "fixture-olm-message",
+                                    )
+                            )
+                    )
+            )
+        )
+    }
+
+    @Test
+    fun encryptedToDeviceUsesOpaqueAuthorityAndPreservesBoundedCiphertextOverHttp() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val key = fixtureKeys(n, device)
+        val body = encryptedBody(key)
+        fun send(auth: String?) =
+            uploadKeys(
+                n,
+                auth,
+                body,
+                chunked = true,
+                route = "sendToDevice/m.room.encrypted/fixture-txn",
+                method = "PUT",
+            )
+        for (invalid in listOf(null, n.access, "fictional-provider-token")) assertEquals(
+            401,
+            send(invalid).statusCode(),
+        )
+        assertEquals(200, uploadKeys(n, token, json.writeValueAsString(key.body())).statusCode())
+        repeat(2) {
+            val response = send(token)
+            assertEquals(200, response.statusCode(), response.body())
+            assertEquals("{}", response.body())
+            assertEquals("no-store", response.headers().firstValue("Cache-Control").orElse(""))
+            assertEquals(json.readTree(body), provider.lastEnvelope.get())
+        }
+    }
+
+    @Test
+    fun encryptedToDeviceRejectsMalformedAndPlaintextRequestsThenFencesNativeRevocation() {
+        val n = native()
+        val (device, token) = enroll(n)
+        val key = fixtureKeys(n, device)
+        val body = encryptedBody(key)
+        val before = provider.encryptedSends.get()
+        fun send(value: String, route: String = "sendToDevice/m.room.encrypted/fixture-txn") =
+            uploadKeys(n, token, value, route = route, method = "PUT")
+        for (invalid in
+            listOf(
+                "{}",
+                "{\"messages\":{},\"messages\":{}}",
+                body.replace("m.olm.v1.curve25519-aes-sha2", "m.megolm.v1.aes-sha2"),
+                body.replace("ZmljdGlvbmFs", "plaintext!"),
+                body.replace("matrix.example.test", "foreign.example.test"),
+                body.replace(key.device, "*"),
+                body + "{}",
+            )) {
+            assertEquals(400, send(invalid).statusCode())
+        }
+        assertTrue(send(body, "sendToDevice/m.room_key/fixture-txn").statusCode() in 400..499)
+        assertEquals(
+            413,
+            uploadKeys(
+                    n,
+                    token,
+                    " ".repeat(1_048_577),
+                    chunked = true,
+                    route = "sendToDevice/m.room.encrypted/fixture-txn",
+                    method = "PUT",
+                )
+                .statusCode(),
+        )
+        assertEquals(before, provider.encryptedSends.get())
+        assertEquals(200, uploadKeys(n, token, json.writeValueAsString(key.body())).statusCode())
+        provider.onEncryptedSend.set {
+            database()
+                .update(
+                    "update native_sessions set revoked_at=now(),version=version+1 where id=?",
+                    n.session,
+                )
+        }
+        try {
+            val response = send(body)
+            assertEquals(401, response.statusCode(), response.body())
+        } finally {
+            provider.onEncryptedSend.set(null)
+        }
+    }
 
     @Test
     fun keyClaimRequiresOpaqueAuthorityAndPreservesSignedFieldsAcrossChunkedHttp() {
@@ -666,6 +776,9 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
         val keyUploads = AtomicInteger()
         val keyQueries = AtomicInteger()
         val keyClaims = AtomicInteger()
+        val encryptedSends = AtomicInteger()
+        val onEncryptedSend = AtomicReference<(() -> Unit)?>(null)
+        val lastEnvelope = AtomicReference<tools.jackson.databind.JsonNode>()
         val onKeyClaim = AtomicReference<(() -> Unit)?>(null)
         private val claimable =
             ConcurrentHashMap<Pair<String, String>, tools.jackson.databind.JsonNode>()
@@ -742,6 +855,26 @@ class NativeCollaborationMatrixIdentityHttpTest : NativeCollaborationApiFixture(
                                                     ?: emptyMap())
                                         )
                                 )
+                            }
+                            "/_matrix/client/v3/sendToDevice/m.room.encrypted/fixture-txn" -> {
+                                encryptedSends.incrementAndGet()
+                                assertEquals("PUT", request.requestMethod)
+                                val identity =
+                                    requireNotNull(
+                                        credentials[
+                                            request.requestHeaders
+                                                .getFirst("Authorization")
+                                                .removePrefix("Bearer ")]
+                                    )
+                                val body =
+                                    parser.readTree(request.requestBody.readNBytes(1_048_577))
+                                assertEquals(
+                                    setOf(identity["user_id"]),
+                                    body.path("messages").propertyNames().toSet(),
+                                )
+                                lastEnvelope.set(body)
+                                onEncryptedSend.getAndSet(null)?.invoke()
+                                emptyMap<String, Any>()
                             }
                             "/_matrix/client/v3/keys/claim" -> {
                                 keyClaims.incrementAndGet()

@@ -115,7 +115,8 @@ for caching/diagnostics: no-store and explicit redacted representations.
 An ordered stateless Matrix security chain bypasses native-bearer/cookie parsing.
 POST refresh, the fixed GET identity operation described below and the typed
 [key upload](device-key-upload.md), [query](device-key-query.md) and
-[claim](device-key-claim.md) routes are permitted. All other `/_matrix/**` and `/_synapse/**` routes, including login, logout, admin,
+[claim](device-key-claim.md) routes and fixed
+[encrypted to-device PUT](to-device-envelopes.md) are permitted. All other `/_matrix/**` and `/_synapse/**` routes, including login, logout, admin,
 federation and sync, are denied. This is not yet a usable SDK sync/content gateway.
 
 The worker owns one fixed-delay cleanup task, one timer thread and at most one

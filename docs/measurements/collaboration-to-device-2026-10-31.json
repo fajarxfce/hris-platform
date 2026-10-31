@@ -1,0 +1,127 @@
+{
+  "date": "2026-10-31",
+  "scope": "Fixed native self/direct encrypted to-device envelopes; schema remains 113",
+  "baseCommit": "42dda378459aac639263838b03b906060bf60e45",
+  "validation": [
+    {
+      "seconds": 12,
+      "result": "compile_failed",
+      "reason": "New bounded request reader passed a variable Int where Long is required; corrected toLong without changing the bounds."
+    },
+    {
+      "seconds": 39,
+      "result": "passed",
+      "tests": {
+        "modules/collaboration/domain": {
+          "tests": 31,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modules/collaboration/data": {
+          "tests": 26,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server": {
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "scope": "Focused authority, policy, transport, actual provider and HTTP checks plus format/architecture."
+    },
+    {
+      "seconds": 337,
+      "result": "passed",
+      "tests": {
+        "modules/collaboration/domain": {
+          "tests": 31,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modules/collaboration/data": {
+          "tests": 167,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/server": {
+          "tests": 155,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "apps/worker": {
+          "tests": 112,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1
+        }
+      },
+      "command": "./gradlew formatCheck architectureCheck :modules:collaboration:domain:test :modules:collaboration:data:test :apps:server:test --tests *NativeCollaboration*Test --tests *ApiContractHttpTest --tests *ClientPolicy*Test --tests *ApprovalReadCompletionAssuranceTest --tests *PeopleReadCompletionTest :apps:worker:test",
+      "scope": "Final source including own-publication/partial-batch rejection and actual HRIS-to-Synapse send; both shared DI contexts."
+    }
+  ],
+  "verified": [
+    "Confirmed own publication and pinned sender/recipient public identities",
+    "Canonical explicit self/direct targets and no partial discard reported as success",
+    "Opaque Olm body/type/optional org.matrix.msgid retained with original transaction ID",
+    "Expired short access and old MFA of otherwise eligible offline peer retained",
+    "Wrong sender/recipient curve keys and removed/unpublished/unknown recipients rejected before send",
+    "Recipient revocation during preflight prevents send; late success/failure withheld after removal",
+    "Native revocation after provider acceptance returns no success response",
+    "One-MiB request with per-envelope/aggregate body bounds; 64-KiB provider response bound and release after failures",
+    "Actual Synapse offline queue, same-device bearer rotation and immediate replay deduplication",
+    "Actual Synapse restart allows identical envelope to enqueue after previous sync acknowledgement",
+    "Actual HRIS native admission through PostgreSQL and private credential to Synapse",
+    "Shared API/worker DI, format and architecture"
+  ],
+  "providerReplay": {
+    "version": "1.164.1",
+    "key": "path, user and device",
+    "storage": "process-local HttpTransactionCache",
+    "cleanupRetentionMinutes": {
+      "minimum": 30,
+      "maximum": 60
+    },
+    "restartReplayObserved": true,
+    "references": [
+      "https://github.com/element-hq/synapse/blob/v1.164.1/synapse/rest/client/sendtodevice.py",
+      "https://github.com/element-hq/synapse/blob/v1.164.1/synapse/rest/client/transactions.py"
+    ]
+  },
+  "sourceSha256": {
+    "apps/server/src/test/kotlin/dev/fajar/hris/NativeCollaborationMatrixIdentityHttpTest.kt": "65f9da0286eb6d6b6df5a9b410a32c333b9e00254237a5e35ecc2fbe698e8360",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/di/CollaborationConfiguration.kt": "41d78254142eba9122b5435fc415eaa94f2e7118bc42146cac96e6b50f402490",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/HttpMatrixClientDataSource.kt": "0dd64d28d39881a3b7883f9299e07543bc8cf41bc0b0d8969887f5522497565c",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixToDeviceDataSource.kt": "208ca68503fa78b8b70598ea15f68a4038a8e023db1257e0abd2092417b590bc",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/DisabledCollaborationMatrixToDeviceRepository.kt": "2d2a26553812f541ac76c8324826c01e2ae912be80074a35a6d51210d53ac9f9",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixToDeviceRepository.kt": "34fcc5227c37dea6d9111638c89cfb37f4a035d0705f3d5f77a64399b182ca9f",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderTransportTest.kt": "e83f2fadcfaf59b1eb51ab1d96d3852b8147b4973fea600c66f7ef97f24dbf5b",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixToDeviceProviderInteropTest.kt": "68470bdc681411b10881f0f0eff46698fc3c822508b22f43431c6f4ea73e61b1",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/NativeCollaborationRegistrationTest.kt": "f8ec7ae24997e88872744b4e5d0f091f60b7dfaf591154821718cd0a4f19a09e",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/controllers/MatrixGatewayDeviceController.kt": "3238c0ae6133f73e257db2f769ac6be6e82915727e28203eda4be10a1ebffaf0",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/di/CollaborationWebConfiguration.kt": "46164036854f3f95d866995a305413fc3e84d5b407c1a8466051e02f8ca63085",
+    "modules/collaboration/delivery/src/main/kotlin/dev/fajar/hris/collaboration/delivery/requests/MatrixToDeviceRequest.kt": "0adca6480a173eb7e11d9c2adfb48c3e0c8b5b251f97697fa036d8fd6905d178",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationToDevice.kt": "39bdaff50d83180cc7a557b2a547ada45b5b9d19c076b0f7550733da6b38209b",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationToDevicePolicy.kt": "0e8e60b742e36a6d8194b74652ad07cd0a9f098bc9790621f2e53e1795d401ce",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationMatrixToDeviceRepository.kt": "073177660c89b2b73e21b2eb2c937002912e68a6e4834e585f64af58c239e640",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/usecases/AccessNativeCollaborationMatrixDevice.kt": "723c9905840fa069462f24bbd01e2599de1654b189cd3cfc9b127a0fd491786a",
+    "modules/collaboration/domain/src/test/kotlin/dev/fajar/hris/collaboration/domain/CollaborationToDevicePolicyTest.kt": "d54ec44dc9bafd334d8891e387d444003a5ba628baee48dbcb94f267fbd57ef1"
+  },
+  "limitations": [
+    "Transport fixture uses opaque fictional bytes; it does not prove valid Olm decryption or durable recipient acknowledgement",
+    "No indefinite provider deduplication or rollback of an already queued external envelope",
+    "Native self/direct only; no plaintext key/secret/verification routes, browser parent or group/context authority",
+    "Scoped sync/history, full SDK gateway integration, durable client UI/outbox and replay/store recovery remain to implement",
+    "No performance/capacity acceptance, live deployment, phone action or Starter port",
+    "One existing opt-in elapsed retention worker test remains skipped"
+  ],
+  "hosted": {
+    "status": "inspect exact commit after push"
+  }
+}

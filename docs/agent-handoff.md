@@ -32,8 +32,13 @@ Current provider/client evidence:
   change. Send commit c3b0955d CI 41229637604 passed both jobs/all 23 steps and
   all 18 source hashes were verified. **Continue product session/store ownership,
   durable SDK queue restart/logical reconciliation, UI and the full P0–P8 plan.**
-  Commit/push the matching Mobile proof and its pinned HRIS CI fixture next;
-  this infrastructure checkpoint accepts no product feature.
+  Matching Mobile `538a1827` is pushed. Hosted HRIS SDK run 41231913617 passed
+  all steps: one real SDK case in 63.437s, APK `9900b041`, cleanup true; all
+  twelve Mobile hashes and ten Platform hashes match their commits. Platform
+  control 41231798310 passed both jobs/all steps. Results and trace are retained.
+  Mobile's product `features/collaboration/{domain,data}` setup adapter/use case
+  is now in progress: focused seven transport cases passed in 39s; full root and
+  new setup-ownership checks are running. This accepts no product feature.
 
 - Native DIRECT encrypted sends now use exact owned-room scope, confirmed sender
   publication and current eligible peer devices, preserving offline short-token

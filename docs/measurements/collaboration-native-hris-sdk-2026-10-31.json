@@ -543,5 +543,827 @@
   "remaining": [
     "Product SDK session/store ownership and durable queue restart/reconciliation",
     "Apple, web HRIS admission, verified multiple devices, notifications, media, calls/meetings and all remaining P0\u2013P8 gates"
-  ]
+  ],
+  "hostedControl": {
+    "commit": "45ccd56f29871a3474aca676be3464cc7d43bee4",
+    "runId": 41231798310,
+    "sourceHashesVerified": 10,
+    "result": {
+      "conclusion": "success",
+      "jobs": [
+        {
+          "completedAt": "2026-10-31T19:12:51Z",
+          "conclusion": "success",
+          "databaseId": 124627372538,
+          "name": "authority-and-storage",
+          "startedAt": "2026-10-31T18:56:19Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-31T18:56:23Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-31T18:56:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:56:25Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-31T18:56:23Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:56:26Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@v4",
+              "number": 3,
+              "startedAt": "2026-10-31T18:56:25Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:56:29Z",
+              "conclusion": "success",
+              "name": "Run gradle/actions/setup-gradle@v4",
+              "number": 4,
+              "startedAt": "2026-10-31T18:56:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:56:33Z",
+              "conclusion": "success",
+              "name": "Check boundaries and recovery schema gate",
+              "number": 5,
+              "startedAt": "2026-10-31T18:56:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:06:29Z",
+              "conclusion": "success",
+              "name": "Verify policies, actual PostgreSQL isolation and backup recovery",
+              "number": 6,
+              "startedAt": "2026-10-31T18:56:33Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:12:47Z",
+              "conclusion": "success",
+              "name": "Verify API contracts, native transport and shared worker context",
+              "number": 7,
+              "startedAt": "2026-10-31T19:06:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:12:48Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@v4",
+              "number": 8,
+              "startedAt": "2026-10-31T19:12:47Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:12:49Z",
+              "conclusion": "success",
+              "name": "Post Run gradle/actions/setup-gradle@v4",
+              "number": 14,
+              "startedAt": "2026-10-31T19:12:48Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:12:49Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@v4",
+              "number": 15,
+              "startedAt": "2026-10-31T19:12:49Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:12:49Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 16,
+              "startedAt": "2026-10-31T19:12:49Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:12:49Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 17,
+              "startedAt": "2026-10-31T19:12:49Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41231798310/job/124627372538"
+        },
+        {
+          "completedAt": "2026-10-31T18:57:24Z",
+          "conclusion": "success",
+          "databaseId": 124627372702,
+          "name": "company-settings",
+          "startedAt": "2026-10-31T18:56:19Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-31T18:56:20Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-31T18:56:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:56:23Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-31T18:56:20Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:56:25Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-node@v4",
+              "number": 3,
+              "startedAt": "2026-10-31T18:56:23Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:56:38Z",
+              "conclusion": "success",
+              "name": "Run npm ci --ignore-scripts --no-audit --no-fund",
+              "number": 4,
+              "startedAt": "2026-10-31T18:56:25Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:56:42Z",
+              "conclusion": "success",
+              "name": "Run npx tsc --noEmit",
+              "number": 5,
+              "startedAt": "2026-10-31T18:56:38Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:56:48Z",
+              "conclusion": "success",
+              "name": "Run npx vitest run src/features/administration src/features/jobs",
+              "number": 6,
+              "startedAt": "2026-10-31T18:56:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:57:05Z",
+              "conclusion": "success",
+              "name": "Run npx playwright install --with-deps chromium",
+              "number": 7,
+              "startedAt": "2026-10-31T18:56:48Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:57:22Z",
+              "conclusion": "success",
+              "name": "Run npx playwright test tests/client-policy.spec.ts tests/client-policy-editor.spec.ts",
+              "number": 8,
+              "startedAt": "2026-10-31T18:57:05Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:57:22Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-node@v4",
+              "number": 15,
+              "startedAt": "2026-10-31T18:57:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:57:22Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 16,
+              "startedAt": "2026-10-31T18:57:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:57:22Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 17,
+              "startedAt": "2026-10-31T18:57:22Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/fajarxfce/hris-platform/actions/runs/41231798310/job/124627372702"
+        }
+      ],
+      "status": "completed"
+    }
+  },
+  "hostedNative": {
+    "mobileCommit": "538a182723861b8124df7fa9a5c94ec5acfd9ffc",
+    "platformCommit": "45ccd56f29871a3474aca676be3464cc7d43bee4",
+    "runId": 41231913617,
+    "sourceHashesVerified": 12,
+    "result": {
+      "conclusion": "success",
+      "jobs": [
+        {
+          "completedAt": "2026-10-31T19:12:05Z",
+          "conclusion": "success",
+          "databaseId": 124627718966,
+          "name": "android-hris",
+          "startedAt": "2026-10-31T18:57:57Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-31T18:57:59Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-31T18:57:58Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:58:01Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "startedAt": "2026-10-31T18:57:59Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:58:03Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@v4",
+              "number": 3,
+              "startedAt": "2026-10-31T18:58:01Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:58:03Z",
+              "conclusion": "success",
+              "name": "Run actions/setup-java@v4",
+              "number": 4,
+              "startedAt": "2026-10-31T18:58:03Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:58:06Z",
+              "conclusion": "success",
+              "name": "Run gradle/actions/setup-gradle@v4",
+              "number": 5,
+              "startedAt": "2026-10-31T18:58:03Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:58:14Z",
+              "conclusion": "success",
+              "name": "Run android-actions/setup-android@v3",
+              "number": 6,
+              "startedAt": "2026-10-31T18:58:06Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T18:58:16Z",
+              "conclusion": "success",
+              "name": "Run sdkmanager 'platforms;android-36' 'build-tools;36.0.0'",
+              "number": 7,
+              "startedAt": "2026-10-31T18:58:14Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:03:22Z",
+              "conclusion": "success",
+              "name": "Build isolated Android SDK fixture before starting the emulator",
+              "number": 8,
+              "startedAt": "2026-10-31T18:58:16Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:08:50Z",
+              "conclusion": "success",
+              "name": "Compile HRIS fixture and verify driver cleanup",
+              "number": 9,
+              "startedAt": "2026-10-31T19:03:22Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:08:50Z",
+              "conclusion": "success",
+              "name": "Enable KVM for the owned runner emulator",
+              "number": 10,
+              "startedAt": "2026-10-31T19:08:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:12:01Z",
+              "conclusion": "success",
+              "name": "Run reactivecircus/android-emulator-runner@v2",
+              "number": 11,
+              "startedAt": "2026-10-31T19:08:50Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:12:02Z",
+              "conclusion": "success",
+              "name": "Run actions/upload-artifact@v4",
+              "number": 12,
+              "startedAt": "2026-10-31T19:12:01Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:12:03Z",
+              "conclusion": "success",
+              "name": "Post Run gradle/actions/setup-gradle@v4",
+              "number": 21,
+              "startedAt": "2026-10-31T19:12:02Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:12:03Z",
+              "conclusion": "success",
+              "name": "Post Run actions/setup-java@v4",
+              "number": 22,
+              "startedAt": "2026-10-31T19:12:03Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:12:03Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 23,
+              "startedAt": "2026-10-31T19:12:03Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:12:03Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@v4",
+              "number": 24,
+              "startedAt": "2026-10-31T19:12:03Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-31T19:12:03Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 25,
+              "startedAt": "2026-10-31T19:12:03Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/fajarxfce/hris-mobile/actions/runs/41231913617/job/124627718966"
+        }
+      ],
+      "status": "completed"
+    },
+    "verification": {
+      "passed": true,
+      "encryptedBothDirections": true,
+      "logicalIdsPreserved": true,
+      "cleanup": true,
+      "artifact": {
+        "apkSha256": "9900b0412c1fbb4ff7440fccbab3dde4bcb57817ffb075fa1809d97afec2aa16",
+        "package": "dev.fajar.hris.collaboration.proof",
+        "avd": "hris-mobile-dev",
+        "androidApi": "35"
+      }
+    },
+    "native": {
+      "passed": true,
+      "cleanup": true,
+      "artifact": {
+        "apkSha256": "9900b0412c1fbb4ff7440fccbab3dde4bcb57817ffb075fa1809d97afec2aa16",
+        "package": "dev.fajar.hris.collaboration.proof",
+        "avd": "hris-mobile-dev",
+        "androidApi": "35"
+      },
+      "diagnostic": {
+        "instrumentationComplete": true,
+        "failureFrames": []
+      },
+      "proof": {
+        "encryptedBothDirections": true,
+        "logicalIdsPreserved": true,
+        "syncMode": "classic",
+        "senderEventId": "$H5jEG8Zxo-nTy7czGEry-jzvlWlFKOGcoVFrjPHbWrY",
+        "recipientEventId": "$xYEwhSlzwJjilsOGsep2aOxhj4g9Mwn4a2sn30OaDd4",
+        "senderTransaction": "6a32992b8c4b4ef3a9bf23c67ca34504",
+        "recipientTransaction": "687f846bfda1429f928ec33c61e68afc"
+      }
+    },
+    "gatewayTrace": [
+      {
+        "method": "GET",
+        "route": "/_matrix/client/versions",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/versions",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/query",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 114,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/query",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 114,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/rooms/_/join",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 2,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/rooms/_/join",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 2,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/upload",
+        "query": [],
+        "unknownQuery": false,
+        "status": 503,
+        "contentLength": 17408,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": "collaboration_provider_busy"
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/upload",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 17408,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "query": [
+          "timeout",
+          "use_state_after"
+        ],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "1000",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/query",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 114,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/upload",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 369,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/upload",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 17408,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "query": [
+          "since",
+          "timeout",
+          "use_state_after"
+        ],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "1000",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "query": [
+          "timeout",
+          "use_state_after"
+        ],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "1000",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/rooms/_/state/_/",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/query",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 114,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/query",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 114,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/upload",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 369,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/rooms/_/members",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/claim",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 191,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "PUT",
+        "route": "/_matrix/client/v3/sendToDevice/m.room.encrypted/_",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 2702,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "query": [
+          "since",
+          "timeout",
+          "use_state_after"
+        ],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "1000",
+        "errorCode": ""
+      },
+      {
+        "method": "POST",
+        "route": "/_matrix/client/v3/keys/upload",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 353,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "query": [
+          "since",
+          "timeout",
+          "use_state_after"
+        ],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "1000",
+        "errorCode": ""
+      },
+      {
+        "method": "PUT",
+        "route": "/_matrix/client/v3/rooms/_/send/m.room.encrypted/_",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 646,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "query": [
+          "since",
+          "timeout",
+          "use_state_after"
+        ],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "1000",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "query": [
+          "since",
+          "timeout",
+          "use_state_after"
+        ],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "1000",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/rooms/_/members",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "PUT",
+        "route": "/_matrix/client/v3/sendToDevice/m.room.encrypted/_",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 2560,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "PUT",
+        "route": "/_matrix/client/v3/rooms/_/send/m.room.encrypted/_",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": 646,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "query": [
+          "since",
+          "timeout",
+          "use_state_after"
+        ],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "1000",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/sync",
+        "query": [
+          "since",
+          "timeout",
+          "use_state_after"
+        ],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "1000",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/rooms/_/event/_",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      },
+      {
+        "method": "GET",
+        "route": "/_matrix/client/v3/rooms/_/event/_",
+        "query": [],
+        "unknownQuery": false,
+        "status": 200,
+        "contentLength": -1,
+        "transferEncoding": false,
+        "timeoutMillis": "absent_or_invalid",
+        "errorCode": ""
+      }
+    ],
+    "suiteSeconds": 63.437
+  }
 }

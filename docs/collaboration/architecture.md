@@ -14,7 +14,11 @@ own PostgreSQL database. Disable public registration/federation and prevent
 clients bypassing HRIS session/company admission. A session broker uses Synapse's
 supported JWT login on an internal path, with subject/audience/expiry checking;
 no HRIS password or Firebase credential is copied into Matrix. Bootstrap never
-creates participant private keys. Revocation admission must not depend solely
+creates participant private keys. Internal provider tokens must expire within ten
+minutes and remain behind the private provider network. A lost/losing issuance
+expires without calling logout: actual Synapse logout deletes the entire device,
+all its tokens and E2EE keys. Only irreversible HRIS device revocation permits
+that deletion; see [transport evidence](../measurements/collaboration-matrix-transport-2026-10-31.json). Revocation admission must not depend solely
 on eventual provisioning cleanup.
 
 The [actual provider proof](provider-proof.md) found that Synapse 1.164.1 accepts

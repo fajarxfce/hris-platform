@@ -171,6 +171,25 @@ This proves the provider mechanism, not HRIS gateway enforcement or product
 Keystore storage. Update Mobile CI's fixed Platform ref to this driver before
 its refresh fixture runs. The emulator is stopped; the phone was untouched.
 
+Internal Matrix transport now exists and passes eight HTTP boundary cases plus
+one real pinned Synapse scenario (35s): deterministic JWT identity, bounded
+nonrefreshable credentials, replacement login with retained signed public keys,
+expiry and terminal deletion. [Transport evidence](measurements/collaboration-matrix-transport-2026-10-31.json)
+retains initial missing-dependency/redundant-cast/formatting failures and the
+corrected passing result. No transport DI/provisioning/gateway is enabled yet.
+
+Critical correction: Synapse `/logout` and its module invalidation API delete the
+whole device and E2EE keys, even with an expired bearer. Never call them to clean
+up a losing or late login; that can destroy the winner. Internal candidates require
+finite expiry (at most ten minutes), stay private and expire if not published.
+Only permanent HRIS device revocation permits `logoutDevice`. Next add persisted
+provider expiry and durable provisioning/fences, then protected gateway and chat.
+Do not repeat or implement the earlier tentative exact-token logout approach.
+
+Mobile native refresh CI `41187875527` passed at `d799e5cf`, using Platform
+`1db0f9fe`: both scenarios in 54.657s with cleanup; Mobile `aeb0f6b5` retains the
+independent source/APK result. All product P0–P8 gates still apply.
+
 The paragraphs below are retained prior-work history. Their old installed build
 2 reference is superseded by Mobile's validated release build 4; consult Mobile's
 current handoff for its artifact/source and future versionCode >= 5.

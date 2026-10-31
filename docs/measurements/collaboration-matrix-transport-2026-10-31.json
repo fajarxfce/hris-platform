@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "kind": "internal_matrix_provider_transport",
+  "productAcceptance": false,
+  "liveRuntimeModified": false,
+  "checks": {
+    "transportScenarios": 8,
+    "actualSynapseScenarios": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "buildElapsedSeconds": 35,
+    "actualSynapseSeconds": 13.299,
+    "format": true,
+    "architecture": true,
+    "ownedContainerNetworkCleanup": true
+  },
+  "providerImage": "ghcr.io/element-hq/synapse:v1.164.1@sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75",
+  "observations": [
+    "Actual JWT login creates the deterministic company/account Matrix user and HRIS device.",
+    "Five-second nonrefreshable tokens expire while replacement credentials retain the same uploaded signed public device keys.",
+    "Logout with the expired old bearer deletes the entire device, replacement credentials and public device keys. It is unsafe compensation for a losing login.",
+    "Malformed, duplicate, trailing, oversized, wrongly encoded responses and unbounded provider token lifetimes are rejected.",
+    "Redirects are not followed; body reception has a deadline and cancellation; no automatic provider retry."
+  ],
+  "initialFailures": [
+    "Missing explicit Jackson dependency failed compilation; added existing catalog alias.",
+    "Werror rejected redundant casts; removed casts.",
+    "Formatter rejected the cast-removal layout; formatted and reran successfully."
+  ],
+  "designCorrection": "Losing internal candidates remain unpublished behind the private provider network and expire within ten minutes. Device logout requires irreversible HRIS revocation. Provider HTTP success still requires a use-case admission/fence before publication.",
+  "limits": [
+    "Transport is not yet wired to provisioning or a public gateway.",
+    "Schema 106 still needs a migration to persist token expiry; live runtime remains schema 103.",
+    "Bounded provider lifetime must also be configured and verified on deployed Synapse.",
+    "No physical phone action or reusable Starter port."
+  ],
+  "sourceSha256": {
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderTransportTest.kt": "3878f1ce2f4f537b0862e42d9e13dadc21fc9ee67b5092916a9b194e0a0e108b",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderInteropTest.kt": "252b6a73f3ffb759a09447d8ecc7ace45610ce480899878cc1d5408d2ccfa518",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/InternalCollaborationMatrixRepository.kt": "485842e58db04a2cd4fbb53e7f62969e6c46b612aeb10654337ea607ed57cb31",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixProviderConfiguration.kt": "0f390fd75306b50f0816c3fe5ec1ed76764c569aea0846ccc1cb0b92d9bbd3de",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/MatrixProviderDataSources.kt": "a14991d0e4bb6f37dbd46ae2d74ca65d4583e70d4331db5809356ad95a407efe",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/HmacMatrixJwtDataSource.kt": "0c361e9d2224b501d50975ae555a815a4344f21d448ad82aa6c8a1c95d89748f",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/SafeMatrixProviderCall.kt": "3ac315ab3596579ee8a68bf7c601743e303dfc168810644d363baad9d38c1e36",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/BoundedMatrixBodySubscriber.kt": "d397929a6c798474eaa2fe07cb786bfdbb4f19997518aa7d662103c98e0f8111",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/matrix/HttpMatrixClientDataSource.kt": "cb0b8c369b0cce5d62ff61fdf15f8587639ce0343c639e1a0cbd61c51587e722",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationMatrixLogin.kt": "f8653531cbd9e51dca7da90ada98c261132fa9eb0b91b2cfd1ad90d6e81f392a",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/policies/CollaborationMatrixIdentity.kt": "c172848367f0408c0baa0237f160875b36acb210ef3f52a9a957b74e306ea5d1",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationMatrixRepository.kt": "9f1feb7a5676d99f8b0c84d69f117abb56d24b4999fd0e422e3708df4a4d3555",
+    "modules/collaboration/data/build.gradle.kts": "738f87812e0b1a12eca067cf076e31edfd8baa2adfd80f3500fbaaa4c7f4f423"
+  }
+}

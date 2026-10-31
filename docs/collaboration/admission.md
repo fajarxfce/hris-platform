@@ -153,3 +153,38 @@ cases, eleven registration/registry regressions, eleven admission cases, formatt
 and architecture also pass. [Storage evidence](../measurements/collaboration-provider-storage-2026-10-31.json)
 records these boundaries. The store is not wired to provider I/O/provisioning yet;
 registration remains pending. No provider credential or live runtime was changed.
+
+## Bounded internal provider transport
+
+`InternalCollaborationMatrixRepository` coordinates JWT signing and fixed-origin
+HTTP sources outside SQL transactions. HS256 claims carry exact company/account
+subject, issuer/audience and at most 60 seconds of HRIS observation. The adapter
+checks the strict deadline before sending; Synapse's JWT tolerance grants no extra
+HRIS authority. The client cannot choose another URL or follow a redirect.
+Requests include body deadlines, cancellation and 64-KiB response limits; JSON
+duplicate/trailing data, invalid credentials and unexpected encodings fail closed.
+
+Internal login asks for nonrefreshable provider credentials and requires an
+`expires_in_ms` value of 1–600,000, without a refresh token. Deployment must set
+Synapse `nonrefreshable_access_token_lifetime: 10m`. The candidate expiry is
+conservatively measured from request start, and its bearer is never a public
+response. A later use case must recheck HRIS authority, expected provider identity
+and its job/generation fence before storing it. Schema 106 still needs an expiry
+column before this transport is connected to storage/provisioning.
+
+**Synapse logout is device deletion.** The pinned provider's
+[`LogoutRestServlet`](https://github.com/element-hq/synapse/blob/v1.164.1/synapse/rest/client/logout.py)
+calls `delete_devices` for a device-bound token. Its module API's
+`invalidate_access_token` does the same. Do not use either to compensate a losing
+login or a late result: even an expired bearer can delete the winning replacement
+credential and E2EE device keys. Losing tokens stay private and expire; bounded
+job attempts prevent unbounded orphan creation. `logoutDevice` is explicitly a
+terminal operation, permitted only after irreversible HRIS device revocation.
+
+Eight transport cases and a real Synapse scenario pass (35s), with formatting and
+architecture checks. The provider scenario uses five-second credentials, actual
+signed public device keys, replacement login, expiry, key query and permanent
+logout. It verifies both retained keys on ordinary expiry and removed keys on
+logout. [Transport evidence](../measurements/collaboration-matrix-transport-2026-10-31.json)
+records the source/image and corrected compiler/formatting failures. The transport
+is not yet wired to API/worker DI; live runtime and phone remain unchanged.

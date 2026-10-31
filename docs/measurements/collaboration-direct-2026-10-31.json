@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-31",
+  "scope": "CHAT-01 canonical company-scoped direct conversation intent and native open/list/detail controls; schema 110",
+  "productAcceptance": false,
+  "validation": {
+    "compileSeconds": 37,
+    "initialFocused": {
+      "collaborationDataCases": 7,
+      "collaborationDataFailures": 0,
+      "apiCases": 7,
+      "apiFailures": 1,
+      "elapsedSeconds": 52
+    },
+    "correctedFocused": {
+      "migrationCases": 1,
+      "collaborationDataCases": 7,
+      "apiCases": 7,
+      "failures": 0,
+      "elapsedSeconds": 43
+    },
+    "recoveryPythonCases": 23,
+    "recoveryPythonFailures": 0,
+    "finalElapsedSeconds": 417,
+    "finalSuites": {
+      "core/database": {
+        "tests": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/domain": {
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/data": {
+        "tests": 89,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server": {
+        "tests": 182,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/worker": {
+        "tests": 111,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      }
+    },
+    "formatCheck": "passed",
+    "architectureCheck": "passed",
+    "skip": "One unchanged opt-in ReportExportElapsedRetentionTest."
+  },
+  "behaviors": [
+    "Opposite participants concurrently open one canonical company pair; one creation audit/outbox, distinct operation receipts, no provider/device/job allocation.",
+    "Replay survives native parent refresh; changed peer payload conflicts and revoked parent or newly ineligible peer denies replay.",
+    "Pair uses PostgreSQL unsigned UUID order; account guards separately follow existing identity natural UUID order. An overlapping exclusive account writer completes without inverted locks.",
+    "Actual runtime forced RLS hides unrelated participants and companies, prevents forged insertion/update/deletion, and discards transaction scope afterwards.",
+    "Failed journal, late session expiry and cancellation roll back pair, operation receipt, audit and outbox together.",
+    "Bounded keyset list/detail exposes retained metadata to currently admitted participants. Offboarding a peer retains the owned pair; revoked initiating permission denies reads.",
+    "An acquired page/detail is withheld after native access expiry. A command waiting for a pair guard revalidates before writing.",
+    "Actual schema-109 upgrade and pg_dump/pg_restore preserve pair data, account snapshots, uniqueness, immutable-row trigger and participant/company RLS.",
+    "Native HTTP enforces strict body fields, UUID idempotency/cursors, current admission and no-store; browser-only transport is rejected."
+  ],
+  "correctedFailures": [
+    {
+      "stage": "First focused API run",
+      "result": "The new test incorrectly expected a replayed JSON flag; the existing MutationResponse contract intentionally contains only id/version. Corrected assertion checks the identical response; domain replay flag remains verified separately."
+    },
+    {
+      "stage": "Recovery schema gate tests",
+      "result": "Two future-schema assertions still used 110 after accepting schema 110. They now reject 111 and preserve earlier supported projections; all 23 Python recovery checks pass."
+    },
+    {
+      "stage": "Lock-order review before full verification",
+      "result": "Stored pair order and shared account-guard order must differ: PostgreSQL unsigned pair canonicalization versus identity module Java UUID order. Corrected the guard ordering and added an actual overlapping exclusive account writer test."
+    }
+  ],
+  "limits": [
+    "Immutable direct-conversation control only. No provider room is provisioned yet; this does not accept CHAT-01, SDK encrypted messaging, group/context rooms or offline sync.",
+    "No mutable existing resource version is consumed by pair creation. Future provisioning and membership changes require independent observed versions.",
+    "All data is fictional. No deployment, real employee message, phone action, Mobile or Starter port occurred. Live schema remains 103."
+  ]
+}

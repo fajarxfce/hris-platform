@@ -79,6 +79,15 @@ Current backend implementation:
   No Matrix login or device allocation is needed. [Contract](collaboration/participants.md)
   remains a selection hint: conversation commands must authorize selected peers again.
 
+- Schema 110 and native direct-conversation open/list/detail now retain one immutable
+  pair per company. Current peer eligibility is checked even on receipt replay;
+  forced RLS hides unrelated accounts/companies. Operation/pair/access guards and
+  final assurance make receipt, audit and outbox atomic. PostgreSQL unsigned pair
+  order differs from the identity module's signed UUID account-lock order; both
+  are tested, including an overlapping administration writer. Metadata survives
+  peer offboarding. [Contract](collaboration/direct-conversations.md) is durable
+  intent only: it does not provision a Matrix room or authorize content.
+
 [Identity evidence](measurements/collaboration-gateway-identity-2026-10-31.json)
 records 148 passing API cases, 77 data cases, fourteen domain cases and the full
 111-case worker suite (110 pass, one unchanged opt-in retention skip). Formatting
@@ -86,7 +95,8 @@ and architecture pass. The final successful selection took 3m39s, with the
 unchanged domain/data/worker results retained incrementally. Corrected failures
 include a fixture missing its explicit Synapse start and two legacy eight-module
 assertions; catalog tests now verify all nine names and run in collaboration CI.
-No new migration was added; repository recovery ceiling remains 109.
+The identity increment added no migration; current repository recovery ceiling is
+now 110 for retained direct pairs (no new secret envelope format).
 
 [Participant evidence](measurements/collaboration-participants-2026-10-31.json)
 records 181 API, 81 collaboration data, 14 collaboration domain, 22 identity data,
@@ -94,6 +104,13 @@ records 181 API, 81 collaboration data, 14 collaboration domain, 22 identity dat
 selection, format and architecture checks passed in 5m16s. Corrected focused failures
 retain the stable native error code and explicitly require positive native client
 metadata. Existing approval/lifecycle selector completion checks also pass.
+
+[Direct-conversation evidence](measurements/collaboration-direct-2026-10-31.json)
+records 30 database, 14 domain, 89 collaboration data, 182 API and 111 worker cases
+(one existing opt-in skip). Full selection, formatting and architecture pass in
+6m57s; 23 Python recovery checks pass. Actual 109-to-110 upgrade and pg_dump/restore
+preserve immutable identity, uniqueness and participant RLS. Corrected API test
+uses the existing id/version response rather than inventing a replay flag.
 
 Critical provider behavior: Synapse logout deletes the **entire device**, all its
 bearers and E2EE keys even with an expired bearer. Never use it to clean up a late
@@ -104,13 +121,17 @@ Provider ports remain private; raw provider credentials never reach clients.
 
 Next implementation:
 
-1. Inspect the participant increment's exact hosted control after push. Identity
-   `b0bf1326` passed every hosted job/step in [41199490597](https://github.com/fajarxfce/hris-platform/actions/runs/41199490597).
-   HTTP/worker `c2e72935` and provider transaction `be810f1c` also passed hosted controls.
-2. Authoritative conversation/member/context storage/control and provider
-   reconciliation with current scope. Then expose bounded SDK key/sync/content
-   operations with per-conversation admission, cancellation and response fencing.
-   Participant discovery and WHOAMI/refresh do not authorize room contents.
+1. Inspect the direct-conversation increment's exact hosted control after push.
+   Participant `d50bb0ad` passed every hosted job/step in
+   [41200742892](https://github.com/fajarxfce/hris-platform/actions/runs/41200742892).
+   Identity `b0bf1326` passed every hosted job/step in [41199490597](https://github.com/fajarxfce/hris-platform/actions/runs/41199490597).
+2. Prove and implement durable provider-room reconciliation for retained DM intent;
+   Synapse createRoom/alias reservation is not atomic. Verify immutable creation
+   marker, creator and complete encryption/membership state before publication,
+   including partial creation, peer first login and response loss. Then group and
+   resource-context membership control and bounded SDK key/sync/content operations
+   with current per-conversation admission, cancellation and response fencing.
+   Participant/DM metadata and WHOAMI/refresh do not authorize room contents.
 3. Native/web SDK adapters, browser-parent admission, owned encrypted stores and
    durable chat UI/outbox/recipient reconciliation. Restore each SDK client only
    once; use standard refresh. Persist logical IDs before queueing, retain every

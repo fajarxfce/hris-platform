@@ -76,6 +76,124 @@ class NativeCollaborationMatrixConfigurationTest : NativeCollaborationApiFixture
     }
 
     @Test
+    fun directOpenListAndDetailRequireNativeAuthorityAndStableOperations() {
+        val n = native()
+        val peer = UUID.randomUUID()
+        database()
+            .update(
+                "insert into accounts(id,email,display_name) values(?,?,'Fictional direct peer')",
+                peer,
+                "$peer@example.test",
+            )
+        database()
+            .update(
+                "insert into company_memberships(company_id,account_id) values(?,?)",
+                n.fixture.company,
+                peer,
+            )
+        database()
+            .update(
+                "insert into membership_permissions(company_id,account_id,permission) values(?,?,'collaboration.chat')",
+                n.fixture.company,
+                peer,
+            )
+        val path = "${n.fixture.root}/collaboration/direct-conversations"
+        fun request(
+            suffix: String = "",
+            body: Map<String, Any>? = null,
+            operation: UUID? = null,
+            build: String = "1",
+        ): HttpResponse<String> {
+            val builder =
+                HttpRequest.newBuilder(URI("http://127.0.0.1:$port$path$suffix"))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Authorization", "Bearer ${n.access}")
+                    .header("X-HRIS-Client-Platform", "ANDROID")
+                    .header("X-HRIS-Client-Build", build)
+            operation?.let { builder.header("Idempotency-Key", it.toString()) }
+            if (body == null) builder.GET()
+            else
+                builder
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(json.writeValueAsString(body)))
+            return n.fixture.browser.send(builder.build(), HttpResponse.BodyHandlers.ofString())
+        }
+        val body = mapOf("peerAccountId" to peer)
+        val operation = UUID.randomUUID()
+        assertEquals(400, request(body = body).statusCode())
+        assertEquals(
+            400,
+            request(body = body + ("companyId" to UUID.randomUUID()), operation = operation)
+                .statusCode(),
+        )
+        failure(
+            request(body = mapOf("peerAccountId" to n.fixture.account), operation = operation),
+            422,
+            "invalid_collaboration_peer",
+        )
+        val created = request(body = body, operation = operation)
+        assertEquals(200, created.statusCode(), created.body())
+        assertEquals("no-store", created.headers().firstValue("Cache-Control").orElse(""))
+        val id = json.readTree(created.body())["id"].asString()
+        val replay = request(body = body, operation = operation)
+        assertEquals(200, replay.statusCode(), replay.body())
+        assertEquals(json.readTree(created.body()), json.readTree(replay.body()))
+        assertEquals(id, json.readTree(replay.body())["id"].asString())
+        val detail = request("/$id")
+        assertEquals(200, detail.statusCode(), detail.body())
+        val head = json.readTree(detail.body())
+        assertEquals(
+            setOf(
+                "id",
+                "companyId",
+                "firstAccountId",
+                "secondAccountId",
+                "createdBy",
+                "createdAt",
+                "version",
+            ),
+            head.propertyNames().toSet(),
+        )
+        assertEquals(
+            setOf(peer.toString(), n.fixture.account.toString()),
+            setOf(head["firstAccountId"].asString(), head["secondAccountId"].asString()),
+        )
+        assertFalse(detail.body().contains("example.test"))
+        val page = request("?limit=1")
+        assertEquals(200, page.statusCode(), page.body())
+        assertEquals(id, json.readTree(page.body())["items"][0]["id"].asString())
+        assertEquals("no-store", page.headers().firstValue("Cache-Control").orElse(""))
+        failure(request("/${UUID.randomUUID()}"), 404, "collaboration_conversation_not_found")
+        failure(request("?limit=51"), 422, "invalid_collaboration_conversation_query")
+        assertEquals(400, request("?after=invalid").statusCode())
+        failure(get(n.fixture.browser, path), 403, "invalid_session_transport")
+        assertEquals(
+            0,
+            database()
+                .queryForObject(
+                    "select count(*) from collaboration_devices where company_id=?",
+                    Int::class.java,
+                    n.fixture.company,
+                ),
+        )
+        database()
+            .update(
+                "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                n.fixture.company,
+                peer,
+            )
+        failure(request(body = body, operation = operation), 403, "collaboration_peer_unavailable")
+        assertEquals(200, request("/$id").statusCode())
+        database()
+            .update(
+                "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+                n.fixture.company,
+                n.fixture.account,
+            )
+        assertEquals(403, request("/$id").statusCode())
+    }
+
+    @Test
     fun participantsAreNativeOnlyCompanyScopedPublicReferencesWithoutProviderCalls() {
         val n = native()
         val peer = UUID.randomUUID()

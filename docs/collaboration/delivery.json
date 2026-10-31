@@ -43,7 +43,9 @@
         "../measurements/collaboration-gateway-http-2026-10-31.json",
         "../measurements/collaboration-gateway-identity-2026-10-31.json",
         "participants.md",
-        "../measurements/collaboration-participants-2026-10-31.json"
+        "../measurements/collaboration-participants-2026-10-31.json",
+        "direct-conversations.md",
+        "../measurements/collaboration-direct-2026-10-31.json"
       ]
     },
     {
@@ -96,7 +98,9 @@
       "status": "in_progress",
       "evidence": [
         "participants.md",
-        "../measurements/collaboration-participants-2026-10-31.json"
+        "../measurements/collaboration-participants-2026-10-31.json",
+        "direct-conversations.md",
+        "../measurements/collaboration-direct-2026-10-31.json"
       ]
     },
     {

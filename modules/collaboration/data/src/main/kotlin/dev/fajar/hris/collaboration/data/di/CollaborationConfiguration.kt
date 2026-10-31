@@ -141,6 +141,75 @@ class CollaborationConfiguration {
         )
 
     @Bean
+    fun collaborationDirectSource(sql: DSLContext): CollaborationDirectDataSource =
+        PostgresCollaborationDirectDataSource(sql)
+
+    @Bean
+    fun collaborationDirectRepository(
+        source: CollaborationDirectDataSource
+    ): CollaborationDirectRepository = StoredCollaborationDirectRepository(source)
+
+    @Bean
+    fun openNativeCollaborationDirect(
+        conversations: CollaborationDirectRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        operations: OperationRepository,
+        journal: ChangeJournalRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        OpenNativeCollaborationDirect(
+            conversations,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            operations,
+            journal,
+            transactions,
+            security,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
+    fun readNativeCollaborationDirect(
+        conversations: CollaborationDirectRepository,
+        sessions: NativeSessionRepository,
+        policies: CompanyClientPolicyRepository,
+        companies: CompanyRepository,
+        members: MembershipRepository,
+        identities: IdentityRepository,
+        transactions: TransactionRunner,
+        security: IdentitySecurityPolicy,
+        service: CollaborationServicePolicy,
+        provider: CollaborationMatrixPolicy,
+        clock: Clock,
+    ) =
+        ReadNativeCollaborationDirect(
+            conversations,
+            sessions,
+            policies,
+            companies,
+            members,
+            identities,
+            transactions,
+            security,
+            service,
+            provider,
+            clock,
+        )
+
+    @Bean
     fun listNativeCollaborationParticipants(
         sessions: NativeSessionRepository,
         policies: CompanyClientPolicyRepository,

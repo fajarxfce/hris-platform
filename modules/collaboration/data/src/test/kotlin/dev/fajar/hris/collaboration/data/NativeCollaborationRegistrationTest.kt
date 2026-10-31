@@ -4,17 +4,20 @@ import dev.fajar.hris.administration.data.datasources.PostgresCompanyClientPolic
 import dev.fajar.hris.administration.data.repositories.StoredCompanyClientPolicyRepository
 import dev.fajar.hris.administration.domain.entities.*
 import dev.fajar.hris.administration.domain.repositories.CompanyClientPolicyRepository
+import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationDirectDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationGatewaySessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProviderSessionDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationProvisioningDataSource
 import dev.fajar.hris.collaboration.data.datasources.PostgresCollaborationRegistryDataSource
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.data.repositories.EncryptedCollaborationProviderSessionRepository
+import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationDirectRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationProvisioningRepository
 import dev.fajar.hris.collaboration.data.repositories.StoredCollaborationRegistryRepository
 import dev.fajar.hris.collaboration.domain.entities.*
 import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixDeviceId
 import dev.fajar.hris.collaboration.domain.policies.collaborationMatrixLocalpart
+import dev.fajar.hris.collaboration.domain.repositories.CollaborationDirectRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationGatewaySessionRepository
 import dev.fajar.hris.collaboration.domain.repositories.CollaborationMatrixRepository
 import dev.fajar.hris.collaboration.domain.usecases.*
@@ -1882,6 +1885,480 @@ class NativeCollaborationRegistrationTest {
         }
     }
 
+    @Test
+    fun directOppositeOpenAndLostResponseReplayKeepOneCanonicalPair() {
+        val f = Fixture(UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff"))
+        val peer = f.peer("Fictional direct peer")
+        val parent = f.parent()
+        val peerParent = f.parent(peer)
+        val peerActor = f.actor.copy(accountId = peer)
+        val operation = UUID.randomUUID()
+        val client = ClientVersion(ClientPlatform.ANDROID, 1)
+        val outcomes =
+            race(
+                    listOf(
+                        { f.openDirect().execute(f.actor, parent, 0, client, operation, peer) },
+                        {
+                            f.openDirect()
+                                .execute(
+                                    peerActor,
+                                    peerParent,
+                                    0,
+                                    client,
+                                    UUID.randomUUID(),
+                                    f.account,
+                                )
+                        },
+                    )
+                )
+                .map { success(it) }
+        assertEquals(outcomes[0].id, outcomes[1].id)
+        assertEquals(1, f.rows("collaboration_direct_conversations"))
+        assertEquals(2, f.rows("operation_receipts"))
+        assertEquals(1, f.rows("audit_entries"))
+        assertEquals(1, f.rows("outbox_events"))
+        assertEquals(0, f.rows("collaboration_devices"))
+        assertEquals(0, f.rows("background_jobs"))
+        val first = success(f.readDirect().get(f.actor, parent, 0, client, outcomes[0].id))
+        assertEquals(peer, first.firstAccountId)
+        assertEquals(f.account, first.secondAccountId)
+        assertEquals(first, success(f.readDirect().get(peerActor, peerParent, 0, client, first.id)))
+        sql.update("update native_sessions set version=version+1 where id=?", parent)
+        val replay = success(f.openDirect().execute(f.actor, parent, 1, client, operation, peer))
+        assertEquals(first.id, replay.id)
+        assertTrue(replay.replayed)
+        assertEquals(
+            "operation_payload_mismatch",
+            failed(
+                f.openDirect()
+                    .execute(f.actor, parent, 1, client, operation, f.peer("Different peer"))
+            ),
+        )
+        sql.update("update native_sessions set revoked_at=now() where id=?", parent)
+        assertEquals(
+            "native_session_invalid",
+            failed(f.openDirect().execute(f.actor, parent, 1, client, operation, peer)),
+        )
+    }
+
+    @Test
+    fun directAccountGuardsDoNotInvertConcurrentAdministrationWriterOrder() {
+        val f = Fixture(UUID.fromString("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"))
+        // Ensure one positive and one negative Java UUID most-significant long.
+        val peer =
+            f.peer(
+                "Fictional ordered peer",
+                id = UUID.fromString("00000000-0000-0000-0000-000000000002"),
+            )
+        val parent = f.parent()
+        val first = listOf(f.account, peer).sorted().first()
+        val second = listOf(f.account, peer).sorted().last()
+        val held = CountDownLatch(1)
+        val entered = CountDownLatch(1)
+        val attempts = AtomicInteger()
+        val executor = Executors.newFixedThreadPool(2)
+        try {
+            val writer =
+                executor.submit<Result<Unit>> {
+                    f.transactions.run(f.actor) {
+                        f.identities.lockAccount(first).flatMap {
+                            held.countDown()
+                            check(entered.await(4, TimeUnit.SECONDS))
+                            f.identities.lockAccount(second)
+                        }
+                    }
+                }
+            assertTrue(held.await(4, TimeUnit.SECONDS))
+            val observer =
+                object : IdentityRepository by f.identities {
+                    override fun lockAccount(accountId: UUID, shared: Boolean): Result<Unit> {
+                        if (attempts.getAndIncrement() == 0) {
+                            if (accountId == first) entered.countDown()
+                            else
+                                return f.identities.lockAccount(accountId, shared).also {
+                                    entered.countDown()
+                                }
+                        }
+                        return f.identities.lockAccount(accountId, shared)
+                    }
+                }
+            val candidate =
+                executor.submit<Result<MutationReceipt>> {
+                    f.openDirect(identities = observer)
+                        .execute(
+                            f.actor,
+                            parent,
+                            0,
+                            ClientVersion(ClientPlatform.ANDROID, 1),
+                            UUID.randomUUID(),
+                            peer,
+                        )
+                }
+            success(writer.get(10, TimeUnit.SECONDS))
+            success(candidate.get(10, TimeUnit.SECONDS))
+            assertEquals(1, f.rows("collaboration_direct_conversations"))
+        } finally {
+            entered.countDown()
+            executor.shutdownNow()
+            assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS))
+        }
+    }
+
+    @Test
+    fun directRlsHidesOtherPairsAndCompaniesAndRetainsIdentity() {
+        val f = Fixture()
+        val peer = f.peer("Fictional peer")
+        val third = f.peer("Fictional unrelated participant")
+        val client = ClientVersion(ClientPlatform.ANDROID, 1)
+        val parent = f.parent()
+        val receipt =
+            success(f.openDirect().execute(f.actor, parent, 0, client, UUID.randomUUID(), peer))
+        val company = requireNotNull(f.actor.companyId)
+        val stored =
+            requireNotNull(
+                success(f.transactions.run(f.actor) { f.direct.find(company, receipt.id) })
+            )
+        assertNull(
+            success(
+                f.transactions.run(f.actor.copy(accountId = third)) {
+                    f.direct.find(company, receipt.id)
+                }
+            )
+        )
+        assertNull(
+            success(
+                f.transactions.run(f.actor.copy(companyId = UUID.randomUUID())) {
+                    f.direct.find(company, receipt.id)
+                }
+            )
+        )
+        val raw = JdbcTemplate(runtime)
+        for (actor in listOf(f.actor, f.actor.copy(accountId = peer))) {
+            assertEquals(
+                0,
+                success(
+                    f.transactions.run(actor) {
+                        Result.Success(
+                            raw.update(
+                                "update collaboration_direct_conversations set version=0 where id=?",
+                                receipt.id,
+                            )
+                        )
+                    }
+                ),
+            )
+            assertEquals(
+                0,
+                success(
+                    f.transactions.run(actor) {
+                        Result.Success(
+                            raw.update(
+                                "delete from collaboration_direct_conversations where id=?",
+                                receipt.id,
+                            )
+                        )
+                    }
+                ),
+            )
+        }
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.transactions.run(f.actor.copy(accountId = third)) {
+                f.direct.create(stored.copy(id = UUID.randomUUID()))
+            },
+        )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.transactions.run(f.actor) {
+                f.direct.create(stored.copy(id = UUID.randomUUID(), companyId = UUID.randomUUID()))
+            },
+        )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.transactions.run(f.actor) {
+                f.direct.create(
+                    stored.copy(
+                        id = UUID.randomUUID(),
+                        firstAccountId = stored.secondAccountId,
+                        secondAccountId = stored.firstAccountId,
+                    )
+                )
+            },
+        )
+        assertThrows(org.springframework.dao.DataAccessException::class.java) {
+            sql.update(
+                "update collaboration_direct_conversations set created_by=? where id=?",
+                third,
+                receipt.id,
+            )
+        }
+        assertThrows(org.springframework.dao.DataAccessException::class.java) {
+            sql.update("delete from collaboration_direct_conversations where id=?", receipt.id)
+        }
+        assertEquals(1, f.rows("collaboration_direct_conversations"))
+        assertEquals(
+            0,
+            raw.queryForObject(
+                "select count(*) from collaboration_direct_conversations",
+                Int::class.java,
+            ),
+        )
+    }
+
+    @Test
+    fun directSelectedPeerIsReauthorizedEvenForReceiptReplay() {
+        val f = Fixture()
+        val client = ClientVersion(ClientPlatform.ANDROID, 1)
+        val parent = f.parent()
+        val peer = f.peer("Fictional enabled peer")
+        val operation = UUID.randomUUID()
+        success(f.openDirect().execute(f.actor, parent, 0, client, operation, peer))
+        sql.update(
+            "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+            f.actor.companyId,
+            peer,
+        )
+        val rejected =
+            listOf(
+                peer,
+                f.peer("No grant", grant = false),
+                f.peer("Inactive", active = false),
+                f.peer("Inactive membership", memberActive = false),
+                f.peer("Foreign", company = f.company()),
+                UUID.randomUUID(),
+            )
+        for (candidate in rejected) assertEquals(
+            "collaboration_peer_unavailable",
+            failed(f.openDirect().execute(f.actor, parent, 0, client, UUID.randomUUID(), candidate)),
+        )
+        assertEquals(
+            "collaboration_peer_unavailable",
+            failed(f.openDirect().execute(f.actor, parent, 0, client, operation, peer)),
+        )
+        assertEquals(
+            "invalid_collaboration_peer",
+            failed(f.openDirect().execute(f.actor, parent, 0, client, UUID.randomUUID(), f.account)),
+        )
+        assertEquals(
+            "invalid_client_version",
+            failed(f.openDirect().execute(f.actor, parent, 0, null, UUID.randomUUID(), peer)),
+        )
+        assertEquals(1, f.rows("collaboration_direct_conversations"))
+        assertEquals(1, f.rows("operation_receipts"))
+    }
+
+    @Test
+    fun directJournalFailureExpiryAndCancellationRollBackIntentAndReceiptTogether() {
+        for (mode in listOf("failure", "expiry", "interrupt")) {
+            val f = Fixture()
+            val peer = f.peer("Fictional peer")
+            val parent = f.parent()
+            val journal =
+                object : ChangeJournalRepository by f.journal {
+                    override fun record(actor: Actor, change: ChangeRecord): Result<Unit> {
+                        val written = f.journal.record(actor, change)
+                        if (mode == "interrupt")
+                            throw InterruptedException("Owned fixture cancellation")
+                        if (mode == "expiry") {
+                            f.clock.at = f.clock.at.plusSeconds(1000)
+                            return written
+                        }
+                        return Result.Failed(
+                            Failure(FailureKind.UNAVAILABLE, "fixture_journal_failed")
+                        )
+                    }
+                }
+            val command = {
+                f.openDirect(journal = journal)
+                    .execute(
+                        f.actor,
+                        parent,
+                        0,
+                        ClientVersion(ClientPlatform.ANDROID, 1),
+                        UUID.randomUUID(),
+                        peer,
+                    )
+            }
+            if (mode == "interrupt") assertThrows(InterruptedException::class.java) { command() }
+            else
+                assertEquals(
+                    if (mode == "expiry") "native_session_invalid" else "fixture_journal_failed",
+                    failed(command()),
+                )
+            for (table in
+                listOf(
+                    "collaboration_direct_conversations",
+                    "operation_receipts",
+                    "audit_entries",
+                    "outbox_events",
+                )) assertEquals(0, f.rows(table), table)
+        }
+    }
+
+    @Test
+    fun directReadPaginationAndOffboardedPeerRetainOnlyOwnedMetadata() {
+        val f = Fixture()
+        val parent = f.parent()
+        val client = ClientVersion(ClientPlatform.ANDROID, 1)
+        val peers = List(3) { f.peer("Fictional peer $it") }
+        val ids =
+            peers
+                .map {
+                    success(
+                            f.openDirect()
+                                .execute(f.actor, parent, 0, client, UUID.randomUUID(), it)
+                        )
+                        .id
+                }
+                .sortedBy(UUID::toString)
+        var cursor: UUID? = null
+        val seen = mutableListOf<UUID>()
+        repeat(3) {
+            val page = success(f.readDirect().list(f.actor, parent, 0, client, cursor, 1))
+            assertEquals(1, page.items.size)
+            seen += page.items.single().id
+            cursor = page.nextCursor?.let(UUID::fromString)
+            assertEquals(it < 2, cursor != null)
+        }
+        assertEquals(ids, seen)
+        assertEquals(
+            "invalid_collaboration_conversation_query",
+            failed(f.readDirect().list(f.actor, parent, 0, client, null, 51)),
+        )
+        val unrelated = f.peer("Unrelated peer")
+        assertEquals(
+            "collaboration_conversation_not_found",
+            failed(
+                f.readDirect()
+                    .get(
+                        f.actor.copy(accountId = unrelated),
+                        f.parent(unrelated),
+                        0,
+                        client,
+                        ids.first(),
+                    )
+            ),
+        )
+        sql.update("update accounts set active=false where id=?", peers.first())
+        assertEquals(
+            3,
+            success(f.readDirect().list(f.actor, parent, 0, client, null, 30)).items.size,
+        )
+        sql.update(
+            "delete from membership_permissions where company_id=? and account_id=? and permission='collaboration.chat'",
+            f.actor.companyId,
+            f.account,
+        )
+        assertInstanceOf(
+            Result.Failed::class.java,
+            f.readDirect().get(f.actor, parent, 0, client, ids.first()),
+        )
+        assertEquals(3, f.rows("collaboration_direct_conversations"))
+    }
+
+    @Test
+    fun directAcquiredMetadataIsWithheldWhenNativeAccessExpires() {
+        for (single in listOf(false, true)) {
+            val f = Fixture()
+            val parent = f.parent()
+            val client = ClientVersion(ClientPlatform.ANDROID, 1)
+            val peer = f.peer("Fictional peer")
+            val id =
+                success(f.openDirect().execute(f.actor, parent, 0, client, UUID.randomUUID(), peer))
+                    .id
+            val late =
+                object : CollaborationDirectRepository by f.direct {
+                    override fun find(
+                        companyId: UUID,
+                        id: UUID,
+                    ): Result<CollaborationDirectConversation?> =
+                        f.direct.find(companyId, id).also {
+                            f.clock.at = f.clock.at.plusSeconds(1000)
+                        }
+
+                    override fun list(
+                        companyId: UUID,
+                        accountId: UUID,
+                        after: UUID?,
+                        limit: Int,
+                    ): Result<Page<CollaborationDirectConversation>> =
+                        f.direct.list(companyId, accountId, after, limit).also {
+                            f.clock.at = f.clock.at.plusSeconds(1000)
+                        }
+                }
+            val reader = f.readDirect(late)
+            assertEquals(
+                "native_session_invalid",
+                failed(
+                    if (single) reader.get(f.actor, parent, 0, client, id)
+                    else reader.list(f.actor, parent, 0, client, null, 30)
+                ),
+            )
+            assertEquals(1, f.rows("collaboration_direct_conversations"))
+        }
+    }
+
+    @Test
+    fun directWaitingCommandRechecksAuthorityAfterAcquiringPairGuard() {
+        val f = Fixture()
+        val parent = f.parent()
+        val peer = f.peer("Fictional peer")
+        val pair = listOf(f.account, peer).sortedBy(UUID::toString)
+        val held = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        val requested = CountDownLatch(1)
+        val executor = Executors.newFixedThreadPool(2)
+        try {
+            val holder =
+                executor.submit<Result<Unit>> {
+                    f.transactions.run(f.actor) {
+                        f.direct
+                            .lockPair(requireNotNull(f.actor.companyId), pair[0], pair[1])
+                            .flatMap {
+                                held.countDown()
+                                check(release.await(4, TimeUnit.SECONDS))
+                                Result.Success(Unit)
+                            }
+                    }
+                }
+            assertTrue(held.await(4, TimeUnit.SECONDS))
+            val observer =
+                object : CollaborationDirectRepository by f.direct {
+                    override fun lockPair(
+                        companyId: UUID,
+                        first: UUID,
+                        second: UUID,
+                    ): Result<Unit> {
+                        requested.countDown()
+                        return f.direct.lockPair(companyId, first, second)
+                    }
+                }
+            val candidate =
+                executor.submit<Result<MutationReceipt>> {
+                    f.openDirect(observer)
+                        .execute(
+                            f.actor,
+                            parent,
+                            0,
+                            ClientVersion(ClientPlatform.ANDROID, 1),
+                            UUID.randomUUID(),
+                            peer,
+                        )
+                }
+            assertTrue(requested.await(4, TimeUnit.SECONDS))
+            f.clock.at = f.clock.at.plusSeconds(1000)
+            release.countDown()
+            success(holder.get(5, TimeUnit.SECONDS))
+            assertEquals("native_session_invalid", failed(candidate.get(5, TimeUnit.SECONDS)))
+            assertEquals(0, f.rows("collaboration_direct_conversations"))
+            assertEquals(0, f.rows("operation_receipts"))
+        } finally {
+            release.countDown()
+            executor.shutdownNow()
+            assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS))
+        }
+    }
+
     private class GatewayFixture {
         val f = Fixture()
         val parent = f.parent()
@@ -1913,14 +2390,14 @@ class NativeCollaborationRegistrationTest {
         fun refresh(token: String) = f.gatewayRefresh().execute(token, UUID.randomUUID())
     }
 
-    private class Fixture {
+    private class Fixture(val account: UUID = UUID.randomUUID()) {
         val clock = MutableClock(Instant.now().truncatedTo(ChronoUnit.MICROS))
-        val account = UUID.randomUUID()
         val transactions =
             PostgresTransactionRunner(JdbcTransactionManager(runtime), JdbcTemplate(runtime))
         private val dsl = DSL.using(TransactionAwareDataSourceProxy(runtime), SQLDialect.POSTGRES)
         private val json = JsonMapper.builder().build()
         private val receipts = PostgresOperationReceiptDataSource(dsl)
+        val direct = StoredCollaborationDirectRepository(PostgresCollaborationDirectDataSource(dsl))
         val registry =
             StoredCollaborationRegistryRepository(PostgresCollaborationRegistryDataSource(dsl))
         val policies =
@@ -2023,7 +2500,7 @@ class NativeCollaborationRegistrationTest {
             return id
         }
 
-        fun parent(): UUID {
+        fun parent(account: UUID = this.account): UUID {
             val id = UUID.randomUUID()
             val hash = id.toString().replace("-", "").repeat(2)
             sql.update(
@@ -2042,8 +2519,8 @@ class NativeCollaborationRegistrationTest {
             grant: Boolean = true,
             active: Boolean = true,
             memberActive: Boolean = true,
+            id: UUID = UUID.randomUUID(),
         ): UUID {
-            val id = UUID.randomUUID()
             sql.update(
                 "insert into accounts(id,email,display_name,active) values(?,?,?,?)",
                 id,
@@ -2065,6 +2542,46 @@ class NativeCollaborationRegistrationTest {
                 )
             return id
         }
+
+        fun openDirect(
+            conversations: CollaborationDirectRepository = direct,
+            journal: ChangeJournalRepository = this.journal,
+            identities: IdentityRepository = this.identities,
+            security: IdentitySecurityPolicy = IdentitySecurityPolicy(),
+        ) =
+            OpenNativeCollaborationDirect(
+                conversations,
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                operations,
+                journal,
+                transactions,
+                security,
+                CollaborationServicePolicy(true),
+                CollaborationMatrixPolicy(true, "proof.invalid"),
+                clock,
+            )
+
+        fun readDirect(
+            conversations: CollaborationDirectRepository = direct,
+            security: IdentitySecurityPolicy = IdentitySecurityPolicy(),
+        ) =
+            ReadNativeCollaborationDirect(
+                conversations,
+                sessions,
+                policies,
+                companies,
+                members,
+                identities,
+                transactions,
+                security,
+                CollaborationServicePolicy(true),
+                CollaborationMatrixPolicy(true, "proof.invalid"),
+                clock,
+            )
 
         fun participants(
             members: MembershipRepository = this.members,

@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-31",
+  "scope": "P0 actual Matrix bearer replacement, transaction retention boundary, sender/peer metadata and retained expiry/logout regression",
+  "provider": {
+    "image": "ghcr.io/element-hq/synapse:v1.164.1",
+    "digest": "sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75",
+    "database": "owned disposable SQLite",
+    "network": "isolated, random loopback-only port"
+  },
+  "validation": {
+    "firstSelection": {
+      "tests": 2,
+      "failures": 0,
+      "elapsedSeconds": 40,
+      "expiryLogoutCaseSeconds": 12.113,
+      "transactionCaseSeconds": 7.325
+    },
+    "finalPeerExtension": {
+      "tests": 1,
+      "failures": 0,
+      "elapsedSeconds": 29,
+      "caseSeconds": 8.962
+    },
+    "format": true,
+    "architecture": true
+  },
+  "observations": [
+    "Replacing a private bearer on the same Matrix user/device preserves deduplication for the same room/event transaction while its mapping exists.",
+    "After fixture aging, the exact provider cleanup predicate and provider restart, the same transaction produces a different event; room history contains both identical opaque encrypted-event payloads.",
+    "The originating device sees the same unsigned transaction ID on both events; an invited peer sees both events without any transaction ID.",
+    "The existing real short-token lifetime/key-retention and expired-token whole-device logout case still passes after shared-fixture extraction.",
+    "The fixture closes its HTTP owner, container and network; restart readiness uses bounded polling and independently owned requests."
+  ],
+  "limits": [
+    "Mapping aging/deletion is an explicit owned fixture action. No 24-hour wait or scheduled-timer acceptance is claimed.",
+    "The transaction payload is opaque fictional content, not actual E2EE cryptography; this does not replace separate native/browser encrypted-message evidence.",
+    "No durable product logical-message reconciliation, UI deduplication, SDK extra-content persistence, notification or offline-delivery acceptance is claimed.",
+    "No API/worker production source, live deployment, phone or Starter change occurred."
+  ],
+  "sourceSha256": {
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderFixture.kt": "0e1d43e80d20d91cd4b7b7825b9b02a532690a9c4611b0c0e6293a38c8e02dd2",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixProviderInteropTest.kt": "8e63f0b98119019fd7e84b14f8e74e1401c0687c46e871a18d26a4ce92190c73",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/MatrixTransactionInteropTest.kt": "bde5c288ed89ef607cd406d9783f319b2fe2e016fdf2d178ea83f73ce766c7f4"
+  },
+  "upstreamSource": {
+    "url": "https://github.com/element-hq/synapse/blob/v1.164.1/synapse/storage/databases/main/events_worker.py",
+    "sha256": "9d9e1b6dad5f3bf1fa112695d7283342a1a74a4afa08a90375b4822f558e0871"
+  }
+}

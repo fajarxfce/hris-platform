@@ -108,9 +108,20 @@ and [41195557470](https://github.com/fajarxfce/hris-platform/actions/runs/411955
 The [transaction-retention gate](collaboration/provider-transaction-retention.md)
 records a pinned-source finding: Synapse deletes message transaction mappings
 older than 24 hours on a five-minute cleanup loop. Actual same-device bearer
-replacement/aged retry proof and durable uncertain-send reconciliation are still
-required before offline messaging acceptance. Do not assume unlimited provider
+replacement and aged-mapping retry are now proved below; durable uncertain-send
+reconciliation remains required before offline messaging acceptance. Do not assume unlimited provider
 deduplication or change a local transaction ID on refresh/restart.
+
+The [actual transaction experiment](measurements/collaboration-transaction-interop-2026-10-31.json)
+now proves same-device bearer replacement returns the same event while the mapping
+exists. Fixture aging + exact cleanup predicate + Synapse restart permits a second
+event for the same transaction. Both appear in room history; the origin device
+sees their transaction IDs, an invited peer does not. No real 24-hour wait or
+scheduled-timer acceptance is claimed. Two provider cases pass in 40s (including
+the retained token-expiry/logout regression); the final peer extension passes in
+29s. Formatting/architecture pass. Native bindings expose `sendWithExtraContent`
+and queue listeners; the next native proof must establish encrypted logical-ID
+round trips/queue ownership before implementing durable recipient coalescing.
 
 Critical provider behavior: Synapse logout deletes the **whole device**, every
 bearer and its E2EE keys, even when called with an expired bearer. Never use it
@@ -127,7 +138,8 @@ Next implementation:
    complete contexts pass; storage/admission hosted results are accepted above.
 2. Protected Matrix request path with current admission before/after provider I/O,
    bounded/cancelled transport, internal credential renewal and room/context scope.
-   Prove same-device transaction IDs across bearer replacement and aged retry.
+   Same-device transaction/aged retry behavior is proved; use the retained limit
+   when implementing SDK outbox reconciliation.
 3. Browser-parent admission, native/web SDK adapters, owned crypto stores and
    durable chat UI/outbox reconciliation. Restore an authenticated Matrix SDK
    client only once; rotate through standard refresh. Retain owned offline facts

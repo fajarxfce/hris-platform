@@ -1,9 +1,6 @@
 package dev.fajar.hris.collaboration.data
 
-import com.github.dockerjava.api.model.*
 import dev.fajar.hris.collaboration.data.matrix.*
-import dev.fajar.hris.collaboration.data.repositories.InternalCollaborationMatrixRepository
-import dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixLogin
 import dev.fajar.hris.collaboration.domain.policies.*
 import dev.fajar.hris.core.domain.Result
 import java.net.URI
@@ -15,10 +12,6 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.testcontainers.containers.GenericContainer
-import org.testcontainers.containers.Network
-import org.testcontainers.containers.wait.strategy.Wait
-import org.testcontainers.images.builder.Transferable
 import tools.jackson.databind.JsonNode
 import tools.jackson.databind.json.JsonMapper
 
@@ -26,124 +19,16 @@ import tools.jackson.databind.json.JsonMapper
 class MatrixProviderInteropTest {
     @Test
     fun boundedInternalTokensExpireWithoutDeletingKeysButLogoutDeletesTheEntireDevice() {
-        val json = JsonMapper.builder().build()
-        val secret = UUID.randomUUID().toString() + UUID.randomUUID().toString()
-        val network = Network.newNetwork()
-        val server =
-            GenericContainer(
-                    "ghcr.io/element-hq/synapse:v1.164.1@sha256:fa4aa980f279bcf26d4e7ecc2a2c9a701c73f2ebe8841da9bdcf3b2fdf693d75"
-                )
-                .withNetwork(network)
-                .withExposedPorts(8008)
-                .withCopyToContainer(
-                    Transferable.of(
-                        json.writeValueAsBytes(
-                            mapOf(
-                                "server_name" to "matrix.example.test",
-                                "report_stats" to false,
-                                "enable_registration" to false,
-                                "password_config" to mapOf("enabled" to false),
-                                "jwt_config" to
-                                    mapOf(
-                                        "enabled" to true,
-                                        "secret" to secret,
-                                        "algorithm" to "HS256",
-                                        "issuer" to "urn:hris:matrix:fixture",
-                                        "audiences" to listOf("matrix:fixture"),
-                                    ),
-                                "nonrefreshable_access_token_lifetime" to "5s",
-                                "listeners" to
-                                    listOf(
-                                        mapOf(
-                                            "port" to 8008,
-                                            "type" to "http",
-                                            "tls" to false,
-                                            "bind_addresses" to listOf("0.0.0.0"),
-                                            "resources" to
-                                                listOf(
-                                                    mapOf(
-                                                        "names" to listOf("client"),
-                                                        "compress" to false,
-                                                    )
-                                                ),
-                                        )
-                                    ),
-                                "database" to
-                                    mapOf(
-                                        "name" to "sqlite3",
-                                        "args" to mapOf("database" to "/data/fixture.db"),
-                                    ),
-                                "media_store_path" to "/data/media",
-                                "signing_key_path" to "/data/signing.key",
-                                "macaroon_secret_key" to UUID.randomUUID().toString(),
-                                "form_secret" to UUID.randomUUID().toString(),
-                                "federation_domain_whitelist" to emptyList<String>(),
-                                "trusted_key_servers" to emptyList<String>(),
-                                "suppress_key_server_warning" to true,
-                                "url_preview_enabled" to false,
-                                "enable_metrics" to false,
-                            )
-                        )
-                    ),
-                    "/data/homeserver.yaml",
-                )
-                .withCreateContainerCmdModifier { command ->
-                    command.withEntrypoint("python", "-m", "synapse.app.homeserver")
-                    command.hostConfig!!
-                        .withPortBindings(
-                            PortBinding(
-                                Ports.Binding.bindIpAndPort("127.0.0.1", 0),
-                                ExposedPort(8008),
-                            )
-                        )
-                        .withMemory(1024L * 1024 * 1024)
-                        .withNanoCPUs(2_000_000_000L)
-                }
-                .withCommand("--config-path", "/data/homeserver.yaml")
-                .waitingFor(
-                    Wait.forHttp("/_matrix/client/versions")
-                        .forPort(8008)
-                        .withStartupTimeout(Duration.ofMinutes(2))
-                )
-        val client =
-            HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(2))
-                .followRedirects(HttpClient.Redirect.NEVER)
-                .build()
-        try {
-            server.start()
-            val origin = URI("http://127.0.0.1:${server.getMappedPort(8008)}")
-            val config =
-                MatrixProviderConfiguration(
-                    origin,
-                    "matrix.example.test",
-                    "urn:hris:matrix:fixture",
-                    "matrix:fixture",
-                    secret,
-                )
-            val clock = Clock.systemUTC()
-            val repository =
-                InternalCollaborationMatrixRepository(
-                    HmacMatrixJwtDataSource(config),
-                    HttpMatrixClientDataSource(client, config, clock),
-                    clock,
-                )
-            val request =
-                CollaborationMatrixLogin(
-                    UUID.randomUUID(),
-                    UUID.randomUUID(),
-                    UUID.randomUUID(),
-                    clock.instant(),
-                    clock.instant().plusSeconds(60),
-                )
-            fun login():
-                dev.fajar.hris.collaboration.domain.entities.CollaborationMatrixCredential {
-                val at = clock.instant()
-                return (repository.login(
-                        request.copy(issuedAt = at, expiresAt = at.plusSeconds(60))
-                    ) as Result.Success)
-                    .value
-            }
+        MatrixProviderFixture("5s").use { fixture ->
+            fixture.start()
+            val json = fixture.json
+            val client = fixture.client
+            val config = fixture.config
+            val origin = config.origin
+            val repository = fixture.repository
+            val clock = fixture.clock
+            val request = fixture.request
+            fun login() = fixture.login()
             val first = login()
             assertEquals(
                 "@${collaborationMatrixLocalpart(request.companyId, request.accountId)}:${config.serverName}",
@@ -230,14 +115,6 @@ class MatrixProviderInteropTest {
                     .isMissingNode
             )
             assertEquals(Result.Success(Unit), repository.logoutDevice(replacement.accessToken))
-        } finally {
-            client.shutdownNow()
-            try {
-                server.close()
-            } finally {
-                network.close()
-            }
-            assertTrue(client.awaitTermination(Duration.ofSeconds(5)))
         }
     }
 

@@ -1,5 +1,35 @@
 # Mobile native setup ownership
 
+## Application runtime checkpoint
+
+Mobile [9f83dcdc](https://github.com/fajarxfce/hris-mobile/commit/9f83dcdc2f42e69441569f050c5428746ef38f8a)
+now installs collaboration DI and an Android Application lifetime owner. Admitted
+bootstrap installation retires only the observed encrypted command after protected
+SDK installation; restoration reopens existing facts without re-enrollment. Late
+account/company/permission changes close acquired resources. One application
+observer closes obsolete owners and owns deadline timers; startup does not create
+SDK clients or issue credentials. Other hosts report unavailable native support.
+
+[Application evidence](https://github.com/fajarxfce/hris-mobile/blob/9f83dcdc2f42e69441569f050c5428746ef38f8a/docs/measurements/collaboration-application-runtime-2026-10-31.json)
+records final root/Wasm/Android/lint passing in 70s: 2,093 desktop cases and zero
+lint errors; domain browser has 51 passing cases. The manifest AppAuth dependency
+fix and lint guard are independently verified and pushed to Starter `9740cb5`
+(331 desktop cases, dev assembly, zero lint errors). Hosted checks remain separate
+from these local results. No device or live service changes.
+
+Corrected provider protocol run `41242901470` at Mobile `3cedb0b1` passed both
+classic/native jobs and all steps against Platform `e0dbb567`: 77.293s/75.327s,
+two browser cases each, cleanup true, all 14 Platform source hashes verified.
+Mobile retains this in its offline-signal measurement at `9f83dcdc`. The earlier
+non-atomic IPC failure remains recorded, not overwritten by the correction.
+
+**Next:** native conversation/participant/room adapters and chat UI, SDK sync/room
+children under the same shutdown owner, bootstrap uncertainty/build recovery and
+offline logical-message reconciliation. This is not product chat acceptance; all
+P0–P8 work continues. The previous checkpoint below is historical.
+
+## Original setup-command checkpoint
+
 Mobile [fb1b1c13](https://github.com/fajarxfce/hris-mobile/commit/fb1b1c13ef2ddce96d8fb3ab341a108d905d32f6)
 implements the native setup HTTP adapters and durable registration, provisioning
 retry and gateway-bootstrap commands. The app captures current HRIS company/native

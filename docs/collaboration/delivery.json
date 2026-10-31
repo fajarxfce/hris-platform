@@ -97,7 +97,8 @@
         "../measurements/collaboration-native-hris-sdk-2026-10-31.json",
         "mobile-setup.md",
         "../measurements/collaboration-protected-native-store-2026-10-31.json",
-        "../measurements/collaboration-sdk-process-death-2026-10-31.json"
+        "../measurements/collaboration-sdk-process-death-2026-10-31.json",
+        "https://github.com/fajarxfce/hris-mobile/blob/9f83dcdc2f42e69441569f050c5428746ef38f8a/docs/measurements/collaboration-application-runtime-2026-10-31.json"
       ]
     },
     {
@@ -490,6 +491,6 @@
     "Integrate owned native/web encrypted stores, durable outbox/logical IDs and product UI; add browser-parent admission.",
     "Prove Apple provider interoperability; physical iPhone acceptance remains waived.",
     "Implement MatrixRTC participant/epoch/key rotation and native call lifecycle before accepting encrypted calls.",
-    "Continue P1–P8 and all 54 groups; current provider/component proofs do not accept product features or capacity."
+    "Continue P1\u2013P8 and all 54 groups; current provider/component proofs do not accept product features or capacity."
   ]
 }

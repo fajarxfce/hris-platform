@@ -17,6 +17,18 @@ and the delivery evidence. Earlier detailed checkpoints remain in
 
 Current provider/client evidence:
 
+- **Mobile application runtime ownership is pushed at `9f83dcdc`.**
+  [Cross-repository checkpoint](collaboration/mobile-setup.md) links admitted
+  install/restore, application DI and Android process lifecycle. Final root/Wasm/
+  Android/lint passed in 70s: 2,093 desktop cases, 51 domain browser cases, zero
+  lint errors. Starter `9740cb5` independently ports the manifest AppAuth dependency
+  and CI lint guard (331 desktop cases, build/lint passed). Corrected provider CI
+  `41242901470` passes both modes/all steps against `e0dbb567`, with source hashes
+  and cleanup verified. Mobile control/HRIS CI and Starter verify are still running
+  at this checkpoint. **Continue conversation adapters/UI, SDK child ownership,
+  bootstrap recovery, offline reconciliation and all P0–P8.** No product group,
+  live rollout or physical phone acceptance is implied.
+
 - **Provider fixture IPC race fixed and classic Android/web regression passes.**
   Mobile `70bfbd21` run `41240634061` passed native but failed classic at
   `ProofOfflineInvite.kt:28`: the reader saw the final signal name before its

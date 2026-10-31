@@ -38,6 +38,22 @@ not blockers for local implementation. Keep any unperformed native/capacity
 acceptance explicitly unverified. Commit and push each atomic increment; update
 this handoff and the delivery ledger. Mobile proves generic code before Starter.
 
+P1 admission policy foundation now exists in `modules/collaboration/domain`:
+company/account/native-session/device ownership, live and captured permission
+intersection, strict 60-second-or-earlier expiry, MFA and replacement rejection.
+Eleven new policy tests and all 35 identity-domain tests pass; architecture checks
+pass. `collaboration.chat` is an assignable employee permission without any
+membership/template migration. [Admission notes](collaboration/admission.md)
+identify the remaining transaction, provisioning, broker, gateway and client
+integration. No new endpoint/provider grant is enabled yet.
+
+Platform browser-only CI also passed at `a9100ece` in `41181617114`. Mobile's
+Android implementation is `477f9c60`; its corrected hosted runner is pending at
+`eefc4121` after an obsolete Android SDK `tools` package failure. Apple native
+store tests and iOS device-slice compilation passed at Mobile `e210508a` in
+`41182072489` (Xcode 16.4 / Swift 6.1.2). Apple proof does not cover provider
+interoperability or native media; its SDK requires iOS 16 for later integration.
+
 The paragraphs below are retained prior-work history. Their old installed build
 2 reference is superseded by Mobile's validated release build 4; consult Mobile's
 current handoff for its artifact/source and future versionCode >= 5.

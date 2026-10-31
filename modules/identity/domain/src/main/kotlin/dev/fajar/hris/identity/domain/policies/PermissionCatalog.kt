@@ -116,6 +116,7 @@ object PermissionCatalog {
         )
     val employee =
         setOf(
+            "collaboration.chat",
             "people.directory.read",
             "announcements.read",
             "company.read",

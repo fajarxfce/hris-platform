@@ -19,8 +19,10 @@
     {
       "id": "P1",
       "name": "Durable encrypted chat",
-      "status": "planned",
-      "evidence": []
+      "status": "in_progress",
+      "evidence": [
+        "admission.md"
+      ]
     },
     {
       "id": "P2",

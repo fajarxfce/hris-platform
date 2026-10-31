@@ -1,6 +1,6 @@
 # Agent continuation — HRIS workspace
 
-Updated 30 October 2026 (UTC). The user requested verification and completion of
+Updated 31 October 2026 (UTC). The user requested verification and completion of
 all specified features, with every atomic commit pushed and handoffs retained in
 Git. The full audit is complete after implementing the discovered gaps and validating every reviewed area.
 Earlier distribution/native acceptance remains valid for its recorded scope. Read `AGENTS.md`, this page and [PRD status](prd-status.md),
@@ -8,8 +8,12 @@ then the affected module contract. The [archived history](agent-history-2026-10-
 preserves earlier work; its old next-step statements are not the active queue.
 
 Current runtime: schema 103; API/worker application `2c2a59e3`, dashboard
-`1e0522c0`, installed Mobile application `3c6db4eb`. Read
-[current development runtime](current-development-runtime.md#final-audit-rollout--30-october-2026).
+`1e0522c0`, installed Mobile `devRelease` **1.0.0 / build 2**, built from latest
+Mobile source `5ffb7300` with unchanged accepted application trees. The authorized
+31 October WireGuard update preserved the signing identity and application data;
+the pulled installed APK matches the built release exactly. No UI was launched.
+Mobile handoff `bae07a27` records the evidence and the new versionCode floor of 2.
+Read [current development runtime](current-development-runtime.md#android-release-installation--31-october-2026).
 Use captured container IDs with `docker start` for checkpoint restart; installed
 Compose has no `start --no-deps` and `compose start` can rerun migration dependencies.
 Earlier pending statements below are retained history, not a new queue.

@@ -4,6 +4,24 @@ Started 29 October 2026 with the user's authorization after installing the Andro
 dev APK. Current audited application and private runtime acceptance are recorded
 below; earlier rollout sections preserve their original sources and dates.
 
+## Android release installation — 31 October 2026
+
+The user requested the latest Mobile release build on the WireGuard phone.
+Mobile source `5ffb7300`, with unchanged accepted `d170810f` application/build/test
+trees, produced signed `devRelease` **1.0.0 / build 2**. Package
+`dev.fajar.hris.mobile.dev` now uses that non-debuggable build on
+`10.77.77.3:5555`, targeting `http://10.77.77.1:8088/api/v1/`. The existing
+development signing certificate was reused for the private in-place update.
+
+Release assembly/vital lint passed; the pulled installed APK exactly matches
+SHA-256 `fa9b20a67148d323b4d8975da147871df6a1d9b576cf9202d0cd8c8cdf45919d`
+(24,111,115 bytes). The app ID and first-install time are preserved. No uninstall,
+data clear or UI launch occurred. API health remains UP; no server changes or new
+Google/FCM interaction tests were required. Mobile commit `bae07a27` retains
+[sanitized build/install evidence](https://github.com/fajarxfce/hris-mobile/blob/bae07a27/docs/measurements/android-release-phone-2026-10-31.json).
+Future phone updates must use versionCode **at least 2**; the repository default
+is still 1. Earlier APK hashes and debug-build records below are historical.
+
 ## Final audit rollout — 30 October 2026
 
 The private API and worker now serve verified application `2c2a59e3`, covered by

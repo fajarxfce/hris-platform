@@ -87,6 +87,7 @@ const kinds: Readonly<Record<string, readonly [string, string]>> = {
   REPORT_EXPORT: ["Report export", "Ekspor laporan"],
   ANNOUNCEMENT_PUBLISH: ["Announcement publication", "Publikasi pengumuman"],
   COLLABORATION_PROVISION: ["Chat device setup", "Penyiapan perangkat chat"],
+  COLLABORATION_DIRECT_PROVISION: ["Chat setup", "Penyiapan chat"],
   PEOPLE_OFFBOARD: ["Scheduled offboarding", "Offboarding terjadwal"],
   PEOPLE_ONBOARD_START: ["Scheduled onboarding", "Onboarding terjadwal"],
   WORKFORCE_CLOSE: ["Attendance closing", "Penutupan kehadiran"],

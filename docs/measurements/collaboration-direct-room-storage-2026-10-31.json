@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "kind": "collaboration_direct_room_storage",
+  "date": "2026-10-31",
+  "complete": true,
+  "productAcceptance": false,
+  "capacityAcceptance": false,
+  "databaseSchema": 111,
+  "checks": {
+    "focusedStorageCases": 6,
+    "focusedElapsedSeconds": 54,
+    "upgradeFromSchema": 110,
+    "actualDumpRestore": true,
+    "runtimeParticipantRls": true,
+    "competingRetryFence": true,
+    "parentCleanupRetainsIdentity": true,
+    "publicationFailureAndInterruptionRollback": true,
+    "recoveryPythonCases": 23,
+    "dashboardTypeScript": true,
+    "dashboardJobCases": 14,
+    "architecture": true,
+    "fullGradleElapsedSeconds": 425,
+    "format": true,
+    "fullSuiteResults": {
+      "core/database": {
+        "tests": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "core/jobs/domain": {
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/domain": {
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modules/collaboration/data": {
+        "tests": 102,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/server": {
+        "tests": 144,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "apps/worker": {
+        "tests": 111,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      }
+    }
+  },
+  "correctedFailures": [
+    {
+      "elapsedSeconds": 41,
+      "kind": "test_compile",
+      "result": "Cancellation test supplied one type argument to the two-parameter flatMap extension. Corrected the test type arguments; six storage cases passed. Also normalized the fictional company code to its 32-character schema bound before execution."
+    }
+  ],
+  "sourceSha256": {
+    "apps/dashboard/src/features/jobs/presentation/i18n/job-messages.ts": "56d351e84b860addb79f179c09d42a1831e2efbca2b66176ccb307ef93a8af24",
+    "core/database/src/main/resources/db/migration/V111__collaboration_direct_room_bindings.sql": "679c5fcbf06c3296c5ac325a51ec04531f2759c7d3c1a7a5a36628ae9368f009",
+    "core/jobs/domain/src/main/kotlin/dev/fajar/hris/jobs/domain/entities/JobKind.kt": "e189d918ae2267bc7bb300b301380acb2073723124c2de5c782e54a339e02fb4",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/CollaborationDirectRoomDataSource.kt": "40dfbc935cbee4e16256a77ca3526e1b33bd22552d5beacc959cd8791caecff9",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/datasources/PostgresCollaborationDirectRoomDataSource.kt": "c97bfce02630fc282b1a60758709e0a6e379a9164cc4a25fb8e63b06a4293563",
+    "modules/collaboration/data/src/main/kotlin/dev/fajar/hris/collaboration/data/repositories/StoredCollaborationDirectRoomRepository.kt": "cab6f4304f56e71f68e4eb2af152ef9be719934ea61c28d165f238623ef05cf7",
+    "modules/collaboration/data/src/test/kotlin/dev/fajar/hris/collaboration/data/CollaborationDirectRoomStorageTest.kt": "04ba30d5f9176d0021ade0fea81b3f7d75db5641cdd52cf8177411f44f48d210",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/entities/CollaborationDirectRoom.kt": "15e6b560af4c951f5abe9ec4c431789bdcf83b6a3e6f88f074b5753b3607df24",
+    "modules/collaboration/domain/src/main/kotlin/dev/fajar/hris/collaboration/domain/repositories/CollaborationDirectRoomRepository.kt": "7f023b71c4a5a43beef03790361adaf3f7bc155dc18aa1e067b3a2af76d01ce2",
+    "tool/recovery_set.py": "b5f2b2bd4197e195455fc2a56678f10eeebfa6ccc331b9afc044bc5a9d1d9e64",
+    "tool/test_recovery_set.py": "d413b36fa9c25b996a0c57eacec90b6eea172716323e83ad8cb45c8343ee339a"
+  },
+  "limits": [
+    "Storage and job identity only; command/status HTTP, provider reconciliation worker and content gateway are not implemented by this increment.",
+    "Provider creator remains the first provisioning account. No silent peer takeover or server-created participant private encryption key.",
+    "No new secret envelope format; no live service, physical phone or real employee message changed."
+  ]
+}

@@ -64,8 +64,11 @@ Current provider/client evidence:
   retains two scenarios in 18.486s (33.494s owned run), cleanup true; full Mobile
   root/debug/lint checks passed in 48s, 2,002 desktop cases and zero lint errors.
   Native recipient-before-join and never-enrolled-device delivery remain separate.
-  Emulator stopped with data retained; no phone action. Pin Mobile CI to this driver
-  commit, push its fixture and inspect exact hosted evidence while continuing.
+  Emulator stopped with data retained; no phone action. Mobile `e6dcb5ea` pins
+  driver `54eb3a66`; every job/step passed in [41204075013](https://github.com/fajarxfce/hris-mobile/actions/runs/41204075013),
+  both scenarios in 34.359s (82.746s owned run), cleanup true and matching driver
+  hashes. Mobile `4f8233c2` retains its source-matched hosted APK evidence. The
+  driver browser workflow [41204052403](https://github.com/fajarxfce/hris-platform/actions/runs/41204052403) also passed every job/step.
 
 Current backend implementation:
 
@@ -124,6 +127,21 @@ Current backend implementation:
   missing initial state is repairable. Actual Synapse exercises the production
   adapter; no HRIS room binding/content route is published yet.
 
+- Schema 111 now stores one retained direct-room provisioning pointer and a separate
+  immutable verified room binding. Pair-only RLS reads survive native-parent cleanup;
+  creator-only retries require terminal old jobs and CAS, retain creator, and may
+  move to a new active device of that account. Publication rejects stale job/version
+  and duplicate provider room identity. No worker handler or public room route yet.
+  [Storage contract](collaboration/direct-room-storage.md) explains lock order and
+  why peer creator takeover is forbidden. [Storage evidence](measurements/collaboration-direct-room-storage-2026-10-31.json)
+  records six real PostgreSQL cases, 110-to-111 upgrade and actual dump/restore,
+  concurrent retries, interruption and transaction rollback. Full checks passed
+  in 7m05s: 30 database, two job-domain, 17 collaboration-domain, 102 data, 144
+  selected API and 111 worker cases (one unchanged opt-in retention skip), plus
+  format/architecture, 23 Python recovery cases and 14 dashboard job cases/typecheck.
+  Initial test compilation failed on flatMap type arguments; corrected focused
+  six-case run passed in 54s. Recovery ceiling is now 111; no new envelope format.
+
 [Identity evidence](measurements/collaboration-gateway-identity-2026-10-31.json)
 records 148 passing API cases, 77 data cases, fourteen domain cases and the full
 111-case worker suite (110 pass, one unchanged opt-in retention skip). Formatting
@@ -167,7 +185,8 @@ Next implementation:
    hosted browser case passed in 9.897s (30.626s owned run), cleanup true. Direct `031c3714` passed all jobs/steps in [41201832706](https://github.com/fajarxfce/hris-platform/actions/runs/41201832706);
    room proof `6139604c` likewise passed [41201965622](https://github.com/fajarxfce/hris-platform/actions/runs/41201965622).
    Participant `d50bb0ad` and identity `b0bf1326` hosted controls also passed.
-2. Implement durable provider-room reconciliation for retained DM intent using the
+2. Inspect the schema-111 storage commit control workflow after push, then wire
+   request/status commands and the durable provider-room worker using the
    [typed adapter and invited-history policy](collaboration/matrix-room-adapter.md);
    Synapse createRoom/alias reservation is not atomic. Verify immutable creation
    marker, creator and complete encryption/membership state before publication,

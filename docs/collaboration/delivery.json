@@ -55,7 +55,9 @@
         "../measurements/collaboration-room-interop-2026-10-31.json",
         "matrix-room-adapter.md",
         "../measurements/collaboration-room-adapter-2026-10-31.json",
-        "../measurements/collaboration-native-invited-2026-10-31.json"
+        "../measurements/collaboration-native-invited-2026-10-31.json",
+        "direct-room-storage.md",
+        "../measurements/collaboration-direct-room-storage-2026-10-31.json"
       ]
     },
     {
@@ -112,7 +114,9 @@
         "direct-conversations.md",
         "../measurements/collaboration-direct-2026-10-31.json",
         "matrix-room-adapter.md",
-        "../measurements/collaboration-room-adapter-2026-10-31.json"
+        "../measurements/collaboration-room-adapter-2026-10-31.json",
+        "direct-room-storage.md",
+        "../measurements/collaboration-direct-room-storage-2026-10-31.json"
       ]
     },
     {

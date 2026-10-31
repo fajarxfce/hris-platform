@@ -21,6 +21,11 @@ pending work. Mobile `fbb2f3ae` provider run `41246770541` passes both modes/all
 steps: classic 83.930s/native 92.938s, two browser cases each, cleanup complete;
 all 14 Platform source hashes per mode match `e0dbb567`. The owned-sync measurement
 retains those provider-only results separately from its actual HRIS lifetime proof.
+Control `41246770522` and HRIS `41246770543` also pass every job and step: 119
+desktop, 103 browser and 103 iOS simulator cases; Android/Wasm/Apple compilation
+passes. The actual HRIS SDK case `001256c3` passes in 70.969s with cleanup complete;
+94 Mobile and 15 Platform source hashes match their pinned commits. These results
+are recorded in Mobile `a07c90e1`; Apple native chat runtime remains pending.
 Starter hosted AppAuth verify `41245287269` passed all 15 verify steps at `9740cb5`
 with matching source hashes; closure is committed at Starter `36116b2`.
 

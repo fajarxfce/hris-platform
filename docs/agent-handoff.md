@@ -24,7 +24,11 @@ Current provider/client evidence:
   across failed transport retries. Final root/browser/Android/lint passes in 4m:
   2,145 desktop cases, 70 domain/49 data browser, zero lint errors. Mobile CI now
   lets running proofs finish; `fbb2f3ae` provider run `41246770541` passes both modes
-  with all steps and source hashes verified. Starter AppAuth hosted verification
+  with all steps and source hashes verified. Its control/HRIS runs `41246770522`
+  and `41246770543` also pass all jobs/steps: 119 desktop, 103 browser, 103 iOS
+  simulator cases; actual SDK case 70.969s, cleanup complete, all 94 Mobile/15
+  Platform hashes verified (Mobile evidence `a07c90e1`). Apple native chat remains
+  pending. Starter AppAuth hosted verification
   also passes (`9740cb5`/`41245287269`), recorded at `36116b2`. No product group,
   live/schema/phone change. **Continue room/timeline ownership, chat UI, offline
   projections/recovery and all P0–P8.**
